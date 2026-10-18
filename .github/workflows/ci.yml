@@ -1,0 +1,53 @@
+name: Code Structure Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check JSON files are valid
+        run: |
+          echo "::group::JSON syntax"
+          fail=0
+          for f in $(find . -name "*.json" -o -name "*.json5" | grep -v node_modules | head -50); do
+            if [[ "$f" == *.json5 ]]; then continue; fi
+            python3 -c "import json,sys; json.load(open('$f'))" 2>/dev/null || { echo "❌ invalid: $f"; fail=1; }
+          done
+          [[ $fail -eq 0 ]] && echo "✅ all JSON valid"
+          echo "::endgroup::"
+
+      - name: Check ArkTS files are non-empty
+        run: |
+          echo "::group::ArkTS files"
+          n=$(find . -name "*.ets" | wc -l)
+          echo "Found $n .ets files"
+          empty=$(find . -name "*.ets" -size -10c | wc -l)
+          echo "Empty files: $empty"
+          [[ $empty -eq 0 ]] || { echo "❌ $empty empty .ets files"; exit 1; }
+          echo "::endgroup::"
+
+      - name: Count lines of code
+        run: |
+          echo "::group::LOC"
+          echo "ArkTS: $(find . -name '*.ets' -exec cat {} + | wc -l) lines"
+          echo "ArkTS files: $(find . -name '*.ets' | wc -l)"
+          echo "Games: $(ls entry/src/main/ets/games/*.ets 2>/dev/null | wc -l)"
+          echo "::endgroup::"
+
+      - name: Verify no secrets committed
+        run: |
+          echo "::group::Secret scan"
+          if grep -rlE "storePassword|keyPassword|BEGIN.*PRIVATE KEY" --include="*.json5" --include="*.json" --include="*.p12" . 2>/dev/null | grep -v example; then
+            echo "❌ secrets found!"
+            exit 1
+          fi
+          echo "✅ no secrets found"
+          echo "::endgroup::"
