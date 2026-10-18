@@ -1,0 +1,189 @@
+/**
+ * 汉诺塔 —— 递归之美
+ * 规则：一次只动一个盘，大盘不能压小盘；把所有盘从 A 柱移到 C 柱
+ * 通关：C 柱上盘数 == 总盘数
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+@Component
+export struct GHanoi {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private pegs: number[][] = [[], [], []];
+  @State private sel: number = -1;      // 选中的柱子，-1 = 没选
+  @State private moves: number = 0;
+  // ★ 难度作用到玩法：盘数（简单 2 / 普通 3 / 困难 5）
+  @State private level: number = GameDiff.pick(2, 3, 5);     // 盘数
+  @State private done: boolean = false;
+
+  private startAt: number = 0;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.reset(this.level);
+  }
+
+  /** 宿主点了「换一局」 */
+  onRestart(): void {
+    this.level = GameDiff.pick(2, 3, 5);
+    this.reset(this.level);
+  }
+
+  private reset(n: number): void {
+    const a: number[] = [];
+    for (let i = n; i >= 1; i--) {
+      a.push(i);   // 大的在底
+    }
+    this.pegs = [a, [], []];
+    this.sel = -1;
+    this.moves = 0;
+    this.done = false;
+    this.startAt = Date.now();
+  }
+
+  private tap(p: number): void {
+    if (this.done) {
+      return;
+    }
+    const cur: number[][] = this.pegs.map((x: number[]) => x.slice());
+    if (this.sel === -1) {
+      if (cur[p].length === 0) {
+        return;
+      }
+      this.sel = p;
+      return;
+    }
+    if (this.sel === p) {
+      this.sel = -1;
+      return;
+    }
+    const from: number[] = cur[this.sel];
+    const to: number[] = cur[p];
+    const disk: number = from[from.length - 1];
+    const top: number = to.length > 0 ? to[to.length - 1] : 999;
+    if (disk < top) {
+      from.pop();
+      to.push(disk);
+      this.moves++;
+      this.pegs = cur;
+      this.sel = -1;
+      if (cur[2].length === this.level) {
+        this.done = true;
+        const r: GameResult = {
+          gameId: 'hanoi',
+          solved: true,
+          score: Math.max(0, 1000 - this.moves * 10),
+          durationMs: Date.now() - this.startAt,
+          levelReached: this.level
+        };
+        LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+        this.onFinish(r);
+      }
+    } else {
+      this.sel = -1;   // 非法：取消选择
+    }
+  }
+
+  build() {
+    Column({ space: Space.lg }) {
+      Row({ space: Space.md }) {
+        Column({ space: 2 }) {
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.moves), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1).padding(Space.sm)
+        .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('最少'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((String(Math.pow(2, this.level) - 1))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1).padding(Space.sm)
+        .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('盘数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.level), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1).padding(Space.sm)
+        .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }
+      .width('100%')
+
+      // 三根柱子
+      Row({ space: Space.sm }) {
+        ForEach([0, 1, 2], (p: number) => {
+          Column() {
+            Column({ space: 4 }) {
+              // 从顶到底画盘（数组尾在底）
+              ForEach(this.pegs[p].slice().reverse(), (d: number) => {
+                Row()
+                  .width(30 + d * 20)
+                  .height(18)
+                  .backgroundColor(Palette.wheel[d % Palette.wheel.length])
+                  .borderRadius(Radius.xs)
+              }, (d: number, i: number) => p + '-' + i + '-' + d)
+            }
+            .width('100%')
+            .layoutWeight(1)
+            .justifyContent(FlexAlign.End)
+
+            // 柱底
+            Row()
+              .width('100%').height(6)
+              .backgroundColor(this.sel === p ? Palette.primary : this.theme.lineSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+              .borderRadius(Radius.xs)
+          }
+          .layoutWeight(1)
+          .height('100%')
+          .padding(Space.xs)
+          .backgroundColor(this.sel === p ? '#1A6366F1' : this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .onClick(() => {
+            this.tap(p);
+          })
+        }, (p: number) => 'peg' + p)
+      }
+      .width('100%')
+      .layoutWeight(1)
+
+      Text(this.done ? '🎉 完成！' : (this.sel >= 0 ? '再点一根柱子放过去' : '点一根柱子拿起最上面的盘'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
+
+      Row({ space: Space.md }) {
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md).fontColor(Color.White)
+          .backgroundColor(Palette.primary).borderRadius(Radius.md)
+          .layoutWeight(1).height(Cell.of(44))
+          .onClick(() => {
+            this.reset(this.level);
+          })
+        Button(this.level === 3 ? '升到 4 盘' : (this.level === 4 ? '升到 5 盘' : '回到 3 盘'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md).fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
+          .layoutWeight(1).height(Cell.of(44))
+          .onClick(() => {
+            this.level = this.level === 3 ? 4 : (this.level === 4 ? 5 : 3);
+            this.reset(this.level);
+          })
+      }
+      .width('100%')
+    }
+    .width('100%').height('100%')
+  }
+
+
+}

@@ -1,0 +1,158 @@
+/**
+ * 分配注意 —— 左右两路符号同时跳变，哪边出现 🎯 就点哪边
+ *
+ * 胜负：12 拍里命中 ≥7 且误报 ≤2 ⇒ 通关
+ * 进度：拍数 / 命中 / 误报 / 漏报
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+const TICKS: number = 12; const PACE: number = 1100; const TARGET: string = '🎯';
+const DECOYS: string[] = ['🍀', '⭐', '🔷', '🌙', '🔺', '🎈', '🧩', '⚡'];
+interface Side {
+  sym: string;
+  on: boolean;     // 这一拍是不是靶
+  done: boolean;   // 这一拍已经点过
+}
+@Component
+export struct GDividedAttention {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TICKS 按难度换算
+  @State private diffTotal: number = GameDiff.sizeNow(TICKS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State private left: Side = { sym: '·', on: false, done: false };
+  @State private right: Side = { sym: '·', on: false, done: false };
+  @State private tickNo: number = 0;
+  @State private hits: number = 0;
+  /** ★ 2026-10-15 得分跳动 */
+  @State private hitsPulse: number = 1;
+  @State private fa: number = 0;
+  @State private miss: number = 0;
+  /** ★ 2026-10-15 错误抖动 */
+  @State private shakeX: number = 0;
+  @State private msg: string = '';
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  private startAt: number = 0;
+  private timer: number = -1;
+  private done: boolean = false;
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now(); this.reset();
+  }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TICKS);
+     this.reset(); }
+  aboutToDisappear(): void { this.stop(); }
+  private stop(): void {
+    if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
+  }
+  private reset(): void {
+    this.stop(); this.hits = 0; this.fa = 0; this.miss = 0; this.over = false; this.won = false;
+    this.done = false; this.tickNo = 1; this.left = this.roll(); this.right = this.roll();
+    this.msg = TG('两边一起看：出现 🎯 就点那一边'); this.startAt = Date.now();
+    this.timer = setInterval(() => { this.tick(); }, PACE);
+  }
+  private roll(): Side {
+    const isOn: boolean = Math.random() < 0.42;
+    const sym: string = isOn ? TARGET : DECOYS[Math.floor(Math.random() * DECOYS.length)];
+    const made: Side = { sym: sym, on: isOn, done: false };
+    return made;
+  }
+  private tick(): void {
+    if (this.over) { return; }
+    let missCount: number = this.miss;
+    if (this.left.on && !this.left.done) { missCount = missCount + 1; }
+    if (this.right.on && !this.right.done) { missCount = missCount + 1; }
+    this.miss = missCount; this.shakeX = 8; setTimeout(() => { this.shakeX = -8; }, 60); setTimeout(() => { this.shakeX = 0; }, 120);
+    if (this.tickNo >= this.diffTotal) {
+      this.finish();
+      return;
+    }
+    this.tickNo = this.tickNo + 1; this.left = this.roll(); this.right = this.roll();
+  }
+  private tap(idx: number): void {
+    if (this.over || this.tickNo === 0) { return; }
+    const side: Side = idx === 0 ? this.left : this.right;
+    if (side.done) { return; }
+    const next: Side = { sym: side.sym, on: side.on, done: true };
+    if (idx === 0) { this.left = next; } else { this.right = next; }
+    if (side.on) {
+      this.hits = this.hits + 1; this.hitsPulse = 1.3; setTimeout(() => { this.hitsPulse = 1; }, 140);
+    } else {
+      this.fa = this.fa + 1;
+    }
+  }
+  private finish(): void {
+    if (this.done) { return; }
+    this.done = true; this.stop(); this.over = true; this.won = this.hits >= 7 && this.fa <= 2;
+    this.msg = (this.won ? TG('🎉 通关！') : TG('💤 本局结束：'))
+      + TG2('命中 {0} · 误报 {1} · 漏报 {2}',Digits(String(this.hits), this.langCode),Digits(String(this.fa), this.langCode),Digits(String(this.miss), this.langCode));
+    const raw: number = this.hits * 100 - this.fa * 40 - this.miss * 30; const r: GameResult = {
+      gameId: 'divided_attention', solved: this.won,
+      score: raw > 0 ? raw : 0, durationMs: Date.now() - this.startAt,
+      levelReached: this.hits
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text((TG('拍数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((String(this.tickNo) + '/' + String(this.diffTotal))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('命中'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.hits), this.langCode)).fontSize(FontSize.md)
+        // ★ 得分跳动
+        .scale({ x: this.hitsPulse, y: this.hitsPulse })
+        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('误报'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.fa), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('漏报'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.miss), this.langCode)).fontSize(FontSize.md)
+        // ★ 错误抖动
+        .translate({ x: this.shakeX })
+        .animation({ duration: Motion.fast, curve: Motion.snap() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }.width('100%')
+      Row({ space: Space.md }) {
+        Column({ space: Space.xs }) {
+        Text(true ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.left).sym).fontSize(FontSize.hero).fontColor(Palette.rose)
+        Text((this.left).done ? ((this.left).on ? '✔ 点对了' : '✘ 误报') : ' ').fontSize(FontSize.xxs).fontColor((this.left).done && (this.left).on ? Palette.success : Palette.danger)
+        }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
+        .borderColor((this.left).done ? ((this.left).on ? Palette.success : Palette.danger) : this.theme.line)
+        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap((0)); })
+        Column({ space: Space.xs }) {
+        Text(false ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.right).sym).fontSize(FontSize.hero).fontColor(Palette.rose)
+        Text((this.right).done ? ((this.right).on ? '✔ 点对了' : '✘ 误报') : ' ').fontSize(FontSize.xxs).fontColor((this.right).done && (this.right).on ? Palette.success : Palette.danger)
+        }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
+        .borderColor((this.right).done ? ((this.right).on ? Palette.success : Palette.danger) : this.theme.line)
+        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap((1)); })
+      }.width('100%')
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Button(this.over ? TG('再来一局') : TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
+        .width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      Text(TG('提示：只点 🎯 那一边；点错和漏掉都扣分')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+
+}

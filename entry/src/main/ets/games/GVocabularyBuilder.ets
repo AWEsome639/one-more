@@ -1,0 +1,160 @@
+/**
+ * 词汇构建 —— 看中文释义与词性，在同一词根的派生词里挑出对的那个（前缀/后缀辨析）
+ * 胜负：8 题里答对 ≥ 6 通关；答错 3 次失败 ｜ 进度：第几题 / 答对数 / 生命 / 得分
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const ROUNDS: number = 8; const PASS: number = 6; const LIVES: number = 3; const FEED_MS: number = 900;
+
+interface Item { gloss: string; pos: string; root: string; opts: string[]; ans: number }
+interface Opt { text: string; ok: boolean }
+
+const BANK: Item[] = [
+  { gloss: '不快乐的', pos: 'adj', root: 'happy', opts: ['unhappy', 'happiness', 'happily', 'unhappily'], ans: 0 },
+  { gloss: '幸福；快乐', pos: 'n', root: 'happy', opts: ['unhappy', 'happiness', 'happily', 'unhappily'], ans: 1 },
+  { gloss: '仔细的', pos: 'adj', root: 'care', opts: ['careful', 'careless', 'carelessly', 'caring'], ans: 0 },
+  { gloss: '粗心地', pos: 'adv', root: 'care', opts: ['careful', 'careless', 'carelessly', 'caring'], ans: 2 },
+  { gloss: '重写', pos: 'v', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 1 },
+  { gloss: '作家', pos: 'n', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 0 },
+  { gloss: '不可能的', pos: 'adj', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 1 },
+  { gloss: '可能性', pos: 'n', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 2 },
+  { gloss: '有用的', pos: 'adj', root: 'use', opts: ['useless', 'useful', 'usage', 'user'], ans: 1 },
+  { gloss: '无用的', pos: 'adj', root: 'use', opts: ['useless', 'useful', 'usage', 'user'], ans: 0 },
+  { gloss: '危险的', pos: 'adj', root: 'danger', opts: ['dangerous', 'danger', 'dangerously', 'endanger'], ans: 0 }
+];
+
+/** 从 0..total-1 中随机取 k 个互不相同的下标 */
+function pickIndexes(total: number, k: number): number[] {
+  const pool: number[] = []; const out: number[] = [];
+  for (let i = 0; i < total; i++) { pool.push(i); }
+  while (out.length < k) { const j: number = Math.floor(Math.random() * pool.length); out.push(pool[j]); pool.splice(j, 1); }
+  return out;
+}
+
+@Component
+export struct GVocabularyBuilder {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private order: number[] = []; @State private qi: number = 0;
+  @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
+  @State private opts: Opt[] = []; @State private right: number = 0;
+  // ★ 难度作用到玩法：本局「容错次数/起始量」按难度换算（简单更多 / 困难更少）
+  private total: number = GameDiff.livesNow(LIVES);
+  @State private life: number = 0; @State private score: number = 0;
+  @State private picked: number = -1; @State private locked: boolean = false;
+  @State private msg: string = ''; @State private over: boolean = false;
+  @State private won: boolean = false;
+
+  private startAt: number = 0; private feed: number = -1; private done: boolean = false;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.total = GameDiff.livesNow(LIVES);   // 难度可能刚变过，必须重算
+     this.reset(); }
+  aboutToDisappear(): void { if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; } }
+
+  private cur(): Item { return BANK[this.order[this.qi]]; }
+
+  private reset(): void {
+    if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; }
+    this.order = pickIndexes(BANK.length, ROUNDS);
+    this.qi = 0; this.right = 0; this.life = this.total; this.score = 0; this.picked = -1;
+    this.locked = false; this.over = false; this.won = false; this.done = false;
+    this.startAt = Date.now(); this.load();
+  }
+
+  private load(): void {
+    const item: Item = this.cur();
+    const raw: Opt[] = [];
+    for (let i = 0; i < item.opts.length; i++) { raw.push({ text: item.opts[i], ok: i === item.ans }); }
+    this.opts = pickIndexes(raw.length, raw.length).map((k: number) => raw[k]);
+    this.picked = -1; this.locked = false;
+    this.msg = TG(TG('看清词性与词缀，再挑那个词'));
+  }
+
+  private findOk(): number {
+    for (let i = 0; i < this.opts.length; i++) { if (this.opts[i].ok) { return i; } }
+    return 0;
+  }
+
+  private tap(i: number): void {
+    if (this.over || this.locked) { return; }
+    this.locked = true; this.picked = i;
+    if (this.opts[i].ok) {
+      this.right = this.right + 1; this.score = this.score + 130; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110);
+      this.msg = '✅ ' + this.opts[i].text + ' —— ' + this.cur().gloss;
+    } else {
+      this.life = this.life - 1;
+      this.msg = TG('❌ 应该是 ') + this.opts[this.findOk()].text + TG('，还剩 ') + this.life + TG(' 条命');
+    }
+    this.feed = setTimeout(() => {
+      this.feed = -1;
+      if (this.life <= 0) { this.end(); } else { this.next(); }
+    }, FEED_MS);
+  }
+
+  private next(): void {
+    if (this.qi + 1 >= ROUNDS) { this.end(); return; }
+    this.qi = this.qi + 1; this.load();
+  }
+
+  private end(): void {
+    if (this.done) { return; }
+    this.done = true; this.over = true;
+    this.won = this.life > 0 && this.right >= PASS;
+    this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0}/{1}", this.right, ROUNDS);
+    const r: GameResult = { gameId: 'vocabulary_builder', solved: this.won, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.right };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Text(TG2("题 {0}/{1}", Math.min(this.qi + 1, ROUNDS), ROUNDS)).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(Palette.amber)
+      }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+      Column({ space: Space.xs }) {
+        Text(this.cur().gloss + '　[' + this.cur().pos + ']').fontSize(FontSize.xl)
+          .fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text(TG2('词根 {0} ＋ 词缀', this.cur().root)).fontSize(FontSize.sm).fontColor(Palette.primaryDeep)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.lg).shadow(Shadow.card)
+      Column({ space: Space.sm }) {
+        ForEach(this.opts, (o: Opt, i: number) => { this.option(o, i) },
+          (o: Opt, i: number) => 'v' + i + o.text)
+      }.width('100%')
+      Row({ space: Space.md }) {
+        Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2)
+          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
+          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { this.reset(); })
+      }.width('100%')
+      Text(TG('提示：un- 表否定，-ness 变名词，-ly 变副词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  option(o: Opt, i: number) {
+    Text(o.text).fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
+      .fontColor(this.locked && (this.picked === i || o.ok) ? '#FFFFFF' : this.theme.ink)
+      .width('100%').height(Cell.of(48)).borderRadius(Radius.md).shadow(Shadow.card)
+      .backgroundColor(this.locked && o.ok
+        ? Palette.emerald : (this.locked && this.picked === i ? Palette.rose : this.theme.surface))
+      .scale({ x: this.picked === i ? Motion.pressScale : 1, y: this.picked === i ? Motion.pressScale : 1 })
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onClick(() => { this.tap(i); })
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "src": [
+    "pages/Splash",
+    "pages/Index",
+    "pages/GameHost",
+    "pages/GuidePage",
+    "pages/LanLobby"
+  ]
+}

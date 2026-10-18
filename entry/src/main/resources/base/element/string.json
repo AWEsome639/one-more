@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "One More · 碎片时间来一局"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "One More 主入口"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "One More"
+    },
+    {
+      "name": "card_display_name",
+      "value": "One More · 今日"
+    },
+    {
+      "name": "card_desc",
+      "value": "等级、连胜与今日打卡"
+    },
+    {
+      "name": "vibrate_reason",
+      "value": "答对的时候轻轻震一下，让你不用看屏幕也知道对了"
+    },
+    {
+      "name": "internet_reason",
+      "value": "只给「局域网对战」用：同一 Wi-Fi 内两台设备直连对局，不连公网、不上传任何数据"
+    },
+    {
+      "name": "wifi_reason",
+      "value": "用来确认你和对手在同一个 Wi-Fi 下，方便互相找到"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+# 补齐原版清单里剩下的 9 款
+minesweeper|扫雷|经典雷区，插旗要果断
+lock_pattern|图案锁|一笔连出图案
+phonetic_guess|音标猜词|看音标猜单词
+double_trouble|双重麻烦|两个任务一起来
+dual_mirror|双镜像|左右同时镜像操作
+compound_connect|复合连线|多重条件连线
+continuous_paired_associate|连续配对|连续配对联想
+# ★ 以下是我加的原创游戏（原版没有）
+tetris|俄罗斯方块|经典落块消行
+spider_solitaire|蜘蛛纸牌|同花顺序排列
+freecell|空当接龙|四列自由搬运
+solitaire|接龙|经典纸牌接龙
+mahjong_solitaire|麻将连连看|配对消牌
+bubble_shooter|泡泡龙|三消打泡泡
+match3|消消乐|三消连锁
+bejeweled|宝石迷阵|交换消宝石
+tic_tac_toe|井字棋|三子连线
+connect_four|四子棋|竖着连四子
+reversi|黑白棋|夹住翻面
+checkers|跳棋|跳过吃子
+peg_solitaire|孔明棋|跳吃剩一颗
+nim|尼姆博弈|拿走最后一颗就输
+mancala|播棋|石子播种
+sudoku_hex|六宫数独|6x6 数独
+kakuro_mini|迷你数谜|小盘数谜
+wordle|猜词游戏|五次猜中单词
+mastermind|珠玑妙算|猜颜色组合
+simon_says|西蒙说|跟着做动作
+pong|乒乓|对打小球
+flappy|像素鸟|穿管道
+doodle_jump|跳一跳|一直往上跳
+snake_3d|立体贪吃蛇|三维空间贪吃蛇
+life_game|生命游戏|康威生命游戏
+mandelbrot|分形探索|曼德博集合
+sorting_visualizer|排序可视化|看排序算法跳舞
+sieve_visualizer|筛法可视化|看素数筛出来
+
+# ★ 我实现的原创游戏（原版清单里没有）
+memory|记忆翻牌|成对翻出，考的就是记性
+sokoban|推箱子|一推一挪，步步为营
+hanoi|汉诺塔|三根柱子，挪完为赢
+game24|24 点|四个数，加减乘除凑 24
+snake|贪吃蛇|越吃越长，别咬到自己
+breakout|打砖块|一板一球，清空全场
+gomoku|五子棋|与 AI 对弈，五子连珠
+g2048|2048|合并数字，别把自己堵死
+slide15|数字华容道|滑块归位
+schulte|舒尔特方格|按顺序点数字练专注

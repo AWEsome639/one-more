@@ -1,0 +1,175 @@
+/**
+ * 几何直觉 📐
+ * 玩法：A、B 两块图形各由 12 个小方格里的若干格拼成，比一比谁占的格子多。
+ * 胜负：10 题全过 = 通关；答错 3 题 = 失败。
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const ROUNDS: number = 10;
+const LIVES: number = 3;
+const CELLS: number = 12;
+const COLS: number[] = [0, 1, 2, 3]; const ROWS: number[] = [0, 1, 2];
+
+@Component
+export struct GGeometricVision {
+  /** ★★★ 2026-10-16 BUG #24：数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  /** ★ 2026-10-16 通关庆祝 */
+  @State private winK: number = 1;
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private aCells: boolean[] = [];
+  @State private bCells: boolean[] = [];
+  @State private na: number = 0; @State private nb: number = 0;
+  @State private idx: number = 0; @State private score: number = 0; @State private wrong: number = 0;
+  /** ★ 错误抖动 */
+  @State private shakeX: number = 0;
+  @State private over: boolean = false; @State private won: boolean = false;
+  @State private note: string = '';
+
+  private startAt: number = 0;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+     this.reset(); }
+
+  /** 12 格里随机点亮 k 格 */
+  private scatter(k: number): boolean[] {
+    const pool: number[] = [];
+    for (let i = 0; i < CELLS; i++) { pool.push(i); }
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j: number = Math.floor(Math.random() * (i + 1));
+      const t: number = pool[i]; pool[i] = pool[j]; pool[j] = t;
+    }
+    const out: boolean[] = [];
+    for (let i = 0; i < CELLS; i++) { out.push(false); }
+    for (let i = 0; i < k; i++) { out[pool[i]] = true; }
+    return out;
+  }
+
+  private roll(): void {
+    const na: number = 3 + Math.floor(Math.random() * 9);
+    let nb: number = 3 + Math.floor(Math.random() * 9);
+    while (nb === na) { nb = 3 + Math.floor(Math.random() * 9); }
+    this.na = na; this.nb = nb;
+    this.aCells = this.scatter(na); this.bCells = this.scatter(nb);
+  }
+
+  private reset(): void {
+    this.idx = 0; this.score = 0; this.wrong = 0;
+    this.over = false; this.won = false; this.note = TG(TG(TG('哪块占的格子多？👀')));
+    this.roll();
+    this.startAt = Date.now();
+  }
+
+  /** pick: 0=A 多 1=B 多 */
+  private answer(pick: number): void {
+    if (this.over) { return; }
+    const na: number = this.na;
+    const nb: number = this.nb;
+    const expect: number = na > nb ? 0 : 1;
+    if (pick === expect) {
+      this.score += 10;
+      this.note = TG2('对！A {0} 格、B {1} 格 ✅', na, nb);
+    } else {
+      this.wrong++; this.shakeX = 8; setTimeout(() => { this.shakeX = -8; }, 60); setTimeout(() => { this.shakeX = 0; }, 120);
+      this.note = '错：A ' + na + ' 格、B ' + nb + ' 格（失误 ' + this.wrong + '/' + LIVES + '）';
+    }
+    this.idx++;
+    if (this.wrong >= LIVES) { this.finish(false); return; }
+    if (this.idx >= this.diffTotal) { this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return; }
+    this.roll();
+  }
+
+  private finish(solved: boolean): void {
+    this.over = true; this.won = solved;
+    this.note = solved ? '十道几何判断全过，通关 🎉' : '看走眼三次，这局结束 😵';
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish({ gameId: 'geometric_vision', solved: solved, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.idx + 1 });
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Text(TG2("第 {0}/{1} 题　得分 {2}", Math.min(this.idx + 1, this.diffTotal),Digits(String(this.diffTotal), this.langCode),Digits(String(this.score), this.langCode)))
+        .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
+        // ★ 错误抖动
+        .translate({ x: this.shakeX })
+        .animation({ duration: Motion.fast, curve: Motion.snap() })
+      Row({ space: Space.sm }) {
+        Column({ space: Space.xs }) {
+          Text(TG('A 图形')).fontSize(FontSize.xxs).fontColor(Palette.emerald)
+          this.gridA()
+        }.layoutWeight(1)
+        Text('VS').fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+        Column({ space: Space.xs }) {
+          Text(TG('B 图形')).fontSize(FontSize.xxs).fontColor(Palette.sky)
+          this.gridB()
+        }.layoutWeight(1)
+      }.width('100%')
+      Text(this.note).fontSize(FontSize.xs)
+        // ★ 通关庆祝
+        .scale({ x: this.winK, y: this.winK })
+        .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+      Row({ space: Space.sm }) {
+        Button(TG('A 更多'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).onClick(() => { this.answer(0); })
+        Button(TG('B 更多'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.sky)
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).onClick(() => { this.answer(1); })
+      }.width('100%')
+      Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
+        .borderRadius(Radius.md).width('100%').height(Cell.of(44)).onClick(() => { this.reset(); })
+    }
+    .width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  gridA() {
+    Column({ space: 2 }) {
+      ForEach(ROWS, (r: number) => {
+        Row({ space: 2 }) {
+          ForEach(COLS, (c: number) => { this.blkA(r * 4 + c) }, (c: number) => 'ac' + r + '_' + c)
+        }.width('100%')
+      }, (r: number) => 'ar' + r)
+    }.width('100%')
+  }
+
+  @Builder
+  gridB() {
+    Column({ space: 2 }) {
+      ForEach(ROWS, (r: number) => {
+        Row({ space: 2 }) {
+          ForEach(COLS, (c: number) => { this.blkB(r * 4 + c) }, (c: number) => 'bc' + r + '_' + c)
+        }.width('100%')
+      }, (r: number) => 'br' + r)
+    }.width('100%')
+  }
+
+  @Builder
+  blkA(i: number) {
+    Text('').layoutWeight(1).aspectRatio(1).backgroundColor(this.aCells[i] ? Palette.emerald : this.theme.surfaceAlt)
+      .borderRadius(Radius.xs).borderWidth(1).borderColor(this.theme.line)
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+  }
+
+  @Builder
+  blkB(i: number) {
+    Text('').layoutWeight(1).aspectRatio(1).backgroundColor(this.bCells[i] ? Palette.sky : this.theme.surfaceAlt)
+      .borderRadius(Radius.xs).borderWidth(1).borderColor(this.theme.line)
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+  }
+}

@@ -1,0 +1,143 @@
+/** 质因数树 —— 把合数一路拆成质因数｜5 棵拆开 4 棵过关 */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const ROUNDS: number = 5;
+const PASS: number = 4;
+const PRIMES: number[] = [2, 3, 5, 7, 11, 13];
+const POOL: number[] = [12, 18, 20, 24, 28, 30, 36, 40, 42, 45, 48, 50, 54, 56, 60, 63, 70, 72, 84, 90, 96, 100, 108, 120, 126, 132, 144];
+
+@Component
+export struct GPrimeFactorTrees {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State private target: number = 12;
+  @State private rest: number = 12;
+  @State private chain: string[] = [];
+  @State private level: number = 0;
+  @State private clears: number = 0;
+  @State private score: number = 0;
+  @State private miss: number = 0;
+  @State private over: boolean = false;
+  @State private tip: string = TG('点能整除的质数');
+  private startAt: number = 0;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now();
+    this.reset();
+  }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+     this.reset(); }
+
+  private reset(): void {
+    this.startAt = Date.now();
+    this.level = 0;
+    this.clears = 0;
+    this.score = 0;
+    this.over = false;
+    this.load();
+  }
+
+  private load(): void {
+    this.target = POOL[Math.floor(Math.random() * POOL.length)];
+    this.rest = this.target;
+    this.chain = [];
+    this.miss = 0;
+    this.tip = TG2('把 {0} 拆成质因数', String(this.target));
+  }
+
+  private tap(p: number): void {
+    if (this.over || this.rest <= 1) { return; }
+    if (this.rest % p === 0) {
+      this.rest = this.rest / p;
+      const c: string[] = this.chain.slice();
+      c.push(String(p));
+      this.chain = c;
+      this.score += 4;
+      if (this.rest === 1) {
+        this.clears++;
+        this.score += 10;
+        this.next('✓ ' + this.chain.join(' × ') + ' = ' + String(this.target));
+      } else {
+        this.tip = TG2('还剩 {0}，继续拆', String(this.rest));
+      }
+      return;
+    }
+    this.miss++;
+    this.tip = String(p) + TG2(' 除不尽 {0}，换一个', String(this.rest));
+    if (this.miss >= 3) { this.next(TG2('✗ {0} 没能拆完', String(this.target))); }
+  }
+
+  private next(msg: string): void {
+    this.level++;
+    if (this.level >= this.diffTotal) {
+      this.over = true;
+      this.tip = msg + TG2('｜共拆开 {0}/{1} 棵', String(this.clears), String(this.diffTotal));
+      const res: GameResult = {
+        gameId: 'prime_factor_trees', solved: this.clears >= PASS,
+        score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.clears
+      };
+      LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+      this.onFinish(res);
+      return;
+    }
+    this.load();
+    this.tip = TG2("{0}，接着下一棵", msg);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((String(Math.min(this.level + 1, this.diffTotal)) + '/' + String(this.diffTotal))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('已拆开'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.clears), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('失误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((String(this.miss) + '/3')).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
+      }.width('100%')
+      Column({ space: Space.xs }) {
+        Text(Digits(String(this.rest), this.langCode)).fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
+          .fontColor(this.rest > 1 ? this.theme.ink : Palette.emerald)
+        Text(TG2('目标数 {0}', String(this.target))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(this.chain.length > 0 ? this.chain.join(' × ') + (this.rest > 1 ? ' × …' : '') : '还没有拆下任何因子')
+          .fontSize(FontSize.lg).fontColor(Palette.cyan)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
+      .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+      Row({ space: Space.xs }) {
+        ForEach(PRIMES, (p: number) => { Button(String((p)))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over && this.rest > 1)
+        .onClick(() => { this.tap((p)); }); }, (p: number) => 'p' + p)
+      }.width('100%')
+      Row({ space: Space.md }) {
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.cyan)
+          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { this.reset(); })
+        Text(TG('质因数连乘起来 = 目标数')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      }.width('100%')
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+
+
+
+}

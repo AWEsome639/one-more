@@ -1,0 +1,246 @@
+/**
+ * 爱因斯坦谜题 ❓ —— 三栋排屋、三种宠物，谜面给若干线索，推出唯一答案
+ * 玩法：点格子循环切宠物（🐱🐟🐦，不能重复），三项都填对即通关
+ * 线索每局随机生成（都真实成立），并用穷举求解器保证"有且只有一个解"
+ * 胜负：解开 1 题即通关（看提示扣 100 分）　进度：步数 / 线索条数
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const N: number = 3;
+const NATION: string[] = ['🇬🇧', '🇸🇪', '🇩🇰'];
+const PETS: string[] = ['🐱', '🐟', '🐦'];
+const PETNAME: string = TG(TG(TG('🐱猫  🐟鱼  🐦鸟')));
+
+interface Clue {
+  kind: number;   // 0 = 某国养某宠　1 = A 住 B 左边　2 = A 紧挨着 B
+  a: number;
+  b: number;
+}
+
+function ok(p: number[], clues: Clue[]): boolean {
+  for (let i = 0; i < clues.length; i++) {
+    const c: Clue = clues[i];
+    if (c.kind === 0 && p[c.a] !== c.b) { return false; }
+    if (c.kind === 1 && p.indexOf(c.a) >= p.indexOf(c.b)) { return false; }
+    if (c.kind === 2 && Math.abs(p.indexOf(c.a) - p.indexOf(c.b)) !== 1) { return false; }
+  }
+  return true;
+}
+
+/** 枚举 6 种排法，数出满足全部线索的个数 */
+function countSol(clues: Clue[]): number {
+  let n: number = 0;
+  for (let a = 0; a < N; a++) {
+    for (let b = 0; b < N; b++) {
+      for (let c = 0; c < N; c++) {
+        if (a === b || a === c || b === c) { continue; }
+        if (ok([a, b, c], clues)) { n++; }
+      }
+    }
+  }
+  return n;
+}
+
+function text(c: Clue): string {
+  if (c.kind === 0) { return NATION[c.a] + TG2(' 家养 {0}', PETS[c.b]); }
+  if (c.kind === 1) { return NATION[c.a] + TG2(' 家的宠物住在 {0} 家左边', NATION[c.b]); }
+  return NATION[c.a] + TG2(' 家的宠物紧挨着 {0} 家住', NATION[c.b]);
+}
+
+/** 生成一局：随机答案 → 从真实线索里随机抽几条 → 只有唯一解才采用 */
+function generate(): Clue[] {
+  for (let guard = 0; guard < 800; guard++) {
+    const sol: number[] = [0, 1, 2];
+    for (let i = sol.length - 1; i > 0; i--) {
+      const j: number = Math.floor(Math.random() * (i + 1));
+      const t: number = sol[i]; sol[i] = sol[j]; sol[j] = t;
+    }
+    const pool: Clue[] = [];
+    for (let a = 0; a < N; a++) { pool.push({ kind: 0, a: a, b: sol[a] }); }
+    for (let a = 0; a < N; a++) {
+      for (let b = 0; b < N; b++) {
+        if (a === b) { continue; }
+        if (sol[a] < sol[b]) { pool.push({ kind: 1, a: a, b: b }); }
+        if (Math.abs(sol[a] - sol[b]) === 1) { pool.push({ kind: 2, a: a, b: b }); }
+      }
+    }
+    const picked: Clue[] = [];
+    const used: number[] = [];
+    const want: number = 3 + Math.floor(Math.random() * 3);
+    while (picked.length < want && used.length < pool.length) {
+      const i: number = Math.floor(Math.random() * pool.length);
+      if (used.indexOf(i) >= 0) { continue; }
+      used.push(i); picked.push(pool[i]);
+    }
+    if (picked.length >= 2 && countSol(picked) === 1) { return picked; }
+  }
+  return [{ kind: 0, a: 0, b: 0 }, { kind: 0, a: 1, b: 1 }, { kind: 0, a: 2, b: 2 }];
+}
+
+@Component
+export struct GEinsteinRiddle {
+  /** ★★★ 2026-10-16 BUG #24：数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法：棋盘边长（原 N=3；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
+  //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2]，上面已一并改成按尺寸生成
+  @State private diffTotal: number = GameDiff.sizeNow(3);
+
+  /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
+  private rowIdx(): number[] {
+    const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const a2: number[] = [];
+    for (let i2 = 0; i2 < n2; i2++) { a2.push(i2); }
+    return a2;
+  }
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private lines: string[] = [];
+  @State private sol: number[] = [];
+  @State private grid: number[] = new Array<number>(this.diffTotal).fill(-1);
+  @State private tries: number = 0;
+  @State private hintOn: boolean = false;
+  @State private note: string = '';
+  @State private over: boolean = false;
+  private startAt: number = 0;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(3);
+     this.reset(); }
+
+  private reset(): void {
+    const clues: Clue[] = generate();
+    const lines: string[] = [];
+    const sol: number[] = new Array<number>(this.diffTotal).fill(-1);
+    for (let i = 0; i < clues.length; i++) {
+      lines.push(text(clues[i]));
+      if (clues[i].kind === 0) { sol[clues[i].a] = clues[i].b; }
+    }
+    // 线索里未必直接给全 —— 补一次穷举，把唯一解算出来
+    const found: number[] = this.solveUnique(clues);
+    this.lines = lines;
+    this.sol = found.length === this.diffTotal ? found : sol;
+    this.grid = new Array<number>(this.diffTotal).fill(-1);
+    this.tries = 0; this.hintOn = false; this.over = false;
+    this.note = TG(TG(TG('点格子切换宠物，三项不能重复')));
+    this.startAt = Date.now();
+  }
+
+  /** 找到唯一解（generate 已保证只有一个） */
+  private solveUnique(clues: Clue[]): number[] {
+    for (let a = 0; a < this.diffTotal; a++) {
+      for (let b = 0; b < this.diffTotal; b++) {
+        for (let c = 0; c < this.diffTotal; c++) {
+          if (a === b || a === c || b === c) { continue; }
+          const p: number[] = [a, b, c];
+          if (ok(p, clues)) { return p; }
+        }
+      }
+    }
+    return [];
+  }
+
+  private tap(i: number): void {
+    if (this.over) { return; }
+    const next: number[] = this.grid.slice();
+    next[i] = (next[i] + 1) % this.diffTotal;
+    this.grid = next; this.tries++;
+    for (let k = 0; k < this.diffTotal; k++) {
+      if (next[k] < 0) { return; }
+    }
+    let dup: boolean = false;
+    for (let a = 0; a < this.diffTotal; a++) {
+      for (let b = a + 1; b < this.diffTotal; b++) {
+        if (next[a] === next[b]) { dup = true; }
+      }
+    }
+    if (dup) { this.note = TG(TG(TG('每种宠物只能用一次 ⚠️'))); return; }
+    if (next.join(',') === this.sol.join(',')) {
+      this.over = true; this.note = TG(TG(TG('解开了 🎉')));
+      LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+      this.onFinish({
+        gameId: 'einstein_riddle', solved: true,
+        score: Math.max(40, 300 - this.tries * 8 - (this.hintOn ? 100 : 0)),
+        durationMs: Date.now() - this.startAt, levelReached: 1
+      });
+    } else {
+      this.note = TG(TG(TG('和线索冲突 ❌ 再核对一下')));
+    }
+  }
+
+  @Builder
+  slot(i: number) {
+    Stack() {
+      Text(this.grid[i] < 0 ? '?' : PETS[this.grid[i]])
+        .fontSize(this.grid[i] < 0 ? FontSize.xl : FontSize.xxl)
+        .fontColor(this.grid[i] < 0 ? this.theme.inkFaint : '#FFFFFF')
+    }
+    .layoutWeight(1).height(Cell.of(56))
+    .backgroundColor(this.grid[i] < 0 ? this.theme.surfaceAlt : Palette.orange)
+    .borderRadius(Radius.md)
+    .shadow(Shadow.card)
+    .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .onClick(() => { this.tap(i); })
+  }
+
+  build() {
+    Column({ space: Space.sm }) {
+      Row({ space: Space.md }) {
+        Text(TG2("步数 {0}",Digits(String(this.tries), this.langCode))).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
+        Text(TG2('线索 {0} 条', this.lines.length)).fontSize(FontSize.md).fontColor(Palette.sky).layoutWeight(1)
+        Text(this.over ? '已解开 🎉' : '唯一解').fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
+      }.width('100%')
+
+      Text(TG('❓ 三栋排屋住着三个国籍的人，各养一种宠物 —— 按线索推出唯一的排法'))
+        .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
+
+      Column({ space: Space.xs }) {
+        ForEach(this.lines, (c: string, i: number) => {
+          Text((i + 1) + '. ' + c).fontSize(FontSize.sm).fontColor(this.theme.ink).width('100%')
+        }, (c: string, i: number) => 'cl' + i)
+      }.width('100%')
+      .padding(Space.sm)
+      .backgroundColor(this.theme.surface)
+      .borderRadius(Radius.md)
+      .shadow(Shadow.card)
+
+      Row({ space: Space.xs }) {
+        ForEach(this.rowIdx(), (i: number) => {
+          this.slot(i)
+        }, (i: number) => 'sl' + i)
+      }.width('100%')
+
+      Row({ space: Space.xs }) {
+        ForEach(this.rowIdx(), (i: number) => {
+          Text(NATION[i]).fontSize(FontSize.md).textAlign(TextAlign.Center)
+            .layoutWeight(1).height(28).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.xs)
+        }, (i: number) => 'na' + i)
+      }.width('100%')
+
+      Text(this.hintOn ? '宠物代号 🔑 ' + PETNAME : this.note)
+        .fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+
+      Row({ space: Space.sm }) {
+        Button(this.hintOn ? '已看提示' : '提示 −100')
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
+          .fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .onClick(() => { this.hintOn = true; })
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
+          .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .onClick(() => { this.reset(); })
+      }.width('100%')
+    }
+    .width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+}

@@ -1,0 +1,510 @@
+/**
+ * 明灯（Akari / Light Up）—— 用灯照亮所有空格
+ *
+ * 规则：
+ *   · 灯照亮自己所在格，并向上下左右直照，遇到黑墙停
+ *   · 两盏灯不能互相照到（之间有墙才行）
+ *   · 墙上的数字 = 紧挨着它的灯数量，必须刚好相等
+ * 判据：所有空格都被照亮 + 墙上数字全部满足 ⇒ 通关；违规满 8 次 ⇒ 失败
+ * 出题：先随机摆墙，再用「贪心 + 随机」求出一组合法灯位 ⇒ 题目一定有解
+ *
+ * 契约：@Prop theme / @Prop @Watch('onRestart') restartToken / onFinish(r)
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const N: number = 6;
+const CELLS: number = N * N;
+const WALL_P: number = 0.22;      // 每格是墙的概率
+const MAX_TRY: number = 300;
+const MAX_WRONG: number = 8;
+const TICK_MS: number = 1000;
+const GAP: number = 2;
+const KEY_H: number = 46;
+
+interface Level {
+  wall: boolean[];
+  clue: number[];     // 墙上的数字；-1 表示不是墙 / 没有数字
+  bulb: number[];     // 参考解
+}
+
+/** 从已有灯出发算照亮情况 */
+function computeLit(wall: boolean[], bulb: number[]): boolean[] {
+  const lit: boolean[] = new Array<boolean>(CELLS).fill(false);
+  const dirs: number[][] = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+  for (let i = 0; i < CELLS; i++) {
+    if (bulb[i] === 0) {
+      continue;
+    }
+    lit[i] = true;
+    const x: number = i % N;
+    const y: number = Math.floor(i / N);
+    for (let d = 0; d < 4; d++) {
+      let cx: number = x + dirs[d][0];
+      let cy: number = y + dirs[d][1];
+      while (cx >= 0 && cx < N && cy >= 0 && cy < N) {
+        const k: number = cy * N + cx;
+        if (wall[k]) {
+          break;
+        }
+        lit[k] = true;
+        cx = cx + dirs[d][0];
+        cy = cy + dirs[d][1];
+      }
+    }
+  }
+  return lit;
+}
+
+/** 这格能不能放灯（四方向到墙之间没有别的灯） */
+function canBulb(wall: boolean[], bulb: number[], idx: number): boolean {
+  if (wall[idx] || bulb[idx] === 1) {
+    return false;
+  }
+  const x: number = idx % N;
+  const y: number = Math.floor(idx / N);
+  const dirs: number[][] = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+  for (let d = 0; d < 4; d++) {
+    let cx: number = x + dirs[d][0];
+    let cy: number = y + dirs[d][1];
+    while (cx >= 0 && cx < N && cy >= 0 && cy < N) {
+      const k: number = cy * N + cx;
+      if (wall[k]) {
+        break;
+      }
+      if (bulb[k] === 1) {
+        return false;
+      }
+      cx = cx + dirs[d][0];
+      cy = cy + dirs[d][1];
+    }
+  }
+  return true;
+}
+
+/** 放灯能新照亮几个还没亮的空格 */
+function gainOf(wall: boolean[], bulb: number[], lit: boolean[], idx: number): number {
+  const probe: number[] = bulb.slice();
+  probe[idx] = 1;
+  const after: boolean[] = computeLit(wall, probe);
+  let gain: number = 0;
+  for (let i = 0; i < CELLS; i++) {
+    if (!wall[i] && !lit[i] && after[i]) {
+      gain++;
+    }
+  }
+  return gain;
+}
+
+/** 贪心摆灯：每次挑「新照亮最多」的位置，带随机打破平局 */
+function trySolve(wall: boolean[]): number[] | null {
+  const bulb: number[] = new Array<number>(CELLS).fill(0);
+  for (let step = 0; step < CELLS; step++) {
+    const lit: boolean[] = computeLit(wall, bulb);
+    let unlit: number = 0;
+    for (let i = 0; i < CELLS; i++) {
+      if (!wall[i] && !lit[i]) {
+        unlit++;
+      }
+    }
+    if (unlit === 0) {
+      return bulb;
+    }
+    let best: number = -1;
+    let bestGain: number = 0;
+    for (let i = 0; i < CELLS; i++) {
+      if (!canBulb(wall, bulb, i)) {
+        continue;
+      }
+      const g: number = gainOf(wall, bulb, lit, i);
+      if (g > bestGain || (g === bestGain && g > 0 && Math.random() < 0.4)) {
+        best = i;
+        bestGain = g;
+      }
+    }
+    if (best < 0 || bestGain === 0) {
+      return null;
+    }
+    bulb[best] = 1;
+  }
+  return null;
+}
+
+function makeLevel(): Level {
+  for (let attempt = 0; attempt < MAX_TRY; attempt++) {
+    const wall: boolean[] = new Array<boolean>(CELLS).fill(false);
+    for (let i = 0; i < CELLS; i++) {
+      wall[i] = Math.random() < WALL_P;
+    }
+    const sol: number[] | null = trySolve(wall);
+    if (sol === null) {
+      continue;
+    }
+    const clue: number[] = new Array<number>(CELLS).fill(-1);
+    for (let i = 0; i < CELLS; i++) {
+      if (!wall[i]) {
+        continue;
+      }
+      const x: number = i % N;
+      const y: number = Math.floor(i / N);
+      let n: number = 0;
+      if (x > 0 && sol[i - 1] === 1) {
+        n++;
+      }
+      if (x < N - 1 && sol[i + 1] === 1) {
+        n++;
+      }
+      if (y > 0 && sol[i - N] === 1) {
+        n++;
+      }
+      if (y < N - 1 && sol[i + N] === 1) {
+        n++;
+      }
+      clue[i] = n;
+    }
+    const out: Level = { wall: wall, clue: clue, bulb: sol };
+    return out;
+  }
+  // 兜底：全空的 6×6（贪心必能照亮）
+  const wall: boolean[] = new Array<boolean>(CELLS).fill(false);
+  const clue: number[] = new Array<number>(CELLS).fill(-1);
+  const sol: number[] = new Array<number>(CELLS).fill(0);
+  sol[0] = 1;
+  sol[4] = 1;
+  sol[2 * N + 2] = 1;
+  sol[4 * N + 4] = 1;
+  const out: Level = { wall: wall, clue: clue, bulb: sol };
+  return out;
+}
+
+@Component
+export struct GAkari {
+  /** ★★★ 2026-10-16 BUG #24：数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法：容错次数（简单 12 / 普通 8 / 困难 5）
+  @State private diffTotal: number = GameDiff.livesNow(MAX_WRONG);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private wall: boolean[] = [];
+  @State private clue: number[] = [];
+  @State private bulbs: number[] = [];
+  @State private wrong: number = 0;
+  @State private seconds: number = 0;
+  @State private status: string = '';
+  @State private done: boolean = false;
+
+  private startAt: number = 0;
+  private timer: number = -1;
+  private finished: boolean = false;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.reset();
+  }
+
+  onRestart(): void {
+    this.diffTotal = GameDiff.livesNow(MAX_WRONG);
+    this.reset();
+  }
+
+  aboutToDisappear(): void {
+    this.stopTimer();
+  }
+
+  private reset(): void {
+    this.stopTimer();
+    const lv: Level = makeLevel();
+    this.wall = lv.wall;
+    this.clue = lv.clue;
+    this.bulbs = new Array<number>(CELLS).fill(0);
+    this.wrong = 0;
+    this.seconds = 0;
+    this.status = TG('点空格放灯，点灯撤掉');
+    this.done = false;
+    this.finished = false;
+    this.startAt = Date.now();
+    this.timer = setInterval(() => {
+      if (!this.done && !this.finished) {
+        this.seconds = this.seconds + 1;
+      }
+    }, TICK_MS);
+  }
+
+  private stopTimer(): void {
+    if (this.timer >= 0) {
+      clearInterval(this.timer);
+      this.timer = -1;
+    }
+  }
+
+  private isWall(i: number): boolean {
+    return i >= 0 && i < this.wall.length ? this.wall[i] : false;
+  }
+
+  private litNow(): boolean[] {
+    return computeLit(this.wall, this.bulbs);
+  }
+
+  private bulbCount(): number {
+    let n: number = 0;
+    for (let i = 0; i < this.bulbs.length; i++) {
+      if (this.bulbs[i] === 1) {
+        n++;
+      }
+    }
+    return n;
+  }
+
+  private litCount(): number {
+    const lit: boolean[] = this.litNow();
+    let n: number = 0;
+    let empty: number = 0;
+    for (let i = 0; i < CELLS; i++) {
+      if (!this.isWall(i)) {
+        empty++;
+        if (lit[i]) {
+          n++;
+        }
+      }
+    }
+    return empty === 0 ? 0 : n;
+  }
+
+  private emptyCount(): number {
+    let n: number = 0;
+    for (let i = 0; i < CELLS; i++) {
+      if (!this.isWall(i)) {
+        n++;
+      }
+    }
+    return n;
+  }
+
+  private tap(i: number): void {
+    if (this.done || this.finished || this.isWall(i) || i < 0 || i >= CELLS) {
+      return;
+    }
+    const next: number[] = this.bulbs.slice();
+    if (next[i] === 1) {
+      next[i] = 0;
+      this.bulbs = next;
+      this.status = TG('撤掉一盏灯');
+      return;
+    }
+    if (!canBulb(this.wall, next, i)) {
+      this.wrong = this.wrong + 1;
+      this.status = TG('这盏灯会照到别的灯，换个位置');
+      if (this.wrong >= this.diffTotal) {
+        this.done = true;
+        this.status = TG2("违规满 {0} 次，这一局没通关",Digits(String(this.diffTotal), this.langCode));
+        this.finish(false);
+      }
+      return;
+    }
+    next[i] = 1;
+    this.bulbs = next;
+    this.status = TG('放下一盏灯');
+    if (this.isWin()) {
+      this.done = true;
+      this.status = TG('🎉 全部照亮，灯位也对！');
+      this.finish(true);
+    }
+  }
+
+  private isWin(): boolean {
+    const lit: boolean[] = this.litNow();
+    for (let i = 0; i < CELLS; i++) {
+      if (!this.isWall(i) && !lit[i]) {
+        return false;
+      }
+    }
+    for (let i = 0; i < CELLS; i++) {
+      if (!this.isWall(i) || this.clue[i] < 0) {
+        continue;
+      }
+      let n: number = 0;
+      const x: number = i % N;
+      const y: number = Math.floor(i / N);
+      if (x > 0 && this.bulbs[i - 1] === 1) {
+        n++;
+      }
+      if (x < N - 1 && this.bulbs[i + 1] === 1) {
+        n++;
+      }
+      if (y > 0 && this.bulbs[i - N] === 1) {
+        n++;
+      }
+      if (y < N - 1 && this.bulbs[i + N] === 1) {
+        n++;
+      }
+      if (n !== this.clue[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private finish(solved: boolean): void {
+    if (this.finished) {
+      return;
+    }
+    this.finished = true;
+    this.stopTimer();
+    const r: GameResult = {
+      gameId: 'akari',
+      solved: solved,
+      score: solved ? Math.max(150, 1100 - this.seconds * 4 - this.wrong * 80) : 0,
+      durationMs: Date.now() - this.startAt,
+      levelReached: this.bulbCount()
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.infoBox(0)
+        this.infoBox(1)
+        this.infoBox(2)
+      }
+      .width('100%')
+
+      Column({ space: GAP }) {
+        ForEach([0, 1, 2, 3, 4, 5], (r: number) => {
+          Row({ space: GAP }) {
+            ForEach([0, 1, 2, 3, 4, 5], (c: number) => {
+              this.cellView(r * N + c)
+            }, (c: number) => 'c' + c)
+          }
+          .width('100%')
+        }, (r: number) => 'r' + r)
+      }
+      .width('86%')
+      .aspectRatio(1)
+      .padding(Space.xs)
+      .backgroundColor('#1AF59E0B')
+      .borderRadius(Radius.lg)
+
+      Row({ space: Space.sm }) {
+        Button(TG('换一题'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(KEY_H)
+          .onClick(() => {
+            this.reset();
+          })
+        Button(TG('清空灯'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(KEY_H)
+          .onClick(() => {
+            if (!this.done && !this.finished) {
+              this.bulbs = new Array<number>(CELLS).fill(0);
+              this.status = TG('灯都撤掉了');
+            }
+          })
+        Button(TG('放弃'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(this.theme.inkSoft)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(KEY_H)
+          .onClick(() => {
+            if (!this.finished) {
+              this.done = true;
+              this.status = TG('已放弃这一局');
+              this.finish(false);
+            }
+          })
+      }
+      .width('100%')
+
+      Text(this.status)
+        .fontSize(FontSize.sm)
+        .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
+        .width('100%')
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+  /** kind: 0=已照亮 1=灯数 2=违规 */
+  @Builder
+  infoBox(kind: number) {
+    Column({ space: 2 }) {
+      Text(kind === 0 ? '照亮' : (kind === 1 ? '灯' : TG('违规')))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+      Text(kind === 0 ? (this.litCount() + '/' + this.emptyCount())
+        : (kind === 1 ? String(this.bulbCount()) : (this.wrong + '/' + this.diffTotal)))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+    }
+    .layoutWeight(1)
+    .padding(Space.sm)
+    .backgroundColor(this.theme.surface)
+    .borderRadius(Radius.md)
+    .shadow(Shadow.card)
+  }
+
+  @Builder
+  cellView(i: number) {
+    Stack() {
+      Text(this.markOf(i))
+        .fontSize(this.isWall(i) ? FontSize.lg : FontSize.md)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.isWall(i) ? '#FFFFFF' : this.theme.ink)
+    }
+    .layoutWeight(1)
+    .aspectRatio(1)
+    .backgroundColor(this.cellBg(i))
+    .borderRadius(this.isWall(i) ? Radius.xs : Radius.sm)
+    .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .onClick(() => {
+      this.tap(i);
+    })
+  }
+
+  private markOf(i: number): string {
+    if (this.isWall(i)) {
+      const c: number = i < this.clue.length ? this.clue[i] : -1;
+      return c > 0 ? String(c) : '';
+    }
+    return i < this.bulbs.length && this.bulbs[i] === 1 ? '💡' : '';
+  }
+
+  private cellBg(i: number): string {
+    if (this.isWall(i)) {
+      return this.theme.isDark ? '#2B2B33' : '#3F3F46';
+    }
+    if (i < this.bulbs.length && this.bulbs[i] === 1) {
+      return '#FDE68A';
+    }
+    const lit: boolean[] = this.litNow();
+    if (i < lit.length && lit[i]) {
+      return this.theme.isDark ? '#3A3320' : '#FEF3C7';
+    }
+    return this.theme.surface;
+  }
+}

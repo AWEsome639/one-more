@@ -1,0 +1,476 @@
+/**
+ * 播棋（Kalah 曼卡拉）—— 石子播种 ♟️
+ *
+ * 规则：轮到你时选一个自己的坑，把石子一颗颗撒进后面的坑（跳过对手的库）。
+ *      最后一颗落进自己的库可以再来一次；落进自己的空坑则把对家正对的坑一起收走。
+ * 胜负：一方六坑全空时结算，库里石子多的一方获胜
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { LanMatch, Side } from '../core/LanMatch';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const PITS: number = 6;      // 每方 6 个坑
+const P_STORE: number = 6;   // 我方库
+const A_STORE: number = 13;  // 对手库
+const START: number = 4;     // 每坑初始石子
+
+/**
+ * ★★ 局域网对战（2026-10-13，P12）—— 走子编码与两个哨兵包
+ *
+ * 走子 = 一个坑号（"0".."5"，**发送方自己那一侧的编号**）。
+ * 对帧映射：对方第 p 个坑 = 我这边的第 `p + 7` 个（不是镜像 12-p！）。
+ *   为什么：两边是**同一个 14 格环**，各自把自己摆在 0~5、对方摆在 7~12，
+ *   两个编号系正好差一个 (PITS+1)=7 的循环平移，而且**撒石方向（下标 +1 绕圈）同向**。
+ *   写成镜像 12-p 会把撒石方向弄反 —— 推演过，别改。
+ * 哨兵包（都借 'move' 通道，因为引擎只认 move 会翻手）：
+ *   'P' 空过：只让引擎翻手、不落子 —— 播棋"最后一颗进自己库可以再走一次"时用；
+ *   'R' 重开：对方收到就整盘重置（否则两边各自重开 ⇒ 棋盘不一样）。
+ */
+const LAN_OFFSET: number = PITS + 1;
+const LAN_PASS: string = 'P';
+const LAN_RESTART: string = 'R';
+
+@Component
+export struct GMancala {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法：棋盘边长（原 PITS=6）
+  @State private diffTotal: number = GameDiff.sizeNow(6);
+
+  /** 0..diffTotal-1（读 @State 建依赖） */
+  private rowIdx(): number[] {
+    const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const a2: number[] = [];
+    for (let i2 = 0; i2 < n2; i2++) { a2.push(i2); }
+    return a2;
+  }
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private pits: number[] = [];
+  @State private turn: number = 0;     // 0 = 我方，1 = 对手
+  @State private moves: number = 0;
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+
+  private aiTimer: number = -1;
+  private lastLand: number = -1;
+  private startAt: number = 0;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.reset();
+    // ★ 联机对局（P12）：对方的走子 = 本局「AI 的那一步」
+    LanMatch.setHandler((d: string) => {
+      const pit: number = Number.parseInt(d, 10);
+      if (isNaN(pit) || this.over || pit < 0 || pit >= this.pits.length || this.pits[pit] === 0) {
+        return;
+      }
+      this.moves = this.moves + 1;
+      this.applyMove(pit, 1);
+      this.turn = 0;                     // 交回我方
+    });
+  }
+
+  aboutToDisappear(): void {
+    this.clearAi();
+  }
+
+  onRestart(): void {
+    // 宿主点「换一局」：联机时也要通知对方，否则两边棋盘不一样
+    this.restartTap();
+  }
+
+  private clearAi(): void {
+    if (this.aiTimer !== -1) {
+      clearTimeout(this.aiTimer);
+      this.aiTimer = -1;
+    }
+  }
+
+  /**
+   * 本局坑数。★ 联机时**固定标准 6 坑**：难度会改坑数（简单 4 / 普通 6 / 困难 8），
+   * 两边难度不同 ⇒ 坑数不同 ⇒ 走子编号对不上（大厅的 diff 广播因为 `LanMatch.begin`
+   * 没传 gameId 而实际不生效）⇒ 联机必须钉死同一尺寸。
+   */
+  private pickSize(): number {
+    return LanMatch.isActive() ? PITS : GameDiff.sizeNow(6);
+  }
+
+  private reset(): void {
+    this.clearAi();
+    this.diffTotal = this.pickSize();
+    const p: number[] = new Array<number>(14).fill(START);
+    p[P_STORE] = 0;
+    p[A_STORE] = 0;
+    this.pits = p;
+    this.turn = 0;
+    // ★ 联机：本地 turn 必须跟"轮到谁"对齐 —— 否则加入方开局会显示"轮到你"却点不动
+    if (LanMatch.isActive()) {
+      this.turn = LanMatch.myTurn() ? 0 : 1;
+    }
+    this.moves = 0;
+    this.over = false;
+    this.won = false;
+    this.startAt = Date.now();
+  }
+
+  /** 撒石：skip 是对手的库；结果写进 this.lastLand */
+  private sow(p: number[], pit: number, skip: number): number[] {
+    const n: number[] = p.slice();
+    let stones: number = n[pit];
+    n[pit] = 0;
+    let pos: number = pit;
+    while (stones > 0) {
+      pos = (pos + 1) % 14;
+      if (pos === skip) {
+        continue;
+      }
+      n[pos] = n[pos] + 1;
+      stones--;
+    }
+    this.lastLand = pos;
+    return n;
+  }
+
+  private mine(i: number, side: number): boolean {
+    return side === 0 ? (i >= 0 && i < this.diffTotal) : (i > this.diffTotal && i < A_STORE);
+  }
+
+  private applyMove(pit: number, side: number): void {
+    const store: number = side === 0 ? P_STORE : A_STORE;
+    const skip: number = side === 0 ? A_STORE : P_STORE;
+    let n: number[] = this.sow(this.pits, pit, skip);
+    const last: number = this.lastLand;
+    const extra: boolean = last === store;
+
+    if (!extra && this.mine(last, side) && n[last] === 1) {
+      const opp: number = 12 - last;
+      n[store] = n[store] + n[opp] + 1;
+      n[opp] = 0;
+      n[last] = 0;
+    }
+    this.pits = n;
+
+    if (this.checkEnd()) {
+      return;
+    }
+    if (!extra) {
+      this.turn = side === 0 ? 1 : 0;
+    }
+  }
+
+  private checkEnd(): boolean {
+    let pEmpty: boolean = true;
+    for (let i = 0; i < this.diffTotal; i++) {
+      if (this.pits[i] > 0) {
+        pEmpty = false;
+      }
+    }
+    let aEmpty: boolean = true;
+    for (let i = this.diffTotal + 1; i < A_STORE; i++) {
+      if (this.pits[i] > 0) {
+        aEmpty = false;
+      }
+    }
+    if (!pEmpty && !aEmpty) {
+      return false;
+    }
+    const n: number[] = this.pits.slice();
+    for (let i = 0; i < this.diffTotal; i++) {
+      n[P_STORE] = n[P_STORE] + n[i];
+      n[i] = 0;
+    }
+    for (let i = this.diffTotal + 1; i < A_STORE; i++) {
+      n[A_STORE] = n[A_STORE] + n[i];
+      n[i] = 0;
+    }
+    this.pits = n;
+    this.over = true;
+    this.won = n[P_STORE] > n[A_STORE];
+    this.finish(this.won);
+    return true;
+  }
+
+  /** 对手：一眼看一步（拿到多少 + 是否连走 − 对手最好的反击） */
+  private aiPick(): number {
+    let best: number = -1;
+    let bestVal: number = -999999;
+    for (let i = this.diffTotal + 1; i < A_STORE; i++) {
+      if (this.pits[i] === 0) {
+        continue;
+      }
+      const s: number[] = this.sow(this.pits, i, P_STORE);
+      const extra: boolean = this.lastLand === A_STORE;
+      const gain: number = s[A_STORE] - this.pits[A_STORE];
+      let opp: number = 0;
+      for (let j = 0; j < this.diffTotal; j++) {
+        if (s[j] === 0) {
+          continue;
+        }
+        const s2: number[] = this.sow(s, j, A_STORE);
+        const g: number = s2[P_STORE] - s[P_STORE];
+        if (g > opp) {
+          opp = g;
+        }
+      }
+      const val: number = gain * 2 + (extra ? 3 : 0) - opp;
+      if (val > bestVal) {
+        bestVal = val;
+        best = i;
+      }
+    }
+    return best;
+  }
+
+  /**
+   * 收到对方的走子（LanMatch 转进来）
+   * ★ 对方第 p 个坑 ⇒ 我这边第 `p + LAN_OFFSET` 个坑，按"对手（side=1）"应用
+   */
+  private onRemote(d: string): void {
+    if (d === LAN_RESTART) {
+      this.reset();          // 对方重开 ⇒ 我也整盘重置
+      return;
+    }
+    if (d === LAN_PASS) {
+      // 空过包：只为了翻手，棋盘不动；但本地 turn 要跟着对齐
+      // （连走时它是幂等的；重开时正是靠它把"该谁走"定下来）
+      this.turn = LanMatch.myTurn() ? 0 : 1;
+      return;
+    }
+    const p: number = Number.parseInt(d, 10);
+    if (isNaN(p) || this.over || p < 0 || p >= this.diffTotal) {
+      return;
+    }
+    const pit: number = p + LAN_OFFSET;
+    if (pit >= A_STORE || this.pits[pit] === 0) {
+      return;
+    }
+    this.moves = this.moves + 1;
+    this.applyMove(pit, 1);   // 连走/收子/结算都由 applyMove 自己算 ⇒ 两边必然一致
+  }
+
+  /**
+   * 重开（按钮与宿主「换一局」都走这里）
+   * ★ 联机时必须**通知对方一起重置**，否则两边棋盘不一样；
+   *   并且要把回合翻回"房主先手"——所以按"重开前轮到的是不是房主"决定要不要补一个空过包。
+   */
+  private restartTap(): void {
+    if (!LanMatch.isActive()) {
+      this.reset();
+      return;
+    }
+    const iAmHost: boolean = LanMatch.mySide() === Side.HOST;
+    const turnWasHost: boolean = iAmHost ? LanMatch.myTurn() : !LanMatch.myTurn();
+    this.reset();
+    LanMatch.record(LAN_RESTART);
+    if (turnWasHost) {
+      LanMatch.record(LAN_PASS);   // 把回合再翻回房主
+    }
+    // record 会翻 LanMatch 的回合 ⇒ 本地 turn 要按最终结果再对齐一次
+    this.turn = LanMatch.myTurn() ? 0 : 1;
+  }
+
+  private playerMove(pit: number): void {
+    if (this.over || this.turn !== 0 || this.pits[pit] === 0) {
+      return;
+    }
+    // ★ 联机：不是我的回合就不接受点击（本地 this.turn 是权威，myTurn() 再兜一层）
+    if (LanMatch.isActive() && !LanMatch.myTurn()) {
+      return;
+    }
+    this.moves = this.moves + 1;
+    this.applyMove(pit, 0);
+    // ★ 联机：广播这一步，**不跑 AI**（对手就是那个人）
+    if (LanMatch.isActive()) {
+      LanMatch.record(String(pit));
+      if (!this.over && this.turn === 0) {
+        // ★ 最后一颗进了自己的库 ⇒ 我还要再走一次；但 record() 已经把回合交给对方了
+        //   ⇒ 补发一个"空过包"把回合换回来（对方收到只翻手、不落子）。
+        LanMatch.record(LAN_PASS);
+      }
+      return;
+    }
+    const nextTurn: number = this.turn;   // 取局部变量，避免 ArkTS 把 this.turn 收窄成字面量
+    if (!this.over && nextTurn === 1) {
+      this.scheduleAi();
+    }
+  }
+
+  private scheduleAi(): void {
+    if (LanMatch.isActive()) {
+      return;                    // ★ 联机时没有 AI
+    }
+    this.clearAi();
+    this.aiTimer = setTimeout(() => {
+      this.aiTimer = -1;
+      this.aiTurn();
+    }, 650);
+  }
+
+  private aiTurn(): void {
+    if (this.over || this.turn !== 1) {
+      return;
+    }
+    const pit: number = this.aiPick();
+    if (pit < 0) {
+      return;
+    }
+    this.applyMove(pit, 1);
+    if (!this.over && this.turn === 1) {
+      this.scheduleAi();
+    }
+  }
+
+  private finish(solved: boolean): void {
+    const r: GameResult = {
+      gameId: 'mancala',
+      solved: solved,
+      score: this.pits[P_STORE] * 100 + (solved ? 200 : 0),
+      durationMs: Date.now() - this.startAt,
+      levelReached: this.pits[P_STORE]
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.md }) {
+        Column({ space: 2 }) {
+        Text((TG('我方库'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((String(this.pits.length > 0 ? this.pits[P_STORE] : 0))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1).padding(Space.sm)
+        .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('对手库'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((String(this.pits.length > 0 ? this.pits[A_STORE] : 0))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1).padding(Space.sm)
+        .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.moves), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1).padding(Space.sm)
+        .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }
+      .width('100%')
+
+      Row({ space: Space.sm }) {
+        // 对手的库（在左）
+        Column({ space: Space.xs }) {
+          Text(LanMatch.isActive() ? '对手' : 'AI').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(String(this.pits.length > 0 ? this.pits[A_STORE] : 0))
+            .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
+        }
+        .width(56)
+        .height('100%')
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.lg)
+
+        Column({ space: Space.sm }) {
+          Row({ space: Space.sm }) {
+            ForEach([12, 11, 10, 9, 8, 7], (i: number) => {
+              Column({ space: 2 }) {
+              Text(String(this.pits.length > 0 ? this.pits[(i)] : 0))
+              .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
+              .fontColor(this.theme.ink)
+              Text(this.pits.length > 0 && this.pits[(i)] > 0 ? '●' : '·')
+              .fontSize(FontSize.xxs)
+              .fontColor(false ? Palette.emerald : Palette.orange)
+              }
+              .layoutWeight(1)
+              .aspectRatio(1)
+              .justifyContent(FlexAlign.Center)
+              .backgroundColor(false && this.turn === 0 && !this.over && this.pits[(i)] > 0
+              ? '#2210B981' : this.theme.surface)
+              .borderRadius(Radius.full)
+              .border({ width: 1, color: this.theme.line })
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .onClick(() => {
+              if (false) {
+              this.playerMove((i));
+              }
+              })
+            }, (i: number) => 'a' + i)
+          }
+          .width('100%')
+
+          Row({ space: Space.sm }) {
+            ForEach(this.rowIdx(), (i: number) => {
+              Column({ space: 2 }) {
+              Text(String(this.pits.length > 0 ? this.pits[(i)] : 0))
+              .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
+              .fontColor(this.theme.ink)
+              Text(this.pits.length > 0 && this.pits[(i)] > 0 ? '●' : '·')
+              .fontSize(FontSize.xxs)
+              .fontColor(true ? Palette.emerald : Palette.orange)
+              }
+              .layoutWeight(1)
+              .aspectRatio(1)
+              .justifyContent(FlexAlign.Center)
+              .backgroundColor(true && this.turn === 0 && !this.over && this.pits[(i)] > 0
+              ? '#2210B981' : this.theme.surface)
+              .borderRadius(Radius.full)
+              .border({ width: 1, color: this.theme.line })
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .onClick(() => {
+              if (true) {
+              this.playerMove((i));
+              }
+              })
+            }, (i: number) => 'p' + i)
+          }
+          .width('100%')
+        }
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+
+        // 我方的库（在右）
+        Column({ space: Space.xs }) {
+          Text(TG('我')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(String(this.pits.length > 0 ? this.pits[P_STORE] : 0))
+            .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
+        }
+        .width(56)
+        .height('100%')
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.lg)
+      }
+      .width('100%')
+      .layoutWeight(1)
+
+      Text(this.over ? (this.won ? '🎉 你的库更多，赢了！' : '这局输了，再来一局') :
+        (this.turn === 0 ? '轮到你：点一个自己的坑撒石子'
+          : (LanMatch.isActive() ? '联机：等对手走子…' : '对手思考中…')))
+        .fontSize(FontSize.sm)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+
+      Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        .fontSize(FontSize.md).fontColor(Color.White)
+        .backgroundColor(Palette.lime).borderRadius(Radius.md)
+        .width('100%').height(Cell.of(44))
+        .onClick(() => {
+          this.restartTap();
+        })
+    }
+    .width('100%')
+    .height('100%')
+  }
+
+
+
+
+}

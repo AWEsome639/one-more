@@ -1,0 +1,160 @@
+/**
+ * AB 反转 —— 刺激按「圆/菱」交替出现，偶尔连续两次相同（= 反转）
+ * 一击：看到反转立刻点「反转！」；正常交替时点 = 误报
+ * 胜负：24 帧内命中 ≥5 且误报 ≤2 通关　进度：帧号 / 命中 / 误报 / 得分
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const TOTAL: number = 24; const FRAME_MS: number = 700; const BLINK_MS: number = 260;
+const FLIP_CHANCE: number = 0.2; const NEED_HIT: number = 5; const MAX_FA: number = 2;
+const A: string = '●'; const B: string = '◆';
+
+@Component
+export struct GAbReversalOddball {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State sym: string = A; @State flip: boolean = false; @State flash: string = '';
+  @State frame: number = 0; @State hits: number = 0; @State fa: number = 0; @State miss: number = 0;
+  @State score: number = 0; @State over: boolean = false; @State won: boolean = false;
+  @State msg: string = '';
+  private startAt: number = 0; private finished: boolean = false; private resp: boolean = false;
+  private timer: number = -1; private flashTo: number = -1;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TOTAL);
+     this.reset(); }
+  aboutToDisappear(): void {
+    if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
+    if (this.flashTo >= 0) { clearTimeout(this.flashTo); this.flashTo = -1; }
+  }
+
+  private reset(): void {
+    if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
+    this.sym = Math.random() < 0.5 ? A : B; this.flip = false; this.resp = false; this.flash = '';
+    this.frame = 1; this.hits = 0; this.fa = 0; this.miss = 0; this.score = 0;
+    this.over = false; this.won = false; this.finished = false; this.startAt = Date.now();
+    this.msg = TG('看到「反常」（连续两次同一个）就点按钮');
+    this.timer = setInterval(() => { this.tick(); }, FRAME_MS);
+  }
+
+  /** 推进一帧；先把上一帧判掉：反转没点 ⇒ 记一次漏 */
+  private tick(): void {
+    if (this.over) { return; }
+    if (this.flip && !this.resp) { this.miss = this.miss + 1; }
+    if (this.frame >= this.diffTotal) { this.end(); return; }
+    const last: string = this.sym;
+    let next: string = last === A ? B : A;
+    if (Math.random() < FLIP_CHANCE) { next = last; }
+    this.flip = next === last; this.sym = next; this.resp = false; this.frame = this.frame + 1;
+  }
+
+  private tapFlip(): void {
+    if (this.over) { return; }
+    if (this.resp) { this.msg = TG('这一帧已经判过了'); return; }
+    const isFlip: boolean = this.flip;
+    this.resp = true;
+    if (isFlip) {
+      this.hits = this.hits + 1; this.score = this.score + 120;
+      this.flash = Palette.emerald; this.msg = TG('✅ 抓到反转！');
+    } else {
+      this.fa = this.fa + 1; this.score = Math.max(0, this.score - 40);
+      this.flash = Palette.rose; this.msg = TG('❌ 这次是正常交替');
+    }
+    if (this.flashTo >= 0) { clearTimeout(this.flashTo); }
+    this.flashTo = setTimeout(() => { this.flashTo = -1; this.flash = ''; }, BLINK_MS);
+  }
+
+  private end(): void {
+    if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
+    this.over = true; this.won = this.hits >= NEED_HIT && this.fa <= MAX_FA;
+    this.msg = this.won ? '🎉 命中 ' + this.hits + ' 次、误报 ' + this.fa + ' 次，通关！'
+      : '💤 命中 ' + this.hits + '/' + NEED_HIT + '、误报 ' + this.fa + '（限 ' + MAX_FA + '）';
+    if (this.finished) { return; }
+    this.finished = true;
+    const r: GameResult = { gameId: 'ab_reversal_oddball', solved: this.won, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.hits };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  private boxColor(): string {
+    if (this.flash.length > 0) { return this.flash; }
+    return this.theme.surface;
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text((TG('帧号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.frame + '/' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
+        }
+        .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('命中'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.hits), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        }
+        .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('误报'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.fa), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
+        }
+        .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+        }
+        .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+      }
+      .width('100%')
+
+      Stack() {
+        Text(this.sym).fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
+          .fontColor(this.flash.length > 0 ? '#FFFFFF' : this.theme.ink)
+      }
+      .width('100%').height(160)
+      .backgroundColor(this.boxColor()).borderRadius(Radius.lg).shadow(Shadow.lifted)
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+
+      Button(TG('反转！'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
+        .borderRadius(Radius.md).width('100%').height(Cell.of(64)).onClick(() => { this.tapFlip(); })
+
+      Row({ space: Space.sm }) {
+        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : '正在跑…')
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).enabled(false)
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { this.reset(); })
+      }
+      .width('100%')
+
+      Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      Text(TG2('提示：漏掉的反转 {0} 次 —— 只在连续两次同一个时点才抓对了',Digits(String(this.miss), this.langCode)))
+        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+    }
+    .width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+
+}

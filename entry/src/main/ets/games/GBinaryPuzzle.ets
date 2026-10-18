@@ -1,0 +1,533 @@
+/**
+ * 二进制（Takuzu / Binary Puzzle）—— 6×6 填 0 和 1
+ *
+ * 规则：
+ *   · 每行每列 0 与 1 各 3 个
+ *   · 任何一行/一列不能出现连续三个相同的数
+ * 判据：36 格填满且三条规则都满足 ⇒ 通关；填满了但有冲突 ⇒ 失败（也可随时放弃）
+ * 出题：随机回溯生成合法满盘，再逐格挖空并验证「解唯一」
+ *
+ * 契约：@Prop theme / @Prop @Watch('onRestart') restartToken / onFinish(r)
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const N: number = 6;
+const CELLS: number = N * N;
+// ★★ 2026-10-13 修复尺寸越界（困难档 ×1.3 ⇒ 8×8 = 64 格，
+//   而数组原来按 CELLS = 36 开 ⇒【困难档必越界】✗）
+const MAX_N: number = 8;
+const MAX_CELLS: number = MAX_N * MAX_N;
+const HALF: number = N / 2;
+const EMPTY: number = -1;
+const GIVENS: number = 18;
+const TICK_MS: number = 1000;
+const GAP: number = 2;
+const KEY_H: number = 46;
+
+interface Puzzle {
+  quiz: number[];
+  answer: number[];
+}
+
+function shuffled(n: number): number[] {
+  const a: number[] = [];
+  for (let i = 0; i < n; i++) {
+    a.push(i);
+  }
+  for (let i = n - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const t: number = a[i];
+    a[i] = a[j];
+    a[j] = t;
+  }
+  return a;
+}
+
+/** 一行（或一列）是否还没违规：连续三连 + 0/1 数量上限 */
+function lineOk(vals: number[]): boolean {
+  let ones: number = 0;
+  let zeros: number = 0;
+  for (let i = 0; i < N; i++) {
+    const v: number = vals[i];
+    if (v === EMPTY) {
+      continue;
+    }
+    if (v === 1) {
+      ones++;
+    } else {
+      zeros++;
+    }
+    if (i >= 2) {
+      const a: number = vals[i - 2];
+      const b: number = vals[i - 1];
+      const c: number = vals[i];
+      if (a !== EMPTY && a === b && b === c) {
+        return false;
+      }
+    }
+  }
+  return ones <= HALF && zeros <= HALF;
+}
+
+/** idx 处放 v 是否合法（不改动 grid） */
+function fits(grid: number[], idx: number, v: number): boolean {
+  const r: number = Math.floor(idx / N);
+  const c: number = idx % N;
+  const old: number = grid[idx];
+  grid[idx] = v;
+  const row: number[] = [];
+  const col: number[] = [];
+  for (let i = 0; i < N; i++) {
+    row.push(grid[r * N + i]);
+    col.push(grid[i * N + c]);
+  }
+  const ok: boolean = lineOk(row) && lineOk(col);
+  grid[idx] = old;
+  return ok;
+}
+
+function fill(grid: number[], pos: number): boolean {
+  if (pos === CELLS) {
+    return true;
+  }
+  if (grid[pos] !== EMPTY) {
+    return fill(grid, pos + 1);
+  }
+  const order: number[] = Math.random() < 0.5 ? [0, 1] : [1, 0];
+  for (let k = 0; k < order.length; k++) {
+    const v: number = order[k];
+    if (fits(grid, pos, v)) {
+      grid[pos] = v;
+      if (fill(grid, pos + 1)) {
+        return true;
+      }
+      grid[pos] = EMPTY;
+    }
+  }
+  return false;
+}
+
+// ★★ 2026-10-13 修复循环上界：原来用 CELLS（固定 base²）
+//   ⇒ 困难档棋盘更大 ⇒ 只检查了前 base² 格；简单档更小 ⇒ 检查到棋盘外
+//   ⇒ 加 size 参数（= 实际棋盘边长）
+function count(grid: number[], limit: number, size: number): number {
+  let pos: number = -1;
+  for (let i = 0; i < size * size; i++) {
+    if (grid[i] === EMPTY) {
+      pos = i;
+      break;
+    }
+  }
+  if (pos < 0) {
+    return 1;
+  }
+  let total: number = 0;
+  for (let v = 0; v <= 1; v++) {
+    if (fits(grid, pos, v)) {
+      grid[pos] = v;
+      total = total + count(grid, limit - total, size);
+      grid[pos] = EMPTY;
+      if (total >= limit) {
+        return total;
+      }
+    }
+  }
+  return total;
+}
+
+function makePuzzle(): Puzzle {
+  const answer: number[] = new Array<number>(MAX_CELLS).fill(EMPTY);
+  fill(answer, 0);
+  const quiz: number[] = answer.slice();
+  const order: number[] = shuffled(CELLS);
+  let removed: number = 0;
+  const need: number = CELLS - GIVENS;
+  for (let k = 0; k < order.length; k++) {
+    if (removed >= need) {
+      break;
+    }
+    const p: number = order[k];
+    const keep: number = quiz[p];
+    quiz[p] = EMPTY;
+    const probe: number[] = quiz.slice();
+    if (count(probe, 2, N) !== 1) {
+      quiz[p] = keep;
+    } else {
+      removed++;
+    }
+  }
+  const out: Puzzle = { quiz: quiz, answer: answer };
+  return out;
+}
+
+@Component
+export struct GBinaryPuzzle {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法：棋盘边长（原 N=6；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
+  //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5]，上面已一并改成按尺寸生成
+  @State private diffTotal: number = GameDiff.sizeNow(6);
+
+  /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
+  private rowIdx(): number[] {
+    const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const a2: number[] = [];
+    for (let i2 = 0; i2 < n2; i2++) { a2.push(i2); }
+    return a2;
+  }
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private cells: number[] = [];
+  @State private fixed: boolean[] = [];
+  @State private mistakes: number = 0;
+  @State private seconds: number = 0;
+  @State private status: string = '';
+  @State private done: boolean = false;
+
+  private startAt: number = 0;
+  private timer: number = -1;
+  private finished: boolean = false;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.reset();
+  }
+
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(6);
+    this.reset();
+  }
+
+  aboutToDisappear(): void {
+    this.stopTimer();
+  }
+
+  private reset(): void {
+    this.stopTimer();
+    const p: Puzzle = makePuzzle();
+    const cells: number[] = p.quiz.slice();
+    const fixed: boolean[] = [];
+    for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
+      fixed.push(cells[i] !== EMPTY);
+    }
+    this.cells = cells;
+    this.fixed = fixed;
+    this.mistakes = 0;
+    this.seconds = 0;
+    this.status = TG('点格子循环切换：空 → 0 → 1');
+    this.done = false;
+    this.finished = false;
+    this.startAt = Date.now();
+    this.timer = setInterval(() => {
+      if (!this.done && !this.finished) {
+        this.seconds = this.seconds + 1;
+      }
+    }, TICK_MS);
+  }
+
+  private stopTimer(): void {
+    if (this.timer >= 0) {
+      clearInterval(this.timer);
+      this.timer = -1;
+    }
+  }
+
+  private valAt(i: number): number {
+    return i >= 0 && i < this.cells.length ? this.cells[i] : EMPTY;
+  }
+
+  private isFixed(i: number): boolean {
+    return i >= 0 && i < this.fixed.length ? this.fixed[i] : false;
+  }
+
+  private filled(): number {
+    let n: number = 0;
+    for (let i = 0; i < this.cells.length; i++) {
+      if (this.cells[i] !== EMPTY) {
+        n++;
+      }
+    }
+    return n;
+  }
+
+  /** 该格现在是否违规 */
+  private bad(i: number): boolean {
+    const v: number = this.valAt(i);
+    if (v === EMPTY) {
+      return false;
+    }
+    const probe: number[] = this.cells.slice();
+    probe[i] = EMPTY;
+    return !fits(probe, i, v);
+  }
+
+  private tap(i: number): void {
+    if (this.done || this.finished) {
+      return;
+    }
+    if (this.isFixed(i)) {
+      this.status = TG('题目自带的数字不能改');
+      return;
+    }
+    const cur: number = this.valAt(i);
+    const next: number = cur === EMPTY ? 0 : (cur === 0 ? 1 : EMPTY);
+    const cells: number[] = this.cells.slice();
+    cells[i] = next;
+    this.cells = cells;
+
+    if (next === EMPTY) {
+      this.status = TG('清空了这一格');
+      return;
+    }
+    if (!fits(cells, i, next)) {
+      this.mistakes = this.mistakes + 1;
+      this.status = TG('这格现在违规：三连或 0/1 数量不等');
+    } else {
+      this.status = TG('合法，继续');
+    }
+    // 填满且合法 ⇒ 立刻通关；填满了但有冲突 ⇒ 只提示，让玩家自己改（点「交卷」才认输）
+    if (this.isWin()) {
+      this.done = true;
+      this.status = TG('🎉 每行每列都平衡，通关！');
+      this.finish(true);
+    } else if (this.allFilled()) {
+      this.status = TG('填满了但有冲突：红色格子改一改，或点「交卷」认输');
+    }
+  }
+
+  /** 交卷：满了且合法算通关，否则认输 */
+  private submit(): void {
+    if (this.done || this.finished) {
+      return;
+    }
+    if (this.isWin()) {
+      this.done = true;
+      this.status = TG('🎉 每行每列都平衡，通关！');
+      this.finish(true);
+      return;
+    }
+    this.done = true;
+    this.status = TG('交卷：盘面还有冲突，这一局没通关');
+    this.finish(false);
+  }
+
+  private allFilled(): boolean {
+    for (let i = 0; i < this.cells.length; i++) {
+      if (this.cells[i] === EMPTY) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private isWin(): boolean {
+    for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
+      if (this.cells[i] === EMPTY) {
+        return false;
+      }
+    }
+    for (let r = 0; r < this.diffTotal; r++) {
+      const row: number[] = [];
+      const col: number[] = [];
+      for (let c = 0; c < this.diffTotal; c++) {
+        row.push(this.cells[r * this.diffTotal + c]);
+        col.push(this.cells[c * this.diffTotal + r]);
+      }
+      if (!lineOk(row) || !lineOk(col)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private finish(solved: boolean): void {
+    if (this.finished) {
+      return;
+    }
+    this.finished = true;
+    this.stopTimer();
+    const r: GameResult = {
+      gameId: 'binary_puzzle',
+      solved: solved,
+      score: solved ? Math.max(150, 1100 - this.seconds * 3 - this.mistakes * 100) : 0,
+      durationMs: Date.now() - this.startAt,
+      levelReached: this.filled()
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text(true ? TG('已填') : (false ? TG('失误') : TG('用时')))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+        Text(true ? (this.filled() + '/' + CELLS)
+        : (false ? String(this.mistakes) : (this.seconds + 's')))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text(false ? TG('已填') : (true ? TG('失误') : TG('用时')))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+        Text(false ? (this.filled() + '/' + CELLS)
+        : (true ? String(this.mistakes) : (this.seconds + 's')))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text(false ? TG('已填') : (false ? TG('失误') : TG('用时')))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+        Text(false ? (this.filled() + '/' + CELLS)
+        : (false ? String(this.mistakes) : (this.seconds + 's')))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+      }
+      .width('100%')
+
+      Column({ space: GAP }) {
+        ForEach(this.rowIdx(), (r: number) => {
+          Row({ space: GAP }) {
+            ForEach(this.rowIdx(), (c: number) => {
+              Stack() {
+              Text(this.textOf((r * this.diffTotal + c)))
+              .fontSize(FontSize.xxl)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.inkOf((r * this.diffTotal + c)))
+              }
+              .layoutWeight(1)
+              .aspectRatio(1)
+              .backgroundColor(this.bgOf((r * this.diffTotal + c)))
+              .borderRadius(Radius.sm)
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .onClick(() => {
+              this.tap((r * this.diffTotal + c));
+              })
+            }, (c: number) => 'c' + c)
+          }
+          .width('100%')
+        }, (r: number) => 'r' + r)
+      }
+      .width('86%')
+      .aspectRatio(1)
+      .padding(Space.xs)
+      .backgroundColor('#1A4F46E5')
+      .borderRadius(Radius.lg)
+
+      Row({ space: Space.sm }) {
+        Button(TG('清空'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(KEY_H)
+          .onClick(() => {
+            if (this.done || this.finished) {
+              return;
+            }
+            const cells: number[] = this.cells.slice();
+            for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
+              if (!this.isFixed(i)) {
+                cells[i] = EMPTY;
+              }
+            }
+            this.cells = cells;
+            this.status = TG('已清空你填的格子');
+          })
+        Button(TG('换一题'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.sm)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(KEY_H)
+          .onClick(() => {
+            this.reset();
+          })
+        Button(TG('交卷'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.inkSoft)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(KEY_H)
+          .onClick(() => {
+            this.submit();
+          })
+      }
+      .width('100%')
+
+      Text(this.status)
+        .fontSize(FontSize.sm)
+        .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
+        .width('100%')
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+  /** kind: 0=已填 1=失误 2=用时 */
+
+
+
+
+  private textOf(i: number): string {
+    const v: number = this.valAt(i);
+    return v === EMPTY ? '' : String(v);
+  }
+
+  private bgOf(i: number): string {
+    if (this.bad(i)) {
+      return '#FECDD3';
+    }
+    const v: number = this.valAt(i);
+    if (v === 1) {
+      return Palette.primaryDeep;
+    }
+    if (v === 0) {
+      return this.theme.isDark ? '#1E1E2E' : '#E2E8F0';
+    }
+    return this.isFixed(i) ? this.theme.surfaceAlt : this.theme.surface;
+  }
+
+  private inkOf(i: number): string {
+    if (this.bad(i)) {
+      return Palette.danger;
+    }
+    return this.valAt(i) === 1 ? '#FFFFFF' : this.theme.ink;
+  }
+}

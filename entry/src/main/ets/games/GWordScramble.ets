@@ -1,0 +1,167 @@
+/**
+ * 单词重排 —— 打乱的字母按正确顺序点回去，中文释义给线索
+ * 胜负：150 秒内拼对 8 个词通关｜超时失败｜进度：第几个 / 拼对 / 剩余时间
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+const ROUNDS: number = 8; const LIMIT_MS: number = 150000;
+const TICK_MS: number = 100; const FEED_MS: number = 620;
+interface Entry { w: string; hint: string }
+const BANK: Entry[] = [
+  { w: 'APPLE', hint: TG('苹果') }, { w: 'BANANA', hint: TG('香蕉') }, { w: 'ORANGE', hint: '橙子' },
+  { w: 'GRAPE', hint: '葡萄' }, { w: 'TIGER', hint: TG('老虎') }, { w: 'RABBIT', hint: '兔子' },
+  { w: 'PENCIL', hint: TG('铅笔') }, { w: 'FLOWER', hint: '花朵' }, { w: 'WINDOW', hint: '窗户' },
+  { w: 'GARDEN', hint: TG('花园') }, { w: 'SUMMER', hint: '夏天' }, { w: 'WINTER', hint: TG('冬天') },
+  { w: 'MUSIC', hint: '音乐' }, { w: 'RIVER', hint: TG('河流') }, { w: 'CANDLE', hint: '蜡烛' },
+  { w: 'KITCHEN', hint: '厨房' }, { w: 'MORNING', hint: '早晨' }, { w: 'MONKEY', hint: '猴子' }
+];
+function mixEntries(src: Entry[]): Entry[] {
+  const out: Entry[] = src.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const t: Entry = out[i]; out[i] = out[j]; out[j] = t;
+  }
+  return out;
+}
+function mixLetters(w: string): string[] {
+  const src: string[] = w.split('');
+  for (let i = src.length - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const t: string = src[i]; src[i] = src[j]; src[j] = t;
+  }
+  return src;
+}
+@Component
+export struct GWordScramble {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  /** ★ 2026-10-16 通关庆祝 */
+  @State private winK: number = 1;
+  onFinish: (r: GameResult) => void = () => {};
+  @State queue: Entry[] = []; @State idx: number = 0; @State tiles: string[] = [];
+  @State used: boolean[] = []; @State typed: string[] = []; @State msg: string = '';
+  @State score: number = 0; @State solved: number = 0; @State leftMs: number = LIMIT_MS;
+  @State over: boolean = false; @State won: boolean = false;
+  private startAt: number = 0; private timer: number = -1; private feed: number = -1;
+  private settled: boolean = false;
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+     this.reset(); }
+  aboutToDisappear(): void { this.stopAll(); }
+  private stopAll(): void {
+    if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
+    if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; }
+  }
+  private word(): string { return this.queue.length > this.idx ? this.queue[this.idx].w : ''; }
+  private hint(): string { return this.queue.length > this.idx ? this.queue[this.idx].hint : ''; }
+  private reset(): void {
+    this.stopAll();
+    this.queue = mixEntries(BANK).slice(0, this.diffTotal);
+    this.idx = 0; this.score = 0; this.solved = 0; this.leftMs = LIMIT_MS;
+    this.over = false; this.won = false; this.settled = false; this.startAt = Date.now();
+    this.load();
+    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+  }
+  private load(): void {
+    const w: string = this.word();
+    let t: string[] = mixLetters(w);
+    for (let guard = 0; guard < 20 && t.join('') === w; guard++) { t = mixLetters(w); }
+    this.tiles = t; this.used = new Array<boolean>(w.length).fill(false); this.typed = [];
+    this.msg = TG2('按顺序点字母，拼出「{0}」', this.hint());
+  }
+  private tick(): void {
+    if (this.over) { return; }
+    const gap: number = Date.now() - this.startAt;
+    this.leftMs = gap >= LIMIT_MS ? 0 : LIMIT_MS - gap;
+    if (gap >= LIMIT_MS) {
+      this.over = true; this.msg = TG2("⌛ 时间到 —— 拼对 {0} 个词", this.solved); this.finish(false);
+    }
+  }
+  private tap(i: number): void {
+    if (this.over || this.feed >= 0 || (this.used.length > i && this.used[i])) { return; }
+    const next: boolean[] = this.used.slice(); next[i] = true; this.used = next;
+    this.typed = this.typed.concat([this.tiles[i]]);
+    if (this.typed.length >= this.word().length) { this.check(); }
+  }
+  private undo(): void {
+    if (this.over || this.typed.length === 0) { return; }
+    const last: string = this.typed[this.typed.length - 1];
+    const next: boolean[] = this.used.slice();
+    for (let i = next.length - 1; i >= 0; i--) {
+      if (next[i] && this.tiles[i] === last) { next[i] = false; break; }
+    }
+    this.used = next; this.typed = this.typed.slice(0, this.typed.length - 1);
+  }
+  private check(): void {
+    const guess: string = this.typed.join(''); const w: string = this.word();
+    if (guess === w) {
+      this.solved = this.solved + 1; this.score = this.score + 100 + Math.floor(this.leftMs / 1000);
+      this.msg = '✅ ' + w + '（' + this.hint() + '）';
+      if (this.solved >= this.diffTotal) {
+        this.over = true; this.won = true; this.msg = TG2('🎉 {0} 个词全拼对，通关！',Digits(String(this.diffTotal), this.langCode));
+        this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
+      }
+      this.feed = setTimeout(() => { this.feed = -1; this.idx = this.idx + 1; this.load(); }, FEED_MS);
+      return;
+    }
+    this.msg = TG2('❌ {0} 不对，再试一次', guess);
+    this.feed = setTimeout(() => { this.feed = -1; this.used = new Array<boolean>(w.length).fill(false); this.typed = []; }, FEED_MS);
+  }
+  private finish(solved: boolean): void {
+    if (this.settled) { return; }
+    this.settled = true; this.stopAll();
+    const r: GameResult = { gameId: 'word_scramble', solved: solved, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.solved };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+  private tileTone(i: number): string { return this.used.length > i && this.used[i] ? (this.theme.isDark ? '#2A2A2A' : '#D8DDE6') : this.theme.surface; }
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: Space.xs }) {
+        Text((TG('第几个'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(((this.idx + 1) + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: Space.xs }) {
+        Text((TG('拼对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.solved), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: Space.xs }) {
+        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(((this.leftMs / 1000).toFixed(1) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }.width('100%')
+      Column({ space: Space.xs }) {
+        Text('「' + this.hint() + '」').fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text(this.typed.length > 0 ? this.typed.join(' ') : '· · ·').fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.primary)
+      }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      Row({ space: Space.xs }) {
+        ForEach(this.tiles, (c: string, i: number) => { Text((c)).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).aspectRatio(1).backgroundColor(this.tileTone((i))).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap((i)); }) }, (c: string, i: number) => 't' + i)
+      }.width('100%')
+      Text(this.msg).fontSize(FontSize.sm)
+        // ★ 通关庆祝
+        .scale({ x: this.winK, y: this.winK })
+        .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      Row({ space: Space.sm }) {
+        Button(TG('撤销'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.undo(); })
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.reset(); })
+      }.width('100%')
+      Text(TG2('提示：拼错会自动清空重来；共 {0} 个词，慢慢想 🐳', this.diffTotal)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+
+}

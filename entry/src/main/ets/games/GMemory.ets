@@ -1,0 +1,213 @@
+/**
+ * 记忆翻牌 —— 成对翻出
+ * 规则：翻两张，相同则保留，不同则翻回；全部配对即通关
+ * 用 emoji 做牌面（零美术依赖）
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const FACES: string[] = ['🍎', '🍇', '🍋', '🍒', '🥝', '🍑', '🌰', '🫐'];
+
+interface Card {
+  face: string;
+  open: boolean;
+  matched: boolean;
+}
+
+@Component
+export struct GMemory {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+  onFinish: (r: GameResult) => void = () => {};
+
+  // ★ 难度作用到玩法：对数（简单 4 对 / 普通 6 对 / 困难 8 对）
+  @State private pairCount: number = GameDiff.pick(4, 6, 8);
+
+  @State private cards: Card[] = [];
+  @State private picked: number[] = [];
+  @State private tries: number = 0;
+  @State private done: boolean = false;
+  @State private lock: boolean = false;
+
+  private startAt: number = 0;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.reset();
+  }
+
+  /** 宿主点了「换一局」 */
+  onRestart(): void {
+    this.pairCount = GameDiff.pick(4, 6, 8);
+    this.reset();
+  }
+
+  private reset(): void {
+    const deck: string[] = FACES.slice(0, this.pairCount).concat(FACES.slice(0, this.pairCount));   // 8 对 = 16 张
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j: number = Math.floor(Math.random() * (i + 1));
+      const t: string = deck[i];
+      deck[i] = deck[j];
+      deck[j] = t;
+    }
+    const cs: Card[] = deck.map((f: string) => {
+      const c: Card = { face: f, open: false, matched: false };
+      return c;
+    });
+    this.cards = cs;
+    this.picked = [];
+    this.tries = 0;
+    this.done = false;
+    this.lock = false;
+    this.startAt = Date.now();
+  }
+
+  private tap(i: number): void {
+    if (this.lock || this.done) {
+      return;
+    }
+    const cur: Card[] = this.cards.map((c: Card) => {
+      const n: Card = { face: c.face, open: c.open, matched: c.matched };
+      return n;
+    });
+    if (cur[i].open || cur[i].matched) {
+      return;
+    }
+    cur[i].open = true;
+    this.cards = cur;
+    const p: number[] = this.picked.concat([i]);
+    this.picked = p;
+
+    if (p.length === 2) {
+      this.tries++;
+      const a: number = p[0];
+      const b: number = p[1];
+      if (cur[a].face === cur[b].face) {
+        const c2: Card[] = this.cards.map((c: Card) => {
+          const n: Card = { face: c.face, open: c.open, matched: c.matched };
+          return n;
+        });
+        c2[a].matched = true;
+        c2[b].matched = true;
+        c2[a].open = false;
+        c2[b].open = false;
+        this.cards = c2;
+        this.picked = [];
+        if (c2.every((c: Card) => c.matched)) {
+          this.done = true;
+          const r: GameResult = {
+            gameId: 'memory',
+            solved: true,
+            score: Math.max(100, 1000 - (this.tries - 8) * 60),
+            durationMs: Date.now() - this.startAt,
+            levelReached: this.tries
+          };
+          LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+          this.onFinish(r);
+        }
+      } else {
+        this.lock = true;
+        setTimeout(() => {
+          const c3: Card[] = this.cards.map((c: Card) => {
+            const n: Card = { face: c.face, open: c.open, matched: c.matched };
+            return n;
+          });
+          c3[a].open = false;
+          c3[b].open = false;
+          this.cards = c3;
+          this.picked = [];
+          this.lock = false;
+        }, 700);
+      }
+    }
+  }
+
+  build() {
+    Column({ space: Space.lg }) {
+      Row({ space: Space.md }) {
+        Column({ space: 2 }) {
+        Text((TG('翻牌次数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.tries), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1).padding(Space.sm)
+        .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('已配对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.matchedCount() + '/8')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1).padding(Space.sm)
+        .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }
+      .width('100%')
+
+      Column({ space: Space.sm }) {
+        ForEach([0, 1, 2, 3], (r: number) => {
+          Row({ space: Space.sm }) {
+            ForEach([0, 1, 2, 3], (c: number) => {
+              Stack() {
+              if ((this.cards[r * 4 + c]) !== undefined && ((this.cards[r * 4 + c]).open || (this.cards[r * 4 + c]).matched)) {
+              Text((this.cards[r * 4 + c]).face).fontSize(FontSize.xxl)
+              } else {
+              Text('?').accessibilityText(TG('待求')).fontSize(FontSize.xl).fontColor('#66FFFFFF')
+                .accessibilityLevel('no')
+              }
+              }
+              .layoutWeight(1)
+              .aspectRatio(0.82)
+              .backgroundColor(
+              ((this.cards[r * 4 + c]) !== undefined && ((this.cards[r * 4 + c]).open || (this.cards[r * 4 + c]).matched))
+              ? ((this.cards[r * 4 + c]).matched ? '#1A10B981' : this.theme.surface)
+              : Palette.violet
+              )
+              .borderRadius(Radius.md)
+              .shadow(Shadow.card)
+              .rotate({ angle: ((this.cards[r * 4 + c]) !== undefined && (this.cards[r * 4 + c]).open) ? 0 : 180 })
+              .animation({ duration: Motion.base, curve: Motion.snap() })
+              .onClick(() => {
+              this.tap((r * 4 + c));
+              })
+            }, (c: number) => 'c' + c)
+          }
+          .width('100%')
+        }, (r: number) => 'r' + r)
+      }
+      .width('100%')
+      .layoutWeight(1)
+
+      Text(this.done ? '🎉 全部配对！' : (this.tries >= 20 ? '有点多哦，沉住气' : '每次翻两张，找相同的'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.done ? Palette.emerald : this.theme.inkFaint)
+
+      Button(TG('重新开始'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        .fontSize(FontSize.md).fontColor(Color.White)
+        .backgroundColor(Palette.primary).borderRadius(Radius.md)
+        .width('100%').height(Cell.of(46))
+        .onClick(() => {
+          this.reset();
+        })
+    }
+    .width('100%').height('100%')
+  }
+
+  private matchedCount(): number {
+    let n: number = 0;
+    this.cards.forEach((c: Card) => {
+      if (c.matched) {
+        n++;
+      }
+    });
+    return n / 2;
+  }
+
+
+
+
+}

@@ -1,0 +1,186 @@
+/**
+ * 注意瞬脱 —— 一串字符逐个闪现，其中有且只有一个数字，找出它是几
+ * 胜负：5 轮答对 4 轮以上 ⇒ 通关（每轮再快 40ms）；进度：轮次 / 答对 / 间隔
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const TRIALS: number = 5;
+const NEED: number = 4;
+const LEN: number = 13;
+const LETTERS: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K', 'M', 'P', 'R', 'S', 'T', 'V', 'X', 'Z'];
+const SLOTS: number[] = [0, 1, 2, 3];
+
+@Component
+export struct GAttentionalBlink {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State private seq: string[] = [];
+  @State private digit: string = '0';
+  @State private idx: number = -1;      // -1 未开始，LEN = 已播完
+  @State private showing: boolean = false;
+  @State private trialNo: number = 1;
+  @State private right: number = 0;
+  @State private opts: string[] = [];
+  @State private pick: number = -1;
+  @State private msg: string = '';
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  private startAt: number = 0;
+  private tickTo: number = -1;
+  private nextTo: number = -1;
+  private done: boolean = false;
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TRIALS);
+     this.reset(); }
+  aboutToDisappear(): void { this.clearAll(); }
+  private clearAll(): void {
+    if (this.tickTo >= 0) { clearTimeout(this.tickTo); this.tickTo = -1; }
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
+  }
+  /** 每轮更快：300ms ⇒ 140ms */
+  private pace(): number { return 300 - (this.trialNo - 1) * 40; }
+  private reset(): void {
+    this.clearAll();
+    this.trialNo = 1; this.right = 0; this.over = false; this.won = false; this.done = false;
+    this.startAt = Date.now();
+    this.newTrial();
+  }
+  private newTrial(): void {
+    const digits: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const list: string[] = [];
+    for (let i = 0; i < LEN; i++) { list.push(LETTERS[Math.floor(Math.random() * LETTERS.length)]); }
+    const at: number = 3 + Math.floor(Math.random() * (LEN - 6));
+    const d: string = digits[Math.floor(Math.random() * digits.length)];
+    list[at] = d;
+    const pool: string[] = [d];
+    while (pool.length < 4) {
+      const x: string = digits[Math.floor(Math.random() * digits.length)];
+      if (pool.indexOf(x) < 0) { pool.push(x); }
+    }
+    const mixed: string[] = [];
+    while (pool.length > 0) { mixed.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]); }
+    this.seq = list;
+    this.digit = d;
+    this.opts = mixed;
+    this.pick = -1;
+    this.idx = -1;
+    this.showing = false;
+    this.msg = TG2("第 {0} 轮：数字混在字母里，记住它是几", String(this.trialNo));
+    this.nextTo = setTimeout(() => { this.nextTo = -1; this.play(0); }, 600);
+  }
+  /** 逐个闪现：亮 pace() 毫秒、灭 70 毫秒 */
+  private play(k: number): void {
+    if (k >= this.seq.length) {
+      this.idx = LEN;
+      this.showing = false;
+      this.msg = TG('刚才的数字是几？');
+      return;
+    }
+    this.idx = k;
+    this.showing = true;
+    this.tickTo = setTimeout(() => {
+      this.tickTo = -1;
+      this.showing = false;
+      this.tickTo = setTimeout(() => { this.tickTo = -1; this.play(k + 1); }, 70);
+    }, this.pace());
+  }
+  private answer(i: number): void {
+    if (this.over || this.pick >= 0 || this.idx < LEN) { return; }
+    this.pick = i;
+    if (this.opts[i] === this.digit) {
+      this.right = this.right + 1;
+      this.msg = TG('✅ 正确！');
+    } else {
+      this.msg = TG2("❌ 应该是 {0}", this.digit);
+    }
+    this.nextTo = setTimeout(() => {
+      this.nextTo = -1;
+      if (this.trialNo >= this.diffTotal) {
+        this.over = true;
+        this.won = this.right >= NEED;
+        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
+        this.clearAll();
+        this.finish(this.won);
+        return;
+      }
+      this.trialNo = this.trialNo + 1;
+      this.newTrial();
+    }, 780);
+  }
+  private finish(solved: boolean): void {
+    if (this.done) { return; }
+    this.done = true;
+    const r: GameResult = {
+      gameId: 'attentional_blink', solved: solved, score: this.right * 120,
+      durationMs: Date.now() - this.startAt, levelReached: this.trialNo
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+  private answered(): boolean { return this.pick >= 0; }
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) { Column({ space: 2 }) {
+      Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.trialNo + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+      }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: 2 }) {
+      Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+      }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: 2 }) {
+      Text((TG('间隔'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.pace() + 'ms')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+      }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card) }.width('100%')
+      Stack() {
+        Text(this.showing && this.idx >= 0 ? this.seq[this.idx] : '·')
+          .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.violet)
+      }.width('100%').height(120).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Row({ space: Space.sm }) { Text(this.opts[(0)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+      .fontColor(this.pick === (0) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
+      .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
+      .backgroundColor(this.pick === (0) ? Palette.primaryDeep : (this.answered() ? this.theme.surface : this.theme.surfaceAlt))
+      .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (0) ? 0.5 : 1).shadow(Shadow.card)
+      .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onClick(() => { this.answer((0)); }); Text(this.opts[(1)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+      .fontColor(this.pick === (1) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
+      .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
+      .backgroundColor(this.pick === (1) ? Palette.primaryDeep : (this.answered() ? this.theme.surface : this.theme.surfaceAlt))
+      .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (1) ? 0.5 : 1).shadow(Shadow.card)
+      .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onClick(() => { this.answer((1)); }) }.width('100%')
+      Row({ space: Space.sm }) { Text(this.opts[(2)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+      .fontColor(this.pick === (2) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
+      .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
+      .backgroundColor(this.pick === (2) ? Palette.primaryDeep : (this.answered() ? this.theme.surface : this.theme.surfaceAlt))
+      .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (2) ? 0.5 : 1).shadow(Shadow.card)
+      .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onClick(() => { this.answer((2)); }); Text(this.opts[(3)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+      .fontColor(this.pick === (3) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
+      .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
+      .backgroundColor(this.pick === (3) ? Palette.primaryDeep : (this.answered() ? this.theme.surface : this.theme.surfaceAlt))
+      .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (3) ? 0.5 : 1).shadow(Shadow.card)
+      .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onClick(() => { this.answer((3)); }) }.width('100%')
+      Button(this.over ? TG('再来一局') : TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      Text(TG('提示：数字只出现一次，其余字母都是干扰项')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+
+}

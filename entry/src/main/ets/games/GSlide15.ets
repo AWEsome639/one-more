@@ -1,0 +1,392 @@
+/**
+ * 数字华容道 4×4 —— 把 1~15 按顺序归位，右下角留空
+ *
+ * ★可解性（关键）：初始局面**不是随机排列**，而是从"已解状态"出发做 260 步随机合法移动打乱。
+ *   15-puzzle 的合法移动只产生偶置换，随机排列有一半是无解的 —— 用"逆向打乱"从根上杜绝无解局面。
+ *
+ * 交互：点空格旁的方块 ⇒ 它滑进空位；也支持朝空位方向滑整块棋盘（滑动是点击的别名）
+ * 通关：第 0~14 格依次为 1~15，第 15 格为空
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const N: number = 4;
+const CELLS: number = N * N;
+// ★★ 2026-10-13 修复尺寸越界（困难档 ×1.3 ⇒ 6×6 = 36 格，原来只开 16）
+const MAX_N: number = 6;
+const MAX_CELLS: number = MAX_N * MAX_N;
+const SHUFFLE_STEPS: number = 260;
+
+@Component
+export struct GSlide15 {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法：棋盘边长（原 N=4；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
+  //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3]，上面已一并改成按尺寸生成
+  @State private diffTotal: number = GameDiff.sizeNow(4);
+
+  /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
+  private rowIdx(): number[] {
+    const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const a2: number[] = [];
+    for (let i2 = 0; i2 < n2; i2++) { a2.push(i2); }
+    return a2;
+  }
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State tiles: number[] = [];        // 0 = 空位
+  @State moves: number = 0;
+  @State seconds: number = 0;
+  @State won: boolean = false;
+  @State pressed: number = -1;
+  @State bestMoves: number = 0;       // 本局内的最好成绩
+  /** ★★ 2026-10-14 滑行（奥森：部分游戏应该有动态的运动过程，以 2048 为首）：
+   *  只让【刚移过来的那一块】从「来处」方向滑进来 */
+  @State private slideTo: number = -1;
+  @State private slideDX: number = 0;
+  @State private slideDY: number = 0;
+
+  private blank: number = CELLS - 1;
+  private initial: number[] = [];
+  private initialBlank: number = CELLS - 1;
+  private startAt: number = 0;
+  private timer: number = -1;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.reset();
+  }
+
+  /** 宿主点了「换一局」 */
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(4);
+    this.reset();
+  }
+
+  aboutToDisappear(): void {
+    if (this.timer >= 0) {
+      clearInterval(this.timer);
+      this.timer = -1;
+    }
+  }
+
+  private reset(): void {
+    // ① 从已解状态出发
+    let t: number[] = new Array<number>(MAX_CELLS).fill(0);
+    for (let i = 0; i < CELLS - 1; i++) {
+      t[i] = i + 1;
+    }
+    // ② 只做合法移动 ⇒ 局面必定可解（等价于"倒着解回去"）
+    let b: number = CELLS - 1;
+    let prev: number = -1;
+    for (let s = 0; s < SHUFFLE_STEPS; s++) {
+      const cand: number[] = this.neighbors(b).filter((x: number) => x !== prev);
+      const pick: number = cand[Math.floor(Math.random() * cand.length)];
+      t[b] = t[pick];
+      t[pick] = 0;
+      prev = b;
+      b = pick;
+    }
+    if (this.isDone(t)) {          // 极小概率又转回原状 ⇒ 再挪一步
+      const nb: number[] = this.neighbors(b);
+      const pick: number = nb[Math.floor(Math.random() * nb.length)];
+      t[b] = t[pick];
+      t[pick] = 0;
+      b = pick;
+    }
+
+    this.initial = t.slice();
+    this.initialBlank = b;
+    this.tiles = t;
+    this.blank = b;
+    this.moves = 0;
+    this.won = false;
+    this.seconds = 0;
+    this.pressed = -1;
+    this.startAt = Date.now();
+
+    if (this.timer >= 0) {
+      clearInterval(this.timer);
+    }
+    this.timer = setInterval(() => {
+      if (!this.won) {
+        this.seconds = Math.floor((Date.now() - this.startAt) / 1000);
+      }
+    }, 1000);
+  }
+
+  /** 某格的上下左右合法邻格 */
+  private neighbors(i: number): number[] {
+    const x: number = i % this.diffTotal;
+    const y: number = Math.floor(i / this.diffTotal);
+    const out: number[] = [];
+    if (x > 0) {
+      out.push(i - 1);
+    }
+    if (x < this.diffTotal - 1) {
+      out.push(i + 1);
+    }
+    if (y > 0) {
+      out.push(i - this.diffTotal);
+    }
+    if (y < this.diffTotal - 1) {
+      out.push(i + this.diffTotal);
+    }
+    return out;
+  }
+
+  private isDone(t: number[]): boolean {
+    for (let i = 0; i < CELLS - 1; i++) {
+      if (t[i] !== i + 1) {
+        return false;
+      }
+    }
+    return t[CELLS - 1] === 0;
+  }
+
+  /** 点方块：只有挨着空位的才能滑 */
+  private tap(i: number): void {
+    if (this.won || i === this.blank) {
+      return;
+    }
+    const bx: number = this.blank % this.diffTotal;
+    const by: number = Math.floor(this.blank / this.diffTotal);
+    const x: number = i % this.diffTotal;
+    const y: number = Math.floor(i / this.diffTotal);
+    if (Math.abs(x - bx) + Math.abs(y - by) !== 1) {
+      return;
+    }
+    const t: number[] = this.tiles.slice();
+    t[this.blank] = t[i];
+    t[i] = 0;
+    this.blank = i;
+    this.tiles = t;
+    // ★ 滑行：记录「移到哪」与「从哪来」的方向
+    const OFF: number = 12;
+    this.slideTo = i;
+    this.slideDX = ((i % this.diffTotal) - bx) * OFF;
+    this.slideDY = (Math.floor(i / this.diffTotal) - by) * OFF;
+    setTimeout(() => { this.slideDX = 0; this.slideDY = 0; }, 16);
+    this.moves++;
+
+    if (this.isDone(t)) {
+      this.won = true;
+      if (this.bestMoves === 0 || this.moves < this.bestMoves) {
+        this.bestMoves = this.moves;
+      }
+      this.finish(true);
+    }
+  }
+
+  /** 滑动是"点空格另一侧那块"的别名：上滑 ⇒ 空位下方的块往上走 */
+  private swipe(dir: number): void {
+    const bx: number = this.blank % this.diffTotal;
+    const by: number = Math.floor(this.blank / this.diffTotal);
+    if (dir === 0 && by < this.diffTotal - 1) {
+      this.tap(this.blank + this.diffTotal);
+    } else if (dir === 1 && bx > 0) {
+      this.tap(this.blank - 1);
+    } else if (dir === 2 && by > 0) {
+      this.tap(this.blank - this.diffTotal);
+    } else if (dir === 3 && bx < this.diffTotal - 1) {
+      this.tap(this.blank + 1);
+    }
+  }
+
+  private finish(solved: boolean): void {
+    const sec: number = Math.floor((Date.now() - this.startAt) / 1000);
+    const r: GameResult = {
+      gameId: 'slide15',
+      solved: solved,
+      score: solved ? Math.max(100, 1600 - this.moves * 8 - sec * 3) : 0,
+      durationMs: Date.now() - this.startAt
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  private clock(): string {
+    const m: number = Math.floor(this.seconds / 60);
+    const s: number = this.seconds % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  private tileBg(v: number, i: number): string {
+    if (v === 0) {
+      return this.theme.isDark ? '#14FFFFFF' : '#0F0F172A';
+    }
+    return v === i + 1 ? Palette.emerald : this.theme.surface;
+  }
+
+  private tileInk(v: number, i: number): ResourceColor {
+    return v === i + 1 ? Color.White : this.theme.ink;
+  }
+
+  /** 回到本局的初始局面（局面不变，从头再来） */
+  private retrySame(): void {
+    const t: number[] = this.initial.slice();
+    this.tiles = t;
+    this.blank = this.initialBlank;
+    this.moves = 0;
+    this.won = false;
+    this.seconds = 0;
+    this.pressed = -1;
+    this.startAt = Date.now();
+  }
+
+  build() {
+    Column({ space: Space.lg }) {
+      // ── 顶部三个数字 ──
+      Row({ space: Space.md }) {
+        Column({ space: 2 }) {
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.moves), this.langCode))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('用时'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.clock()))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('最好'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.bestMoves > 0 ? this.bestMoves + TG(' 步') : '—'))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+      }
+      .width('100%')
+
+      // ── 棋盘 ──
+      Column({ space: Space.xs }) {
+        ForEach(this.rowIdx(), (r: number) => {
+          Row({ space: Space.xs }) {
+            ForEach(this.rowIdx(), (c: number) => {
+              Stack() {
+              if ((this.tiles[r * this.diffTotal + c]) > 0) {
+              Text(String((this.tiles[r * this.diffTotal + c])))
+              .fontSize(FontSize.xxl)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.tileInk((this.tiles[r * this.diffTotal + c]), (r * this.diffTotal + c)))
+              }
+              }
+              .layoutWeight(1)
+              .aspectRatio(1)
+              // ★ 滑行：只有刚移过来的那块有位移（其它块不动）
+              .translate({
+                x: (r * this.diffTotal + c) === this.slideTo ? this.slideDX : 0,
+                y: (r * this.diffTotal + c) === this.slideTo ? this.slideDY : 0
+              })
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .backgroundColor(this.tileBg((this.tiles[r * this.diffTotal + c]), (r * this.diffTotal + c)))
+              .borderRadius(Radius.md)
+              .scale({
+              x: this.pressed === (r * this.diffTotal + c) ? Motion.pressScale : 1,
+              y: this.pressed === (r * this.diffTotal + c) ? Motion.pressScale : 1
+              })
+              .onTouch((e: TouchEvent) => {
+              if (e.type === TouchType.Down) {
+              this.pressed = (r * this.diffTotal + c);
+              } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) {
+              this.pressed = -1;
+              }
+              })
+              .onClick(() => {
+              this.tap((r * this.diffTotal + c));
+              })
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+            }, (c: number) => 's15c' + r + '-' + c)
+          }
+          .width('100%')
+        }, (r: number) => 's15r' + r)
+      }
+      .width('100%')
+      .padding(Space.sm)
+      .backgroundColor(this.theme.surfaceAlt)
+      .borderRadius(Radius.lg)
+      .shadow(Shadow.card)
+      .gesture(
+        SwipeGesture({ fingers: 1, direction: SwipeDirection.All, speed: 20 })
+          .onAction((e: GestureEvent) => {
+            const a: number = e.angle;
+            if (a >= -45 && a < 45) {
+              this.swipe(1);
+            } else if (a >= 45 && a < 135) {
+              this.swipe(2);
+            } else if (a >= -135 && a < -45) {
+              this.swipe(0);
+            } else {
+              this.swipe(3);
+            }
+          })
+      )
+
+      // ── 状态 ──
+      Text(this.won ? '🎉 归位完成！' : '点空白格旁边的方块，让它滑过去')
+        .fontSize(FontSize.sm)
+        .fontColor(this.won ? Palette.emerald : this.theme.inkSoft)
+
+      // ── 操作 ──
+      Row({ space: Space.md }) {
+        Button(TG('打乱重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(Cell.of(48))
+          .onClick(() => {
+            this.reset();
+          })
+        Button(TG('重玩本局'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.inkSoft)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(Cell.of(48))
+          .onClick(() => {
+            this.retrySame();
+          })
+      }
+      .width('100%')
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+
+
+
+}

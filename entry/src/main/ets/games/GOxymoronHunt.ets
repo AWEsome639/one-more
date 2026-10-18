@@ -1,0 +1,184 @@
+/** 矛盾修辞 —— 四个搭配里挑出「自相矛盾」的那一个
+ *  胜负：6 题答对 ≥4 ⇒ 通关 ｜ 进度：题号 / 答对 / 每题倒计时 */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const QN: number = 6; const PASS: number = 4; const DECOY_N: number = 3;
+const LIMIT_MS: number = 8000; const TICK_MS: number = 100; const FEED_MS: number = 900;
+const OXY: string[] = ['震耳欲聋的沉默', '公开的秘密', '甜蜜的负担', '熟悉的陌生人', '有秩序的混乱',
+  '无声的呐喊', '孤独的人群', '缓慢的冲刺', '温柔的暴力', '明亮的黑夜', '微小的巨变'];
+const PLAIN: string[] = ['温暖的阳光', '广阔的海洋', '快速的列车', '绿色的草地', '香甜的蛋糕',
+  '高高的山峰', '明亮的灯光', '坚硬的石头', '深邃的夜空', '整齐的书架', '新鲜的蔬菜', '熟练的工匠'];
+interface OxyRound { opts: string[]; ans: number }
+function shuffled(arr: string[]): string[] {
+  const out: string[] = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const tmp: string = out[i]; out[i] = out[j]; out[j] = tmp;
+  }
+  return out;
+}
+function makeRound(): OxyRound {
+  const idx: number = Math.floor(Math.random() * OXY.length);
+  const pool: string[] = PLAIN.slice(); const opts: string[] = [OXY[idx]];
+  for (let i = 0; i < DECOY_N; i++) {
+    const j: number = Math.floor(Math.random() * pool.length);
+    opts.push(pool[j]); pool.splice(j, 1);
+  }
+  const mixed: string[] = shuffled(opts);
+  let ans: number = 0;
+  for (let i = 0; i < mixed.length; i++) { if (mixed[i] === OXY[idx]) { ans = i; } }
+  return { opts: mixed, ans: ans };
+}
+
+@Component
+export struct GOxymoronHunt {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.timeNow(LIMIT_MS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State q: OxyRound = makeRound(); @State qIndex: number = 0; @State right: number = 0;
+  @State score: number = 0; @State leftMs: number = this.diffTotal; @State msg: string = '';
+  @State over: boolean = false; @State won: boolean = false; @State pressed: number = -1;
+  private startAt: number = 0; private roundAt: number = 0; private timer: number = -1;
+  private feed: number = -1; private done: boolean = false;
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.timeNow(LIMIT_MS);
+     this.reset(); }
+  aboutToDisappear(): void { this.stop(); }
+  private stop(): void {
+    if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
+    if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; }
+  }
+  private reset(): void {
+    this.stop();
+    this.qIndex = 0; this.right = 0; this.score = 0; this.over = false; this.won = false;
+    this.done = false; this.pressed = -1; this.nextQ(); this.startAt = Date.now();
+    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+  }
+  private nextQ(): void {
+    this.q = makeRound(); this.leftMs = this.diffTotal; this.roundAt = Date.now();
+    this.msg = TG('哪一个搭配自相矛盾？');
+  }
+  private tick(): void {
+    if (this.over || this.feed >= 0) { return; }
+    const gap: number = Date.now() - this.roundAt;
+    this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
+    if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时：答案是「{0}」', this.q.opts[this.q.ans]); this.advance(); }
+  }
+  private pick(i: number): void {
+    if (this.over || this.feed >= 0) { return; }
+    const truth: string = this.q.opts[this.q.ans];
+    if (i === this.q.ans) {
+      const gain: number = 120 + Math.floor(this.leftMs / 30);
+      this.right = this.right + 1; this.score = this.score + gain;
+      this.msg = '✅ ' + truth + '　+' + String(gain);
+    } else { this.msg = TG2('❌ 答案是「{0}」', truth); }
+    this.advance();
+  }
+  private advance(): void {
+    this.qIndex = this.qIndex + 1;
+    if (this.qIndex >= QN) {
+      this.over = true; this.won = this.right >= PASS;
+      this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0}/{1}", String(this.right), String(QN));
+      this.finish(this.won);
+      return;
+    }
+    this.feed = setTimeout(() => { this.feed = -1; this.nextQ(); }, FEED_MS);
+  }
+  private finish(solved: boolean): void {
+    if (this.done) { return; }
+    this.done = true;
+    const r: GameResult = { gameId: 'oxymoron_hunt', solved: solved, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.right };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: Space.xs }) {
+        Text((TG('题'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((Math.min(this.qIndex + 1, QN) + '/' + QN)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: Space.xs }) {
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: Space.xs }) {
+        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(((this.leftMs / 1000).toFixed(1) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+      }.width('100%')
+      Column({ space: Space.xs }) {
+        Text(TG('矛盾修辞')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.sky)
+        Text(TG('两个词互相打架，才叫矛盾修辞')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.lg).shadow(Shadow.card)
+      Row({ space: Space.sm }) {
+        Text(this.q.opts.length > (0) ? this.q.opts[(0)] : '')
+        .fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
+        .fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(64)).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+        .scale({ x: this.pressed === (0) ? Motion.pressScale : 1, y: this.pressed === (0) ? Motion.pressScale : 1 })
+        .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .onTouch((e: TouchEvent) => {
+        if (e.type === TouchType.Down) { this.pressed = (0); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
+        })
+        .onClick(() => { this.pick((0)); })
+        Text(this.q.opts.length > (1) ? this.q.opts[(1)] : '')
+        .fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
+        .fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(64)).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+        .scale({ x: this.pressed === (1) ? Motion.pressScale : 1, y: this.pressed === (1) ? Motion.pressScale : 1 })
+        .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .onTouch((e: TouchEvent) => {
+        if (e.type === TouchType.Down) { this.pressed = (1); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
+        })
+        .onClick(() => { this.pick((1)); })
+      }.width('100%')
+      Row({ space: Space.sm }) {
+        Text(this.q.opts.length > (2) ? this.q.opts[(2)] : '')
+        .fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
+        .fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(64)).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+        .scale({ x: this.pressed === (2) ? Motion.pressScale : 1, y: this.pressed === (2) ? Motion.pressScale : 1 })
+        .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .onTouch((e: TouchEvent) => {
+        if (e.type === TouchType.Down) { this.pressed = (2); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
+        })
+        .onClick(() => { this.pick((2)); })
+        Text(this.q.opts.length > (3) ? this.q.opts[(3)] : '')
+        .fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
+        .fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(64)).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md).shadow(Shadow.card)
+        .scale({ x: this.pressed === (3) ? Motion.pressScale : 1, y: this.pressed === (3) ? Motion.pressScale : 1 })
+        .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .onTouch((e: TouchEvent) => {
+        if (e.type === TouchType.Down) { this.pressed = (3); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
+        })
+        .onClick(() => { this.pick((3)); })
+      }.width('100%')
+      Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46))
+        .onClick(() => { this.reset(); })
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+
+}

@@ -1,0 +1,171 @@
+/** 不等式天平 —— 天平不等关系；玩法：比较左右两边的算式，选出正确的 < / = / >；胜负：8 题答对 ≥6 ⇒ 通关；否则失败 */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const TOTAL: number = 8; const PASS: number = 6; const NEXT_MS: number = 800;
+/** 0 = '<'，1 = '='，2 = '>' */
+function sym(k: number): string {
+  if (k === 0) { return '<'; }
+  return k === 1 ? '=' : '>';
+}
+@Component
+export struct GInequalityBalanceOps {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
+  onFinish: (r: GameResult) => void = () => {};
+  @State private exprL: string = '';
+  @State private exprR: string = '';
+  @State private panL: number = 0;
+  @State private panR: number = 0;
+  @State private cmp: number = 1;
+  @State private picked: number = -1;
+  @State private round: number = 1;
+  @State private hits: number = 0;
+  /** ★ 2026-10-15 得分跳动 */
+  @State private hitsPulse: number = 1;
+  @State private score: number = 0;
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  @State private msg: string = '';
+  private startAt: number = 0; private nextTo: number = -1; private finished: boolean = false;
+  private slots: number[] = [0, 1, 2];
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TOTAL);
+     this.reset(); }
+  aboutToDisappear(): void {
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
+  }
+  private reset(): void {
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
+    this.round = 1; this.hits = 0; this.score = 0; this.over = false; this.won = false; this.finished = false;
+    this.startAt = Date.now(); this.ask(); this.msg = TG('先各算一边，再放符号');
+  }
+  private ask(): void {
+    const a: number = 2 + Math.floor(Math.random() * 8); const b: number = 1 + Math.floor(Math.random() * 6);
+    const c: number = 1 + Math.floor(Math.random() * 9); this.panL = a * b + c;
+    this.exprL = String(a) + '×' + String(b) + '+' + String(c);
+    if (Math.random() < 0.25) {
+      // 四分之一概率造出「相等」的一题
+      const e: number = 1 + Math.floor(Math.random() * (this.panL - 2)); this.panR = this.panL;
+      this.exprR = '1×' + String(e) + '+' + String(this.panL - e);
+    } else {
+      const d: number = 2 + Math.floor(Math.random() * 8); const e: number = 1 + Math.floor(Math.random() * 6);
+      const f: number = 1 + Math.floor(Math.random() * 9); this.panR = d * e + f;
+      this.exprR = String(d) + '×' + String(e) + '+' + String(f);
+    }
+    this.cmp = this.panL < this.panR ? 0 : (this.panL === this.panR ? 1 : 2); this.picked = -1;
+  }
+  private pick(i: number): void {
+    if (this.picked >= 0 || this.over) { return; }
+    this.picked = i;
+    if (i === this.cmp) {
+      this.hits = this.hits + 1; this.score += 130; this.hitsPulse = 1.3; setTimeout(() => { this.hitsPulse = 1; }, 140);
+      this.msg = TG2('✅ 左边 {0} {1} 右边 {2}', String(this.panL), sym(this.cmp), String(this.panR));
+    } else {
+      this.score = Math.max(0, this.score - 20);
+      this.msg = TG2("❌ {0} 与 {1} 应是 {2}", String(this.panL), String(this.panR), )
+        sym(this.cmp) + TG2('，不是 {0}', sym(i));
+    }
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); }
+    this.nextTo = setTimeout(() => { this.nextTo = -1; this.next(); }, NEXT_MS);
+  }
+  private next(): void {
+    if (this.over) { return; }
+    if (this.round >= this.diffTotal) {
+      this.over = true; this.won = this.hits >= PASS;
+      this.msg = this.won
+        ? TG('🎉 答对 ') + String(this.hits) + '/' + String(this.diffTotal) + TG('，通关！')
+        : TG('😵 只答对 ') + String(this.hits) + '/' + String(this.diffTotal) + TG('，差 ') + String(PASS - this.hits) + TG(' 题');
+      this.finish(this.won); return;
+    }
+    this.round = this.round + 1; this.ask();
+  }
+  private finish(solved: boolean): void {
+    if (this.finished) { return; }
+    this.finished = true;
+    const r: GameResult = {
+      gameId: 'inequality_balance_ops', solved: solved, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.hits
+    }; LanRace.noteDone(); this.onFinish(r);
+  }
+  private btnBg(i: number): string {
+    if (this.picked < 0) { return this.theme.surface; }
+    if (i === this.cmp) { return Palette.emerald; }
+    return i === this.picked ? Palette.rose : this.theme.surface;
+  }
+  private btnInk(i: number): string {
+    if (this.picked < 0) { return this.theme.ink; }
+    if (i === this.cmp) { return '#FFFFFF'; }
+    return i === this.picked ? '#FFFFFF' : this.theme.inkFaint;
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.hits + '/' + PASS)).fontSize(FontSize.lg)
+        // ★ 得分跳动
+        .scale({ x: this.hitsPulse, y: this.hitsPulse })
+        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }.width('100%')
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text(true ? this.exprL : this.exprR).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
+        Text(this.picked < 0 ? '？' : String(true ? this.panL : this.panR)).fontSize(FontSize.xl).fontColor(this.theme.ink)
+        }.layoutWeight(1)
+        Column({ space: 2 }) {
+          Text('⚖️').fontSize(FontSize.xxl)
+            .accessibilityLevel('no')
+          Text(this.picked < 0 ? '?' : sym(this.cmp)).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+            .fontColor(this.picked < 0 ? this.theme.inkFaint : Palette.emerald)
+        }
+        Column({ space: 2 }) {
+        Text(false ? this.exprL : this.exprR).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
+        Text(this.picked < 0 ? '？' : String(false ? this.panL : this.panR)).fontSize(FontSize.xl).fontColor(this.theme.ink)
+        }.layoutWeight(1)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      Row({ space: Space.sm }) {
+        ForEach(this.slots, (i: number) => {
+          Button(sym(i))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xxl).fontColor(this.btnInk(i))
+            .backgroundColor(this.btnBg(i)).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(i); })
+            // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
+            .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
+              .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+        }, (i: number) => 'ibo' + i)
+      }.width('100%')
+      Text(this.msg).fontSize(FontSize.sm).width('100%')
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal)
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      Text(TG('提示：先算乘、再算加；两边都算完才好放符号')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+  /** which: 0 = 左盘，1 = 右盘 */
+
+
+
+}

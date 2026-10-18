@@ -1,0 +1,168 @@
+/**
+ * 元音重建 —— 单词里的元音在 AEIOU 里被整体挪了若干格，点亮元音把它一格一格转回来
+ * 胜负：6 个词里还原 ≥ 5 个通关 ｜ 进度：第几词 / 已还原 / 剩余步数 / 得分
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const ROUNDS: number = 6; const PASS: number = 5; const VOWELS: string = 'AEIOU'; const FEED_MS: number = 900;
+
+interface VW { w: string; gloss: string }
+
+const BANK: VW[] = [
+  { w: 'MUSIC', gloss: '音乐 🎵' }, { w: 'GARDEN', gloss: '花园 🌷' }, { w: 'PENCIL', gloss: '铅笔 ✏️' },
+  { w: 'CASTLE', gloss: '城堡 🏰' }, { w: 'RIVER', gloss: '河流 🏞️' }, { w: 'TIGER', gloss: '老虎 🐯' },
+  { w: 'WINTER', gloss: '冬天 ❄️' }, { w: 'DOCTOR', gloss: '医生 🩺' }, { w: 'PLANET', gloss: '行星 🪐' },
+  { w: 'MARKET', gloss: '市场 🛒' }, { w: 'SUMMER', gloss: '夏天 ☀️' }, { w: 'ROBOT', gloss: '机器人 🤖' },
+  { w: 'CANDLE', gloss: '蜡烛 🕯️' }, { w: 'SILVER', gloss: '银 🥈' }, { w: 'WINDOW', gloss: '窗户 🪟' },
+  { w: 'BRIDGE', gloss: '桥 🌉' }, { w: 'KITCHEN', gloss: '厨房 🍳' }, { w: 'MONKEY', gloss: '猴子 🐒' }
+];
+
+function isVowel(ch: string): boolean { return VOWELS.indexOf(ch) >= 0; }
+
+function vowelCount(w: string): number {
+  let n: number = 0;
+  for (let i = 0; i < w.length; i++) { if (isVowel(w.charAt(i))) { n = n + 1; } }
+  return n;
+}
+
+/** 每个元音在 AEIOU 里往后挪 shift 格（循环），辅音不动 */
+function encodeWord(w: string, shift: number): string {
+  const out: string[] = [];
+  for (let i = 0; i < w.length; i++) {
+    const ch: string = w.charAt(i); const k: number = VOWELS.indexOf(ch);
+    out.push(k < 0 ? ch : VOWELS.charAt((k + shift) % 5));
+  }
+  return out.join('');
+}
+
+/** 往前转一格：A→U，E→A，I→E，O→I，U→O */
+function backOne(ch: string): string {
+  const k: number = VOWELS.indexOf(ch);
+  return k < 0 ? ch : VOWELS.charAt((k + 4) % 5);
+}
+/** 从 0..total-1 中随机取 k 个互不相同的下标 */
+function pickIndexes(total: number, k: number): number[] {
+  const pool: number[] = []; const out: number[] = [];
+  for (let i = 0; i < total; i++) { pool.push(i); }
+  while (out.length < k) { const j: number = Math.floor(Math.random() * pool.length); out.push(pool[j]); pool.splice(j, 1); }
+  return out;
+}
+
+@Component
+export struct GVowelReconstruct {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private order: number[] = []; @State private qi: number = 0;
+  @State private letters: string[] = []; @State private stepsLeft: number = 0;
+  @State private solvedCount: number = 0; @State private score: number = 0;
+  /** ★ 2026-10-15 得分跳动 */
+  @State private scorePulse: number = 1;
+  @State private msg: string = ''; @State private over: boolean = false;
+  @State private won: boolean = false; @State private pressed: number = -1;
+
+  private startAt: number = 0; private feed: number = -1; private done: boolean = false;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+     this.reset(); }
+  aboutToDisappear(): void { if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; } }
+
+  private cur(): VW { return BANK[this.order[this.qi]]; }
+  private reset(): void {
+    if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; }
+    this.order = pickIndexes(BANK.length, this.diffTotal);
+    this.qi = 0; this.solvedCount = 0; this.score = 0; this.over = false; this.won = false;
+    this.done = false; this.pressed = -1; this.startAt = Date.now(); this.load();
+  }
+  private load(): void {
+    const word: VW = this.cur(); const shift: number = 1 + Math.floor(Math.random() * 3);
+    this.letters = encodeWord(word.w, shift).split('');
+    this.stepsLeft = vowelCount(word.w) * 3 + 3; this.msg = TG('点亮元音，一格一格转回来');
+  }
+  private tap(i: number): void {
+    if (this.over || this.feed >= 0) { return; }
+    const ch: string = this.letters[i];
+    if (!isVowel(ch)) { return; }
+    const next: string[] = this.letters.slice(); next[i] = backOne(ch);
+    this.letters = next; this.stepsLeft = this.stepsLeft - 1;
+    if (this.score >= 10) { this.score = this.score - 10; }
+    const word: VW = this.cur();
+    if (next.join('') === word.w) {
+      this.solvedCount = this.solvedCount + 1; this.score = this.score + 150; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
+      this.msg = '✅ ' + word.w + '　' + word.gloss;
+      this.feed = setTimeout(() => { this.feed = -1; this.next(); }, FEED_MS);
+      return;
+    }
+    if (this.stepsLeft <= 0) {
+      this.msg = TG2('⌛ 步数用完，答案是 {0}', word.w);
+      this.feed = setTimeout(() => { this.feed = -1; this.next(); }, FEED_MS * 2);
+      return;
+    }
+    this.msg = TG2("还剩 {0} 步",Digits(String(this.stepsLeft), this.langCode));
+  }
+  private next(): void {
+    if (this.qi + 1 >= this.diffTotal) { this.end(); return; }
+    this.qi = this.qi + 1; this.load();
+  }
+  private end(): void {
+    if (this.done) { return; }
+    this.done = true; this.over = true; this.won = this.solvedCount >= PASS;
+    this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("还原 {0}/{1}", this.solvedCount, this.diffTotal);
+    const r: GameResult = { gameId: 'vowel_reconstruct', solved: this.won, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.solvedCount };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Text(TG2('词 {0}/{1}　还原 {2}', Math.min(this.qi + 1, this.diffTotal), this.diffTotal, this.solvedCount)
+          + TG2('　步数 {0}',Digits(String(this.stepsLeft), this.langCode))).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).layoutWeight(1)
+        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.xl)
+        // ★ 得分跳动
+        .scale({ x: this.scorePulse, y: this.scorePulse })
+        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(Palette.amber)
+      }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      Column({ space: Space.sm }) {
+        Text(TG2('释义：{0}', this.cur().gloss)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Row({ space: Space.xs }) {
+          ForEach(this.letters, (ch: string, i: number) => { this.letterTile(ch, i) },
+            (ch: string, i: number) => 'v' + i + ch)
+        }.width('100%')
+        Text(TG('点元音字母：A→U，E→A，I→E，O→I，U→O')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      Row({ space: Space.md }) {
+        Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2)
+          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
+          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { this.reset(); })
+      }.width('100%')
+      Text(TG('提示：元音被整体挪过 1～3 格，辅音位置没动')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+  @Builder
+  letterTile(ch: string, i: number) {
+    Text(ch).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
+      .fontColor(isVowel(ch) ? '#FFFFFF' : this.theme.inkFaint)
+      .layoutWeight(1).height(Cell.of(46)).borderRadius(Radius.sm)
+      .backgroundColor(isVowel(ch) ? Palette.primary : this.theme.surfaceAlt)
+      .scale({ x: this.pressed === i ? Motion.pressScale : 1, y: this.pressed === i ? Motion.pressScale : 1 })
+      .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap(i); })
+      .onTouch((e: TouchEvent) => { if (e.type === TouchType.Down) { this.pressed = i; } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; } })
+  }
+}

@@ -1,0 +1,354 @@
+/**
+ * 矩阵秩 —— 求二进制（模 2）矩阵的秩
+ *
+ * 玩法：给一个 4×4 的 0/1 矩阵，算它在 GF(2) 下的秩；四选一。
+ * 判据：秩 = 高斯消元后非零行的个数（模 2 下「同列相消」就是按位异或）。
+ * 胜负：8 题里答对 ≥6 ⇒ 通关；否则失败。
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const N: number = 4;
+const CELLS: number = N * N;
+const TOTAL: number = 8;
+const PASS: number = 6;
+const NEXT_MS: number = 780;
+const LETTERS: string[] = ['A', 'B', 'C', 'D'];
+
+@Component
+export struct GBinaryMatrixRank {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private m: number[] = [];
+  @State private opts: number[] = [];
+  @State private ans: number = -1;
+  @State private picked: number = -1;
+  @State private round: number = 1;
+  @State private right: number = 0;
+  @State private score: number = 0;
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  @State private msg: string = '';
+
+  private startAt: number = 0;
+  private nextTo: number = -1;
+  private finished: boolean = false;
+  private rows: number[] = [0, 1, 2, 3];
+  private optsIdx: number[] = [0, 1, 2, 3];
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now();
+    this.reset();
+  }
+
+  /** 宿主点了「换一局」 */
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TOTAL);
+    this.reset();
+  }
+
+  aboutToDisappear(): void {
+    if (this.nextTo >= 0) {
+      clearTimeout(this.nextTo);
+      this.nextTo = -1;
+    }
+  }
+
+  private reset(): void {
+    if (this.nextTo >= 0) {
+      clearTimeout(this.nextTo);
+      this.nextTo = -1;
+    }
+    this.round = 1;
+    this.right = 0;
+    this.score = 0;
+    this.over = false;
+    this.won = false;
+    this.finished = false;
+    this.startAt = Date.now();
+    this.ask();
+    this.msg = TG('这个 0/1 矩阵在模 2 下的秩是多少？');
+  }
+
+  /** GF(2) 高斯消元求秩 */
+  private rank(src: number[]): number {
+    const a: number[] = src.slice();
+    let r: number = 0;
+    for (let c = 0; c < N; c++) {
+      if (r >= N) {
+        break;
+      }
+      let piv: number = -1;
+      for (let i = r; i < N; i++) {
+        if (a[i * N + c] === 1) {
+          piv = i;
+          break;
+        }
+      }
+      if (piv < 0) {
+        continue;
+      }
+      if (piv !== r) {
+        for (let k = 0; k < N; k++) {
+          const t: number = a[r * N + k];
+          a[r * N + k] = a[piv * N + k];
+          a[piv * N + k] = t;
+        }
+      }
+      for (let i = 0; i < N; i++) {
+        const need: boolean = i !== r && a[i * N + c] === 1;
+        if (need) {
+          for (let k = 0; k < N; k++) {
+            a[i * N + k] = a[i * N + k] ^ a[r * N + k];
+          }
+        }
+      }
+      r = r + 1;
+    }
+    return r;
+  }
+
+  private ask(): void {
+    const m: number[] = [];
+    for (let i = 0; i < CELLS; i++) {
+      m.push(Math.random() < 0.5 ? 0 : 1);
+    }
+    const rk: number = this.rank(m);
+    const pool: number[] = [];
+    for (let v = 0; v <= N; v++) {
+      if (v !== rk) {
+        pool.push(v);
+      }
+    }
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j: number = Math.floor(Math.random() * (i + 1));
+      const t: number = pool[i];
+      pool[i] = pool[j];
+      pool[j] = t;
+    }
+    const opts: number[] = [rk];
+    for (let i = 0; i < pool.length && opts.length < 4; i++) {
+      opts.push(pool[i]);
+    }
+    for (let i = opts.length - 1; i > 0; i--) {
+      const j: number = Math.floor(Math.random() * (i + 1));
+      const t: number = opts[i];
+      opts[i] = opts[j];
+      opts[j] = t;
+    }
+    this.m = m;
+    this.opts = opts;
+    this.ans = opts.indexOf(rk);
+    this.picked = -1;
+  }
+
+  private pick(i: number): void {
+    if (this.picked >= 0 || this.over) {
+      return;
+    }
+    this.picked = i;
+    if (i === this.ans) {
+      this.right = this.right + 1;
+      this.score += 130;
+      this.msg = TG2('✅ 秩就是 {0}', String(this.opts[this.ans]));
+    } else {
+      this.score = Math.max(0, this.score - 20);
+      this.msg = TG('❌ 错了，正确答案已标绿');
+    }
+    if (this.nextTo >= 0) {
+      clearTimeout(this.nextTo);
+    }
+    this.nextTo = setTimeout(() => {
+      this.nextTo = -1;
+      this.next();
+    }, NEXT_MS);
+  }
+
+  private next(): void {
+    if (this.over) {
+      return;
+    }
+    if (this.round >= this.diffTotal) {
+      this.over = true;
+      this.won = this.right >= PASS;
+      this.msg = this.won
+        ? TG('🎉 答对 ') + String(this.right) + '/' + String(this.diffTotal) + TG('，通关！')
+        : TG('😵 只答对 ') + String(this.right) + '/' + String(this.diffTotal) + TG('，差 ') + String(PASS) + TG(' 题');
+      this.finish(this.won);
+      return;
+    }
+    this.round = this.round + 1;
+    this.ask();
+  }
+
+  private finish(solved: boolean): void {
+    if (this.finished) {
+      return;
+    }
+    this.finished = true;
+    const r: GameResult = {
+      gameId: 'binary_matrix_rank',
+      solved: solved,
+      score: this.score,
+      durationMs: Date.now() - this.startAt,
+      levelReached: this.right
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  private optBg(i: number): string {
+    if (this.picked < 0) {
+      return this.theme.surface;
+    }
+    if (i === this.ans) {
+      return Palette.emerald;
+    }
+    return i === this.picked ? Palette.rose : this.theme.surface;
+  }
+
+  private optInk(i: number): string {
+    if (this.picked < 0) {
+      return this.theme.ink;
+    }
+    if (i === this.ans) {
+      return '#FFFFFF';
+    }
+    return i === this.picked ? '#FFFFFF' : this.theme.inkFaint;
+  }
+
+  /** 第 r 行当二进制数看是多少（顺带帮玩家理解行向量） */
+  private rowVal(r: number): number {
+    let v: number = 0;
+    for (let c = 0; c < N; c++) {
+      v = v * 2 + this.m[r * N + c];
+    }
+    return v;
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat(0)
+        this.stat(1)
+        this.stat(2)
+      }
+      .width('100%')
+
+      Column({ space: Space.xs }) {
+        ForEach(this.rows, (r: number) => {
+          Row({ space: Space.xs }) {
+            ForEach(this.rows, (c: number) => {
+              this.cell(r * N + c)
+            }, (c: number) => 'mc' + r + '-' + c)
+            Text('= ' + String(this.rowVal(r)))
+              .fontSize(FontSize.xxs)
+              .fontColor(this.theme.inkFaint)
+              .width(44)
+          }
+          .width('100%')
+        }, (r: number) => 'mr' + r)
+      }
+      .width('100%')
+      .padding(Space.sm)
+      .backgroundColor(this.theme.surfaceAlt)
+      .borderRadius(Radius.md)
+
+      Column({ space: Space.sm }) {
+        ForEach(this.optsIdx, (i: number) => {
+          Row({ space: Space.sm }) {
+            Text(LETTERS[i])
+              .fontSize(FontSize.sm)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.theme.inkFaint)
+            Text(TG2('秩 = {0}', String(this.opts[i])))
+              .fontSize(FontSize.lg)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.optInk(i))
+              .layoutWeight(1)
+          }
+          .width('100%')
+          .height(Cell.of(48))
+          .padding({ left: Space.md, right: Space.md })
+          .backgroundColor(this.optBg(i))
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .onClick(() => {
+            this.pick(i);
+          })
+        }, (i: number) => 'mo' + i)
+      }
+      .width('100%')
+
+      Text(this.msg)
+        .fontSize(FontSize.sm)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .width('100%')
+
+      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        .fontSize(FontSize.md)
+        .fontColor(Color.White)
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
+        .borderRadius(Radius.md)
+        .width('100%')
+        .height(Cell.of(46))
+        .onClick(() => {
+          this.reset();
+        })
+
+      Text(TG('提示：模 2 消元就是「两行按位异或」；秩 = 化到行阶梯后非零行的个数'))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+        .width('100%')
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+  /** kind: 0=题号 1=答对 2=得分 */
+  @Builder
+  stat(kind: number) {
+    Column({ space: 2 }) {
+      Text(kind === 0 ? TG('题号') : (kind === 1 ? TG('答对') : TG('得分')))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+      Text(kind === 0 ? this.round + '/' + this.diffTotal
+        : (kind === 1 ? this.right + '/' + PASS : String(this.score)))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+    }
+    .layoutWeight(1)
+    .padding(Space.sm)
+    .backgroundColor(this.theme.surface)
+    .borderRadius(Radius.md)
+    .shadow(Shadow.card)
+  }
+
+  @Builder
+  cell(i: number) {
+    Text(String(this.m[i]))
+      .fontSize(FontSize.xl)
+      .fontWeight(FontWeight.Bold)
+      .textAlign(TextAlign.Center)
+      .fontColor(this.m[i] === 1 ? '#FFFFFF' : this.theme.inkFaint)
+      .layoutWeight(1)
+      .height(Cell.of(38))
+      .backgroundColor(this.m[i] === 1 ? Palette.primary : this.theme.surface)
+      .borderRadius(Radius.xs)
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+  }
+}

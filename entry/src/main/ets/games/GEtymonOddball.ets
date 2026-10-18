@@ -1,0 +1,163 @@
+/**
+ * 词根异类 —— 四个词里挑出「词根不属于同一族」的那一个
+ * 胜负：8 轮答对 ≥5 通关｜进度：轮次 / 答对 / 剩余秒数
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const ROUNDS: number = 8; const PASS: number = 5;
+const LIMIT_S: number = 20; const TICK_MS: number = 1000;
+
+/** [共同词根含义, 同族词1, 同族词2, 同族词3, 异类词] */
+const GROUPS: string[][] = [
+  ['水 (hydr-)', 'HYDRANT', 'DEHYDRATE', 'HYDROGEN', 'HYGIENE'],
+  ['写 (scrib-)', 'SCRIBBLE', 'DESCRIBE', 'MANUSCRIPT', 'SCRIPTURE'],
+  ['土地 (terr-)', 'TERRACE', 'TERRIER', 'TERRITORY', 'TERMINAL'],
+  ['光 (photo-)', 'PHOTON', 'PHOTOGRAPH', 'PHOTOSYNTHESIS', 'PHONE'],
+  ['书 (bibl-)', 'BIBLE', 'BIBLIOGRAPHY', 'BIBLIOPHILE', 'BICYCLE'],
+  ['生命 (bio-)', 'BIOLOGY', 'BIOPSY', 'BIOGRAPHER', 'BIONIC'],
+  ['看 (spect-)', 'SPECTACLE', 'INSPECT', 'RETROSPECT', 'SPECTACULAR'],
+  ['说 (dict-)', 'DICTION', 'PREDICT', 'VERDICT', 'DICTATOR'],
+  ['手 (manu-)', 'MANUAL', 'MANUFACTURE', 'MANICURE', 'MANNER'],
+  ['心 (cardi-)', 'CARDIAC', 'CARDIOGRAM', 'CARDIOLOGIST', 'CARDINAL']
+];
+
+function shuffleIdx(): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < GROUPS.length; i++) { out.push(i); }
+  for (let i = out.length - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const t: number = out[i]; out[i] = out[j]; out[j] = t;
+  }
+  return out.slice(0, ROUNDS);
+}
+function shuffleStr(arr: string[]): string[] {
+  const out: string[] = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const t: string = out[i]; out[i] = out[j]; out[j] = t;
+  }
+  return out;
+}
+
+@Component
+export struct GEtymonOddball {
+  /** ★★★ 2026-10-16 BUG #24：数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State queue: number[] = []; @State shown: string[] = [];
+  @State round: number = 0; @State right: number = 0; @State score: number = 0;
+  @State leftS: number = LIMIT_S; @State msg: string = ''; @State over: boolean = false; @State won: boolean = false;
+  private startAt: number = 0; private timer: number = -1; private done: boolean = false;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+     this.reset(); }
+  aboutToDisappear(): void { this.stop(); }
+  private stop(): void { if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; } }
+  private reset(): void {
+    this.stop();
+    this.queue = shuffleIdx();
+    this.round = 0; this.right = 0; this.score = 0; this.leftS = LIMIT_S;
+    this.over = false; this.won = false; this.done = false;
+    this.msg = TG('哪个词的词根不属于同一族？'); this.startAt = Date.now();
+    this.load();
+    this.timer = setInterval(() => { this.leftS--; this.tick(); }, TICK_MS);
+  }
+  private load(): void {
+    const g: string[] = GROUPS[this.queue[this.round]];
+    this.shown = shuffleStr([g[1], g[2], g[3], g[4]]);
+  }
+
+  private tick(): void {
+    if (this.over) { return; }
+    if (this.leftS <= 0) {
+      this.msg = TG2('⌛ 超时 —— 异类是 {0}', GROUPS[this.queue[this.round]][4]);
+      this.advance();
+    }
+  }
+  private pick(word: string): void {
+    if (this.over) { return; }
+    const odd: string = GROUPS[this.queue[this.round]][4];
+    const ok: boolean = word === odd;
+    if (ok) {
+      this.right = this.right + 1;
+      this.score = this.score + 100 + this.leftS * 10;
+      this.msg = TG2('✅ 异类是 {0}（同族词根 = {1}）', odd, GROUPS[this.queue[this.round]][0]);
+    }
+    this.advance();
+  }
+  private advance(): void {
+    this.round = this.round + 1;
+    if (this.round >= this.diffTotal) {
+      this.over = true; this.won = this.right >= PASS;
+      this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, this.diffTotal);
+      this.finish(this.won);
+      return;
+    }
+    this.leftS = LIMIT_S;
+    this.load();
+  }
+  private finish(solved: boolean): void {
+    if (this.done) { return; }
+    this.done = true;
+    const r: GameResult = { gameId: 'etymon_oddball', solved: solved, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.right };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: Space.xs }) {
+        Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((Math.min(this.round + 1, this.diffTotal) + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.violet))
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: Space.xs }) {
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.right + ' / ' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: Space.xs }) {
+        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.leftS + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }.width('100%')
+
+      Text(TG('找出词根异类')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).width('100%')
+
+      Column({ space: Space.sm }) {
+        Button((0) < this.shown.length ? this.shown[(0)] : '')
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(this.shown[(0)]); })
+        Button((1) < this.shown.length ? this.shown[(1)] : '')
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(this.shown[(1)]); })
+        Button((2) < this.shown.length ? this.shown[(2)] : '')
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(this.shown[(2)]); })
+        Button((3) < this.shown.length ? this.shown[(3)] : '')
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(this.shown[(3)]); })
+      }.width('100%')
+
+      Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+
+      Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+
+      Text(TG2("共 {0} 轮，答对 ≥{1} 通关；每题 {2} 秒",Digits(String(this.diffTotal), this.langCode), PASS,Digits(String(LIMIT_S), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+
+
+
+}

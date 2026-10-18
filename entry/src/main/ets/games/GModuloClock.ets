@@ -1,0 +1,240 @@
+/**
+ * 模钟 —— 模 12 计算
+ *
+ * 玩法：现在 N 点，再过 M 小时（或 M 小时前）是几点？四选一，共 8 题。
+ * 胜负：答对 ≥ 6 题 ⇒ 通关；否则失败。
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const ROUNDS: number = 8;
+const PASS: number = 6;
+const PICK: number = 4;
+const DIAL: number = 12;
+const NEXT_MS: number = 420;
+
+const FACES: string[] = ['🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚', '🕛'];
+
+function randInt(lo: number, hi: number): number {
+  return lo + Math.floor(Math.random() * (hi - lo + 1));
+}
+
+/** 把任意整数折回 1..12 的钟面 */
+function onDial(v: number): number {
+  return ((v - 1) % DIAL + DIAL) % DIAL + 1;
+}
+
+@Component
+export struct GModuloClock {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private opts: number[] = [];
+  @State private ans: number = -1;
+  @State private picked: number = -1;
+  @State private quiz: string = '';
+  @State private face: string = '🕐';
+  @State private round: number = 1;
+  @State private right: number = 0;
+  @State private score: number = 0;
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  @State private msg: string = '';
+
+  private startAt: number = 0;
+  private nextTo: number = -1;
+  private finished: boolean = false;
+  private slots: number[] = [0, 1, 2, 3];
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now();
+    this.reset();
+  }
+
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+    this.reset();
+  }
+
+  aboutToDisappear(): void {
+    if (this.nextTo >= 0) {
+      clearTimeout(this.nextTo);
+      this.nextTo = -1;
+    }
+  }
+
+  private reset(): void {
+    if (this.nextTo >= 0) {
+      clearTimeout(this.nextTo);
+      this.nextTo = -1;
+    }
+    this.round = 1;
+    this.right = 0;
+    this.score = 0;
+    this.over = false;
+    this.won = false;
+    this.finished = false;
+    this.startAt = Date.now();
+    this.msg = TG(TG(TG('钟面只有 1~12 点：转满 12 点就回到 1 点')));
+    this.ask();
+  }
+
+  private ask(): void {
+    const now: number = randInt(1, DIAL);
+    const delta: number = randInt(1, 11);
+    const forward: boolean = Math.random() < 0.6;
+    const truth: number = forward ? onDial(now + delta) : onDial(now - delta);
+    const pool: number[] = [onDial(truth + 1), onDial(truth - 1), onDial(truth + 3),
+      onDial(truth - 3), onDial(truth + 6)];
+    const opts: number[] = [truth];
+    for (let i = 0; i < pool.length && opts.length < PICK; i++) {
+      if (opts.indexOf(pool[i]) < 0) {
+        opts.push(pool[i]);
+      }
+    }
+    for (let i = opts.length - 1; i > 0; i--) {
+      const j: number = Math.floor(Math.random() * (i + 1));
+      const t: number = opts[i];
+      opts[i] = opts[j];
+      opts[j] = t;
+    }
+    this.opts = opts;
+    this.ans = opts.indexOf(truth);
+    this.picked = -1;
+    this.face = FACES[now - 1];
+    this.quiz = forward
+      ? '现在 ' + now + ' 点，再过 ' + delta + ' 小时是几点？'
+      : TG2('现在 {0} 点，{1} 小时前是几点？', now, delta);
+  }
+
+  private pick(i: number): void {
+    if (this.picked >= 0 || this.over) {
+      return;
+    }
+    this.picked = i;
+    if (i === this.ans) {
+      this.right = this.right + 1;
+      this.score = this.score + 100; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110);
+      this.msg = TG(TG(TG('✅ 对了！')));
+    } else {
+      this.msg = TG('❌ 应该是 ') + this.opts[this.ans] + TG(' 点');
+    }
+    if (this.nextTo >= 0) {
+      clearTimeout(this.nextTo);
+    }
+    this.nextTo = setTimeout(() => {
+      this.nextTo = -1;
+      this.advance();
+    }, NEXT_MS);
+  }
+
+  private advance(): void {
+    if (this.over) {
+      return;
+    }
+    if (this.round >= this.diffTotal) {
+      const ok: boolean = this.right >= PASS;
+      this.msg = ok ? TG('🎉 答对 ') + this.right + '/' + this.diffTotal + ' 题，通关！'
+        : TG('答对 ') + this.right + '/' + this.diffTotal + ' 题，还差一点';
+      this.finish(ok);
+      return;
+    }
+    this.round = this.round + 1;
+    this.ask();
+  }
+
+  private finish(solved: boolean): void {
+    if (this.finished) {
+      return;
+    }
+    this.finished = true;
+    this.over = true;
+    this.won = solved;
+    const r: GameResult = {
+      gameId: 'modulo_clock',
+      solved: solved,
+      score: this.score,
+      durationMs: Date.now() - this.startAt,
+      levelReached: this.right
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  private optBg(i: number): string {
+    if (this.picked < 0) {
+      return this.theme.surface;
+    }
+    if (i === this.ans) {
+      return Palette.emerald;
+    }
+    return i === this.picked ? Palette.rose : this.theme.surface;
+  }
+
+  private optInk(i: number): string {
+    if (this.picked < 0) {
+      return this.theme.ink;
+    }
+    if (i === this.ans) {
+      return '#FFFFFF';
+    }
+    return i === this.picked ? '#FFFFFF' : this.theme.inkFaint;
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text((TG(TG('第几题')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.right + '/' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }.width('100%')
+
+      Column({ space: Space.xs }) {
+        Text(this.face).fontSize(FontSize.hero)
+        Text(this.quiz).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.emerald).textAlign(TextAlign.Center)
+      }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+
+      Column({ space: Space.sm }) {
+        ForEach(this.slots, (i: number) => {
+          Row({ space: Space.sm }) {
+            Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
+            Text(TG2("{0} 点", String(this.opts[i]))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
+          }.width('100%').height(Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+            this.pick(i);
+          })
+        }, (i: number) => 'mc' + i)
+      }.width('100%')
+
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').animation({ duration: Motion.fast, curve: Motion.snap() })
+
+      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White).backgroundColor(Palette.emerald).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => {
+          this.reset();
+        })
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+
+}

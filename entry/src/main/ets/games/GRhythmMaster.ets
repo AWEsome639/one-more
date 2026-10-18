@@ -1,0 +1,140 @@
+/**
+ * 节奏大师 —— 🥁 先看 4 下示范拍，再照同样的间隔自己敲 4 下（id: rhythm_master）
+ * 胜负：平均间隔误差 ≤ 150ms ⇒ 通关；进度：阶段 · 已敲 x/4 · 误差
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+const BEAT_MS: number = 600;
+const DEMO: number = 4;
+const TAPS: number = 4;
+const WIN_ERR: number = 150;
+const TAP_TIMEOUT: number = 9000;
+@Component
+export struct GRhythmMaster {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（time）：原 BEAT_MS=600
+  @State private diffTotal: number = GameDiff.timeNow(600);
+  onFinish: (r: GameResult) => void = () => {};
+  @State private phase: string = 'demo';
+  @State private beat: number = 0;
+  @State private pulse: boolean = false;
+  @State private tapCount: number = 0;
+  @State private errMs: number = -1;
+  @State private msg: string = '';
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  private taps: number[] = [];
+  private startAt: number = 0;
+  private ivId: number = -1;
+  private toId: number = -1;
+  private done: boolean = false;
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.timeNow(600);
+     this.reset(); }
+  aboutToDisappear(): void { this.clearAll(); }
+  private clearAll(): void {
+    if (this.ivId >= 0) { clearInterval(this.ivId); this.ivId = -1; }
+    if (this.toId >= 0) { clearTimeout(this.toId); this.toId = -1; }
+  }
+  private reset(): void {
+    this.clearAll();
+    this.beat = 1; this.pulse = true; this.tapCount = 0; this.errMs = -1;
+    this.over = false; this.won = false; this.done = false; this.taps = [];
+    this.startAt = Date.now(); this.phase = 'demo';
+    this.msg = TG2('看节奏：每 {0} ms 一下', String(this.diffTotal));
+    this.ivId = setInterval(() => {
+      this.beat = this.beat + 1;
+      this.pulse = !this.pulse;
+      if (this.beat > DEMO) {
+        if (this.ivId >= 0) { clearInterval(this.ivId); this.ivId = -1; }
+        this.phase = 'tap'; this.pulse = false; this.taps = [];
+        this.msg = TG2("轮到你了：照刚才的间隔敲 {0} 下", String(TAPS));
+        this.toId = setTimeout(() => { this.toId = -1; this.timeout(); }, TAP_TIMEOUT);
+      }
+    }, this.diffTotal);
+  }
+  private timeout(): void {
+    if (this.phase !== 'tap') { return; }
+    this.phase = 'done'; this.over = true; this.won = false; this.errMs = TAP_TIMEOUT;
+    this.msg = TG2("💤 超时，没敲满 {0} 下", String(TAPS));
+    this.end();
+  }
+  private tapBeat(): void {
+    if (this.phase !== 'tap') { return; }
+    this.taps.push(Date.now());
+    this.tapCount = this.taps.length;
+    if (this.tapCount < TAPS) {
+      this.msg = TG2("第 {0} 下 · 别停", String(this.tapCount));
+      return;
+    }
+    if (this.toId >= 0) { clearTimeout(this.toId); this.toId = -1; }
+    let sum: number = 0;
+    for (let i = 1; i < this.taps.length; i++) {
+      const gap: number = this.taps[i] - this.taps[i - 1];
+      sum = sum + Math.abs(gap - this.diffTotal);
+    }
+    const err: number = Math.round(sum / (TAPS - 1));
+    this.errMs = err; this.phase = 'done'; this.over = true; this.won = err <= WIN_ERR;
+    this.msg = TG2(this.won ? '🎉 稳！平均误差 {0}' : '💤 飘了，平均误差 {0}', String(err)) + ' ms';
+    this.end();
+  }
+  private end(): void {
+    if (this.done) { return; }
+    const err: number = this.errMs < 0 ? TAP_TIMEOUT : this.errMs;
+    this.clearAll();
+    this.done = true;
+    const r: GameResult = {
+      gameId: 'rhythm_master', solved: this.won, score: Math.max(0, 400 - err) * 3,
+      durationMs: Date.now() - this.startAt, levelReached: this.tapCount
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: Space.xs }) {
+        Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.phase === 'demo' ? '示范' : (this.phase === 'tap' ? '跟拍' : TG('结束')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: Space.xs }) {
+        Text((TG('已敲'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((String(this.tapCount) + '/' + String(TAPS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: Space.xs }) {
+        Text((TG('误差'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.errMs >= 0 ? String(this.errMs) + 'ms' : '—')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }.width('100%')
+      Column({ space: Space.xs }) {
+        Text('🥁').fontSize(FontSize.hero)
+          .accessibilityLevel('no')
+          .scale({ x: this.pulse ? 1.3 : 1, y: this.pulse ? 1.3 : 1 })
+          .animation({ duration: Motion.fast, curve: Motion.snap() })
+        Text(this.phase === 'demo' ? TG('第 ') + String(this.beat) + ' 拍' : '目标间隔 ' + String(this.diffTotal) + ' ms')
+          .fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+      }.width('100%').height(140).justifyContent(FlexAlign.Center)
+        .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      Button(TG('敲一下'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF')
+        .backgroundColor(this.phase === 'tap' ? Palette.violet : this.theme.lineSoft)
+        .borderRadius(Radius.lg).width('100%').height(Cell.of(84))
+        .onClick(() => { this.tapBeat(); })
+      Text(this.msg).fontSize(FontSize.sm).textAlign(TextAlign.Center).width('100%')
+        .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft)
+      Button(this.over ? TG('再来一局') : TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      Text(TG('判定：4 下平均间隔误差 ≤ 150 ms（目标间隔 600 ms）'))
+        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+}

@@ -1,0 +1,186 @@
+/** 解不等式（Algebraic Inequality Solver）—— 求一元一次不等式的解集
+ *  玩法：从 4 个解集里点出正确的一个。过关判据：10 题答对 ≥ 7 题
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const TOTAL: number = 10;
+const PASS: number = 7;
+
+interface QIneq { text: string; answer: string; choices: string[] }
+
+function flip(sign: string): string {
+  if (sign === '>') { return '<'; }
+  if (sign === '<') { return '>'; }
+  if (sign === '≥') { return '≤'; }
+  return '≥';
+}
+
+function makeIneq(): QIneq {
+  const a: number = 2 + Math.floor(Math.random() * 4);
+  const x0: number = -5 + Math.floor(Math.random() * 12);
+  const b: number = 1 + Math.floor(Math.random() * 9);
+  const kinds: string[] = ['>', '<', '≥', '≤'];
+  const sign: string = kinds[Math.floor(Math.random() * kinds.length)];
+  const form: number = Math.floor(Math.random() * 2);
+  let text: string = '';
+  if (form === 0) {
+    text = String(a) + 'x + ' + String(b) + ' ' + sign + ' ' + String(a * x0 + b);
+  } else {
+    text = String(a) + 'x - ' + String(b) + ' ' + sign + ' ' + String(a * x0 - b);
+  }
+  const want: string = 'x ' + sign + ' ' + String(x0);
+  const raw: string[] = [want, 'x ' + flip(sign) + ' ' + String(x0),
+    'x ' + sign + ' ' + String(x0 + 1), 'x ' + sign + ' ' + String(x0 - 1)];
+  const bag: string[] = [];
+  for (let k = 0; k < raw.length; k++) {
+    let dup: boolean = false;
+    for (let j = 0; j < bag.length; j++) {
+      if (bag[j] === raw[k]) { dup = true; }
+    }
+    if (!dup) { bag.push(raw[k]); }
+  }
+  while (bag.length < 4) { bag.push('x = ' + String(x0)); }
+  for (let i = bag.length - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const t: string = bag[i];
+    bag[i] = bag[j];
+    bag[j] = t;
+  }
+  return { text: text, answer: want, choices: bag };
+}
+
+@Component
+export struct GAlgebraicInequalitySolver {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private quiz: QIneq = { text: '', answer: '', choices: [] };
+  @State private idx: number = 0;
+  @State private right: number = 0;
+  @State private score: number = 0;
+  @State private over: boolean = false;
+  @State private tip: string = '点出正确的解集';
+  @State private lockTap: boolean = false;
+
+  private startAt: number = 0;
+  private wait: number = -1;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now();
+    this.reset();
+  }
+
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TOTAL);
+     this.reset(); }
+
+  aboutToDisappear(): void {
+    if (this.wait >= 0) { clearTimeout(this.wait); this.wait = -1; }
+  }
+
+  private reset(): void {
+    this.startAt = Date.now();
+    this.idx = 0;
+    this.right = 0;
+    this.score = 0;
+    this.over = false;
+    this.lockTap = false;
+    this.tip = '点出正确的解集';
+    this.quiz = makeIneq();
+  }
+
+  private answer(s: string): void {
+    if (this.over || this.lockTap) { return; }
+    if (s === this.quiz.answer) {
+      this.right++;
+      this.score += 10;
+      this.tip = '✓ 解集就是 ' + this.quiz.answer;
+    } else {
+      this.tip = '✗ 正解：' + this.quiz.answer;
+    }
+    this.lockTap = true;
+    this.wait = setTimeout(() => {
+      this.wait = -1;
+      this.idx++;
+      if (this.idx >= this.diffTotal) {
+        this.over = true;
+        this.tip = '共答对 ' + String(this.right) + '/' + String(this.diffTotal) + TG(' 题');
+        this.finish(this.right >= PASS);
+        return;
+      }
+      this.quiz = makeIneq();
+      this.lockTap = false;
+      this.tip = '点出正确的解集';
+    }, 650);
+  }
+
+  private finish(solved: boolean): void {
+    const res: GameResult = {
+      gameId: 'algebraic_inequality_solver', solved: solved, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.right
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(res);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat(TG('进度'), String(this.idx + 1) + '/' + String(this.diffTotal))
+        this.stat(TG('答对'), String(this.right))
+        this.stat(TG('得分'), String(this.score))
+      }.width('100%')
+
+      Column({ space: Space.sm }) {
+        Text('🔢').fontSize(FontSize.hero)
+        Text(this.quiz.text).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text('求 x 的解集').fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+      }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      .animation({ duration: Motion.base, curve: Motion.snap() })
+
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.tip.startsWith('✓') ? Palette.emerald : this.theme.inkSoft)
+
+      Column({ space: Space.sm }) {
+        Row({ space: Space.sm }) {
+          this.choice(0)
+          this.choice(1)
+        }.width('100%')
+        Row({ space: Space.sm }) {
+          this.choice(2)
+          this.choice(3)
+        }.width('100%')
+      }.width('100%')
+
+      Row({ space: Space.sm }) {
+        Button(TG('重开')).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.sky).borderRadius(Radius.md)
+          .width(120).height(44).onClick(() => { this.reset(); })
+        Text('严格/非严格要看清楚').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      }.width('100%')
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  stat(label: string, value: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+    }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+  }
+
+  @Builder
+  choice(k: number) {
+    Button(this.quiz.choices[k] ?? '?').fontSize(FontSize.lg).fontColor(this.theme.ink)
+      .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(56)
+      .enabled(!this.lockTap && !this.over).onClick(() => { this.answer(this.quiz.choices[k] ?? '?'); })
+  }
+}

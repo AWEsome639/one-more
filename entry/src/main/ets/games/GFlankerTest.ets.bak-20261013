@@ -1,0 +1,187 @@
+/**
+ * 侧抑制（Flanker）—— 只看中间那个箭头，忽略两侧干扰
+ * 胜负：12 题答对 ≥ 11 且平均反应 < 900 ms ⇒ 通关；进度：题号 / 正确 / 平均反应
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const TRIALS: number = 12;
+const LIMIT_MS: number = 900;
+const NEED_HIT: number = 11;
+
+@Component
+export struct GFlankerTest {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private arrows: string[] = [];
+  @State private centerRight: boolean = true;
+  @State private live: boolean = false;
+  @State private trialNo: number = 1;
+  @State private rightN: number = 0;
+  @State private totalRt: number = 0;
+  @State private pick: number = -1;      // -1 未答 0 左 1 右
+  @State private msg: string = '';
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+
+  private startAt: number = 0;
+  private shownAt: number = 0;
+  private waitTo: number = -1;
+  private nextTo: number = -1;
+  private done: boolean = false;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TRIALS);
+     this.reset(); }
+  aboutToDisappear(): void { this.clearAll(); }
+
+  private clearAll(): void {
+    if (this.waitTo >= 0) { clearTimeout(this.waitTo); this.waitTo = -1; }
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
+  }
+
+  private reset(): void {
+    this.clearAll();
+    this.trialNo = 1; this.rightN = 0; this.totalRt = 0;
+    this.over = false; this.won = false; this.done = false;
+    this.startAt = Date.now();
+    this.arm();
+  }
+
+  /** 随机等 0.7~1.6 秒后亮出一排箭头（一半同向、一半反向） */
+  private arm(): void {
+    this.live = false;
+    this.pick = -1;
+    this.msg = '盯住中间那个箭头';
+    const isRight: boolean = Math.random() < 0.5;
+    this.centerRight = isRight;
+    const flank: string = (Math.random() < 0.5 ? isRight : !isRight) ? '→' : '←';
+    const center: string = isRight ? '→' : '←';
+    this.arrows = [flank, flank, center, flank, flank];
+    this.waitTo = setTimeout(() => {
+      this.waitTo = -1;
+      this.shownAt = Date.now();
+      this.live = true;
+      this.msg = '中间朝哪边？';
+    }, 700 + Math.floor(Math.random() * 900));
+  }
+
+  private answer(saidRight: boolean): void {
+    if (this.over || !this.live) { return; }
+    const rt: number = Date.now() - this.shownAt;
+    this.live = false;
+    this.pick = saidRight ? 1 : 0;
+    if (saidRight === this.centerRight) {
+      this.rightN = this.rightN + 1;
+      this.totalRt = this.totalRt + rt;
+      this.msg = '✅ ' + String(rt) + ' ms';
+    } else {
+      this.totalRt = this.totalRt + LIMIT_MS * 2;
+      this.msg = '❌ 中间是 ' + (this.centerRight ? '→' : '←') + '（按 ' + String(LIMIT_MS * 2) + ' ms 计）';
+    }
+    this.nextTo = setTimeout(() => {
+      this.nextTo = -1;
+      if (this.trialNo >= this.diffTotal) { this.judge(); return; }
+      this.trialNo = this.trialNo + 1;
+      this.arm();
+    }, 640);
+  }
+
+  private avgRt(): number {
+    return Math.round(this.totalRt / this.diffTotal);
+  }
+
+  private judge(): void {
+    const avg: number = this.avgRt();
+    this.over = true;
+    this.won = this.rightN >= NEED_HIT && avg < LIMIT_MS;
+    this.msg = (this.won ? '🎉 通关！正确 ' : '💤 结束，正确 ') + String(this.rightN) + '/' + String(this.diffTotal)
+      + ' · 平均 ' + String(avg) + ' ms';
+    if (!this.done) {
+      this.done = true;
+      const r: GameResult = {
+        gameId: 'flanker_test', solved: this.won,
+        score: this.rightN * 100 + Math.max(0, LIMIT_MS - avg),
+        durationMs: Date.now() - this.startAt, levelReached: this.rightN
+      };
+      LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+      this.onFinish(r);
+    }
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat(TG('题号'), String(this.over ? this.diffTotal : this.trialNo) + '/' + String(this.diffTotal))
+        this.stat('正确', String(this.rightN))
+        this.stat(TG('平均'), this.rightN > 0 ? (String(this.avgRt()) + 'ms') : '—')
+      }.width('100%')
+
+      Column({ space: Space.sm }) {
+        if (this.live) {
+          Row({ space: Space.xs }) {
+            ForEach([0, 1, 2, 3, 4], (i: number) => {
+              this.arrowCell(i)
+            }, (i: number) => 'a' + i + this.arrows[i])
+          }.width('100%')
+        } else {
+          Text('👀').fontSize(FontSize.hero)
+        }
+        Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center)
+      }.width('100%').height(Space.xxxl * 2).justifyContent(FlexAlign.Center)
+      .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+
+      Row({ space: Space.md }) {
+        this.dirBtn('←', false)
+        this.dirBtn('→', true)
+      }.width('100%')
+
+      Button(this.over ? TG('再来一局') : TG('重开'))
+        .fontSize(FontSize.md).fontColor('#FFFFFF')
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky)
+        .borderRadius(Radius.md).width('100%').height(Space.xxxl)
+        .onClick(() => { this.reset(); })
+
+      Text('判定：答对 ≥ ' + String(NEED_HIT) + '/' + String(this.diffTotal) + ' 且平均 < ' + String(LIMIT_MS) + ' ms')
+        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  stat(label: string, value: string) {
+    Column({ space: Space.xs }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+    }.layoutWeight(1).padding(Space.sm)
+    .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+  }
+
+  @Builder
+  arrowCell(i: number) {
+    Text(this.arrows[i])
+      .fontSize(i === 2 ? FontSize.hero : FontSize.xxl)
+      .fontWeight(i === 2 ? FontWeight.Bold : FontWeight.Normal)
+      .fontColor(i === 2 ? Palette.sky : this.theme.inkFaint)
+      .textAlign(TextAlign.Center).layoutWeight(1)
+  }
+
+  @Builder
+  dirBtn(label: string, isRight: boolean) {
+    Button(label)
+      .fontSize(FontSize.xxl).fontColor('#FFFFFF')
+      .backgroundColor(this.pick === (isRight ? 1 : 0) ? Palette.primaryDeep : (isRight ? Palette.sky : Palette.violet))
+      .borderRadius(Radius.lg).layoutWeight(1).height(Space.xxxl * 2)
+      .opacity(this.live || this.pick >= 0 ? 1 : 0.55)
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onClick(() => { this.answer(isRight); })
+  }
+}

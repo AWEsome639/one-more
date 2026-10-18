@@ -1,0 +1,164 @@
+/**
+ * 空间提示 —— 中心注视后先给一个方位提示，目标出现时尽快点它所在的一侧（测反应）
+ * 胜负：16 次答对 ≥ 12 ⇒ 通关（越快分越高）　｜　进度：试次 / 答对 / 平均反应
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const TRIALS: number = 16;
+const PASS: number = 12;
+const FIX_MS: number = 450;
+const CUE_MS: number = 400;
+const FEED_MS: number = 380;
+const VALID_P: number = 0.75;
+const MAX_BONUS: number = 120;
+
+@Component
+export struct GPosnerSpatialCueing {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State phase: number = 0;        // 0 注视　1 提示　2 目标　3 反馈
+  @State cueSide: number = 0; @State targetSide: number = 0; @State pickSide: number = -1;
+  @State trial: number = 1; @State right: number = 0; @State score: number = 0;
+  @State msg: string = ''; @State over: boolean = false; @State won: boolean = false;
+  private rtSum: number = 0; private answered: number = 0; private shownAt: number = 0;
+  private startAt: number = 0; private timer: number = -1; private done: boolean = false;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TRIALS);
+     this.reset(); }
+  aboutToDisappear(): void { this.clearAll(); }
+  private clearAll(): void { if (this.timer >= 0) { clearTimeout(this.timer); this.timer = -1; } }
+  private avgRt(): number { return this.answered > 0 ? Math.round(this.rtSum / this.answered) : 0; }
+
+  private reset(): void {
+    this.clearAll();
+    this.trial = 1; this.right = 0; this.score = 0; this.pickSide = -1; this.startAt = Date.now();
+    this.rtSum = 0; this.answered = 0;
+    this.over = false; this.won = false; this.done = false;
+    this.newTrial();
+  }
+
+  private newTrial(): void {
+    const side: number = Math.random() < 0.5 ? 0 : 1;
+    this.targetSide = side;
+    const valid: boolean = Math.random() < VALID_P;
+    this.cueSide = valid ? side : 1 - side;
+    this.pickSide = -1; this.phase = 0;
+    this.msg = TG2("第 {0} 次：盯住中间的 ➕",Digits(String(this.trial), this.langCode));
+    this.timer = setTimeout(() => {
+      this.timer = -1; this.phase = 1;
+      this.msg = TG2("{0}（提示不一定准）", (this.cueSide === 0 ? '⬅️ 提示在左边' : '➡️ 提示在右边'));
+      this.timer = setTimeout(() => {
+        this.timer = -1; this.phase = 2; this.shownAt = Date.now();
+        this.msg = TG('🎯 目标出现，快点它所在的一侧！');
+      }, CUE_MS);
+    }, FIX_MS);
+  }
+
+  private answer(side: number): void {
+    if (this.phase !== 2) { return; }
+    const rt: number = Date.now() - this.shownAt;
+    this.rtSum = this.rtSum + rt; this.answered = this.answered + 1;
+    this.pickSide = side; this.phase = 3;
+    if (side === this.targetSide) {
+      this.right = this.right + 1;
+      this.score = this.score + Math.max(20, MAX_BONUS - Math.floor(rt / 20));
+      this.msg = '✅ ' + rt + ' ms';
+    } else {
+      this.msg = TG2("❌ 目标在{0}边", (this.targetSide === 0 ? TG('左') : TG('右')));
+    }
+    this.timer = setTimeout(() => { this.timer = -1; this.next(); }, FEED_MS);
+  }
+
+  private next(): void {
+    if (this.trial >= this.diffTotal) {
+      this.over = true; this.won = this.right >= PASS;
+      this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}，平均 {2} ms", this.right, this.diffTotal, this.avgRt());
+      this.clearAll(); this.finish(this.won);
+      return;
+    }
+    this.trial = this.trial + 1;
+    this.newTrial();
+  }
+
+  private finish(solved: boolean): void {
+    if (this.done) { return; }
+    this.done = true;
+    const r: GameResult = { gameId: 'posner_spatial_cueing', solved: solved, score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.trial };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) { Column({ space: Space.xs }) {
+      Text((TG('试次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.trial + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primaryDeep))
+      }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: Space.xs }) {
+      Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+      }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: Space.xs }) {
+      Text((TG('平均'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.avgRt() + ' ms')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+      }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card) }.width('100%')
+      Column({ space: Space.sm }) {
+        Text('➕').accessibilityLevel('no').fontSize(FontSize.xl).fontColor(this.theme.inkFaint)
+        Row({ space: Space.sm }) {
+          Stack() {
+          if (this.phase === 1 && this.cueSide === (0)) {
+          Text(true ? '⬅️' : '➡️').fontSize(FontSize.xxl)
+          } else if (this.phase >= 2 && this.targetSide === (0)) {
+          Text('🎯').accessibilityLevel('no').fontSize(FontSize.xxxl)
+          } else {
+          Text('·').accessibilityLevel('no').fontSize(FontSize.lg).fontColor(this.theme.inkFaint)
+          }
+          }.layoutWeight(1).height(150).backgroundColor(this.pickSide === (0) ? Palette.lime : this.theme.surfaceAlt)
+          .borderRadius(Radius.lg).shadow(Shadow.card)
+          .animation({ duration: Motion.fast, curve: Motion.snap() })
+          Stack() {
+          if (this.phase === 1 && this.cueSide === (1)) {
+          Text(false ? '⬅️' : '➡️').fontSize(FontSize.xxl)
+          } else if (this.phase >= 2 && this.targetSide === (1)) {
+          Text('🎯').fontSize(FontSize.xxxl)
+            .accessibilityLevel('no')
+          } else {
+          Text('·').fontSize(FontSize.lg).fontColor(this.theme.inkFaint)
+            .accessibilityLevel('no')
+          }
+          }.layoutWeight(1).height(150).backgroundColor(this.pickSide === (1) ? Palette.lime : this.theme.surfaceAlt)
+          .borderRadius(Radius.lg).shadow(Shadow.card)
+          .animation({ duration: Motion.fast, curve: Motion.snap() })
+        }.width('100%').layoutWeight(1)
+      }.width('100%').layoutWeight(1)
+      Row({ space: Space.sm }) {
+        Button((TG('⬅️ 左边')))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(true ? Palette.sky : Palette.violet)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 2).onClick(() => { this.answer((0)); })
+        Button((TG('右边 ➡️')))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(false ? Palette.sky : Palette.violet)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 2).onClick(() => { this.answer((1)); })
+      }.width('100%')
+      Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      Text(TG('提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+
+
+  /** 一侧的方框：提示箭头 / 目标 🎯 都落在这里 */
+
+
+
+}

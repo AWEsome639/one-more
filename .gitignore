@@ -1,0 +1,52 @@
+# ═══════════════════════════════════════════
+#  白名单策略：先忽略一切，再放行要公开的
+# ═══════════════════════════════════════════
+/*
+
+# ── 放行：源码 ──
+!/entry/
+!/entry/src/
+!/entry/src/**
+!/entry/oh-package.json5
+!/entry/hvigorfile.ts
+!/entry/obfuscation-rules.txt
+!/entry/build-profile.json5.example
+!/AppScope/
+!/AppScope/**
+!/hvigor/
+!/hvigorfile.ts
+!/oh-package.json5
+!/oh-package-lock.json5
+!/code-linter.json5
+!/build-profile.json5.example
+!/build.sh
+
+# ── 放行：文档与资源 ──
+!/README.md
+!/LICENSE
+!/GAME_BRIEF.md
+!/docs/
+!/docs/**
+!/tools/
+!/tools/**
+
+# ── 放行：.gitignore 本身 ──
+!/.gitignore
+
+# ═══════════════════════════════════════════
+#  例外中的例外
+# ═══════════════════════════════════════════
+entry/build/
+entry/oh_modules/
+oh_modules/
+node_modules/
+**/*.p12
+**/*.p7b
+**/*.cer
+**/*.csr
+**/*.key
+**/*.hap
+**/*.app
+**/*.abc
+**/.DS_Store
+**/*.log

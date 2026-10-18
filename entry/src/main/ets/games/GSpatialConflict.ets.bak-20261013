@@ -1,0 +1,129 @@
+/**
+ * 空间冲突 —— 箭头的「方向 / 文字 / 位置」互相捣乱，只准跟箭头走
+ * 胜负：12 题答对 ≥ 9 ⇒ 通关　｜　进度：题号 / 答对 / 得分
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const TRIALS: number = 12; const PASS: number = 9; const FEED_MS: number = 380;
+
+@Component
+export struct GSpatialConflict {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State dir: number = 0; @State word: number = 0; @State spot: number = 0; @State flash: number = -1;
+  @State trial: number = 1; @State hits: number = 0; @State score: number = 0;
+  @State over: boolean = false; @State won: boolean = false; @State msg: string = '';
+  private startAt: number = 0; private timer: number = -1; private done: boolean = false;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TRIALS);
+     this.reset(); }
+  aboutToDisappear(): void { this.clearAll(); }
+  private clearAll(): void { if (this.timer >= 0) { clearTimeout(this.timer); this.timer = -1; } }
+
+  private reset(): void {
+    this.clearAll(); this.trial = 1; this.hits = 0; this.score = 0; this.flash = -1;
+    this.over = false; this.won = false; this.done = false; this.startAt = Date.now();
+    this.newTrial();
+  }
+
+  private newTrial(): void {
+    const d: number = Math.random() < 0.5 ? 0 : 1;
+    this.dir = d; this.spot = Math.random() < 0.5 ? 0 : 1;
+    this.word = Math.random() < 0.65 ? 1 - d : d; this.flash = -1;
+    this.msg = TG('第 ') + this.trial + ' / ' + this.diffTotal + ' 题：照箭头指的方向点';
+  }
+
+  private answer(pickDir: number): void {
+    if (this.over || this.flash >= 0) { return; }
+    const name: string = this.dir === 0 ? TG('左') : TG('右');
+    if (pickDir === this.dir) {
+      this.hits = this.hits + 1; this.score = this.score + 10; this.flash = 1; this.msg = '✅ 箭头指向' + name;
+    } else {
+      this.flash = 0; this.msg = '❌ 箭头指向' + name + '，别被字和位置骗';
+    }
+    this.timer = setTimeout(() => { this.timer = -1; this.next(); }, FEED_MS);
+  }
+
+  private next(): void {
+    if (this.trial >= this.diffTotal) {
+      this.over = true; this.won = this.hits >= PASS;
+      this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) + TG('答对 ') + this.hits + ' / ' + this.diffTotal;
+      this.finish(this.won); return;
+    }
+    this.trial = this.trial + 1; this.newTrial();
+  }
+
+  private finish(solved: boolean): void {
+    if (this.done) { return; }
+    this.done = true;
+    const r: GameResult = { gameId: 'spatial_conflict', solved: solved, score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.trial };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat(TG('题号'), this.trial + ' / ' + this.diffTotal, Palette.primaryDeep)
+        this.stat(TG('答对'), this.hits + ' / ' + PASS, Palette.emerald)
+        this.stat(TG('得分'), String(this.score), Palette.amber)
+      }.width('100%')
+      Row({ space: Space.sm }) {
+        this.field(0)
+        this.field(1)
+      }.width('100%').height(180)
+      Row({ space: Space.sm }) {
+        this.pickBtn('⬅️ 左', 0)
+        this.pickBtn('右 ➡️', 1)
+      }.width('100%')
+      Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      Button(TG('重开')).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
+        .borderRadius(Radius.md).width('100%').height(46).onClick(() => { this.reset(); })
+      Text('规矩只有一条：跟箭头走，字和位置都在骗你').fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  stat(label: string, value: string, tone: string) {
+    Column({ space: Space.xs }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(tone)
+    }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+  }
+
+  /** 某一侧：箭头 + 捣乱的字 */
+  @Builder
+  field(side: number) {
+    Stack() {
+      if (this.spot === side) {
+        Column({ space: Space.xs }) {
+          Text(this.dir === 0 ? '⬅️' : '➡️').fontSize(FontSize.hero)
+          Text(this.word === 0 ? TG('左') : TG('右')).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(Palette.rose)
+        }
+      } else {
+        Text('·').fontSize(FontSize.lg).fontColor(this.theme.inkFaint)
+      }
+    }.layoutWeight(1).height('100%')
+      .backgroundColor(this.flash < 0 ? this.theme.surfaceAlt : (this.flash === 1 ? '#2210B981' : '#22EF4444'))
+      .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
+  }
+
+  @Builder
+  pickBtn(label: string, side: number) {
+    Button(label).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(side === 0 ? Palette.sky : Palette.violet)
+      .borderRadius(Radius.md).layoutWeight(1).height(56).onClick(() => { this.answer(side); })
+  }
+}

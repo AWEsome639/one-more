@@ -1,0 +1,413 @@
+/**
+ * 2048 —— ★参考实现★（其余游戏照这个写法）
+ *
+ * 契约：
+ *   @Prop theme: Theme
+ *   onFinish: (r: GameResult) => void
+ *   build() 自己铺满父容器
+ *
+ * 交互：四向滑动（SwipeGesture），每次有效移动后随机落一个 2/4
+ * 通关判据：拼出 2048
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const N: number = 4;
+const WIN: number = 2048;
+/**
+ * 拖动手势的判定阈值（vp）。
+ * ⚠️ 为什么必须有：PanGesture 的 offsetX/offsetY 是**从手指按下算起的累计位移**，
+ *    不设阈值的话一次 60vp 的慢拖会被当成几十次移动 ⇒ 棋盘瞬间被推烂。
+ *    做法：每认一次方向就把起点重置到当前位置（见 dragX/dragY），于是"再拖 26vp"才算下一次。
+ */
+const DRAG_MIN: number = 26;
+
+/** 方块配色（数字 → 底色） */
+function tileColor(v: number, theme: Theme): string {
+  if (v === 0) {
+    return theme.isDark ? '#1AFFFFFF' : '#EEE9E0';
+  }
+  const map: Record<number, string> = {
+    2: '#EEE4DA', 4: '#EDE0C8', 8: '#F2B179', 16: '#F59563',
+    32: '#F67C5F', 64: '#F65E3B', 128: '#EDCF72', 256: '#EDCC61',
+    512: '#EDC850', 1024: '#EDC53F', 2048: '#EDC22E'
+  };
+  return map[v] ?? '#3C3A32';
+}
+
+function tileInk(v: number): string {
+  return v <= 4 ? '#776E65' : '#FFFFFF';
+}
+
+@Component
+export struct G2048 {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法：通关目标（简单 1024 / 普通 2048 / 困难 4096）
+  //   ⚠️ 必须用 pick() 给明确值 —— 倍率会算出 1434 这种非法方块，简单档永远赢不了
+  private winTile: number = GameDiff.pick(1024, 2048, 4096);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private cells: number[] = [];
+  @State private score: number = 0;
+  /** ★ 2026-10-15 得分跳动 */
+  @State private scorePulse: number = 1;
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  @State private best: number = 0;
+  @State private bump: number = 0;   // 每次落子 +1，触发方块入场动画
+  /** ★★ 2026-10-14 修复（奥森：「2048 直接呈现静态结果」）：
+   *  原来 bump 只递增、渲染里从没读过 ⇒ 入场动画从未发生 ✗
+   *  ⇒ 加 pulse：每次落子整盘轻微放大再回弹，做出落子手感 */
+  @State private pulse: number = 1;
+  /** ★★ 2026-10-14 真滑行（奥森：方块应该滑过去，不是直接呈现静态结果）：
+   *  做法：网格不动，但每次落子让所有方块【先从「来处」方向偏移】，
+   *        下一帧归零 ⇒ 视觉上就是「滑到新位置」（不用重写渲染）*/
+  @State private slideX: number = 0;
+  @State private slideY: number = 0;
+
+  private startAt: number = 0;
+  /** ★ 拖动起点（vp）：每认一次方向就重置 —— 让「直接拖方块」可以连续拖 */
+  private dragX: number = 0;
+  private dragY: number = 0;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now();
+    this.reset();
+  }
+
+  /** 宿主点了「换一局」 */
+  onRestart(): void {
+    this.reset();
+  }
+
+  private reset(): void {
+    this.cells = new Array<number>(N * N).fill(0);
+    this.score = 0;
+    this.over = false;
+    this.won = false;
+    this.spawn();
+    this.spawn();
+    this.startAt = Date.now();
+  }
+
+  /** 在随机空格落一个 2（90%）或 4（10%） */
+  private spawn(): void {
+    const empty: number[] = [];
+    for (let i = 0; i < this.cells.length; i++) {
+      if (this.cells[i] === 0) {
+        empty.push(i);
+      }
+    }
+    if (empty.length === 0) {
+      return;
+    }
+    const idx: number = empty[Math.floor(Math.random() * empty.length)];
+    const next: number[] = this.cells.slice();
+    next[idx] = Math.random() < 0.9 ? 2 : 4;
+    this.cells = next;
+    this.bump++;
+    // ★ 落子手感：整盘弹一下（110ms 一个来回）
+    this.pulse = 1.045;
+    setTimeout(() => { this.pulse = 1; }, 110);
+  }
+
+  /** 把一行/一列向左压并合并，返回 [新数组, 得分] */
+  private collapse(line: number[]): number[] {
+    const out: number[] = line.filter((v: number) => v !== 0);
+    let gained: number = 0;
+    for (let i = 0; i < out.length - 1; i++) {
+      if (out[i] === out[i + 1]) {
+        out[i] = out[i] * 2;
+        gained += out[i];
+        out.splice(i + 1, 1);
+      }
+    }
+    while (out.length < N) {
+      out.push(0);
+    }
+    this.pendingGain += gained;
+    return out;
+  }
+
+  private pendingGain: number = 0;
+
+  private idx(r: number, c: number): number {
+    return r * N + c;
+  }
+
+  /** dir: 0=上 1=右 2=下 3=左 */
+  private move(dir: number): void {
+    if (this.over) {
+      return;
+    }
+    const before: string = this.cells.join(',');
+    const next: number[] = new Array<number>(N * N).fill(0);
+    this.pendingGain = 0;
+
+    for (let i = 0; i < N; i++) {
+      const line: number[] = [];
+      for (let j = 0; j < N; j++) {
+        if (dir === 0) {
+          line.push(this.cells[this.idx(j, i)]);
+        } else if (dir === 1) {
+          line.push(this.cells[this.idx(i, N - 1 - j)]);
+        } else if (dir === 2) {
+          line.push(this.cells[this.idx(N - 1 - j, i)]);
+        } else {
+          line.push(this.cells[this.idx(i, j)]);
+        }
+      }
+      const done: number[] = this.collapse(line);
+      for (let j = 0; j < N; j++) {
+        if (dir === 0) {
+          next[this.idx(j, i)] = done[j];
+        } else if (dir === 1) {
+          next[this.idx(i, N - 1 - j)] = done[j];
+        } else if (dir === 2) {
+          next[this.idx(N - 1 - j, i)] = done[j];
+        } else {
+          next[this.idx(i, j)] = done[j];
+        }
+      }
+    }
+
+    if (next.join(',') === before) {
+      return;   // 无效移动
+    }
+
+    this.score += this.pendingGain; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
+    if (this.score > this.best) {
+      this.best = this.score;
+    }
+    this.cells = next;
+    // ★ 滑行感（2026-10-14）：方块先从「来处」偏移 14px，下一帧归零 ⇒ 有中间帧
+    const OFF: number = 14;
+    this.slideX = dir === 1 ? -OFF : (dir === 3 ? OFF : 0);
+    this.slideY = dir === 0 ? OFF : (dir === 2 ? -OFF : 0);
+    setTimeout(() => { this.slideX = 0; this.slideY = 0; }, 16);
+
+    if (!this.won && next.indexOf(this.winTile) >= 0) {
+      this.won = true;
+      this.finish(true);
+      return;
+    }
+
+    this.spawn();
+    if (this.isDead()) {
+      this.over = true;
+      this.finish(false);
+    }
+  }
+
+  /** 无空格且四邻都不可合并 ⇒ 死局 */
+  private isDead(): boolean {
+    for (let i = 0; i < this.cells.length; i++) {
+      if (this.cells[i] === 0) {
+        return false;
+      }
+    }
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        const v: number = this.cells[this.idx(r, c)];
+        if (c + 1 < N && this.cells[this.idx(r, c + 1)] === v) {
+          return false;
+        }
+        if (r + 1 < N && this.cells[this.idx(r + 1, c)] === v) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  private finish(solved: boolean): void {
+    const r: GameResult = {
+      gameId: 'g2048',
+      solved: solved,
+      score: this.score,
+      durationMs: Date.now() - this.startAt,
+      levelReached: Math.max(...this.cells)
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      // 得分条
+      // ⚠️ 只传「种类」不传「值」—— 见 scoreBox 的注释（@Builder 按值传参不建立观察）
+      Row({ space: Space.md }) {
+        this.scoreBox(0)
+        this.scoreBox(1)
+      }
+      .width('100%')
+
+      // 棋盘
+      Column({ space: Space.sm }) {
+        ForEach([0, 1, 2, 3], (r: number) => {
+          Row({ space: Space.sm }) {
+            ForEach([0, 1, 2, 3], (c: number) => {
+              this.tile(r, c)
+            }, (c: number) => 'c' + c)
+          }
+          .width('100%')
+        }, (r: number) => 'r' + r)
+      }
+      .width('100%')
+      .aspectRatio(1)
+      .padding(Space.sm)
+      .backgroundColor(this.theme.isDark ? '#141414' : '#BBADA0')
+      .borderRadius(Radius.lg)
+      .gesture(
+        // ★ 手指直接在方块上拖 = 朝那个方向推一次（P9「要能直接滑动方块」）
+        //   用 PanGesture 而不是 SwipeGesture：
+        //   ① SwipeGesture 要"甩"够速度才触发，慢拖没反应（手感差）；
+        //   ② PanGesture 的 offsetX/offsetY 是 vp 位移，方向判定不依赖 angle 的正负口径。
+        PanGesture({ fingers: 1, direction: PanDirection.All, distance: 6 })
+          .onActionStart(() => {
+            this.dragX = 0;
+            this.dragY = 0;
+          })
+          .onActionUpdate((e: GestureEvent) => {
+            const dx: number = e.offsetX - this.dragX;
+            const dy: number = e.offsetY - this.dragY;
+            if (Math.abs(dx) < DRAG_MIN && Math.abs(dy) < DRAG_MIN) {
+              return;
+            }
+            this.dragX = e.offsetX;
+            this.dragY = e.offsetY;
+            if (Math.abs(dx) >= Math.abs(dy)) {
+              this.move(dx > 0 ? 1 : 3);
+            } else {
+              this.move(dy > 0 ? 2 : 0);
+            }
+          })
+          .onActionEnd(() => {
+            this.dragX = 0;
+            this.dragY = 0;
+          })
+      )
+
+      // 方向键 —— 比滑动更精确；也保证在没有手势识别的设备/模拟器上一定能玩
+      Column({ space: Space.xs }) {
+        this.dirBtn('↑', 0)
+        Row({ space: Space.xs }) {
+          this.dirBtn('←', 3)
+          this.dirBtn('↓', 2)
+          this.dirBtn('→', 1)
+        }
+      }
+      .width('100%')
+
+      // 状态/操作
+      Row({ space: Space.md }) {
+        Button(this.over ? TG('已结束') : (this.won ? TG('已通关 🎉') : '滑动或按方向键'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.inkSoft)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(Cell.of(44))
+          .enabled(false)
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .width(96)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.reset();
+          })
+      }
+      .width('100%')
+
+      Text(TG('提示：已通关还能继续冲更高分；死局才结算'))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+  /**
+   * 得分格：kind 0=本局得分，1=最大方块
+   *
+   * ★★★ 为什么收「种类」而不是收「值」（2026-10-13 真机 P6 的根因）
+   * `@Builder` 的**按值传参不建立 ArkUI 观察**：编译后（见
+   * `entry/build/.../G2048.ts:343`）`this.scoreBox.bind(this)(TG('得分'), String(this.score))`
+   * 里的 `String(this.score)` 在 **initialRender 的函数体**里求值，不在任何
+   * `observeComponentCreation2` 闭包内 ⇒ 没有任何 elmtId 登记对 `score` 的依赖；
+   * builder 内部的闭包只捕获 `value` 这个局部变量 ⇒ **@State 再变，这个 Text 也永不重新求值**。
+   * ⇒ 用户看到的是「滑了、按了，棋盘/得分一动不动」= 「完全动不了」。
+   * 改成传 kind、在 builder 内部读状态：读取发生在闭包内 ⇒ 依赖建立 ⇒ 正常刷新。
+   */
+  @Builder
+  scoreBox(kind: number) {
+    Column({ space: 2 }) {
+      Text(kind === 0 ? TG('得分') : TG('最大')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(String(kind === 0 ? this.score : Math.max(...this.cells, 0)))
+        .fontSize(FontSize.xl)
+        // ★ 得分跳动
+        .scale({ x: this.scorePulse, y: this.scorePulse })
+        .animation({ duration: Motion.fast, curve: Motion.spring() })
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+    }
+    .layoutWeight(1)
+    .padding(Space.sm)
+    .backgroundColor(this.theme.surface)
+    .borderRadius(Radius.md)
+    .shadow(Shadow.card)
+  }
+
+  /**
+   * 一个方块：收 (r, c) 收「位置」不收「值」
+   * ⚠️ 同上：格子内容与底色都必须在闭包内读 this.cells，否则棋盘永远停在初始两张牌。
+   */
+  @Builder
+  tile(r: number, c: number) {
+    Stack() {
+      Text(this.cells[this.idx(r, c)] === 0 ? '' : String(this.cells[this.idx(r, c)]))
+        .fontSize(this.cells[this.idx(r, c)] >= 1024 ? FontSize.lg
+          : (this.cells[this.idx(r, c)] >= 128 ? FontSize.xl : FontSize.xxl))
+        .fontWeight(FontWeight.Bold)
+        .fontColor(tileInk(this.cells[this.idx(r, c)]))
+    }
+    .layoutWeight(1)
+    .aspectRatio(1)
+    .backgroundColor(tileColor(this.cells[this.idx(r, c)], this.theme))
+    .borderRadius(Radius.md)
+    // ★ 读 pulse ⇒ 动画才有会变化的属性（原来读的都不变 ⇒ 白挂）
+    .scale({ x: this.pulse, y: this.pulse })
+    .translate({ x: this.slideX, y: this.slideY })   // ★ 滑行位移
+    .animation({ duration: Motion.fast, curve: Motion.snap() })
+  }
+
+  /** 方向键：dir 与 move() 同口径（0上 1右 2下 3左） */
+  @Builder
+  dirBtn(label: string, dir: number) {
+    Text(label)
+      .fontSize(FontSize.lg)
+      .fontColor(this.theme.ink)
+      .textAlign(TextAlign.Center)
+      .width(64)
+      .height(Cell.of(40))
+      .backgroundColor(this.theme.surface)
+      .borderRadius(Radius.sm)
+      .shadow(Shadow.card)
+      .onClick(() => {
+        this.move(dir);
+      })
+  }
+}

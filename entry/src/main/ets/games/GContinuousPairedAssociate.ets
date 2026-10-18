@@ -1,0 +1,308 @@
+/**
+ * 连续配对 —— 经典的"成对联想"记忆任务
+ *
+ * 玩法：先看 4 组配对（学会阶段），点「记住了」开始答题；
+ *       之后连续 8 题：给出左项，从 4 个右项里选出刚才配对的它
+ * 胜负：答完 8 题 ⇒ solved=true；中途错满 3 题 ⇒ solved=false（答完立刻出下一题，节奏不断）
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const PAIRS_PER_ROUND: number = 4;   // 学会阶段记几对
+const TRIALS: number = 8;            // 答题总题数
+const MAX_MISTAKE: number = 3;       // 错满就结束
+const PER_CORRECT: number = 100;
+
+interface Pair {
+  a: string;
+  b: string;
+}
+
+const POOL: Pair[] = [
+  { a: '🐶', b: '🍖' },
+  { a: '🐱', b: '🐟' },
+  { a: '🐰', b: '🥕' },
+  { a: '🐻', b: '🍯' },
+  { a: '🐼', b: '🎋' },
+  { a: '🐵', b: '🍌' },
+  { a: '🐧', b: '🧊' },
+  { a: '🦊', b: '🍇' },
+  { a: '🐝', b: '🌻' },
+  { a: '🐳', b: '🌊' }
+];
+
+@Component
+export struct GContinuousPairedAssociate {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private phase: number = 0;          // 0 = 学会，1 = 答题，2 = 结束
+  @State private pairs: Pair[] = [];
+  @State private trial: number = 0;
+  @State private correct: number = 0;
+  @State private mistakes: number = 0;
+  @State private options: string[] = [];
+  @State private lastMsg: string = '';
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+
+  private startAt: number = 0;
+  private finished: boolean = false;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.reset();
+  }
+
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TRIALS);
+    this.reset();
+  }
+
+  private reset(): void {
+    const idx: number[] = [];
+    for (let i = 0; i < POOL.length; i++) {
+      idx.push(i);
+    }
+    for (let k = idx.length - 1; k > 0; k--) {
+      const j: number = Math.floor(Math.random() * (k + 1));
+      const t: number = idx[k];
+      idx[k] = idx[j];
+      idx[j] = t;
+    }
+    const ps: Pair[] = [];
+    for (let i = 0; i < PAIRS_PER_ROUND; i++) {
+      ps.push(POOL[idx[i]]);
+    }
+    this.pairs = ps;
+    this.phase = 0;
+    this.trial = 0;
+    this.correct = 0;
+    this.mistakes = 0;
+    this.options = [];
+    this.lastMsg = TG('看 4 组配对，记住谁配谁');
+    this.over = false;
+    this.won = false;
+    this.finished = false;
+    this.startAt = Date.now();
+  }
+
+  private cur(): Pair {
+    const i: number = this.trial % this.pairs.length;
+    return this.pairs[i];
+  }
+
+  /** 出题：正确项 + 3 个别的右项，打乱 */
+  private startTrial(): void {
+    const right: string = this.cur().b;
+    const others: string[] = [];
+    for (let i = 0; i < this.pairs.length; i++) {
+      if (this.pairs[i].b !== right) {
+        others.push(this.pairs[i].b);
+      }
+    }
+    const opts: string[] = [right];
+    while (opts.length < 4 && others.length > 0) {
+      const j: number = Math.floor(Math.random() * others.length);
+      opts.push(others[j]);
+      others.splice(j, 1);
+    }
+    for (let k = opts.length - 1; k > 0; k--) {
+      const j: number = Math.floor(Math.random() * (k + 1));
+      const t: string = opts[k];
+      opts[k] = opts[j];
+      opts[j] = t;
+    }
+    this.options = opts;
+  }
+
+  private answer(pick: string): void {
+    if (this.over || this.phase !== 1) {
+      return;
+    }
+    if (pick === this.cur().b) {
+      this.correct++;
+      this.lastMsg = TG2("✅ 答对 {0} 题", this.correct);
+    } else {
+      this.mistakes++;
+      this.lastMsg = TG2('❌ 它配的是 {0}', this.cur().b);
+    }
+    this.trial++;
+    if (this.mistakes >= MAX_MISTAKE) {
+      this.end(false);
+      return;
+    }
+    if (this.trial >= this.diffTotal) {
+      this.end(true);
+      return;
+    }
+    this.startTrial();
+  }
+
+  private end(solved: boolean): void {
+    this.over = true;
+    this.won = solved;
+    this.phase = 2;
+    this.lastMsg = solved
+      ? '🎉 8 题答完，错误 ' + this.mistakes + TG(' 次')
+      : TG2('错了 {0} 次，本轮结束',Digits(String(this.mistakes), this.langCode));
+    this.finish(solved);
+  }
+
+  private finish(solved: boolean): void {
+    if (this.finished) {
+      return;
+    }
+    this.finished = true;
+    const r: GameResult = {
+      gameId: 'continuous_paired_associate',
+      solved: solved,
+      score: this.correct * PER_CORRECT,
+      durationMs: Date.now() - this.startAt,
+      levelReached: this.correct
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text((TG('题目'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((Math.min(this.trial + 1, this.diffTotal) + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.correct), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('错误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.mistakes + ' / ' + MAX_MISTAKE)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+      }
+      .width('100%')
+
+      if (this.phase === 0) {
+        Column({ space: Space.sm }) {
+          Text(TG2("记住这 {0} 组", PAIRS_PER_ROUND)).fontSize(FontSize.md).fontColor(this.theme.inkSoft)
+          ForEach(this.pairs, (p: Pair) => {
+            Row({ space: Space.md }) {
+              Text(p.a).fontSize(FontSize.xxl)
+              Text('→').accessibilityText(TG('指向')).fontSize(FontSize.lg).fontColor(this.theme.inkFaint)
+              Text(p.b).fontSize(FontSize.xxl)
+            }
+            .width('100%')
+            .justifyContent(FlexAlign.Center)
+            .padding(Space.sm)
+            .backgroundColor(this.theme.surface)
+            .borderRadius(Radius.md)
+            .shadow(Shadow.card)
+          }, (p: Pair) => 'p' + p.a)
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+
+        Button(TG('记住了，开始答题'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(Cell.of(48))
+          .onClick(() => {
+            this.phase = 1;
+            this.lastMsg = TG('选出刚才和它配对的');
+            this.startTrial();
+          })
+      } else {
+        Column({ space: Space.md }) {
+          Text(this.cur().a)
+            .fontSize(FontSize.hero)
+            .padding(Space.lg)
+            .backgroundColor(this.theme.surface)
+            .borderRadius(Radius.lg)
+            .shadow(Shadow.card)
+          Text(TG('它配的是？')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+
+        Row({ space: Space.sm }) {
+          ForEach(this.options, (o: string) => {
+            Text(o)
+              .fontSize(FontSize.xxl)
+              .textAlign(TextAlign.Center)
+              .layoutWeight(1)
+              .height(Cell.of(72))
+              .backgroundColor(this.theme.surface)
+              .borderRadius(Radius.md)
+              .shadow(Shadow.card)
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+              // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
+              .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
+                .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+              .onClick(() => {
+                this.answer(o);
+              })
+          }, (o: string) => 'o' + o)
+        }
+        .width('100%')
+      }
+
+      Text(this.lastMsg)
+        .fontSize(FontSize.sm)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+
+      Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        .fontSize(FontSize.md)
+        .fontColor(Color.White)
+        .backgroundColor(Palette.primary)
+        .borderRadius(Radius.md)
+        .width('100%')
+        .height(Cell.of(46))
+        .onClick(() => {
+          this.reset();
+        })
+
+      Text(TG2('错 {0} 题就结束；答满 {1} 题算通关',Digits(String(MAX_MISTAKE), this.langCode),Digits(String(this.diffTotal), this.langCode)))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+
+}

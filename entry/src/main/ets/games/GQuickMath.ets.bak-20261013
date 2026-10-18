@@ -1,0 +1,187 @@
+/** 速算 —— 60 秒限时心算抢答｜拿到 100 分过关 */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const LIMIT: number = 60;
+const PASS: number = 100;
+
+interface QA { q: string; ans: number; opts: number[] }
+
+function makeQA(): QA {
+  const kind: number = Math.floor(Math.random() * 3);
+  let a: number = 0;
+  let b: number = 0;
+  let ans: number = 0;
+  let q: string = '';
+  if (kind === 0) {
+    a = 11 + Math.floor(Math.random() * 89);
+    b = 11 + Math.floor(Math.random() * 89);
+    ans = a + b;
+    q = String(a) + ' + ' + String(b);
+  } else if (kind === 1) {
+    a = 31 + Math.floor(Math.random() * 69);
+    b = 11 + Math.floor(Math.random() * (a - 20));
+    ans = a - b;
+    q = String(a) + ' − ' + String(b);
+  } else {
+    a = 3 + Math.floor(Math.random() * 17);
+    b = 3 + Math.floor(Math.random() * 10);
+    ans = a * b;
+    q = String(a) + ' × ' + String(b);
+  }
+  const cands: number[] = [ans + 1, ans - 1, ans + 2, ans - 2, ans + 10, ans - 10, ans + 3];
+  const opts: number[] = [ans];
+  for (let i = 0; i < cands.length && opts.length < 4; i++) {
+    const v: number = cands[i];
+    if (v > 0 && opts.indexOf(v) < 0) { opts.push(v); }
+  }
+  for (let i = opts.length - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const t: number = opts[i];
+    opts[i] = opts[j];
+    opts[j] = t;
+  }
+  return { q: q, ans: ans, opts: opts };
+}
+
+@Component
+export struct GQuickMath {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+  onFinish: (r: GameResult) => void = () => {};
+  @State private q: string = '';
+  @State private ans: number = 0;
+  @State private opts: number[] = [];
+  // ★ 难度作用到玩法：本局时限 = 基础 × 难度倍率（简单 1.5× / 普通 1× / 困难 0.7×）
+  private total: number = GameDiff.timeNow(LIMIT);
+  @State private left: number = 0;
+  @State private score: number = 0;
+  @State private right: number = 0;
+  @State private wrong: number = 0;
+  @State private combo: number = 0;
+  @State private best: number = 0;
+  @State private flash: string = '60 秒，能答多少答多少';
+  @State private over: boolean = false;
+  private startAt: number = 0;
+  private tick: number = -1;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now();
+    this.reset();
+    this.tick = setInterval(() => { this.beat(); }, 1000);
+  }
+  onRestart(): void {
+    this.total = GameDiff.timeNow(LIMIT);   // 难度可能刚变过，必须重算
+     this.reset(); }
+  aboutToDisappear(): void { if (this.tick >= 0) { clearInterval(this.tick); this.tick = -1; } }
+
+  private reset(): void {
+    this.startAt = Date.now();
+    this.left = this.total;
+    this.score = 0;
+    this.right = 0;
+    this.wrong = 0;
+    this.combo = 0;
+    this.best = 0;
+    this.over = false;
+    this.flash = '60 秒，能答多少答多少';
+    this.next();
+  }
+
+  private next(): void {
+    const item: QA = makeQA();
+    this.q = item.q;
+    this.ans = item.ans;
+    this.opts = item.opts;
+  }
+
+  private beat(): void {
+    if (this.over) { return; }
+    this.left = this.left - 1;
+    if (this.left <= 0) {
+      this.left = 0;
+      this.finish();
+    }
+  }
+
+  private choose(v: number): void {
+    if (this.over) { return; }
+    if (v === this.ans) {
+      this.combo++;
+      if (this.combo > this.best) { this.best = this.combo; }
+      const gain: number = 10 + this.combo;
+      this.score += gain;
+      this.right++;
+      this.flash = '✓ +' + String(gain) + '，连击 ' + String(this.combo);
+    } else {
+      this.wrong++;
+      this.combo = 0;
+      this.left = this.left - 3;
+      this.flash = '✗ ' + this.q + ' = ' + String(this.ans) + '，扣 3 秒';
+      if (this.left <= 0) {
+        this.left = 0;
+        this.finish();
+        return;
+      }
+    }
+    this.next();
+  }
+
+  private finish(): void {
+    if (this.over) { return; }
+    this.over = true;
+    this.flash = '时间到｜答对 ' + String(this.right) + '、答错 ' + String(this.wrong);
+    const res: GameResult = {
+      gameId: 'quick_math', solved: this.score >= PASS,
+      score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.right
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(res);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat(TG('剩余'), String(this.left) + 's')
+        this.stat(TG('得分'), String(this.score))
+        this.stat('最高连击', String(this.best))
+      }.width('100%')
+      Column({ space: Space.xs }) {
+        Text(this.q + ' = ?').fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text(this.over ? '本局已结束，点重开再来' : '抢答，答错扣 3 秒').fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+      }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
+      .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
+      Text(this.flash).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+      Row({ space: Space.sm }) {
+        ForEach([0, 1], (i: number) => { this.optBtn(i); }, (i: number) => 'a' + i)
+      }.width('100%')
+      Row({ space: Space.sm }) {
+        ForEach([2, 3], (i: number) => { this.optBtn(i); }, (i: number) => 'b' + i)
+      }.width('100%')
+      Row({ space: Space.md }) {
+        Button(TG('重开')).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
+          .borderRadius(Radius.md).width(120).height(44).onClick(() => { this.reset(); })
+        Text('连击越高分越多').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      }.width('100%')
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  stat(label: string, value: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+    }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
+  }
+
+  @Builder
+  optBtn(i: number) {
+    Button(this.opts.length > i ? String(this.opts[i]) : '—').fontSize(FontSize.xl).fontColor(this.theme.ink)
+      .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(56)
+      .enabled(!this.over && this.opts.length > i).onClick(() => { this.choose(this.opts[i]); })
+  }
+}

@@ -1,0 +1,428 @@
+/**
+ * 数壹进阶（Hitori 8×8）⬛
+ *
+ * 规则：涂黑一些格子，使 ——
+ *   ① 每行每列的**未涂黑**数字都不重复；
+ *   ② 涂黑的格子不能上下左右相邻；
+ *   ③ 所有未涂黑的格子要连成一片。
+ * 胜负：三条全满足 = 通关；步数用尽 = 失败。
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const N: number = 8;
+const MAX_MOVES: number = 150;
+
+interface HitoriGen {
+  vals: number[];
+  shade: boolean[];
+}
+
+function shuffleArr(a: number[]): void {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const t: number = a[i];
+    a[i] = a[j];
+    a[j] = t;
+  }
+}
+
+/** 循环拉丁方 + 行/列/符号三重打乱 */
+function latinSquare(): number[] {
+  const rows: number[] = [];
+  const cols: number[] = [];
+  const syms: number[] = [];
+  for (let i = 0; i < N; i++) {
+    rows.push(i);
+    cols.push(i);
+    syms.push(i + 1);
+  }
+  shuffleArr(rows);
+  shuffleArr(cols);
+  shuffleArr(syms);
+  const out: number[] = new Array<number>(N * N).fill(0);
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      out[r * N + c] = syms[(rows[r] + cols[c]) % N];
+    }
+  }
+  return out;
+}
+
+/** 白格四邻数（-1 表示越界） */
+function nbIdx(i: number, d: number): number {
+  const r: number = Math.floor(i / N);
+  const c: number = i - r * N;
+  if (d === 0) {
+    return c > 0 ? i - 1 : -1;
+  }
+  if (d === 1) {
+    return c < N - 1 ? i + 1 : -1;
+  }
+  if (d === 2) {
+    return r > 0 ? i - N : -1;
+  }
+  return r < N - 1 ? i + N : -1;
+}
+
+function whiteCount(shade: boolean[]): number {
+  let n: number = 0;
+  for (let i = 0; i < N * N; i++) {
+    if (!shade[i]) {
+      n++;
+    }
+  }
+  return n;
+}
+
+/** 白格连通：从第一个白格洪水填充，看能否覆盖全部白格 */
+function whiteLinked(shade: boolean[]): boolean {
+  let start: number = -1;
+  for (let i = 0; i < N * N; i++) {
+    if (!shade[i]) {
+      start = i;
+      break;
+    }
+  }
+  if (start < 0) {
+    return false;
+  }
+  const seen: boolean[] = new Array<boolean>(N * N).fill(false);
+  const st: number[] = [start];
+  seen[start] = true;
+  let cnt: number = 0;
+  while (st.length > 0) {
+    const k: number = st[st.length - 1];
+    st.splice(st.length - 1, 1);
+    cnt++;
+    for (let d = 0; d < 4; d++) {
+      const j: number = nbIdx(k, d);
+      if (j >= 0 && !shade[j] && !seen[j]) {
+        seen[j] = true;
+        st.push(j);
+      }
+    }
+  }
+  return cnt === whiteCount(shade);
+}
+
+/** 行列中去重后仍重复的数字个数 */
+function dupCount(vals: number[], shade: boolean[]): number {
+  let n: number = 0;
+  for (let r = 0; r < N; r++) {
+    const sv: boolean[] = new Array<boolean>(N + 1).fill(false);
+    for (let c = 0; c < N; c++) {
+      const i: number = r * N + c;
+      if (shade[i]) {
+        continue;
+      }
+      const v: number = vals[i];
+      if (sv[v]) {
+        n++;
+      } else {
+        sv[v] = true;
+      }
+    }
+  }
+  for (let c = 0; c < N; c++) {
+    const sv: boolean[] = new Array<boolean>(N + 1).fill(false);
+    for (let r = 0; r < N; r++) {
+      const i: number = r * N + c;
+      if (shade[i]) {
+        continue;
+      }
+      const v: number = vals[i];
+      if (sv[v]) {
+        n++;
+      } else {
+        sv[v] = true;
+      }
+    }
+  }
+  return n;
+}
+
+function adjCount(shade: boolean[]): number {
+  let n: number = 0;
+  for (let i = 0; i < N * N; i++) {
+    if (!shade[i]) {
+      continue;
+    }
+    const right: number = nbIdx(i, 1);
+    const down: number = nbIdx(i, 3);
+    if (right >= 0 && shade[right]) {
+      n++;
+    }
+    if (down >= 0 && shade[down]) {
+      n++;
+    }
+  }
+  return n;
+}
+
+function hitoriGen(): HitoriGen {
+  for (let t = 0; t < 400; t++) {
+    const L: number[] = latinSquare();
+    const order: number[] = [];
+    for (let i = 0; i < N * N; i++) {
+      order.push(i);
+    }
+    shuffleArr(order);
+    const want: number = N + Math.floor(Math.random() * (N + 1));
+    const shade: boolean[] = new Array<boolean>(N * N).fill(false);
+    let cnt: number = 0;
+    for (let k = 0; k < order.length && cnt < want; k++) {
+      const i: number = order[k];
+      let bad: boolean = false;
+      for (let d = 0; d < 4; d++) {
+        const j: number = nbIdx(i, d);
+        if (j >= 0 && shade[j]) {
+          bad = true;
+        }
+      }
+      if (bad) {
+        continue;
+      }
+      shade[i] = true;
+      cnt++;
+    }
+    if (cnt === 0 || !whiteLinked(shade)) {
+      continue;
+    }
+    // 黑格数字复制相邻白格 ⇒ 该行/列必然出现重复，必须涂黑
+    const vals: number[] = L.slice();
+    let ok: boolean = true;
+    for (let i = 0; i < N * N; i++) {
+      if (!shade[i]) {
+        continue;
+      }
+      const nbs: number[] = [];
+      for (let d = 0; d < 4; d++) {
+        const j: number = nbIdx(i, d);
+        if (j >= 0 && !shade[j]) {
+          nbs.push(j);
+        }
+      }
+      if (nbs.length === 0) {
+        ok = false;
+        break;
+      }
+      vals[i] = L[nbs[Math.floor(Math.random() * nbs.length)]];
+    }
+    if (ok && dupCount(vals, shade) === 0) {
+      return { vals: vals, shade: shade };
+    }
+  }
+  return { vals: latinSquare(), shade: new Array<boolean>(N * N).fill(false) };
+}
+
+@Component
+export struct GHitoriAll {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private vals: number[] = [];
+  @State private shade: boolean[] = [];
+  @State private moves: number = 0;
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  @State private pressed: number = -1;
+
+  private startAt: number = 0;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.reset();
+  }
+
+  onRestart(): void {
+    this.diffTotal = GameDiff.livesNow(MAX_MOVES);
+    this.reset();
+  }
+
+  private reset(): void {
+    const g: HitoriGen = hitoriGen();
+    this.vals = g.vals;
+    this.shade = new Array<boolean>(N * N).fill(false);
+    this.moves = 0;
+    this.over = false;
+    this.won = false;
+    this.pressed = -1;
+    this.startAt = Date.now();
+  }
+
+  private shaded(): number {
+    let n: number = 0;
+    for (let i = 0; i < this.shade.length; i++) {
+      if (this.shade[i]) {
+        n++;
+      }
+    }
+    return n;
+  }
+
+  private bad(): number {
+    return dupCount(this.vals, this.shade) + adjCount(this.shade) + (whiteLinked(this.shade) ? 0 : 1);
+  }
+
+  private tap(i: number): void {
+    if (this.over) {
+      return;
+    }
+    const s: boolean[] = this.shade.slice();
+    s[i] = !s[i];
+    this.shade = s;
+    this.moves++;
+    if (this.bad() === 0) {
+      this.over = true;
+      this.won = true;
+      this.finish(true);
+      return;
+    }
+    if (this.moves >= this.diffTotal) {
+      this.over = true;
+      this.finish(false);
+    }
+  }
+
+  private finish(solved: boolean): void {
+    const r: GameResult = {
+      gameId: 'hitori_all',
+      solved: solved,
+      score: solved ? Math.max(200, 1600 - this.moves * 8) : this.shaded() * 40,
+      durationMs: Date.now() - this.startAt,
+      levelReached: this.shaded()
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.md }) {
+        Column({ space: 2 }) {
+        Text((TG('已涂黑'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((String(this.shaded())))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('违规'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((String(this.bad())))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.moves), this.langCode))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+      }
+      .width('100%')
+
+      Column({ space: 2 }) {
+        ForEach([0, 1, 2, 3, 4, 5, 6, 7], (r: number) => {
+          Row({ space: 2 }) {
+            ForEach([0, 1, 2, 3, 4, 5, 6, 7], (c: number) => {
+              Stack() {
+              Text(String(this.vals[(r * N + c)]))
+              .fontSize(FontSize.md)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.shade[(r * N + c)] ? (this.theme.isDark ? '#64748B' : '#94A3B8') : this.theme.ink)
+              }
+              .layoutWeight(1)
+              .aspectRatio(1)
+              .backgroundColor(this.shade[(r * N + c)] ? (this.theme.isDark ? '#0B0B0B' : '#334155') : this.theme.surface)
+              .borderRadius(Radius.xs)
+              .scale({
+              x: this.pressed === (r * N + c) ? Motion.pressScale : 1,
+              y: this.pressed === (r * N + c) ? Motion.pressScale : 1
+              })
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .onTouch((e: TouchEvent) => {
+              if (e.type === TouchType.Down) {
+              this.pressed = (r * N + c);
+              } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) {
+              this.pressed = -1;
+              }
+              })
+              .onClick(() => {
+              this.tap((r * N + c));
+              })
+            }, (c: number) => 'ha' + r + '-' + c)
+          }
+          .width('100%')
+        }, (r: number) => 'har' + r)
+      }
+      .width('100%')
+      .padding(Space.xs)
+      .backgroundColor(this.theme.surfaceAlt)
+      .borderRadius(Radius.md)
+
+      Row({ space: Space.md }) {
+        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : '点格子涂黑 / 取消')
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.inkSoft)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(Cell.of(44))
+          .enabled(false)
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .width(96)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.reset();
+          })
+      }
+      .width('100%')
+
+      Text(TG('8×8 大盘：每行每列剩下的数字不能重复，黑格不相邻，白格连成一片'))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+
+
+
+}

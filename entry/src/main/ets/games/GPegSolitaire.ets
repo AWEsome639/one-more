@@ -1,0 +1,303 @@
+/**
+ * 孔明棋（Peg Solitaire）—— 跳吃剩一颗
+ *
+ * 规则：点一颗棋子选中，再点同一直线隔一格的空位 ⇒ 跳过去，被跳过的棋子拿掉。
+ * 结算：全盘没有任何可跳的走法时结算；只剩 1 颗 ⇒ 通关。
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const SIZE: number = 7;
+const CELLS: number = SIZE * SIZE;
+const VOID: number = -1;      // 不在棋盘上
+const HOLE: number = 0;       // 空位
+const PEG: number = 1;        // 有棋子
+const START_PEGS: number = 32;
+const GAP: number = 2;
+const ROW: number[] = [0, 1, 2, 3, 4, 5, 6];
+/** 四个跳向（行列增量） */
+const DIRS: number[][] = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+function at(r: number, c: number): number {
+  return r * SIZE + c;
+}
+
+/** 标准十字棋盘：四个角的 2×2 是不在盘上的 */
+function onBoard(r: number, c: number): boolean {
+  if (r < 0 || r >= SIZE || c < 0 || c >= SIZE) {
+    return false;
+  }
+  const rFar: boolean = r < 2 || r > 4;
+  const cFar: boolean = c < 2 || c > 4;
+  return !(rFar && cFar);
+}
+
+@Component
+export struct GPegSolitaire {
+  /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private cells: number[] = [];
+  @State private sel: number = -1;
+  @State private dests: number[] = [];
+  // ★ 难度作用到玩法（本局次数/起始量按难度换算）
+  private total: number = GameDiff.livesNow(START_PEGS);
+  @State private pegs: number = 0;
+  @State private steps: number = 0;
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+
+  private startAt: number = 0;
+  private finished: boolean = false;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.reset();
+  }
+
+  /** 宿主点了「换一局」 */
+  onRestart(): void {
+    this.total = GameDiff.livesNow(START_PEGS);
+    this.reset();
+  }
+
+  private reset(): void {
+    const a: number[] = [];
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        a.push(onBoard(r, c) ? PEG : VOID);
+      }
+    }
+    a[at(3, 3)] = HOLE;                  // 正中央先空一格
+    this.cells = a;
+    this.sel = -1;
+    this.dests = [];
+    this.pegs = this.total;
+    this.steps = 0;
+    this.over = false;
+    this.won = false;
+    this.finished = false;
+    this.startAt = Date.now();
+  }
+
+  /** 从 p 出发的所有合法落点 */
+  private legalDests(p: number): number[] {
+    const out: number[] = [];
+    const r: number = Math.floor(p / SIZE);
+    const c: number = p % SIZE;
+    for (let k = 0; k < DIRS.length; k++) {
+      const dr: number = DIRS[k][0];
+      const dc: number = DIRS[k][1];
+      const mr: number = r + dr;
+      const mc: number = c + dc;
+      const tr: number = r + dr * 2;
+      const tc: number = c + dc * 2;
+      if (!onBoard(tr, tc)) {
+        continue;
+      }
+      if (this.cells[at(mr, mc)] !== PEG) {
+        continue;
+      }
+      if (this.cells[at(tr, tc)] !== HOLE) {
+        continue;
+      }
+      out.push(at(tr, tc));
+    }
+    return out;
+  }
+
+  private anyMove(): boolean {
+    for (let i = 0; i < CELLS; i++) {
+      if (this.cells[i] === PEG && this.legalDests(i).length > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private tap(i: number): void {
+    if (this.over || this.cells[i] === VOID) {
+      return;
+    }
+    if (this.cells[i] === PEG) {
+      this.sel = i;
+      this.dests = this.legalDests(i);
+      return;
+    }
+    const from: number = this.sel;
+    if (from < 0 || this.dests.indexOf(i) < 0) {
+      return;
+    }
+    const next: number[] = this.cells.slice();
+    const mid: number = at(Math.floor((Math.floor(from / SIZE) + Math.floor(i / SIZE)) / 2),
+      Math.floor((from % SIZE + i % SIZE) / 2));
+    next[from] = HOLE;
+    next[mid] = HOLE;
+    next[i] = PEG;
+    this.cells = next;
+    this.pegs--;
+    this.steps++;
+    this.sel = -1;
+    this.dests = [];
+    if (!this.anyMove()) {
+      this.over = true;
+      this.won = this.pegs === 1;
+      this.finish(this.won);
+    }
+  }
+
+  private finish(solved: boolean): void {
+    if (this.finished) {
+      return;
+    }
+    this.finished = true;
+    const score: number = solved
+      ? Math.max(100, 800 - this.steps * 15)
+      : (START_PEGS - this.pegs) * 20;
+    const r: GameResult = {
+      gameId: 'peg_solitaire',
+      solved: solved,
+      score: score,
+      durationMs: Date.now() - this.startAt,
+      levelReached: START_PEGS - this.pegs + 1
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  private status(): string {
+    if (this.won) {
+      return TG('🎉 只剩一颗，完美通关！');
+    }
+    if (this.over) {
+      return TG2('😵 还剩 {0} 颗，没有可跳的走法了',Digits(String(this.pegs), this.langCode));
+    }
+    if (this.sel >= 0) {
+      return this.dests.length > 0 ? '再点绿点，跳过去' : '这颗跳不动，换一颗试试';
+    }
+    return TG('点棋子选中，再点绿点跳过它旁边的棋子');
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text((TG('剩余棋子'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.pegs), this.langCode))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(Digits(String(this.steps), this.langCode))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('可跳'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.sel >= 0 ? this.dests.length + ' 处' : '—'))
+        .fontSize(FontSize.lg)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.sm)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+      }
+      .width('100%')
+
+      Column({ space: GAP }) {
+        ForEach(ROW, (r: number) => {
+          Row({ space: GAP }) {
+            ForEach(ROW, (c: number) => {
+              Stack() {
+              if (this.cells[at((r), (c))] === PEG) {
+              Row()
+              .width('68%')
+              .aspectRatio(1)
+              .backgroundColor(this.sel === at((r), (c)) ? Palette.orange : Palette.amber).animation({ duration: Motion.fast, curve: Motion.snap() })
+              .borderRadius(Radius.full)
+              .shadow(Shadow.card)
+              } else if (this.cells[at((r), (c))] === HOLE) {
+              Row()
+              .width('30%')
+              .aspectRatio(1)
+              .backgroundColor(this.dests.indexOf(at((r), (c))) >= 0 ? Palette.emerald : this.theme.line)
+              .borderRadius(Radius.full)
+              }
+              }
+              .layoutWeight(1)
+              .aspectRatio(1)
+              // ★★ 2026-10-14 修复【死动画】：原来读的都是常量
+              //    现在绑【可跳目标】⇒ 目标格弹大一点（动画真的活了）
+              .scale({
+                x: this.dests.indexOf(at((r), (c))) >= 0 ? 1.1 : 1,
+                y: this.dests.indexOf(at((r), (c))) >= 0 ? 1.1 : 1
+              })
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .onClick(() => {
+              this.tap(at((r), (c)));
+              })
+            }, (c: number) => 'c' + c)
+          }
+          .width('100%')
+        }, (r: number) => 'r' + r)
+      }
+      .width('100%')
+      .aspectRatio(1)
+      .padding(Space.sm)
+      .backgroundColor(this.theme.isDark ? '#141414' : '#F1E7D0')
+      .borderRadius(Radius.lg)
+      .shadow(Shadow.card)
+
+      Text(this.status())
+        .fontSize(FontSize.sm)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+
+      Button(TG('重新开始'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        .fontSize(FontSize.md)
+        .fontColor(Color.White)
+        .backgroundColor(Palette.amber)
+        .borderRadius(Radius.md)
+        .width('100%')
+        .height(Cell.of(46))
+        .onClick(() => {
+          this.reset();
+        })
+
+      Text(TG('目标：最后只剩 1 颗（中央开局，32 颗）'))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+
+
+
+}

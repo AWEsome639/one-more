@@ -1,0 +1,171 @@
+/**
+ * 自定顺序（SOPT）—— 9 个方格随机布号，按 1→9 依次点，序号每轮重排
+ * 胜负：撑过 3 轮通关 / 点错 3 次失败
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG, TG2 } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+import { Digits } from '../core/I18n';
+
+const N: number = 3;
+const CELLS: number = N * N;
+const ROUNDS: number = 3;
+
+@Component
+export struct GSopt {
+  /** ★★★ 2026-10-16 BUG #24：数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
+  @StorageProp('lang') langCode: string = 'zh';
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State private spots: number[] = [];   // 每格上的序号，0 = 空位
+  @State private filled: number[] = [];  // 已点的格子
+  @State private next: number = 1;       // 下一个该点的号
+  @State private round: number = 1;
+  @State private wrong: number = 0;
+  @State private score: number = 0;
+  /** ★ 2026-10-15 得分跳动 */
+  @State private scorePulse: number = 1;
+  @State private msg: string = TG(TG(TG('按 1 → 9 依次点')));
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  private startAt: number = 0;
+  private roundAt: number = 0;
+  private nextTo: number = -1;
+  private done: boolean = false;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+     this.reset(); }
+  aboutToDisappear(): void { if (this.nextTo >= 0) { clearTimeout(this.nextTo); } }
+
+  private reset(): void {
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
+    this.filled = []; this.score = 0; this.wrong = 0; this.round = 1;
+    this.over = false; this.won = false; this.done = false;
+    this.startAt = Date.now();
+    this.shuffle();
+  }
+
+  /** 9 个号随机撒进 3×3 */
+  private shuffle(): void {
+    const pool: number[] = [];
+    for (let i = 0; i < CELLS; i++) { pool.push(i + 1); }
+    const out: number[] = [];
+    for (let i = 0; i < CELLS; i++) {
+      const j: number = Math.floor(Math.random() * pool.length);
+      out.push(pool[j]);
+      pool.splice(j, 1);
+    }
+    this.spots = out;
+    this.filled = [];
+    this.next = 1;
+    this.roundAt = Date.now();
+    this.msg = TG('第 ') + String(this.round) + '/' + String(this.diffTotal) + ' 轮：按 1 → 9 依次点';
+  }
+
+  private tap(i: number): void {
+    if (this.over || this.spots.length === 0 || this.filled.indexOf(i) >= 0) { return; }
+    if (this.spots[i] !== this.next) {
+      const want: number = this.next;
+      this.wrong = this.wrong + 1;
+      this.msg = TG2('❌ 该点 {0} 号', String(want));
+      if (this.wrong >= 3) { this.stop(false); }
+      return;
+    }
+    const hit: number[] = this.filled.slice();
+    hit.push(i);
+    this.filled = hit;
+    this.next = this.next + 1;
+    if (this.next <= CELLS) {
+      this.msg = TG2('下一个 {0} 号', String(this.next));
+      return;
+    }
+    const used: number = Date.now() - this.roundAt;
+    this.score = this.score + Math.max(0, CELLS * 800 - used); this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
+    if (this.round >= this.diffTotal) { this.stop(true); return; }
+    this.round = this.round + 1; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110);
+    this.msg = TG2('✅ 本轮 {0} ms，下一轮重排', String(used));
+    this.nextTo = setTimeout(() => { this.nextTo = -1; this.shuffle(); }, 700);
+  }
+
+  private stop(solved: boolean): void {
+    if (this.done) { return; }
+    this.done = true;
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
+    this.over = true; this.won = solved;
+    const went: number = solved ? this.diffTotal : this.round - 1;
+    this.msg = (solved ? TG('🎉 通关 ') : TG('💤 失败 ')) +TG2("完成 {0}/{1}", String(went), String(this.diffTotal))
+      + TG2(' 轮 · 点错 {0} 次',Digits(String(this.wrong), this.langCode));
+    const r: GameResult = {
+      gameId: 'sopt', solved: solved, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.round
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  private tint(i: number): string {
+    return this.filled.indexOf(i) >= 0 ? Palette.cyan : this.theme.surface;
+  }
+
+  private face(i: number): string {
+    return this.filled.indexOf(i) >= 0 ? '✔' : String(this.spots[i]);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row() {
+        Text(TG2("轮次 {0}/{1}",Digits(String(this.round), this.langCode),Digits(String(this.diffTotal), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Text(TG2('下一个 {0}', String(this.next))).fontSize(FontSize.sm).fontColor(Palette.cyan)
+        Text(TG2('点错 {0}/3', String(this.wrong))).fontSize(FontSize.sm).fontColor(this.theme.ink)
+        Text(TG('得分 ') + String(this.score)).fontSize(FontSize.sm)
+        // ★ 得分跳动
+        .scale({ x: this.scorePulse, y: this.scorePulse })
+        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.ink)
+      }
+      .width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
+      .borderRadius(Radius.md).shadow(Shadow.card).justifyContent(FlexAlign.SpaceBetween)
+      Column({ space: Space.xs }) {
+        ForEach([0, 1, 2], (r: number) => {
+          Row({ space: Space.xs }) {
+            ForEach([0, 1, 2], (c: number) => {
+              this.dot(r * N + c)
+            }, (c: number) => 'c' + c)
+          }.width('100%')
+        }, (r: number) => 'r' + r)
+      }
+      .width('100%').aspectRatio(1).padding(Space.xs)
+      .backgroundColor(this.theme.isDark ? '#141414' : '#E2E8F0').borderRadius(Radius.lg)
+      Text(this.msg)
+        .fontSize(FontSize.md).fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .width('100%').textAlign(TextAlign.Center)
+      Button(this.over ? TG('再来一局') : TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        .fontSize(FontSize.md).fontColor('#FFFFFF')
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.cyan)
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+    }
+    .width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  dot(i: number) {
+    Stack() {
+      Text(this.face(i))
+        .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
+        .fontColor(this.filled.indexOf(i) >= 0 ? '#FFFFFF' : this.theme.ink)
+    }
+    .layoutWeight(1).aspectRatio(1).backgroundColor(this.tint(i)).borderRadius(Radius.md)
+    .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .onClick(() => { this.tap(i); })
+  }
+}
