@@ -1,6 +1,16 @@
 # One More · 一局
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Platform-HarmonyOS%20Next-0A59F7?style=for-the-badge&logo=harmonyos&logoColor=white" alt="HarmonyOS">
+  <img src="https://img.shields.io/badge/Language-ArkTS-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="ArkTS">
+  <img src="https://img.shields.io/badge/Games-355-FF6B6B?style=for-the-badge" alt="355 games">
+  <img src="https://img.shields.io/badge/Offline-100%25-2EA043?style=for-the-badge" alt="Offline">
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT">
+</p>
+
+
+
+<p align="center">
   <img src="docs/screenshots/01-首页.png" width="200" alt="首页">
   <img src="docs/screenshots/04-AZ列表.png" width="200" alt="游戏列表">
   <img src="docs/screenshots/05-游戏内页.png" width="200" alt="游戏内页">
