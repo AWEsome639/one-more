@@ -125,7 +125,7 @@ export struct GFactorFinder {
       Column({ space: Space.xs }) {
         Text('➗').fontSize(FontSize.xxl)
           .accessibilityLevel('no')
-        Text(TG2('找出 {0} 的全部因数', String(this.n))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(Palette.primaryDeep)
+        Text(TG2('找出 {0} 的全部因数', String(this.n))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.isDark ? Palette.primary : Palette.primaryDeep)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
         ForEach(ROWS, (row: number) => {

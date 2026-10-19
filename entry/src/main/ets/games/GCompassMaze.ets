@@ -157,7 +157,7 @@ export struct GCompassMaze {
  top: (this.walls[r * this.diffTotal + c] & 1) !== 0 ? 2 : 0, right: (this.walls[r * this.diffTotal + c] & 2) !== 0 ? 2 : 0,
  bottom: (this.walls[r * this.diffTotal + c] & 4) !== 0 ? 2 : 0,
  left: (this.walls[r * this.diffTotal + c] & 8) !== 0 ? 2 : 0
- }).borderColor(this.theme.lineSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+ }).borderColor(Palette.wall).animation({ duration: Motion.fast, curve: Motion.snap() })
  }, (c: number) => 'c' + c) }.width('100%')
  }, (r: number) => 'r' + r) }.width('100%')
  Row({ space: 2 }) {

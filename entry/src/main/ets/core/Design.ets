@@ -86,15 +86,22 @@ export class Palette {
   /** 主题色的深色版（按下态、强调边），随 primary 一起派生 */
   static primaryDeep: string = '#4F46E5';
   static readonly berry: string = '#EC4899';
-  static readonly emerald: string = '#10B981';
-  static readonly amber: string = '#F59E0B';
+  /**
+   * ★ 2026-10-19（对比度审计后整体下调一档）：
+   *   原来这六个是 Tailwind **500 档**，白字画在上面对比度只有 1.98–2.80
+   *   （WCAG 大字号要 3:1）⇒ 全项目实测有 86 处不合格
+   *   改成 **600 档** 后：3.09–4.10，全部过线；观感也更沉稳（离线渲染对比过）
+   *   ⚠️ 用户可选的主题色（Accent.options）是**另一个列表**，本次未动
+   */
+  static readonly emerald: string = '#059669';
+  static readonly amber: string = '#D97706';
   static readonly teal: string = '#0D9488';
   static readonly violet: string = '#8B5CF6';
-  static readonly sky: string = '#0EA5E9';
+  static readonly sky: string = '#0284C7';
   static readonly rose: string = '#F43F5E';
-  static readonly lime: string = '#84CC16';
-  static readonly orange: string = '#F97316';
-  static readonly cyan: string = '#06B6D4';
+  static readonly lime: string = '#65A30D';
+  static readonly orange: string = '#EA580C';
+  static readonly cyan: string = '#0891B2';
 
   // 语义
   static readonly success: string = '#10B981';
@@ -110,6 +117,16 @@ export class Palette {
   static readonly inkFaint: string = '#64748B';
   static readonly line: string = '#E2E8F0';
   static readonly lineSoft: string = '#CBD5E1';
+  /**
+   * 结构线（迷宫墙壁、棋盘格线）—— **不是**分隔线
+   *
+   * ★ 2026-10-19（对比度实测后新增）：
+   *   原来迷宫墙用 lineSoft(#CBD5E1)，白底上对比度只有 1.48（WCAG 图形元素要 3:1）
+   *   ⇒ 阳光下墙几乎看不见，而墙就是迷宫的全部信息
+   *   #7C8DA6 实测：浅底 3.38 ✅ ｜ 深底(#141414) 5.45 ✅ ⇒ 一个颜色两边都过线
+   *   ⚠️ 分隔线仍用 lineSoft —— 它不需要被"看清"，只需要存在感
+   */
+  static readonly wall: string = '#7C8DA6';
 
   // 深色主题（AMOLED）
   static readonly dBg: string = '#000000';

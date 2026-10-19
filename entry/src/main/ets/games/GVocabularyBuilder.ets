@@ -129,7 +129,7 @@ export struct GVocabularyBuilder {
       Column({ space: Space.xs }) {
         Text(this.cur().gloss + '　[' + this.cur().pos + ']').fontSize(FontSize.xl)
           .fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(TG2('词根 {0} ＋ 词缀', this.cur().root)).fontSize(FontSize.sm).fontColor(Palette.primaryDeep)
+        Text(TG2('词根 {0} ＋ 词缀', this.cur().root)).fontSize(FontSize.sm).fontColor(this.theme.isDark ? Palette.primary : Palette.primaryDeep)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {

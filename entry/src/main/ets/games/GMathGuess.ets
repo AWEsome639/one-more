@@ -116,7 +116,7 @@ export struct GMathGuess {
     Column({ space: Space.md }) {
       Text(TG2('已用 {0}/{1}　范围 {2}', String(this.tries), String(this.diffTotal), String(this.lowBound))
         + TG2('~{0}　分 {1}',Digits(String(this.highBound), this.langCode),Digits(String(this.score), this.langCode)))
-        .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.primaryDeep)
+        .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.isDark ? Palette.primary : Palette.primaryDeep)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Column({ space: Space.xs }) {

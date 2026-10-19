@@ -169,7 +169,7 @@ export struct GMentalCalendar {
       Column({ space: Space.xs }) {
         Text(TG('📅 这一天是星期几？')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(String(this.yr) + TG2(' 年 {0} 月 {1} 日', String(this.mon), String(this.day)))
-          .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.primaryDeep)
+          .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.isDark ? Palette.primary : Palette.primaryDeep)
       }
       .width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card)

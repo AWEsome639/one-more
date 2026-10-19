@@ -125,7 +125,7 @@ export struct GClassicMaze {
  top: (this.walls[r * this.diffTotal + c] & 1) !== 0 ? 2 : 0, right: (this.walls[r * this.diffTotal + c] & 2) !== 0 ? 2 : 0,
  bottom: (this.walls[r * this.diffTotal + c] & 4) !== 0 ? 2 : 0,
  left: (this.walls[r * this.diffTotal + c] & 8) !== 0 ? 2 : 0
- }).borderColor(this.theme.lineSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+ }).borderColor(Palette.wall).animation({ duration: Motion.fast, curve: Motion.snap() })
  // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
  .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
    .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))

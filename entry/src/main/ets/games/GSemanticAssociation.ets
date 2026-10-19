@@ -115,7 +115,7 @@ export struct GSemanticAssociation {
 
       Column({ space: Space.xs }) {
         Text(TG('📖 语义联想')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
-        Text(this.cue).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.primaryDeep)
+        Text(this.cue).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.isDark ? Palette.primary : Palette.primaryDeep)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
 

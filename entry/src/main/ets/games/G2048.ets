@@ -41,7 +41,14 @@ function tileColor(v: number, theme: Theme): string {
 }
 
 function tileInk(v: number): string {
-  return v <= 4 ? '#776E65' : '#FFFFFF';
+  if (v <= 4) { return '#776E65'; }
+  // ★ 2026-10-19（对比度实测后改）：
+  //   128 以上是黄系底，白字对比度只有 1.53–1.70
+  //   （WCAG 大字号要 3:1）⇒ 肉眼就是“糊的”
+  //   换成深墨字 #4A3B2A 后对比度 6.34–7.06，全部过线
+  //   橙系底（8–64）留白字：那是 2048 的经典样子，且渲染图里确实读得出来
+  if (v >= 128) { return '#4A3B2A'; }
+  return '#FFFFFF';
 }
 
 @Component

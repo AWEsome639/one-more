@@ -359,7 +359,7 @@ export struct GSlitherlink {
               Text('')
               .width(DOT)
               .height(DOT)
-              .backgroundColor(this.theme.lineSoft)
+              .backgroundColor(Palette.wall)
               .borderRadius(Radius.full)
               } else if (this.isHEdge((gr), (gc))) {
               Text('')
