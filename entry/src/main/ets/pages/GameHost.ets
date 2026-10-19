@@ -549,6 +549,10 @@ struct GameHost {
     //   · 没通关       ⇒ fail()       两下短震（和 success 明显不同）
     // ★ 手感：得分与经验**滚上去**（0 → 最终值，约 700ms）
     this.countUp(r.score, (v2: number) => { this.scoreShown = v2; });
+    // ★★★ 2026-10-19 真机抓到：结算弹窗显示的是 scoreShown（滚动动画中间值）
+    //   实测：游戏内得分 1050，结算里却是 442 —— 动画被打断就停在半路
+    //   ⇒ 动画走完（18×34≈612ms）后强制对齐真值，保证显示永远等于 lastScore
+    setTimeout(() => { this.scoreShown = r.score; }, 760);
     setTimeout(() => {
       this.countUp(gain, (v2: number) => { this.gainShown = v2; });
     }, 140);
