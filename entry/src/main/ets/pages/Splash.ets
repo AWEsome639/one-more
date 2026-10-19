@@ -501,7 +501,10 @@ struct Splash {
             .markAnchor({ x: seg(this.p, 0.54, 0.64) * 96 + 6, y: 1 })
             .opacity(seg(this.p, 0.54, 0.64) * (1 - seg(this.p, 0.66, 0.82)))
         }
-        .width('78%')
+        // ★ 2026-10-19（离线渲染比对后调）：78% → 88%
+        //   渲染出来 OM + 标题只占屏幕上方 43%，下面 57% 空着 ⇒ 太稀
+        //   88% 让 OM 成为绝对主体，内容占到 51%
+        .width('88%')
         .aspectRatio(OM_RATIO)
         .shadow({
           radius: seg(this.p, 0.50, 0.58) * (1 - seg(this.p, 0.62, 0.80)) * 44,
@@ -542,7 +545,8 @@ struct Splash {
       .width('100%')
       .height('100%')
       .justifyContent(FlexAlign.Start)
-      .padding({ top: '17%' })
+      // ★ 同步下调：17% → 20%，让 OM 落在屏幕中上方
+      .padding({ top: '20%' })
 
       // ── 标语（贴底）──
       Column() {

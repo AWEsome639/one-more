@@ -631,6 +631,25 @@ struct GameHost {
       .opacity(0)
   }
 
+  /**
+   * 结算弹窗里 🎉 的纵向位置（百分比字符串）
+   *
+   * 为什么需要它：弹窗高度会随界面模式变（padding、行高、按钮高度都跟着 Cell.k 缩放），
+   *   而 🎉 的字号是写死的 44 ⇒ 弹窗越高，🎉 在屏幕上就越靠上。
+   *   粒子如果固定锚在 72%，elder 模式下会比 emoji 低 11%（约 88vp），看起来像从空气里炸出来。
+   *
+   * 实测换算（屏高 800vp）：
+   *   normal(Cell.k=1)     弹窗 297vp ⇒ 🎉 在 70.1%
+   *   elder (Cell.k=1.33)  弹窗 384vp ⇒ 🎉 在 60.8%
+   *   simple(Cell.k=0.9)   弹窗 更矮   ⇒ 🎉 在 ≈72.7%
+   * ⇒ 用 70 - (k-1)*27 拟合，三点误差都 < 1%
+   */
+  private burstY(): string {
+    const k: number = Cell.k;
+    const y: number = 70 - (k - 1) * 27;
+    return y.toFixed(1) + '%';
+  }
+
   build() {
     Stack({ alignContent: Alignment.Bottom }) {
       Column() {
@@ -2991,7 +3010,8 @@ struct GameHost {
         SparkBurst({ progress: this.burstP, count: 26, spread: 175 })
           .width(420)
           .height(420)
-          .position({ x: '50%', y: '72%' })
+          // ★ 纵向锚点随界面模式算（见 burstY 的注释）
+          .position({ x: '50%', y: this.burstY() })
           .markAnchor({ x: 210, y: 210 })
           .hitTestBehavior(HitTestMode.None)
       }
