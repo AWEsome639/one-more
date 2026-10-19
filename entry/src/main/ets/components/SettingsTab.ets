@@ -125,7 +125,10 @@ export struct SettingsTab {
    *   这个 @StorageProp 也是本页"选色立刻重绘"的观察源。
    */
   @StorageProp('accent') accent: string = Palette.primary;
-  @StorageProp('uiMode') uiMode: string = 'normal';   // ★ 界面模式（大字/紧凑）的观察源
+  // ★★★ 2026-10-19 自查 A1：这里会被【赋值】（点按切换模式时 this.uiMode = m）
+  //   @StorageProp 是【单向】（AppStorage → 组件），本地赋值不回写、下次同步还会被覆盖
+  //   ⇒ 改成 @StorageLink（双向）—— 这才是"既读又写"的正确装饰器
+  @StorageLink('uiMode') uiMode: string = 'normal';   // 界面模式（大字/紧凑），双向
   @State private copyHint: string = '';   // 「已复制 ✓」提示
   @StorageProp('themeMode') mode: string = 'system';
   @StorageProp('lang') lang: string = 'zh';
@@ -345,7 +348,7 @@ build() {
           }
         })
 
-        Text('一局 · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length))
+        Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme().inkFaint)
           .width('100%')
@@ -498,6 +501,7 @@ build() {
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
       .onClick(() => {
+        Haptics.tap();   // ★ 2026-10-19 按压反馈
         // ★ 语言切换不能包在 animateTo 里 —— 它不是动画属性，
         //   而且换语言要重建大量文案，包进动画闭包反而可能不执行
         I18n.set(code);
@@ -639,6 +643,7 @@ build() {
     .borderRadius(Radius.full)
     .animation({ duration: Motion.fast, curve: Motion.spring() })
     .onClick(() => {
+      Haptics.tap();   // ★ 2026-10-19 按压反馈
       animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
         ProgressStore.setThemeMode(m);
       });
@@ -773,10 +778,22 @@ build() {
         Flex({ wrap: FlexWrap.Wrap }) {
           ForEach(UiModeMgr.all(), (m: string) => {
             Column({ space: 2 }) {
-              Text(this.t(UiModeMgr.labelOf(m), UiModeMgr.labelEnOf(m)))
-                .fontSize(FontSize.sm)
-                .fontWeight(this.uiMode === m ? FontWeight.Bold : FontWeight.Normal)
-                .fontColor(this.uiMode === m ? Color.White : this.theme().inkSoft)
+              // ★★★ 2026-10-19 奥森报的 bug：「切换到别的模式后，默认模式下面的文字还是"当前模式"」
+              //   第一刀：把「现在的样子」改成绝对描述「标准字号与间距」（见 UiMode.descOf / I18n）
+              //   第二刀：选中的那一格【打一个 ✓】—— "哪个是当前"不再需要从颜色深浅去猜
+              Row({ space: 3 }) {
+                Text(this.t(UiModeMgr.labelOf(m), UiModeMgr.labelEnOf(m)))
+                  .fontSize(FontSize.sm)
+                  .fontWeight(this.uiMode === m ? FontWeight.Bold : FontWeight.Normal)
+                  .fontColor(this.uiMode === m ? Color.White : this.theme().inkSoft)
+                if (this.uiMode === m) {
+                  Text('✓')
+                    .accessibilityLevel('no')
+                    .fontSize(FontSize.sm)
+                    .fontWeight(FontWeight.Bold)
+                    .fontColor(Color.White)
+                }
+              }
               Text(this.t(UiModeMgr.descOf(m), UiModeMgr.descEnOf(m)))
                 .fontSize(FontSize.micro)
                 .fontColor(this.uiMode === m ? Color.White : this.theme().inkFaint)
@@ -996,7 +1013,14 @@ build() {
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
+    // ★★★ 2026-10-19 全面自查 A6：这一处 navRow 被【6 个入口】复用（隐私政策 / 局域网 /
+    //   反馈 / 关于 …），原来点了没任何按压反馈、也没触感 ⇒ 改一处顶六处
+    .stateStyles({
+      pressed: { .scale({ x: 0.975, y: 0.975 }).opacity(0.9) },
+      normal: { .scale({ x: 1, y: 1 }).opacity(1) }
+    })
     .onClick(() => {
+      Haptics.tap();
       cfg.tap();
     })
   }
@@ -1030,6 +1054,7 @@ build() {
           .backgroundColor(this.theme().surface)
           .borderRadius(Radius.sm)
           .onClick(() => {
+            Haptics.tap();   // ★ 2026-10-19 按压反馈
             this.confirming = false;
           })
 
@@ -1067,8 +1092,8 @@ build() {
           .width(Space.xxl)
           .textAlign(TextAlign.Center)
         Column({ space: Space.xs }) {
-          // 「一局」是应用名（品牌），不翻译；下面这行是版本 + 款数
-          Text('一局')
+          // ★ 2026-10-19 自查：应用名已改 One More（品牌名，不翻译）；下面这行是版本 + 款数
+          Text('One More')
             .fontSize(FontSize.lg)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.theme().ink)

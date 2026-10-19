@@ -1,5 +1,6 @@
 /** 斐波那契合并 —— 合并斐波那契数；玩法：点两个相邻格子，若两数之和也是斐波那契数 ⇒ 合并成和，另一格补新数；胜负：合出 21 ⇒ 通关；错 3 次 ⇒ 失败 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -112,7 +113,7 @@ export struct GFibonacciMerge {
           // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
           .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
             .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-          .onClick(() => { this.tap((i)); })
+          .onClick(() => { Haptics.tick(); this.tap((i)); })
         }, (i: number) => 'fbm' + i + '_' + this.cells[i])
       }.width('100%').height(Cell.of(72))
       Text(this.msg).fontSize(FontSize.sm)
@@ -123,7 +124,7 @@ export struct GFibonacciMerge {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：相邻两格之和要落在 1,2,3,5,8,13,21… 里；合到 21 即通关')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

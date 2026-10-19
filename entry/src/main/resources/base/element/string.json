@@ -2,7 +2,7 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "One More · 碎片时间来一局"
+      "value": "One More · 碎片时间，随时开局"
     },
     {
       "name": "EntryAbility_desc",
@@ -14,7 +14,7 @@
     },
     {
       "name": "card_display_name",
-      "value": "One More · 今日"
+      "value": "One More"
     },
     {
       "name": "card_desc",

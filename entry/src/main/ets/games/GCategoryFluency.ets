@@ -3,6 +3,7 @@
  * 胜负：4 个类别共列出 ≥8 个有效词 ⇒ 通关｜进度：类别 / 已列 / 剩余秒数
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -142,7 +143,7 @@ export struct GCategoryFluency {
         Button(TG('提交'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.lime)
           .borderRadius(Radius.md).width(84).height(Cell.of(46))
-          .enabled(!this.over).onClick(() => { this.submit(); })
+          .enabled(!this.over).onClick(() => { Haptics.tap(); this.submit(); })
       }.width('100%')
       Text(this.used.length > 0 ? this.used.join(' · ') : '（还没列出来）')
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
@@ -153,10 +154,10 @@ export struct GCategoryFluency {
         Button(TG('换下一类'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).enabled(!this.over)
-          .onClick(() => { this.nextCat(); })
+          .onClick(() => { Haptics.tap(); this.nextCat(); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(TG2('提示：每类 {0} 秒，共列 {1} 个有效词即通关（词库有限，常见词优先）',Digits(String(this.diffTotal), this.langCode), PASS))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

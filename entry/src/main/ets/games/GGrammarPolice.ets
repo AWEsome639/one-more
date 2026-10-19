@@ -3,6 +3,7 @@
  * 胜负：8 题答对 ≥5 通关｜进度：题号 / 答对 / 剩余秒数（点错罚 3 秒）
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -137,15 +138,15 @@ export struct GGrammarPolice {
 
       Flex({ wrap: FlexWrap.Wrap }) {
         ForEach(this.cur().words, (w: string) => {
-          Text((w)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm }).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).margin({ right: Space.xs, bottom: Space.xs }).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick((w)); })
+          Text((w)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm }).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).margin({ right: Space.xs, bottom: Space.xs }).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((w)); })
         }, (w: string, i: number) => 'w' + i + w)
       }.width('100%')
 
       Row({ space: Space.sm }) {
         Button(TG('无错误 ✅'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over).onClick(() => { this.pick(''); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over).onClick(() => { Haptics.tap(); this.pick(''); })
         Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)

@@ -4,6 +4,7 @@
  * 胜负：步数内清空全部光点 = 通关；步数用尽 = 失败。可悔一步 / 要提示。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -149,7 +150,7 @@ export struct GChainReaction {
  Text(this.orbs(r * this.diffTotal + c)).fontSize(FontSize.xl).fontColor(Palette.amber)
  Text(String(this.cells[r * this.diffTotal + c])).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).offset({ x: 0, y: 20 })
  }.layoutWeight(1).height(Cell.of(72)).backgroundColor(this.tip === r * this.diffTotal + c ? Palette.violet : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] >= capOf(r * this.diffTotal + c)
- ? Palette.danger : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(r * this.diffTotal + c); })
+ ? Palette.danger : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick(r * this.diffTotal + c); })
  }, (c: number) => 'c' + c) }.width('100%')
  }, (r: number) => 'r' + r) }.width('100%')
  Text(this.note).fontSize(FontSize.sm)
@@ -158,11 +159,11 @@ export struct GChainReaction {
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
  Row({ space: Space.xs }) {
  Button(TG('悔一步'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).onClick(() => { this.undo(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).onClick(() => { Haptics.tap(); this.undo(); })
  Button(TG('提示'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.violet).borderRadius(Radius.md).onClick(() => { this.askHint(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.violet).borderRadius(Radius.md).onClick(() => { Haptics.tap(); this.askHint(); })
  Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { Haptics.tap(); this.reset(); })
  }.width('100%') }.width('100%').height('100%').justifyContent(FlexAlign.Start)
  }
  private orbs(i: number): string {

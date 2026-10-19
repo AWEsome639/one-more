@@ -3,6 +3,7 @@
  * 胜负：12 回合正确 ≥10 且「冲」的平均反应 < 800ms 通关
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -164,7 +165,7 @@ export struct GStopSignal {
       .width('100%').height(170).justifyContent(FlexAlign.Center)
       .backgroundColor(this.panel()).borderRadius(Radius.lg).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.tap(); })
+      .onClick(() => { Haptics.tick(); this.tap(); })
       Button(this.kind === 2 ? '🛑 忍住' : '⚡ 冲')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.xxl).fontColor('#FFFFFF')
@@ -172,14 +173,14 @@ export struct GStopSignal {
         .borderRadius(Radius.lg).width('100%').height(Cell.of(84))
         .scale({ x: this.kind === 3 ? Motion.pressScale : 1, y: this.kind === 3 ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.tap(); })
+        .onClick(() => { Haptics.tap(); this.tap(); })
       if (this.over) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.rose)
           .borderRadius(Radius.md).width('100%').height(Cell.of(46))
-          .onClick(() => { this.reset(); })
+          .onClick(() => { Haptics.tap(); this.reset(); })
       }
       Text(TG('判定：正确 ≥ 10/12 且冲均值 < 800 ms（该按没按按 1500 ms 计）'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

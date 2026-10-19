@@ -3,6 +3,7 @@
  * 胜负：连过 广度 3 → 4 → 5 三关 ⇒ 通关；进度：关卡/3 · 广度 · 阶段
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -139,7 +140,7 @@ export struct GRunningMemorySpan {
           .layoutWeight(1).height(Cell.of(50)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
           .opacity(this.phase === 'input' ? 1 : 0.4)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.keyTap((d)); })
+          .onClick(() => { Haptics.tick(); this.keyTap((d)); })
         }, (d: number) => 'a' + d)
       }.width('100%')
       Row({ space: Space.xs }) {
@@ -148,7 +149,7 @@ export struct GRunningMemorySpan {
           .layoutWeight(1).height(Cell.of(50)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
           .opacity(this.phase === 'input' ? 1 : 0.4)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.keyTap((d)); })
+          .onClick(() => { Haptics.tick(); this.keyTap((d)); })
         }, (d: number) => 'b' + d)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).textAlign(TextAlign.Center).width('100%')
@@ -156,7 +157,7 @@ export struct GRunningMemorySpan {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.rose).borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：连过 广度 3 → 4 → 5 三关；数字 700 ms 一个'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

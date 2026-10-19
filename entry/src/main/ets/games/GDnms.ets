@@ -5,6 +5,7 @@
  * 进度：轮次 / 答对 / 选项数 / 阶段
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -140,7 +141,7 @@ export struct GDnms {
               .backgroundColor(this.phase === 3 && this.pick === (r * 3 + c) ? Palette.primaryDeep : this.theme.surfaceAlt)
               .borderRadius(Radius.md).opacity(this.phase === 2 ? 1 : 0.55)
               .scale({ x: this.phase === 3 && this.pick === (r * 3 + c) ? Motion.pressScale : 1, y: this.phase === 3 && this.pick === (r * 3 + c) ? Motion.pressScale : 1 })
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.answer((r * 3 + c)); })
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.answer((r * 3 + c)); })
             }, (c: number) => 'oc' + c)
           }.width('100%')
         }, (r: number) => 'or' + r)
@@ -148,7 +149,7 @@ export struct GDnms {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：其余几个刚才都见过，只有一个是全新的')).fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

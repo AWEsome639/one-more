@@ -4,6 +4,7 @@
  * 胜负：答对 10 题 ⇒ 通关；失误 3 次 ⇒ 失败。进度：答对 / 失误 / 剩余时间。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -122,13 +123,13 @@ export struct GSimonCommand {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width('100%').height(Cell.of(48))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.judge(-1); })
+        .onClick(() => { Haptics.tap(); this.judge(-1); })
       Text(this.note).fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 
@@ -141,6 +142,6 @@ export struct GSimonCommand {
       .borderRadius(Radius.md).shadow(Shadow.card)
       .scale({ x: this.phase === 'play' ? 1 : Motion.pressScale, y: this.phase === 'play' ? 1 : Motion.pressScale })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.judge(i); })
+      .onClick(() => { Haptics.tick(); this.judge(i); })
   }
 }

@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -383,6 +384,7 @@ export struct GSlitherlink {
               .aspectRatio(1)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.gridTap((gr), (gc));
               })
             }, (gc: number) => 'g' + gc)
@@ -412,6 +414,7 @@ export struct GSlitherlink {
           .width(96)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

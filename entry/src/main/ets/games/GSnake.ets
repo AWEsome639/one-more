@@ -11,6 +11,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -400,6 +401,7 @@ export struct GSnake {
           .height(BTN_H)
           .enabled(!this.over && !this.won)
           .onClick(() => {
+            Haptics.tap();
             this.togglePause();
           })
         Button(TG('重开'))
@@ -411,6 +413,7 @@ export struct GSnake {
           .layoutWeight(1)
           .height(BTN_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }
@@ -485,6 +488,7 @@ export struct GSnake {
       }
     })
     .onClick(() => {
+      Haptics.tick();
       this.turn(d);
     })
   }

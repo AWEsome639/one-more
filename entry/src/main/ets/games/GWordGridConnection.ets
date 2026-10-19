@@ -3,6 +3,7 @@
  * 胜负：连完 8 对通关｜连错 5 次失败｜进度：已连 / 失误 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -126,7 +127,7 @@ export struct GWordGridConnection {
       Column({ space: Space.xs }) {
         ForEach(this.rowIdx(), (r: number) => {
           Row({ space: Space.xs }) {
-            ForEach(this.rowIdx(), (c: number) => { Text(this.cells.length > (r * this.diffTotal + c) ? this.cells[(r * this.diffTotal + c)] : '').fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkOf((r * this.diffTotal + c))).layoutWeight(1).aspectRatio(1).backgroundColor(this.bgOf((r * this.diffTotal + c))).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap((r * this.diffTotal + c)); }) }, (c: number) => 'c' + c)
+            ForEach(this.rowIdx(), (c: number) => { Text(this.cells.length > (r * this.diffTotal + c) ? this.cells[(r * this.diffTotal + c)] : '').fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkOf((r * this.diffTotal + c))).layoutWeight(1).aspectRatio(1).backgroundColor(this.bgOf((r * this.diffTotal + c))).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('100%')
@@ -135,7 +136,7 @@ export struct GWordGridConnection {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG2('提示：8 对同义词混在 16 格里；连错扣分，错满 {0} 次结束', MAX_MISS)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

@@ -1,6 +1,7 @@
 /** 移一字母 —— 两个词只差一个字母：限时点出要换掉的那一位
  *  胜负：8 题答对 ≥5 ⇒ 通关 ｜ 进度：题号 / 答对 / 每题倒计时 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -131,7 +132,7 @@ export struct GOneLetterShift {
             .onTouch((e: TouchEvent) => {
             if (!(true)) { return; } else if (e.type === TouchType.Down) { this.pressed = (i); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
             })
-            .onClick(() => { if ((true)) { this.pick((i)); } })
+            .onClick(() => { Haptics.tick(); if ((true)) { this.pick((i)); } })
           }, (i: number) => 'a' + i)
         }.width('100%')
         Text(this.q.da).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
@@ -145,7 +146,7 @@ export struct GOneLetterShift {
             .onTouch((e: TouchEvent) => {
             if (!(false)) { return; } else if (e.type === TouchType.Down) { this.pressed = (i); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
             })
-            .onClick(() => { if ((false)) { this.pick((i)); } })
+            .onClick(() => { Haptics.tick(); if ((false)) { this.pick((i)); } })
           }, (i: number) => 'b' + i)
         }.width('100%')
         Text(this.q.db).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
@@ -156,7 +157,7 @@ export struct GOneLetterShift {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：换掉一个字母就变成另一个词，位置就是两词不一样的地方'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

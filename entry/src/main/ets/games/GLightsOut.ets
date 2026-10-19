@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -225,6 +226,7 @@ export struct GLightsOut {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * N + c));
               })
             }, (c: number) => 'oc' + r + '-' + c)
@@ -254,6 +256,7 @@ export struct GLightsOut {
         .width('100%')
         .height(Cell.of(44))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
     }

@@ -3,6 +3,7 @@
  * 胜负：铺满 ⇒ 通关；次数用尽（12 次）⇒ 失败　｜　进度：铺对 / 次数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -137,6 +138,7 @@ export struct GTangram {
           .backgroundColor(this.sel === (p) ? '#336366F1' : this.theme.surfaceAlt).borderRadius(Radius.md)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tick();
           if (this.pieceAt.indexOf((p)) < 0 && !this.over) { this.sel = this.sel === (p) ? -1 : (p); }
           })
         }, (p: number) => 'p' + p)
@@ -150,7 +152,7 @@ export struct GTangram {
               }.layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
               .backgroundColor(this.pieceAt[(r * this.diffTotal + c)] >= 0 ? (this.target[(r * this.diffTotal + c)] === 1 ? Palette.sky : Palette.rose)
               : (this.target[(r * this.diffTotal + c)] === 1 ? (this.theme.isDark ? '#220EA5E9' : '#330EA5E9') : this.theme.surfaceAlt))
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap((r * this.diffTotal + c)); })
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * this.diffTotal + c)); })
             }, (c: number) => 'c' + r + '_' + c)
           }.width('100%').layoutWeight(1)
         }, (r: number) => 'r' + r)
@@ -163,7 +165,7 @@ export struct GTangram {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开（换一题）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

@@ -4,6 +4,7 @@
  * 胜负：恰好点亮 12 格、且全部落在同一个矩形边框上 = 通关；超过 12 格 = 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -136,7 +137,7 @@ export struct GBoxCompletion {
  Text(this.cells[r * this.diffTotal + c] && this.lit[r * this.diffTotal + c] ? '✨'
  : (this.cells[r * this.diffTotal + c] ? '⬛'
  : (this.lit[r * this.diffTotal + c] ? '🟨' : ''))).fontSize(FontSize.xxl)
- }.layoutWeight(1).height(Cell.of(62)).backgroundColor(this.lit[r * this.diffTotal + c] ? Palette.amber : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] ? Palette.ink : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(r * this.diffTotal + c); })
+ }.layoutWeight(1).height(Cell.of(62)).backgroundColor(this.lit[r * this.diffTotal + c] ? Palette.amber : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] ? Palette.ink : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick(r * this.diffTotal + c); })
  }, (c: number) => 'c' + c) }.width('100%')
  }, (r: number) => 'r' + r) }.width('100%')
  Text(this.note).fontSize(FontSize.sm)
@@ -146,10 +147,11 @@ export struct GBoxCompletion {
  Row({ space: Space.sm }) {
  Button(TG('清空点亮'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).onClick(() => {
+ Haptics.tap();
  if (!this.over) { this.lit = new Array<boolean>(MAX_CELLS).fill(false); }
  })
  Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { Haptics.tap(); this.reset(); })
  }.width('100%') }.width('100%').height('100%').justifyContent(FlexAlign.Start)
  }
 }

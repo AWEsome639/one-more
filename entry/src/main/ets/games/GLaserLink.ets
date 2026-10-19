@@ -2,6 +2,7 @@
  *  造局：随机镜位 → 随机「解态」朝向 → 光束射出棋盘的那格即探头 ⇒ **每局必定可解**；
  *  开局给随机朝向且保证还没点亮 ⇒ 必须先转镜子。／ 右→上、上→右；＼ 右→下、下→右。 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -186,7 +187,7 @@ export struct GLaserLink {
           .fontColor(this.theme.inkSoft).layoutWeight(1)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
@@ -197,6 +198,6 @@ export struct GLaserLink {
     }
     .layoutWeight(1).aspectRatio(1).backgroundColor(this.bg(i)).borderRadius(Radius.xs)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { if (this.slots.indexOf(i) >= 0) { this.rotateAt(i); } })
+    .onClick(() => { Haptics.tap(); if (this.slots.indexOf(i) >= 0) { this.rotateAt(i); } })
   }
 }

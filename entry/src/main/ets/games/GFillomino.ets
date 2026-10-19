@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -359,6 +360,7 @@ export struct GFillomino {
               }
               })
               .onClick(() => {
+              Haptics.tick();
               if (!this.over && !this.given[(r * N + c)]) {
               this.sel = (r * N + c);
               }
@@ -386,6 +388,7 @@ export struct GFillomino {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.setVal((d));
           })
         }, (d: number) => 'fk' + d)
@@ -405,6 +408,7 @@ export struct GFillomino {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.setVal((d));
           })
         }, (d: number) => 'fk2' + d)
@@ -421,6 +425,7 @@ export struct GFillomino {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.setVal(0);
           })
         Button(TG('重开'))
@@ -432,6 +437,7 @@ export struct GFillomino {
           .width(96)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

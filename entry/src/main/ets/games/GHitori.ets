@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -459,6 +460,7 @@ export struct GHitori {
               }
               })
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * N + c));
               })
             }, (c: number) => 'ht' + r + '-' + c)
@@ -490,6 +492,7 @@ export struct GHitori {
           .width(96)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

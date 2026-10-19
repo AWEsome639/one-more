@@ -19,6 +19,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch, Side } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
@@ -736,6 +737,7 @@ export struct GGo9 {
           .height(Cell.of(46))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.passTap();
           })
         Button(TG('重开'))
@@ -747,6 +749,7 @@ export struct GGo9 {
           .layoutWeight(1)
           .height(Cell.of(46))
           .onClick(() => {
+            Haptics.tap();
             this.restartTap();
           })
       }
@@ -814,6 +817,7 @@ export struct GGo9 {
     .backgroundColor(this.canTap(r, c) ? '#15FFFFFF' : Color.Transparent)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.tapPoint(r, c);
     })
   }

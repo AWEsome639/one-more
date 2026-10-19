@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -239,6 +240,7 @@ export struct GContinuousPairedAssociate {
           .width('100%')
           .height(Cell.of(48))
           .onClick(() => {
+            Haptics.tap();
             this.phase = 1;
             this.lastMsg = TG('选出刚才和它配对的');
             this.startTrial();
@@ -272,6 +274,7 @@ export struct GContinuousPairedAssociate {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .onClick(() => {
+                Haptics.tick();
                 this.answer(o);
               })
           }, (o: string) => 'o' + o)
@@ -292,6 +295,7 @@ export struct GContinuousPairedAssociate {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
 

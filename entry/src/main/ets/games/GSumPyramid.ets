@@ -3,6 +3,7 @@
  *  胜负：6 格全填对 ⇒ 通关；错 3 次 ⇒ 失败 */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -163,6 +164,7 @@ export struct GSumPyramid {
           : this.theme.surfaceAlt)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tap();
           if (this.opts.length > (i)) { this.choose(this.opts[(i)]); }
           })
         }, (i: number) => 'o' + i)
@@ -171,6 +173,7 @@ export struct GSumPyramid {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46)).onClick(() => {
+          Haptics.tap();
           this.reset();
         })
       Text(TG('提示：相邻两格之和往上搬，一层层来')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')

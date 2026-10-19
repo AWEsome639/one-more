@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -229,6 +230,7 @@ export struct GMentalMapping {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.answer((0));
           })
           Text(DIRS[(1)])
@@ -241,6 +243,7 @@ export struct GMentalMapping {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.answer((1));
           })
           Text(DIRS[(2)])
@@ -253,6 +256,7 @@ export struct GMentalMapping {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.answer((2));
           })
         }
@@ -267,6 +271,7 @@ export struct GMentalMapping {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.answer((3));
           })
           Text(DIRS[(4)])
@@ -279,6 +284,7 @@ export struct GMentalMapping {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.answer((4));
           })
           Text(DIRS[(5)])
@@ -291,6 +297,7 @@ export struct GMentalMapping {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.answer((5));
           })
         }
@@ -305,6 +312,7 @@ export struct GMentalMapping {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.answer((6));
           })
           Text(DIRS[(7)])
@@ -317,6 +325,7 @@ export struct GMentalMapping {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.answer((7));
           })
           Text(DIRS[(8)])
@@ -329,6 +338,7 @@ export struct GMentalMapping {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.answer((8));
           })
         }
@@ -347,6 +357,7 @@ export struct GMentalMapping {
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(44))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
     }

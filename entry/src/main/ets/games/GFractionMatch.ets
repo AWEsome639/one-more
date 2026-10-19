@@ -1,5 +1,6 @@
 /** 分数配对 —— 匹配等值分数（翻牌记忆）；玩法：8 张牌两两成对，一对是等值的两个分数；每次翻两张；胜负：60 秒内配齐 4 对 ⇒ 通关；超时 ⇒ 失败 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -141,7 +142,7 @@ export struct GFractionMatch {
               Stack() {
               Text(this.face((row * 4 + col))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.cardInk((row * 4 + col)))
               }.layoutWeight(1).aspectRatio(1).backgroundColor(this.cardBg((row * 4 + col))).borderRadius(Radius.md).shadow(Shadow.card)
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.flip((row * 4 + col)); })
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.flip((row * 4 + col)); })
             }, (col: number) => 'fmc' + col)
           }.width('100%')
         }, (row: number) => 'fmr' + row)
@@ -154,7 +155,7 @@ export struct GFractionMatch {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.berry)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：2/4 与 1/2 等值 —— 同乘（同除）同一个数，分数大小不变')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

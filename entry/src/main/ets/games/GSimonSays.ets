@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -264,6 +265,7 @@ export struct GSimonSays {
           .scale({ x: this.lit === (0) ? 1.06 : 1, y: this.lit === (0) ? 1.06 : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tick();
           this.tapPad((0));
           })
           Stack() {
@@ -277,6 +279,7 @@ export struct GSimonSays {
           .scale({ x: this.lit === (1) ? 1.06 : 1, y: this.lit === (1) ? 1.06 : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tick();
           this.tapPad((1));
           })
         }
@@ -293,6 +296,7 @@ export struct GSimonSays {
           .scale({ x: this.lit === (2) ? 1.06 : 1, y: this.lit === (2) ? 1.06 : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tick();
           this.tapPad((2));
           })
           Stack() {
@@ -306,6 +310,7 @@ export struct GSimonSays {
           .scale({ x: this.lit === (3) ? 1.06 : 1, y: this.lit === (3) ? 1.06 : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tick();
           this.tapPad((3));
           })
         }
@@ -330,6 +335,7 @@ export struct GSimonSays {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
     }

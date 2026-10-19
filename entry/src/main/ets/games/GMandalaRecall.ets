@@ -1,5 +1,6 @@
 /** 曼陀罗回忆 —— 彩格亮 2 秒后熄灭，凭记忆把亮过的格子点回来；连过 4 关通关，错一次即负 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -157,7 +158,7 @@ export struct GMandalaRecall {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：只看位置，颜色只是帮你分组；点满即自动判定'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
@@ -171,6 +172,6 @@ export struct GMandalaRecall {
     }
     .layoutWeight(1).aspectRatio(1).backgroundColor(this.tint(i)).borderRadius(Radius.md)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { this.tap(i); })
+    .onClick(() => { Haptics.tick(); this.tap(i); })
   }
 }

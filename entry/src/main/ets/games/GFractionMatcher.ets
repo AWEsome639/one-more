@@ -1,5 +1,6 @@
 /** 分数匹配 —— 找相等分数；玩法：给出一个分数，从四个分数里选出与它等值的那个；胜负：8 题答对 ≥6 ⇒ 通关；否则失败 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -144,7 +145,7 @@ export struct GFractionMatcher {
             Text(this.opts[i]).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
           }.width('100%').height(Cell.of(48)).padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card)
-          .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(i); })
+          .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick(i); })
           // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
           .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
             .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
@@ -155,7 +156,7 @@ export struct GFractionMatcher {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.emerald)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：分子分母同乘（同除）一个非零数，分数的值不变')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

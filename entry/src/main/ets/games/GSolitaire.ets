@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -612,6 +613,7 @@ export struct GSolitaire {
           .height(BTN_H)
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.autoCollect();
           })
         Button(TG('重新开始'))
@@ -623,6 +625,7 @@ export struct GSolitaire {
           .layoutWeight(1)
           .height(BTN_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }
@@ -751,6 +754,7 @@ export struct GSolitaire {
     .borderRadius(Radius.xs)
     .border({ width: 1, color: this.theme.lineSoft })
     .onClick(() => {
+      Haptics.tick();
       this.tapStock();
     })
   }
@@ -764,6 +768,7 @@ export struct GSolitaire {
     .layoutWeight(1)
     .height(CARD_H)
     .onClick(() => {
+      Haptics.tick();
       this.tapWaste();
     })
   }
@@ -786,6 +791,7 @@ export struct GSolitaire {
     .borderRadius(Radius.xs)
     .border({ width: 1, color: this.theme.lineSoft })
     .onClick(() => {
+      Haptics.tick();
       this.tapFound(f);
     })
   }
@@ -811,6 +817,7 @@ export struct GSolitaire {
     .layoutWeight(1)
     .height(this.pileH(p))
     .onClick(() => {
+      Haptics.tick();
       this.tapPileBlank(p);
     })
   }
@@ -824,6 +831,7 @@ export struct GSolitaire {
     .height(CARD_H)
     .position({ x: 0, y: i * STEP })
     .onClick(() => {
+      Haptics.tick();
       this.tapPileCard(p, i);
     })
   }

@@ -1,5 +1,6 @@
 /** 字母频率 —— 数字母出现几次（8 题答对 ≥5 通关 ｜ 进度：题号/答对/每题倒计时） */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -142,7 +143,7 @@ export struct GLetterFrequencyScan {
           .onTouch((e: TouchEvent) => {
           if (e.type === TouchType.Down) { this.pressed = (i); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
           })
-          .onClick(() => { this.pick((i)); })
+          .onClick(() => { Haptics.tick(); this.pick((i)); })
         }, (i: number) => 'o' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
@@ -150,7 +151,7 @@ export struct GLetterFrequencyScan {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：看清整串字母再选，别只数开头几个')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

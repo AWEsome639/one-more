@@ -5,6 +5,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -171,6 +172,7 @@ export struct GMemory {
               .rotate({ angle: ((this.cards[r * 4 + c]) !== undefined && (this.cards[r * 4 + c]).open) ? 0 : 180 })
               .animation({ duration: Motion.base, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * 4 + c));
               })
             }, (c: number) => 'c' + c)
@@ -191,6 +193,7 @@ export struct GMemory {
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
     }

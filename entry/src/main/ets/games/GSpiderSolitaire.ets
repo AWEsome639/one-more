@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -438,6 +439,7 @@ export struct GSpiderSolitaire {
           .height(BTN_H)
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.deal();
           })
         Button(TG('重新开始'))
@@ -449,6 +451,7 @@ export struct GSpiderSolitaire {
           .layoutWeight(1)
           .height(BTN_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }
@@ -556,6 +559,7 @@ export struct GSpiderSolitaire {
     .layoutWeight(1)
     .height(this.pileH(p))
     .onClick(() => {
+      Haptics.tick();
       this.tapPileBlank(p);
     })
   }
@@ -569,6 +573,7 @@ export struct GSpiderSolitaire {
     .height(CARD_H)
     .position({ x: 0, y: i * STEP })
     .onClick(() => {
+      Haptics.tick();
       this.tapPileCard(p, i);
     })
   }

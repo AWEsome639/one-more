@@ -4,6 +4,7 @@
  * 胜负：8 题答对 ≥6 通关　进度：题号 / 答对 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -171,14 +172,14 @@ export struct GComplexFoldingNets {
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pick((this.opts[0])); })
+        .onClick(() => { Haptics.tap(); this.pick((this.opts[0])); })
         Button((this.opts[1]) + ' 层')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pick((this.opts[1])); })
+        .onClick(() => { Haptics.tap(); this.pick((this.opts[1])); })
       }.width('100%')
       Row({ space: Space.sm }) {
         Button((this.opts[2]) + ' 层')
@@ -187,21 +188,21 @@ export struct GComplexFoldingNets {
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pick((this.opts[2])); })
+        .onClick(() => { Haptics.tap(); this.pick((this.opts[2])); })
         Button((this.opts[3]) + ' 层')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pick((this.opts[3])); })
+        .onClick(() => { Haptics.tap(); this.pick((this.opts[3])); })
       }.width('100%')
 
       Button(this.over ? (this.right >= PASS ? TG('通关 🎉') : TG('结束')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

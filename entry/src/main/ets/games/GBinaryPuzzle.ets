@@ -11,6 +11,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -430,6 +431,7 @@ export struct GBinaryPuzzle {
               .borderRadius(Radius.sm)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * this.diffTotal + c));
               })
             }, (c: number) => 'c' + c)
@@ -453,6 +455,7 @@ export struct GBinaryPuzzle {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             if (this.done || this.finished) {
               return;
             }
@@ -474,6 +477,7 @@ export struct GBinaryPuzzle {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('交卷'))
@@ -485,6 +489,7 @@ export struct GBinaryPuzzle {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.submit();
           })
       }

@@ -60,6 +60,20 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
+    // ★★★ 2026-10-19 全面自查：全工程从来没设过【窗口底色】
+    //   后果：onWindowStageCreate 到第一帧之间，窗口是系统默认底色（浅色）
+    //        ⇒ 每次启动都会先闪一下白，然后才是深墨蓝的开屏
+    //   ⇒ 在 loadContent【之前】把窗口底色调成开屏同色 —— 启动变成"无缝入画"
+    //   ⚠️ 用 try/catch：个别设备/低版本 API 不支持 setWindowBackgroundColor，
+    //      失败只影响那一下白闪，不能因此让应用起不来
+    try {
+      const win: window.Window = windowStage.getMainWindowSync();
+      // #0D1320 = Splash.ets 的 OM_INK，与开屏、图标底色完全一致
+      win.setWindowBackgroundColor('#0D1320');
+    } catch (e) {
+      hilog.warn(DOMAIN, 'testTag', 'setWindowBackgroundColor 失败（不影响启动）: %{public}s', JSON.stringify(e));
+    }
+
     windowStage.loadContent('pages/Splash', (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));

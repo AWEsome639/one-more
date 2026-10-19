@@ -8,6 +8,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
 import { TG } from '../core/GameI18n';
@@ -400,6 +401,7 @@ export struct GTicTacToe {
               .scale({ x: this.inWin((r * this.diffTotal + c)) ? 1.05 : 1, y: this.inWin((r * this.diffTotal + c)) ? 1.05 : 1 })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * this.diffTotal + c));
               })
             }, (c: number) => 'c' + c)
@@ -430,6 +432,7 @@ export struct GTicTacToe {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('我认输'))
@@ -442,6 +445,7 @@ export struct GTicTacToe {
           .height(KEY_H)
           .enabled(!this.over && !this.finished)
           .onClick(() => {
+            Haptics.tap();
             if (!this.over && !this.finished) {
               this.over = true;
               this.status = TG('已认输');

@@ -5,6 +5,7 @@
  * 进度：题号 / 正确数 / 判断数 / 当前 N
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -138,6 +139,7 @@ export struct GDoubleNBack {
         .backgroundColor((true ? this.selPos : this.selLetter) ? Palette.primaryDeep : this.theme.surfaceAlt)
         .borderRadius(Radius.md).opacity(this.idx >= N ? 1 : 0.45).enabled(this.idx >= N)
         .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+        Haptics.tick();
         if (true) { this.selPos = !this.selPos; } else { this.selLetter = !this.selLetter; }
         })
         Text((false ? this.selPos : this.selLetter) ? '✔ ' + (TG('字母 = 2-back')) : (TG('字母 = 2-back'))).fontSize(FontSize.sm)
@@ -145,16 +147,17 @@ export struct GDoubleNBack {
         .backgroundColor((false ? this.selPos : this.selLetter) ? Palette.primaryDeep : this.theme.surfaceAlt)
         .borderRadius(Radius.md).opacity(this.idx >= N ? 1 : 0.45).enabled(this.idx >= N)
         .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+        Haptics.tick();
         if (false) { this.selPos = !this.selPos; } else { this.selLetter = !this.selLetter; }
         })
       }.width('100%')
       Row({ space: Space.sm }) {
         Button(this.idx >= this.diffTotal - 1 ? '提交结算' : '下一题 ▶')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.submit(); })
+          .backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.submit(); })
         Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width(96).height(Cell.of(46)).onClick(() => { this.reset(); })
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width(96).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

@@ -2,6 +2,7 @@
  * 三行光点各自按固定节拍循环（周期 2/3/4 不等），一次猜出三行的下一拍位置；
  * 5 拍猜中 ≥11 个 ⇒ 通关，否则失败。 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -121,7 +122,7 @@ export struct GTripleSequence {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
@@ -146,6 +147,6 @@ export struct GTripleSequence {
     // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
     .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
       .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-    .onClick(() => { this.pick(i, c); })
+    .onClick(() => { Haptics.tick(); this.pick(i, c); })
   }
 }

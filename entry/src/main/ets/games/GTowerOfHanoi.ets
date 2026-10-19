@@ -1,6 +1,7 @@
 /** 汉诺塔 🗼（id: tower_of_hanoi）
  * 大盘不能压小盘，把整摞盘从最左柱搬到最右柱；搬到 ⇒ 通关，40 步搬不完 ⇒ 失败。 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -102,7 +103,7 @@ export struct GTowerOfHanoi {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.won ? Palette.emerald : Palette.primary).animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
@@ -128,6 +129,6 @@ export struct GTowerOfHanoi {
     }
     .layoutWeight(1).height('100%').padding(Space.xs).borderRadius(Radius.md)
     .borderWidth(this.sel === i ? 2 : 0).borderColor(Palette.amber)
-    .onClick(() => { this.tapPeg(i); })
+    .onClick(() => { Haptics.tick(); this.tapPeg(i); })
   }
 }

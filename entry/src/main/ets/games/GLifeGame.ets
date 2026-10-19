@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -212,6 +213,7 @@ export struct GLifeGame {
               .backgroundColor(this.cells[(r * G + c)] ? Palette.violet : this.theme.surface)
               .borderRadius(Radius.xs)
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * G + c));
               })
             }, (c: number) => 'c' + r + '-' + c)
@@ -238,6 +240,7 @@ export struct GLifeGame {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.play();
           })
         Button(TG('单步'))
@@ -247,6 +250,7 @@ export struct GLifeGame {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.running && !this.over)
           .onClick(() => {
+            Haptics.tap();
             this.step();
           })
       }
@@ -259,6 +263,7 @@ export struct GLifeGame {
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('清空'))
@@ -268,6 +273,7 @@ export struct GLifeGame {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.stop();
             this.running = false;
             this.cells = new Array<boolean>(G * G).fill(false);

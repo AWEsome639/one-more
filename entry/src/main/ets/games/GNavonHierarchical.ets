@@ -3,6 +3,7 @@
  * 12 题，每题两问全对才得分；答对 ≥ 8 题通关。进度：题号 / 答对 / 剩余秒数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -248,6 +249,7 @@ export struct GNavonHierarchical {
       .scale({ x: this.pickedNow((i), ((true))) ? Motion.pressScale : 1, y: this.pickedNow((i), ((true))) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => {
+      Haptics.tap();
       if (((true))) {
       this.pickGlobal((i));
       } else {
@@ -274,6 +276,7 @@ export struct GNavonHierarchical {
       .scale({ x: this.pickedNow((i), ((false))) ? Motion.pressScale : 1, y: this.pickedNow((i), ((false))) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => {
+      Haptics.tap();
       if (((false))) {
       this.pickGlobal((i));
       } else {
@@ -291,7 +294,7 @@ export struct GNavonHierarchical {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：12 题里两问全对 ≥ 8 题 · 90 秒内完成'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

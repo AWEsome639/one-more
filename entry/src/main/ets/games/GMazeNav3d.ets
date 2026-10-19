@@ -8,6 +8,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -197,6 +198,7 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .enabled(this.pz > 0)
           .onClick(() => {
+            Haptics.tap();
             this.tryMove(0, 0, -1);
           })
         Button(TG('▲ 上层'))
@@ -205,6 +207,7 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .enabled(this.pz < this.diffTotal - 1)
           .onClick(() => {
+            Haptics.tap();
             this.tryMove(0, 0, 1);
           })
       }
@@ -221,6 +224,7 @@ export struct GMazeNav3d {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .onClick(() => {
+        Haptics.tap();
         this.tryMove((0), (-1), 0);
         })
         Row({ space: Space.xs }) {
@@ -233,6 +237,7 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.tryMove((-1), (0), 0);
           })
           Text(('↓'))
@@ -244,6 +249,7 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.tryMove((0), (1), 0);
           })
           Text(('→'))
@@ -255,6 +261,7 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.tryMove((1), (0), 0);
           })
         }
@@ -266,6 +273,7 @@ export struct GMazeNav3d {
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(44))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
     }

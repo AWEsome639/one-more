@@ -2,6 +2,7 @@
  * 字谜定义 —— 看中文释义，按顺序点字母把单词拼回来
  * 胜负：6 题答对 ≥4 ⇒ 通关｜进度：题号 / 答对 / 每题倒计时（点错罚 3 秒） */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -138,10 +139,10 @@ export struct GAnagramDefinition {
       Row({ space: Space.sm }) {
         Button(TG('退一格'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.picked = this.picked.slice(0, this.picked.length - 1); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.picked = this.picked.slice(0, this.picked.length - 1); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
@@ -156,6 +157,6 @@ export struct GAnagramDefinition {
       .layoutWeight(1).aspectRatio(1)
       .backgroundColor(this.picked.indexOf(i) >= 0 ? this.theme.line : this.theme.surface)
       .borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.tap(i); })
+      .onClick(() => { Haptics.tick(); this.tap(i); })
   }
 }

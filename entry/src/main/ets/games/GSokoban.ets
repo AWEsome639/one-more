@@ -10,6 +10,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -444,6 +445,7 @@ export struct GSokoban {
           .height(Cell.of(48))
           .enabled(this.level > 0)
           .onClick(() => {
+            Haptics.tap();
             this.go(this.level - 1);
           })
         Button(TG('重开'))
@@ -455,6 +457,7 @@ export struct GSokoban {
           .layoutWeight(1)
           .height(Cell.of(48))
           .onClick(() => {
+            Haptics.tap();
             this.load(this.level);
           })
         Button(TG('撤销'))
@@ -466,6 +469,7 @@ export struct GSokoban {
           .layoutWeight(1)
           .height(Cell.of(48))
           .onClick(() => {
+            Haptics.tap();
             this.undo();
           })
         Button(TG('下一关'))
@@ -478,6 +482,7 @@ export struct GSokoban {
           .height(Cell.of(48))
           .enabled(this.level < LEVELS.length - 1)
           .onClick(() => {
+            Haptics.tap();
             this.go(this.level + 1);
           })
       }
@@ -530,6 +535,7 @@ export struct GSokoban {
         }
       })
       .onClick(() => {
+        Haptics.tap();
         this.step(dx, dy);
       })
       .animation({ duration: Motion.fast, curve: Motion.snap() })

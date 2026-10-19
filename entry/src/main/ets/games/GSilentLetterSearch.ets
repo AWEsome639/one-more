@@ -1,5 +1,6 @@
 /** 不发音字母 —— 从字母格里点出那个不发音的字母｜胜负：10 题答对 ≥7 通关，错 3 次失败 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -144,7 +145,7 @@ export struct GSilentLetterSearch {
             : ((i) === this.ansIdx() ? Palette.emerald : ((i) === this.picked ? Palette.rose : this.theme.surfaceAlt)))
             .borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(50))
             .animation({ duration: Motion.fast, curve: Motion.snap() })
-            .onClick(() => { this.pick((i)); })
+            .onClick(() => { Haptics.tick(); this.pick((i)); })
           }, (c: string, i: number) => 'L' + i)
         }.width('100%')
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
@@ -154,7 +155,7 @@ export struct GSilentLetterSearch {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG2("{0} 题，答对 ≥{1} 通关：点错扣一条命",Digits(String(this.diffTotal), this.langCode), PASS))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

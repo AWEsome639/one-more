@@ -11,6 +11,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -688,6 +689,7 @@ export struct GBridges {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             if (this.done || this.finished) {
               return;
             }
@@ -706,6 +708,7 @@ export struct GBridges {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.hint();
           })
         Button(TG('换一题'))
@@ -717,6 +720,7 @@ export struct GBridges {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('放弃'))
@@ -728,6 +732,7 @@ export struct GBridges {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             if (!this.finished) {
               this.done = true;
               this.status = TG('已放弃这一局');
@@ -801,6 +806,7 @@ export struct GBridges {
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.tapCell(cell);
     })
   }

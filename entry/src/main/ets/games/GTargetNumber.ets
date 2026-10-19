@@ -3,6 +3,7 @@
  *  胜负：6 题答对 ≥5 ⇒ 通关；否则失败 */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -176,6 +177,7 @@ export struct GTargetNumber {
         .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
           .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
         .onClick(() => {
+        Haptics.tap();
         this.submit((i));
         })
       }, (i: number) => 'o' + i)
@@ -183,6 +185,7 @@ export struct GTargetNumber {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46)).onClick(() => {
+          Haptics.tap();
           this.reset();
         })
       Text(TG('提示：先算乘除，再算加减；括号先算')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')

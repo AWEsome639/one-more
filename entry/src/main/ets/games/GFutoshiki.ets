@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -293,6 +294,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((0) * N + 0)]) {
         this.sel = ((0) * N + 0);
         }
@@ -326,6 +328,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((0) * N + 1)]) {
         this.sel = ((0) * N + 1);
         }
@@ -359,6 +362,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((0) * N + 2)]) {
         this.sel = ((0) * N + 2);
         }
@@ -392,6 +396,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((0) * N + 3)]) {
         this.sel = ((0) * N + 3);
         }
@@ -425,6 +430,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((0) * N + 4)]) {
         this.sel = ((0) * N + 4);
         }
@@ -489,6 +495,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((1) * N + 0)]) {
         this.sel = ((1) * N + 0);
         }
@@ -522,6 +529,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((1) * N + 1)]) {
         this.sel = ((1) * N + 1);
         }
@@ -555,6 +563,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((1) * N + 2)]) {
         this.sel = ((1) * N + 2);
         }
@@ -588,6 +597,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((1) * N + 3)]) {
         this.sel = ((1) * N + 3);
         }
@@ -621,6 +631,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((1) * N + 4)]) {
         this.sel = ((1) * N + 4);
         }
@@ -685,6 +696,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((2) * N + 0)]) {
         this.sel = ((2) * N + 0);
         }
@@ -718,6 +730,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((2) * N + 1)]) {
         this.sel = ((2) * N + 1);
         }
@@ -751,6 +764,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((2) * N + 2)]) {
         this.sel = ((2) * N + 2);
         }
@@ -784,6 +798,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((2) * N + 3)]) {
         this.sel = ((2) * N + 3);
         }
@@ -817,6 +832,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((2) * N + 4)]) {
         this.sel = ((2) * N + 4);
         }
@@ -881,6 +897,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((3) * N + 0)]) {
         this.sel = ((3) * N + 0);
         }
@@ -914,6 +931,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((3) * N + 1)]) {
         this.sel = ((3) * N + 1);
         }
@@ -947,6 +965,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((3) * N + 2)]) {
         this.sel = ((3) * N + 2);
         }
@@ -980,6 +999,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((3) * N + 3)]) {
         this.sel = ((3) * N + 3);
         }
@@ -1013,6 +1033,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((3) * N + 4)]) {
         this.sel = ((3) * N + 4);
         }
@@ -1077,6 +1098,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((4) * N + 0)]) {
         this.sel = ((4) * N + 0);
         }
@@ -1110,6 +1132,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((4) * N + 1)]) {
         this.sel = ((4) * N + 1);
         }
@@ -1143,6 +1166,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((4) * N + 2)]) {
         this.sel = ((4) * N + 2);
         }
@@ -1176,6 +1200,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((4) * N + 3)]) {
         this.sel = ((4) * N + 3);
         }
@@ -1209,6 +1234,7 @@ export struct GFutoshiki {
         }
         })
         .onClick(() => {
+        Haptics.tick();
         if (!this.over && !this.given[((4) * N + 4)]) {
         this.sel = ((4) * N + 4);
         }
@@ -1234,6 +1260,7 @@ export struct GFutoshiki {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.put((d));
           })
         }, (d: number) => 'fk' + d)
@@ -1250,6 +1277,7 @@ export struct GFutoshiki {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

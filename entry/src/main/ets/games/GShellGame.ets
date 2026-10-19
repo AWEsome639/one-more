@@ -3,6 +3,7 @@
  * 胜负：连中 5 关 ⇒ 通关（每关多洗 2 次）；进度：猜中/5 · 洗牌次数 · 阶段
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -140,7 +141,7 @@ export struct GShellGame {
           .backgroundColor(this.pickSlot === (slot) ? Palette.primaryDeep : (this.hotA === (slot) || this.hotB === (slot) ? Palette.amber : this.theme.surface))
           .scale({ x: this.pickSlot === (slot) ? Motion.pressScale : 1, y: this.pickSlot === (slot) ? Motion.pressScale : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.pick((slot)); })
+          .onClick(() => { Haptics.tick(); this.pick((slot)); })
         }, (slot: number) => 's' + slot)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%')
@@ -148,7 +149,7 @@ export struct GShellGame {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.orange)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：连中 5 关通关；每过一关多洗 2 次'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

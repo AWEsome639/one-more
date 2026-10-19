@@ -3,6 +3,7 @@
  * 胜负：15 题答对 ≥ 12 且平均 < 1600ms ⇒ 通关；进度：题号/15 · 答对 · 平均
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -138,21 +139,21 @@ export struct GRuleSwitcher {
         .borderRadius(Radius.lg).layoutWeight(1).height(Cell.of(80))
         .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((0)); })
+        .onClick(() => { Haptics.tap(); this.answer((0)); })
         Button((this.rule === 0 ? '偶' : '小'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xxl).fontColor('#FFFFFF')
         .backgroundColor(this.pick === (1) && (1) !== this.need() ? Palette.primaryDeep : Palette.sky)
         .borderRadius(Radius.lg).layoutWeight(1).height(Cell.of(80))
         .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((1)); })
+        .onClick(() => { Haptics.tap(); this.answer((1)); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).textAlign(TextAlign.Center).width('100%')
         .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft)
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：15 题答对 ≥ 12 且平均 < 1600 ms（每 3 题换一次规则）'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

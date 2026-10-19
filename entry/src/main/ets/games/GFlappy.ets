@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -415,6 +416,7 @@ export struct GFlappy {
       .clip(true)
       .shadow(Shadow.card)
       .onClick(() => {
+        Haptics.tick();
         this.flap();
       })
 
@@ -433,6 +435,7 @@ export struct GFlappy {
           .height(Cell.of(52))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.flap();
           })
         Button(TG('重开'))
@@ -444,6 +447,7 @@ export struct GFlappy {
           .layoutWeight(1)
           .height(Cell.of(52))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

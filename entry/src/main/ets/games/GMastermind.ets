@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -205,6 +206,7 @@ export struct GMastermind {
             .border({ width: this.sel === c ? 3 : 1, color: this.sel === c ? this.theme.ink : this.theme.line })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => {
+              Haptics.tick();
               this.sel = c;
             })
         }, (c: number) => 'hue' + c)
@@ -222,6 +224,7 @@ export struct GMastermind {
             .border({ width: 1, color: this.theme.line })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => {
+              Haptics.tick();
               this.tapSlot(i);
             })
         }, (i: number) => 'cur' + i)
@@ -237,6 +240,7 @@ export struct GMastermind {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.submit();
           })
         Button(TG('清空'))
@@ -246,6 +250,7 @@ export struct GMastermind {
           .width(80).height(Cell.of(44))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.clearCur();
           })
         Button(TG('重开'))
@@ -254,6 +259,7 @@ export struct GMastermind {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .width(80).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

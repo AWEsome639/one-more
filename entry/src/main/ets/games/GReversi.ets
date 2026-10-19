@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
@@ -424,6 +425,7 @@ export struct GReversi {
               .aspectRatio(1)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tap((r) * this.diffTotal + (c));
               })
             }, (c: number) => 'c' + c)
@@ -451,6 +453,7 @@ export struct GReversi {
         .width('100%')
         .height(BTN_H)
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
 

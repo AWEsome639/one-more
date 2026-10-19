@@ -13,11 +13,12 @@
 
 import { router } from '@kit.ArkUI';
 import { window } from '@kit.ArkUI';
-import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Layout, Accent } from '../core/Design';
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Layout, Accent, Cell } from '../core/Design';
 import { IconPress, RollingNumber } from '../core/MotionKit';
 import { findGame, GameMeta, GameResult, difficultyFactor, displayTagline, displayName } from '../core/GameRegistry';
 import { ProgressStore } from '../core/ProgressStore';
 import { Haptics } from '../core/Haptics';
+import { SparkBurst } from '../components/SparkBurst';
 import { GameDiff } from '../core/GameDiff';
 import { AppClock } from '../core/AppClock';
 import { L, Digits } from '../core/I18n';
@@ -444,6 +445,8 @@ struct GameHost {
   @State lastSolved: boolean = false;
   @State fav: boolean = false;
   @State pop: boolean = false;
+  // ★★★「动画拉满」第 2 层：胜利粒子进度（0→1 由 animateTo 推）
+  @State burstP: number = 0;
   /** ★ 2026-10-13「动画拉满」item ④：顶栏图标按下弹一下 */
   @State private backPressed: boolean = false;
   @State levelUpTo: number = 0;
@@ -563,6 +566,16 @@ struct GameHost {
     animateTo({ duration: Motion.sheet, curve: Motion.spring() }, () => {
       this.showResult = true;
     });
+    // ★★★「动画拉满」胜利粒子：只在通关时放，和 pop（300ms）同一拍起飞
+    //   失败不放 —— 失败的情绪应该是"沉"，不是"散"
+    if (r.solved) {
+      this.burstP = 0;
+      setTimeout(() => {
+        animateTo({ duration: 980, curve: Curve.EaseOut }, () => {
+          this.burstP = 1;
+        });
+      }, Motion.base + 40);
+    }
     // ★★★ 2026-10-14 奥森反馈「每个小游戏的开启动画非常诡异」⇒ 第二个根因修：
     //   原来是 60ms 就置 pop=true ⇒ 而共享元素转场是 Motion.base(260ms)
     //   ⇒ 【两套动画重叠 200ms】：页面还在平移/缩放时，各元素已经在淡入上浮
@@ -681,6 +694,7 @@ struct GameHost {
             .shadow(Shadow.card)
             .margin({ right: Space.sm })
             .onClick(() => {
+              Haptics.tap();   // ★ 2026-10-19 按压反馈
               router.pushUrl({ url: 'pages/GuidePage', params: { id: this.gameId } });
             })
 
@@ -2942,8 +2956,10 @@ struct GameHost {
             .fontColor(Color.White)
             .backgroundColor(this.accentColor())
             .borderRadius(Radius.md)
-            .width('100%').height(46)
+            // ★ 2026-10-19 自查 A3：结算页主按钮写死 46vp，大字模式字会顶出去
+            .width('100%').constraintSize({ minHeight: Cell.of(46) })
             .onClick(() => {
+              Haptics.tap();   // ★ 2026-10-19 按压反馈
               animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
                 this.showResult = false;
                 this.nonce = this.nonce + 1;
@@ -2966,6 +2982,18 @@ struct GameHost {
         .shadow(Shadow.card)
         .transition(TransitionEffect.OPACITY.animation({ duration: Motion.sheet })
           .combine(TransitionEffect.translate({ y: 300 })))
+      }
+
+      // ★★★「动画拉满」胜利粒子层
+      //   放在结算弹窗【之后】⇒ 盖在最上面；绝对定位 + markAnchor ⇒ 不影响任何布局
+      //   中心点 (50%, 72%) ≈ 结算弹窗里那个 🎉 的位置 ⇒ 粒子看起来是"从 🎉 炸出来的"
+      if (this.showResult && this.lastSolved) {
+        SparkBurst({ progress: this.burstP, count: 26, spread: 175 })
+          .width(420)
+          .height(420)
+          .position({ x: '50%', y: '72%' })
+          .markAnchor({ x: 210, y: 210 })
+          .hitTestBehavior(HitTestMode.None)
       }
     }
     .width('100%')

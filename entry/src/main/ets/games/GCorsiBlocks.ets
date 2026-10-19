@@ -4,6 +4,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -162,7 +163,7 @@ export struct GCorsiBlocks {
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-              .onClick(() => { this.tap((r * 3 + c)); })
+              .onClick(() => { Haptics.tick(); this.tap((r * 3 + c)); })
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
@@ -174,7 +175,7 @@ export struct GCorsiBlocks {
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('顺背：长度升到 {0} 即通关',Digits(String(WIN_SPAN), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

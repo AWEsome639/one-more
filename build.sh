@@ -25,8 +25,26 @@ fi
 TASK="${1:-assembleHap}"
 
 # ── 最多重试 3 次（应对 "Another build is already running"）──
+# ── ★ 上架包必须 release 模式：debug 构建的包 AGC 会报 993（Profile 非法）──
+HVIGOR_ARGS=""
+case "$TASK" in
+  assembleApp*)
+    HVIGOR_ARGS="-p buildMode=release"
+    if [ -f build-profile.json5 ]; then
+      for _k in certpath profile storeFile; do
+        _p=$(sed -n 's/.*"'"$_k"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' build-profile.json5 | head -1)
+        if [ -n "$_p" ] && [ ! -e "$_p" ]; then
+          echo "❌ 签名配置里的 $_k 路径不存在：$_p" >&2
+          echo "   hvigor 会静默回退 debug 签名 ⇒ AGC 报 993" >&2
+          exit 2
+        fi
+      done
+    fi
+    ;;
+esac
+
 for try in 1 2 3; do
-  OUT=$("$DEVECO_CLI_CLT_PATH/hvigor/bin/hvigorw" --no-daemon "$TASK" 2>&1)
+  OUT=$("$DEVECO_CLI_CLT_PATH/hvigor/bin/hvigorw" --no-daemon "$TASK" $HVIGOR_ARGS 2>&1)
   RC=$?
   echo "$OUT"
   if echo "$OUT" | grep -q "Another build is already running"; then

@@ -3,6 +3,7 @@
  *  胜负：8 题答对 ≥6 ⇒ 通关；否则失败 */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -144,6 +145,7 @@ export struct GVectorDotProduct {
         : this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.submit((0));
         })
         Button(this.opts.length > (1) ? String(this.opts[(1)]) : '—')
@@ -153,6 +155,7 @@ export struct GVectorDotProduct {
         : this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.submit((1));
         })
       }.width('100%')
@@ -164,6 +167,7 @@ export struct GVectorDotProduct {
         : this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.submit((2));
         })
         Button(this.opts.length > (3) ? String(this.opts[(3)]) : '—')
@@ -173,6 +177,7 @@ export struct GVectorDotProduct {
         : this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.submit((3));
         })
       }.width('100%')
@@ -180,6 +185,7 @@ export struct GVectorDotProduct {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46)).onClick(() => {
+          Haptics.tap();
           this.reset();
         })
       Text(TG('提示：对应分量相乘再全部相加，负号也算进去')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')

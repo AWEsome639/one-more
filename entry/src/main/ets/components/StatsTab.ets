@@ -18,7 +18,7 @@ import { router } from '@kit.ArkUI';
 import { Digits } from '../core/I18n';   // ★ 2026-10-16 数字本地化
 // ★ 2026-10-13「动画拉满」：数字滚动（从 GameHost 提取成公共件，见 core/MotionKit.ets）
 import { RollingNumber } from '../core/MotionKit';
-import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Layout, Accent } from '../core/Design';
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Layout, Accent, Cell } from '../core/Design';
 import { GAMES, GameMeta, GameCategory, CatCount, categoryList, findGame, colorOf, displayName, displayTagline, gamesByCategory } from '../core/GameRegistry';
 import { ProgressStore } from '../core/ProgressStore';
 import { LevelHeader, iconOf } from './Common';
@@ -556,7 +556,14 @@ export struct StatsTab {
         .fontColor(this.theme().inkFaint)
     }
     .alignItems(HorizontalAlign.Center)
+    // ★★★ 2026-10-19 全面自查 A6：统计页「最近玩的」这张卡点开就进游戏，
+    //   但原来没有任何按压反馈、也没有触感 ⇒ 与主页 GameCard 的手感不一致
+    .stateStyles({
+      pressed: { .scale({ x: 0.94, y: 0.94 }).opacity(0.85) },
+      normal: { .scale({ x: 1, y: 1 }).opacity(1) }
+    })
     .onClick(() => {
+      Haptics.tap();
       this.openGame(g.id);
     })
   }
@@ -626,6 +633,7 @@ export struct StatsTab {
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
     .onClick(() => {
+      Haptics.tap();   // ★ 2026-10-19 按压反馈
       this.openGame(it.meta.id);
     })
   }
@@ -715,6 +723,7 @@ export struct StatsTab {
       .justifyContent(FlexAlign.Center)
       .padding({ top: 6, bottom: 2 })
       .onClick(() => {
+        Haptics.tap();   // ★ 2026-10-19 按压反馈
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
           this.achvExpanded = !this.achvExpanded;
         });
@@ -748,7 +757,7 @@ export struct StatsTab {
               .layoutWeight(1)
             }
             .width('100%')
-            .height(70)
+            .constraintSize({ minHeight: Cell.of(70) })
             .padding({ left: 6, right: 6 })
             .backgroundColor(this.theme().surfaceAlt)
             .borderRadius(Radius.sm)
@@ -884,7 +893,9 @@ export struct StatsTab {
       .layoutWeight(1)
     }
     .width('100%')
-    .height(70)
+    // ★ 2026-10-19 自查 A3：与上面那张徽章卡同一模式 —— 3 行文字 + 写死 70vp
+    //   大字模式字号 +25~42% ⇒ 会被裁 ⇒ 改最小高度（可长高）
+    .constraintSize({ minHeight: Cell.of(70) })
     .padding({ left: 6, right: 6 })
     .backgroundColor(this.theme().surfaceAlt)
     .borderRadius(Radius.sm)
@@ -962,5 +973,10 @@ export struct StatsTab {
     .borderRadius(Radius.lg)
     .shadow(Shadow.card)
     .alignItems(HorizontalAlign.Center)
+        // ★ 2026-10-19 自查 ⑦：空白页也要有入场（淡入 + 上浮），不能"啪"一下出现
+        .transition(TransitionEffect.OPACITY
+          .animation({ duration: Motion.base, curve: Motion.spring() })
+          .combine(TransitionEffect.translate({ y: 10 })
+            .animation({ duration: Motion.base, curve: Motion.spring() })))
   }
 }

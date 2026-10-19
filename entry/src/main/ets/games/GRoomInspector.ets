@@ -4,6 +4,7 @@
  * 胜负：找齐 3 处 ⇒ 通关；错点 3 次或超过 60 秒 ⇒ 失败。　进度：找到几处 / 失误 / 剩余秒
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -142,6 +143,7 @@ export struct GRoomInspector {
       .borderColor(this.borderOf((r * COLS + c), ((0))))
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => {
+      Haptics.tick();
       if (false) { this.tap((r * COLS + c)); }
       }) }, (c: number) => 'c' + c)
       }.width('100%')
@@ -160,6 +162,7 @@ export struct GRoomInspector {
       .borderColor(this.borderOf((r * COLS + c), ((1))))
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => {
+      Haptics.tick();
       if (true) { this.tap((r * COLS + c)); }
       }) }, (c: number) => 'c' + c)
       }.width('100%')
@@ -174,7 +177,7 @@ export struct GRoomInspector {
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

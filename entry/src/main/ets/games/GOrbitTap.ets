@@ -4,6 +4,7 @@
  * 胜负：25 秒内点中 10 次 ⇒ 通关；时间耗尽 ⇒ 失败。　进度：命中 / 剩余秒 / 点空
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -115,7 +116,7 @@ export struct GOrbitTap {
         .backgroundColor((i) === this.target ? Palette.cyan : this.theme.surfaceAlt)
         .position({ x: pctOf(slotX((i))), y: pctOf(slotY((i))) })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.tap((i)); }) }, (i: number) => 'slot' + i)
+        .onClick(() => { Haptics.tick(); this.tap((i)); }) }, (i: number) => 'slot' + i)
       }.width(ARENA).height(ARENA).backgroundColor(this.theme.surface)
       .borderRadius(Radius.xl).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm)
@@ -125,7 +126,7 @@ export struct GOrbitTap {
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

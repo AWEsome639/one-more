@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -345,6 +346,7 @@ export struct GFreecell {
           .border({ width: 1, color: this.sel === (i) ? Palette.primary : this.theme.line })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tick();
           this.tapFree((i));
           })
         }, (i: number) => 'f' + i)
@@ -361,6 +363,7 @@ export struct GFreecell {
           .borderRadius(Radius.sm)
           .border({ width: 1, color: this.found[(s)] === TOP ? Palette.emerald : this.theme.line })
           .onClick(() => {
+          Haptics.tick();
           this.tapFound((s));
           })
         }, (s: number) => 'h' + s)
@@ -395,6 +398,7 @@ export struct GFreecell {
           .borderRadius(Radius.sm)
           .justifyContent(FlexAlign.End)
           .onClick(() => {
+          Haptics.tick();
           this.tapCol((i));
           })
         }, (i: number) => 'c' + i)
@@ -414,6 +418,7 @@ export struct GFreecell {
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('自动归位'))
@@ -422,6 +427,7 @@ export struct GFreecell {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.autoHome();
           })
       }

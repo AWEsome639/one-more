@@ -4,6 +4,7 @@
  * 胜负：长度撑到 8 ⇒ 通关；点错 ⇒ 失败。进度：序列长度 / 得分 / 已点几下。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -137,7 +138,7 @@ export struct GSimonSequence {
         .shadow(this.lit === (i) ? Shadow.lifted : Shadow.card)
         .scale({ x: this.lit === (i) ? 1.05 : 1, y: this.lit === (i) ? 1.05 : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.tapPad((i)); }) }, (i: number) => 'a' + i)
+        .onClick(() => { Haptics.tick(); this.tapPad((i)); }) }, (i: number) => 'a' + i)
       }.width('100%')
       Row({ space: Space.sm }) {
         ForEach(ROW_B, (i: number) => { Stack() {
@@ -147,7 +148,7 @@ export struct GSimonSequence {
         .shadow(this.lit === (i) ? Shadow.lifted : Shadow.card)
         .scale({ x: this.lit === (i) ? 1.05 : 1, y: this.lit === (i) ? 1.05 : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.tapPad((i)); }) }, (i: number) => 'b' + i)
+        .onClick(() => { Haptics.tick(); this.tapPad((i)); }) }, (i: number) => 'b' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md)
         // ★ 通关庆祝
@@ -157,7 +158,7 @@ export struct GSimonSequence {
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

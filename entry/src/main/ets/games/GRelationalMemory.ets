@@ -3,6 +3,7 @@
  * 胜负：6 题答对 ≥ 5 ⇒ 通关；进度：答对/6 · 题号 · 记忆倒计时
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -137,7 +138,7 @@ export struct GRelationalMemory {
             // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
             .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
               .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-            .onClick(() => { this.answer((o)); })
+            .onClick(() => { Haptics.tick(); this.answer((o)); })
           }, (o: string) => o)
         }.width('100%')
       }
@@ -146,7 +147,7 @@ export struct GRelationalMemory {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：6 题答对 ≥ 5 通关；看 5 秒后开始答题'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

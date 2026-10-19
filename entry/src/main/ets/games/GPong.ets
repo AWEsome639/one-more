@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -391,6 +392,7 @@ export struct GPong {
           .height(BTN_H)
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.togglePause();
           })
         Button(TG('重新开始'))
@@ -402,6 +404,7 @@ export struct GPong {
           .layoutWeight(1)
           .height(BTN_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

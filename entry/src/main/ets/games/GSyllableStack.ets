@@ -3,6 +3,7 @@
  * 胜负：6 个词全部叠对通关；错叠 3 次失败 ｜ 进度：第几词 / 已叠对 / 生命 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -143,7 +144,7 @@ export struct GSyllableStack {
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(TG('提示：每个词都混进了 2 个假音节')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
@@ -156,7 +157,7 @@ export struct GSyllableStack {
       .backgroundColor(this.slots[i].length === 0 ? this.theme.surfaceAlt : this.theme.surface).animation({ duration: Motion.fast, curve: Motion.snap() })
       .borderRadius(Radius.md).shadow(Shadow.card)
       .scale({ x: this.pressed === i ? Motion.pressScale : 1, y: this.pressed === i ? Motion.pressScale : 1 })
-      .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap(i); })
+      .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap(i); })
       .onTouch((e: TouchEvent) => { if (e.type === TouchType.Down) { this.pressed = i; } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; } })
   }
 }

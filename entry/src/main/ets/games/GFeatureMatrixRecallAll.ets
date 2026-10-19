@@ -3,6 +3,7 @@
  * 胜负：6 格完全正确 ⇒ 通关；进度：倒计时 / 已选 n/6 / 点对数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -166,7 +167,7 @@ export struct GFeatureMatrixRecallAll {
               }.layoutWeight(1).aspectRatio(1)
               .backgroundColor(this.cellBg((row * N + col))).borderRadius(Radius.md)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
-              .onClick(() => { this.toggle((row * N + col)); })
+              .onClick(() => { Haptics.tick(); this.toggle((row * N + col)); })
             }, (col: number) => this.cellKey(row * N + col))
           }.width('100%')
         }, (row: number) => 'r' + row)
@@ -180,7 +181,7 @@ export struct GFeatureMatrixRecallAll {
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
         .enabled(this.phase === 1 && this.pickCount() === LIT)
         .opacity(this.phase === 1 && this.pickCount() === LIT ? 1 : 0.5)
-        .onClick(() => { if (this.phase === 2) { this.reset(); } else { this.judge(); } })
+        .onClick(() => { Haptics.tap(); if (this.phase === 2) { this.reset(); } else { this.judge(); } })
 
       Text(TG('不许多点也不许漏点：选满 6 格才能提交'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

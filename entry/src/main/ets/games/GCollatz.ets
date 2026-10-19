@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -246,6 +247,7 @@ export struct GCollatz {
           .shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+            Haptics.tick();
             this.pick(i);
           })
         }, (i: number) => 'cz' + i)
@@ -274,6 +276,7 @@ export struct GCollatz {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
 

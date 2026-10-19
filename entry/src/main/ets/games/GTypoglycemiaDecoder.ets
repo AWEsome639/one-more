@@ -3,6 +3,7 @@
  * 胜负：6 句里读对 ≥ 4 句通关 ｜ 进度：第几句 / 读对数 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -146,7 +147,7 @@ export struct GTypoglycemiaDecoder {
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(TG('提示：首尾字母没动，中间只是被洗过牌')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
@@ -161,6 +162,6 @@ export struct GTypoglycemiaDecoder {
         ? Palette.emerald : (this.locked && this.picked === i ? Palette.rose : this.theme.surface))
       .scale({ x: this.picked === i ? Motion.pressScale : 1, y: this.picked === i ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.tap(i); })
+      .onClick(() => { Haptics.tick(); this.tap(i); })
   }
 }

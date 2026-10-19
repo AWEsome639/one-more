@@ -3,6 +3,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -165,7 +166,7 @@ export struct GAlgebraicBalance {
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.violet).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .backgroundColor(Palette.violet).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('点候选值 → 立刻判分')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
@@ -192,6 +193,6 @@ export struct GAlgebraicBalance {
     Button('x = ' + String(this.eq.choices[k] ?? 0))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink)
       .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-      .enabled(!this.lockTap && !this.over).onClick(() => { this.answer(this.eq.choices[k] ?? 0); })
+      .enabled(!this.lockTap && !this.over).onClick(() => { Haptics.tap(); this.answer(this.eq.choices[k] ?? 0); })
   }
 }

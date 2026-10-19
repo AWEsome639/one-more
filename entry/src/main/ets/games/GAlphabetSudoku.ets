@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -390,6 +391,7 @@ export struct GAlphabetSudoku {
               .scale({ x: this.sel === (r * this.diffTotal + c) ? 1.06 : 1, y: this.sel === (r * this.diffTotal + c) ? 1.06 : 1 })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tapCell((r * this.diffTotal + c));
               })
             }, (c: number) => 'c' + c)
@@ -414,6 +416,7 @@ export struct GAlphabetSudoku {
             .layoutWeight(1)
             .height(KEY_H)
             .onClick(() => {
+              Haptics.tap();
               this.put(k + 1);
             })
         }, (ch: string) => 'k' + ch)
@@ -430,6 +433,7 @@ export struct GAlphabetSudoku {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.put(0);
           })
         Button(TG('换一题'))
@@ -441,6 +445,7 @@ export struct GAlphabetSudoku {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('放弃'))
@@ -452,6 +457,7 @@ export struct GAlphabetSudoku {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             if (!this.finished) {
               this.done = true;
               this.status = TG('已放弃这一局');

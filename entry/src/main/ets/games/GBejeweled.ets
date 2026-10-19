@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -331,6 +332,7 @@ export struct GBejeweled {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .onClick(() => {
+              Haptics.tick();
               this.tap((this.idx(r, c)));
               })
             }, (c: number) => 'c' + c)
@@ -360,6 +362,7 @@ export struct GBejeweled {
           .layoutWeight(1)
           .height(Cell.of(46))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('取消选择'))
@@ -372,6 +375,7 @@ export struct GBejeweled {
           .height(Cell.of(46))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.sel = -1;
           })
       }

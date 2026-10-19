@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -335,6 +336,7 @@ export struct GMahjongSolitaire {
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+                Haptics.tick();
                 this.tap(r * PC + c);
               })
             }, (c: number) => 't' + r + '-' + c)
@@ -361,6 +363,7 @@ export struct GMahjongSolitaire {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.useHint();
           })
         Button(TG('重开'))
@@ -369,6 +372,7 @@ export struct GMahjongSolitaire {
           .backgroundColor(Palette.rose).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }
@@ -413,6 +417,7 @@ export struct GMahjongSolitaire {
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.tap(i);
     })
   }

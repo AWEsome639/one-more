@@ -1,5 +1,6 @@
 /** 混合词拆分 —— 合成词由哪两个词拼成？（6 题答对 ≥4 通关 ｜ 进度：题号/答对/倒计时） */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -144,7 +145,7 @@ export struct GPortmanteauSplit {
         .onTouch((e: TouchEvent) => {
         if (e.type === TouchType.Down) { this.pressed = (0); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
         })
-        .onClick(() => { this.tap((0)); })
+        .onClick(() => { Haptics.tick(); this.tap((0)); })
         Text(this.q.opts.length > (1) ? this.q.opts[(1)] : '')
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
         .fontColor(this.sel.indexOf((1)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(58))
@@ -155,7 +156,7 @@ export struct GPortmanteauSplit {
         .onTouch((e: TouchEvent) => {
         if (e.type === TouchType.Down) { this.pressed = (1); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
         })
-        .onClick(() => { this.tap((1)); })
+        .onClick(() => { Haptics.tick(); this.tap((1)); })
       }.width('100%')
       Row({ space: Space.sm }) {
         Text(this.q.opts.length > (2) ? this.q.opts[(2)] : '')
@@ -168,7 +169,7 @@ export struct GPortmanteauSplit {
         .onTouch((e: TouchEvent) => {
         if (e.type === TouchType.Down) { this.pressed = (2); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
         })
-        .onClick(() => { this.tap((2)); })
+        .onClick(() => { Haptics.tick(); this.tap((2)); })
         Text(this.q.opts.length > (3) ? this.q.opts[(3)] : '')
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
         .fontColor(this.sel.indexOf((3)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(58))
@@ -179,13 +180,13 @@ export struct GPortmanteauSplit {
         .onTouch((e: TouchEvent) => {
         if (e.type === TouchType.Down) { this.pressed = (3); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
         })
-        .onClick(() => { this.tap((3)); })
+        .onClick(() => { Haptics.tick(); this.tap((3)); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

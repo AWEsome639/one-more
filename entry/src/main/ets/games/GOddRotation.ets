@@ -3,6 +3,7 @@
  * 10 题，答对 ≥ 8 通关；进度：题号 / 答对 / 点错次数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -196,7 +197,7 @@ export struct GOddRotation {
               .borderWidth(this.revealed && (r * 3 + c) === this.odd ? 2 : 0)
               .borderColor(Palette.orange)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
-              .onClick(() => { this.tap((r * 3 + c)); })
+              .onClick(() => { Haptics.tick(); this.tap((r * 3 + c)); })
             }, (c: number) => 'c' + c)
           }
           .width('100%')
@@ -216,7 +217,7 @@ export struct GOddRotation {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：10 题答对 ≥ 8 题 · 图案角度每轮随机，别看错基准'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

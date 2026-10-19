@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -451,6 +452,7 @@ export struct GTapa {
               .border({ width: 1, color: this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * this.diffTotal + c));
               })
             }, (c: number) => 'c' + c)
@@ -480,6 +482,7 @@ export struct GTapa {
         .width('100%')
         .height(Cell.of(44))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
 

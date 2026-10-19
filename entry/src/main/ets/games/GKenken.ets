@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -418,6 +419,7 @@ export struct GKenken {
               .border({ width: this.sel === (r * N + c) ? 2 : 1, color: this.sel === (r * N + c) ? Palette.primary : this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tapCell((r * N + c));
               })
             }, (c: number) => 'nc' + r + '-' + c)
@@ -447,6 +449,7 @@ export struct GKenken {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.put((d));
           })
         }, (d: number) => 'na' + d)
@@ -462,6 +465,7 @@ export struct GKenken {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.put((d));
           })
         }, (d: number) => 'nb' + d)
@@ -478,6 +482,7 @@ export struct GKenken {
         .width('100%')
         .height(Cell.of(44))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
     }
@@ -524,6 +529,7 @@ export struct GKenken {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.sm)
       .onClick(() => {
+        Haptics.tick();
         this.clearSel();
       })
   }

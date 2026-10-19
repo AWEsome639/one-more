@@ -4,6 +4,7 @@
  * 胜负：目标分达标 = 通关；步数用尽没达标 = 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -131,7 +132,7 @@ export struct GColorMatch {
  Stack() {
  Text(this.colors[r * N + c] >= 0 ? '●' : '').fontSize(FontSize.md).fontColor('#FFFFFF')
  }.layoutWeight(1).height(Cell.of(58)).backgroundColor(this.colors[r * N + c] >= 0
- ? HUE[this.colors[r * N + c]] : this.theme.surfaceAlt).borderRadius(Radius.sm).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(r * N + c); })
+ ? HUE[this.colors[r * N + c]] : this.theme.surfaceAlt).borderRadius(Radius.sm).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick(r * N + c); })
  }, (c: number) => 'c' + c) }.width('100%')
  }, (r: number) => 'r' + r) }.width('100%')
  Text(this.note).fontSize(FontSize.sm)
@@ -139,7 +140,7 @@ export struct GColorMatch {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
  Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).width('100%').height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).width('100%').height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { Haptics.tap(); this.reset(); })
  }.width('100%').height('100%').justifyContent(FlexAlign.Start)
  }
 }

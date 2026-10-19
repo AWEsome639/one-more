@@ -4,6 +4,7 @@
  * 胜负：清单放完 = 通关；某柱超高失衡 = 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -118,7 +119,7 @@ export struct GBlockStackingPhysics {
                 ? Palette.danger : this.theme.inkSoft)
           }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
 .borderRadius(Radius.md).borderWidth(1).borderColor(this.theme.line)
-.onClick(() => { this.place(k); })
+.onClick(() => { Haptics.tick(); this.place(k); })
         }, (k: number) => 'k' + k)
       }.width('100%').alignItems(VerticalAlign.Bottom)
       Column({ space: Space.xs }) {
@@ -136,10 +137,11 @@ export struct GBlockStackingPhysics {
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
-.backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { this.reset(); })
+.backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { Haptics.tap(); this.reset(); })
         Button(TG('换一关'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor(this.theme.ink)
 .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).onClick(() => {
+            Haptics.tap();
             const n: number = (this.level + 1) % LEVELS.length; this.reset();
             this.level = n; this.queue = LEVELS[n].queue.slice();
           })

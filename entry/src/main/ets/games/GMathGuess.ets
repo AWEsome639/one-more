@@ -3,6 +3,7 @@
  * 胜负：7 次内猜中 ⇒ 通关；次数用尽 ⇒ 失败｜进度：已用次数 / 当前范围
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -130,19 +131,19 @@ export struct GMathGuess {
       Row({ space: Space.sm }) {
         Button('−1')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { this.nudge(-1); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.nudge(-1); })
         Button(TG('中位'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.violet)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { this.nudge(0); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.nudge(0); })
         Button('+1')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { this.nudge(1); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.nudge(1); })
       }.width('100%')
       Button(TG2('就猜 {0}', Math.round(this.guess)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
         .borderRadius(Radius.md).width('100%').height(Cell.of(48))
-        .enabled(!this.over).onClick(() => { this.submit(); })
+        .enabled(!this.over).onClick(() => { Haptics.tap(); this.submit(); })
       Text(this.recentText())
         .fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%')
         .padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
@@ -151,7 +152,7 @@ export struct GMathGuess {
           .fontSize(FontSize.xs).fontColor(this.theme.inkFaint).layoutWeight(1)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)

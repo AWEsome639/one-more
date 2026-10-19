@@ -1,5 +1,6 @@
 /** 速算 —— 60 秒限时心算抢答｜拿到 100 分过关 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -177,18 +178,18 @@ export struct GQuickMath {
         ForEach([0, 1], (i: number) => { Button(this.opts.length > (i) ? String(this.opts[(i)]) : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-        .enabled(!this.over && this.opts.length > (i)).onClick(() => { this.choose(this.opts[(i)]); }); }, (i: number) => 'a' + i)
+        .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'a' + i)
       }.width('100%')
       Row({ space: Space.sm }) {
         ForEach([2, 3], (i: number) => { Button(this.opts.length > (i) ? String(this.opts[(i)]) : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-        .enabled(!this.over && this.opts.length > (i)).onClick(() => { this.choose(this.opts[(i)]); }); }, (i: number) => 'b' + i)
+        .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'b' + i)
       }.width('100%')
       Row({ space: Space.md }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
-          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('连击越高分越多')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

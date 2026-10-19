@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { LanMatch, Side } from '../core/LanMatch';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
@@ -398,6 +399,7 @@ export struct GMancala {
               .border({ width: 1, color: this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               if (false) {
               this.playerMove((i));
               }
@@ -425,6 +427,7 @@ export struct GMancala {
               .border({ width: 1, color: this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               if (true) {
               this.playerMove((i));
               }
@@ -463,6 +466,7 @@ export struct GMancala {
         .backgroundColor(Palette.lime).borderRadius(Radius.md)
         .width('100%').height(Cell.of(44))
         .onClick(() => {
+          Haptics.tap();
           this.restartTap();
         })
     }

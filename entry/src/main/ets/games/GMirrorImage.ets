@@ -3,6 +3,7 @@
  * 胜负：10 题答对 ≥ 8 题通关；进度：题号 / 答对 / 已判对局数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -246,7 +247,7 @@ export struct GMirrorImage {
         .height(Cell.of(60))
         .scale({ x: this.picked === (1) ? Motion.pressScale : 1, y: this.picked === (1) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer(true); })
+        .onClick(() => { Haptics.tap(); this.answer(true); })
         Button((TG('不是')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
@@ -257,7 +258,7 @@ export struct GMirrorImage {
         .height(Cell.of(60))
         .scale({ x: this.picked === (0) ? Motion.pressScale : 1, y: this.picked === (0) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer(false); })
+        .onClick(() => { Haptics.tap(); this.answer(false); })
       }
       .width('100%')
       Button(this.over ? TG('再来一局') : TG('重开'))
@@ -268,7 +269,7 @@ export struct GMirrorImage {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：10 题答对 ≥ 8 题 · 干扰项是「上下翻转」，别与左右镜像混了'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

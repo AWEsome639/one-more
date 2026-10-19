@@ -4,6 +4,7 @@
  * 进度：第几词 / 已还原数 / 生命 / 得分
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -156,7 +157,7 @@ export struct GConsonantReconstruct {
         Button(TG('提交'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
           .borderRadius(Radius.md).width(84).height(Cell.of(46)).enabled(!this.over)
-          .onClick(() => { this.submit(); })
+          .onClick(() => { Haptics.tap(); this.submit(); })
       }
       .width('100%')
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%')
@@ -166,10 +167,10 @@ export struct GConsonantReconstruct {
         Button(TG('跳过（-1 命）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
-          .enabled(!this.over).onClick(() => { this.skip(); })
+          .enabled(!this.over).onClick(() => { Haptics.tap(); this.skip(); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       }
       .width('100%')
       Text(TG('提示：下划线是被人挖走的元音，字母总数照原样保留'))

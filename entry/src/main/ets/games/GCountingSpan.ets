@@ -4,6 +4,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -174,14 +175,14 @@ export struct GCountingSpan {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.amber)
           .borderRadius(Radius.md).width('100%').height(Cell.of(48))
-          .onClick(() => { this.nextCard(); })
+          .onClick(() => { Haptics.tap(); this.nextCard(); })
       } else {
         Row({ space: Space.xs }) {
           ForEach([1, 2, 3, 4, 5], (k: number) => {
             Button(String((k)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(Palette.primary)
             .borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(52)).enabled(this.phase === 1)
-            .onClick(() => { this.answerCount((k)); })
+            .onClick(() => { Haptics.tap(); this.answerCount((k)); })
           }, (k: number) => 'n' + k)
         }.width('100%')
       }
@@ -191,7 +192,7 @@ export struct GCountingSpan {
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('张数升到 {0} 即通关；黄点 1~5 个不等',Digits(String(WIN_SPAN), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

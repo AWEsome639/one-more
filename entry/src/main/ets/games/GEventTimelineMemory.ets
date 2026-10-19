@@ -5,6 +5,7 @@
  * 进度：轮次 / 答对轮数 / 本轮已点
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -164,7 +165,7 @@ export struct GEventTimelineMemory {
                 }.layoutWeight(1).padding(Space.sm).backgroundColor(this.picks.indexOf((r * 2 + c)) >= 0 ? '#22EC4899' : this.theme.surfaceAlt)
                 .borderRadius(Radius.md).borderWidth(2).borderColor(this.picks.indexOf((r * 2 + c)) >= 0 ? Palette.berry : this.theme.line)
                 .scale({ x: this.picks.indexOf((r * 2 + c)) >= 0 ? Motion.pressScale : 1, y: this.picks.indexOf((r * 2 + c)) >= 0 ? Motion.pressScale : 1 })
-                .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tapCard((r * 2 + c)); })
+                .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapCard((r * 2 + c)); })
               }, (c: number) => 'cc' + c)
             }.width('100%')
           }, (r: number) => 'cr' + r)
@@ -175,12 +176,12 @@ export struct GEventTimelineMemory {
         Button(TG('打乱作答 ▶'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.berry)
           .borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(this.shown >= LEN)
-          .opacity(this.shown >= LEN ? 1 : 0.5).onClick(() => { this.shuffleIn(); })
+          .opacity(this.shown >= LEN ? 1 : 0.5).onClick(() => { Haptics.tap(); this.shuffleIn(); })
       }
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.phase === 0 ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.phase === 0 ? Palette.primary : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

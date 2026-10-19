@@ -3,6 +3,7 @@
  * 胜负：12 题答对 ≥10 题通关
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -118,7 +119,7 @@ export struct GStroopTest {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：12 题答对 ≥ 10 题；答的是墨色，不是字面写的颜色'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         .width('100%').textAlign(TextAlign.Center)
@@ -136,6 +137,6 @@ export struct GStroopTest {
       .borderRadius(Radius.lg).layoutWeight(1).height(Cell.of(62))
       .scale({ x: this.pick === k ? Motion.pressScale : 1, y: this.pick === k ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer(k); })
+      .onClick(() => { Haptics.tap(); this.answer(k); })
   }
 }

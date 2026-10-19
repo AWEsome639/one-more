@@ -4,6 +4,7 @@
  * 胜负：90 秒内完成 3 块题板（每块 3 对）⇒ 通关；时间归零 ⇒ 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -197,7 +198,7 @@ export struct GMatrixMultiplierMatch {
           .width('100%').padding(Space.sm).borderRadius(Radius.md).shadow(Shadow.card)
           .backgroundColor(this.done[k] ? HIT : (this.selL === k ? Palette.lime : this.theme.surface))
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.pickL(k); })
+          .onClick(() => { Haptics.tick(); this.pickL(k); })
         }, (k: number) => 'ml' + k)
       }.width('100%')
 
@@ -208,7 +209,7 @@ export struct GMatrixMultiplierMatch {
             .textAlign(TextAlign.Center)
             .layoutWeight(1).padding(Space.sm).borderRadius(Radius.md).shadow(Shadow.card)
             .backgroundColor(this.theme.surfaceAlt)
-            .onClick(() => { this.pickR(slot); })
+            .onClick(() => { Haptics.tick(); this.pickR(slot); })
         }, (slot: number) => 'ms' + slot)
       }.width('100%')
 
@@ -219,7 +220,7 @@ export struct GMatrixMultiplierMatch {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：2×2 乘积 C[r][c] = A[r][0]×B[0][c] + A[r][1]×B[1][c]'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

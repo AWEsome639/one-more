@@ -4,6 +4,7 @@
  * 胜负：120 秒内过 3 关 ⇒ 通关；超时或错满 4 次 ⇒ 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -215,7 +216,7 @@ export struct GMagicSquares {
             .layoutWeight(1).aspectRatio(1).borderRadius(Radius.md)
             .backgroundColor(this.fixed[(r * SIDE + c)] ? this.theme.surface : (this.theme.isDark ? '#16283A' : '#E0F2FE'))
             .animation({ duration: Motion.fast, curve: Motion.snap() })
-            .onClick(() => { this.tapCell((r * SIDE + c)); }) }, (c: number) => 'mc' + c)
+            .onClick(() => { Haptics.tick(); this.tapCell((r * SIDE + c)); }) }, (c: number) => 'mc' + c)
           }.width('100%')
         }, (r: number) => 'mr' + r)
       }
@@ -233,14 +234,14 @@ export struct GMagicSquares {
         .backgroundColor(this.sel === (i) ? Palette.sky : this.theme.surface)
         .scale({ x: this.sel === (i) ? 1.06 : 1, y: this.sel === (i) ? 1.06 : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pickNum((i)); }) }, (v: number) => 'mp' + v)
+        .onClick(() => { Haptics.tick(); this.pickNum((i)); }) }, (v: number) => 'mp' + v)
       }.width('100%').height(Cell.of(64))
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：点已填的格子可以把数字取回托盘'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

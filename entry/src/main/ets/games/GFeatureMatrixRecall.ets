@@ -3,6 +3,7 @@
  * 胜负：选中的 3 格完全正确 ⇒ 通关；进度：倒计时 / 已选 n/3 / 判分明细
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -171,7 +172,7 @@ export struct GFeatureMatrixRecall {
               }.layoutWeight(1).aspectRatio(1)
               .backgroundColor(this.cellBg((row * N + col))).borderRadius(Radius.md)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
-              .onClick(() => { this.toggle((row * N + col)); })
+              .onClick(() => { Haptics.tick(); this.toggle((row * N + col)); })
             }, (col: number) => this.cellKey(row * N + col))
           }.width('100%')
         }, (row: number) => 'r' + row)
@@ -185,7 +186,7 @@ export struct GFeatureMatrixRecall {
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
         .enabled(this.phase === 1 && this.pickCount() === PER_COLOR)
         .opacity(this.phase === 1 && this.pickCount() === PER_COLOR ? 1 : 0.5)
-        .onClick(() => { if (this.phase === 2) { this.reset(); } else { this.judge(); } })
+        .onClick(() => { Haptics.tap(); if (this.phase === 2) { this.reset(); } else { this.judge(); } })
 
       Text(TG('只看不抄：3 红 3 蓝，遮蔽后按指定颜色复原'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

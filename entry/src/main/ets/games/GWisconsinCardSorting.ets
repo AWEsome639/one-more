@@ -4,6 +4,7 @@
  * 胜负：18 试次答对 ≥12 ⇒ 通关｜进度：试次 / 答对 / 连对
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -127,7 +128,7 @@ export struct GWisconsinCardSorting {
           Text(MARKS[(i)]).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
           }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md)
           .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.put((i)); })
+          .onClick(() => { Haptics.tick(); this.put((i)); })
         }, (i: number) => 'p' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
@@ -135,7 +136,7 @@ export struct GWisconsinCardSorting {
           : (this.good ? Palette.emerald : this.theme.inkSoft))
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：规则只认颜色 / 形状 / 数量之一，连对 4 次就换')).fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

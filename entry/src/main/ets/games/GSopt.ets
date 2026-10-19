@@ -3,6 +3,7 @@
  * 胜负：撑过 3 轮通关 / 点错 3 次失败
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -152,7 +153,7 @@ export struct GSopt {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.cyan)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
@@ -166,6 +167,6 @@ export struct GSopt {
     }
     .layoutWeight(1).aspectRatio(1).backgroundColor(this.tint(i)).borderRadius(Radius.md)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { this.tap(i); })
+    .onClick(() => { Haptics.tick(); this.tap(i); })
   }
 }

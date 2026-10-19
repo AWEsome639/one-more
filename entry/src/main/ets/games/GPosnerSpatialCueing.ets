@@ -4,6 +4,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -143,14 +144,14 @@ export struct GPosnerSpatialCueing {
       Row({ space: Space.sm }) {
         Button((TG('⬅️ 左边')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(true ? Palette.sky : Palette.violet)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 2).onClick(() => { this.answer((0)); })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 2).onClick(() => { Haptics.tap(); this.answer((0)); })
         Button((TG('右边 ➡️')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(false ? Palette.sky : Palette.violet)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 2).onClick(() => { this.answer((1)); })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 2).onClick(() => { Haptics.tap(); this.answer((1)); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

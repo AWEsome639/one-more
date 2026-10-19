@@ -4,6 +4,7 @@
  * 胜负：5 题答对 ≥4 ⇒ 通关；进度：第几题 / 答对 / 记忆倒计时。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -116,7 +117,7 @@ export struct GSourceMonitoring {
         }, (i: number) => 'st' + i)
         Button(TG('我记好了 ▶'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.teal)
-          .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.toQuiz(); })
+          .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.toQuiz(); })
       } else {
         Column({ space: Space.xs }) {
           Text(TG('这条消息是谁说的？')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -137,7 +138,7 @@ export struct GSourceMonitoring {
         Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-          .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       }
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
@@ -148,6 +149,6 @@ export struct GSourceMonitoring {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.picked === i ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.softBtn(i)).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52))
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.pick(i); })
+      .onClick(() => { Haptics.tap(); this.pick(i); })
   }
 }

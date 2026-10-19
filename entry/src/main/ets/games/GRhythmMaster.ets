@@ -3,6 +3,7 @@
  * 胜负：平均间隔误差 ≤ 150ms ⇒ 通关；进度：阶段 · 已敲 x/4 · 误差
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -125,13 +126,13 @@ export struct GRhythmMaster {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF')
         .backgroundColor(this.phase === 'tap' ? Palette.violet : this.theme.lineSoft)
         .borderRadius(Radius.lg).width('100%').height(Cell.of(84))
-        .onClick(() => { this.tapBeat(); })
+        .onClick(() => { Haptics.tap(); this.tapBeat(); })
       Text(this.msg).fontSize(FontSize.sm).textAlign(TextAlign.Center).width('100%')
         .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft)
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：4 下平均间隔误差 ≤ 150 ms（目标间隔 600 ms）'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

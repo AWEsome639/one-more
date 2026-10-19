@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -297,6 +298,7 @@ export struct GBlockEscape {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('认输'))
@@ -308,6 +310,7 @@ export struct GBlockEscape {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             if (!this.finished) {
               this.done = true;
               this.status = TG('已认输');
@@ -361,6 +364,7 @@ export struct GBlockEscape {
     .borderColor('#FFFFFF')
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.tap(cell);
     })
   }
@@ -382,6 +386,7 @@ export struct GBlockEscape {
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
       .onClick(() => {
+        Haptics.tick();
         this.go(dir);
       })
   }

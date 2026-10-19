@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -252,6 +253,7 @@ export struct GTennerGrid {
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               if (this.over) {
               return;
               }
@@ -278,6 +280,7 @@ export struct GTennerGrid {
             .borderRadius(Radius.sm)
             .shadow(Shadow.card)
             .onClick(() => {
+            Haptics.tick();
             this.place((d));
             })
           }, (d: number) => 'd' + d)
@@ -296,6 +299,7 @@ export struct GTennerGrid {
             .borderRadius(Radius.sm)
             .shadow(Shadow.card)
             .onClick(() => {
+            Haptics.tick();
             this.place((d));
             })
           }, (d: number) => 'e' + d)
@@ -321,6 +325,7 @@ export struct GTennerGrid {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

@@ -4,6 +4,7 @@
  * 胜负：6 题答对 ≥4 ⇒ 通关；进度：题号 / 答对 / 光源角度。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -151,7 +152,7 @@ export struct GShadowPivot {
         .borderColor(this.picked >= 0 || this.over
         ? ((0) === this.answerAt ? Palette.emerald : Palette.rose) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pick((0)); })
+        .onClick(() => { Haptics.tick(); this.pick((0)); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
         ForEach(ROWS, (r: number) => {
@@ -169,7 +170,7 @@ export struct GShadowPivot {
         .borderColor(this.picked >= 0 || this.over
         ? ((1) === this.answerAt ? Palette.emerald : Palette.rose) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pick((1)); })
+        .onClick(() => { Haptics.tick(); this.pick((1)); })
       }.width('100%')
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
@@ -189,7 +190,7 @@ export struct GShadowPivot {
         .borderColor(this.picked >= 0 || this.over
         ? ((2) === this.answerAt ? Palette.emerald : Palette.rose) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pick((2)); })
+        .onClick(() => { Haptics.tick(); this.pick((2)); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
         ForEach(ROWS, (r: number) => {
@@ -207,14 +208,14 @@ export struct GShadowPivot {
         .borderColor(this.picked >= 0 || this.over
         ? ((3) === this.answerAt ? Palette.emerald : Palette.rose) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pick((3)); })
+        .onClick(() => { Haptics.tick(); this.pick((3)); })
       }.width('100%')
       Text(this.note).fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

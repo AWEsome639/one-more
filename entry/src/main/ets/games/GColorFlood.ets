@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -210,6 +211,7 @@ export struct GColorFlood {
           }
           })
           .onClick(() => {
+          Haptics.tick();
           this.pick((i));
           })
         }, (i: number) => 'cfp' + i)
@@ -235,6 +237,7 @@ export struct GColorFlood {
           .width(96)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

@@ -4,6 +4,7 @@
  * 胜负：展开后与目标完全一致 ⇒ 通关；步数用尽还没对上 ⇒ 失败。　进度：已打孔 / 步数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -122,7 +123,7 @@ export struct GPaperFolding {
                 // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
                 .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                   .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-                .onClick(() => { this.punch((r * this.diffTotal + c)); }) }, (c: number) => 'fc' + c)
+                .onClick(() => { Haptics.tick(); this.punch((r * this.diffTotal + c)); }) }, (c: number) => 'fc' + c)
               }.width('100%')
             }, (r: number) => 'fr' + r)
           }.width('100%').aspectRatio(1).padding(Space.xs)
@@ -162,7 +163,7 @@ export struct GPaperFolding {
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

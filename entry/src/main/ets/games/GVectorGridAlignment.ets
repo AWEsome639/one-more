@@ -3,6 +3,7 @@
  *  胜负：5 个向量全对齐 ⇒ 通关；某回合步数用尽还没对齐 ⇒ 失败 */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -145,24 +146,28 @@ export struct GVectorGridAlignment {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.move((-1), (0));
         })
         Button(('↑'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.move((0), (-1));
         })
         Button(('↓'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.move((0), (1));
         })
         Button(('→'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.move((1), (0));
         })
       }.width('100%')
@@ -170,6 +175,7 @@ export struct GVectorGridAlignment {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46)).onClick(() => {
+          Haptics.tap();
           this.reset();
         })
       Text(TG('提示：走错一步要花两步补回来，步数很紧')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')

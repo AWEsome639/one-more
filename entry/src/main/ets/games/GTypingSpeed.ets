@@ -3,6 +3,7 @@
  * 胜负：5 句都在 25 秒内打完且正确率 ≥ 90% 通关 ｜ 进度：第几句 / WPM / 正确率 / 剩余秒
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -167,7 +168,7 @@ export struct GTypingSpeed {
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(TG('提示：不区分大小写；25 秒没打完算这句错')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

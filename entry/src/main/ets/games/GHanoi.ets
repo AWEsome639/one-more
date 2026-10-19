@@ -5,6 +5,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -150,6 +151,7 @@ export struct GHanoi {
           .shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+            Haptics.tick();
             this.tap(p);
           })
         }, (p: number) => 'peg' + p)
@@ -168,6 +170,7 @@ export struct GHanoi {
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset(this.level);
           })
         Button(this.level === 3 ? '升到 4 盘' : (this.level === 4 ? '升到 5 盘' : '回到 3 盘'))
@@ -176,6 +179,7 @@ export struct GHanoi {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.level = this.level === 3 ? 4 : (this.level === 4 ? 5 : 3);
             this.reset(this.level);
           })

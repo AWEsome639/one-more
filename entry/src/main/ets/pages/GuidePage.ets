@@ -12,6 +12,7 @@
 
 import { router } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Accent } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 // ★★★ 2026-10-16 BUG #26 补完：★ 指南页的游戏名/分类/说明原来用【原文】直接渲染
 //   ⇒ 阿语下显示【中文】⇒ 改用 GameRegistry 的本地化助手（GameCard 用的就是这套）
 import { findGame, GameMeta, GameCategory, displayName, displayTagline, catLabelEn } from '../core/GameRegistry';
@@ -147,7 +148,14 @@ struct GuidePage {
           .width(44).height(44).textAlign(TextAlign.Center)
           .backgroundColor(this.theme().surface).borderRadius(Radius.full)
           .shadow(Shadow.card)
+          // ★ 2026-10-19 自查 A6：这个返回键原来点了没反馈、也没触感
+          //   （GameHost 顶栏那个有 IconPress 缩放，这里补齐一致的手感）
+          .stateStyles({
+            pressed: { .scale({ x: 0.9, y: 0.9 }).opacity(0.85) },
+            normal: { .scale({ x: 1, y: 1 }).opacity(1) }
+          })
           .onClick(() => {
+            Haptics.tap();
             router.back();
           })
         Text(this.isPrivacy ? this.t('隐私政策', 'Privacy policy') : this.t('怎么玩', 'How to play'))
@@ -160,10 +168,26 @@ struct GuidePage {
 
       Scroll() {
         Column({ space: Space.lg }) {
+          // ★ 2026-10-19：两块内容切换原来是"啪"一下换掉
+          //   ⇒ 各自包一层带过渡的 Column（淡入 + 轻微上浮），跟全应用进场语言一致
           if (this.isPrivacy) {
-            this.privacyBody()
+            Column({ space: Space.lg }) {
+              this.privacyBody()
+            }
+            .width('100%')
+            .transition(TransitionEffect.OPACITY
+              .animation({ duration: Motion.base, curve: Motion.spring() })
+              .combine(TransitionEffect.translate({ y: 8 })
+                .animation({ duration: Motion.base, curve: Motion.spring() })))
           } else {
-            this.guideBody()
+            Column({ space: Space.lg }) {
+              this.guideBody()
+            }
+            .width('100%')
+            .transition(TransitionEffect.OPACITY
+              .animation({ duration: Motion.base, curve: Motion.spring() })
+              .combine(TransitionEffect.translate({ y: 8 })
+                .animation({ duration: Motion.base, curve: Motion.spring() })))
           }
         }
         .width('100%')
@@ -273,6 +297,7 @@ struct GuidePage {
       .backgroundColor(this.accentColor()).borderRadius(Radius.md)
       .width('100%').height(46)
       .onClick(() => {
+        Haptics.tap();   // ★ 2026-10-19 按压反馈
         router.back();
       })
   }
@@ -358,7 +383,7 @@ struct GuidePage {
     Column({ space: Space.md }) {
       Text(this.t('一句话', 'In one line'))
         .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
-      Text(this.t('「一局」不联网、不采集、不上传你的任何个人信息。你在应用里的所有记录，都只存在你自己的手机里。', '"One More" does not go online, does not collect, and does not upload any of your personal information. Every record stays on your own phone.'))
+      Text(this.t('「One More」不采集你的个人信息，也不上传你的游戏记录。所有记录只存在你自己的手机里。需联网的只有两项：局域网对战、华为游戏服务的账号校验。', '"One More" does not collect your personal information and never uploads your game records. Everything stays on your device. Only two features use the network: LAN play and Huawei Game Service account check.'))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.theme().ink)
         .lineHeight(24)
@@ -370,17 +395,17 @@ struct GuidePage {
     .borderRadius(Radius.lg)
     .shadow(Shadow.card)
 
-    this.sec('一、我们不收集哪些信息', '1. What we do not collect', '本应用不收集、不存储、不传输：姓名/手机号/邮箱等身份信息、通讯录、通话记录、短信、位置信息、相册与相机内容、麦克风内容、设备标识符（IMEI/OAID/MAC）、应用安装列表、剪贴板、网络访问记录。\n\n关于网络权限：本应用**只申请了网络权限与 Wi-Fi 信息两项**，且**只用于「局域网对战」** —— 让同一 Wi-Fi 下的两台设备互相找到并直连。**除此之外**，本应用未申请位置、相机、麦克风、通讯录、日历、电话、短信、存储读写等任何敏感权限。\n\n局域网对战**不连接互联网、不上传任何数据**：消息只在同一 Wi-Fi 内的两台设备之间直接传输，一局结束即断开。其余 353 款游戏与全部记录、统计**完全离线**，飞行模式下照常可玩。', 'This app does not collect, store or transmit: identity information such as your name, phone number or email; contacts; call logs; text messages; location; photos or camera content; microphone content; device identifiers (IMEI / OAID / MAC); your list of installed apps; the clipboard; or any record of network access.\n\nAbout network access: this app requests only two permissions — network and Wi-Fi information — and uses them solely for LAN play, so two devices on the same Wi-Fi can find each other and connect directly. Beyond that, no location, camera, microphone, contacts, calendar, phone, SMS or storage permissions are requested.\n\nLAN play never connects to the internet and never uploads anything: messages travel directly between the two devices on your Wi-Fi and the connection closes when the round ends. The other 353 games, along with all records and statistics, stay completely offline and work in airplane mode.')
+    this.sec('一、我们不收集哪些信息', '1. What we do not collect', '本应用不收集、不存储、不传输：姓名/手机号/邮箱等身份信息、通讯录、通话记录、短信、位置信息、相册与相机内容、麦克风内容、设备标识符（IMEI/OAID/MAC）、应用安装列表、剪贴板、网络访问记录。\n\n关于网络权限：本应用**只申请了网络权限与 Wi-Fi 信息两项**，用于两件事：① **「局域网对战」** —— 让同一 Wi-Fi 下的两台设备互相找到并直连；② **华为游戏服务的账号校验** —— 应用市场对游戏类目的合规要求（防沉迷），由华为 SDK 完成，本应用不接触校验内容。**除此之外**，本应用未申请位置、相机、麦克风、通讯录、日历、电话、短信、存储读写等任何敏感权限。\n\n局域网对战**不经过任何服务器**：消息只在同一 Wi-Fi 内的两台设备之间直接传输，一局结束即断开。其余 353 款游戏与全部记录、统计**完全离线**，飞行模式下照常可玩。', 'This app does not collect, store or transmit: identity information such as your name, phone number or email; contacts; call logs; text messages; location; photos or camera content; microphone content; device identifiers (IMEI / OAID / MAC); your list of installed apps; the clipboard; or any record of network access.\n\nAbout network access: this app requests only two permissions — network and Wi-Fi information — and uses them solely for LAN play, so two devices on the same Wi-Fi can find each other and connect directly. Beyond that, no location, camera, microphone, contacts, calendar, phone, SMS or storage permissions are requested.\n\nLAN play never connects to the internet and never uploads anything: messages travel directly between the two devices on your Wi-Fi and the connection closes when the round ends. The other 353 games, along with all records and statistics, stay completely offline and work in airplane mode.')
 
     this.sec('二、应用会在本地保存什么', '2. What is stored on your device', '为了让「等级」「连胜」「今日打卡」正常工作，本应用会在你手机上存下这些：累计经验值、各游戏通关次数与最佳成绩、连胜天数、最近一次游玩日期、深色模式开关、收藏与最近玩过的游戏。\n\n这些数据只存在应用自己的文件夹里，别的应用读不到；不会传到任何服务器；不含任何能认出你是谁的信息；把应用卸载掉，它们就一起没了。', 'To make Level, Streak and the Daily Pick work, the app stores these on your phone: total XP, clears and best scores per game, streak days, the date you last played, the dark-mode switch, your saves and recently played games.\n\nThis data lives only inside the app own folder, so no other app can read it. It is never sent to any server, it contains nothing that could identify you, and uninstalling the app removes it all.')
 
-    this.sec('三、第三方服务', '3. Third-party services', '本应用没有接入任何第三方 SDK（SDK 就是别人写好的代码包）—— 没有广告的、没有统计分析的、没有崩溃上报的、没有社交分享的、没有支付的、也没有推送的。\n\n本应用不含任何广告，不含任何内购，不产生任何费用。', 'The app includes no third-party SDKs (an SDK is a pre-written code package) — none for ads, none for analytics, none for crash reporting, none for social sharing, none for payments and none for push notifications.\n\nThe app has no ads, no in-app purchases and costs nothing.')
+    this.sec('三、第三方服务', '3. Third-party services', '本应用只接入了一个第三方组件：**华为 Game Service Kit** —— 用于上面提到的账号校验，属应用市场对游戏类目的合规要求。除此之外没有接入任何其他 SDK（SDK 就是别人写好的代码包）—— 没有广告的、没有统计分析的、没有崩溃上报的、没有社交分享的、没有支付的、也没有推送的。\n\n本应用不含任何广告，不含任何内购，不产生任何费用。', 'The app includes no third-party SDKs (an SDK is a pre-written code package) — none for ads, none for analytics, none for crash reporting, none for social sharing, none for payments and none for push notifications.\n\nThe app has no ads, no in-app purchases and costs nothing.')
 
     this.sec('四、桌面服务卡片', '4. Home screen widget', '本应用提供桌面服务卡片（显示等级、连胜与今日打卡状态）。卡片读取的数据与主应用完全相同，均来自上述本地存储，不涉及任何额外的信息收集或网络传输。', 'The app offers a home-screen widget showing your level, streak and daily check-in. The widget reads exactly the same data as the main app, all of it from the local storage described above, and involves no extra data collection or network transfer.')
 
     this.sec('五、未成年人保护', '5. Protection of minors', '本应用为全年龄向休闲益智游戏合集，内容为经典益智玩法（数字合并、扫雷、数独等），不含暴力、色情、赌博、恐怖或其他不适宜内容，不含社交功能，不含用户间交流，不含任何付费项目。由于不收集任何个人信息，因此不存在未成年人个人信息被收集的风险。', 'This is an all-ages collection of classic puzzle games (number merging, minesweeper, sudoku and so on). It contains no violence, sexual content, gambling, horror or anything else unsuitable, no social features, no user-to-user messaging and no paid items. Because no personal information is collected at all, there is no risk of personal information from a minor being gathered.')
 
-    this.sec('六、你的权利', '6. Your rights', '你对自己的本地数据拥有完全控制权：\n· 清除数据：系统「设置 → 应用 → 一局 → 存储 → 清除数据」\n· 彻底删除：卸载应用即可\n· 也可以在应用「设置 → 重置进度」里一键清空', 'You have full control over your local data:\n· Clear data: Settings → Apps → One More → Storage → Clear data\n· Delete completely: uninstall the app\n· Or use Reset progress inside the app to wipe everything in one tap')
+    this.sec('六、你的权利', '6. Your rights', '你对自己的本地数据拥有完全控制权：\n· 清除数据：系统「设置 → 应用 → One More → 存储 → 清除数据」\n· 彻底删除：卸载应用即可\n· 也可以在应用「设置 → 重置进度」里一键清空', 'You have full control over your local data:\n· Clear data: Settings → Apps → One More → Storage → Clear data\n· Delete completely: uninstall the app\n· Or use Reset progress inside the app to wipe everything in one tap')
 
     this.sec('七、合规声明', '7. Compliance', '本应用为个人开发者独立开发的休闲益智游戏合集：\n· 全部代码为原创编写（ArkTS / ArkUI 原生开发）\n· 玩法均为公有领域的经典益智玩法\n· 未复制、未改编任何第三方项目的代码、美术资源或名称\n· 未使用任何第三方依赖库\n· 图标与界面视觉均为原创设计', 'This is a casual puzzle collection independently developed by a solo developer:\n· All code is originally written (native ArkTS / ArkUI)\n· All gameplay comes from classic puzzles in the public domain\n· No code, artwork or name from any third-party project has been copied or adapted\n· No third-party dependency libraries are used\n· The icon and all interface visuals are original designs')
 

@@ -4,6 +4,7 @@
  * 胜负：连过 6 轮（路径 3→8 格）⇒ 通关；点错一格 ⇒ 失败。　进度：轮次 / 路径长度 / 已点
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -146,7 +147,7 @@ export struct GPathRecall {
             .backgroundColor(this.lit((r * this.diffTotal + c)) ? Palette.sky : this.theme.surfaceAlt)
             .borderRadius(Radius.md)
             .animation({ duration: Motion.fast, curve: Motion.snap() })
-            .onClick(() => { this.tap((r * this.diffTotal + c)); }) }, (c: number) => 'c' + c)
+            .onClick(() => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('86%').aspectRatio(1)
@@ -160,7 +161,7 @@ export struct GPathRecall {
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

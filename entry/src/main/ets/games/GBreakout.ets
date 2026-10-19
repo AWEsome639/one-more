@@ -16,6 +16,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -424,6 +425,7 @@ export struct GBreakout {
           }
         })
         .onClick(() => {
+          Haptics.tick();
           this.launch();
         })
         .gesture(
@@ -452,6 +454,7 @@ export struct GBreakout {
           .height(BTN_H)
           .enabled(!this.over && !this.won)
           .onClick(() => {
+            Haptics.tap();
             if (!this.launched) {
               this.launch();
             } else {
@@ -467,6 +470,7 @@ export struct GBreakout {
           .layoutWeight(1)
           .height(BTN_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

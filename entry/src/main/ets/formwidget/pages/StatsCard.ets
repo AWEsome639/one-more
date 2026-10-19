@@ -12,6 +12,8 @@ interface CardData {
   today: string;
   solved: string;
   pct: string;
+  footer: string;
+  done: string;
 }
 
 const storage = new LocalStorage();
@@ -25,16 +27,22 @@ struct StatsCard {
   @LocalStorageProp('today') today: string = '今天还没玩';
   @LocalStorageProp('solved') solved: string = '0';
   @LocalStorageProp('pct') pct: string = '0';
+  // ★ 2026-10-19 自查 A2：底部文案改为 Ability 注入（已本地化）
+  @LocalStorageProp('footer') footer: string = '累计 0 局 · 点我开一局';
+  // ★ '1' = 今日已打卡。原来靠 today.indexOf('已') 判断 ⇒ 一旦本地化就永远判成"没玩"
+  @LocalStorageProp('done') done: string = '0';
 
   private played(): boolean {
-    return this.today.indexOf('已') >= 0;
+    // ★ 2026-10-19 修：原来是 today.indexOf('已') ≥ 0 —— 只对中文成立；
+    //   本地化后（"Checked in today"）永不命中 ⇒ 打卡状态永远是"没玩"
+    return this.done === '1';
   }
 
   build() {
     Column({ space: 8 }) {
       // 顶行：名字 + 连胜
       Row() {
-        Text('一局')
+        Text('One More')
           .fontSize(13)
           .fontWeight(FontWeight.Bold)
           .fontColor('#F8FAFC')
@@ -82,7 +90,8 @@ struct StatsCard {
       }
       .width('100%').height(5)
 
-      Text('累计 ' + this.solved + ' 局 · 点我开一局')
+      // ★ 2026-10-19 自查 A2：底部文案由 FormExtensionAbility 本地化后注入
+      Text(this.footer)
         .fontSize(9)
         .fontColor('#94A3B8')
     }

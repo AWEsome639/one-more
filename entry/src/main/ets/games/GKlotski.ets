@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -236,6 +237,7 @@ export struct GKlotski {
         .width('100%')
         .height(Cell.of(44))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
     }
@@ -291,6 +293,7 @@ export struct GKlotski {
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.sel = i;
       this.tip = TG2("{0} 已选中，点方向键移动", this.blocks[i].label);
     })
@@ -335,6 +338,7 @@ export struct GKlotski {
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
       .onClick(() => {
+        Haptics.tick();
         this.tryMove(dx, dy);
       })
   }

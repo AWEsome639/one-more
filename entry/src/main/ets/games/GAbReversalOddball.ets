@@ -4,6 +4,7 @@
  * 胜负：24 帧内命中 ≥5 且误报 ≤2 通关　进度：帧号 / 命中 / 误报 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -135,7 +136,7 @@ export struct GAbReversalOddball {
 
       Button(TG('反转！'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(64)).onClick(() => { this.tapFlip(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(64)).onClick(() => { Haptics.tap(); this.tapFlip(); })
 
       Row({ space: Space.sm }) {
         Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : '正在跑…')
@@ -144,7 +145,7 @@ export struct GAbReversalOddball {
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).enabled(false)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }
       .width('100%')
 

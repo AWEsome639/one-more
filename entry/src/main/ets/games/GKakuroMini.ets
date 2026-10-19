@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -316,6 +317,7 @@ export struct GKakuroMini {
           .backgroundColor(Palette.teal).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('重开'))
@@ -324,6 +326,7 @@ export struct GKakuroMini {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }
@@ -401,6 +404,7 @@ export struct GKakuroMini {
     .border({ width: this.sel === i ? 2 : 1, color: this.sel === i ? Palette.primary : this.theme.line })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.tapCell(i);
     })
   }
@@ -416,6 +420,7 @@ export struct GKakuroMini {
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
       .onClick(() => {
+        Haptics.tick();
         this.put(d);
       })
   }
@@ -431,6 +436,7 @@ export struct GKakuroMini {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.sm)
       .onClick(() => {
+        Haptics.tick();
         this.backspace();
       })
   }

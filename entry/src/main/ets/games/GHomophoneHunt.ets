@@ -3,6 +3,7 @@
  * 胜负：10 题答对 ≥6 通关｜进度：题号 / 答对 / 剩余秒数（点错罚 2 秒）
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -137,22 +138,22 @@ export struct GHomophoneHunt {
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
           Button(this.cur().opts[(0)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(this.cur().opts[(0)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(0)]); })
           Button(this.cur().opts[(1)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(this.cur().opts[(1)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(1)]); })
         }.width('100%')
         Row({ space: Space.sm }) {
           Button(this.cur().opts[(2)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(this.cur().opts[(2)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(2)]); })
           Button(this.cur().opts[(3)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick(this.cur().opts[(3)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(3)]); })
         }.width('100%')
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2("{0} 题，每题 {1} 秒；答对 ≥{2} 通关",Digits(String(QN), this.langCode),Digits(String(this.diffTotal), this.langCode), PASS)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

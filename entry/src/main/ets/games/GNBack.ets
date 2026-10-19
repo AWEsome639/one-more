@@ -1,5 +1,6 @@
 /** N-back —— 每步判断当前字母与 2 步前那个是否相同；12 试次答对 ≥9 通关 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -145,7 +146,7 @@ export struct GNBack {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：前 2 个字母只是热身，从第 3 个起才计分'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
@@ -169,6 +170,6 @@ export struct GNBack {
       .layoutWeight(1).height(Cell.of(52)).backgroundColor(same ? Palette.amber : Palette.inkSoft).borderRadius(Radius.md)
       .opacity(!this.warm() && this.pick < 0 && !this.over ? 1 : 0.4).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer(same); })
+      .onClick(() => { Haptics.tick(); this.answer(same); })
   }
 }

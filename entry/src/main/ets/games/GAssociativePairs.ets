@@ -3,6 +3,7 @@
  * 胜负：8 题拿满 600 分以上 ⇒ 通关；进度：题号 / 连对 / 用时
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -156,35 +157,35 @@ export struct GAssociativePairs {
       .borderRadius(Radius.md).shadow(Shadow.card)
       .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer((0)); }); Text(this.opts[(1)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+      .onClick(() => { Haptics.tick(); this.answer((0)); }); Text(this.opts[(1)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
       .width('100%').height(Cell.of(52))
       .backgroundColor(this.pick === (1) ? (this.opts[(1)].ok ? Palette.emerald : Palette.rose) : this.theme.surfaceAlt)
       .borderRadius(Radius.md).shadow(Shadow.card)
       .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer((1)); }); Text(this.opts[(2)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+      .onClick(() => { Haptics.tick(); this.answer((1)); }); Text(this.opts[(2)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (2) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
       .width('100%').height(Cell.of(52))
       .backgroundColor(this.pick === (2) ? (this.opts[(2)].ok ? Palette.emerald : Palette.rose) : this.theme.surfaceAlt)
       .borderRadius(Radius.md).shadow(Shadow.card)
       .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer((2)); }); Text(this.opts[(3)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+      .onClick(() => { Haptics.tick(); this.answer((2)); }); Text(this.opts[(3)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (3) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
       .width('100%').height(Cell.of(52))
       .backgroundColor(this.pick === (3) ? (this.opts[(3)].ok ? Palette.emerald : Palette.rose) : this.theme.surfaceAlt)
       .borderRadius(Radius.md).shadow(Shadow.card)
       .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer((3)); }) }.width('100%')
+      .onClick(() => { Haptics.tick(); this.answer((3)); }) }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
         .fontColor(this.fb === 1 ? Palette.rose : (this.fb === 0 ? Palette.emerald : this.theme.inkSoft))
         .width('100%').textAlign(TextAlign.Center)
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG2('用时 {0}s · 连对越长分越高',Digits(String(this.clock), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

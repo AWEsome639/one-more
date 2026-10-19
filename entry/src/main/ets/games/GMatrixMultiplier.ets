@@ -4,6 +4,7 @@
  * 胜负：60 秒内答对 8 题 ⇒ 通关；时间归零 ⇒ 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -218,7 +219,7 @@ export struct GMatrixMultiplier {
         .scale({ x: this.press === (i) ? Motion.pressScale : 1, y: this.press === (i) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onTouch((e: TouchEvent) => { this.press = e.type === TouchType.Down ? (i) : -1; })
-        .onClick(() => { this.pick((i)); }) }, (i: number) => 'mo' + i)
+        .onClick(() => { Haptics.tick(); this.pick((i)); }) }, (i: number) => 'mo' + i)
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).width('100%')
@@ -228,7 +229,7 @@ export struct GMatrixMultiplier {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：C(r,c) = A[r][0]×B[0][c] + A[r][1]×B[1][c]'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

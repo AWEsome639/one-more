@@ -1,5 +1,6 @@
 /** 不等式冲刺 —— 限时解不等式；玩法：把 ax + c ⋚ k 解成 x 的范围，四选一，60 秒内尽量多答；胜负：答对 8 题 ⇒ 通关；时间到 ⇒ 按答对数判失败 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -149,7 +150,7 @@ export struct GInequalityDash {
               Stack() {
               Text('x ' + this.opts[(row * 2 + col)]).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.btnInk((row * 2 + col)))
               }.layoutWeight(1).height(Cell.of(56)).backgroundColor(this.btnBg((row * 2 + col))).borderRadius(Radius.md).shadow(Shadow.card)
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick((row * 2 + col)); })
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((row * 2 + col)); })
             }, (col: number) => 'idc' + col)
           }.width('100%')
         }, (row: number) => 'idr' + row)
@@ -162,7 +163,7 @@ export struct GInequalityDash {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：ax + c > k ⇒ x > (k−c)/a；两边同除负数才要变号')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

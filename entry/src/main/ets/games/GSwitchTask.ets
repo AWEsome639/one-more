@@ -3,6 +3,7 @@
  * 胜负：12 轮答对 ≥9 ⇒ 通关；进度：轮次 / 答对 / 本轮规则
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -135,7 +136,7 @@ export struct GSwitchTask {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((0)); })
+        .onClick(() => { Haptics.tick(); this.answer((0)); })
         Text(this.optName((1))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
         .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
@@ -143,7 +144,7 @@ export struct GSwitchTask {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((1)); })
+        .onClick(() => { Haptics.tick(); this.answer((1)); })
       }.width('100%')
 
       Button(this.over ? TG('再来一局') : TG('重开'))
@@ -152,7 +153,7 @@ export struct GSwitchTask {
         .onTouch((e: TouchEvent) => { this.pressed = e.type === TouchType.Down; })
         .scale({ x: this.pressed ? Motion.pressScale : 1, y: this.pressed ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：数字不变，换规则那几轮手会明显慢一拍'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

@@ -143,7 +143,8 @@ export class UiModeMgr {
     if (mode === UiMode.SIMPLE) {
       return 'Tighter — more per screen';
     }
-    return 'As it is now';
+    // ★ 2026-10-19 修：原来 'As it is now' 是相对说法，切走之后就成了假话
+    return 'Standard text & spacing';
   }
 
   static descOf(mode: string): string {
@@ -154,7 +155,8 @@ export class UiModeMgr {
       return '更紧凑，一屏看更多';
     // 注意：ZHTW/外语下这两个串会走 I18n 的 L()，见 SettingsTab 调用处
     }
-    return '现在的样子';
+    // ★ 2026-10-19 修：绝对描述（原「现在的样子」= 相对说法，切走即失真）
+    return '标准字号与间距';
   }
 
   /** 给 UI 遍历用 */

@@ -4,6 +4,7 @@
  * 胜负：64 格全部一致 ⇒ 通关；步数用尽还没画对 ⇒ 失败。　进度：对上几格 / 步数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -136,6 +137,7 @@ export struct GPixelMimic {
           .backgroundColor(this.pixOf((1), r * this.diffTotal + c) ? Palette.amber : this.theme.surfaceAlt)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tick();
           if (false) { this.paint(r * this.diffTotal + c); }
           })
           }, (c: number) => (true ? 'gc' : 'pc') + c)
@@ -154,6 +156,7 @@ export struct GPixelMimic {
           .backgroundColor(this.pixOf((0), r * this.diffTotal + c) ? Palette.amber : this.theme.surfaceAlt)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tick();
           if (true) { this.paint(r * this.diffTotal + c); }
           })
           }, (c: number) => (false ? 'gc' : 'pc') + c)
@@ -170,7 +173,7 @@ export struct GPixelMimic {
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

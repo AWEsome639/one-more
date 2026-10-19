@@ -3,6 +3,7 @@
  * 胜负：40 个刺激里命中 ≥6 且误报 ≤3 ⇒ 通关；进度：进度 / 命中 / 误报 / 漏报
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -154,12 +155,12 @@ export struct GVigilanceTask {
         .onTouch((e: TouchEvent) => { this.pressing = e.type === TouchType.Down; })
         .scale({ x: this.pressing ? Motion.pressScale : 1, y: this.pressing ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.strike(); })
+        .onClick(() => { Haptics.tick(); this.strike(); })
 
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primaryDeep).borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：这一局考的是「忍住」—— 乱点扣分，漏掉也扣分'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

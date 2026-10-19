@@ -3,6 +3,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -231,7 +232,7 @@ export struct GDigitSwapEq {
             .fontColor(this.pickA === (this.puz.tokens[i]).pos ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
             .width(Space.xxxl).height(Space.xxxl)
             .backgroundColor(this.pickA === (this.puz.tokens[i]).pos ? Palette.lime : this.theme.surfaceAlt).borderRadius(Radius.xs)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tapDigit((this.puz.tokens[i]).pos); })
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapDigit((this.puz.tokens[i]).pos); })
             }
           }, (i: number) => 't' + i)
         }.width('100%')
@@ -242,7 +243,7 @@ export struct GDigitSwapEq {
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.lime).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .backgroundColor(Palette.lime).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('运算符位置不会变')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

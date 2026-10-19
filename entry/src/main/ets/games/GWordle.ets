@@ -8,6 +8,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -277,6 +278,7 @@ export struct GWordle {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Text(this.status)
@@ -344,6 +346,7 @@ export struct GWordle {
       .backgroundColor(this.keyBg(ch))
       .borderRadius(Radius.xs)
       .onClick(() => {
+        Haptics.tick();
         this.tapKey(ch);
       })
   }

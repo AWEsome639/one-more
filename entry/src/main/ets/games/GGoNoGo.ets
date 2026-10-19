@@ -3,6 +3,7 @@
  * 胜负：20 试里正确 ≥ 17 且误点 ≤ 1 ⇒ 通关；进度：试次 / 正确 / 误点
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -171,14 +172,14 @@ export struct GGoNoGo {
         .borderRadius(Radius.lg).opacity(this.live ? 1 : 0.5)
         .scale({ x: this.fbMark === 2 ? Motion.pressScale : 1, y: this.fbMark === 2 ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.tap(); })
+        .onClick(() => { Haptics.tick(); this.tap(); })
 
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.orange)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('判定：正确 ≥ {0}/{1}', String(NEED_CORRECT), String(this.diffTotal))
         + TG2(' 且误点 ≤ {0} 次 · 红灯约四分之一',Digits(String(MAX_FA), this.langCode)))

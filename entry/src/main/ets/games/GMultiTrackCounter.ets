@@ -3,6 +3,7 @@
  * 3 轮，每轮 +1 轮速；误差 ≤ 2 通关。进度：第几轮 / 题数 / 总分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -215,7 +216,7 @@ export struct GMultiTrackCounter {
         .layoutWeight(1)
         .height(Cell.of(48))
         .scale({ x: Motion.pressScale, y: Motion.pressScale })
-        .onClick(() => { this.bump((-1)); })
+        .onClick(() => { Haptics.tap(); this.bump((-1)); })
         Button((1) > 0 ? '+' + String((1)) : String((1)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.lg)
@@ -225,7 +226,7 @@ export struct GMultiTrackCounter {
         .layoutWeight(1)
         .height(Cell.of(48))
         .scale({ x: Motion.pressScale, y: Motion.pressScale })
-        .onClick(() => { this.bump((1)); })
+        .onClick(() => { Haptics.tap(); this.bump((1)); })
         Button((5) > 0 ? '+' + String((5)) : String((5)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.lg)
@@ -235,7 +236,7 @@ export struct GMultiTrackCounter {
         .layoutWeight(1)
         .height(Cell.of(48))
         .scale({ x: Motion.pressScale, y: Motion.pressScale })
-        .onClick(() => { this.bump((5)); })
+        .onClick(() => { Haptics.tap(); this.bump((5)); })
       }
       .width('100%')
       Button('报数：共 ' + String(this.answer) + TG(' 下'))
@@ -246,7 +247,7 @@ export struct GMultiTrackCounter {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(48))
-        .onClick(() => { this.submit(); })
+        .onClick(() => { Haptics.tap(); this.submit(); })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
@@ -255,7 +256,7 @@ export struct GMultiTrackCounter {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：3 轮各报一次，命中 ≤ 2 通关（每差 1 扣 100 分）'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

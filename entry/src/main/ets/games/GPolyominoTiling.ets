@@ -4,6 +4,7 @@
  * 胜负：把所有空格铺满 ⇒ 通关；步数用尽还没铺满 ⇒ 失败。　进度：已铺格数 / 剩余步数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -152,7 +153,7 @@ export struct GPolyominoTiling {
             : (this.board[(r * this.diffTotal + c)] === 1 ? this.theme.line : this.theme.surfaceAlt))
             .borderRadius(Radius.sm)
             .animation({ duration: Motion.fast, curve: Motion.snap() })
-            .onClick(() => { this.place((r * this.diffTotal + c)); }) }, (c: number) => 'c' + c)
+            .onClick(() => { Haptics.tick(); this.place((r * this.diffTotal + c)); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('86%').aspectRatio(1).padding(Space.xs)
@@ -167,7 +168,7 @@ export struct GPolyominoTiling {
         .borderRadius(Radius.sm).borderWidth(2)
         .borderColor(this.sel === (s) ? Palette.teal : this.theme.line)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.sel = (s); }) }, (s: number) => 'sh' + s)
+        .onClick(() => { Haptics.tick(); this.sel = (s); }) }, (s: number) => 'sh' + s)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
@@ -176,7 +177,7 @@ export struct GPolyominoTiling {
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

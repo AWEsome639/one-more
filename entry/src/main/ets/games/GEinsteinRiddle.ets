@@ -5,6 +5,7 @@
  * 胜负：解开 1 题即通关（看提示扣 100 分）　进度：步数 / 线索条数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -188,7 +189,7 @@ export struct GEinsteinRiddle {
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { this.tap(i); })
+    .onClick(() => { Haptics.tick(); this.tap(i); })
   }
 
   build() {
@@ -233,12 +234,12 @@ export struct GEinsteinRiddle {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
           .fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
-          .onClick(() => { this.hintOn = true; })
+          .onClick(() => { Haptics.tap(); this.hintOn = true; })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
           .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md)
-          .onClick(() => { this.reset(); })
+          .onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)

@@ -3,6 +3,7 @@
  * 胜负：8 题里答对 ≥ 6 通关；答错 3 次失败 ｜ 进度：第几题 / 答对数 / 生命 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -139,7 +140,7 @@ export struct GVerbalAnalogies {
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(TG('提示：先想「前者是后者的什么」，再去套第三个词'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -155,6 +156,6 @@ export struct GVerbalAnalogies {
         ? Palette.emerald : (this.locked && this.picked === i ? Palette.rose : this.theme.surface))
       .scale({ x: this.picked === i ? Motion.pressScale : 1, y: this.picked === i ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.tap(i); })
+      .onClick(() => { Haptics.tick(); this.tap(i); })
   }
 }

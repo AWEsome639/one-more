@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -368,6 +369,7 @@ export struct GCrown {
               }
               })
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * N + c));
               })
             }, (c: number) => 'cr' + r + '-' + c)
@@ -391,6 +393,7 @@ export struct GCrown {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         .onClick(() => {
+        Haptics.tick();
         this.mode = (1);
         })
         Text((TG('✕ 标排除')))
@@ -403,6 +406,7 @@ export struct GCrown {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         .onClick(() => {
+        Haptics.tick();
         this.mode = (2);
         })
         Button(TG('重开'))
@@ -414,6 +418,7 @@ export struct GCrown {
           .width(88)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

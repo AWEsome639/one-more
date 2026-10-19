@@ -5,6 +5,7 @@
  * 进度：轮次 / 已答位数 / 心算正确数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -181,7 +182,7 @@ export struct GDualTaskMemory {
             Text(this.qs.length > 0 && (i) < this.qs[this.qIdx].opts.length ? String(this.qs[this.qIdx].opts[(i)]) : '')
             .fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
             .layoutWeight(1).height(Cell.of(56)).backgroundColor(this.pick === (i) ? Palette.primaryDeep : this.theme.surfaceAlt)
-            .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.answerMath((i)); })
+            .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.answerMath((i)); })
           }, (i: number) => 'mb' + i)
         }.width('100%')
       } else if (this.phase === 2) {
@@ -191,7 +192,7 @@ export struct GDualTaskMemory {
               ForEach([0, 1, 2], (c: number) => {
                 Text(String((r * 3 + c + 1))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
                 .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(46)).backgroundColor(this.theme.surfaceAlt)
-                .borderRadius(Radius.sm).onClick(() => { this.tapDigit((r * 3 + c + 1)); })
+                .borderRadius(Radius.sm).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
               }, (c: number) => 'dc' + c)
             }.width('100%')
           }, (r: number) => 'dr' + r)
@@ -202,7 +203,7 @@ export struct GDualTaskMemory {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

@@ -3,6 +3,7 @@
  * 胜负：15 只里抓到 ≥ 12 只 ⇒ 通关；进度：第 n 只 / 抓到 / 溜走
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -158,7 +159,7 @@ export struct GGhostTap {
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-              .onClick(() => { this.tapCell((row * SIZE + col)); })
+              .onClick(() => { Haptics.tick(); this.tapCell((row * SIZE + col)); })
             }, (col: number) => 'c' + col + this.cellColor(row * SIZE + col))
           }.width('100%')
         }, (row: number) => 'r' + row)
@@ -173,7 +174,7 @@ export struct GGhostTap {
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('判定：{0} 只里抓到 {1} 只即通关，点偏会拖慢节奏',Digits(String(this.diffTotal), this.langCode),Digits(String(WIN_HITS), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

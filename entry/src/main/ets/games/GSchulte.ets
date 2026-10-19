@@ -5,6 +5,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -158,6 +159,7 @@ export struct GSchulte {
               .shadow(Shadow.card)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tap((this.nums[r * this.diffTotal + c]), (r * this.diffTotal + c));
               })
             }, (c: number) => 'c' + c)
@@ -179,6 +181,7 @@ export struct GSchulte {
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
     }

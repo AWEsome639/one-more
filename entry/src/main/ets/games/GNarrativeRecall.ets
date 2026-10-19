@@ -1,5 +1,6 @@
 /** 故事回忆 —— 读一段小故事，凭记忆回答细节题；2 篇 6 题答对 ≥5 通关 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -159,7 +160,7 @@ export struct GNarrativeRecall {
         Button(TG('我记住了'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.teal)
           .borderRadius(Radius.md).width('100%').height(Cell.of(46))
-          .onClick(() => { this.phase = 1; this.msg = TG(TG(TG('第 1 题'))); })
+          .onClick(() => { Haptics.tap(); this.phase = 1; this.msg = TG(TG(TG('第 1 题'))); })
       } else if (this.phase === 1 && this.qIdx < this.story.qs.length) {
         ForEach([0, 1, 2], (k: number) => { this.optBtn(k) }, (k: number) => 'o' + k)
       }
@@ -168,7 +169,7 @@ export struct GNarrativeRecall {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：不用背原文，抓住时间、地点、数字与人名'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
@@ -183,6 +184,6 @@ export struct GNarrativeRecall {
       .backgroundColor(this.pick === k ? Palette.primaryDeep : this.theme.surfaceAlt)
       .opacity(this.pick >= 0 && this.pick !== k ? 0.45 : 1)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer(k); })
+      .onClick(() => { Haptics.tick(); this.answer(k); })
   }
 }

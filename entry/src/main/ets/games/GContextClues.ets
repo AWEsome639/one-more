@@ -4,6 +4,7 @@
  * 进度：题号 / 答对数 / 生命 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -136,22 +137,22 @@ export struct GContextClues {
       .fontColor(this.picked >= 0 && ((0) === this.ans || (0) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((0))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.choose((0)); })
+      .onClick(() => { Haptics.tick(); this.choose((0)); })
       Text((this.opts.length > 1 ? this.opts[1] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
       .fontColor(this.picked >= 0 && ((1) === this.ans || (1) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((1))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.choose((1)); })
+      .onClick(() => { Haptics.tick(); this.choose((1)); })
       Text((this.opts.length > 2 ? this.opts[2] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
       .fontColor(this.picked >= 0 && ((2) === this.ans || (2) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((2))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.choose((2)); })
+      .onClick(() => { Haptics.tick(); this.choose((2)); })
       Text((this.opts.length > 3 ? this.opts[3] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
       .fontColor(this.picked >= 0 && ((3) === this.ans || (3) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((3))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.choose((3)); })
+      .onClick(() => { Haptics.tick(); this.choose((3)); })
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%')
         .textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
@@ -159,11 +160,11 @@ export struct GContextClues {
         Button(this.picked < 0 ? '选一个释义' : '下一题 →')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
-          .enabled(this.picked >= 0).onClick(() => { this.nextQ(); })
+          .enabled(this.picked >= 0).onClick(() => { Haptics.tap(); this.nextQ(); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width(96).height(Cell.of(46))
-          .onClick(() => { this.reset(); })
+          .onClick(() => { Haptics.tap(); this.reset(); })
       }
       .width('100%')
     }

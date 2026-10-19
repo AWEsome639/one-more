@@ -4,6 +4,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -127,17 +128,17 @@ export struct GTopology {
         Button((TG('等价（洞数相同）')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor((true) ? Palette.teal : Palette.rose)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).enabled(!this.revealed && !this.over)
-        .onClick(() => { this.answer((true)); })
+        .onClick(() => { Haptics.tap(); this.answer((true)); })
         Button((TG('不等价')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor((false) ? Palette.teal : Palette.rose)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).enabled(!this.revealed && !this.over)
-        .onClick(() => { this.answer((false)); })
+        .onClick(() => { Haptics.tap(); this.answer((false)); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判据是洞的个数：能拉伸、能压扁，洞既不会变多也不会变少')).fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

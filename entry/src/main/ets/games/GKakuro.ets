@@ -11,6 +11,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -327,6 +328,7 @@ export struct GKakuro {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .onClick(() => {
+              Haptics.tick();
               this.tapCell(((r * N + c)));
               })
               } else {
@@ -373,6 +375,7 @@ export struct GKakuro {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.put((d));
           })
         }, (d: number) => 'ka' + d)
@@ -392,6 +395,7 @@ export struct GKakuro {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .onClick(() => {
+          Haptics.tick();
           this.put((d));
           })
         }, (d: number) => 'kb' + d)
@@ -409,6 +413,7 @@ export struct GKakuro {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }
@@ -441,6 +446,7 @@ export struct GKakuro {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.sm)
       .onClick(() => {
+        Haptics.tick();
         this.clearSel();
       })
   }

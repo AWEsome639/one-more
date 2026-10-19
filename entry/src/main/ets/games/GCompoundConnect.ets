@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -334,6 +335,7 @@ export struct GCompoundConnect {
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tap((this.idx(r, c)));
               })
             }, (c: number) => 'c' + c)
@@ -367,6 +369,7 @@ export struct GCompoundConnect {
           .height(Cell.of(46))
           .enabled(!this.over && this.path.length > 0)
           .onClick(() => {
+            Haptics.tap();
             const p: number[] = this.path.slice();
             p.pop();
             this.path = p;
@@ -382,6 +385,7 @@ export struct GCompoundConnect {
           .height(Cell.of(46))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.path = [];
             this.msg = TG('从左上角重新起步');
           })
@@ -394,6 +398,7 @@ export struct GCompoundConnect {
           .layoutWeight(1)
           .height(Cell.of(46))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

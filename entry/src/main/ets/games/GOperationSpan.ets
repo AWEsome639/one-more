@@ -5,6 +5,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -187,7 +188,7 @@ export struct GOperationSpan {
         Row({ space: Space.sm }) {
           ForEach(OPT_IDX, (i: number) => { Button(String(this.opts.length > (i) ? this.opts[(i)] : 0))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF').backgroundColor(Palette.orange)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 0).onClick(() => { this.pickOpt(this.opts[(i)]); }) }, (i: number) => 'os' + i)
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 0).onClick(() => { Haptics.tap(); this.pickOpt(this.opts[(i)]); }) }, (i: number) => 'os' + i)
         }.width('100%')
       } else if (this.phase === 1) {
         Column({ space: Space.sm }) {
@@ -196,7 +197,7 @@ export struct GOperationSpan {
               ForEach(COLS, (col: number) => {
                 if (row * 3 + col < this.pool.length) { Button(this.pool[(row * 3 + col)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF').backgroundColor(this.pool[(row * 3 + col)] === '✔' ? Palette.lime : Palette.teal)
-                .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(this.pool[(row * 3 + col)] !== '✔').onClick(() => { this.pickPool((row * 3 + col)); }) }
+                .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(this.pool[(row * 3 + col)] !== '✔').onClick(() => { Haptics.tap(); this.pickPool((row * 3 + col)); }) }
               }, (col: number) => 'pc' + row + '_' + col)
             }.width('100%')
           }, (row: number) => 'pr' + row)
@@ -204,7 +205,7 @@ export struct GOperationSpan {
       }
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：算对不算完 —— 题目全部结束后还要按顺序回忆结果')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

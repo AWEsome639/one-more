@@ -3,6 +3,7 @@
  *  胜负：10 题答对 ≥8 ⇒ 通关；否则失败 */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -159,6 +160,7 @@ export struct GUnitConverterPro {
         : this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.submit((0));
         })
         Button(this.opts.length > (1) ? this.opts[(1)] : '—')
@@ -168,6 +170,7 @@ export struct GUnitConverterPro {
         : this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.submit((1));
         })
       }.width('100%')
@@ -179,6 +182,7 @@ export struct GUnitConverterPro {
         : this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.submit((2));
         })
         Button(this.opts.length > (3) ? this.opts[(3)] : '—')
@@ -188,6 +192,7 @@ export struct GUnitConverterPro {
         : this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
+        Haptics.tap();
         this.submit((3));
         })
       }.width('100%')
@@ -195,6 +200,7 @@ export struct GUnitConverterPro {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46)).onClick(() => {
+          Haptics.tap();
           this.reset();
         })
       Text(TG('提示：长度 10 进、数据 1024 进、时间 60 进')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')

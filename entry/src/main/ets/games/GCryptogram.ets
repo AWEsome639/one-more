@@ -3,6 +3,7 @@
  * 胜负：8 关解出 ≥6 关通关，错 3 次即失败；每揭一条「密文→明文」映射扣 30 分
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -163,7 +164,7 @@ export struct GCryptogram {
         Button(TG('提交'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.teal)
           .borderRadius(Radius.md).width(84).height(Cell.of(46)).enabled(!this.over)
-          .onClick(() => { this.submit(); })
+          .onClick(() => { Haptics.tap(); this.submit(); })
       }
       .width('100%')
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%')
@@ -173,10 +174,10 @@ export struct GCryptogram {
         Button(TG('揭一条映射（-30 分）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
-          .enabled(!this.over).onClick(() => { this.hint(); })
+          .enabled(!this.over).onClick(() => { Haptics.tap(); this.hint(); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(46)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       }
       .width('100%')
     }

@@ -3,6 +3,7 @@
  * 胜负：18 步内排成严格递增 ⇒ 通关｜进度：已归位 / 16 + 剩余步数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -130,7 +131,7 @@ export struct GHueSort {
         Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(TG(TG(TG('正确顺序：左上 → 右下，色相 0° 递增到 337°'))))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -147,6 +148,6 @@ export struct GHueSort {
     .backgroundColor(hueColor(this.hues[i]))
     .borderRadius(Radius.sm).borderWidth(this.sel === i ? 3 : 0).borderColor('#FFFFFF')
     .animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { this.tap(i); })
+    .onClick(() => { Haptics.tick(); this.tap(i); })
   }
 }

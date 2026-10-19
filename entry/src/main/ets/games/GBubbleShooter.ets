@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -288,6 +289,7 @@ export struct GBubbleShooter {
               .layoutWeight(1)
               .aspectRatio(1)
               .onClick(() => {
+              Haptics.tick();
               this.fire((c));
               })
             }, (c: number) => 'c' + c)
@@ -338,6 +340,7 @@ export struct GBubbleShooter {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
 

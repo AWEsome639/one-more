@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -238,6 +239,7 @@ export struct GBalanceScale {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
 
@@ -313,6 +315,7 @@ export struct GBalanceScale {
     .scale({ x: this.used[i] ? 1.04 : 1, y: this.used[i] ? 1.04 : 1 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.toggle(i);
     })
   }

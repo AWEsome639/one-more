@@ -3,6 +3,7 @@
  * 胜负：找齐 5 个词通关；拼错 3 次失败　进度：已找到 / 得分 / 剩余机会
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -131,7 +132,7 @@ export struct GWordWheel {
           .backgroundColor(this.theme.isDark ? Palette.primaryDeep : Palette.primary)
           .borderRadius(Radius.sm).shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.pick((i)); })
+          .onClick(() => { Haptics.tick(); this.pick((i)); })
         }, (i: number) => 'L' + i)
       }
       .width('100%')
@@ -142,14 +143,14 @@ export struct GWordWheel {
       Row({ space: Space.sm }) {
         Button(TG('提交'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.submit(); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.submit(); })
         Button(TG('退格'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surface)
           .borderRadius(Radius.md).width(76).height(Cell.of(46))
-          .onClick(() => { this.typed = this.typed.substring(0, Math.max(0, this.typed.length - 1)); })
+          .onClick(() => { Haptics.tap(); this.typed = this.typed.substring(0, Math.max(0, this.typed.length - 1)); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.cyan)
-          .borderRadius(Radius.md).width(76).height(Cell.of(46)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(76).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       }
       .width('100%')
 

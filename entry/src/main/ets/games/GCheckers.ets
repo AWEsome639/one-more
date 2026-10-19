@@ -8,6 +8,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch, Side } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
@@ -526,6 +527,7 @@ export struct GCheckers {
               .borderRadius(Radius.xs)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tap((this.idx(r, c)));
               })
             }, (c: number) => 'c' + c)
@@ -554,6 +556,7 @@ export struct GCheckers {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.restartTap();
         })
 

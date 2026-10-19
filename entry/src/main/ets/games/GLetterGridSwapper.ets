@@ -1,6 +1,7 @@
 /** 字母换位 —— 3×3 格子点两个字母交换，按行排成目标单词
  *  胜负：排好 ⇒ 通关；步数用尽 ⇒ 失败 ｜ 进度：步数 / 就位字母数 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -128,7 +129,7 @@ export struct GLetterGridSwapper {
               .onTouch((e: TouchEvent) => {
               if (e.type === TouchType.Down) { this.pressed = (r * this.diffTotal + c); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
               })
-              .onClick(() => { this.tap((r * this.diffTotal + c)); })
+              .onClick(() => { Haptics.tick(); this.tap((r * this.diffTotal + c)); })
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
@@ -141,7 +142,7 @@ export struct GLetterGridSwapper {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：按行从左到右读，读出来就是目标单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

@@ -5,6 +5,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -163,10 +164,10 @@ export struct GReadingSpan {
         Row({ space: Space.sm }) {
           Button((TG('✔ 通顺')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor((true) ? Palette.emerald : Palette.rose)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 0).onClick(() => { this.judge((true)); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 0).onClick(() => { Haptics.tap(); this.judge((true)); })
           Button((TG('✖ 不通')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor((false) ? Palette.emerald : Palette.rose)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 0).onClick(() => { this.judge((false)); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 0).onClick(() => { Haptics.tap(); this.judge((false)); })
         }.width('100%')
       } else if (this.phase === 1) {
         Column({ space: Space.sm }) {
@@ -175,7 +176,7 @@ export struct GReadingSpan {
               ForEach(COLS, (col: number) => {
                 if (row * 3 + col < this.pool.length) { Button(this.pool[(row * 3 + col)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.pool[(row * 3 + col)] === '✔' ? Palette.lime : Palette.berry)
-                .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(this.pool[(row * 3 + col)] !== '✔').onClick(() => { this.pickPool((row * 3 + col)); }) }
+                .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(this.pool[(row * 3 + col)] !== '✔').onClick(() => { Haptics.tap(); this.pickPool((row * 3 + col)); }) }
               }, (col: number) => 'rc' + row + '_' + col)
             }.width('100%')
           }, (row: number) => 'rr' + row)
@@ -183,7 +184,7 @@ export struct GReadingSpan {
       }
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：先判断通不通顺，整组读完再按顺序回忆关键词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

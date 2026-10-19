@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -238,6 +239,7 @@ export struct GPathFinder {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * MC + c));
               })
             }, (c: number) => 'c' + c)
@@ -261,6 +263,7 @@ export struct GPathFinder {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .onClick(() => {
+        Haptics.tick();
         this.move((0), (-1));
         })
         Text(('↑'))
@@ -273,6 +276,7 @@ export struct GPathFinder {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .onClick(() => {
+        Haptics.tick();
         this.move((-1), (0));
         })
         Text(('↓'))
@@ -285,6 +289,7 @@ export struct GPathFinder {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .onClick(() => {
+        Haptics.tick();
         this.move((1), (0));
         })
         Text(('→'))
@@ -297,6 +302,7 @@ export struct GPathFinder {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .onClick(() => {
+        Haptics.tick();
         this.move((0), (1));
         })
       }
@@ -318,6 +324,7 @@ export struct GPathFinder {
           .width(96)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

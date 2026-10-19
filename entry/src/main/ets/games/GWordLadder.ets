@@ -3,6 +3,7 @@
  * 胜负：步数上限内到达目标词通关｜步数用尽未到失败｜进度：步数 / 剩余 / 目标
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -103,7 +104,7 @@ export struct GWordLadder {
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Row({ space: Space.sm }) {
-        ForEach([0, 1, 2, 3], (i: number) => { Text(this.word.length > (i) ? this.word.charAt((i)) : '').fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(60)).backgroundColor(this.pick === (i) ? Palette.primary : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tapPos((i)); }) }, (i: number) => 's' + i)
+        ForEach([0, 1, 2, 3], (i: number) => { Text(this.word.length > (i) ? this.word.charAt((i)) : '').fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(60)).backgroundColor(this.pick === (i) ? Palette.primary : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapPos((i)); }) }, (i: number) => 's' + i)
       }.width('100%')
       Text(this.trail.join(' → ')).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').maxLines(2)
       Text(this.msg).fontSize(FontSize.sm)
@@ -115,14 +116,14 @@ export struct GWordLadder {
           Row({ space: Space.xs }) {
             ForEach([0, 1, 2, 3, 4, 5, 6], (c: number) => {
               if (r * 7 + c < LETTERS.length) {
-                Text((LETTERS.charAt(r * 7 + c))).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(36)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).shadow(Shadow.card).onClick(() => { this.tapLetter((LETTERS.charAt(r * 7 + c))); })
+                Text((LETTERS.charAt(r * 7 + c))).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(36)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).shadow(Shadow.card).onClick(() => { Haptics.tick(); this.tapLetter((LETTERS.charAt(r * 7 + c))); })
               }
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('100%')
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(44)).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG2('提示：起点 {0} → 目标 {1}，词库里都是常见 {2} 字母单词', this.from, this.to, LEN)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

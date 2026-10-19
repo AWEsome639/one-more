@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -349,6 +350,7 @@ export struct GSkyscrapers {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .onClick(() => {
+              Haptics.tick();
               this.skyTap((gr), (gc));
               })
             }, (gc: number) => 'g' + gc)
@@ -374,6 +376,7 @@ export struct GSkyscrapers {
             .borderRadius(Radius.sm)
             .shadow(Shadow.card)
             .onClick(() => {
+              Haptics.tick();
               this.pick = v;
             })
         }, (v: number) => 'p' + v)
@@ -396,6 +399,7 @@ export struct GSkyscrapers {
           .width(96)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

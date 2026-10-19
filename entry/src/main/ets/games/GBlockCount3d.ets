@@ -3,6 +3,7 @@
  * 胜负：8 题答对 ≥6 通关　进度：题号 / 答对 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -140,7 +141,7 @@ export struct GBlockCount3d {
           .backgroundColor(this.picked < 0 ? this.theme.surface
           : ((i) === this.ansIdx ? Palette.emerald : ((i) === this.picked ? Palette.rose : this.theme.surface)))
           .borderRadius(Radius.md).shadow(Shadow.card)
-          .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick((i)); })
+          .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((i)); })
           // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
           .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
             .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
@@ -152,7 +153,7 @@ export struct GBlockCount3d {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：每格从下往上数高度，全部加起来才是总块数；空格是 0'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

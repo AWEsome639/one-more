@@ -1,6 +1,7 @@
 /** 三元逻辑 🧠（id: triplets_logic）
  * 三句「谁比谁高」里挑出唯一说得通的「从高到低」排序；6 题答对 ≥4 ⇒ 通关，否则失败。 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -122,7 +123,7 @@ export struct GTripletsLogic {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
@@ -135,6 +136,6 @@ export struct GTripletsLogic {
       .borderColor(this.picked < 0 ? this.theme.line :
         (i === this.ans ? Palette.emerald : (i === this.picked ? Palette.rose : this.theme.line)))
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.pick(i); })
+      .onClick(() => { Haptics.tick(); this.pick(i); })
   }
 }

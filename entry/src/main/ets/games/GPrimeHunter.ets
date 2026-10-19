@@ -1,5 +1,6 @@
 /** 素数猎手 —— 在 5×5 数字阵里点掉所有素数｜3 关猎到 2 关过关 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -151,7 +152,7 @@ export struct GPrimeHunter {
             Text(String(this.nums[(r * SIZE + c)])).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
             .fontColor(this.marks[(r * SIZE + c)] === 0 ? this.theme.ink : '#FFFFFF')
             }.layoutWeight(1).aspectRatio(1).backgroundColor(this.cellTone((r * SIZE + c))).borderRadius(Radius.sm)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap((r * SIZE + c)); }); }, (c: number) => 'c' + c)
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * SIZE + c)); }); }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
@@ -160,7 +161,7 @@ export struct GPrimeHunter {
       Row({ space: Space.md }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('绿=捞到 红=点错')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

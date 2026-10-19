@@ -4,6 +4,7 @@
  * 胜负：五行全填对通关；挑错 3 次即失败　进度：已填行数 / 失误 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -145,25 +146,25 @@ export struct GCrossword {
         .fontColor(this.isUsed((0)) ? this.theme.inkFaint : '#FFFFFF')
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((0)) ? this.theme.surfaceAlt : Palette.primary)
-        .onClick(() => { this.place((0)); })
+        .onClick(() => { Haptics.tick(); this.place((0)); })
         Text((1) < this.bank.length ? this.bank[(1)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
         .fontColor(this.isUsed((1)) ? this.theme.inkFaint : '#FFFFFF')
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((1)) ? this.theme.surfaceAlt : Palette.primary)
-        .onClick(() => { this.place((1)); })
+        .onClick(() => { Haptics.tick(); this.place((1)); })
         Text((2) < this.bank.length ? this.bank[(2)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
         .fontColor(this.isUsed((2)) ? this.theme.inkFaint : '#FFFFFF')
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((2)) ? this.theme.surfaceAlt : Palette.primary)
-        .onClick(() => { this.place((2)); })
+        .onClick(() => { Haptics.tick(); this.place((2)); })
         Text((3) < this.bank.length ? this.bank[(3)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
         .fontColor(this.isUsed((3)) ? this.theme.inkFaint : '#FFFFFF')
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((3)) ? this.theme.surfaceAlt : Palette.primary)
-        .onClick(() => { this.place((3)); })
+        .onClick(() => { Haptics.tick(); this.place((3)); })
       }
       .width('100%')
       Row({ space: Space.xs }) {
@@ -172,24 +173,24 @@ export struct GCrossword {
         .fontColor(this.isUsed((4)) ? this.theme.inkFaint : '#FFFFFF')
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((4)) ? this.theme.surfaceAlt : Palette.primary)
-        .onClick(() => { this.place((4)); })
+        .onClick(() => { Haptics.tick(); this.place((4)); })
         Text((5) < this.bank.length ? this.bank[(5)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
         .fontColor(this.isUsed((5)) ? this.theme.inkFaint : '#FFFFFF')
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((5)) ? this.theme.surfaceAlt : Palette.primary)
-        .onClick(() => { this.place((5)); })
+        .onClick(() => { Haptics.tick(); this.place((5)); })
         Text((6) < this.bank.length ? this.bank[(6)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
         .fontColor(this.isUsed((6)) ? this.theme.inkFaint : '#FFFFFF')
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((6)) ? this.theme.surfaceAlt : Palette.primary)
-        .onClick(() => { this.place((6)); })
+        .onClick(() => { Haptics.tick(); this.place((6)); })
       }
       .width('100%')
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

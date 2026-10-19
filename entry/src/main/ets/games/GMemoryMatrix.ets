@@ -1,5 +1,6 @@
 /** 记忆矩阵 —— 亮格闪一下，凭记忆全部点出来；过 5 关通关，点错 3 次失败 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -178,7 +179,7 @@ export struct GMemoryMatrix {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：每关多一格，点错扣一条命'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
@@ -194,6 +195,6 @@ export struct GMemoryMatrix {
     }
     .layoutWeight(1).aspectRatio(1).backgroundColor(this.tint(i)).borderRadius(Radius.md)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { this.tap(i); })
+    .onClick(() => { Haptics.tick(); this.tap(i); })
   }
 }

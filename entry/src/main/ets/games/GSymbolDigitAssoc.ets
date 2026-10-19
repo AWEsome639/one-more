@@ -3,6 +3,7 @@
  * 胜负：12 题答对 ≥9 ⇒ 通关；进度：题号 / 答对 / 用时
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -140,7 +141,7 @@ export struct GSymbolDigitAssoc {
               .borderRadius(Radius.md).shadow(Shadow.card)
               .scale({ x: this.pick === (r * 3 + c) ? Motion.pressScale : 1, y: this.pick === (r * 3 + c) ? Motion.pressScale : 1 })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
-              .onClick(() => { this.answer((r * 3 + c)); })
+              .onClick(() => { Haptics.tick(); this.answer((r * 3 + c)); })
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
@@ -148,7 +149,7 @@ export struct GSymbolDigitAssoc {
 
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-        .backgroundColor(Palette.rose).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .backgroundColor(Palette.rose).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：先扫一眼对照表再点；同一个符号不会连着出现'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

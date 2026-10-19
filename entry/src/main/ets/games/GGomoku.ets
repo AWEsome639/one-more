@@ -11,6 +11,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch, Side } from '../core/LanMatch';
 import { TG } from '../core/GameI18n';
@@ -759,6 +760,7 @@ export struct GGomoku {
               .layoutWeight(1)
               .aspectRatio(1)
               .onClick(() => {
+              Haptics.tick();
               this.humanTap((r * this.diffTotal + c));
               })
             }, (c: number) => 'gk' + r + '-' + c)
@@ -792,6 +794,7 @@ export struct GGomoku {
           .height(Cell.of(48))
           .enabled(!LanMatch.isActive())      // ★ 联机不能单方悔棋
           .onClick(() => {
+            Haptics.tap();
             this.undo();
           })
         Button(TG('重开'))
@@ -803,6 +806,7 @@ export struct GGomoku {
           .layoutWeight(1)
           .height(Cell.of(48))
           .onClick(() => {
+            Haptics.tap();
             this.restartTap();
           })
       }

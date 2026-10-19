@@ -4,6 +4,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -148,11 +149,11 @@ export struct GPeripheralFocus {
       Row({ space: Space.sm }) {
         ForEach(OPTS, (i: number) => { Button(this.opts.length > (i) ? this.opts[(i)] : '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xxl).fontColor('#FFFFFF').backgroundColor(this.pick === this.opts[(i)] ? Palette.cyan : Palette.primary)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(60)).enabled(this.phase === 1).onClick(() => { this.answer(this.opts[(i)]); }) }, (i: number) => 'po' + i)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(60)).enabled(this.phase === 1).onClick(() => { Haptics.tap(); this.answer(this.opts[(i)]); }) }, (i: number) => 'po' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：视线始终留在中心 ➕ 上，只靠余光看四周的格子')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

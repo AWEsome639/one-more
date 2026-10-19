@@ -4,6 +4,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -167,7 +168,7 @@ export struct GD2Attention {
               .backgroundColor(this.picked[(r * COLS + c)] ? this.theme.surfaceAlt : this.theme.surface)
               .borderRadius(Radius.xs)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
-              .onClick(() => { this.tap((r * COLS + c)); })
+              .onClick(() => { Haptics.tick(); this.tap((r * COLS + c)); })
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
@@ -179,7 +180,7 @@ export struct GD2Attention {
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2("目标＝字母 d 且上下小撇共 2 个；{0} 秒内找齐 {1} 个",Digits(String(this.diffTotal), this.langCode),Digits(String(TARGETS), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

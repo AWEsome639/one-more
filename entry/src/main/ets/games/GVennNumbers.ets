@@ -3,6 +3,7 @@
  * 胜负：6 个数全部归位且错不超过 3 次 ⇒ 通关；进度：归位 / 答错 / 用时
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -134,15 +135,15 @@ export struct GVennNumbers {
         .textAlign(TextAlign.Center).width((96)).height(Cell.of(44)).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).border({ width: 2, color: this.fb === 1 ? Palette.rose : this.theme.line })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.tapZone((0)); }); Text(('B')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        .onClick(() => { Haptics.tick(); this.tapZone((0)); }); Text(('B')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         .textAlign(TextAlign.Center).width((96)).height(Cell.of(44)).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).border({ width: 2, color: this.fb === 1 ? Palette.rose : this.theme.line })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.tapZone((1)); }); Text(('A∩B')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        .onClick(() => { Haptics.tick(); this.tapZone((1)); }); Text(('A∩B')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         .textAlign(TextAlign.Center).width((74)).height(Cell.of(44)).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).border({ width: 2, color: this.fb === 1 ? Palette.rose : this.theme.line })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.tapZone((2)); }) }
+        .onClick(() => { Haptics.tick(); this.tapZone((2)); }) }
           .width('100%').height(150).justifyContent(FlexAlign.Center)
       }.width('100%').height(150)
       Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Center }) {
@@ -154,7 +155,7 @@ export struct GVennNumbers {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.sel === (i) ? 1.06 : 1, y: this.sel === (i) ? 1.06 : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.tapChip((i)); }) }, (i: number) => 'vn' + i)
+        .onClick(() => { Haptics.tick(); this.tapChip((i)); }) }, (i: number) => 'vn' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
         .fontColor(this.fb === 1 ? Palette.rose : (this.fb === 0 ? Palette.emerald : this.theme.inkSoft))
@@ -162,7 +163,7 @@ export struct GVennNumbers {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：A ∩ B = 既是 3 的倍数又是偶数，比如 6')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

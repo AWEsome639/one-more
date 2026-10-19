@@ -3,6 +3,7 @@
  * 胜负：5 轮答对 4 轮以上 ⇒ 通关（每轮再快 40ms）；进度：轮次 / 答对 / 间隔
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -151,14 +152,14 @@ export struct GAttentionalBlink {
       .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (0) ? 0.5 : 1).shadow(Shadow.card)
       .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer((0)); }); Text(this.opts[(1)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+      .onClick(() => { Haptics.tick(); this.answer((0)); }); Text(this.opts[(1)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (1) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
       .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
       .backgroundColor(this.pick === (1) ? Palette.primaryDeep : (this.answered() ? this.theme.surface : this.theme.surfaceAlt))
       .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (1) ? 0.5 : 1).shadow(Shadow.card)
       .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer((1)); }) }.width('100%')
+      .onClick(() => { Haptics.tick(); this.answer((1)); }) }.width('100%')
       Row({ space: Space.sm }) { Text(this.opts[(2)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (2) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
       .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
@@ -166,18 +167,18 @@ export struct GAttentionalBlink {
       .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (2) ? 0.5 : 1).shadow(Shadow.card)
       .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer((2)); }); Text(this.opts[(3)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+      .onClick(() => { Haptics.tick(); this.answer((2)); }); Text(this.opts[(3)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (3) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
       .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
       .backgroundColor(this.pick === (3) ? Palette.primaryDeep : (this.answered() ? this.theme.surface : this.theme.surfaceAlt))
       .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (3) ? 0.5 : 1).shadow(Shadow.card)
       .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer((3)); }) }.width('100%')
+      .onClick(() => { Haptics.tick(); this.answer((3)); }) }.width('100%')
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：数字只出现一次，其余字母都是干扰项')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

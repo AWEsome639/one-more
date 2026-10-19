@@ -3,6 +3,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -148,11 +149,11 @@ export struct GDivisibilityDash {
         Button(TG('能整除'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor(Palette.emerald).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(72)).enabled(!this.over)
-          .onClick(() => { this.answer(true); })
+          .onClick(() => { Haptics.tap(); this.answer(true); })
         Button(TG('不能整除'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(72)).enabled(!this.over)
-          .onClick(() => { this.answer(false); })
+          .onClick(() => { Haptics.tap(); this.answer(false); })
       }.width('100%')
 
       Text(this.tip).fontSize(FontSize.sm).fontColor(this.tip.startsWith('✓') ? Palette.emerald : this.theme.inkSoft).height(20)
@@ -160,7 +161,7 @@ export struct GDivisibilityDash {
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.orange).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .backgroundColor(Palette.orange).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('答错 -5 分；连击 5 次起加分')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

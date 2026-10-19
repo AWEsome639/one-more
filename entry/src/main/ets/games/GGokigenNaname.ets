@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -345,6 +346,7 @@ export struct GGokigenNaname {
               }
               })
               .onClick(() => {
+              Haptics.tick();
               this.tapCell((r), (c));
               })
             }, (c: number) => 'gk' + r + '-' + c)
@@ -376,6 +378,7 @@ export struct GGokigenNaname {
           .width(96)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

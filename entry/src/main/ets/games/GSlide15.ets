@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -320,6 +321,7 @@ export struct GSlide15 {
               }
               })
               .onClick(() => {
+              Haptics.tick();
               this.tap((r * this.diffTotal + c));
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -365,6 +367,7 @@ export struct GSlide15 {
           .layoutWeight(1)
           .height(Cell.of(48))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('重玩本局'))
@@ -376,6 +379,7 @@ export struct GSlide15 {
           .layoutWeight(1)
           .height(Cell.of(48))
           .onClick(() => {
+            Haptics.tap();
             this.retrySame();
           })
       }

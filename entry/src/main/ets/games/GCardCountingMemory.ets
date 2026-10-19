@@ -3,6 +3,7 @@
  * 胜负：8 轮答对 6 轮以上 ⇒ 通关；进度：轮次 / 答对 / 用时
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -167,7 +168,7 @@ export struct GCardCountingMemory {
         .borderRadius(Radius.sm).border({ width: 2, color: Palette.rose })
         .scale({ x: this.pick === (i) ? Motion.pressScale : 1, y: this.pick === (i) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((i)); })
+        .onClick(() => { Haptics.tick(); this.answer((i)); })
 
         } }, (i: number) => 'cc' + i)
       }.columnsTemplate('1fr 1fr 1fr 1fr').rowsGap(Space.sm).columnsGap(Space.sm)
@@ -175,7 +176,7 @@ export struct GCardCountingMemory {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：下面 8 张就是刚才闪过的牌，只有一张出现两次')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

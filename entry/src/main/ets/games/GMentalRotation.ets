@@ -3,6 +3,7 @@
  * 胜负：10 题答对 ≥ 8 题通关；进度：题号 / 答对 / 总旋转角度
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -236,7 +237,7 @@ export struct GMentalRotation {
         .height(Cell.of(60))
         .scale({ x: this.picked === (0) ? Motion.pressScale : 1, y: this.picked === (0) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer(false); })
+        .onClick(() => { Haptics.tap(); this.answer(false); })
         Button((TG('镜像 🪞')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
@@ -247,7 +248,7 @@ export struct GMentalRotation {
         .height(Cell.of(60))
         .scale({ x: this.picked === (1) ? Motion.pressScale : 1, y: this.picked === (1) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer(true); })
+        .onClick(() => { Haptics.tap(); this.answer(true); })
       }
       .width('100%')
       Button(this.over ? TG('再来一局') : TG('重开'))
@@ -258,7 +259,7 @@ export struct GMentalRotation {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：10 题答对 ≥ 8 题 · 提示：不对称图形转过 90/180/270° 的样子'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

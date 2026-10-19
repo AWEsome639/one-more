@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -270,6 +271,7 @@ export struct GSieveVisualizer {
           .height(BTN_H)
           .enabled(!this.done)
           .onClick(() => {
+            Haptics.tap();
             if (this.running) {
               this.pause();
             } else {
@@ -286,6 +288,7 @@ export struct GSieveVisualizer {
           .height(BTN_H)
           .enabled(!this.done)
           .onClick(() => {
+            Haptics.tap();
             this.pause();
             this.step();
           })
@@ -298,6 +301,7 @@ export struct GSieveVisualizer {
           .layoutWeight(1)
           .height(BTN_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

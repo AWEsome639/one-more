@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
@@ -292,6 +293,7 @@ export struct GNim {
           .combine(TransitionEffect.scale({ x: 0.75, y: 0.75 }))
           .animation({ duration: Motion.fast, curve: Motion.spring() }))
         .onClick(() => {
+        Haptics.tick();
         this.take((i), k);
         })
         }
@@ -323,6 +325,7 @@ export struct GNim {
         .backgroundColor(Palette.emerald).borderRadius(Radius.md)
         .width('100%').height(Cell.of(44))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
 

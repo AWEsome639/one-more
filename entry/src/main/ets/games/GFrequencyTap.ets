@@ -3,6 +3,7 @@
  * 胜负：20 拍命中 ≥ 16 ⇒ 通关；进度：拍号 / 命中数 / 上次误差 ms
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -148,7 +149,7 @@ export struct GFrequencyTap {
       .borderRadius(Radius.full).shadow(Shadow.card)
       .scale({ x: this.pulse ? 1.05 : 0.95, y: this.pulse ? 1.05 : 0.95 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.tap(); })
+      .onClick(() => { Haptics.tick(); this.tap(); })
 
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
         .width('100%').textAlign(TextAlign.Center)
@@ -158,7 +159,7 @@ export struct GFrequencyTap {
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.berry)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
-        .onClick(() => { if (this.phase === 0) { this.start(); } else { this.reset(); } })
+        .onClick(() => { Haptics.tap(); if (this.phase === 0) { this.start(); } else { this.reset(); } })
 
       Text(TG2("{0}{1} 拍即通关", TG2('判定：每拍误差 ≤ {0} ms 记命中，{1} 拍中 ', String(HIT_MS), String(this.diffTotal)),Digits(String(WIN_HITS), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

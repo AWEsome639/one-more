@@ -4,6 +4,7 @@
  * 胜负：60 秒内答对 10 题 ⇒ 通关；时间归零 ⇒ 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -180,7 +181,7 @@ export struct GMissingOperator {
             })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onTouch((e: TouchEvent) => { this.press = e.type === TouchType.Down ? kind : -1; })
-            .onClick(() => { this.pick(kind); })
+            .onClick(() => { Haptics.tick(); this.pick(kind); })
         }, (kind: number) => 'op' + kind)
       }.width('100%')
 
@@ -191,7 +192,7 @@ export struct GMissingOperator {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：先估大小 —— 比两个数都大很多，多半是乘'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

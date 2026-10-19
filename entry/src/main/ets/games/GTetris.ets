@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -375,6 +376,7 @@ export struct GTetris {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Text(this.status)
@@ -437,6 +439,7 @@ export struct GTetris {
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
       .onClick(() => {
+        Haptics.tick();
         if (kind === 0) {
           this.move(-1);
         } else if (kind === 1) {

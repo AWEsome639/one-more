@@ -3,6 +3,7 @@
  * 判据：面积 = 长×宽，周长 = 2×(长+宽)　胜负：10 题答对 ≥7 通关　进度：题号 / 答对 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -143,7 +144,7 @@ export struct GAreaPerimeterMatch {
           .backgroundColor(this.picked < 0 ? this.theme.surface
           : ((i) === this.ansIdx ? Palette.emerald : ((i) === this.picked ? Palette.rose : this.theme.surface)))
           .borderRadius(Radius.md).shadow(Shadow.card)
-          .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick((i)); })
+          .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((i)); })
         }, (i: number) => 'c' + i)
       }
       .width('100%')
@@ -152,7 +153,7 @@ export struct GAreaPerimeterMatch {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：面积看长宽之积，周长看四条边之和 —— 细长条的周长往往更大'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

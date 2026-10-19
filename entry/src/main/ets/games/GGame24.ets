@@ -13,6 +13,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -440,6 +441,7 @@ export struct GGame24 {
             .height(Cell.of(56))
             .opacity(this.ready() ? 1 : 0.45)
             .onClick(() => {
+              Haptics.tap();
               this.tapOp(op);
             })
         }, (k: string) => 'op' + k)
@@ -473,6 +475,7 @@ export struct GGame24 {
           .height(Cell.of(44))
           .opacity(this.undoDepth > 0 && !this.done ? 1 : 0.45)
           .onClick(() => {
+            Haptics.tap();
             this.undo();
           })
         Button(TG('提示'))
@@ -484,6 +487,7 @@ export struct GGame24 {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.hint();
           })
         Button(TG('换一题'))
@@ -495,6 +499,7 @@ export struct GGame24 {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }
@@ -549,6 +554,7 @@ export struct GGame24 {
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.tapTile(i);
     })
   }

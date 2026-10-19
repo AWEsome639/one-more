@@ -3,6 +3,7 @@
  * 胜负：10 题平均 < 900ms 且答错不超过 1 次 ⇒ 通关；进度：题号 / 平均 / 最快
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -138,19 +139,19 @@ export struct GChoiceReactionTime {
           .borderRadius(Radius.lg).layoutWeight(1).height(Cell.of(78)).opacity(this.live ? 1 : 0.55)
           .scale({ x: this.pick === 0 ? Motion.pressScale : 1, y: this.pick === 0 ? Motion.pressScale : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.answer(false); })
+          .onClick(() => { Haptics.tap(); this.answer(false); })
         Button(TG('偶'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xxl).fontColor('#FFFFFF')
           .backgroundColor(this.pick === 1 ? Palette.primaryDeep : Palette.sky)
           .borderRadius(Radius.lg).layoutWeight(1).height(Cell.of(78)).opacity(this.live ? 1 : 0.55)
           .scale({ x: this.pick === 1 ? Motion.pressScale : 1, y: this.pick === 1 ? Motion.pressScale : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.answer(true); })
+          .onClick(() => { Haptics.tap(); this.answer(true); })
       }.width('100%')
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.orange)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG2('判定：平均 < {0} ms 且答错 ≤ 1 次（答错一题按 1800 ms 计）',Digits(String(LIMIT_MS), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

@@ -4,6 +4,7 @@
  * 出题：随机摆墙 + BFS 保证一定连通（最短路径同时作为步数上限）
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -254,7 +255,7 @@ export struct GMirrorMaze {
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
-        .onClick(() => { this.tap((3)); })
+        .onClick(() => { Haptics.tick(); this.tap((3)); })
         Text(('▲'))
         .fontSize(FontSize.lg)
         .fontColor(this.theme.ink)
@@ -264,7 +265,7 @@ export struct GMirrorMaze {
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
-        .onClick(() => { this.tap((0)); })
+        .onClick(() => { Haptics.tick(); this.tap((0)); })
         Text(('▼'))
         .fontSize(FontSize.lg)
         .fontColor(this.theme.ink)
@@ -274,7 +275,7 @@ export struct GMirrorMaze {
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
-        .onClick(() => { this.tap((2)); })
+        .onClick(() => { Haptics.tick(); this.tap((2)); })
         Text(('▶'))
         .fontSize(FontSize.lg)
         .fontColor(this.theme.ink)
@@ -284,7 +285,7 @@ export struct GMirrorMaze {
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
-        .onClick(() => { this.tap((1)); })
+        .onClick(() => { Haptics.tick(); this.tap((1)); })
       }
       .width('100%')
       Button(this.over ? TG('再来一局') : TG('重开'))
@@ -295,7 +296,7 @@ export struct GMirrorMaze {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：走到 🏁 通关 · 步数上限 = 最短路径 + 7'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

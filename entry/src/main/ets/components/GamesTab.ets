@@ -92,6 +92,11 @@ export struct GamesTab {
   @State picked: string[] = [];        // 选中的特征
   @State showFilter: boolean = false;  // 是否展开筛选面板
   @State viewMode: ViewMode = ViewMode.GRID;   // 网格 ⇄ 字母表
+  // ★★★ 2026-10-19「动画拉满」第 1 层：内容刷新脉冲
+  //   奥森：「全部拉满，拉满到手机性能不支持」
+  //   问题：切分类 / 切片段 / 切视图模式时，网格内容【瞬间换掉】，没有"换了一批"的实感
+  //   ⇒ 切换瞬间网格收紧到 0.972 + 透明度 0.62，然后弹簧弹回 ⇒ "内容被刷新了"
+  @State private gridPulse: boolean = false;
   /** A-Z 首屏进场的错峰开关：切到字母表后 30ms 置 true ⇒ 触发动效 */
   @State azShown: boolean = true;
   /**
@@ -271,6 +276,22 @@ export struct GamesTab {
     return this.listCache;
   }
 
+  /**
+   * ★「动画拉满」内容刷新脉冲
+   *   切换分类/片段/视图模式时调用：网格先收紧，再弹簧弹回
+   *   120ms 收紧（快而狠）+ 420ms 弹回（有回弹，落得住）
+   */
+  private pulseGrid(): void {
+    animateTo({ duration: 120, curve: Curve.FastOutSlowIn }, () => {
+      this.gridPulse = true;
+    });
+    setTimeout(() => {
+      animateTo({ duration: 420, curve: Motion.spring() }, () => {
+        this.gridPulse = false;
+      });
+    }, 130);
+  }
+
   private computeList(): GameMeta[] {
     let base: GameMeta[];
     if (this.seg === Seg.FAV) {
@@ -309,8 +330,11 @@ export struct GamesTab {
       return this.t(this.seg, this.segEn()) + ' · ' + n;
     }
     if (this.picked.length > 0) {
-      return this.t('符合这 ' + this.picked.length + ' 个条件的有 ' + n + ' 款',
-                    n + ' match');
+      // ★ 2026-10-19 自查修：原来是动态拼接 ⇒ key 永远查不到 ⇒ 非中英用户退英文
+      //   改为 {a}/{b} 占位符 ⇒ key 静态可命中 12 语言表
+      return this.t('符合这 {a} 个条件的有 {b} 款', '{a} filters · {b} matches')
+        .replace('{a}', String(this.picked.length))
+        .replace('{b}', String(n));
     }
     const observed: string = this.langCode;
     const cat: string = L(this.category, catLabelEn(this.category));   // ★ 繁體走 toTrad
@@ -607,6 +631,7 @@ build() {
             selected: this.category,
             theme: this.theme(),
             onPick: (c: GameCategory) => {
+              this.pulseGrid();   // ★ 拉满：内容刷新脉冲
               animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
                 this.category = c;
               });
@@ -686,6 +711,9 @@ build() {
         .columnsTemplate('1fr 1fr')
         .columnsGap(Space.md)
         .rowsGap(Space.md)
+        // ★ 拉满：内容刷新脉冲的视觉（收紧 + 半透 ⇒ 弹回）
+        .scale({ x: this.gridPulse ? 0.972 : 1.0, y: this.gridPulse ? 0.972 : 1.0 })
+        .opacity(this.gridPulse ? 0.62 : 1.0)
         .padding({ left: Space.lg, right: Space.lg, bottom: Space.xxxl })
         .width('100%')
         .layoutWeight(1)
@@ -775,6 +803,7 @@ build() {
     .backgroundColor(this.theme().surfaceAlt)
     .borderRadius(Radius.full)
     .onClick(() => {
+      Haptics.tap();   // ★ 2026-10-19 按压反馈
       const now: number = Date.now();
       animateTo({ duration: 520, curve: Curve.ExtremeDeceleration }, () => {
         this.topCollapsed = !this.topCollapsed;
@@ -840,6 +869,7 @@ build() {
           this.darkPressed = IconPress.onTouch(this.darkPressed, e);
         })
         .onClick(() => {
+          Haptics.tap();   // ★ 2026-10-19 按压反馈
           ProgressStore.setThemeDark(!this.dark);
         })
 
@@ -971,6 +1001,7 @@ build() {
       .borderRadius(Radius.md)
       .shadow(Shadow.card)
       .onClick(() => {
+        Haptics.tap();   // ★ 2026-10-19 按压反馈
         this.openGame(this.dailyId);
       })
     }
@@ -1010,7 +1041,7 @@ build() {
         .accessibilityLevel('no')
       Text(this.picked.length === 0
         ? this.t('按喜好挑游戏', 'Pick by taste')
-        : this.t('已选 ' + this.picked.length + ' 个条件', this.picked.length + ' filter' + (this.picked.length > 1 ? 's' : '') + ' on'))
+        : this.t('已选 {n} 个条件', '{n} filters on').replace('{n}', String(this.picked.length)))
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
         .fontColor(this.picked.length > 0 ? this.accentColor() : this.theme().ink)
       Blank()
@@ -1021,6 +1052,7 @@ build() {
           .backgroundColor(this.theme().surfaceAlt)
           .borderRadius(Radius.full)
           .onClick(() => {
+            Haptics.tap();   // ★ 2026-10-19 按压反馈
             this.picked = [];
           })
       }
@@ -1086,6 +1118,7 @@ build() {
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
       .onClick(() => {
+        Haptics.tap();   // ★ 2026-10-19 按压反馈
         animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
           this.toggleTag(t.id);
         });
@@ -1118,6 +1151,8 @@ build() {
       .shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
       .onClick(() => {
+        Haptics.tap();   // ★ 2026-10-19 按压反馈
+        this.pulseGrid();   // ★ 拉满：内容刷新脉冲
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
           this.seg = s;
         });
@@ -1210,6 +1245,7 @@ build() {
         Haptics.tap();
         // ★ 每次切到 A-Z 都重放一次首屏错峰（先归零再置起，否则第二次进来不动）
         this.azShown = (mode !== ViewMode.AZ);
+        this.pulseGrid();   // ★ 拉满：内容刷新脉冲（网格 ⇄ 字母表）
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
           this.viewMode = mode;
         });
@@ -1358,6 +1394,7 @@ build() {
           .backgroundColor(i === this.azCurrent ? this.theme().surfaceAlt : Color.Transparent)
           .animation({ duration: Motion.fast, curve: Motion.spring() })
           .onClick(() => {
+            Haptics.tap();   // ★ 2026-10-19 按压反馈
             if (this.azCounts()[i] === 0) {
               return;
             }
@@ -1472,6 +1509,7 @@ build() {
       delay: enterIdx >= 0 ? Motion.stagger(enterIdx) : 0
     })
     .onClick(() => {
+      Haptics.tap();   // ★ 2026-10-19 按压反馈
       this.openGame(m.id);
     })
   }
@@ -1480,6 +1518,7 @@ build() {
   emptyState() {
     Column({ space: Space.md }) {
       Text(this.seg === Seg.FAV ? '⭐' : (this.seg === Seg.RECENT ? '🕐' : '🔍'))
+          .accessibilityLevel('no')   // 装饰性 emoji 不朗读（与 StatsTab 对齐）
         .fontSize(FontSize.hero)
       Text(this.emptyTitle())
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
@@ -1492,5 +1531,11 @@ build() {
     .layoutWeight(1)
     .justifyContent(FlexAlign.Center)
     .padding(Space.xxl)
+        // ★ 2026-10-19 自查 ⑦：空状态原来是"瞬间出现"，没有入场感
+        //   ⇒ 淡入 + 轻微上浮（与全应用的进场语言一致）
+        .transition(TransitionEffect.OPACITY
+          .animation({ duration: Motion.base, curve: Motion.spring() })
+          .combine(TransitionEffect.translate({ y: 10 })
+            .animation({ duration: Motion.base, curve: Motion.spring() })))
   }
 }

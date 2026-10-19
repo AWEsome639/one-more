@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -291,6 +292,7 @@ export struct GTangleFix {
           .scale({ x: this.sel === (p) ? Motion.pressScale : 1, y: this.sel === (p) ? Motion.pressScale : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+          Haptics.tick();
           this.tap((p));
           })
         }, (p: number) => 'p' + p)
@@ -344,6 +346,7 @@ export struct GTangleFix {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

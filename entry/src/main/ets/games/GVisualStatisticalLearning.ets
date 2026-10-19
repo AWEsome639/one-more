@@ -2,6 +2,7 @@
  * 一串图形逐个闪过，其中某三个总是连着出现；看完后从四个组合里挑出那一组；
  * 3 轮答对 ≥2 ⇒ 通关，否则失败。 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -139,7 +140,7 @@ export struct GVisualStatisticalLearning {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
@@ -152,6 +153,6 @@ export struct GVisualStatisticalLearning {
       .borderColor(this.picked < 0 ? this.theme.line :
         (i === this.ans ? Palette.emerald : (i === this.picked ? Palette.rose : this.theme.line)))
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.pick(i); })
+      .onClick(() => { Haptics.tick(); this.pick(i); })
   }
 }

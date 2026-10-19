@@ -3,6 +3,7 @@
  * 胜负：答对 ≥8 题通关；错 3 次或时间耗尽即失败　进度：题号 / 答对 / 失误 / 倒计时
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -160,13 +161,13 @@ export struct GDefinitionDash {
 
       Text((this.opts.length > 0 ? this.opts[0] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
-      .shadow(Shadow.card).onClick(() => { this.answer((0)); })
+      .shadow(Shadow.card).onClick(() => { Haptics.tick(); this.answer((0)); })
       Text((this.opts.length > 1 ? this.opts[1] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
-      .shadow(Shadow.card).onClick(() => { this.answer((1)); })
+      .shadow(Shadow.card).onClick(() => { Haptics.tick(); this.answer((1)); })
       Text((this.opts.length > 2 ? this.opts[2] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
-      .shadow(Shadow.card).onClick(() => { this.answer((2)); })
+      .shadow(Shadow.card).onClick(() => { Haptics.tick(); this.answer((2)); })
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%')
         .textAlign(TextAlign.Center)
@@ -174,7 +175,7 @@ export struct GDefinitionDash {
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

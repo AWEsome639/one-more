@@ -1,5 +1,6 @@
 /** 罗马数字算术 —— 罗马数字的加减｜8 题答对 6 题过关 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -162,18 +163,18 @@ export struct GRomanArithmetic {
         ForEach([0, 1], (i: number) => { Button(this.opts[(i)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.picked.length === 0 && !this.over)
-        .onClick(() => { this.choose(this.opts[(i)]); }); }, (i: number) => 'a' + i)
+        .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'a' + i)
       }.width('100%')
       Row({ space: Space.sm }) {
         ForEach([2, 3], (i: number) => { Button(this.opts[(i)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.picked.length === 0 && !this.over)
-        .onClick(() => { this.choose(this.opts[(i)]); }); }, (i: number) => 'b' + i)
+        .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'b' + i)
       }.width('100%')
       Row({ space: Space.md }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.teal)
-          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('左减右加：IV=4，IX=9，XL=40')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

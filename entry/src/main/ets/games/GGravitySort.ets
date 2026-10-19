@@ -3,6 +3,7 @@
  * 胜负：22 步内清空棋盘 ⇒ 通关｜进度：已消 / 总数 + 剩余步数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -115,14 +116,14 @@ export struct GGravitySort {
           Text('⬇').fontSize(FontSize.lg).textAlign(TextAlign.Center).fontColor(Palette.teal).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
             .accessibilityLevel('no')
             .layoutWeight(1).height(Cell.of(40)).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm)
-            .onClick(() => { this.drop(c); })
+            .onClick(() => { Haptics.tick(); this.drop(c); })
         }, (c: number) => 'd' + c)
       }.width('100%')
       Row({ space: Space.md }) {
         Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).layoutWeight(1)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
@@ -136,6 +137,6 @@ export struct GGravitySort {
     .layoutWeight(1).aspectRatio(1)
     .backgroundColor(this.grid[this.idx(r, c)] >= 0 ? COLORS[this.grid[this.idx(r, c)]] : this.theme.line)
     .borderRadius(Radius.sm).animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { this.drop(c); })
+    .onClick(() => { Haptics.tick(); this.drop(c); })
   }
 }

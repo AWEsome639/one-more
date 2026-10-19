@@ -1,6 +1,7 @@
 /** 边写边说 —— 双任务：判断词语类别（说）+ 等光标踩中 ✦ 时落笔（写）
  * 胜负：得分 ≥12 且落笔 ≥3 即通关｜说对 +2 / 说错 -2 / 写对 +1 / 写歪 -1｜进度：剩余 / 得分 / 说·写 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -132,12 +133,12 @@ export struct GChalkAndTalk {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor((true) ? Palette.emerald : Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))
-          .enabled(!this.over && !this.sayLock).onClick(() => { this.say((true)); })
+          .enabled(!this.over && !this.sayLock).onClick(() => { Haptics.tap(); this.say((true)); })
           Button(('否'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor((false) ? Palette.emerald : Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))
-          .enabled(!this.over && !this.sayLock).onClick(() => { this.say((false)); })
+          .enabled(!this.over && !this.sayLock).onClick(() => { Haptics.tap(); this.say((false)); })
         }.width('100%')
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Text(TG2("写：光标踩中 ✦ 时落笔　得分 ≥{0} 且落笔 ≥{1} 通关",Digits(String(this.diffTotal), this.langCode), WRITE_MIN)).fontSize(FontSize.xs)
@@ -151,12 +152,12 @@ export struct GChalkAndTalk {
       Button(TG('落笔 ✍️'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(Palette.orange)
         .borderRadius(Radius.md).width('100%').height(Cell.of(56))
-        .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.write(); })
+        .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.write(); })
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

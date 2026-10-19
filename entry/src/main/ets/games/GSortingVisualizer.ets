@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -332,6 +333,7 @@ export struct GSortingVisualizer {
             .backgroundColor(this.algo === k ? Palette.amber : this.theme.surface)
             .borderRadius(Radius.sm)
             .onClick(() => {
+              Haptics.tick();
               this.pickAlgo(k);
             })
         }, (k: number) => 'a' + k)
@@ -378,6 +380,7 @@ export struct GSortingVisualizer {
           .height(BTN_H)
           .enabled(!this.sorted)
           .onClick(() => {
+            Haptics.tap();
             if (this.running) {
               this.pause();
             } else {
@@ -394,6 +397,7 @@ export struct GSortingVisualizer {
           .height(BTN_H)
           .enabled(!this.sorted)
           .onClick(() => {
+            Haptics.tap();
             this.pause();
             this.step();
           })
@@ -406,6 +410,7 @@ export struct GSortingVisualizer {
           .layoutWeight(1)
           .height(BTN_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

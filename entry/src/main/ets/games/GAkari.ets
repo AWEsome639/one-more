@@ -12,6 +12,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -404,6 +405,7 @@ export struct GAkari {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
         Button(TG('清空灯'))
@@ -415,6 +417,7 @@ export struct GAkari {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             if (!this.done && !this.finished) {
               this.bulbs = new Array<number>(CELLS).fill(0);
               this.status = TG('灯都撤掉了');
@@ -429,6 +432,7 @@ export struct GAkari {
           .layoutWeight(1)
           .height(KEY_H)
           .onClick(() => {
+            Haptics.tap();
             if (!this.finished) {
               this.done = true;
               this.status = TG('已放弃这一局');
@@ -482,6 +486,7 @@ export struct GAkari {
     .borderRadius(this.isWall(i) ? Radius.xs : Radius.sm)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.tap(i);
     })
   }

@@ -3,6 +3,7 @@
  * 胜负：6 题答对 ≥ 5 ⇒ 通关；进度：记脸倒计时 / 题号 / 答对数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -184,7 +185,7 @@ export struct GFaceTraitAssociation {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((0)); }); Text(this.opts[(1)].label)
+        .onClick(() => { Haptics.tick(); this.answer((0)); }); Text(this.opts[(1)].label)
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
         .textAlign(TextAlign.Center).width('100%').height(Space.xxxl)
@@ -192,7 +193,7 @@ export struct GFaceTraitAssociation {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((1)); }); Text(this.opts[(2)].label)
+        .onClick(() => { Haptics.tick(); this.answer((1)); }); Text(this.opts[(2)].label)
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (2) ? '#FFFFFF' : this.theme.ink)
         .textAlign(TextAlign.Center).width('100%').height(Space.xxxl)
@@ -200,7 +201,7 @@ export struct GFaceTraitAssociation {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((2)); }); Text(this.opts[(3)].label)
+        .onClick(() => { Haptics.tick(); this.answer((2)); }); Text(this.opts[(3)].label)
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (3) ? '#FFFFFF' : this.theme.ink)
         .textAlign(TextAlign.Center).width('100%').height(Space.xxxl)
@@ -208,7 +209,7 @@ export struct GFaceTraitAssociation {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((3)); }) }.width('100%')
+        .onClick(() => { Haptics.tick(); this.answer((3)); }) }.width('100%')
       } else {
         Column({ space: Space.xs }) {
           Text(this.won ? '🎉' : '💤').fontSize(FontSize.hero)
@@ -225,7 +226,7 @@ export struct GFaceTraitAssociation {
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('判定：6 题答对 ≥ {0} 即通关。特质皆为虚构。',Digits(String(NEED), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

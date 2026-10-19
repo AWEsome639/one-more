@@ -4,6 +4,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -150,28 +151,28 @@ export struct GSymmetry {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xs).fontColor('#FFFFFF')
         .backgroundColor(this.revealed && (0) === this.axis ? Palette.emerald : (this.revealed && (0) === this.pick ? Palette.rose : Palette.violet))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.revealed && !this.over)
-        .onClick(() => { this.answer((0)); })
+        .onClick(() => { Haptics.tap(); this.answer((0)); })
         Button(AXES[(1)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xs).fontColor('#FFFFFF')
         .backgroundColor(this.revealed && (1) === this.axis ? Palette.emerald : (this.revealed && (1) === this.pick ? Palette.rose : Palette.violet))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.revealed && !this.over)
-        .onClick(() => { this.answer((1)); })
+        .onClick(() => { Haptics.tap(); this.answer((1)); })
         Button(AXES[(2)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xs).fontColor('#FFFFFF')
         .backgroundColor(this.revealed && (2) === this.axis ? Palette.emerald : (this.revealed && (2) === this.pick ? Palette.rose : Palette.violet))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.revealed && !this.over)
-        .onClick(() => { this.answer((2)); })
+        .onClick(() => { Haptics.tap(); this.answer((2)); })
         Button(AXES[(3)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xs).fontColor('#FFFFFF')
         .backgroundColor(this.revealed && (3) === this.axis ? Palette.emerald : (this.revealed && (3) === this.pick ? Palette.rose : Palette.violet))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.revealed && !this.over)
-        .onClick(() => { this.answer((3)); })
+        .onClick(() => { Haptics.tap(); this.answer((3)); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

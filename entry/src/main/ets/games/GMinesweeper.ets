@@ -12,6 +12,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -431,6 +432,7 @@ export struct GMinesweeper {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.flagMode = !this.flagMode;
           })
         Button(TG('重开'))
@@ -442,6 +444,7 @@ export struct GMinesweeper {
           .width(96)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }
@@ -517,6 +520,7 @@ export struct GMinesweeper {
         })
     )
     .onClick(() => {
+      Haptics.tick();
       this.onCellTap(i);
     })
   }

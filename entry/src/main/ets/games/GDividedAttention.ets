@@ -5,6 +5,7 @@
  * 进度：拍数 / 命中 / 误报 / 漏报
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -136,20 +137,20 @@ export struct GDividedAttention {
         Text((this.left).done ? ((this.left).on ? '✔ 点对了' : '✘ 误报') : ' ').fontSize(FontSize.xxs).fontColor((this.left).done && (this.left).on ? Palette.success : Palette.danger)
         }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
         .borderColor((this.left).done ? ((this.left).on ? Palette.success : Palette.danger) : this.theme.line)
-        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap((0)); })
+        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((0)); })
         Column({ space: Space.xs }) {
         Text(false ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.right).sym).fontSize(FontSize.hero).fontColor(Palette.rose)
         Text((this.right).done ? ((this.right).on ? '✔ 点对了' : '✘ 误报') : ' ').fontSize(FontSize.xxs).fontColor((this.right).done && (this.right).on ? Palette.success : Palette.danger)
         }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
         .borderColor((this.right).done ? ((this.right).on ? Palette.success : Palette.danger) : this.theme.line)
-        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap((1)); })
+        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((1)); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
-        .width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：只点 🎯 那一边；点错和漏掉都扣分')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

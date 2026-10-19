@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -188,6 +189,7 @@ export struct GNumberBondsAll {
               }
               }.layoutWeight(1).aspectRatio(1).backgroundColor(this.used[(r * COLS + c)] ? this.theme.surfaceAlt
               : (this.sel === (r * COLS + c) ? Palette.violet : this.theme.surface)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+              Haptics.tick();
               if ((r * COLS + c) < this.tiles.length) {
               this.tap((r * COLS + c));
               }
@@ -206,6 +208,7 @@ export struct GNumberBondsAll {
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White).backgroundColor(Palette.violet).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => {
+          Haptics.tap();
           this.reset();
         })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

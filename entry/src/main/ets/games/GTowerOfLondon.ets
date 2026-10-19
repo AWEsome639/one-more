@@ -1,6 +1,7 @@
 /** 伦敦塔 📐（id: tower_of_london）
  * 每次搬一个球、大球不许压小球，把三球摆成目标；摆成 ⇒ 通关，超出「最少步 + 5」⇒ 失败。 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -139,7 +140,7 @@ export struct GTowerOfLondon {
       .backgroundColor(((false)) && this.sel === (i) ? Palette.amber : this.theme.lineSoft)
       }
       .layoutWeight(1).height('100%').padding(Space.xs).borderRadius(Radius.md)
-      .borderWidth(((false)) && this.sel === (i) ? 2 : 0).borderColor(Palette.amber).onClick(() => { if (((false))) { this.tap((i)); } })
+      .borderWidth(((false)) && this.sel === (i) ? 2 : 0).borderColor(Palette.amber).onClick(() => { Haptics.tick(); if (((false))) { this.tap((i)); } })
       }, (i: number) => ((false) ? 'lp' : 'gp') + i)
       }
       .width('100%').height((false) ? Space.xxxl * 3 : Space.xxxl * 2).padding(Space.xs)
@@ -162,7 +163,7 @@ export struct GTowerOfLondon {
       .backgroundColor(((true)) && this.sel === (i) ? Palette.amber : this.theme.lineSoft)
       }
       .layoutWeight(1).height('100%').padding(Space.xs).borderRadius(Radius.md)
-      .borderWidth(((true)) && this.sel === (i) ? 2 : 0).borderColor(Palette.amber).onClick(() => { if (((true))) { this.tap((i)); } })
+      .borderWidth(((true)) && this.sel === (i) ? 2 : 0).borderColor(Palette.amber).onClick(() => { Haptics.tick(); if (((true))) { this.tap((i)); } })
       }, (i: number) => ((true) ? 'lp' : 'gp') + i)
       }
       .width('100%').height((true) ? Space.xxxl * 3 : Space.xxxl * 2).padding(Space.xs)
@@ -175,7 +176,7 @@ export struct GTowerOfLondon {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

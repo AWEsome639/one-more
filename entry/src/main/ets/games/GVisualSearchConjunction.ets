@@ -3,6 +3,7 @@
  * 胜负：6 局找对 ≥5 ⇒ 通关｜进度：局数 / 找对 / 得分（每局 9 秒，点错罚 1.5 秒）
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -140,7 +141,7 @@ export struct GVisualSearchConjunction {
               .layoutWeight(1).aspectRatio(1)
               .backgroundColor(this.badIdx === (r * N + c) ? Palette.rose : this.theme.surface)
               .borderRadius(Radius.sm).animation({ duration: Motion.fast, curve: Motion.snap() })
-              .onClick(() => { this.pick((r * N + c)); })
+              .onClick(() => { Haptics.tick(); this.pick((r * N + c)); })
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
@@ -149,7 +150,7 @@ export struct GVisualSearchConjunction {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

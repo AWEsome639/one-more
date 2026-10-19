@@ -3,6 +3,7 @@
  * 胜负：8 题答对 ≥6 通关　进度：题号 / 答对 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -136,14 +137,14 @@ export struct GAngleFinder {
             .backgroundColor(this.picked < 0 ? this.theme.surface
             : ((r * 2) === this.ansIdx ? Palette.emerald : ((r * 2) === this.picked ? Palette.rose : this.theme.surface)))
             .borderRadius(Radius.md).shadow(Shadow.card)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick((r * 2)); })
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((r * 2)); })
             Text(LETTERS[(r * 2 + 1)] + '. ' + this.opts[(r * 2 + 1)] + '°').fontSize(FontSize.md).fontWeight(FontWeight.Bold)
             .fontColor(this.picked >= 0 && ((r * 2 + 1) === this.ansIdx || (r * 2 + 1) === this.picked) ? '#FFFFFF' : this.theme.ink)
             .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(56))
             .backgroundColor(this.picked < 0 ? this.theme.surface
             : ((r * 2 + 1) === this.ansIdx ? Palette.emerald : ((r * 2 + 1) === this.picked ? Palette.rose : this.theme.surface)))
             .borderRadius(Radius.md).shadow(Shadow.card)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.pick((r * 2 + 1)); })
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((r * 2 + 1)); })
           }
           .width('100%')
         }, (r: number) => 'or' + r)
@@ -154,7 +155,7 @@ export struct GAngleFinder {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：先把已知角加起来，再用内角和去减')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)

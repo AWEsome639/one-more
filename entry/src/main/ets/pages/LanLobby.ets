@@ -8,7 +8,7 @@
  */
 
 import { router } from '@kit.ArkUI';
-import { FontSize, Space, Radius, Palette, Theme, Shadow, Layout, Accent } from '../core/Design';
+import { FontSize, Space, Radius, Palette, Theme, Shadow, Layout, Accent, Cell } from '../core/Design';
 import { Lan, LanRoom, LanMsg } from '../core/Lan';
 import { LanRace, RaceScore } from '../core/LanRace';
 import { LanMatch } from '../core/LanMatch';
@@ -91,7 +91,15 @@ struct LanLobby {
         Text('‹').fontSize(FontSize.xl).fontColor(this.theme().ink)
           .accessibilityText(this.t('返回', 'Back'))
           .width(Layout.touchMin).height(Layout.touchMin).textAlign(TextAlign.Center)
-          .onClick(() => router.back())
+          // ★ 2026-10-19 奥森：「整个游戏必要的地方都要有细腻的按压反馈（合适的振动）」
+          .stateStyles({
+            pressed: { .scale({ x: 0.9, y: 0.9 }).opacity(0.85) },
+            normal: { .scale({ x: 1, y: 1 }).opacity(1) }
+          })
+          .onClick(() => {
+            Haptics.tap();
+            router.back();
+          })
         Text(this.t('局域网对战', 'LAN Play')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink).layoutWeight(1)
         Text(this.t('重扫', 'Rescan')).fontSize(FontSize.xs).fontColor(this.accentColor())
@@ -203,9 +211,13 @@ struct LanLobby {
 
       // 开房
       Button(this.t('开个房间（我来当房主）', 'Host a room'))
-        .width('100%').height(48)
+        // ★ 2026-10-19 自查 A3：开房按钮写死 48vp，大字模式会裁
+        .width('100%').constraintSize({ minHeight: Cell.of(48) })
         .backgroundColor(this.accentColor())
-        .onClick(() => this.hostRoom())
+        .onClick(() => {
+          Haptics.tap();   // ★ 2026-10-19 按压反馈
+          this.hostRoom();
+        })
 
       // 房间列表
       Text(this.status).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
@@ -214,7 +226,7 @@ struct LanLobby {
           Text('📶').fontSize(FontSize.lg)
             .accessibilityLevel('no')
           Column({ space: 2 }) {
-            Text(r.host + this.t(' 的房间', "'s room")).fontSize(FontSize.sm)
+            Text(this.t('{s} 的房间', "{s}'s room").replace('{s}', r.host)).fontSize(FontSize.sm)
               .fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
             Text(this.gameName(r.gameId) + ' · ' + r.ip).fontSize(FontSize.micro)
               .fontColor(this.theme().inkFaint)
@@ -320,7 +332,7 @@ struct LanLobby {
       }
     });
     this.status = port > 0
-      ? this.t('房间已开（端口 ' + port + '）—— 等对手加入', 'Room open on port ' + port + ' — waiting')
+      ? this.t('房间已开（端口 {n}）—— 等对手加入', 'Room open on port {n} — waiting').replace('{n}', String(port))
       : this.t('开房失败，检查 Wi-Fi', 'Could not host — check your Wi-Fi');
   }
 
@@ -334,7 +346,7 @@ struct LanLobby {
     }
     const pt: number = Number.parseInt(this.manualPort.trim(), 10);
     const room: LanRoom = { ip: ip, port: isNaN(pt) ? 41235 : pt, host: 'Host', gameId: this.picked };
-    this.status = this.t('正在连接 ' + ip + '…', 'Connecting to ' + ip + '…');
+    this.status = this.t('正在连接 {s}…', 'Connecting to {s}…').replace('{s}', ip);
     LanMatch.begin(false, (d: string) => {
       this.status = this.t('对手落子：', 'Opponent moved: ') + d;
     }, this.picked);          // ★ P12：传 gameId，难度广播才生效

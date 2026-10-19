@@ -61,8 +61,12 @@ export class About {
   static readonly PRIVACY_TITLE_CN: string = '隐私政策';
   static readonly PRIVACY_TITLE_EN: string = 'Privacy Policy';
 
-  /** 版本号（发版时改这里） */
-  static readonly VERSION: string = '1.0.0';
+  /**
+   * 版本号 —— ★ 单一真相源（界面所有地方都用它）
+   * ⚠️ 发版时必须和 AppScope/app.json5 的 versionName **同时改**，
+   *    两边不一致 ⇒ 设置页显示的版本和商店里的对不上 ⇒ `tools/audit.py` 的 A11 会报
+   */
+  static readonly VERSION: string = '1.0.1';
 
   /** 版权行 */
   static readonly YEAR: string = '2026';

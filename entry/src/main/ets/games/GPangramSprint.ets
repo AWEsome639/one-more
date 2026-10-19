@@ -1,5 +1,6 @@
 /** 全字母句 —— 句子被抠掉几个字母，从 A–Z 里挑出缺的（6 题答对 ≥4 通关 ｜ 进度：题号/答对/倒计时） */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -142,7 +143,7 @@ export struct GPangramSprint {
             .onTouch((e: TouchEvent) => {
             if (e.type === TouchType.Down) { this.pressed = (i); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
             })
-            .onClick(() => { this.tap((i)); })
+            .onClick(() => { Haptics.tick(); this.tap((i)); })
           }, (i: number) => 'lt' + i)
         }.width('100%')
       }, (row: number[], idx: number) => 'row' + idx)
@@ -150,7 +151,7 @@ export struct GPangramSprint {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

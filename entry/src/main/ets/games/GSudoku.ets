@@ -11,6 +11,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -532,6 +533,7 @@ export struct GSudoku {
             .layoutWeight(1)
             .height(Cell.of(44))
             .onClick(() => {
+              Haptics.tap();
               this.fill(d);
             })
         }, (d: number) => 'd' + d)
@@ -552,6 +554,7 @@ export struct GSudoku {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.erase();
           })
         Button(TG('重开（新题）'))
@@ -563,6 +566,7 @@ export struct GSudoku {
           .layoutWeight(1)
           .height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }
@@ -607,6 +611,7 @@ export struct GSudoku {
     .borderRadius(Radius.xs)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => {
+      Haptics.tick();
       this.sel = i;
     })
   }

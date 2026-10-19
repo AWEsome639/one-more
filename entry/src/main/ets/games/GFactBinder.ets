@@ -4,6 +4,7 @@
  * 胜负：5 组全部绑定 = 通关；失误满 3 次 = 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -128,7 +129,7 @@ export struct GFactBinder {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(44))
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
@@ -144,7 +145,7 @@ export struct GFactBinder {
     .backgroundColor(this.done[i] ? Palette.emerald : (this.pickL === i ? Palette.primary : this.theme.surface))
     .borderRadius(Radius.sm).shadow(Shadow.card)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { this.tapL(i); })
+    .onClick(() => { Haptics.tick(); this.tapL(i); })
   }
 
   @Builder
@@ -158,6 +159,6 @@ export struct GFactBinder {
     .backgroundColor(this.done[i] ? Palette.emerald : (this.pickR === i ? Palette.primary : this.theme.surface))
     .borderRadius(Radius.sm).shadow(Shadow.card)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { this.tapR(i); })
+    .onClick(() => { Haptics.tick(); this.tapR(i); })
   }
 }

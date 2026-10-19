@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -208,6 +209,7 @@ export struct GLockPattern {
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => {
+              Haptics.tick();
               this.tapDot((r * 3 + c));
               })
             }, (c: number) => 'd' + r + '-' + c)
@@ -236,6 +238,7 @@ export struct GLockPattern {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(this.phase === 1)
           .onClick(() => {
+            Haptics.tap();
             this.peek();
           })
         Button(TG('重开'))
@@ -244,6 +247,7 @@ export struct GLockPattern {
           .backgroundColor(Palette.sky).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .onClick(() => {
+            Haptics.tap();
             this.newGame();
           })
       }

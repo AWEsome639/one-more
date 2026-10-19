@@ -4,6 +4,7 @@
  * 胜负：10 题全过 = 通关；答错 3 题 = 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -125,14 +126,14 @@ export struct GGeometricVision {
       Row({ space: Space.sm }) {
         Button(TG('A 更多'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).onClick(() => { this.answer(0); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).onClick(() => { Haptics.tap(); this.answer(0); })
         Button(TG('B 更多'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.sky)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).onClick(() => { this.answer(1); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).onClick(() => { Haptics.tap(); this.answer(1); })
       }.width('100%')
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(44)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }

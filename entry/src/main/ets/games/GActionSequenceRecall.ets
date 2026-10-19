@@ -3,6 +3,7 @@
  * 胜负：6 关全过通关；错 3 次失败　进度：关卡 / 长度 / 得分 / 生命
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -140,7 +141,7 @@ export struct GActionSequenceRecall {
           .layoutWeight(1).height(Cell.of(80)).justifyContent(FlexAlign.Center).padding(Space.xs)
           .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
           .opacity(this.playing ? 0.5 : 1).animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.tap((i)); })
+          .onClick(() => { Haptics.tick(); this.tap((i)); })
         }, (i: number) => 'a' + i)
       }
       .width('100%')
@@ -149,7 +150,7 @@ export struct GActionSequenceRecall {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：回放期间按钮不响应，等「轮到你了」再动手'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

@@ -1,5 +1,6 @@
 /** 负空间 —— 满屏色块里留白拼出一个形状，认出它是哪一个；6 关答对 ≥5 通关 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -152,7 +153,7 @@ export struct GNegativeSpaceDetection {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：别盯着色块，看它们中间空出来的那一块'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
@@ -175,6 +176,6 @@ export struct GNegativeSpaceDetection {
       .backgroundColor(this.pick === k ? Palette.violet : this.theme.surface).borderRadius(Radius.md)
       .opacity(this.pick >= 0 && this.pick !== k ? 0.45 : 1).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => { this.answer(k); })
+      .onClick(() => { Haptics.tick(); this.answer(k); })
   }
 }

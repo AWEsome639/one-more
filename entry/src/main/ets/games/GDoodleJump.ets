@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -354,6 +355,7 @@ export struct GDoodleJump {
           .height(Cell.of(52))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.move(-1);
           })
         Button(TG('▶ 右'))
@@ -366,6 +368,7 @@ export struct GDoodleJump {
           .height(Cell.of(52))
           .enabled(!this.over)
           .onClick(() => {
+            Haptics.tap();
             this.move(1);
           })
       }
@@ -384,6 +387,7 @@ export struct GDoodleJump {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
 

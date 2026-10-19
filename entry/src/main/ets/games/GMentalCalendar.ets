@@ -4,6 +4,7 @@
  * 胜负：90 秒内答对 6 题 ⇒ 通关；时间归零 ⇒ 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -183,7 +184,7 @@ export struct GMentalCalendar {
           .backgroundColor(this.pickedW < 0 ? this.theme.surface
           : ((w) === this.ansW ? Palette.emerald : ((w) === this.pickedW ? Palette.rose : this.theme.surface)))
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.pick((w)); }) }, (w: number) => 'cw1' + w)
+          .onClick(() => { Haptics.tick(); this.pick((w)); }) }, (w: number) => 'cw1' + w)
         }.width('100%')
         Row({ space: Space.sm }) {
           ForEach(W2, (w: number) => { Text(TG(WEEK[(w)]))
@@ -194,7 +195,7 @@ export struct GMentalCalendar {
           .backgroundColor(this.pickedW < 0 ? this.theme.surface
           : ((w) === this.ansW ? Palette.emerald : ((w) === this.pickedW ? Palette.rose : this.theme.surface)))
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onClick(() => { this.pick((w)); }) }, (w: number) => 'cw2' + w)
+          .onClick(() => { Haptics.tick(); this.pick((w)); }) }, (w: number) => 'cw2' + w)
         }.width('100%')
       }.width('100%')
 
@@ -205,7 +206,7 @@ export struct GMentalCalendar {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：一三五七八十腊，三十一天永不差；闰年二月二十九天'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

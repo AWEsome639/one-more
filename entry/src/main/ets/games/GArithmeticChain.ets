@@ -3,6 +3,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -200,28 +201,28 @@ export struct GArithmeticChain {
           Button((0) < this.stage.palette.length ? this.stage.palette[(0)].label : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl)
           .fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (0) < this.stage.palette.length).onClick(() => { this.tap((0)); })
+          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (0) < this.stage.palette.length).onClick(() => { Haptics.tap(); this.tap((0)); })
           Button((1) < this.stage.palette.length ? this.stage.palette[(1)].label : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl)
           .fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (1) < this.stage.palette.length).onClick(() => { this.tap((1)); })
+          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (1) < this.stage.palette.length).onClick(() => { Haptics.tap(); this.tap((1)); })
         }.width('100%')
         Row({ space: Space.sm }) {
           Button((2) < this.stage.palette.length ? this.stage.palette[(2)].label : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl)
           .fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (2) < this.stage.palette.length).onClick(() => { this.tap((2)); })
+          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (2) < this.stage.palette.length).onClick(() => { Haptics.tap(); this.tap((2)); })
           Button((3) < this.stage.palette.length ? this.stage.palette[(3)].label : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl)
           .fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (3) < this.stage.palette.length).onClick(() => { this.tap((3)); })
+          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (3) < this.stage.palette.length).onClick(() => { Haptics.tap(); this.tap((3)); })
         }.width('100%')
       }.width('100%')
 
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG2("步数 {0}/{1}",Digits(String(this.steps), this.langCode),Digits(String(MAXSTEP), this.langCode))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

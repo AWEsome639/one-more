@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
@@ -389,6 +390,7 @@ export struct GConnectFour {
             .textAlign(TextAlign.Center)
             .layoutWeight(1)
             .onClick(() => {
+              Haptics.tick();
               this.tap(c);
             })
         }, (c: number) => 't' + c)
@@ -421,6 +423,7 @@ export struct GConnectFour {
               .backgroundColor(this.theme.surface)
               .borderRadius(Radius.full)
               .onClick(() => {
+              Haptics.tick();
               this.tap((c));
               })
             }, (c: number) => 'c' + c)
@@ -449,6 +452,7 @@ export struct GConnectFour {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => {
+          Haptics.tap();
           this.reset();
         })
 

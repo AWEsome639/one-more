@@ -7,7 +7,7 @@
 
 import { Haptics } from '../core/Haptics';
 import { Digits } from '../core/I18n';   // ★ 2026-10-16 数字本地化
-import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Accent } from '../core/Design';
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Accent, Cell } from '../core/Design';
 import { GameMeta, GameCategory, CatCount, colorOf, enterDelay, catLabelEn, ACCENT_TAG, ACCENT_DEEP_TAG, displayName, displayTagline } from '../core/GameRegistry';
 import { L, TN } from '../core/I18n';
 
@@ -519,7 +519,7 @@ export struct LevelHeader {
               .fontColor(Color.White)
           }
         }
-        .width(56).height(56)
+        .width(Cell.of(56)).height(Cell.of(56))
 
         Column({ space: Space.xs }) {
           Text(this.titleForLevel())
@@ -924,6 +924,7 @@ export struct CategoryBar {
             .borderRadius(Radius.full)
             .animation({ duration: Motion.fast, curve: Motion.spring() })
             .onClick(() => {
+              Haptics.tap();   // ★ 2026-10-19 按压反馈
               this.onPick(it.cat);
             })
         }, (it: CatCount) => it.cat)

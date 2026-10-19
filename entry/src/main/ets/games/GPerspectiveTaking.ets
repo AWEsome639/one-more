@@ -4,6 +4,7 @@
  * 胜负：8 题答对 ≥6 ⇒ 通关；否则失败。　进度：第几题 / 已答对
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -173,13 +174,13 @@ export struct GPerspectiveTaking {
         .backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .borderWidth(2).borderColor(this.optBorder((k)))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.choose((k)); }) }, (k: number) => 'opt' + k)
+        .onClick(() => { Haptics.tick(); this.choose((k)); }) }, (k: number) => 'opt' + k)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

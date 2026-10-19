@@ -3,6 +3,7 @@
  * 胜负：16 轮答对 ≥12 ⇒ 通关；进度：轮次 / 答对 / 重复-切换平均反应时与代价
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -141,12 +142,12 @@ export struct GTaskSwitching {
         .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64)).backgroundColor(this.pick === (0) ? Palette.cyan : this.theme.surfaceAlt)
         .borderRadius(Radius.md).shadow(Shadow.card).scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((0)); })
+        .onClick(() => { Haptics.tick(); this.answer((0)); })
         Text(this.optName((1))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
         .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64)).backgroundColor(this.pick === (1) ? Palette.cyan : this.theme.surfaceAlt)
         .borderRadius(Radius.md).shadow(Shadow.card).scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.answer((1)); })
+        .onClick(() => { Haptics.tick(); this.answer((1)); })
       }.width('100%')
 
       Text(TG2('重复 {0}ms · 切换 {1}ms · 代价 ', String(this.avgRep()), String(this.avgSw()))
@@ -155,7 +156,7 @@ export struct GTaskSwitching {
 
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-        .backgroundColor(Palette.cyan).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .backgroundColor(Palette.cyan).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：切换试次比重复试次慢多少，就是这一局的「切换代价」')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

@@ -4,6 +4,7 @@
  * 胜负：60 秒内答对 8 题 ⇒ 通关；时间归零 ⇒ 失败。
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -192,7 +193,7 @@ export struct GMentalAbacus {
         .backgroundColor(this.picked < 0 ? this.theme.surface
         : ((i) === this.ans ? Palette.emerald : ((i) === this.picked ? Palette.rose : this.theme.surface)))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { this.pick((i)); }) }, (i: number) => 'ao' + i)
+        .onClick(() => { Haptics.tick(); this.pick((i)); }) }, (i: number) => 'ao' + i)
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).width('100%')
@@ -202,7 +203,7 @@ export struct GMentalAbacus {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.cyan)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：一步一算，别跳步 —— 减法看准方向'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

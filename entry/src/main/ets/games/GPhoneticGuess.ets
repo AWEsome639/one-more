@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -330,6 +331,7 @@ export struct GPhoneticGuess {
           .shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
+            Haptics.tick();
             this.pick(i);
           })
         }, (i: number) => 'o' + i)
@@ -350,6 +352,7 @@ export struct GPhoneticGuess {
           .layoutWeight(1)
           .height(Cell.of(46))
           .onClick(() => {
+            Haptics.tap();
             this.hint = true;
           })
         Button(TG('重新开始'))
@@ -361,6 +364,7 @@ export struct GPhoneticGuess {
           .layoutWeight(1)
           .height(Cell.of(46))
           .onClick(() => {
+            Haptics.tap();
             this.reset();
           })
       }

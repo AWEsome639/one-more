@@ -3,6 +3,7 @@
  * 胜负：6 题答对 ≥4 ⇒ 通关｜进度：题号 / 答对 / 每题倒计时
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell, Motion } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -163,10 +164,10 @@ export struct GLogicalSyllogisms {
       Row({ space: Space.sm }) {
         Button(TG('推理有效 ✓'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.judge(true, ''); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.judge(true, ''); })
         Button(TG('推理无效 ✗'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.rose)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { this.judge(false, ''); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.judge(false, ''); })
       }.width('100%')
       Text(this.feedback.length > 0 ? this.feedback : '结论能从两个前提必然推出吗？')
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
@@ -175,7 +176,7 @@ export struct GLogicalSyllogisms {
         Text(TG2('分 {0}',Digits(String(this.score), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)

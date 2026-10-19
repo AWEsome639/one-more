@@ -1,5 +1,6 @@
 /** 语义距离 —— 判断两个候选词里哪个离锚点词更近｜胜负：10 题答对 ≥7 通关 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -113,21 +114,21 @@ export struct GSemanticDistance {
         : ((0) === this.ans ? Palette.emerald : ((0) === this.picked ? Palette.rose : this.theme.lineSoft)))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(72))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .enabled(!this.over && this.picked < 0).onClick(() => { this.pick((0)); })
+        .enabled(!this.over && this.picked < 0).onClick(() => { Haptics.tap(); this.pick((0)); })
         Button(this.opts.length > (1) ? this.opts[(1)] : '')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF')
         .backgroundColor(this.picked < 0 ? Palette.primary
         : ((1) === this.ans ? Palette.emerald : ((1) === this.picked ? Palette.rose : this.theme.lineSoft)))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(72))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .enabled(!this.over && this.picked < 0).onClick(() => { this.pick((1)); })
+        .enabled(!this.over && this.picked < 0).onClick(() => { Haptics.tap(); this.pick((1)); })
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG2("{0} 题，答对 ≥{1} 通关：词义越近越好",Digits(String(this.diffTotal), this.langCode), PASS))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }.width('100%').height('100%').justifyContent(FlexAlign.Start)

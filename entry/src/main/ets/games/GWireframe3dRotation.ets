@@ -2,6 +2,7 @@
  * 题面是 4 块方块搭成的立体形状，四个点阵里只有一个是它「转了个方向」的正交投影；
  * 4 题答对 ≥3 ⇒ 通关，否则失败。 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -139,7 +140,7 @@ export struct GWireframe3dRotation {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.win() ? Palette.emerald : Palette.primary)
-        .onClick(() => { this.reset(); })
+        .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
@@ -155,6 +156,6 @@ export struct GWireframe3dRotation {
       (i === this.ans ? Palette.emerald : (i === this.picked ? Palette.rose : this.theme.line)))
     .shadow(Shadow.card)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
-    .onClick(() => { this.pick(i); })
+    .onClick(() => { Haptics.tick(); this.pick(i); })
   }
 }
