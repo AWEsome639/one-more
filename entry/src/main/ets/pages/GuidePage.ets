@@ -37,7 +37,7 @@ function categoryTips(c: GameCategory, en: boolean): string[] {
   if (c === GameCategory.CLASSIC) {
     return [
       L2('点/滑操作，规则简单，玩起来就懂', 'Tap or swipe. Simple rules, obvious once you start.', en),
-      L2('有明确胜负判定，通关或失败都会结算经验', 'There is a clear win or lose, and either way you earn XP.', en),
+      L2('有明确胜负判定；通关才有经验', 'Clear win or lose — you earn XP only when you clear.', en),
       L2('右上角 ↻ 可以随时重开这一局', 'Tap ↻ top-right to restart any time.', en)
     ];
   }
