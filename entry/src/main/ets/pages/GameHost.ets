@@ -3018,7 +3018,15 @@ struct GameHost {
       //   放在结算弹窗【之后】⇒ 盖在最上面；绝对定位 + markAnchor ⇒ 不影响任何布局
       //   中心点 (50%, 72%) ≈ 结算弹窗里那个 🎉 的位置 ⇒ 粒子看起来是"从 🎉 炸出来的"
       if (this.showResult && this.lastSolved) {
-        SparkBurst({ progress: this.burstP, count: 26, spread: 175 })
+        // ★★★ 2026-10-19 真机看到粒子后修：原来只传 count/spread，颜色用组件默认值
+        //   默认 gold=#E8C97C（vs 白 1.61）、cream=#FAF8F3（vs 白 1.06）
+        //   ⇒ 结算弹窗是浅色底（surface），奶白粒子等于看不见；实测放大才看得出
+        //   ⇒ 按主题传色：浅底用深金+琥珀（3.25 / 2.6），深底保留原来的奶白（深底上正好）
+        SparkBurst({
+          progress: this.burstP, count: 26, spread: 175,
+          goldColor: this.theme().isDark ? '#E8C97C' : '#B8860B',
+          creamColor: this.theme().isDark ? '#FAF8F3' : '#D4A017'
+        })
           .width(420)
           .height(420)
           // ★ 纵向锚点随界面模式算（见 burstY 的注释）
