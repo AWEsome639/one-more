@@ -1112,9 +1112,14 @@ build() {
       .width('100%')
 
       this.infoRow({
-        icon: '📴', zh: '无需联网', en: 'No network needed',
-        subZh: '连网络权限都没申请，飞行模式照样玩',
-        subEn: 'We do not even request network access — flight mode works'
+        // ★★★ 2026-10-19 收口复查抓到的假陈述（第 13 轮只修了隐私弹窗，这里漏了）：
+        //   原来写「无需联网 / 连网络权限都没申请，飞行模式照样玩」—— 假话
+        //   实际：manifest 申请了 ohos.permission.INTERNET（局域网对战要开 UDP 端口），
+        //         GameKit 也要连华为服务器做账号校验
+        //   ⇒ 改成实话：不改"离线能玩"这个真实卖点，只说清"什么时候才用网"
+        icon: '📴', zh: '不联网也能玩', en: 'Playable offline',
+        subZh: '355 款游戏全都不用联网。只有局域网对战、和华为游戏服务账号校验会用到网络',
+        subEn: 'All 355 games run offline. Network is used only for LAN play and Huawei sign-in'
       })
       this.infoRow({
         icon: '🚫', zh: '无广告', en: 'No ads',
@@ -1122,9 +1127,12 @@ build() {
         subEn: 'No splash ads, no pop-ups, no watch-a-video to unlock'
       })
       this.infoRow({
-        icon: '🔒', zh: '不采集任何数据', en: 'No data collected',
-        subZh: '不用注册账号，不上传数据，没用任何第三方代码',
-        subEn: 'No account, no uploads, no third-party code'
+        // ★★★ 同上：原来写「不用注册账号，不上传数据，没用任何第三方代码」——
+        //   「没用任何第三方代码」是假话（GameKit 就是第三方 SDK）
+        //   ⇒ 改成实话
+        icon: '🔒', zh: '不采集你的数据', en: 'No personal data collected',
+        subZh: '不用注册账号，不上传游戏记录。只用华为游戏服务做账号校验',
+        subEn: 'No account, no uploads of your records. Huawei Game Service is used only for sign-in'
       })
     }
     .alignItems(HorizontalAlign.Start)
