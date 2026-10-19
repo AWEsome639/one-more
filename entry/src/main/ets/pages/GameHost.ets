@@ -575,9 +575,16 @@ struct GameHost {
     if (r.solved) {
       this.burstP = 0;
       setTimeout(() => {
-        animateTo({ duration: 980, curve: Curve.EaseOut }, () => {
-          this.burstP = 1;
-        });
+        // ★★★ 2026-10-19 真机验证后改：原来用 animateTo 改 @State 再传 @Prop，
+        //   Canvas 的 @Watch 拿不到中间值 ⇒ 粒子一次都没画出来（8 秒动画也看不到）
+        //   ⇒ 改用手动逐帧推进（与 MotionKit.RollingNumber 同一套做法）
+        this.burstP = 0;
+        let bi: number = 0;
+        const bTimer: number = setInterval(() => {
+          bi = bi + 1;
+          this.burstP = Math.min(1, bi / 30);
+          if (bi >= 30) { clearInterval(bTimer); }
+        }, 33);
       }, Motion.base + 40);
     }
     // ★★★ 2026-10-14 奥森反馈「每个小游戏的开启动画非常诡异」⇒ 第二个根因修：
