@@ -430,7 +430,12 @@ struct GameHost {
   // ★ 难度标签必须读一个 @State —— 只调 ProgressStore.diffOf() 的话
   //   ArkUI 看不到依赖，切了难度标签不会重渲染（同一个坑踩了四次）
   @State diffTick: number = 0;
-  @State dark: boolean = false;
+  // ★★★ 2026-10-19 真机抓到：原来这里是 `@State dark`（写死 false、从不更新）
+  //   ⇒ 深色模式下，别的页面（主页/统计/设置/局域网页）都是深色，
+  //     唯独【游戏页】和【结算弹窗】一直是浅色 —— 用户会看到"点进去突然变白"
+  //   ⇒ 改成与其余 5 个页面一致的写法：订阅 AppStorage 里的 themeDark
+  //     （StatsTab / SettingsTab / GamesTab / LanLobby / Index 都是这么写的）
+  @StorageProp('themeDark') dark: boolean = false;
   @State showResult: boolean = false;
   @State lastGain: number = 0;
   /** ★ 本局新解锁的成就（结算面板要展示并庆祝） */
