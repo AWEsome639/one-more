@@ -554,6 +554,11 @@ build() {
 
         Row({ space: Space.sm }) {
           Text(About.FEEDBACK_EMAIL)
+          // ★ 2026-10-19 真机大字模式实拍后修：原来只有 fontSize(sm) + maxLines(1) + Ellipsis
+          //   ⇒ 大字模式邮箱 andrew680701@outlook.com 被截成「andrew680701@outlook....」
+          //   ⇒ 加 minFontSize/maxFontSize（与游戏卡副标题同一套机制）：先缩字号，真缩不下才省略
+          .minFontSize(9)
+          .maxFontSize(FontSize.sm)
             .fontSize(FontSize.sm).fontColor(this.theme().inkSoft).layoutWeight(1)
             .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
           Text(this.t('复制', 'Copy'))
