@@ -1470,17 +1470,6 @@ const EXTRA: Record<string, Record<string, string>> = {
     "it": "Livello LV ",
   },
   /** ★★ 2026-10-16 隐私摘要句（原来 9 语言退英文） */
-  "「One More」不联网、不采集、不上传你的任何个人信息。你在应用里的所有记录，都只存在你自己的手机里。": {
-    "ja": "「One More」はネットに接続せず、個人情報を収集も送信もしません。アプリ内の記録はすべてあなたのスマホの中だけに保存されます。",
-    "ko": "「One More」는 인터넷에 연결하지 않고, 어떤 개인정보도 수집·전송하지 않습니다. 앱 안의 모든 기록은 오직 당신의 휴대폰에만 저장됩니다.",
-    "fr": "« One More » ne se connecte pas à Internet, ne collecte ni ne transmet aucune donnée personnelle. Tous vos enregistrements restent uniquement sur votre téléphone.",
-    "de": "„One More“ geht nicht online, erhebt und überträgt keine persönlichen Daten. Alle Aufzeichnungen bleiben ausschließlich auf Ihrem Telefon.",
-    "es": "«One More» no se conecta a Internet ni recopila ni transmite dato personal alguno. Todos tus registros se guardan solo en tu teléfono.",
-    "ru": "«One More» не выходит в интернет, не собирает и не передаёт никаких личных данных. Все записи хранятся только в вашем телефоне.",
-    "ar": "«One More» لا يتصل بالإنترنت ولا يجمع ولا يرسل أي بيانات شخصية. كل سجلاتك محفوظة في هاتفك وحده.",
-    "pt": "O «One More» não se conecta à internet nem coleta ou transmite qualquer dado pessoal. Todos os seus registros ficam apenas no seu telefone.",
-    "it": "«One More» non si connette a Internet, non raccoglie né trasmette alcun dato personale. Tutti i tuoi record restano solo sul tuo telefono.",
-  },
   /** ★★ 2026-10-16 隐私政策第 1 段正文（原来 9 语言退英文） */
   "本应用不收集、不存储、不传输：姓名/手机号/邮箱等身份信息、通讯录、通话记录、短信、位置信息、相册与相机内容、麦克风内容、设备标识符（IMEI/OAID/MAC）、应用安装列表、剪贴板、网络访问记录。\\n\\n关于网络权限：本应用**只申请了网络权限与 Wi-Fi 信息两项**，且**只用于「局域网对战」** —— 让同一 Wi-Fi 下的两台设备互相找到并直连。**除此之外**，本应用未申请位置、相机、麦克风、通讯录、日历、电话、短信、存储读写等任何敏感权限。\\n\\n局域网对战**不连接互联网、不上传任何数据**：消息只在同一 Wi-Fi 内的两台设备之间直接传输，一局结束即断开。其余 353 款游戏与全部记录、统计**完全离线**，飞行模式下照常可玩。": {
     "ja": "本アプリは収集・保存・送信しません：氏名／電話番号／メール等の身元情報、連絡先、通話履歴、SMS、位置情報、写真とカメラの内容、マイクの内容、端末識別子（IMEI/OAID/MAC）、インストール済みアプリ一覧、クリップボード、ネットワークアクセス履歴。\\n\\nネットワーク権限について：本アプリが申請するのは**ネットワーク権限と Wi-Fi 情報の2つのみ**で、**「LAN 対戦」専用**です —— 同じ Wi-Fi 上の2台が互いを見つけて直接接続するため。**それ以外**に、位置・カメラ・マイク・連絡先・カレンダー・電話・SMS・ストレージ読み書き等の機微な権限は一切申請していません。\\n\\nLAN 対戦は**インターネットに接続せず、いかなるデータも送信しません**：メッセージは同じ Wi-Fi 内の2台間で直接やり取りされ、1局終われば切断されます。残り 353 本のゲームとすべての記録・統計は**完全オフライン**で、機内モードでも遊べます。",
