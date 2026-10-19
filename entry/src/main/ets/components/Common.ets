@@ -772,7 +772,11 @@ build() {
           //        ② 真塞不下时用省略号（Ellipsis）⇒ 截断也体面 ✓
           .minFontSize(8)
           .maxFontSize(FontSize.xxs)
-          .fontColor(Overlay.onColorSoft)
+          // ★ 2026-10-19（对比度实测后改）：原来用 onColorSoft = 80% 白
+          //   副标题在着色卡片上只有 2.51–3.16（最低的 lime 连 3.0 都不到）
+          //   ⇒ 改纯白，3.09–4.10，+23%
+          //   ⓘ 仍不到正文 4.5：那要把卡片从「实色底」改成「浅色底+深字」，属设计改动，留待真机看过
+          .fontColor(Overlay.onColor)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
