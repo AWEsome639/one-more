@@ -734,10 +734,14 @@ export struct StatsTab {
           GridItem() {
             // ★ 内联 + 读 this.totalSolved 建立观察：
             //   ProgressStore 是静态类、不是 @State ⇒ 原来解锁成就后徽章墙不刷新（P3 同族）
-            Row({ space: Space.sm }) {
+            // ★ 2026-10-19 真机实拍后调：原 space.sm(14) + 图标 36
+            //   ⇒ 文字区只剩 94vp，而副标题「玩出你的第一局」正好需 94vp
+            //   ⇒ 零余量 ⇒ 实拍出看到省略号
+            //   收到 Space.xs(13) + 图标 30 ⇒ 文字区 99vp，够了
+            Row({ space: Space.xs }) {
               Text(ProgressStore.isUnlocked(a[0]) ? a[1] : '🔒')
                 .fontSize(FontSize.xl)
-                .width(36).height(36).textAlign(TextAlign.Center)
+                .width(30).height(30).textAlign(TextAlign.Center)
                 .backgroundColor(ProgressStore.isUnlocked(a[0]) ? '#1A6366F1' : this.theme().surfaceAlt)
                 .borderRadius(Radius.sm)
               Column({ space: 1 }) {
