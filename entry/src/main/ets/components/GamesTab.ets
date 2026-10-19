@@ -708,7 +708,11 @@ build() {
             .height(this.cardH())
           }, (g: GameMeta) => g.id + this.tick)
         }
-        .columnsTemplate('1fr 1fr')
+        // ★★★ 2026-10-19 真机大字模式实拍后改：大字模式改【单列】
+        //   实拍：副标题「一板一球，清空全场」在大字模式下被截成「一板一球，清…」
+        //   算过：9 字 × 17px = 153vp，可用宽度只有 156-48-12-32 ≈ 64vp ⇒ 怎么缩都不够
+        //   ⇒ 大字模式单列（卡片通栏 328vp，文字区 236vp）
+        .columnsTemplate(this.uiMode === 'elder' ? '1fr' : '1fr 1fr')
         .columnsGap(Space.md)
         .rowsGap(Space.md)
         // ★ 拉满：内容刷新脉冲的视觉（收紧 + 半透 ⇒ 弹回）
@@ -1194,13 +1198,23 @@ build() {
   }
 
   private cardH(): number {
+    // ★★★ 2026-10-19 真机大字模式实拍后重算（奥森：「任何地方都要注意」）
+    //   实拍现象：elder 下「宝石迷阵」被挤成两行、「打砖块」副标题被截
+    //
+    //   按 elder 档真实数值算：
+    //     padding Space.md 21×2 = 42 ＋ 标题 2 行(21×1.4×2) 58.8
+    //     ＋ 间隔 Space.xs 18 ＋ 副标题 1 行(17×1.4) 23.8  = 142.6 vp
+    //   而写死的是 112 ⇒ 差 30.6 vp ⇒ 就是实拍那个样子
+    //
+    //   normal / simple 也是零余量：normal 需 84 恰好写 84，simple 需 76 恰好写 76
+    //   ⇒ 三档全部加 8–31 vp 余量（不会明显变稀，因为多的是留白）
     if (this.uiMode === 'elder') {
-      return 112;
+      return 146;   // 需 142.6，给 3.4 余量
     }
     if (this.uiMode === 'simple') {
-      return 76;
+      return 84;    // 需 76，给 8 余量
     }
-    return 84;
+    return 92;      // 需 84，给 8 余量
   }
 
   @Builder

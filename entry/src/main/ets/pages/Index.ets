@@ -65,14 +65,14 @@ struct Index {
     const opt: AlertDialogParamWithButtons = {
       title: this.t('隐私说明', 'Privacy'),
       message: this.t(
-        '「One More」不收集你的任何信息，也不上传任何数据。\n' +
-        '你的记录只存在自己手机里；网络权限仅用于「局域网对战」，不连公网。\n\n' +
-        '详情见隐私政策。',
-        '"One More" collects no information and uploads no data.\n' +
-        'Everything stays on your device; network permission is used only for LAN play.\n\n' +
-        'See the Privacy Policy for details.'),
-      autoCancel: false,
-      // ★ 2026-10-13 实测修正：`cancel` 要的是 `{value, action}` **对象**，
+          // ★ 2026-10-19 真机首启实拍后修正：原来写「不连公网」是假的
+          //   （GameKit 的账号校验会连华为服务器，这是应用市场对游戏类目的合规要求）
+          '「One More」不收集你的个人信息，也不上传你的游戏记录。\n' +
+          '所有记录只存在你自己的手机里。需联网的只有两项：局域网对战、华为游戏服务的账号校验。\n\n' +
+          '详情见隐私政策。',
+             '"One More" does not collect your personal information and never uploads your game records.\n' +
+             'Everything stays on your device. Only two features use the network: LAN play and Huawei Game Service account check.\n\n' +
+             'See the Privacy Policy for details.'),
       //   我第一版传了个函数 ⇒ **「查看全文」按钮根本没渲染**（实拍只有"同意并继续"）
       //   ⇒ 审核要求「用户能在同意【之前】读到全文」，这个按钮是硬要求
       secondaryButton: {
