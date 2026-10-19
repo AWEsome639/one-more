@@ -103,7 +103,9 @@ export struct SparkBurst {
       const y: number = cy + Math.sin(s.angle) * r;
       // 前 15% 淡入（从无到有），之后一路淡出
       const fadeIn: number = clamp01(t / 0.15);
-      const alpha: number = fadeIn * (1 - t) * 0.95;
+      // 2026-10-19 真机修：原来 0.95 太实，粒子落在文字/按钮上看着脏
+      //   => 降到 0.72：还是亮的，但能透出下面的字
+      const alpha: number = fadeIn * (1 - t) * 0.72;
       if (alpha <= 0.01) {
         continue;
       }

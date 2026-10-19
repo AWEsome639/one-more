@@ -657,7 +657,10 @@ struct GameHost {
    */
   private burstY(): string {
     const k: number = Cell.k;
-    const y: number = 70 - (k - 1) * 27;
+    // ★★★ 2026-10-19 真机量后修：原来基准 70%，但实拍量出那个 emoji 中心在 56%
+    //   ⇒ 粒子从 emoji 下方 14 个百分点处炸开，不是从 emoji 里钻出来
+    //   ⇒ 基准改 56%（大字/简约模式的 -27/级 斜率保留，只是整体上移）
+    const y: number = 56 - (k - 1) * 27;
     return y.toFixed(1) + '%';
   }
 
@@ -3023,7 +3026,8 @@ struct GameHost {
         //   ⇒ 结算弹窗是浅色底（surface），奶白粒子等于看不见；实测放大才看得出
         //   ⇒ 按主题传色：浅底用深金+琥珀（3.25 / 2.6），深底保留原来的奶白（深底上正好）
         SparkBurst({
-          progress: this.burstP, count: 26, spread: 175,
+          // ★ 2026-10-19 真机修：spread 175→130 ⇒ 原来粒子飞到「再来一局」按钮上盖住字
+          progress: this.burstP, count: 26, spread: 130,
           goldColor: this.theme().isDark ? '#E8C97C' : '#B8860B',
           creamColor: this.theme().isDark ? '#FAF8F3' : '#D4A017'
         })
