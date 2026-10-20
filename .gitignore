@@ -53,3 +53,6 @@ node_modules/
 **/.DS_Store
 **/*.log
 __pycache__/
+
+# 备份文件不进仓库（2026-10-20）：260 个 .bak / 57,604 行 / 2.5 MB，没有代码价值
+entry/src/main/ets/games/*.bak*
