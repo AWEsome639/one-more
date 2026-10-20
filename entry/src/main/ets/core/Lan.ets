@@ -133,7 +133,7 @@ export class Lan {
         udp.send({
           data: MAGIC + ' HERE ' + port + ' ' + Lan.nick() + ' ' + gameId,
           address: { address: '255.255.255.255', port: DISCOVER_PORT, family: 1 },
-        }).catch(() => {});
+        }).catch(() => { /* 广播失败无所谓：对端没在听就算了，不打断本机流程 */ });
       }, 1500);
     } catch (e) {
       const err = e as BusinessError;

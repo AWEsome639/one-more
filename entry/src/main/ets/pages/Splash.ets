@@ -33,7 +33,7 @@
  */
 
 import { router } from '@kit.ArkUI';
-import { FontSize, Space, Motion } from '../core/Design';
+import { FontSize } from '../core/Design';   // Space/Motion 2026-10-20 清掉：正文零引用
 import { Haptics } from '../core/Haptics';
 import { L } from '../core/I18n';
 
