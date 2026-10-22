@@ -17,6 +17,9 @@ import { LanMatch, Side } from '../core/LanMatch';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+// ★★★ 2026-10-23 AI 升级（路线 A）：α-β 搜索器，只做算法、不碰界面
+//   搜不出来（简单档 / 异常 / 超预算）⇒ 自动回落下面那个 chooseMove 启发式
+import { GomokuSearch } from '../ai/GomokuSearch';
 
 const SIZE: number = 15;
 const CELLS: number = SIZE * SIZE;
@@ -404,6 +407,8 @@ export struct GGomoku {
 
   private history: number[] = [];
   private startAt: number = 0;
+  /** ★ 2026-10-23：α-β 搜索器（路线 A）。置换表随实例复用，跨局不清 */
+  private searcher: GomokuSearch = new GomokuSearch();
   private aiTimer: number = -1;
 
   aboutToAppear(): void {
@@ -580,7 +585,18 @@ export struct GGomoku {
       this.thinking = false;
       return;
     }
-    const idx: number = chooseMove(this.board, this.diffTotal, GameDiff.now());
+    // ★★★ 2026-10-23：先跑 α-β 搜索（路线 A），失败或简单档就回落原启发式
+    //   传 board.slice() 是故意的 —— 搜索内部会临时落子/撤销，
+    //   给它一份副本，就算搜索里出任何岔子也污染不到真正的棋盘 ✓
+    let idx: number = -1;
+    try {
+      idx = this.searcher.pick(this.board.slice(), this.diffTotal, GameDiff.now());
+    } catch (e) {
+      idx = -1;
+    }
+    if (idx < 0) {
+      idx = chooseMove(this.board, this.diffTotal, GameDiff.now());
+    }
     if (idx < 0) {
       this.thinking = false;
       this.over = true;
