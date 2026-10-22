@@ -23,6 +23,9 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23：GMultiTrackCounter 原来用裸中文拼接，改成 TG2 模板 */
+  "报数：共 {0} 下": { "en": "Count out: {0} taps total", "ja": "カウント：全部で{0}回", "ko": "세기: 총 {0}회", "es": "Cuenta: {0} toques en total", "fr": "Compte : {0} appuis au total", "de": "Zählen: insgesamt {0} Mal", "pt": "Contagem: {0} toques no total", "ru": "Счёт: всего {0} нажатий", "it": "Conteggio: {0} tocchi in totale", "ar": "العد: {0} نقرات إجمالًا" },
+
   /** ★★ 2026-10-23：这几个原来 TG 包了但字典里没有 */
   "乘": { "en": "multiply", "ja": "掛ける", "ko": "곱하기", "es": "multiplicar", "fr": "multiplier", "de": "mal", "pt": "multiplicar", "ru": "умножить", "it": "moltiplicare", "ar": "ضرب" },
   /** ★★ 2026-10-23：这几个原来 TG 包了但字典里没有 */

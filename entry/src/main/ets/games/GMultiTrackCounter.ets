@@ -239,7 +239,7 @@ export struct GMultiTrackCounter {
         .onClick(() => { Haptics.tap(); this.bump((5)); })
       }
       .width('100%')
-      Button('报数：共 ' + String(this.answer) + TG(' 下'))
+      Button(TG2('报数：共 {0} 下', this.answer))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
         .fontColor('#FFFFFF')
