@@ -13,6 +13,8 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+// ★★★ 2026-10-23 路线 C：价值网络（提示用）
+import { G2048Value } from '../ai/G2048Value';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -51,6 +53,78 @@ function tileInk(v: number): string {
   return '#FFFFFF';
 }
 
+
+/**
+ * ★★★ 2026-10-23 路线 C：预演一次移动，**不改任何状态**。
+ *   原来的 move() 是组件方法、会改 this.cells 并加分 —— 提示功能需要
+ *   "只看不落"的版本，所以单独写一个纯函数。
+ *   规则与 collapse() 严格一致（左到右、每块最多合一次）。
+ */
+function previewMove(cells: number[], dir: number): number[] {
+  const out: number[] = new Array<number>(16);
+  for (let i = 0; i < 16; i++) {
+    out[i] = cells[i];
+  }
+  const collapseLine = (line: number[]): number[] => {
+    const t: number[] = [];
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] !== 0) {
+        t.push(line[i]);
+      }
+    }
+    let i: number = 0;
+    while (i < t.length - 1) {
+      if (t[i] === t[i + 1]) {
+        t[i] = t[i] * 2;
+        t.splice(i + 1, 1);
+      }
+      i++;
+    }
+    while (t.length < N) {
+      t.push(0);
+    }
+    return t;
+  };
+  if (dir === 0 || dir === 1) {
+    for (let r = 0; r < N; r++) {
+      const line: number[] = [];
+      for (let c = 0; c < N; c++) {
+        line.push(out[r * N + c]);
+      }
+      const src: number[] = dir === 0 ? line : line.slice().reverse();
+      const res: number[] = collapseLine(src);
+      const fin: number[] = dir === 0 ? res : res.slice().reverse();
+      for (let c = 0; c < N; c++) {
+        out[r * N + c] = fin[c];
+      }
+    }
+  } else {
+    for (let c = 0; c < N; c++) {
+      const line: number[] = [];
+      for (let r = 0; r < N; r++) {
+        line.push(out[r * N + c]);
+      }
+      const src: number[] = dir === 2 ? line : line.slice().reverse();
+      const res: number[] = collapseLine(src);
+      const fin: number[] = dir === 2 ? res : res.slice().reverse();
+      for (let r = 0; r < N; r++) {
+        out[r * N + c] = fin[r];
+      }
+    }
+  }
+  return out;
+}
+
+/** 两个盘面是否相同（用来判断"这一方向能不能动"） */
+function sameCells(a: number[], b: number[]): boolean {
+  for (let i = 0; i < 16; i++) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 @Component
 export struct G2048 {
   @Prop theme: Theme = Theme.light();
@@ -62,6 +136,8 @@ export struct G2048 {
   onFinish: (r: GameResult) => void = () => {};
 
   @State private cells: number[] = [];
+  @State private hintDir: number = -1;
+  @State private hintText: string = '';
   @State private score: number = 0;
   /** ★ 2026-10-15 得分跳动 */
   @State private scorePulse: number = 1;
@@ -151,6 +227,63 @@ export struct G2048 {
   }
 
   /** dir: 0=上 1=右 2=下 3=左 */
+
+  /**
+   * ★★★ 2026-10-23 路线 C：用价值网络算「最优的一步」。
+   *
+   * 做法是一步前瞻（不搜树）：
+   *   对 4 个方向各预演滑动后的局面 → 喂给价值网络 → 取预测值最大的那个。
+   *
+   * 为什么一步就够：
+   *   2048 的分支因子只有 4，而且滑动后马上会随机生成新块 ⇒ 深搜会引入
+   *   大量运气分支，反而稀释信号。学界公认「好评估 + 一步前瞻」性价比最高。
+   *
+   * 模型不可用 ⇒ 返回 -1，由调用方给出手工提示（绝不卡死）。
+   */
+  private askHint(): void {
+    Haptics.tap();
+    const order: number[] = [0, 1, 2, 3];      // 左 右 上 下
+    let bestDir: number = -1;
+    let bestVal: number = -1e18;
+    let anyMoved: boolean = false;
+    for (let k = 0; k < order.length; k++) {
+      const d: number = order[k];
+      const next: number[] = previewMove(this.cells, d);
+      if (sameCells(next, this.cells)) {
+        continue;                              // 这个方向动不了
+      }
+      anyMoved = true;
+      let v: number = 0;
+      const pred: number | null = G2048Value.value(next);
+      if (pred === null) {
+        // 模型不可用 ⇒ 退化成"空格多 + 合并多"的手工分
+        let empty: number = 0;
+        for (let i = 0; i < 16; i++) {
+          if (next[i] === 0) {
+            empty++;
+          }
+        }
+        v = empty * 10;
+      } else {
+        v = pred;
+      }
+      if (v > bestVal) {
+        bestVal = v;
+        bestDir = d;
+      }
+    }
+    if (!anyMoved) {
+      this.hintDir = -1;
+      this.hintText = TG('没有可动的方向了');
+      return;
+    }
+    const names: string[] = [TG('左'), TG('右'), TG('上'), TG('下')];
+    this.hintDir = bestDir;
+    this.hintText = TG('试试往') + names[bestDir] + TG('滑');
+    // 3 秒后自动清掉，不长期占屏幕
+    setTimeout(() => { this.hintDir = -1; this.hintText = ''; }, 3000);
+  }
+
   private move(dir: number): void {
     if (this.over) {
       return;
@@ -314,6 +447,21 @@ export struct G2048 {
       }
       .width('100%')
 
+      // ★★★ 2026-10-23 路线 C：提示文字
+      //   ⚠️ 我第一版只加了 hintText 状态和 askHint() 方法，**忘了在界面上渲染它**
+      //      ⇒ 真机点了没反应（状态一直在变，屏幕上什么都看不到）
+      //      ⇒ 教训：加状态必须同一次就把「谁读它」也加上，否则等于没加
+      if (this.hintText.length > 0) {
+        Text(this.hintText)
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.sm)
+          .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
+          .width('100%')
+          .textAlign(TextAlign.Center)
+      }
+
       // 状态/操作
       Row({ space: Space.md }) {
         Button(this.over ? TG('已结束') : (this.won ? TG('已通关 🎉') : '滑动或按方向键'))
@@ -325,6 +473,17 @@ export struct G2048 {
           .layoutWeight(1)
           .height(Cell.of(44))
           .enabled(false)
+        Button(TG('提示'))
+          .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .height(Cell.of(44))
+          .padding({ left: Space.md, right: Space.md })
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

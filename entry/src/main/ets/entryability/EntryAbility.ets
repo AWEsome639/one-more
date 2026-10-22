@@ -25,6 +25,8 @@ import { GameLog } from '../core/GameLog';
 import { AiEngine } from '../ai/AiEngine';
 // ★★★ 2026-10-23 路线 B：数独难度模型（11→12→1 手写 MLP，权重 2.7 KB）
 import { SudokuDifficulty } from '../ai/SudokuDifficulty';
+// ★★★ 2026-10-23 路线 C：2048 价值网络（24→24→1，权重 9.5 KB）
+import { G2048Value } from '../ai/G2048Value';
 import { gamePlayer } from '@kit.GameServiceKit';
 
 const DOMAIN = 0x0000;
@@ -49,6 +51,8 @@ export default class EntryAbility extends UIAbility {
       AiEngine.probe(this.context);
       // ★ 路线 B：读不到权重就永久降级（内部只试一次）
       SudokuDifficulty.init(this.context);
+      // ★ 路线 C：读不到就永久降级到手工提示
+      G2048Value.init(this.context);
       hilog.info(DOMAIN, 'testTag', 'GameLog ready (%{public}d 条)', GameLog.count());
     }).catch((e: Object) => {
       hilog.error(DOMAIN, 'testTag', 'ProgressStore init failed: %{public}s', JSON.stringify(e));
