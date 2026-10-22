@@ -13,6 +13,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+// ★★★ 2026-10-23 路线 B：难度不再只看挖空数，用模型预测「真实难度」
+import { SudokuDifficulty } from '../ai/SudokuDifficulty';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -101,6 +104,8 @@ export struct GSudoku {
   @State private seconds: number = 0;
   @State private done: boolean = false;
   @State private holes: number = 0;           // 本局挖空数
+  /** ★ 路线 B：模型预测的本局难度（-1 = 模型不可用） */
+  private aiDifficulty: number = -1;
   @State private label: string = '';          // 用的第几道底
 
   private answer: number[] = [];              // 本局完整解（判失误用）
@@ -161,6 +166,59 @@ export struct GSudoku {
         puzzle[i] = keep;      // 会出现多解 ⇒ 这一格留着
       }
     }
+
+    // ★★★ 2026-10-23 路线 B：按【预测难度】补挖
+    //   为什么：挖空数 ≠ 难度。实测同样挖 54 格，有的题 15 轮技巧推完、
+    //   有的要 28 轮还夹搜索。原来困难档只是"挖 52 格"，运气不好出一局很水的题。
+    //   现在：挖完后问模型"这局有多难"，离目标差得远就继续挖（最多多挖 8 格，
+    //   且每一步仍然保证唯一解）⇒ 困难档真的难。
+    //   模型不可用 ⇒ predict 返回 null ⇒ 完全跳过，行为与原来一致。
+    let aiDiff: number = -1;
+    try {
+      const target: number = SudokuDifficulty.targetFor(GameDiff.now());
+      let predicted: number | null = SudokuDifficulty.predict(puzzle);
+      if (predicted !== null && predicted < target - 0.08 && budget > 0) {
+        const extraCap: number = blanks + 8;
+        for (let k = 0; k < order.length && budget > 0; k++) {
+          if (blanks >= extraCap) {
+            break;
+          }
+          const i: number = order[k];
+          if (puzzle[i] === 0) {
+            continue;
+          }
+          const keep: number = puzzle[i];
+          puzzle[i] = 0;
+          this.nodes = 0;
+          const cnt: number = this.countSolutions(puzzle.slice(), 2);
+          budget = budget - this.nodes;
+          if (cnt === 1) {
+            blanks++;
+            const p2: number | null = SudokuDifficulty.predict(puzzle);
+            if (p2 !== null && p2 >= target - 0.08) {
+              predicted = p2;
+              break;
+            }
+          } else {
+            puzzle[i] = keep;
+          }
+        }
+        if (predicted !== null) {
+          const finalP: number | null = SudokuDifficulty.predict(puzzle);
+          aiDiff = finalP === null ? predicted : finalP;
+        }
+      } else if (predicted !== null) {
+        aiDiff = predicted;
+      }
+    } catch (e) {
+      aiDiff = -1;
+    }
+    this.aiDifficulty = aiDiff;
+    hilog.info(0x0000, 'SudokuDifficulty',
+      '本局生成：挖空 %{public}d，模型难度 %{public}s，目标 %{public}s',
+      blanks,
+      aiDiff < 0 ? '不可用' : aiDiff.toFixed(3),
+      SudokuDifficulty.targetFor(GameDiff.now()).toFixed(2));
 
     this.answer = sol;
     this.values = puzzle.slice();
