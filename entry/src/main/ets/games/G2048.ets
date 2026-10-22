@@ -15,7 +15,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 路线 C：价值网络（提示用）
 import { G2048Value, heuristicScore } from '../ai/G2048Value';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -276,9 +276,12 @@ export struct G2048 {
       this.hintText = TG('没有可动的方向了');
       return;
     }
-    const names: string[] = [TG('左'), TG('右'), TG('上'), TG('下')];
+    // ★★★ 2026-10-23 修：原来用三处 TG() 拼字符串 —— 跨语言语序会错
+    //   （日语"左へスライド"、德语"nach links schieben" 位置都不一样）
+    //   ⇒ 改用 TG2 模板：「试试往{0}滑」整句进字典，方向单独查
+    const dirCn: string[] = ['左', '右', '上', '下'];
     this.hintDir = bestDir;
-    this.hintText = TG('试试往') + names[bestDir] + TG('滑');
+    this.hintText = TG2('试试往{0}滑', TG(dirCn[bestDir]));
     // 3 秒后自动清掉，不长期占屏幕
     setTimeout(() => { this.hintDir = -1; this.hintText = ''; }, 3000);
   }
@@ -463,7 +466,7 @@ export struct G2048 {
 
       // 状态/操作
       Row({ space: Space.md }) {
-        Button(this.over ? TG('已结束') : (this.won ? TG('已通关 🎉') : '滑动或按方向键'))
+        Button(this.over ? TG('已结束') : (this.won ? TG('已通关 🎉') : TG('滑动或按方向键')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
           .fontColor(this.theme.inkSoft)

@@ -23,6 +23,17 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23：2048 状态栏这句原来是裸中文（TG 都没包），英文模式下一直显示中文 */
+  "滑动或按方向键": { "en": "Swipe or use arrow keys", "ja": "スワイプか矢印キーで操作", "ko": "스와이프 또는 방향키로 조작", "es": "Desliza o usa las flechas", "fr": "Glisse ou utilise les flèches", "de": "Wischen oder Pfeiltasten nutzen", "pt": "Deslize ou use as setas", "ru": "Свайп или стрелки", "it": "Scorri o usa le frecce", "ar": "اسحب أو استخدم الأسهم" },
+
+  /** ★★ 2026-10-23 路线 C：2048 提示按钮的文案（原来只在中文里写了，11 种语言缺译） */
+  "上": { "en": "Up", "ja": "上", "ko": "위", "es": "Arriba", "fr": "Haut", "de": "Oben", "pt": "Cima", "ru": "Вверх", "it": "Su", "ar": "أعلى" },
+  /** ★★ 2026-10-23 路线 C：2048 提示按钮的文案（原来只在中文里写了，11 种语言缺译） */
+  "下": { "en": "Down", "ja": "下", "ko": "아래", "es": "Abajo", "fr": "Bas", "de": "Unten", "pt": "Baixo", "ru": "Вниз", "it": "Giù", "ar": "أسفل" },
+  /** ★★ 2026-10-23 路线 C：2048 提示按钮的文案（原来只在中文里写了，11 种语言缺译） */
+  "试试往{0}滑": { "en": "Try sliding {0}", "ja": "{0}へスライドしてみて", "ko": "{0}으로 밀어 보세요", "es": "Prueba a deslizar hacia {0}", "fr": "Essaie de glisser vers {0}", "de": "Versuch mal, nach {0} zu schieben", "pt": "Tente deslizar para {0}", "ru": "Попробуйте сдвинуть {0}", "it": "Prova a scorrere verso {0}", "ar": "جرّب التحريك {0}" },
+  /** ★★ 2026-10-23 路线 C：2048 提示按钮的文案（原来只在中文里写了，11 种语言缺译） */
+  "没有可动的方向了": { "en": "No moves left", "ja": "動かせる方向がない", "ko": "움직일 수 있는 방향이 없습니다", "es": "No quedan movimientos", "fr": "Plus aucun mouvement possible", "de": "Keine Züge mehr möglich", "pt": "Não há mais movimentos", "ru": "Ходов больше нет", "it": "Nessuna mossa disponibile", "ar": "لا توجد حركات متاحة" },
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "接入 ✅": {
     "en": "Connected ✅",
