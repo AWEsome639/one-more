@@ -167,6 +167,28 @@ export function g2048Features(cells: number[]): number[] {
   return f;
 }
 
+
+/**
+ * ★★★ 2026-10-23 实测抓到的重大负面结果（必须留着）：
+ *   拿价值网络**贪婪地**选方向（V 最大的那步），100 局均分从 10,885 掉到 919，
+ *   逐局 0 胜 100 负。
+ *
+ *   根因：价值网络是在「启发式策略的轨迹」上训的。一旦用它做决策，
+ *        就会走进训练时没见过的局面 ⇒ 预测变垃圾 ⇒ 越下越死。
+ *        这是 off-policy 价值函数直接贪心的经典失败，不是训练量不够。
+ *
+ *   ⇒ 产品上正确的做法：**启发式当主评估**（它被实测证明能到 1 万分），
+ *     价值网络只在「启发式自己也拿不定主意」时当裁决。
+ *   ⇒ 将来若要让模型主导，必须先做策略迭代（用当前策略产生数据再训），
+ *     而不是拿一个固定数据集训完就用。
+ */
+export function heuristicScore(cells: number[]): number {
+  const f: number[] = g2048Features(cells);
+  // 与 工具/train_2048_value.py 的 heuristic_value() 完全同一组权重
+  return f[17] * 120.0 + f[22] * 60.0 + (1.0 - f[18]) * 50.0
+    + (1.0 - f[19]) * 50.0 + (1.0 - f[20]) * 40.0 + f[21] * 15.0 + f[16] * 100.0;
+}
+
 export class G2048Value {
   private static mlp: TinyMlp = new TinyMlp();
   private static tried: boolean = false;

@@ -14,7 +14,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 路线 C：价值网络（提示用）
-import { G2048Value } from '../ai/G2048Value';
+import { G2048Value, heuristicScore } from '../ai/G2048Value';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -253,19 +253,18 @@ export struct G2048 {
         continue;                              // 这个方向动不了
       }
       anyMoved = true;
-      let v: number = 0;
-      const pred: number | null = G2048Value.value(next);
-      if (pred === null) {
-        // 模型不可用 ⇒ 退化成"空格多 + 合并多"的手工分
-        let empty: number = 0;
-        for (let i = 0; i < 16; i++) {
-          if (next[i] === 0) {
-            empty++;
-          }
+      // ★★★ 2026-10-23 实测修正：**启发式当主评估**，价值网络只做裁决
+      //   实测拿价值网络贪婪选方向，100 局均分 10,885 → 919（0 胜 100 负）
+      //   根因：模型是在启发式轨迹上训的，用它做决策就走出训练分布
+      //   ⇒ 主评估用启发式（实测能到 1 万分），
+      //     只有当两手启发式分数几乎一样（差 < 3）时，才让模型裁决
+      const hv: number = heuristicScore(next);
+      let v: number = hv;
+      if (hv > bestVal - 3 && hv < bestVal + 3) {
+        const pred: number | null = G2048Value.value(next);
+        if (pred !== null) {
+          v = hv + pred * 0.001;      // 只当极小权重的水滴，绝不改变量级
         }
-        v = empty * 10;
-      } else {
-        v = pred;
       }
       if (v > bestVal) {
         bestVal = v;
