@@ -389,7 +389,16 @@ struct GameHost {
   /** 难度标签（读 diffTick 建立 ArkUI 依赖） */
   private diffLabel(): string {
     const tick: number = this.diffTick;
-    const d: number = ProgressStore.diffOf(this.gameId);
+    const raw: number = GameDiff.rawOf(this.gameId);
+    // ★★★ 2026-10-23 路线 F：自动档要让人**看见它现在调到了哪一档**
+    //   只显示"自动"的话，玩家不知道里面在做什么 ⇒ 显示「自动·困难」
+    if (raw === 3) {
+      const real: number = GameDiff.of(this.gameId);
+      const autoCn: string = this.t('自动', 'Auto');
+      const realCn: string = this.t(ProgressStore.DIFF_NAME[real][0], ProgressStore.DIFF_NAME[real][1]);
+      return autoCn + '·' + realCn;
+    }
+    const d: number = raw;
     // ★★★ 2026-10-16 实拍日语发现：原来非中文一律用【英文】难度名 ⇒ 日语玩家看到 "Normal"
     //   ⇒ 改走 this.t(cn, en)：EXTRA 里有 12 语言的难度名（简单/普通/困难）
     const cn: string = ProgressStore.DIFF_NAME[d][0];
@@ -399,11 +408,15 @@ struct GameHost {
 
   /** 难度对应的颜色：简单绿 / 普通蓝 / 困难橙 */
   private diffColor(): string {
-    const d: number = ProgressStore.diffOf(this.gameId);
-    if (d === 0) {
+    const raw: number = GameDiff.rawOf(this.gameId);
+    // ★ 路线 F：自动档用紫色 —— 它是个"模式"不是"档位"，颜色也要能分辨
+    if (raw === 3) {
+      return Palette.violet;
+    }
+    if (raw === 0) {
       return Palette.emerald;
     }
-    if (d === 2) {
+    if (raw === 2) {
       return Palette.orange;
     }
     return this.accentColor();
@@ -571,7 +584,7 @@ struct GameHost {
     const m: GameMeta | undefined = this.meta;
     const baseXp: number = m ? m.baseXp : 10;
     const factor: number = m ? difficultyFactor(m.difficulty) : 1;
-    const gain: number = ProgressStore.finishGame(r.gameId, r.solved, baseXp, factor * ProgressStore.DIFF_XP[ProgressStore.diffOf(r.gameId)], r.score, r.durationMs);
+    const gain: number = ProgressStore.finishGame(r.gameId, r.solved, baseXp, factor * ProgressStore.DIFF_XP[GameDiff.of(r.gameId)], r.score, r.durationMs);
     // ★★★ 2026-10-23 路线 E：记一局（内部全兜底，写失败也绝不打断结算）
     //   难度用 GameDiff.now()（0 简单 / 1 中等 / 2 困难），与 AI 搜索用的是同一个口径 ✓
     try {

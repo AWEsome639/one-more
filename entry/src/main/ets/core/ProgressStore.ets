@@ -761,15 +761,23 @@ export class ProgressStore {
   //          ② 游戏可以读它来改初始条件（时限、棋盘大小、生命数…）
 
   /** 难度档位数 */
-  static readonly DIFF_COUNT: number = 3;
+  /**
+   * ★★★ 2026-10-23 路线 F：3 → 4
+   *   0 简单 / 1 普通 / 2 困难 / **3 自动**
+   *   3 不是真实难度，是个"模式"：真正用哪档由 GameLog.autoLevel() 按最近战绩算。
+   *   ⚠️ 凡是拿 diff 直接分支的地方（if d===0 / if d===2）都必须先过 GameDiff.of() 映射，
+   *      否则 3 会掉进默认分支 ⇒ 自动档静默变成普通档（这是最容易漏的坑）
+   */
+  static readonly DIFF_COUNT: number = 4;
 
   /** 各档的名字（中/英） */
   static readonly DIFF_NAME: string[][] = [
-    ['简单', 'Easy'], ['普通', 'Normal'], ['困难', 'Hard']
+    ['简单', 'Easy'], ['普通', 'Normal'], ['困难', 'Hard'], ['自动', 'Auto']
   ];
 
   /** 各档的经验倍率 */
-  static readonly DIFF_XP: number[] = [0.8, 1.0, 1.4];
+  // 自动档的倍率用 1.0 打底 —— 真实倍率由结算时的【实际难度】决定
+  static readonly DIFF_XP: number[] = [0.8, 1.0, 1.4, 1.0];
 
   /** 这款游戏当前选的难度（0/1/2，默认 1 普通） */
   static diffOf(gameId: string): number {

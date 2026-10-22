@@ -18,6 +18,7 @@
  */
 
 import { ProgressStore } from './ProgressStore';
+import { GameLog } from './GameLog';   // ★ 路线 F：自动难度读游玩记录
 
 export class GameDiff {
   /**
@@ -40,14 +41,31 @@ export class GameDiff {
     return GameDiff.cur;
   }
 
-  /** 玩家选的档：0 简单 / 1 普通 / 2 困难 */
+  /**
+   * 玩家选的档：0 简单 / 1 普通 / 2 困难 / **3 自动**
+   * ★★★ 2026-10-23 路线 F：3 不是真实难度，这里统一映射成真实档
+   *   ⇒ 全项目**只有这一个出口**能让 3 出现，其余地方拿到的都是 0/1/2
+   *   ⇒ 354 款游戏的 time/size/lives 全部走这里 ⇒ 自动档对它们是透明的
+   */
   static of(gameId: string): number {
-    return ProgressStore.diffOf(gameId);
+    const raw: number = ProgressStore.diffOf(gameId);
+    if (raw === 3) {
+      return GameLog.autoLevel(gameId);
+    }
+    return raw;
   }
 
-  /** 当前游戏的档 */
+  /** 当前游戏的档（已映射过） */
   static now(): number {
-    return ProgressStore.diffOf(GameDiff.cur);
+    return GameDiff.of(GameDiff.cur);
+  }
+
+  /**
+   * 玩家**选**的档（0/1/2/3，3=自动）—— 只给界面显示用
+   * ⚠️ 游戏逻辑一律用 of()/now()，不要用这个
+   */
+  static rawOf(gameId: string): number {
+    return ProgressStore.diffOf(gameId);
   }
 
   /** 时间倍率：简单更长、困难更短 */
@@ -127,7 +145,7 @@ export class GameDiff {
    *   改成运行时自证：只要进过这款游戏，这里就有记录，在设置页一屏看完。
    */
   static timeNow(base: number): number {
-    const d: number = ProgressStore.diffOf(GameDiff.cur);
+    const d: number = GameDiff.now();   // ★ 路线 F：走映射，自动档才对
     const v: number = GameDiff.time(GameDiff.cur, base);
     GameDiff.log(GameDiff.cur, base, v, d);
     return v;
@@ -135,7 +153,7 @@ export class GameDiff {
 
   static sizeNow(base: number): number {
     // ★ 也记一笔 —— 自证页要能看到"棋盘/数量"这一维度的难度是否生效
-    const d: number = ProgressStore.diffOf(GameDiff.cur);
+    const d: number = GameDiff.now();   // ★ 路线 F：走映射，自动档才对
     const v: number = GameDiff.size(GameDiff.cur, base);
     GameDiff.log(GameDiff.cur, base, v, d);
     return v;
@@ -143,7 +161,7 @@ export class GameDiff {
 
   static livesNow(base: number): number {
     // ★ 也记一笔 —— 自证页要能看到"次数/容错"这一维度的难度是否生效
-    const d: number = ProgressStore.diffOf(GameDiff.cur);
+    const d: number = GameDiff.now();   // ★ 路线 F：走映射，自动档才对
     const v: number = GameDiff.lives(GameDiff.cur, base);
     GameDiff.log(GameDiff.cur, base, v, d);
     return v;
@@ -158,7 +176,7 @@ export class GameDiff {
    *   ⇒ 这种情况用 pick(1024, 2048, 4096)。
    */
   static pick(easy: number, normal: number, hard: number): number {
-    const d: number = ProgressStore.diffOf(GameDiff.cur);
+    const d: number = GameDiff.now();   // ★ 路线 F：走映射，自动档才对
     if (d === 0) {
       return easy;
     }

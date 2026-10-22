@@ -1941,6 +1941,21 @@ const EXTRA: Record<string, Record<string, string>> = {
     "pt": "Registro de partidas exportado, arquivo salvo neste dispositivo",
     "it": "Registro di gioco esportato, file salvato su questo dispositivo",
   },
+
+  /** ★★ 2026-10-23 路线 F：自动难度档（三档都有，这档之前没有） */
+  "自动": {
+    "en": "Auto",
+    "zh-Hant": "自動",
+    "ja": "自動",
+    "ko": "자동",
+    "fr": "Auto",
+    "de": "Auto",
+    "es": "Auto",
+    "ru": "Авто",
+    "ar": "تلقائي",
+    "pt": "Auto",
+    "it": "Auto",
+  },
 };
 
 /**

@@ -351,9 +351,72 @@ export class GameLog {
     return GameLog.writeErrors;
   }
 
+
+  /**
+   * ★★★ 2026-10-23 路线 F：自动难度
+   *
+   * 规则（看这款游戏最近的记录，不是全局）：
+   *   最近 3 局都赢  → 困难(2)   —— 直接给压力
+   *   最近 3 局都输  → 简单(0)   —— 别让人卡死
+   *   其它           → 普通(1)
+   *   ⚠️ 样本 < 3 局时固定普通 —— 不然刚上手就被判"差"会很难受
+   *
+   * 为什么用【最近 3 局】而不是胜率：
+   *   胜率在 0.5 附近会来回抖，玩家会觉得"难度自己乱跳"。
+   *   连胜/连败三局才动，中间有一段"两赢一输"的死区 ⇒ 稳定得多。
+   *
+   * 缓存：同 (gameId, 记录条数) 只算一次 —— GameDiff.of() 会被每款游戏在构造时调用，
+   *      354 个游戏就是 354 次调用，不缓存等于每次都扫一遍日志。
+   */
+  private static autoCache: Map<string, number> = new Map<string, number>();
+  private static autoCacheLen: number = -1;
+
+  static autoLevel(gameId: string): number {
+    // ① 缓存命中（日志没变过就直接返回）
+    if (GameLog.autoCacheLen === GameLog.mem.length) {
+      const hit: number | undefined = GameLog.autoCache.get(gameId);
+      if (hit !== undefined) {
+        return hit;
+      }
+    } else {
+      GameLog.autoCache.clear();
+      GameLog.autoCacheLen = GameLog.mem.length;
+    }
+    // ② 从尾部往回找这款游戏的记录，最多 3 条
+    let n: number = 0;
+    let wins: number = 0;
+    for (let i = GameLog.mem.length - 1; i >= 0 && n < 3; i--) {
+      const r: PlayRecord = GameLog.mem[i];
+      if (r.g !== gameId) {
+        continue;
+      }
+      n++;
+      if (r.ok) {
+        wins++;
+      }
+    }
+    let lv: number = 1;
+    if (n >= 3) {
+      if (wins === 3) {
+        lv = 2;
+      } else if (wins === 0) {
+        lv = 0;
+      }
+    }
+    GameLog.autoCache.set(gameId, lv);
+    return lv;
+  }
+
+  /** 清缓存（导出/清空记录后调一次，避免拿到旧结论） */
+  static invalidateAuto(): void {
+    GameLog.autoCache.clear();
+    GameLog.autoCacheLen = -1;
+  }
+
   /** 清空（设置页给一个「清除游玩记录」，走二次确认） */
   static clear(): boolean {
     GameLog.mem = [];
+    GameLog.invalidateAuto();
     if (!GameLog.ready) {
       return true;
     }
