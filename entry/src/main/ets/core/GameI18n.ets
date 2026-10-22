@@ -23,6 +23,16 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23：这几个原来 TG 包了但字典里没有 */
+  "乘": { "en": "multiply", "ja": "掛ける", "ko": "곱하기", "es": "multiplicar", "fr": "multiplier", "de": "mal", "pt": "multiplicar", "ru": "умножить", "it": "moltiplicare", "ar": "ضرب" },
+  /** ★★ 2026-10-23：这几个原来 TG 包了但字典里没有 */
+  "等于": { "en": "equals", "ja": "イコール", "ko": "같다", "es": "igual", "fr": "égal", "de": "gleich", "pt": "igual", "ru": "равно", "it": "uguale", "ar": "يساوي" },
+  /** ★★ 2026-10-23：这几个原来 TG 包了但字典里没有 */
+  "待求": { "en": "to find", "ja": "求める値", "ko": "구할 값", "es": "por calcular", "fr": "à trouver", "de": "gesucht", "pt": "a descobrir", "ru": "искомое", "it": "da trovare", "ar": "المطلوب" },
+  /** ★★ 2026-10-23：这几个原来 TG 包了但字典里没有 */
+  "对应": { "en": "corresponds to", "ja": "対応する", "ko": "대응", "es": "corresponde a", "fr": "correspond à", "de": "entspricht", "pt": "corresponde a", "ru": "соответствует", "it": "corrisponde a", "ar": "يقابل" },
+  /** ★★ 2026-10-23：这几个原来 TG 包了但字典里没有 */
+  "指向": { "en": "points to", "ja": "指す", "ko": "가리킴", "es": "apunta a", "fr": "pointe vers", "de": "zeigt auf", "pt": "aponta para", "ru": "указывает на", "it": "punta a", "ar": "يشير إلى" },
   /** ★★ 2026-10-23：2048 状态栏这句原来是裸中文（TG 都没包），英文模式下一直显示中文 */
   "滑动或按方向键": { "en": "Swipe or use arrow keys", "ja": "スワイプか矢印キーで操作", "ko": "스와이프 또는 방향키로 조작", "es": "Desliza o usa las flechas", "fr": "Glisse ou utilise les flèches", "de": "Wischen oder Pfeiltasten nutzen", "pt": "Deslize ou use as setas", "ru": "Свайп или стрелки", "it": "Scorri o usa le frecce", "ar": "اسحب أو استخدم الأسهم" },
 
