@@ -36,7 +36,10 @@ import { router } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Accent, AccentOption } from '../core/Design';
 import { BUILD_TAG, GAMES } from '../core/GameRegistry';
 import { ProgressStore } from '../core/ProgressStore';
+// ★★★ 2026-10-23 路线 E：游玩记录导出
+import { GameLog } from '../core/GameLog';
 import { Haptics } from '../core/Haptics';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { GameDiff } from '../core/GameDiff';
 import { findGame, displayName } from '../core/GameRegistry';
 import { I18n, L, LANGS, LangInfo, TN } from '../core/I18n';
@@ -220,6 +223,39 @@ export struct SettingsTab {
     }
   }
 
+  /**
+   * 导出游玩记录（路线 E）
+   * 写给谁：路线 B/C 的训练脚本读这个 JSON；他自己也能看
+   * 失败怎么办：note 里说清楚，不弹窗、不打断
+   */
+  private doExport(): void {
+    hilog.info(0x0000, 'GameLog', 'doExport ENTER, count=%{public}d', GameLog.count());
+    Haptics.tap();
+    const n: number = GameLog.count();
+    hilog.info(0x0000, 'GameLog', 'doExport count=%{public}d ready-check', n);
+    if (n === 0) {
+      this.noteOk = false;
+      this.note = this.t('还没有游玩记录 —— 先玩几局再来导出',
+        'No play records yet — play a few games first');
+      return;
+    }
+    hilog.info(0x0000, 'GameLog', 'doExport: calling writeExport');
+    const path: string = GameLog.writeExport();
+    hilog.info(0x0000, 'GameLog', 'doExport: writeExport returned len=%{public}d', path.length);
+    if (path.length === 0) {
+      this.noteOk = false;
+      this.note = this.t('导出失败 —— 请再试一次', 'Export failed — please try again');
+      return;
+    }
+    this.noteOk = true;
+    // ★ 不带数字：i18n 是拿【中文原文当 key】查 EXTRA 的，
+    //   一拼接就查不到 ⇒ 10 种语言全退成英文（这是 App 里踩过很多次的坑）
+    //   局数放日志里：
+    this.note = this.t('游玩记录已导出，文件在手机上',
+      'Play log exported and saved on this device');
+    hilog.info(0x0000, 'GameLog', 'doExport: note set len=%{public}d text=%{public}s', this.note.length, this.note);
+  }
+
   private askReset(): void {
     this.confirming = true;
     this.note = '';
@@ -311,21 +347,10 @@ build() {
         })
 
         // ───────── 数据 ─────────
-        this.sectionTitle('数据', 'Your data')
-        this.statCard()
-
-        if (this.confirming) {
-          this.confirmPanel()
-        } else {
-          this.navRow({
-            icon: '🧹', zh: '重置进度', en: 'Reset progress',
-            subZh: '等级、通关记录、收藏和统计全部归零', subEn: 'Level, clears, saves and stats all go to zero',
-            danger: true, tap: () => {
-              this.askReset();
-            }
-          })
-        }
-
+        // ★★★ 2026-10-23 真机抓到的显示问题：
+        //   提示语原来放在两个 navRow 之后 ⇒ 「重置进度」本身就贴着屏幕底边，
+        //   提示语被顶到屏幕外 ⇒ 导出成功了但用户什么都看不到（截图确认过）
+        //   ⇒ 移到 statCard 之前：分组顶部，永远在首屏
         if (this.note.length > 0) {
           Text(this.note)
             .fontSize(FontSize.xxs)
@@ -336,6 +361,32 @@ build() {
             .backgroundColor(this.theme().surfaceAlt)
             .borderRadius(Radius.sm)
         }
+        this.sectionTitle('数据', 'Your data')
+        this.statCard()
+
+        if (this.confirming) {
+          this.confirmPanel()
+        } else {
+          // ★★★ 2026-10-23 路线 E：导出游玩记录
+          //   为什么放这里：它在「数据」分组，和重置进度是一对（一个拿走、一个清零）
+          //   为什么导 JSON：路线 B/C 的训练脚本要读它；他自己也能看
+          this.navRow({
+            icon: '📤', zh: '导出游玩记录', en: 'Export play log',
+            subZh: '把每局的用时与结果导出成 JSON，只存在本机',
+            subEn: 'Export each game time and result as JSON, stored on this device only',
+            danger: false, tap: () => {
+              this.doExport();
+            }
+          })
+          this.navRow({
+            icon: '🧹', zh: '重置进度', en: 'Reset progress',
+            subZh: '等级、通关记录、收藏和统计全部归零', subEn: 'Level, clears, saves and stats all go to zero',
+            danger: true, tap: () => {
+              this.askReset();
+            }
+          })
+        }
+
 
         // ───────── 关于 ─────────
         this.sectionTitle('关于', 'About')

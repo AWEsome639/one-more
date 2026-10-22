@@ -1870,6 +1870,77 @@ const EXTRA: Record<string, Record<string, string>> = {
   "熟练": { "ja": "熟練", "ko": "숙련", "fr": "Habitué", "de": "Geübt", "es": "Hábil", "ru": "Опытный", "ar": "ماهر", "pt": "Hábil", "it": "Abile", "zh-Hant": "熟練" },
   "精通": { "ja": "達人", "ko": "달인", "fr": "Virtuose", "de": "Experte", "es": "Experto", "ru": "Знаток", "ar": "خبير", "pt": "Especialista", "it": "Esperto", "zh-Hant": "精通" },
   "大师": { "ja": "マスター", "ko": "마스터", "fr": "Maître", "de": "Meister", "es": "Maestro", "ru": "Мастер", "ar": "أستاذ", "pt": "Mestre", "it": "Maestro", "zh-Hant": "大師" },
+
+  /** ★★ 2026-10-23 路线 E：游玩记录导出（11 语言） */
+  "导出游玩记录": {
+    "en": "Export play log",
+    "zh-Hant": "匯出遊玩記錄",
+    "ja": "プレイ記録を書き出す",
+    "ko": "플레이 기록 내보내기",
+    "fr": "Exporter le journal de jeu",
+    "de": "Spielverlauf exportieren",
+    "es": "Exportar el registro de partidas",
+    "ru": "Экспорт журнала игры",
+    "ar": "تصدير سجل اللعب",
+    "pt": "Exportar o registro de partidas",
+    "it": "Esporta il registro di gioco",
+  },
+  /** ★★ 2026-10-23 路线 E：游玩记录导出（11 语言） */
+  "把每局的用时与结果导出成 JSON，只存在本机": {
+    "en": "Export each game time and result as JSON, stored on this device only",
+    "zh-Hant": "將每局的用時與結果匯出成 JSON，只存在本機",
+    "ja": "各プレイの所要時間と結果を JSON に書き出します。端末内にのみ保存",
+    "ko": "각 판의 소요 시간과 결과를 JSON으로 내보냅니다. 이 기기에만 저장",
+    "fr": "Exporter la duree et le resultat de chaque partie en JSON, uniquement sur cet appareil",
+    "de": "Zeit und Ergebnis jeder Partie als JSON exportieren, nur auf diesem Geraet",
+    "es": "Exporta el tiempo y el resultado de cada partida en JSON, solo en este dispositivo",
+    "ru": "Экспорт времени и результата каждой партии в JSON, только на этом устройстве",
+    "ar": "تصدير وقت كل جولة ونتيجتها بصيغة JSON، على هذا الجهاز فقط",
+    "pt": "Exportar o tempo e o resultado de cada partida em JSON, apenas neste dispositivo",
+    "it": "Esporta il tempo e il risultato di ogni partita in JSON, solo su questo dispositivo",
+  },
+  /** ★★ 2026-10-23 路线 E：游玩记录导出（11 语言） */
+  "还没有游玩记录 —— 先玩几局再来导出": {
+    "en": "No play records yet — play a few games first",
+    "zh-Hant": "還沒有遊玩記錄 —— 先玩幾局再來匯出",
+    "ja": "プレイ記録がまだありません —— 何局か遊んでから書き出してください",
+    "ko": "아직 플레이 기록이 없습니다 —— 몇 판 먼저 해 보세요",
+    "fr": "Aucun historique de jeu — jouez d abord quelques parties",
+    "de": "Noch kein Spielverlauf — spielen Sie zuerst ein paar Partien",
+    "es": "Aun no hay registros de partidas — juega algunas partidas primero",
+    "ru": "Записей пока нет — сначала сыграйте несколько партий",
+    "ar": "لا توجد سجلات لعب بعد — العب بضع جولات أولاً",
+    "pt": "Ainda nao ha registros de partidas — jogue algumas partidas primeiro",
+    "it": "Nessun registro di gioco — gioca prima qualche partita",
+  },
+  /** ★★ 2026-10-23 路线 E：游玩记录导出（11 语言） */
+  "导出失败 —— 请再试一次": {
+    "en": "Export failed — please try again",
+    "zh-Hant": "匯出失敗 —— 請再試一次",
+    "ja": "書き出しに失敗しました —— もう一度お試しください",
+    "ko": "내보내기 실패 —— 다시 시도해 주세요",
+    "fr": "Echec de l export — veuillez reessayer",
+    "de": "Export fehlgeschlagen — bitte erneut versuchen",
+    "es": "Error al exportar — intentalo de nuevo",
+    "ru": "Ошибка экспорта — попробуйте ещё раз",
+    "ar": "فشل التصدير — يرجى المحاولة مرة أخرى",
+    "pt": "Falha na exportacao — tente novamente",
+    "it": "Esportazione non riuscita — riprova",
+  },
+  /** ★★ 2026-10-23 路线 E：游玩记录导出（11 语言） */
+  "游玩记录已导出，文件在手机上": {
+    "en": "Play log exported and saved on this device",
+    "zh-Hant": "遊玩記錄已匯出，檔案在手機上",
+    "ja": "プレイ記録を書き出しました。ファイルは端末内にあります",
+    "ko": "플레이 기록을 내보냈습니다. 파일은 이 기기에 있습니다",
+    "fr": "Historique exporte, fichier enregistre sur cet appareil",
+    "de": "Spielverlauf exportiert, Datei auf diesem Geraet gespeichert",
+    "es": "Registro de partidas exportado, archivo guardado en este dispositivo",
+    "ru": "Журнал игры экспортирован, файл сохранён на устройстве",
+    "ar": "تم تصدير سجل اللعب وحفظ الملف على هذا الجهاز",
+    "pt": "Registro de partidas exportado, arquivo salvo neste dispositivo",
+    "it": "Registro di gioco esportato, file salvato su questo dispositivo",
+  },
 };
 
 /**

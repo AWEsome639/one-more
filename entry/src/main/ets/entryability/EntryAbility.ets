@@ -19,6 +19,8 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { window } from '@kit.ArkUI';
 import { Configuration } from '@ohos.app.ability.Configuration';
 import { ProgressStore } from '../core/ProgressStore';
+// ★★★ 2026-10-23 路线 E：游玩记录（路线 B/C/F 的数据地基）
+import { GameLog } from '../core/GameLog';
 import { gamePlayer } from '@kit.GameServiceKit';
 
 const DOMAIN = 0x0000;
@@ -37,8 +39,13 @@ export default class EntryAbility extends UIAbility {
     // 进度系统：读 XP/等级/连胜/打卡（失败也不阻塞启动，ProgressStore 内部有兜底）
     ProgressStore.init(this.context).then(() => {
       hilog.info(DOMAIN, 'testTag', '%{public}s', 'ProgressStore ready');
+      // ★ 路线 E：游玩记录初始化（同步、内部全兜底，失败只是不落盘，不影响启动）
+      GameLog.init(this.context);
+      hilog.info(DOMAIN, 'testTag', 'GameLog ready (%{public}d 条)', GameLog.count());
     }).catch((e: Object) => {
       hilog.error(DOMAIN, 'testTag', 'ProgressStore init failed: %{public}s', JSON.stringify(e));
+      // ProgressStore 失败也要让 GameLog 尽量起来（两条链路互不拖累）
+      GameLog.init(this.context);
     });
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
   }

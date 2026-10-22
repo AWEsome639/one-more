@@ -17,6 +17,9 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Layout, Accent
 import { IconPress, RollingNumber } from '../core/MotionKit';
 import { findGame, GameMeta, GameResult, difficultyFactor, displayTagline, displayName } from '../core/GameRegistry';
 import { ProgressStore } from '../core/ProgressStore';
+// ★★★ 2026-10-23 路线 E：每局结束记一条游玩记录
+import { GameLog } from '../core/GameLog';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Haptics } from '../core/Haptics';
 import { SparkBurst } from '../components/SparkBurst';
 import { GameDiff } from '../core/GameDiff';
@@ -448,6 +451,18 @@ struct GameHost {
   @State lastScore: number = 0;
   @State lastMs: number = 0;
   @State lastSolved: boolean = false;
+  /**
+   * ★★★ 2026-10-23 路线 E：进游戏页的时间戳与本局是否已结算
+   *
+   * 为什么需要：原来【中途退出一个字都不记】——
+   *   GameHost 没有 onBackPress，aboutToDisappear 也不调 finishGame
+   *   ⇒ 玩家玩一半退出，数据层完全看不到这件事
+   *   ⇒ 而「放弃点」恰恰是路线 F（难度自适应）最有用的信号：
+   *      在哪一关放弃的、放弃了多久之后又回来
+   * 怎么避免重复记：handleFinish 里把 finished 置 true，aboutToDisappear 就不会再记一次
+   */
+  private startedAt: number = 0;
+  private finished: boolean = false;
   @State fav: boolean = false;
   @State pop: boolean = false;
   // ★★★「动画拉满」第 2 层：胜利粒子进度（0→1 由 animateTo 推）
@@ -457,6 +472,9 @@ struct GameHost {
   @State levelUpTo: number = 0;
 
   aboutToAppear(): void {
+    // ★ 路线 E：记下进游戏页的时刻（中途退出时用它算时长）
+    this.startedAt = Date.now();
+    this.finished = false;
     const p: Record<string, Object> = router.getParams() as Record<string, Object>;
     if (p && p.id !== undefined) {
       this.gameId = p.id as string;
@@ -492,6 +510,18 @@ struct GameHost {
     // ★ 先把数字滚动的计时器停掉 —— 否则退出游戏页后它还在推帧改 @State
     //   （本项目纪律：别在后台每帧 setState）
     this.roll.stop();
+    // ★★★ 2026-10-23 路线 E：中途退出也要记一条（ok=false）
+    //   判据：进了游戏页、且没有走过 handleFinish ⇒ 就是放弃
+    //   时长算到退出这一刻；难度用 GameDiff.now()，与结算时同一口径
+    hilog.info(0x0000, 'GameLog', 'leave page finished=%{public}s startedAt=%{public}d gid=%{public}s',
+      this.finished ? 'Y' : 'N', this.startedAt, this.gameId);
+    if (!this.finished && this.startedAt > 0 && this.gameId.length > 0) {
+      try {
+        const sp: number = Date.now() - this.startedAt;
+        GameLog.recordResult(this.gameId, false, this.lastScore, sp, GameDiff.now(), -1);
+      } catch (e) {
+      }
+    }
     try {
       window.getLastWindow(getContext(this)).then((w: window.Window) => {
         w.setWindowKeepScreenOn(false);
@@ -542,6 +572,14 @@ struct GameHost {
     const baseXp: number = m ? m.baseXp : 10;
     const factor: number = m ? difficultyFactor(m.difficulty) : 1;
     const gain: number = ProgressStore.finishGame(r.gameId, r.solved, baseXp, factor * ProgressStore.DIFF_XP[ProgressStore.diffOf(r.gameId)], r.score, r.durationMs);
+    // ★★★ 2026-10-23 路线 E：记一局（内部全兜底，写失败也绝不打断结算）
+    //   难度用 GameDiff.now()（0 简单 / 1 中等 / 2 困难），与 AI 搜索用的是同一个口径 ✓
+    try {
+      GameLog.recordResult(r.gameId, r.solved, r.score, r.durationMs,
+        GameDiff.now(), r.levelReached ?? -1);
+    } catch (e) {
+    }
+    this.finished = true;      // ★ 路线 E：已结算，退出时不再补记
     this.lastGain = gain;
     this.lastScore = r.score;
     this.lastMs = r.durationMs;
