@@ -547,10 +547,12 @@ export class GomokuSearch {
       this.stat.fellBack = true;
       return -1;                          // 简单档：不搜，交给启发式（保持原手感）
     }
-    // ★★ 预算压到 ≤400ms：这段搜索跑在【UI 主线程】上（ArkTS 同步调用）
-    //   900ms 会让界面明显冻一下。400ms 与现有的"电脑思考 260ms 延迟"体感接近。
-    //   ⇒ 后续路线 D 会用 TaskPool 把它挪到后台线程，那时可以放宽到 1–2 秒。
-    const budget: number = level >= 2 ? 400 : 200;
+    // ★★★ 2026-10-23 路线 D 下半：预算从 400ms 放开到 1200ms
+    //   原来压到 400 是因为它跑在 UI 主线程上（同步调用），900ms 会明显冻界面。
+    //   现在搜索走 TaskPool 工作线程（ai/GomokuWorker.ets），UI 完全不冻
+    //   ⇒ 同样"电脑在思考"的体感下，可以搜到深度 8 而不是 6，棋力再上一档。
+    //   ⚠️ 别无限加：玩家等 1.2 秒已经是耐心的边界了，2 秒会显得卡。
+    const budget: number = level >= 2 ? 1200 : 400;
     this.deadline = t0 + budget;
     if (this.tt.size > 40000) {
       this.tt.clear();                    // 防内存无限涨
@@ -600,7 +602,7 @@ export class GomokuSearch {
     let bestMove: number = -1;
     let bestDepth: number = 0;
     try {
-      for (let d = 2; d <= 6; d += 2) {
+      for (let d = 2; d <= 8; d += 2) {   // ★ 路线 D 下半：时间够了，深度 6→8
         const sc: number = this.negamax(board, size, d, -MAX_SCORE * 2, MAX_SCORE * 2, 2, 0);
         if (this.aborted) {
           break;                           // 用上一层的答案

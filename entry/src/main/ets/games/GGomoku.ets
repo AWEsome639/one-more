@@ -20,6 +20,9 @@ import { LanRace } from '../core/LanRace';
 // ★★★ 2026-10-23 AI 升级（路线 A）：α-β 搜索器，只做算法、不碰界面
 //   搜不出来（简单档 / 异常 / 超预算）⇒ 自动回落下面那个 chooseMove 启发式
 import { GomokuSearch } from '../ai/GomokuSearch';
+// ★★★ 2026-10-23 路线 D 下半：把搜索挪到工作线程（TaskPool）
+//   失败会自动在主线程兜底，行为与路线 A 完全一样
+import { GomokuWorker } from '../ai/GomokuWorker';
 
 const SIZE: number = 15;
 const CELLS: number = SIZE * SIZE;
@@ -409,6 +412,13 @@ export struct GGomoku {
   private startAt: number = 0;
   /** ★ 2026-10-23：α-β 搜索器（路线 A）。置换表随实例复用，跨局不清 */
   private searcher: GomokuSearch = new GomokuSearch();
+  /**
+   * ★★★ 2026-10-23 路线 D 下半：搜索挪到工作线程后，它是**异步**的。
+   *   异步期间玩家可能：重开 / 悔棋 / 退回列表 ⇒ 算出来的那一手已经过期。
+   *   用一个递增的代数当守卫：回调里代数对不上就直接丢弃结果。
+   *   （没有这个守卫的话，会出现"重开之后电脑还补了一手旧棋"这种鬼现象）
+   */
+  private moveGen: number = 0;
   private aiTimer: number = -1;
 
   aboutToAppear(): void {
@@ -585,15 +595,29 @@ export struct GGomoku {
       this.thinking = false;
       return;
     }
-    // ★★★ 2026-10-23：先跑 α-β 搜索（路线 A），失败或简单档就回落原启发式
-    //   传 board.slice() 是故意的 —— 搜索内部会临时落子/撤销，
-    //   给它一份副本，就算搜索里出任何岔子也污染不到真正的棋盘 ✓
-    let idx: number = -1;
-    try {
-      idx = this.searcher.pick(this.board.slice(), this.diffTotal, GameDiff.now());
-    } catch (e) {
-      idx = -1;
-    }
+    // ★★★ 2026-10-23 路线 D 下半：搜索交给工作线程，UI 不再被冻
+    //   原来在主线程跑 188ms（困难档预算 400ms）—— 手指能感觉到顿
+    //   现在主线程只等一个 Promise；工作线程失败会自动在主线程兜底
+    const gen: number = ++this.moveGen;
+    const snap: number[] = this.board.slice();     // 快照：搜索内部会临时落子
+    const lv: number = GameDiff.now();
+    GomokuWorker.pick(snap, this.diffTotal, lv).then((r: number) => {
+      if (gen !== this.moveGen) {
+        return;                                     // 期间重开/悔棋了 ⇒ 丢弃
+      }
+      this.applyAiMove(r);
+    }).catch(() => {
+      if (gen !== this.moveGen) {
+        return;
+      }
+      this.applyAiMove(-1);
+    });
+  }
+
+  /** 把算出来的一手落到盘上（原 aiMove 的后半段，逻辑一字未改） */
+  private applyAiMove(idxIn: number): void {
+    // ★ 路线 A 的兜底：搜索没结果（简单档/异常）⇒ 回落原来的启发式
+    let idx: number = idxIn;
     if (idx < 0) {
       idx = chooseMove(this.board, this.diffTotal, GameDiff.now());
     }
@@ -623,6 +647,7 @@ export struct GGomoku {
 
   /** 悔棋：退回到"轮到你"（通常退两手：电脑 + 你） */
   private undo(): void {
+    this.moveGen++;    // ★ 让在飞的搜索作废
     // ★ 联机不能单方悔棋（两边棋盘会不一致）⇒ 直接禁用
     if (LanMatch.isActive() || this.thinking || this.over || this.history.length === 0) {
       return;
