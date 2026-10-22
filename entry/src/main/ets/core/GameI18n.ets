@@ -23,6 +23,104 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第 57 轮：**尾随空格是故意的** —— 源码里与后面的片段拼接，
+   *   例：TG('🎉 通关 ') + TG2("答对 {0}/{1}", ...)。
+   *   这是"片段拼接"的设计债，正确解法是改成整句 TG2 模板（见多语言待修清单）。 */
+  "最长记住 ": { "en": "Longest remembered ", "ja": "最長記憶 ", "ko": "최장 기억 ", "es": "Más largo recordado ", "fr": "Plus long retenu ", "de": "Längste gemerkt ", "pt": "Mais longo lembrado ", "ru": "Дольше всего запомнено ", "it": "Più lungo ricordato ", "ar": "أطول ما تم تذكره " },
+  /** ★★ 2026-10-23 第 57 轮：**尾随空格是故意的** —— 源码里与后面的片段拼接，
+   *   例：TG('🎉 通关 ') + TG2("答对 {0}/{1}", ...)。
+   *   这是"片段拼接"的设计债，正确解法是改成整句 TG2 模板（见多语言待修清单）。 */
+  "纯旋转（转 ": { "en": "Pure rotation (turn ", "ja": "純回転（回す ", "ko": "순수 회전 (돌리기 ", "es": "Rotación pura (gira ", "fr": "Rotation pure (tourne ", "de": "Reine Drehung (dreh ", "pt": "Rotação pura (gire ", "ru": "Чистый поворот (поверните ", "it": "Rotazione pura (gira ", "ar": "دوران محض (أدر " },
+  /** ★★ 2026-10-23 第 57 轮：**尾随空格是故意的** —— 源码里与后面的片段拼接，
+   *   例：TG('🎉 通关 ') + TG2("答对 {0}/{1}", ...)。
+   *   这是"片段拼接"的设计债，正确解法是改成整句 TG2 模板（见多语言待修清单）。 */
+  "记忆 ": { "en": "Memory ", "ja": "記憶 ", "ko": "기억 ", "es": "Memoria ", "fr": "Mémoire ", "de": "Gedächtnis ", "pt": "Memória ", "ru": "Память ", "it": "Memoria ", "ar": "ذاكرة " },
+  /** ★★ 2026-10-23 第 57 轮：**尾随空格是故意的** —— 源码里与后面的片段拼接，
+   *   例：TG('🎉 通关 ') + TG2("答对 {0}/{1}", ...)。
+   *   这是"片段拼接"的设计债，正确解法是改成整句 TG2 模板（见多语言待修清单）。 */
+  "镜像（转 ": { "en": "Mirror (turn ", "ja": "鏡像（回す ", "ko": "거울상 (돌리기 ", "es": "Espejo (gira ", "fr": "Miroir (tourne ", "de": "Spiegel (dreh ", "pt": "Espelho (gire ", "ru": "Зеркало (поверните ", "it": "Specchio (gira ", "ar": "انعكاس (أدر " },
+  /** ★★ 2026-10-23 第 57 轮：**尾随空格是故意的** —— 源码里与后面的片段拼接，
+   *   例：TG('🎉 通关 ') + TG2("答对 {0}/{1}", ...)。
+   *   这是"片段拼接"的设计债，正确解法是改成整句 TG2 模板（见多语言待修清单）。 */
+  "🎉 通关 · 平均 ": { "en": "🎉 Cleared · average ", "ja": "🎉 クリア · 平均 ", "ko": "🎉 통과 · 평균 ", "es": "🎉 Superado · media ", "fr": "🎉 Terminé · moyenne ", "de": "🎉 Geschafft · Durchschnitt ", "pt": "🎉 Concluído · média ", "ru": "🎉 Пройдено · среднее ", "it": "🎉 Completato · media ", "ar": "🎉 تم الإنجاز · المتوسط " },
+  /** ★★ 2026-10-23 第 57 轮：**尾随空格是故意的** —— 源码里与后面的片段拼接，
+   *   例：TG('🎉 通关 ') + TG2("答对 {0}/{1}", ...)。
+   *   这是"片段拼接"的设计债，正确解法是改成整句 TG2 模板（见多语言待修清单）。 */
+  "🎉 通关：一口气记住 ": { "en": "🎉 Cleared: remembered in one go ", "ja": "🎉 クリア：一気に覚えた ", "ko": "🎉 통과: 한 번에 외웠어요 ", "es": "🎉 Superado: lo recordaste de una vez ", "fr": "🎉 Terminé : retenu d un coup ", "de": "🎉 Geschafft: auf einmal gemerkt ", "pt": "🎉 Concluído: memorizou de uma vez ", "ru": "🎉 Пройдено: запомнено за один раз ", "it": "🎉 Completato: ricordato in un colpo ", "ar": "🎉 تم الإنجاز: حفظتها دفعة واحدة " },
+  /** ★★ 2026-10-23 第 57 轮：**尾随空格是故意的** —— 源码里与后面的片段拼接，
+   *   例：TG('🎉 通关 ') + TG2("答对 {0}/{1}", ...)。
+   *   这是"片段拼接"的设计债，正确解法是改成整句 TG2 模板（见多语言待修清单）。 */
+  "💤 结束 · 平均 ": { "en": "💤 Over · average ", "ja": "💤 終了 · 平均 ", "ko": "💤 종료 · 평균 ", "es": "💤 Fin · media ", "fr": "💤 Fini · moyenne ", "de": "💤 Vorbei · Durchschnitt ", "pt": "💤 Fim · média ", "ru": "💤 Конец · среднее ", "it": "💤 Finito · media ", "ar": "💤 انتهى · المتوسط " },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  " 件": { "en": " items", "ja": " 個", "ko": " 개", "es": " piezas", "fr": " pièces", "de": " Stück", "pt": " peças", "ru": " шт.", "it": " pezzi", "ar": " قطع" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  " 在集合里": { "en": " was in the set", "ja": " は集合に含まれる", "ko": " 은 집합에 있음", "es": " estaba en el conjunto", "fr": " était dans l ensemble", "de": " war in der Menge", "pt": " estava no conjunto", "ru": " было во множестве", "it": " era nell insieme", "ar": " كان في المجموعة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  " 不在集合里": { "en": " was not in the set", "ja": " は集合に含まれない", "ko": " 은 집합에 없음", "es": " no estaba en el conjunto", "fr": " n était pas dans l ensemble", "de": " war nicht in der Menge", "pt": " não estava no conjunto", "ru": " не было во множестве", "it": " non era nell insieme", "ar": " لم يكن في المجموعة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "在": { "en": "In", "ja": "は", "ko": "는", "es": "En", "fr": "Dans", "de": "In", "pt": "Em", "ru": "В", "it": "In", "ar": "في" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "一致": { "en": "Match", "ja": "一致", "ko": "일치", "es": "Iguales", "fr": "Identique", "de": "Gleich", "pt": "Iguais", "ru": "Совпадает", "it": "Uguale", "ar": "متطابق" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "不一致": { "en": "Mismatch", "ja": "不一致", "ko": "불일치", "es": "Distintos", "fr": "Différent", "de": "Anders", "pt": "Diferentes", "ru": "Не совпадает", "it": "Diverso", "ar": "غير متطابق" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "加法": { "en": "Addition", "ja": "たし算", "ko": "덧셈", "es": "Suma", "fr": "Addition", "de": "Addition", "pt": "Adição", "ru": "Сложение", "it": "Addizione", "ar": "جمع" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "减法": { "en": "Subtraction", "ja": "ひき算", "ko": "뺄셈", "es": "Resta", "fr": "Soustraction", "de": "Subtraktion", "pt": "Subtração", "ru": "Вычитание", "it": "Sottrazione", "ar": "طرح" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "红方块": { "en": "Red square", "ja": "赤い四角", "ko": "빨간 사각형", "es": "Cuadrado rojo", "fr": "Carré rouge", "de": "Rotes Quadrat", "pt": "Quadrado vermelho", "ru": "Красный квадрат", "it": "Quadrato rosso", "ar": "مربع أحمر" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "蓝圆点": { "en": "Blue dot", "ja": "青い丸", "ko": "파란 점", "es": "Punto azul", "fr": "Point bleu", "de": "Blauer Punkt", "pt": "Ponto azul", "ru": "Синяя точка", "it": "Punto blu", "ar": "نقطة زرقاء" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "阅读": { "en": "Reading", "ja": "読解", "ko": "읽기", "es": "Lectura", "fr": "Lecture", "de": "Lesen", "pt": "Leitura", "ru": "Чтение", "it": "Lettura", "ar": "قراءة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "最长记住": { "en": "Longest remembered", "ja": "最長記憶", "ko": "최장 기억", "es": "Más largo recordado", "fr": "Plus long retenu", "de": "Längste gemerkt", "pt": "Mais longo lembrado", "ru": "Дольше всего запомнено", "it": "Più lungo ricordato", "ar": "أطول ما تم تذكره" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "本句无误": { "en": "No error in this sentence", "ja": "この文は正しい", "ko": "이 문장은 맞음", "es": "Esta frase es correcta", "fr": "Cette phrase est correcte", "de": "Dieser Satz ist korrekt", "pt": "Esta frase está correta", "ru": "Это предложение верное", "it": "Questa frase è corretta", "ar": "هذه الجملة صحيحة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "➡️ 提示在右边": { "en": "➡️ Cue on the right", "ja": "➡️ 手がかりは右", "ko": "➡️ 단서는 오른쪽", "es": "➡️ Señal a la derecha", "fr": "➡️ Indice à droite", "de": "➡️ Hinweis rechts", "pt": "➡️ Dica à direita", "ru": "➡️ Подсказка справа", "it": "➡️ Indizio a destra", "ar": "➡️ الإشارة على اليمين" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "⬅️ 提示在左边": { "en": "⬅️ Cue on the left", "ja": "⬅️ 手がかりは左", "ko": "⬅️ 단서는 왼쪽", "es": "⬅️ Señal a la izquierda", "fr": "⬅️ Indice à gauche", "de": "⬅️ Hinweis links", "pt": "⬅️ Dica à esquerda", "ru": "⬅️ Подсказка слева", "it": "⬅️ Indizio a sinistra", "ar": "⬅️ الإشارة على اليسار" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "{0} 点": { "en": "{0} pts", "ja": "{0} ポイント", "ko": "{0}점", "es": "{0} pts", "fr": "{0} pts", "de": "{0} Pkt.", "pt": "{0} pts", "ru": "{0} очк.", "it": "{0} punti", "ar": "{0} نقطة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "顺时针再走 {0}": { "en": "Clockwise {0} more", "ja": "時計回りにあと {0}", "ko": "시계 방향으로 {0} 더", "es": "En sentido horario {0} más", "fr": "Dans le sens horaire encore {0}", "de": "Im Uhrzeigersinn noch {0}", "pt": "Sentido horário mais {0}", "ru": "По часовой ещё {0}", "it": "Senso orario ancora {0}", "ar": "باتجاه عقارب الساعة {0} أخرى" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "往回倒拨 {0}": { "en": "Turn back {0}", "ja": "逆に {0} 戻す", "ko": "반대로 {0} 되돌리기", "es": "Gira atrás {0}", "fr": "Recule de {0}", "de": "Zurück um {0}", "pt": "Volte {0}", "ru": "Назад на {0}", "it": "Indietro di {0}", "ar": "ارجع {0}" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "纯旋转（转": { "en": "Pure rotation (turn", "ja": "純回転（回す", "ko": "순수 회전 (돌리기", "es": "Rotación pura (gira", "fr": "Rotation pure (tourne", "de": "Reine Drehung (dreh", "pt": "Rotação pura (gire", "ru": "Чистый поворот (поверните", "it": "Rotazione pura (gira", "ar": "دوران محض (أدر" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "镜像（转": { "en": "Mirror (turn", "ja": "鏡像（回す", "ko": "거울상 (돌리기", "es": "Espejo (gira", "fr": "Miroir (tourne", "de": "Spiegel (dreh", "pt": "Espelho (gire", "ru": "Зеркало (поверните", "it": "Specchio (gira", "ar": "انعكاس (أدر" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "第 {0} 根超高，塌了 💥": { "en": "Stack {0} was too tall — it collapsed 💥", "ja": "{0}本目が高すぎて崩れた 💥", "ko": "{0}번째가 너무 높아 무너졌어요 💥", "es": "La pila {0} era demasiado alta y se derrumbó 💥", "fr": "La pile {0} était trop haute, elle s est effondrée 💥", "de": "Stapel {0} war zu hoch und ist eingestürzt 💥", "pt": "A pilha {0} estava alta demais e desabou 💥", "ru": "Стопка {0} была слишком высокой и рухнула 💥", "it": "La pila {0} era troppo alta ed è crollata 💥", "ar": "الكومة {0} كانت عالية جدًا فانهارت 💥" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "第 {0} 轮：记住登场顺序": { "en": "Round {0}: remember the order", "ja": "{0}ラウンド目：登場順を覚えて", "ko": "{0}라운드: 등장 순서를 기억하세요", "es": "Ronda {0}: recuerda el orden", "fr": "Manche {0} : retiens l ordre", "de": "Runde {0}: merke dir die Reihenfolge", "pt": "Rodada {0}: lembre a ordem", "ru": "Раунд {0}: запомните порядок", "it": "Round {0}: ricorda l ordine", "ar": "الجولة {0}: تذكّر الترتيب" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "🎉 稳！平均误差 {0}": { "en": "🎉 Steady! Average error {0}", "ja": "🎉 安定！平均誤差 {0}", "ko": "🎉 안정적! 평균 오차 {0}", "es": "🎉 ¡Estable! Error medio {0}", "fr": "🎉 Régulier ! Erreur moyenne {0}", "de": "🎉 Stabil! Mittlerer Fehler {0}", "pt": "🎉 Estável! Erro médio {0}", "ru": "🎉 Ровно! Средняя ошибка {0}", "it": "🎉 Stabile! Errore medio {0}", "ar": "🎉 ثابت! متوسط الخطأ {0}" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "🎉 通关 · 平均": { "en": "🎉 Cleared · average", "ja": "🎉 クリア · 平均", "ko": "🎉 통과 · 평균", "es": "🎉 Superado · media", "fr": "🎉 Terminé · moyenne", "de": "🎉 Geschafft · Durchschnitt", "pt": "🎉 Concluído · média", "ru": "🎉 Пройдено · среднее", "it": "🎉 Completato · media", "ar": "🎉 تم الإنجاز · المتوسط" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "🎉 通关 · 答对 {0}/{1}": { "en": "🎉 Cleared · {0}/{1} correct", "ja": "🎉 クリア · {0}/{1} 正解", "ko": "🎉 통과 · {0}/{1} 정답", "es": "🎉 Superado · {0}/{1} correctas", "fr": "🎉 Terminé · {0}/{1} correctes", "de": "🎉 Geschafft · {0}/{1} richtig", "pt": "🎉 Concluído · {0}/{1} certas", "ru": "🎉 Пройдено · {0}/{1} верно", "it": "🎉 Completato · {0}/{1} corrette", "ar": "🎉 تم الإنجاز · {0}/{1} صحيحة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "🎉 通关！总分 {0}": { "en": "🎉 Cleared! Score {0}", "ja": "🎉 クリア！合計 {0}", "ko": "🎉 통과! 총점 {0}", "es": "🎉 ¡Superado! Puntuación {0}", "fr": "🎉 Terminé ! Score {0}", "de": "🎉 Geschafft! Punktzahl {0}", "pt": "🎉 Concluído! Pontuação {0}", "ru": "🎉 Пройдено! Счёт {0}", "it": "🎉 Completato! Punteggio {0}", "ar": "🎉 تم الإنجاز! النتيجة {0}" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "🎉 通关！抓到 {0}/{1}": { "en": "🎉 Cleared! Caught {0}/{1}", "ja": "🎉 クリア！{0}/{1} 捕まえた", "ko": "🎉 통과! {0}/{1} 잡았어요", "es": "🎉 ¡Superado! Atrapaste {0}/{1}", "fr": "🎉 Terminé ! {0}/{1} attrapés", "de": "🎉 Geschafft! {0}/{1} gefangen", "pt": "🎉 Concluído! Pego {0}/{1}", "ru": "🎉 Пройдено! Поймано {0}/{1}", "it": "🎉 Completato! Catturati {0}/{1}", "ar": "🎉 تم الإنجاز! أمسكت {0}/{1}" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "🎉 通关！答对 {0}/{1}": { "en": "🎉 Cleared! {0}/{1} correct", "ja": "🎉 クリア！{0}/{1} 正解", "ko": "🎉 통과! {0}/{1} 정답", "es": "🎉 ¡Superado! {0}/{1} correctas", "fr": "🎉 Terminé ! {0}/{1} correctes", "de": "🎉 Geschafft! {0}/{1} richtig", "pt": "🎉 Concluído! {0}/{1} certas", "ru": "🎉 Пройдено! {0}/{1} верно", "it": "🎉 Completato! {0}/{1} corrette", "ar": "🎉 تم الإنجاز! {0}/{1} صحيحة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "🎉 通关：一口气记住": { "en": "🎉 Cleared: remembered in one go", "ja": "🎉 クリア：一気に覚えた", "ko": "🎉 통과: 한 번에 외웠어요", "es": "🎉 Superado: lo recordaste de una vez", "fr": "🎉 Terminé : retenu d un coup", "de": "🎉 Geschafft: auf einmal gemerkt", "pt": "🎉 Concluído: memorizou de uma vez", "ru": "🎉 Пройдено: запомнено за один раз", "it": "🎉 Completato: ricordato in un colpo", "ar": "🎉 تم الإنجاز: حفظتها دفعة واحدة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "💤 本局结束，总分 {0}": { "en": "💤 Round over, score {0}", "ja": "💤 今回終了、合計 {0}", "ko": "💤 이번 판 종료, 총점 {0}", "es": "💤 Fin de la partida, puntuación {0}", "fr": "💤 Manche terminée, score {0}", "de": "💤 Runde vorbei, Punktzahl {0}", "pt": "💤 Rodada encerrada, pontuação {0}", "ru": "💤 Партия окончена, счёт {0}", "it": "💤 Partita finita, punteggio {0}", "ar": "💤 انتهت الجولة، النتيجة {0}" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "💤 结束 · 平均": { "en": "💤 Over · average", "ja": "💤 終了 · 平均", "ko": "💤 종료 · 평균", "es": "💤 Fin · media", "fr": "💤 Fini · moyenne", "de": "💤 Vorbei · Durchschnitt", "pt": "💤 Fim · média", "ru": "💤 Конец · среднее", "it": "💤 Finito · media", "ar": "💤 انتهى · المتوسط" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "💤 结束 · 答对 {0}/{1}": { "en": "💤 Over · {0}/{1} correct", "ja": "💤 終了 · {0}/{1} 正解", "ko": "💤 종료 · {0}/{1} 정답", "es": "💤 Fin · {0}/{1} correctas", "fr": "💤 Fini · {0}/{1} correctes", "de": "💤 Vorbei · {0}/{1} richtig", "pt": "💤 Fim · {0}/{1} certas", "ru": "💤 Конец · {0}/{1} верно", "it": "💤 Finito · {0}/{1} corrette", "ar": "💤 انتهى · {0}/{1} صحيحة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "💤 结束，抓到 {0}/{1}": { "en": "💤 Over, caught {0}/{1}", "ja": "💤 終了、{0}/{1} 捕まえた", "ko": "💤 종료, {0}/{1} 잡았어요", "es": "💤 Fin, atrapaste {0}/{1}", "fr": "💤 Fini, {0}/{1} attrapés", "de": "💤 Vorbei, {0}/{1} gefangen", "pt": "💤 Fim, pego {0}/{1}", "ru": "💤 Конец, поймано {0}/{1}", "it": "💤 Finito, catturati {0}/{1}", "ar": "💤 انتهى، أمسكت {0}/{1}" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "💤 结束，答对 {0}/{1}": { "en": "💤 Over, {0}/{1} correct", "ja": "💤 終了、{0}/{1} 正解", "ko": "💤 종료, {0}/{1} 정답", "es": "💤 Fin, {0}/{1} correctas", "fr": "💤 Fini, {0}/{1} correctes", "de": "💤 Vorbei, {0}/{1} richtig", "pt": "💤 Fim, {0}/{1} certas", "ru": "💤 Конец, {0}/{1} верно", "it": "💤 Finito, {0}/{1} corrette", "ar": "💤 انتهى، {0}/{1} صحيحة" },
+  /** ★★ 2026-10-23 第 57 轮：工具扫出的 36 条缺译之一 */
+  "💤 飘了，平均误差 {0}": { "en": "💤 Drifted, average error {0}", "ja": "💤 ずれた、平均誤差 {0}", "ko": "💤 흔들렸어요, 평균 오차 {0}", "es": "💤 Te desviaste, error medio {0}", "fr": "💤 Tu as dérivé, erreur moyenne {0}", "de": "💤 Abgewichen, mittlerer Fehler {0}", "pt": "💤 Desviou, erro médio {0}", "ru": "💤 Сбились, средняя ошибка {0}", "it": "💤 Hai deviato, errore medio {0}", "ar": "💤 انحرفت، متوسط الخطأ {0}" },
   /** ★★ 2026-10-23：GMultiTrackCounter 原来用裸中文拼接，改成 TG2 模板 */
   "报数：共 {0} 下": { "en": "Count out: {0} taps total", "ja": "カウント：全部で{0}回", "ko": "세기: 총 {0}회", "es": "Cuenta: {0} toques en total", "fr": "Compte : {0} appuis au total", "de": "Zählen: insgesamt {0} Mal", "pt": "Contagem: {0} toques no total", "ru": "Счёт: всего {0} нажатий", "it": "Conteggio: {0} tocchi in totale", "ar": "العد: {0} نقرات إجمالًا" },
 
