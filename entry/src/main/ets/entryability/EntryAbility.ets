@@ -21,6 +21,8 @@ import { Configuration } from '@ohos.app.ability.Configuration';
 import { ProgressStore } from '../core/ProgressStore';
 // ★★★ 2026-10-23 路线 E：游玩记录（路线 B/C/F 的数据地基）
 import { GameLog } from '../core/GameLog';
+// ★★★ 2026-10-23 路线 D：端侧 AI 引擎（探针失败是正常状态，不影响任何玩法）
+import { AiEngine } from '../ai/AiEngine';
 import { gamePlayer } from '@kit.GameServiceKit';
 
 const DOMAIN = 0x0000;
@@ -41,6 +43,8 @@ export default class EntryAbility extends UIAbility {
       hilog.info(DOMAIN, 'testTag', '%{public}s', 'ProgressStore ready');
       // ★ 路线 E：游玩记录初始化（同步、内部全兜底，失败只是不落盘，不影响启动）
       GameLog.init(this.context);
+      // ★ 路线 D：AI 引擎探针 —— 不 await，绝不让模型加载拖慢首屏
+      AiEngine.probe(this.context);
       hilog.info(DOMAIN, 'testTag', 'GameLog ready (%{public}d 条)', GameLog.count());
     }).catch((e: Object) => {
       hilog.error(DOMAIN, 'testTag', 'ProgressStore init failed: %{public}s', JSON.stringify(e));
