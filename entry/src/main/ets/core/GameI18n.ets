@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：倒计时数学提示 */
+  "先算 {0} {1} {2} = {3}，再继续": { "en": "First do {0} {1} {2} = {3}, then keep going", "ja": "まず {0} {1} {2} = {3}、それから続ける", "ko": "먼저 {0} {1} {2} = {3}, 그다음 계속", "es": "Primero {0} {1} {2} = {3}, luego sigue", "fr": "D'abord {0} {1} {2} = {3}, puis continue", "de": "Zuerst {0} {1} {2} = {3}, dann weiter", "pt": "Primeiro {0} {1} {2} = {3}, depois continue", "ru": "Сначала {0} {1} {2} = {3}, затем дальше", "it": "Prima {0} {1} {2} = {3}, poi continua", "ar": "أولًا {0} {1} {2} = {3} ثم تابع" },
   /** ★★ 2026-10-23 第二期：算术链提示 */
   "{0} 步就能到：{1}": { "en": "{0} step(s) to the goal: {1}", "ja": "{0} 手で届く：{1}", "ko": "{0}걸음이면 도달: {1}", "es": "{0} paso(s) para llegar: {1}", "fr": "{0} pas pour arriver : {1}", "de": "{0} Schritt(e) bis zum Ziel: {1}", "pt": "{0} passo(s) até a meta: {1}", "ru": "{0} шаг(ов) до цели: {1}", "it": "{0} passi al traguardo: {1}", "ar": "{0} خطوة للوصول: {1}" },
   /** ★★ 2026-10-23 第二期：二进制码提示 */

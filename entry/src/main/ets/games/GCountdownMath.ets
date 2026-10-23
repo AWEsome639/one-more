@@ -5,7 +5,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -103,6 +105,101 @@ export struct GCountdownMath {
     this.over = false;
     this.tip = TG('点数字 → 点运算符 → 点数字');
     this.load();
+  }
+
+
+  /**
+   * ★ 2026-10-23 第二期：倒计时数学提示（真求解器）
+   *
+   * 4 个数、每次用两个合成一个，最多 3 步 ⇒ 状态空间很小。
+   * 直接 DFS 找解，但**只报第一步**：
+   *   「先算 3 × 4 = 12」
+   * ⇒ 因为这款是交互式的：玩家点两个数、点运算符，结果会顶替旧的数。
+   *   报出完整表达式反而不好用 —— 指数会变。
+   *
+   * 约束与游戏本体一致：结果必须是正整数，且 ≤ 9999。
+   */
+  private dfsFirst(aVals: number[], aIdx: number[], target: number, first: boolean,
+                   out: number[]): boolean {
+    if (aVals.length === 1) {
+      return aVals[0] === target;
+    }
+    const signs: string[] = ['+', '-', 'x', '/'];
+    for (let p = 0; p < aVals.length; p++) {
+      for (let q = 0; q < aVals.length; q++) {
+        if (p === q) {
+          continue;
+        }
+        for (let si = 0; si < signs.length; si++) {
+          const sg: string = signs[si];
+          const r: number = combine(aVals[p], aVals[q], sg);
+          if (r <= 0 || r > 9999) {
+            continue;
+          }
+          const nv: number[] = [];
+          const ni: number[] = [];
+          for (let k = 0; k < aVals.length; k++) {
+            if (k === q) {
+              continue;
+            }
+            if (k === p) {
+              nv.push(r);
+              ni.push(aIdx[k]);
+            } else {
+              nv.push(aVals[k]);
+              ni.push(aIdx[k]);
+            }
+          }
+          if (first && out.length === 0) {
+            out.push(aIdx[p]);
+            out.push(aIdx[q]);
+            out.push(si === 0 ? 0 : (si === 1 ? 1 : (si === 2 ? 2 : 3)));
+            out.push(r);
+          }
+          if (this.dfsFirst(nv, ni, target, false, out)) {
+            return true;
+          }
+          if (first) {
+            out.length = 0;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const vals: number[] = [];
+    const idx: number[] = [];
+    for (let i = 0; i < this.round.nums.length; i++) {
+      if (!this.used[i]) {
+        vals.push(this.round.nums[i]);
+        idx.push(i);
+      }
+    }
+    if (vals.length < 2) {
+      return Hint.none('none');
+    }
+    const out: number[] = [];
+    const ok: boolean = this.dfsFirst(vals, idx, this.round.target, true, out);
+    if (!ok || out.length < 4) {
+      return Hint.none('none');
+    }
+    const signs: string[] = ['+', '-', 'x', '/'];
+    const a: number = this.round.nums[out[0]];
+    const b: number = this.round.nums[out[1]];
+    const sg: string = signs[out[2]];
+    const r: number = out[3];
+    return Hint.make([],
+      TG4('先算 {0} {1} {2} = {3}，再继续', String(a), sg, String(b), String(r)),
+      TG4('First do {0} {1} {2} = {3}, then keep going', String(a), sg, String(b), String(r)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
   }
 
   private load(): void {
@@ -258,6 +355,16 @@ export struct GCountdownMath {
       Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).height(20)
 
       Row({ space: Space.sm }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(Cell.of(40))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.sky).borderRadius(Radius.md)
           .width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
