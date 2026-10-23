@@ -23,6 +23,12 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：扫雷提示三句 */
+  "这一格是安全的，可以翻开": { "en": "This cell is safe — open it", "ja": "このマスは安全。開けて大丈夫", "ko": "이 칸은 안전해요. 열어도 됩니다", "es": "Esta casilla es segura: ábrela", "fr": "Cette case est sûre — ouvre-la", "de": "Dieses Feld ist sicher — öffne es", "pt": "Esta célula é segura — abra", "ru": "Эта клетка безопасна — открывайте", "it": "Questa casella è sicura — aprila", "ar": "هذا المربع آمن — افتحه" },
+  /** ★★ 2026-10-23 第二期：扫雷提示三句 */
+  "这一格是雷，插旗吧": { "en": "This cell is a mine — flag it", "ja": "このマスは地雷。旗を立てて", "ko": "이 칸은 지뢰예요. 깃발을 꽂으세요", "es": "Esta casilla es una mina: márcala", "fr": "Cette case est une mine — mets un drapeau", "de": "Dieses Feld ist eine Mine — setz eine Fahne", "pt": "Esta célula é uma mina — marque", "ru": "Здесь мина — поставьте флажок", "it": "Questa casella è una mina — metti la bandierina", "ar": "هذا المربع لغم — ضع علمًا" },
+  /** ★★ 2026-10-23 第二期：扫雷提示三句 */
+  "这一步从已知信息推不出来，得猜一格": { "en": "This step can t be deduced from what you know — you ll have to guess", "ja": "この一手は今の情報では導けない。どこかを推測して", "ko": "이 수는 지금 정보로는 알 수 없어요. 한 칸은 찍어야 해요", "es": "Este paso no se deduce con lo que sabes: tendrás que adivinar", "fr": "Ce coup ne se déduit pas de ce que tu sais — il faut deviner", "de": "Dieser Zug ist aus dem Bekannten nicht ableitbar — du musst raten", "pt": "Este passo não dá para deduzir — terá de adivinhar", "ru": "Этот ход не выводится из известного — придётся угадать", "it": "Questa mossa non si deduce — bisogna indovinare", "ar": "هذه الخطوة لا تُستنتج — عليك التخمين" },
   /** ★★ 2026-10-23 第二期：数独提示的三句文案 */
   "这一格只能是 {0}": { "en": "This cell can only be {0}", "ja": "このマスは{0}しか入らない", "ko": "이 칸은 {0}만 가능", "es": "Esta casilla solo puede ser {0}", "fr": "Cette case ne peut être que {0}", "de": "Dieses Feld kann nur {0} sein", "pt": "Esta célula só pode ser {0}", "ru": "В этой клетке может быть только {0}", "it": "Questa casella può essere solo {0}", "ar": "هذا المربع يمكن أن يكون {0} فقط" },
   /** ★★ 2026-10-23 第二期：数独提示的三句文案 */

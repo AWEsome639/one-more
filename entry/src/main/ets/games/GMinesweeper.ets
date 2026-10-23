@@ -14,6 +14,8 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+// ★★★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -92,6 +94,10 @@ export struct GMinesweeper {
   @State private flags: number = 0;
   @State private pressed: number = -1;
   @State private boom: number = -1;
+  /** ★ 第二期：提示说的话（空 = 没提示） */
+  @State private hintMsg: string = '';
+  /** 提示指向的格子（-1 = 无） */
+  @State private hintIdx: number = -1;
 
   private seeded: boolean = false;      // 是否已经布雷（首点之后才布）
   private startAt: number = 0;
@@ -262,6 +268,99 @@ export struct GMinesweeper {
   }
 
   /** 翻开：0 邻雷格自动泛洪展开（迭代实现，不用递归） */
+
+  /** 第 i 格的相邻格（纯函数，不依赖组件状态以外的任何东西） */
+  private nbOf(i: number, size: number): number[] {
+    const r: number = Math.floor(i / size);
+    const c: number = i % size;
+    const out: number[] = [];
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) {
+          continue;
+        }
+        const rr: number = r + dr;
+        const cc: number = c + dc;
+        if (rr >= 0 && rr < size && cc >= 0 && cc < size) {
+          out.push(rr * size + cc);
+        }
+      }
+    }
+    return out;
+  }
+
+  /**
+   * ★★★ 2026-10-23 第二期：扫雷提示
+   *
+   * 用两条**纯逻辑**规则（不猜、不作弊看雷）：
+   *   A「某已开格的数字 = 周围旗数」⇒ 它其余未开邻格都是**安全的**
+   *   B「某已开格的数字 = 周围未开格数 + 旗数」⇒ 它其余未开邻格**全是雷**
+   *
+   * ⚠️ 绝不去读 cell.mine 来判断（那是作弊）——
+   *    玩家要的是"从已知信息能推出什么"，不是"答案是什么"。
+   *    这条边界很重要：提示若作弊，游戏的推理乐趣就没了。
+   *
+   * 都给不出 ⇒ Hint.none()，界面直说「这一步看不出来，得猜」。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const size: number = SIDE;
+    // 规则 B 优先（标雷比翻开更"值钱"，因为它防止踩雷）
+    for (let i = 0; i < this.cells.length; i++) {
+      const c: MineCell = this.cells[i];
+      if (!c.open || c.adj <= 0) {
+        continue;
+      }
+      const nbs: number[] = this.nbOf(i, size);
+      let flags: number = 0;
+      let closed: number = 0;
+      for (let k = 0; k < nbs.length; k++) {
+        const n: MineCell = this.cells[nbs[k]];
+        if (n.flag) {
+          flags++;
+        } else if (!n.open) {
+          closed++;
+        }
+      }
+      // B：已确定的雷数正好填满，其余全开
+      if (c.adj === flags && closed > 0) {
+        for (let k = 0; k < nbs.length; k++) {
+          const j: number = nbs[k];
+          if (!this.cells[j].open && !this.cells[j].flag) {
+            return Hint.make([j], TG('这一格是安全的，可以翻开'),
+              TG('This cell is safe — open it'), t0);
+          }
+        }
+      }
+      // A：数字 = 旗 + 未开 ⇒ 未开的全是雷
+      if (c.adj === flags + closed && closed > 0) {
+        for (let k = 0; k < nbs.length; k++) {
+          const j: number = nbs[k];
+          if (!this.cells[j].open && !this.cells[j].flag) {
+            return Hint.make([j], TG('这一格是雷，插旗吧'),
+              TG('This cell is a mine — flag it'), t0);
+          }
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  /** 点「提示」 */
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintIdx = r.cells[0];
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintIdx = -1; this.hintMsg = ''; }, 4000);
+      return;
+    }
+    this.hintIdx = -1;
+    this.hintMsg = TG('这一步从已知信息推不出来，得猜一格');
+    setTimeout(() => { this.hintMsg = ''; }, 4000);
+  }
+
   private reveal(i: number): void {
     if (this.over || this.finished) {
       return;
@@ -377,6 +476,9 @@ export struct GMinesweeper {
   }
 
   private statusText(): string {
+    if (this.hintMsg.length > 0) {
+      return this.hintMsg;              // ★ 提示优先占状态栏
+    }
     if (this.won) {
       return TG2("🎉 全部扫清！用时 {0} 秒",Digits(String(this.seconds), this.langCode));
     }
@@ -434,6 +536,16 @@ export struct GMinesweeper {
           .onClick(() => {
             Haptics.tap();
             this.flagMode = !this.flagMode;
+          })
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askHint();
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
