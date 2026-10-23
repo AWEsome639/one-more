@@ -22,9 +22,17 @@ const ASK: string[] = [TG('左手边'), TG('右手边'), TG('正前方'), TG('�
 const FX: number[] = [-1, 0, 1, 0]; const FY: number[] = [0, 1, 0, -1];
 const RX: number[] = [0, 1, 0, -1]; const RY: number[] = [1, 0, -1, 0];
 
-/** t：0 左 1 右 2 前 3 后 —— 判断某格物品落在观察者的哪个方位 */
-function rel(or: number, oc: number, cell: number, face: number, t: number): boolean {
-  const dr: number = Math.floor(cell / N) - or; const dc: number = cell % N - oc;
+/**
+ * t：0 左 1 右 2 前 3 后 —— 判断某格物品落在观察者的哪个方位
+ *
+ * ★ 2026-10-23：加 n 参数。
+ *   棋盘是按 diffTotal 生成和渲染的（4/5/6），
+ *   但这里原来用模块常量 N=5 把 cell 换成坐标
+ *   ⇒ 4×4 与 6×6 时几乎每一格都算成别的方位。
+ *   调用处本来就传的是 diffTotal 算出来的 or/oc，两边对齐即可。
+ */
+function rel(or: number, oc: number, cell: number, face: number, t: number, n: number): boolean {
+  const dr: number = Math.floor(cell / n) - or; const dc: number = cell % n - oc;
   if (t === 2) { return dr * FX[face] + dc * FY[face] > 0; }
   if (t === 3) { return dr * FX[face] + dc * FY[face] < 0; }
   if (t === 1) { return dr * RX[face] + dc * RY[face] > 0; }
@@ -92,7 +100,7 @@ export struct GPerspectiveTaking {
       for (let t = 0; t < 4; t++) {
         let cnt: number = 0;
         for (let k = 0; k < 3; k++) {
-          if (rel(Math.floor(spot / this.diffTotal), spot % this.diffTotal, cells[k], way, t)) { cnt = cnt + 1; who[t] = k; }
+          if (rel(Math.floor(spot / this.diffTotal), spot % this.diffTotal, cells[k], way, t, this.diffTotal)) { cnt = cnt + 1; who[t] = k; }
         }
         if (cnt === 1) { types.push(t); }
       }

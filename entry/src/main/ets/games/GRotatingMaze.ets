@@ -19,23 +19,29 @@ const MAX_CELLS: number = MAX_N * MAX_N; const DMAX: number = 64; const TURN_EVE
 const DR: number[] = [-1, 0, 1, 0]; const DC: number[] = [0, 1, 0, -1];
 const ROWS: number[] = [0, 1, 2, 3, 4, 5, 6];
 
-/** 顺时针 90°：格 (r,c) → (c, N-1-r) */
-function rotIdx(i: number): number {
-  const r: number = Math.floor(i / N); const c: number = i % N;
-  return c * N + (N - 1 - r);
+/**
+ * 顺时针 90°：格 (r,c) → (c, n-1-r)
+ *
+ * ★ 2026-10-23：加 n 参数。
+ *   迷宫按 diffTotal 生成（5/7/9），但这里用模块常量 N=7 换算坐标
+ *   ⇒ 5×5 与 9×9 时旋转会算到盘外或错位。
+ */
+function rotIdx(i: number, n: number): number {
+  const r: number = Math.floor(i / n); const c: number = i % n;
+  return c * n + (n - 1 - r);
 }
 /** 左上角能否走到右下角（旋转不改变连通性，判一次就够） */
-function reachable(w: number[]): boolean {
+function reachable(w: number[], n: number): boolean {
   const seen: boolean[] = new Array<boolean>(MAX_CELLS).fill(false); const q: number[] = [0];
   seen[0] = true; let head: number = 0;
   while (head < q.length) {
     const cur: number = q[head]; head++;
-    if (cur === CELLS - 1) { return true; }
-    const r: number = Math.floor(cur / N); const c: number = cur % N;
+    if (cur === n * n - 1) { return true; }
+    const r: number = Math.floor(cur / n); const c: number = cur % n;
     for (let d = 0; d < 4; d++) {
       const nr: number = r + DR[d]; const nc: number = c + DC[d];
-      if (nr < 0 || nr >= N || nc < 0 || nc >= N) { continue; }
-      const nb: number = nr * N + nc;
+      if (nr < 0 || nr >= n || nc < 0 || nc >= n) { continue; }
+      const nb: number = nr * n + nc;
       if (w[nb] === 1 || seen[nb]) { continue; }
       seen[nb] = true; q.push(nb);
     }
@@ -48,7 +54,7 @@ function genWalls(n: number): number[] {
     const w: number[] = [];
     for (let i = 0; i < n * n; i++) { w.push(Math.random() < 0.3 ? 1 : 0); }
     w[0] = 0; w[n * n - 1] = 0;
-    if (reachable(w)) { return w; }
+    if (reachable(w, n)) { return w; }
   }
   return new Array<number>(MAX_CELLS).fill(0);
 }
@@ -73,7 +79,7 @@ export struct GRotatingMaze {
     return a2;
   }
   onFinish: (r: GameResult) => void = () => {};
-  @State walls: number[] = []; @State pos: number = 0; @State goal: number = CELLS - 1;
+  @State walls: number[] = []; @State pos: number = 0; @State goal: number = 0;
   @State steps: number = 0; @State turns: number = 0; @State turnIn: number = TURN_EVERY;
   @State over: boolean = false; @State won: boolean = false; @State note: string = '';
   private startAt: number = 0; private done: boolean = false;
@@ -83,15 +89,17 @@ export struct GRotatingMaze {
     this.diffTotal = GameDiff.sizeNow(7);
      this.reset(); }
   private reset(): void {
-    this.walls = genWalls(this.diffTotal); this.pos = 0; this.goal = CELLS - 1; this.steps = 0; this.turns = 0;
+    this.walls = genWalls(this.diffTotal); this.pos = 0;
+    this.goal = this.diffTotal * this.diffTotal - 1; this.steps = 0; this.turns = 0;
     this.turnIn = TURN_EVERY; this.over = false; this.won = false; this.done = false;
     this.note = TG('走到 🏁 出口；每走 2 步迷宫会转 90°'); this.startAt = Date.now();
   }
   /** 墙、人、出口一起顺时针转 90° */
   private spin(): void {
     const next: number[] = new Array<number>(MAX_CELLS).fill(0);
-    for (let i = 0; i < this.diffTotal * this.diffTotal; i++) { next[rotIdx(i)] = this.walls[i]; }
-    this.walls = next; this.pos = rotIdx(this.pos); this.goal = rotIdx(this.goal); this.turns++;
+    for (let i = 0; i < this.diffTotal * this.diffTotal; i++) { next[rotIdx(i, this.diffTotal)] = this.walls[i]; }
+    this.walls = next; this.pos = rotIdx(this.pos, this.diffTotal);
+    this.goal = rotIdx(this.goal, this.diffTotal); this.turns++;
   }
   /** d: 0 上 1 右 2 下 3 左（屏幕方向） */
   private step(d: number): void {
