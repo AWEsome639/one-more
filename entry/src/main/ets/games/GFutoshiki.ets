@@ -8,7 +8,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -64,6 +66,9 @@ export struct GFutoshiki {
   @State private over: boolean = false;
   @State private won: boolean = false;
   @State private pressed: number = -1;
+  /** ★ 提示说的话 */
+  @State private hintMsg: string = '';
+  @State private hintIdx: number = -1;
 
   private startAt: number = 0;
 
@@ -128,6 +133,130 @@ export struct GFutoshiki {
       }
     }
     return n;
+  }
+
+
+  /** 1..N 的全部排列（N=5 时 120 个） */
+  private allPerms5(): number[][] {
+    const out: number[][] = [];
+    const cur: number[] = [];
+    const used: boolean[] = new Array<boolean>(N + 1).fill(false);
+    const rec = (): void => {
+      if (cur.length === N) {
+        out.push(cur.slice());
+        return;
+      }
+      for (let v = 1; v <= N; v++) {
+        if (used[v]) {
+          continue;
+        }
+        used[v] = true;
+        cur.push(v);
+        rec();
+        cur.pop();
+        used[v] = false;
+      }
+    };
+    rec();
+    return out;
+  }
+
+  /**
+   * ★ 2026-10-23 第二期：不等式提示
+   *
+   * 规则：每行每列是 1..N 的排列，相邻格要满足给的不等号。
+   * ⇒ 逐行/逐列「枚举所有符合不等号与已填数字的排列（N=5 时 120 个）→ 求交集」，
+   *    所有候选都一致的格就是确定的。
+   *
+   * ⚠️ 只做行内/列内推理，不做全盘搜索 —— 宁可少给。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const perms: number[][] = this.allPerms5();
+    for (let horiz = 1; horiz >= 0; horiz--) {
+      for (let k = 0; k < N; k++) {
+        const marks: number[] = [];
+        const signs: number[] = [];
+        for (let i = 0; i < N; i++) {
+          marks.push(horiz === 1 ? this.vals[k * N + i] : this.vals[i * N + k]);
+        }
+        for (let i = 0; i < N - 1; i++) {
+          if (horiz === 1) {
+            signs.push(this.hSign[k * (N - 1) + i]);
+          } else {
+            signs.push(this.vSign[i * N + k]);
+          }
+        }
+        let acc: number[] = [];
+        let cnt: number = 0;
+        for (let pi = 0; pi < perms.length; pi++) {
+          const cand: number[] = perms[pi];
+          let ok: boolean = true;
+          for (let i = 0; i < N - 1; i++) {
+            const sg: number = signs[i];
+            if (sg === 1 && !(cand[i] < cand[i + 1])) {
+              ok = false;
+              break;
+            }
+            if (sg === 2 && !(cand[i] > cand[i + 1])) {
+              ok = false;
+              break;
+            }
+          }
+          if (!ok) {
+            continue;
+          }
+          for (let i = 0; i < N; i++) {
+            if (marks[i] !== 0 && marks[i] !== cand[i]) {
+              ok = false;
+              break;
+            }
+          }
+          if (!ok) {
+            continue;
+          }
+          if (cnt === 0) {
+            acc = cand.slice();
+          } else {
+            for (let i = 0; i < N; i++) {
+              if (acc[i] !== cand[i]) {
+                acc[i] = -1;
+              }
+            }
+          }
+          cnt++;
+        }
+        if (cnt <= 1) {
+          continue;
+        }
+        for (let i = 0; i < N; i++) {
+          if (acc[i] < 0 || marks[i] === acc[i]) {
+            continue;
+          }
+          const idx: number = horiz === 1 ? k * N + i : i * N + k;
+          const r: number = horiz === 1 ? k + 1 : i + 1;
+          const c: number = horiz === 1 ? i + 1 : k + 1;
+          return Hint.make([idx],
+            TG2('第 {0} 行第 {1} 列一定是 {2}', String(r), String(c), String(acc[i])),
+            TG2('Row {0}, column {1} must be {2}', String(r), String(c), String(acc[i])), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintIdx = r.cells[0];
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintIdx = -1; this.hintMsg = ''; }, 4500);
+      return;
+    }
+    this.hintIdx = -1;
+    this.hintMsg = TG('这一步从不等号推不出来，得先试一个数');
+    setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
   private signTotal(): number {
@@ -1268,6 +1397,21 @@ export struct GFutoshiki {
       .width('100%')
 
       Row({ space: Space.md }) {
+        Text(this.hintMsg.length > 0 ? this.hintMsg : '')
+          .fontSize(FontSize.xs)
+          .fontColor(this.theme.inkSoft)
+          .layoutWeight(2)
+          .maxLines(2)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

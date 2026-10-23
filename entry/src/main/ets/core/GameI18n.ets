@@ -23,6 +23,9 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：不等式提示 */
+  "这一步从不等号推不出来，得先试一个数": { "en": "No inequality gives it away here — try a number", "ja": "この一手は不等号からは導けない。数字を試して", "ko": "이 수는 부등호로 알 수 없어요. 숫자를 시험해 보세요", "es": "Las desigualdades no lo deducen: prueba un número", "fr": "Les inégalités ne suffisent pas — essaie un nombre", "de": "Die Ungleichungen geben es nicht her — probier eine Zahl", "pt": "As desigualdades não bastam — tente um número", "ru": "Неравенства не дают ответа — попробуйте число", "it": "Le disuguaglianze non bastano — prova un numero", "ar": "المتباينات لا تحدد ذلك — جرّب رقمًا" },
+
   /** ★★ 2026-10-23 第二期：数字华容道提示 */
   "把第 {0} 行第 {1} 列的块推进空格（总距离 {2} → {3}）": { "en": "Slide the tile at row {0}, column {1} (distance {2} → {3})", "ja": "{0}行{1}列のブロックを空きへ（距離 {2} → {3}）", "ko": "{0}행 {1}열 블록을 빈칸으로 (거리 {2} → {3})", "es": "Mueve la ficha de fila {0}, columna {1} (distancia {2} → {3})", "fr": "Pousse la tuile ligne {0}, colonne {1} (distance {2} → {3})", "de": "Schieb das Feld Zeile {0}, Spalte {1} (Distanz {2} → {3})", "pt": "Empurre a peça da linha {0}, coluna {1} (distância {2} → {3})", "ru": "Двиньте клетку строка {0}, столбец {1} (расстояние {2} → {3})", "it": "Spingi la tessera riga {0}, colonna {1} (distanza {2} → {3})", "ar": "حرّك القطعة في الصف {0} والعمود {1} (المسافة {2} → {3})" },
   /** ★★ 2026-10-23 第二期：数字华容道提示 */
