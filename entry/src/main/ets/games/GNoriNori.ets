@@ -62,7 +62,31 @@ export struct GNoriNori {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4]，上面已一并改成按尺寸生成
-  @State private diffTotal: number = GameDiff.sizeNow(5);
+  /**
+   * ★★★ 2026-10-23 修「尺寸陷阱」：
+   *   原来 diffTotal = sizeNow(5)（4/5/7），棋盘按它开，
+   *   但**分区来自 REGION_LIB，是手工画的 5×5 = 25 格**：
+   *     · 困难 7×7 = 49 格：regions 只有 25 项，后 24 格全是 undefined
+   *     · 简单 4×4 = 16 格：只取前 16 项 ⇒ 区域形状不连续，题是错的
+   *   ⇒ 简单档与困难档都坏。
+   *
+   *   修法：**分区表是 5×5 手绘的，棋盘就固定 5×5**；
+   *   难度改到**容错次数**上（本来就是它的压力来源）。
+   */
+  @State private diffTotal: number = 5;
+  /** 本局允许的错误次数：简单 8 / 普通 5 / 困难 3 */
+  @State private errMax: number = GNoriNori.errNow();
+
+  private static errNow(): number {
+    const d: number = GameDiff.now();
+    if (d === 0) {
+      return 8;
+    }
+    if (d === 2) {
+      return 3;
+    }
+    return 5;
+  }
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
   private rowIdx(): number[] {
@@ -90,7 +114,7 @@ export struct GNoriNori {
   }
 
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(5);
+    this.errMax = GNoriNori.errNow();
     this.reset();
   }
 
@@ -196,7 +220,7 @@ export struct GNoriNori {
     next[i] = 1;
     if (!this.legal(next, i)) {
       this.errors++;
-      if (this.errors >= ERR_MAX) {
+      if (this.errors >= this.errMax) {
         this.over = true;
         this.won = false;
         this.score = 0;
@@ -263,7 +287,7 @@ export struct GNoriNori {
         .shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('错手'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.errors) + '/' + String(ERR_MAX)))
+        Text((String(this.errors) + '/' + String(this.errMax)))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
