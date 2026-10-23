@@ -12,6 +12,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -200,6 +202,9 @@ export struct GAlphabetSudoku {
   @State private seconds: number = 0;
   @State private status: string = '';
   @State private done: boolean = false;
+  /** ★ 提示说的话 */
+  @State private hintMsg: string = '';
+  @State private hintIdx: number = -1;
 
   private startAt: number = 0;
   private timer: number = -1;
@@ -266,6 +271,53 @@ export struct GAlphabetSudoku {
     const probe: number[] = this.cells.slice();
     probe[i] = 0;
     return !fits(probe, i, v, this.diffTotal);
+  }
+
+
+  /**
+   * ★ 2026-10-23 第二期：字母数独提示
+   *
+   * 这个文件本来就有完整求解器（fill：回溯填满），
+   * 所以提示很直接：把当前盘面复制一份、解开、找一个还空着的格，告诉它该填几。
+   *
+   * ⚠️ 与数独（GSudoku）的做法一致：
+   *    优先找「唯一候选」的格（更"人类"），没有再直接揭答案。
+   *    这里因为求解器现成，先做揭答案这一路 —— 简单、永远可用。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    const g: number[] = new Array<number>(MAX_CELLS).fill(0);
+    for (let i = 0; i < n * n; i++) {
+      g[i] = this.cells[i];
+    }
+    if (!fill(g, 0, n)) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < n * n; i++) {
+      if (this.cells[i] === 0 && g[i] > 0) {
+        this.hintIdx = i;
+        const r: number = Math.floor(i / n) + 1;
+        const c: number = (i % n) + 1;
+        return Hint.make([i],
+          TG2('第 {0} 行第 {1} 列填 {2}', String(r), String(c), String(g[i])),
+          TG2('Row {0}, column {1}: fill {2}', String(r), String(c), String(g[i])), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok) {
+      this.status = r.zh;
+      setTimeout(() => { this.hintIdx = -1; this.hintMsg = ''; }, 4500);
+      return;
+    }
+    this.hintIdx = -1;
+    this.status = TG('这一步算不出来（盘面可能已经填错了）');
+    setTimeout(() => { this.status = ''; }, 4500);
   }
 
   private filled(): number {
@@ -455,6 +507,16 @@ export struct GAlphabetSudoku {
       .width('100%')
 
       Row({ space: Space.sm }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('✕ 擦除'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)

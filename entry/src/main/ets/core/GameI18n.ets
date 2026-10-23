@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：字母数独提示 */
+  "第 {0} 行第 {1} 列填 {2}": { "en": "Row {0}, column {1}: fill {2}", "ja": "{0}行{1}列に {2} を入れる", "ko": "{0}행 {1}열에 {2}을(를) 넣으세요", "es": "Fila {0}, columna {1}: pon {2}", "fr": "Ligne {0}, colonne {1} : mets {2}", "de": "Zeile {0}, Spalte {1}: {2} eintragen", "pt": "Linha {0}, coluna {1}: coloque {2}", "ru": "Строка {0}, столбец {1}: впишите {2}", "it": "Riga {0}, colonna {1}: inserisci {2}", "ar": "الصف {0} والعمود {1}: اكتب {2}" },
+  /** ★★ 2026-10-23 第二期：字母数独提示 */
+  "这一步算不出来（盘面可能已经填错了）": { "en": "Can t compute a step — the grid may already be wrong", "ja": "この一手は計算できない。盤面がもう誤っているかも", "ko": "이 수는 계산할 수 없어요. 판이 이미 틀렸을 수 있어요", "es": "No se puede calcular un paso: puede que el tablero ya esté mal", "fr": "Impossible de calculer — la grille est peut-être déjà fausse", "de": "Kein Schritt berechenbar — das Gitter ist evtl. schon falsch", "pt": "Não dá para calcular — o tabuleiro pode já estar errado", "ru": "Не удаётся найти ход — возможно, сетка уже неверна", "it": "Impossibile calcolare — la griglia forse è già sbagliata", "ar": "لا يمكن حساب خطوة — قد تكون الشبكة خاطئة بالفعل" },
   /** ★★ 2026-10-23 第二期：管道提示 */
   "第 {0} 行第 {1} 列再转 {2} 次就对了": { "en": "Row {0}, column {1}: rotate {2} more time(s)", "ja": "{0}行{1}列をあと{2}回まわす", "ko": "{0}행 {1}열을 {2}번 더 돌리세요", "es": "Fila {0}, columna {1}: gira {2} vez/veces más", "fr": "Ligne {0}, colonne {1} : tourne encore {2} fois", "de": "Zeile {0}, Spalte {1}: noch {2} Mal drehen", "pt": "Linha {0}, coluna {1}: gire mais {2} vez(es)", "ru": "Строка {0}, столбец {1}: поверните ещё {2} раз", "it": "Riga {0}, colonna {1}: ruota ancora {2} volta/e", "ar": "الصف {0} والعمود {1}: أدر {2} مرة أخرى" },
   /** ★★ 2026-10-23 第二期：管道提示 */
