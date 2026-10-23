@@ -12,7 +12,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -342,6 +344,57 @@ export struct GHeyawake {
     return heyaRules(this.room, this.black);
   }
 
+
+  /**
+   * ★ 2026-10-23 第二期：数间提示
+   *
+   * 规则：每个区域要涂黑 need[r] 格；黑格不能相邻；等等。
+   * 这里用一条最保守但严格成立的计数规则：
+   *   **区域内「还需涂黑的数量」正好等于「区域内还没涂黑的格子数」**
+   *   ⇒ 那些格子必须全部涂黑。
+   *
+   * ⚠️ 这款只有"黑/非黑"两态，没有单独的白色标记，
+   *    所以只能推「必须黑」，不能推「必须白」。宁可少给。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const total: number = N * N;
+    for (let r = 0; r < this.rooms; r++) {
+      let blackHere: number = 0;
+      let freeHere: number = 0;
+      let freeIdx: number = -1;
+      for (let i = 0; i < total; i++) {
+        if (this.room[i] !== r) {
+          continue;
+        }
+        if (this.black[i]) {
+          blackHere++;
+        } else {
+          freeHere++;
+          freeIdx = i;
+        }
+      }
+      const left: number = this.need[r] - blackHere;
+      if (left <= 0 || freeHere === 0 || left !== freeHere || freeIdx < 0) {
+        continue;
+      }
+      const rr: number = Math.floor(freeIdx / N) + 1;
+      const cc: number = (freeIdx % N) + 1;
+      return Hint.make([freeIdx],
+        TG2('第 {0} 行第 {1} 列必须涂黑（这个分区剩下的格子正好都要黑）',
+          String(rr), String(cc)),
+        TG2('Row {0}, column {1} must be black (the rest of this region must all be black)',
+          String(rr), String(cc)), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格必须涂黑'));
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -471,6 +524,16 @@ export struct GHeyawake {
           .layoutWeight(1)
           .height(Cell.of(44))
           .enabled(false)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

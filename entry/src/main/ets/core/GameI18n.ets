@@ -23,6 +23,9 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：数间提示 */
+  "第 {0} 行第 {1} 列必须涂黑（这个分区剩下的格子正好都要黑）": { "en": "Row {0}, column {1} must be black (the rest of this region must all be black)", "ja": "{0}行{1}列は必ず黒（この区画の残りは全部黒）", "ko": "{0}행 {1}열은 반드시 검게 (이 구역의 남은 칸이 모두 검정)", "es": "Fila {0}, columna {1} debe ser negra (el resto de la región debe ser negro)", "fr": "Ligne {0}, colonne {1} doit être noire (le reste de la région doit être noir)", "de": "Zeile {0}, Spalte {1} muss schwarz sein (der Rest der Region muss schwarz sein)", "pt": "Linha {0}, coluna {1} deve ser preta (o resto da região deve ser preto)", "ru": "Строка {0}, столбец {1} — чёрная (остаток области весь чёрный)", "it": "Riga {0}, colonna {1} deve essere nera (il resto della regione deve essere nero)", "ar": "الصف {0} والعمود {1} يجب أن يكون أسود (بقية المنطقة كلها سوداء)" },
+
   /** ★★ 2026-10-23 第二期：塔帕提示 */
   "第 {0} 行第 {1} 列必须涂黑（旁边那个数字还差 {2} 格）": { "en": "Row {0}, column {1} must be black (that clue still needs {2})", "ja": "{0}行{1}列は必ず黒（そばの数字はあと{2}マス）", "ko": "{0}행 {1}열은 반드시 검게 (옆 숫자는 {2}칸 더)", "es": "Fila {0}, columna {1} debe ser negra (esa pista aún pide {2})", "fr": "Ligne {0}, colonne {1} doit être noire (cet indice en demande encore {2})", "de": "Zeile {0}, Spalte {1} muss schwarz sein (der Hinweis braucht noch {2})", "pt": "Linha {0}, coluna {1} deve ser preta (essa dica ainda pede {2})", "ru": "Строка {0}, столбец {1} — чёрная (числу нужно ещё {2})", "it": "Riga {0}, colonna {1} deve essere nera (quel numero ne chiede ancora {2})", "ar": "الصف {0} والعمود {1} يجب أن يكون أسود (الرقم يطلب {2} أخرى)" },
   /** ★★ 2026-10-23 第二期：塔帕提示 */
