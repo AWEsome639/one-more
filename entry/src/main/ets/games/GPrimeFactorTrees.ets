@@ -3,6 +3,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -81,6 +83,39 @@ export struct GPrimeFactorTrees {
     if (this.miss >= 3) { this.next(TG2('✗ {0} 没能拆完', String(this.target))); }
   }
 
+
+  /**
+   * ★ 2026-10-23 第二期：质因数树提示
+   *
+   * 玩法是「把目标数一步步拆成质因数」。
+   * 提示 = **当前剩余数能被哪个质数整除**（取最小的那个）。
+   * 这正好是下一步该点的按钮，而且给出了"为什么"。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.rest;
+    if (n <= 1) {
+      return Hint.none('none');
+    }
+    for (let k = 0; k < PRIMES.length; k++) {
+      const p: number = PRIMES[k];
+      if (n % p === 0) {
+        return Hint.make([],
+          TG2('{0} 能被 {1} 整除（{0} ÷ {1} = {2}），点 {1}',
+            String(n), String(p), String(n / p)),
+          TG2('{0} divides by {1} ({0} ÷ {1} = {2}) — tap {1}',
+            String(n), String(p), String(n / p)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private next(msg: string): void {
     this.level++;
     if (this.level >= this.diffTotal) {
@@ -130,6 +165,16 @@ export struct GPrimeFactorTrees {
         .onClick(() => { Haptics.tap(); this.tap((p)); }); }, (p: number) => 'p' + p)
       }.width('100%')
       Row({ space: Space.md }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.cyan)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })

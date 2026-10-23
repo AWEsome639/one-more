@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：质因数树提示 */
+  "{0} 能被 {1} 整除（{0} ÷ {1} = {2}），点 {1}": { "en": "{0} divides by {1} ({0} ÷ {1} = {2}) — tap {1}", "ja": "{0} は {1} で割れる（{0} ÷ {1} = {2}）—— {1} を押す", "ko": "{0}은 {1}로 나눠져요 ({0} ÷ {1} = {2}) — {1}을 누르세요", "es": "{0} es divisible por {1} ({0} ÷ {1} = {2}): toca {1}", "fr": "{0} est divisible par {1} ({0} ÷ {1} = {2}) — touche {1}", "de": "{0} ist durch {1} teilbar ({0} ÷ {1} = {2}) — tippe {1}", "pt": "{0} é divisível por {1} ({0} ÷ {1} = {2}) — toque {1}", "ru": "{0} делится на {1} ({0} ÷ {1} = {2}) — нажмите {1}", "it": "{0} è divisibile per {1} ({0} ÷ {1} = {2}) — tocca {1}", "ar": "{0} يقبل القسمة على {1} ({0} ÷ {1} = {2}) — اضغط {1}" },
   /** ★★ 2026-10-23 第二期：数列侦探提示 */
   "规律是：{0}（照着它算第六项）": { "en": "The rule is: {0} (work out the sixth term from it)", "ja": "規則は：{0}（それで第六項を計算）", "ko": "규칙은: {0} (그걸로 여섯째 항을 계산)", "es": "La regla es: {0} (calcula el sexto término)", "fr": "La règle est : {0} (calcule le sixième terme)", "de": "Die Regel ist: {0} (berechne den sechsten Term)", "pt": "A regra é: {0} (calcule o sexto termo)", "ru": "Правило: {0} (вычислите шестой член)", "it": "La regola è: {0} (calcola il sesto termine)", "ar": "القاعدة هي: {0} (احسب الحد السادس)" },
   /** ★★ 2026-10-23 第二期：找因数提示 */
