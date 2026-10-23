@@ -55,6 +55,197 @@ function range(n: number): number[] {
   return a;
 }
 
+
+/**
+ * ★★★ 2026-10-23 第二期：给跳棋装一个会思考的对手
+ *
+ * 原来 scheduleAi() 里是：
+ *   const pick = ms[Math.floor(Math.random() * ms.length)];
+ * ⇒ 「电脑」是**随机走子**。7 款棋类里它是唯一一个不会思考的。
+ *
+ * 现在换成极小化极大 + α-β 剪枝：
+ *   评估 = 子力（兵 1 / 王 2.5）+ 推进度（兵往前走一点点加分）+ 中心偏好
+ *   深度：0 档 1 层（几乎乱走，新手能赢）/ 1 档 4 层 / 2 档 6 层
+ *
+ * ★ 为什么评估里"王"值 2.5 而不是 3：跳棋里一个王很强但不等于三个兵，
+ *   2.5 是经验值（我按常见跳棋引擎的取值取的）。
+ * ★ 纯函数：只吃 board/size/side，不碰组件状态 —— 这样将来能挪到工作线程。
+ */
+
+/** 某方所有可走法（纯函数版，与组件里的 movesFrom 规则一致） */
+function genMoves(b: number[], size: number, side: number, onlyFrom: number): Move[] {
+  const out: Move[] = [];
+  const idx = (r: number, c: number): number => r * size + c;
+  for (let i = 0; i < b.length; i++) {
+    const v: number = b[i];
+    const mine: boolean = side === 1 ? (v === P_MAN || v === P_KING) : (v === A_MAN || v === A_KING);
+    if (!mine || (onlyFrom >= 0 && i !== onlyFrom)) {
+      continue;
+    }
+    const r: number = Math.floor(i / size);
+    const c: number = i % size;
+    const king: boolean = (side === 1 && v === P_KING) || (side === 3 && v === A_KING);
+    const dirs: number[] = king ? [-1, 1] : (side === 1 ? [-1] : [1]);
+    for (let d = 0; d < dirs.length; d++) {
+      const dr: number = dirs[d];
+      for (let dc = -1; dc <= 1; dc += 2) {
+        const tr: number = r + dr;
+        const tc: number = c + dc;
+        if (tr < 0 || tr >= size || tc < 0 || tc >= size) {
+          continue;
+        }
+        if (b[idx(tr, tc)] === EMPTY) {
+          out.push({ from: i, to: idx(tr, tc), cap: -1 });
+        }
+        const lr: number = r + dr * 2;
+        const lc: number = c + dc * 2;
+        if (lr < 0 || lr >= size || lc < 0 || lc >= size) {
+          continue;
+        }
+        const mid: number = b[idx(tr, tc)];
+        const midIsOpp: boolean = side === 1 ? (mid === A_MAN || mid === A_KING) : (mid === P_MAN || mid === P_KING);
+        if (midIsOpp && b[idx(lr, lc)] === EMPTY) {
+          out.push({ from: i, to: idx(lr, lc), cap: idx(tr, tc) });
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/** 落一子后的新盘（不改原盘） */
+function afterMove(b: number[], size: number, m: Move, side: number): number[] {
+  const n: number[] = b.slice();
+  let v: number = n[m.from];
+  n[m.from] = EMPTY;
+  if (m.cap >= 0) {
+    n[m.cap] = EMPTY;
+  }
+  const r: number = Math.floor(m.to / size);
+  if (v === P_MAN && r === 0) {
+    v = P_KING;
+  } else if (v === A_MAN && r === size - 1) {
+    v = A_KING;
+  }
+  n[m.to] = v;
+  return n;
+}
+
+/** 评估（站在 side=3 电脑的视角，越大越好） */
+function evalBoard(b: number[], size: number): number {
+  let score: number = 0;
+  for (let i = 0; i < b.length; i++) {
+    const v: number = b[i];
+    if (v === EMPTY) {
+      continue;
+    }
+    const r: number = Math.floor(i / size);
+    const c: number = i % size;
+    // 中心偏好：越靠中间越值钱
+    const cx: number = Math.abs(c - (size - 1) / 2) / size;
+    const centerBonus: number = (0.5 - cx) * 0.4;
+    if (v === A_MAN) {
+      // 电脑的兵往上走（r 越小越接近升王）
+      score += 1.0 + (size - 1 - r) / size * 0.35 + centerBonus;
+    } else if (v === A_KING) {
+      score += 2.5 + centerBonus;
+    } else if (v === P_MAN) {
+      score -= 1.0 + r / size * 0.35 + centerBonus;
+    } else if (v === P_KING) {
+      score -= 2.5 + centerBonus;
+    }
+  }
+  return score;
+}
+
+const WIN_SCORE: number = 100000;
+
+/** 极小化极大 + α-β。side 是"该谁走"。 */
+function search(b: number[], size: number, side: number, depth: number,
+                alpha0: number, beta0: number, budget: number[]): number {
+  budget[0]--;
+  if (budget[0] <= 0) {
+    return evalBoard(b, size);          // 超预算就交静态评估（保证有返回值）
+  }
+  const ms: Move[] = genMoves(b, size, side, -1);
+  if (ms.length === 0) {
+    // 无路可走 = 该方输
+    return side === 3 ? -WIN_SCORE : WIN_SCORE;
+  }
+  if (depth <= 0) {
+    return evalBoard(b, size);
+  }
+  let alpha: number = alpha0;
+  let beta: number = beta0;
+  if (side === 3) {
+    let best: number = -WIN_SCORE * 2;
+    for (let k = 0; k < ms.length; k++) {
+      const nb: number[] = afterMove(b, size, ms[k], side);
+      const sc: number = search(nb, size, 1, depth - 1, alpha, beta, budget);
+      if (sc > best) {
+        best = sc;
+      }
+      if (best > alpha) {
+        alpha = best;
+      }
+      if (alpha >= beta) {
+        break;
+      }
+    }
+    return best;
+  }
+  let best2: number = WIN_SCORE * 2;
+  for (let k = 0; k < ms.length; k++) {
+    const nb: number[] = afterMove(b, size, ms[k], side);
+    const sc: number = search(nb, size, 3, depth - 1, alpha, beta, budget);
+    if (sc < best2) {
+      best2 = sc;
+    }
+    if (best2 < beta) {
+      beta = best2;
+    }
+    if (alpha >= beta) {
+      break;
+    }
+  }
+  return best2;
+}
+
+/**
+ * 电脑选一手。
+ * level: 0 简单（深 1，几乎乱走）/ 1 普通（深 4）/ 2 困难（深 6）
+ * 任何异常 ⇒ 返回 null，调用方回落随机（绝不让游戏卡死）
+ */
+function aiBest(board: number[], size: number, level: number, onlyFrom: number): Move | null {
+  try {
+    const ms: Move[] = genMoves(board, size, 3, onlyFrom);
+    if (ms.length === 0) {
+      return null;
+    }
+    if (ms.length === 1) {
+      return ms[0];                     // 只有一步，不用想
+    }
+    const depth: number = level <= 0 ? 1 : (level >= 2 ? 6 : 4);
+    const budget: number[] = [level >= 2 ? 120000 : 30000];
+    let best: Move = ms[0];
+    let bestSc: number = -WIN_SCORE * 2;
+    for (let k = 0; k < ms.length; k++) {
+      const nb: number[] = afterMove(board, size, ms[k], 3);
+      const sc: number = search(nb, size, 1, depth - 1, -WIN_SCORE * 2, WIN_SCORE * 2, budget);
+      if (sc > bestSc) {
+        bestSc = sc;
+        best = ms[k];
+      }
+      if (budget[0] <= 0) {
+        break;                          // 超预算 ⇒ 用当前最好的
+      }
+    }
+    return best;
+  } catch (e) {
+    return null;
+  }
+}
+
 @Component
 export struct GCheckers {
   @Prop theme: Theme = Theme.light();
@@ -362,7 +553,13 @@ export struct GCheckers {
         this.endTurn();
         return;
       }
-      const pick: Move = ms[Math.floor(Math.random() * ms.length)];
+      // ★★★ 2026-10-23：随机走子 → 极小化极大 + α-β
+      //   原来「电脑」是 Math.random 挑一个合法步 ⇒ 玩家几乎不可能输，
+      //   7 款棋类里它是唯一一个不会思考的。
+      //   level 用 GameDiff.now()（0/1/2）；算不出来（异常/超预算）⇒ 回落随机，绝不卡死
+      const lv: number = GameDiff.now();
+      const best: Move | null = aiBest(this.board, this.diffTotal, lv, from);
+      const pick: Move = best !== null ? best : ms[Math.floor(Math.random() * ms.length)];
       this.apply(pick);
     }, AI_DELAY);
   }
