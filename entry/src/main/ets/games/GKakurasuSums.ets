@@ -9,7 +9,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -36,6 +38,9 @@ export struct GKakurasuSums {
   @State private over: boolean = false;
   @State private won: boolean = false;
   @State private pressed: number = -1;
+  /** ★ 提示说的话 */
+  @State private hintMsg: string = '';
+  @State private hintIdx: number = -1;
 
   private startAt: number = 0;
 
@@ -134,6 +139,100 @@ export struct GKakurasuSums {
       }
     }
     return n;
+  }
+
+
+  /**
+   * ★ 2026-10-23 第二期：黑白和提示
+   *
+   * 规则：行线索 = 这一行**涂黑格的列号+1** 之和；
+   *       列线索 = 这一列**涂黑格的行号+1** 之和。
+   * ⇒ 逐行/逐列可判，沿用数织那套：
+   *    枚举这一行所有涂黑组合（2^5 = 32），只留"和等于线索且与玩家标记不矛盾"的，
+   *    再求交集 —— 所有候选里都一样的格，就是确定的。
+   * 都给不出 ⇒ Hint.none()。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    for (let horiz = 1; horiz >= 0; horiz--) {
+      for (let k = 0; k < N; k++) {
+        const marks: number[] = [];
+        for (let i = 0; i < N; i++) {
+          marks.push(this.black[horiz === 1 ? k * N + i : i * N + k] ? 1 : 0);
+        }
+        const target: number = horiz === 1 ? this.rowLab[k] : this.colLab[k];
+        let acc: number[] = [];
+        let cnt: number = 0;
+        const total: number = 1 << N;
+        for (let mask = 0; mask < total; mask++) {
+          let s2: number = 0;
+          let ok: boolean = true;
+          for (let i = 0; i < N; i++) {
+            const isBlack: boolean = ((mask >> i) & 1) === 1;
+            if (isBlack) {
+              s2 += i + 1;                  // 权重 = 位置 + 1
+            }
+            if (marks[i] === 1 && !isBlack) {
+              ok = false;
+              break;
+            }
+          }
+          if (!ok || s2 !== target) {
+            continue;
+          }
+          if (cnt === 0) {
+            acc = [];
+            for (let i = 0; i < N; i++) {
+              acc.push(((mask >> i) & 1) === 1 ? 1 : 0);
+            }
+          } else {
+            for (let i = 0; i < N; i++) {
+              const cur: number = ((mask >> i) & 1) === 1 ? 1 : 0;
+              if (acc[i] !== cur) {
+                acc[i] = -1;
+              }
+            }
+          }
+          cnt++;
+        }
+        if (cnt <= 1) {
+          continue;
+        }
+        for (let i = 0; i < N; i++) {
+          if (acc[i] < 0) {
+            continue;
+          }
+          const idx: number = horiz === 1 ? k * N + i : i * N + k;
+          const wantBlack: boolean = acc[i] === 1;
+          if (this.black[idx] === wantBlack) {
+            continue;
+          }
+          const r: number = horiz === 1 ? k + 1 : i + 1;
+          const c: number = horiz === 1 ? i + 1 : k + 1;
+          if (wantBlack) {
+            return Hint.make([idx], TG2('第 {0} 行第 {1} 列必须涂黑', String(r), String(c)),
+              TG2('Row {0}, column {1} must be filled', String(r), String(c)), t0);
+          }
+          return Hint.make([idx], TG2('第 {0} 行第 {1} 列必须留白', String(r), String(c)),
+            TG2('Row {0}, column {1} must stay empty', String(r), String(c)), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintIdx = r.cells[0];
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintIdx = -1; this.hintMsg = ''; }, 4500);
+      return;
+    }
+    this.hintIdx = -1;
+    this.hintMsg = TG('这一步从线索推不出来，得先涂一个试试');
+    setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
   private tap(i: number): void {
@@ -294,6 +393,21 @@ export struct GKakurasuSums {
           .layoutWeight(1)
           .height(Cell.of(44))
           .enabled(false)
+        Text(this.hintMsg.length > 0 ? this.hintMsg : '')
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .width('100%')
+          .textAlign(TextAlign.Center)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

@@ -23,6 +23,9 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：黑白和提示 */
+  "这一步从线索推不出来，得先涂一个试试": { "en": "No logical step from the clues here — try filling one cell", "ja": "この一手は手がかりからは導けない。どこかを塗ってみて", "ko": "이 수는 단서만으로는 알 수 없어요. 한 칸을 칠해 보세요", "es": "Con las pistas no se deduce este paso: rellena una casilla", "fr": "Pas d étape logique ici — remplis une case pour voir", "de": "Kein logischer Schritt — füll versuchsweise ein Feld", "pt": "Sem passo lógico pelas pistas — preencha uma célula", "ru": "Логикой из подсказок не выводится — заполните клетку", "it": "Nessun passo logico — riempi una casella", "ar": "لا خطوة منطقية من الأدلة — املأ مربعًا" },
+
   /** ★★ 2026-10-23 第二期：数壹提示 */
   "第 {0} 行第 {1} 列必须涂黑": { "en": "Row {0}, column {1} must be shaded", "ja": "{0}行{1}列は必ず塗りつぶす", "ko": "{0}행 {1}열은 반드시 검게 칠해야 해요", "es": "La fila {0}, columna {1} debe sombrearse", "fr": "Ligne {0}, colonne {1} doit être noircie", "de": "Zeile {0}, Spalte {1} muss geschwärzt werden", "pt": "Linha {0}, coluna {1} deve ser sombreada", "ru": "Строка {0}, столбец {1} — обязательно закрасить", "it": "Riga {0}, colonna {1} va annerita", "ar": "الصف {0} والعمود {1} يجب تظليله" },
   /** ★★ 2026-10-23 第二期：数壹提示 */
