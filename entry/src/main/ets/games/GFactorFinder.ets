@@ -3,6 +3,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -62,6 +64,43 @@ export struct GFactorFinder {
     }
     this.cands = list; this.hit = new Array<boolean>(CAND).fill(false); this.need = divs.length; this.found = 0; this.bad = -1;
   }
+
+  /**
+   * ★ 2026-10-23 第二期：找因数提示
+   *
+   * 这一关要求点亮 n 的**全部**因数 ⇒ 泄露其中一个只是部分答案，够格当提示。
+   * 优先给最小的未找到因数（最容易验算的）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    let bestV: number = -1;
+    let bestIdx: number = -1;
+    for (let i = 0; i < this.cands.length; i++) {
+      if (this.hit[i]) {
+        continue;
+      }
+      const v: number = this.cands[i];
+      if (v > 0 && this.n % v === 0 && (bestV < 0 || v < bestV)) {
+        bestV = v;
+        bestIdx = i;
+      }
+    }
+    if (bestIdx < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([bestIdx],
+      TG2('试试 {0} —— 它能整除 {1}（{1} ÷ {0} = {2}）',
+        String(bestV), String(this.n), String(this.n / bestV)),
+      TG2('Try {0} — it divides {1} ({1} ÷ {0} = {2})',
+        String(bestV), String(this.n), String(this.n / bestV)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.hit[i] || this.bad === i) { return; }
     const v: number = this.cands[i];
@@ -147,6 +186,14 @@ export struct GFactorFinder {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      Button(TG('提示'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.theme.ink)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
+        .width('100%').height(Cell.of(40)).onClick(() => {
+          this.askHint();
+        })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)

@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：找因数提示 */
+  "试试 {0} —— 它能整除 {1}（{1} ÷ {0} = {2}）": { "en": "Try {0} — it divides {1} ({1} ÷ {0} = {2})", "ja": "{0} を試して —— {1} を割り切れる（{1} ÷ {0} = {2}）", "ko": "{0}을(를) 시도하세요 — {1}을 나눌 수 있어요 ({1} ÷ {0} = {2})", "es": "Prueba {0}: divide a {1} ({1} ÷ {0} = {2})", "fr": "Essaie {0} : il divise {1} ({1} ÷ {0} = {2})", "de": "Probier {0} — teilt {1} ({1} ÷ {0} = {2})", "pt": "Tente {0} — divide {1} ({1} ÷ {0} = {2})", "ru": "Попробуйте {0} — делит {1} ({1} ÷ {0} = {2})", "it": "Prova {0} — divide {1} ({1} ÷ {0} = {2})", "ar": "جرّب {0} — يقسم {1} ({1} ÷ {0} = {2})" },
   /** ★★ 2026-10-23 第二期：数列堆叠提示 */
   "这是等差数列：每一项比前一项多 {0}（用 {1} 加一加）": { "en": "Arithmetic sequence: each term adds {0} (try {1} + {0})", "ja": "等差数列：每一项は前より {0} 多い（{1} + {0} を計算）", "ko": "등차수열: 각 항이 앞 항보다 {0} 큽니다 ({1} + {0})", "es": "Progresión aritmética: cada término suma {0} (prueba {1} + {0})", "fr": "Suite arithmétique : chaque terme ajoute {0} (essaie {1} + {0})", "de": "Arithmetische Folge: jeder Term plus {0} (probiere {1} + {0})", "pt": "Progressão aritmética: cada termo soma {0} (tente {1} + {0})", "ru": "Арифметическая прогрессия: каждый член плюс {0} (попробуйте {1} + {0})", "it": "Progressione aritmetica: ogni termine aggiunge {0} (prova {1} + {0})", "ar": "متتابعة حسابية: كل حد يزيد {0} (جرّب {1} + {0})" },
   /** ★★ 2026-10-23 第二期：数列堆叠提示 */
