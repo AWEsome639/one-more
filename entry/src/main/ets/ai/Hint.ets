@@ -1,3 +1,5 @@
+import { promptAction } from '@kit.ArkUI';
+
 /**
  * Hint —— 统一的「提示」层（2026-10-23 第二期）
  *
@@ -68,6 +70,37 @@ export class Hint {
     }
     r.ms = ms;
     return r;
+  }
+
+  /**
+   * ★ 2026-10-23：用 toast 显示一条提示。
+   *
+   * 为什么放进框架：
+   *   到第 13 款时，我发现「提示怎么显示」其实有三种做法 ——
+   *     ① 有状态栏 → 复用那个 Text（最省，零风险）
+   *     ② 没有状态栏 → toast（零布局改动）
+   *     ③ 都不适合 → 才新增元素（⚠️ 必须当场截图确认没挤坏别的控件，
+   *        管道/黑白和就是在这里把按钮挤出屏幕的）
+   *   皇冠用的是 ②，那段 try/catch 写在各游戏里很重复
+   *   ⇒ 收到框架里，以后新接游戏只需一行。
+   *
+   * ⚠️ toast 起不来（设备不支持 / 权限）就算了 —— 提示是附加功能，
+   *    绝不能因为它让游戏出问题。
+   */
+  static toast(msg: string): void {
+    if (msg.length === 0) {
+      return;
+    }
+    try {
+      promptAction.showToast({ message: msg, duration: 4000 });
+    } catch (e) {
+      // 静默失败
+    }
+  }
+
+  /** 结果给不出时，用一句兜底话走 toast */
+  static toastResult(r: HintResult, zhFail: string): void {
+    Hint.toast(r.ok ? r.zh : zhFail);
   }
 
   /** 把结果翻译成「给玩家看的一句话」（给不出时也有话说） */

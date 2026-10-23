@@ -13,7 +13,6 @@ import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
 // ★ 提示用 toast 显示 —— 这款没有状态栏，加 Text 会挤坏布局
-import { promptAction } from '@kit.ArkUI';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -318,12 +317,8 @@ export struct GCrown {
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
-    let msg: string = r.ok ? r.zh : TG('这一步看不出哪格必须放皇冠，先把明显的排除掉');
-    try {
-      promptAction.showToast({ message: msg, duration: 4000 });
-    } catch (e) {
-      // toast 起不来就算了 —— 提示是附加功能，不能因为它让游戏出问题
-    }
+    // ★ 2026-10-23：改用框架里的 Hint.toast —— 不再每个游戏各写一份 try/catch
+    Hint.toastResult(r, TG('这一步看不出哪格必须放皇冠，先把明显的排除掉'));
   }
 
   private tap(i: number): void {
