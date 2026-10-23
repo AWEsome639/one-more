@@ -16,12 +16,20 @@ const N: number = 3; const CELLS: number = 9;
 //   而数组按 CELLS=9 开 ⇒ 【困难档必越界】✗ ⇒ 按最大尺寸开
 const MAX_N: number = 4; const MAX_CELLS: number = MAX_N * MAX_N;
 
-function capOf(i: number): number {
- const r: number = Math.floor(i / N); const c: number = i % N; let d: number = 0;
+/**
+ * ★★★ 2026-10-23 修「尺寸陷阱」：
+ *   棋盘按 diffTotal 开（3×3 / 4×4），但这几个函数用模块常量 N=3 算行号与邻居，
+ *   ⇒ 困难档 4×4 时 Math.floor(j/3) 算错行、j ± 3 算错邻居。
+ *   ⚠️ 2026-10-13 的注释已经写明"困难档 4×4 = 16 格"，
+ *      但那次只修了数组分配（MAX_CELLS），**没修这两个函数**。
+ *   ⇒ 边长当参数传进来。
+ */
+function capOf(i: number, n: number): number {
+ const r: number = Math.floor(i / n); const c: number = i % n; let d: number = 0;
  if (r > 0) { d++; }
- if (r < N - 1) { d++; }
+ if (r < n - 1) { d++; }
  if (c > 0) { d++; }
- if (c < N - 1) { d++; }
+ if (c < n - 1) { d++; }
  return d;
 }
 function total(a: number[]): number {
@@ -30,18 +38,18 @@ function total(a: number[]): number {
  return s;
 }
 /** 点 i 后一路炸到稳定；null = 连锁失控 */
-function boom(src: number[], i: number): number[] | null {
+function boom(src: number[], i: number, n: number): number[] | null {
  const a: number[] = src.slice(); a[i]++; const qu: number[] = [i]; let guard: number = 0;
  while (qu.length > 0) {
  guard++;
  if (guard > 400) { return null; }
  const j: number = qu.shift() as number;
- if (a[j] <= capOf(j)) { continue; }
- a[j] = a[j] - capOf(j); const r: number = Math.floor(j / N); const c: number = j % N;
- if (r > 0) { a[j - N]++; qu.push(j - N); }
- if (r < N - 1) { a[j + N]++; qu.push(j + N); }
+ if (a[j] <= capOf(j, n)) { continue; }
+ a[j] = a[j] - capOf(j, n); const r: number = Math.floor(j / n); const c: number = j % n;
+ if (r > 0) { a[j - n]++; qu.push(j - n); }
+ if (r < n - 1) { a[j + n]++; qu.push(j + n); }
  if (c > 0) { a[j - 1]++; qu.push(j - 1); }
- if (c < N - 1) { a[j + 1]++; qu.push(j + 1); }
+ if (c < n - 1) { a[j + 1]++; qu.push(j + 1); }
  }
  return a;
 }
@@ -54,7 +62,7 @@ function makeBoard(n: number): number[] {
  const a: number[] = new Array<number>(MAX_CELLS).fill(0);
  let clicks: number = 12 + Math.floor(Math.random() * 7);
  for (let t = 0; t < clicks; t++) {
-  const ns: number[] | null = boom(a, Math.floor(Math.random() * n * n));
+  const ns: number[] | null = boom(a, Math.floor(Math.random() * n * n), n);
   if (ns === null) { break; }
   for (let i = 0; i < n * n; i++) { a[i] = ns[i]; }
  }
@@ -100,7 +108,7 @@ export struct GChainReaction {
  }
  private pick(i: number): void {
  if (this.over) { return; }
- const ns: number[] | null = boom(this.cells, i);
+ const ns: number[] | null = boom(this.cells, i, this.diffTotal);
  if (ns === null) {
  this.note = TG('连锁失控，重开吧 💥'); this.finish(false); return;
  }
@@ -118,7 +126,7 @@ export struct GChainReaction {
  private askHint(): void {
  let bestI: number = -1; let gain: number = 0; const cur: number = total(this.cells);
  for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
- const ns: number[] | null = boom(this.cells, i);
+ const ns: number[] | null = boom(this.cells, i, this.diffTotal);
  if (ns === null) { continue; }
  if (cur - total(ns) > gain) {
  gain = cur - total(ns); bestI = i;
@@ -149,7 +157,7 @@ export struct GChainReaction {
  Stack() {
  Text(this.orbs(r * this.diffTotal + c)).fontSize(FontSize.xl).fontColor(Palette.amber)
  Text(String(this.cells[r * this.diffTotal + c])).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).offset({ x: 0, y: 20 })
- }.layoutWeight(1).height(Cell.of(72)).backgroundColor(this.tip === r * this.diffTotal + c ? Palette.violet : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] >= capOf(r * this.diffTotal + c)
+ }.layoutWeight(1).height(Cell.of(72)).backgroundColor(this.tip === r * this.diffTotal + c ? Palette.violet : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] >= capOf(r * this.diffTotal + c, this.diffTotal)
  ? Palette.danger : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick(r * this.diffTotal + c); })
  }, (c: number) => 'c' + c) }.width('100%')
  }, (r: number) => 'r' + r) }.width('100%')
