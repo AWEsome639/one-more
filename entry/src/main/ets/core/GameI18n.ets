@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：数列侦探提示 */
+  "规律是：{0}（照着它算第六项）": { "en": "The rule is: {0} (work out the sixth term from it)", "ja": "規則は：{0}（それで第六項を計算）", "ko": "규칙은: {0} (그걸로 여섯째 항을 계산)", "es": "La regla es: {0} (calcula el sexto término)", "fr": "La règle est : {0} (calcule le sixième terme)", "de": "Die Regel ist: {0} (berechne den sechsten Term)", "pt": "A regra é: {0} (calcule o sexto termo)", "ru": "Правило: {0} (вычислите шестой член)", "it": "La regola è: {0} (calcola il sesto termine)", "ar": "القاعدة هي: {0} (احسب الحد السادس)" },
   /** ★★ 2026-10-23 第二期：找因数提示 */
   "试试 {0} —— 它能整除 {1}（{1} ÷ {0} = {2}）": { "en": "Try {0} — it divides {1} ({1} ÷ {0} = {2})", "ja": "{0} を試して —— {1} を割り切れる（{1} ÷ {0} = {2}）", "ko": "{0}을(를) 시도하세요 — {1}을 나눌 수 있어요 ({1} ÷ {0} = {2})", "es": "Prueba {0}: divide a {1} ({1} ÷ {0} = {2})", "fr": "Essaie {0} : il divise {1} ({1} ÷ {0} = {2})", "de": "Probier {0} — teilt {1} ({1} ÷ {0} = {2})", "pt": "Tente {0} — divide {1} ({1} ÷ {0} = {2})", "ru": "Попробуйте {0} — делит {1} ({1} ÷ {0} = {2})", "it": "Prova {0} — divide {1} ({1} ÷ {0} = {2})", "ar": "جرّب {0} — يقسم {1} ({1} ÷ {0} = {2})" },
   /** ★★ 2026-10-23 第二期：数列堆叠提示 */

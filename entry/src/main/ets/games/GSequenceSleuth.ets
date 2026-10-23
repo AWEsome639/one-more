@@ -3,6 +3,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -103,6 +105,31 @@ export struct GSequenceSleuth {
      this.reset(); }
   aboutToDisappear(): void { if (this.wait >= 0) { clearTimeout(this.wait); this.wait = -1; } }
 
+
+  /**
+   * ★ 2026-10-23 第二期：数列侦探提示
+   *
+   * 这款每一项的 `why` 字段本身就是「规律说明」：
+   *   等差数列，公差 N ｜ 等比数列，公比 N ｜ 每项 = 前两项之和 ｜ 连续平方数
+   * ⇒ 直接把它当提示 —— **说明规律，但不给答案**。
+   *   玩家知道规律之后自己就能算出第六项。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.why.length === 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('规律是：{0}（照着它算第六项）', this.why),
+      TG2('The rule is: {0} (work out the sixth term from it)', this.why), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private reset(): void {
     this.startAt = Date.now();
     this.idx = 0;
@@ -192,6 +219,16 @@ export struct GSequenceSleuth {
         .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'b' + i)
       }.width('100%')
       Row({ space: Space.md }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.violet)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
