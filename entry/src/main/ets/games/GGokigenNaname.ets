@@ -443,8 +443,11 @@ export struct GGokigenNaname {
           .fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
-          .width('100%')
-          .height(44)
+          // ★ 2026-10-24 修：这两个按钮在 **Row** 里（和左边那条 layoutWeight(1) 的说明按钮同一行）
+          //   Row 里用 width('100%') 会抢占整行宽度 ⇒ 把「重开」挤到屏幕外（真机实测：dump 里没有它）
+          //   ⇒ Row 里应该用 layoutWeight 按比例分，和左边那个保持一致
+          .layoutWeight(1)
+          .height(Cell.of(44))
           .onClick(() => {
             this.askHint();
           })
