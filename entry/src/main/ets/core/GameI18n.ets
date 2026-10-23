@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：华容道逃脱提示 */
+  "右边已经空了 —— 把车一路推到出口就行": { "en": "The path is clear — push the car all the way right", "ja": "右は空いている —— 車を出口まで押すだけ", "ko": "오른쪽이 비었어요 — 차를 출구까지 밀면 돼요", "es": "El camino está libre: empuja el coche hasta la salida", "fr": "Le passage est libre : pousse la voiture jusqu'à la sortie", "de": "Der Weg ist frei — schiebe das Auto zum Ausgang", "pt": "O caminho está livre — empurre o carro até a saída", "ru": "Путь свободен — толкайте машину к выходу", "it": "La via è libera — spingi l'auto all'uscita", "ar": "الطريق خالٍ — ادفع السيارة إلى المخرج" },
+  /** ★★ 2026-10-23 第二期：华容道逃脱提示 */
+  "右边第 {0} 格被 {1} 号挡住，先把它挪开": { "en": "Block {1} blocks the car at cell {0} — move it first", "ja": "右の {0} マス目を {1} 号がふさいでいる —— まず動かす", "ko": "오른쪽 {0}칸을 {1}번이 막고 있어요 — 먼저 옮기세요", "es": "El bloque {1} tapa la casilla {0}: muévelo primero", "fr": "Le bloc {1} bloque la case {0} : déplace-le d'abord", "de": "Block {1} versperrt Feld {0} — zuerst wegschieben", "pt": "O bloco {1} bloqueia a casa {0} — mova-o primeiro", "ru": "Блок {1} закрывает клетку {0} — сначала уберите его", "it": "Il blocco {1} ostruisce la cella {0} — spostalo prima", "ar": "القطعة {1} تسد المربع {0} — حركها أولًا" },
   /** ★★ 2026-10-23 第二期：代数天平提示 */
   "先把两边都除以 {0}，再把 {1} 移到右边（{2}）": { "en": "Divide both sides by {0}, then move {1} to the right ({2})", "ja": "両辺を {0} で割ってから、{1} を右へ（{2}）", "ko": "양변을 {0}으로 나눈 뒤, {1}을 오른쪽으로 ({2})", "es": "Divide ambos lados entre {0} y pasa {1} a la derecha ({2})", "fr": "Divise les deux côtés par {0}, puis passe {1} à droite ({2})", "de": "Teile beide Seiten durch {0}, dann {1} nach rechts ({2})", "pt": "Divida ambos os lados por {0} e mova {1} para a direita ({2})", "ru": "Разделите обе части на {0}, затем перенесите {1} вправо ({2})", "it": "Dividi entrambi i lati per {0}, poi sposta {1} a destra ({2})", "ar": "اقسم الطرفين على {0} ثم انقل {1} لليمين ({2})" },
   /** ★★ 2026-10-23 第二期：代数天平提示 */

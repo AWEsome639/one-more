@@ -12,6 +12,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -234,6 +236,45 @@ export struct GBlockEscape {
     this.status = TG2("已走 {0} 步",Digits(String(this.moves), this.langCode));
   }
 
+  /**
+   * ★ 2026-10-23 第二期：华容道逃脱提示
+   *
+   * 完整 BFS 成本偏高（状态在 occ 里，重建形状麻烦），
+   * 先做一条最有用的局部提示：
+   *   看 0 号车右边到出口这一段，第一个挡住它的是谁。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const row: number = this.by[TARGET];
+    const startCol: number = this.bx[TARGET] + this.blen[TARGET];
+    let blocker: number = -1;
+    let blockerCol: number = -1;
+    for (let c = startCol; c < GRID; c++) {
+      const b: number = this.blockAt(row * GRID + c);
+      if (b >= 0 && b !== TARGET) {
+        blocker = b;
+        blockerCol = c;
+        break;
+      }
+    }
+    if (blocker < 0) {
+      return Hint.make([],
+        TG('右边已经空了 —— 把车一路推到出口就行'),
+        TG('The path is clear — push the car all the way right'), t0);
+    }
+    return Hint.make([],
+      TG2('右边第 {0} 格被 {1} 号挡住，先把它挪开',
+        String(blockerCol - startCol + 1), String(blocker + 1)),
+      TG2('Block {1} blocks the car at cell {0} — move it first',
+        String(blockerCol - startCol + 1), String(blocker + 1)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private gapToExit(): number {
     return GRID - (this.bx[TARGET] + this.blen[TARGET]);
   }
@@ -300,6 +341,16 @@ export struct GBlockEscape {
           .onClick(() => {
             Haptics.tap();
             this.reset();
+          })
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(KEY_H + 8)
+          .onClick(() => {
+            this.askHint();
           })
         Button(TG('认输'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
