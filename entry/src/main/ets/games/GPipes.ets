@@ -385,17 +385,12 @@ export struct GPipes {
       .borderRadius(Radius.lg)
 
       Row({ space: Space.md }) {
-        Text(this.over
+        Text(this.hintMsg.length > 0 ? this.hintMsg : (this.over
           ? (this.won ? '水路全通 🎉 得分 ' + String(this.score) : TG('步数用尽，本局失败'))
-          : '点格子旋转管道，绿色表示这一格接口都接上了')
+          : '点格子旋转管道，绿色表示这一格接口都接上了'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)
-        Text(this.hintMsg.length > 0 ? this.hintMsg : '')
-          .fontSize(FontSize.sm)
-          .fontColor(this.theme.ink)
-          .width('100%')
-          .textAlign(TextAlign.Center)
         Button(TG('提示'))
           .fontSize(FontSize.sm)
           .fontColor(this.theme.ink)

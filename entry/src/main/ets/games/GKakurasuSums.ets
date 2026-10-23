@@ -393,11 +393,6 @@ export struct GKakurasuSums {
           .layoutWeight(1)
           .height(Cell.of(44))
           .enabled(false)
-        Text(this.hintMsg.length > 0 ? this.hintMsg : '')
-          .fontSize(FontSize.sm)
-          .fontColor(this.theme.ink)
-          .width('100%')
-          .textAlign(TextAlign.Center)
         Button(TG('提示'))
           .fontSize(FontSize.sm)
           .fontColor(this.theme.ink)
@@ -423,7 +418,7 @@ export struct GKakurasuSums {
       }
       .width('100%')
 
-      Text(TG('上方数字 = 该列黑格的行号之和；左侧数字 = 该行黑格的列号之和（行/列号从 1 起）'))
+      Text(this.hintMsg.length > 0 ? this.hintMsg : TG('上方数字 = 该列黑格的行号之和；左侧数字 = 该行黑格的列号之和（行/列号从 1 起）'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
     }
