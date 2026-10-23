@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：根式化简提示 */
+  "{0} 里没有能开出来的平方因子，它本身已经最简": { "en": "{0} has no square factor — it is already simplest", "ja": "{0} には平方因子がない。すでに最も簡単", "ko": "{0}에는 제곱 인수가 없어요. 이미 가장 간단해요", "es": "{0} no tiene factor cuadrado: ya está simplificado", "fr": "{0} n a pas de facteur carré : déjà simplifié", "de": "{0} hat keinen Quadratfaktor — schon vereinfacht", "pt": "{0} não tem fator quadrado — já está simplificado", "ru": "{0}: нет квадратного множителя — уже проще некуда", "it": "{0} non ha fattori quadrati: già semplificato", "ar": "{0} ليس له عامل مربع — وهو بالفعل أبسط صورة" },
+  /** ★★ 2026-10-23 第二期：根式化简提示 */
+  "{0} 里有 {1}²，能开出来 —— 外面写 {1}，根号里剩 {2}": { "en": "{0} contains {1}² — take {1} outside, leave {2} under the root", "ja": "{0} に {1}² がある —— 外に {1}、根号の中に {2}", "ko": "{0}에 {1}²가 있어요 — 밖에 {1}, 근호 안에 {2}", "es": "{0} contiene {1}²: saca {1} fuera y deja {2} dentro", "fr": "{0} contient {1}² : {1} dehors, {2} dessous", "de": "{0} enthält {1}² — {1} nach außen, {2} unter der Wurzel", "pt": "{0} contém {1}² — {1} fora, {2} dentro da raiz", "ru": "{0} содержит {1}² — {1} наружу, {2} под корнем", "it": "{0} contiene {1}² — {1} fuori, {2} sotto la radice", "ar": "{0} يحتوي {1}² — أخرج {1} واترك {2} تحت الجذر" },
   /** ★★ 2026-10-23 第二期：质因数树提示 */
   "{0} 能被 {1} 整除（{0} ÷ {1} = {2}），点 {1}": { "en": "{0} divides by {1} ({0} ÷ {1} = {2}) — tap {1}", "ja": "{0} は {1} で割れる（{0} ÷ {1} = {2}）—— {1} を押す", "ko": "{0}은 {1}로 나눠져요 ({0} ÷ {1} = {2}) — {1}을 누르세요", "es": "{0} es divisible por {1} ({0} ÷ {1} = {2}): toca {1}", "fr": "{0} est divisible par {1} ({0} ÷ {1} = {2}) — touche {1}", "de": "{0} ist durch {1} teilbar ({0} ÷ {1} = {2}) — tippe {1}", "pt": "{0} é divisível por {1} ({0} ÷ {1} = {2}) — toque {1}", "ru": "{0} делится на {1} ({0} ÷ {1} = {2}) — нажмите {1}", "it": "{0} è divisibile per {1} ({0} ÷ {1} = {2}) — tocca {1}", "ar": "{0} يقبل القسمة على {1} ({0} ÷ {1} = {2}) — اضغط {1}" },
   /** ★★ 2026-10-23 第二期：数列侦探提示 */

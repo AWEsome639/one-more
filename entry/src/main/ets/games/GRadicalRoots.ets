@@ -3,6 +3,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -78,6 +80,49 @@ export struct GRadicalRoots {
     this.diffTotal = GameDiff.sizeNow(TOTAL);
      this.reset(); }
   aboutToDisappear(): void { if (this.wait >= 0) { clearTimeout(this.wait); this.wait = -1; } }
+
+
+  /**
+   * ★ 2026-10-23 第二期：根式化简提示
+   *
+   * 提示只做两步：
+   *   ① 找出被开方数里**最大的完全平方因子**
+   *   ② 说明「可以把它开出来」
+   * ⇒ 不直接给答案，玩家自己把外面的倍数算出来。
+   *
+   * 例：√48 → 48 = 16 × 3，16 = 4² ⇒ 「48 里有 4²=16，可以开成 4√3 的一部分」
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const v: number = Number(this.q.replace('√', ''));
+    if (!(v > 0)) {
+      return Hint.none('none');
+    }
+    let sq: number = 1;
+    for (let k = 2; k * k <= v; k++) {
+      if (v % (k * k) === 0) {
+        sq = k;
+      }
+    }
+    if (sq === 1) {
+      return Hint.make([],
+        TG2('{0} 里没有能开出来的平方因子，它本身已经最简', String(v)),
+        TG2('{0} has no square factor — it is already simplest', String(v)), t0);
+    }
+    const rest: number = v / (sq * sq);
+    // ⚠️ 模板最多 4 个占位符（TG4 上限）⇒ 只说「提出几、剩几」，让玩家自己组合
+    return Hint.make([],
+      TG2('{0} 里有 {1}²，能开出来 —— 外面写 {1}，根号里剩 {2}',
+        String(v), String(sq), String(rest)),
+      TG2('{0} contains {1}² — take {1} outside, leave {2} under the root',
+        String(v), String(sq), String(rest)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
 
   private reset(): void {
     this.startAt = Date.now();
@@ -166,6 +211,16 @@ export struct GRadicalRoots {
         .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'b' + i)
       }.width('100%')
       Row({ space: Space.md }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.amber)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
