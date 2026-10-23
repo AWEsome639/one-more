@@ -19,12 +19,22 @@ const DIRS: string[] = [TG('北 ⬆️'), TG('东 ➡️'), TG('南 ⬇️'), TG
 /** 方向 → 顺时针转几次，近边才落到视图下方 */
 const ROTS: number[] = [2, 1, 0, 3];
 
-function spin(map: string[], times: number): string[] {
+/**
+ * 把地图顺时针转 times 次。
+ *
+ * ★★★ 2026-10-23 修：原来全部用模块常量 N（=3），
+ *   但难度会改棋盘边长（简单 ×0.7→2 / 普通 3 / 困难 ×1.3→4）。
+ *   渲染按 diffTotal，旋转却按 3 ⇒ 3 以外的尺寸下旋转矩阵全错位。
+ *   ⇒ 把边长当参数传进来。
+ */
+function spin(map: string[], times: number, n: number): string[] {
   let cur: string[] = map.slice();
   for (let t = 0; t < times % 4; t++) {
-    const next: string[] = new Array<string>(N * N).fill('');
-    for (let r = 0; r < N; r++) {
-      for (let c = 0; c < N; c++) { next[c * N + (N - 1 - r)] = cur[r * N + c]; }
+    const next: string[] = new Array<string>(n * n).fill('');
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        next[c * n + (n - 1 - r)] = cur[r * n + c];
+      }
     }
     cur = next;
   }
@@ -87,8 +97,8 @@ export struct GPerspectiveShiftView {
         used.push(i); b[i] = COLORS[k];
       }
       const way: number = Math.floor(Math.random() * 4);
-      const right: string[] = spin(b, ROTS[way]);
-      const opts: string[][] = [right, spin(b, (ROTS[way] + 1) % 4), spin(b, (ROTS[way] + 2) % 4)];
+      const right: string[] = spin(b, ROTS[way], this.diffTotal);
+      const opts: string[][] = [right, spin(b, (ROTS[way] + 1) % 4, this.diffTotal), spin(b, (ROTS[way] + 2) % 4, this.diffTotal)];
       if (sameMap(opts[0], opts[1]) || sameMap(opts[0], opts[2]) || sameMap(opts[1], opts[2])) { continue; }
       for (let k = 2; k > 0; k--) {
         const j: number = Math.floor(Math.random() * (k + 1));

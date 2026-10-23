@@ -20,6 +20,33 @@ const N: number = 6;
 const BOX_R: number = 3;          // 宫高 3
 const BOX_C: number = 2;          // 宫宽 2
 const CELLS: number = N * N;
+
+/**
+ * ★★★ 2026-10-23 修「尺寸陷阱」：这个文件原本把三样东西写死成 6×6 的值 ——
+ *   ① 宫格布局 BOX_R×BOX_C
+ *   ② 校验循环上界 N
+ *   ③ 题给数个数 GIVENS
+ *   而难度会改棋盘边长（简单 ×0.7→4 / 普通 6 / 困难 ×1.3→8）。
+ *   ⇒ 简单 4×4 时题给数比总格数还多 ⇒ 一格都不挖 ⇒ 满盘全是题给数、无法游玩。
+ *
+ *   现在：边长当参数传；宫格按边长选；题给数按比例。
+ *   6×6 的行为与修复前完全一致（宫格 3×2、题给 16 个）。
+ */
+function boxFor(n: number): number[] {
+  if (n === 4) {
+    const a: number[] = [2, 2];
+    return a;
+  }
+  if (n === 8) {
+    const a2: number[] = [4, 2];
+    return a2;
+  }
+  const a3: number[] = [3, 2];
+  return a3;
+}
+
+/** 题给数比例：50%（6×6 → 16 个，与修复前一致） */
+const GIVEN_RATIO: number = 0.5;
 // ★★ 2026-10-13 修复尺寸越界（困难档 ×1.3 ⇒ 8×8 = 64 格，
 //   而数组原来按 CELLS = 36 开 ⇒【困难档必越界】✗）
 const MAX_N: number = 8;
@@ -50,19 +77,22 @@ function shuffled(n: number): number[] {
   return a;
 }
 
-function fits(grid: number[], idx: number, v: number): boolean {
-  const r: number = Math.floor(idx / N);
-  const c: number = idx % N;
-  for (let i = 0; i < N; i++) {
-    if (grid[r * N + i] === v || grid[i * N + c] === v) {
+function fits(grid: number[], idx: number, v: number, n: number): boolean {
+  const r: number = Math.floor(idx / n);
+  const c: number = idx % n;
+  for (let i = 0; i < n; i++) {
+    if (grid[r * n + i] === v || grid[i * n + c] === v) {
       return false;
     }
   }
-  const r0: number = Math.floor(r / BOX_R) * BOX_R;
-  const c0: number = Math.floor(c / BOX_C) * BOX_C;
-  for (let i = 0; i < BOX_R; i++) {
-    for (let j = 0; j < BOX_C; j++) {
-      if (grid[(r0 + i) * N + c0 + j] === v) {
+  const bx: number[] = boxFor(n);
+  const br: number = bx[0];
+  const bc: number = bx[1];
+  const r0: number = Math.floor(r / br) * br;
+  const c0: number = Math.floor(c / bc) * bc;
+  for (let i = 0; i < br; i++) {
+    for (let j = 0; j < bc; j++) {
+      if (grid[(r0 + i) * n + c0 + j] === v) {
         return false;
       }
     }
@@ -70,19 +100,19 @@ function fits(grid: number[], idx: number, v: number): boolean {
   return true;
 }
 
-function fill(grid: number[], pos: number): boolean {
-  if (pos === CELLS) {
+function fill(grid: number[], pos: number, n: number): boolean {
+  if (pos === n * n) {
     return true;
   }
   if (grid[pos] !== 0) {
-    return fill(grid, pos + 1);
+    return fill(grid, pos + 1, n);
   }
-  const order: number[] = shuffled(N);
+  const order: number[] = shuffled(n);
   for (let k = 0; k < order.length; k++) {
     const v: number = order[k] + 1;
-    if (fits(grid, pos, v)) {
+    if (fits(grid, pos, v, n)) {
       grid[pos] = v;
-      if (fill(grid, pos + 1)) {
+      if (fill(grid, pos + 1, n)) {
         return true;
       }
       grid[pos] = 0;
@@ -104,8 +134,8 @@ function count(grid: number[], limit: number, size: number): number {
     return 1;
   }
   let total: number = 0;
-  for (let v = 1; v <= N; v++) {
-    if (fits(grid, pos, v)) {
+  for (let v = 1; v <= size; v++) {
+    if (fits(grid, pos, v, size)) {
       grid[pos] = v;
       total = total + count(grid, limit - total, size);
       grid[pos] = 0;
@@ -117,13 +147,14 @@ function count(grid: number[], limit: number, size: number): number {
   return total;
 }
 
-function makePuzzle(): Puzzle {
+function makePuzzle(size: number): Puzzle {
   const answer: number[] = new Array<number>(MAX_CELLS).fill(0);
-  fill(answer, 0);
+  fill(answer, 0, size);
   const quiz: number[] = answer.slice();
-  const order: number[] = shuffled(CELLS);
+  const total: number = size * size;
+  const order: number[] = shuffled(total);
   let removed: number = 0;
-  const need: number = CELLS - GIVENS;
+  const need: number = total - Math.floor(total * GIVEN_RATIO);
   for (let k = 0; k < order.length; k++) {
     if (removed >= need) {
       break;
@@ -132,7 +163,7 @@ function makePuzzle(): Puzzle {
     const keep: number = quiz[p];
     quiz[p] = 0;
     const probe: number[] = quiz.slice();
-    if (count(probe, 2, N) !== 1) {
+    if (count(probe, 2, size) !== 1) {
       quiz[p] = keep;
     } else {
       removed++;
@@ -190,7 +221,7 @@ export struct GAlphabetSudoku {
 
   private reset(): void {
     this.stopTimer();
-    const p: Puzzle = makePuzzle();
+    const p: Puzzle = makePuzzle(this.diffTotal);
     const cells: number[] = p.quiz.slice();
     const fixed: boolean[] = [];
     for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
@@ -234,7 +265,7 @@ export struct GAlphabetSudoku {
     }
     const probe: number[] = this.cells.slice();
     probe[i] = 0;
-    return !fits(probe, i, v);
+    return !fits(probe, i, v, this.diffTotal);
   }
 
   private filled(): number {
@@ -275,7 +306,7 @@ export struct GAlphabetSudoku {
     if (v !== 0) {
       const probe: number[] = next.slice();
       probe[i] = 0;
-      if (!fits(probe, i, v)) {
+      if (!fits(probe, i, v, this.diffTotal)) {
         this.mistakes = this.mistakes + 1;
         this.status = TG('这个字母在行/列/宫里重复了');
         if (this.mistakes >= MAX_MISTAKE) {
