@@ -9,7 +9,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -172,6 +174,74 @@ export struct GPathFinder {
   }
 
   /** 点相邻格子也能走 */
+
+  /**
+   * ★ 2026-10-23 第二期：找路径提示
+   *
+   * 直接 BFS 从当前位置到终点，取第一步。
+   * 迷宫只有 49 格 ⇒ 毫秒级，也永远不会"算不出来"（迷宫本身保证连通）。
+   *
+   * ⚠️ 这只是"一条最短路的下一步"，不是唯一解 —— 提示文案说的是
+   *    「这一步能让你离终点更近」，不声称"唯一走法"。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    const start: number = this.pos;
+    if (start === GOAL) {
+      return Hint.none('none');
+    }
+    const prev: number[] = new Array<number>(n * n).fill(-1);
+    const seen: boolean[] = new Array<boolean>(n * n).fill(false);
+    const q: number[] = [start];
+    seen[start] = true;
+    let head: number = 0;
+    while (head < q.length) {
+      const cur: number = q[head];
+      head++;
+      if (cur === GOAL) {
+        break;
+      }
+      const r: number = Math.floor(cur / MC);
+      const c: number = cur % MC;
+      const dr: number[] = [-1, 1, 0, 0];
+      const dc: number[] = [0, 0, -1, 1];
+      for (let d = 0; d < 4; d++) {
+        const nr: number = r + dr[d];
+        const nc: number = c + dc[d];
+        if (nr < 0 || nr >= n || nc < 0 || nc >= n) {
+          continue;
+        }
+        const ni: number = nr * MC + nc;
+        if (seen[ni] || this.maze[ni] === 1) {
+          continue;
+        }
+        seen[ni] = true;
+        prev[ni] = cur;
+        q.push(ni);
+      }
+    }
+    if (prev[GOAL] < 0) {
+      return Hint.none('none');
+    }
+    // 回溯到第一步
+    let step: number = GOAL;
+    while (prev[step] !== start && prev[step] >= 0) {
+      step = prev[step];
+    }
+    const r: number = Math.floor(step / MC) + 1;
+    const c: number = (step % MC) + 1;
+    return Hint.make([step],
+      TG2('往第 {0} 行第 {1} 列走（最短路上的一步）', String(r), String(c)),
+      TG2('Move to row {0}, column {1} (one step on a shortest path)', String(r), String(c)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private tap(i: number): void {
     const dr: number = Math.floor(i / MC) - Math.floor(this.pos / MC);
     const dc: number = i % MC - this.pos % MC;
@@ -340,6 +410,16 @@ export struct GPathFinder {
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

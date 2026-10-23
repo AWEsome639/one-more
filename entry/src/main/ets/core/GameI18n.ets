@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：找路径提示 */
+  "往第 {0} 行第 {1} 列走（最短路上的一步）": { "en": "Move to row {0}, column {1} (one step on a shortest path)", "ja": "{0}行{1}列へ（最短経路の一手）", "ko": "{0}행 {1}열로 이동 (최단 경로의 한 수)", "es": "Ve a la fila {0}, columna {1} (un paso de un camino mínimo)", "fr": "Va en ligne {0}, colonne {1} (un pas d un chemin minimal)", "de": "Geh zu Zeile {0}, Spalte {1} (ein Schritt auf einem kürzesten Weg)", "pt": "Vá para linha {0}, coluna {1} (um passo de um caminho mínimo)", "ru": "Идите в строку {0}, столбец {1} (шаг по кратчайшему пути)", "it": "Vai a riga {0}, colonna {1} (un passo di un cammino minimo)", "ar": "انتقل إلى الصف {0} والعمود {1} (خطوة على أقصر مسار)" },
+  /** ★★ 2026-10-23 第二期：找路径提示 */
+  "这一步算不出来": { "en": "Can t compute a step", "ja": "この一手は計算できない", "ko": "이 수는 계산할 수 없어요", "es": "No se puede calcular", "fr": "Impossible de calculer", "de": "Nicht berechenbar", "pt": "Não dá para calcular", "ru": "Не удаётся посчитать", "it": "Impossibile calcolare", "ar": "لا يمكن الحساب" },
   /** ★★ 2026-10-23 第二期：色彩洪水提示 */
   "第 {0} 种颜色": { "en": "colour {0}", "ja": "{0}番目の色", "ko": "{0}번째 색", "es": "color {0}", "fr": "couleur {0}", "de": "Farbe {0}", "pt": "cor {0}", "ru": "цвет {0}", "it": "colore {0}", "ar": "اللون {0}" },
   /** ★★ 2026-10-23 第二期：色彩洪水提示 */
