@@ -66,8 +66,6 @@ export struct GColorFlood {
   @State private over: boolean = false;
   @State private won: boolean = false;
   @State private pressed: number = -1;
-  /** ★ 提示说的话 */
-  @State private hintMsg: string = '';
 
   private startAt: number = 0;
 
@@ -129,16 +127,46 @@ export struct GColorFlood {
   }
 
 
-  /** 已连成一片的格数 */
+  /**
+   * ★ 2026-10-23 修：这里必须算**从左上角连通的区域大小**，
+   *   不能算「全盘同色格数」。
+   *   原来写错成后者：base = 31（连通区），而各颜色的全盘同色格只有 ~24，
+   *   ⇒ 24 <= 31 ⇒ 每一种颜色都被「必须有收益」的检查跳过 ⇒ bestC = -1
+   *   ⇒ 提示永远返回「算不出来」。这是真机验证抓出来的。
+   */
   private floodFilled(arr: number[]): number {
     if (arr.length === 0) {
       return 0;
     }
     const head: number = arr[0];
+    const seen: boolean[] = new Array<boolean>(arr.length).fill(false);
+    const st: number[] = [0];
+    seen[0] = true;
     let n: number = 0;
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i] === head) {
-        n++;
+    while (st.length > 0) {
+      const i: number = st[st.length - 1];
+      st.splice(st.length - 1, 1);
+      if (arr[i] !== head) {
+        continue;
+      }
+      n++;
+      const r: number = Math.floor(i / N);
+      const c: number = i - r * N;
+      if (c > 0 && !seen[i - 1]) {
+        seen[i - 1] = true;
+        st.push(i - 1);
+      }
+      if (c < N - 1 && !seen[i + 1]) {
+        seen[i + 1] = true;
+        st.push(i + 1);
+      }
+      if (r > 0 && !seen[i - N]) {
+        seen[i - N] = true;
+        st.push(i - N);
+      }
+      if (r < N - 1 && !seen[i + N]) {
+        seen[i + N] = true;
+        st.push(i + N);
       }
     }
     return n;
@@ -227,13 +255,8 @@ export struct GColorFlood {
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
-    if (r.ok) {
-      this.hintMsg = r.zh;
-      setTimeout(() => { this.hintMsg = ''; }, 6000);
-      return;
-    }
-    this.hintMsg = TG('这一步算不出来，重开一局试试');
-    setTimeout(() => { this.hintMsg = ''; }, 6000);
+    // ★ 改用框架的 toast：这款的底部按钮行很挤，加 Text 会压到按钮上
+    Hint.toastResult(r, TG('这一步算不出来，重开一局试试'));
   }
 
   private finish(solved: boolean): void {
@@ -340,11 +363,6 @@ export struct GColorFlood {
           .layoutWeight(1)
           .height(Cell.of(44))
           .enabled(false)
-        Text(this.hintMsg.length > 0 ? this.hintMsg : '')
-          .fontSize(FontSize.xs)
-          .fontColor(this.theme.inkSoft)
-          .layoutWeight(2)
-          .maxLines(2)
         Button(TG('提示'))
           .fontSize(FontSize.sm)
           .fontColor(this.theme.ink)
