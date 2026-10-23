@@ -9,7 +9,11 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
+// ★ 提示用 toast 显示 —— 这款没有状态栏，加 Text 会挤坏布局
+import { promptAction } from '@kit.ArkUI';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -266,6 +270,62 @@ export struct GCrown {
     return true;
   }
 
+
+  /**
+   * ★ 2026-10-23 第二期：皇冠提示
+   *
+   * 规则：每一行 / 每一列 / 每个色区各一个皇冠，且皇冠不能相邻（含斜向）。
+   * 用的局部规则：
+   *   某个色区里**只有一个格子还没被排除** ⇒ 那一格必须是皇冠。
+   *  （这个推理不依赖相邻约束，所以永远成立；宁可少给。）
+   *
+   * ⚠️ 这款没有状态栏。提示走 **toast** 显示 ——
+   *    上一轮的教训：往已有 Row 里插 width('100%') 的 Text 会把按钮挤没。
+   *    toast 完全不动布局，最安全。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    // 统计每个色区：还剩几个"可能放皇冠"的格（marks === 0）
+    const regions: number = N;
+    for (let rg = 0; rg < regions; rg++) {
+      let free: number = 0;
+      let freeIdx: number = -1;
+      let hasCrown: boolean = false;
+      for (let i = 0; i < N * N; i++) {
+        if (this.reg[i] !== rg) {
+          continue;
+        }
+        if (this.marks[i] === 1) {
+          hasCrown = true;
+        } else if (this.marks[i] === 0) {
+          free++;
+          freeIdx = i;
+        }
+      }
+      if (hasCrown || free !== 1 || freeIdx < 0) {
+        continue;
+      }
+      const r: number = Math.floor(freeIdx / N) + 1;
+      const c: number = (freeIdx % N) + 1;
+      return Hint.make([freeIdx],
+        TG2('第 {0} 行第 {1} 列是这个色区唯一还没排除的格子 ⇒ 必须是皇冠', String(r), String(c)),
+        TG2('Row {0}, column {1} is the only cell left in its region — it must be a crown',
+          String(r), String(c)), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    let msg: string = r.ok ? r.zh : TG('这一步看不出哪格必须放皇冠，先把明显的排除掉');
+    try {
+      promptAction.showToast({ message: msg, duration: 4000 });
+    } catch (e) {
+      // toast 起不来就算了 —— 提示是附加功能，不能因为它让游戏出问题
+    }
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -409,6 +469,16 @@ export struct GCrown {
         Haptics.tick();
         this.mode = (2);
         })
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
