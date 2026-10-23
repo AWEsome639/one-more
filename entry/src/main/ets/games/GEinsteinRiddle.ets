@@ -54,7 +54,7 @@ function text(c: Clue): string {
 }
 
 /** 生成一局：随机答案 → 从真实线索里随机抽几条 → 只有唯一解才采用 */
-function generate(): Clue[] {
+function generate(wantClues: number): Clue[] {
   for (let guard = 0; guard < 800; guard++) {
     const sol: number[] = [0, 1, 2];
     for (let i = sol.length - 1; i > 0; i--) {
@@ -72,7 +72,7 @@ function generate(): Clue[] {
     }
     const picked: Clue[] = [];
     const used: number[] = [];
-    const want: number = 3 + Math.floor(Math.random() * 3);
+    const want: number = wantClues;
     while (picked.length < want && used.length < pool.length) {
       const i: number = Math.floor(Math.random() * pool.length);
       if (used.indexOf(i) >= 0) { continue; }
@@ -92,11 +92,36 @@ export struct GEinsteinRiddle {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=3；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2]，上面已一并改成按尺寸生成
-  @State private diffTotal: number = GameDiff.sizeNow(3);
+  /**
+   * ★★★ 2026-10-23 修「尺寸陷阱」：
+   *   原来这里是 `GameDiff.sizeNow(3)`，格子数随难度变（2/3/4），
+   *   但**整个谜题写死 3 家**（NATION/PETS/generate/countSol 全是 3）：
+   *     · 简单档 2 格：sol 有 3 项，`found.length === diffTotal` 永远 false
+   *     · 困难档 4 格：只有 3 只宠物，第 4 格永远填不上
+   *   ⇒ 游戏在简单档和困难档都是坏的。
+   *
+   *   修法：**爱因斯坦谜题本质就是 3 家题**，改 2/4 家要另写线索集。
+   *   所以格子固定 3，难度改到**线索条数**上（线索越少越难）——
+   *   这才是这款游戏真正的难度轴。
+   */
+  @State private houses: number = 3;
+  /** 本局给多少条线索：简单 5 / 普通 4 / 困难 3 */
+  @State private clueCount: number = GEinsteinRiddle.clueCountNow();
 
-  /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
+  private static clueCountNow(): number {
+    const d: number = GameDiff.now();
+    if (d === 0) {
+      return 5;
+    }
+    if (d === 2) {
+      return 3;
+    }
+    return 4;
+  }
+
+  /** 0..houses-1（读 @State 建依赖，ArkUI 才追踪得到） */
   private rowIdx(): number[] {
-    const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const n2: number = this.houses > 1 ? this.houses : 2;
     const a2: number[] = [];
     for (let i2 = 0; i2 < n2; i2++) { a2.push(i2); }
     return a2;
@@ -105,7 +130,7 @@ export struct GEinsteinRiddle {
 
   @State private lines: string[] = [];
   @State private sol: number[] = [];
-  @State private grid: number[] = new Array<number>(this.diffTotal).fill(-1);
+  @State private grid: number[] = new Array<number>(this.houses).fill(-1);
   @State private tries: number = 0;
   @State private hintOn: boolean = false;
   @State private note: string = '';
@@ -114,13 +139,13 @@ export struct GEinsteinRiddle {
 
   aboutToAppear(): void { LanRace.noteStart(); this.reset(); }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(3);
+    this.clueCount = GEinsteinRiddle.clueCountNow();
      this.reset(); }
 
   private reset(): void {
-    const clues: Clue[] = generate();
+    const clues: Clue[] = generate(this.clueCount);
     const lines: string[] = [];
-    const sol: number[] = new Array<number>(this.diffTotal).fill(-1);
+    const sol: number[] = new Array<number>(this.houses).fill(-1);
     for (let i = 0; i < clues.length; i++) {
       lines.push(text(clues[i]));
       if (clues[i].kind === 0) { sol[clues[i].a] = clues[i].b; }
@@ -128,8 +153,8 @@ export struct GEinsteinRiddle {
     // 线索里未必直接给全 —— 补一次穷举，把唯一解算出来
     const found: number[] = this.solveUnique(clues);
     this.lines = lines;
-    this.sol = found.length === this.diffTotal ? found : sol;
-    this.grid = new Array<number>(this.diffTotal).fill(-1);
+    this.sol = found.length === this.houses ? found : sol;
+    this.grid = new Array<number>(this.houses).fill(-1);
     this.tries = 0; this.hintOn = false; this.over = false;
     this.note = TG(TG(TG('点格子切换宠物，三项不能重复')));
     this.startAt = Date.now();
@@ -137,9 +162,9 @@ export struct GEinsteinRiddle {
 
   /** 找到唯一解（generate 已保证只有一个） */
   private solveUnique(clues: Clue[]): number[] {
-    for (let a = 0; a < this.diffTotal; a++) {
-      for (let b = 0; b < this.diffTotal; b++) {
-        for (let c = 0; c < this.diffTotal; c++) {
+    for (let a = 0; a < this.houses; a++) {
+      for (let b = 0; b < this.houses; b++) {
+        for (let c = 0; c < this.houses; c++) {
           if (a === b || a === c || b === c) { continue; }
           const p: number[] = [a, b, c];
           if (ok(p, clues)) { return p; }
@@ -152,14 +177,14 @@ export struct GEinsteinRiddle {
   private tap(i: number): void {
     if (this.over) { return; }
     const next: number[] = this.grid.slice();
-    next[i] = (next[i] + 1) % this.diffTotal;
+    next[i] = (next[i] + 1) % this.houses;
     this.grid = next; this.tries++;
-    for (let k = 0; k < this.diffTotal; k++) {
+    for (let k = 0; k < this.houses; k++) {
       if (next[k] < 0) { return; }
     }
     let dup: boolean = false;
-    for (let a = 0; a < this.diffTotal; a++) {
-      for (let b = a + 1; b < this.diffTotal; b++) {
+    for (let a = 0; a < this.houses; a++) {
+      for (let b = a + 1; b < this.houses; b++) {
         if (next[a] === next[b]) { dup = true; }
       }
     }
