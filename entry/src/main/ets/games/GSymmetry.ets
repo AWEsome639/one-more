@@ -14,35 +14,51 @@ import { Digits } from '../core/I18n';
 const N: number = 4; const ROUNDS: number = 8; const PASS: number = 6; const FEED_MS: number = 900;
 const AXES: string[] = ['左右对称', '上下对称', '主对角', '副对角'];
 
-function at(r: number, c: number): number { return r * N + c; }
+function at(r: number, c: number, n: number): number { return r * n + c; }
 
 /** 按指定轴生成对称图案 */
-function buildSym(axis: number): number[] {
-  const g: number[] = new Array<number>(N * N).fill(0);
-  for (let r = 0; r < N; r++) {
-    for (let c = 0; c < N; c++) {
+/**
+ * ★★★ 2026-10-23 修：原来这里全部用模块常量 N（=4），
+ *   但难度会改棋盘边长（简单 ×0.7→3 / 普通 4 / 困难 ×1.3→5），
+ *   而**渲染用的是 diffTotal** ⇒ 生成 4×4、画 3×3 或 5×5 ⇒ 图案与判定全错。
+ *   ⇒ 把边长当参数传进来。
+ */
+function buildSym(axis: number, n: number): number[] {
+  const g: number[] = new Array<number>(n * n).fill(0);
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
       const v: number = Math.random() < 0.45 ? 1 : 0;
-      g[at(r, c)] = v;
-      if (axis === 0) { g[at(r, N - 1 - c)] = v; } else if (axis === 1) { g[at(N - 1 - r, c)] = v; } else if (axis === 2) { g[at(c, r)] = v; } else { g[at(N - 1 - c, N - 1 - r)] = v; }
+      g[at(r, c, n)] = v;
+      if (axis === 0) { g[at(r, n - 1 - c, n)] = v; } else if (axis === 1) { g[at(n - 1 - r, c, n)] = v; } else if (axis === 2) { g[at(c, r, n)] = v; } else { g[at(N - 1 - c, N - 1 - r, n)] = v; }
     }
   }
   return g;
 }
 /** 该图案共有几条对称轴（==1 才算题目清晰） */
-function axisCount(g: number[]): number {
-  let n: number = 0;
+function axisCount(g: number[], size: number): number {
+  let cnt: number = 0;
   for (let a = 0; a < 4; a++) {
     let ok: boolean = true;
-    for (let r = 0; r < N; r++) {
-      for (let c = 0; c < N; c++) {
-        let m: number = at(r, N - 1 - c);
-        if (a === 1) { m = at(N - 1 - r, c); } else if (a === 2) { m = at(c, r); } else if (a === 3) { m = at(N - 1 - c, N - 1 - r); }
-        if (g[m] !== g[at(r, c)]) { ok = false; }
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        let m: number = at(r, size - 1 - c, size);
+        if (a === 1) {
+          m = at(size - 1 - r, c, size);
+        } else if (a === 2) {
+          m = at(c, r, size);
+        } else if (a === 3) {
+          m = at(size - 1 - c, size - 1 - r, size);
+        }
+        if (g[m] !== g[at(r, c, size)]) {
+          ok = false;
+        }
       }
     }
-    if (ok) { n = n + 1; }
+    if (ok) {
+      cnt = cnt + 1;
+    }
   }
-  return n;
+  return cnt;
 }
 @Component
 export struct GSymmetry {
@@ -80,10 +96,10 @@ export struct GSymmetry {
   }
   private makeRound(): void {
     let axis: number = Math.floor(Math.random() * 4);
-    let g: number[] = buildSym(axis);
+    let g: number[] = buildSym(axis, this.diffTotal);
     let guard: number = 0;
-    while (guard < 60 && axisCount(g) !== 1) {
-      axis = Math.floor(Math.random() * 4); g = buildSym(axis); guard = guard + 1;
+    while (guard < 60 && axisCount(g, this.diffTotal) !== 1) {
+      axis = Math.floor(Math.random() * 4); g = buildSym(axis, this.diffTotal); guard = guard + 1;
     }
     this.grid = g; this.axis = axis; this.pick = -1; this.revealed = false;
     this.msg = TG2("第 {0} / {1} 题：它关于哪条轴对称？",Digits(String(this.round), this.langCode), ROUNDS);
