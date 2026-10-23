@@ -58,7 +58,28 @@ export struct GMasyu {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=5）
   //   ⚠️ 渲染原本用 ForEach(this.rows)，已改成 ForEach(this.rowIdx())
-  @State private diffTotal: number = GameDiff.sizeNow(5);
+  /**
+   * ★★★ 2026-10-23 修「尺寸陷阱」第 21 个：
+   *   候选环路来自 RING —— 固定 5×5 边框的 16 个格子（手工写的）。
+   *   但原来 diffTotal = sizeNow(5)（4/5/7），棋盘按 diffTotal² 渲染：
+   *     · 简单 4×4：RING 里 index 最大到 24，超出 16 格范围 ⇒ 越界
+   *     · 困难 7×7：RING 只覆盖中间 5×5 的边框，位置全错
+   *   ⇒ 修法：棋盘固定 5×5，难度改到**点击次数上限**上。
+   */
+  @State private diffTotal: number = 5;
+  /** 本局允许的点击次数：简单 56 / 普通 40 / 困难 28 */
+  @State private tapCap: number = GMasyu.capNow();
+
+  private static capNow(): number {
+    const d: number = GameDiff.now();
+    if (d === 0) {
+      return 56;
+    }
+    if (d === 2) {
+      return 28;
+    }
+    return 40;
+  }
 
   /** 0..diffTotal-1（读 @State 建依赖） */
   private rowIdx(): number[] {
@@ -88,7 +109,7 @@ export struct GMasyu {
   }
 
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(5);
+    this.tapCap = GMasyu.capNow();
     this.reset();
   }
 
@@ -319,7 +340,7 @@ export struct GMasyu {
     np.push(i);
     this.path = np;
     this.moves++;
-    if (this.moves >= MAX_TAPS) {
+    if (this.moves >= this.tapCap) {
       this.lose();
       return;
     }
@@ -368,7 +389,7 @@ export struct GMasyu {
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.moves) + '/' + String(MAX_TAPS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((String(this.moves) + '/' + String(this.tapCap))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)
         .padding(Space.sm)
