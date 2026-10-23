@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：多米诺提示 */
+  "第 {0} 行第 {1} 列的格子只能和第 {2} 行第 {3} 列配（换一组就重了）": { "en": "Cell row {0}, column {1} can only pair with row {2}, column {3} (any other pair would repeat)", "ja": "{0}行{1}列のマスは{2}行{3}列としか組めない（他は重複する）", "ko": "{0}행 {1}열 칸은 {2}행 {3}열과만 짝지을 수 있어요 (다른 조합은 중복)", "es": "La casilla fila {0}, columna {1} solo puede emparejarse con fila {2}, columna {3}", "fr": "La case ligne {0}, colonne {1} ne peut s apparier qu avec ligne {2}, colonne {3}", "de": "Feld Zeile {0}, Spalte {1} passt nur zu Zeile {2}, Spalte {3}", "pt": "A célula linha {0}, coluna {1} só pode juntar-se à linha {2}, coluna {3}", "ru": "Клетка строка {0}, столбец {1} сочетается только со строкой {2}, столбцом {3}", "it": "La casella riga {0}, colonna {1} può unirsi solo a riga {2}, colonna {3}", "ar": "المربع في الصف {0} والعمود {1} يمكن أن يقترن فقط بالصف {2} والعمود {3}" },
+  /** ★★ 2026-10-23 第二期：多米诺提示 */
+  "这一步看不出哪一对是唯一的": { "en": "No forced pair right now", "ja": "今は一意な組がない", "ko": "지금은 확정된 짝이 없어요", "es": "Ahora ningún par es forzoso", "fr": "Aucune paire forcée pour l instant", "de": "Gerade kein erzwungenes Paar", "pt": "Agora nenhum par é forçado", "ru": "Сейчас нет однозначной пары", "it": "Nessuna coppia forzata ora", "ar": "لا يوجد زوج مؤكد الآن" },
   /** ★★ 2026-10-23 第二期：找路径提示 */
   "往第 {0} 行第 {1} 列走（最短路上的一步）": { "en": "Move to row {0}, column {1} (one step on a shortest path)", "ja": "{0}行{1}列へ（最短経路の一手）", "ko": "{0}행 {1}열로 이동 (최단 경로의 한 수)", "es": "Ve a la fila {0}, columna {1} (un paso de un camino mínimo)", "fr": "Va en ligne {0}, colonne {1} (un pas d un chemin minimal)", "de": "Geh zu Zeile {0}, Spalte {1} (ein Schritt auf einem kürzesten Weg)", "pt": "Vá para linha {0}, coluna {1} (um passo de um caminho mínimo)", "ru": "Идите в строку {0}, столбец {1} (шаг по кратчайшему пути)", "it": "Vai a riga {0}, colonna {1} (un passo di un cammino minimo)", "ar": "انتقل إلى الصف {0} والعمود {1} (خطوة على أقصر مسار)" },
   /** ★★ 2026-10-23 第二期：找路径提示 */

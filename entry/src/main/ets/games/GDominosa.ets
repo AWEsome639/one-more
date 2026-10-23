@@ -8,7 +8,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -206,6 +208,86 @@ export struct GDominosa {
     return this.paired() === this.diffTotal && this.dups() === 0;
   }
 
+
+  /**
+   * ★ 2026-10-23 第二期：多米诺拼盘提示
+   *
+   * 规则：把 4×5 铺满骨牌，每种 (a,b) 只能用一次。
+   * 局部规则：**某个未配对的格子，只剩一个可能的配对伙伴**
+   *   ⇒ 这一对必须连起来。
+   *
+   * 「可能的伙伴」= 上下左右未配对的邻居，且
+   *   · 这对的数字组合还没被别的骨牌占用
+   * 这就是严格成立的：若只剩一个候选，它必是所有解的那一对。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    // 已用掉的数字组合
+    const usedPair: boolean[] = new Array<boolean>(100).fill(false);
+    for (let i = 0; i < H * W; i++) {
+      const j: number = this.owner[i];
+      if (j > i) {
+        const a: number = this.vals[i];
+        const b: number = this.vals[j];
+        const lo: number = a < b ? a : b;
+        const hi: number = a < b ? b : a;
+        usedPair[lo * 10 + hi] = true;
+      }
+    }
+    for (let i = 0; i < H * W; i++) {
+      if (this.owner[i] >= 0) {
+        continue;
+      }
+      const r: number = Math.floor(i / W);
+      const c: number = i - r * W;
+      const cand: number[] = [];
+      if (c + 1 < W && this.owner[i + 1] < 0) {
+        cand.push(i + 1);
+      }
+      if (c > 0 && this.owner[i - 1] < 0) {
+        cand.push(i - 1);
+      }
+      if (r + 1 < H && this.owner[i + W] < 0) {
+        cand.push(i + W);
+      }
+      if (r > 0 && this.owner[i - W] < 0) {
+        cand.push(i - W);
+      }
+      // 过滤掉组合已被用掉的
+      const ok: number[] = [];
+      for (let k = 0; k < cand.length; k++) {
+        const j: number = cand[k];
+        const a: number = this.vals[i];
+        const b: number = this.vals[j];
+        const lo: number = a < b ? a : b;
+        const hi: number = a < b ? b : a;
+        if (!usedPair[lo * 10 + hi]) {
+          ok.push(j);
+        }
+      }
+      if (ok.length !== 1) {
+        continue;
+      }
+      const j: number = ok[0];
+      const r2: number = Math.floor(j / W) + 1;
+      const c2: number = (j - Math.floor(j / W) * W) + 1;
+      const r1: number = r + 1;
+      const c1: number = c + 1;
+      return Hint.make([i, j],
+        TG4('第 {0} 行第 {1} 列的格子只能和第 {2} 行第 {3} 列配（换一组就重了）',
+          String(r1), String(c1), String(r2), String(c2)),
+        TG4('Cell row {0}, column {1} can only pair with row {2}, column {3}',
+          String(r1), String(c1), String(r2), String(c2)), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪一对是唯一的'));
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -369,6 +451,16 @@ export struct GDominosa {
           .layoutWeight(1)
           .height(Cell.of(44))
           .enabled(false)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
