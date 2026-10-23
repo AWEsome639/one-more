@@ -21,6 +21,8 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+// ★★★ 2026-10-23 第二期：围棋上 MCTS（工作线程）
+import { GoWorker } from '../ai/GoWorker';
 import { LanMatch, Side } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -264,6 +266,8 @@ export struct GGo9 {
 
   /** AI 档位：0 乱下 / 1 会提子会逃 / 2 再加一层浅算（难度来自设置） */
   private aiLevel: number = GameDiff.pick(0, 1, 2);
+  /** ★ 第二期：异步搜索的代际守卫 —— 重开/换局后旧结果必须作废 */
+  private aiGen: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
   @State private board: number[] = [];
@@ -326,6 +330,8 @@ export struct GGo9 {
   }
 
   private reset(): void {
+    // ★ 代际 +1：让还没回来的异步搜索结果作废，避免"重开后又落了一子"
+    this.aiGen++;
     this.clearAi();
     this.board = new Array<number>(CELLS).fill(EMPTY);
     this.myCap = 0;
@@ -506,7 +512,39 @@ export struct GGo9 {
       this.thinking = false;
       return;
     }
-    const mv: number = this.aiPick();
+    // ★★★ 2026-10-23 第二期：困难/普通档走 MCTS（工作线程），简单档保留启发式
+    //   实测（贴目归零、每局 200 手）：
+    //     100ms 预算 MCTS 2 胜 5 负  ⇒ 不够，会输给启发式
+    //     400ms 预算 MCTS 5 胜 2 负  ⇒ 够了
+    //   ⇒ 所以 简单档不用 MCTS（省电、也让新手能赢），普通 250ms / 困难 400ms
+    const budget: number = this.aiLevel >= 2 ? 400 : (this.aiLevel === 1 ? 250 : 0);
+    if (budget <= 0) {
+      const mv0: number = this.aiPick();
+      this.applyAiMove(mv0);
+      return;
+    }
+    const gen: number = this.aiGen;
+    this.thinking = true;
+    this.msg = TG('AI 正在想…');
+    GoWorker.pick(this.board.slice(), WHITE, this.boardN(), this.koStr, budget)
+      .then((idx: number) => {
+        if (gen !== this.aiGen) {
+          return;                       // 已经重开/换局 ⇒ 这个结果作废
+        }
+        // 工作线程算不出（-1）⇒ 回落启发式，绝不让 AI 停手
+        const mv: number = idx >= 0 ? idx : this.aiPick();
+        this.applyAiMove(mv);
+      })
+      .catch(() => {
+        if (gen !== this.aiGen) {
+          return;
+        }
+        this.applyAiMove(this.aiPick());
+      });
+  }
+
+  /** 把 AI 选的一手落下去（工作线程与降级共用） */
+  private applyAiMove(mv: number): void {
     this.thinking = false;
     if (mv < 0) {
       this.pass();
