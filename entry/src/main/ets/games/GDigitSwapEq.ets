@@ -5,7 +5,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -152,6 +154,48 @@ export struct GDigitSwapEq {
     if (this.tick >= 0) { clearInterval(this.tick); this.tick = -1; }
   }
 
+
+  /**
+   * ★ 2026-10-23 第二期：数字换位提示（真求解器）
+   *
+   * 玩法：交换两个数字块，让等式成立。
+   * 解法：把**所有两两交换**都试一遍，用 isTrue 判定。
+   *   位数最多 9 个 ⇒ 最多 36 次交换，成本可忽略。
+   * ⇒ 提示直接报出该换哪两个：「把第 2 个和第 5 个数字换个位」
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const d: number[] = this.puz.digits;
+    const n: number = d.length;
+    const g1: number = this.puz.g1;
+    const g2: number = this.puz.g2;
+    const g3: number = this.puz.g3;
+    const sg: string = this.puz.sign;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const nd: number[] = d.slice();
+        const t: number = nd[i];
+        nd[i] = nd[j];
+        nd[j] = t;
+        if (isTrue(nd, g1, g2, g3, sg)) {
+          // ⚠️ 模板最多 4 个占位符（TG4 上限）
+          //    第一版写了 5 个 ⇒ Expected 1-5 arguments, but got 7
+          //    ⇒ 只报位置；玩家自己看得见换完之后等式成不成立
+          return Hint.make([i, j],
+            TG2('把第 {0} 个和第 {1} 个换个位', String(i + 1), String(j + 1)),
+            TG2('Swap tile {0} and tile {1}', String(i + 1), String(j + 1)), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private reset(): void {
     this.startAt = Date.now();
     this.left = this.total;
@@ -241,6 +285,16 @@ export struct GDigitSwapEq {
       Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).height(20)
 
       Row({ space: Space.sm }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(Cell.of(42))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.lime).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })

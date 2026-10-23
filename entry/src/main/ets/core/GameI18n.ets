@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：数字换位提示 */
+  "把第 {0} 个和第 {1} 个换个位": { "en": "Swap tile {0} and tile {1}", "ja": "{0} 個目と {1} 個目を入れ替える", "ko": "{0}번째와 {1}번째를 바꾸세요", "es": "Cambia la ficha {0} y la {1}", "fr": "Échange la tuile {0} et la {1}", "de": "Tausche Plättchen {0} und {1}", "pt": "Troque a peça {0} e a {1}", "ru": "Поменяйте местами плитки {0} и {1}", "it": "Scambia la tessera {0} e la {1}", "ar": "بدّل القطعة {0} والقطعة {1}" },
   /** ★★ 2026-10-24 倒计时数学：一步命中 */
   "一步就中：{0} {1} {2} = {3}": { "en": "One move wins: {0} {1} {2} = {3}", "ja": "一手で的中：{0} {1} {2} = {3}", "ko": "한 번에 명중: {0} {1} {2} = {3}", "es": "Un movimiento gana: {0} {1} {2} = {3}", "fr": "Un coup gagnant : {0} {1} {2} = {3}", "de": "Ein Zug genügt: {0} {1} {2} = {3}", "pt": "Um movimento vence: {0} {1} {2} = {3}", "ru": "Один ход решает: {0} {1} {2} = {3}", "it": "Una mossa vince: {0} {1} {2} = {3}", "ar": "حركة واحدة تكفي: {0} {1} {2} = {3}" },
 
