@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：斜线数回提示 */
+  "第 {0} 行第 {1} 列这一格只能画 {2}（另一个方向会让数字超限）": { "en": "Cell row {0}, column {1} must be {2} (the other way would overflow a clue)", "ja": "{0}行{1}列は {2} しか描けない（逆だと数字が超える）", "ko": "{0}행 {1}열은 {2}만 가능해요 (반대는 숫자를 넘겨요)", "es": "La casilla fila {0}, columna {1} debe ser {2} (la otra desborda una pista)", "fr": "La case ligne {0}, colonne {1} doit être {2} (l'autre dépasse un indice)", "de": "Feld Zeile {0}, Spalte {1} muss {2} sein (anders überschreitet es einen Hinweis)", "pt": "A célula linha {0}, coluna {1} deve ser {2} (o outro estoura uma dica)", "ru": "Клетка строка {0}, столбец {1} должна быть {2} (иначе число превышено)", "it": "La casella riga {0}, colonna {1} deve essere {2} (l'altro sfora un numero)", "ar": "المربع في الصف {0} والعمود {1} يجب أن يكون {2} (الاتجاه الآخر يتجاوز الرقم)" },
+  /** ★★ 2026-10-23 第二期：斜线数回提示 */
+  "这一步看不出哪格只能画一个方向": { "en": "No cell is forced to one direction right now", "ja": "今は一方向に決まるマスがない", "ko": "지금은 한 방향으로 정해지는 칸이 없어요", "es": "Ahora ninguna casilla está forzada", "fr": "Aucune case n'est forcée pour l instant", "de": "Gerade ist kein Feld erzwungen", "pt": "Agora nenhuma célula é forçada", "ru": "Сейчас нет однозначно определённой клетки", "it": "Nessuna casella è forzata ora", "ar": "لا يوجد مربع محدد الاتجاه الآن" },
   /** ★★ 2026-10-23 第二期：华容道逃脱提示 */
   "右边已经空了 —— 把车一路推到出口就行": { "en": "The path is clear — push the car all the way right", "ja": "右は空いている —— 車を出口まで押すだけ", "ko": "오른쪽이 비었어요 — 차를 출구까지 밀면 돼요", "es": "El camino está libre: empuja el coche hasta la salida", "fr": "Le passage est libre : pousse la voiture jusqu'à la sortie", "de": "Der Weg ist frei — schiebe das Auto zum Ausgang", "pt": "O caminho está livre — empurre o carro até a saída", "ru": "Путь свободен — толкайте машину к выходу", "it": "La via è libera — spingi l'auto all'uscita", "ar": "الطريق خالٍ — ادفع السيارة إلى المخرج" },
   /** ★★ 2026-10-23 第二期：华容道逃脱提示 */

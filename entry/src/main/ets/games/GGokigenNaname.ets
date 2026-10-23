@@ -9,7 +9,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -207,6 +209,73 @@ export struct GGokigenNaname {
     return true;
   }
 
+  /**
+   * ★ 2026-10-23 第二期：斜线数回提示（排斥法）
+   *
+   * 每个圆点的数字 = 该点周围要画几条斜线。
+   * 规则：某格若画成某方向，会让它碰到的圆点**超出**该点的数字
+   *       ⇒ 这一格只能画**另一个方向**。
+   *
+   * 方向约定（见 numOk）：ori=1 是 ╲（碰 (r,c) 与 (r+1,c+1)），
+   *                        ori=2 是 ╱（碰 (r,c+1) 与 (r+1,c)）。
+   */
+  private cntArr(): number[] {
+    const cnt: number[] = new Array<number>(D * D).fill(0);
+    for (let i = 0; i < M * M; i++) {
+      const o: number = this.ori[i];
+      if (o === 0) {
+        continue;
+      }
+      const r: number = Math.floor(i / M);
+      const c: number = i - r * M;
+      if (o === 1) {
+        cnt[r * D + c]++;
+        cnt[(r + 1) * D + (c + 1)]++;
+      } else {
+        cnt[r * D + (c + 1)]++;
+        cnt[(r + 1) * D + c]++;
+      }
+    }
+    return cnt;
+  }
+
+  private overflows(cnt: number[], r: number, c: number, ori2: number): boolean {
+    const a: number = ori2 === 1 ? (r * D + c) : (r * D + (c + 1));
+    const b: number = ori2 === 1 ? ((r + 1) * D + (c + 1)) : ((r + 1) * D + c);
+    return (cnt[a] + 1 > this.num[a]) || (cnt[b] + 1 > this.num[b]);
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const cnt: number[] = this.cntArr();
+    for (let i = 0; i < M * M; i++) {
+      if (this.ori[i] !== 0) {
+        continue;
+      }
+      const r: number = Math.floor(i / M);
+      const c: number = i - r * M;
+      const ok1: boolean = !this.overflows(cnt, r, c, 1);
+      const ok2: boolean = !this.overflows(cnt, r, c, 2);
+      if (ok1 === ok2) {
+        continue;                      // 两种都行 或 都不行 ⇒ 推不出
+      }
+      const must: number = ok1 ? 1 : 2;
+      const ch: string = must === 1 ? '╲' : '╱';
+      return Hint.make([i],
+        TG2('第 {0} 行第 {1} 列这一格只能画 {2}（另一个方向会让数字超限）',
+          String(r + 1), String(c + 1), ch),
+        TG2('Cell row {0}, column {1} must be {2} (the other way would overflow a clue)',
+          String(r + 1), String(c + 1), ch), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格只能画一个方向'));
+  }
+
   private tapCell(r: number, c: number): void {
     if (this.over) {
       return;
@@ -369,6 +438,16 @@ export struct GGokigenNaname {
           .layoutWeight(1)
           .height(Cell.of(44))
           .enabled(false)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
