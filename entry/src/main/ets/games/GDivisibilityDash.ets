@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -85,6 +87,56 @@ export struct GDivisibilityDash {
     this.yes = n % d === 0;
   }
 
+
+  /**
+   * ★ 2026-10-23 第二期：整除冲刺提示
+   *
+   * 这是判断题，直接说"能/不能"就等于给答案。
+   * ⇒ 改给**整除规则**：玩家照着规则自己判断。
+   *   除数只可能是 2..12，规则全都能用一句话说清。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const d: number = this.div;
+    const n: string = String(this.num);
+    let zh: string = '';
+    let en: string = '';
+    if (d === 2) {
+      zh = TG('看末位：末位是偶数就能被 2 整除'); en = TG('Look at the last digit: even ⇒ divisible by 2');
+    } else if (d === 3) {
+      zh = TG('把各位数字加起来，和能被 3 整除就行'); en = TG('Sum the digits; if the sum divides by 3, so does the number');
+    } else if (d === 4) {
+      zh = TG('只看末两位，末两位能被 4 整除就行'); en = TG('Look at the last two digits only: divisible by 4 ⇒ yes');
+    } else if (d === 5) {
+      zh = TG('看末位：末位是 0 或 5 就能被 5 整除'); en = TG('Last digit 0 or 5 ⇒ divisible by 5');
+    } else if (d === 6) {
+      zh = TG('同时满足两条：能被 2 整除**且**能被 3 整除'); en = TG('Both at once: divisible by 2 AND by 3');
+    } else if (d === 7) {
+      zh = TG('7 没有简便规则，最快是直接除一下'); en = TG('No shortcut for 7 — just divide it');
+    } else if (d === 8) {
+      zh = TG('只看末三位，末三位能被 8 整除就行'); en = TG('Look at the last three digits only: divisible by 8 ⇒ yes');
+    } else if (d === 9) {
+      zh = TG('把各位数字加起来，和能被 9 整除就行'); en = TG('Sum the digits; if the sum divides by 9, so does the number');
+    } else if (d === 10) {
+      zh = TG('看末位：末位是 0 就能被 10 整除'); en = TG('Last digit 0 ⇒ divisible by 10');
+    } else if (d === 11) {
+      zh = TG('奇数位之和减偶数位之和，差能被 11 整除就行'); en = TG('Alternating digit sum difference divisible by 11 ⇒ yes');
+    } else if (d === 12) {
+      zh = TG('同时满足两条：能被 3 整除**且**能被 4 整除'); en = TG('Both at once: divisible by 3 AND by 4');
+    } else {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('判断 {0} 能不能被 {1} 整除 —— {2}', n, String(d), zh),
+      TG2('Can {0} divide by {1}? — {2}', n, String(d), en), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private answer(said: boolean): void {
     if (this.over) { return; }
     if (said === this.yes) {
@@ -159,6 +211,16 @@ export struct GDivisibilityDash {
       Text(this.tip).fontSize(FontSize.sm).fontColor(this.tip.startsWith('✓') ? Palette.emerald : this.theme.inkSoft).height(20)
 
       Row({ space: Space.sm }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(Cell.of(40))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.orange).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
