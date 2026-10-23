@@ -23,6 +23,16 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：代数天平提示 */
+  "先把两边都除以 {0}，再把 {1} 移到右边（{2}）": { "en": "Divide both sides by {0}, then move {1} to the right ({2})", "ja": "両辺を {0} で割ってから、{1} を右へ（{2}）", "ko": "양변을 {0}으로 나눈 뒤, {1}을 오른쪽으로 ({2})", "es": "Divide ambos lados entre {0} y pasa {1} a la derecha ({2})", "fr": "Divise les deux côtés par {0}, puis passe {1} à droite ({2})", "de": "Teile beide Seiten durch {0}, dann {1} nach rechts ({2})", "pt": "Divida ambos os lados por {0} e mova {1} para a direita ({2})", "ru": "Разделите обе части на {0}, затем перенесите {1} вправо ({2})", "it": "Dividi entrambi i lati per {0}, poi sposta {1} a destra ({2})", "ar": "اقسم الطرفين على {0} ثم انقل {1} لليمين ({2})" },
+  /** ★★ 2026-10-23 第二期：代数天平提示 */
+  "加回来": { "en": "add it back", "ja": "足し戻す", "ko": "다시 더하기", "es": "súmalo de vuelta", "fr": "rajoute-le", "de": "wieder addieren", "pt": "some de volta", "ru": "прибавьте обратно", "it": "riaggiungilo", "ar": "أضفه مرة أخرى" },
+  /** ★★ 2026-10-23 第二期：代数天平提示 */
+  "减过去": { "en": "subtract it", "ja": "引く", "ko": "빼기", "es": "réstalo", "fr": "soustrais-le", "de": "abziehen", "pt": "subtraia", "ru": "вычтите", "it": "sottrailo", "ar": "اطرحه" },
+  /** ★★ 2026-10-23 第二期：代数天平提示 */
+  "先把两边都加上 {0}，再除以 {1}": { "en": "Add {0} to both sides first, then divide by {1}", "ja": "まず両辺に {0} を足して、それから {1} で割る", "ko": "먼저 양변에 {0}을 더한 뒤 {1}로 나누세요", "es": "Primero suma {0} a ambos lados, luego divide entre {1}", "fr": "Ajoute {0} aux deux côtés, puis divise par {1}", "de": "Addiere {0} auf beiden Seiten, dann durch {1} teilen", "pt": "Some {0} aos dois lados, depois divida por {1}", "ru": "Прибавьте {0} к обеим частям, затем разделите на {1}", "it": "Aggiungi {0} a entrambi i lati, poi dividi per {1}", "ar": "أضف {0} للطرفين ثم اقسم على {1}" },
+  /** ★★ 2026-10-23 第二期：代数天平提示 */
+  "先把两边都减去 {0}，再除以 {1}": { "en": "Subtract {0} from both sides first, then divide by {1}", "ja": "まず両辺から {0} を引いて、それから {1} で割る", "ko": "먼저 양변에서 {0}을 뺀 뒤 {1}로 나누세요", "es": "Primero resta {0} a ambos lados, luego divide entre {1}", "fr": "Soustrais {0} aux deux côtés, puis divise par {1}", "de": "Subtrahiere {0} auf beiden Seiten, dann durch {1} teilen", "pt": "Subtraia {0} dos dois lados, depois divida por {1}", "ru": "Вычтите {0} из обеих частей, затем разделите на {1}", "it": "Sottrai {0} da entrambi i lati, poi dividi per {1}", "ar": "اطرح {0} من الطرفين ثم اقسم على {1}" },
   /** ★★ 2026-10-23 第二期：数字换位提示 */
   "把第 {0} 个和第 {1} 个换个位": { "en": "Swap tile {0} and tile {1}", "ja": "{0} 個目と {1} 個目を入れ替える", "ko": "{0}번째와 {1}번째를 바꾸세요", "es": "Cambia la ficha {0} y la {1}", "fr": "Échange la tuile {0} et la {1}", "de": "Tausche Plättchen {0} und {1}", "pt": "Troque a peça {0} e a {1}", "ru": "Поменяйте местами плитки {0} и {1}", "it": "Scambia la tessera {0} e la {1}", "ar": "بدّل القطعة {0} والقطعة {1}" },
   /** ★★ 2026-10-24 倒计时数学：一步命中 */

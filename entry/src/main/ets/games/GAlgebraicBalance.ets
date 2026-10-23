@@ -5,7 +5,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -127,6 +129,55 @@ export struct GAlgebraicBalance {
     }, 650);
   }
 
+
+  /**
+   * ★ 2026-10-23 第二期：代数天平提示
+   *
+   * 三种题型（见 makeEq）：
+   *   ax + b = rhs ｜ ax - b = rhs ｜ a(x + b) = rhs
+   * ⇒ 提示只给**解方程的步骤**，不给 x 的值：
+   *   「先两边减 b，再除以 a」
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const txt: string = this.eq.text;
+    if (txt.length === 0) {
+      return Hint.none('none');
+    }
+    // 从文本里抓系数 a 与常数 b
+    let a: number = 1;
+    let b: number = 0;
+    const paren: boolean = txt.indexOf('(') >= 0;
+    const m1: RegExpMatchArray | null = txt.match(/^(\d+)/);
+    if (m1 !== null) {
+      a = Number(m1[1]);
+    }
+    const m2: RegExpMatchArray | null = txt.match(/([+-])\s*(\d+)/);
+    if (m2 !== null) {
+      b = Number(m2[2]);
+    }
+    const isMinus: boolean = m2 !== null && m2[1] === '-';
+    if (paren) {
+      return Hint.make([],
+        TG4('先把两边都除以 {0}，再把 {1} 移到右边（{2}）', String(a), String(b), isMinus ? '加回来' : '减过去'),
+        TG4('Divide both sides by {0}, then move {1} to the right', String(a), String(b)), t0);
+    }
+    if (isMinus) {
+      return Hint.make([],
+        TG4('先把两边都加上 {0}，再除以 {1}', String(b), String(a)),
+        TG4('Add {0} to both sides first, then divide by {1}', String(b), String(a)), t0);
+    }
+    return Hint.make([],
+      TG4('先把两边都减去 {0}，再除以 {1}', String(b), String(a)),
+      TG4('Subtract {0} from both sides first, then divide by {1}', String(b), String(a)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private finish(solved: boolean): void {
     const res: GameResult = {
       gameId: 'algebraic_balance', solved: solved, score: this.score,
@@ -164,6 +215,16 @@ export struct GAlgebraicBalance {
       }.width('100%')
 
       Row({ space: Space.sm }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(Cell.of(42))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.violet).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
