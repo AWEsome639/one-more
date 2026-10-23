@@ -16,7 +16,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -46,6 +48,9 @@ export struct GSlidePuzzle {
   onFinish: (r: GameResult) => void = () => {};
 
   @State tiles: number[] = [];      // 0 = 空格
+  /** ★ 提示说的话 */
+  @State private hintMsg: string = '';
+  @State private hintIdx: number = -1;
   @State blank: number = 0;      // 空格位置（reset() 里按本局格数设）
   @State steps: number = 0;
   @State budget: number = 0;
@@ -153,6 +158,84 @@ export struct GSlidePuzzle {
     return n;
   }
 
+
+  /** 一个盘面的总曼哈顿距离（空格不算） */
+  private manhattan(arr: number[]): number {
+    const n2: number = this.boardN();
+    let sum: number = 0;
+    for (let i = 0; i < n2 * n2; i++) {
+      const v: number = arr[i];
+      if (v <= 0) {
+        continue;
+      }
+      const tr: number = Math.floor((v - 1) / n2);
+      const tc: number = (v - 1) % n2;
+      sum += Math.abs(Math.floor(i / n2) - tr) + Math.abs(i % n2 - tc);
+    }
+    return sum;
+  }
+
+  /**
+   * ★ 2026-10-23 第二期：数字华容道提示
+   *
+   * 做法是**曼哈顿距离的贪心爬山**：
+   *   枚举空格能换的相邻块 → 各算换完之后的曼哈顿距离
+   *   → 挑距离最小的那一步；若没有一步能下降，则挑最不坏的。
+   *
+   * ⚠️ 这**不是最优解**，只是"朝着答案走的一步"。
+   *    最优解要 A 星 / IDA 星；4×4 打乱后解长五六十步，500 ms 内跑不完。
+   *    与其给个算不准的"最优"，不如诚实给个"能往前走的一步"，
+   *    提示文案也是这么写的（「总距离 x → y」，不写"最优"）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n2: number = this.boardN();
+    const b: number = this.blank;
+    const cand: number[] = this.nbrsOf(b);
+    if (cand.length === 0) {
+      return Hint.none('none');
+    }
+    const cur: number = this.manhattan(this.tiles);
+    let bestIdx: number = -1;
+    let bestDist: number = 1e9;
+    for (let k = 0; k < cand.length; k++) {
+      const i: number = cand[k];
+      const arr: number[] = this.tiles.slice();
+      arr[b] = arr[i];
+      arr[i] = 0;
+      const d: number = this.manhattan(arr);
+      if (d < bestDist) {
+        bestDist = d;
+        bestIdx = i;
+      }
+    }
+    if (bestIdx < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(bestIdx / n2) + 1;
+    const c: number = (bestIdx % n2) + 1;
+    const better: boolean = bestDist < cur;
+    return Hint.make([bestIdx],
+      TG4(better ? '把第 {0} 行第 {1} 列的块推进空格（总距离 {2} → {3}）'
+                 : '没有能立刻缩短距离的一步；先推第 {0} 行第 {1} 列（距离 {2} → {3}）',
+        String(r), String(c), String(cur), String(bestDist)),
+      TG4(better ? 'Slide the tile at row {0}, column {1} (distance {2} → {3})'
+                 : 'No immediate gain; slide row {0}, column {1} first (distance {2} → {3})',
+        String(r), String(c), String(cur), String(bestDist)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok) {
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintMsg = ''; }, 5000);
+      return;
+    }
+    this.hintMsg = TG('这一局算不出来，重开一局试试');
+    setTimeout(() => { this.hintMsg = ''; }, 5000);
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -230,12 +313,22 @@ export struct GSlidePuzzle {
       .borderRadius(Radius.lg)
 
       Row({ space: Space.md }) {
-        Text(this.over
+        Text(this.hintMsg.length > 0 ? this.hintMsg : (this.over
           ? (this.won ? '全部归位 🎉 得分 ' + String(this.score) : TG('步数用尽，本局失败'))
-          : '点空格旁边的块把它推进去')
+          : '点空格旁边的块把它推进去'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
