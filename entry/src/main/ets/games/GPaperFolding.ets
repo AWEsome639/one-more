@@ -11,16 +11,35 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
 const Q: number = 4; const F: number = Q * 2; const HOLES: number = 3; const LIMIT: number = 14;
-const IDXQ: number[] = [0, 1, 2, 3]; const IDXF: number[] = [0, 1, 2, 3, 4, 5, 6, 7];
+// ★ 2026-10-23：原来这里是固定的 [0,1,2,3] / [0..7]，
+//   与 diffTotal（3/4/5）不一致 ⇒ 渲染的行列数永远等于 4×4 与 8×8。
+//   改成按 diffTotal 现算。
+function idxOf(n: number): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < n; i++) {
+    out.push(i);
+  }
+  return out;
+}
 
 /** 折叠态 → 展开态：一个孔镜像成四份 */
-function unfold(q: boolean[]): boolean[] {
-  const out: boolean[] = new Array<boolean>(F * F).fill(false);
-  for (let r = 0; r < Q; r++) {
-    for (let c = 0; c < Q; c++) {
-      if (!q[r * Q + c]) { continue; }
-      out[r * F + c] = true; out[r * F + (F - 1 - c)] = true;
-      out[(F - 1 - r) * F + c] = true; out[(F - 1 - r) * F + (F - 1 - c)] = true;
+/**
+ * ★★★ 2026-10-23 修「尺寸陷阱」第 13 个：
+ *   原来 unfold 固定用 Q=4 / F=8，但 fold 区按 diffTotal² 建（3/4/5）：
+ *     · 简单 3×3：q 只有 9 项，索引 9..15 是 undefined（被当 false 跳过）
+ *     · 困难 5×5：q 有 25 项，**16..24 号孔完全丢失**，goal 永远是错的；
+ *       而且玩家在 5×5 上操作，这里按 4 的步长读 ⇒ 位置全错
+ *   ⇒ 只有 4×4（普通档）是对的。
+ *   修法：**边长跟着走**（qn = diffTotal，展开后 2*qn）。
+ */
+function unfold(q: boolean[], qn: number): boolean[] {
+  const f: number = qn * 2;
+  const out: boolean[] = new Array<boolean>(f * f).fill(false);
+  for (let r = 0; r < qn; r++) {
+    for (let c = 0; c < qn; c++) {
+      if (!q[r * qn + c]) { continue; }
+      out[r * f + c] = true; out[r * f + (f - 1 - c)] = true;
+      out[(f - 1 - r) * f + c] = true; out[(f - 1 - r) * f + (f - 1 - c)] = true;
     }
   }
   return out;
@@ -62,7 +81,7 @@ export struct GPaperFolding {
       const j: number = Math.floor(Math.random() * pool.length);
       g[pool[j]] = true; pool.splice(j, 1);
     }
-    this.goal = unfold(g); this.mine = new Array<boolean>(this.diffTotal * this.diffTotal).fill(false); this.shown = unfold(this.mine);
+    this.goal = unfold(g, this.diffTotal); this.mine = new Array<boolean>(this.diffTotal * this.diffTotal).fill(false); this.shown = unfold(this.mine, this.diffTotal);
     this.steps = 0; this.over = false; this.won = false;
     this.msg = TG2('展开后要有 {0} 个孔，位置你自己找', String(HOLES * 4));
     this.startAt = Date.now();
@@ -71,7 +90,7 @@ export struct GPaperFolding {
     if (this.over) { return; }
     const m: boolean[] = this.mine.slice();
     m[i] = !m[i];
-    this.mine = m; this.shown = unfold(m); this.steps = this.steps + 1;
+    this.mine = m; this.shown = unfold(m, this.diffTotal); this.steps = this.steps + 1;
     if (sameMap(this.shown, this.goal)) { this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return; }
     if (this.steps >= LIMIT) { this.finish(false); return; }
     this.msg = TG2("已打 {0} 孔（展开后 {1} 个）", String(countOf(m)), String(countOf(this.shown)));
@@ -111,9 +130,9 @@ export struct GPaperFolding {
         Column({ space: Space.xs }) {
           Text(TG('折好的纸 · 点它打孔')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
           Column({ space: Space.xs }) {
-            ForEach(IDXQ, (r: number) => {
+            ForEach(idxOf(this.diffTotal), (r: number) => {
               Row({ space: Space.xs }) {
-                ForEach(IDXQ, (c: number) => { Stack() {
+                ForEach(idxOf(this.diffTotal), (c: number) => { Stack() {
                 Text(this.mine[(r * this.diffTotal + c)] ? '🕳️' : '').fontSize(FontSize.sm)
                 }.layoutWeight(1).aspectRatio(1)
                 .backgroundColor(this.mine[(r * this.diffTotal + c)] ? Palette.amber : this.theme.surface)
@@ -132,9 +151,9 @@ export struct GPaperFolding {
         Column({ space: Space.xs }) {
           Text(TG('目标')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
           Column({ space: 1 }) {
-          ForEach(IDXF, (r: number) => {
+          ForEach(idxOf(this.diffTotal * 2), (r: number) => {
           Row({ space: 1 }) {
-          ForEach(IDXF, (c: number) => {
+          ForEach(idxOf(this.diffTotal * 2), (c: number) => {
           Text('').layoutWeight(1).aspectRatio(1)
           .backgroundColor(this.hasHole((1), r * F + c) ? Palette.primaryDeep : this.theme.surfaceAlt)
           }, (c: number) => (true ? 'gc' : 'mc') + c)
@@ -145,9 +164,9 @@ export struct GPaperFolding {
         Column({ space: Space.xs }) {
           Text(TG('我的')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
           Column({ space: 1 }) {
-          ForEach(IDXF, (r: number) => {
+          ForEach(idxOf(this.diffTotal * 2), (r: number) => {
           Row({ space: 1 }) {
-          ForEach(IDXF, (c: number) => {
+          ForEach(idxOf(this.diffTotal * 2), (c: number) => {
           Text('').layoutWeight(1).aspectRatio(1)
           .backgroundColor(this.hasHole((0), r * F + c) ? Palette.primaryDeep : this.theme.surfaceAlt)
           }, (c: number) => (false ? 'gc' : 'mc') + c)
