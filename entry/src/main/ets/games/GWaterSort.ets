@@ -15,8 +15,18 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 
 const CAP: number = 4;          // 每管容量
-const COLORS: number = 4;       // 颜色数
-const TUBES: number = COLORS + 2;
+/**
+ * ★★★ 2026-10-23 修「尺寸陷阱」第 15 个：
+ *   颜色数由难度决定（diffTotal = sizeNow(4) → 3/4/5），
+ *   管子数应该 = 颜色数 + 2（5/6/7）。
+ *   但原来 TUBES = COLORS + 2 里的 COLORS 是**常量 4** ⇒ 恒为 6：
+ *     · 简单（3 色）：6 根管子里有 3 根是空的（应该 2 根）⇒ 太容易
+ *     · 困难（5 色）：6 根里只剩 1 根空的（应该 2 根）⇒ 可能无解
+ *     · 而且 5 色时该是 7 根 × 4 格 = 28 格，原来只分配 24 ⇒ 越界
+ *   ⇒ 修法：颜色数仍走 diffTotal，管子数按「颜色数 + 2」现算，
+ *     分配按**最大可能**（5 色 + 2 = 7 根）来。
+ */
+const MAX_TUBES: number = 7;    // 最多 5 色 + 2 根空管
 
 function tubeColor(c: number): string {
   const wheel: number[] = [0, 3, 1, 5, 7, 9];
@@ -57,6 +67,10 @@ export struct GWaterSort {
   @State score: number = 0;
 
   private startAt: number = 0;
+  /** 本局的管子数 = 颜色数 + 2（颜色数已按难度换算） */
+  private tubeCount(): number {
+    return this.diffTotal + 2;
+  }
 
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
@@ -167,7 +181,7 @@ export struct GWaterSort {
   }
 
   private isDone(st: number[]): boolean {
-    for (let t = 0; t < TUBES; t++) {
+    for (let t = 0; t < this.tubeCount(); t++) {
       if (this.topOf(st, t) >= 0 && !this.sameAll(st, t)) {
         return false;
       }
@@ -176,8 +190,8 @@ export struct GWaterSort {
   }
 
   private anyMove(st: number[]): boolean {
-    for (let a = 0; a < TUBES; a++) {
-      for (let b = 0; b < TUBES; b++) {
+    for (let a = 0; a < this.tubeCount(); a++) {
+      for (let b = 0; b < this.tubeCount(); b++) {
         if (this.legal(st, a, b)) {
           return true;
         }
@@ -190,8 +204,8 @@ export struct GWaterSort {
   private pickMove(st: number[]): number {
     let best: number = -1;
     const cand: number[] = [];
-    for (let a = 0; a < TUBES; a++) {
-      for (let b = 0; b < TUBES; b++) {
+    for (let a = 0; a < this.tubeCount(); a++) {
+      for (let b = 0; b < this.tubeCount(); b++) {
         if (!this.legal(st, a, b)) {
           continue;
         }
@@ -253,7 +267,7 @@ export struct GWaterSort {
         pool[i] = pool[j];
         pool[j] = t;
       }
-      const st: number[] = new Array<number>(TUBES * CAP).fill(-1);
+      const st: number[] = new Array<number>(MAX_TUBES * CAP).fill(-1);
       for (let t = 0; t < this.diffTotal; t++) {
         for (let k = 0; k < CAP; k++) {
           st[t * CAP + k] = pool[t * CAP + k];
@@ -280,7 +294,7 @@ export struct GWaterSort {
 
   private doneCount(st: number[]): number {
     let n: number = 0;
-    for (let t = 0; t < TUBES; t++) {
+    for (let t = 0; t < this.tubeCount(); t++) {
       if (this.topOf(st, t) >= 0 && this.sameAll(st, t)) {
         n++;
       }
