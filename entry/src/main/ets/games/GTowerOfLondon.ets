@@ -23,7 +23,33 @@ export struct GTowerOfLondon {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 PEGS=3
-  @State private diffTotal: number = GameDiff.sizeNow(3);
+  /**
+   * ★★★ 2026-10-23 修「尺寸陷阱」第 14 个：
+   *   状态编码是**手工设计的三进制**：3 根柱子 × 3 个球 = 27 种状态，
+   *   权重 W=[9,3,1]（球 1 最轻）。这是固定结构，不能按难度缩放。
+   *
+   *   但原来 diffTotal = sizeNow(3)（2/3/4），而且 ballAt() 用它当进制：
+   *     ballAt(s,b) = floor(s / W[b-1]) % diffTotal
+   *     · 简单 diffTotal=2：三进制权重配 %2 ⇒ 状态映射全乱
+   *     · 困难 diffTotal=4：%4 会返回 3 ⇒ **第 4 根柱子不存在**，
+   *       bfs 里 nx 能超过 26 ⇒ dist[nx] 越界写（数组只有 27 项）
+   *
+   *   ⇒ 修法：进制固定成 PEGS=3；难度改到**允许多走的步数**上。
+   */
+  @State private diffTotal: number = PEGS;
+  /** 允许比最少步数多走几步：简单 8 / 普通 5 / 困难 3 */
+  @State private slacks: number = GTowerOfLondon.slackNow();
+
+  private static slackNow(): number {
+    const d: number = GameDiff.now();
+    if (d === 0) {
+      return 8;
+    }
+    if (d === 2) {
+      return 3;
+    }
+    return 5;
+  }
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
   onFinish: (r: GameResult) => void = () => {};
@@ -39,7 +65,7 @@ export struct GTowerOfLondon {
   private done: boolean = false;
   aboutToAppear(): void { LanRace.noteStart(); this.reset(); }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(3);
+    this.slacks = GTowerOfLondon.slackNow();
      this.reset(); }
   private reset(): void {
     const a: number = Math.floor(Math.random() * STATES);
@@ -102,7 +128,7 @@ export struct GTowerOfLondon {
     const next: number = this.state + (i - this.sel) * W[ball - 1];
     this.state = next; this.moves++; this.sel = -1;
     if (next === this.goalState) { this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return; }
-    if (this.moves >= this.best + SLACK) { this.note = TG('步数用光了'); this.finish(false); return; }
+    if (this.moves >= this.best + this.slacks) { this.note = TG('步数用光了'); this.finish(false); return; }
     this.note = TG2('✅ 好，继续 · 对位 {0}/{1}', String(this.rightCount(next)), String(BALLS));
   }
   private finish(solved: boolean): void {
@@ -117,7 +143,7 @@ export struct GTowerOfLondon {
   }
   build() {
     Column({ space: Space.sm }) {
-      Text(TG2('步数 {0} · 最少 {1} · 上限 {2}',Digits(String(this.moves), this.langCode),Digits(String(this.best), this.langCode), String(this.best + SLACK)) +
+      Text(TG2('步数 {0} · 最少 {1} · 上限 {2}',Digits(String(this.moves), this.langCode),Digits(String(this.best), this.langCode), String(this.best + this.slacks)) +
         TG2(' · 对位 {0}/{1}', String(this.rightCount(this.state)), String(BALLS)))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md)
