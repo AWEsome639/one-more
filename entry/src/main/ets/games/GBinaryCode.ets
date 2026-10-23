@@ -8,7 +8,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -113,6 +115,46 @@ export struct GBinaryCode {
       }
     }
     return v;
+  }
+
+
+  /**
+   * ★ 2026-10-23 第二期：二进制码提示
+   *
+   * 玩法：8 个位（128..1）开关，拼出目标数。
+   * 提示 = **找第一个"当前状态与目标二进制不一致"的位**，直接说它该是 0 还是 1。
+   *   「第 3 位（值 32）现在应该是 1，你还没点亮」
+   * ⇒ 精确、可执行，且每次只泄露一个位（不是整串答案）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const tgt: number = this.target;
+    if (!(tgt > 0)) {
+      return Hint.none('none');
+    }
+    for (let k = 0; k < BITS; k++) {
+      const should: boolean = ((tgt >> (BITS - 1 - k)) & 1) === 1;
+      if (this.flag[k] !== should) {
+        const w: number = WEIGHTS[k];
+        const pos: string = String(k + 1);
+        const weight: string = String(w);
+        if (should) {
+          return Hint.make([k],
+            TG2('第 {0} 位（值 {1}）应该是 1 —— 还没点亮', pos, weight),
+            TG2('Bit {0} (value {1}) should be ON — it is still off', pos, weight), t0);
+        }
+        return Hint.make([k],
+          TG2('第 {0} 位（值 {1}）应该是 0 —— 该关掉', pos, weight),
+          TG2('Bit {0} (value {1}) should be OFF — turn it off', pos, weight), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
   }
 
   private bitsText(): string {
@@ -247,6 +289,16 @@ export struct GBinaryCode {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         .width('100%')
 
+      Button(TG('提示'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.theme.ink)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
+        .width('100%')
+        .height(Cell.of(42))
+        .onClick(() => {
+          this.askHint();
+        })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)

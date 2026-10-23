@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：二进制码提示 */
+  "第 {0} 位（值 {1}）应该是 1 —— 还没点亮": { "en": "Bit {0} (value {1}) should be ON — it is still off", "ja": "{0} ビット目（値 {1}）は 1 にすべき —— まだ点いていない", "ko": "{0}번째 비트(값 {1})는 1이어야 해요 — 아직 꺼져 있어요", "es": "El bit {0} (valor {1}) debe estar encendido — sigue apagado", "fr": "Le bit {0} (valeur {1}) doit être à 1 — il est encore éteint", "de": "Bit {0} (Wert {1}) sollte AN sein — noch aus", "pt": "O bit {0} (valor {1}) deve estar ligado — ainda apagado", "ru": "Бит {0} (значение {1}) должен быть 1 — пока выключен", "it": "Il bit {0} (valore {1}) deve essere 1 — ancora spento", "ar": "البِت {0} (القيمة {1}) يجب أن يكون 1 — ما زال مطفأ" },
+  /** ★★ 2026-10-23 第二期：二进制码提示 */
+  "第 {0} 位（值 {1}）应该是 0 —— 该关掉": { "en": "Bit {0} (value {1}) should be OFF — turn it off", "ja": "{0} ビット目（値 {1}）は 0 にすべき —— 消す", "ko": "{0}번째 비트(값 {1})는 0이어야 해요 — 꺼야 해요", "es": "El bit {0} (valor {1}) debe estar apagado — apágalo", "fr": "Le bit {0} (valeur {1}) doit être à 0 — éteins-le", "de": "Bit {0} (Wert {1}) sollte AUS sein — ausschalten", "pt": "O bit {0} (valor {1}) deve estar desligado — desligue", "ru": "Бит {0} (значение {1}) должен быть 0 — выключите", "it": "Il bit {0} (valore {1}) deve essere 0 — spegnilo", "ar": "البِت {0} (القيمة {1}) يجب أن يكون 0 — أطفئه" },
   /** ★★ 2026-10-23 第二期：整除冲刺提示 */
   "看末位：末位是偶数就能被 2 整除": { "en": "Last digit: even ⇒ divisible by 2", "ja": "末位が偶数なら 2 で割れる", "ko": "끝자리가 짝수면 2로 나눠져요", "es": "Último dígito par ⇒ divisible por 2", "fr": "Dernier chiffre pair ⇒ divisible par 2", "de": "Letzte Ziffer gerade ⇒ durch 2 teilbar", "pt": "Último dígito par ⇒ divisível por 2", "ru": "Последняя цифра чётная ⇒ делится на 2", "it": "Ultima cifra pari ⇒ divisibile per 2", "ar": "الرقم الأخير زوجي ⇒ يقبل القسمة على 2" },
   /** ★★ 2026-10-23 第二期：整除冲刺提示 */
