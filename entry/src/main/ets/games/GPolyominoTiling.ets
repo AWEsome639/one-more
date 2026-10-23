@@ -24,13 +24,19 @@ const SHAPES: Shape[] = [
   { name: '⊤', dr: [0, 0, 0, 1], dc: [0, 1, 2, 1] },
   { name: '▪', dr: [0], dc: [0] }
 ];
-/** 棋盘值：0 空（要铺）、1 墙、2 已铺；以 start 为锚点能不能放下 */
-function fits(board: number[], s: Shape, start: number): boolean {
-  const r0: number = Math.floor(start / N); const c0: number = start % N;
+/**
+ * 棋盘值：0 空（要铺）、1 墙、2 已铺；以 start 为锚点能不能放下
+ *
+ * ★ 2026-10-23：加 n 参数。
+ *   棋盘按 diffTotal 生成（4/5/6），但这里用模块常量 N=5 换算坐标与边界
+ *   ⇒ 4×4 时可能越界读到盘外，6×6 时右下那圈永远"放不下"。
+ */
+function fits(board: number[], s: Shape, start: number, n: number): boolean {
+  const r0: number = Math.floor(start / n); const c0: number = start % n;
   for (let t = 0; t < s.dr.length; t++) {
     const r: number = r0 + s.dr[t]; const c: number = c0 + s.dc[t];
-    if (r < 0 || r >= N || c < 0 || c >= N) { return false; }
-    if (board[r * N + c] !== 0) { return false; }
+    if (r < 0 || r >= n || c < 0 || c >= n) { return false; }
+    if (board[r * n + c] !== 0) { return false; }
   }
   return true;
 }
@@ -81,7 +87,7 @@ export struct GPolyominoTiling {
       const spots: number[] = []; const which: number[] = [];
       for (let s = 0; s < SHAPES.length; s++) {
         for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
-          if (fits(cover, SHAPES[s], i)) { spots.push(i); which.push(s); }
+          if (fits(cover, SHAPES[s], i, this.diffTotal)) { spots.push(i); which.push(s); }
         }
       }
       if (spots.length === 0) { break; }
@@ -108,7 +114,7 @@ export struct GPolyominoTiling {
     }
     if (cur === 1) { this.msg = TG('这是墙，放不了'); return; }
     const s: Shape = SHAPES[this.sel];
-    if (!fits(this.board, s, i)) { this.msg = TG('这块放不下，换个位置'); return; }
+    if (!fits(this.board, s, i, this.diffTotal)) { this.msg = TG('这块放不下，换个位置'); return; }
     const b: number[] = this.board.slice();
     const r0: number = Math.floor(i / this.diffTotal); const c0: number = i % this.diffTotal;
     for (let t = 0; t < s.dr.length; t++) { b[(r0 + s.dr[t]) * this.diffTotal + (c0 + s.dc[t])] = 2; }
