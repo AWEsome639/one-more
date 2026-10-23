@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：灭灯提示两句 */
+  "试试点第 {0} 行第 {1} 列（这条路共 {2} 手）": { "en": "Try row {0}, column {1} ({2} taps in this line)", "ja": "{0}行{1}列を試して（この手順は全{2}手）", "ko": "{0}행 {1}열을 시도해 보세요 (이 경로는 총 {2}수)", "es": "Prueba fila {0}, columna {1} ({2} toques en esta línea)", "fr": "Essaie ligne {0}, colonne {1} ({2} appuis dans cette voie)", "de": "Versuch Zeile {0}, Spalte {1} ({2} Züge in dieser Linie)", "pt": "Tente linha {0}, coluna {1} ({2} toques nesta linha)", "ru": "Попробуйте строку {0}, столбец {1} (в этой линии {2} ходов)", "it": "Prova riga {0}, colonna {1} ({2} tocchi in questa linea)", "ar": "جرّب الصف {0} والعمود {1} ({2} نقرات في هذا المسار)" },
+  /** ★★ 2026-10-23 第二期：灭灯提示两句 */
+  "这一步算不出来（盘面可能已经无解），重开一局吧": { "en": "Can t compute a step — this board may be unsolvable. Start a new one", "ja": "この手は計算できない。解けない盤面かも。新しく始めて", "ko": "이 수는 계산할 수 없어요. 풀 수 없는 판일 수 있어요. 새로 시작하세요", "es": "No se puede calcular un paso: puede que no tenga solución. Empieza otra", "fr": "Impossible de calculer un coup — ce plateau n a peut-être pas de solution", "de": "Kein Zug berechenbar — dieses Brett ist evtl. unlösbar. Starte neu", "pt": "Não dá para calcular um passo — talvez sem solução. Comece outra", "ru": "Не удаётся найти ход — возможно, решений нет. Начните заново", "it": "Impossibile calcolare una mossa — forse irrisolvibile. Ricomincia", "ar": "لا يمكن حساب خطوة — قد لا يكون لها حل. ابدأ من جديد" },
   /** ★★ 2026-10-23 第二期：扫雷提示三句 */
   "这一格是安全的，可以翻开": { "en": "This cell is safe — open it", "ja": "このマスは安全。開けて大丈夫", "ko": "이 칸은 안전해요. 열어도 됩니다", "es": "Esta casilla es segura: ábrela", "fr": "Cette case est sûre — ouvre-la", "de": "Dieses Feld ist sicher — öffne es", "pt": "Esta célula é segura — abra", "ru": "Эта клетка безопасна — открывайте", "it": "Questa casella è sicura — aprila", "ar": "هذا المربع آمن — افتحه" },
   /** ★★ 2026-10-23 第二期：扫雷提示三句 */

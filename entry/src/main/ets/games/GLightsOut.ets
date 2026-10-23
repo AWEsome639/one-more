@@ -9,6 +9,8 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+// ★★★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -52,6 +54,8 @@ export struct GLightsOut {
   @State private over: boolean = false;
   @State private won: boolean = false;
   @State private tip: string = TG('点任意一格：它和上下左右一起翻转');
+  /** ★ 第二期：提示指向的格子（-1 = 无） */
+  @State private hintIdx: number = -1;
 
   private startAt: number = 0;
   private finished: boolean = false;
@@ -164,6 +168,87 @@ export struct GLightsOut {
     this.tip = TG2('还剩 {0} 盏亮着', String(this.litCount()));
   }
 
+
+  /**
+   * ★★★ 2026-10-23 第二期：灭灯提示（**精确解**，不猜）
+   *
+   * 灭灯有个很好的性质：**第一行怎么点，后面的行就全被决定了**
+   *   —— 因为第 r 行点不点，只取决于第 r-1 行哪盏还亮着。
+   * 所以只要枚举第一行的 2^5 = 32 种点法，逐行"追赶"下去，
+   * 5 行做完看是否全灭即可。**这是可证的正确解，不是启发式。**
+   *
+   * 提示 = 最短解法的第一手。
+   * ⚠️ 与扫雷不同：灭灯**没有隐藏信息**（棋盘全公开），
+   *    所以给出"完整解法里的第一步"不算作弊 —— 只是替你算了一步。
+   */
+  private solveTaps(): number[] {
+    let best: number[] = [];
+    // ⚠️ 必须用单独的 found 标记，不能用 best.length === 0 兼作"还没找到"：
+    //    "解是空的"（盘已全灭）和"还没找到解"用同一个判据会互相冒充，
+    //    实测就把一个全灭的盘解成了 12 手（测试④抓到的就是这个）
+    let found: boolean = false;
+    for (let mask = 0; mask < (1 << N); mask++) {
+      const b: boolean[] = this.on.slice();
+      const taps: number[] = [];
+      // 第一行按 mask 点
+      for (let c = 0; c < N; c++) {
+        if ((mask & (1 << c)) !== 0) {
+          this.flip(b, c);
+          taps.push(c);
+        }
+      }
+      // 之后逐行追赶：上一行哪盏亮着，就在下一行同一列点它
+      for (let r = 1; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          if (b[(r - 1) * N + c]) {
+            this.flip(b, r * N + c);
+            taps.push(r * N + c);
+          }
+        }
+      }
+      let allOff: boolean = true;
+      for (let i = 0; i < CELLS; i++) {
+        if (b[i]) {
+          allOff = false;
+          break;
+        }
+      }
+      if (allOff && (!found || taps.length < best.length)) {
+        best = taps;
+        found = true;
+      }
+    }
+    return best;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const sol: number[] = this.solveTaps();
+    if (sol.length === 0) {
+      return Hint.none('none');            // 已经全灭 / 无解（不该发生）
+    }
+    const first: number = sol[0];
+    const r: number = Math.floor(first / N) + 1;
+    const c: number = (first % N) + 1;
+    return Hint.make([first],
+      TG2('试试点第 {0} 行第 {1} 列（这条路共 {2} 手）', String(r), String(c), String(sol.length)),
+      TG2('Try row {0}, column {1} ({2} taps in this line)', String(r), String(c), String(sol.length)),
+      t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintIdx = r.cells[0];
+      this.tip = r.zh;
+      setTimeout(() => { this.hintIdx = -1; }, 4500);
+      return;
+    }
+    this.hintIdx = -1;
+    this.tip = TG('这一步算不出来（盘面可能已经无解），重开一局吧');
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -239,6 +324,15 @@ export struct GLightsOut {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
 
+      Button(TG('提示'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.theme.ink)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
+        .height(Cell.of(40))
+        .onClick(() => {
+          this.askHint();
+        })
       Text(this.tip)
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
