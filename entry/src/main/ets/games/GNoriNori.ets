@@ -216,8 +216,43 @@ export struct GNoriNori {
           blackCell = k;
         }
       }
+      if (blackN === 0) {
+        // ★ 2026-10-24 补：某区**一个黑格都还没有**，且只剩 2 个空格
+        //   ⇒ 那 2 格必须都涂黑（每区恰好 2 个）。
+        //   这一条能让提示在开局就有用，不必等到"已有 1 黑"那种局面。
+        let freeN: number = 0;
+        let f1: number = -1;
+        let f2: number = -1;
+        for (let k = 0; k < total; k++) {
+          if (this.regions[k] === rid) {
+            if (this.blacks[k] === 1) {
+              freeN = 99;              // 已经有黑格，交给下面那条规则
+              break;
+            }
+            if (f1 < 0) {
+              f1 = k;
+            } else if (f2 < 0) {
+              f2 = k;
+            }
+            freeN++;
+          }
+        }
+        // ★ 2026-10-24 再补：这一格自己不能已经贴着 2 个黑格
+        //   （否则涂上后它的邻居数会 >1，违反规则；单测 6 例）
+        if (freeN === 2 && f1 >= 0 && f2 >= 0
+            && this.blackNbrs(this.blacks, f1) <= 1) {
+          const rr0: number = Math.floor(f1 / n) + 1;
+          const cc0: number = (f1 % n) + 1;
+          return Hint.make([f1],
+            TG2('第 {0} 行第 {1} 列必须涂黑 —— 这个区只剩两格了，两格都要黑',
+              String(rr0), String(cc0)),
+            TG2('Row {0}, column {1} must be black — this region has only two cells left',
+              String(rr0), String(cc0)), t0);
+        }
+        continue;
+      }
       if (blackN !== 1 || blackCell < 0) {
-        continue;                      // 0 个或已满 2 个都不推
+        continue;                      // 已满 2 个不推
       }
       // ★ 2026-10-24 补：这个黑格自己必须**还没有黑邻居**。
       //   若它已有一个（可能是跨区的）黑邻居，再给它加一个相邻黑格
