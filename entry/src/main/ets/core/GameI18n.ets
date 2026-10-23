@@ -23,6 +23,9 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 倒计时数学：一步命中 */
+  "一步就中：{0} {1} {2} = {3}": { "en": "One move wins: {0} {1} {2} = {3}", "ja": "一手で的中：{0} {1} {2} = {3}", "ko": "한 번에 명중: {0} {1} {2} = {3}", "es": "Un movimiento gana: {0} {1} {2} = {3}", "fr": "Un coup gagnant : {0} {1} {2} = {3}", "de": "Ein Zug genügt: {0} {1} {2} = {3}", "pt": "Um movimento vence: {0} {1} {2} = {3}", "ru": "Один ход решает: {0} {1} {2} = {3}", "it": "Una mossa vince: {0} {1} {2} = {3}", "ar": "حركة واحدة تكفي: {0} {1} {2} = {3}" },
+
   /** ★★ 2026-10-23 第二期：倒计时数学提示 */
   "先算 {0} {1} {2} = {3}，再继续": { "en": "First do {0} {1} {2} = {3}, then keep going", "ja": "まず {0} {1} {2} = {3}、それから続ける", "ko": "먼저 {0} {1} {2} = {3}, 그다음 계속", "es": "Primero {0} {1} {2} = {3}, luego sigue", "fr": "D'abord {0} {1} {2} = {3}, puis continue", "de": "Zuerst {0} {1} {2} = {3}, dann weiter", "pt": "Primeiro {0} {1} {2} = {3}, depois continue", "ru": "Сначала {0} {1} {2} = {3}, затем дальше", "it": "Prima {0} {1} {2} = {3}, poi continua", "ar": "أولًا {0} {1} {2} = {3} ثم تابع" },
   /** ★★ 2026-10-23 第二期：算术链提示 */

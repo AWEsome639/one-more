@@ -193,6 +193,34 @@ export struct GCountdownMath {
     if (vals.length < 2) {
       return Hint.none('none');
     }
+    // ★ 2026-10-24 加：先找"一步命中"。
+    //   DFS 返回的是任意一条路径，可能是绕远的
+    //   （真机实测：2,8,1,1 目标 7，它给了 2+1=3，其实 8-1=7 一步就中）
+    //   ⇒ 先扫一遍有没有一步解，有就直接报它。
+    {
+      const signs0: string[] = ['+', '-', 'x', '/'];
+      for (let p = 0; p < vals.length; p++) {
+        for (let q = 0; q < vals.length; q++) {
+          if (p === q) {
+            continue;
+          }
+          for (let si = 0; si < signs0.length; si++) {
+            const r0: number = combine(vals[p], vals[q], signs0[si]);
+            if (r0 <= 0 || r0 > 9999) {
+              continue;
+            }
+            if (r0 === this.round.target) {
+              const a0: number = vals[p];
+              const b0: number = vals[q];
+              const sg0: string = signs0[si];
+              return Hint.make([],
+                TG4('一步就中：{0} {1} {2} = {3}', String(a0), sg0, String(b0), String(r0)),
+                TG4('One move wins: {0} {1} {2} = {3}', String(a0), sg0, String(b0), String(r0)), t0);
+            }
+          }
+        }
+      }
+    }
     const out: number[] = [];
     const ok: boolean = this.dfsFirst(vals, idx, this.round.target, true, out);
     if (!ok || out.length < 4) {
