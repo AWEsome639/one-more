@@ -10,6 +10,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -346,6 +348,77 @@ export struct GTapa {
     return true;
   }
 
+
+  /**
+   * ★ 2026-10-23 第二期：塔帕提示
+   *
+   * 规则：带数字的格子，其 8 邻域里黑格连成的段长要正好等于那些数字。
+   * 局部规则（与明灯同型）：
+   *   「已黑邻居数 + 还能涂黑的未定邻居数」正好等于线索之和
+   *   ⇒ 那些未定邻居**必须全部涂黑**。
+   *
+   * ⚠️ 这款的 cells 只有 0（未定/白）和 1（黑），没有单独的白标记，
+   *    所以只能推「必须黑」，不能推「必须白」。宁可少给。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    for (let i = 0; i < n * n; i++) {
+      const runs: number[] = this.clueRuns[i];
+      if (runs.length === 0) {
+        continue;
+      }
+      let need: number = 0;
+      for (let k = 0; k < runs.length; k++) {
+        need += runs[k];
+      }
+      const r: number = Math.floor(i / n);
+      const c: number = i % n;
+      let have: number = 0;
+      let free: number = 0;
+      let freeIdx: number = -1;
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          if (dr === 0 && dc === 0) {
+            continue;
+          }
+          const rr: number = r + dr;
+          const cc: number = c + dc;
+          if (rr < 0 || rr >= n || cc < 0 || cc >= n) {
+            continue;
+          }
+          const j: number = rr * n + cc;
+          if (this.clueRuns[j].length > 0) {
+            continue;                      // 数字格不计入
+          }
+          if (this.cells[j] === 1) {
+            have++;
+          } else {
+            free++;
+            freeIdx = j;
+          }
+        }
+      }
+      if (have + free !== need || free === 0 || freeIdx < 0) {
+        continue;
+      }
+      const rr2: number = Math.floor(freeIdx / n) + 1;
+      const cc2: number = (freeIdx % n) + 1;
+      return Hint.make([freeIdx],
+        TG2('第 {0} 行第 {1} 列必须涂黑（旁边那个数字还差 {2} 格）',
+          String(rr2), String(cc2), String(need - have)),
+        TG2('Row {0}, column {1} must be black (that clue still needs {2})',
+          String(rr2), String(cc2), String(need - have)), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格必须涂黑'));
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -473,6 +546,16 @@ export struct GTapa {
           : this.theme.inkSoft)
         .width('100%')
 
+      Button(TG('提示'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.theme.ink)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
+        .width(64)
+        .height(44)
+        .onClick(() => {
+          this.askHint();
+        })
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
