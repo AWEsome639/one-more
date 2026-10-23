@@ -23,6 +23,12 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：数壹提示 */
+  "第 {0} 行第 {1} 列必须涂黑": { "en": "Row {0}, column {1} must be shaded", "ja": "{0}行{1}列は必ず塗りつぶす", "ko": "{0}행 {1}열은 반드시 검게 칠해야 해요", "es": "La fila {0}, columna {1} debe sombrearse", "fr": "Ligne {0}, colonne {1} doit être noircie", "de": "Zeile {0}, Spalte {1} muss geschwärzt werden", "pt": "Linha {0}, coluna {1} deve ser sombreada", "ru": "Строка {0}, столбец {1} — обязательно закрасить", "it": "Riga {0}, colonna {1} va annerita", "ar": "الصف {0} والعمود {1} يجب تظليله" },
+  /** ★★ 2026-10-23 第二期：数壹提示 */
+  "第 {0} 行第 {1} 列必须留白": { "en": "Row {0}, column {1} must stay white", "ja": "{0}行{1}列は白のまま", "ko": "{0}행 {1}열은 흰색으로 남겨야 해요", "es": "La fila {0}, columna {1} debe quedar blanca", "fr": "Ligne {0}, colonne {1} doit rester blanche", "de": "Zeile {0}, Spalte {1} muss weiß bleiben", "pt": "Linha {0}, coluna {1} deve ficar branca", "ru": "Строка {0}, столбец {1} — оставить белым", "it": "Riga {0}, colonna {1} deve restare bianca", "ar": "الصف {0} والعمود {1} يجب أن يبقى أبيض" },
+  /** ★★ 2026-10-23 第二期：数壹提示 */
+  "这一步从规则推不出来，得先涂一个试试": { "en": "No logical step from the rules here — try shading one cell", "ja": "この一手は規則だけでは導けない。どこかを塗ってみて", "ko": "이 수는 규칙만으로는 알 수 없어요. 한 칸을 칠해 보세요", "es": "Con las reglas no se deduce este paso: sombrea una casilla", "fr": "Pas d étape logique ici — noircis une case pour voir", "de": "Kein logischer Schritt — schwärze versuchsweise ein Feld", "pt": "Sem passo lógico pelas regras — sombreie uma célula", "ru": "Логикой из правил не выводится — закрасьте клетку", "it": "Nessun passo logico — annerisci una casella", "ar": "لا خطوة منطقية من القواعد — ظلّل مربعًا" },
   /** ★★ 2026-10-23 第二期：数楼提示 */
   "这一步从线索推不出来，得试一个数看看": { "en": "No logical step from the clues here — try a number and see", "ja": "この一手は手がかりからは導けない。数字を試してみて", "ko": "이 수는 단서만으로는 알 수 없어요. 숫자를 하나 시험해 보세요", "es": "Con las pistas no se deduce este paso: prueba un número", "fr": "Pas d étape logique ici — essaie un nombre", "de": "Kein logischer Schritt — probier eine Zahl", "pt": "Sem passo lógico pelas pistas — tente um número", "ru": "Логикой из подсказок не выводится — попробуйте число", "it": "Nessun passo logico — prova un numero", "ar": "لا خطوة منطقية من الأدلة — جرّب رقمًا" },
 

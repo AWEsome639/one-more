@@ -11,7 +11,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -221,6 +223,9 @@ export struct GHitori {
   @State private over: boolean = false;
   @State private won: boolean = false;
   @State private pressed: number = -1;
+  /** ★ 提示说的话（空 = 没提示） */
+  @State private hintMsg: string = '';
+  @State private hintIdx: number = -1;
 
   private startAt: number = 0;
 
@@ -359,6 +364,134 @@ export struct GHitori {
     return this.whiteLinked() ? n : n + 1;
   }
 
+
+  /**
+   * ★ 2026-10-23 第二期：数壹提示
+   *
+   * 数壹有三条规则：① 每行每列剩下的（白）数字不能重复
+   *                ② 黑格不能相邻
+   *                ③ 白格要连成一片
+   * ①② 是**逐行可判**的 ⇒ 可以用数织/数楼那套：
+   *   枚举这一行所有"哪些格涂黑"的组合（2^6 = 64），
+   *   只留满足 ①② 且与玩家当前标记不矛盾的，
+   *   再求交集 —— 在所有候选里都一样的格，就是确定的。
+   *
+   * ⚠️ 规则③（连通性）是全盘性质，这里**没有**纳入枚举；
+   *    只用 ①② 推出来的结论仍然是**正确**的（只是可能少推一些）。
+   *    宁可少给，不给错。
+   *
+   * 都给不出 ⇒ Hint.none()（数壹开局常常确实没有确定步）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    for (let horiz = 1; horiz >= 0; horiz--) {
+      for (let k = 0; k < N; k++) {
+        // 这一行的数字与玩家当前的涂黑状态
+        const vals: number[] = [];
+        const marks: number[] = [];      // 0 未定 / 1 已黑 / 2 已白
+        for (let i = 0; i < N; i++) {
+          const idx: number = horiz === 1 ? k * N + i : i * N + k;
+          vals.push(this.vals[idx]);
+          marks.push(this.shade[idx] ? 1 : 0);
+        }
+        let acc: number[] = [];          // 按位累积：1 = 所有候选都黑，0 = 都白，-1 = 不一致
+        let cnt: number = 0;
+        const total: number = 1 << N;
+        for (let mask = 0; mask < total; mask++) {
+          // ② 黑格不能相邻
+          let ok: boolean = true;
+          for (let i = 0; i < N; i++) {
+            const isBlack: boolean = ((mask >> i) & 1) === 1;
+            if (isBlack && i + 1 < N && ((mask >> (i + 1)) & 1) === 1) {
+              ok = false;
+              break;
+            }
+            // 与玩家标记不矛盾（玩家标白的不能黑，标黑的必须黑）
+            if (marks[i] === 0 && isBlack) {
+              // 玩家还没标，允许
+            } else if (marks[i] === 1 && !isBlack) {
+              ok = false;
+              break;
+            }
+          }
+          if (!ok) {
+            continue;
+          }
+          // ① 白格的数字不能重复
+          const seen: number[] = new Array<number>(10).fill(0);
+          for (let i = 0; i < N; i++) {
+            if (((mask >> i) & 1) === 1) {
+              continue;
+            }
+            const v: number = vals[i];
+            if (v <= 0) {
+              ok = false;
+              break;
+            }
+            if (seen[v] === 1) {
+              ok = false;
+              break;
+            }
+            seen[v] = 1;
+          }
+          if (!ok) {
+            continue;
+          }
+          if (cnt === 0) {
+            acc = [];
+            for (let i = 0; i < N; i++) {
+              acc.push(((mask >> i) & 1) === 1 ? 1 : 0);
+            }
+          } else {
+            for (let i = 0; i < N; i++) {
+              const cur: number = ((mask >> i) & 1) === 1 ? 1 : 0;
+              if (acc[i] !== cur) {
+                acc[i] = -1;
+              }
+            }
+          }
+          cnt++;
+        }
+        if (cnt <= 1) {
+          continue;
+        }
+        for (let i = 0; i < N; i++) {
+          if (acc[i] < 0) {
+            continue;
+          }
+          const wantBlack: boolean = acc[i] === 1;
+          if (this.shade[horiz === 1 ? k * N + i : i * N + k] === wantBlack) {
+            continue;
+          }
+          const idx: number = horiz === 1 ? k * N + i : i * N + k;
+          const r: number = horiz === 1 ? k + 1 : i + 1;
+          const c: number = horiz === 1 ? i + 1 : k + 1;
+          if (wantBlack) {
+            return Hint.make([idx], TG2('第 {0} 行第 {1} 列必须涂黑', String(r), String(c)),
+              TG2('Row {0}, column {1} must be shaded', String(r), String(c)), t0);
+          }
+          return Hint.make([idx], TG2('第 {0} 行第 {1} 列必须留白', String(r), String(c)),
+            TG2('Row {0}, column {1} must stay white', String(r), String(c)), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintIdx = r.cells[0];
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintIdx = -1; this.hintMsg = ''; }, 4500);
+      return;
+    }
+    this.hintIdx = -1;
+    this.hintMsg = TG('这一步从规则推不出来，得先涂一个试试');
+    setTimeout(() => { this.hintMsg = ''; }, 4500);
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -483,6 +616,16 @@ export struct GHitori {
           .layoutWeight(1)
           .height(Cell.of(44))
           .enabled(false)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
@@ -498,7 +641,7 @@ export struct GHitori {
       }
       .width('100%')
 
-      Text(TG('涂黑的格子仍显示数字；每行每列剩下的数字不能重复，白格要连成一片'))
+      Text(this.hintMsg.length > 0 ? this.hintMsg : TG('涂黑的格子仍显示数字；每行每列剩下的数字不能重复，白格要连成一片'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
     }
