@@ -23,6 +23,9 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：数楼提示 */
+  "这一步从线索推不出来，得试一个数看看": { "en": "No logical step from the clues here — try a number and see", "ja": "この一手は手がかりからは導けない。数字を試してみて", "ko": "이 수는 단서만으로는 알 수 없어요. 숫자를 하나 시험해 보세요", "es": "Con las pistas no se deduce este paso: prueba un número", "fr": "Pas d étape logique ici — essaie un nombre", "de": "Kein logischer Schritt — probier eine Zahl", "pt": "Sem passo lógico pelas pistas — tente um número", "ru": "Логикой из подсказок не выводится — попробуйте число", "it": "Nessun passo logico — prova un numero", "ar": "لا خطوة منطقية من الأدلة — جرّب رقمًا" },
+
   /** ★★ 2026-10-23 第二期：二进制提示两句 */
   "第 {0} 行第 {1} 列一定是 {2}": { "en": "Row {0}, column {1} must be {2}", "ja": "{0}行{1}列は必ず{2}", "ko": "{0}행 {1}열은 반드시 {2}", "es": "La fila {0}, columna {1} debe ser {2}", "fr": "Ligne {0}, colonne {1} doit être {2}", "de": "Zeile {0}, Spalte {1} muss {2} sein", "pt": "Linha {0}, coluna {1} deve ser {2}", "ru": "Строка {0}, столбец {1} — обязательно {2}", "it": "Riga {0}, colonna {1} deve essere {2}", "ar": "الصف {0} والعمود {1} يجب أن يكون {2}" },
   /** ★★ 2026-10-23 第二期：二进制提示两句 */

@@ -9,7 +9,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -61,6 +63,9 @@ export struct GSkyscrapers {
 
   @State clues: number[] = [];
   @State grid: number[] = [];      // 0 = 空格
+  /** ★ 2026-10-23 第二期：提示说的话（空 = 没提示） */
+  @State hintMsg: string = '';
+  @State hintIdx: number = -1;
   @State pick: number = 1;
   @State errors: number = 0;
   @State over: boolean = false;
@@ -199,6 +204,137 @@ export struct GSkyscrapers {
       }
     }
     return true;
+  }
+
+
+  /** 视野数：给一条线（长度 N），从前往后看能看见几栋楼 */
+  private sightOf(line: number[]): number {
+    let mx: number = 0;
+    let n: number = 0;
+    for (let k = 0; k < line.length; k++) {
+      if (line[k] > mx) {
+        mx = line[k];
+        n++;
+      }
+    }
+    return n;
+  }
+
+  /** 生成 1..N 的全部排列（N=4 时 24 个） */
+  private allPerms(): number[][] {
+    const out: number[][] = [];
+    const cur: number[] = [];
+    const used: boolean[] = new Array<boolean>(N + 1).fill(false);
+    const rec = (): void => {
+      if (cur.length === N) {
+        out.push(cur.slice());
+        return;
+      }
+      for (let v = 1; v <= N; v++) {
+        if (used[v]) {
+          continue;
+        }
+        used[v] = true;
+        cur.push(v);
+        rec();
+        cur.pop();
+        used[v] = false;
+      }
+    };
+    rec();
+    return out;
+  }
+
+  /**
+   * ★ 2026-10-23 第二期：数楼提示
+   *
+   * 规则：每行每列是 1..N 的一个排列，且两端线索 = 从那一端看过去的视野数。
+   * ⇒ 可以逐行/逐列做「枚举所有符合线索与已填数字的排列，再求交集」：
+   *    某格在所有候选里都相同的，就是确定的。
+   *   N=4 时每行只有 24 个排列，毫秒级。
+   *
+   * ⚠️ 判断依据只用「线索 + 玩家已填」，不看题目答案。
+   * 全部推不出 ⇒ Hint.none()（数楼确实有需要猜的局面）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const perms: number[][] = this.allPerms();
+    for (let horiz = 1; horiz >= 0; horiz--) {
+      for (let k = 0; k < N; k++) {
+        const marks: number[] = [];
+        for (let i = 0; i < N; i++) {
+          marks.push(horiz === 1 ? this.grid[k * N + i] : this.grid[i * N + k]);
+        }
+        const cA: number = horiz === 1 ? this.clues[N * 3 + k] : this.clues[k];
+        const cB: number = horiz === 1 ? this.clues[N + k] : this.clues[N * 2 + k];
+        let acc: number[] = [];
+        let cnt: number = 0;
+        for (let pi = 0; pi < perms.length; pi++) {
+          const cand: number[] = perms[pi];
+          // 与线索比
+          if (this.sightOf(cand) !== cA) {
+            continue;
+          }
+          const rev: number[] = [];
+          for (let i = N - 1; i >= 0; i--) {
+            rev.push(cand[i]);
+          }
+          if (this.sightOf(rev) !== cB) {
+            continue;
+          }
+          // 与玩家已填比
+          let ok: boolean = true;
+          for (let i = 0; i < N; i++) {
+            if (marks[i] !== 0 && marks[i] !== cand[i]) {
+              ok = false;
+              break;
+            }
+          }
+          if (!ok) {
+            continue;
+          }
+          if (cnt === 0) {
+            acc = cand.slice();
+          } else {
+            for (let i = 0; i < N; i++) {
+              if (acc[i] !== cand[i]) {
+                acc[i] = -1;
+              }
+            }
+          }
+          cnt++;
+        }
+        if (cnt <= 1) {
+          continue;
+        }
+        for (let i = 0; i < N; i++) {
+          if (acc[i] < 0 || marks[i] === acc[i]) {
+            continue;
+          }
+          const idx: number = horiz === 1 ? k * N + i : i * N + k;
+          const r: number = horiz === 1 ? k + 1 : i + 1;
+          const c: number = horiz === 1 ? i + 1 : k + 1;
+          return Hint.make([idx],
+            TG2('第 {0} 行第 {1} 列一定是 {2}', String(r), String(c), String(acc[i])),
+            TG2('Row {0}, column {1} must be {2}', String(r), String(c), String(acc[i])), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintIdx = r.cells[0];
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintIdx = -1; this.hintMsg = ''; }, 4500);
+      return;
+    }
+    this.hintIdx = -1;
+    this.hintMsg = TG('这一步从线索推不出来，得试一个数看看');
+    setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
   private tap(i: number): void {
@@ -386,10 +522,20 @@ export struct GSkyscrapers {
       Row({ space: Space.md }) {
         Text(this.over
           ? (this.won ? '楼数全对 🎉 得分 ' + String(this.score) : '错手太多，本局失败')
-          : '先选数字，再点格子；同一个数字点两次即清空')
+          : (this.hintMsg.length > 0 ? this.hintMsg : '先选数字，再点格子；同一个数字点两次即清空'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
