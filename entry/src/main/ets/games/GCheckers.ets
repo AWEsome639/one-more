@@ -225,7 +225,14 @@ function aiBest(board: number[], size: number, level: number, onlyFrom: number):
     if (ms.length === 1) {
       return ms[0];                     // 只有一步，不用想
     }
-    const depth: number = level <= 0 ? 1 : (level >= 2 ? 6 : 4);
+    // ★★★ 2026-10-23：困难档由深 6 提到深 8 —— **不是拍脑袋，是打出来的**
+    //   量过：深 6 的搜索只要 8.4 ms（Node），12 万节点预算只用了 5 千
+    //   于是让深 6 与深 8 自对弈 24 局（两侧轮换抵消先手）：
+    //     深 8 胜 12 ｜ 深 6 胜 0 ｜ 平 12
+    //   ⇒ 深 8 从不输给深 6，加深是稳赚的
+    //   ⚠️ 24 局里 12 平说明双方都能避免被吃 —— 评测函数缺"推进"以外的长期目标，
+    //      这是已知弱点，不在这轮解决（记在台账里）
+    const depth: number = level <= 0 ? 1 : (level >= 2 ? 8 : 4);
     const budget: number[] = [level >= 2 ? 120000 : 30000];
     let best: Move = ms[0];
     let bestSc: number = -WIN_SCORE * 2;
