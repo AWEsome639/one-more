@@ -11,7 +11,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -83,6 +85,8 @@ export struct GShikaku {
   @State over: boolean = false;
   @State won: boolean = false;
   @State score: number = 0;
+  /** ★ 提示说的话 */
+  @State private hintMsg: string = '';
 
   private seq: number = 0;
   private startAt: number = 0;
@@ -123,6 +127,104 @@ export struct GShikaku {
     }
     this.owner = own;
     this.covered -= removed;
+  }
+
+
+  /**
+   * ★ 2026-10-23 第二期：数方提示
+   *
+   * 每个线索格必须被一个面积 = 线索值、且只含它一个线索的矩形覆盖。
+   * ⇒ 对每个线索格，枚举所有「含它、面积对上、不压已有矩形、不含别的线索」的矩形；
+   *    如果**只有一种放法**，那个矩形就是确定的，提示直接报它的两个角。
+   * 一条都找不到 ⇒ Hint.none()。
+   *
+   * ⚠️ 只判"这个线索只有一个合法框"，不做全局搜索：
+   *    多个线索互相约束出来的推理不在这一版范围内（宁可少给）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    for (let k = 0; k < n * n; k++) {
+      const want: number = this.clues[k];
+      if (want <= 0 || this.owner[k] !== 0) {
+        continue;                       // 没线索 / 已经被圈进去了
+      }
+      const cr: number = Math.floor(k / n);
+      const cc: number = k % n;
+      let found: number = 0;
+      let aR: number = 0;
+      let aC: number = 0;
+      let bR: number = 0;
+      let bC: number = 0;
+      // 枚举高 h 与宽 w，使 h*w == want
+      for (let h = 1; h <= want; h++) {
+        if (want % h !== 0) {
+          continue;
+        }
+        const w: number = want / h;
+        if (h > n || w > n) {
+          continue;
+        }
+        // 矩形左上角 (r0,c0) 必须让 cr/cc 落在里面
+        for (let r0 = cr - h + 1; r0 <= cr; r0++) {
+          for (let c0 = cc - w + 1; c0 <= cc; c0++) {
+            const r1: number = r0 + h - 1;
+            const c1: number = c0 + w - 1;
+            if (r0 < 0 || c0 < 0 || r1 >= n || c1 >= n) {
+              continue;
+            }
+            let ok: boolean = true;
+            let clueCnt: number = 0;
+            for (let r = r0; r <= r1 && ok; r++) {
+              for (let c = c0; c <= c1; c++) {
+                const idx: number = r * n + c;
+                if (this.owner[idx] !== 0) {
+                  ok = false;
+                  break;
+                }
+                if (this.clues[idx] > 0) {
+                  clueCnt++;
+                }
+              }
+            }
+            if (!ok || clueCnt !== 1) {
+              continue;
+            }
+            found++;
+            aR = r0; aC = c0; bR = r1; bC = c1;
+            if (found > 1) {
+              break;
+            }
+          }
+          if (found > 1) {
+            break;
+          }
+        }
+        if (found > 1) {
+          break;
+        }
+      }
+      if (found === 1) {
+        return Hint.make([aR * n + aC, bR * n + bC],
+          TG4('这里只有一个框法：从第 {0} 行第 {1} 列拖到第 {2} 行第 {3} 列',
+            String(aR + 1), String(aC + 1), String(bR + 1), String(bC + 1)),
+          TG4('Only one rectangle fits: from row {0}, column {1} to row {2}, column {3}',
+            String(aR + 1), String(aC + 1), String(bR + 1), String(bC + 1)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok) {
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintMsg = ''; }, 5000);
+      return;
+    }
+    this.hintMsg = TG('这一步看不出哪块是唯一的，先圈几个简单的');
+    setTimeout(() => { this.hintMsg = ''; }, 5000);
   }
 
   private tap(i: number): void {
@@ -288,12 +390,22 @@ export struct GShikaku {
       .borderRadius(Radius.lg)
 
       Row({ space: Space.md }) {
-        Text(this.over
+        Text(this.hintMsg.length > 0 ? this.hintMsg : (this.over
           ? (this.won ? '整盘切好 🎉 得分 ' + String(this.score) : '错手太多，本局失败')
-          : '点两格圈矩形：面积要等于里面的数字')
+          : '点两格圈矩形：面积要等于里面的数字'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint).animation({ duration: Motion.fast, curve: Motion.snap() })
           .layoutWeight(1)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

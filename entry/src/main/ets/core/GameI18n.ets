@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：数方提示 */
+  "这里只有一个框法：从第 {0} 行第 {1} 列拖到第 {2} 行第 {3} 列": { "en": "Only one rectangle fits: from row {0}, column {1} to row {2}, column {3}", "ja": "ここしか枠が作れない：{0}行{1}列から{2}行{3}列へ", "ko": "여기만 가능해요: {0}행 {1}열에서 {2}행 {3}열까지", "es": "Solo cabe un rectángulo: de fila {0}, columna {1} a fila {2}, columna {3}", "fr": "Un seul rectangle possible : de la ligne {0}, colonne {1} à la ligne {2}, colonne {3}", "de": "Nur ein Rechteck passt: von Zeile {0}, Spalte {1} bis Zeile {2}, Spalte {3}", "pt": "Só cabe um retângulo: da linha {0}, coluna {1} até linha {2}, coluna {3}", "ru": "Подходит только один прямоугольник: от строки {0}, столбца {1} до строки {2}, столбца {3}", "it": "C entra solo un rettangolo: da riga {0}, colonna {1} a riga {2}, colonna {3}", "ar": "يناسب مستطيل واحد فقط: من الصف {0} والعمود {1} إلى الصف {2} والعمود {3}" },
+  /** ★★ 2026-10-23 第二期：数方提示 */
+  "这一步看不出哪块是唯一的，先圈几个简单的": { "en": "No uniquely-forced rectangle right now — circle a few easy ones first", "ja": "今は一意に決まる枠がない。簡単なところから囲んで", "ko": "지금은 확정된 사각형이 없어요. 쉬운 것부터 그려 보세요", "es": "Ahora no hay rectángulo forzado: empieza por los fáciles", "fr": "Aucun rectangle forcé pour l instant — commence par les plus simples", "de": "Gerade kein erzwungenes Rechteck — nimm erst die einfachen", "pt": "Agora nenhum retângulo é forçado — comece pelos fáceis", "ru": "Сейчас нет однозначного прямоугольника — начните с простых", "it": "Nessun rettangolo forzato ora — inizia dai più semplici", "ar": "لا يوجد مستطيل محدد الآن — ابدأ بالأسهل" },
   /** ★★ 2026-10-23 第二期：字母数独提示 */
   "第 {0} 行第 {1} 列填 {2}": { "en": "Row {0}, column {1}: fill {2}", "ja": "{0}行{1}列に {2} を入れる", "ko": "{0}행 {1}열에 {2}을(를) 넣으세요", "es": "Fila {0}, columna {1}: pon {2}", "fr": "Ligne {0}, colonne {1} : mets {2}", "de": "Zeile {0}, Spalte {1}: {2} eintragen", "pt": "Linha {0}, coluna {1}: coloque {2}", "ru": "Строка {0}, столбец {1}: впишите {2}", "it": "Riga {0}, colonna {1}: inserisci {2}", "ar": "الصف {0} والعمود {1}: اكتب {2}" },
   /** ★★ 2026-10-23 第二期：字母数独提示 */
@@ -9796,6 +9800,29 @@ export function TG2(tpl: string, p0?: number | string, p1?: number | string, p2?
   }
   if (p2 !== undefined) {
     out = out.replace('{2}', `${p2}`);
+  }
+  return out;
+}
+
+/**
+ * ★ 2026-10-23：四个占位符的版本。
+ *   TG2 只支持到 {2}，数方的提示需要同时报「起行/起列/终行/终列」四个数。
+ *   仍然走同一套 TG(tpl) 查表 —— 模板本身进字典，只是替换多两次。
+ */
+export function TG4(tpl: string, p0?: number | string, p1?: number | string,
+                    p2?: number | string, p3?: number | string): string {
+  let out: string = TG(tpl);
+  if (p0 !== undefined) {
+    out = out.replace('{0}', `${p0}`);
+  }
+  if (p1 !== undefined) {
+    out = out.replace('{1}', `${p1}`);
+  }
+  if (p2 !== undefined) {
+    out = out.replace('{2}', `${p2}`);
+  }
+  if (p3 !== undefined) {
+    out = out.replace('{3}', `${p3}`);
   }
   return out;
 }
