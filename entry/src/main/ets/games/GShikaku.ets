@@ -66,7 +66,26 @@ export struct GShikaku {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4]，上面已一并改成按尺寸生成
-  @State private diffTotal: number = GameDiff.sizeNow(5);
+  /**
+   * ★ 2026-10-23 修「尺寸陷阱」第 18 个：
+   *   CLUE_LIB 是手工画的 5×5 = 25 格，但 diffTotal = sizeNow(5)（4/5/7）
+   *   ⇒ 简单档只取前 16 项、困难档 25..48 是 undefined（线索全丢）
+   *   修法：棋盘固定 5×5，难度改到**容错次数**上。
+   */
+  @State private diffTotal: number = 5;
+  /** 本局的容错次数：简单 6 / 普通 3 / 困难 2 */
+  @State private errMax: number = GShikaku.errNow();
+
+  private static errNow(): number {
+    const d: number = GameDiff.now();
+    if (d === 0) {
+      return 6;
+    }
+    if (d === 2) {
+      return 2;
+    }
+    return 3;
+  }
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
   private rowIdx(): number[] {
@@ -98,7 +117,7 @@ export struct GShikaku {
   }
 
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(5);
+    this.errMax = GShikaku.errNow();
     this.reset();
   }
 
@@ -268,7 +287,7 @@ export struct GShikaku {
     }
     if (clueCnt !== 1 || clueVal !== area) {
       this.errors++;
-      if (this.errors >= ERR_MAX) {
+      if (this.errors >= this.errMax) {
         this.over = true;
         this.won = false;
         this.score = 0;
@@ -331,7 +350,7 @@ export struct GShikaku {
         .shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('错手'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.errors) + '/' + String(ERR_MAX)))
+        Text((String(this.errors) + '/' + String(this.errMax)))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
