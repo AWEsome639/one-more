@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：二进制提示两句 */
+  "第 {0} 行第 {1} 列一定是 {2}": { "en": "Row {0}, column {1} must be {2}", "ja": "{0}行{1}列は必ず{2}", "ko": "{0}행 {1}열은 반드시 {2}", "es": "La fila {0}, columna {1} debe ser {2}", "fr": "Ligne {0}, colonne {1} doit être {2}", "de": "Zeile {0}, Spalte {1} muss {2} sein", "pt": "Linha {0}, coluna {1} deve ser {2}", "ru": "Строка {0}, столбец {1} — обязательно {2}", "it": "Riga {0}, colonna {1} deve essere {2}", "ar": "الصف {0} والعمود {1} يجب أن يكون {2}" },
+  /** ★★ 2026-10-23 第二期：二进制提示两句 */
+  "这一步纯靠规则推不出来，得试着填一格看看": { "en": "No logical step from the rules here — try filling a cell and see", "ja": "この一手は規則だけでは導けない。どこかを試しに埋めてみて", "ko": "이 수는 규칙만으로는 알 수 없어요. 한 칸을 시험 삼아 채워 보세요", "es": "Con las reglas no se deduce este paso: prueba a rellenar una casilla", "fr": "Pas d étape logique ici — essaie de remplir une case", "de": "Kein logischer Schritt — füll versuchsweise ein Feld", "pt": "Sem passo lógico pelas regras — tente preencher uma célula", "ru": "Логикой из правил не выводится — попробуйте заполнить клетку", "it": "Nessun passo logico — prova a riempire una casella", "ar": "لا خطوة منطقية من القواعد — جرّب ملء مربع" },
   /** ★★ 2026-10-23 第二期：数织提示三句 */
   "第 {0} 行第 {1} 列一定涂黑": { "en": "Row {0}, column {1} must be filled", "ja": "{0}行{1}列は必ず塗る", "ko": "{0}행 {1}열은 반드시 칠해야 해요", "es": "La fila {0}, columna {1} debe rellenarse", "fr": "Ligne {0}, colonne {1} doit être remplie", "de": "Zeile {0}, Spalte {1} muss gefüllt werden", "pt": "Linha {0}, coluna {1} deve ser preenchida", "ru": "Строка {0}, столбец {1} — обязательно закрасить", "it": "Riga {0}, colonna {1} va riempita", "ar": "الصف {0} والعمود {1} يجب تلوينه" },
   /** ★★ 2026-10-23 第二期：数织提示三句 */

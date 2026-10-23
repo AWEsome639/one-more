@@ -13,7 +13,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+// ★★★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -49,11 +51,20 @@ function shuffled(n: number): number[] {
   return a;
 }
 
-/** 一行（或一列）是否还没违规：连续三连 + 0/1 数量上限 */
-function lineOk(vals: number[]): boolean {
+/**
+ * 一行（或一列）是否还没违规：连续三连 + 0/1 数量上限
+ *
+ * ★★★ 2026-10-23 修 bug：原来这里写死了模块常量 N（=6）与 HALF（=3），
+ *   但难度会改棋盘边长（简单 4 / 普通 6 / 困难 8）：
+ *     · 简单 4×4：循环读到 vals[4]、vals[5] 是 undefined ⇒ 计入 zeros
+ *       ⇒ zeros 恒 > HALF ⇒ **lineOk 永远 false ⇒ 简单档根本不可能通关**
+ *     · 困难 8×8：只看前 6 格，第 7、8 格完全不校验 ⇒ 通关判定漏判
+ *   ⇒ 改成接受 size 参数。这个 bug 是难度改造留下的回归。
+ */
+function lineOk(vals: number[], n: number): boolean {
   let ones: number = 0;
   let zeros: number = 0;
-  for (let i = 0; i < N; i++) {
+  for (let i = 0; i < n; i++) {
     const v: number = vals[i];
     if (v === EMPTY) {
       continue;
@@ -72,39 +83,40 @@ function lineOk(vals: number[]): boolean {
       }
     }
   }
-  return ones <= HALF && zeros <= HALF;
+  const half: number = Math.floor(n / 2);
+  return ones <= half && zeros <= half;
 }
 
 /** idx 处放 v 是否合法（不改动 grid） */
-function fits(grid: number[], idx: number, v: number): boolean {
-  const r: number = Math.floor(idx / N);
-  const c: number = idx % N;
+function fits(grid: number[], idx: number, v: number, n: number): boolean {
+  const r: number = Math.floor(idx / n);
+  const c: number = idx % n;
   const old: number = grid[idx];
   grid[idx] = v;
   const row: number[] = [];
   const col: number[] = [];
-  for (let i = 0; i < N; i++) {
-    row.push(grid[r * N + i]);
-    col.push(grid[i * N + c]);
+  for (let i = 0; i < n; i++) {
+    row.push(grid[r * n + i]);
+    col.push(grid[i * n + c]);
   }
-  const ok: boolean = lineOk(row) && lineOk(col);
+  const ok: boolean = lineOk(row, n) && lineOk(col, n);
   grid[idx] = old;
   return ok;
 }
 
-function fill(grid: number[], pos: number): boolean {
-  if (pos === CELLS) {
+function fill(grid: number[], pos: number, n: number): boolean {
+  if (pos === n * n) {
     return true;
   }
   if (grid[pos] !== EMPTY) {
-    return fill(grid, pos + 1);
+    return fill(grid, pos + 1, n);
   }
   const order: number[] = Math.random() < 0.5 ? [0, 1] : [1, 0];
   for (let k = 0; k < order.length; k++) {
     const v: number = order[k];
-    if (fits(grid, pos, v)) {
+    if (fits(grid, pos, v, n)) {
       grid[pos] = v;
-      if (fill(grid, pos + 1)) {
+      if (fill(grid, pos + 1, n)) {
         return true;
       }
       grid[pos] = EMPTY;
@@ -129,7 +141,7 @@ function count(grid: number[], limit: number, size: number): number {
   }
   let total: number = 0;
   for (let v = 0; v <= 1; v++) {
-    if (fits(grid, pos, v)) {
+    if (fits(grid, pos, v, size)) {
       grid[pos] = v;
       total = total + count(grid, limit - total, size);
       grid[pos] = EMPTY;
@@ -141,13 +153,13 @@ function count(grid: number[], limit: number, size: number): number {
   return total;
 }
 
-function makePuzzle(): Puzzle {
+function makePuzzle(size: number): Puzzle {
   const answer: number[] = new Array<number>(MAX_CELLS).fill(EMPTY);
-  fill(answer, 0);
+  fill(answer, 0, size);
   const quiz: number[] = answer.slice();
-  const order: number[] = shuffled(CELLS);
+  const order: number[] = shuffled(size * size);
   let removed: number = 0;
-  const need: number = CELLS - GIVENS;
+  const need: number = size * size - GIVENS;
   for (let k = 0; k < order.length; k++) {
     if (removed >= need) {
       break;
@@ -156,7 +168,7 @@ function makePuzzle(): Puzzle {
     const keep: number = quiz[p];
     quiz[p] = EMPTY;
     const probe: number[] = quiz.slice();
-    if (count(probe, 2, N) !== 1) {
+    if (count(probe, 2, size) !== 1) {
       quiz[p] = keep;
     } else {
       removed++;
@@ -190,6 +202,10 @@ export struct GBinaryPuzzle {
   @State private seconds: number = 0;
   @State private status: string = '';
   @State private done: boolean = false;
+  /** ★ 第二期：提示说的话（空 = 没提示） */
+  @State private hintMsg: string = '';
+  /** 提示指向的格子（-1 = 无） */
+  @State private hintIdx: number = -1;
 
   private startAt: number = 0;
   private timer: number = -1;
@@ -211,7 +227,7 @@ export struct GBinaryPuzzle {
 
   private reset(): void {
     this.stopTimer();
-    const p: Puzzle = makePuzzle();
+    const p: Puzzle = makePuzzle(this.diffTotal);
     const cells: number[] = p.quiz.slice();
     const fixed: boolean[] = [];
     for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
@@ -265,7 +281,112 @@ export struct GBinaryPuzzle {
     }
     const probe: number[] = this.cells.slice();
     probe[i] = EMPTY;
-    return !fits(probe, i, v);
+    return !fits(probe, i, v, this.diffTotal);
+  }
+
+
+  /**
+   * ★★★ 2026-10-23 第二期：二进制（Takuzu）提示
+   *
+   * 规则只有两条（见文件里的 lineOk）：每行列 0/1 数量相等、不能三连。
+   * ⇒ 这是**逐行可判**的，所以能用和数织同一套技术：
+   *    枚举这一行的所有合法排列（2^n，n ≤ 8 时最多 256 个），
+   *    只保留与玩家已填内容不矛盾的，
+   *    再求交集 —— 在所有候选里都一样的格，就是确定的。
+   *
+   * ⚠️ 判断依据只用「规则 + 玩家已填」，**不看题目答案**。
+   *    这跟扫雷、数织是同一条底线。
+   *
+   * 全盘都推不出 ⇒ Hint.none()，界面直说"这一步推不出来"。
+   * （Takuzu 确实存在需要试探的局面。）
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    const half: number = Math.floor(n / 2);
+    for (let horiz = 1; horiz >= 0; horiz--) {
+      for (let k = 0; k < n; k++) {
+        // 取这一行/列的当前值
+        const marks: number[] = [];
+        for (let i = 0; i < n; i++) {
+          marks.push(horiz === 1 ? this.valAt(k * n + i) : this.valAt(i * n + k));
+        }
+        const total: number = 1 << n;
+        let acc: number[] = [];
+        let cnt: number = 0;
+        for (let mask = 0; mask < total; mask++) {
+          const bits: number[] = [];
+          let ones: number = 0;
+          let ok: boolean = true;
+          let run: number = 1;
+          for (let i = 0; i < n; i++) {
+            const v: number = (mask >> i) & 1;
+            bits.push(v);
+            if (v === 1) {
+              ones++;
+            }
+            if (marks[i] !== EMPTY && marks[i] !== v) {
+              ok = false;
+              break;
+            }
+            if (i > 0 && bits[i] === bits[i - 1]) {
+              run++;
+              if (run >= 3) {
+                ok = false;
+                break;
+              }
+            } else {
+              run = 1;
+            }
+          }
+          if (!ok || ones !== half) {
+            continue;
+          }
+          if (cnt === 0) {
+            acc = bits.slice();
+          } else {
+            for (let i = 0; i < n; i++) {
+              if (acc[i] !== bits[i]) {
+                acc[i] = -1;
+              }
+            }
+          }
+          cnt++;
+        }
+        if (cnt <= 1) {
+          continue;
+        }
+        for (let i = 0; i < n; i++) {
+          if (acc[i] < 0) {
+            continue;
+          }
+          if (marks[i] === acc[i]) {
+            continue;                     // 玩家已经填对了
+          }
+          const idx: number = horiz === 1 ? k * n + i : i * n + k;
+          const r: number = horiz === 1 ? k + 1 : i + 1;
+          const c: number = horiz === 1 ? i + 1 : k + 1;
+          return Hint.make([idx],
+            TG2('第 {0} 行第 {1} 列一定是 {2}', String(r), String(c), String(acc[i])),
+            TG2('Row {0}, column {1} must be {2}', String(r), String(c), String(acc[i])), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintIdx = r.cells[0];
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintIdx = -1; this.hintMsg = ''; }, 4500);
+      return;
+    }
+    this.hintIdx = -1;
+    this.hintMsg = TG('这一步纯靠规则推不出来，得试着填一格看看');
+    setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
   private tap(i: number): void {
@@ -286,7 +407,7 @@ export struct GBinaryPuzzle {
       this.status = TG('清空了这一格');
       return;
     }
-    if (!fits(cells, i, next)) {
+    if (!fits(cells, i, next, this.diffTotal)) {
       this.mistakes = this.mistakes + 1;
       this.status = TG('这格现在违规：三连或 0/1 数量不等');
     } else {
@@ -340,7 +461,7 @@ export struct GBinaryPuzzle {
         row.push(this.cells[r * this.diffTotal + c]);
         col.push(this.cells[c * this.diffTotal + r]);
       }
-      if (!lineOk(row) || !lineOk(col)) {
+      if (!lineOk(row, this.diffTotal) || !lineOk(col, this.diffTotal)) {
         return false;
       }
     }
@@ -446,6 +567,15 @@ export struct GBinaryPuzzle {
       .borderRadius(Radius.lg)
 
       Row({ space: Space.sm }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('清空'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
@@ -495,7 +625,7 @@ export struct GBinaryPuzzle {
       }
       .width('100%')
 
-      Text(this.status)
+      Text(this.hintMsg.length > 0 ? this.hintMsg : this.status)
         .fontSize(FontSize.sm)
         .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
         .width('100%')
