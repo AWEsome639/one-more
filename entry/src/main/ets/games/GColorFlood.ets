@@ -8,7 +8,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -64,6 +66,8 @@ export struct GColorFlood {
   @State private over: boolean = false;
   @State private won: boolean = false;
   @State private pressed: number = -1;
+  /** ★ 提示说的话 */
+  @State private hintMsg: string = '';
 
   private startAt: number = 0;
 
@@ -122,6 +126,114 @@ export struct GColorFlood {
       this.over = true;
       this.finish(false);
     }
+  }
+
+
+  /** 已连成一片的格数 */
+  private floodFilled(arr: number[]): number {
+    if (arr.length === 0) {
+      return 0;
+    }
+    const head: number = arr[0];
+    let n: number = 0;
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i] === head) {
+        n++;
+      }
+    }
+    return n;
+  }
+
+  /**
+   * 贪心跑到底：每步选能吞掉最多格的颜色，返回剩余步数（跑不完返回 999）
+   * 只用于评估首步好坏，不是最优求解器。
+   */
+  private rollout(first: number): number {
+    let cur: number[] = floodTo(this.cells, first);
+    let steps: number = 1;
+    for (let k = 0; k < 40; k++) {
+      const filled: number = this.floodFilled(cur);
+      if (filled === N * N) {
+        return steps;
+      }
+      let bestC: number = -1;
+      let bestGain: number = -1;
+      const head: number = cur[0];
+      for (let c = 0; c < COLORS.length; c++) {
+        if (c === head) {
+          continue;
+        }
+        const g: number = this.floodFilled(floodTo(cur, c));
+        if (g > bestGain) {
+          bestGain = g;
+          bestC = c;
+        }
+      }
+      if (bestC < 0 || bestGain <= filled) {
+        return 999;
+      }
+      cur = floodTo(cur, bestC);
+      steps++;
+    }
+    return 999;
+  }
+
+  /**
+   * ★ 2026-10-23 第二期：色彩洪水提示
+   *
+   * 对 6 种颜色各跑一次「贪心到底」的 rollout，选总步数最少的那种当首步。
+   * 相当于一层前瞻 + 贪心收尾，比纯贪心稳，又不用做全搜索。
+   * ⚠️ 不是最优解 —— 文案只说「大约再 N 步」，不说「最优」。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.cells.length === 0) {
+      return Hint.none('none');
+    }
+    const head: number = this.cells[0];
+    const base: number = this.floodFilled(this.cells);
+    let bestC: number = -1;
+    let bestSteps: number = 1000;
+    for (let c = 0; c < COLORS.length; c++) {
+      if (c === head) {
+        continue;
+      }
+      // ★ 2026-10-23 修：先要求**这一步真的有收益**。
+      //   原来直接比 rollout 步数，可能选中一个和当前区域根本不沾边的颜色
+      //   （换了色但一格没吞，等于白走一步）。测试抓到 20 个随机盘里 11 个这样。
+      if (this.floodFilled(floodTo(this.cells, c)) <= base) {
+        continue;
+      }
+      const st: number = this.rollout(c);
+      if (st < bestSteps) {
+        bestSteps = st;
+        bestC = c;
+      }
+    }
+    if (bestC < 0) {
+      return Hint.none('none');
+    }
+    const name: string = TG2('第 {0} 种颜色', String(bestC + 1));
+    if (bestSteps >= 999) {
+      return Hint.make([bestC],
+        TG2('试试{0}（这一路走下去可能还有更优的）', name),
+        TG2('Try {0} — there may be a better line further on', name), t0);
+    }
+    return Hint.make([bestC],
+      TG2('用{0}，大约再 {1} 步就能连成一片', name, String(bestSteps)),
+      TG2('Pick {0}: about {1} more moves to finish', name, String(bestSteps)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok) {
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintMsg = ''; }, 6000);
+      return;
+    }
+    this.hintMsg = TG('这一步算不出来，重开一局试试');
+    setTimeout(() => { this.hintMsg = ''; }, 6000);
   }
 
   private finish(solved: boolean): void {
@@ -228,6 +340,21 @@ export struct GColorFlood {
           .layoutWeight(1)
           .height(Cell.of(44))
           .enabled(false)
+        Text(this.hintMsg.length > 0 ? this.hintMsg : '')
+          .fontSize(FontSize.xs)
+          .fontColor(this.theme.inkSoft)
+          .layoutWeight(2)
+          .maxLines(2)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

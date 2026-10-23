@@ -23,6 +23,14 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：色彩洪水提示 */
+  "第 {0} 种颜色": { "en": "colour {0}", "ja": "{0}番目の色", "ko": "{0}번째 색", "es": "color {0}", "fr": "couleur {0}", "de": "Farbe {0}", "pt": "cor {0}", "ru": "цвет {0}", "it": "colore {0}", "ar": "اللون {0}" },
+  /** ★★ 2026-10-23 第二期：色彩洪水提示 */
+  "试试{0}（这一路走下去可能还有更优的）": { "en": "Try {0} (a better line may exist further on)", "ja": "{0}を試して（先にもっと良い手があるかも）", "ko": "{0}을(를) 시도해 보세요 (더 나은 길이 있을 수 있어요)", "es": "Prueba {0} (puede haber una línea mejor más adelante)", "fr": "Essaie {0} (une meilleure ligne est peut-être plus loin)", "de": "Probier {0} (evtl. gibt es später einen besseren Weg)", "pt": "Tente {0} (pode haver uma linha melhor adiante)", "ru": "Попробуйте {0} (дальше может быть лучше)", "it": "Prova {0} (forse più avanti c è di meglio)", "ar": "جرّب {0} (قد يكون هناك خط أفضل لاحقًا)" },
+  /** ★★ 2026-10-23 第二期：色彩洪水提示 */
+  "用{0}，大约再 {1} 步就能连成一片": { "en": "Pick {0}: about {1} more moves to finish", "ja": "{0}で、あと約{1}手で完成", "ko": "{0}을(를) 쓰면 약 {1}수 더면 완성", "es": "Usa {0}: unas {1} jugadas más para terminar", "fr": "Prends {0} : encore environ {1} coups", "de": "Nimm {0}: noch etwa {1} Züge", "pt": "Use {0}: cerca de {1} jogadas para terminar", "ru": "Возьмите {0}: ещё около {1} ходов", "it": "Usa {0}: circa {1} mosse ancora", "ar": "استخدم {0}: نحو {1} حركة أخرى" },
+  /** ★★ 2026-10-23 第二期：色彩洪水提示 */
+  "这一步算不出来，重开一局试试": { "en": "Can t compute this one — try restarting", "ja": "この一手は計算できない。やり直して", "ko": "이 수는 계산할 수 없어요. 다시 시작해 보세요", "es": "No se puede calcular: prueba a reiniciar", "fr": "Impossible de calculer — relance", "de": "Nicht berechenbar — starte neu", "pt": "Não dá para calcular — reinicie", "ru": "Не удаётся посчитать — начните заново", "it": "Impossibile calcolare — ricomincia", "ar": "لا يمكن الحساب — أعد البدء" },
   /** ★★ 2026-10-23 第二期：不等式提示 */
   "这一步从不等号推不出来，得先试一个数": { "en": "No inequality gives it away here — try a number", "ja": "この一手は不等号からは導けない。数字を試して", "ko": "이 수는 부등호로 알 수 없어요. 숫자를 시험해 보세요", "es": "Las desigualdades no lo deducen: prueba un número", "fr": "Les inégalités ne suffisent pas — essaie un nombre", "de": "Die Ungleichungen geben es nicht her — probier eine Zahl", "pt": "As desigualdades não bastam — tente um número", "ru": "Неравенства не дают ответа — попробуйте число", "it": "Le disuguaglianze non bastano — prova un numero", "ar": "المتباينات لا تحدد ذلك — جرّب رقمًا" },
 
