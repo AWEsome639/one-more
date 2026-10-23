@@ -290,7 +290,7 @@ export struct GDigitSwapEq {
           .fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
-          .width('100%')
+          .layoutWeight(1)
           .height(Cell.of(42))
           .onClick(() => {
             this.askHint();

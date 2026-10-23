@@ -216,7 +216,7 @@ export struct GDivisibilityDash {
           .fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
-          .width('100%')
+          .layoutWeight(1)
           .height(Cell.of(40))
           .onClick(() => {
             this.askHint();
