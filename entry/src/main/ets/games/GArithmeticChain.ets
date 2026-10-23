@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -87,6 +89,70 @@ export struct GArithmeticChain {
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(LEVELS);
      this.reset(); }
+
+
+  /**
+   * ★ 2026-10-23 第二期：算术链提示（真求解器）
+   *
+   * 4 个运算、最多 4 步 ⇒ 状态空间最多 4⁴ = 256 条路径，
+   * 直接 DFS 找一条从当前值走到目标值的路径。
+   * ⇒ 提示给出**完整的一串运算**，玩家照着点就能到。
+   *
+   * 上限：depth ≤ MAXSTEP - this.steps，节点数 ≤ 256，远远低于 500ms 预算。
+   */
+  private solvePath(v: number, depth: number, acc: Op[]): Op[] | null {
+    if (v === this.stage.target) {
+      return acc.slice();
+    }
+    if (depth <= 0) {
+      return null;
+    }
+    for (let i = 0; i < this.stage.palette.length; i++) {
+      const o: Op = this.stage.palette[i];
+      const nv: number = apply(v, o);
+      if (nv < 0 || nv > 999) {
+        continue;                   // 越界不探索，避免无意义路径
+      }
+      acc.push(o);
+      const r: Op[] | null = this.solvePath(nv, depth - 1, acc);
+      acc.pop();
+      if (r !== null) {
+        return r;
+      }
+    }
+    return null;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const left: number = MAXSTEP - this.steps;
+    if (left <= 0) {
+      return Hint.none('none');
+    }
+    const path: Op[] | null = this.solvePath(this.value, left, []);
+    if (path === null || path.length === 0) {
+      return Hint.none('none');
+    }
+    let zh: string = '';
+    let en: string = '';
+    for (let i = 0; i < path.length; i++) {
+      if (i > 0) {
+        zh += '，然后 ';
+        en += ', then ';
+      }
+      zh += path[i].label;
+      en += path[i].label;
+    }
+    return Hint.make([],
+      TG2('{0} 步就能到：{1}', String(path.length), zh),
+      TG2('{0} step(s) to the goal: {1}', String(path.length), en), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
 
   private reset(): void {
     this.startAt = Date.now();
@@ -220,6 +286,16 @@ export struct GArithmeticChain {
       }.width('100%')
 
       Row({ space: Space.sm }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(Cell.of(42))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })

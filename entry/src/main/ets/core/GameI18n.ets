@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：算术链提示 */
+  "{0} 步就能到：{1}": { "en": "{0} step(s) to the goal: {1}", "ja": "{0} 手で届く：{1}", "ko": "{0}걸음이면 도달: {1}", "es": "{0} paso(s) para llegar: {1}", "fr": "{0} pas pour arriver : {1}", "de": "{0} Schritt(e) bis zum Ziel: {1}", "pt": "{0} passo(s) até a meta: {1}", "ru": "{0} шаг(ов) до цели: {1}", "it": "{0} passi al traguardo: {1}", "ar": "{0} خطوة للوصول: {1}" },
   /** ★★ 2026-10-23 第二期：二进制码提示 */
   "第 {0} 位（值 {1}）应该是 1 —— 还没点亮": { "en": "Bit {0} (value {1}) should be ON — it is still off", "ja": "{0} ビット目（値 {1}）は 1 にすべき —— まだ点いていない", "ko": "{0}번째 비트(값 {1})는 1이어야 해요 — 아직 꺼져 있어요", "es": "El bit {0} (valor {1}) debe estar encendido — sigue apagado", "fr": "Le bit {0} (valeur {1}) doit être à 1 — il est encore éteint", "de": "Bit {0} (Wert {1}) sollte AN sein — noch aus", "pt": "O bit {0} (valor {1}) deve estar ligado — ainda apagado", "ru": "Бит {0} (значение {1}) должен быть 1 — пока выключен", "it": "Il bit {0} (valore {1}) deve essere 1 — ancora spento", "ar": "البِت {0} (القيمة {1}) يجب أن يكون 1 — ما زال مطفأ" },
   /** ★★ 2026-10-23 第二期：二进制码提示 */
