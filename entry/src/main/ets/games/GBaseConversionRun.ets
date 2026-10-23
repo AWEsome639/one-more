@@ -9,6 +9,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -53,6 +55,10 @@ export struct GBaseConversionRun {
   @State private ans: number = -1;
   @State private picked: number = -1;
   @State private quiz: string = '';
+  /** ★ 提示用：当前题的目标进制 / 数值 / 方向（true = 十进制转过去） */
+  @State private curBase: number = 2;
+  @State private curN: number = 0;
+  @State private curToBase: boolean = true;
   @State private right: number = 0;
   @State private wrong: number = 0;
   /** ★ 错误抖动 */
@@ -130,12 +136,46 @@ export struct GBaseConversionRun {
   }
 
   /** 出题：十进制 → b 进制 或 b 进制 → 十进制 */
+
+  /**
+   * ★ 2026-10-23 第二期：进制转换提示
+   *
+   * 提示**只给方法**，不给答案：
+   *   十进制 → b 进制：「不断除以 {b}，把余数从下往上写」
+   *   b 进制 → 十进制：「从右往左，每位乘 {b} 的幂再加起来」
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const b: number = this.curBase;
+    if (!(b >= 2)) {
+      return Hint.none('none');
+    }
+    if (this.curToBase) {
+      return Hint.make([],
+        TG2('十进制转 {0} 进制：把 {1} 不断除以 {0}，记下每次的余数，最后从下往上读',
+          String(b), String(this.curN)),
+        TG2('Decimal to base {0}: divide {1} by {0} repeatedly, keep the remainders, read them bottom-up',
+          String(b), String(this.curN)), t0);
+    }
+    return Hint.make([],
+      TG2('{0} 进制转十进制：从右往左，每一位乘 {0} 的幂再相加（最右是 {0}⁰）', String(b)),
+      TG2('Base {0} to decimal: from the right, multiply each digit by {0} to the power of its position',
+        String(b)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private ask(): void {
     const bi: number = Math.floor(Math.random() * BASES.length);
     const b: number = BASES[bi];
     const hi: number = b === 2 ? 127 : 255;
     const n: number = 5 + Math.floor(Math.random() * (hi - 4));
     const toBaseQ: boolean = Math.random() < 0.5;
+    this.curBase = b; this.curN = n; this.curToBase = toBaseQ;
     const pool: string[] = [];
     let correct: string = '';
     if (toBaseQ) {
@@ -344,6 +384,16 @@ export struct GBaseConversionRun {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         .width('100%')
 
+      Button(TG('提示'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.theme.ink)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
+        .width('100%')
+        .height(Cell.of(42))
+        .onClick(() => {
+          this.askHint();
+        })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
