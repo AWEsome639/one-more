@@ -9836,16 +9836,21 @@ export function TG(zh: string): string {
  *    ArkTS 的 arkts-no-untyped-obj-literals / 不支持遍历 Record 的键
  *    ⇒ 改成【位置参数】，最多 3 个（够覆盖现有 98% 的拼接）
  */
+// ★ 2026-10-23 修：占位符必须替换**全部**出现。
+//   String.replace('{0}', x) 只替换第一个 ⇒ 模板里重复的占位符会漏掉，
+//   界面上会露出 {1} 这种原始文本（真机上就出现过
+//   「试试 1 —— 它能整除 18（{1} ÷ {0} = 18）」）。
+//   ⇒ 改用 split/join，语义是"全部替换"。
 export function TG2(tpl: string, p0?: number | string, p1?: number | string, p2?: number | string): string {
   let out: string = TG(tpl);
   if (p0 !== undefined) {
-    out = out.replace('{0}', `${p0}`);
+    out = out.split('{0}').join(`${p0}`);
   }
   if (p1 !== undefined) {
-    out = out.replace('{1}', `${p1}`);
+    out = out.split('{1}').join(`${p1}`);
   }
   if (p2 !== undefined) {
-    out = out.replace('{2}', `${p2}`);
+    out = out.split('{2}').join(`${p2}`);
   }
   return out;
 }
@@ -9859,16 +9864,16 @@ export function TG4(tpl: string, p0?: number | string, p1?: number | string,
                     p2?: number | string, p3?: number | string): string {
   let out: string = TG(tpl);
   if (p0 !== undefined) {
-    out = out.replace('{0}', `${p0}`);
+    out = out.split('{0}').join(`${p0}`);
   }
   if (p1 !== undefined) {
-    out = out.replace('{1}', `${p1}`);
+    out = out.split('{1}').join(`${p1}`);
   }
   if (p2 !== undefined) {
-    out = out.replace('{2}', `${p2}`);
+    out = out.split('{2}').join(`${p2}`);
   }
   if (p3 !== undefined) {
-    out = out.replace('{3}', `${p3}`);
+    out = out.split('{3}').join(`${p3}`);
   }
   return out;
 }
