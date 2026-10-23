@@ -27,7 +27,19 @@ const MAX_N: number = 8;
 const MAX_CELLS: number = MAX_N * MAX_N;
 const HALF: number = N / 2;
 const EMPTY: number = -1;
-const GIVENS: number = 18;
+/**
+ * 题给数的比例（不是固定个数）
+ *
+ * ★★★ 2026-10-23 修 bug：原来是 `const GIVENS = 18` 写死，
+ *   但难度会改棋盘边长：
+ *     简单 4×4 = 16 格，need = 16 - 18 = **-2**
+ *       ⇒ 挖空循环第一行就 break ⇒ 一格都不挖
+ *       ⇒ **满盘全是题给数，玩家什么都填不了（游戏不可玩）**
+ *     困难 8×8 = 64 格，need = 46 ⇒ 只留 18 个数，偏狠
+ *   ⇒ 改成按比例：50% 题给数。
+ *     4×4 → 8 个，6×6 → 18 个（与原来的 18 完全一致），8×8 → 32 个。
+ */
+const GIVEN_RATIO: number = 0.5;
 const TICK_MS: number = 1000;
 const GAP: number = 2;
 const KEY_H: number = 46;
@@ -159,7 +171,10 @@ function makePuzzle(size: number): Puzzle {
   const quiz: number[] = answer.slice();
   const order: number[] = shuffled(size * size);
   let removed: number = 0;
-  const need: number = size * size - GIVENS;
+  const total: number = size * size;
+  // 题给数 = 总数的 50%（向下取整），保证至少挖掉一半
+  const givens: number = Math.floor(total * GIVEN_RATIO);
+  const need: number = total - givens;
   for (let k = 0; k < order.length; k++) {
     if (removed >= need) {
       break;
@@ -492,7 +507,7 @@ export struct GBinaryPuzzle {
         Text(true ? TG('已填') : (false ? TG('失误') : TG('用时')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
-        Text(true ? (this.filled() + '/' + CELLS)
+        Text(true ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
         : (false ? String(this.mistakes) : (this.seconds + 's')))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
@@ -507,7 +522,7 @@ export struct GBinaryPuzzle {
         Text(false ? TG('已填') : (true ? TG('失误') : TG('用时')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
-        Text(false ? (this.filled() + '/' + CELLS)
+        Text(false ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
         : (true ? String(this.mistakes) : (this.seconds + 's')))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
@@ -522,7 +537,7 @@ export struct GBinaryPuzzle {
         Text(false ? TG('已填') : (false ? TG('失误') : TG('用时')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
-        Text(false ? (this.filled() + '/' + CELLS)
+        Text(false ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
         : (false ? String(this.mistakes) : (this.seconds + 's')))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
