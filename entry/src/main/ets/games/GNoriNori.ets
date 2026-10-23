@@ -10,6 +10,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -188,6 +190,92 @@ export struct GNoriNori {
     return n;
   }
 
+  /**
+   * ★ 2026-10-23 第二期：两格方块提示
+   *
+   * 规则：每个区域恰好 2 个黑格，且两个黑格必须**相邻**（成对），
+   *       任何黑格的邻居不超过 1 个（防三连与 2×2）。
+   *
+   * 这里用一条严格成立的推理：
+   *   某区**已经有 1 个黑格** ⇒ 第二个必须与它相邻
+   *   ⇒ 若该区里"与这个黑格相邻的未涂格"只剩一个 ⇒ 那一格必须涂黑
+   *
+   * ⚠️ 只推「必须黑」，不推「必须白」（这款只有 0/1 两态，没有白标记）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    const total: number = n * n;
+    for (let rid = 1; rid <= REG_CNT; rid++) {
+      // 该区已有的黑格
+      let blackCell: number = -1;
+      let blackN: number = 0;
+      for (let k = 0; k < total; k++) {
+        if (this.blacks[k] === 1 && this.regions[k] === rid) {
+          blackN++;
+          blackCell = k;
+        }
+      }
+      if (blackN !== 1 || blackCell < 0) {
+        continue;                      // 0 个或已满 2 个都不推
+      }
+      // ★ 2026-10-24 补：这个黑格自己必须**还没有黑邻居**。
+      //   若它已有一个（可能是跨区的）黑邻居，再给它加一个相邻黑格
+      //   ⇒ 邻居数变 2 ⇒ 违反"黑格邻居不超过 1"的规则。
+      //   （单测 1221 组里抓到 142 例，是真 bug）
+      if (this.blackNbrs(this.blacks, blackCell) > 0) {
+        continue;
+      }
+      // 与它相邻、同区、且还没涂黑的格子
+      const r: number = Math.floor(blackCell / n);
+      const c: number = blackCell % n;
+      const cand: number[] = [];
+      const tryCell = (j: number): void => {
+        if (j >= 0 && j < total && this.blacks[j] === 0 && this.regions[j] === rid) {
+          cand.push(j);
+        }
+      };
+      if (r > 0) {
+        tryCell(blackCell - n);
+      }
+      if (r < n - 1) {
+        tryCell(blackCell + n);
+      }
+      if (c > 0) {
+        tryCell(blackCell - 1);
+      }
+      if (c < n - 1) {
+        tryCell(blackCell + 1);
+      }
+      if (cand.length !== 1) {
+        continue;                      // 只剩一个候选才推
+      }
+      const j2: number = cand[0];
+      // ★ 2026-10-24 再补（第三次修正）：候选格的**黑邻居必须恰好是那一个**。
+      //   它本来就与 blackCell 相邻 ⇒ 至少有 1 个黑邻居。
+      //   ⇒ 条件是「恰好 1 个」，不是「0 个」。
+      //   若为 0 ⇒ 说明它其实不与 blackCell 相邻（不该走到这里）；
+      //   若 ≥ 2 ⇒ 另有别的黑格贴着它，涂黑后邻居数会变 2 ⇒ 非法。
+      if (this.blackNbrs(this.blacks, j2) !== 1) {
+        continue;
+      }
+      const rr: number = Math.floor(j2 / n) + 1;
+      const cc: number = (j2 % n) + 1;
+      return Hint.make([j2],
+        TG2('第 {0} 行第 {1} 列必须涂黑 —— 这一区的第二个黑格只能贴着已有的那个放',
+          String(rr), String(cc)),
+        TG2('Row {0}, column {1} must be black — it is the only cell adjacent to the region\'s single black',
+          String(rr), String(cc)), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格必须涂黑'));
+  }
+
   private isWin(): boolean {
     if (this.placed !== REG_CNT * 2) {
       return false;
@@ -338,6 +426,16 @@ export struct GNoriNori {
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
