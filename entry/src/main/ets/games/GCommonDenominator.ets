@@ -10,6 +10,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -75,6 +77,41 @@ export struct GCommonDenominator {
       clearTimeout(this.nextTo);
       this.nextTo = -1;
     }
+  }
+
+
+  /**
+   * ★ 2026-10-23 第二期：通分提示
+   *
+   * 判据是「最小公分母 = b × d ÷ gcd(b, d)」。
+   * 提示**只给最大公约数**，让玩家自己乘除：
+   *   「{b} 和 {d} 的最大公约数是 G ⇒ 用 {b} × {d} ÷ G」
+   * ⇒ 给了方法的关键一步，没直接报答案。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const g: number = gcd(this.b, this.d);
+    if (g <= 0) {
+      return Hint.none('none');
+    }
+    if (g === 1) {
+      return Hint.make([],
+        TG2('{0} 和 {1} 没有公约数（最大公约数 1）⇒ 直接乘起来就是最小公分母',
+          String(this.b), String(this.d)),
+        TG2('{0} and {1} share no factor (gcd 1) — just multiply them',
+          String(this.b), String(this.d)), t0);
+    }
+    return Hint.make([],
+      TG2('{0} 和 {1} 的最大公约数是 {2} ⇒ 最小公分母 = {0} × {1} ÷ {2}',
+        String(this.b), String(this.d), String(g)),
+      TG2('gcd({0}, {1}) = {2} ⇒ the common denominator is {0} × {1} ÷ {2}',
+        String(this.b), String(this.d), String(g)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
   }
 
   private reset(): void {
@@ -252,6 +289,16 @@ export struct GCommonDenominator {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         .width('100%')
 
+      Button(TG('提示'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.theme.ink)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
+        .layoutWeight(1)
+        .height(44)
+        .onClick(() => {
+          this.askHint();
+        })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
