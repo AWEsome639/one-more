@@ -252,9 +252,28 @@ export struct GWaterSort {
     return false;
   }
 
+  /**
+   * ★★★ 2026-10-23：出题必须有时间上限，否则会 ANR。
+   *
+   * 原来最多试 60 次，每次 solvable 又要跑 16 次 × 160 步模拟。
+   * 4 色时还行，**5 色（困难档）时主线程被卡住**，
+   * 系统判定应用无响应 ⇒ 直接杀进程。
+   * 真机实测：点难度后进程消失，日志只有 onProcessDied，没有 JS 异常。
+   *
+   * 现在：
+   *   · 总预算 900 ms（远低于 ANR 阈值）
+   *   · 到点就用已经生成的最好一盘返回（保证可玩）
+   *   · 颜色越多，尝试次数上限越小
+   */
   private freshDeal(): number[] {
     let last: number[] = [];
-    for (let attempt = 0; attempt < 60; attempt++) {
+    const budgetMs: number = 900;
+    const t0: number = Date.now();
+    const maxTry: number = this.diffTotal >= 5 ? 12 : (this.diffTotal >= 4 ? 24 : 40);
+    for (let attempt = 0; attempt < maxTry; attempt++) {
+      if (Date.now() - t0 > budgetMs) {
+        break;                       // ★ 到预算就收手，绝不卡 UI 线程
+      }
       const pool: number[] = [];
       for (let c = 0; c < this.diffTotal; c++) {
         for (let k = 0; k < CAP; k++) {
