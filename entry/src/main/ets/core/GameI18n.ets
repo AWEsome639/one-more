@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：管道提示 */
+  "第 {0} 行第 {1} 列再转 {2} 次就对了": { "en": "Row {0}, column {1}: rotate {2} more time(s)", "ja": "{0}行{1}列をあと{2}回まわす", "ko": "{0}행 {1}열을 {2}번 더 돌리세요", "es": "Fila {0}, columna {1}: gira {2} vez/veces más", "fr": "Ligne {0}, colonne {1} : tourne encore {2} fois", "de": "Zeile {0}, Spalte {1}: noch {2} Mal drehen", "pt": "Linha {0}, coluna {1}: gire mais {2} vez(es)", "ru": "Строка {0}, столбец {1}: поверните ещё {2} раз", "it": "Riga {0}, colonna {1}: ruota ancora {2} volta/e", "ar": "الصف {0} والعمود {1}: أدر {2} مرة أخرى" },
+  /** ★★ 2026-10-23 第二期：管道提示 */
+  "这一步看不出来哪格是确定的，先转几个试试": { "en": "No cell is forced right now — try rotating a few", "ja": "今は確定できるマスがない。いくつか回してみて", "ko": "지금은 확정할 칸이 없어요. 몇 개 돌려 보세요", "es": "Ahora mismo no hay casilla forzada: gira algunas", "fr": "Aucune case forcée pour l instant — tourne-en quelques-unes", "de": "Gerade ist kein Feld erzwungen — dreh ein paar", "pt": "Agora nenhuma célula é forçada — gire algumas", "ru": "Сейчас ни одна клетка не определена — поверните несколько", "it": "Nessuna casella forzata ora — ruotane alcune", "ar": "لا يوجد مربع محدد الآن — أدر بعضها" },
   /** ★★ 2026-10-23 第二期：黑白和提示 */
   "这一步从线索推不出来，得先涂一个试试": { "en": "No logical step from the clues here — try filling one cell", "ja": "この一手は手がかりからは導けない。どこかを塗ってみて", "ko": "이 수는 단서만으로는 알 수 없어요. 한 칸을 칠해 보세요", "es": "Con las pistas no se deduce este paso: rellena una casilla", "fr": "Pas d étape logique ici — remplis une case pour voir", "de": "Kein logischer Schritt — füll versuchsweise ein Feld", "pt": "Sem passo lógico pelas pistas — preencha uma célula", "ru": "Логикой из подсказок не выводится — заполните клетку", "it": "Nessun passo logico — riempi una casella", "ar": "لا خطوة منطقية من الأدلة — املأ مربعًا" },
 

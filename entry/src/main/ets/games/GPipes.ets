@@ -11,7 +11,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -76,6 +78,9 @@ export struct GPipes {
   @State over: boolean = false;
   @State won: boolean = false;
   @State score: number = 0;
+  /** ★ 提示说的话 */
+  @State private hintMsg: string = '';
+  @State private hintIdx: number = -1;
 
   private startAt: number = 0;
 
@@ -171,6 +176,104 @@ export struct GPipes {
       return false;
     }
     return true;
+  }
+
+
+  /** 某个朝向（mask）下，这个格子的所有开孔是否都与邻居对接 */
+  private maskAllOk(i: number, mask: number): boolean {
+    const r: number = Math.floor(i / this.diffTotal);
+    const c: number = i % this.diffTotal;
+    if ((mask & 1) !== 0) {
+      if (!(r > 0 && (this.pipeMask[i - this.diffTotal] & 4) !== 0)) {
+        return false;
+      }
+    }
+    if ((mask & 2) !== 0) {
+      if (!(c < this.diffTotal - 1 && (this.pipeMask[i + 1] & 8) !== 0)) {
+        return false;
+      }
+    }
+    if ((mask & 4) !== 0) {
+      if (!(r < this.diffTotal - 1 && (this.pipeMask[i + this.diffTotal] & 1) !== 0)) {
+        return false;
+      }
+    }
+    if ((mask & 8) !== 0) {
+      if (!(c > 0 && (this.pipeMask[i - 1] & 2) !== 0)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * ★ 2026-10-23 第二期：管道提示
+   *
+   * 每个格子有 4 个朝向（旋转 90° 一次 = mask 循环左移一位）。
+   * 如果某个格子**只有一种朝向能让它的所有开孔都对接**，
+   * 那它就该转成那个朝向 —— 这就是一个确定步。
+   *
+   * ⚠️ 只做单格判定，不做全盘搜索：
+   *    邻居也错时，这个格子可能 0 种朝向可行 ⇒ 跳过。
+   *    **宁可少给，不给错。**
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const total: number = this.diffTotal * this.diffTotal;
+    for (let i = 0; i < total; i++) {
+      const cur: number = this.pipeMask[i];
+      // 当前已经全对接 ⇒ 不用提示这一格
+      if (this.maskAllOk(i, cur)) {
+        continue;
+      }
+      let goodMask: number = -1;
+      let goodCnt: number = 0;
+      let m: number = cur;
+      for (let k = 0; k < 4; k++) {
+        if (this.maskAllOk(i, m)) {
+          goodCnt++;
+          goodMask = m;
+        }
+        m = ((m << 1) | (m >> 3)) & 15;
+      }
+      if (goodCnt !== 1 || goodMask === cur) {
+        continue;
+      }
+      // 需要转几次
+      let turns: number = 0;
+      let t2: number = cur;
+      for (let k = 0; k < 4; k++) {
+        if (t2 === goodMask) {
+          turns = k;
+          break;
+        }
+        t2 = ((t2 << 1) | (t2 >> 3)) & 15;
+      }
+      if (turns === 0) {
+        continue;
+      }
+      const r: number = Math.floor(i / this.diffTotal) + 1;
+      const c: number = (i % this.diffTotal) + 1;
+      return Hint.make([i],
+        TG2('第 {0} 行第 {1} 列再转 {2} 次就对了', String(r), String(c), String(turns)),
+        TG2('Row {0}, column {1}: rotate {2} more time(s)', String(r), String(c), String(turns)),
+        t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintIdx = r.cells[0];
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintIdx = -1; this.hintMsg = ''; }, 4500);
+      return;
+    }
+    this.hintIdx = -1;
+    this.hintMsg = TG('这一步看不出来哪格是确定的，先转几个试试');
+    setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
   private tap(i: number): void {
@@ -288,6 +391,21 @@ export struct GPipes {
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)
+        Text(this.hintMsg.length > 0 ? this.hintMsg : '')
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .width('100%')
+          .textAlign(TextAlign.Center)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
