@@ -121,6 +121,11 @@ export struct GCountdownMath {
    */
   private dfsFirst(aVals: number[], aIdx: number[], target: number, first: boolean,
                    out: number[]): boolean {
+    // ★ 2026-10-24 修：本游戏的胜利条件是「**任意一步的结果等于目标**」
+    //   （见 tapNum 里 `if (r === this.round.target)`），
+    //   不是"把 4 个数都合完"。
+    //   ⇒ 第一版只认"合到只剩一个"，比游戏严格得多，
+    //     会漏掉更浅的解，白报"算不出来"。
     if (aVals.length === 1) {
       return aVals[0] === target;
     }
@@ -136,6 +141,19 @@ export struct GCountdownMath {
           if (r <= 0 || r > 9999) {
             continue;
           }
+          if (first && out.length === 0) {
+            out.push(aIdx[p]);
+            out.push(aIdx[q]);
+            out.push(si === 0 ? 0 : (si === 1 ? 1 : (si === 2 ? 2 : 3)));
+            out.push(r);
+          }
+          if (r === target) {
+            return true;                 // ★ 直接命中，不用把数用完
+          }
+          // ★ 2026-10-24 修：这里原来还有一段 `if (first) { out.length = 0; }`
+          //   它发生在**递归之前** ⇒ 递归一旦成功，第一步已被清空
+          //   ⇒ out.length < 4 ⇒ 白报"算不出来"。
+          //   清空只应发生在"递归失败之后"（下面那处），不能有两处。
           const nv: number[] = [];
           const ni: number[] = [];
           for (let k = 0; k < aVals.length; k++) {
@@ -149,12 +167,6 @@ export struct GCountdownMath {
               nv.push(aVals[k]);
               ni.push(aIdx[k]);
             }
-          }
-          if (first && out.length === 0) {
-            out.push(aIdx[p]);
-            out.push(aIdx[q]);
-            out.push(si === 0 ? 0 : (si === 1 ? 1 : (si === 2 ? 2 : 3)));
-            out.push(r);
           }
           if (this.dfsFirst(nv, ni, target, false, out)) {
             return true;
