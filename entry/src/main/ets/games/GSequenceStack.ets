@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -67,6 +69,37 @@ export struct GSequenceStack {
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(8);
      this.reset(); }
+
+  /**
+   * ★ 2026-10-23 第二期：数列堆叠提示
+   *
+   * 这款的规律只有两种：等差（每次 +step）与等比（每次 ×step）。
+   * ⇒ **提示只说出「是哪种规律、步长多少」，不直接给答案。**
+   *   玩家自己算一下就能得到下一项 —— 这才算「帮他想」而不是「替他想」。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const last: number = this.terms.length > 0 ? this.terms[this.terms.length - 1] : 0;
+    if (this.info.kind === 0) {
+      return Hint.make([],
+        TG2('这是等差数列：每一项比前一项多 {0}（用 {1} 加一加）',
+          String(this.info.step), String(last)),
+        TG2('Arithmetic sequence: each term adds {0} (try {1} + {0})',
+          String(this.info.step), String(last)), t0);
+    }
+    return Hint.make([],
+      TG2('这是等比数列：每一项是前一项的 {0} 倍（用 {1} 乘一乘）',
+        String(this.info.step), String(last)),
+      TG2('Geometric sequence: each term multiplies by {0} (try {1} × {0})',
+        String(this.info.step), String(last)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private reset(): void {
     this.startAt = Date.now(); this.done = false; this.built = 0; this.wrong = 0; this.score = 0; this.pick = -1;
     this.over = false; this.won = false; this.info = makeSeq(); this.terms = [this.info.start];
@@ -161,6 +194,14 @@ export struct GSequenceStack {
           })
         }, (i: number) => 'o' + i)
       }.width('100%')
+      Button(TG('提示'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.theme.ink)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
+        .width('100%').height(Cell.of(40)).onClick(() => {
+          this.askHint();
+        })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
