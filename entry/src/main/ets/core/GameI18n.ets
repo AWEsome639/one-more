@@ -23,6 +23,12 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：数独提示的三句文案 */
+  "这一格只能是 {0}": { "en": "This cell can only be {0}", "ja": "このマスは{0}しか入らない", "ko": "이 칸은 {0}만 가능", "es": "Esta casilla solo puede ser {0}", "fr": "Cette case ne peut être que {0}", "de": "Dieses Feld kann nur {0} sein", "pt": "Esta célula só pode ser {0}", "ru": "В этой клетке может быть только {0}", "it": "Questa casella può essere solo {0}", "ar": "هذا المربع يمكن أن يكون {0} فقط" },
+  /** ★★ 2026-10-23 第二期：数独提示的三句文案 */
+  "试试在这里填 {0}": { "en": "Try {0} here", "ja": "ここに {0} を入れてみて", "ko": "여기에 {0}을(를) 넣어 보세요", "es": "Prueba {0} aquí", "fr": "Essaie {0} ici", "de": "Versuch {0} hier", "pt": "Tente {0} aqui", "ru": "Попробуйте {0} здесь", "it": "Prova {0} qui", "ar": "جرّب {0} هنا" },
+  /** ★★ 2026-10-23 第二期：数独提示的三句文案 */
+  "这局暂时想不出提示，再试试别的格": { "en": "No hint for this puzzle right now — try another cell", "ja": "この問題は今ヒントが出せない。別のマスを試して", "ko": "이 문제는 지금 힌트를 낼 수 없어요. 다른 칸을 시도해 보세요", "es": "Ahora no hay pista para este puzzle: prueba otra casilla", "fr": "Pas d indice pour l instant — essaie une autre case", "de": "Gerade kein Hinweis — versuch ein anderes Feld", "pt": "Sem dica agora — tente outra célula", "ru": "Пока нет подсказки — попробуйте другую клетку", "it": "Nessun indizio ora — prova un altra casella", "ar": "لا يوجد تلميح الآن — جرّب مربعًا آخر" },
   /** ★★ 2026-10-23 第 57 轮：**尾随空格是故意的** —— 源码里与后面的片段拼接，
    *   例：TG('🎉 通关 ') + TG2("答对 {0}/{1}", ...)。
    *   这是"片段拼接"的设计债，正确解法是改成整句 TG2 模板（见多语言待修清单）。 */

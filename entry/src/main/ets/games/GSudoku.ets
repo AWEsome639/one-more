@@ -15,6 +15,8 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 路线 B：难度不再只看挖空数，用模型预测「真实难度」
 import { SudokuDifficulty } from '../ai/SudokuDifficulty';
+// ★★★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -103,7 +105,13 @@ export struct GSudoku {
   @State private filled: number = 0;          // 已填格数
   @State private seconds: number = 0;
   @State private done: boolean = false;
-  @State private holes: number = 0;           // 本局挖空数
+  @State private holes: number = 0;
+  /** ★ 第二期：提示高亮的格子（-1 = 没有提示） */
+  @State private hintCell: number = -1;
+  /** 提示要填的数字（0 = 无） */
+  @State private hintValue: number = 0;
+  /** ★ 第二期：提示说了什么（空 = 没提示） */
+  @State private hintMsg: string = '';
   /** ★ 路线 B：模型预测的本局难度（-1 = 模型不可用） */
   private aiDifficulty: number = -1;
   @State private label: string = '';          // 用的第几道底
@@ -130,6 +138,115 @@ export struct GSudoku {
   }
 
   // ────────────────────────── 生命周期 / 计时 ──────────────────────────
+
+
+  /**
+   * ★★★ 2026-10-23 第二期：数独提示
+   *
+   * 策略（从便宜到贵，够用就停）：
+   *   ① 找「唯一候选」的空格 —— 直接告诉玩家这格填几（最快、最常见）
+   *   ② 没有唯一候选 ⇒ 用回溯求解器算出完整解，揭一个空格（保证有提示，但更贵）
+   *   ③ 都失败 ⇒ Hint.none()，界面说"这局暂时想不出来"
+   *
+   * ★ 为什么先找唯一候选：那是最"人类"的一步，玩家学会了自己也能看出来。
+   *   直接揭答案（②）会让人失去推理乐趣，所以只在①失败时兜底。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    // ① 唯一候选
+    for (let i = 0; i < CELLS; i++) {
+      if (this.values[i] !== 0) {
+        continue;
+      }
+      const mask: number = this.candMask(this.values, i);
+      if (mask !== 0 && (mask & (mask - 1)) === 0) {
+        // 只有一个 bit ⇒ 唯一候选
+        let v: number = 0;
+        for (let k = 1; k <= SIDE; k++) {
+          if ((mask & (1 << k)) !== 0) {
+            v = k;
+            break;
+          }
+        }
+        if (v > 0) {
+          this.hintValue = v;
+          return Hint.make([i], TG2('这一格只能是 {0}', v),
+            TG2('This cell can only be {0}', v), t0);
+        }
+      }
+    }
+    // ② 回溯求解，揭一个空格
+    const g: number[] = this.values.slice();
+    if (this.fillSolved(g)) {
+      for (let i = 0; i < CELLS; i++) {
+        if (this.values[i] === 0 && g[i] !== 0) {
+          this.hintValue = g[i];
+          return Hint.make([i], TG2('试试在这里填 {0}', g[i]),
+            TG2('Try {0} here', g[i]), t0);
+        }
+      }
+    }
+    this.hintValue = 0;
+    return Hint.none('none');
+  }
+
+  /** 回溯填满（返回是否成功）。只用于提示，不影响玩家棋盘。 */
+  private fillSolved(g: number[]): boolean {
+    let best: number = -1;
+    let bestCnt: number = 10;
+    for (let i = 0; i < CELLS; i++) {
+      if (g[i] !== 0) {
+        continue;
+      }
+      const mask: number = this.candMask(g, i);
+      let cnt: number = 0;
+      for (let k = 1; k <= SIDE; k++) {
+        if ((mask & (1 << k)) !== 0) {
+          cnt++;
+        }
+      }
+      if (cnt === 0) {
+        return false;
+      }
+      if (cnt < bestCnt) {
+        bestCnt = cnt;
+        best = i;
+        if (cnt === 1) {
+          break;
+        }
+      }
+    }
+    if (best < 0) {
+      return true;                      // 全填满了
+    }
+    const mask: number = this.candMask(g, best);
+    for (let k = 1; k <= SIDE; k++) {
+      if ((mask & (1 << k)) !== 0) {
+        g[best] = k;
+        if (this.fillSolved(g)) {
+          return true;
+        }
+        g[best] = 0;
+      }
+    }
+    return false;
+  }
+
+  /** 玩家点「提示」 */
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintCell = r.cells[0];
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintCell = -1; this.hintMsg = ''; }, 4000);
+      return;
+    }
+    this.hintCell = -1;
+    this.hintValue = 0;
+    this.hintMsg = TG('这局暂时想不出提示，再试试别的格');
+    setTimeout(() => { this.hintMsg = ''; }, 4000);
+  }
 
   private reset(): void {
     this.stopTimer();
@@ -535,6 +652,9 @@ export struct GSudoku {
       return TG2("🎉 完成！失误 {0} 次 · 用时 {1} 秒",Digits(String(this.mistakes), this.langCode),Digits(String(this.seconds), this.langCode));
     }
     if (this.sel < 0) {
+      if (this.hintMsg.length > 0) {
+        return this.hintMsg;              // ★ 提示优先占状态栏，4 秒后自动清
+      }
       return this.label + TG2(' · 挖空 {0} 格 · 唯一解 —— 点一个空格，再点下面的数字', this.holes);
     }
     if (this.givenAt(this.sel)) {
@@ -603,6 +723,16 @@ export struct GSudoku {
         .fontColor(this.done ? Palette.emerald : this.theme.inkFaint)
 
       Row({ space: Space.md }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.md)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .height(Cell.of(44))
+          .padding({ left: Space.md, right: Space.md })
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('擦除'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
