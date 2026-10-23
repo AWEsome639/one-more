@@ -9,7 +9,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+// ★★★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -95,6 +97,10 @@ export struct GNonogram {
   @State over: boolean = false;
   @State won: boolean = false;
   @State score: number = 0;
+  /** ★ 第二期：提示指向的格子（-1 = 无） */
+  @State private hintIdx: number = -1;
+  /** ★ 提示说了什么（空 = 没提示） */
+  @State private hintMsg: string = '';
 
   private startAt: number = 0;
 
@@ -151,6 +157,139 @@ export struct GNonogram {
       }
     }
     return n;
+  }
+
+
+  /** 线索数组（与 clueOf 同一个规则，只是返回数字） */
+  private clueNums(line: number[]): number[] {
+    const out: number[] = [];
+    let run: number = 0;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === 1) {
+        run++;
+      } else if (run > 0) {
+        out.push(run);
+        run = 0;
+      }
+    }
+    if (run > 0) {
+      out.push(run);
+    }
+    return out;
+  }
+
+  /** 一条线（长度 n）的线索串是否与实际涂黑情况一致 */
+  private fitsClue(bits: number[], clues: number[]): boolean {
+    const got: number[] = this.clueNums(bits);
+    if (got.length !== clues.length) {
+      return false;
+    }
+    for (let i = 0; i < got.length; i++) {
+      if (got[i] !== clues[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /** 这个候选与玩家当前的标记是否矛盾（涂黑格必须涂黑；打叉格必须空） */
+  private fitsMarks(bits: number[], marks: number[]): boolean {
+    for (let i = 0; i < bits.length; i++) {
+      if (marks[i] === 1 && bits[i] !== 1) {
+        return false;
+      }
+      if (marks[i] === 2 && bits[i] !== 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * ★★★ 2026-10-23 第二期：数织提示（严格逻辑，不猜）
+   *
+   * 原理：一条线的线索 + 玩家已经涂/叉的格子，往往能把某些格**唯一确定**：
+   *   枚举这条线所有与线索相符、又不与玩家标记矛盾的排列；
+   *   如果某一格在**每一个排列里**状态都一样，那它就是确定的。
+   *   ⇒ 这就是人手玩数织时用的"这一格非涂不可"推理，只是算得比人快。
+   *
+   * ⚠️ 关键：**判断依据只用「线索 + 玩家标记」**，
+   *    绝不用 art 直接看答案是 0 还是 1（那是作弊）。
+   *    线索本身是从 art 算出来并显示给玩家的，所以用它是正当的。
+   *
+   * 线长 n ≤ 9 ⇒ 每行最多 2^9 = 512 个候选，18 条线也就几千次判断，毫秒级。
+   * 所有线都推不出 ⇒ Hint.none()（数织确实有需要猜的情况）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    // 先看行，再看列（行的线索在人眼里更直观）
+    for (let horiz = 1; horiz >= 0; horiz--) {
+      for (let k = 0; k < n; k++) {
+        const marks: number[] = this.line(horiz === 1, k);
+        const clues: number[] = this.clueNums(this.artLine(horiz === 1, k));
+        // 枚举 2^n 种候选
+        const total: number = 1 << n;
+        let acc: number[] = [];           // 所有合法候选的按位累积
+        let cnt: number = 0;
+        for (let mask = 0; mask < total; mask++) {
+          const bits: number[] = [];
+          for (let i = 0; i < n; i++) {
+            bits.push((mask & (1 << i)) !== 0 ? 1 : 0);
+          }
+          if (!this.fitsClue(bits, clues) || !this.fitsMarks(bits, marks)) {
+            continue;
+          }
+          if (cnt === 0) {
+            acc = bits.slice();
+          } else {
+            for (let i = 0; i < n; i++) {
+              if (acc[i] !== bits[i]) {
+                acc[i] = -1;              // 该格在不同候选里不一致
+              }
+            }
+          }
+          cnt++;
+        }
+        if (cnt <= 1) {
+          continue;                       // 没有候选或已唯一，没什么可推的
+        }
+        // 找第一个"确定但玩家还没正确标记"的格
+        for (let i = 0; i < n; i++) {
+          if (acc[i] < 0) {
+            continue;
+          }
+          const want: number = acc[i] === 1 ? 1 : 2;   // 确定涂黑 → 1；确定空 → 2（打叉）
+          if (marks[i] === want) {
+            continue;                     // 玩家已经标对了
+          }
+          const idx: number = horiz === 1 ? k * n + i : i * n + k;
+          const r: number = horiz === 1 ? k + 1 : i + 1;
+          const c: number = horiz === 1 ? i + 1 : k + 1;
+          if (want === 1) {
+            return Hint.make([idx], TG2('第 {0} 行第 {1} 列一定涂黑', String(r), String(c)),
+              TG2('Row {0}, column {1} must be filled', String(r), String(c)), t0);
+          }
+          return Hint.make([idx], TG2('第 {0} 行第 {1} 列一定留空', String(r), String(c)),
+            TG2('Row {0}, column {1} must stay empty', String(r), String(c)), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.cells.length > 0) {
+      this.hintIdx = r.cells[0];
+      this.hintMsg = r.zh;
+      setTimeout(() => { this.hintIdx = -1; this.hintMsg = ''; }, 4500);
+      return;
+    }
+    this.hintIdx = -1;
+    this.hintMsg = TG('这一步纯靠线索推不出来，只能猜一格了');
+    setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
   private tap(i: number): void {
@@ -290,10 +429,20 @@ export struct GNonogram {
       Row({ space: Space.md }) {
         Text(this.over
           ? (this.won ? '图案复原 🎉 得分 ' + String(this.score) : '错涂太多，本局失败')
-          : '点格子：涂黑 → 打叉 → 清空')
+          : (this.hintMsg.length > 0 ? this.hintMsg : '点格子：涂黑 → 打叉 → 清空'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

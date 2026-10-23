@@ -23,6 +23,12 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：数织提示三句 */
+  "第 {0} 行第 {1} 列一定涂黑": { "en": "Row {0}, column {1} must be filled", "ja": "{0}行{1}列は必ず塗る", "ko": "{0}행 {1}열은 반드시 칠해야 해요", "es": "La fila {0}, columna {1} debe rellenarse", "fr": "Ligne {0}, colonne {1} doit être remplie", "de": "Zeile {0}, Spalte {1} muss gefüllt werden", "pt": "Linha {0}, coluna {1} deve ser preenchida", "ru": "Строка {0}, столбец {1} — обязательно закрасить", "it": "Riga {0}, colonna {1} va riempita", "ar": "الصف {0} والعمود {1} يجب تلوينه" },
+  /** ★★ 2026-10-23 第二期：数织提示三句 */
+  "第 {0} 行第 {1} 列一定留空": { "en": "Row {0}, column {1} must stay empty", "ja": "{0}行{1}列は必ず空ける", "ko": "{0}행 {1}열은 반드시 비워야 해요", "es": "La fila {0}, columna {1} debe quedar vacía", "fr": "Ligne {0}, colonne {1} doit rester vide", "de": "Zeile {0}, Spalte {1} muss leer bleiben", "pt": "Linha {0}, coluna {1} deve ficar vazia", "ru": "Строка {0}, столбец {1} — обязательно пусто", "it": "Riga {0}, colonna {1} deve restare vuota", "ar": "الصف {0} والعمود {1} يجب أن يبقى فارغًا" },
+  /** ★★ 2026-10-23 第二期：数织提示三句 */
+  "这一步纯靠线索推不出来，只能猜一格了": { "en": "No logical step from the clues here — you ll have to guess one cell", "ja": "この一手は手がかりだけでは導けない。どこかを推測して", "ko": "이 수는 단서만으로는 알 수 없어요. 한 칸은 찍어야 해요", "es": "Con las pistas no se deduce este paso: tendrás que adivinar una casilla", "fr": "Pas d étape logique ici — il faut deviner une case", "de": "Kein logischer Schritt — du musst ein Feld raten", "pt": "Sem passo lógico pelas pistas — terá de adivinhar uma célula", "ru": "Логикой из подсказок не выводится — придётся угадать клетку", "it": "Nessun passo logico — devi indovinare una casella", "ar": "لا خطوة منطقية من الأدلة — عليك تخمين مربع" },
   /** ★★ 2026-10-23 第二期：灭灯提示两句 */
   "试试点第 {0} 行第 {1} 列（这条路共 {2} 手）": { "en": "Try row {0}, column {1} ({2} taps in this line)", "ja": "{0}行{1}列を試して（この手順は全{2}手）", "ko": "{0}행 {1}열을 시도해 보세요 (이 경로는 총 {2}수)", "es": "Prueba fila {0}, columna {1} ({2} toques en esta línea)", "fr": "Essaie ligne {0}, colonne {1} ({2} appuis dans cette voie)", "de": "Versuch Zeile {0}, Spalte {1} ({2} Züge in dieser Linie)", "pt": "Tente linha {0}, coluna {1} ({2} toques nesta linha)", "ru": "Попробуйте строку {0}, столбец {1} (в этой линии {2} ходов)", "it": "Prova riga {0}, colonna {1} ({2} tocchi in questa linea)", "ar": "جرّب الصف {0} والعمود {1} ({2} نقرات في هذا المسار)" },
   /** ★★ 2026-10-23 第二期：灭灯提示两句 */
