@@ -64,7 +64,31 @@ export struct GPathFinder {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：棋盘边长（原 MR=7）
-  @State private diffTotal: number = GameDiff.sizeNow(7);
+  /**
+   * ★★★ 2026-10-23 修「尺寸陷阱」第 12 个：
+   *   迷宫来自 MAZE_LIB，是**手工画的 7×7 = 49 格**，
+   *   但原来 diffTotal = sizeNow(7)（5/7/9）：
+   *     · 简单 5×5：终点 index 48 在行 6，而 move() 里 r >= diffTotal 直接 return
+   *       ⇒ **走不到终点，这一档无解**
+   *     · 困难 9×9：r 允许到 8，但 maze 只有 49 项 ⇒ 后两行读到 undefined
+   *     · move() 里行用 diffTotal、列用 MC=7 ⇒ 行列口径不一致
+   *   ⇒ 修法：**棋盘固定 7×7**，难度改到**步数预算**上
+   *     （budget 本来就是 par * 2，现在按难度给不同倍率）
+   */
+  @State private diffTotal: number = 7;
+  /** 本局的步数预算倍率：简单 2.6 / 普通 2.0 / 困难 1.5 */
+  @State private budgetMul: number = GPathFinder.mulNow();
+
+  private static mulNow(): number {
+    const d: number = GameDiff.now();
+    if (d === 0) {
+      return 2.6;
+    }
+    if (d === 2) {
+      return 1.5;
+    }
+    return 2.0;
+  }
 
   /** 0..diffTotal-1（读 @State 建依赖） */
   private rowIdx(): number[] {
@@ -94,6 +118,7 @@ export struct GPathFinder {
   }
 
   onRestart(): void {
+    this.budgetMul = GPathFinder.mulNow();
     this.diffTotal = GameDiff.sizeNow(7);
     this.reset();
   }
@@ -102,7 +127,7 @@ export struct GPathFinder {
     const k: number = Math.floor(Math.random() * MAZE_LIB.length);
     this.maze = MAZE_LIB[k].slice();
     this.par = MAZE_PAR[k];
-    this.budget = this.par * 2;
+    this.budget = Math.round(this.par * this.budgetMul);
     this.pos = 0;
     this.steps = 0;
     this.trail = new Array<number>(CELLS).fill(0);
