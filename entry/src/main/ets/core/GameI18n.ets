@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-23 第二期：考拉兹提示 */
+  "{0} 是偶数 ⇒ 用「除以 2」这条规则": { "en": "{0} is even ⇒ use the \"divide by 2\" rule", "ja": "{0} は偶数 ⇒ 「2 で割る」の規則", "ko": "{0}은 짝수 ⇒ 「2로 나누기」규칙", "es": "{0} es par ⇒ usa la regla \"dividir entre 2\"", "fr": "{0} est pair ⇒ utilise la règle \"diviser par 2\"", "de": "{0} ist gerade ⇒ Regel \"durch 2 teilen\"", "pt": "{0} é par ⇒ use a regra \"dividir por 2\"", "ru": "{0} чётное ⇒ правило «делим на 2»", "it": "{0} è pari ⇒ usa la regola \"dividi per 2\"", "ar": "{0} عدد زوجي ⇒ استخدم قاعدة «القسمة على 2»" },
+  /** ★★ 2026-10-23 第二期：考拉兹提示 */
+  "{0} 是奇数 ⇒ 用「乘 3 加 1」这条规则": { "en": "{0} is odd ⇒ use the \"×3 + 1\" rule", "ja": "{0} は奇数 ⇒ 「3 倍して 1 を足す」の規則", "ko": "{0}은 홀수 ⇒ 「3을 곱하고 1 더하기」규칙", "es": "{0} es impar ⇒ usa la regla \"×3 + 1\"", "fr": "{0} est impair ⇒ utilise la règle \"×3 + 1\"", "de": "{0} ist ungerade ⇒ Regel \"×3 + 1\"", "pt": "{0} é ímpar ⇒ use a regra \"×3 + 1\"", "ru": "{0} нечётное ⇒ правило «×3 + 1»", "it": "{0} è dispari ⇒ usa la regola \"×3 + 1\"", "ar": "{0} عدد فردي ⇒ استخدم قاعدة «×3 + 1»" },
   /** ★★ 2026-10-23 第二期：通分提示 */
   "{0} 和 {1} 没有公约数（最大公约数 1）⇒ 直接乘起来就是最小公分母": { "en": "{0} and {1} share no factor (gcd 1) — just multiply them", "ja": "{0} と {1} に公約数はない（gcd 1）—— 掛ければ最小公分母", "ko": "{0}과 {1}은 공약수가 없어요 (gcd 1) — 곱하면 최소공분모", "es": "{0} y {1} no tienen factor común (gcd 1): multiplícalos", "fr": "{0} et {1} n ont pas de facteur commun (pgcd 1) : multiplie-les", "de": "{0} und {1} haben keinen gemeinsamen Faktor (ggT 1) — einfach multiplizieren", "pt": "{0} e {1} não têm fator comum (mdc 1) — basta multiplicar", "ru": "{0} и {1} взаимно просты (НОД 1) — просто перемножьте", "it": "{0} e {1} non hanno fattori comuni (gcd 1) — moltiplicali", "ar": "{0} و {1} لا يشتركان في عامل (gcd 1) — اضربهما مباشرة" },
   /** ★★ 2026-10-23 第二期：通分提示 */

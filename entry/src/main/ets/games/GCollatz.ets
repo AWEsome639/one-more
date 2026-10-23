@@ -10,6 +10,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -89,6 +91,37 @@ export struct GCollatz {
 
   private evenNext(v: number): number {
     return v % 2 === 0 ? Math.floor(v / 2) : v * 3 + 1;
+  }
+
+
+  /**
+   * ★ 2026-10-23 第二期：考拉兹提示
+   *
+   * 规则只有两条：偶数 ÷ 2，奇数 × 3 + 1。
+   * ⇒ 提示**只说明当前这个数该走哪条规则**，不直接给答案：
+   *    「{n} 是奇数 ⇒ 用 3n+1」
+   *    玩家自己算 3×7+1 = 22 —— 这才算帮他想。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const v: number = this.n;
+    if (!(v > 0)) {
+      return Hint.none('none');
+    }
+    if (v % 2 === 0) {
+      return Hint.make([],
+        TG2('{0} 是偶数 ⇒ 用「除以 2」这条规则', String(v)),
+        TG2('{0} is even ⇒ use the "divide by 2" rule', String(v)), t0);
+    }
+    return Hint.make([],
+      TG2('{0} 是奇数 ⇒ 用「乘 3 加 1」这条规则', String(v)),
+      TG2('{0} is odd ⇒ use the "×3 + 1" rule', String(v)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
   }
 
   private ask(): void {
@@ -267,6 +300,16 @@ export struct GCollatz {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         .width('100%')
 
+      Button(TG('提示'))
+        .fontSize(FontSize.sm)
+        .fontColor(this.theme.ink)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
+        .layoutWeight(1)
+        .height(44)
+        .onClick(() => {
+          this.askHint();
+        })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : '换个数')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
