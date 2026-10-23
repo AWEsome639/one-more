@@ -48,13 +48,37 @@ export struct GTangram {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=4；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3]，上面已一并改成按尺寸生成
-  @State private diffTotal: number = GameDiff.sizeNow(4);
+  /**
+   * ★★★ 2026-10-23 修「尺寸陷阱」：
+   *   原来 diffTotal = sizeNow(4)（3/4/5），但**四套拼图布局是手工为 4×4 画的**，
+   *   shadowOf() 也固定返回 4×4 的投影：
+   *     渲染却用 this.target[r * diffTotal + c] —— 拿 diffTotal 当步长索引 4×4 的数组
+   *     ⇒ 困难档 5×5 时下标越界读到 undefined，简单档 3×3 时读错格
+   *   ⇒ 简单档与困难档都是坏的。
+   *
+   *   修法：**拼图几何就是 4×4**，棋盘固定下来；
+   *   难度改到**步数上限**上（上限越少越难）—— 这本来就是这款游戏的压力来源。
+   */
+  @State private boardN: number = 4;
+  /** 本局允许的步数上限：简单 18 / 普通 12 / 困难 8 */
+  @State private moveLimit: number = GTangram.limitNow();
+
+  private static limitNow(): number {
+    const d: number = GameDiff.now();
+    if (d === 0) {
+      return 18;
+    }
+    if (d === 2) {
+      return 8;
+    }
+    return 12;
+  }
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
   private rowIdx(): number[] {
-    const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const n2: number = this.boardN > 1 ? this.boardN : 2;
     const a2: number[] = [];
     for (let i2 = 0; i2 < n2; i2++) { a2.push(i2); }
     return a2;
@@ -65,11 +89,11 @@ export struct GTangram {
   private startAt: number = 0; private done: boolean = false;
   aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(4);
+    this.moveLimit = GTangram.limitNow();
      this.reset(); }
   private reset(): void {
     const li: number = Math.floor(Math.random() * LAYOUTS.length);
-    this.target = shadowOf(LAYOUTS[li]); this.pieceAt = new Array<number>(this.diffTotal * this.diffTotal).fill(-1);
+    this.target = shadowOf(LAYOUTS[li]); this.pieceAt = new Array<number>(this.boardN * this.boardN).fill(-1);
     this.sel = -1; this.moves = 0; this.over = false; this.won = false; this.done = false;
     this.startAt = Date.now(); this.msg = TG('选一块砖，再点棋盘落点铺上去');
   }
@@ -92,18 +116,18 @@ export struct GTangram {
     }
     if (this.sel < 0) { this.msg = TG('先在上方选一块砖'); return; }
     const cells: number[] = PIECES[this.sel].cells;
-    const r: number = Math.floor(i / this.diffTotal); const c: number = i % this.diffTotal;
+    const r: number = Math.floor(i / this.boardN); const c: number = i % this.boardN;
     for (let m = 0; m < cells.length; m++) {
-      const rr: number = r + Math.floor(cells[m] / this.diffTotal); const cc: number = c + cells[m] % this.diffTotal;
-      if (rr >= this.diffTotal || cc >= this.diffTotal || this.pieceAt[rr * this.diffTotal + cc] >= 0) { this.msg = TG('❌ 放不下：出界或压住别的砖'); return; }
+      const rr: number = r + Math.floor(cells[m] / this.boardN); const cc: number = c + cells[m] % this.boardN;
+      if (rr >= this.boardN || cc >= this.boardN || this.pieceAt[rr * this.boardN + cc] >= 0) { this.msg = TG('❌ 放不下：出界或压住别的砖'); return; }
     }
     const at: number[] = this.pieceAt.slice();
     for (let m = 0; m < cells.length; m++) {
-      at[(r + Math.floor(cells[m] / this.diffTotal)) * this.diffTotal + (c + cells[m] % this.diffTotal)] = this.sel;
+      at[(r + Math.floor(cells[m] / this.boardN)) * this.boardN + (c + cells[m] % this.boardN)] = this.sel;
     }
     this.pieceAt = at; this.sel = -1; this.moves = this.moves + 1;
     let exact: boolean = true;
-    for (let k = 0; k < this.diffTotal * this.diffTotal; k++) {
+    for (let k = 0; k < this.boardN * this.boardN; k++) {
       if ((this.target[k] === 1) !== (this.pieceAt[k] >= 0)) { exact = false; }
     }
     const now: number[] = this.scan();
@@ -111,17 +135,17 @@ export struct GTangram {
       this.over = true; this.won = true; this.msg = TG2("🎉 严丝合缝！用了 {0} 次",Digits(String(this.moves), this.langCode));
       this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
     }
-    if (this.moves >= LIMIT) {
+    if (this.moves >= this.moveLimit) {
       this.over = true; this.won = false;
       this.msg = TG2("💤 次数用尽，只铺对 {0} / {1} 格", now[0], now[1]);
       this.finish(false); return;
     }
-    this.msg = TG2("铺对 {0} / {1} 格　剩 {2} 次", now[0], now[1], (LIMIT - this.moves));
+    this.msg = TG2("铺对 {0} / {1} 格　剩 {2} 次", now[0], now[1], (this.moveLimit - this.moves));
   }
   private finish(solved: boolean): void {
     if (this.done) { return; }
     this.done = true;
-    const sc: number = solved ? 40 + (LIMIT - this.moves) * 5 : this.scan()[0] * 5;
+    const sc: number = solved ? 40 + (this.moveLimit - this.moves) * 5 : this.scan()[0] * 5;
     const r: GameResult = { gameId: 'tangram', solved: solved, score: sc, durationMs: Date.now() - this.startAt, levelReached: this.scan()[0] };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
@@ -150,9 +174,9 @@ export struct GTangram {
               Stack() {
               Text('').fontSize(FontSize.md)
               }.layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
-              .backgroundColor(this.pieceAt[(r * this.diffTotal + c)] >= 0 ? (this.target[(r * this.diffTotal + c)] === 1 ? Palette.sky : Palette.rose)
-              : (this.target[(r * this.diffTotal + c)] === 1 ? (this.theme.isDark ? '#220EA5E9' : '#330EA5E9') : this.theme.surfaceAlt))
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * this.diffTotal + c)); })
+              .backgroundColor(this.pieceAt[(r * this.boardN + c)] >= 0 ? (this.target[(r * this.boardN + c)] === 1 ? Palette.sky : Palette.rose)
+              : (this.target[(r * this.boardN + c)] === 1 ? (this.theme.isDark ? '#220EA5E9' : '#330EA5E9') : this.theme.surfaceAlt))
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * this.boardN + c)); })
             }, (c: number) => 'c' + r + '_' + c)
           }.width('100%').layoutWeight(1)
         }, (r: number) => 'r' + r)
