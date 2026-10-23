@@ -75,7 +75,32 @@ export struct GDominosa {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
-  @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
+  /**
+   * ★★★ 2026-10-23 修「尺寸陷阱」第 20 个（这一类的第一次"两种难度都不可通关"）：
+   *   棋盘固定 4×5 = 20 格 ⇒ 永远只能配成 10 对骨牌。
+   *   但 diffTotal = sizeNow(TOTAL) = 7/10/13，
+   *   而胜利条件是 `paired() === diffTotal`：
+   *     · 简单 7：盘上 20 格，配到 10 也 != 7 ⇒ **永远赢不了**
+   *     · 困难 13：最多 10 对，凑不到 13 ⇒ **永远赢不了**
+   *   ⇒ 只有普通档（正好 10）能通关。
+   *
+   *   修法：**对数固定为 TOTAL=10**（棋盘决定的），
+   *   难度改到**步数上限**上（MAX_MOVES 本来就是为此准备的）。
+   */
+  @State private diffTotal: number = TOTAL;
+  /** 本局可用步数：简单 120 / 普通 80 / 困难 56 */
+  @State private moveCap: number = GDominosa.capNow();
+
+  private static capNow(): number {
+    const d: number = GameDiff.now();
+    if (d === 0) {
+      return 120;
+    }
+    if (d === 2) {
+      return 56;
+    }
+    return 80;
+  }
   onFinish: (r: GameResult) => void = () => {};
 
   @State private vals: number[] = [];
@@ -94,7 +119,7 @@ export struct GDominosa {
   }
 
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(TOTAL);
+    this.moveCap = GDominosa.capNow();
     this.reset();
   }
 
@@ -223,7 +248,7 @@ export struct GDominosa {
       this.finish(true);
       return;
     }
-    if (this.moves >= MAX_MOVES) {
+    if (this.moves >= this.moveCap) {
       this.over = true;
       this.finish(false);
     }
