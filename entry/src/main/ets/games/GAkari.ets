@@ -14,7 +14,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -201,6 +203,8 @@ export struct GAkari {
   @State private seconds: number = 0;
   @State private status: string = '';
   @State private done: boolean = false;
+  /** ★ 提示说的话 */
+  @State private hintMsg: string = '';
 
   private startAt: number = 0;
   private timer: number = -1;
@@ -287,6 +291,76 @@ export struct GAkari {
       }
     }
     return n;
+  }
+
+
+  /**
+   * ★ 2026-10-23 第二期：明灯提示
+   *
+   * 用的是一条**严格成立的局部规则**：
+   *   对每个带数字的墙：如果「周围已放的灯数 + 周围还能放灯的空格数」正好等于这个数字，
+   *   那么那些空格**必须全部放灯**（不然数字凑不满）。
+   *
+   * ⚠️ 只说"这一格必须放灯"，不说"这一格不能放"（后者需要更复杂的推理）。
+   *    一格都推不出 ⇒ Hint.none()（明灯开局常常确实没有确定步）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    for (let i = 0; i < CELLS; i++) {
+      const want: number = this.clue[i];
+      if (!this.wall[i] || want < 0) {
+        continue;
+      }
+      const x: number = i % N;
+      const y: number = Math.floor(i / N);
+      let haveBulb: number = 0;
+      let freeCnt: number = 0;
+      let onlyIdx: number = -1;
+      // 四个方向紧邻的格（只差一位，不沿射线走）
+      const nb: number[] = [];
+      if (y > 0) { nb.push(i - N); }
+      if (y < N - 1) { nb.push(i + N); }
+      if (x > 0) { nb.push(i - 1); }
+      if (x < N - 1) { nb.push(i + 1); }
+      for (let k = 0; k < nb.length; k++) {
+        const j: number = nb[k];
+        if (this.wall[j]) {
+          continue;
+        }
+        if (this.bulbs[j] === 1) {
+          haveBulb++;
+        } else {
+          freeCnt++;
+          onlyIdx = j;
+        }
+      }
+      if (haveBulb + freeCnt !== want || freeCnt === 0) {
+        continue;
+      }
+      // freeCnt 个空格必须全部放灯 ⇒ 报第一个
+      if (onlyIdx >= 0 && canBulb(this.wall, this.bulbs, onlyIdx)) {
+        const r: number = Math.floor(onlyIdx / N) + 1;
+        const c: number = (onlyIdx % N) + 1;
+        return Hint.make([onlyIdx],
+          TG4('第 {0} 行第 {1} 列必须放灯（旁边那个 {2} 的数字还剩 {3} 个空位）',
+            String(r), String(c), String(want), String(freeCnt)),
+          TG4('Row {0}, column {1} must get a lamp (that {2} still needs {3})',
+            String(r), String(c), String(want), String(freeCnt)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok) {
+      this.status = r.zh;
+      setTimeout(() => { this.status = ''; }, 5000);
+      return;
+    }
+    this.status = TG('这一步看不出哪格必须放灯，先随便点几个试试');
+    setTimeout(() => { this.status = ''; }, 5000);
   }
 
   private tap(i: number): void {
@@ -407,6 +481,16 @@ export struct GAkari {
           .onClick(() => {
             Haptics.tap();
             this.reset();
+          })
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
           })
         Button(TG('清空灯'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
