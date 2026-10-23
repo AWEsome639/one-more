@@ -305,8 +305,12 @@ export struct GCollatz {
         .fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md)
-        .layoutWeight(1)
-        .height(44)
+        // ★ 2026-10-24 修：这两个按钮是 Column 的**直接子元素**，
+        //   不是 Row 里的兄弟。Column 里 layoutWeight 分配的是**高度**，
+        //   配上 height(44) 直接被压成 0 ⇒ 按钮渲染不出来（真机实测：dump 里根本没有它）。
+        //   ⇒ 改成 width('100%') + height，与「换个数」保持一致。
+        .width('100%')
+        .height(Cell.of(46))
         .onClick(() => {
           this.askHint();
         })
