@@ -110,7 +110,7 @@ export struct GDivisibilityDash {
     } else if (d === 5) {
       zh = TG('看末位：末位是 0 或 5 就能被 5 整除'); en = TG('Last digit 0 or 5 ⇒ divisible by 5');
     } else if (d === 6) {
-      zh = TG('同时满足两条：能被 2 整除**且**能被 3 整除'); en = TG('Both at once: divisible by 2 AND by 3');
+      zh = TG('同时满足两条：能被 2 整除，也能被 3 整除'); en = TG('Both at once: divisible by 2 AND by 3');
     } else if (d === 7) {
       zh = TG('7 没有简便规则，最快是直接除一下'); en = TG('No shortcut for 7 — just divide it');
     } else if (d === 8) {
@@ -122,7 +122,7 @@ export struct GDivisibilityDash {
     } else if (d === 11) {
       zh = TG('奇数位之和减偶数位之和，差能被 11 整除就行'); en = TG('Alternating digit sum difference divisible by 11 ⇒ yes');
     } else if (d === 12) {
-      zh = TG('同时满足两条：能被 3 整除**且**能被 4 整除'); en = TG('Both at once: divisible by 3 AND by 4');
+      zh = TG('同时满足两条：能被 3 整除，也能被 4 整除'); en = TG('Both at once: divisible by 3 AND by 4');
     } else {
       return Hint.none('none');
     }
