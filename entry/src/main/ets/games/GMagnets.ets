@@ -42,6 +42,10 @@ export struct GMagnets {
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State，按钮文字才会变 */
+
+  @State private autoId: number = -1;
+
   @State private marks: number[] = new Array<number>(CELLS).fill(0);
   @State private rowClue: number[] = new Array<number>(N).fill(0);
   @State private colClue: number[] = new Array<number>(N).fill(0);
@@ -215,6 +219,69 @@ export struct GMagnets {
     this.tip = TG2('磁铁成对 {0}/8', String(this.goodDominoes()));
   }
 
+  // ═══════════ 磁铁求解器（2026-10-24 第三期）═══════════
+  // 4×4 = 8 对磁铁，每对两种朝向 ⇒ 最多 256 种组合，DFS 秒出。
+  // 有了它：提示能兜底，代打能一路做到通关。
+
+  private magDfs(k: number, marks: number[], rowHave: number[], colHave: number[]): boolean {
+    if (k >= 2 * N) {
+      for (let r = 0; r < N; r++) {
+        if (rowHave[r] !== this.rowClue[r]) {
+          return false;
+        }
+      }
+      for (let c = 0; c < N; c++) {
+        if (colHave[c] !== this.colClue[c]) {
+          return false;
+        }
+      }
+      return true;
+    }
+    const r: number = Math.floor(k / 2);
+    const a: number = this.dominoA(r, k % 2);
+    const b: number = a + 1;
+    // 朝向一：a = ＋，b = －
+    if (rowHave[r] + 1 <= this.rowClue[r] && colHave[a % N] + 1 <= this.colClue[a % N]) {
+      marks[a] = PLUS;
+      marks[b] = MINUS;
+      rowHave[r]++;
+      colHave[a % N]++;
+      if (this.magDfs(k + 1, marks, rowHave, colHave)) {
+        return true;
+      }
+      rowHave[r]--;
+      colHave[a % N]--;
+      marks[a] = 0;
+      marks[b] = 0;
+    }
+    // 朝向二：a = －，b = ＋
+    if (rowHave[r] + 1 <= this.rowClue[r] && colHave[b % N] + 1 <= this.colClue[b % N]) {
+      marks[a] = MINUS;
+      marks[b] = PLUS;
+      rowHave[r]++;
+      colHave[b % N]++;
+      if (this.magDfs(k + 1, marks, rowHave, colHave)) {
+        return true;
+      }
+      rowHave[r]--;
+      colHave[b % N]--;
+      marks[a] = 0;
+      marks[b] = 0;
+    }
+    return false;
+  }
+
+  /** 求一个完整解；无解返回空数组 */
+  private solveMagnets(): number[] {
+    const marks: number[] = new Array<number>(CELLS).fill(0);
+    const rowHave: number[] = new Array<number>(N).fill(0);
+    const colHave: number[] = new Array<number>(N).fill(0);
+    if (!this.magDfs(0, marks, rowHave, colHave)) {
+      return [];
+    }
+    return marks;
+  }
+
   /**
    * ★ 2026-10-23 第二期：磁铁提示（计数法第 6 次复用）
    *
@@ -282,7 +349,61 @@ export struct GMagnets {
             String(rr), String(cc), String(need)), t0);
       }
     }
+    // ★ 2026-10-24 第三期：计数规则找不到时，用求解器兜底
+    const sol: number[] = this.solveMagnets();
+    if (sol.length > 0) {
+      for (let i = 0; i < CELLS; i++) {
+        if (sol[i] !== 0 && this.marks[i] !== sol[i]) {
+          const r: number = Math.floor(i / N) + 1;
+          const c: number = (i % N) + 1;
+          const want: string = sol[i] === PLUS ? '＋' : '－';
+          return Hint.make([i],
+            TG2('第 {0} 行第 {1} 列应该是 {2}（求解器算出来的完整解）',
+              String(r), String(c), want),
+            TG2('Row {0}, column {1} should be {2} (full solution)', String(r), String(c), want), t0);
+        }
+      }
+    }
     return Hint.none('none');
+  }
+
+  /**
+   * ★★ 2026-10-24 第三期：AI 代打（磁铁，一次点一格）
+   * 用求解器算出完整解，然后一格一格点到位（tap 是 空→＋→－ 循环）。
+   */
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const sol: number[] = this.solveMagnets();
+    if (sol.length === 0) {
+      return false;
+    }
+    for (let i = 0; i < CELLS; i++) {
+      if (sol[i] !== 0 && this.marks[i] !== sol[i]) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private askHint(): void {
@@ -430,6 +551,18 @@ export struct GMagnets {
           .onClick(() => {
 
             this.askHint();
+
+          })
+
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+
+          .layoutWeight(1)
+
+          .height(46)
+
+          .onClick(() => {
+
+            this.askAuto();
 
           })
 
