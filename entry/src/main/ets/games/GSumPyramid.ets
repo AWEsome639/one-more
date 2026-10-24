@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -48,6 +50,8 @@ export struct GSumPyramid {
   @State private cursor: number = 0; @State private wrong: number = 0; @State private score: number = 0;
   /** ★ 2026-10-15 得分跳动 */
   @State private scorePulse: number = 1;
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private pick: number = -1; @State private msg: string = ''; @State private over: boolean = false;
   @State private won: boolean = false;
   private sol: number[] = []; private startAt: number = 0; private done: boolean = false;
@@ -72,6 +76,36 @@ export struct GSumPyramid {
     const mates: number[] = [this.sol[idx] + 3, this.sol[idx] - 3]; this.answer = this.sol[idx];
     this.opts = shuffle(buildOpts(this.answer, mates)); this.pick = -1;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这款把正确答案存在 this.answer 里 ⇒ 每拍直接选它。
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    // ★ choose(v) 里有"和上次选的一样就跳过"的判定，所以要先清掉 pick
+    this.pick = -1;
+    this.choose(this.answer);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private choose(v: number): void {
     if (this.over || v === this.pick) { return; }
     this.pick = v; const idx: number = this.current();
@@ -169,6 +203,11 @@ export struct GSumPyramid {
           })
         }, (i: number) => 'o' + i)
       }.width('100%')
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
