@@ -14,6 +14,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -416,6 +418,8 @@ export struct GBridges {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：K 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(K);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -585,6 +589,36 @@ export struct GBridges {
   }
 
   /** 提示：照参考答案补上「第一对还差桥的岛」 */
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这款本来就有 this.sol + hint()（提示按钮调的就是它）
+  // ⇒ 代打只要反复调 hint()，直到补不动为止。
+  private autoStep(): boolean {
+    if (this.done || this.finished) {
+      return false;
+    }
+    const before: number = this.bridgesOn();
+    this.hint();
+    return !this.done && this.bridgesOn() > before;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private hint(): void {
     if (this.done || this.finished || this.sol.length === 0) {
       return;
@@ -711,6 +745,11 @@ export struct GBridges {
             Haptics.tap();
             this.hint();
           })
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          autoOn: this.autoId >= 0
+        })
         Button(TG('换一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
