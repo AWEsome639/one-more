@@ -235,6 +235,14 @@ export struct GHitoriAll {
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 出题时的完整解（涂黑方案） */
+
+  private solShade: boolean[] = [];
+
+  /** 代打计时器（-1 = 未运行）。必须 @State，按钮文字才会变 */
+
+  @State private autoId: number = -1;
+
   @State private vals: number[] = [];
   @State private shade: boolean[] = [];
   @State private moves: number = 0;
@@ -260,6 +268,8 @@ export struct GHitoriAll {
   private reset(): void {
     const g: HitoriGen = hitoriGen();
     this.vals = g.vals;
+    // ★ 2026-10-24 第三期：出题时的完整解留着，代打直接用（同数壹）
+    this.solShade = g.shade;
     this.shade = new Array<boolean>(N * N).fill(false);
     this.moves = 0;
     this.over = false;
@@ -393,6 +403,44 @@ export struct GHitoriAll {
       }
     }
     return Hint.none('none');
+  }
+
+  /**
+   * ★★ 2026-10-24 第三期：AI 代打（数壹进阶）
+   * 用出题时保留的完整解，一格一格摆到位。
+   */
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.solShade.length !== N * N) {
+      return false;
+    }
+    for (let i = 0; i < N * N; i++) {
+      if (this.shade[i] !== this.solShade[i]) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private askHint(): void {
@@ -542,6 +590,12 @@ export struct GHitoriAll {
           .height(44)
           .onClick(() => {
             this.askHint();
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askAuto();
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

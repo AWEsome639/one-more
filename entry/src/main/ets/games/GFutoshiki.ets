@@ -57,6 +57,14 @@ export struct GFutoshiki {
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 出题时的完整解 */
+
+  private solVals: number[] = [];
+
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+
+  @State private autoId: number = -1;
+
   @State private vals: number[] = [];
   @State private given: boolean[] = [];
   @State private hSign: number[] = [];   // 水平：(r,c)-(r,c+1)，1 = <，2 = >
@@ -114,6 +122,8 @@ export struct GFutoshiki {
       vv[i] = given[i] ? sol[i] : 0;
     }
     this.vals = vv;
+    // ★ 2026-10-24 第三期：出题时的完整解留着（同数壹的做法）
+    this.solVals = sol.slice();
     this.given = given;
     this.hSign = h;
     this.vSign = v;
@@ -243,6 +253,45 @@ export struct GFutoshiki {
       }
     }
     return Hint.none('none');
+  }
+
+  /**
+   * ★★ 2026-10-24 第三期：AI 代打（不等号）
+   * 用出题时保留的完整解，一格一格填到位。
+   */
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.solVals.length !== N * N) {
+      return false;
+    }
+    for (let i = 0; i < N * N; i++) {
+      if (this.vals[i] !== this.solVals[i] && !this.given[i]) {
+        this.sel = i;
+        this.put(this.solVals[i]);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private askHint(): void {
@@ -1411,6 +1460,12 @@ export struct GFutoshiki {
           .height(44)
           .onClick(() => {
             this.askHint();
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askAuto();
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
