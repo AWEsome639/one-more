@@ -5,6 +5,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 const POOL: string[] = ['🍎', '🍌', '🍇', '🍓', '🍑', '🥝'];
@@ -21,6 +23,8 @@ export struct GVisualStatisticalLearning {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
   onFinish: (r: GameResult) => void = () => {};
   @State stream: string[] = [];
@@ -88,6 +92,37 @@ export struct GVisualStatisticalLearning {
     }
     this.opts = out; this.ans = at; this.asking = true; this.note = TG('哪三个总是连着出现？');
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案就在状态里（this.ans）+ 有"已答"守卫
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.picked >= 0) {
+      return true;              // 这题答过了，等 setTimeout 进下一题
+    }
+    this.pick(this.ans);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private pick(i: number): void {
     if (this.over || !this.asking || this.picked >= 0) { return; }
     this.picked = i;
@@ -136,6 +171,11 @@ export struct GVisualStatisticalLearning {
       }
       Text(this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
         .textAlign(TextAlign.Center).width('100%')
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
