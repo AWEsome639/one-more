@@ -211,6 +211,14 @@ export struct GBinaryPuzzle {
   }
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 出题时的完整解 */
+
+  private solCells: number[] = [];
+
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+
+  @State private autoId: number = -1;
+
   @State private cells: number[] = [];
   @State private fixed: boolean[] = [];
   @State private mistakes: number = 0;
@@ -243,6 +251,8 @@ export struct GBinaryPuzzle {
   private reset(): void {
     this.stopTimer();
     const p: Puzzle = makePuzzle(this.diffTotal);
+    // ★ 2026-10-24 第三期：出题时就有完整解（p.answer），以前丢掉了
+    this.solCells = p.answer.slice();
     const cells: number[] = p.quiz.slice();
     const fixed: boolean[] = [];
     for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
@@ -388,6 +398,45 @@ export struct GBinaryPuzzle {
       }
     }
     return Hint.none('none');
+  }
+
+  /**
+   * ★★ 2026-10-24 第三期：AI 代打
+   * 用出题时保留的完整解，一格一格点到位。
+   */
+  private autoStep(): boolean {
+    if (this.done || this.finished) {
+      return false;
+    }
+    const n: number = this.diffTotal;
+    if (this.solCells.length < n * n) {
+      return false;
+    }
+    for (let i = 0; i < n * n; i++) {
+      if (this.cells[i] !== this.solCells[i] && !this.fixed[i]) {
+        this.tap(i);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private askHint(): void {
@@ -612,6 +661,12 @@ export struct GBinaryPuzzle {
             }
             this.cells = cells;
             this.status = TG('已清空你填的格子');
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askAuto();
           })
         Button(TG('换一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

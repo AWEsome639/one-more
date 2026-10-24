@@ -195,6 +195,14 @@ export struct GAlphabetSudoku {
   }
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 出题时的完整解 */
+
+  private solCells: number[] = [];
+
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+
+  @State private autoId: number = -1;
+
   @State private cells: number[] = [];
   @State private fixed: boolean[] = [];
   @State private sel: number = -1;
@@ -227,6 +235,8 @@ export struct GAlphabetSudoku {
   private reset(): void {
     this.stopTimer();
     const p: Puzzle = makePuzzle(this.diffTotal);
+    // ★ 2026-10-24 第三期：出题时的完整解留着（同数壹的做法）
+    this.solCells = p.answer.slice();
     const cells: number[] = p.quiz.slice();
     const fixed: boolean[] = [];
     for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
@@ -307,6 +317,46 @@ export struct GAlphabetSudoku {
     return Hint.none('none');
   }
 
+  /**
+   * ★★ 2026-10-24 第三期：AI 代打（字母数独）
+   * 用出题时保留的完整解：选格 → 填字母，一次一格。
+   */
+  private autoStep(): boolean {
+    if (this.done || this.finished) {
+      return false;
+    }
+    const n: number = this.diffTotal;
+    if (this.solCells.length < n * n) {
+      return false;
+    }
+    for (let i = 0; i < n * n; i++) {
+      if (this.cells[i] !== this.solCells[i] && !this.fixed[i]) {
+        this.sel = i;
+        this.put(this.solCells[i]);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
@@ -381,7 +431,13 @@ export struct GAlphabetSudoku {
   }
 
   private isWin(): boolean {
-    for (let i = 0; i < this.cells.length; i++) {
+    // ★ 2026-10-24 修真 BUG：cells 的长度是 MAX_CELLS（8×8 = 64），
+    //   但本局只用到 diffTotal² 个格子。原来的循环写到 cells.length，
+    //   于是 36~63 这些**永远为 0 的尾巴**让 isWin 永远返回 false
+    //   ⇒ 小于 8×8 的字母数独根本不可能通关。
+    //   证据：AI 代打把 6×6 填满成 36/36、零失误，游戏仍显示「填得对，继续」。
+    const n: number = this.diffTotal;
+    for (let i = 0; i < n * n; i++) {
       if (this.cells[i] === 0 || this.bad(i)) {
         return false;
       }
@@ -528,6 +584,12 @@ export struct GAlphabetSudoku {
           .onClick(() => {
             Haptics.tap();
             this.put(0);
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askAuto();
           })
         Button(TG('换一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
