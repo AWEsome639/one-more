@@ -193,6 +193,8 @@ export struct GAkari {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：容错次数（简单 12 / 普通 8 / 困难 5）
+  /** 代打计时器（-1 = 未运行）。必须 @State，按钮文字才会变 */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_WRONG);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -351,6 +353,42 @@ export struct GAkari {
     return Hint.none('none');
   }
 
+  /**
+   * ★★ 2026-10-24 第二期：AI 代打（明灯，一次放一盏灯）
+   *
+   * 直接复用 computeHint()：
+   * 它已经能算出"某格必须放灯"，这里只要把那一格放上去。
+   */
+  private autoStep(): boolean {
+    if (this.done) {
+      return false;
+    }
+    const r: HintResult = this.computeHint();
+    if (!r.ok || r.cells.length === 0) {
+      return false;
+    }
+    this.tap(r.cells[0]);
+    return !this.done;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
@@ -491,6 +529,12 @@ export struct GAkari {
           .height(44)
           .onClick(() => {
             this.askHint();
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askAuto();
           })
         Button(TG('清空灯'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

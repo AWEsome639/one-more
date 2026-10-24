@@ -47,6 +47,8 @@ export struct GTennerGrid {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=10；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State，按钮文字才会变 */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(10);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -227,6 +229,57 @@ export struct GTennerGrid {
     return Hint.none('none');
   }
 
+  /**
+   * ★★ 2026-10-24 第二期：AI 代打（十格，一次填一格）
+   * 与提示同一套判据：唯一候选法。
+   */
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const n: number = this.diffTotal;
+    for (let i = 0; i < n * n; i++) {
+      if (this.grid[i] > 0 || this.fixed[i] === 1) {
+        continue;
+      }
+      let only: number = -1;
+      let cnt: number = 0;
+      for (let d = 0; d < n; d++) {
+        if (!this.conflict(i, d)) {
+          cnt++;
+          only = d;
+          if (cnt > 1) {
+            break;
+          }
+        }
+      }
+      if (cnt === 1 && only >= 0) {
+        this.sel = i;
+        this.place(only);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
@@ -374,6 +427,17 @@ export struct GTennerGrid {
           .height(44)
           .onClick(() => {
             this.askHint();
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.cyan)
+          .borderRadius(Radius.md)
+          .width(96)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askAuto();
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
