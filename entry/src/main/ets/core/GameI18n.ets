@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 六边形数独 */
+  "第 {0} 行第 {1} 列应该填 {2}": { "en": "Row {0}, column {1} should be {2}", "ja": "{0}行{1}列は {2} を入れる", "ko": "{0}행 {1}열에는 {2}를 넣어요", "es": "Fila {0}, columna {1} debe ser {2}", "fr": "Ligne {0}, colonne {1} doit être {2}", "de": "Zeile {0}, Spalte {1} sollte {2} sein", "pt": "Linha {0}, coluna {1} deve ser {2}", "ru": "Строка {0}, столбец {1} — впишите {2}", "it": "Riga {0}, colonna {1} deve essere {2}", "ar": "الصف {0} والعمود {1} يجب أن يكون {2}" },
+  /** ★★ 2026-10-24 六边形数独 */
+  "这一局暂时给不出提示": { "en": "No hint available right now", "ja": "今はヒントを出せません", "ko": "지금은 힌트를 드릴 수 없어요", "es": "Ahora no hay pista disponible", "fr": "Pas d indice pour le moment", "de": "Gerade kein Hinweis möglich", "pt": "Sem dica no momento", "ru": "Сейчас подсказки нет", "it": "Nessun suggerimento ora", "ar": "لا تلميح متاح الآن" },
   /** ★★ 2026-10-24 磁铁求解器提示 */
   "第 {0} 行第 {1} 列应该是 {2}（求解器算出来的完整解）": { "en": "Row {0}, column {1} should be {2} (from the full solution)", "ja": "{0}行{1}列は {2} のはずです（完全解より）", "ko": "{0}행 {1}열은 {2}이어야 해요 (완전해 기준)", "es": "Fila {0}, columna {1} debe ser {2} (según la solución completa)", "fr": "Ligne {0}, colonne {1} devrait être {2} (solution complète)", "de": "Zeile {0}, Spalte {1} sollte {2} sein (aus der vollständigen Lösung)", "pt": "Linha {0}, coluna {1} deve ser {2} (da solução completa)", "ru": "Строка {0}, столбец {1} — должно быть {2} (из полного решения)", "it": "Riga {0}, colonna {1} dovrebbe essere {2} (dalla soluzione completa)", "ar": "الصف {0} والعمود {1} يجب أن يكون {2} (من الحل الكامل)" },
   /** ★★ 2026-10-24 明灯求解器提示 */

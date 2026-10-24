@@ -15,6 +15,8 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+// ★ 2026-10-24 第三期：通用提示层 + AI 代打
+import { Hint, HintResult } from '../ai/Hint';
 
 const N: number = 6;              // 6×6
 const BOX_R: number = 2;          // 宫高
@@ -200,6 +202,10 @@ export struct GSudokuHex {
   @State private sel: number = -1;
   @State private mistakes: number = 0;
   @State private seconds: number = 0;
+  /** 出题时的完整解 */
+  private solCells: number[] = [];
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private status: string = '';
   @State private done: boolean = false;
 
@@ -224,6 +230,8 @@ export struct GSudokuHex {
   private reset(): void {
     this.stopTimer();
     const p: Puzzle = makePuzzle(this.diffTotal);
+    // 出题时的完整解（以前丢掉了）
+    this.solCells = p.answer.slice();
     const cells: number[] = p.quiz.slice();
     const fixed: boolean[] = [];
     for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
@@ -281,6 +289,74 @@ export struct GSudokuHex {
     return n;
   }
 
+  // ═══════════ 提示 + 代打（2026-10-24 第三期）═══════════
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    if (this.solCells.length < n * n) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < n * n; i++) {
+      if (this.cells[i] === 0 && !this.isFixed(i) && this.solCells[i] > 0) {
+        const r: number = Math.floor(i / n) + 1;
+        const c: number = (i % n) + 1;
+        return Hint.make([i],
+          TG2('第 {0} 行第 {1} 列应该填 {2}', String(r), String(c), String(this.solCells[i])),
+          TG2('Row {0}, column {1} should be {2}', String(r), String(c), String(this.solCells[i])), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok) {
+      this.status = r.zh;
+      return;
+    }
+    this.status = TG('这一局暂时给不出提示');
+  }
+
+  /**
+   * ★★ AI 代打：用出题时保留的完整解，一格一格填。
+   */
+  private autoStep(): boolean {
+    if (this.done || this.finished) {
+      return false;
+    }
+    const n: number = this.diffTotal;
+    if (this.solCells.length < n * n) {
+      return false;
+    }
+    for (let i = 0; i < n * n; i++) {
+      if (this.cells[i] !== this.solCells[i] && !this.isFixed(i)) {
+        this.sel = i;
+        this.put(this.solCells[i]);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tapCell(i: number): void {
     if (this.done || this.finished || this.isFixed(i)) {
       return;
@@ -332,7 +408,12 @@ export struct GSudokuHex {
   }
 
   private isWin(): boolean {
-    for (let i = 0; i < this.cells.length; i++) {
+    // ★ 2026-10-24 修真 BUG（与字母数独同族）：
+    //   cells 的长度是 MAX_CELLS（8×8 = 64），但本局只用 diffTotal² 个格子。
+    //   原循环跑到 cells.length ⇒ 尾部恒为 0 的格子让 isWin 永远 false
+    //   ⇒ 小于 8×8 的局根本不可能通关。
+    const n: number = this.diffTotal;
+    for (let i = 0; i < n * n; i++) {
       if (this.cells[i] === 0 || this.bad(i)) {
         return false;
       }
@@ -469,6 +550,18 @@ export struct GSudokuHex {
           .onClick(() => {
             Haptics.tap();
             this.put(0);
+          })
+        Button(TG('提示'))
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askAuto();
           })
         Button(TG('换一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
