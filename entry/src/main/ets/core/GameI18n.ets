@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 倒水排序 */
+  "把第 {0} 管倒进第 {1} 管（这条路共 {2} 步）": { "en": "Pour tube {0} into tube {1} ({2} moves in this line)", "ja": "第{0}本を第{1}本へ（この手順で計 {2} 手）", "ko": "{0}번 관을 {1}번 관에 부어요 (이 경로 {2}수)", "es": "Vierte el tubo {0} en el {1} ({2} movimientos)", "fr": "Verse le tube {0} dans le {1} ({2} coups)", "de": "Röhre {0} in Röhre {1} gießen ({2} Züge)", "pt": "Despeje o tubo {0} no {1} ({2} jogadas)", "ru": "Перелейте пробирку {0} в {1} ({2} ходов)", "it": "Versa la provetta {0} nella {1} ({2} mosse)", "ar": "اسكب الأنبوب {0} في {1} ({2} حركات)" },
+  /** ★★ 2026-10-24 倒水排序 */
+  "这一步看不出往哪倒": { "en": "No obvious pour right now", "ja": "今はどこへ注ぐか分かりません", "ko": "지금은 어디로 부을지 모르겠어요", "es": "Ahora no hay trasvase claro", "fr": "Aucun versement évident", "de": "Gerade kein klarer Umfüllzug", "pt": "Agora nenhum trasfego claro", "ru": "Сейчас непонятно, куда переливать", "it": "Ora nessun travaso ovvio", "ar": "لا سكب واضح الآن" },
   /** ★★ 2026-10-24 六边形数独 */
   "第 {0} 行第 {1} 列应该填 {2}": { "en": "Row {0}, column {1} should be {2}", "ja": "{0}行{1}列は {2} を入れる", "ko": "{0}행 {1}열에는 {2}를 넣어요", "es": "Fila {0}, columna {1} debe ser {2}", "fr": "Ligne {0}, colonne {1} doit être {2}", "de": "Zeile {0}, Spalte {1} sollte {2} sein", "pt": "Linha {0}, coluna {1} deve ser {2}", "ru": "Строка {0}, столбец {1} — впишите {2}", "it": "Riga {0}, colonna {1} deve essere {2}", "ar": "الصف {0} والعمود {1} يجب أن يكون {2}" },
   /** ★★ 2026-10-24 六边形数独 */
