@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-25 视觉搜索 */
+  "第 {0} 行第 {1} 列": { "en": "Row {0}, column {1}", "ja": "{0}行{1}列", "ko": "{0}행 {1}열", "es": "Fila {0}, columna {1}", "fr": "Ligne {0}, colonne {1}", "de": "Zeile {0}, Spalte {1}", "pt": "Linha {0}, coluna {1}", "ru": "Строка {0}, столбец {1}", "it": "Riga {0}, colonna {1}", "ar": "الصف {0}، العمود {1}" },
+  /** ★★ 2026-10-25 视觉搜索 */
+  "这一局看不出在哪": { "en": "Not obvious where it is this round", "ja": "この局はどこか分かりません", "ko": "이번 판은 어디인지 알 수 없어요", "es": "En esta ronda no se ve dónde está", "fr": "Impossible de voir où cette manche", "de": "Diese Runde ist es nicht zu erkennen", "pt": "Nesta rodada não dá para ver onde", "ru": "В этом раунде не видно, где это", "it": "In questa manche non si vede dove sia", "ar": "لا يمكن تحديد موضعه في هذه الجولة" },
   /** ★★ 2026-10-24 帐篷与树 */
   "第 {0} 行第 {1} 列放一顶帐篷": { "en": "Put a tent at row {0}, column {1}", "ja": "{0}行{1}列にテントを置く", "ko": "{0}행 {1}열에 텐트를 놓으세요", "es": "Pon una tienda en la fila {0}, columna {1}", "fr": "Placez une tente ligne {0}, colonne {1}", "de": "Setze ein Zelt auf Zeile {0}, Spalte {1}", "pt": "Coloque uma tenda na linha {0}, coluna {1}", "ru": "Поставьте палатку в строку {0}, столбец {1}", "it": "Metti una tenda alla riga {0}, colonna {1}", "ar": "ضع خيمة في الصف {0} والعمود {1}" },
   /** ★★ 2026-10-24 帐篷与树 */
