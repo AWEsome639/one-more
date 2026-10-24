@@ -791,6 +791,16 @@ export struct GSudoku {
 
       Row({ space: Space.md }) {
         Button(TG('提示'))
+          .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.amber !== undefined ? Palette.amber : Palette.cyan)
+          .borderRadius(Radius.md)
+          .width(96)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
           .fontSize(FontSize.sm)
           .fontColor(this.theme.ink)
