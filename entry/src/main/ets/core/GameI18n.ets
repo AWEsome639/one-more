@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 黑在哪提示 */
+  "第 {0} 行第 {1} 列必须变黑 —— 旁边那个「1」只能看见自己": { "en": "Row {0}, column {1} must be black — the nearby 1 can only see itself", "ja": "{0}行{1}列は黒 —— そばの「1」は自分しか見えない", "ko": "{0}행 {1}열은 검정 — 옆의 「1」은 자기 자신만 봐요", "es": "Fila {0}, columna {1} debe ser negro: el 1 vecino solo se ve a sí mismo", "fr": "Ligne {0}, colonne {1} doit être noire : le 1 voisin ne voit que lui-même", "de": "Zeile {0}, Spalte {1} muss schwarz sein — die 1 sieht nur sich selbst", "pt": "Linha {0}, coluna {1} deve ser preta: o 1 vizinho só vê a si mesmo", "ru": "Строка {0}, столбец {1} — чёрная: соседняя 1 видит только себя", "it": "Riga {0}, colonna {1} deve essere nera: l 1 vicino vede solo sé", "ar": "الصف {0} والعمود {1} يجب أن يكون أسود — الرقم 1 المجاور يرى نفسه فقط" },
+  /** ★★ 2026-10-24 黑在哪提示 */
+  "这一步看不出哪格必须变黑": { "en": "No cell is forced to be black right now", "ja": "今は黒確定のマスがない", "ko": "지금은 검정 확정 칸이 없어요", "es": "Ahora ninguna casilla es negra forzosa", "fr": "Aucune case noire forcée", "de": "Gerade kein erzwungenes schwarzes Feld", "pt": "Agora nenhuma célula preta é forçada", "ru": "Сейчас нет однозначно чёрной клетки", "it": "Nessuna casella nera forzata", "ar": "لا خانة سوداء مؤكدة الآن" },
   /** ★★ 2026-10-24 十格提示 */
   "第 {0} 行第 {1} 列只能填 {2} —— 其它数字都会撞": { "en": "Row {0}, column {1} can only be {2} — every other digit clashes", "ja": "{0}行{1}列は {2} しか入らない —— 他はぶつかる", "ko": "{0}행 {1}열은 {2}만 가능해요 — 다른 숫자는 충돌해요", "es": "Fila {0}, columna {1} solo puede ser {2}: los demás chocan", "fr": "Ligne {0}, colonne {1} ne peut être que {2} : les autres entrent en conflit", "de": "Zeile {0}, Spalte {1} kann nur {2} sein — alle anderen kollidieren", "pt": "Linha {0}, coluna {1} só pode ser {2}: os outros colidem", "ru": "Строка {0}, столбец {1} — только {2}: остальные конфликтуют", "it": "Riga {0}, colonna {1} può essere solo {2}: gli altri confliggono", "ar": "الصف {0} والعمود {1} يمكن أن يكون {2} فقط — البقية تتعارض" },
   /** ★★ 2026-10-24 十格提示 */

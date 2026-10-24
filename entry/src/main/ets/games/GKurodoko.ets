@@ -13,6 +13,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -298,6 +300,47 @@ export struct GKurodoko {
     this.startAt = Date.now();
   }
 
+  /**
+   * ★ 2026-10-23 第二期：黑在哪（Kurodoko）提示
+   *
+   * 规则：数字 = 从该格看出去能看见的白格数（视线被黑格挡住）；
+   *       所有白格必须连通；黑格不能相邻、不能 2×2。
+   *
+   * 用一条严格成立的推理：
+   *   **数字为 1** ⇒ 只能看见它自己 ⇒ 四个邻居必须全黑
+   *
+   * ⚠️ 只推「必须黑」，不推「必须白」。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    for (let i = 0; i < CELLS; i++) {
+      if (this.clue[i] !== 1 || this.black[i]) {
+        continue;
+      }
+      const nb: number[] = this.nbrs(i);
+      for (let t = 0; t < nb.length; t++) {
+        const j: number = nb[t];
+        if (this.black[j] || this.clue[j] > 0) {
+          continue;                      // 已是黑 / 是数字格（数字格必为白）
+        }
+        const r: number = this.rowOf(j) + 1;
+        const c: number = this.colOf(j) + 1;
+        return Hint.make([j],
+          TG2('第 {0} 行第 {1} 列必须变黑 —— 旁边那个「1」只能看见自己',
+            String(r), String(c)),
+          TG2('Row {0}, column {1} must be black — the nearby "1" can only see itself',
+            String(r), String(c)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格必须变黑'));
+  }
+
   private finish(solved: boolean): void {
     if (this.finished) {
       return;
@@ -428,6 +471,26 @@ export struct GKurodoko {
       Text(TG('数字 = 从这格朝四个方向能看见的黑格数；黑格不能相邻；白格要连成一片'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
+
+      Button(TG('提示'))
+
+        .fontSize(FontSize.sm)
+
+        .fontColor(this.theme.ink)
+
+        .backgroundColor(this.theme.surfaceAlt)
+
+        .borderRadius(Radius.md)
+
+        .layoutWeight(1)
+
+        .height(44)
+
+        .onClick(() => {
+
+          this.askHint();
+
+        })
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
