@@ -269,7 +269,7 @@ export struct GWordle {
       .width('100%')
 
       Row({ space: Space.md }) {
-        Button(TG('换一题'))
+                Button(TG('换一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor(Color.White)
