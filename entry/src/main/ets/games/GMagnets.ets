@@ -411,34 +411,37 @@ export struct GMagnets {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
 
-      Button(TG('提示'))
+      Row({ space: Space.sm }) {
+        Button(TG('提示'))
 
-        .fontSize(FontSize.sm)
+          .fontSize(FontSize.sm)
 
-        .fontColor(this.theme.ink)
+          .fontColor(this.theme.ink)
 
-        .backgroundColor(this.theme.surfaceAlt)
+          .backgroundColor(this.theme.surfaceAlt)
 
-        .borderRadius(Radius.md)
+          .borderRadius(Radius.md)
 
-        .layoutWeight(1)
+          // ★ 2026-10-24 修（同一个坑第二次）：Column 的直接子元素不能用 layoutWeight 当宽度
+          .layoutWeight(1)
+          .height(46)
 
-        .height(44)
 
-        .onClick(() => {
+          .onClick(() => {
 
-          this.askHint();
+            this.askHint();
 
-        })
+          })
 
-      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .fontSize(FontSize.md)
-        .fontColor(Color.White)
-        .backgroundColor(Palette.rose)
-        .borderRadius(Radius.md)
-        .width('100%')
-        .height(Cell.of(44))
+        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.rose)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+      }
+      .layoutWeight(1)
         .onClick(() => {
           Haptics.tap();
           this.reset();
