@@ -482,7 +482,8 @@ export struct GKurodoko {
 
         .borderRadius(Radius.md)
 
-        .layoutWeight(1)
+        .width('100%')
+        .height(46)
 
         .height(44)
 
