@@ -23,6 +23,9 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 数蛇提示 */
+  "接第 {0} 行第 {1} 列（+{2}，累计 {3}）": { "en": "Extend to row {0}, column {1} (+{2}, total {3})", "ja": "{0}行{1}列につなぐ（+{2}、累計 {3}）", "ko": "{0}행 {1}열로 이어가기 (+{2}, 누적 {3})", "es": "Extiende a fila {0}, columna {1} (+{2}, total {3})", "fr": "Prolonge en ligne {0}, colonne {1} (+{2}, total {3})", "de": "Weiter zu Zeile {0}, Spalte {1} (+{2}, Summe {3})", "pt": "Estenda para linha {0}, coluna {1} (+{2}, total {3})", "ru": "Продолжите в строку {0}, столбец {1} (+{2}, сумма {3})", "it": "Estendi a riga {0}, colonna {1} (+{2}, totale {3})", "ar": "امدد إلى الصف {0} والعمود {1} (+{2}، المجموع {3})" },
+
   /** ★★ 2026-10-23 第二期：数墙提示 */
   "第 {0} 行第 {1} 列必须涂黑 —— 紧挨着的那个白区已经长满 {2} 格": { "en": "Row {0}, column {1} must be a wall — the white island next to it is already full", "ja": "{0}行{1}列は壁 —— 隣の白い島はもう {2} マスで満杯", "ko": "{0}행 {1}열은 벽 — 옆 흰 섬이 이미 {2}칸으로 가득", "es": "Fila {0}, columna {1} debe ser muro: la isla vecina ya tiene {2} casillas", "fr": "Ligne {0}, colonne {1} doit être un mur : l île voisine est pleine", "de": "Zeile {0}, Spalte {1} muss Mauer sein — die weiße Insel ist voll", "pt": "Linha {0}, coluna {1} deve ser muro: a ilha vizinha já está cheia", "ru": "Строка {0}, столбец {1} — стена: соседний белый остров уже полон", "it": "Riga {0}, colonna {1} deve essere muro: l isola vicina è piena", "ar": "الصف {0} والعمود {1} يجب أن يكون جدارًا — الجزيرة المجاورة مكتملة" },
   /** ★★ 2026-10-23 第二期：数墙提示 */

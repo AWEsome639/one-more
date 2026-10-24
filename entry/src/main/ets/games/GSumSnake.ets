@@ -9,7 +9,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -124,6 +126,92 @@ export struct GSumSnake {
     this.won = false;
     this.score = 0;
     this.startAt = Date.now();
+  }
+
+  /**
+   * ★ 2026-10-23 第二期：数蛇提示（真求解器）
+   *
+   * 规则：从蛇头出发沿相邻格延伸，路径上数字之和**正好等于**目标才赢；
+   *       超过目标立刻输。
+   *
+   * ⇒ DFS：从当前路径尾出发，只走没走过的相邻格，和超过目标就剪枝，
+   *        和正好等于目标就成功。
+   * ⇒ 提示**只报下一步走哪一格**。
+   */
+  private dfsSnake(cur: number, sum: number, used: boolean[], out: number): boolean {
+    if (sum === this.target) {
+      return true;
+    }
+    if (sum > this.target) {
+      return false;
+    }
+    const ns: number[] = this.nbrs(cur);
+    for (let t = 0; t < ns.length; t++) {
+      const nx: number = ns[t];
+      if (used[nx]) {
+        continue;
+      }
+      used[nx] = true;
+      if (this.dfsSnake(nx, sum + this.nums[nx], used, out)) {
+        used[nx] = false;
+        return true;
+      }
+      used[nx] = false;
+    }
+    return false;
+  }
+
+  private findNextSnake(): number {
+    const cur: number = this.path[this.path.length - 1];
+    let sum: number = this.sumOf(this.path);
+    if (sum === this.target) {
+      return -1;
+    }
+    const used: boolean[] = new Array<boolean>(CELLS).fill(false);
+    for (let i = 0; i < this.path.length; i++) {
+      used[this.path[i]] = true;
+    }
+    const ns: number[] = this.nbrs(cur);
+    for (let t = 0; t < ns.length; t++) {
+      const nx: number = ns[t];
+      if (used[nx]) {
+        continue;
+      }
+      const nsum: number = sum + this.nums[nx];
+      if (nsum > this.target) {
+        continue;
+      }
+      const u2: boolean[] = used.slice();
+      u2[nx] = true;
+      if (this.dfsSnake(nx, nsum, u2, -1)) {
+        return nx;
+      }
+    }
+    return -1;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const nx: number = this.findNextSnake();
+    if (nx < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(nx / this.diffTotal) + 1;
+    const c: number = (nx % this.diffTotal) + 1;
+    const add: number = this.nums[nx];
+    const sum: number = this.sumOf(this.path) + add;
+    return Hint.make([nx],
+      TG4('接第 {0} 行第 {1} 列（+{2}，累计 {3}）', String(r), String(c), String(add), String(sum)),
+      TG4('Extend to row {0}, column {1} (+{2}, total {3})', String(r), String(c), String(add), String(sum)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
   }
 
   private tap(i: number): void {
@@ -294,6 +382,16 @@ export struct GSumSnake {
             ? (this.won ? Palette.emerald : Palette.rose)
             : this.theme.inkSoft)
           .layoutWeight(1)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
