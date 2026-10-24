@@ -10,7 +10,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -219,6 +221,94 @@ export struct GMathMaze {
     return s;
   }
 
+  /**
+   * ★ 2026-10-23 第二期：数学迷宫提示（真求解器）
+   *
+   * 规则：从左上走到右下，不能回头；路径上的数字之和必须等于目标。
+   * ⇒ DFS：从当前格出发，维护"已访问 + 当前和"，超过目标就剪枝，
+   *        走到右下且和相等就成功。
+   * ⇒ 提示**只报下一步走哪一格**（报整条路径玩家也用不上，因为格子会变）。
+   */
+  private dfsSum(cur: number, sum: number, visited: boolean[], out: number): boolean {
+    if (cur === GOAL) {
+      return sum === this.target;
+    }
+    const ns: number[] = this.nbrs(cur);
+    for (let t = 0; t < ns.length; t++) {
+      const nx: number = ns[t];
+      if (visited[nx]) {
+        continue;
+      }
+      const nsum: number = sum + this.vals[nx];
+      if (nsum > this.target) {
+        continue;                      // 剪枝：和只会越来越大（值都 ≥1）
+      }
+      visited[nx] = true;
+      if (this.dfsSum(nx, nsum, visited, out)) {
+        if (out < 0) {
+          // 记下"第一步"：回溯到最外层时才知道，所以用返回值链传递
+        }
+        visited[nx] = false;
+        return true;
+      }
+      visited[nx] = false;
+    }
+    return false;
+  }
+
+  private findNext(): number {
+    const start: number = this.trail[this.trail.length - 1];
+    if (start === GOAL) {
+      return -1;
+    }
+    const visited: boolean[] = new Array<boolean>(MAX_CELLS).fill(false);
+    for (let i = 0; i < this.trail.length; i++) {
+      visited[this.trail[i]] = true;
+    }
+    let sum: number = this.sumNow();
+    const ns: number[] = this.nbrs(start);
+    for (let t = 0; t < ns.length; t++) {
+      const nx: number = ns[t];
+      if (visited[nx]) {
+        continue;
+      }
+      const nsum: number = sum + this.vals[nx];
+      if (nsum > this.target) {
+        continue;
+      }
+      const v2: boolean[] = visited.slice();
+      v2[nx] = true;
+      if (this.dfsSum(nx, nsum, v2, -1)) {
+        return nx;
+      }
+    }
+    return -1;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const nx: number = this.findNext();
+    if (nx < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(nx / this.diffTotal) + 1;
+    const c: number = (nx % this.diffTotal) + 1;
+    const add: number = this.vals[nx];
+    const sum: number = this.sumNow() + add;
+    return Hint.make([nx],
+      TG4('走第 {0} 行第 {1} 列（+{2}，累计 {3}）', String(r), String(c), String(add), String(sum)),
+      TG4('Step to row {0}, column {1} (+{2}, total {3})', String(r), String(c), String(add), String(sum)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
   private steps(): number {
     return this.trail.length - 1;
   }
@@ -384,6 +474,16 @@ export struct GMathMaze {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 
       Row({ space: Space.md }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('退一步'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

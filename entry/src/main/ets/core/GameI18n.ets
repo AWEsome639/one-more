@@ -23,6 +23,9 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 数学迷宫提示 */
+  "走第 {0} 行第 {1} 列（+{2}，累计 {3}）": { "en": "Step to row {0}, column {1} (+{2}, total {3})", "ja": "{0}行{1}列へ（+{2}、累計 {3}）", "ko": "{0}행 {1}열로 (+{2}, 누적 {3})", "es": "Ve a fila {0}, columna {1} (+{2}, total {3})", "fr": "Va en ligne {0}, colonne {1} (+{2}, total {3})", "de": "Gehe zu Zeile {0}, Spalte {1} (+{2}, Summe {3})", "pt": "Vá para linha {0}, coluna {1} (+{2}, total {3})", "ru": "Шаг в строку {0}, столбец {1} (+{2}, сумма {3})", "it": "Vai a riga {0}, colonna {1} (+{2}, totale {3})", "ar": "انتقل إلى الصف {0} والعمود {1} (+{2}، المجموع {3})" },
+
   /** ★★ 2026-10-24 两格方块：只剩两格 */
   "第 {0} 行第 {1} 列必须涂黑 —— 这个区只剩两格了，两格都要黑": { "en": "Row {0}, column {1} must be black — this region has only two cells left", "ja": "{0}行{1}列は必ず黒 —— この区は残り 2 マス、両方黒", "ko": "{0}행 {1}열은 반드시 검게 — 이 구역은 두 칸만 남았어요", "es": "Fila {0}, columna {1} debe ser negra: a esta región solo le quedan dos casillas", "fr": "Ligne {0}, colonne {1} doit être noire : il ne reste que deux cases", "de": "Zeile {0}, Spalte {1} muss schwarz sein — nur noch zwei Felder übrig", "pt": "Linha {0}, coluna {1} deve ser preta: só restam duas casas", "ru": "Строка {0}, столбец {1} — чёрная: в области осталось две клетки", "it": "Riga {0}, colonna {1} deve essere nera: restano solo due caselle", "ar": "الصف {0} والعمود {1} يجب أن يكون أسود — بقي مربعان فقط" },
 
