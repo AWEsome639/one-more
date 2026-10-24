@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -54,6 +56,8 @@ export struct GVectorDotProduct {
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 ROUNDS=8
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(8);
   onFinish: (r: GameResult) => void = () => {};
   @State private u: number[] = []; @State private v: number[] = []; @State private opts: number[] = [];
@@ -77,6 +81,43 @@ export struct GVectorDotProduct {
     const p: Pair = makePair(); this.u = p.u; this.v = p.v; this.answer = dot(p.u, p.v);
     this.opts = shuffle(buildOpts(this.answer, p.u, p.v)); this.pick = -1; this.answered = false;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ★ 答完要等一会儿才进下一题 ⇒ 先看"这一轮答过没有"，答过就等着，
+  //   否则每拍都会重复提交、把计数打乱。
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.answered) {
+      return true;
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === this.answer) {
+        this.submit(i);
+        break;
+      }
+    }
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private submit(i: number): void {
     if (this.answered || this.over || this.opts.length <= i) { return; }
     this.answered = true; this.pick = i; const ans: number = this.answer; const got: number = this.opts[i];
@@ -181,6 +222,11 @@ export struct GVectorDotProduct {
         this.submit((3));
         })
       }.width('100%')
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
