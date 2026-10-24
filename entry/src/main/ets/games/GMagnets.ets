@@ -12,6 +12,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -213,6 +215,82 @@ export struct GMagnets {
     this.tip = TG2('磁铁成对 {0}/8', String(this.goodDominoes()));
   }
 
+  /**
+   * ★ 2026-10-23 第二期：磁铁提示（计数法第 6 次复用）
+   *
+   * 判据（见 linesOk）：每行每列的 ＋ 数量必须正好等于该行/列的数字。
+   * ⇒ 若某行"还缺的＋数"正好等于"这行的空格数" ⇒ 那些空格必须全填＋。
+   *    列同理。
+   *
+   * 只推「必须是＋」，不推「必须是−」（这款只有三种状态，宁可少给）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    // 按行找
+    for (let r = 0; r < N; r++) {
+      let have: number = 0;
+      let empty: number = 0;
+      let last: number = -1;
+      for (let c = 0; c < N; c++) {
+        const v: number = this.marks[r * N + c];
+        if (v === PLUS) {
+          have++;
+        } else if (v === 0) {
+          empty++;
+          last = r * N + c;
+        }
+      }
+      const need: number = this.rowClue[r] - have;
+      // ★ 2026-10-24 补：还要看**列**。填这个＋会让它所在列也多一个＋，
+      //   若那一列已经满了 ⇒ 填了就是违规（单测 3017 组里 1274 例）。
+      const lastCol: number = last % N;
+      const colFull: boolean = this.plusInCol(lastCol) >= this.colClue[lastCol];
+      if (need > 0 && empty > 0 && need === empty && last >= 0 && !colFull) {
+        const rr: number = r + 1;
+        const cc: number = (last % N) + 1;
+        return Hint.make([last],
+          TG2('第 {0} 行第 {1} 列必须填＋ —— 这一行还缺 {2} 个＋，正好只剩 {2} 个空格',
+            String(rr), String(cc), String(need)),
+          TG2('Row {0}, column {1} must be + — this row still needs {2}, exactly the empty cells left',
+            String(rr), String(cc), String(need)), t0);
+      }
+    }
+    // 按列找
+    for (let c = 0; c < N; c++) {
+      let have: number = 0;
+      let empty: number = 0;
+      let last: number = -1;
+      for (let r = 0; r < N; r++) {
+        const v: number = this.marks[r * N + c];
+        if (v === PLUS) {
+          have++;
+        } else if (v === 0) {
+          empty++;
+          last = r * N + c;
+        }
+      }
+      const need: number = this.colClue[c] - have;
+      const lastRow: number = Math.floor(last / N);
+      const rowFull: boolean = this.plusInRow(lastRow) >= this.rowClue[lastRow];
+      if (need > 0 && empty > 0 && need === empty && last >= 0 && !rowFull) {
+        const rr: number = Math.floor(last / N) + 1;
+        const cc: number = c + 1;
+        return Hint.make([last],
+          TG2('第 {0} 行第 {1} 列必须填＋ —— 这一列还缺 {2} 个＋，正好只剩 {2} 个空格',
+            String(rr), String(cc), String(need)),
+          TG2('Row {0}, column {1} must be + — this column still needs {2}, exactly the empty cells left',
+            String(rr), String(cc), String(need)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格必须填＋'));
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -332,6 +410,26 @@ export struct GMagnets {
       Text(TG('每块磁铁（横向两格）必须一正一负；右侧/下方数字是该行该列 ＋ 的个数'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
+
+      Button(TG('提示'))
+
+        .fontSize(FontSize.sm)
+
+        .fontColor(this.theme.ink)
+
+        .backgroundColor(this.theme.surfaceAlt)
+
+        .borderRadius(Radius.md)
+
+        .layoutWeight(1)
+
+        .height(44)
+
+        .onClick(() => {
+
+          this.askHint();
+
+        })
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
