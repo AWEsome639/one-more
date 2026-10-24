@@ -503,7 +503,7 @@ export struct GNurikabe {
           .onClick(() => {
             this.askHint();
           })
-        Button(TG('重开'))
+                Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor('#FFFFFF')
