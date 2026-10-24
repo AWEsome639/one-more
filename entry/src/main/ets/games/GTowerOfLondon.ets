@@ -4,6 +4,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -53,6 +55,8 @@ export struct GTowerOfLondon {
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State state: number = 0;
   @State goalState: number = 1;
   @State sel: number = -1;
@@ -131,6 +135,91 @@ export struct GTowerOfLondon {
     if (this.moves >= this.best + this.slacks) { this.note = TG('步数用光了'); this.finish(false); return; }
     this.note = TG2('✅ 好，继续 · 对位 {0}/{1}', String(this.rightCount(next)), String(BALLS));
   }
+  // ═══════════ 提示 + 代打（2026-10-24 第三期）═══════════
+  // 这款游戏本来就有 bfs(from, to) 给出最短距离（27 个状态，极快）。
+  // ⇒ 每一步枚举所有合法走法，选"走完离目标最近"的那个。
+
+  /** 找一步最优走法，返回 [from, to]；没有返回空 */
+  private bestMove(): number[] {
+    if (this.bfs(this.state, this.goalState) === 0) {
+      return [];
+    }
+    let bestA: number = -1;
+    let bestB: number = -1;
+    let bestD: number = 99999;
+    for (let a = 0; a < this.diffTotal; a++) {
+      const ball: number = this.topBall(this.state, a);
+      if (ball < 0) {
+        continue;
+      }
+      for (let b = 0; b < this.diffTotal; b++) {
+        if (a === b || !this.canPut(this.state, ball, b)) {
+          continue;
+        }
+        const nx: number = this.state + (b - a) * W[ball - 1];
+        const d: number = this.bfs(nx, this.goalState);
+        if (d >= 0 && d < bestD) {
+          bestD = d;
+          bestA = a;
+          bestB = b;
+        }
+      }
+    }
+    if (bestA < 0) {
+      return [];
+    }
+    return [bestA, bestB];
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const mv: number[] = this.bestMove();
+    if (mv.length < 2) {
+      return Hint.none('none');
+    }
+    const ball: number = this.topBall(this.state, mv[0]);
+    return Hint.make([],
+      TG2('把 {0} 号球从第 {1} 根柱子移到第 {2} 根', String(ball), String(mv[0] + 1), String(mv[1] + 1)),
+      TG2('Move ball {0} from peg {1} to peg {2}', String(ball), String(mv[0] + 1), String(mv[1] + 1)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出该动哪颗球'));
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const mv: number[] = this.bestMove();
+    if (mv.length < 2) {
+      return false;
+    }
+    this.sel = mv[0];
+    this.tap(mv[1]);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private finish(solved: boolean): void {
     if (this.done) { return; }
     this.done = true; this.over = true; this.won = solved; const r: GameResult = {
@@ -198,6 +287,11 @@ export struct GTowerOfLondon {
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).width('100%')
+      HintBar({
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))

@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 伦敦塔 */
+  "把 {0} 号球从第 {1} 根柱子移到第 {2} 根": { "en": "Move ball {0} from peg {1} to peg {2}", "ja": "{0}号球を{1}番から{2}番の柱へ", "ko": "{0}번 공을 {1}번 기둥에서 {2}번 기둥으로", "es": "Mueve la bola {0} del poste {1} al {2}", "fr": "Déplacez la boule {0} du pieu {1} au {2}", "de": "Kugel {0} von Stab {1} auf Stab {2}", "pt": "Mova a bola {0} do pino {1} para o {2}", "ru": "Переставьте шар {0} со стержня {1} на {2}", "it": "Sposta la pallina {0} dal piolo {1} al {2}", "ar": "انقل الكرة {0} من الوتد {1} إلى {2}" },
+  /** ★★ 2026-10-24 伦敦塔 */
+  "这一步看不出该动哪颗球": { "en": "No obvious ball move right now", "ja": "今はどの球を動かすか決まりません", "ko": "지금은 어느 공을 움직일지 모르겠어요", "es": "Ahora ninguna bola tiene jugada clara", "fr": "Aucun déplacement évident", "de": "Gerade kein klarer Kugelzug", "pt": "Agora nenhuma jogada clara", "ru": "Сейчас нет очевидного хода", "it": "Ora nessuna mossa ovvia", "ar": "لا حركة واضحة الآن" },
   /** ★★ 2026-10-24 灯塔 */
   "第 {0} 行第 {1} 列放一座灯塔": { "en": "Put a lighthouse at row {0}, column {1}", "ja": "{0}行{1}列に灯台を置く", "ko": "{0}행 {1}열에 등대를 놓으세요", "es": "Pon un faro en la fila {0}, columna {1}", "fr": "Placez un phare ligne {0}, colonne {1}", "de": "Setze einen Leuchtturm auf Zeile {0}, Spalte {1}", "pt": "Coloque um farol na linha {0}, coluna {1}", "ru": "Поставьте маяк в строку {0}, столбец {1}", "it": "Metti un faro alla riga {0}, colonna {1}", "ar": "ضع منارة في الصف {0} والعمود {1}" },
   /** ★★ 2026-10-24 灯塔 */
