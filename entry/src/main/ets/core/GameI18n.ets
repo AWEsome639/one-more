@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 帐篷与树 */
+  "第 {0} 行第 {1} 列放一顶帐篷": { "en": "Put a tent at row {0}, column {1}", "ja": "{0}行{1}列にテントを置く", "ko": "{0}행 {1}열에 텐트를 놓으세요", "es": "Pon una tienda en la fila {0}, columna {1}", "fr": "Placez une tente ligne {0}, colonne {1}", "de": "Setze ein Zelt auf Zeile {0}, Spalte {1}", "pt": "Coloque uma tenda na linha {0}, coluna {1}", "ru": "Поставьте палатку в строку {0}, столбец {1}", "it": "Metti una tenda alla riga {0}, colonna {1}", "ar": "ضع خيمة في الصف {0} والعمود {1}" },
+  /** ★★ 2026-10-24 帐篷与树 */
+  "这一步看不出哪格该放帐篷": { "en": "No tent position is forced right now", "ja": "今はテントの位置が決まりません", "ko": "지금은 텐트 자리가 확정되지 않았어요", "es": "Ahora ninguna casilla exige tienda", "fr": "Aucune tente forcée pour le moment", "de": "Gerade kein erzwungenes Zelt", "pt": "Agora nenhuma tenda é obrigatória", "ru": "Сейчас нет однозначного места", "it": "Ora nessuna tenda obbligata", "ar": "لا موضع خيمة مؤكد الآن" },
   /** ★★ 2026-10-24 伦敦塔 */
   "把 {0} 号球从第 {1} 根柱子移到第 {2} 根": { "en": "Move ball {0} from peg {1} to peg {2}", "ja": "{0}号球を{1}番から{2}番の柱へ", "ko": "{0}번 공을 {1}번 기둥에서 {2}번 기둥으로", "es": "Mueve la bola {0} del poste {1} al {2}", "fr": "Déplacez la boule {0} du pieu {1} au {2}", "de": "Kugel {0} von Stab {1} auf Stab {2}", "pt": "Mova a bola {0} do pino {1} para o {2}", "ru": "Переставьте шар {0} со стержня {1} на {2}", "it": "Sposta la pallina {0} dal piolo {1} al {2}", "ar": "انقل الكرة {0} من الوتد {1} إلى {2}" },
   /** ★★ 2026-10-24 伦敦塔 */

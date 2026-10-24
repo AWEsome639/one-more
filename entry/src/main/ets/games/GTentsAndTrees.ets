@@ -10,6 +10,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -35,6 +37,8 @@ export struct GTentsAndTrees {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=6；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(6);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -294,6 +298,119 @@ export struct GTentsAndTrees {
     this.startAt = Date.now();
   }
 
+  // ═══════════ 求解器 + 提示 + 代打（2026-10-24 第三期）═══════════
+  // 规则（见 rulesOk）：每棵树恰好 1 顶相邻帐篷；帐篷之间不相邻；
+  //                     每行/每列的帐篷数 == 线索。
+  // 做法：DFS 遍历"树"，给每棵树挑一个空格放帐篷，用行列余量 + 相邻判定剪枝。
+  private tentsDfs(k: number, trees: number[], board: number[], rowHave: number[],
+                   colHave: number[], n: number, out: number[], budget: number[]): boolean {
+    if (k >= trees.length) {
+      for (let r = 0; r < n; r++) {
+        if (rowHave[r] !== this.rowClue[r]) { return false; }
+      }
+      for (let c = 0; c < n; c++) {
+        if (colHave[c] !== this.colClue[c]) { return false; }
+      }
+      return true;
+    }
+    budget[0] = budget[0] - 1;
+    if (budget[0] <= 0) { return false; }
+    const nb: number[] = this.nbrs4(trees[k]);
+    for (let t = 0; t < nb.length; t++) {
+      const j: number = nb[t];
+      if (board[j] !== 0) { continue; }
+      const r: number = Math.floor(j / n);
+      const c: number = j % n;
+      if (rowHave[r] >= this.rowClue[r] || colHave[c] >= this.colClue[c]) { continue; }
+      board[j] = 2;
+      if (this.nearTent(board, j)) { board[j] = 0; continue; }
+      rowHave[r]++;
+      colHave[c]++;
+      out.push(j);
+      if (this.tentsDfs(k + 1, trees, board, rowHave, colHave, n, out, budget)) { return true; }
+      out.pop();
+      rowHave[r]--;
+      colHave[c]--;
+      board[j] = 0;
+    }
+    return false;
+  }
+
+  private tentsSolve(): number[] {
+    const n: number = this.diffTotal;
+    const board: number[] = this.board.slice();
+    for (let i = 0; i < n * n; i++) {
+      if (board[i] === 2) { board[i] = 0; }
+    }
+    const trees: number[] = [];
+    for (let i = 0; i < n * n; i++) {
+      if (board[i] === 1) { trees.push(i); }
+    }
+    if (trees.length === 0) { return []; }
+    const rowHave: number[] = new Array<number>(n).fill(0);
+    const colHave: number[] = new Array<number>(n).fill(0);
+    const out: number[] = [];
+    const budget: number[] = [200000];
+    if (!this.tentsDfs(0, trees, board, rowHave, colHave, n, out, budget)) { return []; }
+    return out;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const sol: number[] = this.tentsSolve();
+    if (sol.length === 0) { return Hint.none('none'); }
+    for (let k = 0; k < sol.length; k++) {
+      const i: number = sol[k];
+      if (this.board[i] !== 2) {
+        const r: number = Math.floor(i / this.diffTotal) + 1;
+        const c: number = (i % this.diffTotal) + 1;
+        return Hint.make([i],
+          TG2('第 {0} 行第 {1} 列放一顶帐篷', String(r), String(c)),
+          TG2('Put a tent at row {0}, column {1}', String(r), String(c)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格该放帐篷'));
+  }
+
+  private autoStep(): boolean {
+    if (this.over) { return false; }
+    const sol: number[] = this.tentsSolve();
+    if (sol.length === 0) { return false; }
+    for (let k = 0; k < sol.length; k++) {
+      const i: number = sol[k];
+      if (this.board[i] !== 2) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -452,6 +569,16 @@ export struct GTentsAndTrees {
           ? (this.won ? Palette.emerald : Palette.rose)
           : this.theme.inkSoft)
         .width('100%')
+
+      HintBar({
+
+        onHintTap: () => { this.askHint(); },
+
+        onAutoTap: () => { this.askAuto(); },
+
+        autoOn: this.autoId >= 0
+
+      })
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
