@@ -10,6 +10,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -184,6 +186,53 @@ export struct GTennerGrid {
     this.onFinish(r);
   }
 
+  /**
+   * ★ 2026-10-23 第二期：十格提示（唯一候选法）
+   *
+   * 规则：每行放 0..9 各一次；相邻两行同列不能相同（见 conflict）。
+   * ⇒ 对每个空格，把 0..9 都试一遍 **用游戏自己的 conflict 判定**
+   *   ⇒ 只剩一个合法数字时，它就确定了。
+   *
+   * 复用 conflict 的好处：提示与游戏本体永远同一把尺子。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    for (let i = 0; i < n * n; i++) {
+      if (this.grid[i] > 0 || this.fixed[i] === 1) {
+        continue;                      // 已填 / 题目给的，跳过
+      }
+      let only: number = -1;
+      let cnt: number = 0;
+      for (let d = 0; d < n; d++) {
+        if (!this.conflict(i, d)) {
+          cnt++;
+          only = d;
+          if (cnt > 1) {
+            break;
+          }
+        }
+      }
+      if (cnt !== 1 || only < 0) {
+        continue;
+      }
+      const r: number = Math.floor(i / n) + 1;
+      const c: number = (i % n) + 1;
+      return Hint.make([i],
+        TG2('第 {0} 行第 {1} 列只能填 {2} —— 其它数字都会撞',
+          String(r), String(c), String(only)),
+        TG2('Row {0}, column {1} can only be {2} — every other digit clashes',
+          String(r), String(c), String(only)), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格是唯一的'));
+  }
+
   private tip(): string {
     if (this.over) {
       return this.won ? TG2("整盘排好 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : '冲突太多，本局失败';
@@ -316,6 +365,16 @@ export struct GTennerGrid {
         .width('100%')
 
       Row({ space: Space.md }) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
