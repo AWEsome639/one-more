@@ -19,6 +19,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2, TG4 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -31,6 +32,8 @@ export struct GSlidePuzzle {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=3；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(3);
   /** ★★ 2026-10-14 滑行（奥森：部分游戏应该有动态的运动过程，以 2048 为首）：
    *  只让【刚移过来的那一块】从「来处」方向滑进来 */
@@ -224,6 +227,38 @@ export struct GSlidePuzzle {
         String(r), String(c), String(cur), String(bestDist)), t0);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 复用 computeHint()：它返回"该推哪一块"，代打就把它按下去。
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const r: HintResult = this.computeHint();
+    if (!r.ok || r.cells.length === 0) {
+      return false;
+    }
+    this.tap(r.cells[0]);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
@@ -329,6 +364,11 @@ export struct GSlidePuzzle {
           .onClick(() => {
             this.askHint();
           })
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
