@@ -13,6 +13,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -45,6 +46,8 @@ export struct GLighthouses {
 
   @State private rock: boolean[] = new Array<boolean>(CELLS).fill(false);
   @State private ship: boolean[] = new Array<boolean>(CELLS).fill(false);
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private lamp: boolean[] = new Array<boolean>(CELLS).fill(false);
   @State private moves: number = 0;
   @State private over: boolean = false;
@@ -336,6 +339,78 @@ export struct GLighthouses {
     }
   }
 
+  // ═══════════ 提示 + 代打（2026-10-24 第三期）═══════════
+  // 这款游戏本来就有真求解器 search()（出题时用它验证可解）
+  // ⇒ 直接复用它求一组灯位。
+
+  private solveLamps(): boolean[] {
+    const lamp: boolean[] = new Array<boolean>(CELLS).fill(false);
+    this.nodes = 0;
+    if (!this.search(0, lamp, this.rock, this.ship)) {
+      return [];
+    }
+    return lamp;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const sol: boolean[] = this.solveLamps();
+    if (sol.length === 0) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < CELLS; i++) {
+      if (sol[i] && !this.lamp[i]) {
+        const r: number = this.rowOf(i) + 1;
+        const c: number = this.colOf(i) + 1;
+        return Hint.make([i],
+          TG2('第 {0} 行第 {1} 列放一座灯塔', String(r), String(c)),
+          TG2('Put a lighthouse at row {0}, column {1}', String(r), String(c)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格该放灯'));
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const sol: boolean[] = this.solveLamps();
+    if (sol.length === 0) {
+      return false;
+    }
+    for (let i = 0; i < CELLS; i++) {
+      if (this.lamp[i] !== sol[i] && !this.rock[i] && !this.ship[i]) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tap(i: number): void {
     if (this.over || this.rock[i] || this.ship[i]) {
       return;
@@ -421,18 +496,34 @@ export struct GLighthouses {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
 
-      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .fontSize(FontSize.md)
-        .fontColor(Color.White)
-        .backgroundColor(Palette.violet)
-        .borderRadius(Radius.md)
-        .width('100%')
-        .height(Cell.of(44))
-        .onClick(() => {
-          Haptics.tap();
-          this.reset();
-        })
+
+      Row({ space: Space.sm }) {
+        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.violet)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(Cell.of(44))
+          .onClick(() => {
+            Haptics.tap();
+            this.reset();
+          })
+        Button(TG('提示'))
+          .layoutWeight(1)
+          .height(Cell.of(38))
+          .onClick(() => {
+            this.askHint();
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .layoutWeight(1)
+          .height(Cell.of(38))
+          .onClick(() => {
+            this.askAuto();
+          })
+      }
+      .width('100%')
     }
     .width('100%')
     .height('100%')

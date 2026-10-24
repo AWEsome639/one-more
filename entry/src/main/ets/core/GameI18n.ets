@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 灯塔 */
+  "第 {0} 行第 {1} 列放一座灯塔": { "en": "Put a lighthouse at row {0}, column {1}", "ja": "{0}行{1}列に灯台を置く", "ko": "{0}행 {1}열에 등대를 놓으세요", "es": "Pon un faro en la fila {0}, columna {1}", "fr": "Placez un phare ligne {0}, colonne {1}", "de": "Setze einen Leuchtturm auf Zeile {0}, Spalte {1}", "pt": "Coloque um farol na linha {0}, coluna {1}", "ru": "Поставьте маяк в строку {0}, столбец {1}", "it": "Metti un faro alla riga {0}, colonna {1}", "ar": "ضع منارة في الصف {0} والعمود {1}" },
+  /** ★★ 2026-10-24 灯塔 */
+  "这一步看不出哪格该放灯": { "en": "No lamp position is forced right now", "ja": "今は灯を置く場所が決まりません", "ko": "지금은 등대를 놓을 곳이 확정되지 않았어요", "es": "Ahora ninguna casilla exige faro", "fr": "Aucun phare forcé pour le moment", "de": "Gerade kein erzwungener Leuchtturm", "pt": "Agora nenhum farol é obrigatório", "ru": "Сейчас нет однозначного места", "it": "Ora nessun faro obbligato", "ar": "لا موضع منارة مؤكد الآن" },
   /** ★★ 2026-10-24 倒水排序 */
   "把第 {0} 管倒进第 {1} 管（这条路共 {2} 步）": { "en": "Pour tube {0} into tube {1} ({2} moves in this line)", "ja": "第{0}本を第{1}本へ（この手順で計 {2} 手）", "ko": "{0}번 관을 {1}번 관에 부어요 (이 경로 {2}수)", "es": "Vierte el tubo {0} en el {1} ({2} movimientos)", "fr": "Verse le tube {0} dans le {1} ({2} coups)", "de": "Röhre {0} in Röhre {1} gießen ({2} Züge)", "pt": "Despeje o tubo {0} no {1} ({2} jogadas)", "ru": "Перелейте пробирку {0} в {1} ({2} ходов)", "it": "Versa la provetta {0} nella {1} ({2} mosse)", "ar": "اسكب الأنبوب {0} في {1} ({2} حركات)" },
   /** ★★ 2026-10-24 倒水排序 */
