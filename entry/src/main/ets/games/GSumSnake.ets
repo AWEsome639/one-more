@@ -421,6 +421,16 @@ export struct GSumSnake {
             : this.theme.inkSoft)
           .layoutWeight(1)
         Button(TG('提示'))
+          .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.cyan)
+          .borderRadius(Radius.md)
+          .width(96)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
