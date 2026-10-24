@@ -112,6 +112,8 @@ export struct GSudoku {
   @State private hintValue: number = 0;
   /** ★ 第二期：提示说了什么（空 = 没提示） */
   @State private hintMsg: string = '';
+  /** 代打计时器（-1 = 未运行）。★ 必须是 @State，否则按钮文字不会变「停代打」 */
+  @State private autoId: number = -1;
   /** ★ 路线 B：模型预测的本局难度（-1 = 模型不可用） */
   private aiDifficulty: number = -1;
   @State private label: string = '';          // 用的第几道底
@@ -233,6 +235,71 @@ export struct GSudoku {
   }
 
   /** 玩家点「提示」 */
+  /**
+   * ★★ 2026-10-24 第二期：AI 代打（奥森提的想法）
+   *
+   * 一次只走一步：找出"唯一候选"的格子，选中它、填上正确数字。
+   * 找不到唯一候选时，退而用 fillSolved 求完整解，取第一个空格。
+   * 返回 false ⇒ 没有下一步了（代打自动停）。
+   */
+  private autoStep(): boolean {
+    if (this.done) {
+      return false;
+    }
+    // ① 唯一候选法：和一键提示同一套逻辑
+    for (let i = 0; i < CELLS; i++) {
+      if (this.values[i] !== 0) {
+        continue;
+      }
+      const mask: number = this.candMask(this.values, i);
+      if (mask !== 0 && (mask & (mask - 1)) === 0) {
+        let v: number = 0;
+        for (let k = 1; k <= SIDE; k++) {
+          if ((mask & (1 << k)) !== 0) {
+            v = k;
+            break;
+          }
+        }
+        if (v > 0) {
+          this.sel = i;
+          this.fill(v);
+          return !this.done;
+        }
+      }
+    }
+    // ② 兜底：求一个完整解，取第一个空格的正确值
+    const g: number[] = this.values.slice();
+    if (!this.fillSolved(g)) {
+      return false;                    // 求不出解就停
+    }
+    for (let i = 0; i < CELLS; i++) {
+      if (this.values[i] === 0 && g[i] > 0) {
+        this.sel = i;
+        this.fill(g[i]);
+        return !this.done;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
@@ -724,6 +791,16 @@ export struct GSudoku {
 
       Row({ space: Space.md }) {
         Button(TG('提示'))
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askAuto();
+          })
           .fontSize(FontSize.md)
           .fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt)

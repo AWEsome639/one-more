@@ -23,6 +23,14 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 AI 代打 */
+  "AI 代打": { "en": "AI plays", "ja": "AI 代打", "ko": "AI 대타", "es": "IA juega", "fr": "IA joue", "de": "KI spielt", "pt": "IA joga", "ru": "ИИ играет", "it": "IA gioca", "ar": "الذكاء الاصطناعي يلعب" },
+  /** ★★ 2026-10-24 AI 代打 */
+  "停代打": { "en": "Stop AI", "ja": "AI 停止", "ko": "AI 중지", "es": "Parar IA", "fr": "Arrêter IA", "de": "KI stoppen", "pt": "Parar IA", "ru": "Стоп ИИ", "it": "Ferma IA", "ar": "إيقاف الذكاء الاصطناعي" },
+  /** ★★ 2026-10-24 AI 代打 */
+  "AI 开始代打…": { "en": "AI is playing…", "ja": "AI が代打開始…", "ko": "AI가 대타 시작…", "es": "La IA empieza a jugar…", "fr": "L IA commence à jouer…", "de": "KI spielt jetzt…", "pt": "A IA começa a jogar…", "ru": "ИИ начинает играть…", "it": "L IA inizia a giocare…", "ar": "الذكاء الاصطناعي يبدأ اللعب…" },
+  /** ★★ 2026-10-24 AI 代打 */
+  "已停止代打": { "en": "AI stopped", "ja": "AI を停止しました", "ko": "AI를 멈췄어요", "es": "IA detenida", "fr": "IA arrêtée", "de": "KI gestoppt", "pt": "IA parada", "ru": "ИИ остановлен", "it": "IA fermata", "ar": "تم إيقاف الذكاء الاصطناعي" },
   /** ★★ 2026-10-24 黑在哪提示 */
   "第 {0} 行第 {1} 列必须变黑 —— 旁边那个「1」只能看见自己": { "en": "Row {0}, column {1} must be black — the nearby 1 can only see itself", "ja": "{0}行{1}列は黒 —— そばの「1」は自分しか見えない", "ko": "{0}행 {1}열은 검정 — 옆의 「1」은 자기 자신만 봐요", "es": "Fila {0}, columna {1} debe ser negro: el 1 vecino solo se ve a sí mismo", "fr": "Ligne {0}, colonne {1} doit être noire : le 1 voisin ne voit que lui-même", "de": "Zeile {0}, Spalte {1} muss schwarz sein — die 1 sieht nur sich selbst", "pt": "Linha {0}, coluna {1} deve ser preta: o 1 vizinho só vê a si mesmo", "ru": "Строка {0}, столбец {1} — чёрная: соседняя 1 видит только себя", "it": "Riga {0}, colonna {1} deve essere nera: l 1 vicino vede solo sé", "ar": "الصف {0} والعمود {1} يجب أن يكون أسود — الرقم 1 المجاور يرى نفسه فقط" },
   /** ★★ 2026-10-24 黑在哪提示 */

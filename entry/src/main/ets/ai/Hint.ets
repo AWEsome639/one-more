@@ -103,6 +103,48 @@ export class Hint {
     Hint.toast(r.ok ? r.zh : zhFail);
   }
 
+  // ═══════════ 第二期·AI 代打（2026-10-24 奥森提的想法）═══════════
+  // 他说：「这 355 个游戏都可以加入一个 AI 代打按钮；点下去后，
+  //         会有一个所谓的 AI 帮人玩，数独就一格一格填满（不是一下子全满），
+  //         棋类就代下（也是一步一步下）。」
+  //
+  // 实现思路：**代打 = 把提示层"下一步"自动执行**。
+  // 每款游戏只需要实现一个 `autoStep(): boolean`：
+  //   算一步 → 调用游戏自己的落子函数 → 返回是否还有下一步。
+  // 这里的 autoRun/autoStop 只负责"按节奏重复调用它"。
+
+  /** 代打节拍（毫秒）。太快会看不清，太慢会像卡住。 */
+  static AUTO_MS: number = 320;
+
+  /**
+   * 开始代打：每 AUTO_MS 调一次 tick，tick 返回 false 就自动停。
+   * @returns 计时器 id（传给 autoStop）
+   */
+  static autoRun(tick: () => boolean): number {
+    let id: number = -1;
+    id = setInterval(() => {
+      let more: boolean = false;
+      try {
+        more = tick();
+      } catch (e) {
+        more = false;                  // 代打里出错也要停，绝不能让游戏卡死
+      }
+      if (!more) {
+        if (id >= 0) {
+          clearInterval(id);
+        }
+      }
+    }, Hint.AUTO_MS);
+    return id;
+  }
+
+  /** 停止代打（幂等） */
+  static autoStop(id: number): void {
+    if (id >= 0) {
+      clearInterval(id);
+    }
+  }
+
   /** 把结果翻译成「给玩家看的一句话」（给不出时也有话说） */
   static describe(r: HintResult, zhFail: string, enFail: string): string {
     if (r.ok) {
