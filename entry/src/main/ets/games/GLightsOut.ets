@@ -11,6 +11,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -46,6 +47,8 @@ export struct GLightsOut {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -236,6 +239,38 @@ export struct GLightsOut {
       t0);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这款已有 computeHint()（返回应该点的那一格）⇒ 代打就是"按提示一直点"。
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const r: HintResult = this.computeHint();
+    if (!r.ok || r.cells.length === 0) {
+      return false;
+    }
+    this.tap(r.cells[0]);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
@@ -340,6 +375,16 @@ export struct GLightsOut {
       Text(TG('目标：全部熄灭。点一格会连带翻转上下左右四格'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
+
+      HintBar({
+
+        showHint: false,
+
+        onAutoTap: () => { this.askAuto(); },
+
+        autoOn: this.autoId >= 0
+
+      })
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
