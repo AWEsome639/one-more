@@ -232,9 +232,6 @@ export struct GSumSnake {
   }
 
   private askAuto(): void {
-    // ★ 2026-10-24 临时可观测点：把 autoId 先设成 0
-    //   ⇒ 按钮会立刻从「AI 代打」变「停代打」⇒ 能确证本函数有没有被调用
-    this.autoId = 0;
     Haptics.tap();
     if (this.autoId >= 0) {
       this.stopAuto();
@@ -430,6 +427,17 @@ export struct GSumSnake {
           .height(Cell.of(44))
           .onClick(() => {
             this.askHint();
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.violet !== undefined ? Palette.violet : Palette.cyan)
+          .borderRadius(Radius.md)
+          .width(96)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askAuto();
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
