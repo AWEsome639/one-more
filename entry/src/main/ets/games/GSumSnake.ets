@@ -46,6 +46,8 @@ export struct GSumSnake {
   @State nums: number[] = [];
   @State path: number[] = [];
   @State target: number = 0;
+  /** 代打计时器（-1 = 未运行）。必须 @State，按钮文字才会变 */
+  @State private autoId: number = -1;
   @State steps: number = 0;
   @State over: boolean = false;
   @State won: boolean = false;
@@ -212,6 +214,39 @@ export struct GSumSnake {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
     Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
+  /**
+   * ★★ 2026-10-24 第二期：AI 代打（一次接一格）
+   */
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const nx: number = this.findNextSnake();
+    if (nx < 0) {
+      return false;
+    }
+    this.tap(nx);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tap(i: number): void {
@@ -383,6 +418,16 @@ export struct GSumSnake {
             : this.theme.inkSoft)
           .layoutWeight(1)
         Button(TG('提示'))
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askAuto();
+          })
           .fontSize(FontSize.sm)
           .fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt)
