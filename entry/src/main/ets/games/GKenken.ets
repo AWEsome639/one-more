@@ -10,6 +10,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { I18n } from '../core/I18n';
 import { LanRace } from '../core/LanRace';
@@ -59,6 +60,14 @@ export struct GKenken {
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
+
+  /** 出题时的完整解 */
+
+  private solCells: number[] = [];
+
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+
+  @State private autoId: number = -1;
 
   @State private vals: number[] = new Array<number>(CELLS).fill(0);
   @State private cages: Cage[] = [];
@@ -203,6 +212,8 @@ export struct GKenken {
     this.cages = cages;
     this.cageOf = cageOf;
     this.anchor = anchor;
+    // ★ 出题时的完整解留着（提示兜底 + 代打）
+    this.solCells = sol.slice();
     this.vals = new Array<number>(CELLS).fill(0);
     this.sel = 0;
     this.moves = 0;
@@ -312,6 +323,63 @@ export struct GKenken {
     n[i] = v;
     this.vals = n;
   }
+  // ═══════════ 提示 + 代打（2026-10-24 第三期）═══════════
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    for (let i = 0; i < CELLS; i++) {
+      if (this.vals[i] === 0 && this.solCells[i] > 0) {
+        const r: number = Math.floor(i / N) + 1;
+        const c: number = (i % N) + 1;
+        return Hint.make([i],
+          TG2('第 {0} 行第 {1} 列应该填 {2}', String(r), String(c), String(this.solCells[i])),
+          TG2('Row {0}, column {1} should be {2}', String(r), String(c), String(this.solCells[i])), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一局暂时给不出提示'));
+  }
+
+  /** ★ AI 代打：用出题时的完整解，一格一格填 */
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.solCells.length < CELLS) {
+      return false;
+    }
+    for (let i = 0; i < CELLS; i++) {
+      if (this.vals[i] !== this.solCells[i]) {
+        this.sel = i;
+        this.put(this.solCells[i]);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
 
   private put(d: number): void {
     if (this.over) {
@@ -435,6 +503,22 @@ export struct GKenken {
       Text(this.tip)
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+
+      Row({ space: Space.sm }) {
+        Button(TG('提示'))
+          .layoutWeight(1)
+          .height(Cell.of(38))
+          .onClick(() => {
+            this.askHint();
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .layoutWeight(1)
+          .height(Cell.of(38))
+          .onClick(() => {
+            this.askAuto();
+          })
+      }
+      .width('100%')
 
       Row({ space: Space.xs }) {
         ForEach(this.k1, (d: number) => {
