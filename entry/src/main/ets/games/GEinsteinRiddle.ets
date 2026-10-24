@@ -8,6 +8,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -131,6 +133,8 @@ export struct GEinsteinRiddle {
   @State private lines: string[] = [];
   @State private sol: number[] = [];
   @State private grid: number[] = new Array<number>(this.houses).fill(-1);
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private tries: number = 0;
   @State private hintOn: boolean = false;
   @State private note: string = '';
@@ -172,6 +176,39 @@ export struct GEinsteinRiddle {
       }
     }
     return [];
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这款已经把完整解存在 this.sol 里 ⇒ 一格一格拨到位即可。
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    for (let i = 0; i < this.houses; i++) {
+      if (this.grid[i] !== this.sol[i]) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tap(i: number): void {
@@ -260,6 +297,11 @@ export struct GEinsteinRiddle {
           .fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .onClick(() => { Haptics.tap(); this.hintOn = true; })
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
           .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)

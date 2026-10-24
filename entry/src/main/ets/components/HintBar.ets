@@ -26,18 +26,22 @@ export struct HintBar {
   autoOn: boolean = false;
   /** 高度，默认 38（比主按钮矮一点，不和它们抢视觉） */
   barHeight: number = 38;
+  /** 是否显示「提示」按钮（默认显示；游戏自带提示时传 false） */
+  showHint: boolean = true;
 
   build() {
     Row({ space: Space.sm }) {
-      Button(TG('提示'))
-        .layoutWeight(1)
-        .height(this.barHeight)
-        .fontSize(FontSize.sm)
-        .backgroundColor(Palette.cyan)
-        .borderRadius(Radius.md)
-        .onClick(() => {
-          this.onHintTap();
-        })
+      if (this.showHint) {
+        Button(TG('提示'))
+          .layoutWeight(1)
+          .height(this.barHeight)
+          .fontSize(FontSize.sm)
+          .backgroundColor(Palette.cyan)
+          .borderRadius(Radius.md)
+          .onClick(() => {
+            this.onHintTap();
+          })
+      }
       Button(this.autoOn ? TG('停代打') : TG('AI 代打'))
         .layoutWeight(1)
         .height(this.barHeight)
