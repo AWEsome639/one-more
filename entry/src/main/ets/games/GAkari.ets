@@ -306,6 +306,182 @@ export struct GAkari {
    * ⚠️ 只说"这一格必须放灯"，不说"这一格不能放"（后者需要更复杂的推理）。
    *    一格都推不出 ⇒ Hint.none()（明灯开局常常确实没有确定步）。
    */
+  // ═══════════ 明灯求解器（2026-10-24 第三期）═══════════
+  // 明灯的提示原来只有一条计数规则，多数开局触发不了，代打因此立刻停。
+  // 6×6 = 36 格，加剪枝的 DFS 在毫秒级就能求出完整解。
+  // 有了它：提示能兜底，代打能一路走到底。
+
+  /** 这一格此刻是否被照亮（含它自己有灯） */
+  private litAt(i: number, bulbs: number[]): boolean {
+    if (bulbs[i] === 1) {
+      return true;
+    }
+    const x: number = i % N;
+    const y: number = Math.floor(i / N);
+    if (x > 0) {
+      for (let k = i - 1; k >= y * N; k--) {
+        if (this.wall[k]) {
+          break;
+        }
+        if (bulbs[k] === 1) {
+          return true;
+        }
+      }
+    }
+    if (x < N - 1) {
+      for (let k = i + 1; k < y * N + N; k++) {
+        if (this.wall[k]) {
+          break;
+        }
+        if (bulbs[k] === 1) {
+          return true;
+        }
+      }
+    }
+    if (y > 0) {
+      for (let k = i - N; k >= 0; k -= N) {
+        if (this.wall[k]) {
+          break;
+        }
+        if (bulbs[k] === 1) {
+          return true;
+        }
+      }
+    }
+    if (y < N - 1) {
+      for (let k = i + N; k < CELLS; k += N) {
+        if (this.wall[k]) {
+          break;
+        }
+        if (bulbs[k] === 1) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /** 剪枝：数字墙的余量 + 每个空格是否还"有可能"被照亮 */
+  private akariPrune(bulbs: number[], decided: boolean[]): boolean {
+    for (let i = 0; i < CELLS; i++) {
+      if (!this.wall[i] || this.clue[i] < 0) {
+        continue;
+      }
+      const want: number = this.clue[i];
+      const x: number = i % N;
+      const y: number = Math.floor(i / N);
+      let cnt: number = 0;
+      let free: number = 0;
+      const nb: number[] = [];
+      if (y > 0) { nb.push(i - N); }
+      if (y < N - 1) { nb.push(i + N); }
+      if (x > 0) { nb.push(i - 1); }
+      if (x < N - 1) { nb.push(i + 1); }
+      for (let k = 0; k < nb.length; k++) {
+        const j: number = nb[k];
+        if (this.wall[j]) {
+          continue;
+        }
+        if (bulbs[j] === 1) {
+          cnt++;
+        } else if (!decided[j]) {
+          free++;
+        }
+      }
+      if (cnt > want || cnt + free < want) {
+        return false;
+      }
+    }
+    for (let i = 0; i < CELLS; i++) {
+      if (this.wall[i] || this.litAt(i, bulbs)) {
+        continue;
+      }
+      // 还没亮：只要还有一格能放灯照到它，就还有希望
+      let hope: boolean = false;
+      if (!decided[i]) {
+        hope = true;
+      } else {
+        const x: number = i % N;
+        const y: number = Math.floor(i / N);
+        const dirs: number[][] = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+        for (let d = 0; d < 4 && !hope; d++) {
+          let cx: number = x + dirs[d][0];
+          let cy: number = y + dirs[d][1];
+          while (cx >= 0 && cx < N && cy >= 0 && cy < N) {
+            const k: number = cy * N + cx;
+            if (this.wall[k]) {
+              break;
+            }
+            if (bulbs[k] === 1) {
+              hope = true;
+              break;
+            }
+            if (!decided[k]) {
+              hope = true;
+              break;
+            }
+            cx = cx + dirs[d][0];
+            cy = cy + dirs[d][1];
+          }
+        }
+      }
+      if (!hope) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private akariDfs(bulbs: number[], decided: boolean[]): boolean {
+    let idx: number = -1;
+    for (let i = 0; i < CELLS; i++) {
+      if (!this.wall[i] && !decided[i]) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx < 0) {
+      for (let i = 0; i < CELLS; i++) {
+        if (!this.wall[i] && !this.litAt(i, bulbs)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    // 先试"不放灯"
+    decided[idx] = true;
+    bulbs[idx] = 0;
+    if (this.akariPrune(bulbs, decided) && this.akariDfs(bulbs, decided)) {
+      return true;
+    }
+    // 再试"放灯"
+    if (canBulb(this.wall, bulbs, idx)) {
+      bulbs[idx] = 1;
+      if (this.akariPrune(bulbs, decided) && this.akariDfs(bulbs, decided)) {
+        return true;
+      }
+      bulbs[idx] = 0;
+    }
+    decided[idx] = false;
+    return false;
+  }
+
+  /** 求一组完整灯位；无解返回空数组 */
+  private solveAkari(): number[] {
+    const bulbs: number[] = new Array<number>(CELLS).fill(0);
+    const decided: boolean[] = new Array<boolean>(CELLS).fill(false);
+    if (!this.akariDfs(bulbs, decided)) {
+      return [];
+    }
+    const out: number[] = [];
+    for (let i = 0; i < CELLS; i++) {
+      if (bulbs[i] === 1) {
+        out.push(i);
+      }
+    }
+    return out;
+  }
+
   private computeHint(): HintResult {
     const t0: number = Date.now();
     for (let i = 0; i < CELLS; i++) {
@@ -350,6 +526,22 @@ export struct GAkari {
             String(r), String(c), String(want), String(freeCnt)), t0);
       }
     }
+    // ★ 2026-10-24 第三期：计数规则找不到时，用求解器兜底
+    const sol: number[] = this.solveAkari();
+    if (sol.length > 0) {
+      for (let k = 0; k < sol.length; k++) {
+        const i: number = sol[k];
+        if (this.bulbs[i] !== 1 && canBulb(this.wall, this.bulbs, i)) {
+          const r: number = Math.floor(i / N) + 1;
+          const c: number = (i % N) + 1;
+          return Hint.make([i],
+            TG2('第 {0} 行第 {1} 列可以放灯（求解器算出来的完整解里就有这一盏）',
+              String(r), String(c)),
+            TG2('Row {0}, column {1} takes a lamp (part of the full solution)',
+              String(r), String(c)), t0);
+        }
+      }
+    }
     return Hint.none('none');
   }
 
@@ -360,15 +552,21 @@ export struct GAkari {
    * 它已经能算出"某格必须放灯"，这里只要把那一格放上去。
    */
   private autoStep(): boolean {
-    if (this.done) {
+    if (this.done || this.finished) {
       return false;
     }
-    const r: HintResult = this.computeHint();
-    if (!r.ok || r.cells.length === 0) {
+    const sol: number[] = this.solveAkari();
+    if (sol.length === 0) {
       return false;
     }
-    this.tap(r.cells[0]);
-    return !this.done;
+    for (let k = 0; k < sol.length; k++) {
+      const i: number = sol[k];
+      if (this.bulbs[i] !== 1 && canBulb(this.wall, this.bulbs, i)) {
+        this.tap(i);
+        return !this.done;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

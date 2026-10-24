@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-24 明灯求解器提示 */
+  "第 {0} 行第 {1} 列可以放灯（求解器算出来的完整解里就有这一盏）": { "en": "Row {0}, column {1} takes a lamp (it appears in the full solution)", "ja": "{0}行{1}列に灯を置けます（完全解に含まれています）", "ko": "{0}행 {1}열에 램프를 놓을 수 있어요 (완전해에 포함)", "es": "Fila {0}, columna {1} admite una lámpara (está en la solución completa)", "fr": "Ligne {0}, colonne {1} accepte une lampe (présente dans la solution complète)", "de": "Zeile {0}, Spalte {1} nimmt eine Lampe auf (in der vollständigen Lösung)", "pt": "Linha {0}, coluna {1} aceita uma lâmpada (está na solução completa)", "ru": "Строка {0}, столбец {1} — можно лампу (есть в полном решении)", "it": "Riga {0}, colonna {1} accetta una lampada (è nella soluzione completa)", "ar": "الصف {0} والعمود {1} يقبل مصباحًا (ضمن الحل الكامل)" },
   /** ★★ 2026-10-24 AI 代打 */
   "AI 代打": { "en": "AI plays", "ja": "AI 代打", "ko": "AI 대타", "es": "IA juega", "fr": "IA joue", "de": "KI spielt", "pt": "IA joga", "ru": "ИИ играет", "it": "IA gioca", "ar": "الذكاء الاصطناعي يلعب" },
   /** ★★ 2026-10-24 AI 代打 */
