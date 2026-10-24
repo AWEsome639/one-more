@@ -9,7 +9,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+// ★ 2026-10-23 第二期：通用提示层
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -210,6 +212,110 @@ export struct GNurikabe {
     return n;
   }
 
+  /**
+   * ★ 2026-10-23 第二期：数墙提示
+   *
+   * 规则：线索格所在的白色区必须恰好包含它一个线索、且格数等于线索值；
+   *       墙要连成一片且不能出现 2×2。
+   *
+   * 这里用一条严格成立的推理：
+   *   **某个线索格的白区已经达到线索值** ⇒ 这些白格不能再扩张
+   *   ⇒ 与这个白区相邻的、尚未涂黑的格子必须涂黑
+   *
+   * 只推「必须黑」，不推「必须白」（这款只有 0/1 两态）。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.diffTotal;
+    const total: number = n * n;
+    for (let i = 0; i < total; i++) {
+      if (this.clues[i] <= 0 || this.blacks[i] === 1) {
+        continue;                      // 只看线索格、且它现在是白
+      }
+      // ★ 2026-10-24 补：线索为 1 ⇒ 这个岛就是它自己 ⇒ 四邻必须全是墙。
+      //   这条开局就成立，比"白区已满"实用得多。
+      //   （原来的规则在真机上几乎不触发：未定格也算白，
+      //     flood 会把整片非墙区都算进同一个岛。）
+      if (this.clues[i] === 1) {
+        const r0: number = Math.floor(i / n);
+        const c0: number = i % n;
+        const nbs: number[] = [];
+        if (r0 > 0) {
+          nbs.push(i - n);
+        }
+        if (r0 < n - 1) {
+          nbs.push(i + n);
+        }
+        if (c0 > 0) {
+          nbs.push(i - 1);
+        }
+        if (c0 < n - 1) {
+          nbs.push(i + 1);
+        }
+        for (let t = 0; t < nbs.length; t++) {
+          const j0: number = nbs[t];
+          if (this.blacks[j0] === 1 || this.clues[j0] > 0) {
+            continue;
+          }
+          const rr0: number = Math.floor(j0 / n) + 1;
+          const cc0: number = (j0 % n) + 1;
+          return Hint.make([j0],
+            TG2('第 {0} 行第 {1} 列必须涂黑 —— 那个「1」的岛只有它自己一格，四邻都得是墙',
+              String(rr0), String(cc0)),
+            TG2('Row {0}, column {1} must be a wall — a "1" island is that cell alone',
+              String(rr0), String(cc0)), t0);
+        }
+      }
+      const seen: number[] = new Array<number>(MAX_CELLS).fill(0);
+      const comp: number[] = this.flood(this.blacks, i, seen, 0);
+      if (comp.length !== this.clues[i]) {
+        continue;                      // 白区还没长满，不推
+      }
+      // 白区已满 ⇒ 贴着它的未涂格必须涂黑
+      for (let k = 0; k < comp.length; k++) {
+        const cur: number = comp[k];
+        const r: number = Math.floor(cur / n);
+        const c: number = cur % n;
+        const nb: number[] = [];
+        if (r > 0) {
+          nb.push(cur - n);
+        }
+        if (r < n - 1) {
+          nb.push(cur + n);
+        }
+        if (c > 0) {
+          nb.push(cur - 1);
+        }
+        if (c < n - 1) {
+          nb.push(cur + 1);
+        }
+        for (let t = 0; t < nb.length; t++) {
+          const j: number = nb[t];
+          if (this.blacks[j] === 1) {
+            continue;                  // 已经是墙
+          }
+          if (comp.indexOf(j) >= 0) {
+            continue;                  // 同一白区内部
+          }
+          const rr: number = Math.floor(j / n) + 1;
+          const cc: number = (j % n) + 1;
+          return Hint.make([j],
+            TG2('第 {0} 行第 {1} 列必须涂黑 —— 紧挨着的那个白区已经长满 {2} 格',
+              String(rr), String(cc), String(this.clues[i])),
+            TG2('Row {0}, column {1} must be a wall — the white island next to it is already full',
+              String(rr), String(cc)), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    Hint.toastResult(r, TG('这一步看不出哪格必须涂黑'));
+  }
+
   private isWin(): boolean {
     if (this.violations(this.blacks)) {
       return false;
@@ -387,6 +493,16 @@ export struct GNurikabe {
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.askHint();
+          })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
