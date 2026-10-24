@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/D
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -68,6 +70,8 @@ export struct GPerspectiveShiftView {
   @State private base: string[] = []; @State private opts: string[][] = [];
   @State private dir: number = 0; @State private answer: number = 0;
   @State private q: number = 1; @State private correct: number = 0; @State private chosen: number = -1;
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private over: boolean = false; @State private won: boolean = false; @State private msg: string = '';
   private startAt: number = 0; private delay: number = -1; private done: boolean = false;
 
@@ -110,6 +114,40 @@ export struct GPerspectiveShiftView {
       done = true;
     }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    // ★ 关键：choose() 答完会等 1000ms 才 next()。
+    //   如果这里每拍都重置 chosen 再作答，1 秒内会被调用 3 次
+    //   ⇒ 每题多加几次 correct、排多个 next() ⇒ 题目被跳过、计数错乱。
+    //   ⇒ 答过的这一轮什么都不做，只等 next()。
+    if (this.chosen >= 0) {
+      return true;
+    }
+    this.choose(this.answer);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private choose(k: number): void {
     if (k < 0 || this.over || this.chosen >= 0) { return; }
     this.chosen = k;
@@ -176,6 +214,11 @@ export struct GPerspectiveShiftView {
         }, (k: number) => 'opt' + k)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
