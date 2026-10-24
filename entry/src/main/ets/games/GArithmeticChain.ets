@@ -65,6 +65,8 @@ export struct GArithmeticChain {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State，按钮文字才会变 */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(LEVELS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -169,6 +171,56 @@ export struct GArithmeticChain {
     this.value = this.stage.start;
     this.steps = 0;
     this.chain = [];
+  }
+
+  /**
+   * ★★ 2026-10-24 第二期：AI 代打（一次走一步）
+   */
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const left: number = MAXSTEP - this.steps;
+    if (left <= 0) {
+      return false;
+    }
+    const path: Op[] | null = this.solvePath(this.value, left, []);
+    if (path === null || path.length === 0) {
+      return false;
+    }
+    // 找到第一步在 palette 里的下标
+    const first: Op = path[0];
+    let k: number = -1;
+    for (let i = 0; i < this.stage.palette.length; i++) {
+      const o: Op = this.stage.palette[i];
+      if (o.kind === first.kind && o.value === first.value) {
+        k = i;
+        break;
+      }
+    }
+    if (k < 0) {
+      return false;
+    }
+    this.tap(k);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tap(k: number): void {
@@ -295,6 +347,17 @@ export struct GArithmeticChain {
           .height(Cell.of(42))
           .onClick(() => {
             this.askHint();
+          })
+        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+          .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.cyan)
+          .borderRadius(Radius.md)
+          .width(96)
+          .height(Cell.of(44))
+          .onClick(() => {
+            this.askAuto();
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
