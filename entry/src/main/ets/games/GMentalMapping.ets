@@ -193,6 +193,16 @@ export struct GMentalMapping {
 
   build() {
     Column({ space: Space.md }) {
+
+    HintBar({
+
+      showHint: false,
+
+      onAutoTap: () => { this.askAuto(); },
+
+      autoOn: this.autoId >= 0
+
+    })
       Row({ space: Space.lg }) {
         Column({ space: 2 }) {
         Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
@@ -386,15 +396,6 @@ export struct GMentalMapping {
           .fontColor(this.lastOk === 1 ? Palette.emerald : Palette.rose)
       }
 
-      HintBar({
-
-        showHint: false,
-
-        onAutoTap: () => { this.askAuto(); },
-
-        autoOn: this.autoId >= 0
-
-      })
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

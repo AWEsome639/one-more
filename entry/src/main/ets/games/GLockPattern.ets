@@ -126,9 +126,15 @@ export struct GLockPattern {
   // ★ 变体⑦：照真值走
   // 必须按 target 的顺序点：下一个该点的是 target[input.length]
   private autoStep(): boolean {
-    // 这款没有 over 字段，用 phase 判：1 = 可以输入，2 = 已结束
+    // 这款没有 over 字段，用 phase 判：0 = 预览 / 1 = 作答 / 2 = 结束
+    if (this.phase === 2) {
+      return false;             // 真的结束了，停
+    }
     if (this.phase !== 1) {
-      return false;
+      return true;              // ★ 还在预览，要"继续等"而不是停掉计时器
+    }
+    if (this.target.length === 0) {
+      return true;              // ★ 题目还没生成出来，继续等（别在这里停）
     }
     const k: number = this.input.length;
     if (k >= this.target.length) {
@@ -210,6 +216,16 @@ export struct GLockPattern {
 
   build() {
     Column({ space: Space.lg }) {
+
+    HintBar({
+
+      showHint: false,
+
+      onAutoTap: () => { this.askAuto(); },
+
+      autoOn: this.autoId >= 0
+
+    })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -279,11 +295,6 @@ export struct GLockPattern {
             Haptics.tap();
             this.peek();
           })
-        HintBar({
-          showHint: false,
-          onAutoTap: () => { this.askAuto(); },
-          autoOn: this.autoId >= 0
-        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor(Color.White)
