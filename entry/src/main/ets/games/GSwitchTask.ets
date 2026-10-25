@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -21,6 +23,8 @@ export struct GSwitchTask {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State trialNo: number = 1;
@@ -73,6 +77,37 @@ export struct GSwitchTask {
   private optName(i: number): string {
     if (this.rule === 0) { return i === 0 ? '>5 算大' : '≤5 算小'; }
     return i === 0 ? '奇数' : TG('偶数');
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 判定式：i === this.want   ｜ 守卫条件取自它自己的 if (...) { return; }
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.pick >= 0 || this.over) {
+      return true;              // 还没到能作答的时刻 / 已经答过，等推进
+    }
+    this.answer(this.want());
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private answer(i: number): void {
@@ -146,6 +181,16 @@ export struct GSwitchTask {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.answer((1)); })
       }.width('100%')
+
+      HintBar({
+
+        showHint: false,
+
+        onAutoTap: () => { this.askAuto(); },
+
+        autoOn: this.autoId >= 0
+
+      })
 
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
