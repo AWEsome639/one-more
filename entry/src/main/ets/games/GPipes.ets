@@ -14,6 +14,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -68,6 +69,8 @@ export struct GPipes {
    *   ⇒ 简单档只取前 16 项、困难档 25..48 是 undefined（管道形状全乱）
    *   修法：棋盘固定 5×5，难度改到**步数预算**上。
    */
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = 5;
   /** 本局的步数上限：简单 8 / 普通 5 / 困难 3 */
   @State private errMax: number = GPipes.errNow();
@@ -295,6 +298,38 @@ export struct GPipes {
     setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // computeHint 返回"该转哪一个水管"，转到没得转就说明通了
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const r: HintResult = this.computeHint();
+    if (!r.ok || r.cells.length === 0) {
+      return false;
+    }
+    this.tap(r.cells[0]);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -420,6 +455,11 @@ export struct GPipes {
           .onClick(() => {
             this.askHint();
           })
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
