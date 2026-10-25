@@ -9,13 +9,13 @@
 # 用法: bash verify_fast.sh <起始序号> <款数> <日志文件>
 set -u
 HDC="$HOME/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc"
-TMP=/tmp/yiju_fast; mkdir -p "$TMP"
+TMP=/tmp/onemore_fast; mkdir -p "$TMP"
 START="${1:-0}"; COUNT="${2:-9999}"; LOG="${3:-$TMP/report.txt}"
 PKG=com.andrewoscar.onemore
 
 /usr/bin/python3 - > "$TMP/all.txt" <<'PY'
 import re
-s = open('/Users/a0000/dev/yiju/entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
+s = open('/Users/a0000/dev/One More/entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
 for gid, name in re.findall(r"id: '([^']+)', name: '([^']*)'", s):
     print(gid + '|' + name)
 PY

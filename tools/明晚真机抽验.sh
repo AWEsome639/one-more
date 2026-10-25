@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # 「一局」真机抽验（Mate 70）—— 2026-10-13 备好，明晚一条命令
-# 用法: bash ~/dev/yiju/明晚真机抽验.sh
+# 用法: bash ~/dev/One More/明晚真机抽验.sh
 set -u
 HDC=~/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc
-HAP=~/dev/yiju/entry/build/default/outputs/default/entry-default-signed.hap
-OUT=~/dev/yiju/真机抽验-$(date +%m%d-%H%M)
+HAP=~/dev/One More/entry/build/default/outputs/default/entry-default-signed.hap
+OUT=~/dev/One More/真机抽验-$(date +%m%d-%H%M)
 mkdir -p "$OUT"
 
 echo "═══ ① 设备 ═══"
@@ -48,4 +48,4 @@ echo "   ④ 像素鸟 / 跳一跳（有没有动画）"
 echo "   ⑤ 麻将连连看（消牌后剩余对数是否变）"
 echo
 echo "★ 5 款都正常 ⇒ 才允许放量 260 文件："
-echo "   python3 ~/.dsh/storages/games-input-20261013/inline_fix.py --apply --risky ~/dev/yiju/entry/src/main/ets/games/*.ets"
+echo "   python3 ~/.dsh/storages/games-input-20261013/inline_fix.py --apply --risky ~/dev/One More/entry/src/main/ets/games/*.ets"

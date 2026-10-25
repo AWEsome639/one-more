@@ -76,7 +76,7 @@ entry/src/main/ets/
 
 ```bash
 # 需要 DevEco Studio + HarmonyOS SDK
-cd yiju
+cd "One More"
 bash build.sh assembleHap     # 快速构建（~10s）
 bash build.sh assembleApp     # 出正式包（~6min，需要签名配置）
 ```

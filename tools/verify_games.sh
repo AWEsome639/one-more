@@ -11,7 +11,7 @@
 set -u
 HDC="$HOME/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc"
 W=1320; H=2232
-TMP=/tmp/yiju_verify; mkdir -p "$TMP"
+TMP=/tmp/onemore_verify; mkdir -p "$TMP"
 OUT="$TMP/report.txt"; : > "$OUT"
 
 # 游戏清单：id|主页卡片上的字|期望进页后标题

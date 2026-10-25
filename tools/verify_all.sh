@@ -11,7 +11,7 @@
 # 用法: bash verify_all.sh [起始序号] [验几款]   默认 0 开始、全验
 set -u
 HDC="$HOME/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc"
-TMP=/tmp/yiju_all; mkdir -p "$TMP"
+TMP=/tmp/onemore_all; mkdir -p "$TMP"
 OUT="$TMP/report.txt"
 START="${1:-0}"
 COUNT="${2:-9999}"
@@ -20,7 +20,7 @@ PKG=com.andrewoscar.onemore
 # 生成全量清单（id|中文名），按注册表顺序
 /usr/bin/python3 > "$TMP/all.txt" <<'PY'
 import re
-s = open('/Users/a0000/dev/yiju/entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
+s = open('/Users/a0000/dev/One More/entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
 for gid, name in re.findall(r"id: '([^']+)', name: '([^']*)'", s):
     print(gid + '|' + name)
 PY

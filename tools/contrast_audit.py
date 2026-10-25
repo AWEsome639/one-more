@@ -38,7 +38,7 @@ import os
 import re
 import sys
 
-ETS = '/Users/a0000/dev/yiju/entry/src/main/ets'
+ETS = '/Users/a0000/dev/One More/entry/src/main/ets'
 DESIGN = os.path.join(ETS, 'core/Design.ets')
 
 

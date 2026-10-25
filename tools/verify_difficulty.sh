@@ -5,7 +5,7 @@
 # 依赖 tools/find_and_click.sh（v3，回顶部已改为无条件上滚）
 set -u
 HDC="$HOME/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc"
-ROOT="$HOME/dev/yiju"
+ROOT="$HOME/dev/One More"
 OUT="${1:-/tmp/diff_verify.txt}"
 LIST="${2:-/tmp/diff_targets.txt}"
 
@@ -13,8 +13,8 @@ LIST="${2:-/tmp/diff_targets.txt}"
 /usr/bin/python3 - > /tmp/diff_targets.txt <<'PY'
 import re, glob, io, os
 reg = dict(re.findall(r"id: '([^']+)', name: '([^']*)'",
-                      io.open('/Users/a0000/dev/yiju/entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()))
-for p in sorted(glob.glob('/Users/a0000/dev/yiju/entry/src/main/ets/games/*.ets')):
+                      io.open('/Users/a0000/dev/One More/entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()))
+for p in sorted(glob.glob('/Users/a0000/dev/One More/entry/src/main/ets/games/*.ets')):
     s = io.open(p, encoding='utf-8').read()
     if 'GameDiff.timeNow' not in s:
         continue

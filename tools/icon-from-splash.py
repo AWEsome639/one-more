@@ -23,7 +23,7 @@ import re
 
 from PIL import Image, ImageDraw, ImageFilter
 
-ROOT = '/Users/a0000/dev/yiju'
+ROOT = '/Users/a0000/dev/One More'
 SPLASH = ROOT + '/entry/src/main/ets/pages/Splash.ets'
 APP_MEDIA = ROOT + '/AppScope/resources/base/media'
 ENTRY_MEDIA = ROOT + '/entry/src/main/resources/base/media'

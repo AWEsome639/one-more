@@ -1,7 +1,7 @@
 #!/bin/bash
 # 「一局」手感优化 —— 一键续跑（奥森 2026-10-12 20:42 叫停后，凌晨 1 点继续）
 #
-# 用法：  bash ~/dev/yiju/tools/续跑-手感验收.sh
+# 用法：  bash ~/dev/One More/tools/续跑-手感验收.sh
 #
 # 做完三件事：
 #   ① 建「热区修正版」（上次构建被叫停）
@@ -12,7 +12,7 @@
 
 set -u
 HDC="$HOME/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc"
-YJ="$HOME/dev/yiju"
+YJ="$HOME/dev/One More"
 SHOT="$HOME/Desktop/学业规划/鸿蒙小游戏合集 20261010/验收截图/动效抽帧 20261012"
 mkdir -p "$SHOT"
 

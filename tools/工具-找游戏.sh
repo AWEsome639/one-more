@@ -6,7 +6,7 @@
 # 用法: bash 工具-找游戏.sh 穿云       → 打印 屏号 x y
 #       bash 工具-找游戏.sh --rebuild  → 重建索引（约 3 分钟）
 set -u
-IDX="$HOME/dev/yiju/游戏位置索引.tsv"
+IDX="$HOME/dev/One More/游戏位置索引.tsv"
 if [ "${1:-}" = "--rebuild" ]; then
   echo "  重建索引：见 真机问题清单 里的小步滑动脚本（每步 200px）"
   exit 0

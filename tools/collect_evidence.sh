@@ -17,7 +17,7 @@ PKG=com.andrewoscar.onemore
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 HAP="$ROOT/entry/build/default/outputs/default/entry-default-signed.hap"
 OUT="$ROOT/验收-全部证据-20261013"
-TMP=/tmp/yiju_ev
+TMP=/tmp/onemore_ev
 mkdir -p "$OUT" "$TMP"
 
 say() { printf '\n\033[1m%s\033[0m\n' "$*"; }

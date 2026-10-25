@@ -25,7 +25,7 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFont
 
-ROOT = '/Users/a0000/dev/yiju'
+ROOT = '/Users/a0000/dev/One More'
 I18N = ROOT + '/entry/src/main/ets/core/I18n.ets'
 
 FONTS = {

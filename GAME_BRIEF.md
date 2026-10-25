@@ -1,6 +1,6 @@
 # 一局 · 游戏开发约定（★动手前必读★）
 
-工程根：`~/dev/yiju`　｜　构建：`bash ~/dev/yiju/build.sh`（并发安全，撞车会自动排队）
+工程根：`~/dev/One More`　｜　构建：`bash ~/dev/One More/build.sh`（并发安全，撞车会自动排队）
 
 ## 一、你要交付什么
 在 `entry/src/main/ets/games/` 下**新建你自己的游戏文件**（文件名见你的任务）。
@@ -58,7 +58,7 @@ this.onFinish(r);
 - ✅ `Math.random()`、`Math.floor()` 可用
 
 ## 六、交付前必须自查
-1. `bash ~/dev/yiju/build.sh` → **必须 BUILD SUCCESSFUL**（不成功就改到成功）
+1. `bash ~/dev/One More/build.sh` → **必须 BUILD SUCCESSFUL**（不成功就改到成功）
 2. 每个游戏都要有：**重开按钮**、**当前进度/得分显示**、**通关或结束的明确判定**
 3. 回复里报：文件名 / 游戏 id / build 结果 / 一句话玩法
 
@@ -124,5 +124,5 @@ this.onFinish({ gameId: 'akari', solved: true, score: 0, durationMs: Date.now() 
 - 纯逻辑类（反应、记忆、心算）可以很简单，60~120 行就够
 
 ## 六、构建
-`bash ~/dev/yiju/build.sh` → 必须 **BUILD SUCCESSFUL**。
+`bash ~/dev/One More/build.sh` → 必须 **BUILD SUCCESSFUL**。
 ⚠️ 多人同时构建会自动排队，等一会儿正常。

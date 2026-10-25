@@ -2,14 +2,14 @@
 # 「一局」真机抽验（Mate 70）—— 2026-10-13 12:0x 更新
 # ★ 本轮新增：隐私合规三项（首启弹窗 / 应用内入口 / 假话已修）
 # ★ 抽验通过 ⇒ 放量 260 文件；晚上回来把结果告诉我
-# 用法: bash ~/dev/yiju/真机抽验.sh
+# 用法: bash ~/dev/One More/真机抽验.sh
 #
 # ★ 2026-10-13 新增 4 项（都要人眼）：界面模式 · A-Z 列表 · 反馈与关于 · 数字滚动
 # ★ 装包必须【先 uninstall】—— `install -r` 会报 sign info inconsistent 9568332
 set -u
 HDC=~/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc
-HAP=~/dev/yiju/entry/build/default/outputs/default/entry-default-signed.hap
-OUT=~/dev/yiju/真机抽验-$(date +%m%d-%H%M)
+HAP=~/dev/One More/entry/build/default/outputs/default/entry-default-signed.hap
+OUT=~/dev/One More/真机抽验-$(date +%m%d-%H%M)
 mkdir -p "$OUT"
 say () { echo ""; echo "────────────────────────────────────────"; echo "$1"; echo "────────────────────────────────────────"; }
 
@@ -48,7 +48,7 @@ cat <<'GAMES'
   │                                                      │
   │ ✅ 全过 ⇒ 放量 260 文件：                             │
   │   python3 ~/.dsh/storages/games-input-20261013/inline_fix.py \
-  │       --apply --risky ~/dev/yiju/entry/src/main/ets/games/*.ets
+  │       --apply --risky ~/dev/One More/entry/src/main/ets/games/*.ets
   └──────────────────────────────────────────────────────┘
 GAMES
 

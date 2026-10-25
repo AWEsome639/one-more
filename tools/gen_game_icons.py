@@ -49,7 +49,7 @@ DESIGN = os.path.join(ROOT, 'entry/src/main/ets/core/Design.ets')
 RENDERER = os.path.join(ROOT, 'tools/icongen/RenderIcons.swift')
 MEDIA_DIR = os.path.join(ROOT, 'entry/src/main/resources/base/media')
 PREVIEW_DIR = os.path.expanduser('~/Desktop/学业规划/鸿蒙小游戏合集 20261010/验收截图')
-TMP = '/tmp/yiju_icons_raw'
+TMP = '/tmp/onemore_icons_raw'
 
 ICON_PX = 192          # 渲染尺寸（卡片上 52vp，3x 屏 = 156px ⇒ 1.23× 余量）
 QUANT_COLORS = 256     # PNG 调色板色数（实测 mean-diff 3.1/255，肉眼无感）

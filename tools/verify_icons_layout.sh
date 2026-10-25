@@ -9,14 +9,14 @@
 #   ③ 下拉到第二屏再截一张（第一屏只能看到 4 款，354 款要滚着抽）
 #   ④ 用 uitest dump 量出**每张卡里图标与文字的矩形**，算实际间距（不靠肉眼）
 #
-# 产物落 ~/dev/yiju/验收-图标与布局-20261013/
+# 产物落 ~/dev/One More/验收-图标与布局-20261013/
 set -u
 HDC="$HOME/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc"
 PKG=com.andrewoscar.onemore
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 HAP="${1:-$ROOT/entry/build/default/outputs/default/entry-default-signed.hap}"
 SHOT="$ROOT/验收-图标与布局-20261013"
-TMP=/tmp/yiju_icon_verify
+TMP=/tmp/onemore_icon_verify
 mkdir -p "$SHOT" "$TMP"
 
 say() { printf '\n\033[1m%s\033[0m\n' "$*"; }

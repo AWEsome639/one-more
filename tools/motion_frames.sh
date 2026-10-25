@@ -6,14 +6,14 @@
 # 用法: bash tools/motion_frames.sh <场景>
 #   场景 = transition | stagger | rolling | all
 #
-# 产物落 ~/dev/yiju/验收-动效-20261013/<场景>/
+# 产物落 ~/dev/One More/验收-动效-20261013/<场景>/
 #   每帧单独存 + 一张"帧序列"横向拼图（一眼看出运动轨迹）
 set -u
 HDC="$HOME/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc"
 PKG=com.andrewoscar.onemore
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT="$ROOT/验收-动效-20261013"
-TMP=/tmp/yiju_motion
+TMP=/tmp/onemore_motion
 mkdir -p "$OUT" "$TMP"
 
 SCENE="${1:-all}"

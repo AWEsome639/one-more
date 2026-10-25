@@ -21,7 +21,7 @@ import re
 import io
 import sys
 
-ROOT = '/Users/a0000/dev/yiju'
+ROOT = '/Users/a0000/dev/One More'
 ETS = os.path.join(ROOT, 'entry/src/main/ets')
 I18N = os.path.join(ETS, 'core/I18n.ets')
 GAME_I18N = os.path.join(ETS, 'core/GameI18n.ets')

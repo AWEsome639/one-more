@@ -25,7 +25,7 @@ import math
 
 from PIL import Image, ImageDraw, ImageFilter
 
-SPLASH = '/Users/a0000/dev/yiju/entry/src/main/ets/pages/Splash.ets'
+SPLASH = '/Users/a0000/dev/One More/entry/src/main/ets/pages/Splash.ets'
 OUT = sys.argv[1] if len(sys.argv) > 1 else '/tmp/splash-frames'
 
 # ── 与 Splash.ets 一致的配色 ──

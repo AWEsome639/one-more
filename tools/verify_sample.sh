@@ -2,14 +2,14 @@
 # 抽样上机验证（拾海 2026-10-10）：从 354 款里均匀抽 N 款，逐个进入并检查控件越界
 set -u
 HDC="$HOME/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc"
-TMP=/tmp/yiju_sample; mkdir -p "$TMP"
+TMP=/tmp/onemore_sample; mkdir -p "$TMP"
 N="${1:-24}"
 
 # 从注册表均匀抽样
 /usr/bin/python3 - "$N" > "$TMP/sample.txt" <<'PY'
 import re, sys
 n = int(sys.argv[1])
-s = open('/Users/a0000/dev/yiju/entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
+s = open('/Users/a0000/dev/One More/entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
 rows = re.findall(r"id: '([^']+)', name: '([^']*)'", s)
 step = max(1, len(rows)//n)
 for i in range(0, len(rows), step):

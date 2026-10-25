@@ -66,5 +66,5 @@ export function G(zh: string): string {
   return hit === undefined ? zh : hit;
 }
 ''')
-io.open('/Users/a0000/dev/yiju/entry/src/main/ets/core/GameI18n.ets', 'w', encoding='utf-8').write(''.join(lines))
+io.open('/Users/a0000/dev/One More/entry/src/main/ets/core/GameI18n.ets', 'w', encoding='utf-8').write(''.join(lines))
 print(f'  ✅ core/GameI18n.ets 已生成（{len(M)} 条对照）')

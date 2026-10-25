@@ -3,7 +3,7 @@
 # 用法: bash verify_list.sh <id列表文件，每行一个 id|中文名> <日志>
 set -u
 HDC="$HOME/Library/Huawei/command-line-tools/sdk/default/openharmony/toolchains/hdc"
-TMP=/tmp/yiju_list; mkdir -p "$TMP"
+TMP=/tmp/onemore_list; mkdir -p "$TMP"
 LIST="$1"; LOG="${2:-$TMP/report.txt}"
 PKG=com.andrewoscar.onemore
 
