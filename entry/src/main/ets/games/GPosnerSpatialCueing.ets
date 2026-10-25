@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -27,6 +29,8 @@ export struct GPosnerSpatialCueing {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State phase: number = 0;        // 0 注视　1 提示　2 目标　3 反馈
@@ -67,6 +71,37 @@ export struct GPosnerSpatialCueing {
         this.msg = TG('🎯 目标出现，快点它所在的一侧！');
       }, CUE_MS);
     }, FIX_MS);
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案：this.targetSide   ｜ 守卫取自它自己的 if (...) { return; }
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 2) {
+      return true;
+    }
+    this.answer(this.targetSide);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private answer(side: number): void {
@@ -150,6 +185,11 @@ export struct GPosnerSpatialCueing {
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 2).onClick(() => { Haptics.tap(); this.answer((1)); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

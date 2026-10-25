@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -30,6 +32,8 @@ export struct GPeripheralFocus {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State at: number = -1; @State target: string = ''; @State opts: string[] = [];
@@ -83,6 +87,37 @@ export struct GPeripheralFocus {
       this.timer = -1; this.phase = 1;
       this.msg = TG2('刚才余光里的符号是哪个？（{0} ms）', this.showMs());
     }, this.showMs());
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案：this.target   ｜ 守卫取自它自己的 if (...) { return; }
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 1) {
+      return true;
+    }
+    this.answer(this.target);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private answer(sym: string): void {
@@ -152,6 +187,11 @@ export struct GPeripheralFocus {
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(60)).enabled(this.phase === 1).onClick(() => { Haptics.tap(); this.answer(this.opts[(i)]); }) }, (i: number) => 'po' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：视线始终留在中心 ➕ 上，只靠余光看四周的格子')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

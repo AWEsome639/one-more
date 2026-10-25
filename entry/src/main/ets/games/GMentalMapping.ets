@@ -12,6 +12,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -30,6 +32,8 @@ export struct GMentalMapping {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：要记住几个地点（简单 3 / 普通 4 / 困难 6）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private spotCount: number = GameDiff.pick(3, 4, 6);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -121,6 +125,37 @@ export struct GMentalMapping {
     const sx: number = dx === 0 ? 0 : (dx > 0 ? 1 : -1);
     const sy: number = dy === 0 ? 0 : (dy > 0 ? 1 : -1);
     return (sy + 1) * 3 + (sx + 1);
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案：this.answerDir()   ｜ 守卫取自它自己的 if (...) { return; }
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.showMap) {
+      return true;
+    }
+    this.answer(this.answerDir());
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private answer(idx: number): void {
@@ -350,6 +385,16 @@ export struct GMentalMapping {
           .fontSize(FontSize.sm)
           .fontColor(this.lastOk === 1 ? Palette.emerald : Palette.rose)
       }
+
+      HintBar({
+
+        showHint: false,
+
+        onAutoTap: () => { this.askAuto(); },
+
+        autoOn: this.autoId >= 0
+
+      })
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
