@@ -10,7 +10,6 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint } from '../ai/Hint';
-import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -27,8 +26,6 @@ export struct GLockPattern {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：DOTS 按难度换算
-  /** 代打计时器（-1 = 未运行）。必须 @State */
-  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(DOTS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -122,46 +119,6 @@ export struct GLockPattern {
     this.preview();
   }
 
-  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
-  // ★ 变体⑦：照真值走
-  // 必须按 target 的顺序点：下一个该点的是 target[input.length]
-  private autoStep(): boolean {
-    // 这款没有 over 字段，用 phase 判：0 = 预览 / 1 = 作答 / 2 = 结束
-    if (this.phase === 2) {
-      return false;             // 真的结束了，停
-    }
-    if (this.phase !== 1) {
-      return true;              // ★ 还在预览，要"继续等"而不是停掉计时器
-    }
-    if (this.target.length === 0) {
-      return true;              // ★ 题目还没生成出来，继续等（别在这里停）
-    }
-    const k: number = this.input.length;
-    if (k >= this.target.length) {
-      return false;
-    }
-    this.tapDot(this.target[k]);
-    return this.phase === 1;
-  }
-
-  private askAuto(): void {
-    Haptics.tap();
-    if (this.autoId >= 0) {
-      this.stopAuto();
-      Hint.toast(TG('已停止代打'));
-      return;
-    }
-    Hint.toast(TG('AI 开始代打…'));
-    this.autoId = Hint.autoRun(() => this.autoStep());
-  }
-
-  private stopAuto(): void {
-    if (this.autoId >= 0) {
-      Hint.autoStop(this.autoId);
-      this.autoId = -1;
-    }
-  }
-
   private tapDot(i: number): void {
     if (this.phase !== 1) {
       return;
@@ -217,16 +174,7 @@ export struct GLockPattern {
   build() {
     Column({ space: Space.lg }) {
 
-    HintBar({
-
-      showHint: false,
-
-      onAutoTap: () => { this.askAuto(); },
-
-      autoOn: this.autoId >= 0
-
-    })
-      Row({ space: Space.md }) {
+          Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((String(this.lvl) + '/' + String(MAXLVL))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
