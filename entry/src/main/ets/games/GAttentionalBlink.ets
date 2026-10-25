@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -24,6 +26,8 @@ export struct GAttentionalBlink {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State private seq: string[] = [];
@@ -97,6 +101,42 @@ export struct GAttentionalBlink {
       this.tickTo = setTimeout(() => { this.tickTo = -1; this.play(k + 1); }, 70);
     }, this.pace());
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 判定式直取：opts[i] === this.digit 的那个选项
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.pick >= 0 || this.idx < LEN) {
+      return true;              // 还在刺激/过渡阶段，等
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === this.digit) {
+        this.answer(i);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private answer(i: number): void {
     if (this.over || this.pick >= 0 || this.idx < LEN) { return; }
     this.pick = i;
@@ -175,6 +215,11 @@ export struct GAttentionalBlink {
       .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => { Haptics.tick(); this.answer((3)); }) }.width('100%')
+      HintBar({
+        onAutoTap: () => { this.askAuto(); },
+        showHint: false,
+        autoOn: this.autoId >= 0
+      })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
