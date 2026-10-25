@@ -16,6 +16,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -85,6 +86,8 @@ export struct GMinesweeper {
   private safeTotal: number = SIDE * SIDE - GameDiff.sizeNow(MINES);
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private cells: MineCell[] = [];
   @State private flagMode: boolean = false;
   @State private over: boolean = false;
@@ -250,6 +253,51 @@ export struct GMinesweeper {
   }
 
   // ────────────────────────── 玩法 ──────────────────────────
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // computeHint 会给两种答案：安全的格（翻开）、是雷的格（插旗）
+  // 这游戏自己的 MineCell.mine 就知道是哪一种 ⇒ 按类型分派
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    // ★ 扫雷靠"提示"走不通：提示遇到"逻辑推不出、得猜"的局面就返回空。
+    //   但这款游戏的 MineCell 里有 mine 字段（它自己知道哪格是雷）
+    //   ⇒ 代打直接照雷区扫：翻开所有非雷格、给所有雷插旗。
+    for (let i = 0; i < this.cells.length; i++) {
+      const c: MineCell = this.cellAt(i);
+      if (c.mine) {
+        if (!c.flag) {
+          this.toggleFlag(i);
+          return !this.over;
+        }
+      } else {
+        if (!c.open) {
+          this.reveal(i);
+          return !this.over;
+        }
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
 
   private onCellTap(i: number): void {
     if (this.swallowClick) {
@@ -547,6 +595,11 @@ export struct GMinesweeper {
           .onClick(() => {
             this.askHint();
           })
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
