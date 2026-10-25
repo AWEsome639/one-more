@@ -14,7 +14,6 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG4 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
-import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -35,8 +34,6 @@ export struct GSlide15 {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=4；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3]，上面已一并改成按尺寸生成
-  /** 代打计时器（-1 = 未运行）。必须 @State */
-  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -236,38 +233,6 @@ export struct GSlide15 {
       TG4(better ? 'Slide the tile at row {0}, column {1} (distance {2} → {3})'
                  : 'No immediate gain; slide row {0}, column {1} first (distance {2} → {3})',
         String(r), String(c), String(cur), String(bestDist)), t0);
-  }
-
-  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
-  // 提示驱动：computeHint 每次给出"下一格" ⇒ 照它点
-  private autoStep(): boolean {
-    if (this.won) {
-      return false;
-    }
-    const r: HintResult = this.computeHint();
-    if (!r.ok || r.cells.length === 0) {
-      return false;
-    }
-    this.tap(r.cells[0]);
-    return !this.won;
-  }
-
-  private askAuto(): void {
-    Haptics.tap();
-    if (this.autoId >= 0) {
-      this.stopAuto();
-      Hint.toast(TG('已停止代打'));
-      return;
-    }
-    Hint.toast(TG('AI 开始代打…'));
-    this.autoId = Hint.autoRun(() => this.autoStep());
-  }
-
-  private stopAuto(): void {
-    if (this.autoId >= 0) {
-      Hint.autoStop(this.autoId);
-      this.autoId = -1;
-    }
   }
 
   private askHint(): void {
@@ -486,12 +451,7 @@ export struct GSlide15 {
 
       // ── 操作 ──
       Row({ space: Space.md }) {
-        HintBar({
-          onHintTap: () => { this.askHint(); },
-          onAutoTap: () => { this.askAuto(); },
-          autoOn: this.autoId >= 0
-        })
-        Button(TG('提示'))
+                Button(TG('提示'))
           .fontSize(FontSize.sm)
           .fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt)
