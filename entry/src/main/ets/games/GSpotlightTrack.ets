@@ -122,7 +122,10 @@ export struct GSpotlightTrack {
       return false;
     }
     if (this.over || this.chasing) {
-      return true;
+      return true;              // 追光中，不能答
+    }
+    if (this.nextTo >= 0) {
+      return true;              // ★ 换题的 760ms 过渡期，也不该再答
     }
     this.tap(this.at);
     return !this.over;
