@@ -80,7 +80,10 @@ export struct GContextClues {
       return false;
     }
     if (this.picked >= 0) {
-      return true;              // 这题答过了，等 setTimeout 进下一题
+      // ★ 这款**没有定时器**：「下一题」是玩家自己点的按钮（第 198 行）
+      //   所以代打必须自己按，否则会一直在原地等
+      this.nextQ();
+      return !this.over;
     }
     this.choose(this.ans);
     return !this.over;
