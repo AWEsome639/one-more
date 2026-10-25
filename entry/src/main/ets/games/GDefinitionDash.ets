@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/D
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -97,6 +97,24 @@ export struct GDefinitionDash {
   /** 答完立刻换下一题，上一题的判定留在提示行里 */
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 判定式：i === this.ans   ｜ 守卫条件取自它自己的 if (...) { return; }
+  /** 提示：直接报正确的那个选项（这款的答案就存在 this.ans 里） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const n: number = this.ans;
+    return Hint.make([n],
+      TG2('答案是第 {0} 个', String(n + 1)),
+      TG2('The answer is option {0}', String(n + 1)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -210,9 +228,10 @@ export struct GDefinitionDash {
 
       HintBar({
 
-        showHint: false,
+        showHint: true,
 
-        onAutoTap: () => { this.askAuto(); },
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
 
         autoOn: this.autoId >= 0
 

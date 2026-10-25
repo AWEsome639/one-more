@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-25 提示：报答案 */
+  "答案是第 {0} 个": { "en": "The answer is option {0}", "ja": "答えは{0}番目", "ko": "정답은 {0}번째", "es": "La respuesta es la opción {0}", "fr": "La réponse est l'option {0}", "de": "Die Antwort ist Option {0}", "pt": "A resposta é a opção {0}", "ru": "Ответ — вариант {0}", "it": "La risposta è l'opzione {0}", "ar": "الجواب هو الخيار {0}" },
+  /** ★★ 2026-10-25 提示：报答案 */
+  "这一步看不出答案": { "en": "Cannot tell the answer from here", "ja": "この手では答えが分かりません", "ko": "이 단계에서는 답을 알 수 없어요", "es": "Aquí no se puede ver la respuesta", "fr": "Impossible de voir la réponse ici", "de": "Hier ist die Antwort nicht erkennbar", "pt": "Não dá para ver a resposta aqui", "ru": "Здесь ответ не определить", "it": "Qui non si vede la risposta", "ar": "لا يمكن تحديد الجواب هنا" },
   /** ★★ 2026-10-25 视觉搜索 */
   "第 {0} 行第 {1} 列": { "en": "Row {0}, column {1}", "ja": "{0}行{1}列", "ko": "{0}행 {1}열", "es": "Fila {0}, columna {1}", "fr": "Ligne {0}, colonne {1}", "de": "Zeile {0}, Spalte {1}", "pt": "Linha {0}, coluna {1}", "ru": "Строка {0}, столбец {1}", "it": "Riga {0}, colonna {1}", "ar": "الصف {0}، العمود {1}" },
   /** ★★ 2026-10-25 视觉搜索 */
