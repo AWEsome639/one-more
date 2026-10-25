@@ -13,7 +13,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 
 const DOMAIN = 0x0001;
 const TAG = 'StatsCard';
-const STORE = 'yiju_progress';
+const STORE = 'onemore_progress';
 
 /** 卡片数据（显式接口，ArkTS 不许无类型对象字面量） */
 interface CardStats {

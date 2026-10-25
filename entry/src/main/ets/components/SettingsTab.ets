@@ -28,7 +28,7 @@
  *    ① persist() 在 ProgressStore 里是 private ⇒ 跨文件调用 TS2341，编译不过；
  *    ② 它只写 xp/totalSolved/superStreak/bestStreak，清不掉 favorites/recent/totalPlays/perGame*。
  *    ⇒ 这里改成：先把 AppStorage 的进度键全写回初始值，再用 preferences 公共 API 把
- *      'yiju_progress' 整库 clear（库名与 ProgressStore / StatsCardAbility 一致，本工程已有先例），
+ *      'onemore_progress' 整库 clear（库名与 ProgressStore / StatsCardAbility 一致，本工程已有先例），
  *      最后把「深色模式」这个外观偏好写回 —— 重置的是进度，不该顺手改外观。
  */
 
@@ -49,7 +49,7 @@ import { pasteboard } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
 
 /** 进度库名 —— 与 ProgressStore 的 STORE_NAME、StatsCardAbility 的 STORE 同一个库 */
-const STORE_NAME: string = 'yiju_progress';
+const STORE_NAME: string = 'onemore_progress';
 /** 版本号 —— 与 AppScope/app.json5 的 versionName 保持一致 */
 // ★ 2026-10-13：版本号**单一真相源**在 `core/About.ets` 的 `About.VERSION`
 //   原来这里又硬编码了一份 ⇒ 改一处忘另一处就会不同步（我今天正好发现两处都是 1.0.0）
@@ -268,7 +268,7 @@ export struct SettingsTab {
 
   /**
    * 重置进度（二次确认后才会调到）。
-   * ① 内存：进度键全部回初始值；② 磁盘：'yiju_progress' 整库清空；③ 外观偏好写回。
+   * ① 内存：进度键全部回初始值；② 磁盘：'onemore_progress' 整库清空；③ 外观偏好写回。
    */
   private doReset(): void {
     try {

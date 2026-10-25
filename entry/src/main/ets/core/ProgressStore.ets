@@ -20,7 +20,10 @@ import { preferences } from '@kit.ArkData';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { common } from '@kit.AbilityKit';
 
-const STORE_NAME: string = 'yiju_progress';
+const STORE_NAME: string = 'onemore_progress';
+/** ★ 2026-10-25 旧库名。只用于**一次性迁移**：开机时把旧库整库搬到新库，搬完删旧库。
+ *   ⚠️ 不许再往这里写数据；迁移失败也绝不影响启动。 */
+const LEGACY_STORE: string = 'yiju_progress';
 /** 语言 / 主题色的落盘键（2026-10-13：从 PersistentStorage 改成吃这个库 —— 见 saveLang 注释） */
 
 /** AppStorage 键名（组件只认这些） */
@@ -75,6 +78,32 @@ export class ProgressStore {
   private static streaks: Map<string, GameStreak> = new Map<string, GameStreak>();
   private static ready: boolean = false;
 
+  /** ★ 一次性迁移：旧库 yiju_progress → 新库 onemore_progress（搬完删旧库） */
+  private static async migrateLegacy(ctx: common.UIAbilityContext,
+                                     dest: preferences.Preferences): Promise<void> {
+    try {
+      const old: preferences.Preferences = await preferences.getPreferences(ctx, LEGACY_STORE);
+      const allRaw: Object = old.getAllSync();
+      const all: Record<string, Object> = allRaw as Record<string, Object>;
+      const keys: string[] = Object.keys(all);
+      if (keys.length === 0) {
+        return;
+      }
+      const curRaw: Object = dest.getAllSync();
+      const cur: Record<string, Object> = curRaw as Record<string, Object>;
+      if (Object.keys(cur).length > 0) {
+        return;                       // 新库已有数据 ⇒ 不覆盖
+      }
+      for (let i = 0; i < keys.length; i++) {
+        dest.putSync(keys[i], all[keys[i]] as preferences.ValueType);
+      }
+      await dest.flush();
+      await preferences.deletePreferences(ctx, LEGACY_STORE);
+    } catch (e) {
+      // 迁移失败不影响启动（旧库留着，数据还在）
+    }
+  }
+
   /** 应用启动时调一次 */
   static async init(ctx: common.UIAbilityContext): Promise<void> {
     if (ProgressStore.ready) {
@@ -83,6 +112,7 @@ export class ProgressStore {
     try {
       ProgressStore.pref = await preferences.getPreferences(ctx, STORE_NAME);
       const p = ProgressStore.pref;
+      await ProgressStore.migrateLegacy(ctx, p);   // ★ 旧库搬家（只在第一次有活干）
 
       const xp: number = p.getSync(Keys.xp, 0) as number;
       const totalSolved: number = p.getSync(Keys.totalSolved, 0) as number;
