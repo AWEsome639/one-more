@@ -82,8 +82,8 @@ export struct GSymbolicFlanker {
       return Hint.none('none');
     }
     return Hint.make([],
-      TG2('答案是 {0}', String(this.dir)),
-      TG2('The answer is {0}', String(this.dir)), t0);
+      this.dir === 0 ? TG('选左边') : TG('选右边'),
+      this.dir === 0 ? TG('Pick the left one') : TG('Pick the right one'), t0);
   }
 
   private askHint(): void {

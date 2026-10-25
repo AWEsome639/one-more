@@ -102,8 +102,8 @@ export struct GPrimeGapHunt {
       return Hint.none('none');
     }
     return Hint.make([],
-      TG2('答案是 {0}', String(this.gap)),
-      TG2('The answer is {0}', String(this.gap)), t0);
+      TG2('间隔是 {0}', String(this.gap)),
+      TG2('The gap is {0}', String(this.gap)), t0);
   }
 
   private askHint(): void {

@@ -116,9 +116,11 @@ export struct GSymmetry {
     if (this.over) {
       return Hint.none('none');
     }
+    const name: string = this.axis === 0 ? TG('左右对称')
+      : (this.axis === 1 ? TG('上下对称') : (this.axis === 2 ? TG('主对角对称') : TG('副对角对称')));
     return Hint.make([],
-      TG2('答案是 {0}', String(this.axis)),
-      TG2('The answer is {0}', String(this.axis)), t0);
+      TG2('答案是{0}', name),
+      TG2('The answer is {0}', name), t0);
   }
 
   private askHint(): void {

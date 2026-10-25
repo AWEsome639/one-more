@@ -121,9 +121,9 @@ export struct GPerspectiveShiftView {
     if (this.over) {
       return Hint.none('none');
     }
-    return Hint.make([],
-      TG2('答案是 {0}', String(this.dir)),
-      TG2('The answer is {0}', String(this.dir)), t0);
+    return Hint.make([this.answer],
+      TG2('答案是第 {0} 个', String(this.answer + 1)),
+      TG2('The answer is option {0}', String(this.answer + 1)), t0);
   }
 
   private askHint(): void {

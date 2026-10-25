@@ -23,6 +23,22 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-25 提示文案精修 */
+  "间隔是 {0}": { "en": "The gap is {0}", "ja": "間隔は {0}", "ko": "간격은 {0}", "es": "El intervalo es {0}", "fr": "L'écart est {0}", "de": "Der Abstand ist {0}", "pt": "O intervalo é {0}", "ru": "Интервал: {0}", "it": "L'intervallo è {0}", "ar": "الفجوة هي {0}" },
+  /** ★★ 2026-10-25 提示文案精修 */
+  "选左边": { "en": "Pick the left", "ja": "左を選ぶ", "ko": "왼쪽 선택", "es": "Elige la izquierda", "fr": "Choisissez la gauche", "de": "Links wählen", "pt": "Escolha a esquerda", "ru": "Выберите левое", "it": "Scegli la sinistra", "ar": "اختر اليسار" },
+  /** ★★ 2026-10-25 提示文案精修 */
+  "选右边": { "en": "Pick the right", "ja": "右を選ぶ", "ko": "오른쪽 선택", "es": "Elige la derecha", "fr": "Choisissez la droite", "de": "Rechts wählen", "pt": "Escolha a direita", "ru": "Выберите правое", "it": "Scegli la destra", "ar": "اختر اليمين" },
+  /** ★★ 2026-10-25 提示文案精修 */
+  "左右对称": { "en": "Left-right mirror", "ja": "左右対称", "ko": "좌우 대칭", "es": "Simetría izquierda-derecha", "fr": "Symétrie gauche-droite", "de": "Links-rechts-Symmetrie", "pt": "Simetria esquerda-direita", "ru": "Симметрия влево-вправо", "it": "Simmetria sinistra-destra", "ar": "تماثل يمين-يسار" },
+  /** ★★ 2026-10-25 提示文案精修 */
+  "上下对称": { "en": "Top-bottom mirror", "ja": "上下対称", "ko": "상하 대칭", "es": "Simetría arriba-abajo", "fr": "Symétrie haut-bas", "de": "Oben-unten-Symmetrie", "pt": "Simetria cima-baixo", "ru": "Симметрия вверх-вниз", "it": "Simmetria alto-basso", "ar": "تماثل أعلى-أسفل" },
+  /** ★★ 2026-10-25 提示文案精修 */
+  "主对角对称": { "en": "Main diagonal mirror", "ja": "主対角線対称", "ko": "주대각 대칭", "es": "Simetría diagonal principal", "fr": "Symétrie diagonale principale", "de": "Hauptdiagonal-Symmetrie", "pt": "Simetria diagonal principal", "ru": "Симметрия по главной диагонали", "it": "Simmetria diagonale principale", "ar": "تماثل القطر الرئيسي" },
+  /** ★★ 2026-10-25 提示文案精修 */
+  "副对角对称": { "en": "Anti-diagonal mirror", "ja": "副対角線対称", "ko": "반대각 대칭", "es": "Simetría diagonal secundaria", "fr": "Symétrie anti-diagonale", "de": "Nebendiagonal-Symmetrie", "pt": "Simetria antidiagonal", "ru": "Симметрия по побочной диагонали", "it": "Simmetria antidiagonale", "ar": "تماثل القطر الثانوي" },
+  /** ★★ 2026-10-25 提示文案精修 */
+  "答案是{0}": { "en": "The answer is {0}", "ja": "答えは{0}", "ko": "정답은 {0}", "es": "La respuesta es {0}", "fr": "La réponse est {0}", "de": "Die Antwort ist {0}", "pt": "A resposta é {0}", "ru": "Ответ: {0}", "it": "La risposta è {0}", "ar": "الجواب هو {0}" },
   /** ★★ 2026-10-25 提示：报值 */
   "答案是 {0}": { "en": "The answer is {0}", "ja": "答えは {0}", "ko": "정답은 {0}", "es": "La respuesta es {0}", "fr": "La réponse est {0}", "de": "Die Antwort ist {0}", "pt": "A resposta é {0}", "ru": "Ответ: {0}", "it": "La risposta è {0}", "ar": "الجواب هو {0}" },
   /** ★★ 2026-10-25 提示：报答案 */
