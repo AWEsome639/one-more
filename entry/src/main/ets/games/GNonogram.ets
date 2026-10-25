@@ -11,6 +11,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -86,6 +87,8 @@ export struct GNonogram {
    *   ⇒ 简单档只取前 16 项、困难档 25..48 是 undefined（图案全丢）
    *   修法：棋盘固定 5×5，难度改到**容错次数**上。
    */
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = 5;
   /** 本局的容错次数：简单 6 / 普通 3 / 困难 2 */
   @State private errMax: number = GNonogram.errNow();
@@ -297,6 +300,38 @@ export struct GNonogram {
     return Hint.none('none');
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 提示驱动：computeHint 每次给出"下一格" ⇒ 照它点
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const r: HintResult = this.computeHint();
+    if (!r.ok || r.cells.length === 0) {
+      return false;
+    }
+    this.tap(r.cells[0]);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
@@ -462,6 +497,11 @@ export struct GNonogram {
           .onClick(() => {
             this.askHint();
           })
+        HintBar({
+          onHintTap: () => { this.askHint(); },
+          onAutoTap: () => { this.askAuto(); },
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
