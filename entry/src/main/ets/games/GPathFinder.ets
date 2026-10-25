@@ -12,6 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -77,6 +78,8 @@ export struct GPathFinder {
    *   ⇒ 修法：**棋盘固定 7×7**，难度改到**步数预算**上
    *     （budget 本来就是 par * 2，现在按难度给不同倍率）
    */
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = 7;
   /** 本局的步数预算倍率：简单 2.6 / 普通 2.0 / 困难 1.5 */
   @State private budgetMul: number = GPathFinder.mulNow();
@@ -240,6 +243,38 @@ export struct GPathFinder {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
     Hint.toastResult(r, TG('这一步算不出来'));
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 提示驱动：computeHint 返回"下一步走哪格" ⇒ tap 它
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const r: HintResult = this.computeHint();
+    if (!r.ok || r.cells.length === 0) {
+      return false;
+    }
+    this.tap(r.cells[0]);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tap(i: number): void {
@@ -420,6 +455,11 @@ export struct GPathFinder {
           .onClick(() => {
             this.askHint();
           })
+        HintBar({
+          onHintTap: () => { this.askHint(); },
+          onAutoTap: () => { this.askAuto(); },
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
