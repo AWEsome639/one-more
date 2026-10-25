@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-25 避免同名冲突的改名 */
+  "十五格华容道": { "en": "15-Puzzle", "ja": "15パズル", "ko": "15퍼즐", "es": "Puzle de 15", "fr": "Taquin 15", "de": "15-Puzzle", "pt": "Quebra-cabeça 15", "ru": "Пятнашки", "it": "Puzzle del 15", "ar": "لغز 15" },
+  /** ★★ 2026-10-25 避免同名冲突的改名 */
+  "递归汉诺塔": { "en": "Recursive Towers", "ja": "再帰ハノイ", "ko": "재귀 하노이", "es": "Torres recursivas", "fr": "Tours récursives", "de": "Rekursive Türme", "pt": "Torres recursivas", "ru": "Рекурсивные башни", "it": "Torri ricorsive", "ar": "أبراج عودية" },
   /** ★★ 2026-10-25 提示文案精修 */
   "间隔是 {0}": { "en": "The gap is {0}", "ja": "間隔は {0}", "ko": "간격은 {0}", "es": "El intervalo es {0}", "fr": "L'écart est {0}", "de": "Der Abstand ist {0}", "pt": "O intervalo é {0}", "ru": "Интервал: {0}", "it": "L'intervallo è {0}", "ar": "الفجوة هي {0}" },
   /** ★★ 2026-10-25 提示文案精修 */
