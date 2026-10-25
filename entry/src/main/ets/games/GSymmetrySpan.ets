@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -20,6 +22,8 @@ export struct GSymmetrySpan {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=4；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -70,6 +74,43 @@ export struct GSymmetrySpan {
       this.timer = -1; this.phase = 1;
       this.msg = TG2('点出刚才的 {0} 格（再点一下可取消）', SPAN);
     }, SHOW_MS);
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ★ 变体⑦：照真值数组走
+  // target[i] === 1 表示这一格要选中；只在 phase 1 能点
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 1) {
+      return true;              // 还没进入选择阶段，等它
+    }
+    for (let i = 0; i < this.target.length; i++) {
+      if (this.target[i] === 1 && this.chosen.indexOf(i) < 0) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tap(i: number): void {
@@ -152,6 +193,11 @@ export struct GSymmetrySpan {
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })

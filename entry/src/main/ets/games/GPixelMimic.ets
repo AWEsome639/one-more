@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -35,6 +37,8 @@ export struct GPixelMimic {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=8）
   //   ⚠️ 原本 ForEach(IDXN, …) 是常量数组，已改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(8);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -86,6 +90,40 @@ export struct GPixelMimic {
     }
     return g;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ★ 变体⑦：照真值数组走
+  // goal vs mine：哪个格子不一致就点哪个（点一下翻转）
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    for (let i = 0; i < this.goal.length; i++) {
+      if (this.goal[i] !== this.mine[i]) {
+        this.paint(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private paint(i: number): void {
     if (this.over) { return; }
     const m: boolean[] = this.mine.slice();
@@ -170,6 +208,11 @@ export struct GPixelMimic {
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
