@@ -3,7 +3,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -112,6 +112,23 @@ export struct GRomanArithmetic {
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 答案 this.ans 是字符串，作答函数的参数也是字符串
   // ★ 守卫 this.picked 也是字符串 ⇒ 判据是 length > 0，不是 >= 0
+  /** 提示：报答案（字段 this.ans） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('答案是 {0}', this.ans),
+      TG2('The answer is {0}', this.ans), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -209,8 +226,9 @@ export struct GRomanArithmetic {
       }.width('100%')
       Row({ space: Space.md }) {
         HintBar({
-          showHint: false,
-          onAutoTap: () => { this.askAuto(); },
+          showHint: true,
+          onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
           autoOn: this.autoId >= 0
         })
         Button(TG('重开'))

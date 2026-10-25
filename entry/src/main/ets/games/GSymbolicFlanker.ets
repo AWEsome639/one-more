@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -75,6 +75,23 @@ export struct GSymbolicFlanker {
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 判定式：i === this.dir   ｜ 守卫条件取自它自己的 if (...) { return; }
+  /** 提示：报答案（字段 this.dir） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('答案是 {0}', String(this.dir)),
+      TG2('The answer is {0}', String(this.dir)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -186,9 +203,10 @@ export struct GSymbolicFlanker {
 
       HintBar({
 
-        showHint: false,
+        showHint: true,
 
-        onAutoTap: () => { this.askAuto(); },
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
 
         autoOn: this.autoId >= 0
 

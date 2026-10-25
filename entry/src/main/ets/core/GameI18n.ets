@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-25 提示：报值 */
+  "答案是 {0}": { "en": "The answer is {0}", "ja": "答えは {0}", "ko": "정답은 {0}", "es": "La respuesta es {0}", "fr": "La réponse est {0}", "de": "Die Antwort ist {0}", "pt": "A resposta é {0}", "ru": "Ответ: {0}", "it": "La risposta è {0}", "ar": "الجواب هو {0}" },
   /** ★★ 2026-10-25 提示：报答案 */
   "答案是第 {0} 个": { "en": "The answer is option {0}", "ja": "答えは{0}番目", "ko": "정답은 {0}번째", "es": "La respuesta es la opción {0}", "fr": "La réponse est l'option {0}", "de": "Die Antwort ist Option {0}", "pt": "A resposta é a opção {0}", "ru": "Ответ — вариант {0}", "it": "La risposta è l'opzione {0}", "ar": "الجواب هو الخيار {0}" },
   /** ★★ 2026-10-25 提示：报答案 */
