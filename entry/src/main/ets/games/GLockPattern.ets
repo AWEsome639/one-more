@@ -9,6 +9,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -25,6 +27,8 @@ export struct GLockPattern {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：DOTS 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(DOTS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -116,6 +120,40 @@ export struct GLockPattern {
     }
     this.peeks++;
     this.preview();
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ★ 变体⑦：照真值走
+  // 必须按 target 的顺序点：下一个该点的是 target[input.length]
+  private autoStep(): boolean {
+    // 这款没有 over 字段，用 phase 判：1 = 可以输入，2 = 已结束
+    if (this.phase !== 1) {
+      return false;
+    }
+    const k: number = this.input.length;
+    if (k >= this.target.length) {
+      return false;
+    }
+    this.tapDot(this.target[k]);
+    return this.phase === 1;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tapDot(i: number): void {
@@ -241,6 +279,11 @@ export struct GLockPattern {
             Haptics.tap();
             this.peek();
           })
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor(Color.White)

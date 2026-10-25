@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -30,6 +32,8 @@ export struct GMirrorTracing {
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 LEVELS=3
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(3);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -68,6 +72,41 @@ export struct GMirrorTracing {
     this.taps = 0;
     this.msg = TG('点镜子左边，笔会落在右边的对称位置');
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ★ 变体⑦：照真值走
+  // target[j] 是应该被标记的格；tap(i) 会作用到 j = mIdx(i)
+  private autoStep(): boolean {
+    if (this.over || this.done) {
+      return false;
+    }
+    for (let i = 0; i < this.target.length; i++) {
+      const j: number = mIdx(i);
+      if (this.target[j] && !this.mark[j]) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tap(i: number): void {
     if (this.over || this.done) { return; }
     const j: number = mIdx(i);
@@ -264,6 +303,11 @@ export struct GMirrorTracing {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         .width('100%')
         .textAlign(TextAlign.Center)
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
