@@ -160,6 +160,9 @@ export struct GBinaryCode {
     if (this.over) {
       return false;
     }
+    if (this.nextTo >= 0) {
+      return true;              // ★ 正在换关的间隙，toggle 会被拒绝，等一等
+    }
     const r: HintResult = this.computeHint();
     if (!r.ok || r.cells.length === 0) {
       return false;
