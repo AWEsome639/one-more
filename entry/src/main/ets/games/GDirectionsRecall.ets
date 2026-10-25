@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -22,6 +24,8 @@ export struct GDirectionsRecall {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(PASS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -69,6 +73,43 @@ export struct GDirectionsRecall {
       this.phase = 'input';
       this.note = TG(TG(TG('轮到你了 —— 按原顺序点回来')));
     }, GAP_MS + len * FLASH_MS));
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 方向序列回忆：按顺序点 seq
+  private autoStep(): boolean {
+    // 这款没有 over，用 phase 判：'done' 就是结束了
+    // ★ 必须用 string 类型的局部变量，否则 ArkTS 会把字面量收窄导致比较报错
+    const ph: string = this.phase;
+    if (ph === 'done') {
+      return false;
+    }
+    if (ph !== 'input') {
+      return true;              // 还在播放/过渡，等
+    }
+    if (this.input.length >= this.seq.length) {
+      return true;              // 这一轮答完了，等它开下一轮
+    }
+    this.tap(this.seq[this.input.length]);
+    return true;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tap(d: number): void {
@@ -159,6 +200,16 @@ export struct GDirectionsRecall {
           this.dirBtn(2)
         }.width('100%')
       }.width('100%')
+
+      HintBar({
+
+        onAutoTap: () => { this.askAuto(); },
+
+        showHint: false,
+
+        autoOn: this.autoId >= 0
+
+      })
 
       Button(this.phase === 'done' ? '下一关…' : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

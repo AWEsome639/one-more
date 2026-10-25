@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -20,6 +22,8 @@ export struct GActionSequenceRecall {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(LEVELS);
   onFinish: (r: GameResult) => void = () => {};
   @State seq: number[] = []; @State cursor: number = 0; @State showIdx: number = -1;
@@ -60,6 +64,40 @@ export struct GActionSequenceRecall {
     }
     this.showIdx = this.tickN % 2 === 0 ? this.seq[k] : -1;
     this.tickN = this.tickN + 1;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 动作序列回忆：按顺序点 seq
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.playing) {
+      return true;              // 还在播放/过渡，等
+    }
+    if (this.cursor >= this.seq.length) {
+      return true;              // 这一轮答完了，等它开下一轮
+    }
+    this.tap(this.seq[this.cursor]);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tap(i: number): void {
@@ -147,6 +185,11 @@ export struct GActionSequenceRecall {
       .width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      HintBar({
+        onAutoTap: () => { this.askAuto(); },
+        showHint: false,
+        autoOn: this.autoId >= 0
+      })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
