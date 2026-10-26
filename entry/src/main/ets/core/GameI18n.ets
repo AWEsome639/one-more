@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-26 布尔提示 */
+  "答案是「是」": { "en": "The answer is Yes", "ja": "答えは「はい」", "ko": "정답은 \"예\"", "es": "La respuesta es Sí", "fr": "La réponse est Oui", "de": "Die Antwort ist Ja", "pt": "A resposta é Sim", "ru": "Ответ — «Да»", "it": "La risposta è Sì", "ar": "الجواب هو «نعم»" },
+  /** ★★ 2026-10-26 布尔提示 */
+  "答案是「否」": { "en": "The answer is No", "ja": "答えは「いいえ」", "ko": "정답은 \"아니오\"", "es": "La respuesta es No", "fr": "La réponse est Non", "de": "Die Antwort ist Nein", "pt": "A resposta é Não", "ru": "Ответ — «Нет»", "it": "La risposta è No", "ar": "الجواب هو «لا»" },
   /** ★★ 2026-10-25 避免同名冲突的改名 */
   "十五格华容道": { "en": "15-Puzzle", "ja": "15パズル", "ko": "15퍼즐", "es": "Puzle de 15", "fr": "Taquin 15", "de": "15-Puzzle", "pt": "Quebra-cabeça 15", "ru": "Пятнашки", "it": "Puzzle del 15", "ar": "لغز 15" },
   /** ★★ 2026-10-25 避免同名冲突的改名 */

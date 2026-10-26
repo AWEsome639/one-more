@@ -8,7 +8,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -82,6 +82,24 @@ export struct GGearTrainDirection {
     if (i === 0) { return spinText(this.firstCw); }
     if (i === this.gearIds.length - 1) { return '?'; }
     return '·';
+  }
+
+  /** 提示：报「是 / 否」——代打用的表达式算出来是它 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const truth: boolean = this.lastCw();
+    return Hint.make([],
+      truth ? TG('答案是「是」') : TG('答案是「否」'),
+      truth ? TG('The answer is Yes') : TG('The answer is No'), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
@@ -169,8 +187,9 @@ export struct GGearTrainDirection {
           .onClick(() => { Haptics.tap(); this.answer(false); })
       }.width('100%')
       HintBar({
-        onAutoTap: () => { this.askAuto(); },
-        showHint: false,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
         autoOn: this.autoId >= 0
       })
       Button(TG('重开'))
