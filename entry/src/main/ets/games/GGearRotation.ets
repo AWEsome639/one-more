@@ -8,6 +8,8 @@ import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -24,6 +26,8 @@ export struct GGearRotation {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -74,6 +78,39 @@ export struct GGearRotation {
     this.note = TG(TG(TG('看 A 的转向，判断 B ⚙️')));
     this.roll();
     this.startAt = Date.now();
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 布尔现算：mesh ? !drive : drive
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    const drive: boolean = this.aCw;
+    const mesh: boolean = this.meshed;
+    this.answer(mesh ? !drive : drive);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private answer(userCw: boolean): void {
@@ -171,6 +208,11 @@ export struct GGearRotation {
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48))
           .onClick(() => { Haptics.tap(); this.answer(false); })
       }.width('100%')
+      HintBar({
+        onAutoTap: () => { this.askAuto(); },
+        showHint: false,
+        autoOn: this.autoId >= 0
+      })
       Button(TG('重开'))
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
         .borderRadius(Radius.md).width('100%').height(Cell.of(44))
