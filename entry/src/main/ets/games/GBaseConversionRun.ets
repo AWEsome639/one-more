@@ -338,6 +338,11 @@ export struct GBaseConversionRun {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)
@@ -428,11 +433,6 @@ export struct GBaseConversionRun {
         .onClick(() => {
           this.askHint();
         })
-      HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)

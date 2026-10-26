@@ -690,6 +690,11 @@ export struct GBridges {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.infoBox(0)
         this.infoBox(1)
@@ -745,11 +750,6 @@ export struct GBridges {
             Haptics.tap();
             this.hint();
           })
-        HintBar({
-          showHint: false,
-          onAutoTap: () => { this.askAuto(); },
-          autoOn: this.autoId >= 0
-        })
         Button(TG('换一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)

@@ -437,6 +437,11 @@ export struct GMathMaze {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -532,11 +537,6 @@ export struct GMathMaze {
             Haptics.tap();
             this.undo();
           })
-        HintBar({
-          showHint: false,
-          onAutoTap: () => { this.askAuto(); },
-          autoOn: this.autoId >= 0
-        })
         Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
