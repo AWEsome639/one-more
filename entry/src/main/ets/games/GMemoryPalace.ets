@@ -3,7 +3,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -83,6 +83,23 @@ export struct GMemoryPalace {
     this.memTo = setTimeout(() => {
       this.memTo = -1; this.phase = 1; this.pickCell = -1; this.msg = TG(TG(TG('它放在哪一格？')));
     }, MEM_MS);
+  }
+
+  /** 提示：直接报答案（代打用的就是这个字段） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([this.target],
+      TG2('答案是第 {0} 个', String(this.target + 1)),
+      TG2('The answer is option {0}', String(this.target + 1)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
@@ -188,9 +205,10 @@ export struct GMemoryPalace {
 
       HintBar({
 
-        onAutoTap: () => { this.askAuto(); },
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
 
-        showHint: false,
+        showHint: true,
 
         autoOn: this.autoId >= 0
 

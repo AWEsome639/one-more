@@ -3,7 +3,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -70,6 +70,23 @@ export struct GInequalityBalanceOps {
     }
     this.cmp = this.panL < this.panR ? 0 : (this.panL === this.panR ? 1 : 2); this.picked = -1;
   }
+  /** 提示：直接报答案（代打用的就是这个字段） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([this.cmp],
+      TG2('答案是第 {0} 个', String(this.cmp + 1)),
+      TG2('The answer is option {0}', String(this.cmp + 1)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 判定式：i === this.cmp  ｜ 守卫取自它自己的 if (...) { return; }
   private autoStep(): boolean {
@@ -194,8 +211,9 @@ export struct GInequalityBalanceOps {
       Text(this.msg).fontSize(FontSize.sm).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       HintBar({
-              onAutoTap: () => { this.askAuto(); },
-        showHint: false,
+              onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
         autoOn: this.autoId >= 0
       })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))

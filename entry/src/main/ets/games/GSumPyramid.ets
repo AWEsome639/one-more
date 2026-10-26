@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -76,6 +76,23 @@ export struct GSumPyramid {
     const mates: number[] = [this.sol[idx] + 3, this.sol[idx] - 3]; this.answer = this.sol[idx];
     this.opts = shuffle(buildOpts(this.answer, mates)); this.pick = -1;
   }
+  /** 提示：直接报答案（代打用的就是这个字段） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([this.answer],
+      TG2('答案是第 {0} 个', String(this.answer + 1)),
+      TG2('The answer is option {0}', String(this.answer + 1)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 判定式直取：choose(答案值)
   private autoStep(): boolean {
@@ -192,8 +209,9 @@ export struct GSumPyramid {
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => {
           HintBar({
-            onAutoTap: () => { this.askAuto(); },
-            showHint: false,
+            onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+            showHint: true,
             autoOn: this.autoId >= 0
           })
           Button(this.opts.length > (i) ? String(this.opts[(i)]) : '—')

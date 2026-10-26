@@ -7,7 +7,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -77,6 +77,23 @@ export struct GSilhouetteMatchOrtho {
       return;
     }
   }
+  /** 提示：直接报答案（代打用的就是这个字段） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([this.answerAt],
+      TG2('答案是第 {0} 个', String(this.answerAt + 1)),
+      TG2('The answer is option {0}', String(this.answerAt + 1)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   private autoStep(): boolean {
     if (this.over) {
@@ -235,8 +252,9 @@ export struct GSilhouetteMatchOrtho {
         .onClick(() => { Haptics.tick(); this.pick((3)); })
       }.width('100%')
       HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
         autoOn: this.autoId >= 0
       })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
