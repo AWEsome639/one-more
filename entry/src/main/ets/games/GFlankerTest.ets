@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -22,6 +24,8 @@ export struct GFlankerTest {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -79,6 +83,37 @@ export struct GFlankerTest {
       this.live = true;
       this.msg = TG('中间朝哪边？');
     }, 700 + Math.floor(Math.random() * 900));
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 布尔直取：侧抑制，答案就在 this.centerRight
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.pick >= 0) {
+      return true;              // 已答，等它换下一题
+    }
+    this.answer(this.centerRight);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private answer(saidRight: boolean): void {
@@ -167,6 +202,11 @@ export struct GFlankerTest {
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
       Row({ space: Space.md }) {
+        HintBar({
+          onAutoTap: () => { this.askAuto(); },
+          showHint: false,
+          autoOn: this.autoId >= 0
+        })
         Button(('←'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.xxl).fontColor('#FFFFFF')

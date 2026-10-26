@@ -10,6 +10,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -138,6 +139,8 @@ export struct GMandelbrot {
     this.cells = out;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 布尔直取：曼德博集合，答案就在 this.inside
   private answer(sayInside: boolean): void {
     if (this.over || this.phase !== 0) {
       return;
@@ -273,6 +276,8 @@ export struct GMandelbrot {
           })
       }
 
+      
+      
       
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

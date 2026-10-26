@@ -8,6 +8,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -23,6 +24,8 @@ export struct GDivisibilityDash {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private num: number = 24;
   @State private div: number = 4;
   @State private yes: boolean = true;
@@ -137,6 +140,34 @@ export struct GDivisibilityDash {
     Hint.toastResult(r, TG('这一步算不出来'));
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 布尔直取：整除判定，答案就在 this.yes
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.answer(this.yes);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private answer(said: boolean): void {
     if (this.over) { return; }
     if (said === this.yes) {
@@ -221,6 +252,11 @@ export struct GDivisibilityDash {
           .onClick(() => {
             this.askHint();
           })
+        HintBar({
+          onAutoTap: () => { this.askAuto(); },
+          showHint: false,
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.orange).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
