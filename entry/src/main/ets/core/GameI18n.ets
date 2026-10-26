@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-26 提示：还没出题 */
+  "还没出题，等一下再点": { "en": "Not dealt yet — try again in a moment", "ja": "まだ出題されていません。少し待ってから", "ko": "아직 문제가 안 나왔어요. 잠시 후 다시", "es": "Aún no hay pregunta, espera un momento", "fr": "Pas encore de question, attends un peu", "de": "Noch keine Frage — gleich nochmal", "pt": "Ainda sem pergunta, espere um pouco", "ru": "Вопрос ещё не задан — повторите", "it": "Domanda non ancora pronta, riprova", "ar": "لم يُطرح السؤال بعد، أعد المحاولة" },
   /** ★★ 2026-10-26 序列提示 */
   "该点第 {0} 个": { "en": "Tap number {0}", "ja": "{0}番目を押す", "ko": "{0}번째를 누르세요", "es": "Toca el número {0}", "fr": "Touchez le numéro {0}", "de": "Nummer {0} tippen", "pt": "Toque o número {0}", "ru": "Нажмите номер {0}", "it": "Tocca il numero {0}", "ar": "اضغط الرقم {0}" },
   /** ★★ 2026-10-26 布尔提示 */

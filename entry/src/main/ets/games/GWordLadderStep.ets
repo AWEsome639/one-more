@@ -112,7 +112,10 @@ export struct GWordLadderStep {
           TG2('The answer is option {0}', String(i + 1)), t0);
       }
     }
-    return Hint.none('none');
+    // ★ 找不到 ok ⇒ 不是"算不出"，是"还没出题"：明确告诉玩家等一等
+    return Hint.make([],
+      TG('还没出题，等一下再点'),
+      TG('Not dealt yet — try again in a moment'), t0);
   }
 
   private askHint(): void {
