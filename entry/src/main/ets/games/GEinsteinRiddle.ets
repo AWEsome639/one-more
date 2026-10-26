@@ -256,6 +256,11 @@ export struct GEinsteinRiddle {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Text(TG2("步数 {0}",Digits(String(this.tries), this.langCode))).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG2('线索 {0} 条', this.lines.length)).fontSize(FontSize.md).fontColor(Palette.sky).layoutWeight(1)
@@ -297,11 +302,6 @@ export struct GEinsteinRiddle {
           .fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .onClick(() => { Haptics.tap(); this.hintOn = true; })
-        HintBar({
-          showHint: false,
-          onAutoTap: () => { this.askAuto(); },
-          autoOn: this.autoId >= 0
-        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
           .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)

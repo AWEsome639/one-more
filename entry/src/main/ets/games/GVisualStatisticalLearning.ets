@@ -170,6 +170,12 @@ export struct GVisualStatisticalLearning {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG('第 ') + String(Math.min(this.round + 1, ROUNDS)) + '/' + String(ROUNDS) + ' 轮 · 答对 ' +
         String(this.hits) + '/' + String(NEED) + ' · ' + String(Math.min(this.cursor + 1, this.diffTotal)) +
         '/' + String(this.diffTotal))
@@ -189,12 +195,6 @@ export struct GVisualStatisticalLearning {
       }
       Text(this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
         .textAlign(TextAlign.Center).width('100%')
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))

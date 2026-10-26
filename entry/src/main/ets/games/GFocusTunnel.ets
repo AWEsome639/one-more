@@ -165,6 +165,12 @@ export struct GFocusTunnel {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        autoOn: this.autoId >= 0
+      })
       Text(TG2('目标 {0}/{1}　余命 {2}',Digits(String(this.found), this.langCode),Digits(String(NEED), this.langCode),Digits(String(this.lives), this.langCode))
         + TG2('/{0}　隧道 {1}', String(LIVES), this.radius.toFixed(1)))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
@@ -186,12 +192,6 @@ export struct GFocusTunnel {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkFaint)
         .width('100%').textAlign(TextAlign.Center)
-      HintBar({
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        showHint: true,
-        autoOn: this.autoId >= 0
-      })
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)

@@ -206,6 +206,12 @@ export struct GPerspectiveTaking {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG('第 ') + String(this.q) + '/' + String(TOTAL) + ' 题 · 答对 ' + String(this.correct)
         + ' · 需要 ' + String(NEED) + TG(' 题'))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
@@ -240,12 +246,6 @@ export struct GPerspectiveTaking {
         .onClick(() => { Haptics.tick(); this.choose((k)); }) }, (k: number) => 'opt' + k)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)

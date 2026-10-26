@@ -163,6 +163,16 @@ export struct GSymbolLogic {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+
+        showHint: true,
+
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+
+        autoOn: this.autoId >= 0
+
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -199,16 +209,6 @@ export struct GSymbolLogic {
         }, (i: number) => 'o' + i)
       }.width('100%')
 
-      HintBar({
-
-        showHint: true,
-
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-
-        autoOn: this.autoId >= 0
-
-      })
 
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')

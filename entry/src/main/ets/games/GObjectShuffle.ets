@@ -165,6 +165,11 @@ export struct GObjectShuffle {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+              onAutoTap: () => { this.askAuto(); },
+        showHint: false,
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) { Column({ space: Space.xs }) {
       Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.roundNo + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: Space.xs }) {
@@ -181,11 +186,6 @@ export struct GObjectShuffle {
         .onClick(() => { Haptics.tick(); this.answer((i)); }) }, (i: number) => 'os' + i)
       }.width('100%').layoutWeight(1)
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
-      HintBar({
-              onAutoTap: () => { this.askAuto(); },
-        showHint: false,
-        autoOn: this.autoId >= 0
-      })
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：洗牌时高亮的一对盒子正在互换，跟着 💎 走')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

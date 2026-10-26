@@ -152,6 +152,12 @@ export struct GSilhouetteMatchOrtho {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("题号 {0}/{1}", Math.min(this.asked + 1, this.diffTotal), this.diffTotal))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -251,12 +257,6 @@ export struct GSilhouetteMatchOrtho {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((3)); })
       }.width('100%')
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)

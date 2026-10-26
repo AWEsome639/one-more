@@ -158,6 +158,11 @@ export struct GGearRotation {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        onAutoTap: () => { this.askAuto(); },
+        showHint: false,
+        autoOn: this.autoId >= 0
+      })
       Text(TG('第 ') + Math.min(this.idx + 1, this.diffTotal) + '/' + this.diffTotal + ' 题　得分 ' + this.score
         + TG('　失误 ') + this.wrong + '/' + LIVES)
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
@@ -208,11 +213,6 @@ export struct GGearRotation {
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48))
           .onClick(() => { Haptics.tap(); this.answer(false); })
       }.width('100%')
-      HintBar({
-        onAutoTap: () => { this.askAuto(); },
-        showHint: false,
-        autoOn: this.autoId >= 0
-      })
       Button(TG('重开'))
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
         .borderRadius(Radius.md).width('100%').height(Cell.of(44))

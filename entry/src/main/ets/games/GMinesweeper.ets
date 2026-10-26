@@ -541,6 +541,11 @@ export struct GMinesweeper {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       // 数据条
       Row({ space: Space.sm }) {
         this.infoBox(0)
@@ -595,11 +600,6 @@ export struct GMinesweeper {
           .onClick(() => {
             this.askHint();
           })
-        HintBar({
-          showHint: false,
-          onAutoTap: () => { this.askAuto(); },
-          autoOn: this.autoId >= 0
-        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

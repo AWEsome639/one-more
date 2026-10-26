@@ -232,6 +232,11 @@ export struct GTowerOfLondon {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2('步数 {0} · 最少 {1} · 上限 {2}',Digits(String(this.moves), this.langCode),Digits(String(this.best), this.langCode), String(this.best + this.slacks)) +
         TG2(' · 对位 {0}/{1}', String(this.rightCount(this.state)), String(BALLS)))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').padding(Space.sm)
@@ -287,11 +292,6 @@ export struct GTowerOfLondon {
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).width('100%')
-      HintBar({
-        onHintTap: () => { this.askHint(); },
-        onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))

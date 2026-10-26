@@ -154,6 +154,11 @@ export struct GVisualSearchAll {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG('第 ') + String(Math.min(this.round + 1, this.diffTotal)) + '/' + String(this.diffTotal) + ' 轮 · 找到 ' +
         String(this.foundCount()) + '/' + String(this.need()) +
         TG2(' · 剩余 {0}', String(Math.max(this.left, 0))) + TG2('s · 得分 {0}',Digits(String(this.score), this.langCode)))
@@ -176,11 +181,6 @@ export struct GVisualSearchAll {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft)
         .textAlign(TextAlign.Center).width('100%')
-      HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))

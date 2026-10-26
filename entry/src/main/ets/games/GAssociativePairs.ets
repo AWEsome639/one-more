@@ -201,6 +201,12 @@ export struct GAssociativePairs {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) { Column({ space: 2 }) {
       Text((TG('题目'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: 2 }) {
@@ -247,12 +253,6 @@ export struct GAssociativePairs {
       Text(this.msg).fontSize(FontSize.sm)
         .fontColor(this.fb === 1 ? Palette.rose : (this.fb === 0 ? Palette.emerald : this.theme.inkSoft))
         .width('100%').textAlign(TextAlign.Center)
-      HintBar({
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        showHint: true,
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal)

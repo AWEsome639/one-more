@@ -185,6 +185,12 @@ export struct GVerbalAnalogies {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Text(TG2("题 {0}/{1}", Math.min(this.qi + 1, ROUNDS), ROUNDS)).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(Palette.amber)
@@ -203,12 +209,6 @@ export struct GVerbalAnalogies {
       Row({ space: Space.md }) {
         Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
-        HintBar({
-          onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-          showHint: true,
-          autoOn: this.autoId >= 0
-        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })

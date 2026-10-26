@@ -323,6 +323,11 @@ export struct GSlidePuzzle {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察（P6/P8 同族），传值这三个数不刷新
         this.statBox(0)
@@ -364,11 +369,6 @@ export struct GSlidePuzzle {
           .onClick(() => {
             this.askHint();
           })
-        HintBar({
-          showHint: false,
-          onAutoTap: () => { this.askAuto(); },
-          autoOn: this.autoId >= 0
-        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

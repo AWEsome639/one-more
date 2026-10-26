@@ -188,6 +188,12 @@ export struct GSpotlightTrack {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2("轮次 {0}/{1}",Digits(String(this.round), this.langCode),Digits(String(this.diffTotal), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG('答对 ') + String(this.hit)).fontSize(FontSize.sm).fontColor(Palette.primary)
@@ -210,12 +216,6 @@ export struct GSpotlightTrack {
       Text(this.msg)
         .fontSize(FontSize.md).fontColor(this.chasing ? this.theme.inkSoft : Palette.primary)
         .width('100%').textAlign(TextAlign.Center)
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF')

@@ -181,6 +181,16 @@ export struct GMemoryPalace {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+
+        showHint: true,
+
+        autoOn: this.autoId >= 0
+
+      })
       Row() {
         Text(TG2("轮次 {0}", (String(this.round) + '/' + String(this.diffTotal)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG('答对 ') + (String(this.right) + '/' + String(this.asked))).fontSize(FontSize.xs).fontColor(this.theme.ink)
@@ -203,16 +213,6 @@ export struct GMemoryPalace {
 
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
-      HintBar({
-
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-
-        showHint: true,
-
-        autoOn: this.autoId >= 0
-
-      })
 
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

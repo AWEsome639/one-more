@@ -163,6 +163,11 @@ export struct GTypoglycemiaDecoder {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        onAutoTap: () => { this.askAuto(); },
+        showHint: false,
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Text(TG2('句 {0}/{1}　读对 {2}', Math.min(this.qi + 1, this.diffTotal), this.diffTotal, this.right))
           .fontSize(FontSize.xs).fontColor(this.theme.inkSoft).layoutWeight(1)
@@ -186,11 +191,6 @@ export struct GTypoglycemiaDecoder {
       Row({ space: Space.md }) {
         Text(this.msg).fontSize(FontSize.xs).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
-        HintBar({
-          onAutoTap: () => { this.askAuto(); },
-          showHint: false,
-          autoOn: this.autoId >= 0
-        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })

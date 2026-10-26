@@ -191,6 +191,16 @@ export struct GCorsiBlocks {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+
+        showHint: true,
+
+        autoOn: this.autoId >= 0
+
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('长度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -232,16 +242,6 @@ export struct GCorsiBlocks {
       Text(this.msg).fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 
-      HintBar({
-
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-
-        showHint: true,
-
-        autoOn: this.autoId >= 0
-
-      })
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)

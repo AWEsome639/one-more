@@ -178,6 +178,11 @@ export struct GMultiTrackCounter {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -281,11 +286,6 @@ export struct GMultiTrackCounter {
         .width('100%')
         .height(Cell.of(48))
         .onClick(() => { Haptics.tap(); this.submit(); })
-      HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)

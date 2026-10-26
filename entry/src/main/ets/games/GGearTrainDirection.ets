@@ -161,6 +161,12 @@ export struct GGearTrainDirection {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        autoOn: this.autoId >= 0
+      })
       Text(TG('第 ') + Math.min(this.idx + 1, this.diffTotal) + '/' + this.diffTotal + ' 题　得分 ' + this.score
         + TG('　失误 ') + this.wrong + '/' + LIVES)
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
@@ -186,12 +192,6 @@ export struct GGearTrainDirection {
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48))
           .onClick(() => { Haptics.tap(); this.answer(false); })
       }.width('100%')
-      HintBar({
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        showHint: true,
-        autoOn: this.autoId >= 0
-      })
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(44))

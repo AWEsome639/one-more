@@ -194,6 +194,12 @@ export struct GCardCountingMemory {
   private faceInk(id: number): string { return cardRed(id) ? '#E11D48' : '#0F172A'; }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) { Column({ space: 2 }) {
       Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: 2 }) {
@@ -225,12 +231,6 @@ export struct GCardCountingMemory {
         } }, (i: number) => 'cc' + i)
       }.columnsTemplate('1fr 1fr 1fr 1fr').rowsGap(Space.sm).columnsGap(Space.sm)
         .width('100%').height(150).opacity(this.phase === 2 ? 1 : 0.35)
-      HintBar({
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        showHint: true,
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
