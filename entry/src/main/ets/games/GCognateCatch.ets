@@ -7,6 +7,7 @@ import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -155,7 +156,7 @@ export struct GCognateCatch {
         }
         .width('100%')
       }
-      Button(TG('重开'))
+            Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：词形像不等于同源 —— 要看它们能不能追到同一个古词根'))
