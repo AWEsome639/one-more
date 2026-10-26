@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -28,6 +30,8 @@ export struct GMissingOperator {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private a: number = 0;
   @State private b: number = 0;
   @State private c: number = 0;
@@ -89,6 +93,37 @@ export struct GMissingOperator {
       b = ri(3, 12); c = ri(3, 12); a = b * c;
     }
     this.a = a; this.b = b; this.c = c; this.ansKind = kind; this.picked = -1;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 字段直取：缺失运算符，答案就在 this.ansKind
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.picked >= 0 || this.over) {
+      return true;
+    }
+    this.pick(this.ansKind);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private pick(kind: number): void {
@@ -187,6 +222,16 @@ export struct GMissingOperator {
 
       Text(this.msg).fontSize(FontSize.sm).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+
+      HintBar({
+
+        onAutoTap: () => { this.askAuto(); },
+
+        showHint: false,
+
+        autoOn: this.autoId >= 0
+
+      })
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
