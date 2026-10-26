@@ -298,7 +298,7 @@ export struct GBlockEscape {
 
   build() {
     Column({ space: Space.md }) {
-      Row({ space: Space.sm }) {
+            Row({ space: Space.sm }) {
         this.infoBox(0)
         this.infoBox(1)
         this.infoBox(2)
