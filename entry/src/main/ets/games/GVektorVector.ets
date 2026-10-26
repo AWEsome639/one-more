@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -97,6 +97,28 @@ export struct GVektorVector {
     while (pool.length > 0) { mixed.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]); }
     this.opts = mixed;
   }
+  /** 提示：哪个选项是对的（代打就是找 opts[i].ok） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i].ok) {
+        return Hint.make([i],
+          TG2('答案是第 {0} 个', String(i + 1)),
+          TG2('The answer is option {0}', String(i + 1)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 选项对象自带对错：opts[i].ok ｜ 守卫取自它自己的第一道 if
   private autoStep(): boolean {
@@ -225,8 +247,9 @@ export struct GVektorVector {
       Text(this.msg.length > 0 ? this.msg : '选一个正确答案').fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
       HintBar({
-        onAutoTap: () => { this.askAuto(); },
-        showHint: false,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
         autoOn: this.autoId >= 0
       })
       Button(this.over ? TG('再来一局') : TG('重开'))
