@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-26 序列提示 */
+  "该点第 {0} 个": { "en": "Tap number {0}", "ja": "{0}番目を押す", "ko": "{0}번째를 누르세요", "es": "Toca el número {0}", "fr": "Touchez le numéro {0}", "de": "Nummer {0} tippen", "pt": "Toque o número {0}", "ru": "Нажмите номер {0}", "it": "Tocca il numero {0}", "ar": "اضغط الرقم {0}" },
   /** ★★ 2026-10-26 布尔提示 */
   "答案是「是」": { "en": "The answer is Yes", "ja": "答えは「はい」", "ko": "정답은 \"예\"", "es": "La respuesta es Sí", "fr": "La réponse est Oui", "de": "Die Antwort ist Ja", "pt": "A resposta é Sim", "ru": "Ответ — «Да»", "it": "La risposta è Sì", "ar": "الجواب هو «نعم»" },
   /** ★★ 2026-10-26 布尔提示 */

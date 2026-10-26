@@ -7,7 +7,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -103,6 +103,27 @@ export struct GPathRecall {
     if (p >= 0 && p < this.seq.length) { return this.seq[p] === i; }
     return this.phase === TG('点') && this.inTrail(i);
   }
+  /** 提示：按顺序点，现在该点第 idx+1 个（seq[idx]） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const k: number = this.step;
+    if (k < 0 || k >= this.seq.length) {
+      return Hint.none('none');
+    }
+    return Hint.make([this.seq[k]],
+      TG2('该点第 {0} 个', String(this.seq[k] + 1)),
+      TG2('Tap number {0}', String(this.seq[k] + 1)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 路径回忆：按顺序点 seq
   private autoStep(): boolean {
@@ -197,8 +218,9 @@ export struct GPathRecall {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
       HintBar({
-        onAutoTap: () => { this.askAuto(); },
-        showHint: false,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
         autoOn: this.autoId >= 0
       })
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
