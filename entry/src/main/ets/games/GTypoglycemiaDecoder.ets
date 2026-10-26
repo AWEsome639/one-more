@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { Digits, I18n } from '../core/I18n';
 import { LanRace } from '../core/LanRace';
@@ -54,6 +56,8 @@ export struct GTypoglycemiaDecoder {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -91,6 +95,43 @@ export struct GTypoglycemiaDecoder {
     this.opts = pickIndexes(3, 3).map((k: number) => raw[k]);
     this.picked = -1; this.locked = false;
     this.msg = TG('把乱序的句子读顺，再选出它原本的样子');
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 选项直取：找 opts[i] === cur().text
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.locked) {
+      return true;              // 已答，等它换下一题
+    }
+    const want: string = this.cur().text;
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tap(i: number): void {
@@ -145,6 +186,11 @@ export struct GTypoglycemiaDecoder {
       Row({ space: Space.md }) {
         Text(this.msg).fontSize(FontSize.xs).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+        HintBar({
+          onAutoTap: () => { this.askAuto(); },
+          showHint: false,
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
