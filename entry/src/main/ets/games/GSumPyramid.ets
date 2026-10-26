@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -40,6 +42,8 @@ export struct GSumPyramid {
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：原 LIVES=3
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(3);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -72,6 +76,37 @@ export struct GSumPyramid {
     const mates: number[] = [this.sol[idx] + 3, this.sol[idx] - 3]; this.answer = this.sol[idx];
     this.opts = shuffle(buildOpts(this.answer, mates)); this.pick = -1;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 判定式直取：choose(答案值)
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.current() < 0) {
+      return true;              // 还没出题，等
+    }
+    this.choose(this.answer);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private choose(v: number): void {
     if (this.over || v === this.pick) { return; }
     this.pick = v; const idx: number = this.current();
@@ -156,6 +191,11 @@ export struct GSumPyramid {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%')
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => {
+          HintBar({
+            onAutoTap: () => { this.askAuto(); },
+            showHint: false,
+            autoOn: this.autoId >= 0
+          })
           Button(this.opts.length > (i) ? String(this.opts[(i)]) : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg)
           .fontColor(this.opts.length > (i) && this.opts[(i)] === this.pick ? '#FFFFFF' : this.theme.ink)

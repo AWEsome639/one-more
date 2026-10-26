@@ -5,6 +5,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -22,6 +23,8 @@ export struct GPrimeFactorTrees {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State private target: number = 12;
@@ -59,6 +62,43 @@ export struct GPrimeFactorTrees {
     this.chain = [];
     this.miss = 0;
     this.tip = TG2('把 {0} 拆成质因数', String(this.target));
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 真值直取：找一个能整除 rest 的质数，点它
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.rest <= 1) {
+      return true;              // 这一棵分解完了，等它换下一棵
+    }
+    for (let k = 0; k < PRIMES.length; k++) {
+      const p: number = PRIMES[k];
+      if (this.rest % p === 0) {
+        this.tap(p);
+        return !this.over;
+      }
+    }
+    return false;               // 没有能整除的质数（理论上不会发生）
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
   }
 
   private tap(p: number): void {
@@ -175,6 +215,11 @@ export struct GPrimeFactorTrees {
           .onClick(() => {
             this.askHint();
           })
+        HintBar({
+          onAutoTap: () => { this.askAuto(); },
+          showHint: false,
+          autoOn: this.autoId >= 0
+        })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.cyan)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
