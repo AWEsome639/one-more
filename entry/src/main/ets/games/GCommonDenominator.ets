@@ -271,8 +271,9 @@ export struct GCommonDenominator {
   build() {
     Column({ space: Space.md }) {
       HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
