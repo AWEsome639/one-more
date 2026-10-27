@@ -23,6 +23,10 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-27 提示文案 */
+  "解集是 {0}": { "en": "The solution set is {0}", "ja": "解集合は {0}", "ko": "해집합은 {0}", "es": "El conjunto solución es {0}", "fr": "L'ensemble solution est {0}", "de": "Die Lösungsmenge ist {0}", "pt": "O conjunto solução é {0}", "ru": "Множество решений: {0}", "it": "L'insieme soluzione è {0}", "ar": "مجموعة الحل هي {0}" },
+  /** ★★ 2026-10-27 提示文案 */
+  "下一个点第 {0} 格": { "en": "Next: cell {0}", "ja": "次は{0}番目のマス", "ko": "다음은 {0}번째 칸", "es": "Siguiente: casilla {0}", "fr": "Suivant : case {0}", "de": "Nächstes: Feld {0}", "pt": "Próximo: casa {0}", "ru": "Далее: клетка {0}", "it": "Prossimo: casella {0}", "ar": "التالي: الخلية {0}" },
   /** ★★ 2026-10-26 提示：还没出题 */
   "还没出题，等一下再点": { "en": "Not dealt yet — try again in a moment", "ja": "まだ出題されていません。少し待ってから", "ko": "아직 문제가 안 나왔어요. 잠시 후 다시", "es": "Aún no hay pregunta, espera un momento", "fr": "Pas encore de question, attends un peu", "de": "Noch keine Frage — gleich nochmal", "pt": "Ainda sem pergunta, espere um pouco", "ru": "Вопрос ещё не задан — повторите", "it": "Domanda non ancora pronta, riprova", "ar": "لم يُطرح السؤال بعد، أعد المحاولة" },
   /** ★★ 2026-10-26 序列提示 */

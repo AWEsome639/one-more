@@ -5,6 +5,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -121,7 +122,7 @@ export struct GTracePath {
   }
   build() {
     Column({ space: Space.sm }) {
-      Text(TG2('路线 {0}/{1}', String(Math.min(this.round + 1, this.diffTotal)), String(this.diffTotal)) +
+            Text(TG2('路线 {0}/{1}', String(Math.min(this.round + 1, this.diffTotal)), String(this.diffTotal)) +
         TG2(' · 已描 {0}/{1}', String(this.traced.length), String(LEN)) +
         TG2(' · 失误 {0}/{1}', String(this.err), String(MAX_ERR)))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')

@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -64,6 +66,8 @@ export struct GAlgebraicInequalitySolver {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -105,6 +109,57 @@ export struct GAlgebraicInequalitySolver {
     this.quiz = makeIneq();
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 判定式直取：s === this.quiz.answer（字符串答案）
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.lockTap) {
+      return true;
+    }
+    if (this.quiz.answer.length === 0) {
+      return true;
+    }
+    this.answer(this.quiz.answer);
+    return !this.over;
+  }
+
+  /** 提示：直接报解集 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.quiz.answer.length === 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('解集是 {0}', this.quiz.answer),
+      TG2('The solution set is {0}', this.quiz.answer), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(s: string): void {
     if (this.over || this.lockTap) { return; }
     if (s === this.quiz.answer) {
@@ -141,6 +196,12 @@ export struct GAlgebraicInequalitySolver {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
