@@ -2,6 +2,8 @@
  * 词根异类 —— 四个词里挑出「词根不属于同一族」的那一个
  * 胜负：8 轮答对 ≥5 通关｜进度：轮次 / 答对 / 剩余秒数
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -53,6 +55,8 @@ export struct GEtymonOddball {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -88,6 +92,53 @@ export struct GEtymonOddball {
       this.advance();
     }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (false) {
+      return true;
+    }
+    this.pick(GROUPS[this.queue[this.round]][4]);
+    return !this.over;
+  }
+
+  /** 提示：直接报异类词 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const odd: string = GROUPS[this.queue[this.round]][4];
+    return Hint.make([], TG2('异类是「{0}」', odd),
+      TG2('The odd one is {0}', odd), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(word: string): void {
     if (this.over) { return; }
     const odd: string = GROUPS[this.queue[this.round]][4];
@@ -121,6 +172,12 @@ export struct GEtymonOddball {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
