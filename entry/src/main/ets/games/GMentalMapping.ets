@@ -127,6 +127,18 @@ export struct GMentalMapping {
     return (sy + 1) * 3 + (sx + 1);
   }
 
+  /** 提示：直接报答案（心象映射，下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const k: number = this.answerDir();
+    return Hint.make([k],
+      TG2('答案是第 {0} 个', String(k + 1)),
+      TG2('The answer is option {0}', String(k + 1)), t0);
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 答案：this.answerDir()   ｜ 守卫取自它自己的 if (...) { return; }
   private autoStep(): boolean {
@@ -138,6 +150,12 @@ export struct GMentalMapping {
     }
     this.answer(this.answerDir());
     return !this.over;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -196,9 +214,10 @@ export struct GMentalMapping {
 
     HintBar({
 
-      showHint: false,
+      showHint: true,
 
-      onAutoTap: () => { this.askAuto(); },
+      onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
 
       autoOn: this.autoId >= 0
 

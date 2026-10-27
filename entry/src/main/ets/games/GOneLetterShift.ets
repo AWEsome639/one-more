@@ -4,7 +4,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -79,6 +79,18 @@ export struct GOneLetterShift {
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时：第 {0} 位要换', String(this.diffAt() + 1)); this.advance(); }
   }
+  /** 提示：直接报答案（移一字母，下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const k: number = this.diffAt();
+    return Hint.make([k],
+      TG2('答案是第 {0} 个', String(k + 1)),
+      TG2('The answer is option {0}', String(k + 1)), t0);
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 判定式：i === this.diffAt  ｜ 守卫取自它自己的 if (...) { return; }
   private autoStep(): boolean {
@@ -90,6 +102,12 @@ export struct GOneLetterShift {
     }
     this.pick(this.diffAt());
     return !this.over;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -140,8 +158,9 @@ export struct GOneLetterShift {
   build() {
     Column({ space: Space.md }) {
       HintBar({
-              onAutoTap: () => { this.askAuto(); },
-        showHint: false,
+              onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
