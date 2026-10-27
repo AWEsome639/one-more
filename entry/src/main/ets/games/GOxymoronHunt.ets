@@ -4,6 +4,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -44,6 +46,8 @@ export struct GOxymoronHunt {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT_MS);
   onFinish: (r: GameResult) => void = () => {};
   @State q: OxyRound = makeRound(); @State qIndex: number = 0; @State right: number = 0;
@@ -76,6 +80,55 @@ export struct GOxymoronHunt {
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时：答案是「{0}」', this.q.opts[this.q.ans]); this.advance(); }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 判定式直取：矛盾修辞
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.feed >= 0) {
+      return true;
+    }
+    this.pick(this.q.ans);
+    return !this.over;
+  }
+
+  /** 提示：直接报正确选项 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const k: number = this.q.ans;
+    return Hint.make([k],
+      TG2('答案是第 {0} 个', String(k + 1)),
+      TG2('The answer is option {0}', String(k + 1)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(i: number): void {
     if (this.over || this.feed >= 0) { return; }
     const truth: string = this.q.opts[this.q.ans];
@@ -106,6 +159,12 @@ export struct GOxymoronHunt {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
