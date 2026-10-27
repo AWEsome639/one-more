@@ -62,6 +62,18 @@ export struct GColorWordMatchUp {
     this.inkIdx = Math.floor(Math.random() * INKS.length);
   }
 
+  /** 提示：字义和墨色一致吗（代打用的同一个判断） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const truth: boolean = this.wordIdx === this.inkIdx;
+    return Hint.make([],
+      truth ? TG('答案是「是」') : TG('答案是「否」'),
+      truth ? TG('The answer is Yes') : TG('The answer is No'), t0);
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 布尔现算：wi === ii
   private autoStep(): boolean {
@@ -75,6 +87,12 @@ export struct GColorWordMatchUp {
     const ii: number = this.inkIdx;
     this.answer(wi === ii);
     return !this.over;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -132,9 +150,10 @@ export struct GColorWordMatchUp {
     Column({ space: Space.md }) {
       HintBar({
 
-        onAutoTap: () => { this.askAuto(); },
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
 
-        showHint: false,
+        showHint: true,
 
         autoOn: this.autoId >= 0
 

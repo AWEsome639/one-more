@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -107,6 +107,17 @@ export struct GMultiTrackCounter {
     }
     return n;
   }
+  /** 提示：正确总和是多少（代打用的同一个值） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const s: number = this.trueSum();
+    return Hint.make([], TG2('正确总和是 {0}', String(s)),
+      TG2('The correct total is {0}', String(s)), t0);
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 这款的答案由 trueSum() 算出 ⇒ 直接把 answer 设成真值再提交。
   private autoStep(): boolean {
@@ -116,6 +127,12 @@ export struct GMultiTrackCounter {
     this.answer = this.trueSum();
     this.submit();
     return !this.over;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -179,8 +196,9 @@ export struct GMultiTrackCounter {
   build() {
     Column({ space: Space.md }) {
       HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {

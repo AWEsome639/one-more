@@ -23,6 +23,16 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-27 提示文案 */
+  "顺时针": { "en": "Clockwise", "ja": "時計回り", "ko": "시계 방향", "es": "Sentido horario", "fr": "Sens horaire", "de": "Im Uhrzeigersinn", "pt": "Sentido horário", "ru": "По часовой стрелке", "it": "Senso orario", "ar": "في اتجاه عقارب الساعة" },
+  /** ★★ 2026-10-27 提示文案 */
+  "逆时针": { "en": "Counter-clockwise", "ja": "反時計回り", "ko": "반시계 방향", "es": "Sentido antihorario", "fr": "Sens antihoraire", "de": "Gegen den Uhrzeigersinn", "pt": "Sentido anti-horário", "ru": "Против часовой стрелки", "it": "Senso antiorario", "ar": "عكس اتجاه عقارب الساعة" },
+  /** ★★ 2026-10-27 提示文案 */
+  "正确总和是 {0}": { "en": "The correct total is {0}", "ja": "正しい合計は{0}", "ko": "정확한 합계는 {0}", "es": "El total correcto es {0}", "fr": "Le total correct est {0}", "de": "Die richtige Summe ist {0}", "pt": "O total correto é {0}", "ru": "Правильная сумма: {0}", "it": "Il totale corretto è {0}", "ar": "المجموع الصحيح هو {0}" },
+  /** ★★ 2026-10-27 提示文案 */
+  "比参照大": { "en": "Larger than the reference", "ja": "基準より大きい", "ko": "기준보다 큼", "es": "Mayor que la referencia", "fr": "Plus grand que la référence", "de": "Größer als die Referenz", "pt": "Maior que a referência", "ru": "Больше эталона", "it": "Più grande del riferimento", "ar": "أكبر من المرجع" },
+  /** ★★ 2026-10-27 提示文案 */
+  "比参照小": { "en": "Smaller than the reference", "ja": "基準より小さい", "ko": "기준보다 작음", "es": "Menor que la referencia", "fr": "Plus petit que la référence", "de": "Kleiner als die Referenz", "pt": "Menor que a referência", "ru": "Меньше эталона", "it": "Più piccolo del riferimento", "ar": "أصغر من المرجع" },
   /** ★★ 2026-10-27 序列提示 */
   "下一步第 {0} 个方向": { "en": "Next direction {0}", "ja": "次の方向は{0}番目", "ko": "다음 방향은 {0}번째", "es": "Siguiente dirección {0}", "fr": "Direction suivante {0}", "de": "Nächste Richtung {0}", "pt": "Próxima direção {0}", "ru": "Следующее направление {0}", "it": "Direzione successiva {0}", "ar": "الاتجاه التالي {0}" },
   /** ★★ 2026-10-27 提示文案 */

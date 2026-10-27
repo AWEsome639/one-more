@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -62,6 +62,18 @@ export struct GStroopNumberSize {
     this.msg = TG2('它比 {0} 大还是小？（别被字号骗）', String(REF));
   }
 
+  /** 提示：数值比参照大还是小（代打用的同一个判断） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.pick >= 0 || this.val === 0) {
+      return Hint.none('none');
+    }
+    const v: number = this.val;
+    const big: boolean = v > REF;
+    return Hint.make([], big ? TG('比参照大') : TG('比参照小'),
+      big ? TG('Larger than the reference') : TG('Smaller than the reference'), t0);
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 布尔现算：v > REF
   private autoStep(): boolean {
@@ -74,6 +86,12 @@ export struct GStroopNumberSize {
     const v: number = this.val;
     this.answer(v > REF);
     return !this.over;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -146,8 +164,9 @@ export struct GStroopNumberSize {
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.md }) {
         HintBar({
-          onAutoTap: () => { this.askAuto(); },
-          showHint: false,
+          onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+          showHint: true,
           autoOn: this.autoId >= 0
         })
         Button(TG('比 5 大'))

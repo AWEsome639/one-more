@@ -8,7 +8,7 @@ import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -80,6 +80,19 @@ export struct GGearRotation {
     this.startAt = Date.now();
   }
 
+  /** 提示：该齿轮往哪转（代打用的同一个判断） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const drive: boolean = this.aCw;
+    const mesh: boolean = this.meshed;
+    const cw: boolean = mesh ? !drive : drive;
+    return Hint.make([], cw ? TG('顺时针') : TG('逆时针'),
+      cw ? TG('Clockwise') : TG('Counter-clockwise'), t0);
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 布尔现算：mesh ? !drive : drive
   private autoStep(): boolean {
@@ -93,6 +106,12 @@ export struct GGearRotation {
     const mesh: boolean = this.meshed;
     this.answer(mesh ? !drive : drive);
     return !this.over;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -159,8 +178,9 @@ export struct GGearRotation {
   build() {
     Column({ space: Space.md }) {
       HintBar({
-        onAutoTap: () => { this.askAuto(); },
-        showHint: false,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
         autoOn: this.autoId >= 0
       })
       Text(TG('第 ') + Math.min(this.idx + 1, this.diffTotal) + '/' + this.diffTotal + ' 题　得分 ' + this.score
