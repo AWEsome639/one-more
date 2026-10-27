@@ -110,8 +110,8 @@ export struct GAssociativePairs {
     for (let i = 0; i < this.opts.length; i++) {
       if (this.opts[i].ok) {
         return Hint.make([i],
-          TG2('答案是第 {0} 个', String(i + 1)),
-          TG2('The answer is option {0}', String(i + 1)), t0);
+          TG2('选「{0}」', this.opts[i].w),
+          TG2('Pick "{0}"', this.opts[i].w), t0);
       }
     }
     // ★ 找不到 ok ⇒ 不是"算不出"，是"还没出题"：明确告诉玩家等一等

@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-28 选项提示 */
+  "选「{0}」": { "en": "Pick \"{0}\"", "ja": "「{0}」を選ぶ", "ko": "「{0}」를 선택", "es": "Elige \"{0}\"", "fr": "Choisissez « {0} »", "de": "Wähle „{0}“", "pt": "Escolha \"{0}\"", "ru": "Выберите «{0}»", "it": "Scegli \"{0}\"", "ar": "اختر \"{0}\"" },
   /** ★★ 2026-10-28 提示文案 */
   "要找的是「{0}」": { "en": "Look for {0}", "ja": "探すのは「{0}」", "ko": "찾을 것은 「{0}」", "es": "Busca {0}", "fr": "Cherchez {0}", "de": "Suche {0}", "pt": "Procure {0}", "ru": "Ищите {0}", "it": "Cerca {0}", "ar": "ابحث عن {0}" },
   /** ★★ 2026-10-28 提示文案 */
