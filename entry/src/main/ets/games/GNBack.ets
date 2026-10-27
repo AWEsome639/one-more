@@ -3,7 +3,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -23,6 +24,8 @@ export struct GNBack {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -79,6 +82,54 @@ export struct GNBack {
     this.msg = TG2('与 {0} 步前那个一样吗？',Digits(String(BACK), this.langCode));
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.warm() || this.pick >= 0) {
+      return true;
+    }
+    this.answer(this.seq[this.idx] === this.seq[this.idx - BACK]);
+    return !this.over;
+  }
+
+  /** 提示：直接说是/否 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.warm() || this.pick >= 0) {
+      return Hint.none('none');
+    }
+    const truth: boolean = this.seq[this.idx] === this.seq[this.idx - BACK];
+    return Hint.make([],
+      truth ? TG('一样') : TG('不一样'),
+      truth ? TG('Same') : TG('Different'), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(same: boolean): void {
     if (this.over || this.warm() || this.pick >= 0) { return; }
     const truth: boolean = this.seq[this.idx] === this.seq[this.idx - BACK];
@@ -121,6 +172,12 @@ export struct GNBack {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2('试次 {0}', (String(this.idx + 1) + '/' + String(this.diffTotal)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2("答对 {0}", String(this.right))).fontSize(FontSize.xs).fontColor(this.theme.ink)

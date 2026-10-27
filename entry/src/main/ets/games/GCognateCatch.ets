@@ -7,7 +7,8 @@ import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -40,6 +41,8 @@ export struct GCognateCatch {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State order: number[] = []; @State qi: number = 0; @State correct: number = 0;
@@ -74,6 +77,54 @@ export struct GCognateCatch {
     }
     this.order = all;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.answered) {
+      return true;
+    }
+    this.answer(this.cur().same);
+    return !this.over;
+  }
+
+  /** 提示：直接说是/否 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.answered) {
+      return Hint.none('none');
+    }
+    const truth: boolean = this.cur().same;
+    return Hint.make([],
+      truth ? TG('是同一个词') : TG('不是同一个词'),
+      truth ? TG('Same word') : TG('Different words'), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(said: boolean): void {
     if (this.over || this.answered) { return; }
     const p: Pair = this.cur();
@@ -106,6 +157,12 @@ export struct GCognateCatch {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

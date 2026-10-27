@@ -24,6 +24,22 @@ import { I18n, Lang, toTrad } from './I18n';
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
   /** ★★ 2026-10-28 提示文案 */
+  "应加「{0}」": { "en": "Add {0}", "ja": "「{0}」を付ける", "ko": "「{0}」를 붙이세요", "es": "Añade {0}", "fr": "Ajoutez {0}", "de": "Füge {0} hinzu", "pt": "Adicione {0}", "ru": "Добавьте {0}", "it": "Aggiungi {0}", "ar": "أضف {0}" },
+  /** ★★ 2026-10-28 提示文案 */
+  "是同一个词": { "en": "Same word", "ja": "同じ語", "ko": "같은 단어", "es": "La misma palabra", "fr": "Le même mot", "de": "Dasselbe Wort", "pt": "A mesma palavra", "ru": "То же слово", "it": "La stessa parola", "ar": "نفس الكلمة" },
+  /** ★★ 2026-10-28 提示文案 */
+  "不是同一个词": { "en": "Different words", "ja": "違う語", "ko": "다른 단어", "es": "Palabras distintas", "fr": "Des mots différents", "de": "Andere Wörter", "pt": "Palavras diferentes", "ru": "Разные слова", "it": "Parole diverse", "ar": "كلمات مختلفة" },
+  /** ★★ 2026-10-28 提示文案 */
+  "折完是 {0} 层": { "en": "It becomes {0} layers", "ja": "折ると{0}層", "ko": "접으면 {0}층", "es": "Quedan {0} capas", "fr": "Cela fait {0} couches", "de": "Es werden {0} Schichten", "pt": "Ficam {0} camadas", "ru": "Получится {0} слоёв", "it": "Diventa {0} strati", "ar": "يصبح {0} طبقات" },
+  /** ★★ 2026-10-28 提示文案 */
+  "是旧的": { "en": "It is old", "ja": "古い", "ko": "오래된 것", "es": "Es antigua", "fr": "C'est ancienne", "de": "Sie ist alt", "pt": "É antiga", "ru": "Старое", "it": "È vecchia", "ar": "قديمة" },
+  /** ★★ 2026-10-28 提示文案 */
+  "是新的": { "en": "It is new", "ja": "新しい", "ko": "새로운 것", "es": "Es nueva", "fr": "C'est nouvelle", "de": "Sie ist neu", "pt": "É nova", "ru": "Новое", "it": "È nuova", "ar": "جديدة" },
+  /** ★★ 2026-10-28 提示文案 */
+  "刚才的是「{0}」": { "en": "It was {0}", "ja": "さっきのは「{0}」", "ko": "방금 것은 「{0}」", "es": "Era {0}", "fr": "C'était {0}", "de": "Es war {0}", "pt": "Era {0}", "ru": "Было {0}", "it": "Era {0}", "ar": "كان {0}" },
+  /** ★★ 2026-10-28 提示文案 */
+  "应该是「{0}」": { "en": "It should be {0}", "ja": "「{0}」のはず", "ko": "「{0}」이어야 함", "es": "Debería ser {0}", "fr": "Ce devrait être {0}", "de": "Es sollte {0} sein", "pt": "Deveria ser {0}", "ru": "Должно быть {0}", "it": "Dovrebbe essere {0}", "ar": "يجب أن يكون {0}" },
+  /** ★★ 2026-10-28 提示文案 */
   "第 {0} 格": { "en": "Cell {0}", "ja": "{0}番目のマス", "ko": "{0}번째 칸", "es": "Casilla {0}", "fr": "Case {0}", "de": "Feld {0}", "pt": "Casa {0}", "ru": "Клетка {0}", "it": "Casella {0}", "ar": "الخلية {0}" },
   /** ★★ 2026-10-28 提示文案 */
   "一共 {0} 个": { "en": "There are {0} items", "ja": "全部で{0}個", "ko": "모두 {0}개", "es": "Hay {0} elementos", "fr": "Il y a {0} éléments", "de": "Es sind {0} Stück", "pt": "Há {0} itens", "ru": "Всего {0}", "it": "Ci sono {0} elementi", "ar": "هناك {0} عناصر" },
