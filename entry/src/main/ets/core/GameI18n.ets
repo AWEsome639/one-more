@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-28 提示文案 */
+  "墨色是「{0}」": { "en": "The ink color is {0}", "ja": "インク色は「{0}」", "ko": "잉크 색은 「{0}」", "es": "El color de la tinta es {0}", "fr": "La couleur de l'encre est {0}", "de": "Die Tintenfarbe ist {0}", "pt": "A cor da tinta é {0}", "ru": "Цвет чернил: {0}", "it": "Il colore dell'inchiostro è {0}", "ar": "لون الحبر هو {0}" },
   /** ★★ 2026-10-27 提示文案 */
   "顺时针": { "en": "Clockwise", "ja": "時計回り", "ko": "시계 방향", "es": "Sentido horario", "fr": "Sens horaire", "de": "Im Uhrzeigersinn", "pt": "Sentido horário", "ru": "По часовой стрелке", "it": "Senso orario", "ar": "في اتجاه عقارب الساعة" },
   /** ★★ 2026-10-27 提示文案 */
