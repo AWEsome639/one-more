@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -37,6 +39,8 @@ export struct GStoryBuilder {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private picks: number[] = []; @State private si: number = 0;
   @State private pool: string[] = []; @State private placed: number = 0;
   @State private cleared: number = 0; // ★ 难度作用到玩法：本局「容错次数/起始量」按难度换算（简单更多 / 困难更少）
@@ -65,6 +69,55 @@ export struct GStoryBuilder {
     this.pool = pickIndexes(LINES, LINES).map((i: number) => st.lines[i]);
     this.placed = 0;
     this.msg = TG('按先后顺序，一句句接上');
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 判定式直取：故事重建
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.tap(this.placed);
+    return !this.over;
+  }
+
+  /** 提示：直接报该点的位置 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const k: number = this.placed;
+    return Hint.make([k],
+      TG2('点第 {0} 个', String(k + 1)),
+      TG2('Tap number {0}', String(k + 1)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -101,6 +154,12 @@ export struct GStoryBuilder {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Text(TG2('段 {0}/{1}　已接 {2}', String(Math.min(this.si + 1, STORIES)), String(STORIES), String(this.placed))
           + TG2('/{0}　生命 {1}', String(LINES),Digits(String(this.life), this.langCode)))
