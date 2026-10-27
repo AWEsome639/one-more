@@ -7,7 +7,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -90,6 +90,22 @@ export struct GPixelMimic {
     }
     return g;
   }
+  /** 提示：和代打同一个循环（含局部常量），只把"点"换成"说" */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < this.goal.length; i++) {
+      if (this.goal[i] !== this.mine[i]) {
+        return Hint.make([i],
+          TG2('点第 {0} 个', String(i + 1)),
+          TG2('Tap number {0}', String(i + 1)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // ★ 变体⑦：照真值数组走
   // goal vs mine：哪个格子不一致就点哪个（点一下翻转）
@@ -104,6 +120,12 @@ export struct GPixelMimic {
       }
     }
     return false;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -148,8 +170,9 @@ export struct GPixelMimic {
   build() {
     Column({ space: Space.md }) {
       HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {

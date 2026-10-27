@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -97,6 +97,22 @@ export struct GWordSurge {
       this.over = true; this.msg = TG2("⌛ 时间到 —— 答对 {0} 个", this.hits); this.finish(false);
     }
   }
+  /** 提示：和代打同一个循环，只把"点"换成"说" */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === this.answer) {
+        return Hint.make([i],
+          TG2('点第 {0} 个', String(i + 1)),
+          TG2('Tap number {0}', String(i + 1)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 选项型直取：找 opts[i] === answer
   private autoStep(): boolean {
@@ -113,6 +129,12 @@ export struct GWordSurge {
       }
     }
     return false;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -173,8 +195,9 @@ export struct GWordSurge {
   build() {
     Column({ space: Space.md }) {
       HintBar({
-        onAutoTap: () => { this.askAuto(); },
-        showHint: false,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        showHint: true,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {

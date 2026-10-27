@@ -7,7 +7,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -106,6 +106,22 @@ export struct GD2Attention {
     if (this.timeLeft <= 0) { this.end(false); }
   }
 
+  /** 提示：和代打同一个循环，只把"点"换成"说" */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < this.isTarget.length; i++) {
+      if (this.isTarget[i] && !this.picked[i]) {
+        return Hint.make([i],
+          TG2('点第 {0} 个', String(i + 1)),
+          TG2('Tap number {0}', String(i + 1)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // ★ 变体⑦：真值数组 isTarget + picked 守卫 ⇒ 直接点"是目标且还没点过"的
   private autoStep(): boolean {
@@ -119,6 +135,12 @@ export struct GD2Attention {
       }
     }
     return false;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -175,9 +197,10 @@ export struct GD2Attention {
     Column({ space: Space.sm }) {
       HintBar({
 
-        showHint: false,
+        showHint: true,
 
-        onAutoTap: () => { this.askAuto(); },
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
 
         autoOn: this.autoId >= 0
 

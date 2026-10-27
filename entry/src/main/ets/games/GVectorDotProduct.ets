@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -81,6 +81,22 @@ export struct GVectorDotProduct {
     const p: Pair = makePair(); this.u = p.u; this.v = p.v; this.answer = dot(p.u, p.v);
     this.opts = shuffle(buildOpts(this.answer, p.u, p.v)); this.pick = -1; this.answered = false;
   }
+  /** 提示：和代打同一个循环（含局部常量），只把"点"换成"说" */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === this.answer) {
+        return Hint.make([i],
+          TG2('点第 {0} 个', String(i + 1)),
+          TG2('Tap number {0}', String(i + 1)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // ★ 答完要等一会儿才进下一题 ⇒ 先看"这一轮答过没有"，答过就等着，
   //   否则每拍都会重复提交、把计数打乱。
@@ -98,6 +114,12 @@ export struct GVectorDotProduct {
       }
     }
     return !this.over;
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private askAuto(): void {
@@ -149,8 +171,9 @@ export struct GVectorDotProduct {
   build() {
     Column({ space: Space.md }) {
       HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
