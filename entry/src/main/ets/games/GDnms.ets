@@ -90,8 +90,8 @@ export struct GDnms {
     }
     const n: number = this.ansIdx;
     return Hint.make([n],
-      TG2('答案是第 {0} 个', String(n + 1)),
-      TG2('The answer is option {0}', String(n + 1)), t0);
+      TG2('答案是「{0}」', this.opts[n]),
+      TG2('The answer is "{0}"', this.opts[n]), t0);
   }
 
   private askHint(): void {

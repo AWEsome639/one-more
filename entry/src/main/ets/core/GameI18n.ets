@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-28 选项提示 */
+  "答案是「{0}」": { "en": "The answer is \"{0}\"", "ja": "答えは「{0}」", "ko": "정답은 「{0}」", "es": "La respuesta es \"{0}\"", "fr": "La réponse est « {0} »", "de": "Die Antwort ist „{0}“", "pt": "A resposta é \"{0}\"", "ru": "Ответ: «{0}»", "it": "La risposta è \"{0}\"", "ar": "الإجابة هي \"{0}\"" },
   /** ★★ 2026-10-28 提示文案 */
   "异类是「{0}」": { "en": "The odd one is {0}", "ja": "異質なのは「{0}」", "ko": "이질적인 것은 「{0}」", "es": "El diferente es {0}", "fr": "L'intrus est {0}", "de": "Das andere ist {0}", "pt": "O diferente é {0}", "ru": "Лишнее: {0}", "it": "L'intruso è {0}", "ar": "الشاذ هو {0}" },
   /** ★★ 2026-10-28 选项提示 */
