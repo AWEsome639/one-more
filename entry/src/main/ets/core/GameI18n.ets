@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-27 序列提示 */
+  "下一步第 {0} 个方向": { "en": "Next direction {0}", "ja": "次の方向は{0}番目", "ko": "다음 방향은 {0}번째", "es": "Siguiente dirección {0}", "fr": "Direction suivante {0}", "de": "Nächste Richtung {0}", "pt": "Próxima direção {0}", "ru": "Следующее направление {0}", "it": "Direzione successiva {0}", "ar": "الاتجاه التالي {0}" },
   /** ★★ 2026-10-27 提示文案 */
   "点第 {0} 个": { "en": "Tap number {0}", "ja": "{0}番目を押す", "ko": "{0}번째를 누르세요", "es": "Toca el número {0}", "fr": "Touchez le numéro {0}", "de": "Nummer {0} tippen", "pt": "Toque o número {0}", "ru": "Нажмите номер {0}", "it": "Tocca il numero {0}", "ar": "اضغط الرقم {0}" },
   /** ★★ 2026-10-27 提示文案 */

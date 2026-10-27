@@ -7,7 +7,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -72,8 +72,6 @@ export struct GDirectionsRecall {
     }, GAP_MS + len * FLASH_MS));
   }
 
-  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
-  // 方向序列回忆：按顺序点 seq
   private tap(d: number): void {
     const ph: string = this.phase;
     if (ph !== 'input') { return; }
@@ -135,7 +133,7 @@ export struct GDirectionsRecall {
 
   build() {
     Column({ space: Space.sm }) {
-      Row({ space: Space.md }) {
+            Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", Math.min(this.round + 1, ROUNDS.length), ROUNDS.length)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG2('长度 {0}', String(this.seq.length > 0 ? this.seq.length : ROUNDS[0]))).fontSize(FontSize.md).fontColor(Palette.sky).layoutWeight(1)
         Text(TG('得分 ') + this.score).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
