@@ -2,6 +2,8 @@
  * 词对记忆 —— 先记住 6 组词对，再看词选搭档
  * 胜负：6 题答对 ≥5 ⇒ 通关｜进度：记忆倒计时 / 题号 / 答对 / 得分
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -39,6 +41,8 @@ export struct GWordPairAssociateMemory {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 PAIRS_N=6
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(6);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -86,6 +90,53 @@ export struct GWordPairAssociateMemory {
     this.opts = others; this.pickedOk = -1; this.lastPick = '';
     this.msg = TG2('「{0}」的搭档是？', p.a);
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.pickedOk >= 0) {
+      return true;
+    }
+    this.pick(this.pairs[this.qIndex].b);
+    return !this.over;
+  }
+
+  /** 提示：直接报搭档词 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.pickedOk >= 0 || this.over) {
+      return Hint.none('none');
+    }
+    const correct: string = this.pairs[this.qIndex].b;
+    return Hint.make([], TG2('它的搭档是「{0}」', correct),
+      TG2('Its partner is {0}', correct), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(o: string): void {
     if (this.pickedOk >= 0 || this.over) { return; }
     const correct: string = this.pairs[this.qIndex].b;
@@ -123,6 +174,12 @@ export struct GWordPairAssociateMemory {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(this.bar()).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.violet)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)

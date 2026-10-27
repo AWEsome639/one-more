@@ -2,6 +2,8 @@
  * 柜子记忆 —— 六格里亮出几件物品，1.5 秒后收起，再问「某件物品在哪一格」
  * 胜负：6 轮答对 ≥5 轮通关
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -29,6 +31,8 @@ export struct GSpatialCabinetMemory {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ITEMS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ITEMS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -97,6 +101,56 @@ export struct GSpatialCabinetMemory {
     }, SHOW_MS);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 1 || this.pick >= 0) {
+      return true;
+    }
+    this.tap(this.slotOf.indexOf(this.target));
+    return !this.over;
+  }
+
+  /** 提示：东西在第几格 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.phase !== 1 || this.pick >= 0) {
+      return Hint.none('none');
+    }
+    const real: number = this.slotOf.indexOf(this.target);
+    if (real < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([real], TG2('第 {0} 格', String(real + 1)),
+      TG2('Cell {0}', String(real + 1)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(cell: number): void {
     if (this.over || this.phase !== 1 || this.pick >= 0) { return; }
     this.pick = cell;
@@ -144,6 +198,12 @@ export struct GSpatialCabinetMemory {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2("轮次 {0}/{1}",Digits(String(this.round), this.langCode),Digits(String(ROUNDS), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG('答对 ') + String(this.hit)).fontSize(FontSize.sm).fontColor(Palette.primaryDeep)

@@ -2,6 +2,8 @@
  * 数量直觉 —— 一团圆点只亮 420 ms，来不及数，只能"一眼看出"有几个
  * 胜负：10 题答对 ≥8 题通关
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -24,6 +26,8 @@ export struct GSubitizingRush {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -95,6 +99,52 @@ export struct GSubitizingRush {
     return v;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.pick >= 0 || this.shown) {
+      return true;
+    }
+    this.answer(this.cnt);
+    return !this.over;
+  }
+
+  /** 提示：直接报个数 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.pick >= 0 || this.shown) {
+      return Hint.none('none');
+    }
+    return Hint.make([], TG2('一共 {0} 个', String(this.cnt)),
+      TG2('There are {0} items', String(this.cnt)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(v: number): void {
     if (this.over || this.pick >= 0 || this.shown) { return; }
     const truth: number = this.cnt;
@@ -128,6 +178,12 @@ export struct GSubitizingRush {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2("题号 {0}/{1}", String(this.round), String(this.diffTotal))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG('答对 ') + String(this.right)).fontSize(FontSize.sm).fontColor(Palette.violet)

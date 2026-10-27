@@ -23,6 +23,12 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  /** ★★ 2026-10-28 提示文案 */
+  "第 {0} 格": { "en": "Cell {0}", "ja": "{0}番目のマス", "ko": "{0}번째 칸", "es": "Casilla {0}", "fr": "Case {0}", "de": "Feld {0}", "pt": "Casa {0}", "ru": "Клетка {0}", "it": "Casella {0}", "ar": "الخلية {0}" },
+  /** ★★ 2026-10-28 提示文案 */
+  "一共 {0} 个": { "en": "There are {0} items", "ja": "全部で{0}個", "ko": "모두 {0}개", "es": "Hay {0} elementos", "fr": "Il y a {0} éléments", "de": "Es sind {0} Stück", "pt": "Há {0} itens", "ru": "Всего {0}", "it": "Ci sono {0} elementi", "ar": "هناك {0} عناصر" },
+  /** ★★ 2026-10-28 提示文案 */
+  "它的搭档是「{0}」": { "en": "Its partner is {0}", "ja": "その相棒は「{0}」", "ko": "그 의 짝은 「{0}」", "es": "Su pareja es {0}", "fr": "Son partenaire est {0}", "de": "Sein Partner ist {0}", "pt": "Seu par é {0}", "ru": "Его пара: {0}", "it": "Il suo partner è {0}", "ar": "شريكه هو {0}" },
   /** ★★ 2026-10-28 选项提示 */
   "答案是「{0}」": { "en": "The answer is \"{0}\"", "ja": "答えは「{0}」", "ko": "정답은 「{0}」", "es": "La respuesta es \"{0}\"", "fr": "La réponse est « {0} »", "de": "Die Antwort ist „{0}“", "pt": "A resposta é \"{0}\"", "ru": "Ответ: «{0}»", "it": "La risposta è \"{0}\"", "ar": "الإجابة هي \"{0}\"" },
   /** ★★ 2026-10-28 提示文案 */
