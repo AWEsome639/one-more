@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { Bp } from '../core/Bp';
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -91,6 +92,27 @@ export default class EntryAbility extends UIAbility {
       win.setWindowBackgroundColor('#0D1320');
     } catch (e) {
       hilog.warn(DOMAIN, 'testTag', 'setWindowBackgroundColor 失败（不影响启动）: %{public}s', JSON.stringify(e));
+    }
+
+    // ★★★ 2026-10-28（项目 F：六设备支持）：把窗口尺寸交给 Bp，全项目按它自适应
+    //   · 读一次当前尺寸 ⇒ 第一帧就是对的（不会先按手机画再跳一下）
+    //   · 监听 windowSizeChange ⇒ 折叠屏展开/收起、PC 拖窗口、分屏都跟着变
+    //   ⚠️ 全程 try/catch：拿不到尺寸就退回手机 360vp，绝不能因为读尺寸失败就打不开
+    try {
+      const mainWin: window.Window = windowStage.getMainWindowSync();
+      const prop: window.WindowProperties = mainWin.getWindowProperties();
+      Bp.update(prop.windowRect.width, prop.windowRect.height);
+      try {
+        mainWin.on('windowSizeChange', (sz: window.Size) => {
+          Bp.update(sz.width, sz.height);
+        });
+      } catch (e2) {
+        hilog.warn(DOMAIN, 'testTag', 'windowSizeChange 监听失败（不影响使用）: %{public}s', JSON.stringify(e2));
+      }
+      hilog.info(DOMAIN, 'testTag', 'Bp 初始化: %{public}s x %{public}s (%{public}s)',
+        String(prop.windowRect.width), String(prop.windowRect.height), Bp.tag());
+    } catch (e) {
+      hilog.warn(DOMAIN, 'testTag', '读窗口尺寸失败，按手机 360vp 走: %{public}s', JSON.stringify(e));
     }
 
     windowStage.loadContent('pages/Splash', (err) => {

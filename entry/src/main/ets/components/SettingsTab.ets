@@ -133,6 +133,8 @@ export struct SettingsTab {
   //   ⇒ 改成 @StorageLink（双向）—— 这才是"既读又写"的正确装饰器
   @StorageLink('uiMode') uiMode: string = 'normal';   // 界面模式（大字/紧凑），双向
   @State private copyHint: string = '';   // 「已复制 ✓」提示
+  /** 标星卡片的提示（打开 GitHub 失败时显示可复制的地址） */
+  @State private starHint: string = '';
   @StorageProp('themeMode') mode: string = 'system';
   @StorageProp('lang') lang: string = 'zh';
   @StorageProp('soundOn') soundOn: boolean = true;
@@ -260,6 +262,77 @@ export struct SettingsTab {
     this.confirming = true;
     this.note = '';
   }
+
+  /**
+   * ★★★ 2026-10-29（项目 F 顺手）：**GitHub 标星方块**
+   *
+   * 奥森：「在应用里加一个『在 GitHub 上标星』的方块，点击后跳到对应的标星页面」
+   *
+   * 设计考虑：
+   *   · 放在设置页「关于」区的最下面 —— 愿意往下翻到这儿的人，才是真的喜欢
+   *   · **不显示 star 数**：那要联网拉 API，与「离线可玩 / 不采集」冲突
+   *   · 不用 WebView，走系统浏览器（和隐私政策一致的做法）
+   *   · 打开失败时给一句可复制的地址，不让用户卡住
+   */
+  @Builder
+  starCard() {
+    Column({ space: Space.xs }) {
+      Row({ space: Space.sm }) {
+        Text('⭐').fontSize(FontSize.lg)
+          .accessibilityLevel('no')
+        Column({ space: 2 }) {
+          Text(this.t('在 GitHub 上标星', 'Star it on GitHub'))
+            .fontSize(FontSize.sm).fontColor(this.theme().ink).fontWeight(FontWeight.Medium)
+          Text(this.t('喜欢的话给它一颗星 · 开源、无广告、不采集',
+                      'Enjoying it? Give it a star · open source, no ads, no tracking'))
+            .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
+            .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        }
+        .alignItems(HorizontalAlign.Start)
+        .layoutWeight(1)
+        Text('↗').fontSize(FontSize.sm).fontColor(this.theme().inkFaint)
+          .accessibilityLevel('no')
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center)
+
+      if (this.starHint.length > 0) {
+        Text(this.starHint)
+          .fontSize(FontSize.xxs).fontColor(Palette.rose)
+          .width('100%')
+          .maxLines(3)
+      }
+    }
+    .width('100%')
+    .padding(Space.md)
+    .backgroundColor(this.theme().surfaceAlt)
+    .borderRadius(Radius.lg)
+    .margin({ top: Space.sm })
+    .onClick(() => {
+      Haptics.tap();
+      this.openStar();
+    })
+    .accessibilityText(this.t('在 GitHub 上标星', 'Star it on GitHub'))
+  }
+
+  /** 打开 GitHub 标星页（失败时给一句可复制的地址） */
+  private openStar(): void {
+    const url: string = About.GITHUB_STAR_URL;
+    try {
+      const ctx = getContext(this) as common.UIAbilityContext;
+      ctx.startAbility({
+        action: 'ohos.want.action.viewData',
+        uri: url
+      }).catch(() => {
+        this.starHint = this.t('打不开链接，请手动访问：', 'Cannot open link. Please visit: ') + url;
+        setTimeout(() => { this.starHint = ''; }, 6000);
+      });
+    } catch (e) {
+      this.starHint = this.t('打不开链接，请手动访问：', 'Cannot open link. Please visit: ') + url;
+      setTimeout(() => { this.starHint = ''; }, 6000);
+    }
+  }
+
 
   private openPrivacy(): void {
     const params: GuideParams = { kind: 'privacy' };
@@ -398,6 +471,7 @@ build() {
             this.openPrivacy();
           }
         })
+        this.starCard()
 
         Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length))
           .fontSize(FontSize.xxs)

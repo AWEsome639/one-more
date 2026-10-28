@@ -1,3 +1,4 @@
+import { Bp } from './Bp';
 import { curves } from '@kit.ArkUI';
 import { resourceManager } from '@kit.LocalizationKit';
 /**
@@ -59,9 +60,13 @@ export class Cell {
   /** 缩放系数：由 UiMode.apply() 写入 */
   static k: number = 1;
 
-  /** 把一个原始尺寸按当前模式缩放（取整，避免半像素） */
+  /** 把一个原始尺寸按当前模式缩放（取整，避免半像素）
+   *  ★★★ 2026-10-28（项目 F）：**再乘设备缩放**
+   *    · 手机上 Bp.scale() = 1.0 ⇒ 结果与改造前**逐像素一致**（零回归的保证）
+   *    · 平板 1.06 / PC 1.12 / 电视 1.45 ⇒ 一处改动，355 款自动跟着放大
+   *  ⚠️ 只对"装内容的格子"生效（和原设计一致），纯装饰尺寸不受影响 */
   static of(base: number): number {
-    return Math.round(base * Cell.k);
+    return Math.round(base * Cell.k * Bp.scale());
   }
 }
 

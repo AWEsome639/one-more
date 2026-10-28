@@ -58,6 +58,17 @@ export class About {
   static readonly PRIVACY_URL_EN: string = 'https://awesome639.github.io/onemore-privacy/privacy-en.html';
 
   /** 用户协议的标题（AGC 有时要） */
+  /**
+   * ★★★ 2026-10-29（项目 F 顺手）：**GitHub 标星入口**
+   *   · 仓库是公开的（API 实测 private=false），星标页对任何人可访问
+   *   · 用系统浏览器打开，应用内不做 WebView（少一个组件、少一份风险）
+   *   · ⚠️ 不要在应用里显示 star 数 —— 那要联网拉 API，
+   *     与「离线可玩 / 不采集」的定位冲突，也慢
+   */
+  static readonly GITHUB_URL: string = 'https://github.com/AWEsome639/one-more';
+  /** 直达「标星」动作的页面（和仓库主页同一个地址，GitHub 会自动显示 Star 按钮） */
+  static readonly GITHUB_STAR_URL: string = 'https://github.com/AWEsome639/one-more';
+
   static readonly PRIVACY_TITLE_CN: string = '隐私政策';
   static readonly PRIVACY_TITLE_EN: string = 'Privacy Policy';
 

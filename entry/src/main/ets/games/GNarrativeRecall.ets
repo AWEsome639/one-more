@@ -1,7 +1,7 @@
 /**
  * 故事回忆 —— 读一段小故事，凭记忆回答细节题
  * 胜负：玩完 ROUNDS 篇（每篇 3 题）后，答对 ≥ min(sizeNow(PASS), 可答题数) 即通关
- *       ⇒ 简单 4 / 普通 5 / 困难 7（可答题 9 道，三档都够得到）
+ *       ⇒ 简单 4 / 普通 5 / 困难 6（全场可答 6 题，三档都够得到）
  */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -14,15 +14,16 @@ import { LanRace } from '../core/LanRace';
 
 /**
  * ★ 2026-10-29 修「困难档数学上不可能赢」：
- *   过关线 = GameDiff.sizeNow(PASS=5) = 4 / 5 / 7，但 ROUNDS=2 ⇒ 全场只问 2×3 = 6 题，
+ *   过关线 = GameDiff.sizeNow(PASS=5) = 4 / 5 / 7，但全场只问 2 篇 × 3 题 = 6 题，
  *   困难档要答对 7 题 > 能答的 6 题 ⇒ **必输**。
- *   题库里本来就有 3 篇（第 3 篇从未被抽到）⇒ ROUNDS 改 3，可答 9 题；
- *   再用 min(难度值, 可答题数) 兜底 ⇒ 4 / 5 / 7，三档都够得到且仍是 易 < 普 < 难。
+ *   改成 min(难度值, 可答题数)：只有困难档从 7 压到 6（该档 6 题得全对 —— 最难但够得到），
+ *   简单/普通仍是 4 / 5（题数、时长都没动）⇒ 三档 4 / 5 / 6。
+ *   （备选：若嫌 6/6 太死，把 ROUNDS 改 3 即变 4 / 5 / 7 —— 题库里本来就有第 3 篇。）
  */
-const ROUNDS: number = 3;
+const ROUNDS: number = 2;
 const PASS: number = 5;
 const Q_PER_STORY: number = 3;                    // 题库里每篇都是 3 题
-const MAX_ASKED: number = ROUNDS * Q_PER_STORY;   // 一局最多能答的题数 = 9
+const MAX_ASKED: number = ROUNDS * Q_PER_STORY;   // 一局最多能答的题数 = 6
 
 interface Q { text: string; opts: string[]; right: number }
 interface Story { body: string; qs: Q[] }
