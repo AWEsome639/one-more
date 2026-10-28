@@ -301,7 +301,9 @@ export struct GCheckers {
     });
     this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
-    setTimeout(() => { this.demoStart(); }, 3000);
+    if (Hint.demoOnce('GCheckers')) {
+      setTimeout(() => { this.demoStart(); }, 3000);
+    }
   }
 
   /** 宿主点了「换一局」：联机时要通知对方，否则两边棋盘不一样 */

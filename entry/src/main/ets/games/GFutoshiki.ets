@@ -87,6 +87,11 @@ export struct GFutoshiki {
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
     this.reset();
+    // ★ 2026-10-29（lead 补）：之前手工接漏了这一步 ⇒ 演示方法写了却从没被调用
+    //   进来 3 秒内没人动就开始演示（一碰就停，见根容器 .onTouch）
+    if (Hint.demoOnce('GFutoshiki')) {
+      setTimeout(() => { this.demoStart(); }, 3000);
+    }
   }
 
   onRestart(): void {

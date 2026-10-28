@@ -61,7 +61,9 @@ export struct GReadingSpan {
   aboutToAppear(): void {
     LanRace.noteStart(); this.startAt = Date.now(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
-    setTimeout(() => { this.demoStart(); }, 3000);
+    if (Hint.demoOnce('GReadingSpan')) {
+      setTimeout(() => { this.demoStart(); }, 3000);
+    }
   }
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(2);
