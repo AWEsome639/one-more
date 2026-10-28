@@ -4,6 +4,8 @@
  * 胜负：3 轮答对 2 轮以上 ⇒ 通关（一轮 4 个事件全对才算对）
  * 进度：轮次 / 答对轮数 / 本轮已点
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -32,6 +34,8 @@ export struct GEventTimelineMemory {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State private evs: Ev[] = [];        // 真实顺序
@@ -86,6 +90,77 @@ export struct GEventTimelineMemory {
     }
     this.cards = mixed; this.picks = []; this.phase = 1; this.msg = TG('按刚才的顺序依次点这 4 张牌');
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase === 0) {
+      if (this.to1 >= 0) {
+        return true;             // 还在逐个登场，等它演完
+      }
+      this.shuffleIn();          // 演完了 ⇒ 替玩家按「打乱作答」
+      return true;
+    }
+    if (this.phase !== 1) {
+      return true;               // 2 = 结算中，等 1300ms 换下一轮
+    }
+    const want: number = this.evs[this.picks.length].k;
+    for (let i = 0; i < this.cards.length; i++) {
+      if (this.cards[i].k === want) {
+        this.tapCard(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase === 0) {
+      const seq: string[] = [];
+      for (let i = 0; i < this.evs.length; i++) {
+        seq.push(this.evs[i].icon + this.evs[i].label);
+      }
+      return Hint.make([],
+        TG2('登场顺序：{0}', seq.join(' → ')),
+        TG2('The order was: {0}', seq.join(' -> ')), t0);
+    }
+    if (this.phase !== 1) {
+      return Hint.none('none');
+    }
+    const want: Ev = this.evs[this.picks.length];
+    return Hint.make([],
+      TG2('下一个点「{0}」', want.icon + want.label),
+      TG2('Tap {0} next', want.icon + want.label), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapCard(i: number): void {
     if (this.over || this.phase !== 1 || this.picks.indexOf(i) >= 0) { return; }
     const next: number[] = this.picks.slice();
@@ -127,6 +202,12 @@ export struct GEventTimelineMemory {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

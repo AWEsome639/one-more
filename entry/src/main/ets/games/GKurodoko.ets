@@ -15,6 +15,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -53,6 +54,8 @@ export struct GKurodoko {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -76,6 +79,10 @@ export struct GKurodoko {
     this.diffTotal = GameDiff.livesNow(MAX_MOVES);
     this.reset();
   }
+
+  /** 解出来的目标黑格（缓存：同一题只解一次，避免每 320ms 重算） */
+  private kuroSol: boolean[] = [];
+  private kuroKey: string = '';
 
   private rowOf(i: number): number {
     return Math.floor(i / N);
@@ -332,6 +339,25 @@ export struct GKurodoko {
             String(r), String(c)), t0);
       }
     }
+    // ★ 2026-10-28 补：代打解过一次后 wantBlack 就有缓存（kuroKey / kuroSol）
+    //   ⇒ 这时候直接照真值报一格，别再说"看不出哪格必须变黑"。
+    //   ⚠️ 只读缓存、不在这里现搜：dfsKuro 是同步 DFS，现搜可能冻界面（Hint.BUDGET 也打断不了）。
+    if (this.kuroSol.length === CELLS && this.kuroKey === this.clue.join(',')) {
+      for (let i = 0; i < CELLS; i++) {
+        if (this.clue[i] > 0 || this.kuroSol[i] === this.black[i]) {
+          continue;
+        }
+        const rr: number = this.rowOf(i) + 1;
+        const cc: number = this.colOf(i) + 1;
+        return Hint.make([i],
+          this.kuroSol[i]
+            ? TG2('第 {0} 行第 {1} 列要涂黑', String(rr), String(cc))
+            : TG2('第 {0} 行第 {1} 列要留白', String(rr), String(cc)),
+          this.kuroSol[i]
+            ? TG2('Row {0}, column {1} → black', String(rr), String(cc))
+            : TG2('Row {0}, column {1} → white', String(rr), String(cc)), t0);
+      }
+    }
     return Hint.none('none');
   }
 
@@ -387,6 +413,103 @@ export struct GKurodoko {
     }
   }
 
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 线索只有 3~4 条 ⇒ 直接搜一个满足三条规则的合法解（黑不相邻做剪枝）
+  private dfsKuro(free: number[], k: number, b: boolean[]): boolean {
+    if (k >= free.length) {
+      for (let i = 0; i < CELLS; i++) {
+        if (this.clue[i] > 0 && this.vis(i, b) !== this.clue[i]) {
+          return false;
+        }
+      }
+      return this.connected(b);
+    }
+    const i: number = free[k];
+    b[i] = false;
+    if (this.dfsKuro(free, k + 1, b)) {
+      return true;
+    }
+    const nb: number[] = this.nbrs(i);
+    let ok: boolean = true;
+    for (let t = 0; t < nb.length; t++) {
+      if (b[nb[t]]) {
+        ok = false;
+      }
+    }
+    if (ok) {
+      b[i] = true;
+      if (this.dfsKuro(free, k + 1, b)) {
+        return true;
+      }
+      b[i] = false;
+    }
+    return false;
+  }
+
+  /** 一组合法解（true = 该格涂黑）；搜不到返回空数组 */
+  private solveKuro(): boolean[] {
+    const b: boolean[] = new Array<boolean>(CELLS).fill(false);
+    const free: number[] = [];
+    for (let i = 0; i < CELLS; i++) {
+      if (this.clue[i] <= 0) {
+        free.push(i);
+      }
+    }
+    if (this.dfsKuro(free, 0, b)) {
+      return b;
+    }
+    return [];
+  }
+
+  private wantBlack(): boolean[] {
+    const key: string = this.clue.join(',');
+    if (this.kuroKey === key && this.kuroSol.length === CELLS) {
+      return this.kuroSol;
+    }
+    const sol: boolean[] = this.solveKuro();
+    this.kuroKey = key;
+    this.kuroSol = sol;
+    return sol;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const want: boolean[] = this.wantBlack();
+    if (want.length !== CELLS) {
+      return false;
+    }
+    for (let i = 0; i < CELLS; i++) {
+      if (this.clue[i] > 0) {
+        continue;
+      }
+      if (want[i] !== this.black[i]) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tap(i: number): void {
     if (this.over || this.clue[i] > 0) {
       return;
@@ -400,6 +523,12 @@ export struct GKurodoko {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -4,6 +4,8 @@
  * 坐标写作（列, 行），列从左往右 1→5、行从上往下 1→5。
  * 胜负：8 个点全部按顺序点亮 = 通关；点错 3 次 = 失败。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -26,6 +28,8 @@ export struct GGraphCoordinatePlot {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：LIVES 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(LIVES);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -64,6 +68,55 @@ export struct GGraphCoordinatePlot {
       if (i < NEED - 1) { s = s + '→'; }
     }
     return s;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.step >= NEED) {
+      return true;
+    }
+    this.tap(PY[this.step] * N + PX[this.step]);
+    return !this.over;
+  }
+
+  /** 提示：按顺序报下一个点（坐标是内容，不是下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.step >= NEED) {
+      return Hint.none('none');
+    }
+    const c: number = PX[this.step] + 1;
+    const r: number = PY[this.step] + 1;
+    const i: number = PY[this.step] * N + PX[this.step];
+    return Hint.make([i],
+      TG2('下一个点 ({0},{1})（列 {0} 行 {1}）', String(c), String(r)),
+      TG2('Next point ({0},{1})', String(c), String(r)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -111,6 +164,12 @@ export struct GGraphCoordinatePlot {
 
   build() {
     Column({ space: Space.xs }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("已绘 {0}/{1}", this.step, NEED))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       Text(TG2('指令：{0}', this.hintList()))

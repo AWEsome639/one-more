@@ -1,4 +1,6 @@
 /** 勾股数 —— 构造勾股三元组｜6 关解出 5 关过关 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -27,6 +29,8 @@ export struct GPythagoreanTripleBuilder {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(LEVELS);
   onFinish: (r: GameResult) => void = () => {};
   @State private ask: string = '';
@@ -81,6 +85,57 @@ export struct GPythagoreanTripleBuilder {
     return v;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const want: string = String(this.ans);
+    if (this.typed.length < want.length) {
+      this.pickKey(want.charAt(this.typed.length));   // 一位一位敲进去
+      return true;
+    }
+    if (this.typed === want) {
+      this.submit();
+      return !this.over;
+    }
+    this.typed = '';                // 玩家留下的残数，先清掉
+    return true;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('填 {0}（a² + b² = c²，取整数）', String(this.ans)),
+      TG2('The answer is {0}', String(this.ans)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pickKey(s: string): void {
     if (this.over) { return; }
     if (s === '⌫') {
@@ -126,6 +181,12 @@ export struct GPythagoreanTripleBuilder {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

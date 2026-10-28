@@ -7,11 +7,13 @@
  * 契约：@Prop theme / @Prop @Watch('onRestart') restartToken / onFinish(r)
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -138,6 +140,8 @@ export struct GTicTacToe {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=3；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(3);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -226,6 +230,143 @@ export struct GTicTacToe {
 
   private valAt(i: number): number {
     return i >= 0 && i < this.cells.length ? this.cells[i] : 0;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.thinking || this.finished || this.humanMove() < 0) {
+      return true;                       // 电脑在想 / 已结束 / 没有空格 ⇒ 这一拍不动
+    }
+    this.tap(this.humanMove());
+    return !this.over;
+  }
+
+  /** 代打与提示共用：从「我」这边选一格（① 直接赢 ② 堵对手 ③ 启发式） */
+  private humanMove(): number {
+    const n: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const size: number = n * n;
+    for (let i = 0; i < size; i++) {
+      if (this.cells[i] !== 0) {
+        continue;
+      }
+      const t: number[] = this.cells.slice();
+      t[i] = HUMAN;
+      if (winnerOf(t) === HUMAN) {
+        return i;                       // ① 这一手就能连成
+      }
+    }
+    for (let i = 0; i < size; i++) {
+      if (this.cells[i] !== 0) {
+        continue;
+      }
+      const t: number[] = this.cells.slice();
+      t[i] = AI;
+      if (winnerOf(t) === AI) {
+        return i;                       // ② 电脑下一手就能连 ⇒ 必须先堵
+      }
+    }
+    let best: number = -1;
+    let bestV: number = -1e9;
+    for (let i = 0; i < size; i++) {
+      if (this.cells[i] !== 0) {
+        continue;
+      }
+      const v: number = this.linePot(i, HUMAN) * 2 + this.linePot(i, AI) * 1.5;
+      if (v > bestV) {
+        bestV = v;
+        best = i;
+      }
+    }
+    return best;
+  }
+
+  /** 经过第 i 格、还没被对手占的线，累计「自己已有几子」的平方（越接近成线越贵） */
+  private linePot(i: number, who: number): number {
+    let sum: number = 0;
+    for (let k = 0; k < LINES.length; k++) {
+      const L: number[] = LINES[k];
+      if (L[0] !== i && L[1] !== i && L[2] !== i) {
+        continue;
+      }
+      let mine: number = 0;
+      let blocked: boolean = false;
+      for (let j = 0; j < 3; j++) {
+        const v: number = L[j] < this.cells.length ? this.cells[L[j]] : 0;
+        if (v === who) {
+          mine++;
+        } else if (v !== 0) {
+          blocked = true;
+        }
+      }
+      if (!blocked) {
+        sum = sum + (mine + 1) * (mine + 1);
+      }
+    }
+    return sum;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.finished) {
+      return Hint.none('none');
+    }
+    if (this.thinking) {
+      return Hint.make([], TG('电脑正在想，等它落子再看'),
+        'The computer is thinking', t0);
+    }
+    const i: number = this.humanMove();
+    if (i < 0) {
+      return Hint.none('none');
+    }
+    const n: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const r: string = String(Math.floor(i / n) + 1);
+    const c: string = String(i % n + 1);
+    const probe: number[] = this.cells.slice();
+    probe[i] = HUMAN;
+    const wins: boolean = winnerOf(probe) === HUMAN;
+    const t2: number[] = this.cells.slice();
+    t2[i] = AI;
+    const mustBlock: boolean = winnerOf(t2) === AI;
+    if (wins) {
+      return Hint.make([i],
+        TG2('落第 {0} 行第 {1} 列 —— 这一手直接连成 ✕', r, c),
+        'Play row ' + r + ', column ' + c + ' to win', t0);
+    }
+    if (mustBlock) {
+      return Hint.make([i],
+        TG2('电脑下一手就能连 —— 必须堵第 {0} 行第 {1} 列', r, c),
+        'Block at row ' + r + ', column ' + c, t0);
+    }
+    return Hint.make([i],
+      TG2('落第 {0} 行第 {1} 列：既是最长的自己的线，也最挡电脑', r, c),
+      'Play row ' + r + ', column ' + c, t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -335,6 +476,12 @@ export struct GTicTacToe {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text(true ? TG('得分') : (false ? TG('步数') : TG('用时')))

@@ -1,6 +1,8 @@
 /** 镜面反射 —— 光路更长更绕，六块镜子导两束光　胜负：18 步内点亮全部探头 ⇒ 通关｜进度：已亮/总数 + 剩余步数
  *  造局：随机镜位 → 随机「解态」朝向 → 光束射出棋盘的那格即探头 ⇒ **每局必定可解**；
  *  开局给随机朝向且保证还没点亮 ⇒ 必须先转镜子。／ 右→上、上→右；＼ 右→下、下→右。 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -36,6 +38,8 @@ export struct GLaserReflect {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：棋盘边长（原 GS=9）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(9);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
 
@@ -131,6 +135,87 @@ export struct GLaserReflect {
     this.moves = 0; this.score = 0; this.over = false; this.won = false; this.done = false;
     this.startAt = Date.now(); this.setup(); this.msg = TG(TG(TG('点 ／＼ 换朝向，把光折到 🎯'))); this.refresh();
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.laserTarget() < 0) {
+      return true;
+    }
+    this.rotateAt(this.laserTarget());
+    return !this.over;
+  }
+
+  /** 提示：报出该转哪块镜子（解法是把 4 块活动镜转成让两束光都打到探头） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) { return Hint.none('none'); }
+    const i: number = this.laserTarget();
+    if (i < 0) { return Hint.none('none'); }
+    const r: number = Math.floor(i / this.diffTotal) + 1;
+    const c: number = i % this.diffTotal + 1;
+    return Hint.make([i],
+      TG2('转第 {0} 行第 {1} 列那块镜子（点一下换朝向）', String(r), String(c)),
+      'Rotate the mirror at row ' + String(r), t0);
+  }
+
+  /** 辅助：下一步该转哪一块活动镜（-1 = 已经全亮了） */
+  private laserTarget(): number {
+    const n: number = this.slots.length;
+    if (n <= 0 || n > 8) { return -1; }
+    let best: number = -1;
+    let bestDiff: number = 99;
+    const total: number = 1 << n;
+    for (let mask = 0; mask < total; mask++) {
+      const g: number[] = this.grid.slice();
+      let diff: number = 0;
+      for (let i = 0; i < n; i++) {
+        const ori2: number = ((mask >> i) & 1) === 1 ? 2 : 1;
+        if (g[this.slots[i]] !== ori2) { diff = diff + 1; }
+        g[this.slots[i]] = ori2;
+      }
+      if (diff >= bestDiff) { continue; }
+      let all: boolean = true;
+      for (let k = 0; k < this.emits.length; k++) {
+        const out: number[] = [-9, -9];
+        const p: number[] = walk(g, this.emits[k], out);
+        if (p.indexOf(this.dets[k]) < 0) { all = false; break; }
+      }
+      if (all) { bestDiff = diff; best = mask; }
+    }
+    if (best < 0 || bestDiff === 0) { return -1; }
+    for (let i = 0; i < n; i++) {
+      const ori2: number = ((best >> i) & 1) === 1 ? 2 : 1;
+      if (this.grid[this.slots[i]] !== ori2) { return this.slots[i]; }
+    }
+    return -1;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private rotateAt(slot: number): void {
     if (this.over) { return; }
     const ng: number[] = this.grid.slice();
@@ -170,6 +255,12 @@ export struct GLaserReflect {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("已亮 {0}/{1}", this.lit, this.dets.length))
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)

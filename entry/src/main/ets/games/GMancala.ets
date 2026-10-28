@@ -6,11 +6,13 @@
  * 胜负：一方六坑全空时结算，库里石子多的一方获胜
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { LanMatch, Side } from '../core/LanMatch';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -44,6 +46,8 @@ export struct GMancala {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：棋盘边长（原 PITS=6）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(6);
 
   /** 0..diffTotal-1（读 @State 建依赖） */
@@ -279,6 +283,104 @@ export struct GMancala {
     this.turn = LanMatch.myTurn() ? 0 : 1;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.turn !== 0 || this.bestPit() < 0) {
+      return true;                       // 轮不到我 / 没有合法的坑 ⇒ 这一拍不动
+    }
+    this.playerMove(this.bestPit());
+    return !this.over;
+  }
+
+  /** 代打与提示共用的选坑：拿到多少 + 是否连走 − 对手最好的反击（对手 AI 的镜像） */
+  private bestPit(): number {
+    let best: number = -1;
+    let bestVal: number = -999999;
+    for (let i = 0; i < this.diffTotal; i++) {
+      if (this.pits[i] === 0) {
+        continue;
+      }
+      const s: number[] = this.sow(this.pits, i, A_STORE);
+      const last: number = this.lastLand;
+      const extra: boolean = last === P_STORE;
+      let gain: number = s[P_STORE] - this.pits[P_STORE];
+      if (!extra && last < this.diffTotal && s[last] === 1) {
+        gain = gain + s[12 - last];
+      }
+      let opp: number = 0;
+      for (let j = this.diffTotal + 1; j < A_STORE; j++) {
+        if (s[j] === 0) {
+          continue;
+        }
+        const s2: number[] = this.sow(s, j, P_STORE);
+        const g: number = s2[A_STORE] - s[A_STORE];
+        if (g > opp) {
+          opp = g;
+        }
+      }
+      const val: number = gain * 2 + (extra ? 3 : 0) - opp;
+      if (val > bestVal) {
+        bestVal = val;
+        best = i;
+      }
+    }
+    return best;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.turn !== 0) {
+      return Hint.make([], TG('等对手走完这一手，再看提示'),
+        'Wait for the opponent move', t0);
+    }
+    const p: number = this.bestPit();
+    if (p < 0) {
+      return Hint.none('none');
+    }
+    const before: number = this.pits[P_STORE];
+    const s: number[] = this.sow(this.pits, p, A_STORE);
+    const last: number = this.lastLand;
+    const extra: boolean = last === P_STORE;
+    let add: number = s[P_STORE] - before;
+    if (!extra && last < this.diffTotal && s[last] === 1) {
+      add = add + s[12 - last];
+    }
+    const tail: string = extra ? TG('，最后一颗进自己的库 ⇒ 能再走一次') : '';
+    return Hint.make([p],
+      TG2('选第 {0} 个坑：这一手进库 {1} 颗{2}', String(p + 1), String(add), tail),
+      'Play pit ' + String(p + 1) + ' (+' + String(add) + ' in store)', t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private playerMove(pit: number): void {
     if (this.over || this.turn !== 0 || this.pits[pit] === 0) {
       return;
@@ -344,6 +446,12 @@ export struct GMancala {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('我方库'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

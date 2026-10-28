@@ -2,6 +2,8 @@
  * 字母桥 —— 单词缺了一个字母，从四个候选里把桥补上
  * 胜负：8 题答对 ≥5 通关｜进度：题号 / 答对 / 剩余秒数（点错罚 2 秒）
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -52,6 +54,8 @@ export struct GLetterBridge {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT_S 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT_S);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -83,6 +87,53 @@ export struct GLetterBridge {
       this.advance();
     }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.pick(this.cur().letter);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const q: LB = this.cur();
+    const word: string = q.left + q.letter + q.right;
+    return Hint.make([],
+      TG2('缺的是「{0}」⇒ {1}（{2}）', q.letter, word, q.cn),
+      TG2('The missing letter is {0} — {1} ({2})', q.letter, word, q.cn), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(l: string): void {
     if (this.over) { return; }
     if (l !== this.cur().letter) {
@@ -116,6 +167,12 @@ export struct GLetterBridge {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

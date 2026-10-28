@@ -15,6 +15,8 @@
  *   ③ onRestart()（宿主点「换一局」）先停旧循环再重开
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -87,6 +89,8 @@ export struct GBreakout {
 
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State bricks: boolean[] = [];        // 每块砖是否还在（行优先）
   @State ballX: number = 50;            // 球心 x（%）
   @State ballY: number = 89;            // 球心 y（%）
@@ -182,9 +186,79 @@ export struct GBreakout {
   }
 
   // ── 物理：一帧 ────────────────────────────────────────────
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over || this.won) {
+      return false;
+    }
+    this.autoPaddle();
+    return !this.over && !this.won;
+  }
+
+  // 挡板接不到球就输 ⇒ 报球现在在哪、挡板要往哪挪
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.won) {
+      return Hint.none('none');
+    }
+    const mid: number = this.paddleX + PADDLE_W / 2;
+    const d: number = this.ballX - mid;
+    const side: string = d > 4 ? '右' : (d < -4 ? '左' : '');
+    let msg: string = '对准了，保持住';
+    if (!this.launched) {
+      msg = '按「发球」先把球打出去';
+    } else if (side.length > 0) {
+      msg = '挡板往' + side + '挪，球在 x=' + String(Math.floor(this.ballX)) + '%';
+    }
+    return Hint.make([], msg + '（还剩 ' + String(this.left) + ' 块砖）',
+      'Move the paddle toward the ball (x = ' + String(Math.floor(this.ballX)) + '%)', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
+  /** 代打：先把球发出去，再把挡板对到「球会打在偏侧」的位置（有斜角才扫得开砖） */
+  private autoPaddle(): void {
+    if (!this.launched) {
+      this.launch();
+      return;
+    }
+    let v: number = this.ballX - PADDLE_W * 0.75;
+    if (v < 0) {
+      v = 0;
+    }
+    if (v > 100 - PADDLE_W) {
+      v = 100 - PADDLE_W;
+    }
+    this.paddleX = v;
+  }
   private tick(): void {
     if (this.over || this.won || this.paused) {
       return;
+    }
+    // ★ AI 代打（2026-10-24 第三期）：autoId >= 0 时每帧把挡板跟到球下面
+    if (this.autoId >= 0) {
+      this.autoPaddle();
     }
     // ★ 按真实 dt 推进 ⇒ 帧率与球速解耦：
     //   k = dtMs / tickMs 表示"这一帧相当于几个原物理帧"，难度决定的球速完全不变。
@@ -367,6 +441,12 @@ export struct GBreakout {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       // 得分条 —— ⚠️ 只传「种类」（@Builder 按值传参不建立观察，见 stat() 注释）
       Row({ space: Space.sm }) {
         this.stat(0)

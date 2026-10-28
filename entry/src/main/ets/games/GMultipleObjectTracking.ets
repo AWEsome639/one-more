@@ -3,6 +3,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -22,6 +24,8 @@ export struct GMultipleObjectTracking {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -52,6 +56,63 @@ export struct GMultipleObjectTracking {
 
   private clearAll(): void {
     if (this.moveId >= 0) { clearInterval(this.moveId); this.moveId = -1; } if (this.showTo >= 0) { clearTimeout(this.showTo); this.showTo = -1; } if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 2) {
+      return true;
+    }
+    this.aiPick(0);
+    return !this.over;
+  }
+
+  /** 提示：目标是哪几格 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase !== 2) {
+      return Hint.make([], TG('还没到作答：先盯住高亮的圆点'),
+        TG('Not yet: keep your eyes on the highlighted dots'), t0);
+    }
+    const tgt: number[] = this.pos.slice(0, this.targets);
+    let s: string = '';
+    for (let i = 0; i < tgt.length; i++) {
+      const rr: string = String(Math.floor(tgt[i] / N) + 1);
+      const cc: string = String(tgt[i] % N + 1);
+      s = s + (i > 0 ? '，' : '') + TG2('第 {0} 行第 {1} 列', rr, cc);
+    }
+    return Hint.make(tgt, TG2('目标就在：{0}', s),
+      TG2('The targets are at: {0}', s), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private reset(): void {
@@ -163,8 +224,23 @@ export struct GMultipleObjectTracking {
     return this.theme.surface;
   }
 
+  /** AI 用：停下那一刻，目标就是 pos 的前 targets 个 */
+  private aiPick(_d: number): void {
+    if (this.phase !== 2) { return; }
+    const tgt: number[] = this.pos.slice(0, this.targets);
+    for (let i = 0; i < tgt.length; i++) {
+      if (this.picks.indexOf(tgt[i]) < 0) { this.tap(tgt[i]); return; }
+    }
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2("轮次 {0}", (String(this.round) + '/' + String(this.diffTotal)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2('目标 {0}', String(this.targets))).fontSize(FontSize.xs).fontColor(this.theme.ink)

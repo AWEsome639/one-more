@@ -2,6 +2,8 @@
  * 联合搜索 —— 目标要「形状 + 颜色」两个特征同时对上，干扰项各只占一个
  * 胜负：6 局找对 ≥5 ⇒ 通关｜进度：局数 / 找对 / 得分（每局 9 秒，点错罚 1.5 秒）
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -25,6 +27,8 @@ export struct GVisualSearchConjunction {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -76,6 +80,65 @@ export struct GVisualSearchConjunction {
     this.leftMs = gap >= LIMIT_MS ? 0 : LIMIT_MS - gap;
     if (gap >= LIMIT_MS) { this.endRound(false); }
   }
+  /** ★ AI 代打/提示共用：唯一那个形状+颜色都对上的格子（没有就 -1） */
+  private targetCell(): number {
+    for (let i = 0; i < this.shapes.length; i++) {
+      if (this.shapes[i] === this.tShape && this.colors[i] === this.tColor) { return i; }
+    }
+    return -1;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.feed >= 0 || this.targetCell() < 0) {
+      return true;
+    }
+    this.pick(this.targetCell());
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const at: number = this.targetCell();
+    if (at < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(at / N) + 1;
+    const c: number = at % N + 1;
+    return Hint.make([at],
+      TG2('形状和颜色都对上的 {0} 在第 {1} 行第 {2} 列', SHAPES[this.tShape], r, c),
+      TG2('The {0} matching both shape and colour is at row {1}, column {2}', SHAPES[this.tShape], r, c), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(i: number): void {
     if (this.over || this.feed >= 0) { return; }
     if (this.shapes[i] === this.tShape && this.colors[i] === this.tColor) {
@@ -109,6 +172,12 @@ export struct GVisualSearchConjunction {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text(('局')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

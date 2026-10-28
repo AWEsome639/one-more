@@ -3,6 +3,8 @@
  * 先记住 5 条消息各自是谁说的（限时 8 秒），再逐条回答「这话是谁说的」。
  * 胜负：5 题答对 ≥4 ⇒ 通关；进度：第几题 / 答对 / 记忆倒计时。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -35,6 +37,8 @@ export struct GSourceMonitoring {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 QUIZ=5
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(5);
   onFinish: (r: GameResult) => void = () => {};
   @State claims: number[] = []; @State srcs: number[] = []; @State phase: string = 'study';
@@ -74,6 +78,52 @@ export struct GSourceMonitoring {
     if (this.clock >= 0) { clearInterval(this.clock); this.clock = -1; }
     this.left = 0; this.phase = 'quiz'; this.note = TG('这条消息是谁说的？');
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 'quiz' || this.picked >= 0) {
+      return true;
+    }
+    this.pick(this.srcs[this.q]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.phase !== 'quiz') {
+      return Hint.none('none');
+    }
+    const who: string = SOURCES[this.srcs[this.q]];
+    return Hint.make([this.srcs[this.q]],
+      TG2('「{0}」是{1}说的', CLAIMS[this.claimNo()], who),
+      TG2('{0} came from {1}', CLAIMS[this.claimNo()], who), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(src: number): void {
     if (this.phase !== 'quiz' || this.picked >= 0 || this.over) { return; }
     this.picked = src;
@@ -102,6 +152,12 @@ export struct GSourceMonitoring {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text((this.phase === 'study' ? TG('记忆') : TG('题号 ') + Math.min(this.q + 1, this.diffTotal) + '/' + this.diffTotal)
         + TG('　答对 ') + this.score + '/' + NEED + '　倒计时 ' + this.left + 's')
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')

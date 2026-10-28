@@ -6,6 +6,8 @@
  * 胜负：泡泡墙清空 ⇒ solved=true；发射次数用完还有泡泡 ⇒ solved=false
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -39,6 +41,8 @@ export struct GBubbleShooter {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private field: number[] = [];     // -1 = 空，0..KINDS-1 = 颜色
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -158,6 +162,87 @@ export struct GBubbleShooter {
     return n;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.bestCol() < 0) {
+      return true;
+    }
+    this.fire(this.bestCol());
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 没有现成答案 ⇒ 预演：每列都试打一次（landing + group），挑能连上最多同色的
+  /** 最该打的列（满列跳过；全满返回 -1） */
+  private bestCol(): number {
+    const f: number[] = this.field.slice();
+    let best: number = -1;
+    let bestN: number = -1;
+    for (let c = 0; c < COLS; c++) {
+      const row: number = this.landing(f, c);
+      if (row < 0) {
+        continue;
+      }
+      const t: number[] = f.slice();
+      const at: number = this.idx(row, c);
+      t[at] = this.shot;
+      const n: number = this.group(t, at).length;
+      if (n > bestN) {
+        bestN = n;
+        best = c;
+      }
+    }
+    return best;
+  }
+
+  /** 提示：报打第几列、能连几颗 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const c: number = this.bestCol();
+    if (c < 0) {
+      return Hint.none('none');
+    }
+    const f: number[] = this.field.slice();
+    const row: number = this.landing(f, c);
+    const t: number[] = f.slice();
+    const at: number = this.idx(row, c);
+    t[at] = this.shot;
+    const n: number = this.group(t, at).length;
+    return Hint.make([at],
+      TG2('打第 {0} 列 —— 能连 {1} 颗', String(c + 1), String(n)),
+      TG2('Fire column {0} — joins {1} bubbles', String(c + 1), String(n)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private fire(c: number): void {
     if (this.over) {
       return;
@@ -235,6 +320,12 @@ export struct GBubbleShooter {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

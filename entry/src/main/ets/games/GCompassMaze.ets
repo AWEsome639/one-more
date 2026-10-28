@@ -4,6 +4,8 @@
  * 点「走一步」按下达方向走，撞墙白扣一步；⇄ 反转整条指令带（排错用，不扣步数）。
  * 胜负：走到右下角出口 = 通关；步数用尽 = 失败。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -78,6 +80,8 @@ export struct GCompassMaze {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=7；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5, 6]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(7);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -109,6 +113,154 @@ export struct GCompassMaze {
  this.idx = 0; this.steps = 0; this.over = false; this.won = false;
  this.note = TG('照着指令走到右下角 🌀'); this.startAt = Date.now();
  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这款玩家只能按「走一步」（照指令带）或「⇄ 反转」（不扣步数）。
+  // 关键认识：反转不花步数 ⇒ 每一步都能自由选「这条指令」或「它的反向」，
+  //   而指令带指针每走一步必然 +1 ⇒ 第 k 步用的指令一定在 (idx + k) 处，
+  //   于是状态只剩「人在哪个格子」⇒ 逐层可达集就够，不需要搜树。
+  /** 按方向 d 从 pos 走一步（撞墙/出界就地不动），与 follow() 同一套判据 */
+  private stepFrom(pos: number, d: number): number {
+    const n: number = this.diffTotal;
+    const r: number = Math.floor(pos / n);
+    const c: number = pos % n;
+    const nr: number = r + DR[d];
+    const nc: number = c + DC[d];
+    if ((this.walls[pos] & WALL[d]) !== 0 || nr < 0 || nr >= n || nc < 0 || nc >= n) {
+      return pos;
+    }
+    return nr * n + nc;
+  }
+
+  /** [要不要先翻转(0/1), 还需要几步到出口(-1 = 步数内到不了)] */
+  private planInfo(): number[] {
+    const n: number = this.diffTotal;
+    const cells: number = n * n;
+    const goal: number = this.goalIdx();
+    const L: number = this.cmds.length;
+    const budget: number = DMAX - this.steps;
+    if (L <= 0 || this.walls.length < cells || budget <= 0) {
+      return [0, -1];                  // 盘面还没初始化 / 没有剩余步数
+    }
+    const reach: boolean[] = new Array<boolean>(cells).fill(false);
+    reach[this.pos] = true;
+    const fromPos: number[][] = [];
+    const fromPar: number[][] = [];
+    let layer0: number[] = new Array<number>(cells).fill(-1);
+    fromPos.push(layer0);
+    fromPar.push(new Array<number>(cells).fill(-1));
+    let kstar: number = this.pos === goal ? 0 : -1;
+    for (let k = 0; k < budget && kstar < 0; k++) {
+      const d0: number = this.cmds[(this.idx + k) % L];
+      const next: boolean[] = new Array<boolean>(cells).fill(false);
+      const fp: number[] = new Array<number>(cells).fill(-1);
+      const fq: number[] = new Array<number>(cells).fill(-1);
+      for (let pos = 0; pos < cells; pos++) {
+        if (!reach[pos]) {
+          continue;
+        }
+        for (let par = 0; par < 2; par++) {
+          const np: number = this.stepFrom(pos, (d0 + 2 * par) % 4);
+          if (!next[np]) {
+            next[np] = true;
+            fp[np] = pos;
+            fq[np] = par;
+          }
+        }
+      }
+      fromPos.push(fp);
+      fromPar.push(fq);
+      for (let pos = 0; pos < cells; pos++) {
+        reach[pos] = next[pos];
+      }
+      if (reach[goal]) {
+        kstar = k + 1;
+      }
+    }
+    if (kstar > 0) {
+      // 从出口往回倒推，取"第 1 步该不该翻转"
+      let pos: number = goal;
+      let par: number = 0;
+      for (let k = kstar; k >= 1; k--) {
+        par = fromPar[k][pos];
+        pos = fromPos[k][pos];
+      }
+      return [par, kstar];
+    }
+    // 到不了 ⇒ 往"离出口更近"的那边走（撞墙也行，至少别原地不动等死）
+    const dNow: number = this.cmds[this.idx];
+    const p0: number = this.stepFrom(this.pos, dNow);
+    const p1: number = this.stepFrom(this.pos, (dNow + 2) % 4);
+    const gr: number = Math.floor(goal / n);
+    const gc: number = goal % n;
+    const dist0: number = Math.abs(Math.floor(p0 / n) - gr) + Math.abs(p0 % n - gc);
+    const dist1: number = Math.abs(Math.floor(p1 / n) - gr) + Math.abs(p1 % n - gc);
+    return [dist1 < dist0 ? 1 : 0, -1];
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.pos === this.goalIdx()) {
+      return false;
+    }
+    const info: number[] = this.planInfo();
+    if (info[0] === 1) {
+      this.flip();                      // 先反转指令带（不扣步数），下一步方向才对上
+    }
+    this.follow();
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.pos === this.goalIdx()) {
+      return Hint.none('none');
+    }
+    if (this.steps >= DMAX) {
+      return Hint.none('none');
+    }
+    const info: number[] = this.planInfo();
+    const d: number = (this.cmds[this.idx] + 2 * info[0]) % 4;
+    const arrow: string = ARROW[d];
+    const needFlip: string = info[0] === 1 ? TG('先点「⇄ 反转」') : '';
+    if (info[1] < 0) {
+      return Hint.make([], TG('剩余步数已经走不到出口了') + needFlip +
+        TG2('，这一下走 {0}，尽量往右下角靠', arrow),
+        'Cannot reach the exit any more', t0);
+    }
+    return Hint.make([], needFlip +
+      TG2('然后点「走一步 {0}」—— {1} 步之后就能出关', arrow, String(info[1])),
+      'Flip first, then step ' + arrow, t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
  private follow(): void {
  if (this.over) { return; }
  const d: number = this.cmds[this.idx]; const cur: number = this.pos;
@@ -145,6 +297,12 @@ export struct GCompassMaze {
  }
  build() {
  Column({ space: Space.xs }) {
+   HintBar({
+     showHint: true,
+     onHintTap: () => { this.askHint(); },
+     onAutoTap: () => { this.askAuto(); },
+     autoOn: this.autoId >= 0
+   })
  Text(TG('步数 ') + this.steps + '/' + DMAX + '　指令 ' + (this.idx + 1) + '/' + this.cmds.length
  + TG2('　出口 {0}排{1}列', this.diffTotal, this.diffTotal)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: 0 }) {

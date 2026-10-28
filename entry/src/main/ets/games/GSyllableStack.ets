@@ -6,7 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -46,6 +47,8 @@ export struct GSyllableStack {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private order: number[] = []; @State private qi: number = 0;
   @State private tiles: string[] = []; @State private slots: string[] = [];
   @State private built: number = 0; @State private right: number = 0;
@@ -79,11 +82,86 @@ export struct GSyllableStack {
     for (let i = 0; i < SLOTS; i++) { pad.push(i < this.tiles.length ? this.tiles[i] : ''); }
     this.slots = pad; this.built = 0; this.msg = TG('按顺序点音节，叠出这个词');
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.built >= this.cur().parts.length || this.tileIdx() < 0) {
+      return true;
+    }
+    this.tap(this.tileIdx());
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 真值在 cur().parts（正确音节序列）里；tiles 是打乱的托盘 ⇒ 反查下标
+  /** 下一个该点的托盘格（找不到返回 -1） */
+  private tileIdx(): number {
+    const parts: string[] = this.cur().parts;
+    if (this.built >= parts.length) {
+      return -1;
+    }
+    const want: string = parts[this.built];
+    // ★ 2026-10-28 修：托盘是洗牌过的，不能从 built 开始找
+    //   （正确音节排在已点格之前时，从 built 起永远搜不到 ⇒ 死局）
+    for (let i = 0; i < this.tiles.length; i++) {
+      if (this.slots.length > i && this.slots[i].length === 0) {
+        continue;                      // 这一格已经叠掉了
+      }
+      if (this.tiles[i] === want) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /** 提示：报下一个音节本身 + 这个词的释义 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const parts: string[] = this.cur().parts;
+    if (this.over || this.built >= parts.length) {
+      return Hint.none('none');
+    }
+    return Hint.make([this.tileIdx()],
+      TG2('接「{0}」—— 拼的是 {1}', parts[this.built], this.cur().gloss),
+      TG2('Next syllable: {0}', parts[this.built]), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     const parts: string[] = this.cur().parts;
-    if (this.over || this.built >= parts.length || i >= this.tiles.length || i < this.built) { return; }
+    // ★ 2026-10-28 修：原来的 `i < this.built` 把"已点格都排在最前"当成事实，
+    //   可托盘是洗牌的 ⇒ 要点的那个音节排在后面时点不到，六局里经常整局无解。
+    //   ⇒ 改成看"这一格是不是已经被叠掉"（叠掉就把 slots[i] 清空）
+    if (this.over || this.built >= parts.length || i >= this.tiles.length || i < 0) { return; }
+    if (this.slots.length > i && this.slots[i].length === 0) { return; }
     if (this.tiles[i] === parts[this.built]) {
       this.built = this.built + 1; this.score = this.score + 120; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
+      const nd: string[] = this.slots.slice(); nd[i] = ''; this.slots = nd;
       this.msg = TG2('✅ 叠上 {0}', this.tiles[i]);
       if (this.built >= parts.length) { this.next(); }
       return;
@@ -116,6 +194,12 @@ export struct GSyllableStack {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Text(TG2('词 {0}/{1}　叠对 {2}', Math.min(this.qi + 1, ROUNDS), ROUNDS, this.right)
           + TG2('　生命 {0}',Digits(String(this.life), this.langCode))).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).layoutWeight(1)

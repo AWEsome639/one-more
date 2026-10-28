@@ -8,10 +8,12 @@
  * 操作：点端点起线 → 点相邻空格延伸；点已有的线即撤销该组
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -55,6 +57,8 @@ export struct GPathIntersect {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：PAIRS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(PAIRS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -123,6 +127,189 @@ export struct GPathIntersect {
     const dr: number = Math.abs(Math.floor(a / N) - Math.floor(b / N));
     const dc: number = Math.abs(a % N - b % N);
     return dr + dc === 1;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.active < 0) {
+      let a: number = -1;
+      let b: number = -1;
+      let pth: number[] = [];
+      for (let p = 0; p < this.diffTotal; p++) {
+        if (this.done[p] === 1) {
+          continue;
+        }
+        const es: number[] = this.piEnds(p);
+        if (es[0] < 0 || es[1] < 0) {
+          continue;
+        }
+        const cand: number[] = this.piPath(es[0], es[1], p);
+        if (cand.length > 0) {
+          a = es[0];
+          b = es[1];
+          pth = cand;
+          break;
+        }
+      }
+      if (pth.length === 0) {
+        return false;
+      }
+      this.piTo = pth;
+      this.piAt = 0;
+      this.tap(a);
+      return !this.over;
+    }
+    if (this.piAt >= this.piTo.length) {
+      return false;
+    }
+    this.tap(this.piTo[this.piAt]);
+    this.piAt = this.piAt + 1;
+    return !this.over;
+  }
+
+  /** 计划要依次点的格（一次性算好） */
+  private piTo: number[] = [];
+  private piAt: number = 0;
+
+  /** 从 from 连到 to 的最短路（避开别组的线与端点），返回要依次点的格（不含 from） */
+  private piPath(from: number, to: number, p: number): number[] {
+    const prev: number[] = new Array<number>(CELLS).fill(-2);
+    const q: number[] = [];
+    q.push(from);
+    prev[from] = -1;
+    let qi: number = 0;
+    while (qi < q.length) {
+      const cur: number = q[qi];
+      qi = qi + 1;
+      if (cur === to) {
+        break;
+      }
+      const r: number = Math.floor(cur / N);
+      const c: number = cur - r * N;
+      for (let d = 0; d < 4; d++) {
+        const rr: number = r + (d === 0 ? -1 : (d === 2 ? 1 : 0));
+        const cc: number = c + (d === 1 ? 1 : (d === 3 ? -1 : 0));
+        if (rr < 0 || rr >= N || cc < 0 || cc >= N) {
+          continue;
+        }
+        const ni: number = rr * N + cc;
+        if (prev[ni] !== -2) {
+          continue;
+        }
+        const e: number = this.ends[ni];
+        if (e > 0 && e !== p + 1) {
+          continue;
+        }
+        if (ni !== to && this.occ[ni] > 0) {
+          continue;
+        }
+        prev[ni] = cur;
+        q.push(ni);
+      }
+    }
+    if (prev[to] === -2) {
+      return [];
+    }
+    const out: number[] = [];
+    let cur2: number = to;
+    while (cur2 !== from && cur2 >= 0) {
+      out.unshift(cur2);
+      cur2 = prev[cur2];
+      if (cur2 === -2) {
+        return [];
+      }
+    }
+    return out;
+  }
+
+  /** 某一组的两个端点 */
+  private piEnds(p: number): number[] {
+    let a: number = -1;
+    let b: number = -1;
+    for (let i = 0; i < CELLS; i++) {
+      if (this.ends[i] === p + 1) {
+        if (a < 0) {
+          a = i;
+        } else if (b < 0) {
+          b = i;
+        }
+      }
+    }
+    const out: number[] = [];
+    out.push(a);
+    out.push(b);
+    return out;
+  }
+
+  /** 提示：已经起线了 ⇒ 报下一格；还没起 ⇒ 报某个能连通的组从哪端起 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.active >= 0) {
+      const a: number = this.active;
+      const h: number = this.head[a];
+      const es: number[] = this.piEnds(a);
+      const other: number = (es[0] === h) ? es[1] : es[0];
+      if (h < 0 || other < 0) {
+        return Hint.none('none');
+      }
+      const pth: number[] = this.piPath(h, other, a);
+      if (pth.length === 0) {
+        return Hint.none(TG('这一组被堵住了，先点已画的线撤掉它'));
+      }
+      const k: number = pth[0];
+      const r: number = Math.floor(k / N) + 1;
+      const c: number = k - Math.floor(k / N) * N + 1;
+      return Hint.make([k],
+        TG2('接着点第 {0} 行第 {1} 列', String(r), String(c)),
+        TG2('Next tap row {0}, column {1}', String(r), String(c)), t0);
+    }
+    for (let p = 0; p < this.diffTotal; p++) {
+      if (this.done[p] === 1) {
+        continue;
+      }
+      const es2: number[] = this.piEnds(p);
+      if (es2[0] < 0 || es2[1] < 0) {
+        continue;
+      }
+      if (this.piPath(es2[0], es2[1], p).length === 0) {
+        continue;
+      }
+      const r2: number = Math.floor(es2[0] / N) + 1;
+      const c2: number = es2[0] - Math.floor(es2[0] / N) * N + 1;
+      return Hint.make([es2[0]],
+        TG2('先点第 {0} 行第 {1} 列的端点起线（第 {2} 组）', String(r2), String(c2), String(p + 1)),
+        TG2('Start from the end at row {0}, column {1} (pair {2})', String(r2), String(c2), String(p + 1)), t0);
+    }
+    return Hint.none('none');
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -252,6 +439,12 @@ export struct GPathIntersect {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已接通'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

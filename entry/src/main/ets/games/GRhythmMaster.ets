@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 const BEAT_MS: number = 600;
@@ -29,6 +31,10 @@ export struct GRhythmMaster {
   @State private msg: string = '';
   @State private over: boolean = false;
   @State private won: boolean = false;
+  /** 代打计时器（-1 = 未运行）。必须 @State，否则按钮文字不刷新 */
+  @State private autoId: number = -1;
+  /** 代打排好的敲击（setTimeout id 表） */
+  private autoTos: number[] = [];
   private taps: number[] = [];
   private startAt: number = 0;
   private ivId: number = -1;
@@ -38,13 +44,123 @@ export struct GRhythmMaster {
   onRestart(): void {
     this.diffTotal = GameDiff.timeNow(600);
      this.reset(); }
-  aboutToDisappear(): void { this.clearAll(); }
+  aboutToDisappear(): void { this.clearAll(); this.stopAuto(); }
   private clearAll(): void {
     if (this.ivId >= 0) { clearInterval(this.ivId); this.ivId = -1; }
     if (this.toId >= 0) { clearTimeout(this.toId); this.toId = -1; }
   }
+  // ═══════════ AI 代打 / 提示（2026-10-28 第六批）═══════════
+  // ★ 「什么时候敲」不能用节拍器：本作要的间隔 = diffTotal（简单 900 / 普通 600 / 困难 420），
+  //   而 Hint.autoRun 固定 320ms 一拍 —— 直接按它敲就是 320ms 一拍 ⇒ 必然判负。
+  //   ⇒ 代打只用通用节拍器决定"什么时候开始排期"，真正那几下用 setTimeout 排在
+  //     base + diffTotal×k（base = 上一次敲击的时刻），精度只受 setTimeout 抖动影响
+  //     （±16ms），远小于 150ms 的判定线。
+  /** 示范还剩几拍（提示用） */
+  private aiDemoLeft(): number {
+    const left: number = DEMO - this.beat + 1;
+    return left < 0 ? 0 : left;
+  }
+
+  /** 把还缺的拍子按目标间隔排好（base = 上一次敲击的时间；还没敲过就用现在） */
+  private aiArm(): void {
+    const now: number = Date.now();
+    let base: number = now;
+    if (this.taps.length > 0) {
+      base = this.taps[this.taps.length - 1];
+    }
+    const need: number = TAPS - this.tapCount;
+    for (let k = 1; k <= need; k++) {
+      let delay: number = base + this.diffTotal * k - now;
+      if (delay < 0) {
+        delay = 0;
+      }
+      this.autoTos.push(setTimeout(() => { this.tapBeat(); }, delay));
+    }
+  }
+
+  /**
+   * 代打的一步（走通用的 Hint.autoRun 节拍，320ms 一次）：
+   * 示范阶段只是等；一进「跟拍」就把剩下几下按目标间隔排上，然后等它们敲完。
+   * ★ 320ms 的节拍器不会污染成绩 —— 真正的敲击时间由 aiArm 的 setTimeout 决定，
+   *   节拍器只负责"什么时候开始排期"（晚一拍开始也不影响：成绩只看每两下之间的间隔）。
+   */
+  private autoStep(): boolean {
+    if (this.over || this.phase === 'done') {
+      return false;
+    }
+    if (this.phase !== 'tap') {
+      return true;                // 示范还没走完，等
+    }
+    if (this.autoTos.length > 0) {
+      return true;                // 已经排好期了，等它们敲完
+    }
+    this.aiArm();
+    return true;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    if (this.over) {
+      Hint.toast(TG('这一局已经结束了 —— 点「再来一局」'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      clearInterval(this.autoId);
+      this.autoId = -1;
+    }
+    for (let i = 0; i < this.autoTos.length; i++) {
+      clearTimeout(this.autoTos[i]);
+    }
+    this.autoTos = [];
+  }
+
+  /** 提示：报目标间隔；已经敲了几下的话报「你现在平均多少、偏快还是偏慢」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase === 'demo') {
+      return Hint.make([], TG2('先看示范：每 {0} ms 一下，还剩 {1} 拍', this.diffTotal, this.aiDemoLeft()),
+        TG2('Watch the demo: one beat every {0} ms, {1} beats left', this.diffTotal, this.aiDemoLeft()), t0);
+    }
+    if (this.phase !== 'tap') {
+      return Hint.none('none');
+    }
+    if (this.taps.length < 2) {
+      return Hint.make([], TG2('目标是每 {0} ms 敲一下，跟着刚才示范的节奏', this.diffTotal),
+        TG2('Tap once every {0} ms', this.diffTotal), t0);
+    }
+    let sum: number = 0;
+    for (let i = 1; i < this.taps.length; i++) {
+      sum = sum + (this.taps[i] - this.taps[i - 1]);
+    }
+    const avg: number = Math.round(sum / (this.taps.length - 1));
+    const fast: boolean = avg < this.diffTotal;
+    return Hint.make([], TG2('你现在平均 {0} ms/下，目标 {1} ms —— {2}', avg, this.diffTotal,
+      fast ? TG('偏快了，放慢一点') : TG('偏慢了，加快一点')),
+      TG2('You average {0} ms, target {1} ms — {2}', avg, this.diffTotal, fast ? 'too fast' : 'too slow'), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private reset(): void {
     this.clearAll();
+    this.stopAuto();
     this.beat = 1; this.pulse = true; this.tapCount = 0; this.errMs = -1;
     this.over = false; this.won = false; this.done = false; this.taps = [];
     this.startAt = Date.now(); this.phase = 'demo';
@@ -99,6 +215,12 @@ export struct GRhythmMaster {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

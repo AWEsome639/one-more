@@ -1,9 +1,10 @@
 /** 购物清单 —— 先记清单，再逐题判断「这件东西在单子上吗」；3 轮答对 ≥75% ⇒ 通关 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -30,6 +31,8 @@ export struct GGroceryList {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -87,6 +90,53 @@ export struct GGroceryList {
     }, MEM_MS);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 1 || this.pick >= 0) {
+      return true;
+    }
+    this.answer(this.probes[this.pIdx].inside);
+    return !this.over;
+  }
+
+  /** 提示：这件东西在不在刚才那份清单里（probes[i].inside 就是真值） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.phase !== 1) {
+      return Hint.none('none');
+    }
+    const cur: Probe = this.probes[this.pIdx];
+    return Hint.make([], cur.inside ? TG2('{0} 在清单里', cur.icon) : TG2('{0} 不在清单里', cur.icon),
+      cur.inside ? TG2('{0} is on the list', cur.icon) : TG2('{0} is not on the list', cur.icon), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(yes: boolean): void {
     if (this.over || this.phase !== 1 || this.pick >= 0) { return; }
     const cur: Probe = this.probes[this.pIdx];
@@ -122,6 +172,12 @@ export struct GGroceryList {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2("轮次 {0}", (String(this.round) + '/' + String(this.diffTotal)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG('答对 ') + (String(this.right) + '/' + String(this.asked))).fontSize(FontSize.xs).fontColor(this.theme.ink)

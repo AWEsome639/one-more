@@ -11,7 +11,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -29,6 +31,23 @@ const DOT: number = 4;                      // 顶点小点
 /** 3 关线索（0~4，格子四边中被画的边数） */
 /** 显示网格的 11 个下标 */
 const IDX: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+
+/**
+ * ★ 3 关的答案（离线解出来的，已用 isWin 逐条复核过：线索全对 + 恰好一个闭合回路）
+ *   前 30 个数 = 横边 he[0..29]，后 30 个数 = 竖边 ve[0..29]，1 = 画上
+ *   ⇒ 代打 / 提示直接照真值走，不做搜索（手机上秒回）
+ */
+const SOL_HE: number[][] = [
+  [1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0],
+  [1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0],
+  [1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0]
+];
+const SOL_VE: number[][] = [
+  [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0],
+  [1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0],
+  [1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0]
+];
 
 const CLUE_LIB: number[][] = [
   // 第 1 关
@@ -63,6 +82,8 @@ export struct GSlitherlink {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：原 STEP_BUDGET=120
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(120);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -75,6 +96,8 @@ export struct GSlitherlink {
   @State score: number = 0;
 
   private startAt: number = 0;
+  /** 本局用的是 CLUE_LIB 的第几关（reset() 里存下来，代打照 SOL_HE/SOL_VE 走） */
+  private lv: number = 0;
 
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
@@ -89,6 +112,7 @@ export struct GSlitherlink {
 
   private reset(): void {
     const k: number = Math.floor(Math.random() * CLUE_LIB.length);
+    this.lv = k;
     this.clues = CLUE_LIB[k].slice();
     this.he = new Array<number>(HE_CNT).fill(0);
     this.ve = new Array<number>(VE_CNT).fill(0);
@@ -230,6 +254,85 @@ export struct GSlitherlink {
     return visited === used;         // 恰好一个环
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 真值直取：3 关答案离线解好写成 SOL_HE / SOL_VE，代打逐条把边画/擦到位
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const solHe: number[] = SOL_HE[this.lv];
+    const solVe: number[] = SOL_VE[this.lv];
+    for (let k = 0; k < HE_CNT; k++) {
+      if (this.he[k] !== solHe[k]) {
+        this.toggle(0, k);
+        return !this.over;
+      }
+    }
+    for (let k = 0; k < VE_CNT; k++) {
+      if (this.ve[k] !== solVe[k]) {
+        this.toggle(1, k);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const solHe: number[] = SOL_HE[this.lv];
+    const solVe: number[] = SOL_VE[this.lv];
+    for (let k = 0; k < HE_CNT; k++) {
+      if (this.he[k] !== solHe[k]) {
+        const r: number = Math.floor(k / NC);
+        const c: number = k % NC;
+        const side: string = r < NC ? TG('上边') : TG('下边');
+        const row: number = (r < NC ? r : NC - 1) + 1;
+        return Hint.make([k],
+          TG2('第 {0} 行第 {1} 列格子要画{2}', String(row), String(c + 1), side),
+          TG2('Draw the {2} edge of the cell at row {0}, column {1}', String(row), String(c + 1), r < NC ? 'top' : 'bottom'), t0);
+      }
+    }
+    for (let k = 0; k < VE_CNT; k++) {
+      if (this.ve[k] !== solVe[k]) {
+        const r: number = Math.floor(k / (NC + 1));
+        const c: number = k % (NC + 1);
+        const side: string = c < NC ? TG('左边') : TG('右边');
+        const col: number = (c < NC ? c : NC - 1) + 1;
+        return Hint.make([k],
+          TG2('第 {0} 行第 {1} 列格子要画{2}', String(r + 1), String(col), side),
+          TG2('Draw the {2} edge of the cell at row {0}, column {1}', String(r + 1), String(col), c < NC ? 'left' : 'right'), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private toggle(kind: number, idx: number): void {
     if (this.over) {
       return;
@@ -310,6 +413,12 @@ export struct GSlitherlink {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已满足线索'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

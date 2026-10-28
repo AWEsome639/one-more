@@ -8,10 +8,12 @@
  * 于是物理与屏幕像素无关。只有拖动球拍要把手指位移（vp）换成百分比，才量一下场高。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -50,6 +52,8 @@ export struct GPong {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：原 TICK_MS=40
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(40);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -257,6 +261,95 @@ export struct GPong {
   }
 
   /** 拖动左拍：按上一帧位移走，触边不粘手 */
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const max: number = 100 - PADDLE_H;
+    // ★ 2026-10-28 修：predictY 给的是**球心**，px 是**拍顶边** ⇒ 要减掉半个拍高，
+    //   否则球永远擦着拍子上沿过（提示说"摆到 v"，代打却把拍顶摆到球心，差 9%）
+    let v: number = this.vx < 0 ? this.predictY() - PADDLE_H / 2 : 50;
+    if (v < 0) {
+      v = 0;
+    }
+    if (v > max) {
+      v = max;
+    }
+    this.px = v;
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 球是纯线性运动 ⇒ 一路模拟到拍面，得到精确落点；打拍边让球拐大角，电脑跟不上
+  private predictY(): number {
+    let x: number = this.bx;
+    let y: number = this.by;
+    let vy: number = this.vy;
+    const vx: number = this.vx;
+    if (vx >= 0) {
+      return 50;
+    }
+    const plane: number = PADDLE_X + PADDLE_W + BALL_R;
+    let guard: number = 0;
+    while (x > plane && guard < 400) {
+      guard++;
+      x = x + vx * DT;
+      y = y + vy * DT;
+      if (y - BALL_R < 0) {
+        y = BALL_R;
+        vy = Math.abs(vy);
+      } else if (y + BALL_R > 100) {
+        y = 100 - BALL_R;
+        vy = -Math.abs(vy);
+      }
+    }
+    return y;
+  }
+
+  /** 提示：报球会落在哪个高度、拍子该摆到哪 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const max: number = 100 - PADDLE_H;
+    let v: number = this.predictY() - PADDLE_H / 2;
+    if (v < 0) {
+      v = 0;
+    }
+    if (v > max) {
+      v = max;
+    }
+    return Hint.make([],
+      TG2('把球拍摆到从上往下 {0}% 的位置（球会落在这儿）', String(Math.round(v))),
+      TG2('Put the paddle at {0}% from the top', String(Math.round(v))), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private onDrag(offsetY: number): void {
     if (!(this.fieldH > 0) || this.over) {
       return;
@@ -280,6 +373,12 @@ export struct GPong {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text(('你')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

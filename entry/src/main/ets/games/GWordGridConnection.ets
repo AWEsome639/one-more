@@ -2,6 +2,8 @@
  * 词格连线 —— 4×4 词格里点两个意思相近的词，把它们连成一对
  * 胜负：连完 8 对通关｜连错 5 次失败｜进度：已连 / 失误 / 得分
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -32,6 +34,8 @@ export struct GWordGridConnection {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=4；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -72,6 +76,111 @@ export struct GWordGridConnection {
     for (let i = 0; i < this.done.length; i++) { if (this.done[i]) { n++; } }
     return n / 2;
   }
+  /** 代打/提示共用：格子 a 的另一半（没有就 -1） */
+  private mateOf(a: number): number {
+    let lim: number = this.done.length;
+    if (this.cells.length < lim) {
+      lim = this.cells.length;
+    }
+    if (a < 0 || a >= lim) {
+      return -1;
+    }
+    const w: string = this.cells[a];
+    for (let j = 0; j < lim; j++) {
+      if (j !== a && !this.done[j] && this.related(w, this.cells[j])) {
+        return j;
+      }
+    }
+    return -1;
+  }
+
+  /** 代打：这一步该点哪一格（已选一个就点它的另一半，否则点一对里的第一个） */
+  private autoCell(): number {
+    let lim: number = this.done.length;
+    if (this.cells.length < lim) {
+      lim = this.cells.length;
+    }
+    if (this.sel.length > 0) {
+      const m: number = this.mateOf(this.sel[0]);
+      return m >= 0 ? m : this.sel[0];
+    }
+    for (let i = 0; i < lim; i++) {
+      if (!this.done[i] && this.mateOf(i) >= 0) {
+        return i;
+      }
+    }
+    return -1;
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.autoCell() < 0) {
+      return true;
+    }
+    this.tap(this.autoCell());
+    return !this.over;
+  }
+
+  // 真值 = PAIRS 里成对的词（tap 靠 related(w1,w2) 判）
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    let lim: number = this.done.length;
+    if (this.cells.length < lim) {
+      lim = this.cells.length;
+    }
+    let a: number = -1;
+    let b: number = -1;
+    if (this.sel.length > 0) {
+      a = this.sel[0];
+      b = this.mateOf(a);
+    } else {
+      for (let i = 0; i < lim && a < 0; i++) {
+        if (this.done[i]) {
+          continue;
+        }
+        const m: number = this.mateOf(i);
+        if (m >= 0) {
+          a = i;
+          b = m;
+        }
+      }
+    }
+    if (a < 0 || b < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([a, b],
+      '把「' + this.cells[a] + '」与「' + this.cells[b] + '」连起来',
+      'Link "' + this.cells[a] + '" with "' + this.cells[b] + '"', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || (this.done.length > i && this.done[i])) { return; }
     if (this.sel.length === 0) { this.sel = [i]; this.msg = TG('再点一个意思相近的词'); return; }
@@ -110,6 +219,12 @@ export struct GWordGridConnection {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('已连'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

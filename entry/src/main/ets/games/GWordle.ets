@@ -7,6 +7,8 @@
  * 契约：@Prop theme / @Prop @Watch('onRestart') restartToken / onFinish(r)
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -46,6 +48,8 @@ export struct GWordle {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：TRIES 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(TRIES);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -98,6 +102,53 @@ export struct GWordle {
       clearInterval(this.timer);
       this.timer = -1;
     }
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.cur.length < LEN) {
+      this.tapKey(this.answer.charAt(this.cur.length));
+      return true;
+    }
+    this.tapKey('⏎');
+    return !this.over;
+  }
+
+  /** 提示：答案就存在 this.answer 里 —— 直接报单词 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('答案是 {0}', this.answer),
+      TG2('The word is {0}', this.answer), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tapKey(ch: string): void {
@@ -236,6 +287,12 @@ export struct GWordle {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.infoBox(0)
         this.infoBox(1)

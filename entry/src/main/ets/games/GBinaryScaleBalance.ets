@@ -7,6 +7,8 @@
  * 出题：目标 = 随机几枚砝码之和 ⇒ 一定是二的幂之和，必有解。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -28,6 +30,8 @@ export struct GBinaryScaleBalance {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(LEVELS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -137,6 +141,74 @@ export struct GBinaryScaleBalance {
     return s === '' ? '空盘' : s;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.needBit() < 0) {
+      return true;
+    }
+    this.toggle(this.needBit());
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 砝码是 1/2/4/…/64：该放哪些就是 target 的二进制位
+  /** 下一枚要拨的砝码（不在位就返回它，超重永远不会发生） */
+  private needBit(): number {
+    for (let i = 0; i < COUNT; i++) {
+      const want: boolean = (((this.target >> i) & 1) === 1);
+      if (want && !this.on[i]) {
+        return i;
+      }
+      if (!want && this.on[i]) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /** 提示：报要拨的那一枚和它的重量 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const i: number = this.needBit();
+    if (i < 0) {
+      return Hint.none('none');
+    }
+    const want: boolean = (((this.target >> i) & 1) === 1);
+    return Hint.make([i],
+      TG2('第 {0} 枚砝码（{1}）要{2}', String(i + 1), String(WEIGHTS[i]), want ? '放上' : '拿掉'),
+      TG2('Weight {0} ({1}) goes {2}', String(i + 1), String(WEIGHTS[i]), want ? 'ON' : 'OFF'), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private toggle(i: number): void {
     if (this.over) {
       return;
@@ -192,6 +264,12 @@ export struct GBinaryScaleBalance {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)

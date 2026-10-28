@@ -3,6 +3,8 @@
  * 玩法：3×3 幻方挖 4 格，从托盘选数字填回；填满即校验八条线。
  * 胜负：120 秒内过 3 关 ⇒ 通关；超时或错满 4 次 ⇒ 失败。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -56,6 +58,8 @@ export struct GMagicSquares {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private board: number[] = [];
   @State private fixed: boolean[] = [];
   @State private pool: number[] = [];
@@ -114,6 +118,113 @@ export struct GMagicSquares {
     if (this.over) { return; }
     this.sel = i;
     this.msg = TG2('已选 {0} —— 点棋盘上的空格放进去', String(this.pool[i]));
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const nf: number[] = this.nextFill();
+    if (nf[0] < 0 || nf[1] < 0) {
+      return false;
+    }
+    const pi: number = this.pool.indexOf(nf[1]);
+    if (pi < 0) {
+      return false;
+    }
+    if (this.sel !== pi) {
+      this.pickNum(pi);
+      return true;
+    }
+    this.tapCell(nf[0]);
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 真值没直接存（题目是挖洞挖出来的）⇒ 现场解：全排列 + 八线校验（最多 4! = 24 种）
+  /** 递归填空格，八线全对时返回 blanks[0] 该填的数，无解返回 -1 */
+  private fillBlanks(blanks: number[], k: number, bd: number[], used: boolean[]): number {
+    if (k >= blanks.length) {
+      for (let q = 0; q < LINES.length; q++) {
+        const ln: number[] = LINES[q];
+        if (bd[ln[0]] + bd[ln[1]] + bd[ln[2]] !== MAGIC) {
+          return -1;
+        }
+      }
+      return bd[blanks[0]];
+    }
+    for (let p = 0; p < this.pool.length; p++) {
+      if (used[p]) {
+        continue;
+      }
+      used[p] = true;
+      const nb: number[] = bd.slice();
+      nb[blanks[k]] = this.pool[p];
+      const got: number = this.fillBlanks(blanks, k + 1, nb, used);
+      if (got >= 0) {
+        return got;
+      }
+      used[p] = false;
+    }
+    return -1;
+  }
+
+  /** 第一个空着的格子；返回 [格子, 该填的数]，没有返回 [-1, -1] */
+  private nextFill(): number[] {
+    const blanks: number[] = [];
+    for (let i = 0; i < CELLS; i++) {
+      if (!this.fixed[i] && this.board[i] === 0) {
+        blanks.push(i);
+      }
+    }
+    if (blanks.length === 0) {
+      return [-1, -1];
+    }
+    const used: boolean[] = new Array<boolean>(this.pool.length).fill(false);
+    const want: number = this.fillBlanks(blanks, 0, this.board.slice(), used);
+    return [blanks[0], want];
+  }
+
+  /** 提示：报哪个空格填几 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const nf: number[] = this.nextFill();
+    if (nf[0] < 0 || nf[1] < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(nf[0] / SIDE) + 1;
+    const c: number = (nf[0] % SIDE) + 1;
+    return Hint.make([nf[0]],
+      TG2('第 {0} 行第 {1} 列填 {2}', String(r), String(c), String(nf[1])),
+      TG2('Row {0}, column {1} takes {2}', String(r), String(c), String(nf[1])), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tapCell(i: number): void {
@@ -183,6 +294,12 @@ export struct GMagicSquares {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

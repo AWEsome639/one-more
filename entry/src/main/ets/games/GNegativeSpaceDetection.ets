@@ -1,4 +1,6 @@
 /** 负空间 —— 满屏色块里留白拼出一个形状，认出它是哪一个；6 关答对 ≥5 通关 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -38,6 +40,8 @@ export struct GNegativeSpaceDetection {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -89,6 +93,51 @@ export struct GNegativeSpaceDetection {
     this.msg = TG('第 ') + String(this.round) + ' 关：空白处拼出了什么形状？';
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.pick >= 0) {
+      return true;
+    }
+    this.answer(this.opts.map((f: Fig, i: number) => f.name === this.rightName ? i : -1).filter((v: number) => v >= 0)[0]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('留白拼出来的是「{0}」', this.rightName),
+      TG2('The negative space forms "{0}"', this.rightName), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(i: number): void {
     if (this.over || this.phase !== 0 || this.pick >= 0) { return; }
     const ok: boolean = this.opts[i].name === this.rightName;
@@ -127,6 +176,12 @@ export struct GNegativeSpaceDetection {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2('关卡 {0}', (String(this.round) + '/' + String(this.diffTotal)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2("答对 {0}", (String(this.right) + '/' + String(this.asked)))).fontSize(FontSize.xs).fontColor(this.theme.ink)

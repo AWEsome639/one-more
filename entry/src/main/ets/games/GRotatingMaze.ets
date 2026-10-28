@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -67,6 +69,8 @@ export struct GRotatingMaze {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：棋盘边长（原 N=7）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(7);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -88,6 +92,55 @@ export struct GRotatingMaze {
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(7);
      this.reset(); }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.aiGo(0);
+    return !this.over;
+  }
+
+  /** 提示：下一步往哪走 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const d: number = this.aiDir();
+    if (d < 0) { return Hint.none('none'); }
+    const dir: string = d === 0 ? TG('上') : (d === 1 ? TG('右') : (d === 2 ? TG('下') : TG('左')));
+    return Hint.make([], TG2('往「{0}」走一步（每 2 步整盘转 90°，这条线照样通）', dir),
+      TG2('Step {0} (the board turns every 2 steps; the route stays valid)', dir), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private reset(): void {
     this.walls = genWalls(this.diffTotal); this.pos = 0;
     this.goal = this.diffTotal * this.diffTotal - 1; this.steps = 0; this.turns = 0;
@@ -128,8 +181,60 @@ export struct GRotatingMaze {
     return Math.abs(Math.floor(this.goal / this.diffTotal) - Math.floor(this.pos / this.diffTotal)) + Math.abs(this.goal % this.diffTotal - this.pos % this.diffTotal);
   }
 
+  /** AI 用：BFS 从脚下到出口，返回下一步方向（0 上 1 右 2 下 3 左；-1 = 无路） */
+  private aiDir(): number {
+    const n: number = this.diffTotal;
+    const total: number = n * n;
+    if (this.pos === this.goal) { return -1; }
+    const prev: number[] = new Array<number>(total).fill(-2);
+    const q: number[] = [this.pos];
+    prev[this.pos] = -1;
+    let head: number = 0;
+    let found: boolean = false;
+    while (head < q.length) {
+      const cur: number = q[head];
+      head = head + 1;
+      if (cur === this.goal) { found = true; break; }
+      const r: number = Math.floor(cur / n);
+      const c: number = cur % n;
+      for (let d = 0; d < 4; d++) {
+        const nr: number = r + DR[d];
+        const nc: number = c + DC[d];
+        if (nr < 0 || nr >= n || nc < 0 || nc >= n) { continue; }
+        const nb: number = nr * n + nc;
+        if (this.walls[nb] === 1 || prev[nb] !== -2) { continue; }
+        prev[nb] = cur;
+        q.push(nb);
+      }
+    }
+    if (!found) { return -1; }
+    let c2: number = this.goal;
+    while (prev[c2] >= 0 && prev[c2] !== this.pos) { c2 = prev[c2]; }
+    if (prev[c2] !== this.pos) { return -1; }
+    const r0: number = Math.floor(this.pos / n);
+    const k0: number = this.pos % n;
+    const r1: number = Math.floor(c2 / n);
+    const k1: number = c2 % n;
+    for (let d = 0; d < 4; d++) {
+      if (r0 + DR[d] === r1 && k0 + DC[d] === k1) { return d; }
+    }
+    return -1;
+  }
+
+  /** AI 用：朝出口走一步（整盘旋转是刚体变换，路线一直有效） */
+  private aiGo(_d: number): void {
+    const d: number = this.aiDir();
+    if (d >= 0) { this.step(d); }
+  }
+
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

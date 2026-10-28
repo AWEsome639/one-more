@@ -4,10 +4,12 @@
  * 用 emoji 做牌面（零美术依赖）
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -29,6 +31,8 @@ export struct GMemory {
   onFinish: (r: GameResult) => void = () => {};
 
   // ★ 难度作用到玩法：对数（简单 4 对 / 普通 6 对 / 困难 8 对）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private pairCount: number = GameDiff.pick(4, 6, 8);
 
   @State private cards: Card[] = [];
@@ -68,6 +72,61 @@ export struct GMemory {
     this.done = false;
     this.lock = false;
     this.startAt = Date.now();
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.done) {
+      return false;
+    }
+    if (this.lock || this.done) {
+      return true;
+    }
+    this.tap(this.picked.length === 0 ? this.cards.map((c: Card, i: number) => (!c.matched && !c.open) ? i : -1).filter((v: number) => v >= 0)[0] : this.cards.map((c: Card, i: number) => (!c.matched && !c.open && i !== this.picked[0] && c.face === this.cards[this.picked[0]].face) ? i : -1).filter((v: number) => v >= 0)[0]);
+    return !this.done;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.done) {
+      return Hint.none('none');
+    }
+    for (let a = 0; a < this.cards.length; a++) {
+      if (this.cards[a].matched || this.cards[a].open) {
+        continue;
+      }
+      for (let b = a + 1; b < this.cards.length; b++) {
+        if (!this.cards[b].matched && !this.cards[b].open && this.cards[b].face === this.cards[a].face) {
+          return Hint.make([a, b],
+            TG2('翻第 {0} 张和第 {1} 张，都是 {2}', String(a + 1), String(b + 1), this.cards[a].face),
+            TG2('Flip cards {0} and {1} — both are {2}', String(a + 1), String(b + 1), this.cards[a].face), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -132,6 +191,12 @@ export struct GMemory {
 
   build() {
     Column({ space: Space.lg }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('翻牌次数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

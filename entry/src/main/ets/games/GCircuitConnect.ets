@@ -3,6 +3,8 @@
  * 规则：4×4 元件盘，点一下顺时针转 90°；电源从左上角左边进电，目标是右下角那格。
  * 胜负：电流通到右下角（且朝右出） = 通关；步数用尽没接通 = 失败。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -27,6 +29,8 @@ export struct GCircuitConnect {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=4；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3]，上面已一并改成按尺寸生成
+ /** 代打计时器（-1 = 未运行）。必须 @State */
+ @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -89,6 +93,139 @@ export struct GCircuitConnect {
  }
  return lit;
  }
+ // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+ private autoStep(): boolean {
+   if (this.over) {
+     return false;
+   }
+   this.spin(this.autoCell());
+   return !this.over;
+ }
+
+ // 通关 = 电流到得了右下角且它朝右出（finish 里的 solved）
+ private computeHint(): HintResult {
+   const t0: number = Date.now();
+   if (this.over) {
+     return Hint.none('none');
+   }
+   const best: number = this.trySpin();
+   if (best < 0) {
+     return Hint.none('none');
+   }
+   const r: number = Math.floor(best / this.diffTotal);
+   const c: number = best % this.diffTotal;
+   return Hint.make([best],
+     '转第 ' + String(r + 1) + ' 行第 ' + String(c + 1) + ' 列那颗（顺时针 90°），带电格会变多',
+     'Rotate row ' + String(r + 1) + ', column ' + String(c + 1) + ' clockwise', t0);
+ }
+ private askAuto(): void {
+   Haptics.tap();
+   if (this.autoId >= 0) {
+     this.stopAuto();
+     Hint.toast(TG('已停止代打'));
+     return;
+   }
+   Hint.toast(TG('AI 开始代打…'));
+   this.autoId = Hint.autoRun(() => this.autoStep());
+ }
+
+ private stopAuto(): void {
+   if (this.autoId >= 0) {
+     Hint.autoStop(this.autoId);
+     this.autoId = -1;
+   }
+ }
+
+ private askHint(): void {
+   Haptics.tap();
+   const r: HintResult = this.computeHint();
+   Hint.toastResult(r, TG('这一步看不出答案'));
+ }
+
+  /** 用一份「假设的朝向」算带电格数（通到终点再 +1000）—— 不动 this.rot，纯试算 */
+  private simLit(rot: number[]): number {
+    const n: number = this.diffTotal;
+    const total: number = n * n;
+    const mask: number[] = [];
+    for (let i = 0; i < total; i++) {
+      const m: number = this.grid[i];
+      const r: number = rot[i];
+      let out: number = 0;
+      for (let d = 0; d < 4; d++) {
+        if (has(m, d)) {
+          out += Math.pow(2, (d + r) % 4);
+        }
+      }
+      mask.push(out);
+    }
+    const lit: boolean[] = new Array<boolean>(total).fill(false);
+    if (!has(mask[0], 3)) {
+      return 0;
+    }
+    lit[0] = true;
+    const st: number[] = [0];
+    let cnt: number = 1;
+    while (st.length > 0) {
+      const i: number = st.pop() as number;
+      const r: number = Math.floor(i / n);
+      const c: number = i % n;
+      const mm: number = mask[i];
+      if (r > 0 && has(mm, 0) && has(mask[i - n], 2) && !lit[i - n]) {
+        lit[i - n] = true;
+        cnt++;
+        st.push(i - n);
+      }
+      if (c < n - 1 && has(mm, 1) && has(mask[i + 1], 3) && !lit[i + 1]) {
+        lit[i + 1] = true;
+        cnt++;
+        st.push(i + 1);
+      }
+      if (r < n - 1 && has(mm, 2) && has(mask[i + n], 0) && !lit[i + n]) {
+        lit[i + n] = true;
+        cnt++;
+        st.push(i + n);
+      }
+      if (c > 0 && has(mm, 3) && has(mask[i - 1], 1) && !lit[i - 1]) {
+        lit[i - 1] = true;
+        cnt++;
+        st.push(i - 1);
+      }
+    }
+    if (lit[total - 1] && has(mask[total - 1], 1)) {
+      cnt += 1000;
+    } else if (lit[total - 1]) {
+      cnt += 100;
+    }
+    return cnt;
+  }
+
+  /** 试算某格顺时针转 90° 后能多带多少电（-1 表示没有更好的） */
+  private trySpin(): number {
+    const total: number = this.diffTotal * this.diffTotal;
+    const base: number = this.simLit(this.rot);
+    let best: number = -1;
+    let bestSc: number = base;
+    for (let i = 0; i < total; i++) {
+      const rt: number[] = this.rot.slice();
+      rt[i] = (rt[i] + 1) % 4;
+      const sc: number = this.simLit(rt);
+      if (sc > bestSc) {
+        bestSc = sc;
+        best = i;
+      }
+    }
+    return best;
+  }
+
+  /** 代打：转哪一格最能推进；一点进步都没有就随机转一格破局 */
+  private autoCell(): number {
+    const total: number = this.diffTotal * this.diffTotal;
+    const best: number = this.trySpin();
+    if (best < 0) {
+      return Math.floor(Math.random() * total);
+    }
+    return best;
+  }
  private spin(i: number): void {
  if (this.over) { return; }
  const rt: number[] = this.rot.slice(); rt[i] = (rt[i] + 1) % 4; this.rot = rt; this.moves++;
@@ -111,6 +248,12 @@ export struct GCircuitConnect {
  }
  build() {
  Column({ space: Space.sm }) {
+   HintBar({
+     showHint: true,
+     onHintTap: () => { this.askHint(); },
+     onAutoTap: () => { this.askAuto(); },
+     autoOn: this.autoId >= 0
+   })
  Text(TG2('步数 {0}/{1}　电源 {2}',Digits(String(this.moves), this.langCode), String(TURNS), this.on[0] ? TG('接入 ✅') : TG('断开 ❌'))
  + TG2('　终点 {0}', this.on[LAST] ? TG('通电 💡') : TG('未通'))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: Space.xs }) {

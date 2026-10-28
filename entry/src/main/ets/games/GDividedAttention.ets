@@ -4,6 +4,8 @@
  * 胜负：12 拍里命中 ≥7 且误报 ≤2 ⇒ 通关
  * 进度：拍数 / 命中 / 误报 / 漏报
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -26,6 +28,8 @@ export struct GDividedAttention {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TICKS 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TICKS);
   onFinish: (r: GameResult) => void = () => {};
   @State private left: Side = { sym: '·', on: false, done: false };
@@ -79,6 +83,62 @@ export struct GDividedAttention {
     }
     this.tickNo = this.tickNo + 1; this.left = this.roll(); this.right = this.roll();
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (!(this.left.on && !this.left.done) && !(this.right.on && !this.right.done)) {
+      return true;
+    }
+    this.tap((this.left.on && !this.left.done) ? 0 : 1);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const l: boolean = this.left.on && !this.left.done;
+    const r: boolean = this.right.on && !this.right.done;
+    if (!l && !r) {
+      return Hint.none('none');
+    }
+    if (l && r) {
+      return Hint.make([0, 1],
+        TG('左右两边这一拍都是 🎯，两边都要点'),
+        TG('Both sides show 🎯 this beat — tap both'), t0);
+    }
+    if (l) {
+      return Hint.make([0], TG('左边这一拍是 🎯，点左边'), TG('The left side is 🎯 — tap it'), t0);
+    }
+    return Hint.make([1], TG('右边这一拍是 🎯，点右边'), TG('The right side is 🎯 — tap it'), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(idx: number): void {
     if (this.over || this.tickNo === 0) { return; }
     const side: Side = idx === 0 ? this.left : this.right;
@@ -106,6 +166,12 @@ export struct GDividedAttention {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('拍数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

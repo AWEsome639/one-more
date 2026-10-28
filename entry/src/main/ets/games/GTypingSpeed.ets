@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/D
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -49,6 +51,8 @@ export struct GTypingSpeed {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private order: number[] = []; @State private qi: number = 0;
   @State private typed: string = ''; // ★ 难度作用到玩法：本局时限 = 基础 × 难度倍率（简单 1.5× / 普通 1× / 困难 0.7×）
   private total: number = GameDiff.timeNow(LIMIT_MS);
@@ -91,6 +95,56 @@ export struct GTypingSpeed {
     this.startAt = Date.now(); this.roundAt = Date.now();
     this.msg = TG('照着上面那句打，打完自动换句');
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 没有"答案字段"—— 要打的就是 this.target()，填满再走玩家的结算（roundDone）
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.typed = this.target();
+    this.roundDone();
+    return !this.over;
+  }
+
+  /** 提示：报这一句里还没打的部分 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const t: string = this.target();
+    if (this.typed.length >= t.length) {
+      return Hint.none('none');
+    }
+    const rest: string = t.substring(this.typed.length);
+    return Hint.make([], TG2('接下来要打：{0}', rest),
+      TG2('Coming up: {0}', rest), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private statsNow(): void {
@@ -137,6 +191,12 @@ export struct GTypingSpeed {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Text(TG2('句 {0}/{1}　{2} WPM　正确率 ', Math.min(this.qi + 1, ROUNDS), ROUNDS, this.wpm)
           + this.acc + TG2('%　剩余 {0}s', (this.leftMs / 1000).toFixed(1)))

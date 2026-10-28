@@ -1,6 +1,8 @@
 /**
  * 字谜定义 —— 看中文释义，按顺序点字母把单词拼回来
  * 胜负：6 题答对 ≥4 ⇒ 通关｜进度：题号 / 答对 / 每题倒计时（点错罚 3 秒） */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -42,6 +44,8 @@ export struct GAnagramDefinition {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT_MS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -81,6 +85,64 @@ export struct GAnagramDefinition {
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时，答案是 {0}', this.curWord()); this.picked = []; this.advance(); }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.feed >= 0) {
+      return true;
+    }
+    this.tap(this.letters.map((ch: string, i: number) => (ch === this.curWord().charAt(this.picked.length) && this.picked.indexOf(i) < 0) ? i : -1).filter((v: number) => v >= 0)[0]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const w: string = this.curWord();
+    // ★ 单词里可能有重复字母（RIVER 有两个 R）⇒ 必须跳过已经点过的位置
+    const cs: number[] = [];
+    const used: number[] = [];
+    for (let i = 0; i < w.length; i++) {
+      for (let k = 0; k < this.letters.length; k++) {
+        if (this.letters[k] === w.charAt(i) && used.indexOf(k) < 0) {
+          cs.push(k);
+          used.push(k);
+          break;
+        }
+      }
+    }
+    return Hint.make(cs,
+      TG2('答案是「{0}」', w),
+      TG2('The answer is "{0}"', w), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.feed >= 0 || i >= this.letters.length || this.picked.indexOf(i) >= 0) { return; }
     this.picked = this.picked.concat([i]);
@@ -124,6 +186,12 @@ export struct GAnagramDefinition {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(this.bar()).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.rose)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)

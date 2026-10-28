@@ -1,4 +1,6 @@
 /** 曼陀罗回忆 —— 彩格亮 2 秒后熄灭，凭记忆把亮过的格子点回来；连过 4 关通关，错一次即负 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -27,6 +29,8 @@ export struct GMandalaRecall {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -77,6 +81,65 @@ export struct GMandalaRecall {
     this.memTo = setTimeout(() => {
       this.memTo = -1; this.phase = 1; this.msg = TG(TG(TG('把亮过的格子都点回来')));
     }, MEM_MS);
+  }
+
+  /** ★ AI 代打/提示共用：下一个还没点回去的亮格（没有就 -1） */
+  private nextLit(): number {
+    for (let i = 0; i < this.lit.length; i++) {
+      if (this.picks.indexOf(this.lit[i]) < 0) { return this.lit[i]; }
+    }
+    return -1;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 1 || this.nextLit() < 0) {
+      return true;
+    }
+    this.tap(this.nextLit());
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.phase !== 1) {
+      return Hint.none('none');
+    }
+    const at: number = this.nextLit();
+    if (at < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(at / N) + 1;
+    const c: number = at % N + 1;
+    return Hint.make([at],
+      TG2('亮过的一共 {2} 格；还差点第 {0} 行第 {1} 列', r, c, this.lit.length),
+      TG2('Tap row {0}, column {1} — {2} cells were lit in total', r, c, this.lit.length), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -132,6 +195,12 @@ export struct GMandalaRecall {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2('关卡 {0}', (String(this.level) + '/' + String(this.diffTotal)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2('还差点 {0}', this.phase === 0 ? TG('看') : String(Math.max(this.lit.length - this.picks.length, 0)))).fontSize(FontSize.xs).fontColor(this.theme.ink)

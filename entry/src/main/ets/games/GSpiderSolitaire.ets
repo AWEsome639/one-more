@@ -8,6 +8,8 @@
  * 牌编码：slot = 点数×2 + 是否正面（A=0…K=12，全黑桃所以不用存花色）。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -39,6 +41,8 @@ export struct GSpiderSolitaire {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 SETS=8
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(8);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -228,6 +232,268 @@ export struct GSpiderSolitaire {
     }
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.selP >= 0) {
+      this.selP = -1;                 // 先清掉玩家留下的选中态，免得把整段搬错
+    }
+    const mv: number[] = this.spBest(true);
+    if (mv.length < 2) {
+      return false;                   // 真走不动了：老实停手，绝不空转
+    }
+    const down0: number = this.spDown();
+    const done0: number = this.done;
+    if (mv[2] < 0) {
+      this.deal();
+      this.spStall = 0;
+      return !this.over;
+    }
+    this.selP = mv[0];
+    this.selI = mv[1];
+    this.tryMoveTo(mv[2]);
+    if (this.done > done0 || this.spDown() < down0) {
+      this.spStall = 0;               // 收走一组 / 翻开一张 = 真进度
+    } else {
+      this.spStall = this.spStall + 1;
+    }
+    return !this.over;
+  }
+
+  /** 走出来的局面（防兜圈子） */
+  private spSeen: Map<string, number> = new Map<string, number>();
+  /** 连续多少步没有真进度（翻牌 / 收组） */
+  private spStall: number = 0;
+
+  /** 盖着的牌还有几张（代打的「真进度」判据：翻牌或收组才算往前走） */
+  private spDown(): number {
+    let n: number = 0;
+    for (let p = 0; p < PILES; p++) {
+      const pile: number[] = this.piles[p];
+      for (let i = 0; i < pile.length; i++) {
+        if (!isUp(pile[i])) {
+          n = n + 1;
+        }
+      }
+    }
+    return n;
+  }
+
+  /** 这一列末尾连着的递减顺子有多长（越长相越好） */
+  private spChain(pile: number[]): number {
+    if (pile.length === 0) {
+      return 0;
+    }
+    let c: number = 1;
+    let k: number = pile.length - 1;
+    while (k > 0 && isUp(pile[k - 1]) && rankOf(pile[k - 1]) === rankOf(pile[k]) + 1) {
+      c = c + 1;
+      k = k - 1;
+    }
+    return c;
+  }
+
+  /** 纯查询版的 canDrop（不碰状态） */
+  private spCanDrop(card: number, q: number): boolean {
+    const d: number[] = this.piles[q];
+    if (d.length === 0) {
+      return true;
+    }
+    const top: number = d[d.length - 1];
+    return isUp(top) && rankOf(top) === rankOf(card) + 1;
+  }
+
+  /** 纯函数：搬一段（不点 UI 状态、不结算），返回新牌面 */
+  private spMove(ps: number[][], p: number, i: number, q: number): number[][] {
+    const np: number[][] = [];
+    for (let k = 0; k < ps.length; k++) {
+      np.push(ps[k].slice());
+    }
+    const moved: number[] = np[p].slice(i);
+    const keep: number[] = np[p].slice(0, i);
+    if (keep.length > 0 && !isUp(keep[keep.length - 1])) {
+      keep[keep.length - 1] = keep[keep.length - 1] + 1;
+    }
+    np[p] = keep;
+    for (let k = 0; k < moved.length; k++) {
+      np[q].push(moved[k]);
+    }
+    return np;
+  }
+
+  /** 纯函数：收走已集齐的 K→A（与 checkComplete 同语义） */
+  private spSettle(ps: number[][]): number[][] {
+    const np: number[][] = [];
+    for (let p = 0; p < ps.length; p++) {
+      let keep: number[] = ps[p].slice();
+      while (keep.length >= 13) {
+        let ok: boolean = true;
+        for (let k = 0; k < 13; k++) {
+          const slot: number = keep[keep.length - 13 + k];
+          if (!isUp(slot) || rankOf(slot) !== 12 - k) {
+            ok = false;
+            break;
+          }
+        }
+        if (!ok) {
+          break;
+        }
+        keep = keep.slice(0, keep.length - 13);
+        if (keep.length > 0 && !isUp(keep[keep.length - 1])) {
+          keep[keep.length - 1] = keep[keep.length - 1] + 1;
+        }
+      }
+      np.push(keep);
+    }
+    return np;
+  }
+
+  /** 局面指纹（各列内容 + 牌堆剩几张）—— 用来记「走过的局面」，防止兜圈子 */
+  private spHash(ps: number[][]): string {
+    let s: string = '';
+    for (let p = 0; p < ps.length; p++) {
+      s = s + ps[p].join(',') + '|';
+    }
+    return s + '#' + String(this.stock.length);
+  }
+
+  /** 打包「分数 + (p,i,q)」成一个正整数（i 上限 127、p/q 上限 15；分数先 +3000 保证非负） */
+  private spPack(score: number, p: number, i: number, q: number): number {
+    return (((score + 3000) * 128 + i) * 16 + q) * 16 + p;
+  }
+
+  // ═══════════ 代打选步（启发式 + 局面记忆）═══════════
+  // 蜘蛛纸牌 104 张、要收满 8 组 K→A，没法穷举；这里的判断顺序是：
+  //   ① 能翻开盖牌的一步最值钱　② 别把已经排好的顺子拆开　③ 落点那边能接出更长的顺子更好
+  //   ④ 清空一整列很值　⑤ 实在没得搬才发牌
+  // ★ 终止性：每一步都把「走出来的局面」记进 spSeen，回到走过的局面直接否决
+  //   （这是硬约束 —— 否则会在两列之间来回搬，代打看起来像卡死）。
+  //   ★ 再加上 spStall（连续 120 步没有翻牌/收组就停手）和总步数上限 700，代打一定会自己停。
+
+  /** 挑一步（mark=true 时把局面记进记忆；提示用 mark=false，免得把记忆弄脏） */
+  private spBest(mark: boolean): number[] {
+    if (mark && (this.moves > 700 || this.spStall > 120)) {
+      return [];                       // 只有代打会被上限拦住；提示随时能给
+    }
+    const cand: number[] = [];
+    for (let p = 0; p < PILES; p++) {
+      const pile: number[] = this.piles[p];
+      for (let i = 0; i < pile.length; i++) {
+        if (!isUp(pile[i]) || !this.runOk(p, i)) {
+          continue;
+        }
+        const card: number = pile[i];
+        const ln: number = pile.length - i;
+        for (let q = 0; q < PILES; q++) {
+          if (q === p || !this.spCanDrop(card, q)) {
+            continue;
+          }
+          const d: number[] = this.piles[q];
+          let sc: number = 0;
+          if (i > 0 && !isUp(pile[i - 1])) {
+            sc = sc + 1000;                    // 翻开盖牌：唯一真进度
+          }
+          if (d.length === 0) {
+            if (i === 0) {
+              continue;                        // 整列搬到空列 = 白走一步
+            }
+            sc = sc + 40;
+          } else {
+            if (i === 0) {
+              sc = sc + 200;                   // 能清空一列
+            }
+            sc = sc + this.spChain(d) * 20;     // 落点那边接得越长越好
+          }
+          sc = sc + ln;
+          if (i > 0 && isUp(pile[i - 1]) && rankOf(pile[i - 1]) === rankOf(card) + 1) {
+            sc = sc - 600;                     // 别拆开已经排好的段
+          }
+          cand.push(this.spPack(sc, p, i, q));
+        }
+      }
+    }
+    cand.sort((a: number, b: number) => b - a);
+    for (let k = 0; k < cand.length; k++) {
+      const v: number = cand[k];
+      const p: number = v % 16;
+      const q: number = Math.floor(v / 16) % 16;
+      const i: number = Math.floor(v / 256) % 128;
+      const nx: number[][] = this.spSettle(this.spMove(this.piles, p, i, q));
+      const key: string = this.spHash(nx);
+      if (this.spSeen.has(key)) {
+        continue;                          // 回到走过的局面 ⇒ 只会兜圈子
+      }
+      if (mark) {
+        this.spSeen.set(key, 1);
+      }
+      return [p, i, q];
+    }
+    // 一步都搬不动才发牌（蜘蛛纸牌的正规打法：有空列时不能发）
+    let empty: boolean = false;
+    for (let p = 0; p < PILES; p++) {
+      if (this.piles[p].length === 0) {
+        empty = true;
+      }
+    }
+    if (this.stock.length >= PILES && !empty) {
+      return [0, 0, -1];
+    }
+    return [];
+  }
+
+
+  /** 提示：报「哪一列的哪张牌搬到哪一列」；没路可走时报「先发一排牌」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const mv: number[] = this.spBest(false);
+    if (mv.length < 2) {
+      return Hint.none(TG('这局已经走不动了，换一局吧'));
+    }
+    if (mv[2] < 0) {
+      return Hint.make([], TG('先发一排牌（每列各一张）'), TG('Deal a new row (one card per column)'), t0);
+    }
+    const card: number = this.piles[mv[0]][mv[1]];
+    const txt: string = RANKS[rankOf(card)];
+    if (this.piles[mv[2]].length === 0) {
+      return Hint.make([mv[2]],
+        TG2('把第 {0} 列的 {1} 搬到空列（第 {2} 列）', String(mv[0] + 1), txt, String(mv[2] + 1)),
+        TG2('Move {1} from column {0} to the empty column {2}', String(mv[0] + 1), txt, String(mv[2] + 1)), t0);
+    }
+    return Hint.make([mv[2]],
+      TG2('把第 {0} 列的 {1} 搬到第 {2} 列', String(mv[0] + 1), txt, String(mv[2] + 1)),
+      TG2('Move {1} from column {0} onto column {2}', String(mv[0] + 1), txt, String(mv[2] + 1)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.spSeen = new Map<string, number>();
+    this.spStall = 0;
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tryMoveTo(p: number): void {
     const card: number = this.selCard();
     if (card < 0) {
@@ -401,6 +667,12 @@ export struct GSpiderSolitaire {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)

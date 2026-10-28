@@ -4,6 +4,8 @@
  * 胜负：3 轮共 12 位，答对 ≥9 位 ⇒ 通关
  * 进度：轮次 / 已答位数 / 心算正确数
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -25,6 +27,8 @@ export struct GDualTaskMemory {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -90,6 +94,70 @@ export struct GDualTaskMemory {
   private toMath(): void {
     this.phase = 1; this.qIdx = 0; this.pick = -1; this.msg = TG(TG(TG('边算边记：数字别忘了')));
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase === 1 && this.pick < 0) {
+      if (this.qIdx >= this.qs.length) {
+        return false;
+      }
+      const q: MathQ = this.qs[this.qIdx];
+      this.answerMath(q.opts.indexOf(q.ans));
+      return !this.over;
+    }
+    if (this.phase === 2 && this.typed.length < SPAN) {
+      this.tapDigit(this.digits[this.typed.length]);
+      return !this.over;
+    }
+    return true;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase === 1 && this.qIdx < this.qs.length) {
+      const q: MathQ = this.qs[this.qIdx];
+      return Hint.make([],
+        TG2('心算：{0} 的答案是 {1}', q.text, q.ans),
+        TG2('{0} = {1}', q.text, q.ans), t0);
+    }
+    if (this.phase === 2) {
+      return Hint.make([],
+        TG2('要回忆的 {0} 位数字是 {1}', this.digits.length, this.digits.join(' ')),
+        TG2('The digits were {0}', this.digits.join(' ')), t0);
+    }
+    return Hint.make([],
+      TG2('先把这 {0} 个数字记牢：{1}', this.digits.length, this.digits.join(' ')),
+      TG2('Memorise these digits: {0}', this.digits.join(' ')), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answerMath(i: number): void {
     if (this.over || this.phase !== 1 || this.pick >= 0) { return; }
     this.pick = i;
@@ -142,6 +210,12 @@ export struct GDualTaskMemory {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })

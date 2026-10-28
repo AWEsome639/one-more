@@ -6,6 +6,8 @@
  * 结算：整列排好 ⇒ 通关，比较/交换越少分越高。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -37,6 +39,8 @@ export struct GSortingVisualizer {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：COUNT 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(COUNT);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -205,6 +209,52 @@ export struct GSortingVisualizer {
     this.stopLoop();
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.sorted) {
+      return false;
+    }
+    if (this.sorted) {
+      return true;
+    }
+    this.step();
+    return true;
+  }
+
+  /** 提示：报出还剩几步、现在在比哪两根柱子 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.sorted) { return Hint.none('none'); }
+    const left: number = this.total - this.pc;
+    return Hint.make([],
+      TG2('{0}还剩 {1} 步；正在比第 {2} 根', ALGOS[this.algo], String(left), String(this.markA + 1)),
+      'Sort left: ' + String(left), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private step(): void {
     if (this.sorted) {
       return;
@@ -281,6 +331,12 @@ export struct GSortingVisualizer {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('比较'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

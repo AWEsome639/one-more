@@ -2,6 +2,8 @@
  * 猜球 —— 🎲 看清球在哪个碗下，洗牌后点出它的位置（id: shell_game）
  * 胜负：连中 5 关 ⇒ 通关（每关多洗 2 次）；进度：猜中/5 · 洗牌次数 · 阶段
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -21,6 +23,8 @@ export struct GShellGame {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(LEVELS);
   onFinish: (r: GameResult) => void = () => {};
   @State private order: number[] = [0, 1, 2];
@@ -83,6 +87,56 @@ export struct GShellGame {
       }
     }, SWAP_MS);
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 'pick') {
+      return true;
+    }
+    this.pick(this.order.indexOf(this.ballCup));
+    return !this.over;
+  }
+
+  /** 提示：洗完之后球就在某个碗下面 —— 直接报「从左数第几个」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.phase !== 'pick') {
+      return Hint.none('none');
+    }
+    const k: number = this.order.indexOf(this.ballCup);
+    if (k < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([k],
+      TG2('球在从左数第 {0} 个碗下', String(k + 1)),
+      TG2('The ball is under cup {0} from the left', String(k + 1)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(slot: number): void {
     if (this.phase !== 'pick' || this.over) { return; }
     this.phase = 'done'; this.pickSlot = slot; this.reveal = true;
@@ -116,6 +170,12 @@ export struct GShellGame {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('猜中'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

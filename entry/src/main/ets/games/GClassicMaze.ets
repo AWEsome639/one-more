@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/D
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -52,6 +54,8 @@ export struct GClassicMaze {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=9；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5, 6, 7, 8]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(9);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -83,6 +87,112 @@ export struct GClassicMaze {
  this.walls = genWalls(this.diffTotal); this.pos = 0; this.steps = 0; this.over = false;
  this.won = false; this.note = TG('滑动或按方向键，找出口 🌀'); this.startAt = Date.now();
  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 迷宫没有"答案字段"—— 现算：在 this.walls 上做 BFS，每次只走一格
+  /** BFS 结果：方向 × 10000 + 还要走几步；负数 = 走不到出口 */
+  private nextMove(): number {
+    const n: number = this.diffTotal;
+    const goal: number = this.goalIdx();
+    const from: number[] = new Array<number>(n * n).fill(-1);
+    const q: number[] = [this.pos];
+    from[this.pos] = this.pos;
+    let head: number = 0;
+    while (head < q.length && from[goal] < 0) {
+      const cur: number = q[head];
+      for (let d = 0; d < 4; d++) {
+        if ((this.walls[cur] & WALL[d]) !== 0) {
+          continue;
+        }
+        const r: number = Math.floor(cur / n) + DR[d];
+        const c: number = cur % n + DC[d];
+        if (r < 0 || r >= n || c < 0 || c >= n) {
+          continue;
+        }
+        const nx: number = r * n + c;
+        if (from[nx] >= 0) {
+          continue;
+        }
+        from[nx] = cur;
+        q.push(nx);
+      }
+      head = head + 1;
+    }
+    if (from[goal] < 0) {
+      return -10000;
+    }
+    let hop: number = 0;
+    let at: number = goal;
+    while (hop < n * n && from[at] >= 0 && from[at] !== this.pos) {
+      at = from[at];
+      hop = hop + 1;
+    }
+    if (at === this.pos) {
+      return -10000;
+    }
+    const dr: number = Math.floor(at / n) - Math.floor(this.pos / n);
+    const dc: number = at % n - this.pos % n;
+    for (let d2 = 0; d2 < 4; d2++) {
+      if (DR[d2] === dr && DC[d2] === dc) {
+        return d2 * 10000 + (hop + 1);
+      }
+    }
+    return -10000;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const m: number = this.nextMove();
+    if (m < 0) {
+      return false;
+    }
+    this.step(Math.floor(m / 10000));
+    return !this.over;
+  }
+
+  /** 提示：下一步往哪走 + 还要几步（迷宫只有"方向"是有意义的信息） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const m: number = this.nextMove();
+    if (m < 0) {
+      return Hint.none('none');
+    }
+    const names: string[] = [TG('上'), TG('右'), TG('下'), TG('左')];
+    const ens: string[] = ['up', 'right', 'down', 'left'];
+    const dir: number = Math.floor(m / 10000);
+    const left: number = m % 10000;
+    return Hint.make([], TG2('往{0}走 🌀 还要 {1} 步', names[dir], left),
+      TG2('Go {0} — {1} steps left', ens[dir], left), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
  private step(d: number): void {
  if (this.over) { return; }
  const cur: number = this.pos;
@@ -113,6 +223,12 @@ export struct GClassicMaze {
  }
  build() {
  Column({ space: Space.xs }) {
+   HintBar({
+     showHint: true,
+     onHintTap: () => { this.askHint(); },
+     onAutoTap: () => { this.askAuto(); },
+     autoOn: this.autoId >= 0
+   })
  Text(TG2("步数 {0}/{1}　位置 {2}排",Digits(String(this.steps), this.langCode), this.dmax(), (Math.floor(this.pos / this.diffTotal) + 1))
  + (this.pos % this.diffTotal + 1) + TG2('列　出口 {0}排{1}列', this.diffTotal, this.diffTotal)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: 0 }) {

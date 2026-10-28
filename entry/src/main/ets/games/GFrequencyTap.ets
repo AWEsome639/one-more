@@ -2,6 +2,8 @@
  * 频率点击 —— 跟着 100 BPM 的节拍点圆盘，测节奏同步
  * 胜负：20 拍命中 ≥ 16 ⇒ 通关；进度：拍号 / 命中数 / 上次误差 ms
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -23,6 +25,8 @@ export struct GFrequencyTap {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：BEATS 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(BEATS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -81,6 +85,57 @@ export struct GFrequencyTap {
     }
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase === 2) {
+      return true;
+    }
+    this.tap();
+    return !this.over;
+  }
+
+  // 这款没有"答案格"，只有节拍 ⇒ 提示报节拍间隔与本拍进度
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.phase === 2) {
+      return Hint.none('none');
+    }
+    if (this.beatTs.length === 0) {
+      return Hint.make([], '先按「开始」，之后每 ' + String(GAP) + ' 毫秒点一下圆盘（误差 ±' + String(HIT_MS) + 'ms 都算命中）',
+        'Press start, then tap once every ' + String(GAP) + ' ms', t0);
+    }
+    const last: number = this.beatTs[this.beatTs.length - 1];
+    const next: number = last + GAP;
+    return Hint.make([], '跟着节拍点：下一拍还有 ' + String(Math.max(0, next - Date.now())) + ' ms（已命中 ' + String(this.hitN) + '/' + String(this.diffTotal) + '）',
+      'Next beat in ' + String(Math.max(0, next - Date.now())) + ' ms', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(): void {
     if (this.phase === 0) { this.start(); return; }
     if (this.phase !== 1) { return; }
@@ -123,6 +178,12 @@ export struct GFrequencyTap {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG(TG('拍号')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

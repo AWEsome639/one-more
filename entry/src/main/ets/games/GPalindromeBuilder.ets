@@ -1,4 +1,6 @@
 /** 回文构造 —— 用给定的字母摆出回文（6 题解出 ≥4 通关 ｜ 进度：题号/答对/倒计时） */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -35,6 +37,8 @@ export struct GPalindromeBuilder {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT_MS);
   onFinish: (r: GameResult) => void = () => {};
   @State word: string = ''; @State pool: string[] = []; @State used: number[] = [];
@@ -66,6 +70,89 @@ export struct GPalindromeBuilder {
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时：例如 {0}', this.word); this.advance(); }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.feed >= 0 || this.used.length >= this.pool.length) {
+      return true;
+    }
+    this.tap(this.palPlan()[this.used.length]);
+    return !this.over;
+  }
+
+  /** 提示：报出该按什么顺序点字母（摆出来的回文本身） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) { return Hint.none('none'); }
+    const plan: number[] = this.palPlan();
+    let text: string = '';
+    for (let i = 0; i < plan.length; i++) { text = text + this.pool[plan[i]]; }
+    return Hint.make(plan,
+      TG2('按这个顺序点：{0}（摆出来是回文）', text),
+      'Tap in this order: ' + text, t0);
+  }
+
+  /** 辅助：要按的 pool 下标顺序 —— 把字母配对成回文再映射回下标 */
+  private palPlan(): number[] {
+    const n: number = this.pool.length;
+    const cnt: number[] = new Array<number>(26).fill(0);
+    for (let i = 0; i < n; i++) { cnt[this.pool[i].charCodeAt(0) - 65] = cnt[this.pool[i].charCodeAt(0) - 65] + 1; }
+    let odd: number = 0;
+    for (let k = 0; k < 26; k++) { if (cnt[k] % 2 === 1) { odd = odd + 1; } }
+    const natural: number[] = [];
+    for (let i = 0; i < n; i++) { natural.push(i); }
+    if (odd > 1) { return natural; }        // 摆不成回文（本款不会发生）：退回原顺序
+    const half: string[] = [];
+    let mid: string = '';
+    for (let k = 0; k < 26; k++) {
+      let c: number = cnt[k];
+      if (c % 2 === 1) { mid = String.fromCharCode(65 + k); c = c - 1; }
+      for (let j = 0; j < (c - c % 2) / 2; j++) { half.push(String.fromCharCode(65 + k)); }
+    }
+    const target: string = half.join('') + mid + half.slice().reverse().join('');
+    if (target.length !== n) { return natural; }
+    const taken: boolean[] = [];
+    for (let i = 0; i < n; i++) { taken.push(false); }
+    const out: number[] = [];
+    for (let p = 0; p < n; p++) {
+      const ch: string = target.charAt(p);
+      let found: number = -1;
+      for (let i = 0; i < n; i++) {
+        if (!taken[i] && this.pool[i] === ch) { found = i; break; }
+      }
+      if (found < 0) { return natural; }
+      taken[found] = true;
+      out.push(found);
+    }
+    return out;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.feed >= 0) { return; }
     if (i >= this.pool.length || this.used.indexOf(i) >= 0) { return; }
@@ -111,6 +198,12 @@ export struct GPalindromeBuilder {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

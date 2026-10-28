@@ -11,6 +11,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -54,6 +56,8 @@ export struct GBinomialMatch {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：PAIRS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(PAIRS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -97,6 +101,61 @@ export struct GBinomialMatch {
       clearTimeout(this.nextTo);
       this.nextTo = -1;
     }
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.aiPair(0);
+    return !this.over;
+  }
+
+  /** 提示：还没配的那一对的系数 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < this.left.length; i++) {
+      if (this.doneL[i]) { continue; }
+      for (let j = 0; j < this.right.length; j++) {
+        if (!this.doneR[j] && this.right[j] === this.left[i].coef) {
+          return Hint.make([i, j],
+            TG2('「{0}」的系数是 {1}', this.left[i].text, String(this.left[i].coef)),
+            TG2('The coefficient of {0} is {1}', this.left[i].text, String(this.left[i].coef)), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private reset(): void {
@@ -251,8 +310,30 @@ export struct GBinomialMatch {
     return this.doneR[j] || this.selR === j ? '#FFFFFF' : this.theme.ink;
   }
 
+  /** AI 用：左项点一下、系数相同的右列点一下，配成一对 */
+  private aiPair(_d: number): void {
+    if (this.selL >= 0) { this.tapL(this.selL); }
+    if (this.selR >= 0) { this.tapR(this.selR); }
+    for (let i = 0; i < this.left.length; i++) {
+      if (this.doneL[i]) { continue; }
+      for (let j = 0; j < this.right.length; j++) {
+        if (!this.doneR[j] && this.right[j] === this.left[i].coef) {
+          this.tapL(i);
+          this.tapR(j);
+          return;
+        }
+      }
+    }
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)

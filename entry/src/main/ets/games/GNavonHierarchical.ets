@@ -2,6 +2,8 @@
  * 整体局部（id: navon_hierarchical）—— 大图是个字母，小图又是另一个字母，两问都要答 📐
  * 12 题，每题两问全对才得分；答对 ≥ 8 题通关。进度：题号 / 答对 / 剩余秒数
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -72,6 +74,8 @@ export struct GNavonHierarchical {
   @StorageProp('lang') langCode: string = 'zh';
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private cell: boolean[] = []; @State private globalCh: string = 'a';
   @State private localCh: string = 'h'; @State private gi: number = -1; @State private li: number = -1;
   @State private round: number = 1; @State private right: number = 0; // ★ 难度作用到玩法：本局时限 = 基础 × 难度倍率（简单 1.5× / 普通 1× / 困难 0.7×）
@@ -127,6 +131,63 @@ export struct GNavonHierarchical {
       }, TICK);
     }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const gs: string[] = ['a', 'h', 'e'];
+    if (this.gi < 0) {
+      this.pickGlobal(gs.indexOf(this.globalCh));
+      return !this.over;
+    }
+    if (this.li < 0) {
+      this.pickLocal(gs.indexOf(this.localCh));
+      return !this.over;
+    }
+    return true;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const g: string = this.globalCh.toUpperCase();
+    const l: string = this.localCh.toUpperCase();
+    if (this.gi < 0) {
+      return Hint.make([],
+        TG2('整体（大图形）是字母 {0}；每个小图形拼的是 {1}', g, l),
+        TG2('The global shape is {0}; the local shape is {1}', g, l), t0);
+    }
+    return Hint.make([],
+      TG2('局部（小图形）是字母 {0}', l),
+      TG2('The local shape is {0}', l), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pickGlobal(i: number): void {
     if (this.over || this.gi >= 0) { return; }
     this.gi = i;
@@ -175,6 +236,12 @@ export struct GNavonHierarchical {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

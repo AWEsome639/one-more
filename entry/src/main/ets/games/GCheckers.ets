@@ -12,6 +12,8 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch, Side } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -260,6 +262,8 @@ export struct GCheckers {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=6）
   //   ⚠️ 渲染原本用 ForEach(this.rows)，已改成 ForEach(this.rowIdx())
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(6);
 
   /** 0..diffTotal-1（读 @State 建依赖） */
@@ -600,6 +604,105 @@ export struct GCheckers {
     this.onFinish(r);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这款本来就有搜索器（aiBest/search），但它只会替电脑（side 3）想。
+  // 代打要替玩家（side 1）想 ⇒ 反过来：search 的分数是电脑视角 ⇒ 挑最小的。
+  private aiBestForPlayer(onlyFrom: number): Move | null {
+    const ms: Move[] = this.movesFrom(this.board, 1, onlyFrom);
+    if (ms.length === 0) {
+      return null;
+    }
+    if (ms.length === 1) {
+      return ms[0];
+    }
+    let best: Move = ms[0];
+    let bestSc: number = WIN_SCORE * 2;
+    for (let k = 0; k < ms.length; k++) {
+      // ★ 每个候选各给一份预算（共用一份的话第一个候选就把它吃光 ⇒ 等于永远走第一手）
+      const budget: number[] = [4000];
+      const nb: number[] = afterMove(this.board, this.diffTotal, ms[k], 1);
+      const sc: number = search(nb, this.diffTotal, 3, 4, -WIN_SCORE * 2, WIN_SCORE * 2, budget);
+      if (sc < bestSc) {
+        bestSc = sc;
+        best = ms[k];
+      }
+    }
+    return best;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.turn !== 1) {
+      return true;               // 轮到电脑/对手，等它走完
+    }
+    if (LanMatch.isActive() && !LanMatch.myTurn()) {
+      return true;
+    }
+    if (this.sel >= 0) {
+      const mv: Move | null = this.aiBestForPlayer(this.sel);
+      if (mv === null) {
+        this.sel = -1;
+        this.targets = [];
+        return true;
+      }
+      this.tap(mv.to);           // 已选中 ⇒ 走到最优目标格
+      return !this.over;
+    }
+    const mv2: Move | null = this.aiBestForPlayer(-1);
+    if (mv2 === null) {
+      return false;
+    }
+    this.tap(mv2.from);          // 先点棋子
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.turn !== 1) {
+      return Hint.none('none');
+    }
+    const mv: Move | null = this.aiBestForPlayer(this.sel >= 0 ? this.sel : -1);
+    if (mv === null) {
+      return Hint.none('none');
+    }
+    const r1: number = Math.floor(mv.from / this.diffTotal) + 1;
+    const c1: number = (mv.from % this.diffTotal) + 1;
+    const r2: number = Math.floor(mv.to / this.diffTotal) + 1;
+    const c2: number = (mv.to % this.diffTotal) + 1;
+    const tail: string = mv.cap >= 0 ? TG('（能吃掉对方一颗子）') : '';
+    return Hint.make([mv.from, mv.to],
+      TG2('把第 {0} 行第 {1} 列的子走到', String(r1), String(c1))
+        + TG2('第 {0} 行第 {1} 列', String(r2), String(c2)) + tail,
+      TG2('Move the piece at row {0}, column {1}', String(r1), String(c1))
+        + TG2(' to row {0}, column {1}', String(r2), String(c2)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.turn !== 1) {
       return;
@@ -647,6 +750,12 @@ export struct GCheckers {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这三格整局不刷新
         Column({ space: 2 }) {

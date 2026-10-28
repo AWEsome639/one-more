@@ -15,6 +15,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -243,6 +244,8 @@ export struct GHeyawake {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -250,6 +253,8 @@ export struct GHeyawake {
   @State private need: number[] = [];
   @State private labelAt: number[] = [];
   @State private black: boolean[] = [];
+  /** 造局时那一版解（AI 代打与提示都用它；只记黑格） */
+  private sol: boolean[] = [];
   @State private rooms: number = 0;
   @State private moves: number = 0;
   @State private over: boolean = false;
@@ -268,8 +273,36 @@ export struct GHeyawake {
     this.reset();
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.aiFill(0);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private reset(): void {
     const g: HeyaGen = heyaGen();
+    this.sol = g.black.slice();   // ★ 解别丢：need 是由它反推的，留着才能代打
     let rooms: number = 0;
     for (let i = 0; i < N * N; i++) {
       if (g.room[i] + 1 > rooms) {
@@ -347,44 +380,27 @@ export struct GHeyawake {
 
   /**
    * ★ 2026-10-23 第二期：数间提示
-   *
-   * 规则：每个区域要涂黑 need[r] 格；黑格不能相邻；等等。
-   * 这里用一条最保守但严格成立的计数规则：
-   *   **区域内「还需涂黑的数量」正好等于「区域内还没涂黑的格子数」**
-   *   ⇒ 那些格子必须全部涂黑。
-   *
-   * ⚠️ 这款只有"黑/非黑"两态，没有单独的白色标记，
-   *    所以只能推「必须黑」，不能推「必须白」。宁可少给。
+   * ★ 2026-10-24 第三期：改成「直接比造局时那一版解」
+   *   原来的推理规则只能推「必须黑」这一种情况，几乎点不出提示；
+   *   现在 reset() 把 heyaGen() 的解留在 this.sol 里（need[] 本来就是由它反推的），
+   *   ⇒ 提示只要报「第一处不一样的格子该涂黑 / 该取消」即可，永远不会错。
    */
   private computeHint(): HintResult {
     const t0: number = Date.now();
-    const total: number = N * N;
-    for (let r = 0; r < this.rooms; r++) {
-      let blackHere: number = 0;
-      let freeHere: number = 0;
-      let freeIdx: number = -1;
-      for (let i = 0; i < total; i++) {
-        if (this.room[i] !== r) {
-          continue;
-        }
-        if (this.black[i]) {
-          blackHere++;
-        } else {
-          freeHere++;
-          freeIdx = i;
-        }
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.sol.length < N * N) { return Hint.none('none'); }
+    for (let i = 0; i < N * N; i++) {
+      if (this.black[i] === this.sol[i]) { continue; }
+      const rr: string = String(Math.floor(i / N) + 1);
+      const cc: string = String((i % N) + 1);
+      if (this.sol[i]) {
+        return Hint.make([i], TG2('第 {0} 行第 {1} 列涂黑', rr, cc),
+          TG2('Paint row {0}, column {1} black', rr, cc), t0);
       }
-      const left: number = this.need[r] - blackHere;
-      if (left <= 0 || freeHere === 0 || left !== freeHere || freeIdx < 0) {
-        continue;
-      }
-      const rr: number = Math.floor(freeIdx / N) + 1;
-      const cc: number = (freeIdx % N) + 1;
-      return Hint.make([freeIdx],
-        TG2('第 {0} 行第 {1} 列必须涂黑（这个分区剩下的格子正好都要黑）',
-          String(rr), String(cc)),
-        TG2('Row {0}, column {1} must be black (the rest of this region must all be black)',
-          String(rr), String(cc)), t0);
+      return Hint.make([i], TG2('第 {0} 行第 {1} 列不用涂黑', rr, cc),
+        TG2('Leave row {0}, column {1} white', rr, cc), t0);
     }
     return Hint.none('none');
   }
@@ -427,8 +443,22 @@ export struct GHeyawake {
     this.onFinish(r);
   }
 
+  /** AI 用：和造局时的解比，第一处不一样的格子点一下 */
+  private aiFill(_d: number): void {
+    if (this.sol.length < N * N) { return; }
+    for (let i = 0; i < N * N; i++) {
+      if (this.black[i] !== this.sol[i]) { this.tap(i); return; }
+    }
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('已涂黑'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -7,10 +7,12 @@
  * 原创实现（拾海 2026-10-10）。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -28,6 +30,8 @@ export struct GMazeNav3d {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：迷宫层数（简单 2 / 普通 3 / 困难 4）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.pick(2, 3, 4);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -104,6 +108,141 @@ export struct GMazeNav3d {
     return this.walls[this.idx(x, y, z)];
   }
 
+  /** ★ 代打/提示共用：格子是不是墙（越界 / 数组越界都算墙 —— 困难档层数会超过常量 L） */
+  private isWallCell(x: number, y: number, z: number): boolean {
+    if (x < 0 || x >= W || y < 0 || y >= H || z < 0 || z >= this.diffTotal) {
+      return true;
+    }
+    const i: number = z * W * H + y * W + x;
+    if (i < 0 || i >= this.walls.length) {
+      return true;
+    }
+    return this.walls[i] === 1;
+  }
+
+  /** 从当前位置到终点的一条最短路，返回首步 [dx, dy, dz]；走不通返回空 */
+  private bfsStep(): number[] {
+    const w: number = W;
+    const h: number = H;
+    const l: number = this.diffTotal;
+    const total: number = w * h * l;
+    if (total <= 0) {
+      return [];
+    }
+    const st: number = this.pz * w * h + this.py * w + this.px;
+    const goal: number = (l - 1) * w * h + (h - 1) * w + (w - 1);
+    if (st === goal) {
+      return [];
+    }
+    const prev: number[] = new Array<number>(total).fill(-2);
+    const q: number[] = [];
+    prev[st] = -1;
+    q.push(st);
+    let head: number = 0;
+    while (head < q.length) {
+      const cur: number = q[head];
+      head = head + 1;
+      if (cur === goal) {
+        break;
+      }
+      const cz: number = Math.floor(cur / (w * h));
+      const cy: number = Math.floor((cur - cz * w * h) / w);
+      const cx: number = cur - cz * w * h - cy * w;
+      const nx: number[] = [cx + 1, cx - 1, cx, cx, cx, cx];
+      const ny: number[] = [cy, cy, cy + 1, cy - 1, cy, cy];
+      const nz: number[] = [cz, cz, cz, cz, cz + 1, cz - 1];
+      for (let k = 0; k < 6; k++) {
+        if (this.isWallCell(nx[k], ny[k], nz[k])) {
+          continue;
+        }
+        const ni: number = nz[k] * w * h + ny[k] * w + nx[k];
+        if (prev[ni] !== -2) {
+          continue;
+        }
+        prev[ni] = cur;
+        q.push(ni);
+      }
+    }
+    if (prev[goal] === -2) {
+      return [];
+    }
+    let node: number = goal;
+    let guard: number = 0;
+    while (prev[node] !== -1 && prev[node] !== st && guard < total + 4) {
+      guard = guard + 1;
+      node = prev[node];
+    }
+    if (node === st) {
+      return [];
+    }
+    const nz2: number = Math.floor(node / (w * h));
+    const ny2: number = Math.floor((node - nz2 * w * h) / w);
+    const nx2: number = node - nz2 * w * h - ny2 * w;
+    return [nx2 - this.px, ny2 - this.py, nz2 - this.pz];
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.done) {
+      return false;
+    }
+    const mv: number[] = this.bfsStep();
+    if (mv.length < 3) {
+      return false;
+    }
+    this.tryMove(mv[0], mv[1], mv[2]);
+    return !this.done;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.done) {
+      return Hint.none('none');
+    }
+    const mv: number[] = this.bfsStep();
+    if (mv.length < 3) {
+      return Hint.none('none');
+    }
+    let dir: string = TG('上');
+    if (mv[2] === 1) {
+      dir = TG('上一层');
+    } else if (mv[2] === -1) {
+      dir = TG('下一层');
+    } else if (mv[0] === 1) {
+      dir = TG('右');
+    } else if (mv[0] === -1) {
+      dir = TG('左');
+    } else if (mv[1] === 1) {
+      dir = TG('下');
+    }
+    return Hint.make([],
+      TG2('往{0}走一步 —— 终点在最深那层的右上角（共 {1} 层）', dir, this.diffTotal),
+      TG2('Move {0} — the exit is on the deepest layer (of {1})', dir, this.diffTotal), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tryMove(dx: number, dy: number, dz: number): void {
     if (this.done) {
       return;
@@ -134,6 +273,12 @@ export struct GMazeNav3d {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       // 状态
       Row({ space: Space.lg }) {
         Column({ space: 2 }) {

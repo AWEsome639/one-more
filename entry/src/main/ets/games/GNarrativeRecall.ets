@@ -1,5 +1,6 @@
 /** 故事回忆 —— 读一段小故事，凭记忆回答细节题；2 篇 6 题答对 ≥5 通关 */
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -46,6 +47,8 @@ export struct GNarrativeRecall {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(PASS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -96,6 +99,66 @@ export struct GNarrativeRecall {
     this.msg = TG('第 ') + String(this.round) + ' 篇：读一遍，记住细节';
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这款两个阶段：0=读故事（要人点「我记住了」）1=答题（答案 = story.qs[qIdx].right）
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase === 0) {
+      this.phase = 1;                  // 读完了 ⇒ 替玩家点「我记住了」
+      this.msg = TG('第 1 题');
+      return true;
+    }
+    if (this.phase !== 1 || this.pick >= 0) {
+      return true;                     // 等过渡期：已答完 → 0.9 秒后自己翻下一题
+    }
+    this.answer(this.story.qs[this.qIdx].right);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase === 0) {
+      return Hint.make([], TG('先把故事读完，点「我记住了」开始答题'),
+        'Read the story first', t0);
+    }
+    if (this.phase !== 1 || this.qIdx >= this.story.qs.length) {
+      return Hint.none('none');
+    }
+    const q: Q = this.story.qs[this.qIdx];
+    return Hint.make([q.right],
+      TG2('答案是「{0}」', q.opts[q.right]),
+      'Answer: ' + q.opts[q.right], t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(i: number): void {
     if (this.over || this.phase !== 1 || this.pick >= 0) { return; }
     const q: Q = this.story.qs[this.qIdx];
@@ -130,6 +193,12 @@ export struct GNarrativeRecall {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
             Row() {
         Text(TG2('篇数 {0}', (String(this.round) + '/' + String(ROUNDS)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2("题号 {0}", (this.phase === 1 ? String(this.qIdx + 1) + '/' + String(this.story.qs.length) : '阅读'))).fontSize(FontSize.xs).fontColor(this.theme.ink)

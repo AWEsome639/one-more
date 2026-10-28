@@ -6,6 +6,8 @@
  * 胜负：走满 6 格 ⇒ 通关；踩错 3 次 ⇒ 失败。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -31,6 +33,8 @@ export struct GModuloPath {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：LIVES 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(LIVES);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -142,6 +146,83 @@ export struct GModuloPath {
     this.msg = TG2('从 {0} 出发，每次走到相邻且 +1（满 {1} 归 0）的格子', base,Digits(String(MOD), this.langCode));
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.nextCell() < 0) {
+      return true;
+    }
+    this.tap(this.nextCell());
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 下一格的「值」是确定的 ⇒ 在相邻格里找那个值（全盘唯一）
+  /** 下一步该点的格子（找不到返回 -1） */
+  private nextCell(): number {
+    if (this.pos < 0) {
+      return -1;
+    }
+    const want: number = (this.startVal + this.step + 1) % MOD;
+    const r1: number = Math.floor(this.pos / GRID);
+    const c1: number = this.pos % GRID;
+    for (let i = 0; i < this.vals.length; i++) {
+      if (this.vals[i] !== want) {
+        continue;
+      }
+      const r2: number = Math.floor(i / GRID);
+      const c2: number = i % GRID;
+      if (Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /** 提示：报下一格在第几行第几列、值是几 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const i: number = this.nextCell();
+    if (i < 0) {
+      return Hint.none('none');
+    }
+    const want: number = (this.startVal + this.step + 1) % MOD;
+    const r: number = Math.floor(i / GRID) + 1;
+    const c: number = (i % GRID) + 1;
+    return Hint.make([i],
+      TG2('走第 {0} 行第 {1} 列 —— 值是 {2}', String(r), String(c), String(want)),
+      TG2('Go to row {0}, column {1} — value {2}', String(r), String(c), String(want)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.pos < 0 || i === this.pos) {
       return;
@@ -199,6 +280,12 @@ export struct GModuloPath {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

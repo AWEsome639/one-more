@@ -12,6 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -75,6 +76,8 @@ export struct GNoriNori {
    *   修法：**分区表是 5×5 手绘的，棋盘就固定 5×5**；
    *   难度改到**容错次数**上（本来就是它的压力来源）。
    */
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = 5;
   /** 本局允许的错误次数：简单 8 / 普通 5 / 困难 3 */
   @State private errMax: number = GNoriNori.errNow();
@@ -328,6 +331,93 @@ export struct GNoriNori {
     return true;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.autoCell() < 0) {
+      return true;
+    }
+    this.tap(this.autoCell());
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+    /** 深搜：每区放一对相邻黑格（rid = 1..REG_CNT）；放满后校验「每个黑格恰好 1 个黑邻居」 */
+    private dfsPick(rid: number, chosen: number[]): boolean {
+      if (rid > REG_CNT) {
+        const arr: number[] = new Array<number>(this.diffTotal * this.diffTotal).fill(0);
+        for (let k = 0; k < chosen.length; k++) {
+          arr[chosen[k]] = 1;
+        }
+        for (let k = 0; k < chosen.length; k++) {
+          if (this.blackNbrs(arr, chosen[k]) !== 1) {
+            return false;
+          }
+        }
+        return true;
+      }
+      const n: number = this.diffTotal;
+      const total: number = n * n;
+      for (let i = 0; i < total; i++) {
+        if (this.regions[i] !== rid) {
+          continue;
+        }
+        const r: number = Math.floor(i / n);
+        const c: number = i % n;
+        if (c < n - 1 && this.regions[i + 1] === rid) {
+          chosen.push(i);
+          chosen.push(i + 1);
+          if (this.dfsPick(rid + 1, chosen)) {
+            return true;
+          }
+          chosen.pop();
+          chosen.pop();
+        }
+        if (r < n - 1 && this.regions[i + n] === rid) {
+          chosen.push(i);
+          chosen.push(i + n);
+          if (this.dfsPick(rid + 1, chosen)) {
+            return true;
+          }
+          chosen.pop();
+          chosen.pop();
+        }
+      }
+      return false;
+    }
+
+    /** 代打：这一步该涂黑哪一格（整盘解由 dfsPick 现算；-1 = 没有待涂的） */
+    private autoCell(): number {
+      const chosen: number[] = [];
+      if (!this.dfsPick(1, chosen) || chosen.length === 0) {
+        return -1;
+      }
+      for (let k = 0; k < chosen.length; k++) {
+        if (this.blacks[chosen[k]] !== 1) {
+          return chosen[k];
+        }
+      }
+      return -1;
+    }
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -383,6 +473,12 @@ export struct GNoriNori {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已满足区域'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -25,6 +27,8 @@ export struct GSimonSequence {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：原 SHOW_TICK=420
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(420);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -46,6 +50,57 @@ export struct GSimonSequence {
     if (this.flashTimer >= 0) { clearTimeout(this.flashTimer); this.flashTimer = -1; }
     if (this.gapTimer >= 0) { clearTimeout(this.gapTimer); this.gapTimer = -1; }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 'input') {
+      return true;
+    }
+    this.tapPad(this.seq[this.pos]);
+    return !this.over;
+  }
+
+  /** 提示：按顺序该点哪个号 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase !== 'input' || this.pos >= this.seq.length) {
+      return Hint.make([], TG('正在演示：先看它亮的顺序'),
+        TG('Watch the sequence first'), t0);
+    }
+    const v: number = this.seq[this.pos];
+    return Hint.make([v], TG2('按顺序第 {0} 下点「{1}」号', String(this.pos + 1), PAD_NUM[v]),
+      TG2('Press pad {1} as step {0}', String(this.pos + 1), PAD_NUM[v]), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private reset(): void {
     this.clearTimers(); this.seq = []; this.len = 0; this.pos = 0; this.score = 0;
     this.lit = -1; this.over = false; this.won = false; this.done = false;
@@ -113,6 +168,12 @@ export struct GSimonSequence {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('长度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

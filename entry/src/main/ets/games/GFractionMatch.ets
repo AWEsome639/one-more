@@ -1,4 +1,6 @@
 /** 分数配对 —— 匹配等值分数（翻牌记忆）；玩法：8 张牌两两成对，一对是等值的两个分数；每次翻两张；胜负：60 秒内配齐 4 对 ⇒ 通关；超时 ⇒ 失败 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -19,6 +21,8 @@ export struct GFractionMatch {
   @Prop theme: Theme = Theme.light();
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private labels: string[] = [];
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -79,6 +83,86 @@ export struct GFractionMatch {
     }
     this.labels = labels; this.keys = keys; this.open = []; this.done = new Array<boolean>(CARD).fill(false);
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.open.length >= 2) {
+      return true;
+    }
+    if (this.open.length === 1) {
+      const a: number = this.open[0];
+      for (let i = 0; i < CARD; i++) {
+        if (i !== a && !this.done[i] && this.keys[i] === this.keys[a]) {
+          this.flip(i);
+          return !this.over;
+        }
+      }
+      return true;
+    }
+    for (let i = 0; i < CARD; i++) {
+      if (!this.done[i]) {
+        this.flip(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.open.length === 1) {
+      const a: number = this.open[0];
+      for (let i = 0; i < CARD; i++) {
+        if (i !== a && !this.done[i] && this.keys[i] === this.keys[a]) {
+          return Hint.make([i],
+            TG2('这张「{0}」和已翻开的「{1}」正好相等 ⇒ 翻它', this.labels[i], this.labels[a]),
+            TG2('{0} equals the open card {1} — flip it', this.labels[i], this.labels[a]), t0);
+        }
+      }
+    }
+    for (let i = 0; i < CARD; i++) {
+      if (this.done[i]) {
+        continue;
+      }
+      for (let j = i + 1; j < CARD; j++) {
+        if (!this.done[j] && this.keys[i] === this.keys[j]) {
+          return Hint.make([i, j],
+            TG2('第 {0} 张和第 {1} 张是一对（都是「{2}」）', i + 1, j + 1, this.labels[i]),
+            TG2('Cards {0} and {1} are a pair (both {2})', i + 1, j + 1, this.labels[i]), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private flip(i: number): void {
     if (this.over || this.done[i] || this.open.indexOf(i) >= 0 || this.open.length >= 2) { return; }
     const cur: number[] = this.open.concat([i]); this.open = cur;
@@ -121,6 +205,12 @@ export struct GFractionMatch {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

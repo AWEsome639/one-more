@@ -8,6 +8,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2, TG4 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -115,6 +116,8 @@ export struct GDigitSwapEq {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private puz: Puzzle = makePuzzle();
   @State private pickA: number = -1;
   // ★ 难度作用到玩法：本局时限 = 基础 × 难度倍率（简单 1.5× / 普通 1× / 困难 0.7×）
@@ -196,6 +199,33 @@ export struct GDigitSwapEq {
     Hint.toastResult(r, TG('这一步算不出来'));
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.aiSwap(0);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private reset(): void {
     this.startAt = Date.now();
     this.left = this.total;
@@ -245,8 +275,23 @@ export struct GDigitSwapEq {
     this.onFinish(res);
   }
 
+  /** AI 用：找出该换的两个数字块并点掉 */
+  private aiSwap(_d: number): void {
+    if (this.pickA >= 0) { this.tapDigit(this.pickA); }
+    const r: HintResult = this.computeHint();
+    if (!r.ok || r.cells.length < 2) { return; }
+    this.tapDigit(r.cells[0]);
+    this.tapDigit(r.cells[1]);
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

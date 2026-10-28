@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/D
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -63,6 +65,8 @@ export struct GColorMazeNav {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=6；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(6);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -87,6 +91,57 @@ export struct GColorMazeNav {
  onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(6);
      this.reset(); }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.aiGo(0);
+    return !this.over;
+  }
+
+  /** 提示：下一步往哪走 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const t: number = this.aiNext();
+    if (t < 0) { return Hint.none('none'); }
+    const dr: number = Math.floor(t / this.diffTotal) - Math.floor(this.pos / this.diffTotal);
+    const dc: number = t % this.diffTotal - this.pos % this.diffTotal;
+    const dir: string = dr < 0 ? TG('上') : (dr > 0 ? TG('下') : (dc < 0 ? TG('左') : TG('右')));
+    return Hint.make([t], TG2('往「{0}」走一步（只能走同色砖）', dir),
+      TG2('Step {0} — only tiles of the same colour', dir), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
  private reset(): void {
  const m: ColorMap = genMap(this.diffTotal); this.color = m.color; this.pos = m.start; this.goal = m.goal;
  this.steps = 0; this.over = false; this.won = false; this.note = TG('只能走同色砖，踩到 🏁 通关');
@@ -120,8 +175,57 @@ export struct GColorMazeNav {
  durationMs: Date.now() - this.startAt, levelReached: solved ? 2 : 1
  });
  }
+  /** AI 用：只走同色砖，BFS 找一条到终点的路，返回要走的下一格（-1 = 走不到） */
+  private aiNext(): number {
+    const n: number = this.diffTotal;
+    const total: number = n * n;
+    if (this.pos === this.goal) { return -1; }
+    const prev: number[] = new Array<number>(total).fill(-2);
+    const q: number[] = [this.pos];
+    prev[this.pos] = -1;
+    let head: number = 0;
+    let found: boolean = false;
+    while (head < q.length) {
+      const cur: number = q[head];
+      head = head + 1;
+      if (cur === this.goal) { found = true; break; }
+      const r: number = Math.floor(cur / n);
+      const c: number = cur % n;
+      const nb: number[] = [];
+      if (r > 0) { nb.push(cur - n); }
+      if (r < n - 1) { nb.push(cur + n); }
+      if (c > 0) { nb.push(cur - 1); }
+      if (c < n - 1) { nb.push(cur + 1); }
+      for (let k = 0; k < nb.length; k++) {
+        const t: number = nb[k];
+        if (prev[t] !== -2 || this.color[t] !== this.color[cur]) { continue; }
+        prev[t] = cur;
+        q.push(t);
+      }
+    }
+    if (!found) { return -1; }
+    let c2: number = this.goal;
+    while (prev[c2] >= 0 && prev[c2] !== this.pos) { c2 = prev[c2]; }
+    return prev[c2] === this.pos ? c2 : -1;
+  }
+
+  /** AI 用：沿同色通路走一步 */
+  private aiGo(_d: number): void {
+    const t: number = this.aiNext();
+    if (t < 0) { return; }
+    const dr: number = Math.floor(t / this.diffTotal) - Math.floor(this.pos / this.diffTotal);
+    const dc: number = t % this.diffTotal - this.pos % this.diffTotal;
+    this.go(dr, dc);
+  }
+
  build() {
  Column({ space: Space.xs }) {
+   HintBar({
+     showHint: true,
+     onHintTap: () => { this.askHint(); },
+     onAutoTap: () => { this.askAuto(); },
+     autoOn: this.autoId >= 0
+   })
  Text(TG2("步数 {0}/{1}　脚下 {2}",Digits(String(this.steps), this.langCode), DMAX, (this.color[this.pos] + 1))
  + TG2(' 号色　终点 {0} 号色', (this.color[this.goal] + 1))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: Space.xs }) {

@@ -14,6 +14,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG4 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -59,6 +60,15 @@ export struct GSlide15 {
   @State private slideDX: number = 0;
   @State private slideDY: number = 0;
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
+  /** ★ 代打用：打乱时记下的空位轨迹，倒着走一遍就必然归位（每一步都可逆） */
+  private solPlan: number[] = [];
+  private planAt: number = 0;
+  /** 倒放计划还成不成立（玩家自己滑过就不成立了） */
+  private planOk: boolean = true;
+  /** 贪心兜底用：上一步空位在哪（避免原地来回） */
+  private lastCell: number = -1;
   private blank: number = CELLS - 1;
   private initial: number[] = [];
   private initialBlank: number = CELLS - 1;
@@ -92,6 +102,8 @@ export struct GSlide15 {
     // ② 只做合法移动 ⇒ 局面必定可解（等价于"倒着解回去"）
     let b: number = CELLS - 1;
     let prev: number = -1;
+    // ★ 代打用：把空位走过的每一格记下来 —— 倒着走一遍就是一条「必定归位」的路
+    const walk: number[] = [CELLS - 1];
     for (let s = 0; s < SHUFFLE_STEPS; s++) {
       const cand: number[] = this.neighbors(b).filter((x: number) => x !== prev);
       const pick: number = cand[Math.floor(Math.random() * cand.length)];
@@ -99,6 +111,7 @@ export struct GSlide15 {
       t[pick] = 0;
       prev = b;
       b = pick;
+      walk.push(pick);
     }
     if (this.isDone(t)) {          // 极小概率又转回原状 ⇒ 再挪一步
       const nb: number[] = this.neighbors(b);
@@ -106,7 +119,14 @@ export struct GSlide15 {
       t[b] = t[pick];
       t[pick] = 0;
       b = pick;
+      walk.push(pick);
     }
+    const rev: number[] = walk.slice();
+    rev.reverse();
+    this.solPlan = rev.slice(1);
+    this.planAt = 0;
+    this.planOk = true;
+    this.lastCell = -1;
 
     this.initial = t.slice();
     this.initialBlank = b;
@@ -247,6 +267,111 @@ export struct GSlide15 {
     setTimeout(() => { this.hintMsg = ''; }, 5000);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ① 局面还是开局 ⇒ 把打乱的那串滑动倒着走一遍，必然归位（每一步都可逆）
+  // ② 玩家已经自己滑过了 ⇒ 退化成曼哈顿下降的一步（缩不短就绕一步，绝不原地打转）
+  private autoStep(): boolean {
+    if (this.won) {
+      return false;
+    }
+    if (this.planOk && this.planAt < this.solPlan.length) {
+      let k: number = 0;
+      while (k < 20 && this.planAt < this.solPlan.length && !this.won) {
+        if (this.planAt === 0 && !this.sameAsInitial()) {
+          this.planOk = false;
+          break;
+        }
+        const cell: number = this.solPlan[this.planAt];
+        if (!this.nearBlank(cell)) {
+          this.planOk = false;
+          break;
+        }
+        this.planAt = this.planAt + 1;
+        this.tap(cell);
+        k = k + 1;
+      }
+      if (this.planOk) {
+        return !this.won;
+      }
+    }
+    return this.greedyStep();
+  }
+
+  /** 局面是否还是本局开局 —— 倒放计划只对这个局面成立 */
+  private sameAsInitial(): boolean {
+    if (this.blank !== this.initialBlank || this.tiles.length !== this.initial.length) {
+      return false;
+    }
+    for (let i = 0; i < this.initial.length; i++) {
+      if (this.tiles[i] !== this.initial[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /** 这一格是不是挨着空位（能滑） */
+  private nearBlank(cell: number): boolean {
+    const bx: number = this.blank % this.diffTotal;
+    const by: number = Math.floor(this.blank / this.diffTotal);
+    const x: number = cell % this.diffTotal;
+    const y: number = Math.floor(cell / this.diffTotal);
+    return Math.abs(x - bx) + Math.abs(y - by) === 1;
+  }
+
+  /** 贪心一步：优先缩短总曼哈顿距离；一步也缩不短就挑最小的一步绕（不立刻走回头路） */
+  private greedyStep(): boolean {
+    const b: number = this.blank;
+    const cand: number[] = this.neighbors(b);
+    if (cand.length === 0) {
+      return false;
+    }
+    let pickAt: number = -1;
+    let pickD: number = -1;
+    let safeAt: number = -1;
+    let safeD: number = -1;
+    for (let k = 0; k < cand.length; k++) {
+      const i: number = cand[k];
+      const arr: number[] = this.tiles.slice();
+      arr[b] = arr[i];
+      arr[i] = 0;
+      const d: number = this.manhattan15(arr);
+      if (pickAt < 0 || d < pickD) {
+        pickAt = i;
+        pickD = d;
+      }
+      if (i !== this.lastCell && (safeAt < 0 || d < safeD)) {
+        safeAt = i;
+        safeD = d;
+      }
+    }
+    const useAt: number = safeAt >= 0 ? safeAt : pickAt;
+    if (useAt < 0) {
+      return false;
+    }
+    this.lastCell = b;
+    this.tap(useAt);
+    return !this.won;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tap(i: number): void {
     if (this.won || i === this.blank) {
       return;
@@ -329,6 +454,7 @@ export struct GSlide15 {
     const t: number[] = this.initial.slice();
     this.tiles = t;
     this.blank = this.initialBlank;
+    this.planAt = 0;
     this.moves = 0;
     this.won = false;
     this.seconds = 0;
@@ -338,6 +464,12 @@ export struct GSlide15 {
 
   build() {
     Column({ space: Space.lg }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       // ── 顶部三个数字 ──
       Row({ space: Space.md }) {
         Column({ space: 2 }) {

@@ -12,6 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 // ★ 提示用 toast 显示 —— 这款没有状态栏，加 Text 会挤坏布局
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -117,6 +118,8 @@ export struct GCrown {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -129,6 +132,8 @@ export struct GCrown {
   @State private pressed: number = -1;
 
   private startAt: number = 0;
+  /** 生成时用的解：每行一个列号（reset() 里存下来，代打照它放） */
+  private sol: number[] = [];
 
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
@@ -147,6 +152,7 @@ export struct GCrown {
       perm.splice(0, perm.length, 0, 2, 4, 1, 3, 5);
     }
     this.reg = crownRegions(perm);
+    this.sol = perm.slice();
     for (let i = 0; i < N * N; i++) {
       if (this.reg[i] < 0 || this.reg[i] >= N) {
         this.reg[i] = 0;   // 兜底：BFS 万一没铺满也不至于取到非法下标
@@ -321,6 +327,58 @@ export struct GCrown {
     Hint.toastResult(r, TG('这一步看不出哪格必须放皇冠，先把明显的排除掉'));
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 真值直取：reset() 生成分区时就把「每行一个列号」的解存进了 this.sol
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.sol.length !== N) {
+      return false;
+    }
+    const keep: number = this.mode;      // tap 按 mode 取反 ⇒ 强制用「放皇冠」模式
+    for (let r = 0; r < N; r++) {
+      const i: number = r * N + this.sol[r];
+      for (let c = 0; c < N; c++) {
+        const j: number = r * N + c;
+        if (this.marks[j] === 1 && j !== i) {
+          this.mode = 1;
+          this.tap(j);                   // 先清掉玩家放错的皇冠
+          this.mode = keep;
+          return !this.over;
+        }
+      }
+    }
+    for (let r = 0; r < N; r++) {
+      const i: number = r * N + this.sol[r];
+      if (this.marks[i] !== 1) {
+        this.mode = 1;
+        this.tap(i);
+        this.mode = keep;
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -355,6 +413,12 @@ export struct GCrown {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('皇冠'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

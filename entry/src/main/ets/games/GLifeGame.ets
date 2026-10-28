@@ -5,10 +5,12 @@
  * 胜负：撑满 60 代不灭绝 = 通关；中途全部死光 = 失败（可随时点格子人工干预）
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -25,6 +27,8 @@ export struct GLifeGame {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：GOAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(GOAL);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -88,6 +92,104 @@ export struct GLifeGame {
     this.over = false;
     this.won = false;
     this.startAt = Date.now();
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.running) {
+      return true;
+    }
+    if (!this.lifeDone) {
+      if (this.lifeAt === 0 && this.lifeTo.length === 0) {
+        this.lifeTo = this.lifePlan();
+      }
+      if (this.lifeAt < this.lifeTo.length) {
+        this.tap(this.lifeTo[this.lifeAt]);
+        this.lifeAt = this.lifeAt + 1;
+        return true;
+      }
+      this.lifeDone = true;
+    }
+    this.play();
+    return true;
+  }
+
+  /** 计划要翻转的格（一次性算好，避免来回改主意） */
+  private lifeTo: number[] = [];
+  private lifeAt: number = 0;
+  private lifeDone: boolean = false;
+
+  /** 代打/提示共用：最省事的 2×2 稳定块（生命游戏里 2×2 方块永生）⇒ 返回要翻转的格 */
+  private lifePlan(): number[] {
+    let best: number[] = [];
+    let bestCost: number = 999;
+    for (let r = 1; r < G - 2; r++) {
+      for (let c = 1; c < G - 2; c++) {
+        const cur: number[] = [];
+        for (let dr = -1; dr <= 2; dr++) {
+          for (let dc = -1; dc <= 2; dc++) {
+            const want: boolean = dr >= 0 && dr <= 1 && dc >= 0 && dc <= 1;
+            const i: number = (r + dr) * G + (c + dc);
+            if (want !== this.cells[i]) {
+              cur.push(i);
+            }
+          }
+        }
+        if (cur.length < bestCost) {
+          bestCost = cur.length;
+          best = cur;
+        }
+      }
+    }
+    return best;
+  }
+
+  /** 提示：报「该点哪一格布种」或「已经是永生块了，开始吧」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.running) {
+      return Hint.none(TG('演化中，先暂停再布种'));
+    }
+    const plan: number[] = this.lifePlan();
+    if (plan.length === 0) {
+      return Hint.make([], TG('已经是永生的 2×2 方块，按「开始」就行'),
+        TG('A stable 2x2 block is ready - just press start'), t0);
+    }
+    const k: number = plan[0];
+    const r: number = Math.floor(k / G) + 1;
+    const c: number = k - Math.floor(k / G) * G + 1;
+    return Hint.make([k],
+      TG2('点第 {0} 行第 {1} 列（2×2 方块能活到最后；布好还差 {2} 格）', String(r), String(c), String(plan.length)),
+      TG2('Tap row {0}, column {1} (a 2x2 block survives; {2} taps to go)', String(r), String(c), String(plan.length)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -186,6 +288,12 @@ export struct GLifeGame {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('代数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

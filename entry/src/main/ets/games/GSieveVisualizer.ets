@@ -10,6 +10,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -30,6 +32,8 @@ export struct GSieveVisualizer {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：原 TICK_MS=240
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(240);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -84,6 +88,58 @@ export struct GSieveVisualizer {
     this.done = false;
     this.finished = false;
     this.startAt = Date.now();
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这款没有"答错"—— 筛法自己走到底就通关，AI 只负责一下一下点「单步」
+  private autoStep(): boolean {
+    if (this.done) {
+      return false;
+    }
+    this.step();
+    return !this.done;
+  }
+
+  /** 提示：报现在划到哪个素数、划到哪个倍数 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.done) {
+      return Hint.none('none');
+    }
+    if (this.p === 0) {
+      return Hint.make([], TG('下一个素数是 2，从它的平方 4 开始划'),
+        TG('Next prime is 2 — start crossing at 4'), t0);
+    }
+    if (this.k > N) {
+      return Hint.make([], TG2('{0} 的倍数划完了，下一步换下一个素数', this.p),
+        TG2('Done with {0} — next prime', this.p), t0);
+    }
+    return Hint.make([this.k], TG2('正在划 {0} 的倍数：下一个是 {1}', this.p, this.k),
+      TG2('Crossing multiples of {0}: next {1}', this.p, this.k), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private play(): void {
@@ -191,6 +247,12 @@ export struct GSieveVisualizer {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已找到素数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

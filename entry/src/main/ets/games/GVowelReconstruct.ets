@@ -2,6 +2,8 @@
  * 元音重建 —— 单词里的元音在 AEIOU 里被整体挪了若干格，点亮元音把它一格一格转回来
  * 胜负：6 个词里还原 ≥ 5 个通关 ｜ 进度：第几词 / 已还原 / 剩余步数 / 得分
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -62,6 +64,8 @@ export struct GVowelReconstruct {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -93,6 +97,52 @@ export struct GVowelReconstruct {
     this.letters = encodeWord(word.w, shift).split('');
     this.stepsLeft = vowelCount(word.w) * 3 + 3; this.msg = TG('点亮元音，一格一格转回来');
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.feed >= 0) {
+      return true;
+    }
+    this.tap(this.letters.map((ch: string, i: number) => (isVowel(ch) && ch !== this.cur().w.charAt(i)) ? i : -1).filter((v: number) => v >= 0)[0]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const w: VW = this.cur();
+    return Hint.make([],
+      TG2('要还原成「{0}」（{1}）', w.w, w.gloss),
+      TG2('The word should become "{0}"', w.w), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.feed >= 0) { return; }
     const ch: string = this.letters[i];
@@ -130,6 +180,12 @@ export struct GVowelReconstruct {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Text(TG2('词 {0}/{1}　还原 {2}', Math.min(this.qi + 1, this.diffTotal), this.diffTotal, this.solvedCount)
           + TG2('　步数 {0}',Digits(String(this.stepsLeft), this.langCode))).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).layoutWeight(1)

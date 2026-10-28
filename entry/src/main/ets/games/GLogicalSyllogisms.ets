@@ -2,6 +2,8 @@
  * 逻辑三段论 —— 看两个前提和一个结论，判断这个推理站不站得住
  * 胜负：6 题答对 ≥4 ⇒ 通关｜进度：题号 / 答对 / 每题倒计时
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell, Motion } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -46,6 +48,8 @@ export struct GLogicalSyllogisms {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(PASS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -107,6 +111,54 @@ export struct GLogicalSyllogisms {
     if (gap >= LIMIT_MS) { this.judge(false, TG('⌛ 超时，未作答')); }
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.answered) {
+      return true;
+    }
+    this.judge(this.cur().valid, '');
+    return !this.over;
+  }
+
+  /** 提示：论点是否成立 + 一句人话解释（this.cur().valid 就是判据） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.answered) {
+      return Hint.none('none');
+    }
+    const q: Syl = this.cur();
+    const head: string = q.valid ? TG('推理有效') : TG('推理无效');
+    return Hint.make([], TG2('{0}：{1}', head, q.why),
+      TG2('{0} — {1}', head, q.why), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private judge(pickedValid: boolean, timeoutMsg: string): void {
     if (this.answered || this.over) { return; }
     const q: Syl = this.cur();
@@ -146,6 +198,12 @@ export struct GLogicalSyllogisms {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("题 {0}/{1}", Math.min(this.qIndex + 1, QN), QN))
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.cyan)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)

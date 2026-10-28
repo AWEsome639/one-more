@@ -3,6 +3,8 @@
  * 玩法：左边 3 个「A × B」算式，下边 3 个乱序乘积矩阵；左点一个、右点一个配对。
  * 胜负：90 秒内完成 3 块题板（每块 3 对）⇒ 通关；时间归零 ⇒ 失败。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -28,6 +30,8 @@ export struct GMatrixMultiplierMatch {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private mats: number[] = [];
   @State private prods: number[] = [];
   @State private order: number[] = [];
@@ -114,6 +118,98 @@ export struct GMatrixMultiplierMatch {
       String(this.prods[b + 2]) + ' ' + String(this.prods[b + 3]);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 两步一手：先 pickL(算式) 再 pickR(积)。真值就在 order[] 里：order[slot] === 算式号
+  /** 还没配对的左边算式（-1 = 全配完了） */
+  private nextLeft(): number {
+    for (let k = 0; k < PAIRS; k++) {
+      if (!this.done[k]) {
+        return k;
+      }
+    }
+    return -1;
+  }
+
+  /** 左边第 k 个算式的积在下边第几个（-1 = 找不到） */
+  private slotOf(k: number): number {
+    for (let s = 0; s < PAIRS; s++) {
+      if (this.order[s] === k) {
+        return s;
+      }
+    }
+    return -1;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.selL < 0) {
+      const k: number = this.nextLeft();
+      if (k < 0) {
+        return true;                   // 这一块全配完了，等它换下一块
+      }
+      this.pickL(k);
+      return !this.over;
+    }
+    const slot: number = this.slotOf(this.selL);
+    if (slot < 0) {
+      return true;
+    }
+    this.pickR(slot);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    let k: number = this.selL;
+    if (k < 0) {
+      k = this.nextLeft();
+    }
+    if (k < 0) {
+      return Hint.none('none');
+    }
+    const slot: number = this.slotOf(k);
+    if (slot < 0) {
+      return Hint.none('none');
+    }
+    if (this.selL < 0) {
+      return Hint.make([k],
+        TG2('先点左边第 {0} 个算式，它的积在下边第 {1} 个', String(k + 1), String(slot + 1)),
+        'Pick left #' + String(k + 1) + ', its product is bottom #' + String(slot + 1), t0);
+    }
+    return Hint.make([slot],
+      TG2('现在点下边第 {0} 个矩阵（它就是左边第 {1} 个算式的积）', String(slot + 1), String(k + 1)),
+      'Now tap bottom #' + String(slot + 1), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pickL(k: number): void {
     if (this.over || this.done[k]) { return; }
     this.selL = k;
@@ -162,6 +258,12 @@ export struct GMatrixMultiplierMatch {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题板'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -2,6 +2,8 @@
  *  玩法：给五个字母指派互不相同的数字（首位不为 0）让等式成立。过关判据：5 题解出 ≥ 4 题
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -48,6 +50,8 @@ export struct GCryptoArithmetic {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -99,6 +103,71 @@ export struct GCryptoArithmetic {
       if (this.slots[k] === d) { return true; }
     }
     return false;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const s: number = this.cryptoCursor();
+    if (s < 0) {
+      return false;
+    }
+    this.sel = s;
+    this.tapDigit(this.puz.sol[s]);
+    return !this.over;
+  }
+
+  /** 提示：每个字母的数字解就在 this.puz.sol 里 —— 报「这个字母填几」 */
+  private cryptoCursor(): number {
+    let s: number = this.sel;
+    if (s >= 0 && s < 5 && this.slots[s] < 0) {
+      return s;
+    }
+    for (let i = 0; i < 5; i++) {
+      if (this.slots[i] < 0) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const s: number = this.cryptoCursor();
+    if (s < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([s],
+      TG2('给 {0} 填 {1}（{2}）', this.letterAt(s), String(this.puz.sol[s]), this.eqText()),
+      TG2('Set {0} = {1} ({2})', this.letterAt(s), String(this.puz.sol[s]), this.eqText()), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tapDigit(d: number): void {
@@ -165,6 +234,12 @@ export struct GCryptoArithmetic {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

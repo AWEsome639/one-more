@@ -3,6 +3,8 @@
  * 胜负：连过 7 关（4→10 个数字）通关；点错扣一条命，命尽即失败
  * 进度：关卡 / 本关个数 / 得分 / 生命
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -20,6 +22,8 @@ export struct GChimpTest {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(LEVELS);
   onFinish: (r: GameResult) => void = () => {};
   @State cells: number[] = []; @State hidden: boolean = false; @State next: number = 1;
@@ -48,6 +52,58 @@ export struct GChimpTest {
     this.cells = grid; this.hidden = false; this.next = 1;
     this.msg = TG2("记住这 {0} 个数字的位置", this.count());
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.next > this.count()) {
+      return true;
+    }
+    this.tap(this.cells.indexOf(this.next));
+    return !this.over;
+  }
+
+  /** 提示：报「现在该点几」+ 它在第几行第几列（数字已藏起来，位置就是内容） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const k: number = this.cells.indexOf(this.next);
+    if (k < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(k / N) + 1;
+    const c: number = k - Math.floor(k / N) * N + 1;
+    return Hint.make([k],
+      TG2('现在该点 {0}（第 {1} 行第 {2} 列）', String(this.next), String(r), String(c)),
+      TG2('Tap {0} now (row {1}, column {2})', String(this.next), String(r), String(c)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(idx: number): void {
     if (this.over) { return; }
     const v: number = this.cells[idx];
@@ -82,6 +138,12 @@ export struct GChimpTest {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

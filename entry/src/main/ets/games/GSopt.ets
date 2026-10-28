@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -22,6 +24,8 @@ export struct GSopt {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -47,6 +51,57 @@ export struct GSopt {
     this.diffTotal = GameDiff.sizeNow(ROUNDS);
      this.reset(); }
   aboutToDisappear(): void { if (this.nextTo >= 0) { clearTimeout(this.nextTo); } }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.nextTo >= 0) {
+      return true;
+    }
+    this.aiTap(0);
+    return !this.over;
+  }
+
+  /** 提示：下一个号码在哪格 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.next < 1 || this.next > CELLS) { return Hint.none('none'); }
+    const i: number = this.spots.indexOf(this.next);
+    if (i < 0) { return Hint.none('none'); }
+    const rr: string = String(Math.floor(i / N) + 1);
+    const cc: string = String((i % N) + 1);
+    return Hint.make([i], TG2('下一个是 {0} 号，在第 {1} 行第 {2} 列', String(this.next), rr, cc),
+      TG2('Next is {0}: row {1}, column {2}', String(this.next), rr, cc), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
 
   private reset(): void {
     if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
@@ -122,8 +177,21 @@ export struct GSopt {
     return this.filled.indexOf(i) >= 0 ? '✔' : String(this.spots[i]);
   }
 
+  /** AI 用：下一个该点的号在哪格，就点哪格 */
+  private aiTap(_d: number): void {
+    if (this.next < 1 || this.next > CELLS) { return; }
+    const i: number = this.spots.indexOf(this.next);
+    if (i >= 0) { this.tap(i); }
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2("轮次 {0}/{1}",Digits(String(this.round), this.langCode),Digits(String(this.diffTotal), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2('下一个 {0}', String(this.next))).fontSize(FontSize.sm).fontColor(Palette.cyan)

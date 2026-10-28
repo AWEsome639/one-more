@@ -3,6 +3,8 @@
  * 秘密：这五个词横竖皆成词（词方阵 HEART / EMBER / ABUSE / RESIN / TREND）
  * 胜负：五行全填对通关；挑错 3 次即失败　进度：已填行数 / 失误 / 得分
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -29,6 +31,8 @@ export struct GCrossword {
 
   // ★ 难度作用到玩法：棋盘边长（原 SIZE=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(5);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -62,6 +66,56 @@ export struct GCrossword {
     }
     this.bank = arr;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.cur >= WORDS.length) {
+      return false;
+    }
+    const i: number = this.bank.indexOf(WORDS[this.cur]);
+    if (i < 0) {
+      return false;
+    }
+    this.place(i);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.cur >= WORDS.length) {
+      return Hint.none('none');
+    }
+    const w: string = WORDS[this.cur];
+    return Hint.make([],
+      TG2('第 {0} 行该填 {1}（线索：{2}）', this.cur + 1, w, CLUES[this.cur]),
+      TG2('Row {0} takes {1}', this.cur + 1, w), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private place(i: number): void {
     if (this.over || i >= this.bank.length || this.isUsed(i)) { return; }
     const w: string = this.bank[i];
@@ -92,6 +146,12 @@ export struct GCrossword {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已填'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

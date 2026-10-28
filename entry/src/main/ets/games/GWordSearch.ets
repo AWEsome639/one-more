@@ -2,6 +2,8 @@
  * 找单词 —— 8×8 字母阵里藏着 4 个单词，点首尾两格把它们圈出来
  * 胜负：90 秒内找齐 4 个通关｜超时失败｜进度：已找 / 得分 / 剩余时间
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -30,6 +32,8 @@ export struct GWordSearch {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT_MS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -86,6 +90,107 @@ export struct GWordSearch {
     for (let i = 0; i < this.found.length; i++) { if (this.found[i]) { n++; } }
     return n;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (false) {
+      return true;
+    }
+    this.tap(this.wsNext());
+    return !this.over;
+  }
+
+  /** 提示：报出哪个词在哪一行/列，以及该点哪两格 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) { return Hint.none('none'); }
+    for (let i = 0; i < this.words.length; i++) {
+      if (this.found[i]) { continue; }
+      const ln: number[] = this.wsLine(this.words[i]);
+      if (ln.length !== 2) { continue; }
+      const r1: number = Math.floor(ln[0] / N) + 1;
+      const c1: number = ln[0] % N + 1;
+      const r2: number = Math.floor(ln[1] / N);
+      if (r1 === r2 + 1) {
+        return Hint.make(ln,
+          TG2('「{0}」横在第 {1} 行，从第 {2} 列开始', this.words[i], String(r1), String(c1)),
+          'Word ' + this.words[i], t0);
+      }
+      return Hint.make(ln,
+        TG2('「{0}」竖在第 {1} 列，从第 {2} 行开始', this.words[i], String(c1), String(r1)),
+        'Word ' + this.words[i], t0);
+    }
+    return Hint.none('none');
+  }
+
+  /** 辅助：某个词在盘上的首尾两格（找不到返回空数组） */
+  private wsLine(w: string): number[] {
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c + w.length <= N; c++) {
+        let t: string = '';
+        for (let k = 0; k < w.length; k++) { t = t + this.grid[r * N + c + k]; }
+        const b: string = t.split('').reverse().join('');
+        if (t === w || b === w) { return [r * N + c, r * N + c + w.length - 1]; }
+      }
+    }
+    for (let c = 0; c < N; c++) {
+      for (let r = 0; r + w.length <= N; r++) {
+        let t: string = '';
+        for (let k = 0; k < w.length; k++) { t = t + this.grid[(r + k) * N + c]; }
+        const b: string = t.split('').reverse().join('');
+        if (t === w || b === w) { return [r * N + c, (r + w.length - 1) * N + c]; }
+      }
+    }
+    return [];
+  }
+
+  /** 辅助：这一步该点哪一格（先点首格，再点尾格；-1 = 没有可找的了） */
+  private wsNext(): number {
+    if (this.sel.length > 0) {
+      const first: number = this.sel[0];
+      for (let i = 0; i < this.words.length; i++) {
+        if (this.found[i]) { continue; }
+        const ln: number[] = this.wsLine(this.words[i]);
+        if (ln.length !== 2) { continue; }
+        if (ln[0] === first) { return ln[1]; }
+        if (ln[1] === first) { return ln[0]; }
+      }
+      return first;                 // 兜底：再点同一格 = 取消选择
+    }
+    for (let i = 0; i < this.words.length; i++) {
+      if (this.found[i]) { continue; }
+      const ln: number[] = this.wsLine(this.words[i]);
+      if (ln.length === 2) { return ln[0]; }
+    }
+    return -1;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over) { return; }
     if (this.sel.length === 0) { this.sel = [i]; this.msg = TG('再点这个词的另一头'); return; }
@@ -132,6 +237,12 @@ export struct GWordSearch {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('已找'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

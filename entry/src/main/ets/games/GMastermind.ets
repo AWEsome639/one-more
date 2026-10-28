@@ -6,10 +6,12 @@
  * 胜负：10 次之内猜中 = 通关；10 次用完还没中 = 失败
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -39,6 +41,8 @@ export struct GMastermind {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 SLOTS=4，按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -104,6 +108,69 @@ export struct GMastermind {
     return out;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    let i: number = -1;
+    for (let k = 0; k < this.diffTotal; k++) {
+      if (this.cur[k] < 0) {
+        i = k;
+        break;
+      }
+    }
+    if (i < 0) {
+      this.submit();
+      return !this.over;
+    }
+    this.sel = this.secret[i];
+    this.tapSlot(i);
+    return true;
+  }
+
+  /** 提示：答案就在 this.secret 里 —— 直接报颜色序列 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const names: string[] = ['红', '黄', '绿', '蓝', '紫', '莓'];
+    let s: string = '';
+    for (let i = 0; i < this.secret.length; i++) {
+      if (i > 0) {
+        s = s + ' · ';
+      }
+      s = s + names[this.secret[i]];
+    }
+    return Hint.make([],
+      TG2('答案是「{0}」（从左到右）', s),
+      TG2('The code is {0} (left to right)', s), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapSlot(i: number): void {
     if (this.over || this.sel < 0) {
       return;
@@ -165,6 +232,12 @@ export struct GMastermind {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('第几次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

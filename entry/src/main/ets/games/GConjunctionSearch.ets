@@ -3,6 +3,8 @@
  * 胜负：连过 6 关通关，点错 3 次判负　｜　进度：关卡 / 错误 / 得分
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -35,6 +37,8 @@ export struct GConjunctionSearch {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -75,6 +79,57 @@ export struct GConjunctionSearch {
     this.flashIdx = -1;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.cells.indexOf(KIND_TARGET) < 0) {
+      return true;
+    }
+    this.tap(this.cells.indexOf(KIND_TARGET));
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const i: number = this.cells.indexOf(KIND_TARGET);
+    if (i < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(i / SIZE) + 1;
+    const c: number = (i % SIZE) + 1;
+    return Hint.make([i],
+      TG2('红圆点在第 {0} 行第 {1} 列', String(r), String(c)),
+      TG2('The red dot is at row {0}, column {1}', String(r), String(c)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || i < 0 || i >= CELLS) { return; }
     const k: number = this.cells[i];
@@ -108,6 +163,12 @@ export struct GConjunctionSearch {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

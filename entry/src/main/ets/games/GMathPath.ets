@@ -12,6 +12,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -87,6 +89,8 @@ export struct GMathPath {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=4）
   //   ⚠️ 渲染原本用 ForEach(this.rows)，已改成 ForEach(this.rowIdx())
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);
 
   /** 0..diffTotal-1（读 @State 建依赖） */
@@ -217,6 +221,58 @@ export struct GMathPath {
     out.push(opTile(OP_PLUS));
     out.push(digitTile(1));
     return 3;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.aiTap(0);
+    return !this.over;
+  }
+
+  /** 提示：连成什么算式 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const sol: number[] = this.aiSolve();
+    if (sol.length < 3) { return Hint.none('none'); }
+    let s: string = '';
+    for (let i = 0; i < sol.length; i++) {
+      s = s + this.label(sol[i]);
+    }
+    return Hint.make(sol, TG2('连成 {0}（左往右算）', s),
+      TG2('Tap {0} (evaluated left to right)', s), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private reset(): void {
@@ -372,8 +428,66 @@ export struct GMathPath {
     this.tip = this.path.length === 0 ? '已清空算式' : TG2("当前：{0}", this.exprText());
   }
 
+  /** AI 用：深搜一条「数字-运算符-数字…」且左到右算下来等于目标的路径 */
+  private aiSolve(): number[] {
+    const n: number = this.diffTotal * this.diffTotal;
+    this.aiNodes = 0;
+    for (let s = 0; s < n; s++) {
+      if (this.isOp(s)) { continue; }
+      const st: number[] = [s];
+      const p: number[] = this.aiDfs(st, this.tiles[s].num);
+      if (p.length >= 3) { return p; }
+    }
+    return [];
+  }
+
+  private aiDfs(p: number[], v: number): number[] {
+    if (p.length >= 7 || this.aiNodes > 60000) { return []; }
+    this.aiNodes = this.aiNodes + 1;
+    const last: number = p[p.length - 1];
+    const ns: number[] = this.nbrs(last);
+    const lastOp: boolean = this.isOp(last);
+    for (let k = 0; k < ns.length; k++) {
+      const nx: number = ns[k];
+      if (p.indexOf(nx) >= 0 || this.isOp(nx) === lastOp) { continue; }
+      const np: number[] = p.concat([nx]);
+      if (this.isOp(nx)) {
+        const r1: number[] = this.aiDfs(np, v);
+        if (r1.length >= 3) { return r1; }
+        continue;
+      }
+      const nv: number = apply(v, this.tiles[last].sym, this.tiles[nx].num);
+      if (nv < RANGE_MIN || nv > RANGE_MAX) { continue; }
+      if (nv === this.target) { return np; }
+      const r2: number[] = this.aiDfs(np, nv);
+      if (r2.length >= 3) { return r2; }
+    }
+    return [];
+  }
+
+  /** AI 用：解路径是一步一步点进去的；玩家乱点过就先撤销一步 */
+  private aiTap(_d: number): void {
+    const sol: number[] = this.aiSolve();
+    if (sol.length < 3) { return; }
+    let prefix: boolean = this.path.length <= sol.length;
+    for (let i = 0; i < this.path.length; i++) {
+      if (this.path[i] !== sol[i]) { prefix = false; }
+    }
+    if (!prefix) { this.undo(); return; }
+    if (this.path.length < sol.length) { this.tap(sol[this.path.length]); }
+  }
+
+  /** AI 深搜的节点预算（防止死板面把界面算卡） */
+  private aiNodes: number = 0;
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

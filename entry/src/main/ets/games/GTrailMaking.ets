@@ -2,6 +2,8 @@
  * 连线测验（trail_making）—— TMT-B：按 1→A→2→B→…→12→L→13 的交替顺序点格子
  * 胜负：25 个全连上且错误 ≤4 ⇒ 通关；错第 5 次立即失败；进度：已连 / 错误 / 下一类
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -25,6 +27,8 @@ export struct GTrailMaking {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
   onFinish: (r: GameResult) => void = () => {};
   @State cells: string[] = [];
@@ -70,6 +74,59 @@ export struct GTrailMaking {
     this.startAt = Date.now();
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.step >= this.diffTotal) {
+      return true;
+    }
+    this.tap(this.cells.indexOf(this.seq[this.step]));
+    return !this.over;
+  }
+
+  /** 提示：报下一个该点的符号 + 它在第几行第几列 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.step >= this.diffTotal) {
+      return Hint.none('none');
+    }
+    const want: string = this.seq[this.step];
+    const k: number = this.cells.indexOf(want);
+    if (k < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(k / SIZE) + 1;
+    const c: number = k - Math.floor(k / SIZE) * SIZE + 1;
+    return Hint.make([k],
+      TG2('下一个是「{0}」（第 {1} 行第 {2} 列）', want, String(r), String(c)),
+      TG2('Next is "{0}" (row {1}, column {2})', want, String(r), String(c)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.flags[i]) { return; }
     if (this.cells[i] === this.seq[this.step]) {
@@ -106,6 +163,12 @@ export struct GTrailMaking {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已连'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -3,6 +3,8 @@
  * 规则：3×3 盘，每格容量 = 邻居数；点一下 +1 光点，超过容量就炸开、向四邻各送 1 点（连锁）。
  * 胜负：步数内清空全部光点 = 通关；步数用尽 = 失败。可悔一步 / 要提示。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -77,6 +79,8 @@ export struct GChainReaction {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=3；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(3);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -106,6 +110,69 @@ export struct GChainReaction {
  this.steps = 0; this.over = false; this.won = false; this.note = TG('点格子加光点，满了就炸 ⚡');
  this.tip = -1; this.hist = []; this.startAt = Date.now();
  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 每手挑「盘面更空」的那格：空位数越多越好、最大堆越小越好（避免连锁失控）。
+  //   ⚠️ 这款的过关条件 `total(ns) === 0` 其实走不到：boom() 只把某格 +1 再级联，
+  //      级联前后总光点不变 ⇒ 每点一下总光点必然 +1（开局就已经 ≥12）。
+  //      ⇒ 代打能做的是"每手都挑最优"，胜负只能交给步数上限。
+  private bestPick(): number {
+    let bi: number = -1;
+    let bv: number = -1e9;
+    const n: number = this.diffTotal;
+    for (let i = 0; i < n * n; i++) {
+      const ns: number[] | null = boom(this.cells, i, n);
+      if (ns === null) {
+        continue;                      // 这手会连锁失控
+      }
+      let zeros: number = 0;
+      let mx: number = 0;
+      for (let j = 0; j < n * n; j++) {
+        if (ns[j] === 0) {
+          zeros++;
+        }
+        if (ns[j] > mx) {
+          mx = ns[j];
+        }
+      }
+      const v: number = zeros * 10 - mx;
+      if (v > bv) {
+        bv = v;
+        bi = i;
+      }
+    }
+    return bi;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const i: number = this.bestPick();
+    if (i < 0) {
+      return false;
+    }
+    this.pick(i);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
  private pick(i: number): void {
  if (this.over) { return; }
  const ns: number[] | null = boom(this.cells, i, this.diffTotal);
@@ -124,15 +191,26 @@ export struct GChainReaction {
  this.note = TG('炸得漂亮，继续 👌');
  }
  private askHint(): void {
- let bestI: number = -1; let gain: number = 0; const cur: number = total(this.cells);
- for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
- const ns: number[] | null = boom(this.cells, i, this.diffTotal);
- if (ns === null) { continue; }
- if (cur - total(ns) > gain) {
- gain = cur - total(ns); bestI = i;
+ // ★ 2026-10-28 修：原实现按「总光点减少量」挑格子，但级联不改总数（见文件头）
+ //   ⇒ cur - total(ns) 恒等于 -1、gain 永远算不出正数 ⇒ 永远提示"悔一步吧"，这个提示是死的。
+ //   ⇒ 改成与 AI 代打同一套评估：挑「炸完空格最多、最大堆最小」的那格，并把结果报出来。
+ const i: number = this.bestPick();
+ this.tip = i;
+ if (i < 0) {
+   this.note = TG('这一手没有不会失控的走法，悔一步吧');
+   return;
  }
+ const n: number = this.diffTotal;
+ const r: number = Math.floor(i / n) + 1;
+ const c: number = i % n + 1;
+ const ns: number[] | null = boom(this.cells, i, n);
+ let zeros: number = 0;
+ if (ns !== null) {
+   for (let j = 0; j < n * n; j++) {
+     if (ns[j] === 0) { zeros++; }
+   }
  }
- this.tip = bestI; this.note = gain > 0 ? '试试闪光那格 ✨' : '这手不好走，悔一步吧';
+ this.note = TG2('第 {0} 行第 {1} 列：炸完空 {2} 格 ✨', String(r), String(c), String(zeros));
  }
  private undo(): void {
  if (this.over || this.hist.length === 0) { return; }
@@ -149,6 +227,11 @@ export struct GChainReaction {
  }
  build() {
  Column({ space: Space.sm }) {
+   HintBar({
+     showHint: false,
+     onAutoTap: () => { this.askAuto(); },
+     autoOn: this.autoId >= 0
+   })
  Text(TG2("步数 {0}/{1}　剩光点 {2}",Digits(String(this.steps), this.langCode),Digits(String(this.limit), this.langCode), total(this.cells))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: Space.xs }) {
  ForEach(this.rowIdx(), (r: number) => {

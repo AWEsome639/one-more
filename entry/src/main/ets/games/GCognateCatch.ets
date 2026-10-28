@@ -8,6 +8,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -40,6 +41,8 @@ export struct GCognateCatch {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State order: number[] = []; @State qi: number = 0; @State correct: number = 0;
@@ -74,6 +77,57 @@ export struct GCognateCatch {
     }
     this.order = all;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.answered) {
+      this.nextQ();
+      return !this.over;
+    }
+    this.answer(this.cur().same);
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 答案就在题目对象里（Pair.same）—— 直接照真值走
+  /** 提示：报这一对到底同不同源，并给词源小注（报内容，不报下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const p: Pair = this.cur();
+    return Hint.make([p.same ? 1 : 0],
+      TG2('{0} —— {1}', p.same ? '这两个是同源词' : '这两个不同源', p.note),
+      TG2('{0} — {1}', p.same ? 'Cognates' : 'Not cognates', p.note), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(said: boolean): void {
     if (this.over || this.answered) { return; }
     const p: Pair = this.cur();
@@ -92,7 +146,12 @@ export struct GCognateCatch {
     if (this.over) { return; }
     if (this.qi + 1 >= this.diffTotal) { this.end(); return; }
     this.qi = this.qi + 1;
-    this.doBump();   // ★ 弹一下 this.answered = false; this.msg = TG('这一对是同源词吗？');
+    // ★ 2026-10-28 修：原来这两句被写进上一行的行尾注释里（`// ★ 弹一下 this.answered = false; …`）
+    //   ⇒ answered 永远回不到 false：第一题答完就只剩"下一题"按钮，
+    //     answer() 被守卫挡掉，一路点到最后一题 = 必输。代打也被这一条卡死。
+    this.doBump();     // ★ 弹一下
+    this.answered = false;
+    this.msg = TG('这一对是同源词吗？');
   }
   private end(): void {
     this.over = true; this.won = this.correct >= PASS;
@@ -106,6 +165,12 @@ export struct GCognateCatch {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
             Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

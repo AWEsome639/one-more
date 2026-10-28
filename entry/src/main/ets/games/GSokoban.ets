@@ -13,6 +13,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -94,6 +96,8 @@ export struct GSokoban {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 MAX_UNDO=300
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(300);
   /** ★★ 2026-10-14 滑行（奥森：部分游戏应该有动态的运动过程）：
    *  玩家与箱子【各自】从「来处」方向滑到新格子 */
@@ -273,6 +277,164 @@ export struct GSokoban {
     }
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 没有"答案字段"—— BFS 搜一条把箱子推上目标的走法，然后一格一格照着走
+  private aiPlan: number[] = [];
+  private aiPlanKey: string = '';
+
+  /** 局面指纹：人站哪儿 + 哪些格子有箱子（箱子互不区分，不用排序） */
+  private aiKeyOf(p: number, bs: boolean[]): string {
+    let s: string = String(p) + ':';
+    for (let i = 0; i < bs.length; i++) {
+      if (bs[i]) {
+        s = s + ',' + String(i);
+      }
+    }
+    return s;
+  }
+
+  private aiKey(): string {
+    return this.aiKeyOf(this.player, this.boxes);
+  }
+
+  /** BFS 求一条走法：方向序列（0 上 1 右 2 下 3 左），空数组 = 算不出来 */
+  private aiSolve(): number[] {
+    const w: number = this.w;
+    const h: number = this.h;
+    const dxs: number[] = [0, 1, 0, -1];
+    const dys: number[] = [-1, 0, 1, 0];
+    const qp: number[] = [this.player];
+    const qb: boolean[][] = [this.boxes.slice()];
+    const par: number[] = [-1];
+    const mvs: number[] = [-1];
+    const seen: Map<string, number> = new Map<string, number>();
+    seen.set(this.aiKey(), 0);
+    let head: number = 0;
+    let winAt: number = -1;
+    while (head < qp.length && winAt < 0 && qp.length < 20000) {
+      const p: number = qp[head];
+      const bs: boolean[] = qb[head];
+      if (this.allOnGoal(bs)) {
+        winAt = head;
+        break;
+      }
+      const px: number = p % w;
+      const py: number = Math.floor(p / w);
+      for (let d = 0; d < 4; d++) {
+        const nx: number = px + dxs[d];
+        const ny: number = py + dys[d];
+        if (nx < 0 || ny < 0 || nx >= w || ny >= h) {
+          continue;
+        }
+        const ni: number = ny * w + nx;
+        if (this.walls[ni]) {
+          continue;
+        }
+        const nbs: boolean[] = bs.slice();
+        if (nbs[ni]) {
+          const bx: number = nx + dxs[d];
+          const by: number = ny + dys[d];
+          if (bx < 0 || by < 0 || bx >= w || by >= h) {
+            continue;
+          }
+          const bi: number = by * w + bx;
+          if (this.walls[bi] || nbs[bi]) {
+            continue;
+          }
+          nbs[ni] = false;
+          nbs[bi] = true;
+        }
+        const k: string = this.aiKeyOf(ni, nbs);
+        if (seen.has(k)) {
+          continue;
+        }
+        seen.set(k, qp.length);
+        qp.push(ni);
+        qb.push(nbs);
+        par.push(head);
+        mvs.push(d);
+        if (this.allOnGoal(nbs) && winAt < 0) {
+          winAt = qp.length - 1;
+        }
+      }
+      head = head + 1;
+    }
+    if (winAt < 0) {
+      return [];
+    }
+    const out: number[] = [];
+    let at: number = winAt;
+    while (at > 0 && par[at] >= 0) {
+      out.unshift(mvs[at]);
+      at = par[at];
+    }
+    return out;
+  }
+
+  private autoStep(): boolean {
+    if (this.solvedNow) {
+      return false;
+    }
+    if (this.aiKey() !== this.aiPlanKey) {
+      this.aiPlan = this.aiSolve();
+      this.aiPlanKey = this.aiKey();
+    }
+    if (this.aiPlan.length === 0) {
+      return false;
+    }
+    const dxs: number[] = [0, 1, 0, -1];
+    const dys: number[] = [-1, 0, 1, 0];
+    const d: number = this.aiPlan[0];
+    this.aiPlan.splice(0, 1);
+    this.step(dxs[d], dys[d]);
+    this.aiPlanKey = this.aiKey();
+    return !this.solvedNow;
+  }
+
+  /** 提示：报下一步往哪推、这条解法一共几步 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.solvedNow) {
+      return Hint.none('none');
+    }
+    if (this.aiKey() !== this.aiPlanKey || this.aiPlan.length === 0) {
+      this.aiPlan = this.aiSolve();
+      this.aiPlanKey = this.aiKey();
+    }
+    if (this.aiPlan.length === 0) {
+      return Hint.none('none');
+    }
+    const names: string[] = [TG('上'), TG('右'), TG('下'), TG('左')];
+    const ens: string[] = ['up', 'right', 'down', 'left'];
+    const d: number = this.aiPlan[0];
+    return Hint.make([], TG2('往{0}推一步（这条解法还要 {1} 步）', names[d], this.aiPlan.length),
+      TG2('Move {0} ({1} steps to solve)', ens[d], this.aiPlan.length), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private undo(): void {
     if (this.history.length === 0) {
       return;
@@ -337,6 +499,12 @@ export struct GSokoban {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       // ── 关卡名 + 进度 ──
       Row({ space: Space.md }) {
         Column({ space: 2 }) {

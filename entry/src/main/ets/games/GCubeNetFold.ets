@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -37,6 +39,8 @@ export struct GCubeNetFold {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -67,6 +71,63 @@ export struct GCubeNetFold {
     this.slots = new Array<string>(SLOTS).fill('');
     this.note = TG(TG(TG('点格子循环选 A / B / C —— 只有折到同一棱边的两个面才成对')));
     this.locked = false;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案就在 this.answer（每格该是 A/B/C）；tap 是循环换字母 ⇒ 一格一格换过去
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.locked) {
+      return true;              // 过关过渡里，等下一关加载
+    }
+    for (let i = 0; i < SLOTS; i++) {
+      if (this.slots[i] !== this.answer[i]) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  /** 提示：报「第几格该填哪个字母」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.locked) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < SLOTS; i++) {
+      if (this.slots[i] !== this.answer[i]) {
+        return Hint.make([i], TG2('第 {0} 格填 {1}', i + 1, this.answer[i]),
+          TG2('Cell {0} should be {1}', i + 1, this.answer[i]), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -127,6 +188,12 @@ export struct GCubeNetFold {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", Math.min(this.round + 1, this.diffTotal), this.diffTotal)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG2('过关 {0}',Digits(String(this.wins), this.langCode))).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)

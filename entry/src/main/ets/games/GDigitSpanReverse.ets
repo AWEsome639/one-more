@@ -4,6 +4,8 @@
  * 胜负：6 轮答对 5 轮以上 ⇒ 通关；位数每两轮加长一位
  * 进度：轮次 / 答对 / 位数 / 已输入
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -23,6 +25,8 @@ export struct GDigitSpanReverse {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State private seq: number[] = [];
@@ -75,6 +79,56 @@ export struct GDigitSpanReverse {
       this.to2 = setTimeout(() => { this.to2 = -1; this.play(k + 1); }, 180);
     }, 720);
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.cursor !== ASK) {
+      return true;
+    }
+    this.tapDigit(this.seq[this.seq.length - 1 - this.typed.length]);
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 真值就在 seq 里：倒序第 k 位 = seq[seq.length - 1 - typed.length]
+  /** 提示：报下一位该点的数字 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.cursor !== ASK) {
+      return Hint.none('none');
+    }
+    const d: number = this.seq[this.seq.length - 1 - this.typed.length];
+    return Hint.make([d],
+      TG2('倒序第 {0} 位是 {1}', String(this.typed.length + 1), String(d)),
+      TG2('Reverse position {0} is {1}', String(this.typed.length + 1), String(d)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapDigit(d: number): void {
     if (this.over || this.cursor !== ASK) { return; }
     const expect: number = this.seq[this.seq.length - 1 - this.typed.length];
@@ -113,6 +167,12 @@ export struct GDigitSpanReverse {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

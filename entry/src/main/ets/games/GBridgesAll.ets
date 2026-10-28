@@ -14,6 +14,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -410,6 +412,8 @@ export struct GBridgesAll {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：K 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(K);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -612,6 +616,89 @@ export struct GBridgesAll {
     this.status = TG('照参考解补不动了，先拆掉几座挡路的桥');
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案就在 this.sol（参考解）—— 每次照它补一座桥；合法性先自己查一遍，绝不能变成违规
+  /** 照参考解找「还该补桥」的第一对岛，返回 a * 1000 + b */
+  private aiFind(): number {
+    const n: number = this.ix.length;
+    for (let a = 0; a < n; a++) {
+      for (let b = a + 1; b < n; b++) {
+        const want: number = this.sol[a * n + b];
+        const cur: number = this.link[a * n + b];
+        if (want <= cur) {
+          continue;
+        }
+        if (!visible(a, b, this.ix, this.iy, n)) {
+          continue;
+        }
+        if (this.degOf(a) + 1 > this.val[a] || this.degOf(b) + 1 > this.val[b]) {
+          continue;
+        }
+        if (crossAny(a, b, this.link, this.ix, this.iy, n)) {
+          continue;
+        }
+        return a * 1000 + b;
+      }
+    }
+    return -1;
+  }
+
+  private autoStep(): boolean {
+    if (this.done || this.finished) {
+      return false;
+    }
+    const m: number = this.aiFind();
+    if (m < 0) {
+      return false;
+    }
+    this.tryLink(Math.floor(m / 1000), m % 1000);
+    return !this.done;
+  }
+
+  /** 提示：报「哪两座岛之间还差几座桥」（报行列，岛号玩家看不见） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.done || this.finished) {
+      return Hint.none('none');
+    }
+    const m: number = this.aiFind();
+    if (m < 0) {
+      return Hint.none('none');
+    }
+    const a: number = Math.floor(m / 1000);
+    const b: number = m % 1000;
+    const n: number = this.ix.length;
+    const want: number = this.sol[a * n + b];
+    const pa: string = (this.iy[a] + 1) + '排' + (this.ix[a] + 1) + '列';
+    const pb: string = (this.iy[b] + 1) + '排' + (this.ix[b] + 1) + '列';
+    return Hint.make([], TG2('{0} 与 {1} 之间要补到 {2} 座桥', pa, pb, want),
+      TG2('{0} ↔ {1}: build {2} bridge(s)', pa, pb, want), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private penalty(msg: string): void {
     this.wrong = this.wrong + 1; this.shakeX = 8; setTimeout(() => { this.shakeX = -8; }, 60); setTimeout(() => { this.shakeX = 0; }, 120);
     this.status = msg;
@@ -650,6 +737,12 @@ export struct GBridgesAll {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.infoBox(0)
         this.infoBox(1)

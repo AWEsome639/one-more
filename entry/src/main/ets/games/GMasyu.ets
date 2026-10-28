@@ -10,6 +10,8 @@
  * 出题：随机找一条简单回路，再从路上挑「拐弯点」当黑圈、「直行点」当白圈。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -66,6 +68,8 @@ export struct GMasyu {
    *     · 困难 7×7：RING 只覆盖中间 5×5 的边框，位置全错
    *   ⇒ 修法：棋盘固定 5×5，难度改到**点击次数上限**上。
    */
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = 5;
   /** 本局允许的点击次数：简单 56 / 普通 40 / 困难 28 */
   @State private tapCap: number = GMasyu.capNow();
@@ -98,6 +102,8 @@ export struct GMasyu {
   @State private won: boolean = false;
   @State private tip: string = TG('依次点相邻格子铺回路，点回起点即闭合');
 
+  /** ★ 出题时那条回路 = 本题答案（AI 代打/提示照它铺） */
+  private sol: number[] = [];
   private startAt: number = 0;
   private finished: boolean = false;
   private nodes: number = 0;
@@ -230,6 +236,7 @@ export struct GMasyu {
 
   private reset(): void {
     const loop: number[] = this.findLoop();
+    this.sol = loop;
     this.makeCircles(loop);
     this.path = [];
     this.moves = 0;
@@ -313,6 +320,77 @@ export struct GMasyu {
 
   // ── 输入 ──
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.autoCell() < 0) {
+      return true;
+    }
+    this.tap(this.autoCell());
+    return !this.over;
+  }
+
+  // 通关 = 回路闭合 + 所有圆圈规则都满足 ⇒ 报出题时那条回路的下一个格子
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const i: number = this.autoCell();
+    if (i < 0) {
+      return Hint.none('none');
+    }
+    const n: number = this.diffTotal;
+    const what: string = this.path.length < this.sol.length ? '下一格点 ' : '点回起点闭合（';
+    const tail: string = this.path.length < this.sol.length ? '' : String(this.sol.length) + ' 格）';
+    return Hint.make([i], what + '第' + String(Math.floor(i / n) + 1) + '行第' + String(i % n + 1) + '列' + tail,
+      'Tap row ' + String(Math.floor(i / n) + 1) + ', column ' + String(i % n + 1), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
+    /** 代打/提示共用：下一步该点的格子（本题答案 = 出题时那条回路） */
+    private autoCell(): number {
+      if (this.sol.length === 0) {
+        return -1;
+      }
+      const k: number = this.path.length;
+      if (k > this.sol.length) {
+        return -1;
+      }
+      for (let i = 0; i < k; i++) {
+        if (this.path[i] !== this.sol[i]) {
+          return -1;
+        }
+      }
+      if (k < this.sol.length) {
+        return this.sol[k];
+      }
+      return this.sol[0];
+    }
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -386,6 +464,12 @@ export struct GMasyu {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

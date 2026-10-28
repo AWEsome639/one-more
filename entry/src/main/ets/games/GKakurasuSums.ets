@@ -12,6 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -28,6 +29,8 @@ export struct GKakurasuSums {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -235,6 +238,100 @@ export struct GKakurasuSums {
     setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  /** 求解：逐行枚举 32 种涂法，用列线索双向剪枝 */
+  private kakDfs(r: number, cols: number[], pick: number[], budget: number[]): boolean {
+    if (budget[0] <= 0) {
+      return false;
+    }
+    budget[0] = budget[0] - 1;
+    if (r >= N) {
+      for (let c = 0; c < N; c++) {
+        if (cols[c] !== this.colLab[c]) {
+          return false;
+        }
+      }
+      return true;
+    }
+    const remain: number = (N * (N + 1) / 2) - ((r + 1) * (r + 2) / 2);
+    const total: number = 1 << N;
+    for (let mask = 0; mask < total; mask++) {
+      let s: number = 0;
+      for (let i = 0; i < N; i++) {
+        if (((mask >> i) & 1) === 1) {
+          s += i + 1;
+        }
+      }
+      if (s !== this.rowLab[r]) {
+        continue;
+      }
+      let ok: boolean = true;
+      for (let c = 0; c < N; c++) {
+        const add: number = ((mask >> c) & 1) === 1 ? r + 1 : 0;
+        if (cols[c] + add > this.colLab[c]) {
+          ok = false;
+          break;
+        }
+        if (cols[c] + add + remain < this.colLab[c]) {
+          ok = false;
+          break;
+        }
+      }
+      if (!ok) {
+        continue;
+      }
+      for (let c2 = 0; c2 < N; c2++) {
+        pick[r * N + c2] = ((mask >> c2) & 1) === 1 ? 1 : 0;
+      }
+      const cols2: number[] = cols.slice();
+      for (let c3 = 0; c3 < N; c3++) {
+        if (((mask >> c3) & 1) === 1) {
+          cols2[c3] = cols2[c3] + r + 1;
+        }
+      }
+      if (this.kakDfs(r + 1, cols2, pick, budget)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const pick: number[] = new Array<number>(N * N).fill(-1);
+    const cols: number[] = new Array<number>(N).fill(0);
+    const budget: number[] = [20000];
+    if (!this.kakDfs(0, cols, pick, budget)) {
+      return false;
+    }
+    for (let i = 0; i < N * N; i++) {
+      if (pick[i] >= 0 && (pick[i] === 1) !== this.black[i]) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -269,6 +366,12 @@ export struct GKakurasuSums {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('黑格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

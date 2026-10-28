@@ -6,6 +6,8 @@
  * 关卡：每局随机生成 6×6 数字盘 + 障碍格，目标与步数上限由一条真实存在的通路反推 ⇒ 一定有解
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -35,6 +37,8 @@ export struct GCompoundConnect {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_FAIL 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_FAIL);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -42,6 +46,8 @@ export struct GCompoundConnect {
 
   @State private board: number[] = [];
   @State private path: number[] = [];
+  /** ★ AI 代打/提示：出题时那条真实通路的格子序列（reset 里存下来） */
+  private sol: number[] = [];
   @State private target: number = 0;
   @State private maxSteps: number = 0;
   @State private fails: number = 0;
@@ -106,6 +112,7 @@ export struct GCompoundConnect {
     for (let i = 0; i < path.length; i++) {
       sum += b[path[i]];
     }
+    this.sol = path;
     this.board = b;
     this.target = sum;
     this.maxSteps = path.length;
@@ -202,6 +209,57 @@ export struct GCompoundConnect {
     return Math.abs(ar - br) + Math.abs(ac - bc) === 1;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.sol.length === 0 || this.path.length >= this.sol.length) {
+      return true;
+    }
+    this.tap(this.sol[this.path.length]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.sol.length === 0) {
+      return Hint.none('none');
+    }
+    if (this.path.length >= this.sol.length) {
+      return Hint.none('none');
+    }
+    const at: number = this.sol[this.path.length];
+    const r: number = Math.floor(at / N) + 1;
+    const c: number = at % N + 1;
+    return Hint.make([at],
+      TG2('下一步点第 {0} 行第 {1} 列（数字 {2}）', r, c, this.board[at]),
+      TG2('Next: row {0}, column {1} (value {2})', r, c, this.board[at]), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -280,6 +338,12 @@ export struct GCompoundConnect {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('数字和'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

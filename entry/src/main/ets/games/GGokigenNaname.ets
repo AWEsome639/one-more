@@ -12,6 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -113,6 +114,8 @@ export struct GGokigenNaname {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -276,6 +279,93 @@ export struct GGokigenNaname {
     Hint.toastResult(r, TG('这一步看不出哪格只能画一个方向'));
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这款是"有唯一合法盘"的填充题 ⇒ 直接解出来（DFS + 两点计数剪枝 + DSU 剪掉闭环），
+  // 再按解一格一格点。约束与生成器 gokiGen() 完全一致，所以解出来必然能过。
+  /** 解出一盘合法摆法（长度 = M*M；空数组 = 没解出来，理论上不会） */
+  private solveOri(): number[] {
+    const sol: number[] = [];
+    const ori2: number[] = new Array<number>(M * M).fill(0);
+    const cnt: number[] = new Array<number>(D * D).fill(0);
+    const par: number[] = [];
+    for (let i = 0; i < D * D; i++) {
+      par.push(i);
+    }
+    const rec = (k: number, p: number[]): boolean => {
+      if (k === M * M) {
+        for (let i = 0; i < M * M; i++) {
+          sol.push(ori2[i]);
+        }
+        return true;
+      }
+      const r: number = Math.floor(k / M);
+      const c: number = k - r * M;
+      for (let v = 1; v <= 2; v++) {
+        const a: number = v === 1 ? (r * D + c) : (r * D + (c + 1));
+        const b: number = v === 1 ? ((r + 1) * D + (c + 1)) : ((r + 1) * D + c);
+        if (cnt[a] + 1 > this.num[a] || cnt[b] + 1 > this.num[b]) {
+          continue;                    // 这两个圆点的数字会被撑爆
+        }
+        const p2: number[] = p.slice();
+        if (!dsuUnion(p2, a, b)) {
+          continue;                    // 会围成闭合回路
+        }
+        cnt[a] = cnt[a] + 1;
+        cnt[b] = cnt[b] + 1;
+        ori2[k] = v;
+        if (rec(k + 1, p2)) {
+          return true;
+        }
+        cnt[a] = cnt[a] - 1;
+        cnt[b] = cnt[b] - 1;
+        ori2[k] = 0;
+      }
+      return false;
+    };
+    if (!rec(0, par)) {
+      return [];
+    }
+    return sol;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const sol: number[] = this.solveOri();
+    if (sol.length !== M * M) {
+      return false;
+    }
+    for (let i = 0; i < M * M; i++) {
+      if (this.ori[i] === sol[i]) {
+        continue;
+      }
+      const r: number = Math.floor(i / M);
+      const c: number = i - r * M;
+      this.tapCell(r * 2 + 1, c * 2 + 1);      // tapCell 收的是"显示行/列"，方格都在奇数位
+      return !this.over;
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tapCell(r: number, c: number): void {
     if (this.over) {
       return;
@@ -342,6 +432,11 @@ export struct GGokigenNaname {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('已画'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

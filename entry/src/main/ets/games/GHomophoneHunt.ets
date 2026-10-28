@@ -2,6 +2,8 @@
  * 同音词 —— 给出发音 /aɪ/ 这类提示，从四个词里挑出与它同音的那个
  * 胜负：10 题答对 ≥6 通关｜进度：题号 / 答对 / 剩余秒数（点错罚 2 秒）
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -51,6 +53,8 @@ export struct GHomophoneHunt {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT_S 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT_S);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -82,6 +86,52 @@ export struct GHomophoneHunt {
       this.advance();
     }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (false) {
+      return true;
+    }
+    this.pick(this.cur().word);
+    return !this.over;
+  }
+
+  /** 提示：这类题的正确词就存在 BANK 里，直接报词本身 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) { return Hint.none('none'); }
+    const w: string = this.cur().word;
+    return Hint.make([],
+      TG2('答案是「{0}」，读音 {1}', w, this.cur().ipa),
+      'The answer is ' + w, t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(w: string): void {
     if (this.over) { return; }
     if (w !== this.cur().word) {
@@ -115,6 +165,12 @@ export struct GHomophoneHunt {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

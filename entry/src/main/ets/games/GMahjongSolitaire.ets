@@ -9,7 +9,9 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -40,6 +42,8 @@ export struct GMahjongSolitaire {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 KINDS=8
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(8);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -63,6 +67,57 @@ export struct GMahjongSolitaire {
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(8);
     this.reset();
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.aiPair(0);
+    return !this.over;
+  }
+
+  /** 提示：哪两张牌能连 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const p: number[] = this.findPair();
+    if (p.length < 2) { return Hint.none('none'); }
+    const lab: string = LABELS[this.grid[p[0]]];
+    const a1: string = String(Math.floor(p[0] / PC)) + TG(' 行 ') + String(p[0] % PC) + TG(' 列');
+    const b1: string = String(Math.floor(p[1] / PC)) + TG(' 行 ') + String(p[1] % PC) + TG(' 列');
+    return Hint.make(p, TG2('两张「{0}」能连：{1} 与 {2}', lab, a1, b1),
+      TG2('Two "{0}" tiles link: {1} and {2}', lab, a1, b1), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private reset(): void {
@@ -305,8 +360,23 @@ export struct GMahjongSolitaire {
     return this.theme.surface;
   }
 
+  /** AI 用：先取消悬着的选中，再消掉 findPair 找到的那一对 */
+  private aiPair(_d: number): void {
+    if (this.sel >= 0) { this.tap(this.sel); }
+    const p: number[] = this.findPair();
+    if (p.length < 2) { this.shuffleLeft(); return; }
+    this.tap(p[0]);
+    this.tap(p[1]);
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         this.head(TG('剩余'), 0)
         this.head(TG('步数'), 1)

@@ -8,6 +8,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -27,6 +29,8 @@ export struct GOperationSpan {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 START_SPAN=2，按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(2);
   onFinish: (r: GameResult) => void = () => {};
   @State phase: number = 0;        // 0 算式　1 回忆　2 结算
@@ -58,6 +62,60 @@ export struct GOperationSpan {
       const t: string = out[i]; out[i] = out[j]; out[j] = t;
     }
     return out;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase === 2) {
+      return true;
+    }
+    this.aiStepOne(0);
+    return !this.over;
+  }
+
+  /** 提示：这道算式的答案 / 该回忆第几个结果 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase === 0) {
+      return Hint.make([this.ans], TG2('这道算式等于 {0}', String(this.ans)),
+        TG2('This one equals {0}', String(this.ans)), t0);
+    }
+    if (this.phase === 1) {
+      const want: number = this.stored[this.got];
+      return Hint.make([this.got], TG2('第 {0} 个结果应该是 {1}', String(this.got + 1), String(want)),
+        TG2('Result {0} should be {1}', String(this.got + 1), String(want)), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private reset(): void {
@@ -147,8 +205,28 @@ export struct GOperationSpan {
     this.onFinish(r);
   }
 
+  /** AI 用：算式阶段点正确答案；回忆阶段按顺序点已存的结果 */
+  private aiStepOne(_d: number): void {
+    if (this.phase === 0) {
+      this.pickOpt(this.ans);
+      return;
+    }
+    if (this.phase === 1) {
+      const want: string = String(this.stored[this.got]);
+      for (let i = 0; i < this.pool.length; i++) {
+        if (this.pool[i] === want) { this.pickPool(i); return; }
+      }
+    }
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) { Column({ space: Space.xs }) {
       Text((TG('组长度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(Digits(String(this.span), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.orange))
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: Space.xs }) {

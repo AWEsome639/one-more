@@ -14,6 +14,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2, TG4 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -72,6 +73,8 @@ export struct GShikaku {
    *   ⇒ 简单档只取前 16 项、困难档 25..48 是 undefined（线索全丢）
    *   修法：棋盘固定 5×5，难度改到**容错次数**上。
    */
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = 5;
   /** 本局的容错次数：简单 6 / 普通 3 / 困难 2 */
   @State private errMax: number = GShikaku.errNow();
@@ -246,6 +249,128 @@ export struct GShikaku {
     setTimeout(() => { this.hintMsg = ''; }, 5000);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.autoCell() < 0) {
+      return true;
+    }
+    this.tap(this.autoCell());
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+    /** 深搜：把还没圈的格子切成合法矩形（每块恰含一个线索、格数 = 线索数）；own 用副本模拟 */
+    private dfsFill(own: number[], out: number[], budget: number[]): boolean {
+      const n: number = this.diffTotal;
+      let k: number = -1;
+      for (let i = 0; i < n * n; i++) {
+        if (own[i] === 0) {
+          k = i;
+          break;
+        }
+      }
+      if (k < 0) {
+        return true;
+      }
+      if (budget[0] <= 0) {
+        return false;
+      }
+      const cr: number = Math.floor(k / n);
+      const cc: number = k % n;
+      for (let r0 = 0; r0 <= cr; r0++) {
+        for (let c0 = 0; c0 <= cc; c0++) {
+          for (let r1 = cr; r1 < n; r1++) {
+            for (let c1 = cc; c1 < n; c1++) {
+              budget[0] = budget[0] - 1;
+              if (budget[0] <= 0) {
+                return false;
+              }
+              const area: number = (r1 - r0 + 1) * (c1 - c0 + 1);
+              let clue: number = 0;
+              let bad: boolean = false;
+              for (let r = r0; r <= r1 && !bad; r++) {
+                for (let c = c0; c <= c1; c++) {
+                  const idx: number = r * n + c;
+                  if (own[idx] !== 0) {
+                    bad = true;
+                    break;
+                  }
+                  if (this.clues[idx] > 0) {
+                    if (clue > 0) {
+                      bad = true;
+                      break;
+                    }
+                    clue = this.clues[idx];
+                  }
+                }
+              }
+              if (bad || clue !== area) {
+                continue;
+              }
+              for (let r = r0; r <= r1; r++) {
+                for (let c = c0; c <= c1; c++) {
+                  own[r * n + c] = 1;
+                }
+              }
+              out.push(r0 * n + c0);
+              out.push(r1 * n + c1);
+              if (this.dfsFill(own, out, budget)) {
+                return true;
+              }
+              out.pop();
+              out.pop();
+              for (let r = r0; r <= r1; r++) {
+                for (let c = c0; c <= c1; c++) {
+                  own[r * n + c] = 0;
+                }
+              }
+            }
+          }
+        }
+      }
+      return false;
+    }
+
+    /** 代打：这一步该点哪一格（先点矩形左上角，再点右下角；-1 = 没解） */
+    private autoCell(): number {
+      const n: number = this.diffTotal;
+      const own: number[] = [];
+      for (let i = 0; i < n * n; i++) {
+        own.push(this.owner[i] > 0 ? 1 : 0);
+      }
+      const out: number[] = [];
+      const budget: number[] = [40000];
+      if (!this.dfsFill(own, out, budget) || out.length < 2) {
+        return -1;
+      }
+      if (this.first < 0) {
+        return out[0];
+      }
+      if (this.first === out[0]) {
+        return out[1];
+      }
+      return this.first;
+    }
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -335,6 +460,12 @@ export struct GShikaku {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已覆盖'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -3,6 +3,8 @@
  * 规则：纸对折两次（你看到的是左上角那四分之一）；在折好的纸上打孔，孔会镜像成四份。
  * 胜负：展开后与目标完全一致 ⇒ 通关；步数用尽还没对上 ⇒ 失败。　进度：已打孔 / 步数
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -60,6 +62,8 @@ export struct GPaperFolding {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 Q=4，按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -86,6 +90,63 @@ export struct GPaperFolding {
     this.msg = TG2('展开后要有 {0} 个孔，位置你自己找', String(HOLES * 4));
     this.startAt = Date.now();
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.steps >= LIMIT) {
+      return true;
+    }
+    this.punch(this.mine.map((v: boolean, i: number) => (v !== this.goal[Math.floor(i / this.diffTotal) * (this.diffTotal * 2) + (i % this.diffTotal)]) ? i : -1).filter((k: number) => k >= 0)[0]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const q: number = this.diffTotal;
+    const f: number = q * 2;
+    const need: string[] = [];
+    for (let i = 0; i < q * q; i++) {
+      const want: boolean = this.goal[Math.floor(i / q) * f + (i % q)];
+      if (want && !this.mine[i]) {
+        need.push(TG2('第 {0} 行第 {1} 列', String(Math.floor(i / q) + 1), String((i % q) + 1)));
+      }
+    }
+    if (need.length === 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('在折好的纸上打这些孔：{0}', need.join('、')),
+      TG2('Punch these on the folded paper: {0}', need.join(', ')), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private punch(i: number): void {
     if (this.over) { return; }
     const m: boolean[] = this.mine.slice();
@@ -109,6 +170,12 @@ export struct GPaperFolding {
   private hasHole(mode: number, i: number): boolean { return mode === 1 ? this.goal[i] : this.shown[i]; }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('目标孔'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

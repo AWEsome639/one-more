@@ -10,11 +10,13 @@
  * 交互：点空点落子（电脑延迟 260ms 落子，可悔棋）；连成五子（含长连）判胜
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch, Side } from '../core/LanMatch';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 // ★★★ 2026-10-23 AI 升级（路线 A）：α-β 搜索器，只做算法、不碰界面
@@ -385,6 +387,8 @@ export struct GGomoku {
 
   // ★ 难度作用到玩法：棋盘边长（原 SIZE=15）
   //   ⚠️ 原本 ForEach(IDX, …) 是常量数组，已改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(15);
   /** ★★ 2026-10-14 修复【死动画】：原来 .scale({x:1,y:1}) 是常量 ⇒ 落子动效从没生效
    *  现在：落子时先 0.6 再弹回 1（注释里原本就写着「从 0.6 弹到 1」）*/
@@ -540,6 +544,130 @@ export struct GGomoku {
   }
 
   /** 人落子 */
+  /** ★ AI 代打/提示共用：人（●）这一方该下哪 —— ① 能成五直接赢 ② 对方能成五必堵 ③ 否则按棋形分挑 */
+  private bestMove(): number {
+    const size: number = this.diffTotal;
+    const n: number = this.board.length;
+    let winAt: number = -1;
+    let blockAt: number = -1;
+    for (let i = 0; i < n; i++) {
+      if (this.board[i] !== EMPTY) {
+        continue;
+      }
+      if (winAt < 0 && fiveAt(this.board, i, HUMAN, size)) {
+        winAt = i;
+      }
+      if (blockAt < 0 && fiveAt(this.board, i, AI, size)) {
+        blockAt = i;
+      }
+    }
+    if (winAt >= 0) {
+      return winAt;
+    }
+    if (blockAt >= 0) {
+      return blockAt;
+    }
+    let best: number = -1;
+    let bestVal: number = -1;
+    const center: number = (size - 1) / 2;
+    let hasStone: boolean = false;
+    for (let i = 0; i < n; i++) {
+      if (this.board[i] !== EMPTY) {
+        hasStone = true;
+      }
+    }
+    for (let i = 0; i < n; i++) {
+      if (this.board[i] !== EMPTY) {
+        continue;
+      }
+      const x: number = i % size;
+      const y: number = Math.floor(i / size);
+      if (hasStone && !nearStone(this.board, x, y, size, 2)) {
+        continue;
+      }
+      const mine: number = pointScore(this.board, x, y, HUMAN, size);
+      const theirs: number = pointScore(this.board, x, y, AI, size);
+      const bonus: number = (size * 2 - Math.abs(x - center) - Math.abs(y - center))
+        + neighborBonus(this.board, x, y, size) * 6;
+      const v: number = mine + theirs * 0.95 + bonus;
+      if (v > bestVal) {
+        bestVal = v;
+        best = i;
+      }
+    }
+    if (best >= 0) {
+      return best;
+    }
+    for (let i = 0; i < n; i++) {
+      if (this.board[i] === EMPTY) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.thinking || this.turn !== HUMAN || LanMatch.isActive() || this.bestMove() < 0) {
+      return true;
+    }
+    this.humanTap(this.bestMove());
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.turn !== HUMAN || this.thinking) {
+      return Hint.make([],
+        TG2('现在轮到对方（○），等它落子'),
+        TG2('It is the opponent turn — wait'), t0);
+    }
+    const at: number = this.bestMove();
+    if (at < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(at / this.diffTotal) + 1;
+    const c: number = at % this.diffTotal + 1;
+    let why: string = TG('这里棋形最好');
+    if (fiveAt(this.board, at, HUMAN, this.diffTotal)) {
+      why = TG('下这里直接连五');
+    } else if (fiveAt(this.board, at, AI, this.diffTotal)) {
+      why = TG('不堵它就连五了');
+    }
+    return Hint.make([at],
+      TG2('下第 {0} 行第 {1} 列 —— {2}', r, c, why),
+      TG2('Play row {0}, column {1} — {2}', r, c, why), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private humanTap(idx: number): void {
     if (this.over || this.thinking || this.turn !== HUMAN || this.board[idx] !== EMPTY) {
       return;
@@ -706,6 +834,12 @@ export struct GGomoku {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       // ── 顶部信息 ──
       Row({ space: Space.md }) {
         // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这三格整局不刷新

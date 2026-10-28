@@ -1,5 +1,7 @@
 /** 字母换位 —— 3×3 格子点两个字母交换，按行排成目标单词
  *  胜负：排好 ⇒ 通关；步数用尽 ⇒ 失败 ｜ 进度：步数 / 就位字母数 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -29,6 +31,8 @@ export struct GLetterGridSwapper {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=3；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(3);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -62,6 +66,69 @@ export struct GLetterGridSwapper {
     for (let i = 0; i < this.diffTotal * this.diffTotal; i++) { if (this.tiles[i] === this.goal.charAt(i)) { n = n + 1; } }
     return n;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.moves >= MAX_MOVE) {
+      return true;
+    }
+    this.tap(this.sel < 0 ? this.tiles.map((t: string, i: number) => (t !== this.goal.charAt(i)) ? i : -1).filter((v: number) => v >= 0)[0] : this.tiles.map((t: string, i: number) => (t === this.goal.charAt(this.sel) && t !== this.goal.charAt(i)) ? i : -1).filter((v: number) => v >= 0)[0]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const n: number = this.diffTotal * this.diffTotal;
+    let a: number = this.sel;
+    if (a < 0) {
+      for (let i = 0; i < n; i++) {
+        if (this.tiles[i] !== this.goal.charAt(i)) {
+          a = i;
+          break;
+        }
+      }
+    }
+    if (a < 0) {
+      return Hint.none('none');
+    }
+    const want: string = this.goal.charAt(a);
+    const ra: number = Math.floor(a / this.diffTotal) + 1;
+    const ca: number = (a % this.diffTotal) + 1;
+    return Hint.make([a],
+      TG2('第 {0} 行第 {1} 列该是「{2}」', String(ra), String(ca), want)
+        + TG2('，现在这里放着「{0}」', this.tiles[a]),
+      TG2('Row {0}, column {1} should be "{2}"', String(ra), String(ca), want)
+        + TG2(', but it holds "{0}" right now', this.tiles[a]), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over) { return; }
     const first: number = this.sel;
@@ -95,6 +162,12 @@ export struct GLetterGridSwapper {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

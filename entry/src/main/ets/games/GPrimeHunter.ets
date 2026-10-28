@@ -1,4 +1,6 @@
 /** 素数猎手 —— 在 5×5 数字阵里点掉所有素数｜3 关猎到 2 关过关 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -47,6 +49,8 @@ export struct GPrimeHunter {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State private nums: number[] = [];
@@ -84,6 +88,65 @@ export struct GPrimeHunter {
     this.remain = countPrime(this.nums);
     this.miss = 0;
     this.tip = TG2('本关藏着 {0} 个素数，全部点掉',Digits(String(this.remain), this.langCode));
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (false) {
+      return true;
+    }
+    this.tap(this.nextPrime());
+    return !this.over;
+  }
+
+  /** 提示：点掉任意一个还没点过的素数（内容报数字本身） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) { return Hint.none('none'); }
+    for (let i = 0; i < this.nums.length; i++) {
+      if (this.marks[i] === 0 && isPrime(this.nums[i])) {
+        const v: number = this.nums[i];
+        return Hint.make([i],
+          TG2('点掉 {0}（它还在阵里）', String(v)),
+          'Tap the prime ' + String(v), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  /** 辅助：下一个还没点过的素数下标（找不到 = -1，tap(-1) 是空操作） */
+  private nextPrime(): number {
+    for (let i = 0; i < this.nums.length; i++) {
+      if (this.marks[i] === 0 && isPrime(this.nums[i])) { return i; }
+    }
+    return -1;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -131,6 +194,12 @@ export struct GPrimeHunter {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

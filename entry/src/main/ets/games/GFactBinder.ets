@@ -3,6 +3,8 @@
  * 玩法：左栏 5 条事实、右栏 5 个答案（已打乱）；左右各点一个即成对绑定，配对成功变绿。
  * 胜负：5 组全部绑定 = 通关；失误满 3 次 = 失败。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -26,6 +28,8 @@ export struct GFactBinder {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：LIVES 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(LIVES);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -86,6 +90,76 @@ export struct GFactBinder {
     if (this.wrong >= this.diffTotal) { this.finish(false); }
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const li: number = this.pickL;
+    if (li >= 0 && !this.done[li]) {
+      this.tapR(li);
+      return !this.over;
+    }
+    let next: number = -1;
+    for (let i = 0; i < IDX.length; i++) {
+      if (!this.done[i]) {
+        next = i;
+        break;
+      }
+    }
+    if (next < 0) {
+      return false;
+    }
+    this.tapL(next);
+    return !this.over;
+  }
+
+  /** 提示：报「哪条事实配哪个答案」（左边 i 与右边同 i 才绑得上） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    let li: number = this.pickL;
+    if (li < 0) {
+      for (let i = 0; i < IDX.length; i++) {
+        if (!this.done[i]) {
+          li = i;
+          break;
+        }
+      }
+    }
+    if (li < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([li],
+      TG2('「{0}」配「{1}」', PAIRS[li].ask, PAIRS[li].ans),
+      TG2('"{0}" goes with "{1}"', PAIRS[li].ask, PAIRS[li].ans), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapL(i: number): void {
     if (this.over || this.done[i]) { return; }
     this.pickL = i;
@@ -111,6 +185,12 @@ export struct GFactBinder {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("已绑定 {0}/{1}", this.bound(), IDX.length))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       Row({ space: Space.sm }) {

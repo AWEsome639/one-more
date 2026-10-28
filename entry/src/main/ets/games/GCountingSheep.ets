@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -46,6 +48,8 @@ export struct GCountingSheep {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -65,6 +69,57 @@ export struct GCountingSheep {
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(TOTAL);
      this.reset(); }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.locked) {
+      return true;
+    }
+    this.pick(this.aiAns());
+    return !this.over;
+  }
+
+  /** 提示：按格数 / 按只数的答案 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const a: number = this.aiAns();
+    if (this.byArea) {
+      return Hint.make([a], TG2('答案：一共占 {0} 格（狼占 2 格）', String(a)),
+        TG2('Answer: {0} cells in total (a wolf takes 2)', String(a)), t0);
+    }
+    return Hint.make([a], TG2('答案：真正的羊有 {0} 只', String(a)),
+      TG2('Answer: {0} sheep', String(a)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
 
   private reset(): void {
     this.right = 0; this.score = 0; this.qi = 0; this.over = false; this.hint = '';
@@ -126,8 +181,25 @@ export struct GCountingSheep {
 
 
 
+  /** AI 用：按当前题型算出答案（占几格 / 几只羊） */
+  private aiAns(): number {
+    let sheep: number = 0;
+    let area: number = 0;
+    for (let k = 0; k < this.cells.length; k++) {
+      if (this.cells[k] === 1) { sheep = sheep + 1; area = area + 1; }
+      if (this.cells[k] === 2) { area = area + 2; }
+    }
+    return this.byArea ? area : sheep;
+  }
+
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", (this.qi + 1), this.diffTotal)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG('答对 ') + this.right).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)

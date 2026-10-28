@@ -2,6 +2,8 @@
  * 特征矩阵 —— 4×4 里亮起 3 红 3 蓝，遮蔽后只点出被指定那一种颜色
  * 胜负：选中的 3 格完全正确 ⇒ 通关；进度：倒计时 / 已选 n/3 / 判分明细
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -21,6 +23,8 @@ export struct GFeatureMatrixRecall {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private hiColors: string[] = [];
   @State private picked: boolean[] = [];
   @State private askColor: string = Palette.rose;
@@ -77,6 +81,75 @@ export struct GFeatureMatrixRecall {
 
   private colorName(c: string): string {
     return c === Palette.rose ? '红色' : '蓝色';
+  }
+
+  /** 代打/提示共用：该点的目标色格子（没有就 -1） */
+  private autoCell(): number {
+    if (this.phase !== 1) {
+      return -1;
+    }
+    for (let i = 0; i < TOTAL; i++) {
+      if (this.hiColors[i] === this.askColor && !this.picked[i]) {
+        return i;
+      }
+    }
+    return -1;
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.autoCell() < 0) {
+      return true;
+    }
+    this.toggle(this.autoCell());
+    return !this.over;
+  }
+
+  // 真值在 this.hiColors（judge 比的就是 hiColors[i] === askColor）
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const cells: number[] = [];
+    const parts: string[] = [];
+    for (let i = 0; i < TOTAL; i++) {
+      if (this.hiColors[i] === this.askColor) {
+        cells.push(i);
+        parts.push('第' + String(Math.floor(i / N) + 1) + '行第' + String(i % N + 1) + '列');
+      }
+    }
+    if (cells.length === 0) {
+      return Hint.none('none');
+    }
+    return Hint.make(cells,
+      this.colorName(this.askColor) + '三格：' + parts.join('、'),
+      'The ' + String(cells.length) + ' target cells are ' + cells.join(', '), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private toggle(i: number): void {
@@ -141,6 +214,12 @@ export struct GFeatureMatrixRecall {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

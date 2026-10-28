@@ -4,10 +4,12 @@
  * 通关：C 柱上盘数 == 总盘数
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -20,6 +22,8 @@ export struct GHanoi {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private pegs: number[][] = [[], [], []];
   @State private sel: number = -1;      // 选中的柱子，-1 = 没选
   @State private moves: number = 0;
@@ -50,6 +54,149 @@ export struct GHanoi {
     this.moves = 0;
     this.done = false;
     this.startAt = Date.now();
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.done) {
+      return false;
+    }
+    const mv: number[] = this.hanoiNext();
+    if (mv[0] < 0) {
+      return false;
+    }
+    if (this.sel === mv[0]) {
+      this.tap(mv[1]);
+      return true;
+    }
+    if (this.sel >= 0) {
+      this.tap(this.sel);
+      return true;
+    }
+    this.tap(mv[0]);
+    return true;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 三柱 ≤5 盘 ⇒ 状态数 ≤ 243，直接 BFS 从「当前局面」找最短路的第一步
+  /** 下一步该走哪：返回 [从, 到]，无解返回 [-1, -1] */
+  private hanoiNext(): number[] {
+    const n: number = this.level;
+    const tot: number = Math.pow(3, n);
+    const pow3: number[] = [];
+    let w: number = 1;
+    for (let i = 0; i < n; i++) {
+      pow3.push(w);
+      w = w * 3;
+    }
+    let id0: number = 0;
+    for (let d = 1; d <= n; d++) {
+      let pg: number = 0;
+      for (let p = 0; p < 3; p++) {
+        if (this.pegs[p].indexOf(d) >= 0) {
+          pg = p;
+        }
+      }
+      id0 = id0 + pg * pow3[d - 1];
+    }
+    const goal: number = tot - 1;
+    if (id0 === goal) {
+      return [-1, -1];
+    }
+    const first: number[] = new Array<number>(tot).fill(-1);
+    const seen: boolean[] = new Array<boolean>(tot).fill(false);
+    const q: number[] = [id0];
+    seen[id0] = true;
+    let head: number = 0;
+    while (head < q.length) {
+      const cur: number = q[head];
+      head++;
+      const cp: number[] = [];
+      let x: number = cur;
+      for (let i = 0; i < n; i++) {
+        cp.push(x % 3);
+        x = Math.floor(x / 3);
+      }
+      for (let f = 0; f < 3; f++) {
+        let topF: number = 0;
+        for (let i = 0; i < n; i++) {
+          if (cp[i] === f) {
+            topF = i + 1;
+            break;
+          }
+        }
+        if (topF === 0) {
+          continue;
+        }
+        for (let t = 0; t < 3; t++) {
+          if (t === f) {
+            continue;
+          }
+          let topT: number = 0;
+          for (let i = 0; i < n; i++) {
+            if (cp[i] === t) {
+              topT = i + 1;
+              break;
+            }
+          }
+          if (topT !== 0 && topT < topF) {
+            continue;
+          }
+          const nid: number = cur - (f - t) * pow3[topF - 1];
+          if (seen[nid]) {
+            continue;
+          }
+          seen[nid] = true;
+          first[nid] = first[cur] >= 0 ? first[cur] : (f * 3 + t);
+          if (nid === goal) {
+            return [Math.floor(first[nid] / 3), first[nid] % 3];
+          }
+          q.push(nid);
+        }
+      }
+    }
+    return [-1, -1];
+  }
+
+  /** 提示：报「第几个盘从哪柱搬到哪柱」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.done) {
+      return Hint.none('none');
+    }
+    const mv: number[] = this.hanoiNext();
+    if (mv[0] < 0) {
+      return Hint.none('none');
+    }
+    const src: number[] = this.pegs[mv[0]];
+    const disk: number = src.length > 0 ? src[src.length - 1] : 0;
+    return Hint.make([mv[0], mv[1]],
+      TG2('把 {0} 号盘从第 {1} 根柱子搬到第 {2} 根柱子', String(disk), String(mv[0] + 1), String(mv[1] + 1)),
+      TG2('Move disk {0} from peg {1} to peg {2}', String(disk), String(mv[0] + 1), String(mv[1] + 1)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(p: number): void {
@@ -97,6 +244,12 @@ export struct GHanoi {
 
   build() {
     Column({ space: Space.lg }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

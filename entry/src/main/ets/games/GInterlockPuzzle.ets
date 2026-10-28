@@ -2,6 +2,8 @@
  * 互锁拼图 —— 卡榫互相咬住，只能先抽没人压着的那一块
  * 胜负：8 步内全部抽出 ⇒ 通关｜进度：已抽 / 总数 + 剩余步数
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -23,6 +25,8 @@ export struct GInterlockPuzzle {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -77,6 +81,60 @@ export struct GInterlockPuzzle {
     return n;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.moves >= this.diffTotal) {
+      return true;
+    }
+    this.pull(this.parts.map((p: number, i: number) => (p >= 0 && !this.gone[p] && this.pressure(p) === 0) ? i : -1).filter((v: number) => v >= 0)[0]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    for (let slot = 0; slot < this.parts.length; slot++) {
+      const p: number = this.parts[slot];
+      if (p < 0 || this.gone[p] || this.pressure(p) > 0) {
+        continue;
+      }
+      const r: number = Math.floor(slot / 3) + 1;
+      const c: number = (slot % 3) + 1;
+      return Hint.make([slot],
+        TG2('抽第 {0} 行第 {1} 格这个 {2}（没人压着）', String(r), String(c), GLYPH[p]),
+        TG2('Pull the {2} at row {0}, column {1} — nothing is holding it down', String(r), String(c), GLYPH[p]), t0);
+    }
+    return Hint.none('none');
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pull(slot: number): void {
     if (this.over) { return; }
     const p: number = this.parts[slot];
@@ -116,6 +174,12 @@ export struct GInterlockPuzzle {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("已拆 {0}/{1}", this.takenCount(), PIECES))
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.rose)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)

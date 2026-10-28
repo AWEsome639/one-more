@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -25,6 +27,8 @@ export struct GVennNumbers {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：要归类的数字个数（简单 4 / 普通 6 / 困难 8）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.pick(4, 6, 8);
 
   /** 0..diffTotal-1 */
@@ -57,6 +61,56 @@ export struct GVennNumbers {
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
     if (this.fbTo >= 0) { clearTimeout(this.fbTo); this.fbTo = -1; }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.aiPlace(0);
+    return !this.over;
+  }
+
+  /** 提示：这个数该放哪一块 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    for (let i = 0; i < this.items.length; i++) {
+      if (this.items[i].zone < 0) { continue; }
+      return Hint.make([i], TG2('{0} 属于「{1}」', String(this.items[i].v), this.zoneName(this.items[i].zone)),
+        TG2('{0} belongs to "{1}"', String(this.items[i].v), this.zoneName(this.items[i].zone)), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private reset(): void {
     this.clearAll();
     const src: number[] = BANK[Math.floor(Math.random() * BANK.length)];
@@ -117,8 +171,25 @@ export struct GVennNumbers {
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }
+  /** AI 用：选一个还没归位的数，点进它真正属于的区域 */
+  private aiPlace(_d: number): void {
+    for (let i = 0; i < this.items.length; i++) {
+      if (this.items[i].zone < 0) { continue; }
+      const z: number = this.items[i].zone;
+      this.tapChip(i);
+      this.tapZone(z);
+      return;
+    }
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) { Column({ space: 2 }) {
       Text((TG('归位'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.placed + '/6')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: 2 }) {

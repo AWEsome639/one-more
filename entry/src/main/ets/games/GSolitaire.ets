@@ -8,6 +8,8 @@
  * 牌编码：cardId = 花色×13 + 点数（A=0…K=12）；slot = cardId×2 + 是否正面。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -59,6 +61,8 @@ export struct GSolitaire {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：棋盘边长（原 GAP=4）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -209,6 +213,172 @@ export struct GSolitaire {
   }
 
   // ── 交互 ────────────────────────────────────────────────
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.stock.length === 0
+      && (this.waste.length === 0 || this.passes >= MAX_PASS)) {
+      return false;
+    }
+    if (this.waste.length > 0) {
+      const w: number = this.waste[this.waste.length - 1];
+      if (this.toFoundOk(w)) {
+        this.selP = 7;
+        this.selI = this.waste.length - 1;
+        this.moveToFound(suitOf(w));
+        return !this.over;
+      }
+    }
+    for (let p = 0; p < PILES; p++) {
+      const pile: number[] = this.piles[p];
+      if (pile.length === 0) {
+        continue;
+      }
+      const t: number = pile[pile.length - 1];
+      if (isUp(t) && this.toFoundOk(t)) {
+        this.selP = p;
+        this.selI = pile.length - 1;
+        this.moveToFound(suitOf(t));
+        return !this.over;
+      }
+    }
+    if (this.waste.length > 0) {
+      const w2: number = this.waste[this.waste.length - 1];
+      for (let q = 0; q < PILES; q++) {
+        if (this.stackOk(w2, q)) {
+          this.selP = 7;
+          this.selI = this.waste.length - 1;
+          this.moveToPile(q);
+          return !this.over;
+        }
+      }
+    }
+    for (let p = 0; p < PILES; p++) {
+      const pile: number[] = this.piles[p];
+      if (pile.length === 0) {
+        continue;
+      }
+      for (let i = 0; i < pile.length; i++) {
+        if (!isUp(pile[i]) || !this.runOk(p, i)) {
+          continue;
+        }
+        const exposes: boolean = (i === 0) || !isUp(pile[i - 1]);
+        if (!exposes) {
+          continue;
+        }
+        const card: number = pile[i];
+        for (let q = 0; q < PILES; q++) {
+          if (q === p || !this.stackOk(card, q)) {
+            continue;
+          }
+          this.selP = p;
+          this.selI = i;
+          this.moveToPile(q);
+          return !this.over;
+        }
+      }
+    }
+    this.tapStock();
+    return !this.over;
+  }
+
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 提示只报「现在哪张能收」—— 这款真正要动脑的是排牌序，报具体牌名最有用
+  /** 提示：报能收进基础堆的那张牌；没有就说先翻牌 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.waste.length > 0) {
+      const w: number = this.waste[this.waste.length - 1];
+      if (this.toFoundOk(w)) {
+        return Hint.make([],
+          TG2('废牌堆顶的 {0} 能收进基础堆', labelOf(w)),
+          TG2('Collect {0} from the waste', labelOf(w)), t0);
+      }
+    }
+    for (let p = 0; p < PILES; p++) {
+      const pile: number[] = this.piles[p];
+      if (pile.length === 0) {
+        continue;
+      }
+      const t: number = pile[pile.length - 1];
+      if (isUp(t) && this.toFoundOk(t)) {
+        return Hint.make([],
+          TG2('第 {0} 列顶上的 {1} 能收进基础堆', String(p + 1), labelOf(t)),
+          TG2('Collect {0} from column {1}', labelOf(t), String(p + 1)), t0);
+      }
+    }
+    // ★ 2026-10-28 补：能收的都报完了，再报"能摆到别列"的那一手。
+    //   代打就是这么走的；原来这里直接跳"先翻一张"，等于把人往错路上带。
+    if (this.waste.length > 0) {
+      const w2: number = this.waste[this.waste.length - 1];
+      for (let q2 = 0; q2 < PILES; q2++) {
+        if (this.stackOk(w2, q2)) {
+          return Hint.make([],
+            TG2('把废牌堆顶的 {0} 摆到第 {1} 列', labelOf(w2), String(q2 + 1)),
+            TG2('Move {0} from the waste to column {1}', labelOf(w2), String(q2 + 1)), t0);
+        }
+      }
+    }
+    for (let p2 = 0; p2 < PILES; p2++) {
+      const pile2: number[] = this.piles[p2];
+      if (pile2.length === 0) {
+        continue;
+      }
+      for (let i2 = 0; i2 < pile2.length; i2++) {
+        if (!isUp(pile2[i2]) || !this.runOk(p2, i2)) {
+          continue;
+        }
+        const exposes2: boolean = (i2 === 0) || !isUp(pile2[i2 - 1]);
+        if (!exposes2) {
+          continue;                    // 只有能掀出暗牌的那种搬法才值得报
+        }
+        const card2: number = pile2[i2];
+        for (let q3 = 0; q3 < PILES; q3++) {
+          if (q3 === p2 || !this.stackOk(card2, q3)) {
+            continue;
+          }
+          return Hint.make([],
+            TG2('把第 {0} 列的 {1} 整段搬到第 {2} 列', String(p2 + 1), labelOf(card2), String(q3 + 1)),
+            TG2('Move {0} from column {1} to column {2}', labelOf(card2), String(p2 + 1), String(q3 + 1)), t0);
+        }
+      }
+    }
+    if (this.stock.length > 0) {
+      return Hint.make([], TG('没有能收的牌了，先翻一张'), TG('Nothing to collect — turn a card'), t0);
+    }
+    return Hint.make([], TG('牌堆空了，把废牌洗回来'), TG('Reshuffle the waste'), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapStock(): void {
     if (this.over) {
       return;
@@ -562,6 +732,12 @@ export struct GSolitaire {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)

@@ -3,6 +3,8 @@
  * 规则：上下两间房，下面那间有 3 处摆设和上面不一样，点出来。
  * 胜负：找齐 3 处 ⇒ 通关；错点 3 次或超过 60 秒 ⇒ 失败。　进度：找到几处 / 失误 / 剩余秒
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -21,6 +23,8 @@ export struct GRoomInspector {
   @Prop theme: Theme = Theme.light();
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private up: string[] = []; @State private down: string[] = [];
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -68,6 +72,74 @@ export struct GRoomInspector {
     this.secs = this.secs - 1;
     if (this.secs <= 0) { this.finish(false); }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ★ 2026-10-28 修：不能拿 found.length 当 diffs 的下标 ——
+  //   diffs 是随机生成顺序，found 是点击顺序；玩家先点了 diffs[2]，
+  //   代打就会一直点已经找到的 diffs[1]（tap 里 return）⇒ 原地卡死、永远赢不了。
+  private nextDiff(): number {
+    for (let k: number = 0; k < this.diffs.length; k++) {
+      if (this.found.indexOf(this.diffs[k]) < 0) {
+        return this.diffs[k];
+      }
+    }
+    return -1;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const d: number = this.nextDiff();
+    if (d < 0) {
+      return true;
+    }
+    this.tap(d);
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 真值就是 this.diffs（生成时抽出来的三处不同）
+  /** 提示：报第几行第几列不同 + 两边分别是什么（报内容，不报下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.found.length >= DIFFS) {
+      return Hint.none('none');
+    }
+    const i: number = this.nextDiff();
+    if (i < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(i / COLS) + 1;
+    const c: number = (i % COLS) + 1;
+    return Hint.make([i],
+      TG2('第 {0} 行第 {1} 列不同 —— 上面是 {2}', String(r), String(c), this.up[i]) + '，下面是 ' + this.down[i],
+      TG2('Row {0}, column {1} differs: {2}', String(r), String(c), this.up[i]) + ' → ' + this.down[i], t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over) { return; }
     if (this.diffs.indexOf(i) >= 0) {
@@ -112,6 +184,12 @@ export struct GRoomInspector {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('找到'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

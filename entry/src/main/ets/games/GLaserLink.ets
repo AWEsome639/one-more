@@ -5,6 +5,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -36,6 +38,8 @@ export struct GLaserLink {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：棋盘边长（原 GS=7）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(7);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
 
@@ -127,6 +131,58 @@ export struct GLaserLink {
     }
     this.beam = lit; this.lit = n;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.aiTurn(0);
+    return !this.over;
+  }
+
+  /** 提示：哪面镜子要转 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.moves < this.slots.length) {
+      const i: number = this.slots[this.moves];
+      const rr: string = String(Math.floor(i / this.diffTotal) + 1);
+      const cc: string = String(i % this.diffTotal + 1);
+      return Hint.make([i], TG2('第 {0} 行第 {1} 列的镜子转一次（每面镜子都只差一次）', rr, cc),
+        TG2('Rotate the mirror at row {0}, column {1} once', rr, cc), t0);
+    }
+    return Hint.none('none');
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private reset(): void {
     this.moves = 0; this.score = 0; this.over = false; this.won = false; this.done = false;
     this.startAt = Date.now(); this.setup(); this.msg = TG(TG(TG('点 ／＼ 换朝向，把光折到 🎯'))); this.refresh();
@@ -168,8 +224,20 @@ export struct GLaserLink {
     const t: number = this.grid[i];
     return t > 0 ? (t === 1 ? Palette.cyan : Palette.amber) : this.theme.surface;
   }
+  /** AI 用：每面镜子都只需转一次（造局时把解态取反当开局）⇒ 按槽位顺序各转一次 */
+  private aiTurn(_d: number): void {
+    if (this.over || this.moves >= this.slots.length) { return; }
+    this.rotateAt(this.slots[this.moves]);
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("已亮 {0}/{1}", this.lit, this.dets.length))
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.lime)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)

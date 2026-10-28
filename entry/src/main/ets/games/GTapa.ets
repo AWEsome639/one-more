@@ -12,6 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -56,6 +57,8 @@ export struct GTapa {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(5);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -76,6 +79,8 @@ export struct GTapa {
   @State score: number = 0;
 
   private clueRuns: number[][] = [];
+  /** 生成时的答案黑格图（reset() 里存下来，代打照它涂） */
+  private sol: number[] = [];
   private timer: number = -1;
   private startAt: number = 0;
 
@@ -271,6 +276,7 @@ export struct GTapa {
 
   private reset(): void {
     const black: number[] = this.genBoard();
+    this.sol = black.slice();
     const runs: number[][] = [];
     const text: string[] = [];
     for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
@@ -419,6 +425,49 @@ export struct GTapa {
     Hint.toastResult(r, TG('这一步看不出哪格必须涂黑'));
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 真值直取：reset() 生成题目时就把答案黑格图存进了 this.sol
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const n: number = this.diffTotal * this.diffTotal;
+    if (this.sol.length < n) {
+      return false;
+    }
+    for (let i = 0; i < n; i++) {
+      if (this.cells[i] === 1 && this.sol[i] !== 1) {
+        this.tap(i);                   // 先擦掉涂错的格子
+        return !this.over;
+      }
+    }
+    for (let i = 0; i < n; i++) {
+      if (this.sol[i] === 1 && this.cells[i] !== 1) {
+        this.tap(i);                   // 再补上答案要的黑格
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -466,6 +515,12 @@ export struct GTapa {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('黑格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

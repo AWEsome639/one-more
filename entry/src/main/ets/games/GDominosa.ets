@@ -11,6 +11,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2, TG4 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -89,6 +90,8 @@ export struct GDominosa {
    *   修法：**对数固定为 TOTAL=10**（棋盘决定的），
    *   难度改到**步数上限**上（MAX_MOVES 本来就是为此准备的）。
    */
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = TOTAL;
   /** 本局可用步数：简单 120 / 普通 80 / 困难 56 */
   @State private moveCap: number = GDominosa.capNow();
@@ -288,6 +291,128 @@ export struct GDominosa {
     Hint.toastResult(r, TG('这一步看不出哪一对是唯一的'));
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  /** 求解：从当前局面铺满棋盘（每种点数组合只能用一次） */
+  private domSolve(used: boolean[], partner: number[], seen: boolean[], budget: number[]): boolean {
+    if (budget[0] <= 0) {
+      return false;
+    }
+    budget[0] = budget[0] - 1;
+    let f: number = -1;
+    for (let i = 0; i < H * W; i++) {
+      if (!used[i]) {
+        f = i;
+        break;
+      }
+    }
+    if (f < 0) {
+      return true;
+    }
+    used[f] = true;
+    const r: number = Math.floor(f / W);
+    const c: number = f - r * W;
+    const opts: number[] = [];
+    if (c + 1 < W && !used[f + 1]) { opts.push(f + 1); }
+    if (r + 1 < H && !used[f + W]) { opts.push(f + W); }
+    if (c > 0 && !used[f - 1]) { opts.push(f - 1); }
+    if (r > 0 && !used[f - W]) { opts.push(f - W); }
+    for (let k = 0; k < opts.length; k++) {
+      const j: number = opts[k];
+      let a: number = this.vals[f];
+      let b: number = this.vals[j];
+      if (a > b) { const t: number = a; a = b; b = t; }
+      const code: number = a * NV + b;
+      if (seen[code]) { continue; }
+      seen[code] = true;
+      used[j] = true;
+      partner[f] = j;
+      partner[j] = f;
+      if (this.domSolve(used, partner, seen, budget)) { return true; }
+      seen[code] = false;
+      used[j] = false;
+      partner[f] = -1;
+      partner[j] = -1;
+    }
+    used[f] = false;
+    return false;
+  }
+
+  /** 当前局面的一整套配对（解不出 → 空数组） */
+  private domPlan(): number[] {
+    const n: number = H * W;
+    const used: boolean[] = [];
+    const partner: number[] = [];
+    const seen: boolean[] = new Array<boolean>(NV * NV).fill(false);
+    for (let i = 0; i < n; i++) {
+      const o: number = this.owner[i];
+      used.push(o >= 0);
+      partner.push(o);
+    }
+    for (let i = 0; i < n; i++) {
+      const j: number = this.owner[i];
+      if (j > i) {
+        let a: number = this.vals[i];
+        let b: number = this.vals[j];
+        if (a > b) { const t: number = a; a = b; b = t; }
+        seen[a * NV + b] = true;
+      }
+    }
+    const budget: number[] = [6000];
+    if (!this.domSolve(used, partner, seen, budget)) {
+      return [];
+    }
+    return partner;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const plan: number[] = this.domPlan();
+    if (plan.length === 0) {
+      this.sel = -1;
+      return false;
+    }
+    if (this.sel >= 0) {
+      const j: number = plan[this.sel];
+      if (j < 0 || j >= plan.length) {
+        this.sel = -1;
+        return true;
+      }
+      this.tap(j);
+      return !this.over;
+    }
+    let f: number = -1;
+    for (let i = 0; i < H * W; i++) {
+      if (this.owner[i] < 0 && plan[i] >= 0) {
+        f = i;
+        break;
+      }
+    }
+    if (f < 0) {
+      return false;
+    }
+    this.tap(f);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -361,6 +486,12 @@ export struct GDominosa {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('已配对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

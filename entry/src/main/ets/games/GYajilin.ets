@@ -2,6 +2,8 @@
  *  玩法：点白格涂黑；带箭头的线索格不可取消。过关判据：4 题全部成环
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -35,6 +37,8 @@ export struct GYajilin {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -162,6 +166,72 @@ export struct GYajilin {
     return count === kept.length;
   }
 
+  /** 代打/提示共用：本题答案里还没涂黑的格子（没有一个就 -1） */
+  private autoCell(): number {
+    for (let k = 0; k < this.cur.black.length; k++) {
+      const i: number = this.cur.black[k];
+      if (!this.blackAt(i)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.autoCell() < 0) {
+      return true;
+    }
+    this.tap(this.autoCell());
+    return !this.over;
+  }
+
+  // 真值就在 this.cur.black（题库里每题的黑格答案；settle 判单回路）
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const i: number = this.autoCell();
+    if (i < 0) {
+      return Hint.none('none');
+    }
+    let left: number = 0;
+    for (let k = 0; k < this.cur.black.length; k++) {
+      if (!this.blackAt(this.cur.black[k])) {
+        left++;
+      }
+    }
+    return Hint.make([i],
+      '第' + String(Math.floor(i / N) + 1) + '行第' + String(i % N + 1) + '列涂黑（本题还差 ' + String(left) + ' 格）',
+      'Blacken row ' + String(Math.floor(i / N) + 1) + ', column ' + String(i % N + 1), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.fixed[i]) { return; }
     const next: boolean[] = this.mine.slice();
@@ -216,6 +286,12 @@ export struct GYajilin {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

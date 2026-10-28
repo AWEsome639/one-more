@@ -3,6 +3,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -35,6 +37,8 @@ export struct GMissingVowels {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT_MS);
   onFinish: (r: GameResult) => void = () => {};
   @State queue: number[] = []; @State qIndex: number = 0; @State right: number = 0;
@@ -69,6 +73,77 @@ export struct GMissingVowels {
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时：答案是 {0}', this.word()); this.advance(); }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 没有"答案字段"—— 答案就是当前单词的元音序列，按顺序一个个点
+  /** 当前该点的下一个元音（'' = 没有了） */
+  private aiNextVowel(): string {
+    const w: string = this.word();
+    let k: number = 0;
+    for (let i = 0; i < w.length; i++) {
+      const ch: string = w.charAt(i);
+      if (isVowel(ch)) {
+        if (k === this.filled.length) {
+          return ch;
+        }
+        k = k + 1;
+      }
+    }
+    return '';
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.feed >= 0) {
+      return true;              // 反馈中，等下一题
+    }
+    const v: string = this.aiNextVowel();
+    if (v.length === 0) {
+      return false;
+    }
+    this.tap(v);
+    return !this.over;
+  }
+
+  /** 提示：报下一个该点的元音（单词已显示，报字母而不是下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.feed >= 0) {
+      return Hint.none('none');
+    }
+    const v: string = this.aiNextVowel();
+    if (v.length === 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([], TG2('下一个元音是 {0}（第 {1} 个）', v, this.filled.length + 1),
+      TG2('Next vowel: {0}', v), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(v: string): void {
     if (this.over || this.feed >= 0 || this.filled.length >= this.blanks()) { return; }
     const next: string[] = this.filled.concat([v]); this.filled = next;
@@ -111,6 +186,12 @@ export struct GMissingVowels {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

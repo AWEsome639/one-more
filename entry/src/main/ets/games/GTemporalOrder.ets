@@ -3,6 +3,8 @@
  * 胜负：5 题答对 ≥ 4 ⇒ 通关　｜　进度：题号 / 答对 / 得分
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -32,6 +34,8 @@ export struct GTemporalOrder {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State opts: Ev[] = []; @State orig: number[] = []; @State picked: number[] = []; @State plan: number[] = [];
@@ -69,6 +73,71 @@ export struct GTemporalOrder {
     for (let i = 0; i < order.length; i++) { shown.push(set[order[i]]); }
     this.opts = shown; this.orig = order; this.picked = []; this.locked = false;
     this.msg = TG2("第 {0} / {1} 题：按发生先后依次点",Digits(String(this.round), this.langCode),Digits(String(this.diffTotal), this.langCode));
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.locked || this.nextIdx() < 0) {
+      return true;
+    }
+    this.tap(this.nextIdx());
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 真值在 orig 里：orig[j] = 第 j 张牌在正确顺序里的位次
+  /** 下一次该点哪张（找不到返回 -1） */
+  private nextIdx(): number {
+    const k: number = this.picked.length;
+    if (k >= 4) {
+      return -1;
+    }
+    for (let j = 0; j < this.orig.length; j++) {
+      if (this.orig[j] === k) {
+        return j;
+      }
+    }
+    return -1;
+  }
+
+  /** 提示：报下一步是哪一个事件（名字 + 图标，不报下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const j: number = this.nextIdx();
+    if (this.over || this.locked || j < 0) {
+      return Hint.none('none');
+    }
+    const ev: Ev = this.opts[j];
+    return Hint.make([j],
+      TG2('第 {0} 步是 {1}', String(this.picked.length + 1), ev.t) + ' ' + ev.e,
+      TG2('Step {0}: {1}', String(this.picked.length + 1), ev.t), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(i: number): void {
@@ -119,6 +188,12 @@ export struct GTemporalOrder {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

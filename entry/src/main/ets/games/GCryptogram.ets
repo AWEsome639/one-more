@@ -2,6 +2,8 @@
  * 密文破译 —— 单词被整体平移若干位（凯撒位移），靠已知映射还原明文
  * 胜负：8 关解出 ≥6 关通关，错 3 次即失败；每揭一条「密文→明文」映射扣 30 分
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -36,6 +38,8 @@ export struct GCryptogram {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State order: number[] = []; @State qi: number = 0; @State word: string = '';
@@ -77,6 +81,55 @@ export struct GCryptogram {
     this.revealed = this.revealed + 1; this.score = this.score > HINT_COST ? this.score - HINT_COST : 0;
     this.msg = TG('🔎 又揭晓一条映射');
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.autoSubmit(this.word);
+    return !this.over;
+  }
+
+  // 明文就在 this.word（submit 比的就是 guess === word）
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const it: Item = this.cur();
+    return Hint.make([],
+      '明文是「' + this.word + '」（' + it.hint + '）· 密文每个字母后移了 ' + String(this.k) + ' 位',
+      'The plaintext is "' + this.word + '" (shifted by ' + String(this.k) + ')', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
+  private autoSubmit(s: string): void {
+    this.input = s;
+    this.submit();
+  }
+
   private submit(): void {
     if (this.over) { return; }
     const guess: string = this.input.trim().toUpperCase();
@@ -116,6 +169,12 @@ export struct GCryptogram {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

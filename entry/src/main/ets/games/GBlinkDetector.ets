@@ -3,6 +3,8 @@
  * 胜负：10 次眨眼内命中 ≥6 且误报 ≤3 通关
  * 进度：进度 / 抓到 / 误报 / 得分
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -22,6 +24,8 @@ export struct GBlinkDetector {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -39,6 +43,7 @@ export struct GBlinkDetector {
   aboutToDisappear(): void {
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
     if (this.blinkTo >= 0) { clearTimeout(this.blinkTo); this.blinkTo = -1; }
+    this.stopAuto();                   // ★ 代打是 120ms 的定时器，离页必须停
   }
 
   private reset(): void {
@@ -68,6 +73,90 @@ export struct GBlinkDetector {
     this.blinkTo = setTimeout(() => { this.blinkTo = -1; this.eye = false; }, BLINK_MS);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (!this.eye || this.responded) {
+      return true;
+    }
+    this.tap();
+    return !this.over;
+  }
+
+  /** 下一次眨眼还有几拍（-1 = 本局不再眨眼） */
+  private nextBlinkIn(): number {
+    let best: number = -1;
+    for (let i = 0; i < this.plan.length; i++) {
+      const d: number = this.plan[i] - this.tickN;
+      if (d > 0 && (best < 0 || d < best)) {
+        best = d;
+      }
+    }
+    return best;
+  }
+
+  // 答案就在状态里（眼睛闭着的这 0.2 秒就是答案）+ 有"已回应"守卫
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.eye && !this.responded) {
+      return Hint.make([], TG('眼睛正闭着 —— 立刻点「眨眼了！」'),
+        'Eyes are closed right now - tap now', t0);
+    }
+    const k: number = this.nextBlinkIn();
+    if (k < 0) {
+      return Hint.make([], TG('本局不会再眨了，等结算'),
+        'No more blinks this round', t0);
+    }
+    return Hint.make([],
+      TG2('再过 {0} 拍才眨（约 {1} 秒），先别点', String(k), String(Math.max(1, Math.round(k * TICK_MS / 1000)))),
+      'Next blink in ' + String(k) + ' ticks - hold', t0);
+  }
+
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    // ★★★ 这款不能用 Hint.AUTO_MS(320ms)：眨眼窗口只有 BLINK_MS=200ms，
+    //    320ms 一拍只能碰上约六成眨眼 ⇒ 命中经常卡在 6/10 的及格线上。
+    //    节拍缩到 120ms（< 200ms 窗口）就能拍进每一次眨眼，逻辑与 Hint.autoRun 完全一致。
+    let id: number = -1;
+    id = setInterval(() => {
+      let more: boolean = false;
+      try {
+        more = this.autoStep();
+      } catch (e) {
+        more = false;
+      }
+      if (!more && id >= 0) {
+        clearInterval(id);
+      }
+    }, 120);
+    this.autoId = id;
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(): void {
     if (this.over) { return; }
     if (this.eye && !this.responded) {
@@ -95,6 +184,12 @@ export struct GBlinkDetector {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

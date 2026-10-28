@@ -2,6 +2,8 @@
  * 瞬脱探针 —— 两问：流里那个数字 T1 是几？T1 之后有没有闪过「探针 ✦」？
  * 胜负：4 轮共 8 分，拿到 6 分以上 ⇒ 通关；进度：轮次 / 得分 / 阶段
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -25,6 +27,8 @@ export struct GAttentionalBlinkProbe {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State private seq: string[] = [];
@@ -101,6 +105,69 @@ export struct GAttentionalBlinkProbe {
       this.tickTo = setTimeout(() => { this.tickTo = -1; this.play(k + 1); }, 60);
     }, 190);
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase === 0 || this.pick >= 0) {
+      return true;
+    }
+    if (this.phase === 1) {
+      const k: number = this.opts.indexOf(this.t1);
+      if (k < 0) {
+        return false;
+      }
+      this.answerDigit(k);
+      return !this.over;
+    }
+    this.answerProbe(this.hasProbe);
+    return !this.over;
+  }
+
+  /** 提示：两问分别报「数字是几」「有没有 ✦」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase === 1) {
+      const k: number = this.opts.indexOf(this.t1);
+      return Hint.make([k < 0 ? 0 : k],
+        TG2('刚才的数字是 {0}', this.t1),
+        TG2('The number was {0}', this.t1), t0);
+    }
+    if (this.phase === 2) {
+      return this.hasProbe
+        ? Hint.make([1], TG('这一轮有 ✦ 探针'), TG('There was a ✦ probe'), t0)
+        : Hint.make([0], TG('这一轮没有 ✦ 探针'), TG('There was no ✦ probe'), t0);
+    }
+    return Hint.none(TG('序列还在闪现，等出题之后再提示'));
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answerDigit(i: number): void {
     if (this.phase !== 1 || this.pick >= 0) { return; }
     this.pick = i;
@@ -152,6 +219,12 @@ export struct GAttentionalBlinkProbe {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.trialNo + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)

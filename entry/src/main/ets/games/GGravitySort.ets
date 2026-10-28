@@ -2,6 +2,8 @@
  * 重力排序 —— 点列让整列重力塌落，同色叠在一起就消掉
  * 胜负：22 步内清空棋盘 ⇒ 通关｜进度：已消 / 总数 + 剩余步数
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -22,6 +24,8 @@ export struct GGravitySort {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -53,6 +57,95 @@ export struct GGravitySort {
   }
 
   /** 点一列：取该列最上面那块的颜色，同色全吸走，其余向下塌实 */
+  /** 代打：哪一列最值得点（该列最上面那种颜色出现最多的一列） */
+  private autoCol(): number {
+    let best: number = 0;
+    let bestN: number = -1;
+    for (let c = 0; c < COLS; c++) {
+      let top: number = -1;
+      for (let r = 0; r < ROWS; r++) {
+        const v: number = this.grid[this.idx(r, c)];
+        if (v >= 0) {
+          top = v;
+          break;
+        }
+      }
+      if (top < 0) {
+        continue;
+      }
+      let cnt: number = 0;
+      for (let r = 0; r < ROWS; r++) {
+        if (this.grid[this.idx(r, c)] === top) {
+          cnt++;
+        }
+      }
+      if (cnt > bestN) {
+        bestN = cnt;
+        best = c;
+      }
+    }
+    return best;
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.drop(this.autoCol());
+    return !this.over;
+  }
+
+  // 点列 = 吸走该列最上面那种颜色 ⇒ 挑同色最多的一列报出来
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const c: number = this.autoCol();
+    let top: number = -1;
+    let cnt: number = 0;
+    for (let r = 0; r < ROWS; r++) {
+      const v: number = this.grid[this.idx(r, c)];
+      if (v >= 0) {
+        top = v;
+        break;
+      }
+    }
+    for (let r = 0; r < ROWS; r++) {
+      if (this.grid[this.idx(r, c)] === top) {
+        cnt++;
+      }
+    }
+    if (top < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([], '点第 ' + String(c + 1) + ' 列，一次吸走 ' + String(cnt) + ' 块同色（还剩 ' + String(this.remain()) + ' 块）',
+      'Tap column ' + String(c + 1) + ' to remove ' + String(cnt) + ' blocks', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private drop(c: number): void {
     if (this.over) { return; }
     const live: number[] = [];
@@ -98,6 +191,12 @@ export struct GGravitySort {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("已消 {0}/{1}", (ROWS * COLS - this.remain()), (ROWS * COLS)))
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)

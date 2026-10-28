@@ -1,4 +1,6 @@
 /** 斐波那契合并 —— 合并斐波那契数；玩法：点两个相邻格子，若两数之和也是斐波那契数 ⇒ 合并成和，另一格补新数；胜负：合出 21 ⇒ 通关；错 3 次 ⇒ 失败 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -19,6 +21,8 @@ export struct GFibonacciMerge {
   @Prop theme: Theme = Theme.light();
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private cells: number[] = [];
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -47,6 +51,79 @@ export struct GFibonacciMerge {
     this.cells = list; this.sel = -1; this.best = 1; this.lives = this.total; this.score = 0; this.moves = 0; this.shakeX = 8; setTimeout(() => { this.shakeX = -8; }, 60); setTimeout(() => { this.shakeX = 0; }, 120);
     this.over = false; this.won = false; this.finished = false; this.startAt = Date.now(); this.msg = TG('点两个相邻格子：和是斐波那契数就合并');
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const lo: number = this.findPair();
+    if (lo < 0) {
+      return false;
+    }
+    if (this.sel < 0) {
+      this.tap(lo);
+      return true;
+    }
+    this.tap(this.sel === lo ? lo + 1 : this.sel);
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 相邻两格的和是斐波那契数就能合 ⇒ 每次挑「和最大」的那一对，冲 21
+  /** 该合哪一对的左格（没有合法对返回 -1 —— 这时绝不能乱点，会掉命） */
+  private findPair(): number {
+    let best: number = -1;
+    let bestSum: number = 0;
+    for (let i = 0; i + 1 < this.cells.length; i++) {
+      const sum: number = this.cells[i] + this.cells[i + 1];
+      if (isFib(sum) && sum > bestSum) {
+        bestSum = sum;
+        best = i;
+      }
+    }
+    return best;
+  }
+
+  /** 提示：报要合的两格和它们的和 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const lo: number = this.findPair();
+    if (lo < 0) {
+      return Hint.none('none');
+    }
+    const sum: number = this.cells[lo] + this.cells[lo + 1];
+    return Hint.make([lo, lo + 1],
+      TG2('合第 {0}、{1} 格 —— 和是 {2}', String(lo + 1), String(lo + 2), String(sum)),
+      TG2('Merge cells {0} and {1} — their sum is {2}', String(lo + 1), String(lo + 2), String(sum)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over) { return; }
     if (this.sel < 0) { this.sel = i; return; }
@@ -81,6 +158,12 @@ export struct GFibonacciMerge {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('最大'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

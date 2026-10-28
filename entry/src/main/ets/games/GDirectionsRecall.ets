@@ -8,6 +8,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -23,6 +24,8 @@ export struct GDirectionsRecall {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(PASS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -70,6 +73,53 @@ export struct GDirectionsRecall {
       this.phase = 'input';
       this.note = TG(TG(TG('轮到你了 —— 按原顺序点回来')));
     }, GAP_MS + len * FLASH_MS));
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.phase === 'done') {
+      return false;
+    }
+    if (this.phase !== 'input') {
+      return true;
+    }
+    this.tap(this.seq[this.input.length]);
+    return true;
+  }
+
+  /** 提示：按闪出的顺序报出这一步该点的箭头 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.phase !== 'input') { return Hint.none('none'); }
+    if (this.input.length >= this.seq.length) { return Hint.none('none'); }
+    const d: number = this.seq[this.input.length];
+    return Hint.make([],
+      TG2('这一步按 {0}（第 {1} 个）', ARROW[d], String(this.input.length + 1)),
+      'Next arrow: ' + ARROW[d], t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(d: number): void {
@@ -133,6 +183,12 @@ export struct GDirectionsRecall {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
             Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", Math.min(this.round + 1, ROUNDS.length), ROUNDS.length)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG2('长度 {0}', String(this.seq.length > 0 ? this.seq.length : ROUNDS[0]))).fontSize(FontSize.md).fontColor(Palette.sky).layoutWeight(1)

@@ -1,6 +1,8 @@
 /** 三重序列 📈（id: triple_sequence）
  * 三行光点各自按固定节拍循环（周期 2/3/4 不等），一次猜出三行的下一拍位置；
  * 5 拍猜中 ≥11 个 ⇒ 通关，否则失败。 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -21,6 +23,8 @@ export struct GTripleSequence {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：STEPS 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(STEPS);
   onFinish: (r: GameResult) => void = () => {};
   @State periods: number[] = [];
@@ -56,6 +60,79 @@ export struct GTripleSequence {
   private beacon(i: number): number {
     return i < this.periods.length ? this.step % this.periods[i] : -1;
   }
+  /** 代打/提示共用：第 i 行下一拍该点的格（judge 里就是 (step + 1) % periods[i]） */
+  private ansAt(i: number): number {
+    return i < this.periods.length ? (this.step + 1) % this.periods[i] : -1;
+  }
+
+  /** 代打：还有哪一行没点（全点完就 0，等 judge 的定时器） */
+  private autoRow(): number {
+    for (let i = 0; i < ROWS.length; i++) {
+      if (this.picks.length > i && this.picks[i] < 0) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
+  private autoCol(): number {
+    return this.ansAt(this.autoRow());
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.picks.indexOf(-1) < 0) {
+      return true;
+    }
+    this.pick(this.autoRow(), this.autoCol());
+    return !this.over;
+  }
+
+  // 答案 = (step + 1) % periods[i]（judge 里就是这么比的），报的是格号内容
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.picks.indexOf(-1) < 0) {
+      return Hint.none('none');
+    }
+    const cells: number[] = [];
+    const parts: string[] = [];
+    for (let i = 0; i < ROWS.length; i++) {
+      const c: number = this.ansAt(i);
+      if (c < 0) {
+        return Hint.none('none');
+      }
+      cells.push(i * CELLS.length + c);
+      parts.push('第' + String(i + 1) + '行第' + String(c + 1) + '格');
+    }
+    return Hint.make(cells, '三行各点：' + parts.join('、'),
+      'Tap ' + parts.join(' / '), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(i: number, c: number): void {
     if (this.over || this.picks[i] >= 0) { return; }
     const p: number[] = this.picks.slice();
@@ -105,6 +182,12 @@ export struct GTripleSequence {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2('第 {0}/{1} 拍 · 命中 {2}', String(Math.min(this.rounds + 1, this.diffTotal)),Digits(String(this.diffTotal), this.langCode),Digits(String(this.hits), this.langCode)) +
         TG2('/{0} · 三行各点一格', String(NEED)))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')

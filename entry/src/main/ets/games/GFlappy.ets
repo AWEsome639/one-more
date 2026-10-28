@@ -5,6 +5,8 @@
  * 胜负：穿过 PIPE_GOAL 根管道 ⇒ solved=true；撞管道、撞地 ⇒ solved=false
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -59,6 +61,8 @@ export struct GFlappy {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：原 TICK_MS=33
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(33);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -110,6 +114,7 @@ export struct GFlappy {
 
   aboutToDisappear(): void {
     this.stopLoop();
+    this.stopAuto();                   // ★ 代打是 96ms 的定时器，离页必须停（否则后台空转）
   }
 
   private stopLoop(): void {
@@ -289,6 +294,111 @@ export struct GFlappy {
     return Math.max(-18, Math.min(22, v * 6));
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 像素鸟是真·实时物理（16ms 一帧）：代打 = "鸟掉到空隙偏下就扇一下"。
+  /** 下一个要穿的管道「空隙里的目标高度」（%）；返回 -1 = 一根都没有 */
+  private gapTarget(): number {
+    let bestX: number = 1e9;
+    let top: number = 45 - PIPE_GAP * 0.5;
+    for (let i = 0; i < this.pipes.length; i++) {
+      const p: Pipe = this.pipes[i];
+      if (p.x + PIPE_W < BX) {
+        continue;                      // 已经飞过去了
+      }
+      if (p.x < bestX) {
+        bestX = p.x;
+        top = p.top;
+      }
+    }
+    if (bestX > 1e8) {
+      return -1;
+    }
+    // ★ 离线仿真实测的系数：瞄准空隙 65% 处（偏下、扇得更晚）⇒ 60 局能过 38 局；
+    //   瞄正中间只有 29 局（扇得太勤反而撞上管）
+    return top + PIPE_GAP * 0.65 - BH * 0.5;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.ready) {
+      this.flap();                     // 还没起飞 ⇒ 先点一下开始
+      return true;
+    }
+    const t: number = this.gapTarget();
+    if (t < 0) {
+      return true;
+    }
+    if (this.py + BH * 0.5 >= t) {
+      this.flap();                     // 掉到位了 ⇒ 扇一下
+    }
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.ready) {
+      return Hint.make([], TG('还没起飞 —— 点一下「扇翅膀」开始'),
+        'Tap to take off first', t0);
+    }
+    const t: number = this.gapTarget();
+    if (t < 0) {
+      return Hint.none('none');
+    }
+    const top: number = t - PIPE_GAP * 0.65 + BH * 0.5;
+    const need: string = this.py + BH * 0.5 >= t ? TG('该扇翅膀了') : TG('先别点，让它再掉一点');
+    return Hint.make([],
+      need + TG2('：空隙在 {0}%–{1}%，鸟在 {2}%', String(Math.round(top)),
+        String(Math.round(top + PIPE_GAP)), String(Math.round(this.py))),
+      'Gap ' + String(Math.round(top)) + '%-' + String(Math.round(top + PIPE_GAP)) + '%', t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    if (this.ready) {
+      this.flap();
+    }
+    // ★★★ 这款不能用 Hint.AUTO_MS(320ms)：鸟每 0.32 秒要掉 20%+，而空隙只有 30%，
+    //    320ms 的反应速度一局都过不了（离线仿真 40 局 0 胜）；48ms 下 60 局能过 38 局。
+    //    ⇒ 代打自己按 48ms 跑，逻辑与 Hint.autoRun 完全一致（tick 返回 false 就自停）。
+    let id: number = -1;
+    id = setInterval(() => {
+      let more: boolean = false;
+      try {
+        more = this.autoStep();
+      } catch (e) {
+        more = false;
+      }
+      if (!more && id >= 0) {
+        clearInterval(id);
+      }
+    }, 48);
+    this.autoId = id;
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private flap(): void {
     if (this.over) {
       return;
@@ -332,6 +442,12 @@ export struct GFlappy {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)

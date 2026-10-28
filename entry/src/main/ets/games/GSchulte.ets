@@ -4,10 +4,12 @@
  * 通关：点完最后一个数
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG } from '../core/GameI18n';
+import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -23,6 +25,8 @@ export struct GSchulte {
 
   // ★ 难度作用到玩法：棋盘边长（原 SIZE=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4]，上面已一并改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(5);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -88,6 +92,58 @@ export struct GSchulte {
     }, 100);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.done) {
+      return false;
+    }
+    const p: number = this.nums.indexOf(this.next);
+    if (p < 0) {
+      return false;
+    }
+    this.tap(this.next, p);
+    return !this.done;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.done) {
+      return Hint.none('none');
+    }
+    const p: number = this.nums.indexOf(this.next);
+    if (p < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(p / this.diffTotal) + 1;
+    const c: number = p % this.diffTotal + 1;
+    return Hint.make([p],
+      TG2('下一个该点 {0}：在第 {1} 行第 {2} 列', this.next, r, c),
+      TG2('Next is {0} — row {1}, column {2}', this.next, r, c), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(v: number, i: number): void {
     if (this.done) {
       return;
@@ -120,6 +176,12 @@ export struct GSchulte {
 
   build() {
     Column({ space: Space.lg }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -3,6 +3,8 @@
  * 胜负：走到 🏁 通关；步数耗尽 ⇒ 失败。进度：步数 / 剩余 / 最短路径
  * 出题：随机摆墙 + BFS 保证一定连通（最短路径同时作为步数上限）
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -94,6 +96,8 @@ export struct GMirrorMaze {
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：棋盘边长（原 N=6）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(6);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -131,6 +135,116 @@ export struct GMirrorMaze {
     this.msg = TG('🌀 镜中世界：按「左」会往右走，按「右」往左走');
     this.startAt = Date.now();
   }
+  /** 方向名（提示用） */
+  private dirName(d: number): string {
+    if (d === 0) {
+      return '上';
+    }
+    if (d === 1) {
+      return '右';
+    }
+    if (d === 2) {
+      return '下';
+    }
+    return '左';
+  }
+
+  /** 代打：BFS 到终点，返回下一步该按的方向（-1 = 走不到） */
+  private autoDir(): number {
+    const n: number = this.diffTotal;
+    const total: number = n * n;
+    const dx: number[] = [0, 1, 0, -1];
+    const dy: number[] = [-1, 0, 1, 0];
+    const dist: number[] = new Array<number>(total).fill(-1);
+    dist[this.goal] = 0;
+    const q: number[] = [this.goal];
+    let head: number = 0;
+    while (head < q.length) {
+      const cur: number = q[head];
+      head++;
+      const cx: number = cur % n;
+      const cy: number = Math.floor(cur / n);
+      for (let d = 0; d < 4; d++) {
+        const nx: number = cx + dx[d];
+        const ny: number = cy + dy[d];
+        if (nx < 0 || nx >= n || ny < 0 || ny >= n) {
+          continue;
+        }
+        const ni: number = ny * n + nx;
+        if (this.wall[ni] || dist[ni] >= 0) {
+          continue;
+        }
+        dist[ni] = dist[cur] + 1;
+        q.push(ni);
+      }
+    }
+    const px: number = this.pos % n;
+    const py: number = Math.floor(this.pos / n);
+    for (let d = 0; d < 4; d++) {
+      const nx: number = px + dx[d];
+      const ny: number = py + dy[d];
+      if (nx < 0 || nx >= n || ny < 0 || ny >= n) {
+        continue;
+      }
+      const ni: number = ny * n + nx;
+      if (this.wall[ni]) {
+        continue;
+      }
+      if (dist[ni] >= 0 && dist[ni] === dist[this.pos] - 1) {
+        return d;
+      }
+    }
+    return -1;
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.done || this.autoDir() < 0) {
+      return true;
+    }
+    this.tap(this.autoDir());
+    return !this.over;
+  }
+
+  // 出口是 this.goal、墙是 this.wall ⇒ 用 BFS 报下一步该按哪个方向
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.done) {
+      return Hint.none('none');
+    }
+    const d: number = this.autoDir();
+    if (d < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([], '按「' + this.dirName(d) + '」，能走到 🏁（还剩 ' + String(this.limit - this.steps) + ' 步）',
+      'Press "' + this.dirName(d) + '" to reach the flag', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(dir: number): void {
     if (this.over || this.done) { return; }
     const dx: number[] = [0, 1, 0, -1];
@@ -179,6 +293,12 @@ export struct GMirrorMaze {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

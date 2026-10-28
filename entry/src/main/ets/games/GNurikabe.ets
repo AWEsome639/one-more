@@ -12,6 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -50,6 +51,30 @@ const CLUE_LIB: number[][] = [
     0,1,0,0,0
   ]
 ];
+const NURI_SOL: number[][] = [
+  // 与 CLUE_LIB 一一对应：1 = 涂黑，0 = 白（离线算出来的合法解）
+  [
+    1, 0, 0, 0, 1,
+    1, 1, 1, 1, 1,
+    0, 0, 0, 1, 0,
+    1, 1, 1, 1, 0,
+    0, 0, 0, 1, 1
+  ],
+  [
+    0, 1, 0, 1, 0,
+    0, 1, 1, 1, 0,
+    0, 1, 0, 0, 1,
+    1, 1, 1, 1, 1,
+    1, 0, 0, 1, 0
+  ],
+  [
+    0, 0, 1, 0, 1,
+    1, 1, 1, 0, 1,
+    0, 0, 1, 1, 1,
+    1, 1, 1, 0, 0,
+    1, 0, 1, 0, 0
+  ]
+];
 
 @Component
 export struct GNurikabe {
@@ -66,6 +91,8 @@ export struct GNurikabe {
    *     · 困难 7×7：索引 25..48 是 undefined ⇒ **一个线索都没有 ⇒ 无解**
    *   ⇒ 修法：**棋盘固定 5×5**，难度改到容错次数上。
    */
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = 5;
   /** 本局允许的错误次数：简单 6 / 普通 3 / 困难 2 */
   @State private errMax: number = GNurikabe.errNow();
@@ -307,6 +334,30 @@ export struct GNurikabe {
         }
       }
     }
+    // ★ 2026-10-28 补：题库是固定的（CLUE_LIB 只有 3 题），每题的解已离线算好放在 NURI_SOL
+    //   ⇒ 两条启发式都推不出来时，直接照真值报一格。
+    //   查表是 O(题数×格数)，不会像 DFS 那样冻界面。
+    const want: number[] = this.wantBlacks();
+    if (want.length >= total) {
+      for (let i = 0; i < total; i++) {
+        if (this.clues[i] > 0) {
+          continue;                    // 线索格必是白、不用点
+        }
+        const cur2: number = this.blacks[i] === 1 ? 1 : 0;
+        if (want[i] === cur2) {
+          continue;
+        }
+        const rr2: number = Math.floor(i / n) + 1;
+        const cc2: number = (i % n) + 1;
+        return Hint.make([i],
+          want[i] === 1
+            ? TG2('第 {0} 行第 {1} 列要涂黑（当墙）', String(rr2), String(cc2))
+            : TG2('第 {0} 行第 {1} 列要留白（属于某个岛）', String(rr2), String(cc2)),
+          want[i] === 1
+            ? TG2('Row {0}, column {1} → wall', String(rr2), String(cc2))
+            : TG2('Row {0}, column {1} → island', String(rr2), String(cc2)), t0);
+      }
+    }
     return Hint.none('none');
   }
 
@@ -366,6 +417,70 @@ export struct GNurikabe {
     return n;
   }
 
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // CLUE_LIB 是固定题库（只有 3 题）⇒ 每题的解已经离线算好放在 NURI_SOL
+  /** 按本题线索在库里找到对应解；找不到返回空数组 */
+  private wantBlacks(): number[] {
+    const total: number = this.diffTotal * this.diffTotal;
+    for (let k = 0; k < CLUE_LIB.length; k++) {
+      if (k >= NURI_SOL.length) {
+        continue;
+      }
+      const cl: number[] = CLUE_LIB[k];
+      let same: boolean = true;
+      for (let i = 0; i < total; i++) {
+        if (cl[i] !== this.clues[i]) {
+          same = false;
+          break;
+        }
+      }
+      if (same) {
+        return NURI_SOL[k];
+      }
+    }
+    return [];
+  }
+
+  private autoStep(): boolean {
+    const total: number = this.diffTotal * this.diffTotal;
+    if (this.over) {
+      return false;
+    }
+    const want: number[] = this.wantBlacks();
+    if (want.length < total) {
+      return false;
+    }
+    for (let i = 0; i < total; i++) {
+      if (this.clues[i] > 0) {
+        continue;
+      }
+      const cur: number = this.blacks[i] === 1 ? 1 : 0;
+      if (want[i] !== cur) {
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tap(i: number): void {
     if (this.over || this.clues[i] > 0) {
       return;      // 提示格固定是岛，不可涂黑
@@ -413,6 +528,12 @@ export struct GNurikabe {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已满足提示'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

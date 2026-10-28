@@ -1,4 +1,6 @@
 /** 分数披萨 —— 按分数切披萨；玩法：按题目的分数点亮同样多的披萨片，点「确认」判定；胜负：6 题答对 ≥5 ⇒ 通关；否则失败 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -16,6 +18,8 @@ export struct GFractionalPizza {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State private d: number = 4;
@@ -52,6 +56,69 @@ export struct GFractionalPizza {
     for (let i = 0; i < this.d; i++) { list.push(i); }
     this.slots = list; this.sel = new Array<boolean>(this.d).fill(false); this.onCount = 0; this.checked = false; this.ok = false;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.checked) {
+      return true;               // 判定中，等 900ms 进下一题
+    }
+    if (this.onCount < this.n) {
+      for (let i = 0; i < this.sel.length; i++) {
+        if (!this.sel[i]) {
+          this.tap(i);
+          return true;
+        }
+      }
+      return false;
+    }
+    if (this.onCount > this.n) {
+      for (let i = 0; i < this.sel.length; i++) {
+        if (this.sel[i]) {
+          this.tap(i);
+          return true;
+        }
+      }
+      return false;
+    }
+    this.submit();               // 正好 n 片 ⇒ 替玩家按「确认」
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('点亮 {0} 片（一共 {1} 片），再点「确认」', String(this.n), String(this.d)),
+      TG2('Light {0} of {1} slices, then tap Confirm', String(this.n), String(this.d)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.checked || this.over) { return; }
     const next: boolean[] = this.sel.slice(); next[i] = !next[i]; this.sel = next;
@@ -96,6 +163,12 @@ export struct GFractionalPizza {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

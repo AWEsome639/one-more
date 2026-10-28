@@ -4,6 +4,8 @@
  * 进度：组长度 / 记住几句 / 得分
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -40,6 +42,8 @@ export struct GReadingSpan {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 START_SPAN=2，按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(2);
   onFinish: (r: GameResult) => void = () => {};
   @State phase: number = 0;        // 0 判断　1 回忆　2 结算
@@ -85,6 +89,70 @@ export struct GReadingSpan {
     const s: Sent = SENTS[this.order[this.pos]];
     this.curText = s.text; this.curOk = s.ok; this.curKey = s.key;
     this.msg = TG2("第 {0} / {1} 句：这句话通顺吗？", (this.pos + 1), this.span);
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase === 0) {
+      this.judge(this.curOk);
+      return !this.over;
+    }
+    if (this.phase === 1) {
+      const want: string = this.keys[this.got];
+      for (let i = 0; i < this.pool.length; i++) {
+        if (this.pool[i] === want) {
+          this.pickPool(i);
+          return !this.over;
+        }
+      }
+    }
+    return false;
+  }
+
+  /** 提示：判断阶段报「这句通不通」，回忆阶段报「下一个关键词」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase === 0) {
+      return this.curOk
+        ? Hint.make([], TG2('这句是通顺的：{0}', this.curText), TG2('This sentence makes sense: {0}', this.curText), t0)
+        : Hint.make([], TG2('这句不通：「{0}」', this.curText), TG2('This sentence is wrong: {0}', this.curText), t0);
+    }
+    if (this.phase === 1) {
+      const want: string = this.keys[this.got];
+      return Hint.make([this.pool.indexOf(want)],
+        TG2('第 {0} 个关键词是「{1}」', String(this.got + 1), want),
+        TG2('Keyword {0} is "{1}"', String(this.got + 1), want), t0);
+    }
+    return Hint.none('none');
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private judge(sayOk: boolean): void {
@@ -144,6 +212,12 @@ export struct GReadingSpan {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) { Column({ space: Space.xs }) {
       Text((TG('组长度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(Digits(String(this.span), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.berry))
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: Space.xs }) {

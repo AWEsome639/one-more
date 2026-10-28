@@ -8,6 +8,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2, TG4 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -56,6 +57,8 @@ export struct GCountdownMath {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private round: Round = { nums: [], target: 0 };
   @State private used: boolean[] = [];
   @State private sel: number = -1;
@@ -249,6 +252,80 @@ export struct GCountdownMath {
     this.opSign = '';
   }
 
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 复用上面的 dfsFirst（真求解器）：取它给的第一步，照玩家路径点
+  /** 下一步 [i, j, 运算符序号]；解不出返回空数组 */
+  private nextMove(): number[] {
+    const signs: string[] = ['+', '-', 'x', '/'];
+    const vals: number[] = [];
+    const idx: number[] = [];
+    for (let i = 0; i < this.round.nums.length; i++) {
+      if (!this.used[i]) {
+        vals.push(this.round.nums[i]);
+        idx.push(i);
+      }
+    }
+    if (vals.length < 2) {
+      return [];
+    }
+    for (let p = 0; p < vals.length; p++) {
+      for (let q = 0; q < vals.length; q++) {
+        if (p === q) {
+          continue;
+        }
+        for (let si = 0; si < 4; si++) {
+          const r0: number = combine(vals[p], vals[q], signs[si]);
+          if (r0 > 0 && r0 <= 9999 && r0 === this.round.target) {
+            return [idx[p], idx[q], si];
+          }
+        }
+      }
+    }
+    const out: number[] = [];
+    const ok: boolean = this.dfsFirst(vals, idx, this.round.target, true, out);
+    if (!ok || out.length < 4) {
+      return [];
+    }
+    return [out[0], out[1], out[2]];
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const mv: number[] = this.nextMove();
+    if (mv.length < 3) {
+      return false;
+    }
+    if (this.sel !== mv[0] || this.opSign === '') {
+      this.tapNum(mv[0], this.round.nums[mv[0]]);
+      if (this.sel === mv[0]) {
+        this.opSign = ['+', '-', 'x', '/'][mv[2]];
+      }
+      return true;
+    }
+    this.tapNum(mv[1], this.round.nums[mv[1]]);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tapNum(i: number, real: number): void {
     if (this.over || this.used[i]) { return; }
     if (this.sel < 0) {
@@ -307,6 +384,12 @@ export struct GCountdownMath {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

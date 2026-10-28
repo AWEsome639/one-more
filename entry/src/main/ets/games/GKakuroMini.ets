@@ -5,6 +5,8 @@
  * 胜负：六条线全部满足 = 通关；超过 40 步还没解出 = 失败
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -21,6 +23,8 @@ export struct GKakuroMini {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -229,6 +233,132 @@ export struct GKakuroMini {
     this.sel = i;
   }
 
+  /** 和为 s 的三个互不相同数字（1..9）的全部排列，按 3 个一组摊平 */
+  private triples(s: number): number[] {
+    const out: number[] = [];
+    for (let a = 1; a <= 9; a++) {
+      for (let b = 1; b <= 9; b++) {
+        if (b === a) {
+          continue;
+        }
+        const c: number = s - a - b;
+        if (c < 1 || c > 9 || c === a || c === b) {
+          continue;
+        }
+        out.push(a);
+        out.push(b);
+        out.push(c);
+      }
+    }
+    return out;
+  }
+
+  /** 解这一题（三行/三列各自互不相同且和等于提示数）⇒ 9 个数；解不出返回空数组 */
+  private solveNow(): number[] {
+    const r0: number[] = this.triples(this.rowT[0]);
+    const r1: number[] = this.triples(this.rowT[1]);
+    const r2: number[] = this.triples(this.rowT[2]);
+    for (let i = 0; i < r0.length; i += 3) {
+      const a: number = r0[i];
+      const b: number = r0[i + 1];
+      const c: number = r0[i + 2];
+      for (let j = 0; j < r1.length; j += 3) {
+        const d: number = r1[j];
+        const e: number = r1[j + 1];
+        const f: number = r1[j + 2];
+        if (a === d || b === e || c === f) {
+          continue;
+        }
+        for (let k = 0; k < r2.length; k += 3) {
+          const g: number = r2[k];
+          const h: number = r2[k + 1];
+          const p: number = r2[k + 2];
+          if (g === a || g === d || h === b || h === e || p === c || p === f) {
+            continue;
+          }
+          if (a + d + g !== this.colT[0] || b + e + h !== this.colT[1] || c + f + p !== this.colT[2]) {
+            continue;
+          }
+          return [a, b, c, d, e, f, g, h, p];
+        }
+      }
+    }
+    return [];
+  }
+
+  /** 代打：把选中格挪到第一个跟解不一样的格子，返回该填的数（0 = 不用填了） */
+  private autoVal(): number {
+    const sol: number[] = this.solveNow();
+    if (sol.length < 9) {
+      return 0;
+    }
+    let t: number = -1;
+    for (let i = 0; i < 9; i++) {
+      if (this.vals[i] !== sol[i]) {
+        t = i;
+        break;
+      }
+    }
+    if (t < 0) {
+      return 0;
+    }
+    this.sel = t;
+    return sol[t];
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.autoVal() < 1) {
+      return true;
+    }
+    this.put(this.autoVal());
+    return !this.over;
+  }
+
+  // 出题时就是先随机填一张合法盘，再把行/列和当提示 ⇒ 反解出来就是答案
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.sel < 0) {
+      return Hint.none('none');
+    }
+    const sol: number[] = this.solveNow();
+    if (sol.length < 9) {
+      return Hint.none('none');
+    }
+    const v: number = sol[this.sel];
+    return Hint.make([this.sel],
+      '这一格填 ' + String(v) + ' —— 整盘解是 ' + sol.slice(0, 3).join(' ') + ' / ' + sol.slice(3, 6).join(' ') + ' / ' + sol.slice(6, 9).join(' '),
+      'Fill ' + String(v) + ' here; the full solution is ' + sol.join(' '), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private put(d: number): void {
     if (this.over || this.sel < 0) {
       return;
@@ -257,6 +387,12 @@ export struct GKakuroMini {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这两格永不刷新
         this.head(0)

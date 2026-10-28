@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -37,6 +39,8 @@ export struct GConundrumAnagram {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State order: number[] = []; @State qi: number = 0; @State input: string = '';
@@ -61,6 +65,57 @@ export struct GConundrumAnagram {
     }
     this.order = out;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案就在 this.cur().a；submit() 读的是 this.input ⇒ 先填词再走玩家的提交路径
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.submitWord(this.cur().a);
+    return !this.over;
+  }
+
+  /** 提示：直接报谜底单词（谜面是英文谜语，报字母数帮不上忙） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const a: string = this.cur().a;
+    return Hint.make([], TG2('谜底是 {0}（{1} 个字母）', a, a.length),
+      TG2('The answer is {0}', a), t0);
+  }
+
+  /** AI 用：先把答案填进输入框，再走玩家的 submit（提交里会自己 trim/大写） */
+  private submitWord(w: string): void {
+    this.input = w;
+    this.submit();
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private submit(): void {
     if (this.over) { return; }
     const guess: string = this.input.trim().toUpperCase();
@@ -110,6 +165,12 @@ export struct GConundrumAnagram {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

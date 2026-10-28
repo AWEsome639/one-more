@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -24,6 +26,8 @@ export struct GFindWord {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT_MS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -44,6 +48,61 @@ export struct GFindWord {
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
     if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.locked) {
+      return true;
+    }
+    this.aiTap(0);
+    return !this.over;
+  }
+
+  /** 提示：横着能拼出的那个词 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c + 2 < N; c++) {
+        const i0: number = r * N + c;
+        const w: string = this.g[i0] + this.g[i0 + 1] + this.g[i0 + 2];
+        if (WORDS.indexOf(w) < 0 || this.found.indexOf(w) >= 0) { continue; }
+        return Hint.make([i0, i0 + 1, i0 + 2],
+          TG2('拼出 {0}：第 {1} 行第 {2} 列起，横着连 3 格', w, String(r + 1), String(c + 1)),
+          TG2('Spell {0}: 3 in a row starting row {1}, column {2}', w, String(r + 1), String(c + 1)), t0);
+      }
+    }
+    return Hint.none('none');
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private reset(): void {
     this.stop();
     const grid: string[] = [];
@@ -117,8 +176,27 @@ export struct GFindWord {
     this.onFinish(r);
   }
 
+  /** AI 用：找一条横着排的、还没找过的三字母单词，按顺序点过去 */
+  private aiTap(_d: number): void {
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c + 2 < N; c++) {
+        const i0: number = r * N + c;
+        const w: string = this.g[i0] + this.g[i0 + 1] + this.g[i0 + 2];
+        if (WORDS.indexOf(w) < 0 || this.found.indexOf(w) >= 0) { continue; }
+        if (this.path.length < 3) { this.tap(i0 + this.path.length); }
+        return;
+      }
+    }
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('已找'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

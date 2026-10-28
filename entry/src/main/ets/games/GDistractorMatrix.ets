@@ -3,6 +3,8 @@
  * 干扰项越来越多，靠"扫视 + 抑制干扰"快速清点
  * 胜负：8 题答对 ≥6 通关　进度：题号 / 答对 / 剩余秒数
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -55,6 +57,8 @@ export struct GDistractorMatrix {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private cells: number[] = [];
   @State private target: string = '';
   @State private distractor: string = '';
@@ -103,6 +107,60 @@ export struct GDistractorMatrix {
     }, 1000);
   }
 
+  /** ★ AI 代打/提示共用：本局目标符号的真实个数 */
+  private countTarget(): number {
+    let n: number = 0;
+    for (let i = 0; i < this.cells.length; i++) {
+      if (this.cells[i] === 1) { n = n + 1; }
+    }
+    return n;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.locked) {
+      return true;
+    }
+    this.judge(this.countTarget());
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('目标符号 {0} 一共 {1} 个', this.target, this.countTarget()),
+      TG2('There are {1} of {0} in the matrix', this.target, this.countTarget()), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private judge(v: number): void {
     if (this.locked || this.over) { return; }
     this.locked = true;
@@ -134,6 +192,12 @@ export struct GDistractorMatrix {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", (this.q + 1), TOTAL)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG('答对 ') + this.hits).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)

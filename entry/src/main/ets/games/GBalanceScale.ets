@@ -6,6 +6,8 @@
  * 出题：先抽 6 枚砝码，再取其中 2~4 枚的和当目标 ⇒ 保证一定有解。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -29,6 +31,8 @@ export struct GBalanceScale {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(LEVELS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -139,6 +143,100 @@ export struct GBalanceScale {
     return n;
   }
 
+  /** 代打：该放上哪枚砝码（枚举 2^n 组，挑「已放 + 待放」正好等于目标的一组；-1 = 无解） */
+  private autoChip(): number {
+    const n: number = this.weights.length;
+    const full: number = Math.pow(2, n);
+    for (let m = 1; m < full; m++) {
+      let s: number = 0;
+      let bad: boolean = false;
+      let add: number = -1;
+      for (let j = 0; j < n; j++) {
+        if (Math.floor(m / Math.pow(2, j)) % 2 === 1) {
+          s += this.weights[j];
+          if (!this.used[j]) {
+            add = j;
+          }
+        } else if (this.used[j]) {
+          bad = true;
+        }
+      }
+      if (!bad && s === this.target && add >= 0) {
+        return add;
+      }
+    }
+    return -1;
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.autoChip() < 0) {
+      return true;
+    }
+    this.toggle(this.autoChip());
+    return !this.over;
+  }
+
+  // 目标 = this.target，砝码 = this.weights ⇒ 报「再放哪几枚」（不会超过目标）
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const n: number = this.weights.length;
+    const full: number = Math.pow(2, n);
+    for (let m = 1; m < full; m++) {
+      let s: number = 0;
+      let bad: boolean = false;
+      const adds: number[] = [];
+      for (let j = 0; j < n; j++) {
+        if (Math.floor(m / Math.pow(2, j)) % 2 === 1) {
+          s += this.weights[j];
+          if (!this.used[j]) {
+            adds.push(j);
+          }
+        } else if (this.used[j]) {
+          bad = true;
+        }
+      }
+      if (bad || s !== this.target || adds.length === 0) {
+        continue;
+      }
+      const parts: string[] = [];
+      for (let k = 0; k < adds.length; k++) {
+        parts.push(String(this.weights[adds[k]]));
+      }
+      return Hint.make(adds, '再放 ' + parts.join(' + ') + ' 号砝码，正好等于 ' + String(this.target),
+        'Add weights ' + parts.join(' + '), t0);
+    }
+    return Hint.none('none');
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private toggle(i: number): void {
     if (this.over) {
       return;
@@ -194,6 +292,12 @@ export struct GBalanceScale {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)

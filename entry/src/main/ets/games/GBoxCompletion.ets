@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/D
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -35,6 +37,8 @@ export struct GBoxCompletion {
 
   // ★ 难度作用到玩法：棋盘边长（简单 3 / 普通 4 / 困难 5）
   //   ⚠️ 光改 this.diffTotal 不够 —— 渲染用的是写死的 [0,1,2,3]，必须同时改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);   // 4 = 原 SIDE
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -85,6 +89,96 @@ export struct GBoxCompletion {
  for (let i = 0; i < this.diffTotal * this.diffTotal; i++) { if (this.lit[i]) { n++; } }
  return n;
  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  /** 代打/提示共用：边框上还空着的格（0 基下标） */
+  private boxHoles(): number[] {
+    const n: number = this.diffTotal;
+    let r1: number = n;
+    let c1: number = n;
+    let r2: number = -1;
+    let c2: number = -1;
+    for (let i = 0; i < n * n; i++) {
+      if (this.cells[i]) {
+        const r: number = Math.floor(i / n);
+        const c: number = i - r * n;
+        if (r < r1) { r1 = r; }
+        if (r > r2) { r2 = r; }
+        if (c < c1) { c1 = c; }
+        if (c > c2) { c2 = c; }
+      }
+    }
+    const out: number[] = [];
+    if (r2 < 0) {
+      return out;
+    }
+    for (let r3 = r1; r3 <= r2; r3++) {
+      for (let c3 = c1; c3 <= c2; c3++) {
+        if (r3 !== r1 && r3 !== r2 && c3 !== c1 && c3 !== c2) {
+          continue;
+        }
+        const i2: number = r3 * n + c3;
+        if (!this.cells[i2] && !this.lit[i2]) {
+          out.push(i2);
+        }
+      }
+    }
+    return out;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const holes: number[] = this.boxHoles();
+    if (holes.length === 0) {
+      return false;
+    }
+    this.pick(holes[0]);
+    return !this.over;
+  }
+
+  /** 提示：报「还差哪一格」（行列是内容，不报下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const holes: number[] = this.boxHoles();
+    if (holes.length === 0) {
+      return Hint.none('边框已经补齐了，别再点了');
+    }
+    const k: number = holes[0];
+    const n: number = this.diffTotal;
+    const r: number = Math.floor(k / n) + 1;
+    const c: number = k - Math.floor(k / n) * n + 1;
+    return Hint.make([k],
+      TG2('点亮第 {0} 行第 {1} 列（边框还差 {2} 格）', String(r), String(c), String(holes.length)),
+      TG2('Light row {0}, column {1} ({2} cells left on the border)', String(r), String(c), String(holes.length)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出要补哪格'));
+  }
  private pick(i: number): void {
  if (this.over || this.cells[i]) { return; }
  const cur: boolean[] = this.lit.slice();
@@ -128,6 +222,12 @@ export struct GBoxCompletion {
  }
  build() {
  Column({ space: Space.sm }) {
+   HintBar({
+     showHint: true,
+     onHintTap: () => { this.askHint(); },
+     onAutoTap: () => { this.askAuto(); },
+     autoOn: this.autoId >= 0
+   })
  Text(TG2('已补 {0}/{1} 格　步数 {2}', this.litCount(), PERIM,Digits(String(this.moves), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: Space.xs }) {
  ForEach(this.rowIdx(), (r: number) => {

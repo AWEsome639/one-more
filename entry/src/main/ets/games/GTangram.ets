@@ -2,6 +2,8 @@
  * 七巧板 —— 用 4 块砖严丝合缝铺满阴影；点已铺的砖可取回重放
  * 胜负：铺满 ⇒ 通关；次数用尽（12 次）⇒ 失败　｜　进度：铺对 / 次数
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -59,6 +61,8 @@ export struct GTangram {
    *   修法：**拼图几何就是 4×4**，棋盘固定下来；
    *   难度改到**步数上限**上（上限越少越难）—— 这本来就是这款游戏的压力来源。
    */
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private boardN: number = 4;
   /** 本局允许的步数上限：简单 18 / 普通 12 / 困难 8 */
   @State private moveLimit: number = GTangram.limitNow();
@@ -105,6 +109,103 @@ export struct GTangram {
     }
     return [ok, all];
   }
+  /** ★ AI 代打/提示共用：本局阴影出自哪一套布局（4 套都是严丝合缝的铺法） */
+  private solIdx(): number {
+    for (let i = 0; i < LAYOUTS.length; i++) {
+      const sh: number[] = shadowOf(LAYOUTS[i]);
+      let same: boolean = true;
+      for (let k = 0; k < this.target.length; k++) {
+        if (sh[k] !== this.target[k]) {
+          same = false;
+        }
+      }
+      if (same) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /** 下一块该放的砖：返回 [砖号, 落点格号]，都放好了返回空 */
+  private nextSlot(): number[] {
+    const li: number = this.solIdx();
+    if (li < 0) {
+      return [];
+    }
+    const slots: Slot[] = LAYOUTS[li];
+    for (let i = 0; i < slots.length; i++) {
+      const at: number = slots[i].r * this.boardN + slots[i].c;
+      if (this.pieceAt[at] !== slots[i].p) {
+        return [slots[i].p, at];
+      }
+    }
+    return [];
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const li: number = this.solIdx();
+    if (li < 0) {
+      return false;
+    }
+    const slots: Slot[] = LAYOUTS[li];
+    for (let i = 0; i < slots.length; i++) {
+      const at: number = slots[i].r * this.boardN + slots[i].c;
+      if (this.pieceAt[at] === slots[i].p) {
+        continue;
+      }
+      if (this.pieceAt[at] >= 0) {
+        return false;
+      }
+      this.sel = slots[i].p;
+      this.tap(at);
+      return !this.over;
+    }
+    return false;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const nx: number[] = this.nextSlot();
+    if (nx.length < 2) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(nx[1] / this.boardN) + 1;
+    const c: number = nx[1] % this.boardN + 1;
+    return Hint.make([nx[1]],
+      TG2('把「{0}」铺在第 {1} 行第 {2} 列', PIECES[nx[0]].icon + PIECES[nx[0]].name, r, c),
+      TG2('Place piece {0} at row {1}, column {2}', PIECES[nx[0]].icon, r, c), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over) { return; }
     if (this.pieceAt[i] >= 0) {
@@ -152,6 +253,12 @@ export struct GTangram {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2('铺对 {0} / {1}　次数 {2}', String(this.scan()[0]), String(this.scan()[1]),Digits(String(this.moves), this.langCode)))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
       Row({ space: Space.sm }) {

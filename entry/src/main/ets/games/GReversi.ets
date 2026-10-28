@@ -5,6 +5,8 @@
  * 结算：双方都无处可下（或棋盘下满）时数子；黑多 ⇒ 通关，白多 ⇒ 失败。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -71,6 +73,8 @@ export struct GReversi {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：棋盘边长（原 N=8）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(8);
 
   /** 0..diffTotal-1（读 @State 建依赖） */
@@ -300,6 +304,85 @@ export struct GReversi {
     this.beginTurn();
   }
 
+  /** 代打：黑方该下哪一格（位置权重 + 行动力，跟内置白方同一套评法） */
+  private autoPick(): number {
+    if (this.over || this.turn !== BLACK) {
+      return -1;
+    }
+    const moves: number[] = this.legal(this.cells, BLACK);
+    if (moves.length === 0) {
+      return -1;
+    }
+    let best: number = moves[0];
+    let bestSc: number = -99999;
+    for (let k = 0; k < moves.length; k++) {
+      const i: number = moves[k];
+      const r: number = Math.floor(i / this.diffTotal);
+      const c: number = i % this.diffTotal;
+      const w: number = posWeight(this.diffTotal, r, c);
+      const flips: number = this.flips(this.cells, i, BLACK).length;
+      const after: number[] = this.place(this.cells, i, BLACK);
+      const oppMoves: number = this.legal(after, WHITE).length;
+      const sc: number = w * 10 + flips * 1.5 - oppMoves * 12;
+      if (sc > bestSc) {
+        bestSc = sc;
+        best = i;
+      }
+    }
+    return best;
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.turn !== BLACK || this.autoPick() < 0) {
+      return true;
+    }
+    this.tap(this.autoPick());
+    return !this.over;
+  }
+
+  // legalNow 就是这一手的全部合法落点 ⇒ 按位置权重挑最好的一个报出来
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.turn !== BLACK) {
+      return Hint.none('none');
+    }
+    const i: number = this.autoPick();
+    if (i < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(i / this.diffTotal);
+    const c: number = i % this.diffTotal;
+    const flips: number = this.flips(this.cells, i, BLACK).length;
+    return Hint.make([i], '下在第 ' + String(r + 1) + ' 行第 ' + String(c + 1) + ' 列，翻 ' + String(flips) + ' 子',
+      'Play row ' + String(r + 1) + ', column ' + String(c + 1) + ' (flips ' + String(flips) + ')', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.turn !== BLACK) {
       return;
@@ -361,6 +444,12 @@ export struct GReversi {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('你（黑）'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

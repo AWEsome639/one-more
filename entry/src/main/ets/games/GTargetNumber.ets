@@ -7,6 +7,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -54,6 +55,8 @@ export struct GTargetNumber {
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 ROUNDS=6
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(6);
   onFinish: (r: GameResult) => void = () => {};
   @State private nums: number[] = []; @State private opts: string[] = []; @State private target: number = 0;
@@ -99,6 +102,53 @@ export struct GTargetNumber {
     }
     this.opts = texts; this.ansIdx = ansPos; this.pick = -1; this.answered = false;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.answered) {
+      return true;
+    }
+    this.submit(this.ansIdx);
+    return !this.over;
+  }
+
+  // 答案就在 this.ansIdx（submit 比的就是 k === ansIdx）
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.answered) {
+      return Hint.none('none');
+    }
+    const i: number = this.ansIdx;
+    return Hint.make([i],
+      '答案是「' + this.opts[i] + '」= ' + String(this.target),
+      'The answer is "' + this.opts[i] + '" = ' + String(this.target), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private submit(k: number): void {
     if (this.answered || this.over) { return; }
     this.answered = true; this.pick = k; const ok: boolean = k === this.ansIdx;
@@ -132,6 +182,12 @@ export struct GTargetNumber {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
             Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

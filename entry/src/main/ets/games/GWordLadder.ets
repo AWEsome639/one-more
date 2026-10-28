@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -33,6 +35,8 @@ export struct GWordLadder {
   @Prop theme: Theme = Theme.light();
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State from: string = ''; @State to: string = ''; @State word: string = '';
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -51,6 +55,140 @@ export struct GWordLadder {
     this.msg = TG2('点一个字母位，再从键盘挑新字母（{0} 步内到 {1}）', l.limit, l.to);
   }
   private left(): number { const n: number = this.limit - this.steps; return n > 0 ? n : 0; }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 没有"答案字段"—— 在词库上做 BFS，求「当前词 → 目标词」的最短阶梯
+  private aiWords: string[] = [];
+
+  private aiDict(): string[] {
+    if (this.aiWords.length === 0) {
+      this.aiWords = DICT.split(' ');
+    }
+    return this.aiWords;
+  }
+
+  /** 下一步该变成的词（'' = 走不到/已经到了） */
+  private aiNextWord(): string {
+    if (this.word === this.to) {
+      return '';
+    }
+    const all: string[] = this.aiDict();
+    const s0: number = all.indexOf(this.word);
+    const g0: number = all.indexOf(this.to);
+    if (s0 < 0 || g0 < 0 || s0 === g0) {
+      return '';
+    }
+    const seen: boolean[] = new Array<boolean>(all.length).fill(false);
+    const par: number[] = new Array<number>(all.length).fill(-1);
+    const q: number[] = [s0];
+    seen[s0] = true;
+    let head: number = 0;
+    while (head < q.length && !seen[g0]) {
+      const w: string = all[q[head]];
+      for (let i = 0; i < all.length; i++) {
+        if (seen[i]) {
+          continue;
+        }
+        if (all[i].length !== LEN) {
+          continue;
+        }
+        let diff: number = 0;
+        for (let p = 0; p < LEN; p++) {
+          if (all[i].charAt(p) !== w.charAt(p)) {
+            diff = diff + 1;
+          }
+        }
+        if (diff === 1) {
+          seen[i] = true;
+          par[i] = q[head];
+          q.push(i);
+        }
+      }
+      head = head + 1;
+    }
+    if (!seen[g0]) {
+      return '';
+    }
+    let at: number = g0;
+    let guard: number = 0;
+    while (guard < all.length && par[at] >= 0 && par[at] !== s0) {
+      at = par[at];
+      guard = guard + 1;
+    }
+    if (par[at] !== s0) {
+      return '';
+    }
+    return all[at];
+  }
+
+  /** 把 word 改成 nx 需要「第几位、换成什么字母」 */
+  private aiDiffPos(w: string, nx: string): number {
+    for (let i = 0; i < LEN; i++) {
+      if (w.charAt(i) !== nx.charAt(i)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const nx: string = this.aiNextWord();
+    if (nx.length !== LEN) {
+      return false;
+    }
+    const pos: number = this.aiDiffPos(this.word, nx);
+    if (pos < 0) {
+      return false;
+    }
+    this.tapPos(pos);
+    this.tapLetter(nx.charAt(pos));
+    return !this.over;
+  }
+
+  /** 提示：报「第几位换成哪个字母 ⇒ 变成哪个单词」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const nx: string = this.aiNextWord();
+    if (nx.length !== LEN) {
+      return Hint.none('none');
+    }
+    const pos: number = this.aiDiffPos(this.word, nx);
+    if (pos < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([], TG2('第 {0} 位换成 {1} ⇒ {2}', pos + 1, nx.charAt(pos), nx),
+      TG2('Set letter {0} to {1} → {2}', pos + 1, nx.charAt(pos), nx), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapPos(i: number): void {
     if (this.over) { return; }
     this.pick = i; this.msg = TG2('已选第 {0} 位 ⇒ 挑个新字母', (i + 1));
@@ -89,6 +227,12 @@ export struct GWordLadder {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

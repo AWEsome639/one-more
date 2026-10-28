@@ -3,6 +3,8 @@
  * 规则：三根柱子各有内宽/限高，方块宽度必须与柱内宽完全相等才塞得进（不许悬空压边）。
  * 胜负：清单放完 = 通关；某柱超高失衡 = 失败。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -29,6 +31,8 @@ export struct GBlockStackingPhysics {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 SLOT=5
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(5);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -58,6 +62,74 @@ export struct GBlockStackingPhysics {
 
   private at(a: number[], i: number): number { return a[i]; }
   private placed(): number { return LEVELS[this.level].queue.length - this.queue.length; }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.queue.length === 0 || this.bestPillar() < 0) {
+      return true;
+    }
+    this.place(this.bestPillar());
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.queue.length === 0) {
+      return Hint.none('none');
+    }
+    const w: number = this.queue[0];
+    const best: number = this.bestPillar();
+    if (best < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([best],
+      TG2('这块宽 {0}，正好塞进第 {1} 根柱子（内宽 {2}）', String(w), String(best + 1), String(LEVELS[this.level].inner[best])),
+      TG2('This block is {0} wide — it fits pillar {1} (inner width {2})', String(w), String(best + 1), String(LEVELS[this.level].inner[best])), t0);
+  }
+
+  /** 能塞进当前方块、且已经叠得最矮的那根柱子（都塞不进返回 -1） */
+  private bestPillar(): number {
+    const w: number = this.queue.length > 0 ? this.queue[0] : -1;
+    let best: number = -1;
+    for (let k = 0; k < 3; k++) {
+      if (LEVELS[this.level].inner[k] !== w) {
+        continue;
+      }
+      if (best < 0 || this.heights[k] < this.heights[best]) {
+        best = k;
+      }
+    }
+    return best;
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
 
   private place(k: number): void {
     if (this.over || this.queue.length === 0) { return; }
@@ -92,6 +164,12 @@ export struct GBlockStackingPhysics {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("第 {0}/{1} 关　已放 {2}/", (this.level + 1), LEVELS.length, this.placed())
         + LEVELS[this.level].queue.length + TG2(' 块　限高 {0} 层', LEVELS[this.level].cap))
 .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')

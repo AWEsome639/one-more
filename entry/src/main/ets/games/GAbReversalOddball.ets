@@ -3,6 +3,8 @@
  * 一击：看到反转立刻点「反转！」；正常交替时点 = 误报
  * 胜负：24 帧内命中 ≥5 且误报 ≤2 通关　进度：帧号 / 命中 / 误报 / 得分
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -23,6 +25,8 @@ export struct GAbReversalOddball {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -62,6 +66,54 @@ export struct GAbReversalOddball {
     this.flip = next === last; this.sym = next; this.resp = false; this.frame = this.frame + 1;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (!this.flip || this.resp) {
+      return true;
+    }
+    this.tapFlip();
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.flip) {
+      return Hint.make([], TG2('这一帧是反常（连着两次同一个图形）⇒ 点「反转！」'),
+        TG2('This frame repeats the same shape — tap 反转！'), t0);
+    }
+    return Hint.make([], TG2('这一帧是正常交替 ⇒ 别点，等下一帧'),
+      TG2('Normal alternation this frame — do not tap'), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapFlip(): void {
     if (this.over) { return; }
     if (this.resp) { this.msg = TG('这一帧已经判过了'); return; }
@@ -98,6 +150,12 @@ export struct GAbReversalOddball {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('帧号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

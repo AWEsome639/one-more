@@ -10,6 +10,8 @@
  * 通关判据：拼出 2048
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -135,6 +137,8 @@ export struct G2048 {
   private winTile: number = GameDiff.pick(1024, 2048, 4096);
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private cells: number[] = [];
   @State private hintDir: number = -1;
   @State private hintText: string = '';
@@ -286,6 +290,56 @@ export struct G2048 {
     setTimeout(() => { this.hintDir = -1; this.hintText = ''; }, 3000);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 一手前瞻：四个方向各预演一次（previewMove 纯函数，不改状态）⇒ 取启发式分最高那手
+  //   ★ 与上面的 askHint 是同一套评估（都走 heuristicScore）
+  private bestDir(): number {
+    let bd: number = -1;
+    let bv: number = -1e18;
+    for (let d = 0; d < 4; d++) {
+      const next: number[] = previewMove(this.cells, d);
+      if (sameCells(next, this.cells)) {
+        continue;                      // 这个方向动不了
+      }
+      const v: number = heuristicScore(next);
+      if (v > bv) {
+        bv = v;
+        bd = d;
+      }
+    }
+    return bd;
+  }
+
+  private autoStep(): boolean {
+    if (this.over || this.won) {
+      return false;                    // 死局 / 已拼出目标块 ⇒ 收工
+    }
+    const d: number = this.bestDir();
+    if (d < 0) {
+      return false;                    // 四个方向都动不了
+    }
+    this.move(d);
+    return !this.over;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private move(dir: number): void {
     if (this.over) {
       return;
@@ -384,6 +438,11 @@ export struct G2048 {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       // 得分条
       // ⚠️ 只传「种类」不传「值」—— 见 scoreBox 的注释（@Builder 按值传参不建立观察）
       Row({ space: Space.md }) {

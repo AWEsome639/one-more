@@ -11,6 +11,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -58,6 +59,8 @@ export struct GSkyscrapers {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：原 ERR_MAX=5
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(5);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -337,6 +340,143 @@ export struct GSkyscrapers {
     setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // N=4、线索表只有 3 套（每套唯一解）⇒ 直接解：逐行枚举候选排列（24 个，按左右线索筛），
+  // 回溯保证列不重复，最后校四边列线索。解出来必然满足 latinOk() + cluesOk()。
+  /** 一条线上的视野数（纯函数） */
+  private sightLine(vals: number[]): number {
+    let mx: number = 0;
+    let n: number = 0;
+    for (let i = 0; i < vals.length; i++) {
+      if (vals[i] > mx) {
+        mx = vals[i];
+        n++;
+      }
+    }
+    return n;
+  }
+
+  /** 求这一盘的解（长度 = CELLS；空数组 = 没解出来） */
+  private solveGrid(): number[] {
+    const perms: number[][] = this.allPerms();
+    const cands: number[][][] = [];
+    for (let r = 0; r < N; r++) {
+      const list: number[][] = [];
+      for (let pi = 0; pi < perms.length; pi++) {
+        const p: number[] = perms[pi];
+        const rev: number[] = [];
+        for (let i = N - 1; i >= 0; i--) {
+          rev.push(p[i]);
+        }
+        if (this.sightLine(p) === this.clues[N * 3 + r] &&
+          this.sightLine(rev) === this.clues[N + r]) {
+          list.push(p);
+        }
+      }
+      cands.push(list);
+    }
+    const grid: number[] = new Array<number>(CELLS).fill(0);
+    const sol: number[] = [];
+    const rec = (r: number): boolean => {
+      if (r === N) {
+        for (let c = 0; c < N; c++) {
+          const col: number[] = [];
+          for (let rr = 0; rr < N; rr++) {
+            col.push(grid[rr * N + c]);
+          }
+          const rev2: number[] = [];
+          for (let i = N - 1; i >= 0; i--) {
+            rev2.push(col[i]);
+          }
+          if (this.sightLine(col) !== this.clues[c] ||
+            this.sightLine(rev2) !== this.clues[N * 2 + c]) {
+            return false;
+          }
+        }
+        for (let i = 0; i < CELLS; i++) {
+          sol.push(grid[i]);
+        }
+        return true;
+      }
+      const list: number[][] = cands[r];
+      for (let k = 0; k < list.length; k++) {
+        const p: number[] = list[k];
+        let ok: boolean = true;
+        for (let c = 0; c < N; c++) {
+          for (let rr = 0; rr < r; rr++) {
+            if (grid[rr * N + c] === p[c]) {
+              ok = false;
+              break;
+            }
+          }
+          if (!ok) {
+            break;
+          }
+        }
+        if (!ok) {
+          continue;
+        }
+        for (let c = 0; c < N; c++) {
+          grid[r * N + c] = p[c];
+        }
+        if (rec(r + 1)) {
+          return true;
+        }
+      }
+      return false;
+    };
+    if (!rec(0)) {
+      return [];
+    }
+    return sol;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const sol: number[] = this.solveGrid();
+    if (sol.length !== CELLS) {
+      return false;
+    }
+    // ① 先清掉玩家填错的格子（pick = 那一格的数字再点 = 清空，不记错手）
+    for (let i = 0; i < CELLS; i++) {
+      if (this.grid[i] !== 0 && this.grid[i] !== sol[i]) {
+        this.pick = this.grid[i];
+        this.tap(i);
+        return !this.over;
+      }
+    }
+    // ② 再照解填空（tap 落的是 this.pick，所以每次要先拨好 pick）
+    for (let i = 0; i < CELLS; i++) {
+      if (this.grid[i] === sol[i]) {
+        continue;
+      }
+      this.pick = sol[i];
+      this.tap(i);
+      return !this.over;
+    }
+    return false;
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -427,6 +567,11 @@ export struct GSkyscrapers {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已填'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

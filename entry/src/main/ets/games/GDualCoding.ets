@@ -8,6 +8,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -33,6 +35,8 @@ export struct GDualCoding {
   @Prop theme: Theme = Theme.light();
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private pairs: Pair[] = [];
   @State private quiz: Pair[] = [];
   @State private phase: number = 0;        // 0 记忆 1 答题
@@ -62,6 +66,57 @@ export struct GDualCoding {
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
     if (this.to1 >= 0) { clearTimeout(this.to1); this.to1 = -1; }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 1 || this.pick >= 0) {
+      return true;
+    }
+    this.answer(this.aiOpt());
+    return !this.over;
+  }
+
+  /** 提示：这个词配哪张图 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase !== 1) {
+      return Hint.make([], TG2('先记住这 {0} 组词和图', String(this.pairs.length)),
+        TG2('Memorise these {0} word-picture pairs first', String(this.pairs.length)), t0);
+    }
+    const ic: string = this.quiz[this.qNo].icon;
+    return Hint.make([this.opts.indexOf(ic)], TG2('答案是 {0}', ic),
+      TG2('The answer is {0}', ic), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private reset(): void {
     this.stop();
     const bag: Pair[] = PAIRS.slice(); const kept: Pair[] = [];
@@ -130,8 +185,20 @@ export struct GDualCoding {
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }
+  /** AI 用：当前词对应的那张图，在 opts 里的下标 */
+  private aiOpt(): number {
+    const ic: string = this.quiz[this.qNo].icon;
+    return this.opts.indexOf(ic);
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

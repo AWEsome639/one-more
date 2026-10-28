@@ -10,6 +10,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -29,6 +31,8 @@ export struct GNumberBondsAll {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：LIVES 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(LIVES);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -97,6 +101,80 @@ export struct GNumberBondsAll {
     return Math.floor(this.target / 2);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案 = 两块数之和等于 this.target；一套一套配，配对了就消
+  /** 返回 i * 100 + j（一对能凑出 target 的未用格），-1 = 没有了 */
+  private aiFindPair(): number {
+    for (let i = 0; i < this.tiles.length; i++) {
+      if (this.used[i]) {
+        continue;
+      }
+      for (let j = i + 1; j < this.tiles.length; j++) {
+        if (this.used[j]) {
+          continue;
+        }
+        if (this.tiles[i] + this.tiles[j] === this.target) {
+          return i * 100 + j;
+        }
+      }
+    }
+    return -1;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.sel = -1;
+    const m: number = this.aiFindPair();
+    if (m < 0) {
+      return false;
+    }
+    this.tap(Math.floor(m / 100));
+    this.tap(m % 100);
+    return !this.over;
+  }
+
+  /** 提示：报哪两个数能凑成目标数 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const m: number = this.aiFindPair();
+    if (m < 0) {
+      return Hint.none('none');
+    }
+    const a: number = Math.floor(m / 100);
+    const b: number = m % 100;
+    return Hint.make([a, b], TG2('{0} + {1} = {2}', this.tiles[a], this.tiles[b], this.target),
+      TG2('{0} + {1} = {2}', this.tiles[a], this.tiles[b], this.target), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.used[i]) {
       return;
@@ -161,6 +239,12 @@ export struct GNumberBondsAll {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

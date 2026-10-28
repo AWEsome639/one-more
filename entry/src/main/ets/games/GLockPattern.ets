@@ -5,11 +5,12 @@
  * 胜负：连对 5 关（图案从 3 个点加到 7 个点）= 通关；点错一个 = 失败
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -26,6 +27,8 @@ export struct GLockPattern {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：DOTS 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(DOTS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -36,6 +39,8 @@ export struct GLockPattern {
   @State private lvl: number = 1;
   @State private peeks: number = 0;
   @State private won: boolean = false;
+  /** ★ 结束标记（AI 代打的 autoStep 要认这个；本款原来只有 phase === 2） */
+  @State private over: boolean = false;
 
   private timer: number = -1;
   private delay: number = -1;
@@ -71,6 +76,7 @@ export struct GLockPattern {
     this.lvl = 1;
     this.peeks = 0;
     this.won = false;
+    this.over = false;
     this.startAt = Date.now();
     this.startLevel();
   }
@@ -119,6 +125,71 @@ export struct GLockPattern {
     this.preview();
   }
 
+  /** 代打：下一个该点的点（preview 出来的顺序就存在 this.target 里） */
+  private autoCell(): number {
+    if (this.phase !== 1 || this.input.length >= this.target.length) {
+      return -1;
+    }
+    return this.target[this.input.length];
+  }
+
+  /** 点号 → 「第 r 行第 c 列」（提示用） */
+  private dotText(i: number): string {
+    return '第' + String(Math.floor(i / 3) + 1) + '行第' + String(i % 3 + 1) + '列';
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.autoCell() < 0) {
+      return true;
+    }
+    this.tapDot(this.autoCell());
+    return !this.over;
+  }
+
+  // 真值就在 this.target（tapDot 比的就是 target[k] !== i）
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.phase !== 1) {
+      return Hint.none('none');
+    }
+    const cells: number[] = [];
+    const parts: string[] = [];
+    for (let k = this.input.length; k < this.target.length; k++) {
+      cells.push(this.target[k]);
+      parts.push(this.dotText(this.target[k]));
+    }
+    if (cells.length === 0) {
+      return Hint.none('none');
+    }
+    return Hint.make(cells, '按顺序点：' + parts.join(' → '), 'Tap in order: ' + parts.join(' -> '), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapDot(i: number): void {
     if (this.phase !== 1) {
       return;
@@ -150,6 +221,7 @@ export struct GLockPattern {
   }
 
   private finish(solved: boolean): void {
+    this.over = true;
     const r: GameResult = {
       gameId: 'lock_pattern',
       solved: solved,
@@ -173,6 +245,12 @@ export struct GLockPattern {
 
   build() {
     Column({ space: Space.lg }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
 
           Row({ space: Space.md }) {
         Column({ space: 2 }) {

@@ -5,6 +5,8 @@
  * 胜负：你先连四 ⇒ solved=true；电脑先连四或棋盘填满 ⇒ solved=false
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -37,6 +39,8 @@ export struct GConnectFour {
 
   // ★ 难度作用到玩法：棋盘边长（原 ROWS=6）
   //   ⚠️ 渲染原本用 ForEach(this.rows)，已改成 ForEach(this.rowIdx())
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(6);
 
   /** 0..diffTotal-1（读 @State 建依赖） */
@@ -173,6 +177,135 @@ export struct GConnectFour {
       this.winLine = line;
     }
     return win;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.busy) {
+      return true;
+    }
+    this.tap(this.bestCol());
+    return !this.over;
+  }
+
+  /** 代打/提示共用：给「我」选一列（① 我能赢 ② 堵电脑 ③ 两层预判） */
+  private bestCol(): number {
+    const b: number[] = this.cells;
+    let pick: number = -1;
+    for (let c = 0; c < COLS; c++) {
+      const r: number = this.dropRow(b, c);
+      if (r < 0) {
+        continue;
+      }
+      const t: number[] = b.slice();
+      t[this.idx(r, c)] = ME;
+      const ln: number[] = [];
+      if (this.isWin(t, r, c, ME, ln)) {
+        return c;
+      }
+    }
+    for (let c2: number = 0; c2 < COLS; c2++) {
+      const r2: number = this.dropRow(b, c2);
+      if (r2 < 0) {
+        continue;
+      }
+      const t2: number[] = b.slice();
+      t2[this.idx(r2, c2)] = AI;
+      const ln2: number[] = [];
+      if (this.isWin(t2, r2, c2, AI, ln2)) {
+        pick = c2;
+        break;
+      }
+    }
+    if (pick >= 0) {
+      return pick;
+    }
+    let bestS: number = -1e9;
+    const center: number = Math.floor(COLS / 2);
+    for (let c3: number = 0; c3 < COLS; c3++) {
+      const r3: number = this.dropRow(b, c3);
+      if (r3 < 0) {
+        continue;
+      }
+      const t3: number[] = b.slice();
+      t3[this.idx(r3, c3)] = ME;
+      let oppWins: number = 0;
+      for (let c4: number = 0; c4 < COLS; c4++) {
+        const r4: number = this.dropRow(t3, c4);
+        if (r4 < 0) {
+          continue;
+        }
+        const t4: number[] = t3.slice();
+        t4[this.idx(r4, c4)] = AI;
+        const ln4: number[] = [];
+        if (this.isWin(t4, r4, c4, AI, ln4)) {
+          oppWins = oppWins + 1;
+        }
+      }
+      let myWins: number = 0;
+      for (let c5: number = 0; c5 < COLS; c5++) {
+        const r5: number = this.dropRow(t3, c5);
+        if (r5 < 0) {
+          continue;
+        }
+        const t5: number[] = t3.slice();
+        t5[this.idx(r5, c5)] = ME;
+        const ln5: number[] = [];
+        if (this.isWin(t5, r5, c5, ME, ln5)) {
+          myWins = myWins + 1;
+        }
+      }
+      const s: number = myWins * 80 - (oppWins > 0 ? 100000 : 0) - oppWins * 500 + (10 - Math.abs(c3 - center));
+      if (s > bestS) {
+        bestS = s;
+        pick = c3;
+      }
+    }
+    return pick;
+  }
+
+  /** 提示：报「下第几列」（列号就是玩家要点的东西） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.busy) {
+      return Hint.none(TG('等电脑落子'));
+    }
+    const c: number = this.bestCol();
+    if (c < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([c],
+      TG2('下第 {0} 列（从左数）', String(c + 1)),
+      TG2('Play column {0} from the left', String(c + 1)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(c: number): void {
@@ -349,6 +482,12 @@ export struct GConnectFour {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('手数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

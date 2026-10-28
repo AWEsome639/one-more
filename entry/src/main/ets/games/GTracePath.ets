@@ -6,6 +6,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -24,6 +25,8 @@ export struct GTracePath {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -82,6 +85,57 @@ export struct GTracePath {
       this.timer = -1; this.show = false; this.note = TG('从 🚩 开始，按刚才的路线点下去');
     }, PREVIEW);
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.show) {
+      return true;
+    }
+    this.tap(this.path[this.traced.length]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const next: number = this.path[this.traced.length];
+    if (this.traced.length >= this.path.length) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(next / M) + 1;
+    const c: number = (next % M) + 1;
+    return Hint.make([next],
+      TG2('按原路线，下一个点第 {0} 行第 {1} 列', String(r), String(c)),
+      TG2('Next on the route: row {0}, column {1}', String(r), String(c)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.show) { return; }
     if (i === this.path[this.traced.length]) {
@@ -122,6 +176,12 @@ export struct GTracePath {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
             Text(TG2('路线 {0}/{1}', String(Math.min(this.round + 1, this.diffTotal)), String(this.diffTotal)) +
         TG2(' · 已描 {0}/{1}', String(this.traced.length), String(LEN)) +
         TG2(' · 失误 {0}/{1}', String(this.err), String(MAX_ERR)))

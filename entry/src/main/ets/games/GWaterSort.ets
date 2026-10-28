@@ -6,6 +6,8 @@
  * 进度：归位管数 ／ 步数 ／ 得分
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -55,6 +57,8 @@ export struct GWaterSort {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 COLORS=4，按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(4);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -321,6 +325,107 @@ export struct GWaterSort {
     return n;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.wsPlan.length === 0) {
+      this.wsPlan = this.wsPlanGreedy();
+      this.wsAt = 0;
+      if (this.wsPlan.length === 0) {
+        return false;
+      }
+    }
+    const mv: number = this.wsPlan[this.wsAt];
+    const a: number = Math.floor(mv / 100);
+    const b: number = mv % 100;
+    if (this.sel < 0) {
+      if (!this.legal(this.flat, a, b)) {
+        this.wsPlan = [];
+        return true;
+      }
+      this.tapTube(a);
+      return true;
+    }
+    if (this.sel !== a) {
+      this.tapTube(this.sel);
+      return true;
+    }
+    this.tapTube(b);
+    this.wsAt = this.wsAt + 1;
+    if (this.wsAt >= this.wsPlan.length) {
+      this.wsPlan = [];
+    }
+    return !this.over;
+  }
+
+  /** 计划里的走法（源管*100+目标管），一次性算好 */
+  private wsPlan: number[] = [];
+  private wsAt: number = 0;
+
+  /** 用游戏自己的贪心求解器试几遍，求出「一整条能倒完的路」；求不出 → 空数组 */
+  private wsPlanGreedy(): number[] {
+    for (let attempt = 0; attempt < 16; attempt++) {
+      let st: number[] = this.flat.slice();
+      const path: number[] = [];
+      let steps: number = 0;
+      while (!this.isDone(st) && steps < 200) {
+        steps = steps + 1;
+        const mv: number = this.pickMove(st);
+        if (mv < 0) {
+          break;
+        }
+        path.push(mv);
+        st = this.poured(st, Math.floor(mv / 100), mv % 100);
+      }
+      if (this.isDone(st)) {
+        return path;
+      }
+    }
+    return [];
+  }
+
+  /** 提示：报「把第几管倒进第几管」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const mv: number = this.pickMove(this.flat);
+    if (mv < 0) {
+      return Hint.none(TG('倒不动了'));
+    }
+    const a: number = Math.floor(mv / 100);
+    const b: number = mv % 100;
+    return Hint.make([a, b],
+      TG2('把第 {0} 管倒进第 {1} 管', String(a + 1), String(b + 1)),
+      TG2('Pour tube {0} into tube {1}', String(a + 1), String(b + 1)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapTube(t: number): void {
     if (this.over) {
       return;
@@ -382,6 +487,12 @@ export struct GWaterSort {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('归位'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

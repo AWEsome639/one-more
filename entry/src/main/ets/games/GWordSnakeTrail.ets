@@ -2,6 +2,8 @@
  * 单词蛇 —— 用方向键操纵小蛇去吃字母，按顺序拼出目标单词
  * 胜负：拼完 3 个词通关｜生命（吃错/撞墙/咬自己）耗尽失败｜进度：第几个词 / 已拼 / 生命
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -31,6 +33,8 @@ export struct GWordSnakeTrail {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -75,6 +79,105 @@ export struct GWordSnakeTrail {
     }
     this.letters = g;
   }
+  /** ★ AI 代打/提示共用：朝「下一个要吃的字母」那一格的方向（0 上 1 右 2 下 3 左，-1 = 没法走） */
+  /** 优先挑字母对得上的邻格（吃到算对）；没有就退而求其次挑任意能走的格 */
+  private bestDir(): number {
+    if (this.body.length === 0) {
+      return -1;
+    }
+    const head: number = this.body[0];
+    const r: number = Math.floor(head / N);
+    const c: number = head % N;
+    const need: string = this.target.charAt(this.spelled);
+    let safe: number = -1;
+    let any: number = -1;
+    for (let d = 0; d < 4; d++) {
+      let nr: number = r;
+      let nc: number = c;
+      if (d === 0) {
+        nr = r - 1;
+      } else if (d === 1) {
+        nc = c + 1;
+      } else if (d === 2) {
+        nr = r + 1;
+      } else {
+        nc = c - 1;
+      }
+      if (nr < 0 || nr >= N || nc < 0 || nc >= N) {
+        continue;
+      }
+      const at: number = nr * N + nc;
+      if (this.body.indexOf(at) >= 0) {
+        continue;
+      }
+      if (((this.dir + 2) % 4) === d && this.body.length > 1) {
+        continue;
+      }
+      if (any < 0) {
+        any = d;
+      }
+      if (this.letters.length > at && this.letters[at] === need) {
+        safe = d;
+        break;
+      }
+    }
+    return safe >= 0 ? safe : any;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const d: number = this.bestDir();
+    if (d < 0) {
+      return false;
+    }
+    this.turn(d);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const need: string = this.target.charAt(this.spelled);
+    const d: number = this.bestDir();
+    if (d < 0) {
+      return Hint.make([],
+        TG2('下一个要吃的字母是 {0}，但四个方向都堵死了', need),
+        TG2('The next letter is {0}, but all four directions are blocked', need), t0);
+    }
+    const dirs: string[] = [TG('上'), TG('右'), TG('下'), TG('左')];
+    return Hint.make([],
+      TG2('往下要拼 {0}，下一个字母是 {1} ⇒ 往{2}走', this.target, need, dirs[d]),
+      TG2('Spelling {0}; next letter is {1} — go {2}', this.target, need, dirs[d]), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private turn(d: number): void {
     if (this.over || ((this.dir + 2) % 4 === d && this.body.length > 1)) { return; }
     this.dir = d;
@@ -123,6 +226,12 @@ export struct GWordSnakeTrail {
   private toneAt(i: number): string { const at: number = this.body.indexOf(i); return at === 0 ? Palette.emerald : (at > 0 ? Palette.primary : this.theme.surface); }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('第几个'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

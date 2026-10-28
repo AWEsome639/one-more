@@ -8,6 +8,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -22,6 +24,8 @@ export struct GDoubleNBack {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
   onFinish: (r: GameResult) => void = () => {};
   @State private idx: number = 0;
@@ -62,6 +66,66 @@ export struct GDoubleNBack {
     this.wrong = 0; this.over = false; this.won = false; this.done = false;
     this.msg = TG('N = 2：和两步前的比，分别判断位置与字母'); this.startAt = Date.now();
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案 = 「和两步前比相不相同」两个布尔，submit() 里现比 ⇒ 照真值把这俩开关拨对
+  private matchPos(): boolean {
+    return this.idx >= N && this.posSeq[this.idx] === this.posSeq[this.idx - N];
+  }
+
+  private matchLet(): boolean {
+    return this.idx >= N && this.letSeq[this.idx] === this.letSeq[this.idx - N];
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.selPos = this.matchPos();
+    this.selLetter = this.matchLet();
+    this.submit();
+    return !this.over;
+  }
+
+  /** 提示：报「位置/字母 各自和两步前相不相同」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.idx < N) {
+      return Hint.make([], TG('前两题没有可比对象，直接点下一题'),
+        TG('Nothing to compare yet — just submit'), t0);
+    }
+    const ps: string = this.matchPos() ? TG('位置相同') : TG('位置不同');
+    const ls: string = this.matchLet() ? TG('字母相同') : TG('字母不同');
+    return Hint.make([], TG2('位置：{0}　字母：{1}', ps, ls),
+      TG2('Position: {0} · Letter: {1}', ps, ls), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private submit(): void {
     if (this.over) { return; }
     if (this.idx >= N) {
@@ -94,6 +158,12 @@ export struct GDoubleNBack {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

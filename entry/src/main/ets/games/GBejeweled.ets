@@ -10,6 +10,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -42,6 +44,8 @@ export struct GBejeweled {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private board: number[] = [];
   @State private sel: number = -1;
   @State private score: number = 0;
@@ -212,6 +216,88 @@ export struct GBejeweled {
     return Math.abs(ar - br) + Math.abs(ac - bc) === 1;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 这盘没有"答案字段"—— 现搜一对能换出三连的相邻格（判据就是游戏自己的 hasMark）
+  private aiSwapOk(a: number, b: number): boolean {
+    const t: number[] = this.board.slice();
+    const tmp: number = t[a];
+    t[a] = t[b];
+    t[b] = tmp;
+    return this.hasMark(t);
+  }
+
+  /** 返回 a * 100 + b（一对可换的相邻格），-1 = 没有可换的 */
+  private aiFindPair(): number {
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        const a: number = r * N + c;
+        if (c + 1 < N && this.aiSwapOk(a, a + 1)) {
+          return a * 100 + (a + 1);
+        }
+        if (r + 1 < N && this.aiSwapOk(a, a + N)) {
+          return a * 100 + (a + N);
+        }
+      }
+    }
+    return -1;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.sel = -1;
+    const m: number = this.aiFindPair();
+    if (m < 0) {
+      return false;
+    }
+    this.tap(Math.floor(m / 100));
+    this.tap(m % 100);
+    return !this.over;
+  }
+
+  /** 提示：报这一对可换的宝石（报行列，不报下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const m: number = this.aiFindPair();
+    if (m < 0) {
+      return Hint.none('none');
+    }
+    const a: number = Math.floor(m / 100);
+    const b: number = m % 100;
+    const pa: string = (Math.floor(a / N) + 1) + '排' + (a % N + 1) + '列';
+    const pb: string = (Math.floor(b / N) + 1) + '排' + (b % N + 1) + '列';
+    return Hint.make([a, b], TG2('换 {0} 与 {1} 这两颗能消', pa, pb),
+      TG2('Swap {0} with {1} to clear', pa, pb), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over) {
       return;
@@ -277,6 +363,12 @@ export struct GBejeweled {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -2,6 +2,8 @@
  *  玩法：网格上给出起点与目标格，按方向键走「向量 (dx, dy)」那么多步，把点走进目标格
  *  胜负：5 个向量全对齐 ⇒ 通关；某回合步数用尽还没对齐 ⇒ 失败 */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -18,6 +20,8 @@ export struct GVectorGridAlignment {
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：棋盘边长（原 N=5）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(5);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -59,6 +63,78 @@ export struct GVectorGridAlignment {
     }
     this.vecX = px; this.vecY = py; this.pos = p0; this.goal = g0; this.movesLeft = mv;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.nextTo >= 0 || this.pos === this.goal) {
+      return true;
+    }
+    this.move(this.stepDx(), this.stepDy());
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 目标格就在 this.goal 里；按行列差走一步（步数上限 = |dx|+|dy|+2，够用）
+  private gapCol(): number {
+    return (this.goal % this.diffTotal) - (this.pos % this.diffTotal);
+  }
+
+  private gapRow(): number {
+    return Math.floor(this.goal / this.diffTotal) - Math.floor(this.pos / this.diffTotal);
+  }
+
+  private stepDx(): number {
+    const g: number = this.gapCol();
+    return g > 0 ? 1 : (g < 0 ? -1 : 0);
+  }
+
+  private stepDy(): number {
+    const g: number = this.gapRow();
+    return g > 0 ? 1 : (g < 0 ? -1 : 0);
+  }
+
+  /** 提示：报目标格在第几行第几列 + 下一步往哪走 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.nextTo >= 0) {
+      return Hint.none('none');
+    }
+    const gc: number = this.gapCol();
+    const gr: number = this.gapRow();
+    const dir: string = gc !== 0 ? (gc > 0 ? '往右走一格' : '往左走一格') : (gr > 0 ? '往下走一格' : '往上走一格');
+    const gr0: number = Math.floor(this.goal / this.diffTotal) + 1;
+    const gc0: number = (this.goal % this.diffTotal) + 1;
+    return Hint.make([this.goal],
+      TG2('{0} —— 目标在第 {1} 行第 {2} 列', dir, String(gr0), String(gc0)),
+      TG2('{0} — target is row {1}, column {2}', dir, String(gr0), String(gc0)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private move(dx: number, dy: number): void {
     if (this.over || this.nextTo >= 0) { return; }
     const r: number = Math.floor(this.pos / this.diffTotal) + dy; const c: number = (this.pos % this.diffTotal) + dx;
@@ -99,6 +175,12 @@ export struct GVectorGridAlignment {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('回合'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

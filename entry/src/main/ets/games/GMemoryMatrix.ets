@@ -1,4 +1,6 @@
 /** 记忆矩阵 —— 亮格闪一下，凭记忆全部点出来；过 5 关通关，点错 3 次失败 */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -20,6 +22,8 @@ export struct GMemoryMatrix {
   @Prop theme: Theme = Theme.light();
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private lit: boolean[] = [];
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -87,6 +91,80 @@ export struct GMemoryMatrix {
     }, SHOW_MS);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 1 || this.memNext() < 0) {
+      return true;
+    }
+    this.tap(this.memNext());
+    return !this.over;
+  }
+
+  /** 代打/提示共用：下一个还没点过的亮格（-1 = 没有） */
+  private memNext(): number {
+    for (let i = 0; i < CELLS; i++) {
+      if (this.lit[i] && this.picks.indexOf(i) < 0) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /** 提示：展示阶段报「要记哪几格」，作答阶段报「下一个点哪格」 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase === 0) {
+      let s: string = '';
+      for (let i = 0; i < CELLS; i++) {
+        if (this.lit[i]) {
+          const r0: number = Math.floor(i / N) + 1;
+          const c0: number = i - Math.floor(i / N) * N + 1;
+          s = s + (s.length > 0 ? '、' : '') + '(' + String(r0) + ',' + String(c0) + ')';
+        }
+      }
+      return Hint.make([], TG2('要记的格子（行,列）：{0}', s),
+        TG2('Cells to remember (row,col): {0}', s), t0);
+    }
+    const k: number = this.memNext();
+    if (k < 0) {
+      return Hint.none('none');
+    }
+    const r: number = Math.floor(k / N) + 1;
+    const c: number = k - Math.floor(k / N) * N + 1;
+    return Hint.make([k],
+      TG2('点第 {0} 行第 {1} 列（还差 {2} 格）', String(r), String(c), String(this.need - this.picks.length)),
+      TG2('Tap row {0}, column {1} ({2} to go)', String(r), String(c), String(this.need - this.picks.length)), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.phase !== 1) { return; }
     if (this.picks.indexOf(i) >= 0 || this.wrong.indexOf(i) >= 0) { return; }
@@ -142,6 +220,12 @@ export struct GMemoryMatrix {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2('关卡 {0}', (String(this.level) + '/' + String(PASS_LEVEL)))).fontSize(FontSize.xs).fontColor(this.theme.ink)
         Text(TG2("得分 {0}",Digits(String(this.score), this.langCode))).fontSize(FontSize.xs)

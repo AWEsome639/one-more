@@ -5,6 +5,8 @@
  * 结算：按错 ⇒ 失败；撑到第 12 关 ⇒ 通关。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -33,6 +35,8 @@ export struct GSimonSays {
 
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private lit: number = -1;
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -135,6 +139,56 @@ export struct GSimonSays {
     this.msg = TG2("轮到你了，按顺序点 {0} 下", this.len);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 'input') {
+      return true;
+    }
+    this.tapPad(this.seq[this.inputIdx]);
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 真值在 seq 里；phase !== input 是「演示中/过关间隙」⇒ 只能等
+  /** 提示：报下一个该点的色块（用它的图标，不报下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.phase !== 'input') {
+      return Hint.none('none');
+    }
+    const i: number = this.seq[this.inputIdx];
+    return Hint.make([i],
+      TG2('下一个按 {0}', PAD_ICON[i]),
+      TG2('Next tap: {0}', PAD_ICON[i]), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapPad(i: number): void {
     if (this.phase !== 'input' || this.over) {
       return;
@@ -209,6 +263,12 @@ export struct GSimonSays {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

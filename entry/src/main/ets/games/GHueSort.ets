@@ -2,6 +2,8 @@
  * 色相排序 —— 交换格子，把 16 个色块按色相排成一道彩虹
  * 胜负：18 步内排成严格递增 ⇒ 通关｜进度：已归位 / 16 + 剩余步数
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -37,6 +39,8 @@ export struct GHueSort {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -79,6 +83,95 @@ export struct GHueSort {
     return true;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.sel >= 0) {
+      const need: number = Math.round(this.sel * 360 / (N * N));
+      for (let i = 0; i < this.hues.length; i++) {
+        if (i !== this.sel && this.hues[i] === need) {
+          this.tap(i);
+          return !this.over;
+        }
+      }
+      this.sel = -1;
+      return true;
+    }
+    for (let p = 0; p < this.hues.length; p++) {
+      if (this.hues[p] !== Math.round(p * 360 / (N * N))) {
+        this.tap(p);
+        return !this.over;
+      }
+    }
+    return false;
+  }
+
+  /** 第 p 格应该放的色相（出题时就是按这个式子生成的） */
+  private wantHue(p: number): number {
+    return Math.round(p * 360 / (N * N));
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const n2: number = N * N;
+    if (this.sel >= 0) {
+      const need: number = this.wantHue(this.sel);
+      for (let i = 0; i < this.hues.length; i++) {
+        if (i !== this.sel && this.hues[i] === need) {
+          return Hint.make([this.sel, i],
+            TG2('把它换到第 {0} 行第 {1} 列（色相 {2}°）',
+              Math.floor(i / n2) + 1, i % n2 + 1, need),
+            TG2('Swap it to row {0}, column {1} (hue {2})',
+              Math.floor(i / n2) + 1, i % n2 + 1, need), t0);
+        }
+      }
+    }
+    for (let p = 0; p < this.hues.length; p++) {
+      const need: number = this.wantHue(p);
+      if (this.hues[p] === need) {
+        continue;
+      }
+      for (let i = 0; i < this.hues.length; i++) {
+        if (i !== p && this.hues[i] === need) {
+          return Hint.make([p, i],
+            TG2('第一处错在第 {0} 行第 {1} 列（该放 {2}°）',
+              Math.floor(p / n2) + 1, p % n2 + 1, need),
+            TG2('First wrong cell is row {0}, column {1} (needs hue {2})',
+              Math.floor(p / n2) + 1, p % n2 + 1, need), t0);
+        }
+      }
+    }
+    return Hint.none('none');
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over) { return; }
     if (this.sel < 0) { this.sel = i; this.msg = TG(TG(TG('已选中，再点一块交换'))); return; }
@@ -114,6 +207,12 @@ export struct GHueSort {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("归位 {0}/{1}", this.fixed(), (N * N)))
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.sky)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)

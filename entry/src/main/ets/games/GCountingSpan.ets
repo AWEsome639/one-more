@@ -4,6 +4,7 @@
  */
 
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -27,6 +28,8 @@ export struct GCountingSpan {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：DOTS 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(DOTS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -96,6 +99,67 @@ export struct GCountingSpan {
     this.msg = TG2('第 1 / {0} 张有几个黄点？', this.span);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 两个阶段：0=数卡（要点「数好了，下一张」）1=回忆（答案 = counts[recallIdx]）
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase === 0) {
+      this.nextCard();                 // 数完这张 ⇒ 翻下一张 / 进回忆
+      return true;
+    }
+    if (this.phase !== 1 || this.recallIdx >= this.counts.length) {
+      return true;                     // 等过渡（换局 / 结算）
+    }
+    this.answerCount(this.counts[this.recallIdx]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.phase === 0) {
+      const n: number = this.counts[this.cardIdx];
+      return Hint.make([],
+        TG2('这张卡上有 {0} 个黄点，记住它再点「数好了，下一张」', String(n)),
+        'This card has ' + String(n) + ' dots', t0);
+    }
+    if (this.phase !== 1 || this.recallIdx >= this.counts.length) {
+      return Hint.none('none');
+    }
+    const truth: number = this.counts[this.recallIdx];
+    return Hint.make([truth],
+      TG2('第 {0} 张卡是 {1} 个黄点', String(this.recallIdx + 1), String(truth)),
+      'Card ' + String(this.recallIdx + 1) + ' has ' + String(truth) + ' dots', t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answerCount(k: number): void {
     if (this.phase !== 1 || this.over) { return; }
     const truth: number = this.counts[this.recallIdx];
@@ -135,6 +199,12 @@ export struct GCountingSpan {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
             Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('张数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

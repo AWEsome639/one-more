@@ -2,6 +2,8 @@
  *  玩法：4×5 数字格，点两块相加正好是 10 的牌把它们消掉，连击加分
  *  胜负：75 秒内全消 ⇒ 通关；时间到还剩牌 ⇒ 失败 */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -32,6 +34,8 @@ export struct GTarget10 {
   @StorageProp('lang') langCode: string = 'zh';
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private tiles: number[] = []; @State private sel: number = -1; @State private cleared: number = 0;
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -68,6 +72,87 @@ export struct GTarget10 {
       this.finish(false);
     }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.tgTarget() < 0) {
+      return true;
+    }
+    this.tap(this.tgTarget());
+    return !this.over;
+  }
+
+  /** 代打/提示共用：这一步点哪一格（已选中的那张先找它的补数） */
+  private tgTarget(): number {
+    const b: number[] = this.tiles;
+    const s: number = this.sel;
+    if (s >= 0 && b[s] > 0) {
+      for (let i = 0; i < TOTAL; i++) {
+        if (i !== s && b[i] > 0 && b[i] + b[s] === 10) {
+          return i;
+        }
+      }
+    }
+    for (let i2: number = 0; i2 < TOTAL; i2++) {
+      if (b[i2] <= 0) {
+        continue;
+      }
+      for (let j: number = i2 + 1; j < TOTAL; j++) {
+        if (b[j] > 0 && b[i2] + b[j] === 10) {
+          return (s === i2) ? j : i2;
+        }
+      }
+    }
+    return -1;
+  }
+
+  /** 提示：报「哪两张牌凑十」（牌面是内容，不是下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const k: number = this.tgTarget();
+    if (k < 0) {
+      return Hint.none('none');
+    }
+    const b: number[] = this.tiles;
+    const s: number = this.sel;
+    if (s >= 0 && b[s] > 0) {
+      return Hint.make([k],
+        TG2('再点 {0}（{1} + {0} = 10）', String(b[k]), String(b[s])),
+        TG2('Now tap {0} ({1} + {0} = 10)', String(b[k]), String(b[s])), t0);
+    }
+    return Hint.make([k],
+      TG2('消掉 {0} 和 {1}（加起来正好 10）', String(b[k]), String(10 - b[k])),
+      TG2('Remove {0} and {1} (they add up to 10)', String(b[k]), String(10 - b[k])), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over) { return; }
     const board: number[] = this.tiles;
@@ -101,6 +186,12 @@ export struct GTarget10 {
   private tileKey(i: number): string { return 't' + i + '_' + this.tiles[i] + (this.sel === i ? 's' : ''); }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('时间'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

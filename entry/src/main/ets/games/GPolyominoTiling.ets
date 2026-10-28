@@ -7,6 +7,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
@@ -53,6 +55,8 @@ export struct GPolyominoTiling {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=5）
   //   ⚠️ 原本 ForEach(IDXN, …) 是常量数组，已改成按尺寸生成
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(5);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -102,6 +106,76 @@ export struct GPolyominoTiling {
   }
   private left(): number { return countOf(this.board, 0); }
   private total(): number { return this.diffTotal * this.diffTotal - countOf(this.board, 1); }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 没有"答案字段"—— 现找一块放得下的骨牌（fits 就是游戏自己的判据）
+  /** 返回 s * 1000 + 落点，-1 = 放不下（每格都能用单格骨牌补，所以总能补完） */
+  private aiFindSpot(): number {
+    const cells: number = this.diffTotal * this.diffTotal;
+    for (let s = 0; s < SHAPES.length; s++) {
+      for (let i = 0; i < cells; i++) {
+        if (fits(this.board, SHAPES[s], i, this.diffTotal)) {
+          return s * 1000 + i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    const m: number = this.aiFindSpot();
+    if (m < 0) {
+      return false;
+    }
+    this.sel = Math.floor(m / 1000);
+    this.place(m % 1000);
+    return !this.over;
+  }
+
+  /** 提示：报用哪块骨牌、放在哪一行哪一列 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const m: number = this.aiFindSpot();
+    if (m < 0) {
+      return Hint.none('none');
+    }
+    const s: number = Math.floor(m / 1000);
+    const i: number = m % 1000;
+    const r: number = Math.floor(i / this.diffTotal) + 1;
+    const c: number = i % this.diffTotal + 1;
+    return Hint.make([i], TG2('用「{0}」放在第 {1} 排第 {2} 列', SHAPES[s].name, r, c),
+      TG2('Place {0} at row{1} col{2}', SHAPES[s].name, r, c), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private place(i: number): void {
     if (this.over) { return; }
     const cur: number = this.board[i];
@@ -135,6 +209,12 @@ export struct GPolyominoTiling {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已铺'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

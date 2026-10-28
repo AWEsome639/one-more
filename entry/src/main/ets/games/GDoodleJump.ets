@@ -6,6 +6,8 @@
  * 坐标口径：整个场地用「百分比」表示（x% 横向、y% 纵向），物理与机型像素无关
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -54,6 +56,8 @@ export struct GDoodleJump {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：原 TICK_MS=33
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(33);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -168,6 +172,10 @@ export struct GDoodleJump {
     if (this.over || !this.running) {
       return;
     }
+    // ★ AI 代打（2026-10-24 第三期）：autoId >= 0 时每帧自动往平台挪一下
+    if (this.autoId >= 0) {
+      this.move(this.autoDir());
+    }
     const prevBottom: number = this.py + P_H;
     // ★ 解析积分（精确 ⇒ 帧率无关）
     this.py += this.vy * DT + 0.5 * GRAVITY * DT * DT;
@@ -235,6 +243,95 @@ export struct GDoodleJump {
     }
   }
 
+  /** 代打：下一步该往哪边挪（1 右 / -1 左 / 0 不动）—— 盯最近那块能踩到的平台 */
+  private autoDir(): number {
+    const feet: number = this.py + P_H;
+    let best: number = -1;
+    let bestDy: number = 999;
+    for (let i = 0; i < this.plats.length; i++) {
+      const dy: number = feet - this.plats[i].y;
+      if (dy <= 0 || dy > 17) {
+        continue;
+      }
+      if (dy < bestDy) {
+        bestDy = dy;
+        best = i;
+      }
+    }
+    if (best < 0) {
+      bestDy = 999;
+      for (let i = 0; i < this.plats.length; i++) {
+        const dy: number = feet - this.plats[i].y;
+        if (dy <= 0) {
+          continue;
+        }
+        if (dy < bestDy) {
+          bestDy = dy;
+          best = i;
+        }
+      }
+    }
+    if (best < 0) {
+      return 0;
+    }
+    const cx: number = this.plats[best].x + this.plats[best].w / 2;
+    const d: number = cx - this.px;
+    if (d > 3) {
+      return 1;
+    }
+    if (d < -3) {
+      return -1;
+    }
+    return 0;
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.won) {
+      return true;
+    }
+    this.move(this.autoDir());
+    return !this.over;
+  }
+
+  // 踩到平台就弹起 ⇒ 报「往哪边挪、去踩哪块平台」
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.won) {
+      return Hint.none('none');
+    }
+    const d: number = this.autoDir();
+    const where: string = d > 0 ? '右' : (d < 0 ? '左' : '');
+    const msg: string = where.length > 0 ? '往' + where + '挪，对准上面那块平台' : '位置正好，等它弹上去';
+    return Hint.make([], msg + '（已爬 ' + String(Math.floor(this.climbed)) + ' 米）',
+      'Move ' + (where.length > 0 ? where : 'to stay centered') + ' to land on the platform above', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private move(dir: number): void {
     // ★ 首次操作 ⇒ 真正开始（起始缓冲结束）
     if (this.ready) {
@@ -271,6 +368,12 @@ export struct GDoodleJump {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)

@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -44,6 +46,8 @@ export struct GWordScramble {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -65,6 +69,54 @@ export struct GWordScramble {
   }
   private word(): string { return this.queue.length > this.idx ? this.queue[this.idx].w : ''; }
   private hint(): string { return this.queue.length > this.idx ? this.queue[this.idx].hint : ''; }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.feed >= 0) {
+      return true;
+    }
+    this.aiTap(0);
+    return !this.over;
+  }
+
+  /** 提示：这个词拼成什么 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const w: string = this.word();
+    if (w.length === 0) { return Hint.none('none'); }
+    return Hint.make([], TG2('这个词是「{0}」（{1}）', w, this.hint()),
+      TG2('The word is {0}', w), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private reset(): void {
     this.stopAll();
     this.queue = mixEntries(BANK).slice(0, this.diffTotal);
@@ -127,8 +179,24 @@ export struct GWordScramble {
     this.onFinish(r);
   }
   private tileTone(i: number): string { return this.used.length > i && this.used[i] ? (this.theme.isDark ? '#2A2A2A' : '#D8DDE6') : this.theme.surface; }
+  /** AI 用：按单词顺序，点出下一个字母 */
+  private aiTap(_d: number): void {
+    const w: string = this.word();
+    if (this.typed.length >= w.length) { return; }
+    const ch: string = w[this.typed.length];
+    for (let i = 0; i < this.tiles.length; i++) {
+      if (this.tiles[i] === ch && !this.used[i]) { this.tap(i); return; }
+    }
+  }
+
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('第几个'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

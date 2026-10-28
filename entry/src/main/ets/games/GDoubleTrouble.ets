@@ -6,6 +6,8 @@
  * 胜负：撑过 8 轮 ⇒ solved=true；答错 3 次（生命用尽）⇒ solved=false
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -29,6 +31,8 @@ export struct GDoubleTrouble {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private round: number = 1;
   // ★ 难度作用到玩法：本局「容错次数/起始量」按难度换算（简单更多 / 困难更少）
   private total: number = GameDiff.livesNow(LIVES);
@@ -113,6 +117,64 @@ export struct GDoubleTrouble {
     this.bDone = false;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (!this.aDone) {
+      this.pickA(this.aAns);
+      return !this.over;
+    }
+    if (!this.bDone) {
+      this.pickB(this.bAns);
+      return !this.over;
+    }
+    return true;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 两个真值都在状态里：aAns（乘法结果）、bAns（墨水颜色的名字）
+  /** 提示：先报算术答案，答完再报颜色 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (!this.aDone) {
+      return Hint.make([],
+        TG2('算术：{0} 的答案是 {1}', this.qText, String(this.aAns)),
+        TG2('Math: {0} → {1}', this.qText, String(this.aAns)), t0);
+    }
+    return Hint.make([],
+      TG2('颜色：点「{0}」—— 要看墨水色，不是字义', this.bAns),
+      TG2('Colour: tap {0} — the ink colour, not the word', this.bAns), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pickA(v: number): void {
     if (this.over || this.aDone) {
       return;
@@ -191,6 +253,12 @@ export struct GDoubleTrouble {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

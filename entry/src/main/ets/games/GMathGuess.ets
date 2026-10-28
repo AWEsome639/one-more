@@ -2,6 +2,8 @@
  * 猜数字 —— 7 次机会二分逼近 1~100 的秘密数字
  * 胜负：7 次内猜中 ⇒ 通关；次数用尽 ⇒ 失败｜进度：已用次数 / 当前范围
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -23,6 +25,8 @@ export struct GMathGuess {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：原 MAX_TRIES=7，按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(7);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -52,6 +56,53 @@ export struct GMathGuess {
     this.history = []; this.hint = TG('提示：每猜一次就能砍掉一半范围');
     this.score = 0; this.over = false; this.won = false;
     this.done = false; this.startAt = Date.now();
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    this.guess = this.secret;
+    this.submit();
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 秘密数字就存在 this.secret 里（真值直取）
+  /** 提示：直接报秘密数字 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([this.secret - LO],
+      TG2('秘密数字是 {0}', String(this.secret)),
+      TG2('The secret number is {0}', String(this.secret)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private submit(): void {
@@ -114,6 +165,12 @@ export struct GMathGuess {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2('已用 {0}/{1}　范围 {2}', String(this.tries), String(this.diffTotal), String(this.lowBound))
         + TG2('~{0}　分 {1}',Digits(String(this.highBound), this.langCode),Digits(String(this.score), this.langCode)))
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.isDark ? Palette.primary : Palette.primaryDeep)

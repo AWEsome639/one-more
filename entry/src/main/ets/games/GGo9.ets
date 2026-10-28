@@ -18,6 +18,8 @@
  *   ⑤ 文案走 `TG('中文')`
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -270,6 +272,8 @@ export struct GGo9 {
   private aiGen: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private board: number[] = [];
   @State private myCap: number = 0;        // 我提掉对方几个子
   @State private foeCap: number = 0;       // 对方提掉我几个子
@@ -439,6 +443,145 @@ export struct GGo9 {
   }
 
   // ── 人操作 ──────────────────────────────────────────────
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (LanMatch.isActive()) {
+      return false;
+    }
+    if (this.thinking || this.turn !== BLACK) {
+      return true;
+    }
+    const mv: number = this.blackPick();
+    const n: number = this.boardN();
+    if (mv < 0) {
+      this.passTap();
+      return !this.over;
+    }
+    this.tapPoint(Math.floor(mv / n), mv % n);
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 黑棋版「能提就提 → 被打吃就逃 → 否则在己方附近挑安全的」
+  /** 黑棋选点；-1 = 停一手 */
+  private blackPick(): number {
+    const b: number[] = this.board;
+    const n: number = this.boardN();
+    const legal: number[] = legalMoves(b, BLACK, n, this.koStr);
+    if (legal.length === 0) {
+      return -1;
+    }
+    let bestCap: number = -1;
+    let bestCapMove: number = -1;
+    for (let k = 0; k < legal.length; k++) {
+      const nb: number[] = placeStone(b, legal[k], BLACK, n) as number[];
+      const got: number = capturedBy(b, nb, BLACK);
+      if (got > bestCap) {
+        bestCap = got;
+        bestCapMove = legal[k];
+      }
+    }
+    if (bestCap > 0) {
+      return bestCapMove;
+    }
+    let inDanger: number = -1;
+    for (let i = 0; i < b.length; i++) {
+      if (b[i] !== BLACK) {
+        continue;
+      }
+      const g: number[] = groupOf(b, i, n);
+      if (libsOf(b, g, n) === 1) {
+        const libs: number[] = nbrs(g[0], n);
+        for (let k = 0; k < libs.length; k++) {
+          if (b[libs[k]] === EMPTY) {
+            inDanger = libs[k];
+          }
+        }
+        if (inDanger >= 0) {
+          break;
+        }
+      }
+    }
+    if (inDanger >= 0 && legal.indexOf(inDanger) >= 0) {
+      return inDanger;
+    }
+    const near: number[] = [];
+    for (let k = 0; k < legal.length; k++) {
+      const cur: number[] = nbrs(legal[k], n);
+      for (let j = 0; j < cur.length; j++) {
+        if (b[cur[j]] === BLACK) {
+          near.push(legal[k]);
+          break;
+        }
+      }
+    }
+    const pool: number[] = near.length > 0 ? near : legal;
+    const safe: number[] = [];
+    for (let k = 0; k < pool.length; k++) {
+      const nb: number[] = placeStone(b, pool[k], BLACK, n) as number[];
+      if (libsAt(nb, pool[k], n) >= 2) {
+        safe.push(pool[k]);
+      }
+    }
+    const pick: number[] = safe.length > 0 ? safe : pool;
+    let bestLibs: number = -1;
+    let bestMv: number = pick[0];
+    for (let k = 0; k < pick.length; k++) {
+      const nb2: number[] = placeStone(b, pick[k], BLACK, n) as number[];
+      const l: number = libsAt(nb2, pick[k], n);
+      if (l > bestLibs) {
+        bestLibs = l;
+        bestMv = pick[k];
+      }
+    }
+    return bestMv;
+  }
+
+  /** 提示：报黑棋该下在第几行第几列 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.thinking || this.turn !== BLACK) {
+      return Hint.none('none');
+    }
+    const mv: number = this.blackPick();
+    const n: number = this.boardN();
+    if (mv < 0) {
+      return Hint.make([], TG('建议停一手'), TG('Suggested: pass'), t0);
+    }
+    const r: number = Math.floor(mv / n) + 1;
+    const c: number = (mv % n) + 1;
+    return Hint.make([mv],
+      TG2('下在第 {0} 行第 {1} 列', String(r), String(c)),
+      TG2('Play row {0}, column {1}', String(r), String(c)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapPoint(r: number, c: number): void {
     const i: number = r * this.boardN() + c;
     if (this.over || this.thinking || this.turn !== BLACK || this.board[i] !== EMPTY) {
@@ -734,6 +877,12 @@ export struct GGo9 {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.statBox(0)
         this.statBox(1)

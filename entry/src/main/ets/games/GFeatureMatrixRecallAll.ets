@@ -6,6 +6,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { AppClock } from '../core/AppClock';
@@ -21,6 +23,8 @@ export struct GFeatureMatrixRecallAll {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private hiColors: string[] = [];
   @State private picked: boolean[] = [];
   @State private phase: number = 0;      // 0 记忆 1 作答 2 判定
@@ -72,6 +76,71 @@ export struct GFeatureMatrixRecallAll {
         this.msg = TG('把这 6 格全部点回来');
       }
     }, 1000);
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 答案就在 this.hiColors（亮起的那 6 格）⇒ 记忆期等着，作答期一格格点回来
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 1) {
+      return true;              // 还在记忆/倒计时，等
+    }
+    for (let i = 0; i < TOTAL; i++) {
+      const want: boolean = this.hiColors[i] !== '';
+      if (this.picked[i] !== want) {
+        this.toggle(i);
+        return true;
+      }
+    }
+    this.judge();
+    return !this.over;
+  }
+
+  /** 提示：把亮过的 6 格按行列报出来（报格子，不报下标） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const parts: string[] = [];
+    for (let i = 0; i < TOTAL; i++) {
+      if (this.hiColors[i] !== '') {
+        const r: number = Math.floor(i / N) + 1;
+        const c: number = i % N + 1;
+        parts.push(r + '排' + c + '列');
+      }
+    }
+    if (parts.length === 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([], TG2('亮过的是：{0}', parts.join('、')),
+      TG2('The lit cells: {0}', parts.join(', ')), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private toggle(i: number): void {
@@ -136,6 +205,12 @@ export struct GFeatureMatrixRecallAll {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

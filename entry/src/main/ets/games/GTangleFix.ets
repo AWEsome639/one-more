@@ -6,6 +6,8 @@
  * 进度：交叉数 ／ 剩余交换 ／ 得分
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -37,6 +39,8 @@ export struct GTangleFix {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -175,6 +179,162 @@ export struct GTangleFix {
     this.startAt = Date.now();
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 只有 6 个节点 ⇒ 6! = 720 种摆法全枚举一遍，找一个"交叉数 = 0"的摆法，
+  // 再按位置一步步换过去。交叉数只跟摆法有关（组合判定），所以这一步是精确解，不是启发式。
+  /** 按给定摆法数交叉（纯函数：用传入的 ord，不动 this.order） */
+  private crossOf(ord: number[], edges: number[]): number {
+    const pos: number[] = [];
+    for (let i = 0; i < NODES; i++) {
+      pos.push(0);
+    }
+    for (let i = 0; i < ord.length; i++) {
+      pos[ord[i]] = i;
+    }
+    let n: number = 0;
+    const cnt: number = edges.length / 2;
+    for (let i = 0; i < cnt; i++) {
+      const a: number = pos[edges[i * 2]];
+      const b: number = pos[edges[i * 2 + 1]];
+      const l1: number = Math.min(a, b);
+      const r1: number = Math.max(a, b);
+      for (let j = i + 1; j < cnt; j++) {
+        const c: number = pos[edges[j * 2]];
+        const d: number = pos[edges[j * 2 + 1]];
+        const l2: number = Math.min(c, d);
+        const r2: number = Math.max(c, d);
+        if ((l1 < l2 && l2 < r1 && r1 < r2) || (l2 < l1 && l1 < r2 && r2 < r1)) {
+          n++;
+        }
+      }
+    }
+    return n;
+  }
+
+  /** 枚举 720 种摆法，返回第一个交叉数为 0 的（找不到返回空数组） */
+  private solveTarget(): number[] {
+    const out: number[] = [];
+    const cur: number[] = [];
+    const used: boolean[] = [];
+    for (let i = 0; i < NODES; i++) {
+      used.push(false);
+    }
+    const rec = (): void => {
+      if (out.length > 0) {
+        return;
+      }
+      if (cur.length === NODES) {
+        if (this.crossOf(cur, this.edges) === 0) {
+          for (let i = 0; i < NODES; i++) {
+            out.push(cur[i]);
+          }
+        }
+        return;
+      }
+      for (let v = 0; v < NODES; v++) {
+        if (used[v]) {
+          continue;
+        }
+        used[v] = true;
+        cur.push(v);
+        rec();
+        cur.pop();
+        used[v] = false;
+        if (out.length > 0) {
+          return;
+        }
+      }
+    };
+    rec();
+    return out;
+  }
+
+  /** 下一对要交换的位置（空数组 = 已经解开 / 解不了） */
+  private planSwap(): number[] {
+    const tgt: number[] = this.solveTarget();
+    if (tgt.length !== NODES) {
+      return [];
+    }
+    let i: number = -1;
+    for (let k = 0; k < NODES; k++) {
+      if (this.order[k] !== tgt[k]) {
+        i = k;
+        break;
+      }
+    }
+    if (i < 0) {
+      return [];
+    }
+    for (let k = 0; k < NODES; k++) {
+      if (this.order[k] === tgt[i]) {
+        return [i, k];
+      }
+    }
+    return [];
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.crossCount() === 0) {
+      return false;
+    }
+    const pr: number[] = this.planSwap();
+    if (pr.length !== 2) {
+      return false;
+    }
+    if (this.sel >= 0) {
+      this.tap(this.sel);             // 清掉残留的选中，免得下一次点击变成"交换"
+    }
+    this.tap(pr[0]);
+    this.tap(pr[1]);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.crossCount() === 0) {
+      return Hint.none('none');
+    }
+    const pr: number[] = this.planSwap();
+    if (pr.length !== 2) {
+      return Hint.none('none');
+    }
+    const a: string = LABELS[this.order[pr[0]]];
+    const b: string = LABELS[this.order[pr[1]]];
+    return Hint.make([pr[0], pr[1]],
+      TG2('把 {0} 和 {1} 换个位置（换完交叉会少）', a, b),
+      'Swap ' + a + ' and ' + b, t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(p: number): void {
     if (this.over) {
       return;
@@ -232,6 +392,12 @@ export struct GTangleFix {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('交叉'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -16,6 +16,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -43,6 +45,8 @@ export struct GGame24 {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TARGET 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TARGET);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -269,6 +273,95 @@ export struct GGame24 {
     return this.selA >= 0 && this.selB >= 0;
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // 用文件里现成的穷举求解器 solve()：只挑「合并之后仍然有解」的那一步
+  /** 返回 i * 10000 + j * 100 + op，-1 = 这局面已经走不通了 */
+  private aiPick(): number {
+    for (let i = 0; i < this.items.length; i++) {
+      for (let j = 0; j < this.items.length; j++) {
+        if (i === j) {
+          continue;
+        }
+        for (let op = 0; op < 4; op++) {
+          const res: Frac | null = this.applyOp(this.items[i], this.items[j], op);
+          if (res === null) {
+            continue;
+          }
+          const rest: Frac[] = [];
+          for (let k = 0; k < this.items.length; k++) {
+            if (k !== i && k !== j) {
+              rest.push(this.items[k]);
+            }
+          }
+          rest.push(res);
+          if (this.solve(rest) !== null) {
+            return i * 10000 + (j * 100) + op;
+          }
+        }
+      }
+    }
+    return -1;
+  }
+
+  private autoStep(): boolean {
+    if (this.done || this.finished) {
+      return false;
+    }
+    const m: number = this.aiPick();
+    if (m < 0) {
+      return false;
+    }
+    this.selA = -1;
+    this.selB = -1;
+    this.tapTile(Math.floor(m / 10000));
+    this.tapTile(Math.floor((m % 10000) / 100));
+    this.tapOp(m % 100);
+    return !this.done;
+  }
+
+  /** 提示：报把哪两个数用什么符号合并（走的是求解器验过的那一步） */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.done || this.finished) {
+      return Hint.none('none');
+    }
+    const m: number = this.aiPick();
+    if (m < 0) {
+      return Hint.none('none');
+    }
+    const i: number = Math.floor(m / 10000);
+    const j: number = Math.floor((m % 10000) / 100);
+    const op: number = m % 100;
+    const a: Frac = this.items[i];
+    const b: Frac = this.items[j];
+    return Hint.make([], TG2('把 {0} 和 {1} 用 {2} 合并', this.fracText(a), this.fracText(b), OP_KEYS[op]),
+      TG2('Merge {0} and {1} with {2}', this.fracText(a), this.fracText(b), OP_KEYS[op]), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapTile(i: number): void {
     if (this.done || this.finished) {
       return;
@@ -410,6 +503,12 @@ export struct GGame24 {
 
   build() {
     Column({ space: Space.lg }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.infoBox(0)
         this.infoBox(1)

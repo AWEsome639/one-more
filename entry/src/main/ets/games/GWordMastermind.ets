@@ -2,6 +2,8 @@
  * 猜词大师 —— 猜隐藏的 5 字母单词，逐格给出「位置对 / 字母在 / 都没有」
  * 胜负：7 次内猜中通关｜次数用完未猜中失败｜进度：第几次 / 剩余机会 / 得分
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -27,6 +29,8 @@ export struct GWordMastermind {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 LEN=5
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(5);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -60,6 +64,55 @@ export struct GWordMastermind {
     }
     return res.join('');
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.press(this.typed.length < this.diffTotal ? LETTERS.indexOf(this.answer.charAt(this.typed.length)) : 27);
+    return !this.over;
+  }
+
+  // ═══════════ AI 代打（2026-10-28 第七批）═══════════
+  // 真值就是 this.answer；press 一次敲一格，敲满再按一次提交
+  /** 提示：直接报隐藏的词 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    return Hint.make([],
+      TG2('要猜的词是 {0}', this.answer),
+      TG2('The hidden word is {0}', this.answer), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private press(k: number): void {
     if (this.over) { return; }
     if (k < 26) {
@@ -114,6 +167,12 @@ export struct GWordMastermind {
   }
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('第几次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

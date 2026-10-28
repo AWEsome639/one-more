@@ -10,6 +10,8 @@
  *   ③ onRestart()（宿主点「换一局」）先停旧循环再重开
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -59,6 +61,8 @@ export struct GSnake {
   private tickMs: number = GameDiff.timeNow(TICK_MS);
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State cells: number[] = [];
   @State score: number = 0;
   @State eaten: number = 0;
@@ -267,6 +271,137 @@ export struct GSnake {
   }
 
   /** 转向：禁 180° 掉头 */
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over || this.won) {
+      return false;
+    }
+    if (this.paused) {
+      return true;
+    }
+    const d: number = this.snDir();
+    if (d < 0) {
+      return false;
+    }
+    this.turn(d);
+    return true;
+  }
+
+  /** 代打/提示共用：从 start 出发能走到的空格数（避开蛇身） */
+  private snRoom(start: number): number {
+    const seen: boolean[] = new Array<boolean>(CELLS).fill(false);
+    for (let i = 0; i < this.snake.length; i++) {
+      if (this.snake[i] !== start) {
+        seen[this.snake[i]] = true;
+      }
+    }
+    const q: number[] = [];
+    q.push(start);
+    seen[start] = true;
+    let n: number = 0;
+    let qi: number = 0;
+    while (qi < q.length) {
+      const cur: number = q[qi];
+      qi = qi + 1;
+      n = n + 1;
+      const r: number = Math.floor(cur / N);
+      const c: number = cur - r * N;
+      for (let d = 0; d < 4; d++) {
+        const rr: number = r + DY[d];
+        const cc: number = c + DX[d];
+        if (rr < 0 || rr >= N || cc < 0 || cc >= N) {
+          continue;
+        }
+        const ni: number = rr * N + cc;
+        if (seen[ni]) {
+          continue;
+        }
+        seen[ni] = true;
+        q.push(ni);
+      }
+    }
+    return n;
+  }
+
+  /** 代打/提示共用：朝食物走，但只在「走完还有空间」的方向里挑（-1 = 全堵死） */
+  private snDir(): number {
+    const head: number = this.snake[0];
+    const hx: number = head % N;
+    const hy: number = Math.floor(head / N);
+    const fx: number = this.food >= 0 ? this.food % N : hx;
+    const fy: number = this.food >= 0 ? Math.floor(this.food / N) : hy;
+    let best: number = -1;
+    let bestS: number = -1e9;
+    for (let d = 0; d < 4; d++) {
+      if ((d + 2) % 4 === this.dir) {
+        continue;
+      }
+      const nx: number = hx + DX[d];
+      const ny: number = hy + DY[d];
+      if (nx < 0 || nx >= N || ny < 0 || ny >= N) {
+        continue;
+      }
+      if (this.snake.indexOf(ny * N + nx) >= 0) {
+        continue;
+      }
+      const room: number = this.snRoom(ny * N + nx);
+      const s: number = room * 100 - (Math.abs(nx - fx) + Math.abs(ny - fy));
+      if (s > bestS) {
+        bestS = s;
+        best = d;
+      }
+    }
+    return best;
+  }
+
+  /** 提示：报「下一步往哪走」+ 食物在哪个方向 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.won) {
+      return Hint.none('none');
+    }
+    const d: number = this.snDir();
+    if (d < 0) {
+      return Hint.none(TG('四面都堵住了，只能等'));
+    }
+    const names: string[] = ['上', '右', '下', '左'];
+    const head: number = this.snake[0];
+    const hx: number = head % N;
+    const hy: number = Math.floor(head / N);
+    const fx: number = this.food >= 0 ? this.food % N : hx;
+    const fy: number = this.food >= 0 ? Math.floor(this.food / N) : hy;
+    let where: string = '';
+    where = where + (fy < hy ? '上' : (fy > hy ? '下' : ''));
+    where = where + (fx > hx ? '右' : (fx < hx ? '左' : ''));
+    if (where.length === 0) { where = '就在头上'; }
+    return Hint.make([],
+      TG2('下一步往{0}走；食物在{1}边', names[d], where),
+      TG2('Turn {0} next; the food is {1}', names[d], where), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private turn(d: number): void {
     if (this.over || this.won || this.paused) {
       return;
@@ -315,6 +450,12 @@ export struct GSnake {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       // 得分条 —— ⚠️ 只传「种类」：@Builder 按值传参不建立观察（见 stat() 注释）
       Row({ space: Space.sm }) {
         this.stat(0)

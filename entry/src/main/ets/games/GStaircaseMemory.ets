@@ -2,6 +2,8 @@
  * 阶梯记忆 —— 六级台阶逐级点亮成一段升序路线，暗下后照着顺序点回来
  * 胜负：4 关从 3 级加到 6 级，全过通关，错一级即失败
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -22,6 +24,8 @@ export struct GStaircaseMemory {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(LEVELS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -83,6 +87,53 @@ export struct GStaircaseMemory {
     }, STEP_MS);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 1 || this.cur >= this.order.length) {
+      return true;
+    }
+    this.tap(this.order[this.cur]);
+    return !this.over;
+  }
+
+  // 答案就在 this.order[this.cur]（tap(i) 比的就是 order[cur] !== i）
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.phase !== 1 || this.cur >= this.order.length) {
+      return Hint.none('none');
+    }
+    const step: number = this.order[this.cur];
+    return Hint.make([step],
+      '第 ' + String(this.cur + 1) + ' 个点第 ' + String(step + 1) + ' 阶（本关共 ' + String(this.order.length) + ' 阶）',
+      'Tap step ' + String(step + 1) + ' (number ' + String(this.cur + 1) + ' of ' + String(this.order.length) + ')', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || this.phase !== 1) { return; }
     if (this.order[this.cur] !== i) {
@@ -133,6 +184,12 @@ export struct GStaircaseMemory {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row() {
         Text(TG2('关卡 {0}/{1}',Digits(String(this.level), this.langCode),Digits(String(this.diffTotal), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2('级数 {0}', String(this.order.length))).fontSize(FontSize.sm).fontColor(Palette.berry)

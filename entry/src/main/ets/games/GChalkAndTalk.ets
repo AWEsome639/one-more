@@ -1,6 +1,7 @@
 /** 边写边说 —— 双任务：判断词语类别（说）+ 等光标踩中 ✦ 时落笔（写）
  * 胜负：得分 ≥12 且落笔 ≥3 即通关｜说对 +2 / 说错 -2 / 写对 +1 / 写歪 -1｜进度：剩余 / 得分 / 说·写 */
 import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -29,6 +30,8 @@ export struct GChalkAndTalk {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(PASS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -76,6 +79,65 @@ export struct GChalkAndTalk {
   }
   /** 通关 = 说得准 + 真落过笔，防「只刷说」或「只刷写」 */
   private target(): boolean { return this.score >= this.diffTotal && this.writeOk >= WRITE_MIN; }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.cursor === this.goal) {
+      this.write();
+      return !this.over;
+    }
+    if (this.sayLock) {
+      return true;
+    }
+    this.say(this.truth);
+    return !this.over;
+  }
+
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    if (this.cursor === this.goal) {
+      return Hint.make([],
+        TG2('光标正踩在 ✦ 上 ⇒ 立刻点「落笔 ✍️」'),
+        TG2('The cursor is on ✦ — tap 落笔 ✍️ now'), t0);
+    }
+    if (this.truth) {
+      return Hint.make([],
+        TG2('「{0}」确实属于{1} ⇒ 说「是」', this.word, this.trueCat),
+        TG2('{0} really is a kind of {1} — answer 是', this.word, this.trueCat), t0);
+    }
+    return Hint.make([],
+      TG2('「{0}」其实属于{1}，不是{2} ⇒ 说「否」', this.word, this.trueCat, this.cat),
+      TG2('{0} is a {1}, not a {2} — answer 否', this.word, this.trueCat, this.cat), t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private say(said: boolean): void {
     if (this.over || this.sayLock) { return; }
     if (said === this.truth) {
@@ -112,6 +174,12 @@ export struct GChalkAndTalk {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
             Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

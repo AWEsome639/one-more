@@ -6,6 +6,8 @@
  * 结算：撞墙或咬到自己 ⇒ 失败；长到 8 节 ⇒ 通关。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -54,6 +56,8 @@ export struct GSnake3D {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
 
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private body: number[] = [];
   @State private food: number = 0;
   @State private dir: number = 1;
@@ -215,6 +219,140 @@ export struct GSnake3D {
     this.onFinish(r);
   }
 
+  /** 这个方向走过去会不会撞墙 / 咬到自己 / 是掉头（setDir 会直接忽略） */
+  private dirOk(d: number): boolean {
+    if (this.body.length === 0) {
+      return false;
+    }
+    if ((this.dir === 0 && d === 1) || (this.dir === 1 && d === 0)
+      || (this.dir === 2 && d === 3) || (this.dir === 3 && d === 2)
+      || (this.dir === 4 && d === 5) || (this.dir === 5 && d === 4)) {
+      return false;
+    }
+    const head: number = this.body[0];
+    const z: number = Math.floor(head / PER);
+    const rest: number = head % PER;
+    const y: number = Math.floor(rest / SIZE);
+    const x: number = rest % SIZE;
+    let nx: number = x;
+    let ny: number = y;
+    let nz: number = z;
+    if (d === 0) {
+      nx--;
+    } else if (d === 1) {
+      nx++;
+    } else if (d === 2) {
+      ny--;
+    } else if (d === 3) {
+      ny++;
+    } else if (d === 4) {
+      nz++;
+    } else {
+      nz--;
+    }
+    if (nx < 0 || nx >= SIZE || ny < 0 || ny >= SIZE || nz < 0 || nz >= LAYERS) {
+      return false;
+    }
+    const ni: number = cellAt(nz, ny, nx);
+    for (let i = 0; i < this.body.length - 1; i++) {
+      if (this.body[i] === ni) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /** 代打：朝食物走，差得多的那根轴优先；都不行就找个安全方向绕（-1 = 无路可走） */
+  private autoDir(): number {
+    if (this.body.length === 0 || this.food < 0) {
+      return -1;
+    }
+    const head: number = this.body[0];
+    const hz: number = Math.floor(head / PER);
+    const hrest: number = head % PER;
+    const hy: number = Math.floor(hrest / SIZE);
+    const hx: number = hrest % SIZE;
+    const fz: number = Math.floor(this.food / PER);
+    const frest: number = this.food % PER;
+    const fy: number = Math.floor(frest / SIZE);
+    const fx: number = frest % SIZE;
+    const dxs: number[] = [fx > hx ? 1 : 0, fy > hy ? 3 : 2, fz > hz ? 4 : 5];
+    const ds: number[] = [Math.abs(fx - hx), Math.abs(fy - hy), Math.abs(fz - hz)];
+    const order: number[] = [];
+    for (let i = 0; i < 3; i++) {
+      if (ds[i] === 0) {
+        continue;
+      }
+      let at: number = order.length;
+      for (let k = 0; k < order.length; k++) {
+        if (ds[i] > ds[order[k]]) {
+          at = k;
+          break;
+        }
+      }
+      order.splice(at, 0, i);
+    }
+    for (let i = 0; i < order.length; i++) {
+      if (this.dirOk(dxs[order[i]])) {
+        return dxs[order[i]];
+      }
+    }
+    for (let d = 0; d < 6; d++) {
+      if (this.dirOk(d)) {
+        return d;
+      }
+    }
+    return -1;
+  }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || this.won || this.autoDir() < 0) {
+      return true;
+    }
+    this.setDir(this.autoDir());
+    return !this.over;
+  }
+
+  // 食物在 this.food、身体在 this.body ⇒ 报下一步该按的方向
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.won) {
+      return Hint.none('none');
+    }
+    const d: number = this.autoDir();
+    if (d < 0) {
+      return Hint.none('none');
+    }
+    return Hint.make([], '按「' + DIR_LABEL[d] + '」，食物在第 ' + String(Math.floor(this.food / PER) + 1) + ' 层',
+      'Press "' + DIR_LABEL[d] + '" toward the food', t0);
+  }
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private setDir(d: number): void {
     if (this.over || this.won) {
       return;
@@ -265,6 +403,12 @@ export struct GSnake3D {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)
