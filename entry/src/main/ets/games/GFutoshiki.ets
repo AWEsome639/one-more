@@ -64,6 +64,9 @@ export struct GFutoshiki {
   /** 代打计时器（-1 = 未运行）。必须 @State */
 
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
 
   @State private vals: number[] = [];
   @State private given: boolean[] = [];
@@ -259,6 +262,32 @@ export struct GFutoshiki {
    * ★★ 2026-10-24 第三期：AI 代打（不等号）
    * 用出题时保留的完整解，一格一格填到位。
    */
+  // ═══════════ 演示动画（项目 C）═══════════
+  private demoFinish(): void {
+    if (this.demoId >= 0) { Hint.autoStop(this.demoId); this.demoId = -1; }
+    this.demoLeft = 0;
+    this.reset();
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) { Hint.autoStop(this.demoId); this.demoId = -1; }
+    this.demoLeft = 0;
+  }
+
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoFinish(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;

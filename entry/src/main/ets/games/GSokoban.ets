@@ -98,6 +98,9 @@ export struct GSokoban {
   // ★ 难度作用到玩法（size）：原 MAX_UNDO=300
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   @State private diffTotal: number = GameDiff.sizeNow(300);
   /** ★★ 2026-10-14 滑行（奥森：部分游戏应该有动态的运动过程）：
    *  玩家与箱子【各自】从「来处」方向滑到新格子 */
@@ -137,6 +140,8 @@ export struct GSokoban {
     }
     this.cleared = c;
     this.load(0);
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
   }
 
   /** 宿主点了「换一局」 */
@@ -147,6 +152,12 @@ export struct GSokoban {
   }
 
   /** 载入第 idx 关 */
+  /** ★ 2026-10-29：演示动画需要「演完重来」⇒ 包一个无参 reset()
+   *  这款没有"当前关卡"字段（一直是 load(0)），所以重来就是重新载入第 0 关 */
+  private reset(): void {
+    this.load(0);
+  }
+
   private load(idx: number): void {
     const lv: Level = LEVELS[idx];
     const rows: string[] = lv.rows;
@@ -369,6 +380,33 @@ export struct GSokoban {
       at = par[at];
     }
     return out;
+  }
+
+  // ═══════════ 演示动画（项目 C）═══════════
+  // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
+  //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoStop(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    const wasOn: boolean = this.demoLeft > 0;
+    this.demoLeft = 0;
+    if (wasOn) { this.reset(); }
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
   }
 
   private autoStep(): boolean {
@@ -656,6 +694,10 @@ export struct GSokoban {
       }
       .width('100%')
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    })
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Start)

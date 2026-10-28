@@ -31,6 +31,9 @@ export struct GCircuitConnect {
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3]，上面已一并改成按尺寸生成
  /** 代打计时器（-1 = 未运行）。必须 @State */
  @State private autoId: number = -1;
+ /** 演示动画（项目 C）：-1 = 未运行 */
+ @State private demoId: number = -1;
+ @State private demoLeft: number = 0;
   @State private diffTotal: number = GameDiff.sizeNow(4);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
@@ -49,7 +52,11 @@ export struct GCircuitConnect {
 
  private startAt: number = 0;
 
- aboutToAppear(): void { LanRace.noteStart(); this.reset(); }
+ aboutToAppear(): void {
+   LanRace.noteStart(); this.reset();
+   // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+   setTimeout(() => { this.demoStart(); }, 3000);
+ }
  onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(4);
      this.reset(); }
@@ -94,6 +101,33 @@ export struct GCircuitConnect {
  return lit;
  }
  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ═══════════ 演示动画（项目 C）═══════════
+  // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
+  //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoStop(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    const wasOn: boolean = this.demoLeft > 0;
+    this.demoLeft = 0;
+    if (wasOn) { this.reset(); }
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
  private autoStep(): boolean {
    if (this.over) {
      return false;
@@ -269,6 +303,10 @@ export struct GCircuitConnect {
  Text(this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
  Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).width('100%').height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { Haptics.tap(); this.reset(); })
- }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+ }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
  }
 }
