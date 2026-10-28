@@ -284,7 +284,8 @@ export struct GLockPattern {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
+        autoOn: this.autoId >= 0,
+        demoOn: this.demoId >= 0
       })
 
           Row({ space: Space.md }) {

@@ -289,7 +289,8 @@ export struct GCircuitConnect {
      showHint: true,
      onHintTap: () => { this.askHint(); },
      onAutoTap: () => { this.askAuto(); },
-     autoOn: this.autoId >= 0
+     autoOn: this.autoId >= 0,
+     demoOn: this.demoId >= 0
    })
  Text(TG2('步数 {0}/{1}　电源 {2}',Digits(String(this.moves), this.langCode), String(TURNS), this.on[0] ? TG('接入 ✅') : TG('断开 ❌'))
  + TG2('　终点 {0}', this.on[LAST] ? TG('通电 💡') : TG('未通'))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')

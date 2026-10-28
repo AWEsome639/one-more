@@ -338,7 +338,8 @@ export struct GCompassMaze {
      showHint: true,
      onHintTap: () => { this.askHint(); },
      onAutoTap: () => { this.askAuto(); },
-     autoOn: this.autoId >= 0
+     autoOn: this.autoId >= 0,
+     demoOn: this.demoId >= 0
    })
  Text(TG('步数 ') + this.steps + '/' + DMAX + '　指令 ' + (this.idx + 1) + '/' + this.cmds.length
  + TG2('　出口 {0}排{1}列', this.diffTotal, this.diffTotal)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')

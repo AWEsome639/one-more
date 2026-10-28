@@ -544,7 +544,8 @@ export struct GSokoban {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
-        autoOn: this.autoId >= 0
+        autoOn: this.autoId >= 0,
+        demoOn: this.demoId >= 0
       })
       // ── 关卡名 + 进度 ──
       Row({ space: Space.md }) {
