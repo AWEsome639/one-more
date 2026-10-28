@@ -2,6 +2,8 @@
  * 反应点击 —— ⚡ 亮起就立刻点它，8 次测平均反应时（id: reflex_tap）
  * 胜负：平均 < 550ms 且点偏 ≤ 2 次 ⇒ 通关；进度：第几/8 · 平均 · 最快
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -17,6 +19,11 @@ export struct GReflexTap {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State private pos: number = -1;
@@ -35,7 +42,11 @@ export struct GReflexTap {
   private nextTo: number = -1;
   private done: boolean = false;
   private hitN: number = 0;
-  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  aboutToAppear(): void {
+    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
+  }
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(ROUNDS);
      this.reset(); }
@@ -61,6 +72,79 @@ export struct GReflexTap {
   private avg(): number {
     return this.hitN > 0 ? Math.round(this.total / this.hitN) : 0;
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ═══════════ 演示动画（项目 C）═══════════
+  // ★ 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
+  //   ⇒ **绝不留成绩**（演完就重来一局，玩家看到的是干净的开局）
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.over || this.demoLeft <= 0) { this.demoStop(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    this.demoLeft = 0;
+    this.reset();          // ★ 演完重来：成绩干净
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0 || this.over) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over || !this.live) {
+      return true;
+    }
+    this.tap(this.pos);
+    return !this.over;
+  }
+
+  /** 提示：目标在哪一格 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || !this.live) {
+      return Hint.none('none');
+    }
+    const target: number = this.pos;
+    return Hint.make([target], TG2('点第 {0} 个', String(target + 1)),
+      TG2('Tap cell {0}', String(target + 1)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tap(i: number): void {
     if (this.over || !this.live) { return; }
     const target: number = this.pos;
@@ -95,6 +179,12 @@ export struct GReflexTap {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('第几'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -135,7 +225,11 @@ export struct GReflexTap {
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：8 次平均 < 550 ms 且点偏 ≤ 2 次（一次罚 600 ms）'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
-    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+    }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 
 

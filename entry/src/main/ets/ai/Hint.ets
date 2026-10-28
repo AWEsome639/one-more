@@ -116,6 +116,32 @@ export class Hint {
   /** 代打节拍（毫秒）。太快会看不清，太慢会像卡住。 */
   static AUTO_MS: number = 320;
 
+  // ═══════════ 演示动画（项目 C，2026-10-28）═══════════
+  // ★ 核心认识：**演示 = 代打跑一遍**，只是节奏更慢、步数有限、不许通关。
+  //   ⇒ 有 autoStep 的游戏，演示只要把它放进"沙盒模式"跑几秒。
+  static DEMO_MS: number = 520;      // 比代打慢（320），看得清
+  static DEMO_STEPS: number = 6;     // 最多 6 步，演到"看起来懂了"就停
+
+  /** 演示：每 DEMO_MS 调一次 tick，tick 返回 false 就停。 */
+  static demoRun(tick: () => boolean): number {
+    let id: number = -1;
+    id = setInterval(() => {
+      let more: boolean = false;
+      try {
+        more = tick();
+      } catch (e) {
+        more = false;                // 演示里出错也要停，绝不能让游戏卡死
+      }
+      if (!more) {
+        if (id >= 0) {
+          clearInterval(id);
+          id = -1;
+        }
+      }
+    }, Hint.DEMO_MS);
+    return id;
+  }
+
   /**
    * 开始代打：每 AUTO_MS 调一次 tick，tick 返回 false 就自动停。
    * @returns 计时器 id（传给 autoStop）
