@@ -28,6 +28,7 @@
  * 拾海 2026-10-10 建；2026-10-12 分级扩充
  */
 
+import { Sound } from './Sound';
 import { vibrator } from '@kit.SensorServiceKit';
 
 export class Haptics {
@@ -44,11 +45,19 @@ export class Haptics {
    */
   static tick(): void {
     Haptics.buzz(6);
+    // ★★★ 2026-10-29（项目 D ④）：**把音效挂到触感总线上**
+    //   全项目 1178 个可点元素、355 款游戏都调 Haptics ——
+    //   接在 Haptics 这一处，等于**所有交互一次到位**，不用改 1178 行。
+    //   · 只在最轻的两档（tick / tap）出声：重档（success/fail/celebrate）
+    //     由 GameHost.handleFinish 播 win/lose，避免一次结算响两声
+    //   · Sound.tap() 内部有 60ms 节流 + soundOn 开关 + try/catch
+    Sound.tap();
   }
 
   /** 轻点一下 —— 点按、切换、收藏、切页 */
   static tap(): void {
     Haptics.buzz(12);
+    Sound.tap();
   }
 
   /** 长按的确认感 */
