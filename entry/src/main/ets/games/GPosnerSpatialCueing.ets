@@ -31,6 +31,9 @@ export struct GPosnerSpatialCueing {
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State phase: number = 0;        // 0 注视　1 提示　2 目标　3 反馈
@@ -40,7 +43,11 @@ export struct GPosnerSpatialCueing {
   private rtSum: number = 0; private answered: number = 0; private shownAt: number = 0;
   private startAt: number = 0; private timer: number = -1; private done: boolean = false;
 
-  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  aboutToAppear(): void {
+    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
+  }
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(TRIALS);
      this.reset(); }
@@ -92,6 +99,41 @@ export struct GPosnerSpatialCueing {
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 答案：this.targetSide   ｜ 守卫取自它自己的 if (...) { return; }
+  // ═══════════ 演示动画（项目 C）═══════════
+  // ★ 两条退出路径：
+  //   ① 演完 6 步（demoFinish）⇒ **必须 reset()**：成绩/记录回到干净开局
+  //   ② 玩家碰了（demoStop）  ⇒ **不 reset**：他们那一下就是要开始玩
+  private demoFinish(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    this.demoLeft = 0;
+    this.reset();
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    this.demoLeft = 0;
+  }
+
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoFinish(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -211,7 +253,11 @@ export struct GPosnerSpatialCueing {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
-    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+    }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 
 

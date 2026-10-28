@@ -32,6 +32,9 @@ export struct GFocusTunnel {
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   @State private target: number = 0;
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -48,7 +51,11 @@ export struct GFocusTunnel {
 
   private startAt: number = 0;
 
-  aboutToAppear(): void { LanRace.noteStart(); this.reset(); }
+  aboutToAppear(): void {
+    LanRace.noteStart(); this.reset();
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
+  }
   onRestart(): void {
     this.total = GameDiff.livesNow(LIVES);   // 难度可能刚变过，必须重算
      this.reset(); }
@@ -99,6 +106,41 @@ export struct GFocusTunnel {
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 真值直取：target 就是当前该点的格（点完会换）
+  // ═══════════ 演示动画（项目 C）═══════════
+  // ★ 两条退出路径：
+  //   ① 演完 6 步（demoFinish）⇒ **必须 reset()**：成绩/记录回到干净开局
+  //   ② 玩家碰了（demoStop）  ⇒ **不 reset**：他们那一下就是要开始玩
+  private demoFinish(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    this.demoLeft = 0;
+    this.reset();
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    this.demoLeft = 0;
+  }
+
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoFinish(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -198,6 +240,10 @@ export struct GFocusTunnel {
         .borderRadius(Radius.md).width('100%').height(Cell.of(44))
         .onClick(() => { Haptics.tap(); this.reset(); })
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    })
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

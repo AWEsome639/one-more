@@ -101,14 +101,16 @@ export struct GAngleFinder {
   }
 
   // ═══════════ 演示动画（项目 C）═══════════
-  // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
-  //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
-  private demoStep(): boolean {
-    if (this.demoId < 0) { return false; }
-    if (this.over || this.demoLeft <= 0) { this.demoStop(); return false; }
-    this.demoLeft = this.demoLeft - 1;
-    this.autoStep();
-    return true;
+  // ★ 两条退出路径：
+  //   ① 演完 6 步（demoFinish）⇒ **必须 reset()**：成绩/记录回到干净开局
+  //   ② 玩家碰了（demoStop）  ⇒ **不 reset**：他们那一下就是要开始玩
+  private demoFinish(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    this.demoLeft = 0;
+    this.reset();
   }
 
   private demoStop(): void {
@@ -116,13 +118,19 @@ export struct GAngleFinder {
       Hint.autoStop(this.demoId);
       this.demoId = -1;
     }
-    const wasOn: boolean = this.demoLeft > 0;
     this.demoLeft = 0;
-    if (wasOn) { this.reset(); }
+  }
+
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoFinish(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
   }
 
   private demoStart(): void {
-    if (this.demoId >= 0 || this.over) { return; }
+    if (this.demoId >= 0) { return; }
     this.demoLeft = Hint.DEMO_STEPS;
     this.demoId = Hint.demoRun(() => this.demoStep());
   }
