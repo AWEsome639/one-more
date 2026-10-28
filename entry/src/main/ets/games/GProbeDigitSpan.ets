@@ -3,6 +3,7 @@
  * 胜负：位数从 3 一路答到 8 位 ⇒ 通关；中途答错 ⇒ 失败　｜　进度：位数 / 答对 / 得分
  */
 
+import { Hint, HintResult } from '../ai/Hint';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -104,7 +105,7 @@ export struct GProbeDigitSpan {
 
   build() {
     Column({ space: Space.md }) {
-      Row({ space: Space.sm }) { Column({ space: Space.xs }) {
+            Row({ space: Space.sm }) { Column({ space: Space.xs }) {
       Text((TG('位数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(Digits(String(this.len), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: Space.xs }) {
       Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))

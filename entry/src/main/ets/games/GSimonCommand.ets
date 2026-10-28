@@ -3,6 +3,8 @@
  * 只有「西蒙说」开头的指令才照做；没这句话就必须按「不做动作 ✋」。每题限时 2.2 秒。
  * 胜负：答对 10 题 ⇒ 通关；失误 3 次 ⇒ 失败。进度：答对 / 失误 / 剩余时间。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -23,6 +25,8 @@ export struct GSimonCommand {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：原 WIN=10，按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(10);
   onFinish: (r: GameResult) => void = () => {};
   @State hasWord: boolean = false; @State color: number = 0; @State correct: number = 0;
@@ -59,6 +63,57 @@ export struct GSimonCommand {
     if (this.left <= 0) { this.left = 0; this.judge(-1); }   // 超时 = 没做动作
   }
   /** act: 0~3 点了色块，-1 表示「不做动作」 */
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.phase !== 'play') {
+      return true;
+    }
+    this.judge(this.hasWord ? this.color : -1);
+    return !this.over;
+  }
+
+  /** 提示：该照做还是该忍住 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.phase !== 'play' || this.over) {
+      return Hint.none('none');
+    }
+    if (!this.hasWord) {
+      return Hint.make([], TG('这回没有「西蒙说」⇒ 别动'),
+        TG('No "Simon says" — do nothing'), t0);
+    }
+    const c: number = this.color;
+    return Hint.make([c], TG2('听话，点第 {0} 个', String(c + 1)),
+      TG2('Do it: press {0}', String(c + 1)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private judge(act: number): void {
     if (this.phase !== 'play' || this.over) { return; }
     if (this.tickTimer >= 0) { clearInterval(this.tickTimer); this.tickTimer = -1; }
@@ -94,6 +149,12 @@ export struct GSimonCommand {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("答对 {0}/{1}", this.correct, this.diffTotal))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       Stack({ alignContent: Alignment.Start }) {

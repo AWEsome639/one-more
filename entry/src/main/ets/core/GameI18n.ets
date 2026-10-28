@@ -24,6 +24,14 @@ import { I18n, Lang, toTrad } from './I18n';
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
   /** ★★ 2026-10-28 提示文案 */
+  "第 {0} 位是 {1}": { "en": "Digit {0} is {1}", "ja": "{0}桁目は{1}", "ko": "{0}번째는 {1}", "es": "El dígito {0} es {1}", "fr": "Le chiffre {0} est {1}", "de": "Ziffer {0} ist {1}", "pt": "O dígito {0} é {1}", "ru": "Цифра {0} — это {1}", "it": "La cifra {0} è {1}", "ar": "الرقم {0} هو {1}" },
+  /** ★★ 2026-10-28 提示文案 */
+  "这回没有「西蒙说」⇒ 别动": { "en": "No \"Simon says\" — do nothing", "ja": "今は「サイモン」なし ⇒ 動かない", "ko": "\"사이먼\"이 없음 ⇒ 움직이지 마", "es": "Sin \"Simón dice\" — no te muevas", "fr": "Pas de « Jacques a dit » — ne bouge pas", "de": "Kein \"Simon sagt\" — nicht bewegen", "pt": "Sem \"Simon diz\" — não se mexa", "ru": "Саймон не говорит — не двигайся", "it": "Niente \"Simon dice\" — non muoverti", "ar": "لا \"سيمون يقول\" — لا تتحرك" },
+  /** ★★ 2026-10-28 提示文案 */
+  "听话，点第 {0} 个": { "en": "Do it: press {0}", "ja": "言う通りに{0}を押す", "ko": "시킨 대로 {0}을 누르세요", "es": "Obedece: pulsa {0}", "fr": "Obéis : appuie sur {0}", "de": "Gehorche: drücke {0}", "pt": "Obedeça: pressione {0}", "ru": "Слушайся: нажми {0}", "it": "Obbedisci: premi {0}", "ar": "أطِع: اضغط {0}" },
+  /** ★★ 2026-10-28 提示文案 */
+  "放到第 {0} 堆": { "en": "Put it on pile {0}", "ja": "{0}番目の山へ", "ko": "{0}번째 더미에 두기", "es": "Ponlo en el montón {0}", "fr": "Mets-le sur le tas {0}", "de": "Lege es auf Stapel {0}", "pt": "Coloque na pilha {0}", "ru": "Положите в стопку {0}", "it": "Mettilo sulla pila {0}", "ar": "ضعه على الكومة {0}" },
+  /** ★★ 2026-10-28 提示文案 */
   "选 A 那边": { "en": "Pick side A", "ja": "A 側を選ぶ", "ko": "A 쪽을 선택", "es": "Elige el lado A", "fr": "Choisis le côté A", "de": "Wähle Seite A", "pt": "Escolha o lado A", "ru": "Выберите сторону A", "it": "Scegli il lato A", "ar": "اختر الجانب A" },
   /** ★★ 2026-10-28 提示文案 */
   "选 B 那边": { "en": "Pick side B", "ja": "B 側を選ぶ", "ko": "B 쪽을 선택", "es": "Elige el lado B", "fr": "Choisis le côté B", "de": "Wähle Seite B", "pt": "Escolha o lado B", "ru": "Выберите сторону B", "it": "Scegli il lato B", "ar": "اختر الجانب B" },
