@@ -20,9 +20,12 @@ interface StackLevel {
 }
 
 const LEVELS: StackLevel[] = [
-  { inner: [2, 3, 4], cap: 2, queue: [4, 2, 3, 2, 3, 2, 4] },
+  // ★ 2026-10-28 修正：第 1、3 关队列 7 块，但每根柱只收同宽的块 ——
+  //   两关的方块都是「宽 2×3、宽 3×2、宽 4×2」，而宽 2 只有一根柱 ⇒ 那根柱得能叠 3 层；
+  //   3 柱 × 限高 2 = 6 个位置 < 7 块 ⇒ 原来两关数学上无解。限高改 3（9 个位置）后全部塞得下。
+  { inner: [2, 3, 4], cap: 3, queue: [4, 2, 3, 2, 3, 2, 4] },
   { inner: [2, 3, 2], cap: 2, queue: [3, 2, 2, 3, 2, 2] },
-  { inner: [4, 2, 3], cap: 2, queue: [2, 2, 3, 3, 4, 2, 4] }
+  { inner: [4, 2, 3], cap: 3, queue: [2, 2, 3, 3, 4, 2, 4] }
 ];
 
 @Component
@@ -33,7 +36,8 @@ export struct GBlockStackingPhysics {
   // ★ 难度作用到玩法（size）：原 SLOT=5
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
-  @State private diffTotal: number = GameDiff.sizeNow(5);
+  // ★ 2026-10-28：槽位跨距必须 ≥ UI 的 5 行，否则简单档 sizeNow(5)=4 会让第 2 根柱的块显示到第 1 根柱顶上。
+  @State private diffTotal: number = Math.max(SLOT, GameDiff.sizeNow(5));
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
   onFinish: (r: GameResult) => void = () => {};
@@ -50,7 +54,7 @@ export struct GBlockStackingPhysics {
 
   aboutToAppear(): void { LanRace.noteStart(); this.reset(); }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(5);
+    this.diffTotal = Math.max(SLOT, GameDiff.sizeNow(5));
      this.reset(); }
 
   private reset(): void {

@@ -1,6 +1,7 @@
 /**
  * 色相排序 —— 交换格子，把 16 个色块按色相排成一道彩虹
- * 胜负：18 步内排成严格递增 ⇒ 通关｜进度：已归位 / 16 + 剩余步数
+ * 胜负：在本档步数上限内（简单 38 / 普通 25 / 困难 15，见 MAX_MOVES）排成严格递增 ⇒ 通关
+ * 进度：已归位 / 16 + 剩余步数
  */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -12,7 +13,15 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
 const N: number = 4;
-const MAX_MOVES: number = 18;
+/**
+ * ★ 2026-10-29 修「困难档数学上不可能赢」：
+ *   16 个格子的随机排列，排回正序最少要「16 − 环数」次交换，最坏一个 16 长环要 15 次。
+ *   原来 MAX_MOVES=18 经 GameDiff.lives 换算成 27/18/10 ⇒ 困难档只给 10 步 < 15 步，
+ *   那一档**任何随机局都赢不了**。
+ *   改 base=25 ⇒ 38/25/15（25×0.6=15 = 最坏所需），三档都够、且仍是 易 > 普 > 难。
+ */
+const MAX_MOVES: number = 25;
+const REQUIRED: number = N * N - 1;   // 16 格最坏情形所需交换数 = 15（兜底：任何档都不许低于它）
 const R4: number[] = [0, 1, 2, 3];
 
 function hueColor(h: number): string {  // hsl(h,100%,55%) → #RRGGBB
@@ -41,7 +50,7 @@ export struct GHueSort {
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
-  @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
+  @State private diffTotal: number = Math.max(GameDiff.livesNow(MAX_MOVES), REQUIRED);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
 
@@ -52,7 +61,7 @@ export struct GHueSort {
 
   aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
   onRestart(): void {
-    this.diffTotal = GameDiff.livesNow(MAX_MOVES);
+    this.diffTotal = Math.max(GameDiff.livesNow(MAX_MOVES), REQUIRED);
      this.reset(); }
 
   private reset(): void {

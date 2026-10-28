@@ -1,4 +1,4 @@
-/** 勾股数 —— 构造勾股三元组｜6 关解出 5 关过关 */
+/** 勾股数 —— 构造勾股三元组｜关数（简单 4/普通 6/困难 8）里解出 ≥ 通关线（3/5/7）关过关 */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -162,13 +162,24 @@ export struct GPythagoreanTripleBuilder {
     this.typed = '';
   }
 
+  /**
+   * ★ 2026-10-28 修正：通关线不能是常量 —— 关数按难度变（简单 4 / 普通 6 / 困难 8），
+   *   原来固定 PASS=5，简单档只有 4 关 ⇒ 最多解出 4 关，数学上不可能赢。
+   *   公式 = min(关数, PASS + (关数 - LEVELS))：简单 4→3、普通 6→5、困难 8→7。
+   *   每题答案都能输入（最多两位数），所以「实际能拿到的最大值 = 关数」。
+   */
+  private passNeed(): number {
+    const v: number = PASS + (this.diffTotal - LEVELS);
+    return Math.max(1, Math.min(this.diffTotal, v));
+  }
+
   private next(msg: string): void {
     this.level++;
     if (this.level >= this.diffTotal) {
       this.over = true;
       this.tip = TG2("{0}｜共解出 {1}/{2} 关", msg,Digits(String(this.clears), this.langCode),Digits(String(this.diffTotal), this.langCode));
       const res: GameResult = {
-        gameId: 'pythagorean_triple_builder', solved: this.clears >= PASS,
+        gameId: 'pythagorean_triple_builder', solved: this.clears >= this.passNeed(),
         score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.clears
       };
       LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）

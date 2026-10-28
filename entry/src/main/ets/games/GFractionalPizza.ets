@@ -1,4 +1,4 @@
-/** 分数披萨 —— 按分数切披萨；玩法：按题目的分数点亮同样多的披萨片，点「确认」判定；胜负：6 题答对 ≥5 ⇒ 通关；否则失败 */
+/** 分数披萨 —— 按分数切披萨；玩法：按题目的分数点亮同样多的披萨片，点「确认」判定；胜负：题数（简单 4/普通 6/困难 8）里答对 ≥ 通关线（3/5/7）⇒ 通关；否则失败 */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -136,13 +136,23 @@ export struct GFractionalPizza {
     if (this.nextTo >= 0) { clearTimeout(this.nextTo); }
     this.nextTo = setTimeout(() => { this.nextTo = -1; this.next(); }, NEXT_MS);
   }
+  /**
+   * ★ 2026-10-28 修正：通关线不能是常量 —— 题数按难度变（简单 4 / 普通 6 / 困难 8），
+   *   原来固定 PASS=5，简单档只有 4 题 ⇒ 最多答对 4 个，数学上不可能赢。
+   *   公式 = min(题数, PASS + (题数 - ROUNDS))：简单 4→3、普通 6→5、困难 8→7。
+   *   每题都一定答得对（点亮 n 片再确认），所以「实际能拿到的最大值 = 题数」。
+   */
+  private passNeed(): number {
+    const v: number = PASS + (this.diffTotal - ROUNDS);
+    return Math.max(1, Math.min(this.diffTotal, v));
+  }
   private next(): void {
     if (this.over) { return; }
     if (this.round >= this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      this.over = true; this.won = this.right >= this.passNeed();
       this.msg = this.won
         ? TG('🎉 答对 ') + String(this.right) + '/' + this.diffTotal + TG('，通关！')
-        : TG('😵 只答对 ') + String(this.right) + '/' + this.diffTotal + TG('，差 ') + String(PASS - this.right) + TG(' 题');
+        : TG('😵 只答对 ') + String(this.right) + '/' + this.diffTotal + TG('，差 ') + String(this.passNeed() - this.right) + TG(' 题');
       this.finish(this.won); return;
     }
     this.round = this.round + 1; this.ask(); this.msg = TG2('点亮 {0}/{1} 片，再点确认', String(this.n), String(this.d));
@@ -176,7 +186,7 @@ export struct GFractionalPizza {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.right + '/' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.right + '/' + this.passNeed())).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

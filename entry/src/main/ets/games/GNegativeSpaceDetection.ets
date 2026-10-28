@@ -1,4 +1,4 @@
-/** 负空间 —— 满屏色块里留白拼出一个形状，认出它是哪一个；6 关答对 ≥5 通关 */
+/** 负空间 —— 满屏色块里留白拼出一个形状，认出它是哪一个；关数（简单 4/普通 6/困难 8）里答对 ≥ 通关线（3/5/7）通关 */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -138,6 +138,17 @@ export struct GNegativeSpaceDetection {
     Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
+  /**
+   * ★ 2026-10-28 修正：通关线不能是常量 —— 关数按难度变（简单 4 / 普通 6 / 困难 8），
+   *   原来固定 PASS=5，简单档只有 4 关 ⇒ 最多答对 4 关，数学上不可能赢。
+   *   公式 = min(关数, PASS + (关数 - ROUNDS))：简单 4→3、普通 6→5、困难 8→7。
+   *   每题都有正确选项，所以「实际能拿到的最大值 = 关数」。
+   */
+  private passNeed(): number {
+    const v: number = PASS + (this.diffTotal - ROUNDS);
+    return Math.max(1, Math.min(this.diffTotal, v));
+  }
+
   private answer(i: number): void {
     if (this.over || this.phase !== 0 || this.pick >= 0) { return; }
     const ok: boolean = this.opts[i].name === this.rightName;
@@ -149,7 +160,7 @@ export struct GNegativeSpaceDetection {
     this.nextTo = setTimeout(() => {
       this.nextTo = -1;
       if (this.round >= this.diffTotal) {
-        this.phase = 2; this.over = true; this.won = this.right >= PASS;
+        this.phase = 2; this.over = true; this.won = this.right >= this.passNeed();
         this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + String(this.right) + '/' + String(this.asked);
         this.finish(this.won);
         return;

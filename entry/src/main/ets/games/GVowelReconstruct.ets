@@ -1,6 +1,8 @@
 /**
  * 元音重建 —— 单词里的元音在 AEIOU 里被整体挪了若干格，点亮元音把它一格一格转回来
- * 胜负：6 个词里还原 ≥ 5 个通关 ｜ 进度：第几词 / 已还原 / 剩余步数 / 得分
+ * 胜负：题数（简单 4/普通 6/困难 8）里还原 ≥ 通关线（3/5/7）个通关
+ *       ★ 通关线原来固定 5，但简单档只有 4 个词 ⇒ 数学上不可能赢；改为随题数换算（passNeed）。
+ *       进度：第几词 / 已还原 / 剩余步数 / 得分
  */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -168,9 +170,19 @@ export struct GVowelReconstruct {
     if (this.qi + 1 >= this.diffTotal) { this.end(); return; }
     this.qi = this.qi + 1; this.load();
   }
+  /**
+   * ★ 2026-10-28 修正：通关线不能是常量 —— 题数按难度变（简单 4 / 普通 6 / 困难 8），
+   *   原来固定 PASS=5，简单档最多只能还原 4 个 ⇒ 数学上不可能赢。
+   *   公式 = min(题数, PASS + (题数 - ROUNDS))：简单 4→3、普通 6→5、困难 8→7。
+   *   每个词都能还原（步数 = 元音数×3+3 ≥ 需要的最大步数 元音数×3），所以「实际能拿到的最大值 = 题数」。
+   */
+  private passNeed(): number {
+    const v: number = PASS + (this.diffTotal - ROUNDS);
+    return Math.max(1, Math.min(this.diffTotal, v));
+  }
   private end(): void {
     if (this.done) { return; }
-    this.done = true; this.over = true; this.won = this.solvedCount >= PASS;
+    this.done = true; this.over = true; this.won = this.solvedCount >= this.passNeed();
     this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("还原 {0}/{1}", this.solvedCount, this.diffTotal);
     const r: GameResult = { gameId: 'vowel_reconstruct', solved: this.won, score: this.score,
       durationMs: Date.now() - this.startAt, levelReached: this.solvedCount };

@@ -3,7 +3,7 @@
  *
  * 规则：8 副黑桃 A~K 共 104 张，10 列。可以整段搬「点数递减」的正面牌，
  *       放到比它大一点的牌上（空列放任意牌）。集齐 K→A 一整组就收走。
- * 结算：收满 8 组 ⇒ 通关；牌堆空了又无处可搬 ⇒ 失败。
+ * 结算：收满本档组数（简单 4 / 普通 6 / 困难 8，见 diffTotal）⇒ 通关；牌堆空了又无处可搬 ⇒ 失败。
  *
  * 牌编码：slot = 点数×2 + 是否正面（A=0…K=12，全黑桃所以不用存花色）。
  */
@@ -41,9 +41,14 @@ export struct GSpiderSolitaire {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：原 SETS=8
+  //   ★ 2026-10-29 修「困难档数学上不可能赢」：
+  //     要收的组数 = GameDiff.sizeNow(8) = 6 / 8 / 10，但整副牌只有 SETS=8 组 A~K（104 张）
+  //     ⇒ 困难档要 10 组 > 牌里存在的 8 组，永远收不齐、必输。
+  //     base 改 6 ⇒ 4 / 6 / 8，再用 min(难度值, SETS) 兜底：困难档刚好用满 8 组（能赢的最难值），
+  //     简单档只收 4 组 ⇒ 仍是 易 < 普 < 难。牌堆、发牌、收组判定一概没动。
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
-  @State private diffTotal: number = GameDiff.sizeNow(8);
+  @State private diffTotal: number = Math.min(GameDiff.sizeNow(6), SETS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
   onFinish: (r: GameResult) => void = () => {};
@@ -68,7 +73,7 @@ export struct GSpiderSolitaire {
 
   /** 宿主点了「换一局」 */
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(8);
+    this.diffTotal = Math.min(GameDiff.sizeNow(6), SETS);
     this.reset();
   }
 

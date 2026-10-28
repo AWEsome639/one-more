@@ -1,7 +1,8 @@
 /**
- * 填字游戏 —— 5×5 迷你填字：按线索从词库里挑词，填满五行
- * 秘密：这五个词横竖皆成词（词方阵 HEART / EMBER / ABUSE / RESIN / TREND）
- * 胜负：五行全填对通关；挑错 3 次即失败　进度：已填行数 / 失误 / 得分
+ * 填字游戏 —— 5×5 迷你填字：按线索从词库里挑词，逐行填满
+ * 秘密：前五个词横竖皆成词（词方阵 HEART / EMBER / ABUSE / RESIN / TREND）
+ *       困难档要多填两行（STONE / FLAME）⇒ 词库共 7 个词，七行都填得满
+ * 胜负：行数全填对通关；挑错 3 次即失败　进度：已填行数 / 失误 / 得分
  */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -13,15 +14,27 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 const SIZE: number = 5; const MAX_MISS: number = 3;
-const WORDS: string[] = ['HEART', 'EMBER', 'ABUSE', 'RESIN', 'TREND'];
+/**
+ * ★ 2026-10-29 修「困难档 7 行填不满」：
+ *   行数 = GameDiff.sizeNow(5) = 4 / 5 / 7，但原来答案词只有 5 个 ⇒ 第 6、7 行没有正解
+ *   （WORDS[cur] === undefined，点什么都算失误）⇒ 困难档**必输**。
+ *   把原来只当干扰项的两个词 STONE / FLAME 提为第 6、7 个答案并补上线索
+ *   ⇒ 词库 7 个词，4 / 5 / 7 行全填得满；简单、普通只用前 4 / 5 行，没轮到的词照旧当干扰项。
+ *   ⚠️ 填字池 UI 只有 7 个格子 ⇒ 词库不能再多，EXTRA 已并入 WORDS（保留 concat 结构不动）。
+ */
+const WORDS: string[] = ['HEART', 'EMBER', 'ABUSE', 'RESIN', 'TREND', 'STONE', 'FLAME'];
 const CLUES: string[] = [
   '1 行：胸腔里日夜跳动的器官（5 字母）',
   '2 行：炭火里将熄未熄的红光（5 字母）',
   '3 行：错误地、过度地使用权力或药物（5 字母）',
   '4 行：松柏伤口渗出的黏稠物（5 字母）',
-  '5 行：风向；潮流所向（5 字母）'
+  '5 行：风向；潮流所向（5 字母）',
+  '6 行：地上坚硬的矿物块（5 字母）',
+  '7 行：燃烧时窜起的光（5 字母）'
 ];
-const EXTRA: string[] = ['STONE', 'FLAME'];
+const EXTRA: string[] = [];
+/** 列数固定 = 词长 5（★ 原来列数跟着行数走，简单档 4 列会把 5 字母词截成 4 个字母） */
+const COLS: number[] = [0, 1, 2, 3, 4];
 @Component
 export struct GCrossword {
   /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
@@ -29,11 +42,12 @@ export struct GCrossword {
   @Prop theme: Theme = Theme.light();
   @Prop @Watch('onRestart') restartToken: number = 0;
 
-  // ★ 难度作用到玩法：棋盘边长（原 SIZE=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
-  //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4]，上面已一并改成按尺寸生成
+  // ★ 难度作用到玩法：**行数**（原 SIZE=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3 ⇒ 4 / 5 / 7 行）
+  //   列数固定 = 词长 5（COLS）—— 词都是 5 字母，列数跟着行数变只会把词截短
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
-  @State private diffTotal: number = GameDiff.sizeNow(5);
+  /** 行数 = min(难度值, 答案词数)：词库几个词就只能填几行，多出来的行必输 */
+  @State private diffTotal: number = Math.min(GameDiff.sizeNow(5), WORDS.length);
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
   private rowIdx(): number[] {
@@ -49,7 +63,7 @@ export struct GCrossword {
   private startAt: number = 0; private done: boolean = false;
   aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(5);
+    this.diffTotal = Math.min(GameDiff.sizeNow(5), WORDS.length);
      this.reset(); }
   private isUsed(i: number): boolean {
     return i < this.bank.length && this.used.indexOf(this.bank[i]) >= 0;
@@ -176,7 +190,7 @@ export struct GCrossword {
       Column({ space: Space.xs }) {
         ForEach(this.rowIdx(), (r: number) => {
           Row({ space: Space.xs }) {
-            ForEach(this.rowIdx(), (c: number) => {
+            ForEach(COLS, (c: number) => {
               Stack() {
               Text(this.rows[(r)].length > (c) ? this.rows[(r)].charAt((c)) : '')
               .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)

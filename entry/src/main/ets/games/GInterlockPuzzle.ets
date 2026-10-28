@@ -1,6 +1,8 @@
 /**
  * 互锁拼图 —— 卡榫互相咬住，只能先抽没人压着的那一块
- * 胜负：8 步内全部抽出 ⇒ 通关｜进度：已抽 / 总数 + 剩余步数
+ * 胜负：步数预算内全部抽出 ⇒ 通关｜进度：已抽 / 总数 + 剩余步数
+ * ★ 步数预算 = 难度换算 livesNow(8)，下限 = 零件数 6（简单 12 / 普通 8 / 困难 6）——
+ *   抽完 6 个零件至少要 6 步，原困难档 4 步在数学上永远赢不了。
  */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -27,7 +29,10 @@ export struct GInterlockPuzzle {
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
-  @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
+  /** ★ 2026-10-28 修正：下限必须 ≥ PIECES —— 抽完 6 个零件至少要 6 步，
+   *  困难档 livesNow(8) = floor(8×0.6) = 4 < 6 ⇒ 原来数学上永远赢不了。
+   *  简单 12 / 普通 8 / 困难 6，三档都够用且难度递进。 */
+  @State private diffTotal: number = Math.max(PIECES, GameDiff.livesNow(MAX_MOVES));
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
 
@@ -40,7 +45,7 @@ export struct GInterlockPuzzle {
 
   aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
   onRestart(): void {
-    this.diffTotal = GameDiff.livesNow(MAX_MOVES);
+    this.diffTotal = Math.max(PIECES, GameDiff.livesNow(MAX_MOVES));   // 同上：永远 ≥ 零件数
      this.reset(); }
 
   /** 生成：按 0..5 顺序层层压 —— 编号大的被编号小的压，天然无环、必定有解 */

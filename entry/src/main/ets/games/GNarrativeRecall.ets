@@ -1,4 +1,8 @@
-/** 故事回忆 —— 读一段小故事，凭记忆回答细节题；2 篇 6 题答对 ≥5 通关 */
+/**
+ * 故事回忆 —— 读一段小故事，凭记忆回答细节题
+ * 胜负：玩完 ROUNDS 篇（每篇 3 题）后，答对 ≥ min(sizeNow(PASS), 可答题数) 即通关
+ *       ⇒ 简单 4 / 普通 5 / 困难 7（可答题 9 道，三档都够得到）
+ */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -8,8 +12,17 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 
-const ROUNDS: number = 2;
+/**
+ * ★ 2026-10-29 修「困难档数学上不可能赢」：
+ *   过关线 = GameDiff.sizeNow(PASS=5) = 4 / 5 / 7，但 ROUNDS=2 ⇒ 全场只问 2×3 = 6 题，
+ *   困难档要答对 7 题 > 能答的 6 题 ⇒ **必输**。
+ *   题库里本来就有 3 篇（第 3 篇从未被抽到）⇒ ROUNDS 改 3，可答 9 题；
+ *   再用 min(难度值, 可答题数) 兜底 ⇒ 4 / 5 / 7，三档都够得到且仍是 易 < 普 < 难。
+ */
+const ROUNDS: number = 3;
 const PASS: number = 5;
+const Q_PER_STORY: number = 3;                    // 题库里每篇都是 3 题
+const MAX_ASKED: number = ROUNDS * Q_PER_STORY;   // 一局最多能答的题数 = 9
 
 interface Q { text: string; opts: string[]; right: number }
 interface Story { body: string; qs: Q[] }
@@ -49,7 +62,7 @@ export struct GNarrativeRecall {
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
-  @State private diffTotal: number = GameDiff.sizeNow(PASS);
+  @State private diffTotal: number = Math.min(GameDiff.sizeNow(PASS), MAX_ASKED);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
   @State private story: Story = { body: '', qs: [] };
@@ -69,7 +82,7 @@ export struct GNarrativeRecall {
 
   aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(PASS);
+    this.diffTotal = Math.min(GameDiff.sizeNow(PASS), MAX_ASKED);
      this.reset(); }
   aboutToDisappear(): void { this.clearAll(); }
 
