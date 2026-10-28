@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SYMS: string[] = ['●', '▲', '■', '★', '◆', '✚'];
 const OPT4: number[] = [0, 1, 2, 3];
@@ -249,6 +250,9 @@ export struct GSymbolLogic {
           .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(60)).backgroundColor(this.pick === (i) ? Palette.lime : this.theme.surfaceAlt)
           .borderRadius(Radius.md).shadow(Shadow.card).scale({ x: this.pick === (i) ? Motion.pressScale : 1, y: this.pick === (i) ? Motion.pressScale : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.answer((i)); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((i)); }); })
           // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
           .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
             .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
@@ -259,6 +263,9 @@ export struct GSymbolLogic {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.lime).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：先算第二个符号，再回代求第一个'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

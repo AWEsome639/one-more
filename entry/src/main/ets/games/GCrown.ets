@@ -17,6 +17,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 6;
 const MAX_MOVES: number = 120;
@@ -520,6 +521,9 @@ export struct GCrown {
               this.pressed = -1;
               }
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tap((r * N + c));
@@ -544,6 +548,9 @@ export struct GCrown {
         .backgroundColor(this.mode === (1) ? Palette.teal : this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.mode = (1); }); })
         .onClick(() => {
         Haptics.tick();
         this.mode = (1);
@@ -557,6 +564,9 @@ export struct GCrown {
         .backgroundColor(this.mode === (2) ? Palette.teal : this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.mode = (2); }); })
         .onClick(() => {
         Haptics.tick();
         this.mode = (2);
@@ -568,6 +578,9 @@ export struct GCrown {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(44)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
@@ -579,6 +592,9 @@ export struct GCrown {
           .borderRadius(Radius.md)
           .width(88)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();

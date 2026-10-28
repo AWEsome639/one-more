@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 interface WheelSet { letters: string; words: string[]; }
 const SETS: WheelSet[] = [
@@ -244,6 +245,9 @@ export struct GWordWheel {
           .borderRadius(Radius.sm).shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.pick((i)); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); })
         }, (i: number) => 'L' + i)
       }
       .width('100%')
@@ -255,13 +259,22 @@ export struct GWordWheel {
         Button(TG('提交'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.submit(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); })
         Button(TG('退格'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surface)
           .borderRadius(Radius.md).width(76).height(Cell.of(46))
           .onClick(() => { Haptics.tap(); this.typed = this.typed.substring(0, Math.max(0, this.typed.length - 1)); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.typed = this.typed.substring(0, Math.max(0, this.typed.length - 1)); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.cyan)
           .borderRadius(Radius.md).width(76).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
 

@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const GOAL: number = 10; const LIMIT: number = 60; const TICK_MS: number = 1000;
 const PENALTY: number = 3; const NEXT_MS: number = 420;
@@ -294,7 +295,10 @@ export struct GModularClockArithmetic {
         .backgroundColor(this.picked < 0 ? this.theme.surface
         : ((i) === this.ans ? Palette.emerald : ((i) === this.picked ? Palette.rose : this.theme.surface)))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { Haptics.tick(); this.pick((i)); }) }, (i: number) => 'mo' + i)
+        .onClick(() => { Haptics.tick(); this.pick((i)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); }) }, (i: number) => 'mo' + i)
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).width('100%')
@@ -318,6 +322,9 @@ export struct GModularClockArithmetic {
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.berry)
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：12 点之后回到 1 点，模运算只看余数'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

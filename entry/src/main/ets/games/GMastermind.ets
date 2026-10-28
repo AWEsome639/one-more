@@ -14,6 +14,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const SLOTS: number = 4;
 const COLORS: number = 6;
@@ -311,6 +312,9 @@ export struct GMastermind {
             .borderRadius(Radius.full)
             .border({ width: this.sel === c ? 3 : 1, color: this.sel === c ? this.theme.ink : this.theme.line })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = c; }); })
             .onClick(() => {
               Haptics.tick();
               this.sel = c;
@@ -329,6 +333,9 @@ export struct GMastermind {
             .borderRadius(Radius.full)
             .border({ width: 1, color: this.theme.line })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapSlot(i); }); })
             .onClick(() => {
               Haptics.tick();
               this.tapSlot(i);
@@ -345,6 +352,9 @@ export struct GMastermind {
           .backgroundColor(Palette.cyan).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); })
           .onClick(() => {
             Haptics.tap();
             this.submit();
@@ -355,6 +365,9 @@ export struct GMastermind {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .width(80).height(Cell.of(44))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.clearCur(); }); })
           .onClick(() => {
             Haptics.tap();
             this.clearCur();
@@ -364,6 +377,9 @@ export struct GMastermind {
           .fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .width(80).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();

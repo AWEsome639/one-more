@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const CAP: number = 4;          // 每管容量
 /**
@@ -596,6 +597,9 @@ export struct GWaterSort {
           Haptics.tick();
           this.tapTube((t));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapTube((t)); }); })
         }, (t: number) => 't' + t)
       }
       .width('100%')
@@ -620,6 +624,9 @@ export struct GWaterSort {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('倒水规则：只有颜色相同、或目标管是空的才能倒；倒的量受目标管剩余空间限制'))
         .fontSize(FontSize.xxs)

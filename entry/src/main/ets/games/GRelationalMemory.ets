@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const PAIRS: number = 6;
 const STUDY_MS: number = 5000;
 const POOL: string[] = ['🍎', '🌙', '⚽', '🎈', '🐳', '🔑', '🍀', '🎸', '🚀', '🍄', '🧊', '🪁'];
@@ -244,6 +245,9 @@ export struct GRelationalMemory {
             .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
               .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
             .onClick(() => { Haptics.tick(); this.answer((o)); })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((o)); }); })
           }, (o: string) => o)
         }.width('100%')
       }
@@ -253,6 +257,9 @@ export struct GRelationalMemory {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：6 题答对 ≥ 5 通关；看 5 秒后开始答题'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }

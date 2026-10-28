@@ -8,6 +8,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const LIMIT: number = 60;
 const PASS: number = 100;
@@ -279,18 +280,27 @@ export struct GQuickMath {
         ForEach([0, 1], (i: number) => { Button(this.opts.length > (i) ? String(this.opts[(i)]) : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-        .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'a' + i)
+        .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.choose(this.opts[(i)]); }); }); }, (i: number) => 'a' + i)
       }.width('100%')
       Row({ space: Space.sm }) {
         ForEach([2, 3], (i: number) => { Button(this.opts.length > (i) ? String(this.opts[(i)]) : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-        .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'b' + i)
+        .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.choose(this.opts[(i)]); }); }); }, (i: number) => 'b' + i)
       }.width('100%')
       Row({ space: Space.md }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Text(TG('连击越高分越多')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }

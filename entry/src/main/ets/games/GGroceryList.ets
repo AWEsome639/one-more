@@ -7,6 +7,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const POOL: string[] = ['🍎', '🥛', '🍞', '🥚', '🧀', '🍌', '🥕', '🍇', '🐟', '🍯', '🍜', '🧴'];
 const ROUNDS: number = 3;
@@ -250,6 +251,9 @@ export struct GGroceryList {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.cyan)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：每轮清单更长，答对 75% 即通关'))
@@ -267,6 +271,9 @@ export struct GGroceryList {
       .layoutWeight(1).height(Cell.of(52)).backgroundColor(yes ? Palette.cyan : Palette.inkSoft).borderRadius(Radius.md)
       .opacity(this.phase === 1 && this.pick < 0 ? 1 : 0.5).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer(yes); }); })
       .onClick(() => { Haptics.tick(); this.answer(yes); })
   }
 }

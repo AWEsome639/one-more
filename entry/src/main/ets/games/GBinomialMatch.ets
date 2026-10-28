@@ -16,6 +16,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const PAIRS: number = 4;        // 每局配对数
 const MISS: number = 3;         // 失误上限
@@ -424,6 +425,9 @@ export struct GBinomialMatch {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();
@@ -482,6 +486,9 @@ export struct GBinomialMatch {
       .borderRadius(Radius.md)
       .shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapL(i); }); })
       .onClick(() => {
         Haptics.tick();
         this.tapL(i);
@@ -502,6 +509,9 @@ export struct GBinomialMatch {
       .borderRadius(Radius.md)
       .shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapR(j); }); })
       .onClick(() => {
         Haptics.tick();
         this.tapR(j);

@@ -16,6 +16,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 5;
 const MAX_MOVES: number = 150;
@@ -505,6 +506,9 @@ export struct GKakurasuSums {
               this.pressed = -1;
               }
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tap((r * N + c));
@@ -536,6 +540,9 @@ export struct GKakurasuSums {
           .borderRadius(Radius.md)
           .width(64)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
@@ -547,6 +554,9 @@ export struct GKakurasuSums {
           .borderRadius(Radius.md)
           .width(96)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();

@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const GOAL: number = 6; const LIMIT: number = 90; const TICK_MS: number = 1000;
 const PENALTY: number = 4; const NEXT_MS: number = 480;
@@ -280,6 +281,9 @@ export struct GMentalCalendar {
           .backgroundColor(this.pickedW < 0 ? this.theme.surface
           : ((w) === this.ansW ? Palette.emerald : ((w) === this.pickedW ? Palette.rose : this.theme.surface)))
           .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((w)); }); })
           .onClick(() => { Haptics.tick(); this.pick((w)); }) }, (w: number) => 'cw1' + w)
         }.width('100%')
         Row({ space: Space.sm }) {
@@ -291,6 +295,9 @@ export struct GMentalCalendar {
           .backgroundColor(this.pickedW < 0 ? this.theme.surface
           : ((w) === this.ansW ? Palette.emerald : ((w) === this.pickedW ? Palette.rose : this.theme.surface)))
           .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((w)); }); })
           .onClick(() => { Haptics.tick(); this.pick((w)); }) }, (w: number) => 'cw2' + w)
         }.width('100%')
       }.width('100%')
@@ -315,6 +322,9 @@ export struct GMentalCalendar {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：一三五七八十腊，三十一天永不差；闰年二月二十九天'))

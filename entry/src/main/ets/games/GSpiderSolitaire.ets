@@ -16,6 +16,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const PILES: number = 10;
 const SETS: number = 8;            // 8 组 A~K
@@ -752,6 +753,9 @@ export struct GSpiderSolitaire {
             Haptics.tap();
             this.deal();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.deal(); }); })
         Button(TG('重新开始'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
@@ -764,6 +768,9 @@ export struct GSpiderSolitaire {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
 
@@ -876,6 +883,9 @@ export struct GSpiderSolitaire {
       Haptics.tick();
       this.tapPileBlank(p);
     })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPileBlank(p); }); })
   }
 
   @Builder
@@ -890,5 +900,8 @@ export struct GSpiderSolitaire {
       Haptics.tick();
       this.tapPileCard(p, i);
     })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPileCard(p, i); }); })
   }
 }

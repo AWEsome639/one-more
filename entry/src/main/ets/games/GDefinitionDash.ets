@@ -10,6 +10,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 10; const PASS: number = 8; const MISS_MAX: number = 3;
 const LIMIT_S: number = 60; const TICK_MS: number = 1000;
@@ -270,13 +271,13 @@ export struct GDefinitionDash {
 
       Text((this.opts.length > 0 ? this.opts[0] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
-      .shadow(Shadow.card).onClick(() => { Haptics.tick(); this.answer((0)); })
+      .shadow(Shadow.card).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); }).onClick(() => { Haptics.tick(); this.answer((0)); })
       Text((this.opts.length > 1 ? this.opts[1] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
-      .shadow(Shadow.card).onClick(() => { Haptics.tick(); this.answer((1)); })
+      .shadow(Shadow.card).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); }).onClick(() => { Haptics.tick(); this.answer((1)); })
       Text((this.opts.length > 2 ? this.opts[2] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
-      .shadow(Shadow.card).onClick(() => { Haptics.tick(); this.answer((2)); })
+      .shadow(Shadow.card).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); }).onClick(() => { Haptics.tick(); this.answer((2)); })
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%')
         .textAlign(TextAlign.Center)
@@ -285,7 +286,7 @@ export struct GDefinitionDash {
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

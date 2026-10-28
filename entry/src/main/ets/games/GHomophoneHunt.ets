@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const QN: number = 10; const PASS: number = 6;
 const LIMIT_S: number = 15; const TICK_MS: number = 1000;
@@ -229,22 +230,22 @@ export struct GHomophoneHunt {
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
           Button(this.cur().opts[(0)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(0)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.cur().opts[(0)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(0)]); })
           Button(this.cur().opts[(1)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(1)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.cur().opts[(1)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(1)]); })
         }.width('100%')
         Row({ space: Space.sm }) {
           Button(this.cur().opts[(2)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(2)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.cur().opts[(2)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(2)]); })
           Button(this.cur().opts[(3)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(3)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.cur().opts[(3)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.cur().opts[(3)]); })
         }.width('100%')
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2("{0} 题，每题 {1} 秒；答对 ≥{2} 通关",Digits(String(QN), this.langCode),Digits(String(this.diffTotal), this.langCode), PASS)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

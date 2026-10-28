@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const LEN: number = 5; const TRIES: number = 7; const KEYS: number = 28;
 const LETTERS: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const BANK: string[] = [
@@ -239,6 +240,9 @@ export struct GWordMastermind {
             ForEach([0, 1, 2, 3, 4, 5, 6], (c: number) => {
               if (r * 7 + c < KEYS) {
                 Text(this.keyLabel((r * 7 + c))).fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(36)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).shadow(Shadow.card).onClick(() => { Haptics.tick(); this.press((r * 7 + c)); })
+                .focusable(Tv.on())
+                .focusBox(Tv.box())
+                .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.press((r * 7 + c)); }); })
               }
             }, (c: number) => 'c' + c)
           }.width('100%')
@@ -247,8 +251,14 @@ export struct GWordMastermind {
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Button(TG('删一个'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.press(26); })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.press(26); }); })
       }.width('100%')
       Text(TG('提示：🟩 字母与位置都对｜🟨 字母在词里但位置错｜⬜ 词里没有')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

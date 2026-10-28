@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const LIMIT: number = 60;
 const NEED: number = 5;
@@ -354,7 +355,7 @@ export struct GDigitSwapEq {
             .fontColor(this.pickA === (this.puz.tokens[i]).pos ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
             .width(Space.xxxl).height(Space.xxxl)
             .backgroundColor(this.pickA === (this.puz.tokens[i]).pos ? Palette.lime : this.theme.surfaceAlt).borderRadius(Radius.xs)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapDigit((this.puz.tokens[i]).pos); })
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((this.puz.tokens[i]).pos); }); }).onClick(() => { Haptics.tick(); this.tapDigit((this.puz.tokens[i]).pos); })
             }
           }, (i: number) => 't' + i)
         }.width('100%')
@@ -370,12 +371,15 @@ export struct GDigitSwapEq {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(42))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.lime).borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .backgroundColor(Palette.lime).borderRadius(Radius.md).width(120).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('运算符位置不会变')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }

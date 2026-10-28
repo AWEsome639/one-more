@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const SPAN_START: number = 3;
 const LEVELS: number = 3;
 const EXTRA: number = 5;
@@ -232,6 +233,9 @@ export struct GRunningMemorySpan {
           .opacity(this.phase === 'input' ? 1 : 0.4)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.keyTap((d)); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.keyTap((d)); }); })
         }, (d: number) => 'a' + d)
       }.width('100%')
       Row({ space: Space.xs }) {
@@ -241,6 +245,9 @@ export struct GRunningMemorySpan {
           .opacity(this.phase === 'input' ? 1 : 0.4)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.keyTap((d)); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.keyTap((d)); }); })
         }, (d: number) => 'b' + d)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).textAlign(TextAlign.Center).width('100%')
@@ -249,6 +256,9 @@ export struct GRunningMemorySpan {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.rose).borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：连过 广度 3 → 4 → 5 三关；数字 700 ms 一个'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }

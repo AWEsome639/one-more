@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const ROUNDS: number = 8; const PASS: number = 6; const NEXT_MS: number = 850; const UNIVERSE: number = 12;
 const REGION: string[] = ['只在 A', '只在 B', 'A、B 都有', '都不在'];
 function sample(k: number, hi: number): number[] {
@@ -258,6 +259,9 @@ export struct GSetTheoryVenn {
         Haptics.tap();
         this.submit((0));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((0)); }); })
         Button(REGION[(1)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.pick === (1)
@@ -268,6 +272,9 @@ export struct GSetTheoryVenn {
         Haptics.tap();
         this.submit((1));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
         Button(REGION[(2)])
@@ -280,6 +287,9 @@ export struct GSetTheoryVenn {
         Haptics.tap();
         this.submit((2));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((2)); }); })
         Button(REGION[(3)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.pick === (3) ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.pick === (3)
@@ -290,6 +300,9 @@ export struct GSetTheoryVenn {
         Haptics.tap();
         this.submit((3));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((3)); }); })
       }.width('100%')
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
@@ -298,6 +311,9 @@ export struct GSetTheoryVenn {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：先看这个数在不在 A 里，再看在不在 B 里')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

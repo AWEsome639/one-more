@@ -11,6 +11,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const COLS: number = 4; const ROWS: number = 3; const CELLS: number = COLS * ROWS;
 const DIFFS: number = 3; const MISS: number = 3; const LIMIT: number = 60;
@@ -258,7 +259,10 @@ export struct GRoomInspector {
       .onClick(() => {
       Haptics.tick();
       if (false) { this.tap((r * COLS + c)); }
-      }) }, (c: number) => 'c' + c)
+      })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (false) { this.tap((r * COLS + c)); } }); }) }, (c: number) => 'c' + c)
       }.width('100%')
       }, (r: number) => 'r' + r)
       }.width('100%').padding(Space.xs).backgroundColor(this.theme.surface)
@@ -277,7 +281,10 @@ export struct GRoomInspector {
       .onClick(() => {
       Haptics.tick();
       if (true) { this.tap((r * COLS + c)); }
-      }) }, (c: number) => 'c' + c)
+      })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (true) { this.tap((r * COLS + c)); } }); }) }, (c: number) => 'c' + c)
       }.width('100%')
       }, (r: number) => 'r' + r)
       }.width('100%').padding(Space.xs).backgroundColor(this.theme.surface)
@@ -291,6 +298,9 @@ export struct GRoomInspector {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

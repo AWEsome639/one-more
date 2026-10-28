@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const COLS: number = 4;
 const FREES: number = 4;
@@ -730,6 +731,9 @@ export struct GFreecell {
           .borderRadius(Radius.sm)
           .border({ width: 1, color: this.sel === (i) ? Palette.primary : this.theme.line })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapFree((i)); }); })
           .onClick(() => {
           Haptics.tick();
           this.tapFree((i));
@@ -747,6 +751,9 @@ export struct GFreecell {
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.sm)
           .border({ width: 1, color: this.found[(s)] === TOP ? Palette.emerald : this.theme.line })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapFound((s)); }); })
           .onClick(() => {
           Haptics.tick();
           this.tapFound((s));
@@ -782,6 +789,9 @@ export struct GFreecell {
           .backgroundColor(this.sel === 10 + (i) ? '#146366F1' : '#00000000')
           .borderRadius(Radius.sm)
           .justifyContent(FlexAlign.End)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCol((i)); }); })
           .onClick(() => {
           Haptics.tick();
           this.tapCol((i));
@@ -802,6 +812,9 @@ export struct GFreecell {
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -811,6 +824,9 @@ export struct GFreecell {
           .fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.autoHome(); }); })
           .onClick(() => {
             Haptics.tap();
             this.autoHome();

@@ -8,6 +8,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 5; const PASS: number = 4; const LIVES: number = 3; const GAP_MS: number = 900;
 
@@ -243,6 +244,9 @@ export struct GSentenceUnscramble {
         .borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(44))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((0)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((0)); }); })
         Text(this.tiles.length > (1) ? this.tiles[(1)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).maxLines(1).textAlign(TextAlign.Center)
         .fontColor(this.usedAt((1)) ? this.theme.inkFaint : '#FFFFFF')
@@ -250,6 +254,9 @@ export struct GSentenceUnscramble {
         .borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(44))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((1)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((1)); }); })
         Text(this.tiles.length > (2) ? this.tiles[(2)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).maxLines(1).textAlign(TextAlign.Center)
         .fontColor(this.usedAt((2)) ? this.theme.inkFaint : '#FFFFFF')
@@ -257,6 +264,9 @@ export struct GSentenceUnscramble {
         .borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(44))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((2)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((2)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
         Text(this.tiles.length > (3) ? this.tiles[(3)] : '')
@@ -266,6 +276,9 @@ export struct GSentenceUnscramble {
         .borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(44))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((3)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((3)); }); })
         Text(this.tiles.length > (4) ? this.tiles[(4)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).maxLines(1).textAlign(TextAlign.Center)
         .fontColor(this.usedAt((4)) ? this.theme.inkFaint : '#FFFFFF')
@@ -273,6 +286,9 @@ export struct GSentenceUnscramble {
         .borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(44))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((4)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((4)); }); })
         Text(this.tiles.length > (5) ? this.tiles[(5)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).maxLines(1).textAlign(TextAlign.Center)
         .fontColor(this.usedAt((5)) ? this.theme.inkFaint : '#FFFFFF')
@@ -280,6 +296,9 @@ export struct GSentenceUnscramble {
         .borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(44))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((5)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((5)); }); })
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
@@ -287,6 +306,9 @@ export struct GSentenceUnscramble {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG2("{0} 句，答对 ≥{1} 通关",Digits(String(this.diffTotal), this.langCode), PASS)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {

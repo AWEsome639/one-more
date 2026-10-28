@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const LEVELS: number = 5;      // 通关关数
 const POOL: number = 6;        // 每关砝码个数
@@ -375,6 +376,9 @@ export struct GBalanceScale {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();
@@ -455,6 +459,9 @@ export struct GBalanceScale {
     .shadow(Shadow.card)
     .scale({ x: this.used[i] ? 1.04 : 1, y: this.used[i] ? 1.04 : 1 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.toggle(i); }); })
     .onClick(() => {
       Haptics.tick();
       this.toggle(i);

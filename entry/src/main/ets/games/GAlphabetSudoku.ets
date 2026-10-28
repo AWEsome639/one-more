@@ -17,6 +17,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 6;
 const BOX_R: number = 3;          // 宫高 3
@@ -571,6 +572,9 @@ export struct GAlphabetSudoku {
               .borderRadius(Radius.xs)
               .scale({ x: this.sel === (r * this.diffTotal + c) ? 1.06 : 1, y: this.sel === (r * this.diffTotal + c) ? 1.06 : 1 })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tapCell((r * this.diffTotal + c));
@@ -596,6 +600,9 @@ export struct GAlphabetSudoku {
             .borderRadius(Radius.sm)
             .layoutWeight(1)
             .height(KEY_H)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.put(k + 1); }); })
             .onClick(() => {
               Haptics.tap();
               this.put(k + 1);
@@ -612,6 +619,9 @@ export struct GAlphabetSudoku {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(44)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
@@ -623,6 +633,9 @@ export struct GAlphabetSudoku {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.put(0); }); })
           .onClick(() => {
             Haptics.tap();
             this.put(0);
@@ -630,6 +643,9 @@ export struct GAlphabetSudoku {
         Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .layoutWeight(1)
           .height(44)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .onClick(() => {
             this.askAuto();
           })
@@ -641,6 +657,9 @@ export struct GAlphabetSudoku {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -653,6 +672,9 @@ export struct GAlphabetSudoku {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.finished) { this.done = true; this.status = TG('已放弃这一局'); this.finish(false); } }); })
           .onClick(() => {
             Haptics.tap();
             if (!this.finished) {

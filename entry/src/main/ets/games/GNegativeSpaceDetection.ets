@@ -7,6 +7,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 5;
 const CELLS: number = N * N;
@@ -255,6 +256,9 @@ export struct GNegativeSpaceDetection {
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：别盯着色块，看它们中间空出来的那一块'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
@@ -282,5 +286,8 @@ export struct GNegativeSpaceDetection {
       .opacity(this.pick >= 0 && this.pick !== k ? 0.45 : 1).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => { Haptics.tick(); this.answer(k); })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer(k); }); })
   }
 }

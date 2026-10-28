@@ -25,6 +25,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 
 const COLS: number = 8;                 // 砖块列数
 const ROWS: number = 5;                 // 砖块行数
@@ -537,6 +538,9 @@ export struct GBreakout {
             this.boardW = w;
           }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.launch(); }); })
         .onClick(() => {
           Haptics.tick();
           this.launch();
@@ -566,6 +570,9 @@ export struct GBreakout {
           .layoutWeight(1)
           .height(BTN_H)
           .enabled(!this.over && !this.won)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.launched) { this.launch(); } else { this.togglePause(); } }); })
           .onClick(() => {
             Haptics.tap();
             if (!this.launched) {
@@ -582,6 +589,9 @@ export struct GBreakout {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(BTN_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();

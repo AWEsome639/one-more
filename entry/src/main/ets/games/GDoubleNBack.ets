@@ -13,6 +13,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const TOTAL: number = 12; const N: number = 2; const NEED: number = 15;
 const LETTERS: string[] = ['A', 'B', 'D', 'E', 'F', 'H', 'K', 'L', 'M', 'P', 'R', 'S', 'T', 'X'];
 const SLOTS: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8];
@@ -241,7 +242,7 @@ export struct GDoubleNBack {
         .fontColor((true ? this.selPos : this.selLetter) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(44))
         .backgroundColor((true ? this.selPos : this.selLetter) ? Palette.primaryDeep : this.theme.surfaceAlt)
         .borderRadius(Radius.md).opacity(this.idx >= N ? 1 : 0.45).enabled(this.idx >= N)
-        .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+        .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (true) { this.selPos = !this.selPos; } else { this.selLetter = !this.selLetter; } }); }).onClick(() => {
         Haptics.tick();
         if (true) { this.selPos = !this.selPos; } else { this.selLetter = !this.selLetter; }
         })
@@ -249,7 +250,7 @@ export struct GDoubleNBack {
         .fontColor((false ? this.selPos : this.selLetter) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(44))
         .backgroundColor((false ? this.selPos : this.selLetter) ? Palette.primaryDeep : this.theme.surfaceAlt)
         .borderRadius(Radius.md).opacity(this.idx >= N ? 1 : 0.45).enabled(this.idx >= N)
-        .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+        .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (false) { this.selPos = !this.selPos; } else { this.selLetter = !this.selLetter; } }); }).onClick(() => {
         Haptics.tick();
         if (false) { this.selPos = !this.selPos; } else { this.selLetter = !this.selLetter; }
         })
@@ -257,10 +258,10 @@ export struct GDoubleNBack {
       Row({ space: Space.sm }) {
         Button(this.idx >= this.diffTotal - 1 ? '提交结算' : '下一题 ▶')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.submit(); })
+          .backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); }).onClick(() => { Haptics.tap(); this.submit(); })
         Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width(96).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width(96).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .onTouch((e: TouchEvent) => {

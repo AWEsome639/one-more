@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const COLS: number = 4;
 const ROWS: number = 5;
@@ -266,6 +267,9 @@ export struct GSpotlightTrack {
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
@@ -282,5 +286,8 @@ export struct GSpotlightTrack {
     .layoutWeight(1).aspectRatio(1).backgroundColor(this.tint(cell)).borderRadius(Radius.sm)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => { Haptics.tick(); this.tap(cell); })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(cell); }); })
   }
 }

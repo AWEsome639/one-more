@@ -16,6 +16,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const W = 5;          // 宽
 const H = 5;          // 深
@@ -375,6 +376,9 @@ export struct GMazeNav3d {
           .backgroundColor(this.theme.surfaceAlt).fontColor(this.theme.ink)
           .borderRadius(Radius.sm)
           .enabled(this.pz > 0)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tryMove(0, 0, -1); }); })
           .onClick(() => {
             Haptics.tap();
             this.tryMove(0, 0, -1);
@@ -384,6 +388,9 @@ export struct GMazeNav3d {
           .backgroundColor(this.theme.surfaceAlt).fontColor(this.theme.ink)
           .borderRadius(Radius.sm)
           .enabled(this.pz < this.diffTotal - 1)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tryMove(0, 0, 1); }); })
           .onClick(() => {
             Haptics.tap();
             this.tryMove(0, 0, 1);
@@ -401,6 +408,9 @@ export struct GMazeNav3d {
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tryMove((0), (-1), 0); }); })
         .onClick(() => {
         Haptics.tap();
         this.tryMove((0), (-1), 0);
@@ -414,6 +424,9 @@ export struct GMazeNav3d {
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove((-1), (0), 0); }); })
           .onClick(() => {
           Haptics.tick();
           this.tryMove((-1), (0), 0);
@@ -426,6 +439,9 @@ export struct GMazeNav3d {
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove((0), (1), 0); }); })
           .onClick(() => {
           Haptics.tick();
           this.tryMove((0), (1), 0);
@@ -438,6 +454,9 @@ export struct GMazeNav3d {
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove((1), (0), 0); }); })
           .onClick(() => {
           Haptics.tick();
           this.tryMove((1), (0), 0);
@@ -450,6 +469,9 @@ export struct GMazeNav3d {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(44))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

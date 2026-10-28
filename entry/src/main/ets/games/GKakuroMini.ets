@@ -13,6 +13,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 3;
 const MAX_MOVES: number = 40;
@@ -485,6 +486,9 @@ export struct GKakuroMini {
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.teal).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -494,6 +498,9 @@ export struct GKakuroMini {
           .fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -576,6 +583,9 @@ export struct GKakuroMini {
     .borderRadius(Radius.sm)
     .border({ width: this.sel === i ? 2 : 1, color: this.sel === i ? Palette.primary : this.theme.line })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell(i); }); })
     .onClick(() => {
       Haptics.tick();
       this.tapCell(i);
@@ -592,6 +602,9 @@ export struct GKakuroMini {
       .backgroundColor(this.theme.surface)
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put(d); }); })
       .onClick(() => {
         Haptics.tick();
         this.put(d);
@@ -608,6 +621,9 @@ export struct GKakuroMini {
       .layoutWeight(1).height(Cell.of(44))
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.sm)
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.backspace(); }); })
       .onClick(() => {
         Haptics.tick();
         this.backspace();

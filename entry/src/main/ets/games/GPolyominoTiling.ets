@@ -11,6 +11,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 5; const LIMIT: number = 26;
 const IDXN: number[] = [0, 1, 2, 3, 4];
@@ -274,7 +275,10 @@ export struct GPolyominoTiling {
             : (this.board[(r * this.diffTotal + c)] === 1 ? this.theme.line : this.theme.surfaceAlt))
             .borderRadius(Radius.sm)
             .animation({ duration: Motion.fast, curve: Motion.snap() })
-            .onClick(() => { Haptics.tick(); this.place((r * this.diffTotal + c)); }) }, (c: number) => 'c' + c)
+            .onClick(() => { Haptics.tick(); this.place((r * this.diffTotal + c)); })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((r * this.diffTotal + c)); }); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('86%').aspectRatio(1).padding(Space.xs)
@@ -289,7 +293,10 @@ export struct GPolyominoTiling {
         .borderRadius(Radius.sm).borderWidth(2)
         .borderColor(this.sel === (s) ? Palette.teal : this.theme.line)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { Haptics.tick(); this.sel = (s); }) }, (s: number) => 'sh' + s)
+        .onClick(() => { Haptics.tick(); this.sel = (s); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = (s); }); }) }, (s: number) => 'sh' + s)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
@@ -299,6 +306,9 @@ export struct GPolyominoTiling {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

@@ -8,6 +8,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const TOTAL: number = 10;
 const PASS: number = 7;
@@ -247,18 +248,27 @@ export struct GPrimeGapHunt {
         ForEach([0, 1], (i: number) => { Button(String(this.opts[(i)]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.picked < 0 && !this.over)
-        .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'a' + i)
+        .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.choose(this.opts[(i)]); }); }); }, (i: number) => 'a' + i)
       }.width('100%')
       Row({ space: Space.sm }) {
         ForEach([2, 3], (i: number) => { Button(String(this.opts[(i)]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.picked < 0 && !this.over)
-        .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); }); }, (i: number) => 'b' + i)
+        .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.choose(this.opts[(i)]); }); }); }, (i: number) => 'b' + i)
       }.width('100%')
       Row({ space: Space.md }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Text(TG('素数：只能被 1 与自身整除')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }

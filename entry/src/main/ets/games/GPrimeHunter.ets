@@ -8,6 +8,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SIZE: number = 5;
 const ROUNDS: number = 3;
@@ -254,7 +255,10 @@ export struct GPrimeHunter {
             Text(String(this.nums[(r * SIZE + c)])).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
             .fontColor(this.marks[(r * SIZE + c)] === 0 ? this.theme.ink : '#FFFFFF')
             }.layoutWeight(1).aspectRatio(1).backgroundColor(this.cellTone((r * SIZE + c))).borderRadius(Radius.sm)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * SIZE + c)); }); }, (c: number) => 'c' + c)
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * SIZE + c)); })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * SIZE + c)); }); }); }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
@@ -264,6 +268,9 @@ export struct GPrimeHunter {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Text(TG('绿=捞到 红=点错')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }

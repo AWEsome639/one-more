@@ -15,6 +15,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const TOTAL: number = 8;
 const PASS: number = 6;
@@ -359,6 +360,9 @@ export struct GCommonDenominator {
           .borderRadius(Radius.md)
           .shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
           .onClick(() => {
             Haptics.tick();
             this.pick(i);
@@ -379,6 +383,9 @@ export struct GCommonDenominator {
         .borderRadius(Radius.md)
         .layoutWeight(1)
         .height(44)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         .onClick(() => {
           this.askHint();
         })
@@ -390,6 +397,9 @@ export struct GCommonDenominator {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

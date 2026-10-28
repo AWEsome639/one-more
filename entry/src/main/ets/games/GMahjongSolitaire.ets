@@ -14,6 +14,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const R: number = 4;
 const C: number = 4;
@@ -438,6 +439,9 @@ export struct GMahjongSolitaire {
                 color: this.grid[r * PC + c] < 0 ? '#00000000' : (this.sel === r * PC + c ? Palette.primary : this.theme.line)
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(r * PC + c); }); })
               .onClick(() => {
                 Haptics.tick();
                 this.tap(r * PC + c);
@@ -465,6 +469,9 @@ export struct GMahjongSolitaire {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.useHint(); }); })
           .onClick(() => {
             Haptics.tap();
             this.useHint();
@@ -474,6 +481,9 @@ export struct GMahjongSolitaire {
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.rose).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -523,6 +533,9 @@ export struct GMahjongSolitaire {
       color: this.grid[i] < 0 ? '#00000000' : (this.sel === i ? Palette.primary : this.theme.line)
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
     .onClick(() => {
       Haptics.tick();
       this.tap(i);

@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const ROUNDS: number = 10; const PASS: number = 8; const LIVES: number = 3;
 interface Q { s: string; w: string; opts: string[] }
 /** opts[0] 恒为正确释义，运行时打乱 */
@@ -244,21 +245,33 @@ export struct GContextClues {
       .fontColor(this.picked >= 0 && ((0) === this.ans || (0) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((0))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.choose((0)); }); })
       .onClick(() => { Haptics.tick(); this.choose((0)); })
       Text((this.opts.length > 1 ? this.opts[1] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
       .fontColor(this.picked >= 0 && ((1) === this.ans || (1) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((1))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.choose((1)); }); })
       .onClick(() => { Haptics.tick(); this.choose((1)); })
       Text((this.opts.length > 2 ? this.opts[2] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
       .fontColor(this.picked >= 0 && ((2) === this.ans || (2) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((2))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.choose((2)); }); })
       .onClick(() => { Haptics.tick(); this.choose((2)); })
       Text((this.opts.length > 3 ? this.opts[3] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
       .fontColor(this.picked >= 0 && ((3) === this.ans || (3) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((3))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.choose((3)); }); })
       .onClick(() => { Haptics.tick(); this.choose((3)); })
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%')
         .textAlign(TextAlign.Center)
@@ -267,10 +280,13 @@ export struct GContextClues {
         Button(this.picked < 0 ? '选一个释义' : '下一题 →')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
-          .enabled(this.picked >= 0).onClick(() => { Haptics.tap(); this.nextQ(); })
+          .enabled(this.picked >= 0).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nextQ(); }); }).onClick(() => { Haptics.tap(); this.nextQ(); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width(96).height(Cell.of(46))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => { Haptics.tap(); this.reset(); })
       }
       .width('100%')

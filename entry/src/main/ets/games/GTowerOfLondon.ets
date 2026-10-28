@@ -9,6 +9,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const PEGS: number = 3;
 const BALLS: number = 3;
 const STATES: number = 27;
@@ -306,6 +307,9 @@ export struct GTowerOfLondon {
       }
       .layoutWeight(1).height('100%').padding(Space.xs).borderRadius(Radius.md)
       .borderWidth(((false)) && this.sel === (i) ? 2 : 0).borderColor(Palette.amber).onClick(() => { Haptics.tick(); if (((false))) { this.tap((i)); } })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (((false))) { this.tap((i)); } }); })
       }, (i: number) => ((false) ? 'lp' : 'gp') + i)
       }
       .width('100%').height((false) ? Space.xxxl * 3 : Space.xxxl * 2).padding(Space.xs)
@@ -329,6 +333,9 @@ export struct GTowerOfLondon {
       }
       .layoutWeight(1).height('100%').padding(Space.xs).borderRadius(Radius.md)
       .borderWidth(((true)) && this.sel === (i) ? 2 : 0).borderColor(Palette.amber).onClick(() => { Haptics.tick(); if (((true))) { this.tap((i)); } })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (((true))) { this.tap((i)); } }); })
       }, (i: number) => ((true) ? 'lp' : 'gp') + i)
       }
       .width('100%').height((true) ? Space.xxxl * 3 : Space.xxxl * 2).padding(Space.xs)
@@ -342,6 +349,9 @@ export struct GTowerOfLondon {
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

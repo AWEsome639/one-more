@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 
 const N: number = 4;
 const TOTAL: number = N * N;
@@ -286,6 +287,9 @@ export struct GFeatureMatrixRecall {
               }.layoutWeight(1).aspectRatio(1)
               .backgroundColor(this.cellBg((row * N + col))).borderRadius(Radius.md)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.toggle((row * N + col)); }); })
               .onClick(() => { Haptics.tick(); this.toggle((row * N + col)); })
             }, (col: number) => this.cellKey(row * N + col))
           }.width('100%')
@@ -300,6 +304,9 @@ export struct GFeatureMatrixRecall {
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
         .enabled(this.phase === 1 && this.pickCount() === PER_COLOR)
         .opacity(this.phase === 1 && this.pickCount() === PER_COLOR ? 1 : 0.5)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.phase === 2) { this.reset(); } else { this.judge(); } }); })
         .onClick(() => { Haptics.tap(); if (this.phase === 2) { this.reset(); } else { this.judge(); } })
 
       Text(TG('只看不抄：3 红 3 蓝，遮蔽后按指定颜色复原'))

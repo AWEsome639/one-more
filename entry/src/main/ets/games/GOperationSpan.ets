@@ -13,6 +13,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const START_SPAN: number = 2;
 const MAX_SPAN: number = 4;
@@ -301,7 +302,10 @@ export struct GOperationSpan {
         Row({ space: Space.sm }) {
           ForEach(OPT_IDX, (i: number) => { Button(String(this.opts.length > (i) ? this.opts[(i)] : 0))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF').backgroundColor(Palette.orange)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 0).onClick(() => { Haptics.tap(); this.pickOpt(this.opts[(i)]); }) }, (i: number) => 'os' + i)
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.phase === 0).onClick(() => { Haptics.tap(); this.pickOpt(this.opts[(i)]); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pickOpt(this.opts[(i)]); }); }) }, (i: number) => 'os' + i)
         }.width('100%')
       } else if (this.phase === 1) {
         Column({ space: Space.sm }) {
@@ -310,7 +314,10 @@ export struct GOperationSpan {
               ForEach(COLS, (col: number) => {
                 if (row * 3 + col < this.pool.length) { Button(this.pool[(row * 3 + col)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF').backgroundColor(this.pool[(row * 3 + col)] === '✔' ? Palette.lime : Palette.teal)
-                .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(this.pool[(row * 3 + col)] !== '✔').onClick(() => { Haptics.tap(); this.pickPool((row * 3 + col)); }) }
+                .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(this.pool[(row * 3 + col)] !== '✔').onClick(() => { Haptics.tap(); this.pickPool((row * 3 + col)); })
+                .focusable(Tv.on())
+                .focusBox(Tv.box())
+                .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pickPool((row * 3 + col)); }); }) }
               }, (col: number) => 'pc' + row + '_' + col)
             }.width('100%')
           }, (row: number) => 'pr' + row)
@@ -319,6 +326,9 @@ export struct GOperationSpan {
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：算对不算完 —— 题目全部结束后还要按顺序回忆结果')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

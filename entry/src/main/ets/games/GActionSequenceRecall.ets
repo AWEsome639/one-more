@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const ACTS: string[] = ['👏', '🦶', '🤚', '✊'];
 const NAMES: string[] = [TG('拍手'), TG('跺脚'), TG('举手'), TG('握拳')];
 const LEVELS: number = 6; const BASE: number = 3; const LIVES: number = 3; const STEP_MS: number = 340;
@@ -244,6 +245,9 @@ export struct GActionSequenceRecall {
           .layoutWeight(1).height(Cell.of(80)).justifyContent(FlexAlign.Center).padding(Space.xs)
           .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
           .opacity(this.playing ? 0.5 : 1).animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); })
           .onClick(() => { Haptics.tick(); this.tap((i)); })
         }, (i: number) => 'a' + i)
       }
@@ -260,7 +264,7 @@ export struct GActionSequenceRecall {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { Haptics.tap(); this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：回放期间按钮不响应，等「轮到你了」再动手'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

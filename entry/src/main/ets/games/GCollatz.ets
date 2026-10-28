@@ -16,6 +16,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const MISS: number = 3;          // 失误上限
 const NEXT_MS: number = 460;     // 选完到下一步
@@ -361,6 +362,9 @@ export struct GCollatz {
           .borderRadius(Radius.md)
           .shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
           .onClick(() => {
             Haptics.tick();
             this.pick(i);
@@ -393,6 +397,9 @@ export struct GCollatz {
         //   ⇒ 改成 width('100%') + height，与「换个数」保持一致。
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         .onClick(() => {
           this.askHint();
         })
@@ -404,6 +411,9 @@ export struct GCollatz {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

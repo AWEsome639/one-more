@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const GRID: number = 5;
 const PATH_LEN: number = 6;
@@ -348,6 +349,9 @@ export struct GModuloPath {
               Haptics.tick();
               this.tap((r * GRID + c));
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * GRID + c)); }); })
             }, (c: number) => 'mc' + c)
           }.width('100%')
         }, (r: number) => 'mr' + r)
@@ -363,6 +367,9 @@ export struct GModuloPath {
           Haptics.tap();
           this.reset();
         })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

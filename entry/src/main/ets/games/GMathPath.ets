@@ -17,6 +17,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 4;
 const CELLS: number = N * N;
@@ -568,6 +569,9 @@ export struct GMathPath {
               .borderRadius(Radius.sm)
               .border({ width: 1, color: this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tap((r * this.diffTotal + c));
@@ -595,6 +599,9 @@ export struct GMathPath {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.undo(); }); })
           .onClick(() => {
             Haptics.tap();
             this.undo();
@@ -607,6 +614,9 @@ export struct GMathPath {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();

@@ -11,6 +11,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 interface FactPair { ask: string; ans: string; }
 
@@ -244,6 +245,9 @@ export struct GFactBinder {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(44))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
@@ -264,6 +268,9 @@ export struct GFactBinder {
     .backgroundColor(this.done[i] ? Palette.emerald : (this.pickL === i ? Palette.primary : this.theme.surface))
     .borderRadius(Radius.sm).shadow(Shadow.card)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapL(i); }); })
     .onClick(() => { Haptics.tick(); this.tapL(i); })
   }
 
@@ -278,6 +285,9 @@ export struct GFactBinder {
     .backgroundColor(this.done[i] ? Palette.emerald : (this.pickR === i ? Palette.primary : this.theme.surface))
     .borderRadius(Radius.sm).shadow(Shadow.card)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapR(i); }); })
     .onClick(() => { Haptics.tick(); this.tapR(i); })
   }
 }

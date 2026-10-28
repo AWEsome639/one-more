@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const DICT: string =
   'ABLE ACHE ACID ACRE AGED AIDE AREA ARMY AUNT AWAY BABY BACK BAKE BALL BAND BANK BARE BARN BASE BATH BEAD BEAM BEAN BEAR BEAT BEEN BEER BELL BELT BEND BEST BIKE BILL BIRD BITE BLUE BOAT BODY BOIL BOLD BOLT BOMB BOND BONE BOOK BOOM BOOT BORE BORN BOSS BOTH BOWL BULK BULL BURN BUSH BUSY CAFE CAGE CAKE CALL CALM CAME CAMP CARD CARE CART CASE CASH CAST CAVE CELL CHAT CHEF CHIN CHIP CITE CITY CLAM CLAP CLAW CLAY CLIP CLUB COAL COAT CODE COIN COLD COME CONE COOK COOL COPE COPY CORD CORE CORN COST CRAB CREW CROP CROW CUBE CURB CURE CURL DARE DARK DART DASH DATA DATE DAWN DEAL DEAR DEBT DECK DEEP DEER' +
   ' DESK DIAL DIET DIRT DISC DISH DIVE DOCK DOLL DONE DOOR DOSE DOWN DRAG DRAW DROP DRUM DUAL DUCK DULL DUNE DUSK DUST DUTY EACH EARL EARN EASE EAST EASY ECHO EDGE EPIC EVEN EVER EVIL EXAM EXIT FACE FACT FADE FAIL FAIR FAKE FALL FAME FARM FAST FATE FEAR FEAT FEED FEEL FELT FILE FILL FILM FIND FINE FIRE FIRM FISH FIST FIVE FLAG FLAT FLAW FLED FLEE FLEW FLIP FLOW FOAM FOIL FOLD FOLK FOND FONT FOOD FOOL FOOT FORK FORM FORT FOUL FOUR FREE FROG FUEL FULL FUND FUSE GAIN GAME GANG GATE GAVE GAZE GEAR GENE GIFT GIRL GIVE GLAD GLOW GLUE GOAL GOAT GOLD GOLF GONE GOOD GOWN GRAB GRAY GRID GRIM GRIN GRIP GROW' +
@@ -283,7 +284,10 @@ export struct GWordLadder {
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Row({ space: Space.sm }) {
-        ForEach([0, 1, 2, 3], (i: number) => { Text(this.word.length > (i) ? this.word.charAt((i)) : '').fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(60)).backgroundColor(this.pick === (i) ? Palette.primary : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapPos((i)); }) }, (i: number) => 's' + i)
+        ForEach([0, 1, 2, 3], (i: number) => { Text(this.word.length > (i) ? this.word.charAt((i)) : '').fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(60)).backgroundColor(this.pick === (i) ? Palette.primary : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapPos((i)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPos((i)); }); }) }, (i: number) => 's' + i)
       }.width('100%')
       Text(this.trail.join(' → ')).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').maxLines(2)
       Text(this.msg).fontSize(FontSize.sm)
@@ -296,6 +300,9 @@ export struct GWordLadder {
             ForEach([0, 1, 2, 3, 4, 5, 6], (c: number) => {
               if (r * 7 + c < LETTERS.length) {
                 Text((LETTERS.charAt(r * 7 + c))).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(36)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).shadow(Shadow.card).onClick(() => { Haptics.tick(); this.tapLetter((LETTERS.charAt(r * 7 + c))); })
+                .focusable(Tv.on())
+                .focusBox(Tv.box())
+                .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapLetter((LETTERS.charAt(r * 7 + c))); }); })
               }
             }, (c: number) => 'c' + c)
           }.width('100%')
@@ -303,6 +310,9 @@ export struct GWordLadder {
       }.width('100%')
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG2('提示：起点 {0} → 目标 {1}，词库里都是常见 {2} 字母单词', this.from, this.to, LEN)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

@@ -8,6 +8,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SLOT: number = 6; const GOAL: number = 21; const LIVES: number = 3;
 const FIB: number[] = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89]; const SEED: number[] = [1, 2, 3];
@@ -231,6 +232,9 @@ export struct GFibonacciMerge {
           // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
           .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
             .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); })
           .onClick(() => { Haptics.tick(); this.tap((i)); })
         }, (i: number) => 'fbm' + i + '_' + this.cells[i])
       }.width('100%').height(Cell.of(72))
@@ -242,7 +246,7 @@ export struct GFibonacciMerge {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：相邻两格之和要落在 1,2,3,5,8,13,21… 里；合到 21 即通关')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

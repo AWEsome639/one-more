@@ -14,6 +14,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const COLS: number = 4;
 const ROWS: number = 5;
@@ -449,6 +450,9 @@ export struct GKlotski {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(44))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();
@@ -509,6 +513,9 @@ export struct GKlotski {
       y: (this.blocks[i].y * 100 / ROWS) + '%'
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = i; this.tip = TG2("{0} 已选中，点方向键移动", this.blocks[i].label); }); })
     .onClick(() => {
       Haptics.tick();
       this.sel = i;
@@ -554,6 +561,9 @@ export struct GKlotski {
       .backgroundColor(this.theme.surface)
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove(dx, dy); }); })
       .onClick(() => {
         Haptics.tick();
         this.tryMove(dx, dy);

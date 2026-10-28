@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const TOTAL: number = 10;
 const PASS: number = 7;
@@ -278,28 +279,28 @@ export struct GAlgebraicInequalitySolver {
           Button(this.quiz.choices[(0)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-          .enabled(!this.lockTap && !this.over).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(0)] ?? '?'); })
+          .enabled(!this.lockTap && !this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(0)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(0)] ?? '?'); })
           Button(this.quiz.choices[(1)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-          .enabled(!this.lockTap && !this.over).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(1)] ?? '?'); })
+          .enabled(!this.lockTap && !this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(1)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(1)] ?? '?'); })
         }.width('100%')
         Row({ space: Space.sm }) {
           Button(this.quiz.choices[(2)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-          .enabled(!this.lockTap && !this.over).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(2)] ?? '?'); })
+          .enabled(!this.lockTap && !this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(2)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(2)] ?? '?'); })
           Button(this.quiz.choices[(3)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-          .enabled(!this.lockTap && !this.over).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(3)] ?? '?'); })
+          .enabled(!this.lockTap && !this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(3)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(3)] ?? '?'); })
         }.width('100%')
       }.width('100%')
 
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.sky).borderRadius(Radius.md)
-          .width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .width(120).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('严格/非严格要看清楚')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }

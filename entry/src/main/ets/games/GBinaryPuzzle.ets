@@ -18,6 +18,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 6;
 const CELLS: number = N * N;
@@ -657,6 +658,9 @@ export struct GBinaryPuzzle {
               .backgroundColor(this.bgOf((r * this.diffTotal + c)))
               .borderRadius(Radius.sm)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tap((r * this.diffTotal + c));
@@ -679,6 +683,9 @@ export struct GBinaryPuzzle {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .height(44)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
@@ -690,6 +697,9 @@ export struct GBinaryPuzzle {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.done || this.finished) { return; } const cells: number[] = this.cells.slice(); for (let i = 0; i < this.diffTotal * this.diffTotal; i++) { if (!this.isFixed(i)) { cells[i] = EMPTY; } } this.cells = cells; this.status = TG('已清空你填的格子'); }); })
           .onClick(() => {
             Haptics.tap();
             if (this.done || this.finished) {
@@ -707,6 +717,9 @@ export struct GBinaryPuzzle {
         Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .layoutWeight(1)
           .height(44)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .onClick(() => {
             this.askAuto();
           })
@@ -718,6 +731,9 @@ export struct GBinaryPuzzle {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -730,6 +746,9 @@ export struct GBinaryPuzzle {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); })
           .onClick(() => {
             Haptics.tap();
             this.submit();

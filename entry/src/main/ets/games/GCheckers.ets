@@ -16,6 +16,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 /**
  * ★★ 局域网对战（2026-10-13，P12）
@@ -872,6 +873,9 @@ export struct GCheckers {
               .backgroundColor(this.dark((r), (c)) ? this.theme.surfaceAlt : this.theme.surface)
               .borderRadius(Radius.xs)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
               .onClick(() => {
               Haptics.tick();
               this.tap((this.idx(r, c)));
@@ -901,6 +905,9 @@ export struct GCheckers {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.restartTap(); }); })
         .onClick(() => {
           Haptics.tap();
           this.restartTap();

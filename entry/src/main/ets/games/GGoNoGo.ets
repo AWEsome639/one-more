@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const TRIALS: number = 20;
 const WINDOW: number = 1000;      // 反应窗口
@@ -275,6 +276,9 @@ export struct GGoNoGo {
         .borderRadius(Radius.lg).opacity(this.live ? 1 : 0.5)
         .scale({ x: this.fbMark === 2 ? Motion.pressScale : 1, y: this.fbMark === 2 ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(); }); })
         .onClick(() => { Haptics.tick(); this.tap(); })
 
       Button(this.over ? TG('再来一局') : TG('重开'))
@@ -282,6 +286,9 @@ export struct GGoNoGo {
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.orange)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('判定：正确 ≥ {0}/{1}', String(NEED_CORRECT), String(this.diffTotal))

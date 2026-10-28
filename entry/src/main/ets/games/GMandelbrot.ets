@@ -15,6 +15,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const GW: number = 16;      // 横向格子
 const GH: number = 12;      // 纵向格子
@@ -336,6 +337,9 @@ export struct GMandelbrot {
             .backgroundColor(Palette.violet).borderRadius(Radius.md)
             .layoutWeight(1).height(Cell.of(44))
             .enabled(!this.over)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(true); }); })
             .onClick(() => {
               Haptics.tap();
               this.answer(true);
@@ -346,6 +350,9 @@ export struct GMandelbrot {
             .backgroundColor(Palette.orange).borderRadius(Radius.md)
             .layoutWeight(1).height(Cell.of(44))
             .enabled(!this.over)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(false); }); })
             .onClick(() => {
               Haptics.tap();
               this.answer(false);
@@ -362,6 +369,9 @@ export struct GMandelbrot {
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
           .width('100%').height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.next(); }); })
           .onClick(() => {
             Haptics.tap();
             this.next();
@@ -376,6 +386,9 @@ export struct GMandelbrot {
         .fontSize(FontSize.md).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .width('100%').height(Cell.of(44))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

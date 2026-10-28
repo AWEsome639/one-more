@@ -14,6 +14,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const PADS: number = 4;
 const WIN_LEN: number = 12;   // 难度会覆盖它        // 通关长度
@@ -361,6 +362,9 @@ export struct GSimonSays {
           Haptics.tick();
           this.tapPad((0));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((0)); }); })
           Stack() {
           Text(PAD_ICON[(1)]).fontSize(FontSize.xxxl)
           }
@@ -375,6 +379,9 @@ export struct GSimonSays {
           Haptics.tick();
           this.tapPad((1));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((1)); }); })
         }
         .width('100%')
         Row({ space: Space.sm }) {
@@ -392,6 +399,9 @@ export struct GSimonSays {
           Haptics.tick();
           this.tapPad((2));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((2)); }); })
           Stack() {
           Text(PAD_ICON[(3)]).fontSize(FontSize.xxxl)
           }
@@ -406,6 +416,9 @@ export struct GSimonSays {
           Haptics.tick();
           this.tapPad((3));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((3)); }); })
         }
         .width('100%')
       }
@@ -431,6 +444,9 @@ export struct GSimonSays {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

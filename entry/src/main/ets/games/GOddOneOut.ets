@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 10;
 const WIN: number = 8;
@@ -268,6 +269,9 @@ export struct GOddOneOut {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .onClick(() => { Haptics.tick(); this.tap((r * 3 + c)); })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * 3 + c)); }); })
             }, (c: number) => 'c' + c)
           }
           .width('100%')
@@ -288,6 +292,9 @@ export struct GOddOneOut {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：10 题答对 ≥ 8 题 · 6→9→12 格逐轮变难'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

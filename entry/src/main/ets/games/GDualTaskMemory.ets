@@ -13,6 +13,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const ROUNDS: number = 3; const SPAN: number = 4; const QS: number = 3; const NEED: number = 9;
 interface MathQ {
   text: string;
@@ -289,7 +290,7 @@ export struct GDualTaskMemory {
             Text(this.qs.length > 0 && (i) < this.qs[this.qIdx].opts.length ? String(this.qs[this.qIdx].opts[(i)]) : '')
             .fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
             .layoutWeight(1).height(Cell.of(56)).backgroundColor(this.pick === (i) ? Palette.primaryDeep : this.theme.surfaceAlt)
-            .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.answerMath((i)); })
+            .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answerMath((i)); }); }).onClick(() => { Haptics.tick(); this.answerMath((i)); })
           }, (i: number) => 'mb' + i)
         }.width('100%')
       } else if (this.phase === 2) {
@@ -299,7 +300,7 @@ export struct GDualTaskMemory {
               ForEach([0, 1, 2], (c: number) => {
                 Text(String((r * 3 + c + 1))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
                 .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(46)).backgroundColor(this.theme.surfaceAlt)
-                .borderRadius(Radius.sm).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
+                .borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); }); }).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
               }, (c: number) => 'dc' + c)
             }.width('100%')
           }, (r: number) => 'dr' + r)
@@ -310,7 +311,7 @@ export struct GDualTaskMemory {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

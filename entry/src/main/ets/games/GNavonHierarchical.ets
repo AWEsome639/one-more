@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 7;
 const GAP: number = 2;
@@ -358,6 +359,9 @@ export struct GNavonHierarchical {
       this.pickLocal((i));
       }
       })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (((true))) { this.pickGlobal((i)); } else { this.pickLocal((i)); } }); })
       }, (i: number) => 'k' + i)
       }
       .width('100%')
@@ -385,6 +389,9 @@ export struct GNavonHierarchical {
       this.pickLocal((i));
       }
       })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (((false))) { this.pickGlobal((i)); } else { this.pickLocal((i)); } }); })
       }, (i: number) => 'k' + i)
       }
       .width('100%')
@@ -397,6 +404,9 @@ export struct GNavonHierarchical {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：12 题里两问全对 ≥ 8 题 · 90 秒内完成'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

@@ -21,6 +21,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const TARGET: number = 24;        // 目标值
 const COUNT: number = 4;          // 4 个数
@@ -572,6 +573,9 @@ export struct GGame24 {
             .layoutWeight(1)
             .height(Cell.of(56))
             .opacity(this.ready() ? 1 : 0.45)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapOp(op); }); })
             .onClick(() => {
               Haptics.tap();
               this.tapOp(op);
@@ -606,6 +610,9 @@ export struct GGame24 {
           .layoutWeight(1)
           .height(Cell.of(44))
           .opacity(this.undoDepth > 0 && !this.done ? 1 : 0.45)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.undo(); }); })
           .onClick(() => {
             Haptics.tap();
             this.undo();
@@ -618,6 +625,9 @@ export struct GGame24 {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint(); }); })
           .onClick(() => {
             Haptics.tap();
             this.hint();
@@ -630,6 +640,9 @@ export struct GGame24 {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -689,6 +702,9 @@ export struct GGame24 {
       y: (i === this.selA || i === this.selB) ? 1.06 : 1
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapTile(i); }); })
     .onClick(() => {
       Haptics.tick();
       this.tapTile(i);

@@ -16,6 +16,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const PILES: number = 7;
 const CARD_H: number = 30;
@@ -825,6 +826,9 @@ export struct GSolitaire {
             Haptics.tap();
             this.autoCollect();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.autoCollect(); }); })
         Button(TG('重新开始'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
@@ -837,6 +841,9 @@ export struct GSolitaire {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
     }
@@ -970,6 +977,9 @@ export struct GSolitaire {
       Haptics.tick();
       this.tapStock();
     })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapStock(); }); })
   }
 
   /** 废牌堆顶 */
@@ -984,6 +994,9 @@ export struct GSolitaire {
       Haptics.tick();
       this.tapWaste();
     })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapWaste(); }); })
   }
 
   /** 基础堆 */
@@ -1007,6 +1020,9 @@ export struct GSolitaire {
       Haptics.tick();
       this.tapFound(f);
     })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapFound(f); }); })
   }
 
   /** 一列牌 */
@@ -1033,6 +1049,9 @@ export struct GSolitaire {
       Haptics.tick();
       this.tapPileBlank(p);
     })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPileBlank(p); }); })
   }
 
   @Builder
@@ -1047,5 +1066,8 @@ export struct GSolitaire {
       Haptics.tick();
       this.tapPileCard(p, i);
     })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPileCard(p, i); }); })
   }
 }

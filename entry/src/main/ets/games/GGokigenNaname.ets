@@ -16,6 +16,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const M: number = 4;          // 4×4 个方格
 const D: number = M + 1;      // 5×5 个圆点
@@ -542,6 +543,9 @@ export struct GGokigenNaname {
               this.pressed = -2;
               }
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r), (c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tapCell((r), (c));
@@ -576,6 +580,9 @@ export struct GGokigenNaname {
           //   ⇒ Row 里应该用 layoutWeight 按比例分，和左边那个保持一致
           .layoutWeight(1)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
@@ -587,6 +594,9 @@ export struct GGokigenNaname {
           .borderRadius(Radius.md)
           .width(96)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();

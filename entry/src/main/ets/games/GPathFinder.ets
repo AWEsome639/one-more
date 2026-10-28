@@ -16,6 +16,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const MR: number = 7;
 const MC: number = 7;
@@ -420,6 +421,9 @@ export struct GPathFinder {
               Haptics.tick();
               this.tap((r * MC + c));
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * MC + c)); }); })
             }, (c: number) => 'c' + c)
           }
           .width('100%')
@@ -444,6 +448,9 @@ export struct GPathFinder {
         Haptics.tick();
         this.move((0), (-1));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move((0), (-1)); }); })
         Text(('↑'))
         .fontSize(FontSize.lg)
         .fontColor(this.theme.ink)
@@ -457,6 +464,9 @@ export struct GPathFinder {
         Haptics.tick();
         this.move((-1), (0));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move((-1), (0)); }); })
         Text(('↓'))
         .fontSize(FontSize.lg)
         .fontColor(this.theme.ink)
@@ -470,6 +480,9 @@ export struct GPathFinder {
         Haptics.tick();
         this.move((1), (0));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move((1), (0)); }); })
         Text(('→'))
         .fontSize(FontSize.lg)
         .fontColor(this.theme.ink)
@@ -483,6 +496,9 @@ export struct GPathFinder {
         Haptics.tick();
         this.move((0), (1));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move((0), (1)); }); })
       }
       .width('100%')
 
@@ -503,6 +519,9 @@ export struct GPathFinder {
           .onClick(() => {
             this.askHint();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
@@ -515,6 +534,9 @@ export struct GPathFinder {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
     }

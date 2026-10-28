@@ -12,6 +12,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SIZE: number = 7;
 const CELLS: number = SIZE * SIZE;
@@ -262,6 +263,9 @@ export struct GPegSolitaire {
               Haptics.tick();
               this.tap(at((r), (c)));
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(at((r), (c))); }); })
             }, (c: number) => 'c' + c)
           }
           .width('100%')
@@ -290,6 +294,9 @@ export struct GPegSolitaire {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('目标：最后只剩 1 颗（中央开局，32 颗）'))
         .fontSize(FontSize.xxs)

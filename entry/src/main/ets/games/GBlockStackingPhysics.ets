@@ -11,6 +11,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const SLOT: number = 5; const EMJ: string[] = ['', '🟦', '🟩', '🟨', '🟥'];
 
@@ -236,6 +237,9 @@ export struct GBlockStackingPhysics {
                 ? Palette.danger : this.theme.inkSoft)
           }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
 .borderRadius(Radius.md).borderWidth(1).borderColor(this.theme.line)
+.focusable(Tv.on())
+.focusBox(Tv.box())
+.onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place(k); }); })
 .onClick(() => { Haptics.tick(); this.place(k); })
         }, (k: number) => 'k' + k)
       }.width('100%').alignItems(VerticalAlign.Bottom)
@@ -254,10 +258,10 @@ export struct GBlockStackingPhysics {
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
-.backgroundColor(Palette.primary).borderRadius(Radius.md).onClick(() => { Haptics.tap(); this.reset(); })
+.backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
         Button(TG('换一关'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor(this.theme.ink)
-.backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).onClick(() => {
+.backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); const n: number = (this.level + 1) % LEVELS.length; this.reset(); this.level = n; this.queue = LEVELS[n].queue.slice(); }); }).onClick(() => {
             Haptics.tap();
             const n: number = (this.level + 1) % LEVELS.length; this.reset();
             this.level = n; this.queue = LEVELS[n].queue.slice();

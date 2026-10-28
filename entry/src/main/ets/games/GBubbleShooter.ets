@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const COLS: number = 9;            // 列数
 const ROWS: number = 9;            // 行数
@@ -412,6 +413,9 @@ export struct GBubbleShooter {
               }
               .layoutWeight(1)
               .aspectRatio(1)
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.fire((c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.fire((c));
@@ -463,6 +467,9 @@ export struct GBubbleShooter {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

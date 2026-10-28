@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const N: number = 6; const CELLS: number = N * N; const TOTAL: number = 6; const PASS: number = 4; const NEXT_MS: number = 820;
 @Component
 export struct GBinaryMatrixRankAll {
@@ -230,6 +231,9 @@ export struct GBinaryMatrixRankAll {
           }
           .width('100%').borderRadius(Radius.xs)
           .borderWidth(this.sel === (r) ? 2 : 0).borderColor(Palette.amber)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapRow((r)); }); })
           .onClick(() => { Haptics.tick(); this.tapRow((r)); })
         }, (r: number) => 'mr' + r)
       }
@@ -242,7 +246,7 @@ export struct GBinaryMatrixRankAll {
           .backgroundColor(this.picked < 0 ? this.theme.surface
           : ((v) === this.realRank ? Palette.emerald : ((v) === this.picked ? Palette.rose : this.theme.surface)))
           .borderRadius(Radius.sm).shadow(Shadow.card)
-          .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((v)); })
+          .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((v)); }); }).onClick(() => { Haptics.tick(); this.pick((v)); })
         }, (v: number) => 'op' + v)
       }
       .width('100%')
@@ -258,7 +262,7 @@ export struct GBinaryMatrixRankAll {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { Haptics.tap(); this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：秩 = 行阶梯里非零行的行数；异或两次等于没做，点错就再点一遍那两行'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

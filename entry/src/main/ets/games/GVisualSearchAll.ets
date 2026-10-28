@@ -11,6 +11,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 const N: number = 6;
 const TOTAL: number = N * N;
 const ROWS: number[] = [0, 1, 2, 3, 4, 5];
@@ -254,6 +255,9 @@ export struct GVisualSearchAll {
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
@@ -271,5 +275,8 @@ export struct GVisualSearchAll {
     .backgroundColor(this.found.length > i && this.found[i] ? Palette.emerald : this.theme.surface)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => { Haptics.tick(); this.tap(i); })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
   }
 }

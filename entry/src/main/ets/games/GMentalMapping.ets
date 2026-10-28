@@ -17,6 +17,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N = 3;              // 3×3 地图
 const CELLS = N * N;
@@ -341,6 +342,9 @@ export struct GMentalMapping {
           Haptics.tick();
           this.answer((0));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
           Text(DIRS[(1)])
           .fontSize(FontSize.lg)
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
@@ -354,6 +358,9 @@ export struct GMentalMapping {
           Haptics.tick();
           this.answer((1));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); })
           Text(DIRS[(2)])
           .fontSize(FontSize.lg)
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
@@ -367,6 +374,9 @@ export struct GMentalMapping {
           Haptics.tick();
           this.answer((2));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); })
         }
         Row({ space: Space.xs }) {
           Text(DIRS[(3)])
@@ -382,6 +392,9 @@ export struct GMentalMapping {
           Haptics.tick();
           this.answer((3));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((3)); }); })
           Text(DIRS[(4)])
           .fontSize(FontSize.lg)
           .fontColor(true ? this.theme.inkFaint : this.theme.ink)
@@ -395,6 +408,9 @@ export struct GMentalMapping {
           Haptics.tick();
           this.answer((4));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((4)); }); })
           Text(DIRS[(5)])
           .fontSize(FontSize.lg)
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
@@ -408,6 +424,9 @@ export struct GMentalMapping {
           Haptics.tick();
           this.answer((5));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((5)); }); })
         }
         Row({ space: Space.xs }) {
           Text(DIRS[(6)])
@@ -423,6 +442,9 @@ export struct GMentalMapping {
           Haptics.tick();
           this.answer((6));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((6)); }); })
           Text(DIRS[(7)])
           .fontSize(FontSize.lg)
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
@@ -436,6 +458,9 @@ export struct GMentalMapping {
           Haptics.tick();
           this.answer((7));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((7)); }); })
           Text(DIRS[(8)])
           .fontSize(FontSize.lg)
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
@@ -449,6 +474,9 @@ export struct GMentalMapping {
           Haptics.tick();
           this.answer((8));
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((8)); }); })
         }
       }
       .width('100%')
@@ -469,6 +497,9 @@ export struct GMentalMapping {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

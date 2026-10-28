@@ -8,6 +8,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 10; const PASS: number = 7; const LIVES: number = 3; const GAP_MS: number = 800;
 
@@ -248,6 +249,9 @@ export struct GSilentLetterSearch {
             .borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(50))
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => { Haptics.tick(); this.pick((i)); })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); })
           }, (c: string, i: number) => 'L' + i)
         }.width('100%')
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
@@ -258,6 +262,9 @@ export struct GSilentLetterSearch {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG2("{0} 题，答对 ≥{1} 通关：点错扣一条命",Digits(String(this.diffTotal), this.langCode), PASS))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

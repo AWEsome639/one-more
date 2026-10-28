@@ -12,6 +12,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 const SECONDS: number = 90;
 const GOAL: number = 25;
 const SYMS: string[] = ['★', '●', '▲', '■', '◆', '✚', '☂', '☀', '♣'];
@@ -223,6 +224,9 @@ export struct GSdmt {
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => { Haptics.tick(); this.keyTap((d)); })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.keyTap((d)); }); })
           }, (d: number) => 'k' + d)
         }.width('100%')
         Row({ space: Space.sm }) {
@@ -233,6 +237,9 @@ export struct GSdmt {
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => { Haptics.tick(); this.keyTap((d)); })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.keyTap((d)); }); })
           }, (d: number) => 'k' + d)
         }.width('100%')
         Row({ space: Space.sm }) {
@@ -243,6 +250,9 @@ export struct GSdmt {
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => { Haptics.tick(); this.keyTap((d)); })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.keyTap((d)); }); })
           }, (d: number) => 'k' + d)
         }.width('100%')
       }.width('100%')
@@ -252,6 +262,9 @@ export struct GSdmt {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：90 秒内答对 ≥ 25 个通关（答错只影响分数）'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }

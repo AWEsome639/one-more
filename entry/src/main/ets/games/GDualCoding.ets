@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 const KEEP: number = 6;      // 要记的词图对
 const NEED: number = 5; const SECONDS: number = 8;
 interface Pair {
@@ -272,7 +273,7 @@ export struct GDualCoding {
                 .backgroundColor(this.pick === (r * 2 + c) ? Palette.primaryDeep : this.theme.surfaceAlt)
                 .borderRadius(Radius.md).opacity(this.pick >= 0 && this.pick !== (r * 2 + c) ? 0.5 : 1)
                 .scale({ x: this.pick === (r * 2 + c) ? Motion.pressScale : 1, y: this.pick === (r * 2 + c) ? Motion.pressScale : 1 })
-                .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.answer((r * 2 + c)); })
+                .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((r * 2 + c)); }); }).onClick(() => { Haptics.tick(); this.answer((r * 2 + c)); })
               }, (c: number) => 'qc' + c)
             }.width('100%')
           }, (r: number) => 'qr' + r)
@@ -283,12 +284,12 @@ export struct GDualCoding {
         if (this.phase === 0) {
           Button(TG('我记住了 ▶'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.cyan)
-            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.startQuiz(); })
+            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.startQuiz(); }); }).onClick(() => { Haptics.tap(); this.startQuiz(); })
         }
         Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.phase === 0 ? '#FFFFFF' : this.theme.ink)
           .backgroundColor(this.phase === 0 ? Palette.primary : this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .onTouch((e: TouchEvent) => {

@@ -9,6 +9,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SLOTS: number = 8; const SLOT_IDX: number[] = [0, 1, 2, 3, 4, 5, 6, 7];
 const TOTAL_S: number = 30; const TICK_MS: number = 500;
@@ -237,12 +238,12 @@ export struct GChalkAndTalk {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor((true) ? Palette.emerald : Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))
-          .enabled(!this.over && !this.sayLock).onClick(() => { Haptics.tap(); this.say((true)); })
+          .enabled(!this.over && !this.sayLock).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.say((true)); }); }).onClick(() => { Haptics.tap(); this.say((true)); })
           Button(('否'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor((false) ? Palette.emerald : Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))
-          .enabled(!this.over && !this.sayLock).onClick(() => { Haptics.tap(); this.say((false)); })
+          .enabled(!this.over && !this.sayLock).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.say((false)); }); }).onClick(() => { Haptics.tap(); this.say((false)); })
         }.width('100%')
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Text(TG2("写：光标踩中 ✦ 时落笔　得分 ≥{0} 且落笔 ≥{1} 通关",Digits(String(this.diffTotal), this.langCode), WRITE_MIN)).fontSize(FontSize.xs)
@@ -256,12 +257,12 @@ export struct GChalkAndTalk {
       Button(TG('落笔 ✍️'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(Palette.orange)
         .borderRadius(Radius.md).width('100%').height(Cell.of(56))
-        .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.write(); })
+        .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.write(); }); }).onClick(() => { Haptics.tap(); this.write(); })
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

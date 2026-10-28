@@ -10,6 +10,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const GS: number = 9;
 const NB: number = 2; const NF: number = 4; const NX: number = 2; const MAX: number = 18;
 const RG: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8];
@@ -313,7 +314,7 @@ export struct GLaserReflect {
           .fontColor(this.theme.inkSoft).layoutWeight(1)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .onTouch((e: TouchEvent) => {
@@ -328,6 +329,9 @@ export struct GLaserReflect {
     }
     .layoutWeight(1).aspectRatio(1).backgroundColor(this.bg(i)).borderRadius(Radius.xs)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.slots.indexOf(i) >= 0) { this.rotateAt(i); } }); })
     .onClick(() => { Haptics.tap(); if (this.slots.indexOf(i) >= 0) { this.rotateAt(i); } })
   }
 }

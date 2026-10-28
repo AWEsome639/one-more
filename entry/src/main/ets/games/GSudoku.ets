@@ -22,6 +22,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SIDE: number = 9;
 const BOX: number = 3;
@@ -823,6 +824,9 @@ export struct GSudoku {
               Haptics.tap();
               this.fill(d);
             })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.fill(d); }); })
         }, (d: number) => 'd' + d)
       }
       .width('100%')
@@ -843,6 +847,9 @@ export struct GSudoku {
           .onClick(() => {
             this.askHint();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .fontSize(FontSize.sm)
           .fontColor(this.theme.ink)
@@ -853,6 +860,9 @@ export struct GSudoku {
           .onClick(() => {
             this.askAuto();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .fontSize(FontSize.md)
           .fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt)
@@ -862,6 +872,9 @@ export struct GSudoku {
           .onClick(() => {
             this.askHint();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(TG('擦除'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
@@ -874,6 +887,9 @@ export struct GSudoku {
             Haptics.tap();
             this.erase();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.erase(); }); })
         Button(TG('重开（新题）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
@@ -886,6 +902,9 @@ export struct GSudoku {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
     }
@@ -935,5 +954,8 @@ export struct GSudoku {
       Haptics.tick();
       this.sel = i;
     })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = i; }); })
   }
 }

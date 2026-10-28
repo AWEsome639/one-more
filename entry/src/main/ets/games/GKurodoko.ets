@@ -18,6 +18,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 5;
 const CELLS: number = N * N;
@@ -612,6 +613,9 @@ export struct GKurodoko {
               color: this.clue[(r * N + c)] > 0 ? Palette.teal : this.theme.line
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tap((r * N + c));
@@ -649,6 +653,9 @@ export struct GKurodoko {
 
         .height(44)
 
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         .onClick(() => {
 
           this.askHint();
@@ -664,6 +671,9 @@ export struct GKurodoko {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(44))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

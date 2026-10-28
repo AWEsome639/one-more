@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const MAXSIDE: number = 12; const TOTAL: number = 10; const PASS: number = 7; const NEXT_MS: number = 820;
 const CHOICES: string[] = [TG('A 更大'), TG('B 更大'), TG('一样大')];
 @Component
@@ -241,7 +242,7 @@ export struct GAreaPerimeterMatch {
           .backgroundColor(this.picked < 0 ? this.theme.surface
           : ((i) === this.ansIdx ? Palette.emerald : ((i) === this.picked ? Palette.rose : this.theme.surface)))
           .borderRadius(Radius.md).shadow(Shadow.card)
-          .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((i)); })
+          .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); }).onClick(() => { Haptics.tick(); this.pick((i)); })
         }, (i: number) => 'c' + i)
       }
       .width('100%')
@@ -257,7 +258,7 @@ export struct GAreaPerimeterMatch {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { Haptics.tap(); this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：面积看长宽之积，周长看四条边之和 —— 细长条的周长往往更大'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

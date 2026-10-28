@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const LIVES: number = 3; const CELLS: number = 10; const ORDER: number[] = [4, 5, 6, 7, 8, 9];
 function shuffle(a: number[]): number[] {
   const out: number[] = a.slice();
@@ -270,6 +271,9 @@ export struct GSumPyramid {
           Haptics.tap();
           if (this.opts.length > (i)) { this.choose(this.opts[(i)]); }
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.opts.length > (i)) { this.choose(this.opts[(i)]); } }); })
         }, (i: number) => 'o' + i)
       }.width('100%')
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
@@ -279,6 +283,9 @@ export struct GSumPyramid {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：相邻两格之和往上搬，一层层来')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

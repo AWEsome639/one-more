@@ -11,6 +11,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const CLAIMS: string[] = [
   TG('本周三有雷阵雨'), TG('图书馆周六闭馆'), TG('新食堂下月开张'), TG('地铁 15 号线年底通车'),
@@ -209,6 +210,9 @@ export struct GSourceMonitoring {
         Button(TG('我记好了 ▶'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.teal)
           .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.toQuiz(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.toQuiz(); }); })
       } else {
         Column({ space: Space.xs }) {
           Text(TG('这条消息是谁说的？')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -230,6 +234,9 @@ export struct GSourceMonitoring {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
           .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
     }
     .onTouch((e: TouchEvent) => {
@@ -245,5 +252,8 @@ export struct GSourceMonitoring {
       .backgroundColor(this.softBtn(i)).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52))
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => { Haptics.tap(); this.pick(i); })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(i); }); })
   }
 }

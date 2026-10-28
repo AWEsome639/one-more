@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const QN: number = 8; const PASS: number = 5;
 const LIMIT_S: number = 15; const TICK_MS: number = 1000;
@@ -232,15 +233,15 @@ export struct GGrammarPolice {
 
       Flex({ wrap: FlexWrap.Wrap }) {
         ForEach(this.cur().words, (w: string) => {
-          Text((w)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm }).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).margin({ right: Space.xs, bottom: Space.xs }).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((w)); })
+          Text((w)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm }).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).margin({ right: Space.xs, bottom: Space.xs }).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((w)); }); }).onClick(() => { Haptics.tick(); this.pick((w)); })
         }, (w: string, i: number) => 'w' + i + w)
       }.width('100%')
 
       Row({ space: Space.sm }) {
         Button(TG('无错误 ✅'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over).onClick(() => { Haptics.tap(); this.pick(''); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(''); }); }).onClick(() => { Haptics.tap(); this.pick(''); })
         Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)

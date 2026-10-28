@@ -20,6 +20,7 @@ import { G2048Value, heuristicScore } from '../ai/G2048Value';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 4;
 const WIN: number = 2048;
@@ -575,6 +576,9 @@ export struct G2048 {
           .borderRadius(Radius.md)
           .height(Cell.of(44))
           .padding({ left: Space.md, right: Space.md })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
@@ -586,6 +590,9 @@ export struct G2048 {
           .borderRadius(Radius.md)
           .width(96)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -672,6 +679,9 @@ export struct G2048 {
       .backgroundColor(this.theme.surface)
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move(dir); }); })
       .onClick(() => {
         Haptics.tick();
         this.move(dir);

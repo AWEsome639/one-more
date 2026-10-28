@@ -17,6 +17,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 /** 一个关卡：名字 + 一句话提示 + 地图 */
 interface Level {
@@ -654,6 +655,9 @@ export struct GSokoban {
             Haptics.tap();
             this.go(this.level - 1);
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(this.level - 1); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
@@ -666,6 +670,9 @@ export struct GSokoban {
             Haptics.tap();
             this.load(this.level);
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.load(this.level); }); })
         Button(TG('撤销'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
@@ -678,6 +685,9 @@ export struct GSokoban {
             Haptics.tap();
             this.undo();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.undo(); }); })
         Button(TG('下一关'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
@@ -691,6 +701,9 @@ export struct GSokoban {
             Haptics.tap();
             this.go(this.level + 1);
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(this.level + 1); }); })
       }
       .width('100%')
     }
@@ -748,6 +761,9 @@ export struct GSokoban {
         Haptics.tap();
         this.step(dx, dy);
       })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(dx, dy); }); })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
   }
 

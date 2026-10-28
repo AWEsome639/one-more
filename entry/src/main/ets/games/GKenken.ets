@@ -14,6 +14,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { I18n } from '../core/I18n';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 4;
 const CELLS: number = N * N;
@@ -528,6 +529,9 @@ export struct GKenken {
               .borderRadius(Radius.xs)
               .border({ width: this.sel === (r * N + c) ? 2 : 1, color: this.sel === (r * N + c) ? Palette.primary : this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tapCell((r * N + c));
@@ -550,12 +554,18 @@ export struct GKenken {
         Button(TG('提示'))
           .layoutWeight(1)
           .height(Cell.of(38))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
         Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .layoutWeight(1)
           .height(Cell.of(38))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .onClick(() => {
             this.askAuto();
           })
@@ -574,6 +584,9 @@ export struct GKenken {
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put((d)); }); })
           .onClick(() => {
           Haptics.tick();
           this.put((d));
@@ -590,6 +603,9 @@ export struct GKenken {
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put((d)); }); })
           .onClick(() => {
           Haptics.tick();
           this.put((d));
@@ -607,6 +623,9 @@ export struct GKenken {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(44))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();
@@ -658,6 +677,9 @@ export struct GKenken {
       .height(Cell.of(44))
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.sm)
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.clearSel(); }); })
       .onClick(() => {
         Haptics.tick();
         this.clearSel();

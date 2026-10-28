@@ -9,6 +9,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 3; const CELLS: number = 9; const MAX_MOVE: number = 24;
 const WORDS: string[] = ['ADVENTURE', 'CHOCOLATE', 'EDUCATION', 'MOUNTAINS', 'TELEPHONE',
@@ -237,6 +238,9 @@ export struct GLetterGridSwapper {
               .onTouch((e: TouchEvent) => {
               if (e.type === TouchType.Down) { this.pressed = (r * this.diffTotal + c); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               .onClick(() => { Haptics.tick(); this.tap((r * this.diffTotal + c)); })
             }, (c: number) => 'c' + c)
           }.width('100%')
@@ -250,6 +254,9 @@ export struct GLetterGridSwapper {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：按行从左到右读，读出来就是目标单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

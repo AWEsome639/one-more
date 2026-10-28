@@ -12,6 +12,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const PAIRS: number = 3; const BOARDS: number = 3;
 const LIMIT: number = 90; const TICK_MS: number = 1000; const PENALTY: number = 5;
@@ -335,6 +336,9 @@ export struct GMatrixMultiplierMatch {
           .width('100%').padding(Space.sm).borderRadius(Radius.md).shadow(Shadow.card)
           .backgroundColor(this.done[k] ? HIT : (this.selL === k ? Palette.lime : this.theme.surface))
           .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pickL(k); }); })
           .onClick(() => { Haptics.tick(); this.pickL(k); })
         }, (k: number) => 'ml' + k)
       }.width('100%')
@@ -346,6 +350,9 @@ export struct GMatrixMultiplierMatch {
             .textAlign(TextAlign.Center)
             .layoutWeight(1).padding(Space.sm).borderRadius(Radius.md).shadow(Shadow.card)
             .backgroundColor(this.theme.surfaceAlt)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pickR(slot); }); })
             .onClick(() => { Haptics.tick(); this.pickR(slot); })
         }, (slot: number) => 'ms' + slot)
       }.width('100%')
@@ -357,6 +364,9 @@ export struct GMatrixMultiplierMatch {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：2×2 乘积 C[r][c] = A[r][0]×B[0][c] + A[r][1]×B[1][c]'))

@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const ROUNDS: number = 10; const PASS: number = 8; const NEXT_MS: number = 800;
 const VALS: number[] = [1, 2, 3, 4, 5, 8, 10, 12, 20, 25, 30, 50, 60, 100, 120, 250, 500, 1000];
 interface Unit { n: string; f: number }
@@ -266,6 +267,9 @@ export struct GUnitConverterPro {
         Haptics.tap();
         this.submit((0));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((0)); }); })
         Button(this.opts.length > (1) ? this.opts[(1)] : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink).backgroundColor(this.pick === (1)
@@ -276,6 +280,9 @@ export struct GUnitConverterPro {
         Haptics.tap();
         this.submit((1));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
         Button(this.opts.length > (2) ? this.opts[(2)] : '—')
@@ -288,6 +295,9 @@ export struct GUnitConverterPro {
         Haptics.tap();
         this.submit((2));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((2)); }); })
         Button(this.opts.length > (3) ? this.opts[(3)] : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (3) ? '#FFFFFF' : this.theme.ink).backgroundColor(this.pick === (3)
@@ -298,6 +308,9 @@ export struct GUnitConverterPro {
         Haptics.tap();
         this.submit((3));
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((3)); }); })
       }.width('100%')
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
@@ -306,6 +319,9 @@ export struct GUnitConverterPro {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：长度 10 进、数据 1024 进、时间 60 进')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

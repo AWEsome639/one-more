@@ -29,6 +29,7 @@ import { LanMatch, Side } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 9;                   // 9 路
 const CELLS: number = N * N;
@@ -956,6 +957,9 @@ export struct GGo9 {
           .layoutWeight(1)
           .height(Cell.of(46))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.passTap(); }); })
           .onClick(() => {
             Haptics.tap();
             this.passTap();
@@ -968,6 +972,9 @@ export struct GGo9 {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(46))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.restartTap(); }); })
           .onClick(() => {
             Haptics.tap();
             this.restartTap();
@@ -1040,6 +1047,9 @@ export struct GGo9 {
     .aspectRatio(1)
     .backgroundColor(this.canTap(r, c) ? '#15FFFFFF' : Color.Transparent)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPoint(r, c); }); })
     .onClick(() => {
       Haptics.tick();
       this.tapPoint(r, c);

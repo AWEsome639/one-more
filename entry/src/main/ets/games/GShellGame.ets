@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const LEVELS: number = 5;
 const BASE_SWAPS: number = 4;
 const SHOW_MS: number = 1400;
@@ -237,6 +238,9 @@ export struct GShellGame {
           .scale({ x: this.pickSlot === (slot) ? Motion.pressScale : 1, y: this.pickSlot === (slot) ? Motion.pressScale : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.pick((slot)); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((slot)); }); })
         }, (slot: number) => 's' + slot)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%')
@@ -245,6 +249,9 @@ export struct GShellGame {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.orange)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：连中 5 关通关；每过一关多洗 2 次'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }

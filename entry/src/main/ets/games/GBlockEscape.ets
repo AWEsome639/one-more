@@ -45,6 +45,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const GRID: number = 6;
 const CELLS: number = GRID * GRID;
@@ -634,6 +635,9 @@ export struct GBlockEscape {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -646,6 +650,9 @@ export struct GBlockEscape {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.stopAuto(); if (!this.finished) { this.done = true; this.status = TG('已认输'); this.finish(false); } }); })
           .onClick(() => {
             Haptics.tap();
             this.stopAuto();
@@ -705,6 +712,9 @@ export struct GBlockEscape {
     .borderWidth(this.selCell(cell) ? 2 : 0)
     .borderColor('#FFFFFF')
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(cell); }); })
     .onClick(() => {
       Haptics.tick();
       this.tap(cell);
@@ -727,6 +737,9 @@ export struct GBlockEscape {
       .backgroundColor(this.theme.surface)
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.go(dir); }); })
       .onClick(() => {
         Haptics.tick();
         this.go(dir);

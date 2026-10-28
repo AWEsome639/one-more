@@ -8,6 +8,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 const PEGS: number = 3;
 const DISKS: number = 4;
 const BEST: number = 15;
@@ -244,6 +245,9 @@ export struct GTowerOfHanoi {
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.won ? Palette.emerald : Palette.primary).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
@@ -274,5 +278,8 @@ export struct GTowerOfHanoi {
     .layoutWeight(1).height('100%').padding(Space.xs).borderRadius(Radius.md)
     .borderWidth(this.sel === i ? 2 : 0).borderColor(Palette.amber)
     .onClick(() => { Haptics.tick(); this.tapPeg(i); })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPeg(i); }); })
   }
 }

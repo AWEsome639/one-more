@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const GOAL: number = 10; const LIMIT: number = 60; const TICK_MS: number = 1000;
 const PENALTY: number = 3; const NEXT_MS: number = 400;
@@ -278,6 +279,9 @@ export struct GMissingOperator {
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onTouch((e: TouchEvent) => { this.press = e.type === TouchType.Down ? kind : -1; })
             .onClick(() => { Haptics.tick(); this.pick(kind); })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(kind); }); })
         }, (kind: number) => 'op' + kind)
       }.width('100%')
 
@@ -302,6 +306,9 @@ export struct GMissingOperator {
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：先估大小 —— 比两个数都大很多，多半是乘'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

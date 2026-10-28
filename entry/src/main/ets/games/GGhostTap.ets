@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SIZE: number = 4;
 const CELLS: number = SIZE * SIZE;
@@ -251,6 +252,9 @@ export struct GGhostTap {
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((row * SIZE + col)); }); })
               .onClick(() => { Haptics.tick(); this.tapCell((row * SIZE + col)); })
             }, (col: number) => 'c' + col + this.cellColor(row * SIZE + col))
           }.width('100%')
@@ -266,6 +270,9 @@ export struct GGhostTap {
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('判定：{0} 只里抓到 {1} 只即通关，点偏会拖慢节奏',Digits(String(this.diffTotal), this.langCode),Digits(String(WIN_HITS), this.langCode)))

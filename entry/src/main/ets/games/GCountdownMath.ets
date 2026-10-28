@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const LIMIT: number = 90;
 const NEED: number = 3;
@@ -453,6 +454,9 @@ export struct GCountdownMath {
           .fontColor(this.used[(i)] ? this.theme.inkFaint : (this.sel === (i) ? '#FFFFFF' : this.theme.ink))
           }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (i) ? Palette.sky : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapNum((i), this.round.nums[(i)] ?? 0); }); })
           .onClick(() => { Haptics.tick(); this.tapNum((i), this.round.nums[(i)] ?? 0); })
         }, (i: number) => 'n' + i)
       }.width('100%')
@@ -461,7 +465,7 @@ export struct GCountdownMath {
         Button(('+'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.opSign === ('+') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.opSign === ('+') ? Palette.violet : this.theme.surface).borderRadius(Radius.md)
-        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).onClick(() => {
+        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.sel < 0) { this.tip = TG('先点一个数字'); return; } this.opSign = ('+'); this.tip = TG2('运算符 {0}，再点一个数字', ('+')); }); }).onClick(() => {
         Haptics.tap();
         if (this.sel < 0) {
         this.tip = TG('先点一个数字');
@@ -473,7 +477,7 @@ export struct GCountdownMath {
         Button(('-'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.opSign === ('-') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.opSign === ('-') ? Palette.violet : this.theme.surface).borderRadius(Radius.md)
-        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).onClick(() => {
+        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.sel < 0) { this.tip = TG('先点一个数字'); return; } this.opSign = ('-'); this.tip = TG2('运算符 {0}，再点一个数字', ('-')); }); }).onClick(() => {
         Haptics.tap();
         if (this.sel < 0) {
         this.tip = TG('先点一个数字');
@@ -485,7 +489,7 @@ export struct GCountdownMath {
         Button(('x'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.opSign === ('x') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.opSign === ('x') ? Palette.violet : this.theme.surface).borderRadius(Radius.md)
-        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).onClick(() => {
+        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.sel < 0) { this.tip = TG('先点一个数字'); return; } this.opSign = ('x'); this.tip = TG2('运算符 {0}，再点一个数字', ('x')); }); }).onClick(() => {
         Haptics.tap();
         if (this.sel < 0) {
         this.tip = TG('先点一个数字');
@@ -497,7 +501,7 @@ export struct GCountdownMath {
         Button(('/'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.opSign === ('/') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.opSign === ('/') ? Palette.violet : this.theme.surface).borderRadius(Radius.md)
-        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).onClick(() => {
+        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.sel < 0) { this.tip = TG('先点一个数字'); return; } this.opSign = ('/'); this.tip = TG2('运算符 {0}，再点一个数字', ('/')); }); }).onClick(() => {
         Haptics.tap();
         if (this.sel < 0) {
         this.tip = TG('先点一个数字');
@@ -518,12 +522,15 @@ export struct GCountdownMath {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(40))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.sky).borderRadius(Radius.md)
-          .width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .width(120).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('除法只在整除时可用')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }

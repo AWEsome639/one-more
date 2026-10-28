@@ -8,6 +8,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const QN: number = 6; const PASS: number = 4; const FEED_MS: number = 1000;
 const LIMIT_MS: number = 10000; const TICK_MS: number = 100;
@@ -250,6 +251,9 @@ export struct GPortmanteauSplit {
         if (e.type === TouchType.Down) { this.pressed = (0); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
         })
         .onClick(() => { Haptics.tick(); this.tap((0)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0)); }); })
         Text(this.q.opts.length > (1) ? this.q.opts[(1)] : '')
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
         .fontColor(this.sel.indexOf((1)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(58))
@@ -261,6 +265,9 @@ export struct GPortmanteauSplit {
         if (e.type === TouchType.Down) { this.pressed = (1); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
         })
         .onClick(() => { Haptics.tick(); this.tap((1)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
         Text(this.q.opts.length > (2) ? this.q.opts[(2)] : '')
@@ -274,6 +281,9 @@ export struct GPortmanteauSplit {
         if (e.type === TouchType.Down) { this.pressed = (2); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
         })
         .onClick(() => { Haptics.tick(); this.tap((2)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((2)); }); })
         Text(this.q.opts.length > (3) ? this.q.opts[(3)] : '')
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
         .fontColor(this.sel.indexOf((3)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(58))
@@ -285,12 +295,18 @@ export struct GPortmanteauSplit {
         if (e.type === TouchType.Down) { this.pressed = (3); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
         })
         .onClick(() => { Haptics.tick(); this.tap((3)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((3)); }); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

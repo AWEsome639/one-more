@@ -14,6 +14,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const G: number = 12;
 const GOAL: number = 60;
@@ -353,6 +354,9 @@ export struct GLifeGame {
               .aspectRatio(1)
               .backgroundColor(this.cells[(r * G + c)] ? Palette.violet : this.theme.surface)
               .borderRadius(Radius.xs)
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * G + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tap((r * G + c));
@@ -380,6 +384,9 @@ export struct GLifeGame {
           .backgroundColor(Palette.violet).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.play(); }); })
           .onClick(() => {
             Haptics.tap();
             this.play();
@@ -390,6 +397,9 @@ export struct GLifeGame {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.running && !this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(); }); })
           .onClick(() => {
             Haptics.tap();
             this.step();
@@ -403,6 +413,9 @@ export struct GLifeGame {
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -413,6 +426,9 @@ export struct GLifeGame {
           .backgroundColor(this.theme.surface).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.stop(); this.running = false; this.cells = new Array<boolean>(G * G).fill(false); this.aliveN = 0; }); })
           .onClick(() => {
             Haptics.tap();
             this.stop();

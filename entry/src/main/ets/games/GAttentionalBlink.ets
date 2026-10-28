@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const TRIALS: number = 5;
 const NEED: number = 4;
@@ -265,6 +266,9 @@ export struct GAttentionalBlink {
       .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (0) ? 0.5 : 1).shadow(Shadow.card)
       .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
       .onClick(() => { Haptics.tick(); this.answer((0)); }); Text(this.opts[(1)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (1) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
       .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
@@ -272,6 +276,9 @@ export struct GAttentionalBlink {
       .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (1) ? 0.5 : 1).shadow(Shadow.card)
       .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); })
       .onClick(() => { Haptics.tick(); this.answer((1)); }) }.width('100%')
       Row({ space: Space.sm }) { Text(this.opts[(2)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (2) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
@@ -280,6 +287,9 @@ export struct GAttentionalBlink {
       .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (2) ? 0.5 : 1).shadow(Shadow.card)
       .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); })
       .onClick(() => { Haptics.tick(); this.answer((2)); }); Text(this.opts[(3)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (3) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
       .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
@@ -287,11 +297,14 @@ export struct GAttentionalBlink {
       .borderRadius(Radius.md).opacity(this.answered() && this.pick !== (3) ? 0.5 : 1).shadow(Shadow.card)
       .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((3)); }); })
       .onClick(() => { Haptics.tick(); this.answer((3)); }) }.width('100%')
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：数字只出现一次，其余字母都是干扰项')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

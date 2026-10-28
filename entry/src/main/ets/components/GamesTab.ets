@@ -9,6 +9,7 @@
  *   「一搜索整个列表区就不渲染」——根因是补丁残留，不是逻辑）
  */
 
+import { Tv } from '../core/Tv';
 import { router } from '@kit.ArkUI';
 import { About } from '../core/About';
 import { Haptics } from '../core/Haptics';
@@ -1004,6 +1005,12 @@ build() {
       .backgroundColor(this.accentColor())
       .borderRadius(Radius.md)
       .shadow(Shadow.card)
+      // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => {
+        Tv.handleKey(e, () => { this.openGame(this.dailyId); });
+      })
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         this.openGame(this.dailyId);
@@ -1027,6 +1034,19 @@ build() {
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
+    // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => {
+      // ★ 遥控器 OK 键 = 随机来一局（动作与下面的 onClick 完全一致）
+      Tv.handleKey(e, () => {
+        const pool: GameMeta[] = this.list();
+        if (pool.length > 0) {
+          const pick: GameMeta = pool[Math.floor(Math.random() * pool.length)];
+          this.openGame(pick.id);
+        }
+      });
+    })
     .onClick(() => {
       const pool: GameMeta[] = this.list();
       if (pool.length === 0) {

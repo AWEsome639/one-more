@@ -15,6 +15,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 6;
 const CELLS: number = N * N;
@@ -606,6 +607,9 @@ export struct GTentsAndTrees {
               Haptics.tick();
               this.tap((r * this.diffTotal + c));
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
           .width('100%')
@@ -636,6 +640,9 @@ export struct GTentsAndTrees {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('🌳 树固定不动；每棵树上下左右恰好一顶 ⛺；行列数字 = 该行/列的帐篷数'))
         .fontSize(FontSize.xxs)

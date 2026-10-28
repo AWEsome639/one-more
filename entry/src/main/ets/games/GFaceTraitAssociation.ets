@@ -12,6 +12,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 
 interface TraitFace { icon: string; trait: string; }
 interface TraitChoice { label: string; ok: boolean; }
@@ -306,6 +307,9 @@ export struct GFaceTraitAssociation {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
         .onClick(() => { Haptics.tick(); this.answer((0)); }); Text(this.opts[(1)].label)
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
@@ -314,6 +318,9 @@ export struct GFaceTraitAssociation {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); })
         .onClick(() => { Haptics.tick(); this.answer((1)); }); Text(this.opts[(2)].label)
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (2) ? '#FFFFFF' : this.theme.ink)
@@ -322,6 +329,9 @@ export struct GFaceTraitAssociation {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); })
         .onClick(() => { Haptics.tick(); this.answer((2)); }); Text(this.opts[(3)].label)
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (3) ? '#FFFFFF' : this.theme.ink)
@@ -330,6 +340,9 @@ export struct GFaceTraitAssociation {
         .borderRadius(Radius.md).shadow(Shadow.card)
         .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((3)); }); })
         .onClick(() => { Haptics.tick(); this.answer((3)); }) }.width('100%')
       } else {
         Column({ space: Space.xs }) {
@@ -348,6 +361,9 @@ export struct GFaceTraitAssociation {
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('判定：6 题答对 ≥ {0} 即通关。特质皆为虚构。',Digits(String(NEED), this.langCode)))

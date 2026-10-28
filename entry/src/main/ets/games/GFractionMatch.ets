@@ -9,6 +9,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 
 const PAIRS: number = 4; const CARD: number = 8; const LIMIT: number = 60; const HIDE_MS: number = 700;
 /** 8 个互不相等的基准分数：分子 / 分母 */
@@ -267,7 +268,7 @@ export struct GFractionMatch {
               Stack() {
               Text(this.face((row * 4 + col))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.cardInk((row * 4 + col)))
               }.layoutWeight(1).aspectRatio(1).backgroundColor(this.cardBg((row * 4 + col))).borderRadius(Radius.md).shadow(Shadow.card)
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.flip((row * 4 + col)); })
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.flip((row * 4 + col)); }); }).onClick(() => { Haptics.tick(); this.flip((row * 4 + col)); })
             }, (col: number) => 'fmc' + col)
           }.width('100%')
         }, (row: number) => 'fmr' + row)
@@ -280,7 +281,7 @@ export struct GFractionMatch {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.berry)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：2/4 与 1/2 等值 —— 同乘（同除）同一个数，分数大小不变')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

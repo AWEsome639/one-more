@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const TRIALS: number = 10; const PASS: number = 7;
 const A_MS: number = 430; const GAP_MS: number = 280; const B_MS: number = 430; const FEED_MS: number = 560;
@@ -251,17 +252,26 @@ export struct GTemporalOrderJudgment {
         .fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(true ? Palette.sky : Palette.violet)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).enabled(this.phase === 3 && !this.over)
         .onClick(() => { Haptics.tap(); this.answer((0)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((0)); }); })
         Button((false ? '⬅️ ' : '➡️ ') + this.embAt((1)) + (false ? ' 左边先' : ' 右边先'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(false ? Palette.sky : Palette.violet)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).enabled(this.phase === 3 && !this.over)
         .onClick(() => { Haptics.tap(); this.answer((1)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((1)); }); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('两次闪现之间夹着一小段空白，别看错先后')).fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

@@ -16,6 +16,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const PITS: number = 6;      // 每方 6 个坑
 const P_STORE: number = 6;   // 我方库
@@ -539,6 +540,9 @@ export struct GMancala {
               .borderRadius(Radius.full)
               .border({ width: 1, color: this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (false) { this.playerMove((i)); } }); })
               .onClick(() => {
               Haptics.tick();
               if (false) {
@@ -567,6 +571,9 @@ export struct GMancala {
               .borderRadius(Radius.full)
               .border({ width: 1, color: this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (true) { this.playerMove((i)); } }); })
               .onClick(() => {
               Haptics.tick();
               if (true) {
@@ -606,6 +613,9 @@ export struct GMancala {
         .fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(Palette.lime).borderRadius(Radius.md)
         .width('100%').height(Cell.of(44))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.restartTap(); }); })
         .onClick(() => {
           Haptics.tap();
           this.restartTap();

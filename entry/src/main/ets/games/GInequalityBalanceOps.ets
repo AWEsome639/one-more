@@ -8,6 +8,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const TOTAL: number = 8; const PASS: number = 6; const NEXT_MS: number = 800;
 /** 0 = '<'，1 = '='，2 = '>' */
@@ -253,7 +254,7 @@ export struct GInequalityBalanceOps {
           Button(sym(i))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xxl).fontColor(this.btnInk(i))
             .backgroundColor(this.btnBg(i)).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tap(); this.pick(i); })
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(i); }); }).onClick(() => { Haptics.tap(); this.pick(i); })
             // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
             .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
               .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
@@ -264,7 +265,7 @@ export struct GInequalityBalanceOps {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：先算乘、再算加；两边都算完才好放符号')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

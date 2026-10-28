@@ -16,6 +16,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 
 const TIME_LIMIT: number = 60;   // 总秒数
 const GOAL: number = 10;         // 通关需答对题数
@@ -450,6 +451,9 @@ export struct GBaseConversionRun {
           .borderRadius(Radius.md)
           .shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
           .onClick(() => {
             Haptics.tick();
             this.pick(i);
@@ -473,6 +477,9 @@ export struct GBaseConversionRun {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(42))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         .onClick(() => {
           this.askHint();
         })
@@ -484,6 +491,9 @@ export struct GBaseConversionRun {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const TRIALS: number = 12;
 const LIMIT_MS: number = 900;
@@ -278,6 +279,9 @@ export struct GFlankerTest {
         .borderRadius(Radius.lg).layoutWeight(1).height(Space.xxxl * 2)
         .opacity(this.live || this.pick >= 0 ? 1 : 0.55)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((false)); }); })
         .onClick(() => { Haptics.tap(); this.answer((false)); })
         Button(('→'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -286,6 +290,9 @@ export struct GFlankerTest {
         .borderRadius(Radius.lg).layoutWeight(1).height(Space.xxxl * 2)
         .opacity(this.live || this.pick >= 0 ? 1 : 0.55)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((true)); }); })
         .onClick(() => { Haptics.tap(); this.answer((true)); })
       }.width('100%')
 
@@ -294,6 +301,9 @@ export struct GFlankerTest {
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('判定：答对 ≥ {0}/{1} 且平均 < {2} ms', String(NEED_HIT), String(this.diffTotal), String(LIMIT_MS)))

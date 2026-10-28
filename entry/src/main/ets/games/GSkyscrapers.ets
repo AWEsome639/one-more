@@ -16,6 +16,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 4;
 const CELLS: number = N * N;
@@ -667,6 +668,9 @@ export struct GSkyscrapers {
               Haptics.tick();
               this.skyTap((gr), (gc));
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.skyTap((gr), (gc)); }); })
             }, (gc: number) => 'g' + gc)
           }
           .width('100%')
@@ -693,6 +697,9 @@ export struct GSkyscrapers {
               Haptics.tick();
               this.pick = v;
             })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick = v; }); })
         }, (v: number) => 'p' + v)
       }
       .width('100%')
@@ -714,6 +721,9 @@ export struct GSkyscrapers {
           .onClick(() => {
             this.askHint();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
                 Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
@@ -726,6 +736,9 @@ export struct GSkyscrapers {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
     }

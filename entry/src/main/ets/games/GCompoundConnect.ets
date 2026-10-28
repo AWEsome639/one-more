@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 6;
 const START: number = 0;
@@ -431,6 +432,9 @@ export struct GCompoundConnect {
               color: Palette.emerald
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
               .onClick(() => {
               Haptics.tick();
               this.tap((this.idx(r, c)));
@@ -465,6 +469,9 @@ export struct GCompoundConnect {
           .layoutWeight(1)
           .height(Cell.of(46))
           .enabled(!this.over && this.path.length > 0)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); const p: number[] = this.path.slice(); p.pop(); this.path = p; this.msg = TG('退回一步'); }); })
           .onClick(() => {
             Haptics.tap();
             const p: number[] = this.path.slice();
@@ -481,6 +488,9 @@ export struct GCompoundConnect {
           .layoutWeight(1)
           .height(Cell.of(46))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.path = []; this.msg = TG('从左上角重新起步'); }); })
           .onClick(() => {
             Haptics.tap();
             this.path = [];
@@ -494,6 +504,9 @@ export struct GCompoundConnect {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(46))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();

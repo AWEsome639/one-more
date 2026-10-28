@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 4;
 const CELLS: number = N * N;
@@ -325,6 +326,9 @@ export struct GMirrorTracing {
       this.tap((r * N + c));
       }
       })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (((false))) { this.tap((r * N + c)); } }); })
       }, (c: number) => 'c' + c)
       }
       .width('100%')
@@ -359,6 +363,9 @@ export struct GMirrorTracing {
       this.tap((r * N + c));
       }
       })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (((true))) { this.tap((r * N + c)); } }); })
       }, (c: number) => 'c' + c)
       }
       .width('100%')
@@ -386,6 +393,9 @@ export struct GMirrorTracing {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：3 关全部对齐通关 · 每关 8 笔（擦掉也算一笔）'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

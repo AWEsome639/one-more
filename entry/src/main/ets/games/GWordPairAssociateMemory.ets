@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const PAIRS_N: number = 6; const PASS: number = 5; const OPT_N: number = 4;
 const STUDY_S: number = 8; const TICK_MS: number = 1000; const FEED_MS: number = 750;
@@ -240,6 +241,9 @@ export struct GWordPairAssociateMemory {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
@@ -263,6 +267,9 @@ export struct GWordPairAssociateMemory {
       .backgroundColor(this.tone(o)).borderRadius(Radius.md).width('100%').height(Cell.of(48))
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => { Haptics.tap(); this.pick(o); })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(o); }); })
   }
   private tone(o: string): string {
     if (this.pickedOk < 0 || this.qIndex >= this.diffTotal) { return Palette.violet; }

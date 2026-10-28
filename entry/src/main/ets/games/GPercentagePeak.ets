@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 
 const TIME_LIMIT: number = 45;
 const GOAL: number = 12;
@@ -366,6 +367,9 @@ export struct GPercentagePeak {
             Haptics.tick();
             this.pick(i);
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
         }, (i: number) => 'pp' + i)
       }.width('100%')
 
@@ -392,6 +396,9 @@ export struct GPercentagePeak {
           Haptics.tap();
           this.reset();
         })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

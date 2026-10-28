@@ -19,6 +19,7 @@ import { LanMatch, Side } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 // ★★★ 2026-10-23 AI 升级（路线 A）：α-β 搜索器，只做算法、不碰界面
 //   搜不出来（简单档 / 异常 / 超预算）⇒ 自动回落下面那个 chooseMove 启发式
 import { GomokuSearch } from '../ai/GomokuSearch';
@@ -967,6 +968,9 @@ export struct GGomoku {
               }
               .layoutWeight(1)
               .aspectRatio(1)
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.humanTap((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.humanTap((r * this.diffTotal + c));
@@ -1001,6 +1005,9 @@ export struct GGomoku {
           .layoutWeight(1)
           .height(Cell.of(48))
           .enabled(!LanMatch.isActive())      // ★ 联机不能单方悔棋
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.undo(); }); })
           .onClick(() => {
             Haptics.tap();
             this.undo();
@@ -1013,6 +1020,9 @@ export struct GGomoku {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(48))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.restartTap(); }); })
           .onClick(() => {
             Haptics.tap();
             this.restartTap();

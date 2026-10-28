@@ -12,6 +12,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 6;
 const CELLS: number = N * N;
@@ -411,6 +412,9 @@ export struct GMirrorMaze {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .onClick(() => { Haptics.tick(); this.tap((3)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((3)); }); })
         Text(('▲'))
         .fontSize(FontSize.lg)
         .fontColor(this.theme.ink)
@@ -421,6 +425,9 @@ export struct GMirrorMaze {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .onClick(() => { Haptics.tick(); this.tap((0)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0)); }); })
         Text(('▼'))
         .fontSize(FontSize.lg)
         .fontColor(this.theme.ink)
@@ -431,6 +438,9 @@ export struct GMirrorMaze {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .onClick(() => { Haptics.tick(); this.tap((2)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((2)); }); })
         Text(('▶'))
         .fontSize(FontSize.lg)
         .fontColor(this.theme.ink)
@@ -441,6 +451,9 @@ export struct GMirrorMaze {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .onClick(() => { Haptics.tick(); this.tap((1)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1)); }); })
       }
       .width('100%')
       Button(this.over ? TG('再来一局') : TG('重开'))
@@ -452,6 +465,9 @@ export struct GMirrorMaze {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：走到 🏁 通关 · 步数上限 = 最短路径 + 7'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

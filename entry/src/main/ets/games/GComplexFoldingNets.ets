@@ -11,6 +11,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const TOTAL: number = 8;
 const PASS: number = 6;
@@ -274,6 +275,9 @@ export struct GComplexFoldingNets {
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[0])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[0])); })
         Button((this.opts[1]) + ' 层')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -281,6 +285,9 @@ export struct GComplexFoldingNets {
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[1])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[1])); })
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -290,6 +297,9 @@ export struct GComplexFoldingNets {
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[2])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[2])); })
         Button((this.opts[3]) + ' 层')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -297,6 +307,9 @@ export struct GComplexFoldingNets {
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[3])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[3])); })
       }.width('100%')
 
@@ -304,6 +317,9 @@ export struct GComplexFoldingNets {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {

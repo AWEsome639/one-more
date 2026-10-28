@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 4; const LIMIT: number = 12;
 
@@ -307,6 +308,9 @@ export struct GTangram {
           Haptics.tick();
           if (this.pieceAt.indexOf((p)) < 0 && !this.over) { this.sel = this.sel === (p) ? -1 : (p); }
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (this.pieceAt.indexOf((p)) < 0 && !this.over) { this.sel = this.sel === (p) ? -1 : (p); } }); })
         }, (p: number) => 'p' + p)
       }.width('100%')
       Column({ space: Space.xs }) {
@@ -319,6 +323,9 @@ export struct GTangram {
               .backgroundColor(this.pieceAt[(r * this.boardN + c)] >= 0 ? (this.target[(r * this.boardN + c)] === 1 ? Palette.sky : Palette.rose)
               : (this.target[(r * this.boardN + c)] === 1 ? (this.theme.isDark ? '#220EA5E9' : '#330EA5E9') : this.theme.surfaceAlt))
               .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * this.boardN + c)); })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.boardN + c)); }); })
             }, (c: number) => 'c' + r + '_' + c)
           }.width('100%').layoutWeight(1)
         }, (r: number) => 'r' + r)
@@ -332,6 +339,9 @@ export struct GTangram {
       Button(TG('重开（换一题）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

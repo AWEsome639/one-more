@@ -16,6 +16,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 @Component
 export struct GNim {
@@ -398,6 +399,9 @@ export struct GNim {
         Haptics.tick();
         this.take((i), k);
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.take((i), k); }); })
         }
         }, (k: number) => 'p' + (i) + '-' + k)
         }
@@ -430,6 +434,9 @@ export struct GNim {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('小提示：三堆都只剩 1 颗时，谁先动手谁输'))
         .fontSize(FontSize.xxs)

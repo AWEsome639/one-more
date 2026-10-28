@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 8;
 const EMPTY: number = 0;
@@ -550,6 +551,9 @@ export struct GReversi {
               Haptics.tick();
               this.tap((r) * this.diffTotal + (c));
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r) * this.diffTotal + (c)); }); })
             }, (c: number) => 'c' + c)
           }
           .width('100%')
@@ -578,6 +582,9 @@ export struct GReversi {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('点浅色提示点落子；棋盘下满或双方都无处可下时结算'))
         .fontSize(FontSize.xxs)

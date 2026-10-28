@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const TOTAL: number = 8; const PASS: number = 6; const NEXT_MS: number = 820;
 const LETTERS: string[] = ['A', 'B', 'C', 'D'];
 const OFFS: number[] = [-30, -20, -10, 10, 20, 30, 40];
@@ -234,14 +235,14 @@ export struct GAngleFinder {
             .backgroundColor(this.picked < 0 ? this.theme.surface
             : ((r * 2) === this.ansIdx ? Palette.emerald : ((r * 2) === this.picked ? Palette.rose : this.theme.surface)))
             .borderRadius(Radius.md).shadow(Shadow.card)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((r * 2)); })
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((r * 2)); }); }).onClick(() => { Haptics.tick(); this.pick((r * 2)); })
             Text(LETTERS[(r * 2 + 1)] + '. ' + this.opts[(r * 2 + 1)] + '°').fontSize(FontSize.md).fontWeight(FontWeight.Bold)
             .fontColor(this.picked >= 0 && ((r * 2 + 1) === this.ansIdx || (r * 2 + 1) === this.picked) ? '#FFFFFF' : this.theme.ink)
             .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(56))
             .backgroundColor(this.picked < 0 ? this.theme.surface
             : ((r * 2 + 1) === this.ansIdx ? Palette.emerald : ((r * 2 + 1) === this.picked ? Palette.rose : this.theme.surface)))
             .borderRadius(Radius.md).shadow(Shadow.card)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.pick((r * 2 + 1)); })
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((r * 2 + 1)); }); }).onClick(() => { Haptics.tick(); this.pick((r * 2 + 1)); })
           }
           .width('100%')
         }, (r: number) => 'or' + r)
@@ -259,7 +260,7 @@ export struct GAngleFinder {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).onClick(() => { Haptics.tap(); this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：先把已知角加起来，再用内角和去减')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {

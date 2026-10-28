@@ -17,6 +17,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 // ★ 2026-10-24 第三期：通用提示层 + AI 代打
 import { Hint, HintResult } from '../ai/Hint';
+import { Tv } from '../core/Tv';
 
 const N: number = 6;              // 6×6
 const BOX_R: number = 2;          // 宫高
@@ -551,6 +552,9 @@ export struct GSudokuHex {
               Haptics.tick();
               this.tapCell((r * this.diffTotal + c));
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
           .width('100%')
@@ -576,6 +580,9 @@ export struct GSudokuHex {
               Haptics.tap();
               this.put(v);
             })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.put(v); }); })
         }, (v: number) => 'n' + v)
       }
       .width('100%')
@@ -593,18 +600,27 @@ export struct GSudokuHex {
             Haptics.tap();
             this.put(0);
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.put(0); }); })
         Button(TG('提示'))
           .layoutWeight(1)
           .height(44)
           .onClick(() => {
             this.askHint();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .layoutWeight(1)
           .height(44)
           .onClick(() => {
             this.askAuto();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
         Button(TG('换一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
@@ -617,6 +633,9 @@ export struct GSudokuHex {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Button(TG('放弃'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
@@ -633,6 +652,9 @@ export struct GSudokuHex {
               this.finish(false);
             }
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.finished) { this.done = true; this.status = TG('已放弃这一局'); this.finish(false); } }); })
       }
       .width('100%')
 

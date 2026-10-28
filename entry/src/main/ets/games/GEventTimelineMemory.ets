@@ -13,6 +13,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const ROUNDS: number = 3; const NEED: number = 2; const LEN: number = 4; const REVEAL: number = 900;
 interface Ev {
   k: number;
@@ -279,7 +280,7 @@ export struct GEventTimelineMemory {
                 }.layoutWeight(1).padding(Space.sm).backgroundColor(this.picks.indexOf((r * 2 + c)) >= 0 ? '#22EC4899' : this.theme.surfaceAlt)
                 .borderRadius(Radius.md).borderWidth(2).borderColor(this.picks.indexOf((r * 2 + c)) >= 0 ? Palette.berry : this.theme.line)
                 .scale({ x: this.picks.indexOf((r * 2 + c)) >= 0 ? Motion.pressScale : 1, y: this.picks.indexOf((r * 2 + c)) >= 0 ? Motion.pressScale : 1 })
-                .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapCard((r * 2 + c)); })
+                .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCard((r * 2 + c)); }); }).onClick(() => { Haptics.tick(); this.tapCard((r * 2 + c)); })
               }, (c: number) => 'cc' + c)
             }.width('100%')
           }, (r: number) => 'cr' + r)
@@ -290,12 +291,12 @@ export struct GEventTimelineMemory {
         Button(TG('打乱作答 ▶'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.berry)
           .borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(this.shown >= LEN)
-          .opacity(this.shown >= LEN ? 1 : 0.5).onClick(() => { Haptics.tap(); this.shuffleIn(); })
+          .opacity(this.shown >= LEN ? 1 : 0.5).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.shuffleIn(); }); }).onClick(() => { Haptics.tap(); this.shuffleIn(); })
       }
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.phase === 0 ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.phase === 0 ? Palette.primary : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

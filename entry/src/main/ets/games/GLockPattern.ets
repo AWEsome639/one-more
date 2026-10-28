@@ -14,6 +14,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const DOTS: number = 9;
 const MAXLVL: number = 5;
@@ -320,6 +321,9 @@ export struct GLockPattern {
               color: this.lit === (r * 3 + c) ? Palette.sky : (this.input.indexOf((r * 3 + c)) >= 0 ? Palette.emerald : this.theme.line)
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDot((r * 3 + c)); }); })
               .onClick(() => {
               Haptics.tick();
               this.tapDot((r * 3 + c));
@@ -349,6 +353,9 @@ export struct GLockPattern {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .enabled(this.phase === 1)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.peek(); }); })
           .onClick(() => {
             Haptics.tap();
             this.peek();
@@ -358,6 +365,9 @@ export struct GLockPattern {
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.sky).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.newGame(); }); })
           .onClick(() => {
             Haptics.tap();
             this.newGame();

@@ -15,6 +15,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 7;               // 盘面边长
 const KINDS: number = 5;           // 宝石种类
@@ -456,6 +457,9 @@ export struct GBejeweled {
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
               .onClick(() => {
               Haptics.tick();
               this.tap((this.idx(r, c)));
@@ -486,6 +490,9 @@ export struct GBejeweled {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(46))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -499,6 +506,9 @@ export struct GBejeweled {
           .layoutWeight(1)
           .height(Cell.of(46))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.sel = -1; }); })
           .onClick(() => {
             Haptics.tap();
             this.sel = -1;

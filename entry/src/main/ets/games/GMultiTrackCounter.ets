@@ -11,6 +11,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const TRACKS: number = 3;
 const ROUNDS: number = 3;
@@ -318,6 +319,9 @@ export struct GMultiTrackCounter {
         .height(Cell.of(48))
         .scale({ x: Motion.pressScale, y: Motion.pressScale })
         .onClick(() => { Haptics.tap(); this.bump((-1)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.bump((-1)); }); })
         Button((1) > 0 ? '+' + String((1)) : String((1)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.lg)
@@ -328,6 +332,9 @@ export struct GMultiTrackCounter {
         .height(Cell.of(48))
         .scale({ x: Motion.pressScale, y: Motion.pressScale })
         .onClick(() => { Haptics.tap(); this.bump((1)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.bump((1)); }); })
         Button((5) > 0 ? '+' + String((5)) : String((5)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.lg)
@@ -338,6 +345,9 @@ export struct GMultiTrackCounter {
         .height(Cell.of(48))
         .scale({ x: Motion.pressScale, y: Motion.pressScale })
         .onClick(() => { Haptics.tap(); this.bump((5)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.bump((5)); }); })
       }
       .width('100%')
       Button(TG2('报数：共 {0} 下', this.answer))
@@ -349,6 +359,9 @@ export struct GMultiTrackCounter {
         .width('100%')
         .height(Cell.of(48))
         .onClick(() => { Haptics.tap(); this.submit(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
@@ -358,6 +371,9 @@ export struct GMultiTrackCounter {
         .width('100%')
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：3 轮各报一次，命中 ≤ 2 通关（每差 1 扣 100 分）'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

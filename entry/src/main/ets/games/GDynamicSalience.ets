@@ -13,6 +13,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const SIDE: number = 4; const CELLS: number = SIDE * SIDE; const LIMIT: number = 20;      // 秒
 const HOP: number = 1500;      // 目标自动换位间隔
 const NEED: number = 10;
@@ -225,7 +226,7 @@ export struct GDynamicSalience {
               Text((r * SIDE + c) === this.hot ? '🌟' : '').fontSize(FontSize.lg)
               }.layoutWeight(1).aspectRatio(1).backgroundColor((r * SIDE + c) === this.hot ? Palette.amber : this.theme.surfaceAlt)
               .borderRadius(Radius.md).scale({ x: (r * SIDE + c) === this.hot ? 1.06 : 1, y: (r * SIDE + c) === this.hot ? 1.06 : 1 })
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * SIDE + c)); })
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * SIDE + c)); }); }).onClick(() => { Haptics.tick(); this.tap((r * SIDE + c)); })
             }, (c: number) => 'sc' + c)
           }.width('100%')
         }, (r: number) => 'sr' + r)
@@ -234,7 +235,7 @@ export struct GDynamicSalience {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
-        .width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：它每 1.5 秒换一次位置，手快一点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

@@ -9,6 +9,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const QN: number = 8; const PASS: number = 5; const FEED_MS: number = 800;
 const LIMIT_MS: number = 5000; const TICK_MS: number = 100;
@@ -237,6 +238,9 @@ export struct GOneLetterShift {
             if (!(true)) { return; } else if (e.type === TouchType.Down) { this.pressed = (i); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
             })
             .onClick(() => { Haptics.tick(); if ((true)) { this.pick((i)); } })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if ((true)) { this.pick((i)); } }); })
           }, (i: number) => 'a' + i)
         }.width('100%')
         Text(this.q.da).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
@@ -251,6 +255,9 @@ export struct GOneLetterShift {
             if (!(false)) { return; } else if (e.type === TouchType.Down) { this.pressed = (i); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
             })
             .onClick(() => { Haptics.tick(); if ((false)) { this.pick((i)); } })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if ((false)) { this.pick((i)); } }); })
           }, (i: number) => 'b' + i)
         }.width('100%')
         Text(this.q.db).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
@@ -262,6 +269,9 @@ export struct GOneLetterShift {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：换掉一个字母就变成另一个词，位置就是两词不一样的地方'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

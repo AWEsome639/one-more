@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const N: number = 4; const MAX_MISS: number = 5; const PAIR_N: number = 8;
 interface WordPair { a: string; b: string }
 const PAIRS: WordPair[] = [
@@ -277,7 +278,10 @@ export struct GWordGridConnection {
       Column({ space: Space.xs }) {
         ForEach(this.rowIdx(), (r: number) => {
           Row({ space: Space.xs }) {
-            ForEach(this.rowIdx(), (c: number) => { Text(this.cells.length > (r * this.diffTotal + c) ? this.cells[(r * this.diffTotal + c)] : '').fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkOf((r * this.diffTotal + c))).layoutWeight(1).aspectRatio(1).backgroundColor(this.bgOf((r * this.diffTotal + c))).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }) }, (c: number) => 'c' + c)
+            ForEach(this.rowIdx(), (c: number) => { Text(this.cells.length > (r * this.diffTotal + c) ? this.cells[(r * this.diffTotal + c)] : '').fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkOf((r * this.diffTotal + c))).layoutWeight(1).aspectRatio(1).backgroundColor(this.bgOf((r * this.diffTotal + c))).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * this.diffTotal + c)); })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('100%')
@@ -287,6 +291,9 @@ export struct GWordGridConnection {
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG2('提示：8 对同义词混在 16 格里；连错扣分，错满 {0} 次结束', MAX_MISS)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

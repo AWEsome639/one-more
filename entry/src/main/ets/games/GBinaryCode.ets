@@ -16,6 +16,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 
 const BITS: number = 8;
 const COLS: number = 4;
@@ -382,6 +383,9 @@ export struct GBinaryCode {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(42))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         .onClick(() => {
           this.askHint();
         })
@@ -393,6 +397,9 @@ export struct GBinaryCode {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();
@@ -453,6 +460,9 @@ export struct GBinaryCode {
     .shadow(Shadow.card)
     .scale({ x: this.flag[i] ? 1.03 : 1, y: this.flag[i] ? 1.03 : 1 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.toggle(i); }); })
     .onClick(() => {
       Haptics.tick();
       this.toggle(i);

@@ -12,6 +12,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const POOL: string[] = ['🍎', '🌙', '⚽', '🎈', '🐟', '🔔', '🍀', '🚀'];
 const TRIALS: number = 8;
@@ -270,10 +271,16 @@ export struct GDelayedMatchSample {
         Text((this.options.length > 0 ? this.options[0] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((this.options.length > 0 ? this.options[0] : '')); }); })
         .onClick(() => { Haptics.tick(); this.answer((this.options.length > 0 ? this.options[0] : '')); })
         Text((this.options.length > 1 ? this.options[1] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((this.options.length > 1 ? this.options[1] : '')); }); })
         .onClick(() => { Haptics.tick(); this.answer((this.options.length > 1 ? this.options[1] : '')); })
       }.width('100%')
 
@@ -281,10 +288,16 @@ export struct GDelayedMatchSample {
         Text((this.options.length > 2 ? this.options[2] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((this.options.length > 2 ? this.options[2] : '')); }); })
         .onClick(() => { Haptics.tick(); this.answer((this.options.length > 2 ? this.options[2] : '')); })
         Text((this.options.length > 3 ? this.options[3] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((this.options.length > 3 ? this.options[3] : '')); }); })
         .onClick(() => { Haptics.tick(); this.answer((this.options.length > 3 ? this.options[3] : '')); })
       }.width('100%')
 
@@ -293,7 +306,7 @@ export struct GDelayedMatchSample {
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2("样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 {0} / {1} 通关",Digits(String(PASS), this.langCode),Digits(String(this.diffTotal), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

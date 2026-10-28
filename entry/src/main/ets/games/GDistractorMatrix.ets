@@ -11,6 +11,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 4;
 const CELLS: number = N * N;
@@ -270,11 +271,17 @@ export struct GDistractorMatrix {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(48)).fontSize(FontSize.lg).fontColor('#FFFFFF')
         .backgroundColor(Palette.lime).borderRadius(Radius.md).shadow(Shadow.card)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.judge((this.opts[0])); }); })
         .onClick(() => { Haptics.tap(); this.judge((this.opts[0])); })
         Button(String((this.opts[1])))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(48)).fontSize(FontSize.lg).fontColor('#FFFFFF')
         .backgroundColor(Palette.lime).borderRadius(Radius.md).shadow(Shadow.card)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.judge((this.opts[1])); }); })
         .onClick(() => { Haptics.tap(); this.judge((this.opts[1])); })
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -282,11 +289,17 @@ export struct GDistractorMatrix {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(48)).fontSize(FontSize.lg).fontColor('#FFFFFF')
         .backgroundColor(Palette.lime).borderRadius(Radius.md).shadow(Shadow.card)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.judge((this.opts[2])); }); })
         .onClick(() => { Haptics.tap(); this.judge((this.opts[2])); })
         Button(String((this.opts[3])))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(48)).fontSize(FontSize.lg).fontColor('#FFFFFF')
         .backgroundColor(Palette.lime).borderRadius(Radius.md).shadow(Shadow.card)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.judge((this.opts[3])); }); })
         .onClick(() => { Haptics.tap(); this.judge((this.opts[3])); })
       }.width('100%')
 
@@ -294,6 +307,9 @@ export struct GDistractorMatrix {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {

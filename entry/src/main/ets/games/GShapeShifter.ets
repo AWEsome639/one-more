@@ -11,6 +11,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const M: number = 4; const CELLS: number = M * M;
 // ★★ 2026-10-13 修复尺寸越界（困难档 ×1.3 ⇒ 6×6 = 36 格，
@@ -282,6 +283,9 @@ export struct GShapeShifter {
         ? ((0) === this.answerAt ? Palette.emerald : Palette.rose) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((0)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((0)); }); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
         ForEach(ROWS, (r: number) => {
@@ -300,6 +304,9 @@ export struct GShapeShifter {
         ? ((1) === this.answerAt ? Palette.emerald : Palette.rose) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((1)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
@@ -320,6 +327,9 @@ export struct GShapeShifter {
         ? ((2) === this.answerAt ? Palette.emerald : Palette.rose) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((2)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((2)); }); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
         ForEach(ROWS, (r: number) => {
@@ -338,11 +348,17 @@ export struct GShapeShifter {
         ? ((3) === this.answerAt ? Palette.emerald : Palette.rose) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((3)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((3)); }); })
       }.width('100%')
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

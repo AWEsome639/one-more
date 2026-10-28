@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SIZE: number = 4;                  // 每层 4×4
 const LAYERS: number = 3;
@@ -519,6 +520,9 @@ export struct GSnake3D {
               this.msg = TG2("第 {0} 层 · 长度 {1}/{2}", (this.headZ() + 1), this.len, WIN_LEN);
             }
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.running = !this.running; if (this.running) { this.msg = TG2("第 {0} 层 · 长度 {1}/{2}", (this.headZ() + 1), this.len, WIN_LEN); } }); })
         Button(TG('重新开始'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
@@ -531,6 +535,9 @@ export struct GSnake3D {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
     }
@@ -622,5 +629,8 @@ export struct GSnake3D {
         Haptics.tick();
         this.setDir(d);
       })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setDir(d); }); })
   }
 }

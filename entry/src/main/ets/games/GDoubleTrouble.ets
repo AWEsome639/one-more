@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 8;
 const LIVES: number = 3;
@@ -344,6 +345,9 @@ export struct GDoubleTrouble {
               .backgroundColor(this.theme.surfaceAlt)
               .borderRadius(Radius.md)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pickA(v); }); })
               .onClick(() => {
                 Haptics.tick();
                 this.pickA(v);
@@ -379,6 +383,9 @@ export struct GDoubleTrouble {
               .backgroundColor(COLOR_VALUES[i % COLOR_VALUES.length])
               .borderRadius(Radius.md)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pickB(n); }); })
               .onClick(() => {
                 Haptics.tick();
                 this.pickB(n);
@@ -405,6 +412,9 @@ export struct GDoubleTrouble {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

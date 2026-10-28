@@ -16,6 +16,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const COLS: number = 10;
 const ROWS: number = 16;
@@ -567,6 +568,9 @@ export struct GTetris {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Text(this.status)
           .fontSize(FontSize.sm)
           .fontColor(this.over ? Palette.danger : this.theme.inkSoft)
@@ -642,6 +646,9 @@ export struct GTetris {
           this.drop();
         }
       })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (kind === 0) { this.move(-1); } else if (kind === 1) { this.turn(); } else if (kind === 2) { this.move(1); } else { this.drop(); } }); })
   }
 
   private cellColor(i: number): string {

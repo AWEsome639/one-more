@@ -12,6 +12,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
+import { Tv } from '../core/Tv';
 const LIMIT: number = 75; const COLS: number = 4; const ROWS: number = 5; const TOTAL: number = COLS * ROWS;
 function shuffle(a: number[]): number[] {
   const out: number[] = a.slice();
@@ -265,6 +266,9 @@ export struct GTarget10 {
               Haptics.tick();
               this.tap((r * COLS + c));
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * COLS + c)); }); })
             }, (c: number) => this.tileKey(r * COLS + c))
           }.width('100%')
         }, (r: number) => 'r' + r)
@@ -282,6 +286,9 @@ export struct GTarget10 {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：连续消对会加连击分，消错会掉分')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

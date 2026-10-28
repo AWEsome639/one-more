@@ -8,6 +8,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const LIVES: number = 3; const GAP_MS: number = 700;
 
@@ -247,6 +248,9 @@ export struct GSemanticLink {
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .enabled(!this.over && this.picked < 0).onClick(() => { Haptics.tap(); this.pick((0)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((0)); }); })
         Button(this.opts.length > (1) ? this.opts[(1)] : '')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
         .backgroundColor(this.picked < 0 ? Palette.berry
@@ -254,6 +258,9 @@ export struct GSemanticLink {
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .enabled(!this.over && this.picked < 0).onClick(() => { Haptics.tap(); this.pick((1)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
         Button(this.opts.length > (2) ? this.opts[(2)] : '')
@@ -263,6 +270,9 @@ export struct GSemanticLink {
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .enabled(!this.over && this.picked < 0).onClick(() => { Haptics.tap(); this.pick((2)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((2)); }); })
         Button(this.opts.length > (3) ? this.opts[(3)] : '')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
         .backgroundColor(this.picked < 0 ? Palette.berry
@@ -270,6 +280,9 @@ export struct GSemanticLink {
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .enabled(!this.over && this.picked < 0).onClick(() => { Haptics.tap(); this.pick((3)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((3)); }); })
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm)
@@ -280,6 +293,9 @@ export struct GSemanticLink {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('每错一环少一条命；接通全链即通关')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {

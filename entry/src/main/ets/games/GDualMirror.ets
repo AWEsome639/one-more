@@ -16,6 +16,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 4;
 const MOVE_LIMIT: number = 20;
@@ -312,6 +313,9 @@ export struct GDualMirror {
                   .backgroundColor(this.on((0), (r * N + c)) ? '#33F59E0B' : this.theme.surface)
                   .borderRadius(Radius.xs)
                   .animation({ duration: Motion.fast, curve: Motion.snap() })
+                  .focusable(Tv.on())
+                  .focusBox(Tv.box())
+                  .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0), (r * N + c)); }); })
                   .onClick(() => {
                   Haptics.tick();
                   this.tap((0), (r * N + c));
@@ -352,6 +356,9 @@ export struct GDualMirror {
                   .backgroundColor(this.on((1), (r * N + c)) ? '#33F59E0B' : this.theme.surface)
                   .borderRadius(Radius.xs)
                   .animation({ duration: Motion.fast, curve: Motion.snap() })
+                  .focusable(Tv.on())
+                  .focusBox(Tv.box())
+                  .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1), (r * N + c)); }); })
                   .onClick(() => {
                   Haptics.tick();
                   this.tap((1), (r * N + c));
@@ -389,6 +396,9 @@ export struct GDualMirror {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

@@ -14,6 +14,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 /**
  * ★★★ 2026-10-15 提帧率（奥森「帧率要拉满」）—— 用【解析积分】做对
@@ -564,6 +565,9 @@ export struct GFlappy {
       .borderRadius(Radius.lg)
       .clip(true)
       .shadow(Shadow.card)
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.flap(); }); })
       .onClick(() => {
         Haptics.tick();
         this.flap();
@@ -583,6 +587,9 @@ export struct GFlappy {
           .layoutWeight(1)
           .height(Cell.of(52))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.flap(); }); })
           .onClick(() => {
             Haptics.tap();
             this.flap();
@@ -595,6 +602,9 @@ export struct GFlappy {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(52))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();

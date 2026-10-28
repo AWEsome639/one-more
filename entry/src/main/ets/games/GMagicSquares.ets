@@ -12,6 +12,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SIDE: number = 3; const CELLS: number = 9; const BLANKS: number = 4; const MAGIC: number = 15;
 const ROUNDS: number = 3; const MAX_ERR: number = 4; const LIMIT: number = 120; const TICK_MS: number = 1000;
@@ -368,6 +369,9 @@ export struct GMagicSquares {
             .layoutWeight(1).aspectRatio(1).borderRadius(Radius.md)
             .backgroundColor(this.fixed[(r * SIDE + c)] ? this.theme.surface : (this.theme.isDark ? '#16283A' : '#E0F2FE'))
             .animation({ duration: Motion.fast, curve: Motion.snap() })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * SIDE + c)); }); })
             .onClick(() => { Haptics.tick(); this.tapCell((r * SIDE + c)); }) }, (c: number) => 'mc' + c)
           }.width('100%')
         }, (r: number) => 'mr' + r)
@@ -386,6 +390,9 @@ export struct GMagicSquares {
         .backgroundColor(this.sel === (i) ? Palette.sky : this.theme.surface)
         .scale({ x: this.sel === (i) ? 1.06 : 1, y: this.sel === (i) ? 1.06 : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pickNum((i)); }); })
         .onClick(() => { Haptics.tick(); this.pickNum((i)); }) }, (v: number) => 'mp' + v)
       }.width('100%').height(Cell.of(64))
 
@@ -393,6 +400,9 @@ export struct GMagicSquares {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：点已填的格子可以把数字取回托盘'))

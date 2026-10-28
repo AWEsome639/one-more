@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const GOAL: number = 8; const LIVES: number = 3; const SHOWN: number = 5;
 interface SeqInfo { kind: number; start: number; step: number }
 function makeSeq(): SeqInfo {
@@ -275,6 +276,9 @@ export struct GSequenceStack {
           Haptics.tap();
           if (this.opts.length > (i)) { this.choose(this.opts[(i)]); }
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.opts.length > (i)) { this.choose(this.opts[(i)]); } }); })
         }, (i: number) => 'o' + i)
       }.width('100%')
       Button(TG('提示'))
@@ -285,6 +289,9 @@ export struct GSequenceStack {
         .width('100%').height(Cell.of(40)).onClick(() => {
           this.askHint();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
@@ -292,6 +299,9 @@ export struct GSequenceStack {
           Haptics.tap();
           this.reset();
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：答错不换题，想清楚再点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

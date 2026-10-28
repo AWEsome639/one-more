@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const NAMES: string[] = [TG('红'), TG('黄'), TG('蓝'), TG('绿')];
 const INKS: string[] = ['#EF4444', '#F59E0B', '#0EA5E9', '#10B981'];
@@ -235,11 +236,17 @@ export struct GColorWordMatchUp {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor((true) ? Palette.emerald : Palette.sky)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((true)); }); })
         .onClick(() => { Haptics.tap(); this.answer((true)); })
         Button((TG('❌ 不一致')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor((false) ? Palette.emerald : Palette.sky)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((false)); }); })
         .onClick(() => { Haptics.tap(); this.answer((false)); })
       }.width('100%')
 
@@ -249,7 +256,7 @@ export struct GColorWordMatchUp {
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('答满 {0} 题且答对 ≥ {1} 即通关',Digits(String(this.diffTotal), this.langCode),Digits(String(PASS), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

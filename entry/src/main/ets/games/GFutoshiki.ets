@@ -14,6 +14,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 5;
 const MAX_MOVES: number = 120;
@@ -500,6 +501,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 0)]) { this.sel = ((0) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((0) * N + 0)]) {
@@ -534,6 +538,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 1)]) { this.sel = ((0) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((0) * N + 1)]) {
@@ -568,6 +575,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 2)]) { this.sel = ((0) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((0) * N + 2)]) {
@@ -602,6 +612,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 3)]) { this.sel = ((0) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((0) * N + 3)]) {
@@ -636,6 +649,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 4)]) { this.sel = ((0) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((0) * N + 4)]) {
@@ -701,6 +717,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 0)]) { this.sel = ((1) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((1) * N + 0)]) {
@@ -735,6 +754,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 1)]) { this.sel = ((1) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((1) * N + 1)]) {
@@ -769,6 +791,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 2)]) { this.sel = ((1) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((1) * N + 2)]) {
@@ -803,6 +828,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 3)]) { this.sel = ((1) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((1) * N + 3)]) {
@@ -837,6 +865,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 4)]) { this.sel = ((1) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((1) * N + 4)]) {
@@ -902,6 +933,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 0)]) { this.sel = ((2) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((2) * N + 0)]) {
@@ -936,6 +970,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 1)]) { this.sel = ((2) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((2) * N + 1)]) {
@@ -970,6 +1007,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 2)]) { this.sel = ((2) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((2) * N + 2)]) {
@@ -1004,6 +1044,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 3)]) { this.sel = ((2) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((2) * N + 3)]) {
@@ -1038,6 +1081,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 4)]) { this.sel = ((2) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((2) * N + 4)]) {
@@ -1103,6 +1149,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 0)]) { this.sel = ((3) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((3) * N + 0)]) {
@@ -1137,6 +1186,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 1)]) { this.sel = ((3) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((3) * N + 1)]) {
@@ -1171,6 +1223,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 2)]) { this.sel = ((3) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((3) * N + 2)]) {
@@ -1205,6 +1260,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 3)]) { this.sel = ((3) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((3) * N + 3)]) {
@@ -1239,6 +1297,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 4)]) { this.sel = ((3) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((3) * N + 4)]) {
@@ -1304,6 +1365,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 0)]) { this.sel = ((4) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((4) * N + 0)]) {
@@ -1338,6 +1402,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 1)]) { this.sel = ((4) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((4) * N + 1)]) {
@@ -1372,6 +1439,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 2)]) { this.sel = ((4) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((4) * N + 2)]) {
@@ -1406,6 +1476,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 3)]) { this.sel = ((4) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((4) * N + 3)]) {
@@ -1440,6 +1513,9 @@ export struct GFutoshiki {
         this.pressed = -1;
         }
         })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 4)]) { this.sel = ((4) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();
         if (!this.over && !this.given[((4) * N + 4)]) {
@@ -1466,6 +1542,9 @@ export struct GFutoshiki {
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put((d)); }); })
           .onClick(() => {
           Haptics.tick();
           this.put((d));
@@ -1487,12 +1566,18 @@ export struct GFutoshiki {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(44)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
           })
         Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
           .layoutWeight(1)
           .height(44)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .onClick(() => {
             this.askAuto();
           })
@@ -1504,6 +1589,9 @@ export struct GFutoshiki {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();

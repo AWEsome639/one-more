@@ -13,6 +13,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 @Component
 export struct GHanoi {
@@ -335,6 +336,9 @@ export struct GHanoi {
           .borderRadius(Radius.md)
           .shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(p); }); })
           .onClick(() => {
             Haptics.tick();
             this.tap(p);
@@ -354,6 +358,9 @@ export struct GHanoi {
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(this.level); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset(this.level);
@@ -363,6 +370,9 @@ export struct GHanoi {
           .fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.level = this.level === 3 ? 4 : (this.level === 4 ? 5 : 3); this.reset(this.level); }); })
           .onClick(() => {
             Haptics.tap();
             this.level = this.level === 3 ? 4 : (this.level === 4 ? 5 : 3);

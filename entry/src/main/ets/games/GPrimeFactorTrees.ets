@@ -9,6 +9,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 5;
 const PASS: number = 4;
@@ -250,7 +251,10 @@ export struct GPrimeFactorTrees {
         ForEach(PRIMES, (p: number) => { Button(String((p)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over && this.rest > 1)
-        .onClick(() => { Haptics.tap(); this.tap((p)); }); }, (p: number) => 'p' + p)
+        .onClick(() => { Haptics.tap(); this.tap((p)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tap((p)); }); }); }, (p: number) => 'p' + p)
       }.width('100%')
       Row({ space: Space.md }) {
         Button(TG('提示'))
@@ -263,9 +267,15 @@ export struct GPrimeFactorTrees {
           .onClick(() => {
             this.askHint();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.cyan)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Text(TG('质因数连乘起来 = 目标数')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }

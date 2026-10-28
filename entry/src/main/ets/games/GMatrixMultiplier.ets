@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const SIZE: number = 2; const CELLS: number = 4; const GOAL: number = 8;
 const LIMIT: number = 60; const TICK_MS: number = 1000; const PENALTY: number = 3; const NEXT_MS: number = 420;
@@ -316,6 +317,9 @@ export struct GMatrixMultiplier {
         .scale({ x: this.press === (i) ? Motion.pressScale : 1, y: this.press === (i) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onTouch((e: TouchEvent) => { this.press = e.type === TouchType.Down ? (i) : -1; })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); })
         .onClick(() => { Haptics.tick(); this.pick((i)); }) }, (i: number) => 'mo' + i)
       }.width('100%')
 
@@ -339,6 +343,9 @@ export struct GMatrixMultiplier {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG('提示：C(r,c) = A[r][0]×B[0][c] + A[r][1]×B[1][c]'))

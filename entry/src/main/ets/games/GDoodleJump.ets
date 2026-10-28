@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 /**
  * ★★★ 2026-10-15 提帧率（同 GFlappy 的解法）：30fps → 60fps
@@ -490,6 +491,9 @@ export struct GDoodleJump {
           .layoutWeight(1)
           .height(Cell.of(52))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.move(-1); }); })
           .onClick(() => {
             Haptics.tap();
             this.move(-1);
@@ -503,6 +507,9 @@ export struct GDoodleJump {
           .layoutWeight(1)
           .height(Cell.of(52))
           .enabled(!this.over)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.move(1); }); })
           .onClick(() => {
             Haptics.tap();
             this.move(1);
@@ -522,6 +529,9 @@ export struct GDoodleJump {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

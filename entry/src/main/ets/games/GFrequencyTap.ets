@@ -11,6 +11,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const BEATS: number = 20;
 const GAP: number = 600;        // 100 BPM
@@ -245,6 +246,9 @@ export struct GFrequencyTap {
       .borderRadius(Radius.full).shadow(Shadow.card)
       .scale({ x: this.pulse ? 1.05 : 0.95, y: this.pulse ? 1.05 : 0.95 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(); }); })
       .onClick(() => { Haptics.tick(); this.tap(); })
 
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
@@ -255,6 +259,9 @@ export struct GFrequencyTap {
         .fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.berry)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.phase === 0) { this.start(); } else { this.reset(); } }); })
         .onClick(() => { Haptics.tap(); if (this.phase === 0) { this.start(); } else { this.reset(); } })
 
       Text(TG2("{0}{1} 拍即通关", TG2('判定：每拍误差 ≤ {0} ms 记命中，{1} 拍中 ', String(HIT_MS), String(this.diffTotal)),Digits(String(WIN_HITS), this.langCode)))

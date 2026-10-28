@@ -19,6 +19,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const N: number = 5;              // 棋盘边
 const CELLS: number = N * N;
@@ -770,6 +771,9 @@ export struct GBridges {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.done || this.finished) { return; } const n: number = this.ix.length; this.link = new Array<number>(n * n).fill(0); this.seg = segments(this.link, this.ix, this.iy, n, N); this.sel = -1; this.status = TG('桥都拆了，重新来'); }); })
           .onClick(() => {
             Haptics.tap();
             if (this.done || this.finished) {
@@ -789,6 +793,9 @@ export struct GBridges {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint(); }); })
           .onClick(() => {
             Haptics.tap();
             this.hint();
@@ -801,6 +808,9 @@ export struct GBridges {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -813,6 +823,9 @@ export struct GBridges {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(KEY_H)
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.finished) { this.done = true; this.status = TG('已放弃这一局'); this.finish(false); } }); })
           .onClick(() => {
             Haptics.tap();
             if (!this.finished) {
@@ -891,6 +904,9 @@ export struct GBridges {
       y: (this.sel >= 0 && this.sel === this.islandAt(cell)) ? 1.08 : 1
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell(cell); }); })
     .onClick(() => {
       Haptics.tick();
       this.tapCell(cell);

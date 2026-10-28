@@ -15,6 +15,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const LEN: number = 5;
 const TRIES: number = 5;
@@ -371,6 +372,9 @@ export struct GWordle {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Text(this.status)
           .fontSize(FontSize.xs)
           .fontColor(this.over ? Palette.emerald : this.theme.inkSoft)
@@ -443,6 +447,9 @@ export struct GWordle {
         Haptics.tick();
         this.tapKey(ch);
       })
+      .focusable(Tv.on())
+      .focusBox(Tv.box())
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapKey(ch); }); })
   }
 
   private tileBg(r: number, c: number): string {

@@ -8,6 +8,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const QN: number = 8; const PASS: number = 5; const OPT_N: number = 4;
 const LIMIT_MS: number = 6000; const TICK_MS: number = 100; const FEED_MS: number = 700;
@@ -246,6 +247,9 @@ export struct GLetterFrequencyScan {
           .onTouch((e: TouchEvent) => {
           if (e.type === TouchType.Down) { this.pressed = (i); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); })
           .onClick(() => { Haptics.tick(); this.pick((i)); })
         }, (i: number) => 'o' + i)
       }.width('100%')
@@ -254,6 +258,9 @@ export struct GLetterFrequencyScan {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：看清整串字母再选，别只数开头几个')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

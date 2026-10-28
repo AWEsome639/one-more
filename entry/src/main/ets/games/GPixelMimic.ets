@@ -11,6 +11,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const N: number = 8; const LIMIT: number = 70;
 const IDXN: number[] = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -251,6 +252,9 @@ export struct GPixelMimic {
           Haptics.tick();
           if (false) { this.paint(r * this.diffTotal + c); }
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (false) { this.paint(r * this.diffTotal + c); } }); })
           }, (c: number) => (true ? 'gc' : 'pc') + c)
           }.width('100%')
           }, (r: number) => (true ? 'gr' : 'pr') + r)
@@ -270,6 +274,9 @@ export struct GPixelMimic {
           Haptics.tick();
           if (true) { this.paint(r * this.diffTotal + c); }
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (true) { this.paint(r * this.diffTotal + c); } }); })
           }, (c: number) => (false ? 'gc' : 'pc') + c)
           }.width('100%')
           }, (r: number) => (false ? 'gr' : 'pr') + r)
@@ -285,6 +292,9 @@ export struct GPixelMimic {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

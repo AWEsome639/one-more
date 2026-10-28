@@ -16,6 +16,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
+import { Tv } from '../core/Tv';
 
 const NC: number = 5;                       // 5×5 格
 const CELLS: number = NC * NC;
@@ -529,6 +530,9 @@ export struct GSlitherlink {
               Haptics.tick();
               this.gridTap((gr), (gc));
               })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.gridTap((gr), (gc)); }); })
             }, (gc: number) => 'g' + gc)
           }
           .width('100%')
@@ -559,6 +563,9 @@ export struct GSlitherlink {
             Haptics.tap();
             this.reset();
           })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
     }

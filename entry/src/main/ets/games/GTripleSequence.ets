@@ -10,6 +10,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 const ROWS: number[] = [0, 1, 2];
 const CELLS: number[] = [0, 1, 2, 3, 4, 5];
 const STEPS: number = 5;
@@ -241,6 +242,9 @@ export struct GTripleSequence {
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
@@ -270,5 +274,8 @@ export struct GTripleSequence {
     .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
       .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
     .onClick(() => { Haptics.tick(); this.pick(i, c); })
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i, c); }); })
   }
 }

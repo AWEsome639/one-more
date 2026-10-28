@@ -15,6 +15,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const PAIRS_PER_ROUND: number = 4;   // 学会阶段记几对
 const TRIALS: number = 8;            // 答题总题数
@@ -353,6 +354,9 @@ export struct GContinuousPairedAssociate {
           .borderRadius(Radius.md)
           .width('100%')
           .height(Cell.of(48))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.phase = 1; this.lastMsg = TG('选出刚才和它配对的'); this.startTrial(); }); })
           .onClick(() => {
             Haptics.tap();
             this.phase = 1;
@@ -387,6 +391,9 @@ export struct GContinuousPairedAssociate {
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer(o); }); })
               .onClick(() => {
                 Haptics.tick();
                 this.answer(o);
@@ -409,6 +416,9 @@ export struct GContinuousPairedAssociate {
         .borderRadius(Radius.md)
         .width('100%')
         .height(Cell.of(46))
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
           this.reset();

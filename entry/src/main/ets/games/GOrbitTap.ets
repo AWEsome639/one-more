@@ -12,6 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 const ARENA: number = 280; const RING: number = 100; const SLOTS: number = 12;
 const DOT: number = 42; const NEED: number = 10; const LIMIT: number = 25; const HOP: number = 1100;
@@ -219,7 +220,10 @@ export struct GOrbitTap {
         .backgroundColor((i) === this.target ? Palette.cyan : this.theme.surfaceAlt)
         .position({ x: pctOf(slotX((i))), y: pctOf(slotY((i))) })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        .onClick(() => { Haptics.tick(); this.tap((i)); }) }, (i: number) => 'slot' + i)
+        .onClick(() => { Haptics.tick(); this.tap((i)); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); }) }, (i: number) => 'slot' + i)
       }.width(ARENA).height(ARENA).backgroundColor(this.theme.surface)
       .borderRadius(Radius.xl).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm)
@@ -230,6 +234,9 @@ export struct GOrbitTap {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
