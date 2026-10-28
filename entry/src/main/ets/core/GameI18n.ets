@@ -24,6 +24,12 @@ import { I18n, Lang, toTrad } from './I18n';
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
   /** ★★ 2026-10-28 提示文案 */
+  "截面积是 {0}": { "en": "The area is {0}", "ja": "断面積は{0}", "ko": "단면적은 {0}", "es": "El área es {0}", "fr": "L'aire est {0}", "de": "Die Fläche ist {0}", "pt": "A área é {0}", "ru": "Площадь: {0}", "it": "L'area è {0}", "ar": "المساحة هي {0}" },
+  /** ★★ 2026-10-28 提示文案 */
+  "原词是「{0}」": { "en": "The word is {0}", "ja": "元の言葉は「{0}」", "ko": "원래 단어는 「{0}」", "es": "La palabra es {0}", "fr": "Le mot est {0}", "de": "Das Wort ist {0}", "pt": "A palavra é {0}", "ru": "Слово: {0}", "it": "La parola è {0}", "ar": "الكلمة هي {0}" },
+  /** ★★ 2026-10-28 提示文案 */
+  "符号对应第 {0} 个": { "en": "Symbol maps to {0}", "ja": "記号は{0}番目", "ko": "기호는 {0}번째", "es": "El símbolo es el {0}", "fr": "Le symbole est le {0}", "de": "Symbol ist Nummer {0}", "pt": "O símbolo é o {0}", "ru": "Символ — номер {0}", "it": "Il simbolo è il {0}", "ar": "الرمز هو {0}" },
+  /** ★★ 2026-10-28 提示文案 */
   "演示中…": { "en": "Demoing…", "ja": "デモ中…", "ko": "데모 중…", "es": "Demostrando…", "fr": "Démo…", "de": "Demo läuft…", "pt": "Demonstrando…", "ru": "Демонстрация…", "it": "Demo…", "ar": "جارٍ العرض…" },
   /** ★★ 2026-10-28 提示文案 */
   "这个说法对": { "en": "This is true", "ja": "この説は正しい", "ko": "이 말은 맞아요", "es": "Esto es cierto", "fr": "C'est vrai", "de": "Das ist richtig", "pt": "Isso é verdade", "ru": "Это верно", "it": "Questo è vero", "ar": "هذا صحيح" },

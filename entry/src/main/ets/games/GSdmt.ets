@@ -2,6 +2,8 @@
  * 符号数字转换 —— 🧠 照图例把符号换成数字，90 秒内尽量多答（id: sdmt）
  * 胜负：答对 ≥ 25 ⇒ 通关；进度：答对/25 · 剩余秒数 · 答错
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -20,6 +22,8 @@ export struct GSdmt {
   @Prop theme: Theme = Theme.light();
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private map: number[] = [];
   @State private cur: number = 0;
   @State private right: number = 0;
@@ -65,6 +69,53 @@ export struct GSdmt {
       if (this.left <= 0) { this.end(); }
     }, 1000);
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.keyTap(this.map[this.cur]);
+    return !this.over;
+  }
+
+  /** 提示：这个符号对应哪个键 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const need: number = this.map[this.cur];
+    return Hint.make([need], TG2('符号对应第 {0} 个', String(need + 1)),
+      TG2('Symbol maps to {0}', String(need + 1)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private keyTap(d: number): void {
     if (this.over) { return; }
     const need: number = this.map[this.cur];
@@ -92,6 +143,12 @@ export struct GSdmt {
   }
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

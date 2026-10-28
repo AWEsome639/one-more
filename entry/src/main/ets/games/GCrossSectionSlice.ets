@@ -3,6 +3,8 @@
  * 问：这一层一共几个方块？（靠平面图逆推每行/每列各一个的阶梯结构）
  * 胜负：8 题答对 ≥6 通关　进度：题号 / 答对 / 得分
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -21,6 +23,8 @@ export struct GCrossSectionSlice {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -65,6 +69,64 @@ export struct GCrossSectionSlice {
     this.qi = i; this.locked = false;
   }
 
+  private csArea(): number {
+    let a: number = 0;
+    for (let k = 0; k < this.plane.length; k++) {
+      if (this.plane[k] === 1) { a++; }
+    }
+    return a;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.locked) {
+      return true;
+    }
+    this.pick(this.csArea());
+    return !this.over;
+  }
+
+  /** 提示：截面积是多少 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.locked || this.over) {
+      return Hint.none('none');
+    }
+    let a: number = 0;
+    for (let k = 0; k < this.plane.length; k++) {
+      if (this.plane[k] === 1) { a++; }
+    }
+    return Hint.make([a], TG2('截面积是 {0}', String(a)),
+      TG2('The area is {0}', String(a)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private pick(v: number): void {
     if (this.locked || this.over) { return; }
     this.locked = true;
@@ -95,6 +157,12 @@ export struct GCrossSectionSlice {
 
   build() {
     Column({ space: Space.sm }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", (this.qi + 1), this.diffTotal)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG('答对 ') + this.right).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
