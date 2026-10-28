@@ -6,6 +6,8 @@
  * 胜负：9 格全部按序点亮 ⇒ 通关；点错 3 次 ⇒ 失败。
  */
 
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -27,6 +29,8 @@ export struct GPatternSequenceDraw {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：LIVES 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.livesNow(LIVES);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -72,6 +76,53 @@ export struct GPatternSequenceDraw {
   private want(): number {
     const cur: number = this.trail.length === 0 ? 1 : this.trail[this.trail.length - 1];
     return ((cur - 1 + this.step) % COUNT) + 1;
+  }
+
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.tap(this.want());
+    return !this.over;
+  }
+
+  /** 提示：下一个该画的点 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const need: number = this.want();
+    return Hint.make([need], TG2('下一个画到 {0}', String(need)),
+      TG2('Next point {0}', String(need)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
   private tap(n: number): void {
@@ -123,6 +174,12 @@ export struct GPatternSequenceDraw {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('规律'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

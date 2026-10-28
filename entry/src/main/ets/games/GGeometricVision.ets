@@ -3,6 +3,8 @@
  * 玩法：A、B 两块图形各由 12 个小方格里的若干格拼成，比一比谁占的格子多。
  * 胜负：10 题全过 = 通关；答错 3 题 = 失败。
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -24,6 +26,8 @@ export struct GGeometricVision {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -75,6 +79,55 @@ export struct GGeometricVision {
   }
 
   /** pick: 0=A 多 1=B 多 */
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.answer(this.na > this.nb ? 0 : 1);
+    return !this.over;
+  }
+
+  /** 提示：哪边格子多 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const a: number = this.na;
+    const b: number = this.nb;
+    const pickA: boolean = a > b;
+    return Hint.make([pickA ? 0 : 1], pickA ? TG('选 A 那边') : TG('选 B 那边'),
+      pickA ? TG('Pick side A') : TG('Pick side B'), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(pick: number): void {
     if (this.over) { return; }
     const na: number = this.na;
@@ -103,6 +156,12 @@ export struct GGeometricVision {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Text(TG2("第 {0}/{1} 题　得分 {2}", Math.min(this.idx + 1, this.diffTotal),Digits(String(this.diffTotal), this.langCode),Digits(String(this.score), this.langCode)))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         // ★ 错误抖动

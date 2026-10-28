@@ -24,6 +24,12 @@ import { I18n, Lang, toTrad } from './I18n';
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
   /** ★★ 2026-10-28 提示文案 */
+  "选 A 那边": { "en": "Pick side A", "ja": "A 側を選ぶ", "ko": "A 쪽을 선택", "es": "Elige el lado A", "fr": "Choisis le côté A", "de": "Wähle Seite A", "pt": "Escolha o lado A", "ru": "Выберите сторону A", "it": "Scegli il lato A", "ar": "اختر الجانب A" },
+  /** ★★ 2026-10-28 提示文案 */
+  "选 B 那边": { "en": "Pick side B", "ja": "B 側を選ぶ", "ko": "B 쪽을 선택", "es": "Elige el lado B", "fr": "Choisis le côté B", "de": "Wähle Seite B", "pt": "Escolha o lado B", "ru": "Выберите сторону B", "it": "Scegli il lato B", "ar": "اختر الجانب B" },
+  /** ★★ 2026-10-28 提示文案 */
+  "下一个画到 {0}": { "en": "Next point {0}", "ja": "次は{0}へ", "ko": "다음은 {0}", "es": "Siguiente punto {0}", "fr": "Point suivant {0}", "de": "Nächster Punkt {0}", "pt": "Próximo ponto {0}", "ru": "Следующая точка {0}", "it": "Punto successivo {0}", "ar": "النقطة التالية {0}" },
+  /** ★★ 2026-10-28 提示文案 */
   "语源是「{0}」": { "en": "The origin is {0}", "ja": "語源は「{0}」", "ko": "어원은 「{0}」", "es": "El origen es {0}", "fr": "L'origine est {0}", "de": "Die Herkunft ist {0}", "pt": "A origem é {0}", "ru": "Происхождение: {0}", "it": "L'origine è {0}", "ar": "الأصل هو {0}" },
   /** ★★ 2026-10-28 提示文案 */
   "第 {0} 个字母不发音": { "en": "Letter {0} is silent", "ja": "{0}番目の文字は発音しない", "ko": "{0}번째 글자는 발음하지 않음", "es": "La letra {0} es muda", "fr": "La lettre {0} est muette", "de": "Buchstabe {0} ist stumm", "pt": "A letra {0} é muda", "ru": "Буква {0} не читается", "it": "La lettera {0} è muta", "ar": "الحرف {0} صامت" },
