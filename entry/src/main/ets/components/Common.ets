@@ -5,6 +5,7 @@
  * 动效一律走 Motion 的时长，按下必有 0.96 缩放反馈。
  */
 
+import { Tv } from '../core/Tv';
 import { Haptics } from '../core/Haptics';
 import { Digits } from '../core/I18n';   // ★ 2026-10-16 数字本地化
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Accent, Cell } from '../core/Design';
@@ -870,6 +871,16 @@ build() {
           this.onLongPress(this.meta.id);
         })
     )
+    // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点导航
+    //   遥控器方向键在这里移动焦点，OK 键进游戏
+    //   · Tv.on() 只在 Bp.isTv() 时为真 ⇒ 手机/平板/PC 上完全不起作用（零回归）
+    //   · focusBox 用 4vp 粗框（3 米视距要看得见）
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => {
+      if (!Tv.on()) { return; }
+      Tv.handleKey(e, () => { this.onOpen(this.meta.id); });
+    })
   }
 }
 
