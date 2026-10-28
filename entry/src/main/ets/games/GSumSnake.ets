@@ -470,7 +470,7 @@ export struct GSumSnake {
           .onClick(() => {
             this.askHint();
           })
-        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+        Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor('#FFFFFF')

@@ -719,7 +719,7 @@ export struct GHitori {
           .onClick(() => {
             this.askHint();
           })
-        Button(this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))
+        Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .layoutWeight(1)
           .height(44)
           .onClick(() => {
