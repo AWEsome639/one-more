@@ -11,6 +11,7 @@
  * 拾海 2026-10-10（本页 2026-10-13 加转场）
  */
 
+import { Tv } from '../core/Tv';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Accent } from '../core/Design';
 import { UiModeMgr } from '../core/UiMode';
 import { ProgressStore } from '../core/ProgressStore';
@@ -224,5 +225,18 @@ build() {
     .width('100%')
     .height(60)
     .justifyContent(FlexAlign.Center)
+    // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
+    //   电视上没有触摸 ⇒ 用遥控器方向键在三个页签间移动，OK 键切换
+    //   `this.current = idx` 就是 Tabs 的受控索引，和点击 tabBar 的效果一致
+    //   ⚠️ 不在电视上时这几行完全不起作用（Tv.on() 恒 false）
+    .focusable(Tv.on())
+    .focusBox(Tv.box())
+    .onKeyEvent((e: KeyEvent) => {
+      Tv.handleKey(e, () => {
+        animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
+          this.current = idx;
+        });
+      });
+    })
   }
 }

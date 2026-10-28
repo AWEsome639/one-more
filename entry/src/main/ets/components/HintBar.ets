@@ -13,6 +13,7 @@
  *             onAutoTap: () => { this.askAuto(); },
  *             autoOn: this.autoId >= 0 })
  */
+import { Tv } from '../core/Tv';
 import { TG } from '../core/GameI18n';
 import { FontSize, Space, Radius, Palette } from '../core/Design';
 
@@ -51,6 +52,13 @@ export struct HintBar {
           .fontSize(FontSize.sm)
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
+          // ★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
+          //   Tv.on() 在非电视上恒为 false ⇒ 手机/平板/PC 零影响
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => {
+            Tv.handleKey(e, () => { this.onHintTap(); });
+          })
           .onClick(() => {
             this.onHintTap();
           })
@@ -62,6 +70,12 @@ export struct HintBar {
         .fontSize(FontSize.sm)
         .backgroundColor(this.autoOn ? Palette.rose : Palette.cyan)
         .borderRadius(Radius.md)
+        // ★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => {
+          Tv.handleKey(e, () => { this.onAutoTap(); });
+        })
         .onClick(() => {
           this.onAutoTap();
         })
