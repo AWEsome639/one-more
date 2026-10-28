@@ -9,6 +9,7 @@
  *   「一搜索整个列表区就不渲染」——根因是补丁残留，不是逻辑）
  */
 
+import { WatchGames } from '../core/WatchGames';
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
 import { router } from '@kit.ArkUI';
@@ -275,7 +276,26 @@ export struct GamesTab {
     }
     this.listCacheKey = key;
     this.listCache = this.computeList();
-    return this.listCache;
+    return this.watchFilter(this.listCache);
+  }
+
+  /**
+   * ★★★ 2026-10-29（项目 F 阶段 3）：手表上只显示精选款
+   *   手表是 466px 圆屏 —— 数独/象棋/五子棋这类棋盘根本放不下。
+   *   把 355 款全塞进去 = 355 个坏体验；只放精选的 24 款才是"体面"。
+   *   ⚠️ 非手表直接返回原列表（零影响、零性能开销）
+   */
+  private watchFilter(all: GameMeta[]): GameMeta[] {
+    if (!Bp.isWatch()) {
+      return all;
+    }
+    const out: GameMeta[] = [];
+    for (let i = 0; i < all.length; i++) {
+      if (WatchGames.has(all[i].id)) {
+        out.push(all[i]);
+      }
+    }
+    return out;
   }
 
   /**
