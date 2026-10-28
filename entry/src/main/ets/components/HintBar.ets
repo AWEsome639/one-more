@@ -22,8 +22,9 @@ export struct HintBar {
   onHintTap: () => void = () => {};
   /** 点「代打/停代打」时回调（游戏自己实现 askAuto） */
   onAutoTap: () => void = () => {};
-  /** 代打是否正在跑（决定按钮文字） */
-  autoOn: boolean = false;
+  /** 代打是否正在跑（决定按钮文字）
+   *  ★ 必须 @Prop：普通成员不随父组件刷新（和 demoOn 同一个坑） */
+  @Prop autoOn: boolean = false;
   /** 高度，默认 38（比主按钮矮一点，不和它们抢视觉） */
   barHeight: number = 38;
   /** 是否显示「提示」按钮（默认显示；游戏自带提示时传 false） */
