@@ -11,6 +11,7 @@
  *   onFinish: (r: GameResult) => void
  */
 
+import { Sound } from '../core/Sound';
 import { router } from '@kit.ArkUI';
 import { window } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Layout, Accent, Cell } from '../core/Design';
@@ -593,6 +594,14 @@ struct GameHost {
     } catch (e) {
     }
     this.finished = true;      // ★ 路线 E：已结算，退出时不再补记
+    // ★★★ 2026-10-29（项目 D ④）：**结算的瞬间必须听得出来成败**
+    //   和下面那段触感同源：通关 → win，没通关 → lose
+    //   （Sound 内部已判 soundOn 开关 + try/catch，这里不用再兜）
+    if (r.solved) {
+      Sound.win();
+    } else {
+      Sound.lose();
+    }
     this.lastGain = gain;
     this.lastScore = r.score;
     this.lastMs = r.durationMs;

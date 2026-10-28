@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { Sound } from '../core/Sound';
 import { Bp } from '../core/Bp';
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -141,6 +142,10 @@ export default class EntryAbility extends UIAbility {
       //   检测报告原文：「未集成 verifyLocalPlayer / init API，不符合华为应用市场审核标准」
       //   ⇒ 在 UI 加载完成后初始化；失败不阻断（这是离线游戏，别因为断网就让用户玩不了）
       this.initGameService();
+      // ★ 2026-10-29（项目 D ④）：音效初始化
+      //   放在 UI 加载完成之后 —— SoundPool 要资源管理器就绪才拿得到 rawfile
+      //   ⚠️ 失败静默（Sound.init 内部已 try/catch），没有音效也能玩
+      Sound.init(this.context).catch(() => {});
     });
   }
 

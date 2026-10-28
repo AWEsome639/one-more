@@ -32,6 +32,7 @@
  *      最后把「深色模式」这个外观偏好写回 —— 重置的是进度，不该顺手改外观。
  */
 
+import { Sound } from '../core/Sound';
 import { router } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Accent, AccentOption } from '../core/Design';
 import { BUILD_TAG, GAMES } from '../core/GameRegistry';
@@ -569,6 +570,13 @@ build() {
           // ★ 手感：开关拨动要有"咔哒"的确认感
           Haptics.tap();
           this.setPref(cfg.storeKey, v);
+          // ★★★ 2026-10-29（项目 D ④）：**打开音效开关时立刻响一声**
+          //   这是最直接的"试听"：用户拧开就能听见，不用等一局游戏
+          //   · 只在「打开」时响（关掉还响就矛盾了）
+          //   · 只对 soundOn 这一个开关生效（别的开关不乱响）
+          if (cfg.storeKey === 'soundOn' && v) {
+            Sound.tap();
+          }
         })
     }
     .width('100%')
