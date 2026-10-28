@@ -37,7 +37,9 @@ export struct GAreaPerimeterMatch {
   aboutToAppear(): void {
     LanRace.noteStart(); this.startAt = Date.now(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
-    setTimeout(() => { this.demoStart(); }, 3000);
+    if (Hint.demoOnce('GAreaPerimeterMatch')) {
+      setTimeout(() => { this.demoStart(); }, 3000);
+    }
   }
   onRestart(): void {
     this.qTotal = GameDiff.sizeNow(10);

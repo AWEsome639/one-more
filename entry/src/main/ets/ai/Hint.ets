@@ -122,7 +122,21 @@ export class Hint {
   static DEMO_MS: number = 520;      // 比代打慢（320），看得清
   static DEMO_STEPS: number = 6;     // 最多 6 步，演到"看起来懂了"就停
 
+  // ★ 每次进入只演示一次
+  //   踩坑：先用 `private static DEMO_SEEN: Set<string>` —— **翻页后没保住**
+  //        （struct 的静态成员在页面重建时会被重新初始化）
+  //   ⇒ 改用 ArkUI 原生全局存储 AppStorage（页面重建不收走）
+  static demoOnce(key: string): boolean {
+    const k: string = 'demo_seen_' + key;
+    if (AppStorage.has(k)) {
+      return false;
+    }
+    AppStorage.setOrCreate<boolean>(k, true);
+    return true;
+  }
+
   /** 演示：每 DEMO_MS 调一次 tick，tick 返回 false 就停。 */
+
   static demoRun(tick: () => boolean): number {
     let id: number = -1;
     id = setInterval(() => {
