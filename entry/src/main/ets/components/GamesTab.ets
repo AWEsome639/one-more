@@ -9,6 +9,7 @@
  *   「一搜索整个列表区就不渲染」——根因是补丁残留，不是逻辑）
  */
 
+import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
 import { router } from '@kit.ArkUI';
 import { About } from '../core/About';
@@ -439,6 +440,27 @@ export struct GamesTab {
     this.picked = next;
   }
 
+  /**
+   * ★★★ 2026-10-29（项目 F）：列表网格的列数
+   *   · 手表 / 大字模式 ⇒ 1 列（手表 466px 圆屏；大字模式副标题会被截断，19 号就踩过）
+   *   · 手机           ⇒ 2 列（与改造前一致 —— **零回归**）
+   *   · 平板竖         ⇒ 3 列
+   *   · 平板横 / PC / 电视 ⇒ 4 列
+   * 返回的是 ArkUI 的 columnsTemplate 字符串。
+   */
+  private gridCols(): string {
+    if (Bp.isWatch() || this.uiMode === 'elder') {
+      return '1fr';
+    }
+    if (Bp.isTv() || Bp.isDesktop() || Bp.isLg()) {
+      return '1fr 1fr 1fr 1fr';
+    }
+    if (Bp.isMd()) {
+      return '1fr 1fr 1fr';
+    }
+    return '1fr 1fr';
+  }
+
   private openGame(id: string): void {
     Haptics.tap();   // ★ 手感：进游戏这一下要有"按到了"的确认
     // ★ item ①：把"这张卡"标记为出场件，让 GameHost 能用工名 id 接上
@@ -713,7 +735,11 @@ build() {
         //   实拍：副标题「一板一球，清空全场」在大字模式下被截成「一板一球，清…」
         //   算过：9 字 × 17px = 153vp，可用宽度只有 156-48-12-32 ≈ 64vp ⇒ 怎么缩都不够
         //   ⇒ 大字模式单列（卡片通栏 328vp，文字区 236vp）
-        .columnsTemplate(this.uiMode === 'elder' ? '1fr' : '1fr 1fr')
+        // ★★★ 2026-10-29（项目 F 阶段 1/3）：列数随设备变
+        //   · 大字模式 / 手表 ⇒ 单列（手表 466px 圆屏，两列根本放不下）
+        //   · 手机 ⇒ 两列（和改造前一致，零回归）
+        //   · 平板竖 ⇒ 三列 ｜ 平板横 / PC ⇒ 四列 ｜ 电视 ⇒ 四列（焦点框要大）
+        .columnsTemplate(this.gridCols())
         .columnsGap(Space.md)
         .rowsGap(Space.md)
         // ★ 拉满：内容刷新脉冲的视觉（收紧 + 半透 ⇒ 弹回）
