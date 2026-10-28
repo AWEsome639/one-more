@@ -98,6 +98,9 @@ export struct GKlotski {
   @State private won: boolean = false;
   /** 代打计时器（-1 = 未运行）。必须 @State，否则按钮文字不刷新 */
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   @State private tip: string = TG('点方块选中，再点方向键移动');
 
   private startAt: number = 0;
@@ -109,6 +112,8 @@ export struct GKlotski {
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
     this.reset();
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
   }
 
   onRestart(): void {
@@ -208,6 +213,33 @@ export struct GKlotski {
         return;
       }
     }
+  }
+
+  // ═══════════ 演示动画（项目 C）═══════════
+  // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
+  //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoStop(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    const wasOn: boolean = this.demoLeft > 0;
+    this.demoLeft = 0;
+    if (wasOn) { this.reset(); }
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
   }
 
   private autoStep(): boolean {
@@ -364,6 +396,7 @@ export struct GKlotski {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
@@ -421,6 +454,10 @@ export struct GKlotski {
           this.reset();
         })
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    })
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Start)

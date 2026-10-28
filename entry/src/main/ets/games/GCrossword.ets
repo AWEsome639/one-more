@@ -46,6 +46,9 @@ export struct GCrossword {
   //   列数固定 = 词长 5（COLS）—— 词都是 5 字母，列数跟着行数变只会把词截短
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   /** 行数 = min(难度值, 答案词数)：词库几个词就只能填几行，多出来的行必输 */
   @State private diffTotal: number = Math.min(GameDiff.sizeNow(5), WORDS.length);
 
@@ -61,7 +64,11 @@ export struct GCrossword {
   @State cur: number = 0; @State miss: number = 0; @State score: number = 0;
   @State over: boolean = false; @State won: boolean = false; @State msg: string = '';
   private startAt: number = 0; private done: boolean = false;
-  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  aboutToAppear(): void {
+    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
+  }
   onRestart(): void {
     this.diffTotal = Math.min(GameDiff.sizeNow(5), WORDS.length);
      this.reset(); }
@@ -81,6 +88,33 @@ export struct GCrossword {
     this.bank = arr;
   }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ═══════════ 演示动画（项目 C）═══════════
+  // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
+  //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoStop(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    const wasOn: boolean = this.demoLeft > 0;
+    this.demoLeft = 0;
+    if (wasOn) { this.reset(); }
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -164,6 +198,7 @@ export struct GCrossword {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
@@ -266,6 +301,10 @@ export struct GCrossword {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    })
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 

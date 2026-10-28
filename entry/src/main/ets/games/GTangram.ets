@@ -63,6 +63,9 @@ export struct GTangram {
    */
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   @State private boardN: number = 4;
   /** 本局允许的步数上限：简单 18 / 普通 12 / 困难 8 */
   @State private moveLimit: number = GTangram.limitNow();
@@ -91,7 +94,11 @@ export struct GTangram {
   @State target: number[] = []; @State pieceAt: number[] = []; @State sel: number = -1;
   @State moves: number = 0; @State over: boolean = false; @State won: boolean = false; @State msg: string = '';
   private startAt: number = 0; private done: boolean = false;
-  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  aboutToAppear(): void {
+    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
+  }
   onRestart(): void {
     this.moveLimit = GTangram.limitNow();
      this.reset(); }
@@ -143,6 +150,33 @@ export struct GTangram {
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ═══════════ 演示动画（项目 C）═══════════
+  // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
+  //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoStop(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    const wasOn: boolean = this.demoLeft > 0;
+    this.demoLeft = 0;
+    if (wasOn) { this.reset(); }
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -257,6 +291,7 @@ export struct GTangram {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2('铺对 {0} / {1}　次数 {2}', String(this.scan()[0]), String(this.scan()[1]),Digits(String(this.moves), this.langCode)))
@@ -297,7 +332,11 @@ export struct GTangram {
       Button(TG('重开（换一题）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
-    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+    }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 
 

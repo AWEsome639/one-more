@@ -50,6 +50,9 @@ export struct GLogicalSyllogisms {
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   @State private diffTotal: number = GameDiff.sizeNow(PASS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
@@ -62,7 +65,11 @@ export struct GLogicalSyllogisms {
   private startAt: number = 0; private roundAt: number = 0;
   private timer: number = -1; private feed: number = -1; private done: boolean = false;
 
-  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  aboutToAppear(): void {
+    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
+  }
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(PASS);
      this.reset(); }
@@ -112,6 +119,33 @@ export struct GLogicalSyllogisms {
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ═══════════ 演示动画（项目 C）═══════════
+  // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
+  //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoStop(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    const wasOn: boolean = this.demoLeft > 0;
+    this.demoLeft = 0;
+    if (wasOn) { this.reset(); }
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -202,6 +236,7 @@ export struct GLogicalSyllogisms {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2("题 {0}/{1}", Math.min(this.qIndex + 1, QN), QN))
@@ -237,6 +272,10 @@ export struct GLogicalSyllogisms {
           .borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    })
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 }

@@ -27,6 +27,9 @@ export struct GFrequencyTap {
   // ★ 难度作用到玩法（size）：BEATS 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   @State private diffTotal: number = GameDiff.sizeNow(BEATS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -47,7 +50,11 @@ export struct GFrequencyTap {
   private endTo: number = -1;
   private done: boolean = false;
 
-  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  aboutToAppear(): void {
+    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
+  }
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(BEATS);
      this.reset(); }
@@ -86,6 +93,33 @@ export struct GFrequencyTap {
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  // ═══════════ 演示动画（项目 C）═══════════
+  // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
+  //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoStop(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    const wasOn: boolean = this.demoLeft > 0;
+    this.demoLeft = 0;
+    if (wasOn) { this.reset(); }
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -182,6 +216,7 @@ export struct GFrequencyTap {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
@@ -224,7 +259,11 @@ export struct GFrequencyTap {
 
       Text(TG2("{0}{1} 拍即通关", TG2('判定：每拍误差 ≤ {0} ms 记命中，{1} 拍中 ', String(HIT_MS), String(this.diffTotal)),Digits(String(WIN_HITS), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
-    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+    }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 
 

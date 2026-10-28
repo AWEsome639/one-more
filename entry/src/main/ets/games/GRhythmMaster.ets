@@ -33,6 +33,9 @@ export struct GRhythmMaster {
   @State private won: boolean = false;
   /** 代打计时器（-1 = 未运行）。必须 @State，否则按钮文字不刷新 */
   @State private autoId: number = -1;
+  /** 演示动画（项目 C）：-1 = 未运行 */
+  @State private demoId: number = -1;
+  @State private demoLeft: number = 0;
   /** 代打排好的敲击（setTimeout id 表） */
   private autoTos: number[] = [];
   private taps: number[] = [];
@@ -40,7 +43,11 @@ export struct GRhythmMaster {
   private ivId: number = -1;
   private toId: number = -1;
   private done: boolean = false;
-  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  aboutToAppear(): void {
+    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
+    setTimeout(() => { this.demoStart(); }, 3000);
+  }
   onRestart(): void {
     this.diffTotal = GameDiff.timeNow(600);
      this.reset(); }
@@ -84,6 +91,33 @@ export struct GRhythmMaster {
    * ★ 320ms 的节拍器不会污染成绩 —— 真正的敲击时间由 aiArm 的 setTimeout 决定，
    *   节拍器只负责"什么时候开始排期"（晚一拍开始也不影响：成绩只看每两下之间的间隔）。
    */
+  // ═══════════ 演示动画（项目 C）═══════════
+  // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
+  //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
+  private demoStep(): boolean {
+    if (this.demoId < 0) { return false; }
+    if (this.demoLeft <= 0) { this.demoStop(); return false; }
+    this.demoLeft = this.demoLeft - 1;
+    this.autoStep();
+    return true;
+  }
+
+  private demoStop(): void {
+    if (this.demoId >= 0) {
+      Hint.autoStop(this.demoId);
+      this.demoId = -1;
+    }
+    const wasOn: boolean = this.demoLeft > 0;
+    this.demoLeft = 0;
+    if (wasOn) { this.reset(); }
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoLeft = Hint.DEMO_STEPS;
+    this.demoId = Hint.demoRun(() => this.demoStep());
+  }
+
   private autoStep(): boolean {
     if (this.over || this.phase === 'done') {
       return false;
@@ -219,6 +253,7 @@ export struct GRhythmMaster {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
@@ -257,7 +292,11 @@ export struct GRhythmMaster {
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('判定：4 下平均间隔误差 ≤ 150 ms（目标间隔 600 ms）'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
-    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+    }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 
 }
