@@ -24,6 +24,16 @@ import { I18n, Lang, toTrad } from './I18n';
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
   /** ★★ 2026-10-28 提示文案 */
+  "演示中…": { "en": "Demoing…", "ja": "デモ中…", "ko": "데모 중…", "es": "Demostrando…", "fr": "Démo…", "de": "Demo läuft…", "pt": "Demonstrando…", "ru": "Демонстрация…", "it": "Demo…", "ar": "جارٍ العرض…" },
+  /** ★★ 2026-10-28 提示文案 */
+  "这个说法对": { "en": "This is true", "ja": "この説は正しい", "ko": "이 말은 맞아요", "es": "Esto es cierto", "fr": "C'est vrai", "de": "Das ist richtig", "pt": "Isso é verdade", "ru": "Это верно", "it": "Questo è vero", "ar": "هذا صحيح" },
+  /** ★★ 2026-10-28 提示文案 */
+  "这个说法不对": { "en": "This is false", "ja": "この説は違う", "ko": "이 말은 틀려요", "es": "Esto es falso", "fr": "C'est faux", "de": "Das ist falsch", "pt": "Isso é falso", "ru": "Это неверно", "it": "Questo è falso", "ar": "هذا خطأ" },
+  /** ★★ 2026-10-28 提示文案 */
+  "数到 {0} 个": { "en": "Counted {0}", "ja": "{0}個だった", "ko": "{0}개였어요", "es": "Contaste {0}", "fr": "Tu as compté {0}", "de": "Gezählt: {0}", "pt": "Contou {0}", "ru": "Насчитано {0}", "it": "Contati {0}", "ar": "عددت {0}" },
+  /** ★★ 2026-10-28 提示文案 */
+  "鬼在第 {0} 格": { "en": "Ghost at cell {0}", "ja": "お化けは{0}番目", "ko": "귀신은 {0}번째 칸", "es": "Fantasma en la casilla {0}", "fr": "Fantôme en case {0}", "de": "Geist in Feld {0}", "pt": "Fantasma na casa {0}", "ru": "Призрак в клетке {0}", "it": "Fantasma nella casella {0}", "ar": "الشبح في الخلية {0}" },
+  /** ★★ 2026-10-28 提示文案 */
   "第 {0} 位是 {1}": { "en": "Digit {0} is {1}", "ja": "{0}桁目は{1}", "ko": "{0}번째는 {1}", "es": "El dígito {0} es {1}", "fr": "Le chiffre {0} est {1}", "de": "Ziffer {0} ist {1}", "pt": "O dígito {0} é {1}", "ru": "Цифра {0} — это {1}", "it": "La cifra {0} è {1}", "ar": "الرقم {0} هو {1}" },
   /** ★★ 2026-10-28 提示文案 */
   "这回没有「西蒙说」⇒ 别动": { "en": "No \"Simon says\" — do nothing", "ja": "今は「サイモン」なし ⇒ 動かない", "ko": "\"사이먼\"이 없음 ⇒ 움직이지 마", "es": "Sin \"Simón dice\" — no te muevas", "fr": "Pas de « Jacques a dit » — ne bouge pas", "de": "Kein \"Simon sagt\" — nicht bewegen", "pt": "Sem \"Simon diz\" — não se mexa", "ru": "Саймон не говорит — не двигайся", "it": "Niente \"Simon dice\" — non muoverti", "ar": "لا \"سيمون يقول\" — لا تتحرك" },

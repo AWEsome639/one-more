@@ -3,6 +3,7 @@
  * 胜负：全对且张数到 5 通关，2 条命用完判负　｜　进度：张数 / 最长 / 生命
  */
 
+import { Hint, HintResult } from '../ai/Hint';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -134,7 +135,7 @@ export struct GCountingSpan {
 
   build() {
     Column({ space: Space.md }) {
-      Row({ space: Space.sm }) {
+            Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('张数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.span), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))

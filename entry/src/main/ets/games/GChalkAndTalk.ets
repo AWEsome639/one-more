@@ -1,5 +1,6 @@
 /** 边写边说 —— 双任务：判断词语类别（说）+ 等光标踩中 ✦ 时落笔（写）
  * 胜负：得分 ≥12 且落笔 ≥3 即通关｜说对 +2 / 说错 -2 / 写对 +1 / 写歪 -1｜进度：剩余 / 得分 / 说·写 */
+import { Hint, HintResult } from '../ai/Hint';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -111,7 +112,7 @@ export struct GChalkAndTalk {
   }
   build() {
     Column({ space: Space.md }) {
-      Row({ space: Space.sm }) {
+            Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.leftS + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.orange))

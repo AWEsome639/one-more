@@ -2,6 +2,8 @@
  * 幽灵点击 —— 4×4 阵里幽灵一闪即逝，趁它还在时点中它（越到后面越快）
  * 胜负：15 只里抓到 ≥ 12 只 ⇒ 通关；进度：第 n 只 / 抓到 / 溜走
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -23,6 +25,8 @@ export struct GGhostTap {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（size）：GHOSTS 按难度换算
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.sizeNow(GHOSTS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -87,6 +91,53 @@ export struct GGhostTap {
     this.nextTo = setTimeout(() => { this.nextTo = -1; this.flash = -1; this.spawn(); }, 240);
   }
 
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.ghostIdx < 0) {
+      return true;
+    }
+    this.tapCell(this.ghostIdx);
+    return !this.over;
+  }
+
+  /** 提示：鬼在哪一格 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over || this.ghostIdx < 0) {
+      return Hint.none('none');
+    }
+    const g: number = this.ghostIdx;
+    return Hint.make([g], TG2('鬼在第 {0} 格', String(g + 1)),
+      TG2('Ghost at cell {0}', String(g + 1)), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private tapCell(i: number): void {
     if (this.over) { return; }
     if (this.ghostIdx < 0) { this.msg = TG('❌ 这里空空的'); return; }
@@ -129,6 +180,12 @@ export struct GGhostTap {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('第几只'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
