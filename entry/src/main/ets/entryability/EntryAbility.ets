@@ -111,16 +111,22 @@ export default class EntryAbility extends UIAbility {
       } catch (e3) {
         dev = '';
       }
-      Bp.update(prop.windowRect.width, prop.windowRect.height, dev);
+      // ★★★ 2026-10-29（lead）：**windowRect 给的是 px，不是 vp！**
+      //   实测：1320×2232 px 的手机（440×744 vp）被判成 lg（平板/PC）
+      //   ⇒ isLg() 为真 ⇒ 列表排 4 列 + 格子放大 1.12 倍 ⇒ 界面像被撑爆了
+      //   ⇒ 必须先用 px2vp 换成 vp（ArkUI 里所有布局单位都是 vp）
+      const wVp: number = px2vp(prop.windowRect.width);
+      const hVp: number = px2vp(prop.windowRect.height);
+      Bp.update(wVp, hVp, dev);
       try {
         mainWin.on('windowSizeChange', (sz: window.Size) => {
-          Bp.update(sz.width, sz.height);
+          Bp.update(px2vp(sz.width), px2vp(sz.height));
         });
       } catch (e2) {
         hilog.warn(DOMAIN, 'testTag', 'windowSizeChange 监听失败（不影响使用）: %{public}s', JSON.stringify(e2));
       }
       hilog.info(DOMAIN, 'testTag', 'Bp 初始化: %{public}s x %{public}s (%{public}s)',
-        String(prop.windowRect.width), String(prop.windowRect.height), Bp.tag());
+        String(wVp), String(hVp), Bp.tag());
     } catch (e) {
       hilog.warn(DOMAIN, 'testTag', '读窗口尺寸失败，按手机 360vp 走: %{public}s', JSON.stringify(e));
     }
