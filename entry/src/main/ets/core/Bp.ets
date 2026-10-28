@@ -154,6 +154,40 @@ export class Bp {
     return 16;
   }
 
+  // ─────────── 圆屏安全区（手表专用）───────────
+  /**
+   * ★★★ 2026-10-29（项目 F 阶段 3）：圆屏安全区内边距
+   *
+   * 手表是**圆形**屏幕：四角会被切掉。内容要留在**内切正方形**里才不会被切。
+   *   466px 圆屏 ⇒ 内切正方形边长 ≈ 466/√2 ≈ 330px
+   *   ⇒ 每边要让出 (466-330)/2 ≈ 68px
+   *
+   * 用法（在页面根容器上）：
+   *   .padding(Bp.isWatch() ? Bp.safePad() : 0)
+   *
+   * ⚠️ 非手表恒为 0 ⇒ 手机/平板/PC 零影响
+   */
+  static safePad(): number {
+    if (!Bp.isWatch()) {
+      return 0;
+    }
+    // 用实际宽度算，别写死 466（不同手表尺寸不同）
+    // 内切正方形边长 = 宽 / √2 ⇒ 每边余量 = (宽 - 宽/√2) / 2
+    const w: number = Bp.width > 0 ? Bp.width : 466;
+    return Math.round((w - w / 1.4142) / 2);
+  }
+
+  /**
+   * 手表上的「可用内容宽度」（内切正方形边长）。
+   * 表格/棋盘类要用它限制最大宽度。
+   */
+  static safeWidth(): number {
+    if (!Bp.isWatch()) {
+      return Bp.width;
+    }
+    return Math.round(Bp.width / 1.4142);
+  }
+
   // ─────────── 设备能力判断（给焦点导航、旋钮等分支用）───────────
   /** 有没有触摸 —— 智慧屏/手表通常没有 */
   static hasTouch(): boolean {
