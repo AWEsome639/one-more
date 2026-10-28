@@ -1,4 +1,5 @@
 /** 故事回忆 —— 读一段小故事，凭记忆回答细节题；2 篇 6 题答对 ≥5 通关 */
+import { Hint, HintResult } from '../ai/Hint';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -129,7 +130,7 @@ export struct GNarrativeRecall {
 
   build() {
     Column({ space: Space.md }) {
-      Row() {
+            Row() {
         Text(TG2('篇数 {0}', (String(this.round) + '/' + String(ROUNDS)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2("题号 {0}", (this.phase === 1 ? String(this.qIdx + 1) + '/' + String(this.story.qs.length) : '阅读'))).fontSize(FontSize.xs).fontColor(this.theme.ink)
         Text(TG('答对 ') + (String(this.right) + '/' + String(this.asked))).fontSize(FontSize.xs).fontColor(this.theme.ink)

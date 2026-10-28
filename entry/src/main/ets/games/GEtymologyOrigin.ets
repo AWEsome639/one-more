@@ -2,6 +2,8 @@
  * 词源探源 —— 看英语单词猜它借自哪门语言
  * 胜负：60 秒内答对 ≥8 通关｜答错扣 3 秒，错满 4 次判负　｜　进度：答对 / 失误 / 倒计时
  */
+import { Hint, HintResult } from '../ai/Hint';
+import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -50,6 +52,8 @@ export struct GEtymologyOrigin {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
+  /** 代打计时器（-1 = 未运行）。必须 @State */
+  @State private autoId: number = -1;
   @State private diffTotal: number = GameDiff.timeNow(LIMIT_MS);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -86,6 +90,53 @@ export struct GEtymologyOrigin {
       this.finish(false);
     }
   }
+  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  private autoStep(): boolean {
+    if (this.over) {
+      return false;
+    }
+    if (this.over) {
+      return true;
+    }
+    this.answer(BANK[this.qIdx].lang);
+    return !this.over;
+  }
+
+  /** 提示：直接报语源 */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');
+    }
+    const a: string = BANK[this.qIdx].lang;
+    return Hint.make([], TG2('语源是「{0}」', a),
+      TG2('The origin is {0}', a), t0);
+  }
+
+  private askAuto(): void {
+    Haptics.tap();
+    if (this.autoId >= 0) {
+      this.stopAuto();
+      Hint.toast(TG('已停止代打'));
+      return;
+    }
+    Hint.toast(TG('AI 开始代打…'));
+    this.autoId = Hint.autoRun(() => this.autoStep());
+  }
+
+  private stopAuto(): void {
+    if (this.autoId >= 0) {
+      Hint.autoStop(this.autoId);
+      this.autoId = -1;
+    }
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
   private answer(sel: string): void {
     if (this.over) { return; }
     if (sel === BANK[this.qIdx].lang) {
@@ -120,6 +171,12 @@ export struct GEtymologyOrigin {
 
   build() {
     Column({ space: Space.md }) {
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
