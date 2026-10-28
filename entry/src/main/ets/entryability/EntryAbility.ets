@@ -16,7 +16,7 @@
 import { Bp } from '../core/Bp';
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { window } from '@kit.ArkUI';
 import { Configuration } from '@ohos.app.ability.Configuration';
 import { ProgressStore } from '../core/ProgressStore';
@@ -101,7 +101,17 @@ export default class EntryAbility extends UIAbility {
     try {
       const mainWin: window.Window = windowStage.getMainWindowSync();
       const prop: window.WindowProperties = mainWin.getWindowProperties();
-      Bp.update(prop.windowRect.width, prop.windowRect.height);
+      // ★★★ 2026-10-29（项目 F 阶段 3）：把**设备类型**也交给 Bp
+      //   deviceInfo.deviceType 的取值：phone / tablet / 2in1 / tv / wearable / car ...
+      //   之前 Bp 里明明有 WATCH / TV 分支，却从没人设置过 ⇒ 永远是 phone
+      //   ⚠️ 用 try/catch：某些设备/低版本取不到，取不到就按宽度推断
+      let dev: string = '';
+      try {
+        dev = deviceInfo.deviceType;
+      } catch (e3) {
+        dev = '';
+      }
+      Bp.update(prop.windowRect.width, prop.windowRect.height, dev);
       try {
         mainWin.on('windowSizeChange', (sz: window.Size) => {
           Bp.update(sz.width, sz.height);
