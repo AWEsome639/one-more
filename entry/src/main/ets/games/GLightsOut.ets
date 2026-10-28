@@ -343,6 +343,8 @@ export struct GLightsOut {
 
         onAutoTap: () => { this.askAuto(); },
 
+        demoOn: this.demoId >= 0,
+
         autoOn: this.autoId >= 0
 
       })

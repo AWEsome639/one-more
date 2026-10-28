@@ -195,6 +195,7 @@ export struct GSimonCommand {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2("答对 {0}/{1}", this.correct, this.diffTotal))

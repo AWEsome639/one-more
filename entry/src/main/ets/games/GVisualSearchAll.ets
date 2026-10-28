@@ -222,6 +222,7 @@ export struct GVisualSearchAll {
         showHint: true,
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG('第 ') + String(Math.min(this.round + 1, this.diffTotal)) + '/' + String(this.diffTotal) + ' 轮 · 找到 ' +

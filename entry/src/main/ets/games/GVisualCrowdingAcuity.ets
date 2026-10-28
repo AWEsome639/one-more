@@ -191,6 +191,8 @@ export struct GVisualCrowdingAcuity {
 
         showHint: false,
 
+        demoOn: this.demoId >= 0,
+
         autoOn: this.autoId >= 0
 
       })

@@ -277,6 +277,7 @@ export struct GTowerOfLondon {
       HintBar({
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2('步数 {0} · 最少 {1} · 上限 {2}',Digits(String(this.moves), this.langCode),Digits(String(this.best), this.langCode), String(this.best + this.slacks)) +

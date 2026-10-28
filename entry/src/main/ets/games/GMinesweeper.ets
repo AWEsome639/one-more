@@ -584,6 +584,7 @@ export struct GMinesweeper {
       HintBar({
         showHint: false,
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       // 数据条

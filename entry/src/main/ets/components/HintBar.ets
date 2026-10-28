@@ -28,10 +28,22 @@ export struct HintBar {
   barHeight: number = 38;
   /** 是否显示「提示」按钮（默认显示；游戏自带提示时传 false） */
   showHint: boolean = true;
+  /** 演示动画是否在跑（项目 C）：跑的时候显示「演示中…」而不是两个按钮
+   *  ★ 必须 @Prop：普通成员不会随父组件状态刷新（实测 demoOn 不生效） */
+  @Prop demoOn: boolean = false;
 
   build() {
     Row({ space: Space.sm }) {
-      if (this.showHint) {
+      // ★ 演示动画进行中（项目 C）：不显示按钮，只显示「演示中…」
+      //   ⇒ 玩家一眼知道"现在不是我在玩"，一碰屏幕就会停
+      if (this.demoOn) {
+        Text(TG('演示中…（碰一下就停）'))
+          .layoutWeight(1)
+          .height(this.barHeight)
+          .fontSize(FontSize.sm)
+          .fontColor(Palette.amber)
+          .textAlign(TextAlign.Center)
+      } else if (this.showHint) {
         Button(TG('提示'))
           .layoutWeight(1)
           .height(this.barHeight)
@@ -42,6 +54,7 @@ export struct HintBar {
             this.onHintTap();
           })
       }
+      if (!this.demoOn) {
       Button(this.autoOn ? TG('停代打') : TG('AI 代打'))
         .layoutWeight(1)
         .height(this.barHeight)
@@ -51,6 +64,7 @@ export struct HintBar {
         .onClick(() => {
           this.onAutoTap();
         })
+      }
     }
     .width('100%')
   }

@@ -199,6 +199,7 @@ export struct GGridDisplacement {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2("题 {0}/{1}", Math.min(this.qIndex + 1, QN), QN))

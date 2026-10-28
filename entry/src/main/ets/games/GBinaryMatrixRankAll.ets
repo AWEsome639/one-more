@@ -250,6 +250,7 @@ export struct GBinaryMatrixRankAll {
               onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
         showHint: true,
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))

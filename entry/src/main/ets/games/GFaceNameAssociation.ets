@@ -250,6 +250,8 @@ export struct GFaceNameAssociation {
 
         showHint: true,
 
+        demoOn: this.demoId >= 0,
+
         autoOn: this.autoId >= 0
 
       })

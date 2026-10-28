@@ -233,6 +233,7 @@ export struct GChoiceReactionTime {
           onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
           showHint: true,
+          demoOn: this.demoId >= 0,
           autoOn: this.autoId >= 0
         })
         Button(TG('奇'))

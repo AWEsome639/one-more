@@ -199,6 +199,7 @@ export struct GRhymeMaster {
         showHint: true,
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {

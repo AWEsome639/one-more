@@ -360,6 +360,8 @@ export struct GNumericalEstimation {
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
 
+        demoOn: this.demoId >= 0,
+
         autoOn: this.autoId >= 0
 
       })

@@ -245,6 +245,7 @@ export struct GDivisibilityDash {
       HintBar({
         onAutoTap: () => { this.askAuto(); },
         showHint: false,
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {

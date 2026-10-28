@@ -202,6 +202,7 @@ export struct GGeometricVision {
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2("第 {0}/{1} 题　得分 {2}", Math.min(this.idx + 1, this.diffTotal),Digits(String(this.diffTotal), this.langCode),Digits(String(this.score), this.langCode)))

@@ -210,6 +210,7 @@ export struct GShadowPivot {
         showHint: true,
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2("题号 {0}/{1}", Math.min(this.asked + 1, ROUNDS), ROUNDS))

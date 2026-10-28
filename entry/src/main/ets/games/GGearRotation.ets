@@ -223,6 +223,7 @@ export struct GGearRotation {
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
         showHint: true,
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG('第 ') + Math.min(this.idx + 1, this.diffTotal) + '/' + this.diffTotal + ' 题　得分 ' + this.score

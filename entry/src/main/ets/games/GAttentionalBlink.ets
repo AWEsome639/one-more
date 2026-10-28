@@ -241,6 +241,7 @@ export struct GAttentionalBlink {
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
         showHint: true,
+        demoOn: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) { Column({ space: 2 }) {
