@@ -807,6 +807,13 @@ export struct GSudoku {
       .padding(Space.xs)
       .backgroundColor(this.theme.isDark ? BOARD_DARK : BOARD_LIGHT)
       .borderRadius(Radius.lg)
+      // ★★★ 2026-10-29 真机 dump 布局树定位到的根因：
+      //   9×9 棋盘的格子是 `layoutWeight(1) + aspectRatio(1)` ⇒ **高度被宽度锁死**
+      //   （1260px），把后面「数字键 + 底部按钮行」全挤出父容器（溢出 144px）。
+      //   表现：底部三个按钮 bounds 下沿 = 2232 = 屏高 ⇒ 被系统手势区吃掉 ⇒ **点不动**。
+      //   （同页证据：棋盘与数字键都能点，已填 41→42）
+      // ⇒ 给棋盘**限高**，让它让出空间，按钮行自然回到可点区域。
+      .constraintSize({ maxHeight: '52%' })
 
       // 数字键盘
       Row({ space: Space.xs }) {
@@ -863,18 +870,6 @@ export struct GSudoku {
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
-          .fontSize(FontSize.md)
-          .fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
-          .height(Cell.of(44))
-          .padding({ left: Space.md, right: Space.md })
-          .onClick(() => {
-            this.askHint();
-          })
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(TG('擦除'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
@@ -907,6 +902,8 @@ export struct GSudoku {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
+      // ★ 2026-10-29：用 margin 把这一行从底部推开（padding 会被 layoutWeight 棋盘吸收）
+      .margin({ bottom: 24 })
       // ★★★ 2026-10-29 真机抓到：这一行按钮**贴着屏幕底**（y=2178 / 屏高 2232），
       //   被系统手势区吃掉 ⇒ **点不动**。
       //   实测证据（同一个页面）：棋盘和数字键都能点（已填 41→42），
@@ -919,12 +916,6 @@ export struct GSudoku {
     })
     .width('100%')
     .height('100%')
-    // ★★★ 2026-10-29 真机抓到：底部按钮行 y=2178 / 屏高 2232（离底仅 54px），
-    //   被系统手势区吃掉 ⇒ **三个按钮点不动**。
-    //   实测证据（同一页面）：棋盘和数字键都能点（已填 41→42），唯独这一行点不动。
-    // ★ 修法要点：容器是 justifyContent(Start) 从上往下排，
-    //   给**最后一行**加 padding 不会把它抬高 ⇒ 必须给**根容器**加底部安全边距。
-    .padding({ bottom: 20 })
     .justifyContent(FlexAlign.Start)
   }
 
