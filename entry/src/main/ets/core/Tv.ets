@@ -75,7 +75,27 @@ export class Tv {
   static readonly KEY_RIGHT: number = 2015;
   static readonly KEY_BACK: number = 2;
   static readonly KEY_ENTER: number = 2054;
+  /**
+   * ★ 2026-10-29（PC/2in1）：ESC 键码。
+   *   HarmonyOS 上 KEYCODE_ESCAPE = 2070；部分外接键盘发 27（ASCII ESC）。
+   *   两个都认。
+   */
+  static readonly KEY_ESC: number = 2070;
+  static readonly KEY_ESC_ASCII: number = 27;
   static readonly KEY_DPAD_CENTER: number = 2019;
+
+  /** 是不是 ESC（两种键码都认） */
+  static isEsc(code: number): boolean {
+    return code === Tv.KEY_ESC || code === Tv.KEY_ESC_ASCII;
+  }
+
+  /**
+   * 桌面类设备（PC/2in1）上，键盘快捷键应该**永远生效**（不需要焦点）。
+   * ★ 与 Tv.on() 的区别：Tv 只在 isTv 时为真；这里 PC 也算。
+   */
+  static desktopKeys(): boolean {
+    return Bp.isDesktop() || Bp.isLg();
+  }
 
   static isUp(code: number): boolean {
     return code === Tv.KEY_UP;

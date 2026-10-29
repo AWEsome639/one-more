@@ -11,6 +11,7 @@
  *   onFinish: (r: GameResult) => void
  */
 
+import { Tv } from '../core/Tv';
 import { Sound } from '../core/Sound';
 import { router } from '@kit.ArkUI';
 import { window } from '@kit.ArkUI';
@@ -3119,6 +3120,25 @@ struct GameHost {
     .width('100%')
     .height('100%')
     .backgroundColor(this.theme().bg)
+    // ★★★ 2026-10-29（PC/2in1，项目 F 阶段 1）：**键盘快捷键**
+    //   · ESC ⇒ 返回游戏列表（等于点左上角那个 ‹）
+    //   · 只在桌面/大屏上生效（`Tv.desktopKeys()`）⇒ 手机/平板零影响
+    //   ⚠️ 必须 focusable + 默认焦点，否则键盘事件收不到
+    .focusable(Tv.desktopKeys())
+    .defaultFocus(Tv.desktopKeys())
+    .onKeyEvent((e: KeyEvent) => {
+      if (!Tv.desktopKeys()) {
+        return;
+      }
+      // 只认按下（KeyType.Down），避免松开时重复触发
+      if (e.type !== KeyType.Down) {
+        return;
+      }
+      if (Tv.isEsc(e.keyCode)) {
+        Haptics.tap();
+        router.back();
+      }
+    })
     // ★ 动画 ①：与首页那张 GameCard 配对（同名 id）—— 卡片"长大"成整页。
     //   用 `sharedTransition`（跨页面）而不是 `geometryTransition`（同页一对），见 Common.ets 的注释。
     .sharedTransition(this.sharedId, {
