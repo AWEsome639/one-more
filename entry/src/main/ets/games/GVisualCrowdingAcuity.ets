@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -158,6 +158,43 @@ export struct GVisualCrowdingAcuity {
     }
   }
 
+  // ═══════════ 提示（2026-10-29：策略提示，**不报答案**）═══════════
+  // ★ 为什么这种给法、以及为什么 cells 恒为 []：
+  //   这款的「正确答案」this.target 本来就明明白白画在屏幕正中（Row 第 3 个，
+  //   颜色 Palette.berry），选项里也包括它 ⇒ **一旦说出是哪个字母，就等于代答**，
+  //   这道题（拥挤视力）的测点当场作废。
+  //   ⇒ 有用的只有「怎么看」：位置（第 3 个 / 共 5 个）、
+  //     看哪个特征（横线条数 / 有没有斜线或腿，而不是整体轮廓）——
+  //     字母表就是 E F H N P R T Z，彼此的差别全在这一两笔上；
+  //     下一步动作（先在选项里挑「只差一笔」的一对，再比这一笔有没有）。
+  //   这些都是方法，不是结果 —— 照做仍要玩家自己读出那个字母。
+  //   全函数只读字段 + 一次 String 拼接，无循环无搜索 ⇒ 远低于 50ms。
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    if (this.over) {
+      return Hint.none('none');          // 已经结束了，没有"下一步"可指
+    }
+    // 两侧间距随题号收紧（gap() 从 Space.xxxl 一路减到 0）⇒ 后半段换成更硬的招
+    if (this.gap() <= Space.md) {
+      return Hint.make([],
+        TG('两侧快贴住中间了 —— 它们都是同一个字母；只认正中第 3 个的笔画（横线条数、有没有斜线或腿），别把三个当整体一起读'),
+        TG('The flankers almost touch it and are all the same letter: judge the 3rd letter by its bars, diagonal or leg — never all three at once'),
+        t0);
+    }
+    return Hint.make([],
+      TG2('第 {0}/{1} 题 —— 只看正中间第 3 个字母（粉的那个）：数横线条数、看有没有斜线或腿，别整体认字；选项里先比只差一笔的一对',
+        String(this.trialNo), String(this.diffTotal)),
+      TG2('Trial {0}/{1} — read only the 3rd letter (the pink one): count its horizontal bars, check for a diagonal or a leg; compare the two options that differ by one stroke',
+        String(this.trialNo), String(this.diffTotal)), t0);
+  }
+
+  private askHint(): void {
+    Haptics.tap();
+    const r: HintResult = this.computeHint();
+    // 兜底话只在 over 时用得上（其余分支都给得出提示），绝不会抛
+    Hint.toastResult(r, TG('这局已经结束，点「再来一局」'));
+  }
+
   private answer(i: number): void {
     if (this.pick >= 0 || this.over) { return; }
     this.pick = i;
@@ -190,9 +227,11 @@ export struct GVisualCrowdingAcuity {
     Column({ space: Space.md }) {
       HintBar({
 
+        onHintTap: () => { this.askHint(); },
+
         onAutoTap: () => { this.askAuto(); },
 
-        showHint: false,
+        showHint: true,
 
         demoOn: this.demoId >= 0,
 

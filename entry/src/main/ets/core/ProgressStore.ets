@@ -998,6 +998,29 @@ export class ProgressStore {
     ProgressStore.putString('privacyAgreed', '1');
   }
 
+  /**
+   * 记「已看过欢迎引导」（项目 D ⑤）。
+   * ★ 2026-10-29：原来**根本没有首次引导** —— 用户第一次打开只看到一屏卡片，
+   *   不知道「提示 / AI 代打 / 演示」这三个按钮干嘛用的，也不知道能搜索分类。
+   *   ⇒ 加一个一次性的欢迎卡，看过就落盘，不再打扰。
+   */
+  static saveOnboarded(): void {
+    ProgressStore.putString('onboarded', '1');
+  }
+
+  /** 看过欢迎引导了吗（没读过 ⇒ false ⇒ 会显示一次） */
+  static onboarded(): boolean {
+    const pr: preferences.Preferences | null = ProgressStore.pref;
+    if (pr === null) {
+      return false;
+    }
+    try {
+      return (pr.getSync('onboarded', '') as string) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
   /** 读同意标记；返回 true 表示已同意（或用户在旧版本已用过 ⇒ 视为已同意） */
   static privacyAgreed(): boolean {
     const pr: preferences.Preferences | null = ProgressStore.pref;

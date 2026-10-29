@@ -14,7 +14,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
-import { Hint } from '../ai/Hint';
+import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -29,6 +29,8 @@ const MAX_DEG: number = 8;        // 岛的数字上限
 const EXTRA_P: number = 0.35;     // 补桥概率
 const MAX_WRONG: number = 10;
 const TICK_MS: number = 1000;
+/** 提示单次预算（ms）：比 Hint.BUDGET_MS(500) 更严，超了直接换降级文案，绝不冻界面 */
+const HINT_BUDGET_MS: number = 80;
 const KEY_H: number = 46;
 const ISLE: string = '72%';       // 岛圆点占格子的比例
 
@@ -695,6 +697,147 @@ export struct GBridges {
     this.status = TG('照参考解补不动了，先拆掉几座挡路的桥');
   }
 
+  // ═══════════ 规则提示（2026-10-29）═══════════
+  // ★ 与上面 hint() 的分工，就是这次改动的全部要害：
+  //    hint()     照 this.sol 直接落桥（AI 代打 / 演示在调它，保持原样）
+  //    askHint()  只做「人自己能复核」的推理，并且**只写 status 这一行字**
+  //   ⇒ 不落桥、不动 link/seg/steps/wrong/hints/done/finished ⇒ 结构上碰不到玩法
+
+  /** 岛的位置文案：「第 3 排第 2 列」—— 岛号玩家看不见，一律报行列 */
+  private posText(i: number): string {
+    return TG2('第 {0} 排第 {1} 列', String(this.iy[i] + 1), String(this.ix[i] + 1));
+  }
+
+  /** 同一个位置的英文写法（HintResult.en 用；纯 ASCII，不掺中文） */
+  private posEn(i: number): string {
+    return 'R' + String(this.iy[i] + 1) + 'C' + String(this.ix[i] + 1);
+  }
+
+  /**
+   * a → b 这条方向「现在还能再架几座桥」。
+   * 返回 0 = 此刻架不进去（不在同一直线 / 已到 2 座 / 任一头已满 / 会交叉）。
+   * 判据与 tryLink() 的三道检查逐条对应 ⇒ 提示说「能架」就一定真能架。
+   */
+  private addable(a: number, b: number): number {
+    const n: number = this.ix.length;
+    if (a === b || !visible(a, b, this.ix, this.iy, n)) {
+      return 0;                                 // 不在同一直线，或中间隔着别的岛
+    }
+    const cur: number = this.link[a * n + b];
+    if (cur >= MAX_BRIDGE) {
+      return 0;                                 // 已经 2 座：到上限
+    }
+    const can: number = Math.min(MAX_BRIDGE - cur,
+      this.val[a] - this.degOf(a), this.val[b] - this.degOf(b));
+    if (can <= 0) {
+      return 0;                                 // 任一头已经满了：再加就超额
+    }
+    if (crossAny(a, b, this.link, this.ix, this.iy, n)) {
+      return 0;                                 // 会和已有的桥十字交叉
+    }
+    return can;
+  }
+
+  /**
+   * 数桥的三条铁律（都只读棋盘，不做全盘搜索）：
+   *   ① 岛 a 还差 rem = val - deg 座桥，而「现在加得进去的方向」容量之和恰好 == rem
+   *      ⇒ 这些方向必须全部架满 ⇒ 每条方向该架几座就此唯一（套路 F：剩余数 == 需求数）
+   *   ② 岛 a 已经刚好满（deg == val）⇒ 它任何还加得进去的方向都不能再点（点了就是违规 +1）
+   *   ③ 每座岛都刚好满、却不连通 ⇒ 数字全对也不是解，只能拆几座桥改道
+   * 一条都推不出 ⇒ 返回 none（正常状态，不是错误），由 askHint() 换成降级文案。
+   */
+  private computeHint(): HintResult {
+    const t0: number = Date.now();
+    const n: number = this.ix.length;
+    if (n === 0 || this.iy.length !== n || this.val.length !== n || this.link.length !== n * n) {
+      return Hint.none('idle');                 // 还没开局：安静返回，不抛异常
+    }
+    if (this.done || this.finished) {
+      return Hint.none('idle');
+    }
+    // ── 铁律①：剩余度数 == 剩余可架方向容量之和
+    for (let a = 0; a < n; a++) {
+      const rem: number = this.val[a] - this.degOf(a);
+      if (rem <= 0) {
+        continue;                               // 这座岛满了，交给铁律②
+      }
+      let capSum: number = 0;
+      let dirs: number = 0;
+      for (let b = 0; b < n; b++) {
+        const can: number = this.addable(a, b);
+        if (can > 0) {
+          capSum = capSum + can;
+          dirs = dirs + 1;
+        }
+      }
+      if (dirs === 0 || capSum !== rem) {
+        continue;                               // 装不下，或还有余地 ⇒ 这条规则推不出唯一解
+      }
+      for (let b = 0; b < n; b++) {
+        const need: number = this.addable(a, b);
+        if (need <= 0) {
+          continue;
+        }
+        return Hint.make([],
+          TG2('{0} 与 {1} 之间再架 {2} 座桥', this.posText(a), this.posText(b), String(need)),
+          TG2('{0} and {1}: add {2} bridge(s)', this.posEn(a), this.posEn(b), String(need)), t0);
+      }
+    }
+    // ── 铁律②：已经刚好满的岛 ⇒ 还能加桥的相邻方向全是违规陷阱
+    for (let a = 0; a < n; a++) {
+      if (this.degOf(a) !== this.val[a]) {
+        continue;
+      }
+      for (let b = 0; b < n; b++) {
+        if (b === a || !visible(a, b, this.ix, this.iy, n)) {
+          continue;
+        }
+        if (this.link[a * n + b] >= MAX_BRIDGE) {
+          continue;
+        }
+        if (this.val[b] - this.degOf(b) <= 0) {
+          continue;                             // 对面也不缺桥 ⇒ 这条方向不诱人
+        }
+        return Hint.make([],
+          TG2('{0} 已经架满 {1} 座桥，往 {2} 那边不能再加',
+            this.posText(a), String(this.val[a]), this.posText(b)),
+          TG2('{0} is already full ({1} bridges), so never add toward {2}',
+            this.posEn(a), String(this.val[a]), this.posEn(b)), t0);
+      }
+    }
+    // ── 铁律③：桥数全对却不连通 ⇒ 只能拆桥改道（这个局面唯一的出路）
+    if (this.doneIslands() === n && !connectedByLink(this.link, n)) {
+      return Hint.make([],
+        TG('每座岛的桥数都对了，但还没连成一片 ⇒ 拆掉几座桥，换个方向重新连'),
+        TG('Every island has the right count but they are not all linked: remove a bridge and reroute'),
+        t0);
+    }
+    return Hint.none('none');
+  }
+
+  /**
+   * 「提示」按钮的入口。格式照 GAkari.ets：Haptics.tap + Hint.run + 复用已有状态行。
+   * ★ 只写 this.status 这一个 @State（只被底部那行 Text 读）⇒ 棋盘字段一个都不动。
+   * ★ 80ms 预算：Hint.run 自己兜 500ms，这里更严；超了就直接走降级文案。
+   */
+  private askHint(): HintResult {
+    Haptics.tap();
+    const r: HintResult = Hint.run(() => this.computeHint());
+    if (r.ok && r.ms <= HINT_BUDGET_MS) {
+      const msg: string = r.zh;
+      this.status = msg;
+      setTimeout(() => { if (this.status === msg) { this.status = ''; } }, 5000);
+      return r;
+    }
+    const tip: string = TG('暂时没找到明显的一步，这盘先靠你自己推一推');
+    this.status = tip;
+    setTimeout(() => { if (this.status === tip) { this.status = ''; } }, 5000);
+    if (r.ok) {
+      return Hint.none('slow');            // 算得出来但超预算：返回的也是 none，和界面一致
+    }
+    return r;
+  }
+
   private penalty(msg: string): void {
     this.wrong = this.wrong + 1; this.shakeX = 8; setTimeout(() => { this.shakeX = -8; }, 60); setTimeout(() => { this.shakeX = 0; }, 120);
     this.status = msg;
@@ -795,10 +938,9 @@ export struct GBridges {
           .height(KEY_H)
           .focusable(Tv.on())
           .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint(); }); })
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
-            Haptics.tap();
-            this.hint();
+            this.askHint();
           })
         Button(TG('换一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

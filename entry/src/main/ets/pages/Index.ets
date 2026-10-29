@@ -13,7 +13,7 @@
 
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
-import { FontSize, Space, Radius, Palette, Motion, Theme, Accent } from '../core/Design';
+import { FontSize, Space, Radius, Palette, Motion, Theme, Accent, Shadow } from '../core/Design';
 import { UiModeMgr } from '../core/UiMode';
 import { ProgressStore } from '../core/ProgressStore';
 import { About } from '../core/About';
@@ -122,6 +122,8 @@ struct Index {
   }
   @State current: number = 0;
   @State entered: boolean = false;
+  /** 首次进入引导卡（项目 D ⑤）：点「开始玩」后落盘，不再出现 */
+  @State private showWelcome: boolean = false;
 
   aboutToAppear(): void {
     UiModeMgr.apply(UiModeMgr.current());
@@ -175,7 +177,53 @@ pageTransition() {
     .opacity(0)
 }
 
+  /**
+   * ★★★ 2026-10-29（项目 D ⑤）：首次进入引导卡。
+   *   一次性：点「开始玩」后 ProgressStore.saveOnboarded()，不再出现。
+   *   手表上跳过（233vp 放不下，且手表只有 24 款，不需要解释 355 款）。
+   */
+  @Builder
+  welcomeCard() {
+    Column({ space: 12 }) {
+      Text('👋').fontSize(38)
+      Text(this.t('欢迎来到 One More', 'Welcome to One More'))
+        .fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
+      Text(this.t('355 款小游戏，每一款都能：', '355 mini-games. Every one can:'))
+        .fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
+      Column({ space: 7 }) {
+        Text(this.t('💡 提示 — 卡住时给下一步', '💡 Hint — the next step when stuck'))
+          .fontSize(FontSize.sm).fontColor(this.theme().ink)
+        Text(this.t('🤖 AI 代打 — 看它一步一步走完', '🤖 Auto-play — watch it finish'))
+          .fontSize(FontSize.sm).fontColor(this.theme().ink)
+        Text(this.t('▶️ 演示 — 进游戏 3 秒自动演一遍', '▶️ Demo — 3s after you enter'))
+          .fontSize(FontSize.sm).fontColor(this.theme().ink)
+        Text(this.t('🔍 搜索 / 分类 / 收藏', '🔍 Search, filter, favourites'))
+          .fontSize(FontSize.sm).fontColor(this.theme().ink)
+      }
+      .alignItems(HorizontalAlign.Start).width('100%')
+
+      Button(this.t('开始玩', 'Start playing'))
+        .width('100%').height(46)
+        .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
+        .fontColor(Color.White)
+        .backgroundColor(this.accentColor())
+        .borderRadius(Radius.md)
+        .accessibilityText(this.t('开始玩', 'Start playing'))
+        .onClick(() => {
+          Haptics.tap();
+          ProgressStore.saveOnboarded();
+          this.showWelcome = false;
+        })
+    }
+    .width('86%')
+    .padding(Space.lg)
+    .backgroundColor(this.theme().surface)
+    .borderRadius(Radius.lg)
+    .shadow(Shadow.card)
+  }
+
 build() {
+    Stack({ alignContent: Alignment.Center }) {
     Column() {
       Tabs({ barPosition: BarPosition.End, index: this.current }) {
         TabContent() {
@@ -220,6 +268,18 @@ build() {
     .opacity(this.entered ? 1 : 0)
     .translate({ y: this.entered ? 0 : 10 })
     .animation({ duration: Motion.slow, curve: Motion.spring() })
+
+    // ★ 首次进入引导卡（项目 D ⑤）：盖在内容之上，点「开始玩」消失
+    //   手表/极小屏跳过（放不下，且那些设备只有 24 款，不需要解释 355 款）
+    if (this.showWelcome && !Bp.isWatch() && !Bp.tinyScreen()) {
+      Stack() {
+        // 半透明遮罩：点它也算"看过了"，但必须点按钮才落盘
+        Column().width('100%').height('100%').backgroundColor('#99000000')
+        this.welcomeCard()
+      }
+      .width('100%').height('100%')
+    }
+    }
   }
 
   @Builder
