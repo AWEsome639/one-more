@@ -32,6 +32,26 @@ function L2(zh: string, en: string, useEN: boolean): string {
   return L(zh, en);
 }
 
+/**
+ * ★★★ 2026-10-29（项目 D ③ 诚实标注）：**需要颜色视觉的款**。
+ *
+ * 全项目做过色盲辅助的 9 款里，这两款**确认无法替代**：
+ *   · color_word_match_up（色词匹配 / Stroop）：
+ *       「词义与墨色是否一致」—— 看不见墨色就无法作答
+ *   · double_trouble（双重麻烦）：
+ *       同源，也是 Stroop 变体
+ * ★ 不给它们塞假解法（那会毁掉测试本身），而是**诚实说明**：
+ *   能玩，但需要正常的颜色辨识能力。
+ * ⇒ 这条文案会显示在「?」说明页里。
+ */
+function colorVisionNote(id: string, en: boolean): string {
+  if (id === 'color_word_match_up' || id === 'double_trouble') {
+    return L2('这一款需要正常的颜色辨识能力（它考的就是颜色）',
+              'This one needs normal colour vision — the colour IS the task.', en);
+  }
+  return '';
+}
+
 /** 分类通用提示 —— 每款游戏的说明 = 它的 tagline + 所属分类的通用玩法 */
 function categoryTips(c: GameCategory, en: boolean): string[] {
   if (c === GameCategory.CLASSIC) {
@@ -317,6 +337,13 @@ struct GuidePage {
     const t: string[] = categoryTips(m.category, !zhLike);
     for (let i = 0; i < t.length; i++) {
       out.push(t[i]);
+    }
+    // ★ 2026-10-29（项目 D ③ 诚实标注）：两款 Stroop 类**确认无法做色盲替代**，
+    //   在说明页里明说「这一款需要正常的颜色辨识能力」——
+    //   不给假解法，也不假装它无障碍。
+    const note: string = colorVisionNote(m.id, !zhLike);
+    if (note.length > 0) {
+      out.push(note);
     }
     return out;
   }
