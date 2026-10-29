@@ -469,7 +469,11 @@ export struct GamesTab {
    * 返回的是 ArkUI 的 columnsTemplate 字符串。
    */
   private gridCols(): string {
-    if (Bp.isWatch() || this.uiMode === 'elder') {
+    // ★★★ 2026-10-29（奥森提醒「显示大小可以变得很小」）：
+    //   极小屏（高 < 340vp）原来还会返回 '1fr 1fr' ⇒ 每列仅 ~69vp，
+    //   卡片里的标题+副标题放不下 ⇒ **整片空白，一张卡都看不到**。
+    //   ⇒ 极小屏一律 1 列（与设备类型无关）。
+    if (Bp.isWatch() || Bp.tinyScreen() || this.uiMode === 'elder') {
       return '1fr';
     }
     if (Bp.isTv() || Bp.isDesktop() || Bp.isLg()) {
@@ -663,9 +667,17 @@ build() {
         if (Bp.isWatch()) {
           this.watchHeader()
         } else {
-        this.topBar()
-        this.levelStrip()
-        this.tagEntry()
+        // ★ 极小屏：连 topBar 都用极简版（副标题与两个圆按钮在 195vp 上放不下）
+        if (Bp.tinyScreen()) {
+          this.watchHeader()
+        } else {
+          this.topBar()
+        }
+        // ★ 极小屏（含手机「显示大小」调到最小）只留标题 + 列表
+        if (!Bp.tinyScreen()) {
+          this.levelStrip()
+          this.tagEntry()
+        }
         if (this.showFilter) {
           // ★ 展开筛选时收起下面的卡片：面板较高，不收起来会把计数行与网格挤出屏幕
           this.tagPanel()
@@ -678,8 +690,10 @@ build() {
             this.randomCard()
           }
         }
-        this.segRow()
-        if (this.seg === Seg.ALL && !this.showFilter) {
+        if (!Bp.tinyScreen()) {
+          this.segRow()
+        }
+        if (this.seg === Seg.ALL && !this.showFilter && !Bp.tinyScreen()) {
           CategoryBar({
             items: categoryList(),
             selected: this.category,
@@ -701,7 +715,11 @@ build() {
       .translate({ y: this.effCollapsed() ? -14 : 0 })
 
       // ★ 收起态的细条（常驻）：左边当前分类，右边【统一切换按钮】
-      this.collapsedBar()
+      // ★ 2026-10-29（极小屏）：这条常驻细条在 195vp 上会吃掉 ~40vp，
+      //   加上页签 36 + 顶栏 30 + 计数行 25 ⇒ 列表只剩 ~60vp < 卡片 ⇒ 一张都看不到
+      if (!Bp.tinyScreen()) {
+        this.collapsedBar()
+      }
 
       if (this.list().length === 0) {
         this.emptyState()
@@ -777,7 +795,7 @@ build() {
         // ★ 拉满：内容刷新脉冲的视觉（收紧 + 半透 ⇒ 弹回）
         .scale({ x: this.gridPulse ? 0.972 : 1.0, y: this.gridPulse ? 0.972 : 1.0 })
         .opacity(this.gridPulse ? 0.62 : 1.0)
-        .padding({ left: Bp.isWatch() ? 2 : Space.lg, right: Bp.isWatch() ? 2 : Space.lg, bottom: Bp.isWatch() ? 4 : Space.xxxl })
+        .padding({ left: Bp.isWatch() || Bp.tinyScreen() ? 2 : Space.lg, right: Bp.isWatch() || Bp.tinyScreen() ? 2 : Space.lg, bottom: Bp.isWatch() || Bp.tinyScreen() ? 4 : Space.xxxl })
         .width('100%')
         .layoutWeight(1)
         .scrollBar(BarState.Off)

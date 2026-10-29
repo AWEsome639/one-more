@@ -729,29 +729,35 @@ build() {
     Stack({ alignContent: Alignment.BottomEnd }) {
     Row({ space: Space.sm }) {
       // ── 左：图标（固定 48vp；今日已玩时右上角一枚 ✓）──
-      Stack({ alignContent: Alignment.TopEnd }) {
-        if (this.iconRes() !== undefined) {
-          Image(this.iconRes())
-            .width(48).height(48)
-            .objectFit(ImageFit.Contain)
-            .draggable(false)
-        } else {
-          // 兜底：资源表里没有这一款（理论上不会发生）⇒ 仍然画 emoji，别开天窗
-          Text(this.meta.icon).fontSize(FontSize.xl).width(48).height(48)
-            .textAlign(TextAlign.Center)
+      // ★ 2026-10-29（六设备·运动手表 195vp 实测）：48vp 图标 + 标题在 139vp 宽的
+      //   卡片里放不下 ⇒ 标题被截成「宝...」⇒ **极小屏（高 < 210vp）直接不画图标**，
+      //   宽度全让给标题（标题字号已降为 sm、允许两行）。
+      //   图标只是辅助识别，标题才是"这款叫什么"的答案。
+      if (!Bp.tinyWatch()) {
+        Stack({ alignContent: Alignment.TopEnd }) {
+          if (this.iconRes() !== undefined) {
+            Image(this.iconRes())
+              .width(48).height(48)
+              .objectFit(ImageFit.Contain)
+              .draggable(false)
+          } else {
+            // 兜底：资源表里没有这一款（理论上不会发生）⇒ 仍然画 emoji，别开天窗
+            Text(this.meta.icon).fontSize(FontSize.xl).width(48).height(48)
+              .textAlign(TextAlign.Center)
+          }
+          if (this.playedToday) {
+            Text('✓')
+              .accessibilityLevel('no')
+              .fontSize(FontSize.micro)
+              .fontColor(Color.White)
+              .backgroundColor(Palette.emerald)
+              .borderRadius(Radius.full)
+              .width(16).height(16)
+              .textAlign(TextAlign.Center)
+          }
         }
-        if (this.playedToday) {
-          Text('✓')
-            .accessibilityLevel('no')
-            .fontSize(FontSize.micro)
-            .fontColor(Color.White)
-            .backgroundColor(Palette.emerald)
-            .borderRadius(Radius.full)
-            .width(16).height(16)
-            .textAlign(TextAlign.Center)
-        }
+        .width(48).height(48)
       }
-      .width(48).height(48)
 
       // ── 右：名称 + 副标题（与图标之间固定 Space.sm 间距，永不重叠）──
       Column({ space: Space.xs }) {

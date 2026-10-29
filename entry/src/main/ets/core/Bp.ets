@@ -207,7 +207,23 @@ export class Bp {
    *   标题被截成「宝...」⇒ 极小屏藏图标、标题降字号且允许两行。
    */
   static tinyWatch(): boolean {
-    return Bp.isWatch() && Bp.height < 210;
+    // ★ 2026-10-29：**只按尺寸判断，不依赖 deviceType。**
+    //   理由：195vp 的屏不管是什么设备，48vp 图标 + 标题就是放不下；
+    //   而 deviceType 在模拟器上永远报 "phone"，靠它会导致这条分支测不到。
+    //   ⇒ 「屏幕小到用不了常规卡片」= 紧凑布局，与设备类型无关。
+    return Bp.height > 0 && Bp.height < 210;
+  }
+
+  /**
+   * 极小屏（高 < 340vp）。
+   * ★★★ 2026-10-29（奥森提醒）：「显示大小可以变得很小啊」
+   *   ⇒ 不只是手表 —— **手机把「显示大小」调到最小，vp 也会变得很小**，
+   *     那时顶栏 + LV 条 + 分类芯片 + 页签 会把列表整片挤没。
+   *   ⇒ 极小屏只留「标题 + 列表」，其余全部收起。
+   *   ★ 与设备类型无关（只看尺寸）：小就是小。
+   */
+  static tinyScreen(): boolean {
+    return Bp.height > 0 && Bp.height < 340;
   }
 
   static isShort(): boolean {

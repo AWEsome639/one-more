@@ -195,7 +195,10 @@ build() {
       }
       // ★ 2026-10-29（六设备·手表实测）：233×233 vp 上 60vp 的页签占掉 1/4 屏
       //   ⇒ 手表缩到 36，给列表让出空间
-      .barHeight(Bp.isWatch() ? 36 : 60)
+      // ★ 2026-10-29（奥森提醒「显示大小可以变得很小」）：
+      //   极小屏（高 < 340vp，含手机把显示大小调到最小）页签也要缩，
+      //   否则 60vp 页签 + 顶栏会把列表挤没（实测 195vp 下一张卡都放不下）
+      .barHeight(Bp.isWatch() || Bp.tinyScreen() ? 36 : 60)
       .barMode(BarMode.Fixed)
       .barBackgroundColor(this.theme().surface)
       .scrollable(true)
@@ -237,7 +240,7 @@ build() {
         .animation({ duration: Motion.fast, curve: Motion.spring() })
     }
     .width('100%')
-    .height(Bp.isWatch() ? 36 : 60)
+    .height(Bp.isWatch() || Bp.tinyScreen() ? 36 : 60)
     .justifyContent(FlexAlign.Center)
     // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
     //   电视上没有触摸 ⇒ 用遥控器方向键在三个页签间移动，OK 键切换
