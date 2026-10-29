@@ -11,6 +11,7 @@
  * 拾海 2026-10-10（本页 2026-10-13 加转场）
  */
 
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Accent, Shadow } from '../core/Design';
@@ -101,7 +102,9 @@ struct Index {
         }
       }
     };
-    AlertDialog.show(opt);
+    // ★ 2026-10-29：不再用系统 AlertDialog（会静默失败、不可重试）
+    //   ⇒ 用应用内自绘弹窗（见 privacyCard()），由 showPrivacy 控制
+    this.showPrivacy = true;
   }
 
   /** 打开隐私政策全文（系统浏览器） */
@@ -124,6 +127,16 @@ struct Index {
   @State entered: boolean = false;
   /** 首次进入引导卡（项目 D ⑤）：点「开始玩」后落盘，不再出现 */
   @State private showWelcome: boolean = false;
+  /**
+   * ★★★ 2026-10-29 真机抓到的合规 BUG：
+   *   原来隐私弹窗用系统 `AlertDialog.show()`，只试一次（800ms）。
+   *   页面没建好时它**静默失败**（代码注释里自己就写着这个坑）⇒
+   *   **全新安装后弹窗永远不出现** ⇒ 用户没同意就用了 App（合规风险），
+   *   而且 privacyAgreed 永远 false ⇒ 欢迎卡也被连带卡死。
+   *   ⇒ 改成**应用内自绘弹窗**（和 welcomeCard 同一个套路）：
+   *     完全可控、可重试、不依赖系统时序。
+   */
+  @State private showPrivacy: boolean = false;
 
   aboutToAppear(): void {
     UiModeMgr.apply(UiModeMgr.current());
@@ -139,11 +152,17 @@ struct Index {
     let tries: number = 0;
     const kick: () => void = () => {
       tries = tries + 1;
-      if (this.showWelcome || ProgressStore.onboarded()) {
+      const agreed: boolean = ProgressStore.privacyAgreed();
+      const done: boolean = ProgressStore.onboarded();
+      // 只在"决定显示"那一刻留一行日志（便于线上排查"为什么没弹"），
+      // 不在每次重试都打 —— 那是噪音
+
+      if (this.showWelcome || done) {
         return;
       }
-      if (ProgressStore.privacyAgreed()) {
+      if (agreed) {
         this.showWelcome = true;
+        hilog.info(0x0001, 'testTag', 'ONBOARD_DBG showWelcome=true');
         return;
       }
       if (tries < 8) {
@@ -195,6 +214,58 @@ pageTransition() {
     .translate({ y: -14 })
     .opacity(0)
 }
+
+  /**
+   * 隐私说明卡（2026-10-29 起改为应用内自绘）。
+   * 合规三条：
+   *   ① 首次启动要弹、要用户明确同意 ⇒ 只有「同意并继续」会落盘
+   *   ② 同意前不得有任何网络请求 ⇒ 本应用启动不联网
+   *   ③ 要能看到隐私政策全文 ⇒ 「查看全文」跳系统浏览器
+   */
+  @Builder
+  privacyCard() {
+    Column({ space: 12 }) {
+      Text(this.t('隐私说明', 'Privacy'))
+        .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
+      Text(this.t('「One More」不收集你的个人信息，也不上传你的游戏记录。所有记录只存在你自己的手机里。需联网的只有两项：局域网对战、华为游戏服务的账号校验。',
+                  'One More collects nothing and uploads nothing. All records stay on your phone. Only two things use the network: LAN matches and Huawei Game Service sign-in.'))
+        .fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
+      Row({ space: 10 }) {
+        Button(this.t('查看全文', 'Read policy'))
+          .layoutWeight(1).height(42)
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme().ink)
+          .backgroundColor(this.theme().surfaceAlt)
+          .borderRadius(Radius.md)
+          .accessibilityText(this.t('查看全文', 'Read policy'))
+          .onClick(() => { Haptics.tap(); this.openPrivacy(); })
+        Button(this.t('同意并继续', 'Agree and continue'))
+          .layoutWeight(1).height(42)
+          .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
+          .fontColor(Color.White)
+          .backgroundColor(this.accentColor())
+          .borderRadius(Radius.md)
+          .accessibilityText(this.t('同意并继续', 'Agree and continue'))
+          .onClick(() => {
+            Haptics.tap();
+            ProgressStore.savePrivacyAgreed();
+            this.showPrivacy = false;
+            // ★ 2026-10-29：同意的那一刻**直接接上欢迎卡**。
+            //   理由：kick 那 8 次重试（1.6s~7.2s）在用户同意之前就耗完了，
+            //   同意之后没有任何东西再触发 ⇒ 欢迎卡永远不出现。
+            if (!ProgressStore.onboarded()) {
+              this.showWelcome = true;
+            }
+          })
+      }
+      .width('100%')
+    }
+    .width('88%')
+    .padding(Space.lg)
+    .backgroundColor(this.theme().surface)
+    .borderRadius(Radius.lg)
+    .shadow(Shadow.card)
+  }
 
   /**
    * ★★★ 2026-10-29（项目 D ⑤）：首次进入引导卡。
@@ -287,6 +358,16 @@ build() {
     .opacity(this.entered ? 1 : 0)
     .translate({ y: this.entered ? 0 : 10 })
     .animation({ duration: Motion.slow, curve: Motion.spring() })
+
+    // ★ 隐私说明卡（2026-10-29：应用内自绘，替代会静默失败的 AlertDialog）
+    //   手表/极小屏也显示 —— 合规内容不能因为屏小而省，但文字会自动换行
+    if (this.showPrivacy) {
+      Stack() {
+        Column().width('100%').height('100%').backgroundColor('#99000000')
+        this.privacyCard()
+      }
+      .width('100%').height('100%')
+    }
 
     // ★ 首次进入引导卡（项目 D ⑤）：盖在内容之上，点「开始玩」消失
     //   手表/极小屏跳过（放不下，且那些设备只有 24 款，不需要解释 355 款）
