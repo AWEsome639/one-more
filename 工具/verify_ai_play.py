@@ -71,8 +71,18 @@ def try_click(nm):
     ai = [r for r in vb.dump() if 'AI 代打' in r[0]]
     if not ai:
         return 'nobtn'
-    vb.sh("uitest uiInput click %d %d" % (ai[0][1], ai[0][2])); time.sleep(2.1)
-    return 'ok' if any('停代打' in a for a in [r[0] for r in vb.dump() if '代打' in r[0]]) else 'retry'
+    vb.sh("uitest uiInput click %d %d" % (ai[0][1], ai[0][2]))
+    # ★★★ 2026-10-29（数蛇教训）：**点完立刻连看 8 次（每 0.4s）**——
+    #   有的款代打一启动就飞快通关 → 页面会自己返回列表 → 慢看会误判成"没启动"
+    #   （数蛇就是这么被误判两次的）
+    for _ in range(8):
+        time.sleep(0.4)
+        cur = [r[0] for r in vb.dump()]
+        if any('停代打' in a for a in cur):
+            return 'ok'
+        if any('One More' in x for x in cur):
+            return 'ok'          # 已返回列表 ⇒ 说明它瞬间通关了，也是启动成功
+    return 'retry'
 
 
 def main():
