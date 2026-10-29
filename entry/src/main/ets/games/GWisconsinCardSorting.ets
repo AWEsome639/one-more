@@ -3,6 +3,7 @@
  * 规则藏在「颜色 / 形状 / 数量」三者之一；参考堆 i 的三个特征都是 i
  * 胜负：18 试次答对 ≥12 ⇒ 通关｜进度：试次 / 答对 / 连对
  */
+import { A11y } from '../core/A11y';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -213,6 +214,13 @@ export struct GWisconsinCardSorting {
       Column({ space: Space.xs }) {
         Text(TG('当前这张牌')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Row({ space: Space.xs }) {
+          // ★ 色盲辅助（项目 D ③）：颜色是「颜色/形状/数量」三维里唯一没被文字化的 ⇒ 补一个颜色字母
+          //   ⚠️ 这里不是色块：颜色涂在形状字的 fontColor 上，底色是 surfaceAlt（浅色）
+          //      ⇒ 白字 + 阴影在浅底上等于看不见，所以用 theme.ink 深色粗体
+          //   ⚠️ 加 chip 底色：让它明显是"标签"，不会被误数成图形的个数
+          Text(A11y.glyph(this.deckColor))
+            .fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+            .padding({ left: Space.xs, right: Space.xs }).backgroundColor(this.theme.surface).borderRadius(Radius.xs)
           ForEach(FOUR, (k: number) => {
             Text((k) < (this.deckCount) ? SHAPES[(this.deckShape)] : '').fontSize(FontSize.lg).fontColor(COLORS[(this.deckColor)])
           }, (k: number) => 'd' + k)
@@ -228,7 +236,11 @@ export struct GWisconsinCardSorting {
           Text((k) < ((i) + 1) ? SHAPES[((i))] : '').fontSize(FontSize.lg).fontColor(COLORS[((i))])
           }, (k: number) => 'g' + k)
           }.justifyContent(FlexAlign.Center).height(Cell.of(30))
-          Text(MARKS[(i)]).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+          // ★ 色盲辅助（项目 D ③）：第 i 堆的颜色就是 COLORS[i] ⇒ 标一个同款字母，和卡片上的字母直接对照
+          Row({ space: Space.xs }) {
+            Text(A11y.glyph(i)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+            Text(MARKS[(i)]).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+          }
           }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md)
           .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.put((i)); })

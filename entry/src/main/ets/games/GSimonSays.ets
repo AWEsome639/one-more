@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { A11y } from '../core/A11y';
 
 const PADS: number = 4;
 const WIN_LEN: number = 12;   // 难度会覆盖它        // 通关长度
@@ -348,10 +349,28 @@ export struct GSimonSays {
       }
       .width('100%')
 
+      // ★ 色盲辅助（项目 D ③）：四块按钮的右上角各印一个固定字母 A/B/C/D。
+      //   · 为什么放角落：中间被图标（🐸🍎💧⭐）占着；角落既不盖图标，也不遮整块「亮起」时的
+      //     亮度与放大 —— 那是除颜色之外唯一能看出「哪块在闪」的提示。
+      //   · 为什么 18 号：一块按钮约 155vp 见方（两列 =（屏宽-40-10)/2），18 号醒目又不喧宾夺主。
+      //   · 字母与底色无关（A11y.glyph(按钮下标)）⇒ 红绿色盲/全色盲按字母记序列即可，玩法等价。
+      //   · 叠层 hitTestBehavior(None)：它永远不接走点击，点到的仍然是原来那块按钮。
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
           Stack() {
           Text(PAD_ICON[(0)]).fontSize(FontSize.xxxl)
+          // ★ 色盲辅助：右上角字母 A~D
+          Stack({ alignContent: Alignment.TopEnd }) {
+          Text(A11y.glyph((0)))
+          .fontSize(FontSize.lg)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(A11y.glyphInk((0)))
+          .textShadow(A11y.glyphShadow())
+          }
+          .width('100%')
+          .height('100%')
+          .padding(Space.sm)
+          .hitTestBehavior(HitTestMode.None)
           }
           .layoutWeight(1)
           .aspectRatio(1)
@@ -369,6 +388,18 @@ export struct GSimonSays {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((0)); }); })
           Stack() {
           Text(PAD_ICON[(1)]).fontSize(FontSize.xxxl)
+          // ★ 色盲辅助：右上角字母 A~D
+          Stack({ alignContent: Alignment.TopEnd }) {
+          Text(A11y.glyph((1)))
+          .fontSize(FontSize.lg)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(A11y.glyphInk((1)))
+          .textShadow(A11y.glyphShadow())
+          }
+          .width('100%')
+          .height('100%')
+          .padding(Space.sm)
+          .hitTestBehavior(HitTestMode.None)
           }
           .layoutWeight(1)
           .aspectRatio(1)
@@ -389,6 +420,18 @@ export struct GSimonSays {
         Row({ space: Space.sm }) {
           Stack() {
           Text(PAD_ICON[(2)]).fontSize(FontSize.xxxl)
+          // ★ 色盲辅助：右上角字母 A~D
+          Stack({ alignContent: Alignment.TopEnd }) {
+          Text(A11y.glyph((2)))
+          .fontSize(FontSize.lg)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(A11y.glyphInk((2)))
+          .textShadow(A11y.glyphShadow())
+          }
+          .width('100%')
+          .height('100%')
+          .padding(Space.sm)
+          .hitTestBehavior(HitTestMode.None)
           }
           .layoutWeight(1)
           .aspectRatio(1)
@@ -406,6 +449,18 @@ export struct GSimonSays {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((2)); }); })
           Stack() {
           Text(PAD_ICON[(3)]).fontSize(FontSize.xxxl)
+          // ★ 色盲辅助：右上角字母 A~D
+          Stack({ alignContent: Alignment.TopEnd }) {
+          Text(A11y.glyph((3)))
+          .fontSize(FontSize.lg)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(A11y.glyphInk((3)))
+          .textShadow(A11y.glyphShadow())
+          }
+          .width('100%')
+          .height('100%')
+          .padding(Space.sm)
+          .hitTestBehavior(HitTestMode.None)
           }
           .layoutWeight(1)
           .aspectRatio(1)

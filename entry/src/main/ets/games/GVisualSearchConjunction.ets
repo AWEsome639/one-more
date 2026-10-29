@@ -2,6 +2,7 @@
  * 联合搜索 —— 目标要「形状 + 颜色」两个特征同时对上，干扰项各只占一个
  * 胜负：6 局找对 ≥5 ⇒ 通关｜进度：局数 / 找对 / 得分（每局 9 秒，点错罚 1.5 秒）
  */
+import { A11y } from '../core/A11y';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -232,6 +233,11 @@ export struct GVisualSearchConjunction {
       }.width('100%')
       Row({ space: Space.sm }) {
         Text(SHAPES[this.tShape]).fontSize(FontSize.xxl).fontColor(COLORS[this.tColor])
+        // ★ 色盲辅助（项目 D ③）：目标颜色也标出同一个字母 —— 否则看不见颜色的人不知道该找哪个字母
+        Text(A11y.glyph(this.tColor))
+        .fontSize(9).fontWeight(FontWeight.Bold).fontColor(A11y.glyphInk(this.tColor))
+        .textShadow(A11y.glyphShadow())
+        .backgroundColor('#99000000').borderRadius(Radius.xs).padding({ left: 2, right: 2 })
         Text(TG('要找：这个形状 + 这个颜色')).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Row() {
@@ -243,8 +249,23 @@ export struct GVisualSearchConjunction {
         ForEach(IDX, (r: number) => {
           Row({ space: Space.xs }) {
             ForEach(IDX, (c: number) => {
-              Text(SHAPES[this.shapes[(r * N + c)]])
-              .fontSize(FontSize.xxl).fontColor(COLORS[this.colors[(r * N + c)]]).textAlign(TextAlign.Center)
+              Stack() {
+                Text(SHAPES[this.shapes[(r * N + c)]])
+                .fontSize(FontSize.xxl).fontColor(COLORS[this.colors[(r * N + c)]]).textAlign(TextAlign.Center)
+                // ★ 色盲辅助（项目 D ③）：形状管形状、字母管颜色 —— 两条通道都能判读，玩法等价
+                //   ⚠️ 必须直接读 this.colors[...]（包成 @Builder 按值传参不刷新，见 GSolitaire 的注释）
+                //   ⚠️ 本款颜色是「形状的字色」、格子底是白/浅色 ⇒ 白字会糊，垫一层半透明深底
+                //   ⚠️ align 只管「我的孩子」，跨层管不到 ⇒ 角标用一层铺满格子的 Stack 定位
+                Stack({ alignContent: Alignment.TopEnd }) {
+                  Text(A11y.glyph(this.colors[(r * N + c)]))
+                  .fontSize(9).fontWeight(FontWeight.Bold).fontColor(A11y.glyphInk(this.colors[(r * N + c)]))
+                  .textShadow(A11y.glyphShadow())
+                  .backgroundColor('#99000000').borderRadius(Radius.xs).padding({ left: 2, right: 2 })
+                  // ★ 内缩 Space.xs：格子是 Radius.sm 圆角，贴 2 就会被圆角切出个尖，6 正好在弧内
+                  .margin({ top: Space.xs, right: Space.xs })
+                }
+                .width('100%').height('100%')
+              }
               .layoutWeight(1).aspectRatio(1)
               .backgroundColor(this.badIdx === (r * N + c) ? Palette.rose : this.theme.surface)
               .borderRadius(Radius.sm).animation({ duration: Motion.fast, curve: Motion.snap() })

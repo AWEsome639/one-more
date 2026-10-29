@@ -16,6 +16,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { A11y } from '../core/A11y';
 
 const CAP: number = 4;          // 每管容量
 /**
@@ -76,6 +77,25 @@ export struct GWaterSort {
 
   private startAt: number = 0;
   /** 本局的管子数 = 颜色数 + 2（颜色数已按难度换算） */
+  /**
+   * ★★★ 2026-10-29（lead 修 BUG）：渲染用的管子下标数组。
+   *
+   * 为什么要有它：原来渲染写的是 `ForEach([0,1,2,3,4,5])` —— **写死 6 根**，
+   * 而 `tubeCount() = 颜色数 + 2`：
+   *   简单 3 色 → 5 根，普通 4 色 → 6 根，**困难 5 色 → 7 根**。
+   * ⇒ 困难档只画得出 6 根，第 7 根的内容**玩家看不见**，
+   *   而 solvable() 是按 7 根判定可解的 ⇒ 会发出「界面上根本无解」的牌面。
+   *
+   * 修法：所有渲染都从 tubeCount() 现算，不再写死。
+   */
+  private tubeIdx(): number[] {
+    const out: number[] = [];
+    for (let t = 0; t < this.tubeCount(); t++) {
+      out.push(t);
+    }
+    return out;
+  }
+
   private tubeCount(): number {
     return this.diffTotal + 2;
   }
@@ -570,11 +590,24 @@ export struct GWaterSort {
       .width('100%')
 
       Row({ space: Space.xs }) {
-        ForEach([0, 1, 2, 3, 4, 5], (t: number) => {
+        ForEach(this.tubeIdx(), (t: number) => {
           Column({ space: Space.xs }) {
           ForEach([3, 2, 1, 0], (k: number) => {
           Stack() {
-          Text('')
+          // ★ 色盲辅助（项目 D ③）：每一层液体都印上它的颜色字母（A~E）。
+          //   · 只给「最上面一层」印字不够用：倒水要靠**整管层次**规划，只看顶层等于让
+          //     色盲玩家多花步数去试探，玩法就和看得见颜色的人不等价了 ⇒ 四层都印。
+          //   · 会不会糊：一层是「宽 ~36vp × 高 ~90vp」的横条（不是 20px 的小方块），
+          //     12 号字只占宽度的 1/3，四层各占一条横条，不会糊在一起。
+          //   · 12 = A11y.glyphSize(36) 的结果，正好落在设计令牌 FontSize.xxs 上。
+          //   · 白色/阴影都走 A11y.glyphInk/glyphShadow（单一真相源），空槽（下标 < 0）返回空串，
+          //     与原来 Text('') 一样什么都不画。
+          Text(this.at(this.flat, ((t)), (k)) >= 0 ? A11y.glyph(this.at(this.flat, ((t)), (k))) : '')
+          .fontSize(FontSize.xxs)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(A11y.glyphInk(this.at(this.flat, ((t)), (k))))
+          .textShadow(A11y.glyphShadow())
+          .hitTestBehavior(HitTestMode.None)
           }
           .layoutWeight(1)
           .width('100%')

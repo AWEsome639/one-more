@@ -3,6 +3,7 @@
  * 规则：6×6 彩砖盘，只能走进「与脚下同色」的四邻砖（每走一步就换一次颜色基准），起点随机。
  * 胜负：踩到终点 🏁 = 通关；步数超过上限 = 失败。
  */
+import { A11y } from '../core/A11y';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -271,7 +272,17 @@ export struct GColorMazeNav {
  Row({ space: Space.xs }) {
  ForEach(this.rowIdx(), (c: number) => {
  Stack() {
+ // ★ 色盲辅助（项目 D ③）：每格叠一个颜色字母 ——「同色才能走」是这个迷宫唯一的判据
+ //   · 格子尺寸：困难档 8×8 ⇒ 单格实测约 36×44，字形取 9 号
+ //     （不用 A11y.glyphSize(44)：它会给 15 号，在 36px 宽的格子里会和 🔵 / 🏁 打架）
+ //   · 不挡内容：字母与 🔵/🏁 并排居中（合计约 27px / 36px），不重叠、不遮挡
+ Row({ space: 2 }) {
+ Text(A11y.glyph(this.color[r * this.diffTotal + c]))
+   .fontSize(9).fontWeight(FontWeight.Bold)
+   .fontColor(A11y.glyphInk(this.color[r * this.diffTotal + c]))
+   .textShadow(A11y.glyphShadow())
  Text(this.pos === r * this.diffTotal + c ? '🔵' : (r * this.diffTotal + c === this.goal ? '🏁' : '')).fontSize(FontSize.md)
+ }
  }.layoutWeight(1).height(Cell.of(44)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); }); }).onClick(() => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); })
  }, (c: number) => 'c' + c) }.width('100%')
  }, (r: number) => 'r' + r)
