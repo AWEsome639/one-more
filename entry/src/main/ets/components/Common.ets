@@ -653,6 +653,8 @@ export struct GameCard {
   onLongPress: (id: string) => void = () => {};
 
   @State private pressed: boolean = false;
+  /** ★ 2026-10-29（PC/2in1）：鼠标悬停态。只在桌面/大屏生效，手机零影响 */
+  @State private hovered: boolean = false;
   // ★★★ 2026-10-14 奥森反馈「滑动时游戏还是闪现」⇒ 第三处根因修：
   //   原来是 `shown = false` ⇒ ArkUI 时序是【@State 初值(false) → aboutToAppear → build】
   //   ⇒ ★ 每张滚动中新建的卡片【第一帧就是 opacity 0 + 下移16】⇒ 然后才变可见 = 闪一下
@@ -870,6 +872,26 @@ build() {
           this.pressed = false;
         });
       }
+    })
+    // ★★★ 2026-10-29（项目 F 阶段 2 · PC/2in1）：**鼠标悬停反馈**
+    //   · 只在桌面/大屏上生效（`Bp.isDesktop() || Bp.isLg()`）⇒ 手机/平板上零影响
+    //   · 悬停时：卡片轻微抬起（1 → 1.02）+ 阴影加深 + 描边高亮
+    //   · 为什么要做：PC 上鼠标划过几百张卡，**没有任何反馈就不知道哪张能点**
+    .onHover((isHover: boolean) => {
+      if (!(Bp.isDesktop() || Bp.isLg())) {
+        return;
+      }
+      animateTo({ duration: Motion.fast, curve: Motion.snap() }, () => {
+        this.hovered = isHover;
+      });
+    })
+    .scale({
+      x: this.pressed ? 0.97 : (this.hovered ? 1.02 : 1),
+      y: this.pressed ? 0.97 : (this.hovered ? 1.02 : 1)
+    })
+    .border({
+      width: this.hovered ? 2 : 0,
+      color: this.hovered ? this.theme.ink : Color.Transparent
     })
     .onClick(() => {
       Haptics.tap();
