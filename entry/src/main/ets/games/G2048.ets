@@ -512,6 +512,12 @@ export struct G2048 {
       }
       .width('100%')
       .aspectRatio(1)
+      // ★★★ 2026-10-29 真机抓到（**第三次**同一个坑）：
+      //   棋盘 aspectRatio(1) ⇒ 高度被宽度锁死 ⇒ 把「提示 / 重开」那一行挤到屏幕外
+      //   （真机 dump：屏上只有「AI 代打」，**没有任何「提示」元素**）
+      //   ⇒ 给棋盘限高，让下面那行回到可视区。
+      //   （数独、孔明棋都修过同一个问题 —— 这是第三处）
+      .constraintSize({ maxHeight: '46%' })
       .padding(Space.sm)
       .backgroundColor(this.theme.isDark ? '#141414' : '#BBADA0')
       .borderRadius(Radius.lg)
