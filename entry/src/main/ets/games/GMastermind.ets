@@ -6,6 +6,7 @@
  * 胜负：10 次之内猜中 = 通关；10 次用完还没中 = 失败
  */
 
+import { A11y } from '../core/A11y';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -294,7 +295,16 @@ export struct GMastermind {
       Row({ space: Space.sm }) {
         Text(TG('答案')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
         ForEach([0, 1, 2, 3], (i: number) => {
-          Row()
+          Stack() {
+            // ★ 色盲辅助（项目 D ③）：色球上叠颜色字母 A~F
+            //   Mastermind 的整条推理链都建立在「这是哪个颜色」上，
+            //   看不见颜色 ⇒ 只能瞎猜 ⇒ 加字母后可以用字母记与推，玩法等价。
+            if (this.over && this.secret.length > i) {
+              Text(A11y.glyph(this.secret[i]))
+                .fontSize(FontSize.xs).fontWeight(FontWeight.Bold)
+                .fontColor(A11y.glyphInk(this.secret[i])).textShadow(A11y.glyphShadow())
+            }
+          }
             .layoutWeight(1)
             .aspectRatio(1)
             .backgroundColor(this.over && this.secret.length > i ? HUES[this.secret[i]] : this.theme.surfaceAlt)
@@ -307,7 +317,14 @@ export struct GMastermind {
       // 调色盘
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2, 3, 4, 5], (c: number) => {
-          Row()
+          Stack() {
+            // ★ 色盲辅助（项目 D ③）：色球上叠颜色字母 A~F
+            //   Mastermind 的整条推理链都建立在「这是哪个颜色」上，
+            //   看不见颜色 ⇒ 只能瞎猜 ⇒ 加字母后可以用字母记与推，玩法等价。
+            Text(A11y.glyph(c))
+              .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
+              .fontColor(A11y.glyphInk(c)).textShadow(A11y.glyphShadow())
+          }
             .layoutWeight(1)
             .aspectRatio(1)
             .backgroundColor(HUES[c])
@@ -328,7 +345,16 @@ export struct GMastermind {
       // 这一行猜的
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => {
-          Row()
+          Stack() {
+            // ★ 色盲辅助（项目 D ③）：色球上叠颜色字母 A~F
+            //   Mastermind 的整条推理链都建立在「这是哪个颜色」上，
+            //   看不见颜色 ⇒ 只能瞎猜 ⇒ 加字母后可以用字母记与推，玩法等价。
+            if (this.cur.length > i && this.cur[i] >= 0) {
+              Text(A11y.glyph(this.cur[i]))
+                .fontSize(FontSize.xs).fontWeight(FontWeight.Bold)
+                .fontColor(A11y.glyphInk(this.cur[i])).textShadow(A11y.glyphShadow())
+            }
+          }
             .layoutWeight(1)
             .aspectRatio(1)
             .backgroundColor(this.cur.length > i && this.cur[i] >= 0 ? HUES[this.cur[i]] : this.theme.surface)
