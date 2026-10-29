@@ -657,6 +657,12 @@ build() {
       //      ⇒ ☀️🌐🎛️ 这些 emoji 图标要【重新渲染一遍】= 那一闪
       //   ⇒ 修法：两块【都常驻、不销毁】+ 透明度/位移做交叉淡入 ⇒ 图标不重渲染、动画也顺
       Column() {
+        // ★★★ 2026-10-29（六设备·手表实测）：233×233 vp 下
+        //   顶栏 + LV 条 + 芯片 + 页签把屏幕吃光，**一张卡都看不到**。
+        //   ⇒ 手表上只留一条极简标题，其余全部收起；列表按 1 列 + 安全区内切圆。
+        if (Bp.isWatch()) {
+          this.watchHeader()
+        } else {
         this.topBar()
         this.levelStrip()
         this.tagEntry()
@@ -687,6 +693,7 @@ build() {
           })
         }
         this.countRow()
+        }
       }
       .width('100%')
       .visibility(this.effCollapsed() ? Visibility.None : Visibility.Visible)
@@ -770,7 +777,7 @@ build() {
         // ★ 拉满：内容刷新脉冲的视觉（收紧 + 半透 ⇒ 弹回）
         .scale({ x: this.gridPulse ? 0.972 : 1.0, y: this.gridPulse ? 0.972 : 1.0 })
         .opacity(this.gridPulse ? 0.62 : 1.0)
-        .padding({ left: Space.lg, right: Space.lg, bottom: Space.xxxl })
+        .padding({ left: Bp.isWatch() ? 2 : Space.lg, right: Bp.isWatch() ? 2 : Space.lg, bottom: Bp.isWatch() ? 4 : Space.xxxl })
         .width('100%')
         .layoutWeight(1)
         .scrollBar(BarState.Off)
@@ -831,7 +838,11 @@ build() {
     // ★ 2026-10-29（项目 F 阶段 3）：圆屏安全区
     //   手表是圆形屏，四角会被切掉 ⇒ 内容要留在内切正方形里
     //   Bp.safePad() 在非手表上恒为 0 ⇒ 手机/平板/PC 零影响
-    .padding(Bp.safePad())
+    // ★★★ 2026-10-29（六设备·手表实测）：原来四边都加 safePad（34vp），
+    //   233vp 的圆屏被挤成 165vp 见方，再减页签+顶栏+Grid 底 padding
+    //   ⇒ 只剩 ~51vp ⇒ **一张游戏卡都放不下**。
+    //   ⇒ 圆屏的安全区只该管**左右**（上下已经被状态栏与页签占掉）。
+    .padding({ left: Bp.safePad(), right: Bp.safePad() })
   }
 
   // ─────────── 各区块 ───────────
@@ -1015,6 +1026,25 @@ build() {
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
+  }
+
+  /**
+   * 手表专用极简顶栏（2026-10-29 六设备实测）。
+   * 233×233 vp 上「One More + LV 条 + 芯片 + 页签」会吃光屏幕，
+   * 一张游戏卡都露不出来 ⇒ 手表只留「One More · 24 款」一行，剩下全给列表。
+   */
+  @Builder
+  watchHeader() {
+    Row({ space: 4 }) {
+      Text('One More')
+        .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
+        .fontColor(this.theme().ink)
+        .layoutWeight(1)
+      Text(String(this.list().length) + this.t(' 款', ' games'))
+        .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
+    }
+    .width('100%')
+    .padding({ left: 6, right: 6, top: 2, bottom: 2 })
   }
 
   @Builder

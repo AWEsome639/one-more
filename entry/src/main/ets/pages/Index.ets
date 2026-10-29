@@ -11,6 +11,7 @@
  * 拾海 2026-10-10（本页 2026-10-13 加转场）
  */
 
+import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Accent } from '../core/Design';
 import { UiModeMgr } from '../core/UiMode';
@@ -65,7 +66,14 @@ struct Index {
     // ★ 显式声明类型；字段名是 primaryButton / secondaryButton（见 d.ts:965）
     const opt: AlertDialogParamWithButtons = {
       title: this.t('隐私说明', 'Privacy'),
-      message: this.t(
+      // ★★★ 2026-10-29（六设备·手表实测）：系统 AlertDialog 的尺寸是系统定的，
+      //   手表 233×233 vp 上原文案太长 ⇒ 弹窗撑满全屏、**「同意并继续」按钮够不到**
+      //   ⇒ 用户卡在首启页，App 根本用不了。
+      //   ⇒ 手表上只用一行极短文案（合规信息不减：「不收集信息 + 本地存储」），
+      //     按钮就能完整露出来。
+      message: Bp.isWatch() ? this.t(
+          '不收集你的信息，记录只存在手表里。',
+          'No data collected. All records stay on this watch.') : this.t(
           // ★ 2026-10-19 真机首启实拍后修正：原来写「不连公网」是假的
           //   （GameKit 的账号校验会连华为服务器，这是应用市场对游戏类目的合规要求）
           '「One More」不收集你的个人信息，也不上传你的游戏记录。\n' +
@@ -181,7 +189,9 @@ build() {
         }
         .tabBar(this.barItem(2, '⚙️', '设置', 'Settings'))
       }
-      .barHeight(60)
+      // ★ 2026-10-29（六设备·手表实测）：233×233 vp 上 60vp 的页签占掉 1/4 屏
+      //   ⇒ 手表缩到 36，给列表让出空间
+      .barHeight(Bp.isWatch() ? 36 : 60)
       .barMode(BarMode.Fixed)
       .barBackgroundColor(this.theme().surface)
       .scrollable(true)
@@ -223,7 +233,7 @@ build() {
         .animation({ duration: Motion.fast, curve: Motion.spring() })
     }
     .width('100%')
-    .height(60)
+    .height(Bp.isWatch() ? 36 : 60)
     .justifyContent(FlexAlign.Center)
     // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
     //   电视上没有触摸 ⇒ 用遥控器方向键在三个页签间移动，OK 键切换
