@@ -585,7 +585,15 @@ struct GameHost {
     const m: GameMeta | undefined = this.meta;
     const baseXp: number = m ? m.baseXp : 10;
     const factor: number = m ? difficultyFactor(m.difficulty) : 1;
+    // ★ 2026-10-29（项目 D ④）：连续打卡 —— 判断「今天是不是第一次解出来」
+    //   solvedToday 由 ProgressStore.finishGame 在**今天首胜**时置 true
+    //   ⇒ 前后各读一次，翻转了就说明"今天刚打上卡"，给一记叮叮。
+    const solvedBefore: boolean = AppStorage.get<boolean>('solvedToday') ?? false;
     const gain: number = ProgressStore.finishGame(r.gameId, r.solved, baseXp, factor * ProgressStore.DIFF_XP[GameDiff.of(r.gameId)], r.score, r.durationMs);
+    const solvedAfter: boolean = AppStorage.get<boolean>('solvedToday') ?? false;
+    if (!solvedBefore && solvedAfter) {
+      Sound.streak();
+    }
     // ★★★ 2026-10-23 路线 E：记一局（内部全兜底，写失败也绝不打断结算）
     //   难度用 GameDiff.now()（0 简单 / 1 中等 / 2 困难），与 AI 搜索用的是同一个口径 ✓
     try {
@@ -626,6 +634,10 @@ struct GameHost {
     if (r.solved) {
       if (this.levelUpTo > 0 || this.newAch.length > 0) {
         Haptics.celebrate();
+        // ★ 2026-10-29（项目 D ④）：升级/解锁成就是"大时刻" ⇒ 换成五音上行。
+        //   Sound.win() 已经在上面响过了（handleFinish 开头），这里**再补一记更高的**
+        //   —— 两记叠起来才是"大事"，只响 win 太轻。
+        Sound.levelUp();
       } else {
         Haptics.success();
       }

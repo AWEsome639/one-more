@@ -40,6 +40,8 @@ export class Sound {
   private static idTap: number = 0;
   private static idWin: number = 0;
   private static idLose: number = 0;
+  private static idLevelUp: number = 0;
+  private static idStreak: number = 0;
   /** 上次播放 tap 的时间 —— 防止一屏滑动时连成一片 */
   private static lastTapMs: number = 0;
 
@@ -75,9 +77,14 @@ export class Sound {
       Sound.idWin = await Sound.pool.load(w.fd, w.offset, w.length);
       const l: resourceManager.RawFileDescriptor = await mgr.getRawFd('sfx/lose.wav');
       Sound.idLose = await Sound.pool.load(l.fd, l.offset, l.length);
+      // ★ 2026-10-29：再补两档 —— 升级（大时刻）与连续打卡（小成就）
+      const u: resourceManager.RawFileDescriptor = await mgr.getRawFd('sfx/levelup.wav');
+      Sound.idLevelUp = await Sound.pool.load(u.fd, u.offset, u.length);
+      const st: resourceManager.RawFileDescriptor = await mgr.getRawFd('sfx/streak.wav');
+      Sound.idStreak = await Sound.pool.load(st.fd, st.offset, st.length);
       Sound.ready = true;
-      hilog.info(DOMAIN, TAG, '音效已就绪: tap=%{public}d win=%{public}d lose=%{public}d',
-        Sound.idTap, Sound.idWin, Sound.idLose);
+      hilog.info(DOMAIN, TAG, '音效已就绪: tap=%{public}d win=%{public}d lose=%{public}d lv=%{public}d streak=%{public}d',
+        Sound.idTap, Sound.idWin, Sound.idLose, Sound.idLevelUp, Sound.idStreak);
     } catch (e) {
       // ★ 静默降级：没有音效，游戏照常玩
       Sound.ready = false;
@@ -124,6 +131,19 @@ export class Sound {
   /** 没通关 */
   static lose(): void {
     Sound.play(Sound.idLose);
+  }
+
+  /**
+   * 升级 —— 五音上行（比 win 更长更高）。
+   * ★ 只在**真的升级**时响，不要在每次通关时都响（会盖过 win）。
+   */
+  static levelUp(): void {
+    Sound.play(Sound.idLevelUp);
+  }
+
+  /** 连续打卡 / 解锁成就这类"小成就"—— 两记清脆的叮叮 */
+  static streak(): void {
+    Sound.play(Sound.idStreak);
   }
 
   /** 释放（App 退出时调） */

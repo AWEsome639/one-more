@@ -132,6 +132,25 @@ struct Index {
     //   ② AlertDialog.show() 不能在 aboutToAppear 里立刻调（页面还没建好 ⇒ 静默失败）
     //   ⇒ 延迟 800ms 再弹
     setTimeout(() => { this.maybeShowPrivacy(); }, 800);
+    // ★★★ 2026-10-29 真机抓到的**真因**：showWelcome 从来没有被设成 true
+    //   （之前那段触发代码根本没进文件）⇒ 欢迎卡永远不出现。
+    //   时序坑：ProgressStore.init() 是异步的，太早判 privacyAgreed() 会返 false
+    //   ⇒ 用重试（700ms × 8 次）而不是只判一次。
+    let tries: number = 0;
+    const kick: () => void = () => {
+      tries = tries + 1;
+      if (this.showWelcome || ProgressStore.onboarded()) {
+        return;
+      }
+      if (ProgressStore.privacyAgreed()) {
+        this.showWelcome = true;
+        return;
+      }
+      if (tries < 8) {
+        setTimeout(kick, 700);
+      }
+    };
+    setTimeout(kick, 1600);
     // 监听后续切换 ⇒ 强制重建（见 uiRev 的注释）   // 启动时把常量设成当前档（落盘恢复由 ProgressStore 负责）
     setTimeout(() => {
       this.entered = true;
