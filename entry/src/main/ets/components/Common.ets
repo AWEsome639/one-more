@@ -5,6 +5,7 @@
  * 动效一律走 Motion 的时长，按下必有 0.96 缩放反馈。
  */
 
+import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
 import { Haptics } from '../core/Haptics';
 import { Digits } from '../core/I18n';   // ★ 2026-10-16 数字本地化
@@ -755,7 +756,11 @@ build() {
       // ── 右：名称 + 副标题（与图标之间固定 Space.sm 间距，永不重叠）──
       Column({ space: Space.xs }) {
         Text(this.gameTitle())
-          .fontSize(FontSize.md)
+          // ★ 2026-10-29（六设备·运动手表实测）：195vp 上标题被截成「宝...」
+          //   ⇒ 极小屏（高 < 210vp）字号从 md 降到 sm、并允许两行，
+          //     同时下面把 48vp 的图标藏起来，把宽度全让给标题。
+          .fontSize(Bp.tinyWatch() ? FontSize.sm : FontSize.md)
+          .maxLines(Bp.tinyWatch() ? 2 : 1)
           .fontWeight(FontWeight.Bold)
           .fontColor(Color.White)
           // ★★★ 2026-10-16 实拍德语大字模式：名字只剩 4 字（Beje… / Bre…）

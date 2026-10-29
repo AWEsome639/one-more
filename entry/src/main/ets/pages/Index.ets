@@ -71,7 +71,11 @@ struct Index {
       //   ⇒ 用户卡在首启页，App 根本用不了。
       //   ⇒ 手表上只用一行极短文案（合规信息不减：「不收集信息 + 本地存储」），
       //     按钮就能完整露出来。
-      message: Bp.isWatch() ? this.t(
+      message: Bp.tinyWatch() ? this.t(
+          // ★ 2026-10-29（运动手表 195vp 实测）：18 字的文案仍会撑到 3 行、
+          //   把两个按钮顶出屏幕 ⇒ 极小屏压到 8 个字（合规信息靠「查看全文」兜）
+          '不收集信息 · 只存本地',
+          'No data · Local only') : Bp.isWatch() ? this.t(
           '不收集你的信息，记录只存在手表里。',
           'No data collected. All records stay on this watch.') : this.t(
           // ★ 2026-10-19 真机首启实拍后修正：原来写「不连公网」是假的

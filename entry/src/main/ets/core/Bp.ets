@@ -201,6 +201,15 @@ export class Bp {
    * 判据用 620vp：手机竖屏 744~812vp 不受影响；
    *   电视 540 / 横放平板 800 中的矮一档 / 小窗 PC 会命中。
    */
+  /**
+   * 是不是「极小的手表」（运动手表 195vp 这类）。
+   * ★ 2026-10-29（六设备实测）：195×195 vp 上手卡的 48vp 图标 + 标题放不下，
+   *   标题被截成「宝...」⇒ 极小屏藏图标、标题降字号且允许两行。
+   */
+  static tinyWatch(): boolean {
+    return Bp.isWatch() && Bp.height < 210;
+  }
+
   static isShort(): boolean {
     return Bp.height < 620;
   }
