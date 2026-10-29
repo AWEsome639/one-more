@@ -5,6 +5,7 @@
  * 胜负：步数上限内整盘同色 = 通关；步数用尽仍未统一 = 失败。
  */
 
+import { A11y } from '../core/A11y';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -391,6 +392,10 @@ export struct GColorFlood {
           Row({ space: 2 }) {
             ForEach([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], (c: number) => {
               Stack() {
+                // ★ 色盲辅助（项目 D ③）：12×12 太密，字形用小号粗体 + 阴影保证可读
+                Text(A11y.glyph(this.cells[(r * N + c)]))
+                  .fontSize(9).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
+                  .textShadow({ radius: 2, color: '#000000B3', offsetX: 0, offsetY: 1 })
               }
               .layoutWeight(1)
               .aspectRatio(1)

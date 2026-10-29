@@ -3,6 +3,7 @@
  * 规则：5×5 彩盘，点中的格子若与四邻有同色，就连同整片同色一起消掉；消完塌落、空列左移、顶部补新色。
  * 胜负：目标分达标 = 通关；步数用尽没达标 = 失败。
  */
+import { A11y } from '../core/A11y';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
@@ -151,7 +152,10 @@ export struct GColorMatch {
  Row({ space: Space.xs }) {
  ForEach([0, 1, 2, 3, 4], (c: number) => {
  Stack() {
- Text(this.colors[r * N + c] >= 0 ? '●' : '').fontSize(FontSize.md).fontColor('#FFFFFF')
+ // ★ 色盲辅助（项目 D ③）：颜色 + 字母双编码，看不见颜色也能玩
+Text(this.colors[r * N + c] >= 0 ? A11y.glyph(this.colors[r * N + c]) : '')
+            .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
+            .textShadow({ radius: 2, color: '#000000B3', offsetX: 0, offsetY: 1 })
  }.layoutWeight(1).height(Cell.of(58)).backgroundColor(this.colors[r * N + c] >= 0
  ? HUE[this.colors[r * N + c]] : this.theme.surfaceAlt).borderRadius(Radius.sm).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(r * N + c); }); }).onClick(() => { Haptics.tick(); this.pick(r * N + c); })
  }, (c: number) => 'c' + c) }.width('100%')
