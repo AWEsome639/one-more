@@ -664,8 +664,13 @@ build() {
           // ★ 展开筛选时收起下面的卡片：面板较高，不收起来会把计数行与网格挤出屏幕
           this.tagPanel()
         } else {
-          this.dailyCard()
-          this.randomCard()
+          // ★★★ 2026-10-29（六设备实测）：智慧屏只有 540vp 高，
+          //   这两块会把游戏列表挤到看不见（而且整页不滚动）⇒ 矮屏时收起。
+          //   列表与分类芯片保留 —— 那才是首页的主体。
+          if (!Bp.isShort()) {
+            this.dailyCard()
+            this.randomCard()
+          }
         }
         this.segRow()
         if (this.seg === Seg.ALL && !this.showFilter) {
