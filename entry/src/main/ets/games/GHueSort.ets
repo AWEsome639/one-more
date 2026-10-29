@@ -290,9 +290,26 @@ export struct GHueSort {
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 
+  /** 色相的两位数字标签（色盲辅助：不看颜色也能排出顺序） */
+  private hueText(i: number): string {
+    const h: number = Math.round(this.hues[i]);
+    return h < 10 ? '0' + String(h) : String(h);
+  }
+
   @Builder
   swatch(i: number) {
     Stack() {
+      // ★★★ 2026-10-29（项目 D ③ 色盲友好）：
+      //   这块原来**只有一个色块**，红绿色盲/全色盲玩家根本无法判断顺序。
+      //   ⇒ 在色块上叠一个**色相数字**（00~337）：
+      //     · 看得见颜色的人：数字很小、几乎不打扰
+      //     · 看不见颜色的人：**直接按数字排序就行**，玩法完全等价
+      //   ⇒ 提示文案里本来就有「色相 {n}°」，现在方块上也对得上了。
+      Text(this.hueText(i))
+        .fontSize(FontSize.xs)
+        .fontWeight(FontWeight.Bold)
+        .fontColor('#FFFFFF')
+        .textShadow({ radius: 2, color: '#00000099', offsetX: 0, offsetY: 1 })
       Text(this.sel === i ? '◉' : '').fontSize(FontSize.lg).fontColor('#FFFFFF')
     }
     .layoutWeight(1).aspectRatio(1)
