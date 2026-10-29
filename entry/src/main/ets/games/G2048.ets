@@ -88,30 +88,42 @@ function previewMove(cells: number[], dir: number): number[] {
     }
     return t;
   };
-  if (dir === 0 || dir === 1) {
-    for (let r = 0; r < N; r++) {
-      const line: number[] = [];
-      for (let c = 0; c < N; c++) {
-        line.push(out[r * N + c]);
-      }
-      const src: number[] = dir === 0 ? line : line.slice().reverse();
-      const res: number[] = collapseLine(src);
-      const fin: number[] = dir === 0 ? res : res.slice().reverse();
-      for (let c = 0; c < N; c++) {
-        out[r * N + c] = fin[c];
-      }
-    }
-  } else {
+  // ★★★ 2026-10-29（真机抓到真 BUG）：**这里的"方向"必须和 move() 完全一致**，
+  //   否则 bestDir() 评估的是 A 方向、move() 执行的是 B 方向
+  //   ⇒ 代打会一直选到"动不了"的方向 ⇒ **棋盘纹丝不动，代打看起来卡死**。
+  //
+  //   move() 的语义（见它里面的 idx 用法）：
+  //     dir 0 (上)：按列，从 row 0 往 row N-1
+  //     dir 1 (右)：按行，从 col N-1 往 col 0
+  //     dir 2 (下)：按列，从 row N-1 往 row 0
+  //     dir 3 (左)：按行，从 col 0 往 col N-1
+  //   原来 previewMove 写的是 dir0/1=按行、dir2/3=按列 ⇒ **0 和 2 全错位**。
+  if (dir === 0 || dir === 2) {
+    // 按列处理
     for (let c = 0; c < N; c++) {
       const line: number[] = [];
       for (let r = 0; r < N; r++) {
         line.push(out[r * N + c]);
       }
-      const src: number[] = dir === 2 ? line : line.slice().reverse();
+      const src: number[] = dir === 0 ? line : line.slice().reverse();
       const res: number[] = collapseLine(src);
-      const fin: number[] = dir === 2 ? res : res.slice().reverse();
+      const fin: number[] = dir === 0 ? res : res.slice().reverse();
       for (let r = 0; r < N; r++) {
         out[r * N + c] = fin[r];
+      }
+    }
+  } else {
+    // 按行处理
+    for (let r = 0; r < N; r++) {
+      const line: number[] = [];
+      for (let c = 0; c < N; c++) {
+        line.push(out[r * N + c]);
+      }
+      const src: number[] = dir === 3 ? line : line.slice().reverse();
+      const res: number[] = collapseLine(src);
+      const fin: number[] = dir === 3 ? res : res.slice().reverse();
+      for (let c = 0; c < N; c++) {
+        out[r * N + c] = fin[c];
       }
     }
   }
