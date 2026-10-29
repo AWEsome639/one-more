@@ -408,6 +408,10 @@ export struct GColorFlood {
         }, (r: number) => 'cfr' + r)
       }
       .width('100%')
+      // ★★★ 2026-10-29 真机抓到（同类坑第 4 处）：棋盘被下面的按钮行挤爆，
+      //   「提示」按钮落在 y=2220（离底仅 12px）⇒ 点不到。
+      //   ⇒ 给棋盘限高，把按钮抬进可点区。
+      .constraintSize({ maxHeight: '46%' })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

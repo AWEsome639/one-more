@@ -82,3 +82,5 @@
 {"name": "分数配对", "ok": true}
 {"name": "分数匹配", "ok": true}
 {"name": "2048", "ok": true}
+{"name": "色彩洪水", "ok": true}
+{"name": "填数拼图", "ok": true}

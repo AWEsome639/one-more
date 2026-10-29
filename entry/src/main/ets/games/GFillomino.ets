@@ -477,6 +477,8 @@ export struct GFillomino {
         }, (r: number) => 'fmr' + r)
       }
       .width('100%')
+      // ★★★ 2026-10-29 真机抓到（同类坑第 5 处）：同上，提示按钮在 y=2220 点不到。
+      .constraintSize({ maxHeight: '46%' })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
