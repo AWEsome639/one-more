@@ -102,6 +102,7 @@ struct Splash {
   @State pDust: number = 0;      // L2 星尘漂浮
   @State pGlow: number = 0;      // L3 光晕
   @State pStroke: number = 0;    // L4a 描边生长
+  @State pSun: number = 0;       // 日出：金点从山脊后升起
   @State pFill: number = 0;      // L4b 填充点亮
   @State pSweep: number = 0;     // L5 光带
   @State pTitle: number = 0;     // L6 标题
@@ -141,6 +142,15 @@ struct Splash {
   }
 
   /** 有回弹的收尾，用于标题/徽标落位 */
+  /**
+   * 日出的曲线：轻微过冲（y1 = 1.12 > 1）。
+   * ★ M3 Expressive 纪律：**位移可过冲，透明度不可**。
+   *   所以同一个 pSun 驱动 translate（有过冲的"升起感"）与 opacity（临界阻尼）。
+   */
+  private sunCurve(): ICurve {
+    return curves.cubicBezierCurve(0.34, 1.12, 0.36, 1.0);
+  }
+
   private settle(): ICurve {
     return curves.cubicBezierCurve(0.22, 1.0, 0.36, 1.0);
   }
@@ -223,6 +233,10 @@ struct Splash {
     setTimeout(() => {
       animateTo({ duration: 980, curve: this.settle() }, () => {
         this.pStroke = 1;
+      });
+      // 日出：比描边快，420ms 内升到位
+      animateTo({ duration: 420, curve: this.sunCurve() }, () => {
+        this.pSun = 1;
       });
     }, 280);
     // L4b 填充点亮（描边快完成时起，衔接最自然）
@@ -517,7 +531,9 @@ struct Splash {
             .borderRadius(999)
             .backgroundColor('#E8C87A')
             .position({ x: this.omPxV() * (0.2409 - 0.0629), y: this.omPxV() * (0.2661 - 0.0629) })
-            .opacity(this.seg(this.pStroke, 0.001, 0.42))
+            // ★「日出」（2026-10-30）：金点从山脊后升起 —— 位移可过冲，透明度不可
+            .translate({ y: (1 - this.pSun) * this.omPxV() * 0.0629 })
+            .opacity(this.seg(this.pSun, 0.001, 0.30))
 
           // ── ③ M 山（米白多边形）：压在点上，遮住下半 ⇒ 日出感 ──
           //   左底(492.9,496.1) 左峰(587.4,0) 谷(744.9,351.2) 右峰(910.2,0) 右底(1000,496.1)
