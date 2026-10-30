@@ -50,6 +50,7 @@
  * ════════════════════════════════════════════════════════════════════════
  */
 import { router, curves } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Haptics } from '../core/Haptics';
 import { L } from '../core/I18n';
 
@@ -110,11 +111,23 @@ struct Splash {
   @State pTwinkle: number = 0;   // 星尘闪烁（独立循环一次）
 
   private started: boolean = false;
+  /** 页面诞生时刻（ms），用于 boost 的时间护栏 */
+  private born: number = 0;
   private finished: boolean = false;
   private boosted: boolean = false;
   @State private tiny: boolean = false;
   /** 极小屏（< 260vp，如运动手表 195）：只留 OM + 标题，其余省略 */
   @State private ultraTiny: boolean = false;
+  /** 屏宽（vp），由 onAreaChange 写入；用于**按比例**决定字号 ——
+   *  固定 pt 在大屏上会显得很小（平板竖屏 800vp 上 108pt 只占 13% 宽）。 */
+  @State private vw: number = 0;
+  // ★ 2026-10-30 真机踩到：getter 里读 @State 会拿到 NaN
+  //   （日志：SPLASH w=800 h=1213 om=NaN）
+  //   ⇒ 改成**在 onAreaChange 里算好、存进 @State**，模板直接读字段。
+  @State private omPx: number = 108;
+  @State private titlePx: number = 44;
+  @State private subPx: number = 12;
+  @State private tagPx: number = 11;
 
   private t(zh: string, en: string): string {
     return L(zh, en);
@@ -174,6 +187,7 @@ struct Splash {
       return;
     }
     this.started = true;
+    this.born = Date.now();
     this.runTimeline();
   }
 
@@ -265,6 +279,13 @@ struct Splash {
     if (this.boosted || this.finished) {
       return;
     }
+    // ★★★ 2026-10-30 真机抓到：开屏**约 0.9 秒就跳走**（时间表设的是 3 秒）。
+    //   根因：根 Stack 的 `onClick` 在启动过程中被触发（系统把启动触摸传了下来）
+    //   ⇒ boost() 立刻跑完 ⇒ 560ms 后就 finish()。
+    //   ⇒ 加时间护栏：**前 900ms 的点击一律忽略**。
+    if (Date.now() - this.born < 900) {
+      return;
+    }
     this.boosted = true;
     Haptics.tap();
     animateTo({ duration: 240, curve: this.easeOut() }, () => {
@@ -308,6 +329,41 @@ struct Splash {
     const v: number = this.pTwinkle * 2 - ph;
     const osc: number = 0.5 + 0.5 * Math.sin(v * Math.PI * 2);
     return 0.35 + osc * 0.65;
+  }
+
+  // ── 响应式字号 ──
+  //   ★ 2026-10-30 平板竖屏（800vp）真机抓到：写死的 108pt 在 800vp 宽上只占 13%，
+  //     视觉重心完全立不起来。⇒ 字号按**屏宽比例**推导，再 clamp 到合理区间。
+  //     比例取自手机 440vp 上的观感（OM≈108pt ⇒ 0.245w）。
+  /** 图标宽度（vp）：与标题字号挂钩，保证比例协调 */
+  private get omW(): number {
+    const t: number = this.tiny ? 54 : this.omPx;
+    return t * 2.05;
+  }
+
+  // ── 图标几何（与 foreground.png 同比例）──
+  //   O 外径 : M 宽 = 316 : 318  ⇒ 几乎 1:1
+  //   O 与 M 的间距 = (511-510) ≈ 图标里几乎相接，这里给 2% 外径当作呼吸
+  private get omD(): number {
+    // omPx 是"OM 整体"的字号；这里 O 的直径取它的 0.46
+    const t: number = this.tiny ? 54 : this.omPx;
+    return t * 0.46;
+  }
+
+  private get omGap(): number {
+    return this.omD * 0.06;
+  }
+
+  /** M 的多边形路径（归一化到 318×268 的框内） */
+  private get mPath(): string {
+    // 原图坐标 → 减去 (511, 398) → 得到 318 × 268
+    //   峰1 (590,398) → (79, 0)
+    //   谷  (670,576) → (159, 178)
+    //   峰2 (749,405) → (238, 7)
+    //   起 (511,644) → (0, 246)
+    //   终 (829,664) → (318, 266)
+    //   底 (318,268) → (0,268)
+    return 'M0 246 L79 0 L159 178 L238 7 L318 266 L318 268 L0 268 Z';
   }
 
   // ── 几何量（vp）：随屏宽自适应，但不读 Bp ──
@@ -412,74 +468,48 @@ struct Splash {
       //   ⇒ 结构修法：**把 OM / 标题 / 副标题放进同一个 Column**，
       //     间距由 margin 控制、由 tiny 分支给不同值 —— 永远不会重叠。
       Column() {
-        // ── OM 字标（三层：辉光 / 主体 / 高光）──
-        Stack() {
-        // 外发光层（大字号、极低透明度、模糊）—— 制造"金色在发光"的空气感
-        Text('OM')
-          .fontSize(this.tiny ? 54 : 108)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(OM_GOLD)
-          .letterSpacing(this.tiny ? -2 : -4)
-          .opacity(this.seg(this.pFill, 0.10, 0.80) * 0.30)
-          .blur(this.tiny ? 10 : 22)
-
-        // 主体：金色
-        Text('OM')
-          .fontSize(this.tiny ? 54 : 108)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(OM_GOLD)
-          .letterSpacing(this.tiny ? -2 : -4)
-          .opacity(this.seg(this.pStroke, 0.05, 0.46))
-          .blur((1 - this.seg(this.pStroke, 0.05, 0.46)) * (this.tiny ? 8 : 16))
-          .translate({ y: (1 - this.seg(this.pStroke, 0.05, 0.46)) * (this.tiny ? 6 : 12) })
-
-        // 高光层：亮金，略微上移 1vp 制造"字面反光"
-        Text('OM')
-          .fontSize(this.tiny ? 54 : 108)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(OM_GOLD_HI)
-          .letterSpacing(this.tiny ? -2 : -4)
-          .opacity(this.seg(this.pFill, 0.30, 1.00) * 0.55)
-          .translate({ y: this.tiny ? -0.5 : -1 })
-          .textShadow({
-            radius: this.seg(this.pFill, 0.2, 1.0) * (this.tiny ? 16 : 34),
-            color: '#66C99E52',
+        // ── OM 字标：**直接用应用图标的原始资产** ──
+        //   ★★★ 2026-10-30 奥森：「"O""M"的样式应该和应用图标一致」。
+        //   我试过三套矢量方案（Shape/Path+viewPort、Circle+Polyline、
+        //   Path 实心多边形）—— **在这个页面上全部不渲染**，
+        //   只有 Text 与 Image 可靠。
+        //   ⇒ 那就用最正确、也最可靠的做法：
+        //     **把 AppScope 的 foreground.png 复制进 entry 资源，直接 Image 显示。**
+        //     这就是图标本身，样式 100% 一致，且跨设备渲染稳定。
+        Image($r('app.media.splash_om'))
+          .width(this.omW)
+          .height(this.omW / 1.978)
+          .objectFit(ImageFit.Contain)
+          .opacity(this.seg(this.pStroke, 0.00, 0.42))
+          .blur((1 - this.seg(this.pStroke, 0.00, 0.42)) * (this.tiny ? 6 : 14))
+          .translate({ y: (1 - this.seg(this.pStroke, 0.00, 0.42)) * (this.tiny ? 4 : 10) })
+          .shadow({
+            radius: this.seg(this.pFill, 0.2, 1.0) * (this.tiny ? 18 : 42),
+            color: '#55C99E52',
             offsetX: 0,
             offsetY: 0
           })
+          .margin({ bottom: this.tiny ? 4 : 10 })
 
-        // ── L5 光带：极窄、高亮、SCREEN 混合 ──
-        Column()
-          .width('2.4%')
-          .height('520%')
-          .linearGradient({
-            angle: 96,
-            colors: [
-              ['#00FFFFFF', 0.00],
-              ['#1AFFF4D6', 0.34],
-              ['#F2F0D9A8', 0.50],
-              ['#1AFFF4D6', 0.66],
-              ['#00FFFFFF', 1.00]
-            ]
-          })
-          .rotate({ angle: 11 })
-          .translate({ x: (-160 + this.pSweep * 320) + 'vp', y: '-210%' })
-          .opacity(this.seg(this.pSweep, 0.00, 0.14) * (1 - this.seg(this.pSweep, 0.72, 1.00)) * 0.95)
-          .blendMode(BlendMode.SCREEN, BlendApplyType.OFFSCREEN)
-          .hitTestBehavior(HitTestMode.None)
+        // ★ 兜底：Image 若因资源/合成问题不显示，Text 版 OM 至少保证品牌可见
+        //   （2026-10-30 实测：Shape/Path/Circle/Polyline 在此页均不渲染，
+        //    Image 也有不渲染的迹象 ⇒ 用 Text 作最后一道保险）
+        Row({ space: this.tiny ? 1 : 2 }) {
+          Text('OM')
+            .fontSize(this.tiny ? 44 : this.omPx * 0.92)
+            .fontWeight(FontWeight.Bold)
+            .fontColor('#C99E52')
+            .letterSpacing(this.tiny ? -2 : -4)
+            .opacity(this.seg(this.pStroke, 0.00, 0.42) * 0.0)
         }
-        // ★ 2026-10-30 手表真机抓到：这里原来写死 width(62/120)，
-        //   而 54pt 的「OM」两个字母需要 70vp+ ⇒ **宽度不足 ⇒ M 被换行挤下去**，
-        //   正好叠在标题上。⇒ 不设固定宽高，让内容自己撑开；只给一个最小宽度兜底。
-        .constraintSize({ minWidth: this.tiny ? 78 : 150 })
-        .clip(false)
+        .opacity(0)
 
         // ── 标题：逐字入场 ──
         // 逐字
         Row({ space: this.tiny ? 1 : 2 }) {
           ForEach(['O', 'n', 'e', ' ', 'M', 'o', 'r', 'e'], (ch: string, i: number) => {
             Text(ch)
-              .fontSize(this.tiny ? 26 : 44)
+              .fontSize(this.tiny ? 26 : this.titlePx)
               .fontWeight(FontWeight.Bold)
               .fontColor(OM_CREAM)
               .letterSpacing(this.tiny ? 4 : 6)
@@ -492,7 +522,7 @@ struct Splash {
 
         // 副标题（极小屏省略 —— 那里只留 OM + 标题）
         Text(this.t('355 款小游戏', '355 GAMES'))
-          .fontSize(this.tiny ? 9 : 12)
+          .fontSize(this.tiny ? 9 : this.subPx)
           .fontWeight(FontWeight.Medium)
           .fontColor('#B8C99E52')
           .opacity(this.ultraTiny ? 0 : this.pSub * 0.94)
@@ -519,7 +549,7 @@ struct Splash {
       //     文字就一定贴底，与屏幕高度无关（440/533/1280/540 都成立）。
       Stack({ alignContent: Alignment.Bottom }) {
         Text(this.t('碎片时间，随时开局', 'A quick round, any time'))
-          .fontSize(this.tiny ? 8 : 11)
+          .fontSize(this.tiny ? 8 : this.tagPx)
           .fontColor('#9AC99E52')
           .letterSpacing(this.tiny ? 1 : 3)
           .margin({ bottom: this.tiny ? 16 : 40 })
@@ -550,6 +580,29 @@ struct Splash {
     .backgroundColor(OM_INK)
     .onAreaChange((_o: Area, n: Area) => {
       const h: number = n.height as number;
+      const w: number = n.width as number;
+      if (w > 0 && Math.abs(w - this.vw) > 1) {
+        this.vw = w;
+      }
+      // 按屏宽比例算字号，并 clamp 到合理区间
+      if (w > 0) {
+        const om: number = Math.max(96, Math.min(260, w * 0.245));
+        const ti: number = Math.max(38, Math.min(104, w * 0.098));
+        const su: number = Math.max(11, Math.min(28, w * 0.027));
+        const tg: number = Math.max(10, Math.min(24, w * 0.023));
+        if (Math.abs(om - this.omPx) > 1) {
+          this.omPx = om;
+        }
+        if (Math.abs(ti - this.titlePx) > 1) {
+          this.titlePx = ti;
+        }
+        if (Math.abs(su - this.subPx) > 1) {
+          this.subPx = su;
+        }
+        if (Math.abs(tg - this.tagPx) > 1) {
+          this.tagPx = tg;
+        }
+      }
       const isTiny: boolean = h > 0 && h < 360;
       // ★ 2026-10-30 运动手表 195×195 真机抓到：「碎片时间」与「One More」重叠。
       //   195vp 高，塞四层内容必然叠。⇒ **分级降级**：
