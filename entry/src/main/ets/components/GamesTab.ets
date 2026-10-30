@@ -298,8 +298,13 @@ export struct GamesTab {
       return this.listCache;
     }
     this.listCacheKey = key;
-    this.listCache = this.computeList();
-    return this.watchFilter(this.listCache);
+    // ★★★ 2026-10-30 手表尺寸真机抓到（这是个**真 bug，真手表上也会犯**）：
+    //   原来这里存的是 `computeList()`（未过滤），却 **返回过滤后的**，
+    //   而缓存命中分支直接 `return this.listCache`（未过滤）
+    //   ⇒ **只有第一次进去有「精选 24 款」，之后全部退回 355 款**。
+    //   ⇒ 修：过滤后的结果才进缓存，两条路径口径一致。
+    this.listCache = this.watchFilter(this.computeList());
+    return this.listCache;
   }
 
   /**
@@ -309,7 +314,19 @@ export struct GamesTab {
    *   ⚠️ 非手表直接返回原列表（零影响、零性能开销）
    */
   private watchFilter(all: GameMeta[]): GameMeta[] {
-    if (!Bp.isWatch()) {
+    // ★★★ 2026-10-30 真机（233×233vp）抓到的不一致：
+    //   这里原本只认 `Bp.isWatch()`（= deviceType === WATCH），
+    //   而 `Bp.tinyWatch()` / `Bp.tinyScreen()` 是**按尺寸**判的（注释里写明
+    //   "deviceType 在模拟器上永远报 phone"）。
+    //   ⇒ 结果：233vp 的小屏上布局已经折叠成"一次一张卡"，
+    //     但列表**仍然是全部 355 款** ⇒ 一张一张翻 355 款，体验极差。
+    //   ⇒ 统一口径：**屏幕上一次只放得下一张卡的时候，就给精选清单**，
+    //     与设备类型无关（和 tinyWatch 的设计原则一致）。
+    // ★ 阈值说明（2026-10-30 实测）：tinyWatch() 是 <210，而手表实机是 233vp
+    //   ⇒ 用 tinyWatch() 覆盖不到 233 这一档。
+    //   真正该判的语义是「**列表一次只放得下一张卡**」，那正是 tinyScreen()（<340）：
+    //   这种屏上翻 355 款是灾难，给精选清单才对。
+    if (!Bp.isWatch() && !Bp.tinyScreen()) {
       return all;
     }
     const out: GameMeta[] = [];
