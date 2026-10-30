@@ -77,6 +77,33 @@ export class Tv {
     return false;
   }
 
+  /**
+   * 这个 keyCode 是不是方向键。
+   * ★ 2026-10-30（PC / 2in1）：键盘方向键与遥控器 D-pad 用**同一套键码**
+   *   （2012~2015）⇒ 一套逻辑同时服务电视遥控器与外接键盘。
+   */
+  static isArrow(code: number): boolean {
+    return code === Tv.KEY_UP || code === Tv.KEY_DOWN
+      || code === Tv.KEY_LEFT || code === Tv.KEY_RIGHT;
+  }
+
+  /**
+   * 方向键 → 偏移量。返回 0 表示不是方向键。
+   * @param cols 网格列数 —— 左右键移 ±1，上下键移 ±cols
+   *
+   * ⚠️ 列数必须由调用方给：
+   *   · 手机竖屏 2 列 · 平板竖 3 列 · 平板横 4 列 · 手表 1 列
+   *   · 但**同一台设备在不同列表里列数可能不同**（如「我收藏的」只剩 3 款）
+   *   ⇒ 不能写死，必须现算。
+   */
+  static arrowDelta(code: number, cols: number): number {
+    if (code === Tv.KEY_LEFT) { return -1; }
+    if (code === Tv.KEY_RIGHT) { return 1; }
+    if (code === Tv.KEY_UP) { return -cols; }
+    if (code === Tv.KEY_DOWN) { return cols; }
+    return 0;
+  }
+
   /** 方向键码（给「列表里上下左右移动」这类自定义导航用） */
   static readonly KEY_UP: number = 2012;
   static readonly KEY_DOWN: number = 2013;

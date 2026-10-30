@@ -532,6 +532,42 @@ export struct GamesTab {
    *   · 平板横 / PC / 电视 ⇒ 4 列
    * 返回的是 ArkUI 的 columnsTemplate 字符串。
    */
+  /**
+   * ★★★ 2026-10-30（PC / 2in1）：**方向键导航需要列数（数字）**
+   *   `gridCols()` 返回的是模板字符串 `'1fr 1fr 1fr'`，没法算「上/下跳几格」。
+   *   ⇒ 这里给一份数字版，规则**必须与 gridCols() 完全一致**（两处一起改）。
+   */
+  private colCount(): number {
+    if (Bp.isWatch() || Bp.tinyScreen() || this.uiMode === 'elder') { return 1; }
+    if (Bp.isTv() || Bp.isDesktop() || Bp.isLg()) { return 4; }
+    if (Bp.isMd()) { return 3; }
+    return 2;
+  }
+
+  /**
+   * ★★★ 2026-10-30（PC / 2in1）：**方向键导航**
+   *   在网格里按方向键，焦点移到相邻卡片并**自动滚进视野**。
+   *
+   * 三条边界：
+   *   ① **首尾不环绕** —— 第一张按左键不动，最后一张按右键不动。
+   *      （电视/桌面上的环绕会让人"迷失在列表里"，找不到回头路）
+   *   ② 越界就**什么都不做**，但按键照样吃掉（避免 ArkUI 默认遍历抢焦点）
+   *   ③ 移动后 `scrollToIndex` —— 否则焦点跑到屏幕外，看起来像"按键失灵"
+   */
+  private moveFocus(fromId: string, delta: number): void {
+    const arr: GameMeta[] = this.list();
+    const from: number = arr.findIndex((g: GameMeta) => g.id === fromId);
+    if (from < 0) { return; }
+    const cols: number = this.colCount();
+    const to: number = from + delta;
+    if (to < 0 || to >= arr.length) { return; }          // ① 不环绕
+    // 上下跳行时，若目标列越界（例如最后一行不满），已在 to 上判过长度 ⇒ 安全
+    const target: string = arr[to].id;
+    focusControl.requestFocus('card-' + target);
+    // 让目标卡进入视野（滚到中间偏上，留出上下文）
+    this.gridScroller.scrollToIndex(Math.max(0, to - cols));
+  }
+
   private gridCols(): string {
     // ★★★ 2026-10-29（奥森提醒「显示大小可以变得很小」）：
     //   极小屏（高 < 340vp）原来还会返回 '1fr 1fr' ⇒ 每列仅 ~69vp，
@@ -825,6 +861,11 @@ build() {
                   this.menuId = id;
                   this.menuX = x;
                   this.menuY = y;
+                },
+                // 方向键导航（PC / 2in1 键盘 · 电视遥控器）
+                gridCols: this.colCount(),
+                onArrow: (id: string, delta: number) => {
+                  this.moveFocus(id, delta);
                 },
                 onLongPress: (id: string) => {
                   // 长按 = 收藏 / 取消收藏，顺手给个提示

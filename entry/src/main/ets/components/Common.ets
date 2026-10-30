@@ -654,8 +654,17 @@ export struct GameCard {
   // ★★★ 2026-10-30（PC / 2in1）：**右键菜单的两个回调**
   //   手机/平板没有右键 ⇒ 这两个回调永远不会被调用（零影响）。
   onMenu: (id: string, x: number, y: number) => void = () => {};
+  /**
+   * ★★★ 2026-10-30（PC / 2in1）：**方向键选游戏**
+   *   卡片收到方向键时，把「往哪个方向走」交给父组件（GamesTab）决定。
+   *   为什么不在卡片里做：网格列数、边界、当前筛选后的列表都在父组件手里。
+   *   delta：-1 左 / +1 右 / -cols 上 / +cols 下
+   */
+  onArrow: (id: string, delta: number) => void = () => {};
   /** 是否允许右键菜单（只在桌面类为真 —— 见 Tv.on()） */
   @Prop allowMenu: boolean = false;
+  /** 当前网格列数（方向键上下移动时要跳一整行）—— 由父组件现算传入 */
+  @Prop gridCols: number = 2;
 
   @State private pressed: boolean = false;
   /** ★ 2026-10-29（PC/2in1）：鼠标悬停态。只在桌面/大屏生效，手机零影响 */
@@ -925,10 +934,23 @@ build() {
     //   遥控器方向键在这里移动焦点，OK 键进游戏
     //   · Tv.on() 只在 Bp.isTv() 时为真 ⇒ 手机/平板/PC 上完全不起作用（零回归）
     //   · focusBox 用 4vp 粗框（3 米视距要看得见）
+    // ★★★ 2026-10-30（PC / 2in1）：**稳定 id** —— 方向键导航靠它 requestFocus
+    //   用 'card-' 前缀与 sharedId 的命名一致（共享元素补间也用这个前缀）
+    .id('card-' + this.meta.id)
     .focusable(Tv.on())
     .focusBox(Tv.box())
     .onKeyEvent((e: KeyEvent) => {
       if (!Tv.on()) { return; }
+      // ① 方向键：交给父组件的网格导航
+      //    ⚠️ 必须**吃掉**这个按键（返回 true），否则 ArkUI 的默认焦点遍历
+      //       会同时把焦点挪到"下一个可聚焦元素"，和我们的网格导航打架。
+      //        实机上表现就是：按一次右键跳两格。
+      if (e.type === KeyType.Down && Tv.isArrow(e.keyCode)) {
+        const d: number = Tv.arrowDelta(e.keyCode, this.gridCols);
+        if (d !== 0) { this.onArrow(this.meta.id, d); }
+        return;
+      }
+      // ② 确认键：进游戏
       Tv.handleKey(e, () => { this.onOpen(this.meta.id); });
     })
   }
