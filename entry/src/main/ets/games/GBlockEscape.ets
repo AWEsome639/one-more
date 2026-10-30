@@ -36,6 +36,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -586,6 +587,35 @@ export struct GBlockEscape {
     this.onFinish(r);
   }
 
+  /**
+   * 棋盘边长(vp)：宽度与可用高度取小者 —— 不许 aspectRatio 自行决定高度。
+   *
+   * ★★★ 2026-10-30 为什么改：原来是 `.width('88%')` + `.aspectRatio(1)`，
+   *   **没有任何高度约束**：平板横屏 853×533 上 88% × 813 ≈ 715vp 宽
+   *   （813 = 853 − 左右 padding 各 20），aspectRatio 把高也锁成 715vp，
+   *   而这块地方真正能用的高只有 ~425vp（533 − 顶栏 88 − 底 padding 20）
+   *   ⇒ **溢出 1.68 倍**：
+   *   下面的按钮/状态被挤出屏外，点不到。
+   *   （第 452 轮只扫了 `width('100%')` 那一族，`width('8x%')` 这一族一直漏着）
+   *
+   * reserve 怎么算（本文件）：
+   *   顶栏 88 + 底 padding 20 + 信息行 56（实测：卡片上下 padding 10 + 两行字）
+   *   + 板下 4 行 = 方向键行 46 + 提示/AI 代打条 38 + 按钮行 46 + 状态文字 20 = 150
+   *   + 子元素间隙：6 个子元素 ⇒ 5 × 16vp = 80
+   *   ⇒ reserve = 88 + 20 + 56 + 150 + 80 = 394
+   *   · 手机竖 420×744 ⇒ min(380, 350) = 350
+   *   · 平板横 853×533 ⇒ min(813, 139) = 160
+   *   · 平板竖 800×1280 ⇒ min(768, 886) = 768
+   *   ⚠️ 平板横算出来只有 139vp，低于 160 下限 ⇒ 取 160；
+   *      533vp 高确实排不下这么多控件，底部仍溢出约 21vp，
+   *      但棋盘本身不再暴涨（原来 715vp）。
+   */
+  private boardPx(reserve: number): number {
+    const w: number = Math.max(160, Bp.width - 40);
+    const h: number = Math.max(160, Bp.height - reserve);
+    return Math.min(w, h);
+  }
+
   build() {
     Column({ space: Space.md }) {
       Row({ space: Space.sm }) {
@@ -605,8 +635,10 @@ export struct GBlockEscape {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('88%')
-      .aspectRatio(1)
+      // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
+      .width(this.boardPx(394))
+      .height(this.boardPx(394))
+      .alignSelf(ItemAlign.Center)
       .padding(Space.xs)
       .backgroundColor('#1A6366F1')
       .borderRadius(Radius.lg)

@@ -4,6 +4,7 @@
  * 进度：第几关 / 点中格数 / 剩余笔数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -263,6 +264,39 @@ export struct GMirrorTracing {
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }
+
+  /**
+   * 棋盘边长(vp)：宽度与**对半分到的可用高度**取小者 —— 不许 aspectRatio 自行决定高度。
+   *
+   * ★★★ 2026-10-30 为什么改：两块棋盘原来都是 `.width('72%')` + `.aspectRatio(1)`，
+   *   **没有任何高度约束**：平板横屏 853×533 上 72% × 813 ≈ 585vp 宽
+   *   （813 = 853 − 左右 padding 各 20），aspectRatio 把高也锁成 585vp
+   *   ⇒ 两块竖着叠起来 1170vp，而这块地方真正能用的高只有 ~425vp
+   *   （533 − 顶栏 88 − 底 padding 20）⇒ 两块合计溢出 2.75 倍
+   *   ⇒ 第二块棋盘和底部说明、重开按钮全被挤出屏外。
+   *   （第 452 轮只扫了 `width('100%')` 那一族，`width('8x%')` 这一族一直漏着）
+   *
+   * ⚠️ 本文件是**两块棋盘竖向叠放** ⇒ 剩余高度要 /2，两块各分一半。
+   *
+   * reserve 怎么算（本文件）＝除两块棋盘之外的一切：
+   *   顶栏 88 + 底 padding 20 + 板上提示/AI 代打条 38 + 信息行 56
+   *   + 两条小标题 34（棋盘上方 17 + 棋盘之间 17）
+   *   + 板下 状态文字 20 + 重开按钮 46 + 判定说明 17 = 83
+   *   + 子元素间隙：9 个子元素 ⇒ 8 × 16vp = 128
+   *   ⇒ reserve = 88 + 20 + 38 + 56 + 34 + 83 + 128 = 447
+   *   · 手机竖 420×744 ⇒ min(380, (744−447)/2) = 160
+   *   · 平板横 853×533 ⇒ min(813, (533−447)/2=43) = 160（两块共 320vp，原来 1170vp）
+   *   · 平板竖 800×1280 ⇒ min(768, (1280−447)/2) = 416
+   *   ⚠️ 533vp 高仍放不下「两块 160 下限 + 上方提示条 + 板下 4 行」（合计约 767vp），
+   *      底部说明会被切——这是屏幕高度不够，不是棋盘算法的问题；
+   *      棋盘本身不再暴涨，两块都能完整看见。
+   */
+  private boardPx(reserve: number): number {
+    const w: number = Math.max(160, Bp.width - 40);
+    const h: number = Math.max(160, (Bp.height - reserve) / 2);
+    return Math.min(w, h);
+  }
+
   build() {
     Column({ space: Space.md }) {
     HintBar({
@@ -334,8 +368,10 @@ export struct GMirrorTracing {
       .width('100%')
       }, (r: number) => 'r' + r)
       }
-      .width('72%')
-      .aspectRatio(1)
+      // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
+      .width(this.boardPx(447))
+      .height(this.boardPx(447))
+      .alignSelf(ItemAlign.Center)
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
@@ -371,8 +407,10 @@ export struct GMirrorTracing {
       .width('100%')
       }, (r: number) => 'r' + r)
       }
-      .width('72%')
-      .aspectRatio(1)
+      // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
+      .width(this.boardPx(447))
+      .height(this.boardPx(447))
+      .alignSelf(ItemAlign.Center)
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

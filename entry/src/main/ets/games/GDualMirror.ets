@@ -10,6 +10,8 @@
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+// ★ 2026-10-30 布局 bug ③ 修复：两块灯板的边长要用 Bp（当前窗口宽/高）反算
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -22,6 +24,26 @@ const N: number = 4;
 const MOVE_LIMIT: number = 20;
 const SCRAMBLE_MIN: number = 4;
 const SCRAMBLE_MAX: number = 6;
+
+/**
+ * 两块灯板之外的纵向预留（vp）—— 按全项目最苛刻的 533vp 横屏口径逐项拆开算：
+ *   顶栏           88   （GameHost：padding top 28 + 图标行 44 + padding bottom 16）
+ *   底 padding     20   （GameHost 游戏区 padding bottom = Space.lg）
+ *   HintBar        38   （顶部「提示 / AI 代打」条）
+ *   信息行         59   （三张卡片：padding 10×2 + xxs 12 与 md 16 两行 + 行距 2）
+ *   消息行         18   （this.msg）
+ *   重开按钮       52   （Cell.of(46) 在平板 ×1.12）
+ *   底部说明       24   （最下面那行规则文字，最长一句，窄屏可能两行）
+ *   行间距         50   （Column space = Space.sm(10) × 5 处间隙）
+ *   ⇒ 88+20+38+59+18+52+24+50 = 349
+ *
+ * 235 这个数的意义在**宽度**上（两盘并排 ⇒ 边长受棋盘外的东西限制）：
+ *   533 - 235 = 298 = 两盘总宽（减去中间 Space.sm(10) 后各 144vp）
+ *   ⇒ 每盘那块 Column 高 = 标题 16 + 行距 6 + 棋盘 144 = 166
+ *   ⇒ 整页总高 = 349 + 166 = 515 ≤ 533，**留 18vp 余量**（不再溢出）
+ * 手机竖屏 440×744：min(400, 509) = 400 ⇒ 每盘 195vp —— 与改前完全一致（零回归）
+ */
+const BOARD_RESERVE: number = 235;
 
 function range(n: number): number[] {
   const a: number[] = [];
@@ -253,6 +275,34 @@ export struct GDualMirror {
     this.onFinish(r);
   }
 
+  /**
+   * 两块灯板的**可用总边长**（vp）：宽度与可用高度取小者 —— 不许 aspectRatio 自行决定高度。
+   *
+   * ★★★ 2026-10-30 修布局 bug ③（两块板一高一矮 + 右盘溢出）：
+   *   改前左右两盘用的是同一段代码，但只有**左盘**多了
+   *   `.constraintSize({ maxHeight: '70%' })`，右盘只有 `.width('100%').aspectRatio(1)`：
+   *     · 左盘：被限高 70%，aspectRatio 反推宽度 ⇒ 比格子实际需要的小
+   *     · 右盘：完全没有高度约束 ⇒ 宽 401vp ⇒ 高 401vp
+   *   ⇒ 两盘**不等高**，右盘还把 533vp 的屏撑爆（板下消息行、重开按钮被顶出屏幕）。
+   *
+   *   ⇒ 修：两盘走**同一个函数**取边长（各占一半，减去中间 Space.sm 间距），
+   *     左右必然等高等宽，且宽高都是确定值 ⇒ 谁也不会再撑爆页面。
+   *     手机竖屏 440×744：min(400, 509) = 400 ⇒ 每盘 195vp（与改前一致）
+   *     平板横屏 853×533：min(813, 298) = 298 ⇒ 每盘 144vp（改前右盘 401vp、溢出 4/5 屏）
+   */
+  private boardPx(reserve: number): number {
+    const w: number = Math.max(160, Bp.width - 40);   // 40 = GameHost 游戏区左右 padding（Space.lg × 2）
+    // ⚠️ 高度下限只能取 96：取 160 这类大数会在矮屏（533vp 横屏）上把算出来的值**顶高**，
+    //    棋盘比可用空间还大 ⇒ 底部又溢出。96 只用来防「窗口极小时算出 0/负数」。
+    const h: number = Math.max(96, Bp.height - reserve);
+    return Math.min(w, h);
+  }
+
+  /** 单块灯板边长（vp）：两盘并排 ⇒ 总边长减去中间 Space.sm 间距后对半分 */
+  private sidePx(): number {
+    return (this.boardPx(BOARD_RESERVE) - Space.sm) / 2;
+  }
+
   build() {
     Column({ space: Space.sm }) {
       HintBar({
@@ -328,11 +378,13 @@ export struct GDualMirror {
               .layoutWeight(1)
             }, (r: number) => 'lr' + r)
           }
-          .width('100%')
-          .aspectRatio(1)
-          // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
-          //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-          .constraintSize({ maxHeight: '70%' })
+          // ★★★ 2026-10-30（布局 bug ③ 主修点 · 左盘）：
+          //   改前：`.width('100%')` + `.aspectRatio(1)` + `.constraintSize({ maxHeight: '70%' })`
+          //         ⇒ 宽度把高度锁死，只靠 70% 上限"事后补救"，两盘各算各的 ⇒ 一高一矮。
+          //   改后：宽高都由 sidePx() 给定（与右盘同一个值）⇒ 左右必然等大。
+          .width(this.sidePx())
+          .height(this.sidePx())
+          .alignSelf(ItemAlign.Center)
           .padding(Space.xs)
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
@@ -374,8 +426,13 @@ export struct GDualMirror {
               .layoutWeight(1)
             }, (r: number) => 'rr' + r)
           }
-          .width('100%')
-          .aspectRatio(1)
+          // ★★★ 2026-10-30（布局 bug ③ 主修点 · 右盘）：
+          //   改前：`.width('100%')` + `.aspectRatio(1)`，**完全没有高度约束**
+          //         ⇒ 宽 401vp 就撑出 401vp 高，右盘比左盘高一截，并且把 533vp 的屏撑爆。
+          //   改后：与左盘同一个 sidePx() ⇒ 两盘等高等宽，整页不再溢出。
+          .width(this.sidePx())
+          .height(this.sidePx())
+          .alignSelf(ItemAlign.Center)
           .padding(Space.xs)
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)

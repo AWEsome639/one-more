@@ -7,6 +7,8 @@
 
 import { A11y } from '../core/A11y';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+// ★ 2026-10-30 布局 bug ② 修复：棋盘边长要用 Bp（当前窗口宽/高）反算，不再依赖 aspectRatio
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -20,6 +22,22 @@ import { Tv } from '../core/Tv';
 const N: number = 12;
 const MAX_MOVES: number = 25;
 const COLORS: string[] = ['#EF4444', '#F59E0B', '#10B981', '#0EA5E9', '#8B5CF6', '#EC4899'];
+
+/**
+ * 棋盘之外的纵向预留（vp）—— 按全项目最苛刻的 533vp 横屏口径逐项拆开算：
+ *   顶栏           88   （GameHost：padding top 28 + 图标行 44 + padding bottom 16）
+ *   底 padding     20   （GameHost 游戏区 padding bottom = Space.lg）
+ *   HintBar        38   （顶部「提示 / AI 代打」条，barHeight 默认 38）
+ *   信息行         64   （两张卡片：padding 10×2 + xxs 12 与 xl 20 两行 + 行距 2）
+ *   颜色行         54   （6 个色块 Cell.of(48) 在平板 ×1.12）
+ *   按钮行         49   （说明 / 提示 / 重开）
+ *   行间距         64   （Column space = Space.md(16) × 4 处间隙）
+ *   ⇒ 88+20+38+64+54+49+64 = 377，取 380 留 3vp 余量
+ *
+ * ⚠️ 静态审计里建议的 280 **不能直接用**：它漏了 HintBar(38) 与 Column 的 4 个 16vp 间隙(64)，
+ *    照 280 反算棋盘会得到 253vp，整页仍溢出约 100vp —— 颜色行仍会被棋盘压住，等于没修。
+ */
+const BOARD_RESERVE: number = 380;
 
 /** 把与 0 号格连通且同色的一整块染成 to，返回新数组 */
 function floodTo(cells: number[], to: number): number[] {
@@ -351,6 +369,34 @@ export struct GColorFlood {
     this.onFinish(r);
   }
 
+  /**
+   * 棋盘边长（vp）：**宽度与可用高度取小者** —— 不许 aspectRatio 自行决定高度。
+   *
+   * ★★★ 2026-10-30 修布局 bug ②（12×12 棋盘尺寸与容器约束自相矛盾）：
+   *   改前同时存在三样东西：
+   *     ① 格子 `layoutWeight(1) + aspectRatio(1)`  ⇒ 12 行高度被 12 列宽度锁死
+   *     ② 容器 `.aspectRatio(1)`                    ⇒ 容器自己又按宽度定高
+   *     ③ 容器 `.constraintSize({ maxHeight: '46%' })` ⇒ 再把容器压到 46%
+   *   三者互相打架：容器被压到 342vp，格子仍要按宽度撑到 418vp
+   *   ⇒ **内容溢出到下方颜色行，棋盘最后 2~3 行被按钮盖住**
+   *   （上一轮注释写"已回退 aspectRatio"，但代码里它一直在，注释与代码矛盾 —— 一并删掉。）
+   *
+   *   ⇒ 现在只留一个口径：棋盘是**定宽定高的正方形**，
+   *     边长 = min(可用宽, 屏高 - 预留)，格子由宽度均分、高度自然等于宽度
+   *     ⇒ 12 行行高总和恰好等于容器高，既不会溢出、也不会被压扁。
+   *     手机竖屏 440×744：min(400, 364) = 364 ⇒ 格子 ~27vp（比改前更好看）
+   *     平板横屏 853×533：min(813, 153) = 153 ⇒ 格子 ~10vp（很小，但**整页不再溢出**；
+   *       12×12 要在 533vp 横屏上放大，只能把整页改成 Scroll，超出本轮范围）
+   */
+  private boardPx(reserve: number): number {
+    const w: number = Math.max(160, Bp.width - 40);   // 40 = GameHost 游戏区左右 padding（Space.lg × 2）
+    // ⚠️ 高度下限只能取 96：原来写 160 的话，533vp 横屏算出 153 会被**抬到 160**
+    //    ⇒ 棋盘反而比可用空间高 7vp，底部又溢出（等于把刚修好的 bug 请回来）。
+    //    96 只用来防「窗口极小时算出 0/负数」，正常设备根本碰不到。
+    const h: number = Math.max(96, Bp.height - reserve);
+    return Math.min(w, h);
+  }
+
   build() {
     Column({ space: Space.md }) {
       HintBar({
@@ -407,19 +453,15 @@ export struct GColorFlood {
           .width('100%')
         }, (r: number) => 'cfr' + r)
       }
-      .width('100%')
-      // ★★★ 2026-10-30 真机抓到（同类坑第 5 处）：**底部 6 个颜色按钮压住棋盘**
-      //   现象：棋盘最后 2~3 行被按钮盖住，规则文字只剩半行。
-      //   根因：格子 `layoutWeight(1) + aspectRatio(1)` ⇒ 12×12 撑到 440vp 高，
-      //         而 `.constraintSize({ maxHeight: '46%' })` 只把容器压到 342vp
-      //         ⇒ **容器被压缩、格子仍要正方形 ⇒ 内容溢出到按钮区**。
-      //   ⇒ 修：容器自己也 `aspectRatio(1)` —— 高度受限时宽度跟着缩，
-      //        格子自然变小，12 行恰好装进 342vp，不再溢出。
-      .aspectRatio(1)
-      // ★ 2026-10-30：试过 8 种约束组合（46vh / aspectRatio / maxWidth），全部更糟。
-      //   根因是结构矛盾（格子按宽度均分 vs 容器限高），不是数值问题 —— 
-      //   正确解需把「棋盘+颜色行+按钮」放进 Scroll，下一轮重做。现保持 46%（棋盘完整）。
-      .constraintSize({ maxHeight: '46%' })
+      // ★★★ 2026-10-30（布局 bug ② 的主修点）：
+      //   改前：`.width('100%')` + `.aspectRatio(1)` + `.constraintSize({ maxHeight: '46%' })`
+      //         —— 容器与格子都用 aspectRatio 定高，再叠一个 46% 上限，三者互相打架：
+      //         容器被压到 342vp、格子仍要 418vp ⇒ **棋盘最后 2~3 行溢出到颜色行上面**。
+      //   改后：删掉 aspectRatio 与 maxHeight 百分比，宽高都由 boardPx() 给定（正方形），
+      //         格子按宽度均分出来的行高正好填满容器 ⇒ 棋盘完整、颜色行不再被压住。
+      .width(this.boardPx(BOARD_RESERVE))
+      .height(this.boardPx(BOARD_RESERVE))
+      .alignSelf(ItemAlign.Center)
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

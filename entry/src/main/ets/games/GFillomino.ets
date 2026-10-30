@@ -7,6 +7,8 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+// ★ 2026-10-30 布局 bug ① 修复：棋盘边长要用 Bp（当前窗口宽/高）反算，不再依赖 aspectRatio
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -19,6 +21,23 @@ import { Tv } from '../core/Tv';
 const N: number = 6;
 const MAX_MOVES: number = 150;
 const SIZES: number = N + 2;   // 1..8，正好铺满 36 格
+
+/**
+ * 棋盘之外的纵向预留（vp）—— 按全项目最苛刻的 533vp 横屏口径逐项拆开算：
+ *   顶栏           88   （GameHost：padding top 28 + 图标行 44 + padding bottom 16）
+ *   底 padding     20   （GameHost 游戏区 padding bottom = Space.lg）
+ *   信息行         62   （三张卡片：padding 10×2 + xxs 12 与 lg 18 两行 + 行距 2）
+ *   数字键 2 行    98   （Cell.of(44) 在平板 ×1.12 = 49，两行）
+ *   按钮行         49   （清除本格 / 提示 / AI 代打 / 重开 同一行）
+ *   状态行         20   （最下面那行灰色说明文字）
+ *   行间距         80   （Column space = Space.md(16) × 5 处间隙）
+ *   ⇒ 88+20+62+98+49+20+80 = 417，取 420 留 3vp 余量
+ *
+ * ⚠️ 静态审计里建议的 325 **不能直接用**：它只算了「顶栏 + padding + 信息行 + 键 + 按钮 + 状态」，
+ *    **漏掉了 Column 的 5 个 16vp 间隙（80vp）**，也按手机口径算的行高（平板上 Cell.of(44)=49）。
+ *    照 325 反算棋盘会得到 208vp，整页仍然溢出约 90vp —— 底部状态行与按钮行继续被裁，等于没修。
+ */
+const BOARD_RESERVE: number = 420;
 
 interface FilloGen {
   sol: number[];
@@ -393,6 +412,32 @@ export struct GFillomino {
     this.onFinish(r);
   }
 
+  /**
+   * 棋盘边长（vp）：**宽度与可用高度取小者** —— 不许 aspectRatio 自行决定高度。
+   *
+   * ★★★ 2026-10-30 修布局 bug ①（平板横屏 853×533，原代码溢出 4.2 倍）：
+   *   原来的写法是「容器 `.width('100%')` + `.constraintSize({ maxHeight: '46%' })`，
+   *   格子 `layoutWeight(1) + aspectRatio(1)`」——
+   *   格子的 aspectRatio 会把**高度锁成宽度**：容器宽 813vp ⇒ 6 行格子要 813vp 高，
+   *   而 46% 只给 ~195vp ⇒ 内容溢出 4.2 倍，
+   *   板下 2 行数字键（1~4 / 5~8）与 4 个按钮（清除本格 / 提示 / AI 代打 / 重开）
+   *   被整排顶出屏幕（表现为「点不到」）。
+   *
+   *   ⇒ 现在：棋盘是**定宽定高的正方形**，边长 = min(可用宽, 屏高 - 预留)，
+   *     格子由宽度均分、高度自然等于宽度 ⇒ 行高总和恰好等于容器高，不存在溢出。
+   *     手机竖屏 440×744：min(400, 324) = 324 ⇒ 格子 ~50vp（仍旧好点）
+   *     平板横屏 853×533：min(813, 113) = 113 ⇒ 格子 ~15vp（很小，但**整页不再溢出**，
+   *       底部按钮回到可点区域；要更大的棋盘必须把整页改成 Scroll，超出本轮范围）
+   */
+  private boardPx(reserve: number): number {
+    const w: number = Math.max(160, Bp.width - 40);   // 40 = GameHost 游戏区左右 padding（Space.lg × 2）
+    // ⚠️ 高度下限只能取 96：原来写 160 的话，533vp 横屏算出 113 会被**抬到 160**
+    //    ⇒ 棋盘反而比可用空间高 47vp，底部又溢出（等于把刚修好的 bug 请回来）。
+    //    96 只用来防「窗口极小时算出 0/负数」，正常设备根本碰不到。
+    const h: number = Math.max(96, Bp.height - reserve);
+    return Math.min(w, h);
+  }
+
   build() {
     Column({ space: Space.md }) {
       Row({ space: Space.md }) {
@@ -476,9 +521,14 @@ export struct GFillomino {
           .width('100%')
         }, (r: number) => 'fmr' + r)
       }
-      .width('100%')
-      // ★★★ 2026-10-29 真机抓到（同类坑第 5 处）：同上，提示按钮在 y=2220 点不到。
-      .constraintSize({ maxHeight: '46%' })
+      // ★★★ 2026-10-30（布局 bug ① 的主修点）：
+      //   改前：`.width('100%')` + `.constraintSize({ maxHeight: '46%' })`
+      //         ⇒ 格子 aspectRatio 把高度锁成宽度，板高 = 813vp，46% 只给 195vp ⇒ 溢出 4.2 倍
+      //   改后：宽高都交给 boardPx()（正方形），格子按宽度均分出来的行高正好填满容器
+      //         ⇒ 板下 2 行数字键 + 按钮行 + 状态行全部留在屏内
+      .width(this.boardPx(BOARD_RESERVE))
+      .height(this.boardPx(BOARD_RESERVE))
+      .alignSelf(ItemAlign.Center)
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

@@ -10,6 +10,7 @@
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
@@ -509,6 +510,33 @@ export struct GTicTacToe {
     this.onFinish(r);
   }
 
+  /**
+   * 棋盘边长(vp)：宽度与可用高度取小者 —— 不许 aspectRatio 自行决定高度。
+   *
+   * ★★★ 2026-10-30 为什么改：原来是 `.width('82%')` + `.aspectRatio(1)`，
+   *   **没有任何高度约束**：平板横屏 853×533 上 82% × 813 ≈ 667vp 宽
+   *   （813 = 853 − 左右 padding 各 20），aspectRatio 把高也锁成 667vp，
+   *   而这块地方真正能用的高只有 ~425vp（533 − 顶栏 88 − 底 padding 20）
+   *   ⇒ **溢出 1.57 倍**：
+   *   下面的按钮/状态被挤出屏外，点不到。
+   *   （第 452 轮只扫了 `width('100%')` 那一族，`width('8x%')` 这一族一直漏着）
+   *
+   * reserve 怎么算（本文件）：
+   *   顶栏 88 + 底 padding 20 + 信息行 56（实测：卡片上下 padding 10 + 两行字）
+   *   + 38（提示/AI 代打条，在棋盘上方）
+   *   + 板下 3 行 = 状态文字 20 + 按钮行 46 + 判定说明 17 = 83
+   *   + 子元素间隙：6 个子元素 ⇒ 5 × 16vp = 80
+   *   ⇒ reserve = 88 + 20 + 56 + 38 + 83 + 80 = 365
+   *   · 手机竖 420×744 ⇒ min(380, 379) = 379
+   *   · 平板横 853×533 ⇒ min(813, 168) = 168
+   *   · 平板竖 800×1280 ⇒ min(768, 915) = 768
+   */
+  private boardPx(reserve: number): number {
+    const w: number = Math.max(160, Bp.width - 40);
+    const h: number = Math.max(160, Bp.height - reserve);
+    return Math.min(w, h);
+  }
+
   build() {
     Column({ space: Space.md }) {
       HintBar({
@@ -595,8 +623,10 @@ export struct GTicTacToe {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('82%')
-      .aspectRatio(1)
+      // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
+      .width(this.boardPx(365))
+      .height(this.boardPx(365))
+      .alignSelf(ItemAlign.Center)
       .padding(Space.sm)
       .backgroundColor('#1AEC4899')
       .borderRadius(Radius.lg)

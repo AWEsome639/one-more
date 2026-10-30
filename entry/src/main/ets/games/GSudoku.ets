@@ -11,6 +11,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 路线 B：难度不再只看挖空数，用模型预测「真实难度」
@@ -773,6 +774,26 @@ export struct GSudoku {
     return TG2("已选中第 {0} 行第 {1} 列", (Math.floor(this.sel / SIDE) + 1), (this.sel % SIDE + 1));
   }
 
+  /**
+   * ★★★ 2026-10-30 真机（平板横屏 853×533）抓到的真 bug：
+   *   9×9 棋盘的格子是 `layoutWeight(1) + aspectRatio(1)`
+   *   ⇒ **高度被宽度锁死**：横屏宽 853vp ⇒ 棋盘 853vp 高
+   *   而容器只给 `maxHeight: '52%'` = 277vp ⇒ **内容溢出 3 倍**
+   *   ⇒ 数字键盘与底部四个按钮被挤出屏幕（截图：键盘压在棋盘中间、按钮被截断）。
+   *
+   *   ⇒ 修：**宽高都由"可用高度"反推**，不再让 aspectRatio 独自决定：
+   *      边长 = min(可用宽, 52% × 屏高)
+   *   这样：
+   *     · 手机竖 440×744：min(408, 387) = 387  ⇒ 与原来接近，零回归
+   *     · 平板横 853×533：min(821, 277) = 277  ⇒ **棋盘变小，按钮回到屏内**
+   *     · 平板竖 800×1280：min(768, 666) = 666 ⇒ 更大更清晰
+   */
+  private boardPx(): number {
+    const w: number = Math.max(200, Bp.width - 40);
+    const h: number = Math.max(160, Bp.height * 0.52);
+    return Math.min(w, h);
+  }
+
   build() {
     Column({ space: Space.md }) {
       Row({ space: Space.sm }) {
@@ -813,7 +834,9 @@ export struct GSudoku {
       //   表现：底部三个按钮 bounds 下沿 = 2232 = 屏高 ⇒ 被系统手势区吃掉 ⇒ **点不动**。
       //   （同页证据：棋盘与数字键都能点，已填 41→42）
       // ⇒ 给棋盘**限高**，让它让出空间，按钮行自然回到可点区域。
-      .constraintSize({ maxHeight: '52%' })
+      .width(this.boardPx())
+      .height(this.boardPx())
+      .alignSelf(ItemAlign.Center)
 
       // 数字键盘
       Row({ space: Space.xs }) {
