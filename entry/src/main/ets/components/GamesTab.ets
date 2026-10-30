@@ -290,6 +290,22 @@ export struct GamesTab {
   // ★ 性能：list() 在 build 里被调 4 次，每次遍历 354 款 ⇒ 按输入记忆化
   /** ★ 2026-10-30：Grid 的滚动控制器 —— 切分类后必须归零 */
   private gridScroller: Scroller = new Scroller();
+
+  /**
+   * ★ 2026-10-30：切换任何"会改变列表长度"的条件后，把 Grid 滚动位置归零。
+   *   踩过的坑（真机）：切分类后列表停在最底部，看起来"完全不能滚"，
+   *   实际是**已经滚到底了**（44 款 = 22 行，maxOffset 17 行）。
+   *   同一类入口：分类 chip / 全部·收藏·最近 / 特征标签 / 清空 / 网格⇄A-Z。
+   */
+  private resetGridScroll(): void {
+    setTimeout(() => {
+      try {
+        this.gridScroller.scrollEdge(Edge.Top);
+      } catch (e) {
+        // 滚动器还没挂上时静默忽略（不影响功能）
+      }
+    }, 0);
+  }
   private listCache: GameMeta[] = [];
   private listCacheKey: string = '\u0000';
 
@@ -500,6 +516,7 @@ export struct GamesTab {
       next.push(id);
     }
     this.picked = next;
+    this.resetGridScroll();
   }
 
   /**
@@ -748,9 +765,7 @@ build() {
               // 算账：44 款 = 22 行，可视 5 行 => maxOffset = 17 行，
               //     首行 = 第 18 行 = 第 35/36 款，与截图第一行吻合。
               // => 修：切分类后把 Grid 滚动位置归零。
-              setTimeout(() => {
-                this.gridScroller.scrollEdge(Edge.Top);
-              }, 0);
+              this.resetGridScroll();
               animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
                 this.category = c;
               });
@@ -1232,6 +1247,7 @@ build() {
           .onClick(() => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
             this.picked = [];
+            this.resetGridScroll();
           })
       }
       Text(this.showFilter ? this.t('收起 ▲', 'Less ▲') : this.t('展开 ▼', 'More ▼'))
@@ -1331,6 +1347,7 @@ build() {
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         this.pulseGrid();   // ★ 拉满：内容刷新脉冲
+        this.resetGridScroll();
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
           this.seg = s;
         });
@@ -1434,6 +1451,7 @@ build() {
         // ★ 每次切到 A-Z 都重放一次首屏错峰（先归零再置起，否则第二次进来不动）
         this.azShown = (mode !== ViewMode.AZ);
         this.pulseGrid();   // ★ 拉满：内容刷新脉冲（网格 ⇄ 字母表）
+        this.resetGridScroll();
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
           this.viewMode = mode;
         });
