@@ -335,12 +335,6 @@ struct Splash {
   //   ★ 2026-10-30 平板竖屏（800vp）真机抓到：写死的 108pt 在 800vp 宽上只占 13%，
   //     视觉重心完全立不起来。⇒ 字号按**屏宽比例**推导，再 clamp 到合理区间。
   //     比例取自手机 440vp 上的观感（OM≈108pt ⇒ 0.245w）。
-  /** 图标宽度（vp）：与标题字号挂钩，保证比例协调 */
-  private get omW(): number {
-    const t: number = this.tiny ? 54 : this.omPx;
-    return t * 2.05;
-  }
-
   // ── 图标几何（与 foreground.png 同比例）──
   //   O 外径 : M 宽 = 316 : 318  ⇒ 几乎 1:1
   //   O 与 M 的间距 = (511-510) ≈ 图标里几乎相接，这里给 2% 外径当作呼吸
@@ -477,18 +471,13 @@ struct Splash {
         //     **把 AppScope 的 foreground.png 复制进 entry 资源，直接 Image 显示。**
         //     这就是图标本身，样式 100% 一致，且跨设备渲染稳定。
         Image($r('app.media.splash_om'))
-          .width(this.omW)
-          .height(this.omW / 1.978)
+          // ★ 不用 getter —— 本工程里 getter 读 @State 会返回 NaN（已踩两次）
+          .width(this.tiny ? 110 : this.omPx * 2.05)
+          .height(this.tiny ? 56 : this.omPx * 2.05 / 1.978)
           .objectFit(ImageFit.Contain)
           .opacity(this.seg(this.pStroke, 0.00, 0.42))
           .blur((1 - this.seg(this.pStroke, 0.00, 0.42)) * (this.tiny ? 6 : 14))
           .translate({ y: (1 - this.seg(this.pStroke, 0.00, 0.42)) * (this.tiny ? 4 : 10) })
-          .shadow({
-            radius: this.seg(this.pFill, 0.2, 1.0) * (this.tiny ? 18 : 42),
-            color: '#55C99E52',
-            offsetX: 0,
-            offsetY: 0
-          })
           .margin({ bottom: this.tiny ? 4 : 10 })
 
         // ★ 兜底：Image 若因资源/合成问题不显示，Text 版 OM 至少保证品牌可见

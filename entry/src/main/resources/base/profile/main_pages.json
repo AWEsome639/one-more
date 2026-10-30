@@ -4,6 +4,7 @@
     "pages/Index",
     "pages/GameHost",
     "pages/GuidePage",
-    "pages/LanLobby"
+    "pages/LanLobby",
+    "pages/DiagPage"
   ]
 }
