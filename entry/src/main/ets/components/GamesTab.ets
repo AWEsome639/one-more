@@ -12,6 +12,7 @@
 import { WatchGames } from '../core/WatchGames';
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { router } from '@kit.ArkUI';
 import { About } from '../core/About';
 import { Haptics } from '../core/Haptics';
