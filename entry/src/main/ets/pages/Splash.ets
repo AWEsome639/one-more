@@ -93,6 +93,14 @@ const STARS: number[][] = [
 // 极小屏只保留前 24 颗（8+8+8 已经是 24；这里再减到 16 更省）
 const STARS_TINY: number = 16;
 
+/**
+ * 两拍节奏用的曲线（全局，setTimeout 里不能用 this）。
+ * 轻微过冲：y1 = 1.06 > 1 —— M 山"长出来"时有一点点弹性。
+ */
+function sunCurveGlobal(): ICurve {
+  return curves.cubicBezierCurve(0.34, 1.06, 0.36, 1.0);
+}
+
 @Entry
 @Component
 struct Splash {
@@ -107,6 +115,8 @@ struct Splash {
   @State pGlint: number = 0;
   /** 环从 12 点画出来（strokeDashOffset 由 1→0） */
   @State pDraw: number = 0;
+  /** M 山：比环晚 70ms 到（两拍节奏的第二拍） */
+  @State pM: number = 0;
   @State pFill: number = 0;      // L4b 填充点亮
   @State pSweep: number = 0;     // L5 光带
   @State pTitle: number = 0;     // L6 标题
@@ -246,10 +256,12 @@ struct Splash {
       animateTo({ duration: 520, curve: Curve.Linear }, () => {
         this.pGlint = 1;
       });
-      // 轮廓先行：环从 12 点画出来，620ms（比描边的 980ms 短 ⇒ 画完才是"成"）
-      animateTo({ duration: 620, curve: curves.cubicBezierCurve(0.05, 0.7, 0.1, 1.0) }, () => {
-        this.pDraw = 1;
-      });
+      // 两拍节奏第二拍：M 山比环晚 70ms 到（scale 0.94→1 + 淡入）
+      setTimeout(() => {
+        animateTo({ duration: 460, curve: sunCurveGlobal() }, () => {
+          this.pM = 1;
+        });
+      }, 70);
     }, 280);
     // L4b 填充点亮（描边快完成时起，衔接最自然）
     setTimeout(() => {
@@ -588,7 +600,11 @@ struct Splash {
             ])
             .fill('#FAF8F3')
             .position({ x: this.omPxV() * 0.4929, y: this.omPxV() * 0.0 })
-            .opacity(this.seg(this.pStroke, 0.001, 0.42))
+            // ★ 两拍节奏（替代 dash 方案）：环先到（pStroke），M 晚 70ms 到（pM）
+            //   「轮廓先行、实心后至」的观感不靠"画"，靠**先后**。
+            .opacity(this.seg(this.pM, 0.001, 0.55))
+            .scale({ x: 0.94 + this.seg(this.pM, 0.0, 1.0) * 0.06,
+                     y: 0.94 + this.seg(this.pM, 0.0, 1.0) * 0.06 })
         }
         // 整体 1000 × 505.5 ⇒ 宽高比 1.978（与应用图标一致）
         .width(this.omPxV() * 1.0)
