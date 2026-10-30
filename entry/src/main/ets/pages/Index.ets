@@ -213,6 +213,20 @@ pageTransition() {
   PageTransitionEnter({ type: RouteType.Pop, duration: Motion.base })
     .translate({ y: -14 })
     .opacity(0)
+  // ★★★ 2026-10-30（P0-3）：**开屏 → 主页的交接**
+  //
+  //   先查了 SDK：`RouteType` 只有 None / Push / Pop **三个值**，没有 Replace。
+  //   而 `page_transition.d.ts` 对 `None = 0` 的注释写明：
+  //     "The page is not redirected. The animation specified by PageTransitionEnter
+  //      takes effect for page entrance" —— **这正是 `router.replaceUrl` 的情形**。
+  //   ⇒ 所以交接要挂在 `RouteType.None` 上。
+  //
+  //   原来只写了 Push/Pop，而 Splash 用 `replaceUrl` ⇒ 走 None ⇒ 无转场 ⇒ **硬切**。
+  //   现在两页共用 #0D1320 底色，只差一个 scale 方向 + 淡入
+  //   ⇒ 读起来是"内容自己浮上来"，不是"换了一页"。
+  PageTransitionEnter({ type: RouteType.None, duration: 320 })
+    .opacity(0)
+    .scale({ x: 1.03, y: 1.03 })
 }
 
   /**
