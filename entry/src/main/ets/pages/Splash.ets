@@ -105,6 +105,8 @@ struct Splash {
   @State pSun: number = 0;       // 日出：金点从山脊后升起
   /** 金属高光：4 段短弧绕环旋转（0→1） */
   @State pGlint: number = 0;
+  /** 环从 12 点画出来（strokeDashOffset 由 1→0） */
+  @State pDraw: number = 0;
   @State pFill: number = 0;      // L4b 填充点亮
   @State pSweep: number = 0;     // L5 光带
   @State pTitle: number = 0;     // L6 标题
@@ -243,6 +245,10 @@ struct Splash {
       // 金属高光：520ms 匀速绕环（唯一该用 Linear 的地方）
       animateTo({ duration: 520, curve: Curve.Linear }, () => {
         this.pGlint = 1;
+      });
+      // 轮廓先行：环从 12 点画出来，620ms（比描边的 980ms 短 ⇒ 画完才是"成"）
+      animateTo({ duration: 620, curve: curves.cubicBezierCurve(0.05, 0.7, 0.1, 1.0) }, () => {
+        this.pDraw = 1;
       });
     }, 280);
     // L4b 填充点亮（描边快完成时起，衔接最自然）
@@ -523,13 +529,20 @@ struct Splash {
           // ── ① O 环（描边圆，可 dash / 可独立高光）──
           //   几何（归一化到 1000 宽，再用 omW 换算成 vp）：
           //     圆心 (240.9, 266.1)  外半径 240.9  环宽 127.6
+          // ★★★ 2026-10-30「轮廓先行」（研究报告 P1-2，仿 Google Drive）：
+          //   环不是"淡入"，是**从 12 点开始顺时针画出来** —— 两拍节奏的第一拍。
+          //   做法：strokeDashArray = [周长, 周长]（一段实线一段空白）
+          //         strokeDashOffset 由 周长 → 0（线头从 12 点走一圈）
+          //   周长 = π × 直径 = π × 0.4818 × omPxV ≈ 1.5137 × omPxV
           Circle()
             .width(this.omPxV() * 0.4818).height(this.omPxV() * 0.4818)
             .fill(Color.Transparent)
             .stroke('#C99E52')
             .strokeWidth(this.omPxV() * 0.1276)
+            .strokeDashArray([this.omPxV() * 1.5137, this.omPxV() * 1.5137])
+            .strokeDashOffset((1 - this.pDraw) * this.omPxV() * 1.5137)
             .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
-            .opacity(this.seg(this.pStroke, 0.001, 0.42))
+            .opacity(this.seg(this.pStroke, 0.001, 0.10))
 
           // ── ①b 金属高光：4 段短弧绕环旋转（研究报告 P2-1）──
           //   ★ 金的「贵」来自**会动的高光**，不是金色本身。
