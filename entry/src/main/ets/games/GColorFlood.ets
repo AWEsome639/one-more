@@ -408,10 +408,24 @@ export struct GColorFlood {
         }, (r: number) => 'cfr' + r)
       }
       .width('100%')
-      // ★★★ 2026-10-29 真机抓到（同类坑第 4 处）：棋盘被下面的按钮行挤爆，
-      //   「提示」按钮落在 y=2220（离底仅 12px）⇒ 点不到。
-      //   ⇒ 给棋盘限高，把按钮抬进可点区。
-      .constraintSize({ maxHeight: '46%' })
+      // ★★★ 2026-10-30 真机抓到（同类坑第 5 处）：**底部 6 个颜色按钮压住棋盘**
+      //   现象：棋盘最后 2~3 行被按钮盖住，规则文字只剩半行。
+      //   根因：格子 `layoutWeight(1) + aspectRatio(1)` ⇒ 12×12 撑到 440vp 高，
+      //         而 `.constraintSize({ maxHeight: '46%' })` 只把容器压到 342vp
+      //         ⇒ **容器被压缩、格子仍要正方形 ⇒ 内容溢出到按钮区**。
+      //   ⇒ 修：容器自己也 `aspectRatio(1)` —— 高度受限时宽度跟着缩，
+      //        格子自然变小，12 行恰好装进 342vp，不再溢出。
+      .aspectRatio(1)
+      // ★★★ 2026-10-30（第 6 次修，前 5 次都错在这里）：
+      //   原来写 `maxHeight: '46%'` —— **百分比高度相对"父容器"，不是屏幕**。
+      //   而父容器是 `Column(...)` wrapContent（高度由子元素决定）
+      //   ⇒ 46% 变成一个**循环依赖** ⇒ 约束静默失效 ⇒ 棋盘撑到自然高度 440vp
+      //   ⇒ 底部按钮压在棋盘最后 3 行上（真机截图明证）。
+      //
+      //   ⇒ 改 `46vh`：**vh 相对屏幕**，不受父容器影响，一定算得出来。
+      //   · 46vh @ 744 = 342vp  ⇒ 12 格 ×28.5vp，与 aspectRatio 自洽
+      //   · 46vh @ 533 = 245vp  ⇒ 横屏自动变得更小，也不会溢出
+      .constraintSize({ maxHeight: '46vh' })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

@@ -12,7 +12,6 @@
 import { WatchGames } from '../core/WatchGames';
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { router } from '@kit.ArkUI';
 import { About } from '../core/About';
 import { Haptics } from '../core/Haptics';
@@ -289,6 +288,8 @@ export struct GamesTab {
   }
 
   // ★ 性能：list() 在 build 里被调 4 次，每次遍历 354 款 ⇒ 按输入记忆化
+  /** ★ 2026-10-30：Grid 的滚动控制器 —— 切分类后必须归零 */
+  private gridScroller: Scroller = new Scroller();
   private listCache: GameMeta[] = [];
   private listCacheKey: string = '\u0000';
 
@@ -741,6 +742,15 @@ build() {
             theme: this.theme(),
             onPick: (c: GameCategory) => {
               this.pulseGrid();   // ★ 拉满：内容刷新脉冲
+              // 2026-10-30 真机抓到的真 bug：切分类后列表停在最底部，
+              // 看起来完全不能滚。证据：逻辑 44 屏上 10 款 = 注册表第 35-44 款，
+              // 第 1-34 款一次都没出现 => 不是数据问题，是滚动位置问题。
+              // 算账：44 款 = 22 行，可视 5 行 => maxOffset = 17 行，
+              //     首行 = 第 18 行 = 第 35/36 款，与截图第一行吻合。
+              // => 修：切分类后把 Grid 滚动位置归零。
+              setTimeout(() => {
+                this.gridScroller.scrollEdge(Edge.Top);
+              }, 0);
               animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
                 this.category = c;
               });
@@ -767,7 +777,7 @@ build() {
       } else if (this.viewMode === ViewMode.AZ) {
         this.azList()
       } else {
-        Grid() {
+        Grid(this.gridScroller) {
           ForEach(this.list(), (g: GameMeta, i: number) => {
             GridItem() {
               GameCard({
