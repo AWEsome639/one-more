@@ -33,6 +33,7 @@
  */
 
 import { Sound } from '../core/Sound';
+import { Bp } from '../core/Bp';
 import { router } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Accent, AccentOption } from '../core/Design';
 import { BUILD_TAG, GAMES } from '../core/GameRegistry';
@@ -482,12 +483,14 @@ build() {
           .margin({ top: Space.lg, bottom: Space.xxxl })
       }
       .width('100%')
-      // ★ 2026-10-13（lead 巡检 ①）：**底部被导航栏吃掉一截** —— 实测
-      //   `Scroll` 视口到 y=1968 就结束（`Tabs`/`Swiper` 给的就是 1851 高），
-      //   而「主题色」那排色块需要往下再走 ~52vp ⇒ **色块被裁掉，用户看不到**。
-      //   ⇒ 给内容底部留出**导航栏高度 + 余量**：滚到底时最后一行能完整露出来。
-      //   （导航栏 `barHeight(60)`；留 60+24 ⇒ 既有余量、又不显得空）
-      .padding({ bottom: 84 })
+      // ★★★ 2026-10-30：**写死 84 在矮屏上不够**（实测 960×540 下
+      //   「界面模式」三个按钮仍被导航栏遮住下半部分 —— 差约 20vp）。
+      //   ⇒ 改成按 **导航栏实际高度** 现算：
+      //       导航栏 = isWatch || tinyScreen ? 36 : 60（与 Index.ets 同一表达式）
+      //       + 48 余量（比原来的 24 更宽，因为矮屏上内容更密、更容易贴边）
+      //   ⚠️ 这里必须和 Index.ets 的 barHeight 表达式保持一致；
+      //      哪天导航栏改了高度，这里会自动跟着变（不再是一个孤立的魔数）。
+      .padding({ bottom: (Bp.isWatch() || Bp.tinyScreen() ? 36 : 60) + 48 })
       .opacity(this.entered ? 1 : 0)
       .translate({ y: this.entered ? 0 : 10 })
       .animation({ duration: Motion.slow, curve: Motion.spring() })
