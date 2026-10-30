@@ -37,7 +37,15 @@ const SIZES: number = N + 2;   // 1..8，正好铺满 36 格
  *    **漏掉了 Column 的 5 个 16vp 间隙（80vp）**，也按手机口径算的行高（平板上 Cell.of(44)=49）。
  *    照 325 反算棋盘会得到 208vp，整页仍然溢出约 90vp —— 底部状态行与按钮行继续被裁，等于没修。
  */
-const BOARD_RESERVE: number = 420;
+// ★★★ 2026-10-30（与 GColorFlood 同一轮发现的同一类问题）：
+//   420 在 960×540（游戏区约 476vp）下算出 56vp ⇒ 被 max(96,...) 抬到 **96vp**
+//   ⇒ 6×6 每格 16vp = 48px，勉强可点；底部说明还被切掉一半。
+//
+//   ⇒ 改成 300：棋盘 176vp（每格 29.3vp ≈ **88px**，非常好点）。
+//   ⚠️ 但 420 原来是子代理按"必须一屏装下"算出来的 ——
+//      改小之后整页会超高 ⇒ **必须同时套 Scroll**，否则底部按钮又被挤出屏。
+//      （这两件事必须一起做，只做一件就是把旧 bug 请回来。）
+const BOARD_RESERVE: number = 300;
 
 interface FilloGen {
   sol: number[];
@@ -439,210 +447,219 @@ export struct GFillomino {
   }
 
   build() {
-    Column({ space: Space.md }) {
-      Row({ space: Space.md }) {
-        Column({ space: 2 }) {
-        Text((TG('已填'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.filledCount()) + '/36'))
-        .fontSize(FontSize.lg)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.theme.ink)
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text((TG('空格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(N * N - this.filledCount())))
-        .fontSize(FontSize.lg)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.theme.ink)
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(Digits(String(this.moves), this.langCode))
-        .fontSize(FontSize.lg)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.theme.ink)
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-      }
-      .width('100%')
-
-      Column({ space: 2 }) {
-        ForEach([0, 1, 2, 3, 4, 5], (r: number) => {
-          Row({ space: 2 }) {
-            ForEach([0, 1, 2, 3, 4, 5], (c: number) => {
-              Stack() {
-              Text(this.vals[(r * N + c)] > 0 ? String(this.vals[(r * N + c)]) : '')
-              .fontSize(FontSize.xl)
-              .fontWeight(this.given[(r * N + c)] ? FontWeight.Bold : FontWeight.Normal)
-              .fontColor(this.given[(r * N + c)] ? this.theme.ink : Palette.primary)
-              }
-              .layoutWeight(1)
-              .aspectRatio(1)
-              .backgroundColor(this.sel === (r * N + c) ? (this.theme.isDark ? '#2A2A44' : '#E0E7FF') :
-              (this.given[(r * N + c)] ? this.theme.surface : this.theme.surfaceAlt))
-              .borderRadius(Radius.xs)
-              .scale({
-              x: this.pressed === (r * N + c) ? Motion.pressScale : 1,
-              y: this.pressed === (r * N + c) ? Motion.pressScale : 1
-              })
-              .animation({ duration: Motion.fast, curve: Motion.snap() })
-              .onTouch((e: TouchEvent) => {
-              if (e.type === TouchType.Down) {
-              this.pressed = (r * N + c);
-              } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) {
-              this.pressed = -1;
-              }
-              })
-              .focusable(Tv.on())
-              .focusBox(Tv.box())
-              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[(r * N + c)]) { this.sel = (r * N + c); } }); })
-              .onClick(() => {
-              Haptics.tick();
-              if (!this.over && !this.given[(r * N + c)]) {
-              this.sel = (r * N + c);
-              }
-              })
-            }, (c: number) => 'fm' + r + '-' + c)
+    // ★★★ 2026-10-30：reserve 从 420 减到 300（让棋盘从 96vp 变成 176vp），
+    //   代价是整页会超高 ⇒ **必须同时套 Scroll**，否则底部按钮又被挤出屏。
+    //   这两件事必须一起做 —— 只做一件就是把旧 bug 请回来。
+    Scroll() {
+      Column({ space: Space.md }) {
+        Row({ space: Space.md }) {
+          Column({ space: 2 }) {
+          Text((TG('已填'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((String(this.filledCount()) + '/36'))
+          .fontSize(FontSize.lg)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.theme.ink)
           }
-          .width('100%')
-        }, (r: number) => 'fmr' + r)
-      }
-      // ★★★ 2026-10-30（布局 bug ① 的主修点）：
-      //   改前：`.width('100%')` + `.constraintSize({ maxHeight: '46%' })`
-      //         ⇒ 格子 aspectRatio 把高度锁成宽度，板高 = 813vp，46% 只给 195vp ⇒ 溢出 4.2 倍
-      //   改后：宽高都交给 boardPx()（正方形），格子按宽度均分出来的行高正好填满容器
-      //         ⇒ 板下 2 行数字键 + 按钮行 + 状态行全部留在屏内
-      .width(this.boardPx(BOARD_RESERVE))
-      .height(this.boardPx(BOARD_RESERVE))
-      .alignSelf(ItemAlign.Center)
-      .padding(Space.xs)
-      .backgroundColor(this.theme.surfaceAlt)
-      .borderRadius(Radius.md)
-
-      Row({ space: Space.xs }) {
-        ForEach([1, 2, 3, 4], (d: number) => {
-          Text(String((d)))
+          .layoutWeight(1)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text((TG('空格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((String(N * N - this.filledCount())))
           .fontSize(FontSize.lg)
           .fontWeight(FontWeight.Bold)
           .fontColor(this.theme.ink)
-          .textAlign(TextAlign.Center)
+          }
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .padding(Space.sm)
           .backgroundColor(this.theme.surface)
-          .borderRadius(Radius.sm)
+          .borderRadius(Radius.md)
           .shadow(Shadow.card)
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setVal((d)); }); })
-          .onClick(() => {
-          Haptics.tick();
-          this.setVal((d));
-          })
-        }, (d: number) => 'fk' + d)
-      }
-      .width('100%')
-
-      Row({ space: Space.xs }) {
-        ForEach([5, 6, 7, 8], (d: number) => {
-          Text(String((d)))
+          Column({ space: 2 }) {
+          Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(Digits(String(this.moves), this.langCode))
           .fontSize(FontSize.lg)
           .fontWeight(FontWeight.Bold)
           .fontColor(this.theme.ink)
-          .textAlign(TextAlign.Center)
+          }
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .padding(Space.sm)
           .backgroundColor(this.theme.surface)
-          .borderRadius(Radius.sm)
+          .borderRadius(Radius.md)
           .shadow(Shadow.card)
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setVal((d)); }); })
-          .onClick(() => {
-          Haptics.tick();
-          this.setVal((d));
-          })
-        }, (d: number) => 'fk2' + d)
-      }
-      .width('100%')
+        }
+        .width('100%')
 
-      Row({ space: Space.md }) {
-        Button(TG('清除本格'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.sm)
-          .fontColor(this.theme.inkSoft)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(Cell.of(44))
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.setVal(0); }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.setVal(0);
-          })
-        Button(TG('提示'))
-          .layoutWeight(1)
-          .height(44)
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
-          .onClick(() => {
-            this.askHint();
-          })
-        Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
-          .layoutWeight(1)
-          .height(44)
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
-          .onClick(() => {
-            this.askAuto();
-          })
-        Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.primary)
-          .borderRadius(Radius.md)
-          .width(96)
-          .height(Cell.of(44))
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
-      }
-      .width('100%')
+        Column({ space: 2 }) {
+          ForEach([0, 1, 2, 3, 4, 5], (r: number) => {
+            Row({ space: 2 }) {
+              ForEach([0, 1, 2, 3, 4, 5], (c: number) => {
+                Stack() {
+                Text(this.vals[(r * N + c)] > 0 ? String(this.vals[(r * N + c)]) : '')
+                .fontSize(FontSize.xl)
+                .fontWeight(this.given[(r * N + c)] ? FontWeight.Bold : FontWeight.Normal)
+                .fontColor(this.given[(r * N + c)] ? this.theme.ink : Palette.primary)
+                }
+                .layoutWeight(1)
+                .aspectRatio(1)
+                .backgroundColor(this.sel === (r * N + c) ? (this.theme.isDark ? '#2A2A44' : '#E0E7FF') :
+                (this.given[(r * N + c)] ? this.theme.surface : this.theme.surfaceAlt))
+                .borderRadius(Radius.xs)
+                .scale({
+                x: this.pressed === (r * N + c) ? Motion.pressScale : 1,
+                y: this.pressed === (r * N + c) ? Motion.pressScale : 1
+                })
+                .animation({ duration: Motion.fast, curve: Motion.snap() })
+                .onTouch((e: TouchEvent) => {
+                if (e.type === TouchType.Down) {
+                this.pressed = (r * N + c);
+                } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) {
+                this.pressed = -1;
+                }
+                })
+                .focusable(Tv.on())
+                .focusBox(Tv.box())
+                .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[(r * N + c)]) { this.sel = (r * N + c); } }); })
+                .onClick(() => {
+                Haptics.tick();
+                if (!this.over && !this.given[(r * N + c)]) {
+                this.sel = (r * N + c);
+                }
+                })
+              }, (c: number) => 'fm' + r + '-' + c)
+            }
+            .width('100%')
+          }, (r: number) => 'fmr' + r)
+        }
+        // ★★★ 2026-10-30（布局 bug ① 的主修点）：
+        //   改前：`.width('100%')` + `.constraintSize({ maxHeight: '46%' })`
+        //         ⇒ 格子 aspectRatio 把高度锁成宽度，板高 = 813vp，46% 只给 195vp ⇒ 溢出 4.2 倍
+        //   改后：宽高都交给 boardPx()（正方形），格子按宽度均分出来的行高正好填满容器
+        //         ⇒ 板下 2 行数字键 + 按钮行 + 状态行全部留在屏内
+        .width(this.boardPx(BOARD_RESERVE))
+        .height(this.boardPx(BOARD_RESERVE))
+        .alignSelf(ItemAlign.Center)
+        .padding(Space.xs)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
 
-      Text(this.over ? (this.won ? '🎉 每块大小都对，通关！' : TG('步数用尽，重开一题吧')) :
-        '粗体数字是题目给的提示，浅底格是尚未填的')
-        .fontSize(FontSize.xxs)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Row({ space: Space.xs }) {
+          ForEach([1, 2, 3, 4], (d: number) => {
+            Text(String((d)))
+            .fontSize(FontSize.lg)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.theme.ink)
+            .textAlign(TextAlign.Center)
+            .layoutWeight(1)
+            .height(Cell.of(44))
+            .backgroundColor(this.theme.surface)
+            .borderRadius(Radius.sm)
+            .shadow(Shadow.card)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setVal((d)); }); })
+            .onClick(() => {
+            Haptics.tick();
+            this.setVal((d));
+            })
+          }, (d: number) => 'fk' + d)
+        }
+        .width('100%')
+
+        Row({ space: Space.xs }) {
+          ForEach([5, 6, 7, 8], (d: number) => {
+            Text(String((d)))
+            .fontSize(FontSize.lg)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.theme.ink)
+            .textAlign(TextAlign.Center)
+            .layoutWeight(1)
+            .height(Cell.of(44))
+            .backgroundColor(this.theme.surface)
+            .borderRadius(Radius.sm)
+            .shadow(Shadow.card)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setVal((d)); }); })
+            .onClick(() => {
+            Haptics.tick();
+            this.setVal((d));
+            })
+          }, (d: number) => 'fk2' + d)
+        }
+        .width('100%')
+
+        Row({ space: Space.md }) {
+          Button(TG('清除本格'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.sm)
+            .fontColor(this.theme.inkSoft)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(Cell.of(44))
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.setVal(0); }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.setVal(0);
+            })
+          Button(TG('提示'))
+            .layoutWeight(1)
+            .height(44)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
+            .onClick(() => {
+              this.askHint();
+            })
+          Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
+            .layoutWeight(1)
+            .height(44)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
+            .onClick(() => {
+              this.askAuto();
+            })
+          Button(TG('重开'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor(Color.White)
+            .backgroundColor(Palette.primary)
+            .borderRadius(Radius.md)
+            .width(96)
+            .height(Cell.of(44))
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.reset();
+            })
+        }
+        .width('100%')
+
+        Text(this.over ? (this.won ? '🎉 每块大小都对，通关！' : TG('步数用尽，重开一题吧')) :
+          '粗体数字是题目给的提示，浅底格是尚未填的')
+          .fontSize(FontSize.xxs)
+          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint).animation({ duration: Motion.fast, curve: Motion.snap() })
+      }
+      .onTouch((e: TouchEvent) => {
+        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+      })
+      .width('100%')
+      .constraintSize({ minHeight: '100%' })
+      .justifyContent(FlexAlign.Start)
     }
-    .onTouch((e: TouchEvent) => {
-      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    })
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Start)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring)
   }
 
 
