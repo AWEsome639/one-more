@@ -113,6 +113,8 @@ struct Splash {
   private finished: boolean = false;
   private boosted: boolean = false;
   @State private tiny: boolean = false;
+  /** 极小屏（< 260vp，如运动手表 195）：只留 OM + 标题，其余省略 */
+  @State private ultraTiny: boolean = false;
 
   private t(zh: string, en: string): string {
     return L(zh, en);
@@ -488,12 +490,12 @@ struct Splash {
         }
         .margin({ top: this.tiny ? 6 : 40 })
 
-        // 副标题
-        Text(this.t('3 5 5 款 小 游 戏', '3 5 5  G A M E S'))
+        // 副标题（极小屏省略 —— 那里只留 OM + 标题）
+        Text(this.t('355 款小游戏', '355 GAMES'))
           .fontSize(this.tiny ? 9 : 12)
           .fontWeight(FontWeight.Medium)
           .fontColor('#B8C99E52')
-          .opacity(this.pSub * 0.94)
+          .opacity(this.ultraTiny ? 0 : this.pSub * 0.94)
           .translate({ y: (1 - this.pSub) * 10 })
           .margin({ top: this.tiny ? 4 : 14 })
       }
@@ -524,7 +526,7 @@ struct Splash {
       }
       .width('100%')
       .height('100%')
-      .opacity(this.pTag * 0.9 * (1 - this.pOut))
+      .opacity(this.ultraTiny ? 0 : this.pTag * 0.9 * (1 - this.pOut))
       .hitTestBehavior(HitTestMode.None)
 
       // ──────── L9 暗角（vignette）：把注意力收到中间 ────────
@@ -549,8 +551,16 @@ struct Splash {
     .onAreaChange((_o: Area, n: Area) => {
       const h: number = n.height as number;
       const isTiny: boolean = h > 0 && h < 360;
+      // ★ 2026-10-30 运动手表 195×195 真机抓到：「碎片时间」与「One More」重叠。
+      //   195vp 高，塞四层内容必然叠。⇒ **分级降级**：
+      //     < 260vp：只留 OM + 标题（副标题、标语全部省略）
+      //     < 360vp：星尘减半、字号缩小、间距收紧（原有 tiny 分支）
+      const isUltra: boolean = h > 0 && h < 260;
       if (isTiny !== this.tiny) {
         this.tiny = isTiny;
+      }
+      if (isUltra !== this.ultraTiny) {
+        this.ultraTiny = isUltra;
       }
     })
     .onClick(() => {
