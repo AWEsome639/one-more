@@ -403,16 +403,15 @@ struct Splash {
       // ──────── L5（提前占位：光带要盖在 logo 上，所以放在 logo 之前声明、之后叠？）
       //          —— 放在 logo 之后绘制，见下方 sweep 段。
 
-      // ──────── L4 OM 字标 ────────
-      //   ★ 三次真机失败后的结论（写下来，别再走回去）：
-      //     ① Shape{Path}.viewPort()  → 映射失效，Path 被填成包围盒
-      //     ② Circle/Polyline + position+markAnchor → 图元画不出来
-      //     ③ Circle/Polyline + Row 布局       → 仍然画不出来
-      //   ⇒ **在这台机器/这个页面上，矢量图元不可靠；文字渲染 100% 可靠**
-      //     （标题「One More」每次都能出）。
-      //   ⇒ 所以字标用 **Text('OM')** 承担：靠字号/字距/辉光/缩放做质感，
-      //     而不是靠几何路径。这不是妥协 —— 字标本就该是"字"。
-      Stack() {
+      // ──────── L4~L7 合并为「一个 Column」：OM / 标题 / 副标题自然垂直排列 ────────
+      //   ★★★ 2026-10-30 手表 233×233 真机抓到：OM 与标题**重叠成一团**。
+      //     根因：OM 是独立层（translate -22），标题列是另一层（translate +10），
+      //           小屏上两层直接撞在一起。
+      //   ⇒ 结构修法：**把 OM / 标题 / 副标题放进同一个 Column**，
+      //     间距由 margin 控制、由 tiny 分支给不同值 —— 永远不会重叠。
+      Column() {
+        // ── OM 字标（三层：辉光 / 主体 / 高光）──
+        Stack() {
         // 外发光层（大字号、极低透明度、模糊）—— 制造"金色在发光"的空气感
         Text('OM')
           .fontSize(this.tiny ? 54 : 108)
@@ -466,20 +465,14 @@ struct Splash {
           .opacity(this.seg(this.pSweep, 0.00, 0.14) * (1 - this.seg(this.pSweep, 0.72, 1.00)) * 0.95)
           .blendMode(BlendMode.SCREEN, BlendApplyType.OFFSCREEN)
           .hitTestBehavior(HitTestMode.None)
-      }
-      .width('100%')
-      .height(this.tiny ? '16%' : '20%')
-      .translate({ y: this.tiny ? -22 : -58 })
-      // ★ 2026-10-30：这里原来有 .shadow()，它在 Stack 的矩形边界上
-      //   画出了两条**横贯屏幕的金线**（真机截图可见）。
-      //   ⇒ 去掉，辉光改由 Text 自己的 textShadow 承担。
-      .scale({
-        x: 1 + this.seg(this.pFill, 0.6, 1.0) * 0.016,
-        y: 1 + this.seg(this.pFill, 0.6, 1.0) * 0.016
-      })
+        }
+        // ★ 2026-10-30 手表真机抓到：这里原来写死 width(62/120)，
+        //   而 54pt 的「OM」两个字母需要 70vp+ ⇒ **宽度不足 ⇒ M 被换行挤下去**，
+        //   正好叠在标题上。⇒ 不设固定宽高，让内容自己撑开；只给一个最小宽度兜底。
+        .constraintSize({ minWidth: this.tiny ? 78 : 150 })
+        .clip(false)
 
-      // ──────── L6/L7 标题与副标题：逐字入场 ────────
-      Column() {
+        // ── 标题：逐字入场 ──
         // 逐字
         Row({ space: this.tiny ? 1 : 2 }) {
           ForEach(['O', 'n', 'e', ' ', 'M', 'o', 'r', 'e'], (ch: string, i: number) => {
@@ -493,7 +486,7 @@ struct Splash {
               .blur((1 - this.charIn(i, 8)) * (this.tiny ? 6 : 10))
           }, (ch: string, i: number) => 'c' + i + ch)
         }
-        .margin({ top: this.tiny ? 18 : 44 })
+        .margin({ top: this.tiny ? 6 : 40 })
 
         // 副标题
         Text(this.t('3 5 5 款 小 游 戏', '3 5 5  G A M E S'))
@@ -502,17 +495,15 @@ struct Splash {
           .fontColor('#B8C99E52')
           .opacity(this.pSub * 0.94)
           .translate({ y: (1 - this.pSub) * 10 })
-          .margin({ top: this.tiny ? 8 : 16 })
+          .margin({ top: this.tiny ? 4 : 14 })
       }
       .width('100%')
-      // ★ 2026-10-30：原来 height('100%') + padding/top% + translate/% 三件套，
-      //   在横屏（533vp 高）上把内容推得东倒西歪。
-      //   ⇒ 改成「不撑满 + Stack 居中 + 固定 vp 上移」，跨尺寸都稳。
+      .height('100%')
       .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
-      .translate({ y: this.tiny ? 10 : 26 })
-      .opacity(this.seg(this.pTitle, 0.0, 0.25))
-      // L9 推出：轻微推近 + 淡出
+      // 极小屏：把整组内容上移一点，给底部标语留位置
+      .padding({ bottom: this.tiny ? 34 : 0 })
+      .translate({ y: this.tiny ? -6 : -14 })
       .scale({ x: 1 + this.pOut * 0.06, y: 1 + this.pOut * 0.06 })
       .opacity(1 - this.pOut)
 
