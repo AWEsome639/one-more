@@ -1,0 +1,19 @@
+{"name": "2048", "r": "nowin"}
+{"name": "数独", "r": "nowin"}
+{"name": "推箱子", "r": "notfound"}
+{"name": "扫雷", "r": "notfound"}
+{"name": "五子棋", "r": "notfound"}
+{"name": "汉诺塔", "r": "notfound"}
+{"name": "跳棋", "r": "notfound"}
+{"name": "连连看", "r": "notfound"}
+{"name": "下一步", "r": "nowin"}
+{"name": "2048", "r": "nowin"}
+{"name": "24 点", "r": "win"}
+{"name": "9 路围棋", "r": "nowin"}
+{"name": "麻将连连看", "r": "win"}
+{"name": "配对消牌", "r": "win"}
+{"name": "播棋", "r": "win"}
+{"name": "音标猜词", "r": "win"}
+{"name": "贪吃蛇", "r": "win"}
+{"name": "立体贪吃蛇", "r": "win"}
+{"name": "三维空间贪吃蛇", "r": "win"}

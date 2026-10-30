@@ -1,0 +1,349 @@
+{"id": "bejeweled", "name": "宝石迷阵", "nodes": 71, "first": ["‹", "宝石迷阵", "交换消宝石", "☆", "?", "普通", "↻", "得分"], "enter_s": 2.0, "entered": true}
+{"id": "breakout", "name": "打砖块", "nodes": 21, "first": ["‹", "打砖块", "一板一球，清空全场", "☆", "?", "普通", "↻", "得分"], "enter_s": 1.9, "entered": true}
+{"id": "continuous_paired_associate", "name": "连续配对", "nodes": 36, "first": ["‹", "连续配对", "连续配对联想", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "doodle_jump", "name": "登高", "nodes": 23, "first": ["‹", "登高", "一直往上跳", "☆", "?", "普通", "↻", "高度"], "enter_s": 1.9, "entered": true}
+{"id": "double_trouble", "name": "双重麻烦", "nodes": 32, "first": ["‹", "双重麻烦", "两个任务一起来", "☆", "?", "普通", "↻", "轮次"], "enter_s": 2.0, "entered": true}
+{"id": "dual_mirror", "name": "双镜像", "nodes": 23, "first": ["‹", "双镜像", "左右同时镜像操作", "☆", "?", "普通", "↻", "步数"], "enter_s": 2.0, "entered": true}
+{"id": "flappy", "name": "穿云", "nodes": 22, "first": ["‹", "穿云", "穿管道", "☆", "?", "普通", "↻", "穿过"], "enter_s": 2.0, "entered": true}
+{"id": "freecell", "name": "空当接龙", "nodes": 43, "first": ["‹", "空当接龙", "四列自由搬运", "☆", "?", "普通", "↻", "步数"], "enter_s": 2.0, "entered": true}
+{"id": "g2048", "name": "2048", "nodes": 25, "first": ["‹", "2048", "合并数字，别把自己堵死", "☆", "?", "普通", "↻", "得分"], "enter_s": 1.9, "entered": true}
+{"id": "game24", "name": "24 点", "nodes": 31, "first": ["‹", "24 点", "四个数，加减乘除凑 24", "☆", "?", "普通", "↻", "本题"], "enter_s": 1.9, "entered": true}
+{"id": "go9", "name": "9 路围棋", "nodes": 22, "first": ["‹", "9 路围棋", "围地吃子，气尽提子", "☆", "?", "普通", "↻", "我提子"], "enter_s": 2.0, "entered": true}
+{"id": "gomoku", "name": "五子棋", "nodes": 22, "first": ["‹", "五子棋", "与 AI 对弈，五子连珠", "☆", "?", "普通", "↻", "手数"], "enter_s": 2.3, "entered": true}
+{"id": "tower_of_hanoi", "name": "汉诺塔", "nodes": 21, "first": ["‹", "汉诺塔", "三根柱子，挪完为赢", "☆", "?", "普通", "↻", "步数"], "enter_s": 2.0, "entered": true}
+{"id": "kakuro_mini", "name": "迷你数谜", "nodes": 39, "first": ["‹", "迷你数谜", "小盘数谜", "☆", "?", "普通", "↻", "步数"], "enter_s": 1.9, "entered": true}
+{"id": "life_game", "name": "生命游戏", "nodes": 21, "first": ["‹", "生命游戏", "康威生命游戏", "☆", "?", "普通", "↻", "代数"], "enter_s": 2.0, "entered": true}
+{"id": "lock_pattern", "name": "图案锁", "nodes": 22, "first": ["‹", "图案锁", "一笔连出图案", "☆", "?", "普通", "↻", "关卡"], "enter_s": 2.1, "entered": true}
+{"id": "mahjong_solitaire", "name": "麻将连连看", "nodes": 37, "first": ["‹", "麻将连连看", "配对消牌", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "mancala", "name": "播棋", "nodes": 48, "first": ["‹", "播棋", "石子播种", "☆", "?", "普通", "↻", "我方库"], "enter_s": 1.9, "entered": true}
+{"id": "mandelbrot", "name": "分形探索", "nodes": 22, "first": ["‹", "分形探索", "曼德博集合", "☆", "?", "普通", "↻", "第几题"], "enter_s": 1.9, "entered": true}
+{"id": "mastermind", "name": "珠玑妙算", "nodes": 21, "first": ["‹", "珠玑妙算", "猜颜色组合", "☆", "?", "普通", "↻", "第几次"], "enter_s": 2.0, "entered": true}
+{"id": "match3", "name": "三连", "nodes": 84, "first": ["‹", "三连", "三消连锁", "☆", "?", "普通", "↻", "分数"], "enter_s": 2.6, "entered": true}
+{"id": "memory", "name": "记忆翻牌", "nodes": 18, "first": ["‹", "记忆翻牌", "成对翻出，考的就是记性", "☆", "?", "普通", "↻", "翻牌次数"], "enter_s": 2.0, "entered": true}
+{"id": "minesweeper", "name": "扫雷", "nodes": 23, "first": ["‹", "扫雷", "经典雷区，插旗要果断", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "nim", "name": "尼姆博弈", "nodes": 42, "first": ["‹", "尼姆博弈", "拿走最后一颗就输", "☆", "?", "普通", "↻", "剩余石子"], "enter_s": 1.8, "entered": true}
+{"id": "peg_solitaire", "name": "孔明棋", "nodes": 21, "first": ["‹", "孔明棋", "跳吃剩一颗", "☆", "?", "普通", "↻", "剩余棋子"], "enter_s": 2.1, "entered": true}
+{"id": "phonetic_guess", "name": "音标猜词", "nodes": 32, "first": ["‹", "音标猜词", "看音标猜单词", "☆", "?", "普通", "↻", "题目"], "enter_s": 1.8, "entered": true}
+{"id": "pong", "name": "乒乓", "nodes": 18, "first": ["‹", "乒乓", "对打小球", "☆", "?", "普通", "↻", "你"], "enter_s": 2.2, "entered": true}
+{"id": "reversi", "name": "黑白棋", "nodes": 21, "first": ["‹", "黑白棋", "夹住翻面", "☆", "?", "普通", "↻", "你（黑）"], "enter_s": 1.9, "entered": true}
+{"id": "schulte", "name": "舒尔特方格", "nodes": 45, "first": ["‹", "舒尔特方格", "按顺序点数字练专注", "☆", "?", "普通", "↻", "目标"], "enter_s": 1.9, "entered": true}
+{"id": "sieve_visualizer", "name": "筛法可视化", "nodes": 123, "first": ["‹", "筛法可视化", "看素数筛出来", "☆", "?", "普通", "↻", "已找到素数"], "enter_s": 1.9, "entered": true}
+{"id": "simon_says", "name": "西蒙说", "nodes": 24, "first": ["‹", "西蒙说", "跟着做动作", "☆", "?", "普通", "↻", "关卡"], "enter_s": 2.0, "entered": true}
+{"id": "snake", "name": "贪吃蛇", "nodes": 25, "first": ["‹", "贪吃蛇", "越吃越长，别咬到自己", "☆", "?", "普通", "↻", "得分"], "enter_s": 2.0, "entered": true}
+{"id": "snake_3d", "name": "立体贪吃蛇", "nodes": 30, "first": ["‹", "立体贪吃蛇", "三维空间贪吃蛇", "☆", "?", "普通", "↻", "所在层"], "enter_s": 2.8, "entered": true}
+{"id": "sokoban", "name": "推箱子", "nodes": 27, "first": ["‹", "推箱子", "一推一挪，步步为营", "☆", "?", "普通", "↻", "第 1 关 · 一步一推"], "enter_s": 1.9, "entered": true}
+{"id": "solitaire", "name": "接龙", "nodes": 32, "first": ["‹", "接龙", "经典纸牌接龙", "☆", "?", "普通", "↻", "归位"], "enter_s": 1.9, "entered": true}
+{"id": "sorting_visualizer", "name": "排序可视化", "nodes": 38, "first": ["‹", "排序可视化", "看排序算法跳舞", "☆", "?", "普通", "↻", "比较"], "enter_s": 1.9, "entered": true}
+{"id": "spider_solitaire", "name": "蜘蛛纸牌", "nodes": 32, "first": ["‹", "蜘蛛纸牌", "同花顺序排列", "☆", "?", "普通", "↻", "已收组数"], "enter_s": 1.9, "entered": true}
+{"id": "sudoku_hex", "name": "六宫数独", "nodes": 48, "first": ["‹", "六宫数独", "6x6 数独", "☆", "?", "普通", "↻", "已填"], "enter_s": 1.9, "entered": true}
+{"id": "tetris", "name": "落方", "nodes": 18, "first": ["‹", "落方", "经典落块消行", "☆", "?", "普通", "↻", "得分"], "enter_s": 2.0, "entered": true}
+{"id": "tic_tac_toe", "name": "井字棋", "nodes": 22, "first": ["‹", "井字棋", "三子连线", "☆", "?", "普通", "↻", "得分"], "enter_s": 1.9, "entered": true}
+{"id": "wordle", "name": "猜词游戏", "nodes": 49, "first": ["‹", "猜词游戏", "五次猜中单词", "☆", "?", "普通", "↻", "机会"], "enter_s": 1.9, "entered": true}
+{"id": "akari", "name": "明灯", "nodes": 27, "first": ["‹", "明灯", "灯光照亮所有空格", "☆", "?", "普通", "↻", "照亮"], "enter_s": 1.9, "entered": true}
+{"id": "alphabet_sudoku", "name": "字母数独", "nodes": 48, "first": ["‹", "字母数独", "用字母代替数字", "☆", "?", "普通", "↻", "已填"], "enter_s": 2.0, "entered": true}
+{"id": "binary_puzzle", "name": "二进制", "nodes": 42, "first": ["‹", "二进制", "每行列数量相等且不连三", "☆", "?", "普通", "↻", "已填"], "enter_s": 2.0, "entered": true}
+{"id": "block_escape", "name": "华容道逃脱", "nodes": 33, "first": ["‹", "华容道逃脱", "移开障碍让方块出去", "☆", "?", "普通", "↻", "步数"], "enter_s": 2.9, "entered": true}
+{"id": "bridges", "name": "桥梁", "nodes": 31, "first": ["‹", "桥梁", "数字岛按桥连接", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "bridges_all", "name": "桥梁进阶", "nodes": 34, "first": ["‹", "桥梁进阶", "大棋盘桥梁", "☆", "?", "普通", "↻", "桥"], "enter_s": 2.0, "entered": true}
+{"id": "color_flood", "name": "色彩洪水", "nodes": 21, "first": ["‹", "色彩洪水", "一色扩展开关", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.0, "entered": true}
+{"id": "crown", "name": "皇冠", "nodes": 23, "first": ["‹", "皇冠", "每行每列每区一个皇冠", "☆", "?", "普通", "↻", "皇冠"], "enter_s": 1.9, "entered": true}
+{"id": "dominosa", "name": "多米诺拼盘", "nodes": 42, "first": ["‹", "多米诺拼盘", "骨牌铺满网格", "☆", "?", "普通", "↻", "已配对"], "enter_s": 2.0, "entered": true}
+{"id": "fillomino", "name": "填数拼图", "nodes": 51, "first": ["‹", "填数拼图", "同数字连成指定大小的块", "☆", "?", "普通", "↻", "已填"], "enter_s": 2.0, "entered": true}
+{"id": "futoshiki", "name": "不等式", "nodes": 57, "first": ["‹", "不等式", "行列不重复且满足不等号", "☆", "?", "普通", "↻", "已填"], "enter_s": 2.1, "entered": true}
+{"id": "gokigen_naname", "name": "斜线数回", "nodes": 47, "first": ["‹", "斜线数回", "填斜线使数字等于交点数", "☆", "?", "普通", "↻", "已画"], "enter_s": 2.4, "entered": true}
+{"id": "heyawake", "name": "数间", "nodes": 26, "first": ["‹", "数间", "分房间涂黑且不连续", "☆", "?", "普通", "↻", "已涂黑"], "enter_s": 2.0, "entered": true}
+{"id": "hitori", "name": "数壹", "nodes": 59, "first": ["‹", "数壹", "涂黑使行列不重复", "☆", "?", "普通", "↻", "已涂黑"], "enter_s": 2.0, "entered": true}
+{"id": "hitori_all", "name": "数壹进阶", "nodes": 87, "first": ["‹", "数壹进阶", "大棋盘数壹", "☆", "?", "普通", "↻", "已涂黑"], "enter_s": 2.0, "entered": true}
+{"id": "kakurasu_sums", "name": "黑白和", "nodes": 42, "first": ["‹", "黑白和", "涂黑列与行凑出目标数", "☆", "?", "普通", "↻", "黑格"], "enter_s": 2.0, "entered": true}
+{"id": "kakuro", "name": "数谜", "nodes": 30, "first": ["‹", "数谜", "填数字使横竖和等于提示", "☆", "?", "普通", "↻", "步数"], "enter_s": 1.8, "entered": true}
+{"id": "kenken", "name": "聪明格", "nodes": 36, "first": ["‹", "聪明格", "四则运算填格", "☆", "?", "普通", "↻", "步数"], "enter_s": 1.9, "entered": true}
+{"id": "klotski", "name": "华容道", "nodes": 29, "first": ["‹", "华容道", "移动方块让曹操出关", "☆", "?", "普通", "↻", "步数"], "enter_s": 1.8, "entered": true}
+{"id": "kurodoko", "name": "黑在哪", "nodes": 26, "first": ["‹", "黑在哪", "涂黑使白格连通", "☆", "?", "普通", "↻", "步数"], "enter_s": 2.0, "entered": true}
+{"id": "lighthouses", "name": "灯塔", "nodes": 31, "first": ["‹", "灯塔", "灯照亮船只", "☆", "?", "普通", "↻", "步数"], "enter_s": 1.9, "entered": true}
+{"id": "lights_out", "name": "灭灯", "nodes": 37, "first": ["‹", "灭灯", "点灯使全灭", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "magnets", "name": "磁铁", "nodes": 38, "first": ["‹", "磁铁", "正负磁铁配对", "☆", "?", "普通", "↻", "步数"], "enter_s": 1.9, "entered": true}
+{"id": "masyu", "name": "数回", "nodes": 27, "first": ["‹", "数回", "连成回路满足黑白圈规则", "☆", "?", "普通", "↻", "步数"], "enter_s": 1.9, "entered": true}
+{"id": "math_maze", "name": "数学迷宫", "nodes": 50, "first": ["‹", "数学迷宫", "按算式结果走迷宫", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "math_path", "name": "数字路径", "nodes": 38, "first": ["‹", "数字路径", "连成正确的算式路径", "☆", "?", "普通", "↻", "目标"], "enter_s": 1.9, "entered": true}
+{"id": "nonogram", "name": "数织", "nodes": 33, "first": ["‹", "数织", "按数字填格子出图", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.2, "entered": true}
+{"id": "norinori", "name": "两格方块", "nodes": 46, "first": ["‹", "两格方块", "每区域放两个多米诺", "☆", "?", "普通", "↻", "已满足区域"], "enter_s": 2.0, "entered": true}
+{"id": "nurikabe", "name": "数墙", "nodes": 25, "first": ["‹", "数墙", "按数字造墙", "☆", "?", "普通", "↻", "已满足提示"], "enter_s": 1.9, "entered": true}
+{"id": "path_finder", "name": "找路径", "nodes": 29, "first": ["‹", "找路径", "连出唯一通路", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.0, "entered": true}
+{"id": "path_intersect", "name": "路径交叉", "nodes": 28, "first": ["‹", "路径交叉", "连线不交叉", "☆", "?", "普通", "↻", "已接通"], "enter_s": 1.9, "entered": true}
+{"id": "pipes", "name": "管道", "nodes": 47, "first": ["‹", "管道", "旋转管道使水连通", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.0, "entered": true}
+{"id": "shikaku", "name": "数方", "nodes": 28, "first": ["‹", "数方", "矩形分割符合数字", "☆", "?", "普通", "↻", "已覆盖"], "enter_s": 1.9, "entered": true}
+{"id": "skyscrapers", "name": "数楼", "nodes": 41, "first": ["‹", "数楼", "从外看楼层高度不重复", "☆", "?", "普通", "↻", "已填"], "enter_s": 1.9, "entered": true}
+{"id": "slide_puzzle", "name": "数字华容道", "nodes": 30, "first": ["‹", "数字华容道", "3×3 八数码，难度可调", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "slitherlink", "name": "数回环", "nodes": 45, "first": ["‹", "数回环", "数字提示画回路", "☆", "?", "普通", "↻", "已满足线索"], "enter_s": 2.1, "entered": true}
+{"id": "sudoku", "name": "数独", "nodes": 73, "first": ["‹", "数独", "每行每列每宫不重复", "☆", "?", "普通", "↻", "已填"], "enter_s": 2.0, "entered": true}
+{"id": "sum_snake", "name": "数蛇", "nodes": 39, "first": ["‹", "数蛇", "蛇形路径求和", "☆", "?", "普通", "↻", "当前和"], "enter_s": 2.0, "entered": true}
+{"id": "tangle_fix", "name": "解缠", "nodes": 50, "first": ["‹", "解缠", "重排使线不交叉", "☆", "?", "普通", "↻", "交叉"], "enter_s": 2.0, "entered": true}
+{"id": "tapa", "name": "塔帕", "nodes": 35, "first": ["‹", "塔帕", "按数字画连续黑格", "☆", "?", "普通", "↻", "黑格"], "enter_s": 2.0, "entered": true}
+{"id": "tenner_grid", "name": "十格", "nodes": 100, "first": ["‹", "十格", "每行列各含 0-9", "☆", "?", "普通", "↻", "已填"], "enter_s": 2.0, "entered": true}
+{"id": "tents_and_trees", "name": "帐篷与树", "nodes": 42, "first": ["‹", "帐篷与树", "每树配一帐篷", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "water_sort", "name": "倒水排序", "nodes": 21, "first": ["‹", "倒水排序", "试管倒水同色归位", "☆", "?", "普通", "↻", "归位"], "enter_s": 2.0, "entered": true}
+{"id": "yajilin", "name": "矢印", "nodes": 37, "first": ["‹", "矢印", "箭头提示黑格并画回路", "☆", "?", "普通", "↻", "进度"], "enter_s": 2.0, "entered": true}
+{"id": "algebraic_balance", "name": "代数天平", "nodes": 27, "first": ["‹", "代数天平", "平衡方程", "☆", "?", "普通", "↻", "进度"], "enter_s": 2.0, "entered": true}
+{"id": "algebraic_inequality_solver", "name": "解不等式", "nodes": 27, "first": ["‹", "解不等式", "求不等式解", "☆", "?", "普通", "↻", "进度"], "enter_s": 1.9, "entered": true}
+{"id": "arithmetic_chain", "name": "算术链", "nodes": 32, "first": ["‹", "算术链", "连续运算达目标", "☆", "?", "普通", "↻", "关卡"], "enter_s": 2.1, "entered": true}
+{"id": "balance_scale", "name": "天平称重", "nodes": 39, "first": ["‹", "天平称重", "称出目标重量", "☆", "?", "普通", "↻", "关卡"], "enter_s": 1.9, "entered": true}
+{"id": "base_conversion_run", "name": "进制转换", "nodes": 32, "first": ["‹", "进制转换", "限时进制换算", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.0, "entered": true}
+{"id": "base_shift", "name": "进制移位", "nodes": 33, "first": ["‹", "进制移位", "不同进制切换", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.1, "entered": true}
+{"id": "binary_code", "name": "二进制码", "nodes": 49, "first": ["‹", "二进制码", "二进制编解码", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.0, "entered": true}
+{"id": "binary_matrix_rank", "name": "矩阵秩", "nodes": 50, "first": ["‹", "矩阵秩", "求二进制矩阵秩", "☆", "?", "普通", "↻", "题号"], "enter_s": 3.5, "entered": true}
+{"id": "binary_scale_balance", "name": "二进制天平", "nodes": 41, "first": ["‹", "二进制天平", "二进制称重", "☆", "?", "普通", "↻", "关卡"], "enter_s": 1.9, "entered": true}
+{"id": "binomial_match", "name": "二项式配对", "nodes": 31, "first": ["‹", "二项式配对", "匹配展开式", "☆", "?", "普通", "↻", "已配对"], "enter_s": 1.9, "entered": true}
+{"id": "calculation_sprint", "name": "计算冲刺", "nodes": 32, "first": ["‹", "计算冲刺", "限时连算", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "collatz", "name": "考拉兹", "nodes": 32, "first": ["‹", "考拉兹", "3n+1 推到 1", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "common_denominator", "name": "通分", "nodes": 35, "first": ["‹", "通分", "找公分母", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "countdown_math", "name": "倒计时数学", "nodes": 32, "first": ["‹", "倒计时数学", "倒计时凑数", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "crypto_arithmetic", "name": "字母算术", "nodes": 38, "first": ["‹", "字母算术", "字母代表数字", "☆", "?", "普通", "↻", "进度"], "enter_s": 1.9, "entered": true}
+{"id": "digit_swap_eq", "name": "数字换位", "nodes": 31, "first": ["‹", "数字换位", "交换使等式成立", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "divisibility_dash", "name": "整除冲刺", "nodes": 28, "first": ["‹", "整除冲刺", "限时判断整除", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "exponent_tower", "name": "指数塔", "nodes": 33, "first": ["‹", "指数塔", "计算幂塔", "☆", "?", "普通", "↻", "题号"], "enter_s": 1.9, "entered": true}
+{"id": "factor_finder", "name": "找因数", "nodes": 35, "first": ["‹", "找因数", "列出全部因数", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "fibonacci_merge", "name": "斐波那契合并", "nodes": 28, "first": ["‹", "斐波那契合并", "合并斐波那契数", "☆", "?", "普通", "↻", "最大"], "enter_s": 1.9, "entered": true}
+{"id": "fraction_match", "name": "分数配对", "nodes": 29, "first": ["‹", "分数配对", "匹配等值分数", "☆", "?", "普通", "↻", "剩余"], "enter_s": 2.0, "entered": true}
+{"id": "fraction_matcher", "name": "分数匹配", "nodes": 34, "first": ["‹", "分数匹配", "找相等分数", "☆", "?", "普通", "↻", "题号"], "enter_s": 1.8, "entered": true}
+{"id": "fractional_pizza", "name": "分数披萨", "nodes": 32, "first": ["‹", "分数披萨", "按分数切披萨", "☆", "?", "普通", "↻", "题号"], "enter_s": 1.8, "entered": true}
+{"id": "inequality_balance_ops", "name": "不等式天平", "nodes": 31, "first": ["‹", "不等式天平", "天平不等关系", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.8, "entered": true}
+{"id": "inequality_dash", "name": "不等式冲刺", "nodes": 29, "first": ["‹", "不等式冲刺", "限时解不等式", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "magic_squares", "name": "幻方", "nodes": 29, "first": ["‹", "幻方", "行列对角线和相等", "☆", "?", "普通", "↻", "关卡"], "enter_s": 1.9, "entered": true}
+{"id": "matrix_multiplier", "name": "矩阵乘法", "nodes": 39, "first": ["‹", "矩阵乘法", "计算矩阵乘积", "☆", "?", "普通", "↻", "剩余"], "enter_s": 2.0, "entered": true}
+{"id": "matrix_multiplier_match", "name": "矩阵配对", "nodes": 33, "first": ["‹", "矩阵配对", "匹配乘积结果", "☆", "?", "普通", "↻", "题板"], "enter_s": 1.9, "entered": true}
+{"id": "matrix_reasoning", "name": "矩阵推理", "nodes": 34, "first": ["‹", "矩阵推理", "找规律填矩阵", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "mental_abacus", "name": "心算算盘", "nodes": 34, "first": ["‹", "心算算盘", "珠算心算", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "mental_calendar", "name": "万年历", "nodes": 32, "first": ["‹", "万年历", "推算日期星期", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "missing_operator", "name": "缺运算符", "nodes": 29, "first": ["‹", "缺运算符", "填入正确运算符", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "modular_clock_arithmetic", "name": "模运算钟", "nodes": 40, "first": ["全部", "展开", "不等式冲刺", "限时解不等式", "1 天", "幻方", "行列对角线和相等", "矩阵乘法"], "enter_s": 2.8, "entered": true}
+{"id": "modulo_clock", "name": "模钟", "nodes": 32, "first": ["‹", "模钟", "模 12 计算", "☆", "?", "普通", "↻", "第几题"], "enter_s": 2.1, "entered": true}
+{"id": "modulo_path", "name": "模路径", "nodes": 45, "first": ["‹", "模路径", "按模数走格", "☆", "?", "普通", "↻", "进度"], "enter_s": 2.0, "entered": true}
+{"id": "number_bonds", "name": "数字键", "nodes": 34, "first": ["‹", "数字键", "拆分成两个数", "☆", "?", "普通", "↻", "第几题"], "enter_s": 2.1, "entered": true}
+{"id": "number_bonds_all", "name": "数字拆分", "nodes": 41, "first": ["‹", "数字拆分", "拆数练习", "☆", "?", "普通", "↻", "目标"], "enter_s": 2.0, "entered": true}
+{"id": "numerical_estimation", "name": "数值估算", "nodes": 32, "first": ["‹", "数值估算", "估算结果", "☆", "?", "普通", "↻", "第几题"], "enter_s": 2.1, "entered": true}
+{"id": "pattern_sequence_draw", "name": "画规律", "nodes": 29, "first": ["‹", "画规律", "按规律画图案", "☆", "?", "普通", "↻", "规律"], "enter_s": 1.9, "entered": true}
+{"id": "percentage_peak", "name": "百分比巅峰", "nodes": 32, "first": ["‹", "百分比巅峰", "限时百分比", "☆", "?", "普通", "↻", "剩余"], "enter_s": 1.9, "entered": true}
+{"id": "percentage_shopping", "name": "打折购物", "nodes": 33, "first": ["‹", "打折购物", "算折扣价", "☆", "?", "普通", "↻", "第几件"], "enter_s": 1.9, "entered": true}
+{"id": "prime_factor_trees", "name": "质因数树", "nodes": 32, "first": ["‹", "质因数树", "分解成质因数", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "prime_gap_hunt", "name": "素数间隔", "nodes": 29, "first": ["‹", "素数间隔", "找相邻素数的差", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.8, "entered": true}
+{"id": "prime_hunter", "name": "素数猎手", "nodes": 46, "first": ["‹", "素数猎手", "找出所有素数", "☆", "?", "普通", "↻", "关卡"], "enter_s": 1.9, "entered": true}
+{"id": "pythagorean_triple_builder", "name": "勾股数", "nodes": 35, "first": ["‹", "勾股数", "构造勾股三元组", "☆", "?", "普通", "↻", "关卡"], "enter_s": 1.9, "entered": true}
+{"id": "quick_math", "name": "速算", "nodes": 29, "first": ["‹", "速算", "限时心算", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "radical_roots", "name": "根式化简", "nodes": 29, "first": ["‹", "根式化简", "化简根号", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "roman_arithmetic", "name": "罗马数字算术", "nodes": 29, "first": ["‹", "罗马数字算术", "罗马数字运算", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "sequence_sleuth", "name": "数列侦探", "nodes": 29, "first": ["‹", "数列侦探", "找数列规律", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "sequence_stack", "name": "数列堆叠", "nodes": 31, "first": ["‹", "数列堆叠", "堆叠数列", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.1, "entered": true}
+{"id": "set_theory_venn", "name": "文氏图", "nodes": 34, "first": ["‹", "文氏图", "集合运算", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.2, "entered": true}
+{"id": "sum_pyramid", "name": "数字金字塔", "nodes": 33, "first": ["‹", "数字金字塔", "下层和等于上层", "☆", "?", "普通", "↻", "已填"], "enter_s": 1.9, "entered": true}
+{"id": "target_10", "name": "凑十", "nodes": 42, "first": ["‹", "凑十", "选数字凑成 10", "☆", "?", "普通", "↻", "时间"], "enter_s": 1.9, "entered": true}
+{"id": "target_number", "name": "目标数字", "nodes": 30, "first": ["‹", "目标数字", "四则运算凑目标", "☆", "?", "普通", "↻", "题号"], "enter_s": 1.9, "entered": true}
+{"id": "unit_converter_pro", "name": "单位换算", "nodes": 28, "first": ["‹", "单位换算", "各种单位转换", "☆", "?", "普通", "↻", "题号"], "enter_s": 1.9, "entered": true}
+{"id": "vector_dot_product", "name": "向量点积", "nodes": 30, "first": ["‹", "向量点积", "计算点积", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "vector_grid_alignment", "name": "向量对齐", "nodes": 27, "first": ["‹", "向量对齐", "对齐向量网格", "☆", "?", "普通", "↻", "回合"], "enter_s": 2.0, "entered": true}
+{"id": "vektor_vector", "name": "向量运算", "nodes": 32, "first": ["‹", "向量运算", "向量加减", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "venn_numbers", "name": "数字文氏图", "nodes": 30, "first": ["‹", "数字文氏图", "文氏图填数", "☆", "?", "普通", "↻", "归位"], "enter_s": 2.0, "entered": true}
+{"id": "associative_pairs", "name": "联想配对", "nodes": 29, "first": ["‹", "联想配对", "配对联想", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "attentional_blink", "name": "注意瞬脱", "nodes": 27, "first": ["‹", "注意瞬脱", "捕捉闪现目标", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "attentional_blink_probe", "name": "瞬脱探针", "nodes": 26, "first": ["‹", "瞬脱探针", "瞬脱进阶", "☆", "?", "普通", "↻", "轮次"], "enter_s": 1.9, "entered": true}
+{"id": "card_counting_memory", "name": "数牌记忆", "nodes": 32, "first": ["‹", "数牌记忆", "记住出过的牌", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "change_blindness", "name": "变化盲视", "nodes": 29, "first": ["‹", "变化盲视", "发现变化", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "choice_reaction_time", "name": "选择反应", "nodes": 25, "first": ["‹", "选择反应", "快速选择", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.0, "entered": true}
+{"id": "color_word_match_up", "name": "色词匹配", "nodes": 26, "first": ["‹", "色词匹配", "颜色与词匹配", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "conjunction_search", "name": "联合特征", "nodes": 46, "first": ["‹", "联合特征", "特征联合搜索", "☆", "?", "普通", "↻", "关卡"], "enter_s": 2.0, "entered": true}
+{"id": "continuous_recognition", "name": "连续再认", "nodes": 24, "first": ["‹", "连续再认", "判断是否见过", "☆", "?", "普通", "↻", "题号"], "enter_s": 1.9, "entered": true}
+{"id": "corsi_backward_span", "name": "倒序空间", "nodes": 21, "first": ["‹", "倒序空间", "倒着回忆", "☆", "?", "普通", "↻", "长度"], "enter_s": 2.4, "entered": true}
+{"id": "corsi_blocks", "name": "空间广度", "nodes": 22, "first": ["‹", "空间广度", "回忆方块顺序", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.4, "entered": true}
+{"id": "counting_span", "name": "计数广度", "nodes": 21, "first": ["‹", "计数广度", "数完记数量", "☆", "?", "普通", "↻", "张数"], "enter_s": 2.0, "entered": true}
+{"id": "d2_attention", "name": "d2 注意", "nodes": 118, "first": ["‹", "d2 注意", "划消测验", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.2, "entered": true}
+{"id": "delayed_match_sample", "name": "延迟匹配", "nodes": 25, "first": ["‹", "延迟匹配", "延迟后匹配", "☆", "?", "普通", "↻", "题号"], "enter_s": 3.2, "entered": true}
+{"id": "digit_span_reverse", "name": "倒背数字", "nodes": 31, "first": ["‹", "倒背数字", "倒序回忆数字", "☆", "?", "普通", "↻", "轮次"], "enter_s": 2.0, "entered": true}
+{"id": "divided_attention", "name": "分配注意", "nodes": 29, "first": ["‹", "分配注意", "双任务", "☆", "?", "普通", "↻", "拍数"], "enter_s": 2.0, "entered": true}
+{"id": "dnms", "name": "非匹配延迟", "nodes": 30, "first": ["‹", "非匹配延迟", "选没见过的", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "double_n_back", "name": "双 N-back", "nodes": 27, "first": ["‹", "双 N-back", "双通道 N-back", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.0, "entered": true}
+{"id": "dual_coding", "name": "双编码", "nodes": 33, "first": ["‹", "双编码", "图文双通道", "☆", "?", "普通", "↻", "阶段"], "enter_s": 2.2, "entered": true}
+{"id": "dual_task_memory", "name": "双任务记忆", "nodes": 22, "first": ["‹", "双任务记忆", "边算边记", "☆", "?", "普通", "↻", "轮次"], "enter_s": 2.0, "entered": true}
+{"id": "dynamic_salience", "name": "动态凸显", "nodes": 25, "first": ["‹", "动态凸显", "找最显眼的", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.2, "entered": true}
+{"id": "event_timeline_memory", "name": "时间线记忆", "nodes": 33, "first": ["‹", "时间线记忆", "事件排序", "☆", "?", "普通", "↻", "轮次"], "enter_s": 2.0, "entered": true}
+{"id": "face_name_association", "name": "人名配对", "nodes": 36, "first": ["‹", "人名配对", "脸和名字配对", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.6, "entered": true}
+{"id": "face_trait_association", "name": "人脸特征", "nodes": 36, "first": ["‹", "人脸特征", "记住人脸特质", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.0, "entered": true}
+{"id": "feature_matrix_recall", "name": "特征矩阵", "nodes": 21, "first": ["‹", "特征矩阵", "回忆特征", "☆", "?", "普通", "↻", "阶段"], "enter_s": 1.9, "entered": true}
+{"id": "feature_matrix_recall_all", "name": "特征回忆", "nodes": 21, "first": ["‹", "特征回忆", "回忆特征矩阵", "☆", "?", "普通", "↻", "阶段"], "enter_s": 2.0, "entered": true}
+{"id": "flanker_test", "name": "侧抑制", "nodes": 24, "first": ["‹", "侧抑制", "忽略干扰", "☆", "?", "普通", "↻", "题号"], "enter_s": 1.9, "entered": true}
+{"id": "frequency_tap", "name": "频率点击", "nodes": 22, "first": ["‹", "频率点击", "按节奏点击", "☆", "?", "普通", "↻", "拍号"], "enter_s": 1.9, "entered": true}
+{"id": "ghost_tap", "name": "幽灵点击", "nodes": 21, "first": ["‹", "幽灵点击", "点出现的目标", "☆", "?", "普通", "↻", "第几只"], "enter_s": 2.3, "entered": true}
+{"id": "go_no_go", "name": "去或停", "nodes": 23, "first": ["‹", "去或停", "该点才点", "☆", "?", "普通", "↻", "试次"], "enter_s": 2.2, "entered": true}
+{"id": "grocery_list", "name": "购物清单", "nodes": 23, "first": ["‹", "购物清单", "记住清单", "☆", "?", "普通", "↻", "轮次 1/3"], "enter_s": 2.0, "entered": true}
+{"id": "mandala_recall", "name": "曼陀罗回忆", "nodes": 18, "first": ["‹", "曼陀罗回忆", "回忆图案", "☆", "?", "普通", "↻", "关卡 1/4"], "enter_s": 2.0, "entered": true}
+{"id": "memory_matrix", "name": "记忆矩阵", "nodes": 18, "first": ["‹", "记忆矩阵", "记住亮格", "☆", "?", "普通", "↻", "关卡 1/5"], "enter_s": 1.9, "entered": true}
+{"id": "memory_palace", "name": "记忆宫殿", "nodes": 29, "first": ["‹", "记忆宫殿", "位置记忆法", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.2, "entered": true}
+{"id": "multiple_object_tracking", "name": "多目标追踪", "nodes": 26, "first": ["‹", "多目标追踪", "追踪多个目标", "☆", "?", "普通", "↻", "轮次 1/3"], "enter_s": 2.0, "entered": true}
+{"id": "n_back", "name": "N-back", "nodes": 33, "first": ["‹", "N-back", "记忆 N 步前的刺激", "☆", "?", "普通", "↻", "试次 2/12"], "enter_s": 1.9, "entered": true}
+{"id": "narrative_recall", "name": "故事回忆", "nodes": 20, "first": ["‹", "故事回忆", "复述故事", "☆", "?", "普通", "↻", "篇数 1/2"], "enter_s": 1.9, "entered": true}
+{"id": "negative_space_detection", "name": "负空间", "nodes": 20, "first": ["‹", "负空间", "看空白形状", "☆", "?", "普通", "↻", "关卡 1/6"], "enter_s": 2.9, "entered": true}
+{"id": "object_displacement", "name": "物体位移", "nodes": 29, "first": ["‹", "物体位移", "发现移动的物体", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "object_shuffle", "name": "物体换位", "nodes": 27, "first": ["‹", "物体换位", "追踪换位", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "odd_even_flash", "name": "奇偶闪现", "nodes": 26, "first": ["‹", "奇偶闪现", "快速判断奇偶", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "operation_span", "name": "运算广度", "nodes": 27, "first": ["‹", "运算广度", "算完记结果", "☆", "?", "普通", "↻", "组长度"], "enter_s": 1.9, "entered": true}
+{"id": "peripheral_focus", "name": "周边视野", "nodes": 27, "first": ["‹", "周边视野", "用余光辨认", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.0, "entered": true}
+{"id": "posner_spatial_cueing", "name": "空间提示", "nodes": 25, "first": ["‹", "空间提示", "提示后反应", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "probe_digit_span", "name": "数字探针", "nodes": 32, "first": ["‹", "数字探针", "回忆指定位置数字", "☆", "?", "普通", "↻", "位数"], "enter_s": 1.9, "entered": true}
+{"id": "reading_span", "name": "阅读广度", "nodes": 24, "first": ["‹", "阅读广度", "读完回忆", "☆", "?", "普通", "↻", "组长度"], "enter_s": 2.1, "entered": true}
+{"id": "reflex_tap", "name": "反应点击", "nodes": 21, "first": ["‹", "反应点击", "越快越好", "☆", "?", "普通", "↻", "第几"], "enter_s": 2.0, "entered": true}
+{"id": "relational_memory", "name": "关系记忆", "nodes": 37, "first": ["‹", "关系记忆", "记住配对关系", "☆", "?", "普通", "↻", "答对"], "enter_s": 2.1, "entered": true}
+{"id": "reverse_stroop", "name": "反向斯特鲁普", "nodes": 27, "first": ["‹", "反向斯特鲁普", "反着答", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.1, "entered": true}
+{"id": "rhythm_master", "name": "节奏大师", "nodes": 23, "first": ["‹", "节奏大师", "跟节奏", "☆", "?", "普通", "↻", "阶段"], "enter_s": 2.8, "entered": true}
+{"id": "rule_switcher", "name": "规则切换器", "nodes": 26, "first": ["‹", "规则切换器", "快速换规则", "☆", "?", "普通", "↻", "题号"], "enter_s": 1.9, "entered": true}
+{"id": "running_memory_span", "name": "记忆广度", "nodes": 33, "first": ["‹", "记忆广度", "按顺序回忆", "☆", "?", "普通", "↻", "关卡"], "enter_s": 2.0, "entered": true}
+{"id": "sdmt", "name": "符号数字转换", "nodes": 50, "first": ["‹", "符号数字转换", "限时符号转换", "☆", "?", "普通", "↻", "答对"], "enter_s": 2.1, "entered": true}
+{"id": "shell_game", "name": "猜球", "nodes": 22, "first": ["‹", "猜球", "追踪碗下球", "☆", "?", "普通", "↻", "猜中"], "enter_s": 2.0, "entered": true}
+{"id": "sopt", "name": "自定顺序", "nodes": 27, "first": ["‹", "自定顺序", "自定顺序指向", "☆", "?", "普通", "↻", "轮次 1/3"], "enter_s": 2.4, "entered": true}
+{"id": "spatial_cabinet_memory", "name": "柜子记忆", "nodes": 21, "first": ["‹", "柜子记忆", "记住物品位置", "☆", "?", "普通", "↻", "轮次 1/6"], "enter_s": 2.5, "entered": true}
+{"id": "spotlight_track", "name": "聚光追踪", "nodes": 19, "first": ["‹", "聚光追踪", "追踪聚光", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.4, "entered": true}
+{"id": "staircase_memory", "name": "阶梯记忆", "nodes": 23, "first": ["‹", "阶梯记忆", "记住阶梯顺序", "☆", "?", "普通", "↻", "关卡 1/4"], "enter_s": 2.2, "entered": true}
+{"id": "stop_signal", "name": "停止信号", "nodes": 19, "first": ["‹", "停止信号", "抑制反应", "☆", "?", "普通", "↻", "回合 1/12"], "enter_s": 2.1, "entered": true}
+{"id": "stroop_number_size", "name": "数字大小", "nodes": 21, "first": ["‹", "数字大小", "忽略数字大小", "☆", "?", "普通", "↻", "题号 1/12"], "enter_s": 1.9, "entered": true}
+{"id": "stroop_test", "name": "斯特鲁普", "nodes": 23, "first": ["‹", "斯特鲁普", "字义与颜色冲突", "☆", "?", "普通", "↻", "题号 1/12"], "enter_s": 2.1, "entered": true}
+{"id": "subitizing_rush", "name": "数量直觉", "nodes": 20, "first": ["‹", "数量直觉", "一眼数数", "☆", "?", "普通", "↻", "题号 1/10"], "enter_s": 1.9, "entered": true}
+{"id": "switch_task", "name": "任务切换", "nodes": 26, "first": ["‹", "任务切换", "规则切换", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "symbol_digit_assoc", "name": "符号数字", "nodes": 34, "first": ["‹", "符号数字", "符号对应数字", "☆", "?", "普通", "↻", "●=1"], "enter_s": 1.9, "entered": true}
+{"id": "symbol_logic", "name": "符号逻辑", "nodes": 30, "first": ["‹", "符号逻辑", "符号推理", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "symbolic_flanker", "name": "符号侧抑制", "nodes": 31, "first": ["‹", "符号侧抑制", "符号版侧抑制", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "task_switching", "name": "切换代价", "nodes": 26, "first": ["‹", "切换代价", "测切换成本", "☆", "?", "普通", "↻", "轮次"], "enter_s": 1.9, "entered": true}
+{"id": "trail_making", "name": "连线测验", "nodes": 46, "first": ["‹", "连线测验", "按序连线", "☆", "?", "普通", "↻", "已连"], "enter_s": 2.0, "entered": true}
+{"id": "vigilance_task", "name": "警觉任务", "nodes": 25, "first": ["‹", "警觉任务", "长时间保持警觉", "☆", "?", "普通", "↻", "进度"], "enter_s": 2.1, "entered": true}
+{"id": "visual_crowding_acuity", "name": "拥挤视力", "nodes": 32, "first": ["‹", "拥挤视力", "辨认拥挤图形", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "visual_search", "name": "视觉搜索", "nodes": 58, "first": ["‹", "视觉搜索", "找出目标", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.2, "entered": true}
+{"id": "visual_search_conjunction", "name": "联合搜索", "nodes": 47, "first": ["‹", "联合搜索", "多特征搜索", "☆", "?", "普通", "↻", "局"], "enter_s": 2.2, "entered": true}
+{"id": "wisconsin_card_sorting", "name": "威斯康星卡片", "nodes": 41, "first": ["‹", "威斯康星卡片", "归类卡片", "☆", "?", "普通", "↻", "试次"], "enter_s": 2.1, "entered": true}
+{"id": "word_pair_associate_memory", "name": "词对记忆", "nodes": 27, "first": ["‹", "词对记忆", "记住词对", "☆", "?", "普通", "↻", "记忆 7s　答对 0　得分 0"], "enter_s": 1.9, "entered": true}
+{"id": "affix_factory", "name": "词缀工厂", "nodes": 27, "first": ["‹", "词缀工厂", "加词缀造词", "☆", "?", "普通", "↻", "题"], "enter_s": 1.9, "entered": true}
+{"id": "anagram_definition", "name": "字谜定义", "nodes": 25, "first": ["‹", "字谜定义", "按释义猜字谜", "☆", "?", "普通", "↻", "题 1/6　答对 0　剩余 18.8s"], "enter_s": 1.9, "entered": true}
+{"id": "category_fluency", "name": "类别流畅", "nodes": 28, "first": ["‹", "类别流畅", "限时列举同类词", "☆", "?", "普通", "↻", "类别"], "enter_s": 1.9, "entered": true}
+{"id": "chalk_and_talk", "name": "边写边说", "nodes": 33, "first": ["‹", "边写边说", "同步任务", "☆", "?", "普通", "↻", "剩余"], "enter_s": 2.0, "entered": true}
+{"id": "chimp_test", "name": "黑猩猩测验", "nodes": 28, "first": ["‹", "黑猩猩测验", "瞬间记住数字位置", "☆", "?", "普通", "↻", "关卡"], "enter_s": 1.9, "entered": true}
+{"id": "cognate_catch", "name": "同源词", "nodes": 25, "first": ["‹", "同源词", "识别同源词", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.0, "entered": true}
+{"id": "consonant_reconstruct", "name": "辅音重建", "nodes": 28, "first": ["‹", "辅音重建", "还原辅音", "☆", "?", "普通", "↻", "进度"], "enter_s": 2.2, "entered": true}
+{"id": "context_clues", "name": "上下文线索", "nodes": 31, "first": ["‹", "上下文线索", "猜词义", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.0, "entered": true}
+{"id": "conundrum_anagram", "name": "谜语字谜", "nodes": 29, "first": ["‹", "谜语字谜", "解谜语", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.1, "entered": true}
+{"id": "crossword", "name": "填字游戏", "nodes": 27, "first": ["‹", "填字游戏", "横竖填词", "☆", "?", "普通", "↻", "已填"], "enter_s": 2.1, "entered": true}
+{"id": "cryptogram", "name": "密文破译", "nodes": 28, "first": ["‹", "密文破译", "替换密码", "☆", "?", "普通", "↻", "关卡"], "enter_s": 2.1, "entered": true}
+{"id": "definition_dash", "name": "释义冲刺", "nodes": 29, "first": ["‹", "释义冲刺", "限时选释义", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "etymology_origin", "name": "词源探源", "nodes": 28, "first": ["‹", "词源探源", "判断词源", "☆", "?", "普通", "↻", "答对"], "enter_s": 2.0, "entered": true}
+{"id": "etymon_oddball", "name": "词根异类", "nodes": 26, "first": ["‹", "词根异类", "找出不同词根", "☆", "?", "普通", "↻", "轮次"], "enter_s": 1.9, "entered": true}
+{"id": "find_word", "name": "找词", "nodes": 59, "first": ["‹", "找词", "快速找词", "☆", "?", "普通", "↻", "已找"], "enter_s": 2.0, "entered": true}
+{"id": "grammar_police", "name": "语法警察", "nodes": 29, "first": ["‹", "语法警察", "找语法错误", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.0, "entered": true}
+{"id": "grammar_sort", "name": "语法分类", "nodes": 29, "first": ["‹", "语法分类", "按词性分类", "☆", "?", "普通", "↻", "进度"], "enter_s": 2.0, "entered": true}
+{"id": "homophone_hunt", "name": "同音词", "nodes": 27, "first": ["‹", "同音词", "找同音异义", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.0, "entered": true}
+{"id": "letter_bridge", "name": "字母桥", "nodes": 30, "first": ["‹", "字母桥", "补字母成词", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.2, "entered": true}
+{"id": "letter_cancellation", "name": "字母划消", "nodes": 61, "first": ["‹", "字母划消", "划掉指定字母", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.3, "entered": true}
+{"id": "letter_frequency_scan", "name": "字母频率", "nodes": 27, "first": ["‹", "字母频率", "数字母出现次数", "☆", "?", "普通", "↻", "题"], "enter_s": 2.1, "entered": true}
+{"id": "letter_grid_swapper", "name": "字母换位", "nodes": 29, "first": ["‹", "字母换位", "交换字母成词", "☆", "?", "普通", "↻", "步数"], "enter_s": 3.6, "entered": true}
+{"id": "missing_vowels", "name": "缺元音", "nodes": 29, "first": ["‹", "缺元音", "补全元音", "☆", "?", "普通", "↻", "题"], "enter_s": 1.9, "entered": true}
+{"id": "one_letter_shift", "name": "移一字母", "nodes": 32, "first": ["‹", "移一字母", "换一个字母变新词", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "oxymoron_hunt", "name": "矛盾修辞", "nodes": 26, "first": ["‹", "矛盾修辞", "找矛盾搭配", "☆", "?", "普通", "↻", "题"], "enter_s": 1.9, "entered": true}
+{"id": "palindrome_builder", "name": "回文构造", "nodes": 29, "first": ["‹", "回文构造", "造回文", "☆", "?", "普通", "↻", "题"], "enter_s": 1.9, "entered": true}
+{"id": "pangram_sprint", "name": "全字母句", "nodes": 49, "first": ["‹", "全字母句", "用完所有字母", "☆", "?", "普通", "↻", "题"], "enter_s": 2.0, "entered": true}
+{"id": "portmanteau_split", "name": "混合词拆分", "nodes": 27, "first": ["‹", "混合词拆分", "拆开合成词", "☆", "?", "普通", "↻", "题"], "enter_s": 2.0, "entered": true}
+{"id": "rhyme_master", "name": "押韵大师", "nodes": 29, "first": ["‹", "押韵大师", "找押韵词", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "semantic_association", "name": "语义联想", "nodes": 29, "first": ["‹", "语义联想", "关联词配对", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "semantic_distance", "name": "语义距离", "nodes": 27, "first": ["‹", "语义距离", "判断词义远近", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "semantic_link", "name": "语义连接", "nodes": 29, "first": ["‹", "语义连接", "连成语义链", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "sentence_unscramble", "name": "句子重组", "nodes": 31, "first": ["‹", "句子重组", "打乱的句子还原", "☆", "?", "普通", "↻", "句号"], "enter_s": 1.9, "entered": true}
+{"id": "silent_letter_search", "name": "不发音字母", "nodes": 28, "first": ["‹", "不发音字母", "找出不发音字母", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.7, "entered": true}
+{"id": "spelling_sprint", "name": "拼写冲刺", "nodes": 27, "first": ["‹", "拼写冲刺", "限时拼写", "☆", "?", "普通", "↻", "进度"], "enter_s": 1.9, "entered": true}
+{"id": "spoonerism_solver", "name": "首音互换", "nodes": 29, "first": ["‹", "首音互换", "互换首音", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "story_builder", "name": "故事拼装", "nodes": 29, "first": ["‹", "故事拼装", "拼出完整故事", "☆", "?", "普通", "↻", "段 1/3　已接 0/5　生命 3"], "enter_s": 1.9, "entered": true}
+{"id": "syllable_stack", "name": "音节堆叠", "nodes": 25, "first": ["‹", "音节堆叠", "按音节组词", "☆", "?", "普通", "↻", "词 1/6　叠对 0　生命 3"], "enter_s": 1.9, "entered": true}
+{"id": "typing_speed", "name": "打字速度", "nodes": 19, "first": ["‹", "打字速度", "测打字速度", "☆", "?", "普通", "↻", "句 1/5　0 WPM　正确率 100%　剩余 23.6s"], "enter_s": 2.0, "entered": true}
+{"id": "typoglycemia_decoder", "name": "乱序解码", "nodes": 24, "first": ["‹", "乱序解码", "首尾对就能读", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "verbal_analogies", "name": "词语类比", "nodes": 25, "first": ["‹", "词语类比", "A 比 B 等于 C 比 ?", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.7, "entered": true}
+{"id": "vocabulary_builder", "name": "词汇构建", "nodes": 25, "first": ["‹", "词汇构建", "积累词汇", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.6, "entered": true}
+{"id": "vowel_reconstruct", "name": "元音重建", "nodes": 25, "first": ["‹", "元音重建", "还原元音", "☆", "?", "普通", "↻", "词 1/6　还原 0　步数 9"], "enter_s": 2.1, "entered": true}
+{"id": "word_association_recall", "name": "词汇联想", "nodes": 33, "first": ["‹", "词汇联想", "回忆关联词", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "word_grid_connection", "name": "词格连线", "nodes": 37, "first": ["‹", "词格连线", "连接相关词", "☆", "?", "普通", "↻", "已连"], "enter_s": 1.9, "entered": true}
+{"id": "word_ladder", "name": "单词阶梯", "nodes": 52, "first": ["‹", "单词阶梯", "一次换一个字母", "☆", "?", "普通", "↻", "步数"], "enter_s": 2.1, "entered": true}
+{"id": "word_ladder_step", "name": "阶梯一步", "nodes": 28, "first": ["‹", "阶梯一步", "单步换字母", "☆", "?", "普通", "↻", "提示"], "enter_s": 3.1, "entered": true}
+{"id": "word_mastermind", "name": "猜词大师", "nodes": 50, "first": ["‹", "猜词大师", "猜中隐藏单词", "☆", "?", "普通", "↻", "第几次"], "enter_s": 2.2, "entered": true}
+{"id": "word_scramble", "name": "单词重排", "nodes": 29, "first": ["‹", "单词重排", "打乱的字母重排", "☆", "?", "普通", "↻", "第几个"], "enter_s": 2.1, "entered": true}
+{"id": "word_search", "name": "找单词", "nodes": 86, "first": ["‹", "找单词", "字母阵里找词", "☆", "?", "普通", "↻", "已找"], "enter_s": 2.3, "entered": true}
+{"id": "word_snake_trail", "name": "单词蛇", "nodes": 90, "first": ["‹", "单词蛇", "蛇形找词", "☆", "?", "普通", "↻", "第几个"], "enter_s": 2.3, "entered": true}
+{"id": "word_surge", "name": "词汇冲刺", "nodes": 27, "first": ["‹", "词汇冲刺", "限时组词", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.0, "entered": true}
+{"id": "word_wheel", "name": "单词轮", "nodes": 31, "first": ["‹", "单词轮", "用字母组词", "☆", "?", "普通", "↻", "找到"], "enter_s": 2.4, "entered": true}
+{"id": "ab_reversal_oddball", "name": "AB 反转", "nodes": 26, "first": ["‹", "AB 反转", "识别反常刺激", "☆", "?", "普通", "↻", "帧号"], "enter_s": 2.2, "entered": true}
+{"id": "action_sequence_recall", "name": "动作序列", "nodes": 36, "first": ["‹", "动作序列", "记住动作顺序", "☆", "?", "普通", "↻", "关卡"], "enter_s": 2.8, "entered": true}
+{"id": "angle_finder", "name": "找角度", "nodes": 33, "first": ["‹", "找角度", "算图形角度", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.6, "entered": true}
+{"id": "area_perimeter_match", "name": "面积周长", "nodes": 33, "first": ["‹", "面积周长", "匹配面积周长", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.9, "entered": true}
+{"id": "binary_matrix_rank_all", "name": "矩阵秩进阶", "nodes": 66, "first": ["‹", "矩阵秩进阶", "大矩阵", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.7, "entered": true}
+{"id": "blink_detector", "name": "眨眼检测", "nodes": 25, "first": ["‹", "眨眼检测", "捕捉眨眼", "☆", "?", "普通", "↻", "进度"], "enter_s": 2.3, "entered": true}
+{"id": "block_count_3d", "name": "数方块", "nodes": 26, "first": ["‹", "数方块", "数立体方块", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.1, "entered": true}
+{"id": "block_stacking_physics", "name": "叠方块", "nodes": 24, "first": ["‹", "叠方块", "物理堆叠", "☆", "?", "普通", "↻", "第 1/3 关　已放 0/7 块　限高 2 层"], "enter_s": 2.3, "entered": true}
+{"id": "box_completion", "name": "补全盒子", "nodes": 17, "first": ["‹", "补全盒子", "补成完整盒子", "☆", "?", "普通", "↻", "已补 0/12 格　步数 0"], "enter_s": 2.0, "entered": true}
+{"id": "chain_reaction", "name": "连锁反应", "nodes": 35, "first": ["‹", "连锁反应", "引发连锁爆炸", "☆", "?", "普通", "↻", "步数 0/20　剩光点 16"], "enter_s": 2.2, "entered": true}
+{"id": "circuit_connect", "name": "电路连接", "nodes": 33, "first": ["‹", "电路连接", "接通电路", "☆", "?", "普通", "↻", "步数 0/26　电源 接入 ✅　终点 未通"], "enter_s": 2.1, "entered": true}
+{"id": "classic_maze", "name": "经典迷宫", "nodes": 21, "first": ["‹", "经典迷宫", "走出迷宫", "☆", "?", "普通", "↻", "步数 0/36　位置 1排1列　出口 9排9列"], "enter_s": 4.1, "entered": true}
+{"id": "color_match", "name": "颜色匹配", "nodes": 40, "first": ["‹", "颜色匹配", "匹配相同颜色", "☆", "?", "普通", "↻", "得分 0/150　步数 0/22　进度 0%"], "enter_s": 2.1, "entered": true}
+{"id": "color_maze_nav", "name": "色彩迷宫", "nodes": 21, "first": ["‹", "色彩迷宫", "按颜色走", "☆", "?", "普通", "↻", "步数 0/26　脚下 1 号色　终点 1 号色"], "enter_s": 2.1, "entered": true}
+{"id": "compass_maze", "name": "罗盘迷宫", "nodes": 27, "first": ["‹", "罗盘迷宫", "按方向指令走", "☆", "?", "普通", "↻", "步数 0/20　指令 1/316　出口 7排7列"], "enter_s": 2.9, "entered": true}
+{"id": "complex_folding_nets", "name": "复杂折纸", "nodes": 25, "first": ["‹", "复杂折纸", "多步折纸", "☆", "?", "普通", "↻", "第 1/8"], "enter_s": 1.9, "entered": true}
+{"id": "counting_sheep", "name": "数羊", "nodes": 26, "first": ["‹", "数羊", "睡前数羊", "☆", "?", "普通", "↻", "第 1/10"], "enter_s": 1.9, "entered": true}
+{"id": "cross_section_slice", "name": "截面切片", "nodes": 35, "first": ["‹", "截面切片", "想象切面", "☆", "?", "普通", "↻", "第 1/8"], "enter_s": 2.0, "entered": true}
+{"id": "cryptogram_all", "name": "密文进阶", "nodes": 29, "first": ["‹", "密文进阶", "难密文", "☆", "?", "普通", "↻", "第 1/8"], "enter_s": 2.2, "entered": true}
+{"id": "cube_net_fold", "name": "立方体展开", "nodes": 23, "first": ["‹", "立方体展开", "展开图折成立方体", "☆", "?", "普通", "↻", "第 1/6"], "enter_s": 1.9, "entered": true}
+{"id": "directions_recall", "name": "方向回忆", "nodes": 22, "first": ["‹", "方向回忆", "记住方向序列", "☆", "?", "普通", "↻", "第 1/5"], "enter_s": 2.0, "entered": true}
+{"id": "distractor_matrix", "name": "干扰矩阵", "nodes": 38, "first": ["‹", "干扰矩阵", "忽略干扰项", "☆", "?", "普通", "↻", "第 1/8"], "enter_s": 1.9, "entered": true}
+{"id": "einstein_riddle", "name": "爱因斯坦谜题", "nodes": 30, "first": ["‹", "爱因斯坦谜题", "斑马谜题", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 1.9, "entered": true}
+{"id": "fact_binder", "name": "事实绑定", "nodes": 25, "first": ["‹", "事实绑定", "匹配事实", "☆", "?", "普通", "↻", "已绑定 0/5"], "enter_s": 2.0, "entered": true}
+{"id": "focus_tunnel", "name": "聚焦隧道", "nodes": 42, "first": ["‹", "聚焦隧道", "隧道视觉", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "gear_rotation", "name": "齿轮转向", "nodes": 25, "first": ["‹", "齿轮转向", "判断齿轮转向", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.0, "entered": true}
+{"id": "gear_train_direction", "name": "齿轮组", "nodes": 30, "first": ["‹", "齿轮组", "多齿轮传动", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.9, "entered": true}
+{"id": "geometric_vision", "name": "几何直觉", "nodes": 20, "first": ["‹", "几何直觉", "几何判断", "☆", "?", "普通", "↻", "第 1/10 题　得分 0"], "enter_s": 2.1, "entered": true}
+{"id": "graph_coordinate_plot", "name": "坐标绘图", "nodes": 16, "first": ["‹", "坐标绘图", "按坐标画图", "☆", "?", "普通", "↻", "已绘 0/8"], "enter_s": 2.0, "entered": true}
+{"id": "gravity_sort", "name": "重力排序", "nodes": 40, "first": ["‹", "重力排序", "倾斜让球归位", "☆", "?", "普通", "↻", "已消 0/25"], "enter_s": 2.0, "entered": true}
+{"id": "grid_displacement", "name": "网格位移", "nodes": 18, "first": ["‹", "网格位移", "按位移指令移动", "☆", "?", "普通", "↻", "题 1/6"], "enter_s": 2.0, "entered": true}
+{"id": "hue_sort", "name": "色相排序", "nodes": 16, "first": ["‹", "色相排序", "按色相排列", "☆", "?", "普通", "↻", "归位 2/16"], "enter_s": 2.1, "entered": true}
+{"id": "interlock_puzzle", "name": "互锁拼图", "nodes": 22, "first": ["‹", "互锁拼图", "拆解互锁", "☆", "?", "普通", "↻", "已拆 0/6"], "enter_s": 2.1, "entered": true}
+{"id": "laser_link", "name": "激光连线", "nodes": 32, "first": ["‹", "激光连线", "反射激光到目标", "☆", "?", "普通", "↻", "已亮 1/2"], "enter_s": 2.2, "entered": true}
+{"id": "laser_reflect", "name": "镜面反射", "nodes": 38, "first": ["‹", "镜面反射", "摆镜子导光", "☆", "?", "普通", "↻", "已亮 1/2"], "enter_s": 2.1, "entered": true}
+{"id": "logical_syllogisms", "name": "逻辑三段论", "nodes": 21, "first": ["‹", "逻辑三段论", "判断推理有效性", "☆", "?", "普通", "↻", "题 1/6"], "enter_s": 4.1, "entered": true}
+{"id": "math_guess", "name": "猜数字", "nodes": 22, "first": ["‹", "猜数字", "二分猜数", "☆", "?", "普通", "↻", "已用 0/7　范围 1~100　分 0"], "enter_s": 2.2, "entered": true}
+{"id": "maze_nav_3d", "name": "3D 迷宫", "nodes": 38, "first": ["‹", "3D 迷宫", "立体迷宫导航", "☆", "?", "普通", "↻", "0"], "enter_s": 3.2, "entered": true}
+{"id": "mental_mapping", "name": "心理地图", "nodes": 30, "first": ["‹", "心理地图", "构建空间地图", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.1, "entered": true}
+{"id": "mental_rotation", "name": "心理旋转", "nodes": 29, "first": ["‹", "心理旋转", "判断旋转后的形状", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.3, "entered": true}
+{"id": "mirror_image", "name": "镜像", "nodes": 30, "first": ["‹", "镜像", "判断镜像", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.3, "entered": true}
+{"id": "mirror_maze", "name": "镜像迷宫", "nodes": 26, "first": ["‹", "镜像迷宫", "镜像方向导航", "☆", "?", "普通", "↻", "步数"], "enter_s": 2.3, "entered": true}
+{"id": "mirror_tracing", "name": "镜像描线", "nodes": 33, "first": ["‹", "镜像描线", "镜面对着描", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.2, "entered": true}
+{"id": "multi_track_counter", "name": "多轨计数", "nodes": 38, "first": ["‹", "多轨计数", "同时数多个", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.2, "entered": true}
+{"id": "navon_hierarchical", "name": "整体局部", "nodes": 29, "first": ["‹", "整体局部", "大图小图冲突", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.1, "entered": true}
+{"id": "odd_one_out", "name": "找不同", "nodes": 28, "first": ["‹", "找不同", "找出异类", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.3, "entered": true}
+{"id": "odd_rotation", "name": "旋转异类", "nodes": 22, "first": ["‹", "旋转异类", "找出旋转不同的", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "orbit_tap", "name": "轨道点击", "nodes": 23, "first": ["‹", "轨道点击", "点中轨道上的目标", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.0, "entered": true}
+{"id": "paper_folding", "name": "折纸", "nodes": 23, "first": ["‹", "折纸", "折叠后打孔", "☆", "?", "普通", "↻", "目标孔"], "enter_s": 3.1, "entered": true}
+{"id": "path_recall", "name": "路径回忆", "nodes": 24, "first": ["‹", "路径回忆", "记住走过的路", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "perspective_shift_view", "name": "视角切换", "nodes": 24, "first": ["‹", "视角切换", "换视角看", "☆", "?", "普通", "↻", "提示"], "enter_s": 1.9, "entered": true}
+{"id": "perspective_taking", "name": "观点采择", "nodes": 30, "first": ["‹", "观点采择", "他人视角", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "pixel_mimic", "name": "像素临摹", "nodes": 23, "first": ["‹", "像素临摹", "照着画像素图", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.1, "entered": true}
+{"id": "polyomino_tiling", "name": "多联骨牌", "nodes": 32, "first": ["‹", "多联骨牌", "铺满网格", "☆", "?", "普通", "↻", "已铺"], "enter_s": 2.1, "entered": true}
+{"id": "room_inspector", "name": "房间检查", "nodes": 46, "first": ["‹", "房间检查", "找房间里的差异", "☆", "?", "普通", "↻", "找到"], "enter_s": 2.0, "entered": true}
+{"id": "rotating_maze", "name": "旋转迷宫", "nodes": 26, "first": ["‹", "旋转迷宫", "迷宫会转", "☆", "?", "普通", "↻", "步数"], "enter_s": 1.9, "entered": true}
+{"id": "shadow_pivot", "name": "影子旋转", "nodes": 20, "first": ["‹", "影子旋转", "影子随光转动", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "shape_shifter", "name": "变形者", "nodes": 21, "first": ["‹", "变形者", "形状变换", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.2, "entered": true}
+{"id": "silhouette_match", "name": "剪影匹配", "nodes": 19, "first": ["‹", "剪影匹配", "匹配影子", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "silhouette_match_ortho", "name": "正交剪影", "nodes": 20, "first": ["‹", "正交剪影", "正投影剪影", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "simon_command", "name": "西蒙指令", "nodes": 26, "first": ["‹", "西蒙指令", "按指令做动作", "☆", "?", "普通", "↻", "答对 0/10"], "enter_s": 2.0, "entered": true}
+{"id": "simon_sequence", "name": "西蒙序列", "nodes": 26, "first": ["‹", "西蒙序列", "记住亮灯顺序", "☆", "?", "普通", "↻", "长度"], "enter_s": 3.1, "entered": true}
+{"id": "source_monitoring", "name": "来源监控", "nodes": 24, "first": ["‹", "来源监控", "记住信息出处", "☆", "?", "普通", "↻", "记忆　答对 0/4　倒计时 7s"], "enter_s": 2.0, "entered": true}
+{"id": "spatial_conflict", "name": "空间冲突", "nodes": 27, "first": ["‹", "空间冲突", "冲突任务", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.0, "entered": true}
+{"id": "sternberg_task", "name": "斯滕伯格", "nodes": 29, "first": ["‹", "斯滕伯格", "短时记忆扫描", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.8, "entered": true}
+{"id": "symmetry", "name": "对称", "nodes": 31, "first": ["‹", "对称", "找对称轴", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.2, "entered": true}
+{"id": "symmetry_span", "name": "对称广度", "nodes": 21, "first": ["‹", "对称广度", "记忆对称图案", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.1, "entered": true}
+{"id": "tangram", "name": "七巧板", "nodes": 19, "first": ["‹", "七巧板", "拼出目标形状", "☆", "?", "普通", "↻", "铺对 0 / 12　次数 0"], "enter_s": 2.3, "entered": true}
+{"id": "temporal_order", "name": "时间顺序", "nodes": 33, "first": ["‹", "时间顺序", "排序事件", "☆", "?", "普通", "↻", "题号"], "enter_s": 2.3, "entered": true}
+{"id": "temporal_order_judgment", "name": "时序判断", "nodes": 26, "first": ["‹", "时序判断", "判断先后", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.3, "entered": true}
+{"id": "topology", "name": "拓扑", "nodes": 29, "first": ["‹", "拓扑", "判断拓扑等价", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.3, "entered": true}
+{"id": "tower_of_london", "name": "伦敦塔", "nodes": 24, "first": ["‹", "伦敦塔", "规划移动步骤", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.8, "entered": true}
+{"id": "trace_path", "name": "描路径", "nodes": 39, "first": ["‹", "描路径", "沿路径描线", "☆", "?", "普通", "↻", "路线 1/3 · 已描 1/7 · 失误 0/4"], "enter_s": 3.0, "entered": true}
+{"id": "triple_sequence", "name": "三重序列", "nodes": 18, "first": ["‹", "三重序列", "多序列并行", "☆", "?", "普通", "↻", "第 1/5 拍 · 命中 0/11 · 三行各点一格"], "enter_s": 2.2, "entered": true}
+{"id": "triplets_logic", "name": "三元逻辑", "nodes": 24, "first": ["‹", "三元逻辑", "三元素推理", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "visual_search_all", "name": "视觉搜索进阶", "nodes": 52, "first": ["‹", "视觉搜索进阶", "难搜索", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.2, "entered": true}
+{"id": "visual_statistical_learning", "name": "统计学习", "nodes": 19, "first": ["‹", "统计学习", "发现隐藏规律", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.4, "entered": true}
+{"id": "wireframe_3d_rotation", "name": "线框旋转", "nodes": 22, "first": ["‹", "线框旋转", "判断 3D 旋转", "☆", "?", "普通", "↻", "第 1/4 题 · 答对 0/3"], "enter_s": 2.2, "entered": true}

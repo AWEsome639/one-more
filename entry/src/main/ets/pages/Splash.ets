@@ -66,6 +66,7 @@
  * ════════════════════════════════════════════════════════════════════════
  */
 import { router, curves } from '@kit.ArkUI';
+import { PathShape } from '@ohos.arkui.shape';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Haptics } from '../core/Haptics';
 import { L } from '../core/I18n';
@@ -651,6 +652,13 @@ struct Splash {
           // ★ 2026-10-30：`Polygon.points` 收的是**绝对坐标**（vp），不是百分比 ——
           //   原来传 [[0,100],[18.6,0]…] 被当成 100vp 的盒子 ⇒ M 缩成一小块。
           //   ⇒ 改成按 omPxV 换算的真实 vp 坐标（M 的 5 个顶点，归一化值 × omPxV）。
+          // ── ③ M 山（米白多边形）──
+          //   ⚠️ 2026-10-30 试过用「linearGradient 底 + maskShape(PathShape)」做渐变，
+          //      结果 **M 整个消失** —— 路径坐标与组件坐标系不匹配，
+          //      路径落在组件外 ⇒ mask 全裁掉。
+          //   ⇒ 已回滚到 Polygon 平色。**渐变这一项仍记作"未做到"。**
+          //      下一步若要再做，必须先用一个最小样例确认 PathShape.commands
+          //      到底吃「组件内相对坐标」还是「绝对 vp」，别直接往主视觉上套。
           Polygon()
             .width(this.omPxV() * 0.5071).height(this.omPxV() * 0.4961)
             .points([

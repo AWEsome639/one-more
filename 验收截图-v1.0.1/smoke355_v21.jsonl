@@ -1,0 +1,22 @@
+{"id": "bejeweled", "name": "宝石迷阵", "nodes": 73, "first": ["‹", "宝石迷阵", "交换消宝石", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.9, "entered": true}
+{"id": "breakout", "name": "打砖块", "nodes": 23, "first": ["‹", "打砖块", "一板一球，清空全场", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.2, "entered": true}
+{"id": "continuous_paired_associate", "name": "连续配对", "nodes": 37, "first": ["‹", "连续配对", "连续配对联想", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.3, "entered": true}
+{"id": "doodle_jump", "name": "登高", "nodes": 25, "first": ["‹", "登高", "一直往上跳", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.1, "entered": true}
+{"id": "double_trouble", "name": "双重麻烦", "nodes": 34, "first": ["‹", "双重麻烦", "两个任务一起来", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.2, "entered": true}
+{"id": "dual_mirror", "name": "双镜像", "nodes": 36, "first": ["全部", "展开", "连续配对", "连续配对联想", "1 天", "登高", "一直往上跳", "双重麻烦"], "enter_s": 3.2, "entered": true}
+{"id": "flappy", "name": "穿云", "nodes": 24, "first": ["‹", "穿云", "穿管道", "☆", "?", "普通", "↻", "提示"], "enter_s": 4.8, "entered": true}
+{"id": "freecell", "name": "空当接龙", "nodes": 45, "first": ["‹", "空当接龙", "四列自由搬运", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.3, "entered": true}
+{"id": "g2048", "name": "2048", "nodes": 23, "first": ["‹", "2048", "合并数字，别把自己堵死", "☆", "?", "普通", "↻", "AI 代打"], "enter_s": 2.5, "entered": true}
+{"id": "game24", "name": "24 点", "nodes": 33, "first": ["‹", "24 点", "四个数，加减乘除凑 24", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.5, "entered": true}
+{"id": "go9", "name": "9 路围棋", "nodes": 24, "first": ["‹", "9 路围棋", "围地吃子，气尽提子", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.5, "entered": true}
+{"id": "gomoku", "name": "五子棋", "nodes": 23, "first": ["‹", "五子棋", "与 AI 对弈，五子连珠", "☆", "?", "普通", "↻", "提示"], "enter_s": 3.0, "entered": true}
+{"id": "hanoi", "name": "汉诺塔", "nodes": 23, "first": ["‹", "汉诺塔", "三根柱子，挪完为赢", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.6, "entered": true}
+{"id": "kakuro_mini", "name": "迷你数谜", "nodes": 36, "first": ["‹", "迷你数谜", "小盘数谜", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.4, "entered": true}
+{"id": "life_game", "name": "生命游戏", "nodes": 21, "first": ["‹", "生命游戏", "康威生命游戏", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.6, "entered": true}
+{"id": "lock_pattern", "name": "图案锁", "nodes": 23, "first": ["‹", "图案锁", "一笔连出图案", "☆", "?", "普通", "↻", "提示"], "enter_s": 3.0, "entered": true}
+{"id": "mahjong_solitaire", "name": "麻将连连看", "nodes": 39, "first": ["‹", "麻将连连看", "配对消牌", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.4, "entered": true}
+{"id": "mancala", "name": "播棋", "nodes": 50, "first": ["‹", "播棋", "石子播种", "☆", "?", "普通", "↻", "提示"], "enter_s": 2.5, "entered": true}
+{"id": "mandelbrot", "name": "分形探索", "nodes": 24, "first": ["‹", "分形探索", "曼德博集合", "☆", "?", "普通", "↻", "提示"], "enter_s": 3.0, "entered": true}
+{"id": "mastermind", "name": "珠玑妙算", "nodes": 23, "first": ["‹", "珠玑妙算", "猜颜色组合", "☆", "?", "普通", "↻", "提示"], "enter_s": 3.9, "entered": true}
+{"id": "match3", "name": "三连", "nodes": 39, "first": ["全部", "展开", "生命游戏", "康威生命游戏", "1 天", "图案锁", "一笔连出图案", "麻将连连看"], "enter_s": 4.7, "entered": true}
+{"id": "memory", "name": "记忆翻牌", "enter_s": 23.3, "entered": false, "nodes": 0, "first": [], "error": "enter_timeout"}
