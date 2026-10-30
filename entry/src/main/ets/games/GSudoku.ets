@@ -790,7 +790,14 @@ export struct GSudoku {
    */
   private boardPx(): number {
     const w: number = Math.max(200, Bp.width - 40);
-    const h: number = Math.max(160, Bp.height * 0.52);
+    // ★★★ 2026-10-30：`0.52` 在 960×540 上算 280vp ⇒ 数字键盘被屏幕底边切掉约 40%
+    //   （数字键盘是**核心操作区**，被切一半不是"小瑕疵"，是"不好用"）。
+    //   ⇒ 改为 0.44：
+    //       960×540 ⇒ 237vp（原来 280）⇒ 省出 43vp 给键盘，键盘完整可见
+    //       440×744 ⇒ 327vp（原来 387）⇒ 手机上棋盘仍很大，且键盘更宽松
+    //       800×1280 ⇒ 352vp（原来 666 → 但会被 w 限到 760，所以手机上不受影响）
+    //   ⚠️ 下限仍是 160：极小屏（手表）不会算出负数。
+    const h: number = Math.max(160, Bp.height * 0.44);
     return Math.min(w, h);
   }
 
