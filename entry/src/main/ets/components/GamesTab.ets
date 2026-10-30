@@ -290,6 +290,11 @@ export struct GamesTab {
   // ★ 性能：list() 在 build 里被调 4 次，每次遍历 354 款 ⇒ 按输入记忆化
   /** ★ 2026-10-30：Grid 的滚动控制器 —— 切分类后必须归零 */
   private gridScroller: Scroller = new Scroller();
+  // ★★★ 2026-10-30（PC / 2in1）：**右键菜单**的状态
+  //   menuId = 当前要操作的游戏；menuX/menuY = 弹出位置（鼠标处）
+  @State private menuId: string = '';
+  @State private menuX: number = 0;
+  @State private menuY: number = 0;
 
   /**
    * ★ 2026-10-30：切换任何"会改变列表长度"的条件后，把 Grid 滚动位置归零。
@@ -814,6 +819,13 @@ build() {
                 onOpen: (id: string) => {
                   this.openGame(id);
                 },
+                // 右键菜单（只在桌面类启用；手机/平板零影响）
+                allowMenu: Tv.on(),
+                onMenu: (id: string, x: number, y: number) => {
+                  this.menuId = id;
+                  this.menuX = x;
+                  this.menuY = y;
+                },
                 onLongPress: (id: string) => {
                   // 长按 = 收藏 / 取消收藏，顺手给个提示
                   ProgressStore.toggleFavorite(id);
@@ -906,6 +918,46 @@ build() {
     .width('100%')
     .height('100%')
 
+    // ═══ 2026-10-30（PC / 2in1）：右键菜单 ═══
+    //   为什么不直接弹系统菜单：ArkUI 的 `bindContextMenu` 绑定在组件上，
+    //   而我们的"更多操作"需要一个**跨卡片统一**的菜单（含收藏/隐藏/分享）。
+    //   ⇒ 自己画：位置跟着鼠标走，点空白处关闭。
+    if (this.menuId.length > 0) {
+      // 遮罩：点任意处关闭
+      Column()
+        .width('100%').height('100%')
+        .backgroundColor('#00000000')
+        .onClick(() => { this.menuId = ''; })
+
+      Column({ space: 2 }) {
+        this.menuItem('⭐', ProgressStore.isFavorite(this.menuId)
+          ? this.t('取消收藏', 'Unsave') : this.t('收藏', 'Save'), () => {
+          ProgressStore.toggleFavorite(this.menuId);
+          this.tick = this.tick + 1;
+          this.menuId = '';
+        })
+        this.menuItem('🎮', this.t('开始这一局', 'Play'), () => {
+          const id: string = this.menuId;
+          this.menuId = '';
+          this.openGame(id);
+        })
+        this.menuItem('📄', this.t('查看说明', 'How to play'), () => {
+          const id: string = this.menuId;
+          this.menuId = '';
+          router.pushUrl({ url: 'pages/GuidePage', params: { id: id } });
+        })
+      }
+      .padding(Space.xs)
+      .backgroundColor(this.theme().surface)
+      .borderRadius(Radius.md)
+      .shadow(Shadow.card)
+      // 边界收敛：菜单宽 168、高约 132 ⇒ 贴边时往回收
+      .position({
+        x: Math.max(8, Math.min(this.menuX, Bp.width - 176)),
+        y: Math.max(8, Math.min(this.menuY, Bp.height - 148))
+      })
+    }
+
     // 长按收藏后的小提示（浮在底部导航之上）
     if (this.toast.length > 0) {
       Text(this.toast)
@@ -935,6 +987,20 @@ build() {
   //   +「加一个两种按钮的切换小动画（配置要拉满）」
   //   ⇒ 一个【位置固定】的切换按钮：展开态朝上（收起）／收起态朝下（展开）
   //   ⇒ 两个块共用一个视觉位置 ⇒ 切换时图标【原地翻转 180°】+ 弹簧 ⇒ 动画拉满
+  /** 右键菜单的一行（图标 + 文案 + 动作） */
+  @Builder
+  menuItem(icon: string, text: string, act: () => void) {
+    Row({ space: Space.sm }) {
+      Text(icon).fontSize(FontSize.sm).accessibilityLevel('no')
+      Text(text).fontSize(FontSize.sm).fontColor(this.theme().ink)
+      Blank()
+    }
+    .width(168)
+    .padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm })
+    .borderRadius(Radius.sm)
+    .onClick(() => { Haptics.tap(); act(); })
+  }
+
   @Builder
   collapseToggle() {
     Row({ space: 4 }) {

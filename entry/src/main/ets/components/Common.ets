@@ -651,6 +651,11 @@ export struct GameCard {
   onOpen: (id: string) => void = () => {};
   /** 长按 = 收藏 / 取消收藏 */
   onLongPress: (id: string) => void = () => {};
+  // ★★★ 2026-10-30（PC / 2in1）：**右键菜单的两个回调**
+  //   手机/平板没有右键 ⇒ 这两个回调永远不会被调用（零影响）。
+  onMenu: (id: string, x: number, y: number) => void = () => {};
+  /** 是否允许右键菜单（只在桌面类为真 —— 见 Tv.on()） */
+  @Prop allowMenu: boolean = false;
 
   @State private pressed: boolean = false;
   /** ★ 2026-10-29（PC/2in1）：鼠标悬停态。只在桌面/大屏生效，手机零影响 */
@@ -896,6 +901,18 @@ build() {
     .onClick(() => {
       Haptics.tap();
       this.onOpen(this.meta.id);
+    })
+    // ★★★ 2026-10-30（PC / 2in1）：**右键菜单**
+    //   这是桌面端最自然的"更多操作"入口，等价于手机上的长按。
+    //   用 `onMouse` 判 `MouseButton.Right` + `MouseAction.Press`
+    //   （ArkUI 没有 `onRightClick`；`onMouse` 是官方给的路径）
+    .onMouse((e: MouseEvent) => {
+      if (!this.allowMenu) { return; }
+      if (e.button === MouseButton.Right && e.action === MouseAction.Press) {
+        Haptics.press();
+        // 把点击位置传上去 —— 菜单要在鼠标处弹出，不是屏幕中央
+        this.onMenu(this.meta.id, e.x, e.y);
+      }
     })
     .gesture(
       LongPressGesture({ repeat: false, duration: 250 })
