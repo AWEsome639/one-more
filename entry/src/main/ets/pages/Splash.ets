@@ -80,6 +80,8 @@ struct Splash {
 
   /** 唯一进度：0 → 1 */
   @State private p: number = 0;
+  /** 开屏动画是否已启动（onPageShow 可能触发多次） */
+  private started: boolean = false;
   /** 是否已加速（避免重复触发） */
   private boosted: boolean = false;
   private jumped: boolean = false;
@@ -91,6 +93,20 @@ struct Splash {
   }
 
   aboutToAppear(): void {
+    // ★★★ 2026-10-30 真机抓到的**真 bug**：开屏动画完全不显示（一片空底色）。
+    //   根因：`animateTo` 放在 `aboutToAppear` 里 —— 那时**首帧还没建好**，
+    //   动画对 @State 的驱动不生效 ⇒ `this.p` 永远停在 0
+    //   ⇒ 所有元素 `seg(p, ...)` 算出来都是 0（透明）⇒ 屏幕上只剩底色。
+    //   而 setTimeout(3500) 照旧跳转 ⇒ 用户看到的就是「空白 3.5 秒然后进主页」。
+    //   ⇒ 修：把动画启动挪到 `onPageShow`（页面真正显示之后才发），
+    //     并用一个标记防止重复启动。
+  }
+
+  onPageShow(): void {
+    if (this.started) {
+      return;
+    }
+    this.started = true;
     // 主时间线：3.4 秒跑完 p 0 → 1
     animateTo({ duration: 3400, curve: Curve.Linear }, () => {
       this.p = 1;
