@@ -550,6 +550,50 @@ struct Splash {
       .opacity(this.ultraTiny ? 0 : this.pTag * 0.9 * (1 - this.pOut))
       .hitTestBehavior(HitTestMode.None)
 
+      // ──────── L10 细光带：从 OM 左侧扫到右侧 ────────
+      //   ★ 2026-10-30（第二次尝试，这次对了）：
+      //     第一次把它塞进 OM 的 Stack 里 ⇒ **把 Stack 撑高、OM 被顶出屏幕**。
+      //     正确做法：作为**根 Stack 的独立层 + `.position()` 绝对定位**，
+      //     不参与其它兄弟的布局测量。
+      Column()
+        .width(this.vw > 0 ? this.vw * 0.045 : 20)
+        .height(this.vw > 0 ? this.vw * 0.22 : 100)
+        .linearGradient({
+          angle: 96,
+          colors: [
+            ['#00FFFFFF', 0.00],
+            ['#22FFF4D6', 0.36],
+            ['#CFF0D9A8', 0.50],
+            ['#22FFF4D6', 0.64],
+            ['#00FFFFFF', 1.00]
+          ]
+        })
+        .rotate({ angle: 12 })
+        .blur(this.tiny ? 8 : 16)
+        .position({
+          x: ((this.vw > 0 ? this.vw * 0.18 : 80) + this.pSweep * (this.vw > 0 ? this.vw * 0.62 : 270)) + 'vp',
+          y: (this.vh > 0 ? this.vh * 0.30 : 230) + 'vp'
+        })
+        .opacity(this.seg(this.pSweep, 0.00, 0.12) * (1 - this.seg(this.pSweep, 0.78, 1.00)) * 0.85)
+        .hitTestBehavior(HitTestMode.None)
+
+      // ──────── L11 胶片颗粒 ────────
+      //   10 颗极小的半透明点，散布全屏 —— 给画面"胶片感"，不做噪点贴图（省资源）
+      ForEach([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], (i: number) => {
+        Column()
+          .width(this.tiny ? 1.2 : 1.8)
+          .height(this.tiny ? 1.2 : 1.8)
+          .borderRadius(99)
+          .backgroundColor('#16FFFFFF')
+          .position({
+            x: (((i * 37 + 11) % 100) * 0.01 * (this.vw > 0 ? this.vw : 440)) + 'vp',
+            y: (((i * 61 + 23) % 100) * 0.01 * (this.vh > 0 ? this.vh : 744)) + 'vp'
+          })
+          .opacity(this.pBg * 0.55)
+          .hitTestBehavior(HitTestMode.None)
+      }, (i: number) => 'grain' + i)
+
+
       // ──────── L9 暗角（vignette）：把注意力收到中间 ────────
       Column()
         .width('100%')
