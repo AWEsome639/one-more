@@ -127,6 +127,29 @@ export struct GamesTab {
     if (this.uiMode === 'elder') {
       this.topCollapsed = true;
     }
+    // ★★★ 2026-10-30 平板横屏真机抓到（第 3 个平板 bug）：
+    //   横屏时（Bp.isShort() = 高 < 620）顶部那堆
+    //   「全部 355 / 经典 46 / 逻辑 44 / 数字 59 / 记忆 74 / 文字 53 / 空间 79」
+    //   加上筛选行、网格/排序/通关行，**一共吃掉约 1050px**，
+    //   剩给游戏列表的只有**一行**，而且列表还滚不动。
+    //   ⇒ 屏高不够时**默认收起顶部**，让列表至少能显示两行以上。
+    //   判据（真机平板横屏 533vp）：首屏能看到 ≥2 行游戏卡片。
+    if (Bp.isShort()) {
+      this.topCollapsed = true;
+    }
+    // ★ 时序坑（2026-10-30 真机踩到）：aboutToAppear 跑的时候 Bp 可能还没 update 完
+    //   （Bp.update 在 EntryAbility.onWindowStageCreate 里）⇒ isShort() 一律返回 false。
+    //   ⇒ 延迟复查两次（600ms / 1600ms），届时 Bp 一定就绪。
+    setTimeout(() => {
+      if (Bp.isShort()) {
+        this.topCollapsed = true;
+      }
+    }, 600);
+    setTimeout(() => {
+      if (Bp.isShort()) {
+        this.topCollapsed = true;
+      }
+    }, 1600);
     const ids: string[] = [];
     for (let i = 0; i < GAMES.length; i++) {
       ids.push(GAMES[i].id);
