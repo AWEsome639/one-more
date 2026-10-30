@@ -617,100 +617,108 @@ export struct GBlockEscape {
   }
 
   build() {
-    Column({ space: Space.md }) {
-      Row({ space: Space.sm }) {
-        this.infoBox(0)
-        this.infoBox(1)
-        this.infoBox(2)
-      }
-      .width('100%')
-
-      Column({ space: GAP }) {
-        ForEach([0, 1, 2, 3, 4, 5], (r: number) => {
-          Row({ space: GAP }) {
-            ForEach([0, 1, 2, 3, 4, 5], (c: number) => {
-              this.cellView(r * GRID + c)
-            }, (c: number) => 'c' + c)
-          }
-          .width('100%')
-        }, (r: number) => 'r' + r)
-      }
-      // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
-      .width(this.boardPx(394))
-      .height(this.boardPx(394))
-      .alignSelf(ItemAlign.Center)
-      .padding(Space.xs)
-      .backgroundColor('#1A6366F1')
-      .borderRadius(Radius.lg)
-
-      Row({ space: Space.sm }) {
-        this.dirBtn('←', 0)
-        this.dirBtn('↑', 2)
-        this.dirBtn('↓', 3)
-        this.dirBtn('→', 1)
-      }
-      .width('100%')
-
-      // ★ 2026-10-28：提示 + 代打走通用组件（父容器是 Row、每个按钮 layoutWeight(1)）
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-        onAutoTap: () => { this.askAuto(); },
-        demoOn: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
-
-      Row({ space: Space.sm }) {
-        Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.primary)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(KEY_H)
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
-        Button(TG('认输'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(this.theme.inkSoft)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(KEY_H)
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.stopAuto(); if (!this.finished) { this.done = true; this.status = TG('已认输'); this.finish(false); } }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.stopAuto();
-            if (!this.finished) {
-              this.done = true;
-              this.status = TG('已认输');
-              this.finish(false);
-            }
-          })
-      }
-      .width('100%')
-
-      Text(this.status)
-        .fontSize(FontSize.sm)
-        .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
+    // ★ 2026-10-30：内容总高在 533vp 横屏上超出（reserve 已触底）
+    //   ⇒ **套 Scroll**：超高时可滚，棋盘尺寸不再受"必须一屏装下"约束。
+    Scroll() {
+      Column({ space: Space.md }) {
+        Row({ space: Space.sm }) {
+          this.infoBox(0)
+          this.infoBox(1)
+          this.infoBox(2)
+        }
         .width('100%')
+
+        Column({ space: GAP }) {
+          ForEach([0, 1, 2, 3, 4, 5], (r: number) => {
+            Row({ space: GAP }) {
+              ForEach([0, 1, 2, 3, 4, 5], (c: number) => {
+                this.cellView(r * GRID + c)
+              }, (c: number) => 'c' + c)
+            }
+            .width('100%')
+          }, (r: number) => 'r' + r)
+        }
+        // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
+        .width(this.boardPx(394))
+        .height(this.boardPx(394))
+        .alignSelf(ItemAlign.Center)
+        .padding(Space.xs)
+        .backgroundColor('#1A6366F1')
+        .borderRadius(Radius.lg)
+
+        Row({ space: Space.sm }) {
+          this.dirBtn('←', 0)
+          this.dirBtn('↑', 2)
+          this.dirBtn('↓', 3)
+          this.dirBtn('→', 1)
+        }
+        .width('100%')
+
+        // ★ 2026-10-28：提示 + 代打走通用组件（父容器是 Row、每个按钮 layoutWeight(1)）
+        HintBar({
+          showHint: true,
+          onHintTap: () => { this.askHint(); },
+          onAutoTap: () => { this.askAuto(); },
+          demoOn: this.demoId >= 0,
+          autoOn: this.autoId >= 0
+        })
+
+        Row({ space: Space.sm }) {
+          Button(TG('重开'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor(Color.White)
+            .backgroundColor(Palette.primary)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(KEY_H)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.reset();
+            })
+          Button(TG('认输'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor(this.theme.inkSoft)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(KEY_H)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.stopAuto(); if (!this.finished) { this.done = true; this.status = TG('已认输'); this.finish(false); } }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.stopAuto();
+              if (!this.finished) {
+                this.done = true;
+                this.status = TG('已认输');
+                this.finish(false);
+              }
+            })
+        }
+        .width('100%')
+
+        Text(this.status)
+          .fontSize(FontSize.sm)
+          .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
+          .width('100%')
+      }
+      .onTouch((e: TouchEvent) => {
+        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+      })
+      .width('100%')
+      .constraintSize({ minHeight: '100%' })
+      .justifyContent(FlexAlign.Start)
     }
-    .onTouch((e: TouchEvent) => {
-      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    })
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Start)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring)
   }
 
   /** kind: 0=步数 1=距出口 2=用时 */

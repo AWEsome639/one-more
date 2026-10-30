@@ -304,158 +304,166 @@ export struct GNavonHierarchical {
   }
 
   build() {
-    Column({ space: Space.sm }) {
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-        onAutoTap: () => { this.askAuto(); },
-        demoOn: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
-      Row({ space: Space.sm }) {
-        Column({ space: Space.xs }) {
-        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.round) + '/' + String(ROUNDS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-        Column({ space: Space.xs }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-        Column({ space: Space.xs }) {
-        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.left) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-      }
-      .width('100%')
-      Column({ space: GAP }) {
-        ForEach([0, 1, 2, 3, 4, 5, 6], (r: number) => {
-          Row({ space: GAP }) {
-            ForEach([0, 1, 2, 3, 4, 5, 6], (c: number) => {
-              Stack() {
-              Text('■').accessibilityLevel('no')
-              .fontSize(FontSize.xs)
-              .fontColor(this.cell[(r * N + c)] ? Palette.rose : this.theme.surfaceAlt)
-              }
-              .layoutWeight(1)
-              .aspectRatio(1)
-              .animation({ duration: Motion.fast, curve: Motion.snap() })
-            }, (c: number) => 'c' + c)
+    // ★ 2026-10-30：内容总高在 533vp 横屏上超出（reserve 已触底）
+    //   ⇒ **套 Scroll**：超高时可滚，棋盘尺寸不再受"必须一屏装下"约束。
+    Scroll() {
+      Column({ space: Space.sm }) {
+        HintBar({
+          showHint: true,
+          onHintTap: () => { this.askHint(); },
+          onAutoTap: () => { this.askAuto(); },
+          demoOn: this.demoId >= 0,
+          autoOn: this.autoId >= 0
+        })
+        Row({ space: Space.sm }) {
+          Column({ space: Space.xs }) {
+          Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((String(this.round) + '/' + String(ROUNDS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
           }
-          .width('100%')
-        }, (r: number) => 'r' + r)
-      }
-      // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
-      .width(this.boardPx(439))
-      .height(this.boardPx(439))
-      .alignSelf(ItemAlign.Center)
-      .padding(Space.xs)
-      .backgroundColor(this.theme.surfaceAlt)
-      .borderRadius(Radius.md)
-      Text(this.msg)
-        .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+          .layoutWeight(1)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          Column({ space: Space.xs }) {
+          Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          }
+          .layoutWeight(1)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          Column({ space: Space.xs }) {
+          Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((String(this.left) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          }
+          .layoutWeight(1)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+        }
         .width('100%')
-        .textAlign(TextAlign.Center)
-      Row({ space: Space.sm }) {
-      Text((TG('大图形（整体轮廓）')))
-      .fontSize(FontSize.xxs)
-      .fontColor(this.theme.inkFaint)
-      .width(88)
-      ForEach([0, 1, 2], (i: number) => {
-      Button(['A', 'H', 'E'][(i)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-      .fontSize(FontSize.md)
-      .fontColor('#FFFFFF')
-      .backgroundColor(this.letterBg((i), ((true))))
-      .borderRadius(Radius.sm)
-      .layoutWeight(1)
-      .height(Cell.of(42))
-      .scale({ x: this.pickedNow((i), ((true))) ? Motion.pressScale : 1, y: this.pickedNow((i), ((true))) ? Motion.pressScale : 1 })
-      .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => {
-      Haptics.tap();
-      if (((true))) {
-      this.pickGlobal((i));
-      } else {
-      this.pickLocal((i));
-      }
-      })
-      .focusable(Tv.on())
-      .focusBox(Tv.box())
-      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (((true))) { this.pickGlobal((i)); } else { this.pickLocal((i)); } }); })
-      }, (i: number) => 'k' + i)
-      }
-      .width('100%')
-      Row({ space: Space.sm }) {
-      Text((TG('小图形（组成小块）')))
-      .fontSize(FontSize.xxs)
-      .fontColor(this.theme.inkFaint)
-      .width(88)
-      ForEach([0, 1, 2], (i: number) => {
-      Button(['A', 'H', 'E'][(i)])
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-      .fontSize(FontSize.md)
-      .fontColor('#FFFFFF')
-      .backgroundColor(this.letterBg((i), ((false))))
-      .borderRadius(Radius.sm)
-      .layoutWeight(1)
-      .height(Cell.of(42))
-      .scale({ x: this.pickedNow((i), ((false))) ? Motion.pressScale : 1, y: this.pickedNow((i), ((false))) ? Motion.pressScale : 1 })
-      .animation({ duration: Motion.fast, curve: Motion.snap() })
-      .onClick(() => {
-      Haptics.tap();
-      if (((false))) {
-      this.pickGlobal((i));
-      } else {
-      this.pickLocal((i));
-      }
-      })
-      .focusable(Tv.on())
-      .focusBox(Tv.box())
-      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (((false))) { this.pickGlobal((i)); } else { this.pickLocal((i)); } }); })
-      }, (i: number) => 'k' + i)
-      }
-      .width('100%')
-      Button(this.over ? TG('再来一局') : TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .fontSize(FontSize.md)
-        .fontColor('#FFFFFF')
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.berry)
+        Column({ space: GAP }) {
+          ForEach([0, 1, 2, 3, 4, 5, 6], (r: number) => {
+            Row({ space: GAP }) {
+              ForEach([0, 1, 2, 3, 4, 5, 6], (c: number) => {
+                Stack() {
+                Text('■').accessibilityLevel('no')
+                .fontSize(FontSize.xs)
+                .fontColor(this.cell[(r * N + c)] ? Palette.rose : this.theme.surfaceAlt)
+                }
+                .layoutWeight(1)
+                .aspectRatio(1)
+                .animation({ duration: Motion.fast, curve: Motion.snap() })
+              }, (c: number) => 'c' + c)
+            }
+            .width('100%')
+          }, (r: number) => 'r' + r)
+        }
+        // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
+        .width(this.boardPx(439))
+        .height(this.boardPx(439))
+        .alignSelf(ItemAlign.Center)
+        .padding(Space.xs)
+        .backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md)
-        .width('100%')
-        .height(Cell.of(46))
-        .onClick(() => { Haptics.tap(); this.reset(); })
-        .focusable(Tv.on())
-        .focusBox(Tv.box())
-        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：12 题里两问全对 ≥ 8 题 · 90 秒内完成'))
+        Text(this.msg)
+          .fontSize(FontSize.sm)
+          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+          .width('100%')
+          .textAlign(TextAlign.Center)
+        Row({ space: Space.sm }) {
+        Text((TG('大图形（整体轮廓）')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
+        .width(88)
+        ForEach([0, 1, 2], (i: number) => {
+        Button(['A', 'H', 'E'][(i)])
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        .fontSize(FontSize.md)
+        .fontColor('#FFFFFF')
+        .backgroundColor(this.letterBg((i), ((true))))
+        .borderRadius(Radius.sm)
+        .layoutWeight(1)
+        .height(Cell.of(42))
+        .scale({ x: this.pickedNow((i), ((true))) ? Motion.pressScale : 1, y: this.pickedNow((i), ((true))) ? Motion.pressScale : 1 })
+        .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .onClick(() => {
+        Haptics.tap();
+        if (((true))) {
+        this.pickGlobal((i));
+        } else {
+        this.pickLocal((i));
+        }
+        })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (((true))) { this.pickGlobal((i)); } else { this.pickLocal((i)); } }); })
+        }, (i: number) => 'k' + i)
+        }
         .width('100%')
-        .textAlign(TextAlign.Center)
+        Row({ space: Space.sm }) {
+        Text((TG('小图形（组成小块）')))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+        .width(88)
+        ForEach([0, 1, 2], (i: number) => {
+        Button(['A', 'H', 'E'][(i)])
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        .fontSize(FontSize.md)
+        .fontColor('#FFFFFF')
+        .backgroundColor(this.letterBg((i), ((false))))
+        .borderRadius(Radius.sm)
+        .layoutWeight(1)
+        .height(Cell.of(42))
+        .scale({ x: this.pickedNow((i), ((false))) ? Motion.pressScale : 1, y: this.pickedNow((i), ((false))) ? Motion.pressScale : 1 })
+        .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .onClick(() => {
+        Haptics.tap();
+        if (((false))) {
+        this.pickGlobal((i));
+        } else {
+        this.pickLocal((i));
+        }
+        })
+        .focusable(Tv.on())
+        .focusBox(Tv.box())
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (((false))) { this.pickGlobal((i)); } else { this.pickLocal((i)); } }); })
+        }, (i: number) => 'k' + i)
+        }
+        .width('100%')
+        Button(this.over ? TG('再来一局') : TG('重开'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor('#FFFFFF')
+          .backgroundColor(this.over && !this.won ? Palette.rose : Palette.berry)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(Cell.of(46))
+          .onClick(() => { Haptics.tap(); this.reset(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+        Text(TG('判定：12 题里两问全对 ≥ 8 题 · 90 秒内完成'))
+          .fontSize(FontSize.xxs)
+          .fontColor(this.theme.inkFaint)
+          .width('100%')
+          .textAlign(TextAlign.Center)
+      }
+      .onTouch((e: TouchEvent) => {
+        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+      })
+      .width('100%')
+      .constraintSize({ minHeight: '100%' })
+      .justifyContent(FlexAlign.Start)
     }
-    .onTouch((e: TouchEvent) => {
-      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    })
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Start)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring)
   }
 
 
