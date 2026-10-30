@@ -103,6 +103,8 @@ struct Splash {
   @State pGlow: number = 0;      // L3 光晕
   @State pStroke: number = 0;    // L4a 描边生长
   @State pSun: number = 0;       // 日出：金点从山脊后升起
+  /** 金属高光：4 段短弧绕环旋转（0→1） */
+  @State pGlint: number = 0;
   @State pFill: number = 0;      // L4b 填充点亮
   @State pSweep: number = 0;     // L5 光带
   @State pTitle: number = 0;     // L6 标题
@@ -237,6 +239,10 @@ struct Splash {
       // 日出：比描边快，420ms 内升到位
       animateTo({ duration: 420, curve: this.sunCurve() }, () => {
         this.pSun = 1;
+      });
+      // 金属高光：520ms 匀速绕环（唯一该用 Linear 的地方）
+      animateTo({ duration: 520, curve: Curve.Linear }, () => {
+        this.pGlint = 1;
       });
     }, 280);
     // L4b 填充点亮（描边快完成时起，衔接最自然）
@@ -524,6 +530,24 @@ struct Splash {
             .strokeWidth(this.omPxV() * 0.1276)
             .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
             .opacity(this.seg(this.pStroke, 0.001, 0.42))
+
+          // ── ①b 金属高光：4 段短弧绕环旋转（研究报告 P2-1）──
+          //   ★ 金的「贵」来自**会动的高光**，不是金色本身。
+          //   ★ 这是全片唯一该用 Linear 的地方：金属反射本就匀速。
+          //   做法：4 个同尺寸 Circle，各带一段 dash，初相 0/90/180/270，
+          //        整组 rotate 0→90 ⇒ 读作"光在环上走"。
+          ForEach([0, 1, 2, 3], (i: number) => {
+            Circle()
+              .width(this.omPxV() * 0.4818).height(this.omPxV() * 0.4818)
+              .fill(Color.Transparent)
+              .stroke('#F0D9A8')
+              .strokeWidth(this.omPxV() * 0.1276)
+              .strokeDashArray([this.omPxV() * 0.0832, this.omPxV() * 1.5140])
+              .strokeDashOffset(-this.omPxV() * 0.3785 * i)
+              .rotate({ angle: this.pGlint * 90 })
+              .opacity(this.pGlint * [0.85, 0.40, 0.15, 0.40][i])
+              .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
+          }, (i: number) => 'glint' + i)
 
           // ── ② O 心点（金）：日出时从山脊后升起 ──
           Column()
