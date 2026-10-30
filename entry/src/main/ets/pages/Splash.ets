@@ -71,8 +71,8 @@ const VP_H: number = 1855;
 const OM_RATIO: number = VP_W / VP_H;    // ≈ 1.981
 
 // ── 总时长 ──
-const TOTAL: number = 3000;
-const HOLD: number = 3120;               // 兜底跳转时刻
+const TOTAL: number = 1660;
+const HOLD: number = 1720;               // 兜底跳转时刻
 
 // ── 星尘：三组，各自速度/相位 ──
 //   每组 16 颗；每颗有 x, y, 半径, 组号
@@ -203,7 +203,7 @@ struct Splash {
       animateTo({ duration: 520, curve: this.easeOut() }, () => {
         this.pNebula = 1;
       });
-    }, 180);
+    }, 110);
     // L2 星尘（一次长动，覆盖全程）
     setTimeout(() => {
       animateTo({ duration: 2600, curve: Curve.Linear }, () => {
@@ -212,55 +212,55 @@ struct Splash {
       animateTo({ duration: 1400, curve: this.easeOut() }, () => {
         this.pTwinkle = 1;
       });
-    }, 260);
+    }, 170);
     // L3 光晕
     setTimeout(() => {
       animateTo({ duration: 600, curve: this.easeOut() }, () => {
         this.pGlow = 1;
       });
-    }, 300);
+    }, 200);
     // L4a 描边生长
     setTimeout(() => {
       animateTo({ duration: 980, curve: this.settle() }, () => {
         this.pStroke = 1;
       });
-    }, 420);
+    }, 280);
     // L4b 填充点亮（描边快完成时起，衔接最自然）
     setTimeout(() => {
       animateTo({ duration: 440, curve: this.easeOut() }, () => {
         this.pFill = 1;
       });
-    }, 1180);
+    }, 600);
     // L5 光带扫过
     setTimeout(() => {
       animateTo({ duration: 520, curve: this.sweepCurve() }, () => {
         this.pSweep = 1;
       });
-    }, 1380);
+    }, 740);
     // L6 标题
     setTimeout(() => {
       animateTo({ duration: 550, curve: this.settle() }, () => {
         this.pTitle = 1;
       });
-    }, 1500);
+    }, 820);
     // L7 副标题
     setTimeout(() => {
       animateTo({ duration: 360, curve: this.easeOut() }, () => {
         this.pSub = 1;
       });
-    }, 1900);
+    }, 1080);
     // L8 标语
     setTimeout(() => {
       animateTo({ duration: 400, curve: this.easeOut() }, () => {
         this.pTag = 1;
       });
-    }, 2150);
+    }, 1220);
     // L9 推出
     setTimeout(() => {
       animateTo({ duration: 460, curve: this.easeOut() }, () => {
         this.pOut = 1;
       });
-    }, 2500);
+    }, 1400);
     // 兜底
     setTimeout(() => {
       this.finish();
@@ -482,18 +482,6 @@ struct Splash {
           .translate({ y: (1 - this.seg(this.pStroke, 0.00, 0.42)) * (this.tiny ? 4 : 10) })
           .margin({ bottom: this.tiny ? 4 : 10 })
 
-        // ★ 兜底：Image 若因资源/合成问题不显示，Text 版 OM 至少保证品牌可见
-        //   （2026-10-30 实测：Shape/Path/Circle/Polyline 在此页均不渲染，
-        //    Image 也有不渲染的迹象 ⇒ 用 Text 作最后一道保险）
-        Row({ space: this.tiny ? 1 : 2 }) {
-          Text('OM')
-            .fontSize(this.tiny ? 44 : this.omPx * 0.92)
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#C99E52')
-            .letterSpacing(this.tiny ? -2 : -4)
-            .opacity(this.seg(this.pStroke, 0.00, 0.42) * 0.0)
-        }
-        .opacity(0)
 
         // ── 标题：逐字入场 ──
         // 逐字
@@ -527,7 +515,7 @@ struct Splash {
       // 极小屏：把整组内容上移一点，给底部标语留位置
       .padding({ bottom: this.tiny ? 34 : 0 })
       .translate({ y: this.tiny ? -6 : -14 })
-      .scale({ x: 1 + this.pOut * 0.06, y: 1 + this.pOut * 0.06 })
+      .scale({ x: 1 - this.pOut * 0.06, y: 1 - this.pOut * 0.06 })
       .opacity(1 - this.pOut)
 
       // ──────── L8 底部标语 ────────
@@ -544,7 +532,7 @@ struct Splash {
           // ★ 2026-10-30：原来是 '#9AC99E52'（alpha 0x9A=60%）× opacity 0.9
           //   ⇒ 最终约 54% ⇒ 真机上"几乎看不见"，等于没做这一层。
           //   ⇒ 提到 0xCC（80%）：可读、但仍低于标题与副标题的亮度（不抢戏）。
-          .fontColor('#CC9E52')
+          .fontColor('#CC9E52')  // ★ 注意：这是 6 位 hex = 全不透明（不是 80%）
           .letterSpacing(this.tiny ? 1 : 3)
           .margin({ bottom: this.tiny ? 16 : 40 })
       }
