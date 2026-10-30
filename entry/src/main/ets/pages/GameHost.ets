@@ -3087,6 +3087,12 @@ struct GameHost {
             })
         }
         .width('100%')
+        // ★★★ 2026-10-29 平板横屏真机抓到：结算弹窗是 `.width('100%')`，
+        //   在 1280vp 宽的平板上**直接拉满全宽** ——
+        //   成就列表挤成中间一小条，读起来很糟（截图证据：
+        //   "解锁成就 初次开局/首次通关/通关达人/百局老手" 四条挤在正中）。
+        //   ⇒ 给一个**最大宽度**，大屏上就是一个居中卡片。
+        .constraintSize({ maxWidth: 560 })
         .padding(Space.xxl)
         .backgroundColor(this.theme().surface)
         .borderRadius({ topLeft: Radius.xl, topRight: Radius.xl })
