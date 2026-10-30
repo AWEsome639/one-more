@@ -541,13 +541,16 @@ struct Splash {
       Stack({ alignContent: Alignment.Bottom }) {
         Text(this.t('碎片时间，随时开局', 'A quick round, any time'))
           .fontSize(this.tiny ? 8 : this.tagPx)
-          .fontColor('#9AC99E52')
+          // ★ 2026-10-30：原来是 '#9AC99E52'（alpha 0x9A=60%）× opacity 0.9
+          //   ⇒ 最终约 54% ⇒ 真机上"几乎看不见"，等于没做这一层。
+          //   ⇒ 提到 0xCC（80%）：可读、但仍低于标题与副标题的亮度（不抢戏）。
+          .fontColor('#CC9E52')
           .letterSpacing(this.tiny ? 1 : 3)
           .margin({ bottom: this.tiny ? 16 : 40 })
       }
       .width('100%')
       .height('100%')
-      .opacity(this.ultraTiny ? 0 : this.pTag * 0.9 * (1 - this.pOut))
+      .opacity(this.ultraTiny ? 0 : this.pTag * (1 - this.pOut))
       .hitTestBehavior(HitTestMode.None)
 
       // ──────── L10 细光带：从 OM 左侧扫到右侧 ────────
