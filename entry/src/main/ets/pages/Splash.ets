@@ -472,8 +472,9 @@ struct Splash {
         //     这就是图标本身，样式 100% 一致，且跨设备渲染稳定。
         Image($r('app.media.splash_om'))
           // ★ 不用 getter —— 本工程里 getter 读 @State 会返回 NaN（已踩两次）
-          .width(this.tiny ? 110 : this.omPx * 2.05)
-          .height(this.tiny ? 56 : this.omPx * 2.05 / 1.978)
+          // 宽度取「字号推导值」与「屏宽 52%」的较小者 —— 平板竖屏上 260pt 会占 67% 屏宽，太大
+          .width(this.tiny ? 110 : Math.min(this.omPx * 2.05, this.vw > 0 ? this.vw * 0.52 : this.omPx * 2.05))
+          .height(this.tiny ? 56 : Math.min(this.omPx * 2.05, this.vw > 0 ? this.vw * 0.52 : this.omPx * 2.05) / 1.978)
           .objectFit(ImageFit.Contain)
           .opacity(this.seg(this.pStroke, 0.00, 0.42))
           .blur((1 - this.seg(this.pStroke, 0.00, 0.42)) * (this.tiny ? 6 : 14))
@@ -575,7 +576,7 @@ struct Splash {
       }
       // 按屏宽比例算字号，并 clamp 到合理区间
       if (w > 0) {
-        const om: number = Math.max(96, Math.min(260, w * 0.245));
+        const om: number = Math.max(96, Math.min(200, w * 0.245));
         const ti: number = Math.max(38, Math.min(104, w * 0.098));
         const su: number = Math.max(11, Math.min(28, w * 0.027));
         const tg: number = Math.max(10, Math.min(24, w * 0.023));
