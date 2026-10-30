@@ -703,6 +703,33 @@ struct Splash {
         }
         .margin({ top: this.tiny ? 6 : (this.vh > 0 && this.vh < 620 ? 12 : 40) })
 
+        // ═══ 金线（2026-10-30 新增 · 在临时页 TitleTest 里先验过）═══
+        //   研究报告的「轮廓先行」思路，落不到 dash 上（见第 503 轮实测），
+        //   但**可以用一条金线的展开来达成同样的"成形感"**：
+        //     线从中间向两边长出来，标题在这条线的"上方"被托住
+        //   ⇒ 读起来是"标志落定 → 一条基线承住它"，而不是"文字淡入"。
+        //
+        //   为什么用 `Divider` 而不是 `Rect`/`Line`：
+        //     临时页里 `Divider().strokeWidth(2).color(...).width(...)` 一次就成
+        //     （`Rect` 要管 fill/height，`Line` 的坐标语义更容易踩坑）。
+        //
+        //   ★ 时序：线比标题晚 120ms 起、但更早完成（0.42→0.78 vs 标题 0.30→0.72）
+        //     ⇒ 视觉上是"标题先到、线随即把它承住"，不是"线先画完再放标题"。
+        //   ★ 极小屏（手表）不画线：那里宽度只有 ~110vp，一条线会显得局促。
+        if (!this.tiny) {
+          Row() {
+            Divider()
+              .strokeWidth(2)
+              .color('#C99E52')
+              // 线宽：从 0 长到标题宽的约 1.15 倍（略宽于文字，视觉上才"托得住"）
+              .width(this.seg(this.pTitle, 0.42, 0.78) * this.titlePx * 5.6)
+              // 线本身也淡入，避免"啪"地出现
+              .opacity(this.seg(this.pTitle, 0.42, 0.62) * 0.85)
+          }
+          .justifyContent(FlexAlign.Center)
+          .margin({ top: this.vh > 0 && this.vh < 620 ? 4 : 10 })
+        }
+
         // 副标题（极小屏省略 —— 那里只留 OM + 标题）
         Text(this.t('355 款小游戏', '355 GAMES'))
           .fontSize(this.tiny ? 9 : this.subPx)
