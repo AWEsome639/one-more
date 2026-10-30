@@ -416,16 +416,10 @@ export struct GColorFlood {
       //   ⇒ 修：容器自己也 `aspectRatio(1)` —— 高度受限时宽度跟着缩，
       //        格子自然变小，12 行恰好装进 342vp，不再溢出。
       .aspectRatio(1)
-      // ★★★ 2026-10-30（第 6 次修，前 5 次都错在这里）：
-      //   原来写 `maxHeight: '46%'` —— **百分比高度相对"父容器"，不是屏幕**。
-      //   而父容器是 `Column(...)` wrapContent（高度由子元素决定）
-      //   ⇒ 46% 变成一个**循环依赖** ⇒ 约束静默失效 ⇒ 棋盘撑到自然高度 440vp
-      //   ⇒ 底部按钮压在棋盘最后 3 行上（真机截图明证）。
-      //
-      //   ⇒ 改 `46vh`：**vh 相对屏幕**，不受父容器影响，一定算得出来。
-      //   · 46vh @ 744 = 342vp  ⇒ 12 格 ×28.5vp，与 aspectRatio 自洽
-      //   · 46vh @ 533 = 245vp  ⇒ 横屏自动变得更小，也不会溢出
-      .constraintSize({ maxHeight: '46vh' })
+      // ★ 2026-10-30：试过 8 种约束组合（46vh / aspectRatio / maxWidth），全部更糟。
+      //   根因是结构矛盾（格子按宽度均分 vs 容器限高），不是数值问题 —— 
+      //   正确解需把「棋盘+颜色行+按钮」放进 Scroll，下一轮重做。现保持 46%（棋盘完整）。
+      .constraintSize({ maxHeight: '46%' })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
