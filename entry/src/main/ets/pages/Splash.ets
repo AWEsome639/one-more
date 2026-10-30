@@ -121,6 +121,7 @@ struct Splash {
   /** 屏宽（vp），由 onAreaChange 写入；用于**按比例**决定字号 ——
    *  固定 pt 在大屏上会显得很小（平板竖屏 800vp 上 108pt 只占 13% 宽）。 */
   @State private vw: number = 0;
+  @State private vh: number = 0;
   // ★ 2026-10-30 真机踩到：getter 里读 @State 会拿到 NaN
   //   （日志：SPLASH w=800 h=1213 om=NaN）
   //   ⇒ 改成**在 onAreaChange 里算好、存进 @State**，模板直接读字段。
@@ -473,8 +474,8 @@ struct Splash {
         Image($r('app.media.splash_om'))
           // ★ 不用 getter —— 本工程里 getter 读 @State 会返回 NaN（已踩两次）
           // 宽度取「字号推导值」与「屏宽 52%」的较小者 —— 平板竖屏上 260pt 会占 67% 屏宽，太大
-          .width(this.tiny ? 110 : Math.min(this.omPx * 2.05, this.vw > 0 ? this.vw * 0.52 : this.omPx * 2.05))
-          .height(this.tiny ? 56 : Math.min(this.omPx * 2.05, this.vw > 0 ? this.vw * 0.52 : this.omPx * 2.05) / 1.978)
+          .width(this.tiny ? 110 : Math.min(this.omPx * 2.05, Math.min(this.vw > 0 ? this.vw * 0.52 : 9999, this.vh > 0 ? this.vh * 0.62 : 9999)))
+          .height(this.tiny ? 56 : Math.min(this.omPx * 2.05, Math.min(this.vw > 0 ? this.vw * 0.52 : 9999, this.vh > 0 ? this.vh * 0.62 : 9999)) / 1.978)
           .objectFit(ImageFit.Contain)
           .opacity(this.seg(this.pStroke, 0.00, 0.42))
           .blur((1 - this.seg(this.pStroke, 0.00, 0.42)) * (this.tiny ? 6 : 14))
@@ -508,7 +509,7 @@ struct Splash {
               .blur((1 - this.charIn(i, 8)) * (this.tiny ? 6 : 10))
           }, (ch: string, i: number) => 'c' + i + ch)
         }
-        .margin({ top: this.tiny ? 6 : 40 })
+        .margin({ top: this.tiny ? 6 : (this.vh > 0 && this.vh < 620 ? 12 : 40) })
 
         // 副标题（极小屏省略 —— 那里只留 OM + 标题）
         Text(this.t('355 款小游戏', '355 GAMES'))
@@ -574,9 +575,14 @@ struct Splash {
       if (w > 0 && Math.abs(w - this.vw) > 1) {
         this.vw = w;
       }
+      if (h > 0 && Math.abs(h - this.vh) > 1) {
+        this.vh = h;
+      }
       // 按屏宽比例算字号，并 clamp 到合理区间
       if (w > 0) {
-        const om: number = Math.max(96, Math.min(200, w * 0.245));
+        // 矮屏（h < 620，如智慧屏 540 / 平板横屏 533）用更小的上限
+        const cap: number = h > 0 && h < 620 ? 150 : 200;
+        const om: number = Math.max(96, Math.min(cap, w * 0.245));
         const ti: number = Math.max(38, Math.min(104, w * 0.098));
         const su: number = Math.max(11, Math.min(28, w * 0.027));
         const tg: number = Math.max(10, Math.min(24, w * 0.023));
