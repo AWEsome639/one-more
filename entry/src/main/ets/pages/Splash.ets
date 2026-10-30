@@ -113,8 +113,6 @@ struct Splash {
   @State pSun: number = 0;       // 日出：金点从山脊后升起
   /** 金属高光：4 段短弧绕环旋转（0→1） */
   @State pGlint: number = 0;
-  /** 环从 12 点画出来（strokeDashOffset 由 1→0） */
-  @State pDraw: number = 0;
   /** M 山：比环晚 70ms 到（两拍节奏的第二拍） */
   @State pM: number = 0;
   @State pFill: number = 0;      // L4b 填充点亮
@@ -541,18 +539,15 @@ struct Splash {
           // ── ① O 环（描边圆，可 dash / 可独立高光）──
           //   几何（归一化到 1000 宽，再用 omW 换算成 vp）：
           //     圆心 (240.9, 266.1)  外半径 240.9  环宽 127.6
-          // ★★★ 2026-10-30「轮廓先行」（研究报告 P1-2，仿 Google Drive）：
-          //   环不是"淡入"，是**从 12 点开始顺时针画出来** —— 两拍节奏的第一拍。
-          //   做法：strokeDashArray = [周长, 周长]（一段实线一段空白）
-          //         strokeDashOffset 由 周长 → 0（线头从 12 点走一圈）
-          //   周长 = π × 直径 = π × 0.4818 × omPxV ≈ 1.5137 × omPxV
+          // ── ① O 环（静态完整环；"成形感"由 opacity + 后面的错峰提供）──
+          //   ★ 2026-10-30 实测结论：`strokeDashOffset` **不被 animateTo 插值**
+          //     （放慢到 3000ms 仍 550ms 就到位）⇒ "从 12 点画出来"这条路走不通。
+          //     已改用两拍节奏（环先到 → M 晚 70ms 到），见下方 M 的注释。
           Circle()
             .width(this.omPxV() * 0.4818).height(this.omPxV() * 0.4818)
             .fill(Color.Transparent)
             .stroke('#C99E52')
             .strokeWidth(this.omPxV() * 0.1276)
-            .strokeDashArray([this.omPxV() * 1.5137, this.omPxV() * 1.5137])
-            .strokeDashOffset((1 - this.pDraw) * this.omPxV() * 1.5137)
             .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
             .opacity(this.seg(this.pStroke, 0.001, 0.10))
 
