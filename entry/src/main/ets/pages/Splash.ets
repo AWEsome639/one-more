@@ -396,6 +396,17 @@ struct Splash {
   // ══════════════════════════════════════════════════════════════════
   //  渲染
   // ══════════════════════════════════════════════════════════════════
+  /**
+   * OM 的宽度（vp）—— 与图标同比例。
+   * ★ 不用 getter：本工程里 getter 读 @State 会返回 NaN（已踩两次，导致 Image 静默不渲染）。
+   *   直接在方法里算，模板中调用。
+   */
+  private omPxV(): number {
+    // 矢量 OM 的整体宽度（vp）。与 Image 版同口径：omPx × 2.05
+    const t: number = this.tiny ? 54 : this.omPx;
+    return t * 2.05;
+  }
+
   build() {
     Stack({ alignContent: Alignment.Center }) {
       // ──────── L0 底色（永远不透明，绝不留白）────────
@@ -471,16 +482,65 @@ struct Splash {
         //   ⇒ 那就用最正确、也最可靠的做法：
         //     **把 AppScope 的 foreground.png 复制进 entry 资源，直接 Image 显示。**
         //     这就是图标本身，样式 100% 一致，且跨设备渲染稳定。
-        Image($r('app.media.splash_om'))
-          // ★ 不用 getter —— 本工程里 getter 读 @State 会返回 NaN（已踩两次）
-          // 宽度取「字号推导值」与「屏宽 52%」的较小者 —— 平板竖屏上 260pt 会占 67% 屏宽，太大
-          .width(this.tiny ? 110 : Math.min(this.omPx * 2.05, Math.min(this.vw > 0 ? this.vw * 0.52 : 9999, this.vh > 0 ? this.vh * 0.62 : 9999)))
-          .height(this.tiny ? 56 : Math.min(this.omPx * 2.05, Math.min(this.vw > 0 ? this.vw * 0.52 : 9999, this.vh > 0 ? this.vh * 0.62 : 9999)) / 1.978)
-          .objectFit(ImageFit.Contain)
-          .opacity(this.seg(this.pStroke, 0.00, 0.42))
-          .blur((1 - this.seg(this.pStroke, 0.00, 0.42)) * (this.tiny ? 6 : 14))
-          .translate({ y: (1 - this.seg(this.pStroke, 0.00, 0.42)) * (this.tiny ? 4 : 10) })
-          .margin({ bottom: this.tiny ? 4 : 10 })
+        // ═══════════════════════════════════════════════════════════
+        //  OM 不是位图，是**三层可独立驱动的矢量**（2026-10-30 重做）
+        //
+        //  为什么必须拆（子代理研究报告的核心结论）：
+        //    Image 只吃 opacity / blur / translate ⇒ 12 层背景全在动，
+        //    **唯一该被看的主角反而一动不动** —— 这就是"丑"的真根因。
+        //
+        //  几何：从 AppScope/foreground.png 逐像素量出，归一化到 1000 宽
+        //    · O 环  圆心(240.9, 266.1) 外半径 240.9 环宽 127.6
+        //    · O 心  半径 62.9
+        //    · M 山  左底(492.9,496.1) 左峰(587.4,0) 谷(744.9,351.2)
+        //            右峰(910.2,0) 右底(1000,496.1)
+        //    整体 1000 × 505.5（比率 1.978，与应用图标一致）
+        //
+        //  层序（Stack 子节点顺序即层序）：环 → 点 → M
+        //    ⇒ M 的实心米白会遮住金点的下半 ⇒ **点从山脊后升起的"日出"成立**
+        // ═══════════════════════════════════════════════════════════
+        Stack() {
+          // ── ① O 环（描边圆，可 dash / 可独立高光）──
+          //   几何（归一化到 1000 宽，再用 omW 换算成 vp）：
+          //     圆心 (240.9, 266.1)  外半径 240.9  环宽 127.6
+          Circle()
+            .width(this.omPxV() * 0.4818).height(this.omPxV() * 0.4818)
+            .fill(Color.Transparent)
+            .stroke('#C99E52')
+            .strokeWidth(this.omPxV() * 0.1276)
+            .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
+            .opacity(this.seg(this.pStroke, 0.001, 0.42))
+
+          // ── ② O 心点（金）：日出时从山脊后升起 ──
+          Column()
+            .width(this.omPxV() * 0.1258).height(this.omPxV() * 0.1258)
+            .borderRadius(999)
+            .backgroundColor('#E8C87A')
+            .position({ x: this.omPxV() * (0.2409 - 0.0629), y: this.omPxV() * (0.2661 - 0.0629) })
+            .opacity(this.seg(this.pStroke, 0.001, 0.42))
+
+          // ── ③ M 山（米白多边形）：压在点上，遮住下半 ⇒ 日出感 ──
+          //   左底(492.9,496.1) 左峰(587.4,0) 谷(744.9,351.2) 右峰(910.2,0) 右底(1000,496.1)
+          // ★ 2026-10-30：`Polygon.points` 收的是**绝对坐标**（vp），不是百分比 ——
+          //   原来传 [[0,100],[18.6,0]…] 被当成 100vp 的盒子 ⇒ M 缩成一小块。
+          //   ⇒ 改成按 omPxV 换算的真实 vp 坐标（M 的 5 个顶点，归一化值 × omPxV）。
+          Polygon()
+            .width(this.omPxV() * 0.5071).height(this.omPxV() * 0.4961)
+            .points([
+              [0, this.omPxV() * 0.4961],                    // 左底 (492.9, 496.1)
+              [this.omPxV() * 0.0945, 0],                    // 左峰 (587.4, 0)
+              [this.omPxV() * 0.2520, this.omPxV() * 0.3512],// 谷   (744.9, 351.2)
+              [this.omPxV() * 0.4173, 0],                    // 右峰 (910.2, 0)
+              [this.omPxV() * 0.5071, this.omPxV() * 0.4961] // 右底 (1000, 496.1)
+            ])
+            .fill('#FAF8F3')
+            .position({ x: this.omPxV() * 0.4929, y: this.omPxV() * 0.0 })
+            .opacity(this.seg(this.pStroke, 0.001, 0.42))
+        }
+        // 整体 1000 × 505.5 ⇒ 宽高比 1.978（与应用图标一致）
+        .width(this.omPxV() * 1.0)
+        .height(this.omPxV() * 0.5055)
+        .margin({ bottom: this.tiny ? 4 : 10 })
 
 
         // ── 标题：逐字入场 ──
