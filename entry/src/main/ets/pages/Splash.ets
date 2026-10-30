@@ -344,7 +344,7 @@ struct Splash {
   //  渲染
   // ══════════════════════════════════════════════════════════════════
   build() {
-    Stack() {
+    Stack({ alignContent: Alignment.Center }) {
       // ──────── L0 底色（永远不透明，绝不留白）────────
       Column()
         .width('100%')
@@ -469,7 +469,7 @@ struct Splash {
       }
       .width('100%')
       .height(this.tiny ? '16%' : '20%')
-      .translate({ y: this.tiny ? '-14%' : '-18%' })
+      .translate({ y: this.tiny ? -22 : -58 })
       // ★ 2026-10-30：这里原来有 .shadow()，它在 Stack 的矩形边界上
       //   画出了两条**横贯屏幕的金线**（真机截图可见）。
       //   ⇒ 去掉，辉光改由 Text 自己的 textShadow 承担。
@@ -505,28 +505,34 @@ struct Splash {
           .margin({ top: this.tiny ? 8 : 16 })
       }
       .width('100%')
-      .height('100%')
+      // ★ 2026-10-30：原来 height('100%') + padding/top% + translate/% 三件套，
+      //   在横屏（533vp 高）上把内容推得东倒西歪。
+      //   ⇒ 改成「不撑满 + Stack 居中 + 固定 vp 上移」，跨尺寸都稳。
       .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
-      .padding({ top: this.tiny ? '0%' : '14%' })
-      .translate({ y: this.tiny ? '20%' : '18%' })
+      .translate({ y: this.tiny ? 10 : 26 })
       .opacity(this.seg(this.pTitle, 0.0, 0.25))
       // L9 推出：轻微推近 + 淡出
       .scale({ x: 1 + this.pOut * 0.06, y: 1 + this.pOut * 0.06 })
       .opacity(1 - this.pOut)
 
       // ──────── L8 底部标语 ────────
-      Column() {
+      // ★ 2026-10-30 平板横屏真机抓到：标语原来用 height('100%') + justifyContent(End)，
+      //   在 533vp 高的横屏上**没有落到最底**，反而压到了副标题上。
+      //   ⇒ 改用 Stack 的 align(Alignment.Bottom)：位置由 Stack 决定，与高度无关。
+      // ★ 2026-10-30：`.align(Alignment.Bottom)` 在 Stack 的直接子节点上不生效
+      //   （容器没有高度 ⇒ 没有"底"可对齐）。
+      //   ⇒ 用一个**撑满高度的内层 Stack** + `alignContent: Bottom`，
+      //     文字就一定贴底，与屏幕高度无关（440/533/1280/540 都成立）。
+      Stack({ alignContent: Alignment.Bottom }) {
         Text(this.t('碎片时间，随时开局', 'A quick round, any time'))
           .fontSize(this.tiny ? 8 : 11)
           .fontColor('#9AC99E52')
           .letterSpacing(this.tiny ? 1 : 3)
+          .margin({ bottom: this.tiny ? 16 : 40 })
       }
       .width('100%')
       .height('100%')
-      .justifyContent(FlexAlign.End)
-      .alignItems(HorizontalAlign.Center)
-      .padding({ bottom: this.tiny ? 18 : 44 })
       .opacity(this.pTag * 0.9 * (1 - this.pOut))
       .hitTestBehavior(HitTestMode.None)
 
