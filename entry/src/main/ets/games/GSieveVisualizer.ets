@@ -353,7 +353,7 @@ export struct GSieveVisualizer {
       .aspectRatio(1)
       // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
       //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: '100%' })
+      .constraintSize({ maxHeight: '70%' })
 
       Text(this.done
         ? '🎉 筛完！100 以内共 ' + this.found + ' 个素数'
