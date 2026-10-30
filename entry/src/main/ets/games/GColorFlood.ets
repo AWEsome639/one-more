@@ -398,156 +398,171 @@ export struct GColorFlood {
   }
 
   build() {
-    Column({ space: Space.md }) {
-      HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
-        demoOn: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
-      Row({ space: Space.md }) {
-        Column({ space: 2 }) {
-        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.moves) + '/' + String(this.diffTotal)))
-        .fontSize(FontSize.xl)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.theme.ink)
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text((TG('统一度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.filled()) + '/' + String(N * N)))
-        .fontSize(FontSize.xl)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.theme.ink)
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-      }
-      .width('100%')
-
-      Column({ space: 2 }) {
-        ForEach([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], (r: number) => {
-          Row({ space: 2 }) {
-            ForEach([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], (c: number) => {
-              Stack() {
-                // ★ 色盲辅助（项目 D ③）：12×12 太密，字形用小号粗体 + 阴影保证可读
-                Text(A11y.glyph(this.cells[(r * N + c)]))
-                  .fontSize(9).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
-                  .textShadow({ radius: 2, color: '#000000B3', offsetX: 0, offsetY: 1 })
-              }
-              .layoutWeight(1)
-              .aspectRatio(1)
-              .backgroundColor(COLORS[this.cells[(r * N + c)]])
-              .borderRadius(Radius.xs)
-              .animation({ duration: Motion.fast, curve: Motion.snap() })
-            }, (c: number) => 'cf' + r + '-' + c)
-          }
-          .width('100%')
-        }, (r: number) => 'cfr' + r)
-      }
-      // ★★★ 2026-10-30（布局 bug ② 的主修点）：
-      //   改前：`.width('100%')` + `.aspectRatio(1)` + `.constraintSize({ maxHeight: '46%' })`
-      //         —— 容器与格子都用 aspectRatio 定高，再叠一个 46% 上限，三者互相打架：
-      //         容器被压到 342vp、格子仍要 418vp ⇒ **棋盘最后 2~3 行溢出到颜色行上面**。
-      //   改后：删掉 aspectRatio 与 maxHeight 百分比，宽高都由 boardPx() 给定（正方形），
-      //         格子按宽度均分出来的行高正好填满容器 ⇒ 棋盘完整、颜色行不再被压住。
-      .width(this.boardPx(BOARD_RESERVE))
-      .height(this.boardPx(BOARD_RESERVE))
-      .alignSelf(ItemAlign.Center)
-      .padding(Space.xs)
-      .backgroundColor(this.theme.surfaceAlt)
-      .borderRadius(Radius.md)
-
-      Row({ space: Space.xs }) {
-        ForEach([0, 1, 2, 3, 4, 5], (i: number) => {
-          Stack() {
-          Text(this.cells.length > 0 && this.cells[0] === (i) ? '起点' : '')
-          .fontSize(FontSize.xxs)
-          .fontColor('#FFFFFF')
-          }
-          .layoutWeight(1)
-          .height(Cell.of(48))
-          .backgroundColor(COLORS[(i)])
-          .borderRadius(Radius.md)
-          .scale({
-          x: this.pressed === (i) ? Motion.pressScale : 1,
-          y: this.pressed === (i) ? Motion.pressScale : 1
-          })
-          .animation({ duration: Motion.fast, curve: Motion.snap() })
-          .onTouch((e: TouchEvent) => {
-          if (e.type === TouchType.Down) {
-          this.pressed = (i);
-          } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) {
-          this.pressed = -1;
-          }
-          })
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); })
-          .onClick(() => {
-          Haptics.tick();
-          this.pick((i));
-          })
-        }, (i: number) => 'cfp' + i)
-      }
-      .width('100%')
-
-      Row({ space: Space.md }) {
-        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : '点色块染左上角连通区')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.sm)
-          .fontColor(this.theme.inkSoft)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(Cell.of(44))
-          .enabled(false)
-        Button(TG('提示'))
-          .fontSize(FontSize.sm)
+    // ★★★ 2026-10-30：**色彩洪水底部按钮覆盖棋盘** 的结构修复
+    //   之前试过 8 次"调约束"（限高 / aspectRatio / 限宽）全失败：
+    //     只限高      ⇒ 容器变矮、内容溢出 ⇒ 按钮被盖（原问题）
+    //     限高+aspectRatio ⇒ 两者打架，容器被压成小块
+    //     限高+限宽   ⇒ vh 在 maxWidth 里语义不明，仍是小块
+    //   ⇒ 真解不是"调约束"，是**改结构**：整页套 Scroll，
+    //     内容自然超高时可滚，而不是硬塞进一屏。
+    //   ★ 同一套结构已在 GBlockEscape / GNavonHierarchical / GMirrorTracing
+    //     上真机验过（第 511 轮），三款都成立。
+    Scroll() {
+      Column({ space: Space.md }) {
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          demoOn: this.demoId >= 0,
+          autoOn: this.autoId >= 0
+        })
+        Row({ space: Space.md }) {
+          Column({ space: 2 }) {
+          Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((String(this.moves) + '/' + String(this.diffTotal)))
+          .fontSize(FontSize.xl)
+          .fontWeight(FontWeight.Bold)
           .fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
+          }
           .layoutWeight(1)
-          .height(44)
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
-          .onClick(() => {
-            this.askHint();
-          })
-        Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.primary)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
           .borderRadius(Radius.md)
-          .width(96)
-          .height(Cell.of(44))
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
+          .shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text((TG('统一度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((String(this.filled()) + '/' + String(N * N)))
+          .fontSize(FontSize.xl)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.theme.ink)
+          }
+          .layoutWeight(1)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+        }
+        .width('100%')
+
+        Column({ space: 2 }) {
+          ForEach([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], (r: number) => {
+            Row({ space: 2 }) {
+              ForEach([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], (c: number) => {
+                Stack() {
+                  // ★ 色盲辅助（项目 D ③）：12×12 太密，字形用小号粗体 + 阴影保证可读
+                  Text(A11y.glyph(this.cells[(r * N + c)]))
+                    .fontSize(9).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
+                    .textShadow({ radius: 2, color: '#000000B3', offsetX: 0, offsetY: 1 })
+                }
+                .layoutWeight(1)
+                .aspectRatio(1)
+                .backgroundColor(COLORS[this.cells[(r * N + c)]])
+                .borderRadius(Radius.xs)
+                .animation({ duration: Motion.fast, curve: Motion.snap() })
+              }, (c: number) => 'cf' + r + '-' + c)
+            }
+            .width('100%')
+          }, (r: number) => 'cfr' + r)
+        }
+        // ★★★ 2026-10-30（布局 bug ② 的主修点）：
+        //   改前：`.width('100%')` + `.aspectRatio(1)` + `.constraintSize({ maxHeight: '46%' })`
+        //         —— 容器与格子都用 aspectRatio 定高，再叠一个 46% 上限，三者互相打架：
+        //         容器被压到 342vp、格子仍要 418vp ⇒ **棋盘最后 2~3 行溢出到颜色行上面**。
+        //   改后：删掉 aspectRatio 与 maxHeight 百分比，宽高都由 boardPx() 给定（正方形），
+        //         格子按宽度均分出来的行高正好填满容器 ⇒ 棋盘完整、颜色行不再被压住。
+        .width(this.boardPx(BOARD_RESERVE))
+        .height(this.boardPx(BOARD_RESERVE))
+        .alignSelf(ItemAlign.Center)
+        .padding(Space.xs)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.md)
+
+        Row({ space: Space.xs }) {
+          ForEach([0, 1, 2, 3, 4, 5], (i: number) => {
+            Stack() {
+            Text(this.cells.length > 0 && this.cells[0] === (i) ? '起点' : '')
+            .fontSize(FontSize.xxs)
+            .fontColor('#FFFFFF')
+            }
+            .layoutWeight(1)
+            .height(Cell.of(48))
+            .backgroundColor(COLORS[(i)])
+            .borderRadius(Radius.md)
+            .scale({
+            x: this.pressed === (i) ? Motion.pressScale : 1,
+            y: this.pressed === (i) ? Motion.pressScale : 1
+            })
+            .animation({ duration: Motion.fast, curve: Motion.snap() })
+            .onTouch((e: TouchEvent) => {
+            if (e.type === TouchType.Down) {
+            this.pressed = (i);
+            } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) {
+            this.pressed = -1;
+            }
+            })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); })
+            .onClick(() => {
+            Haptics.tick();
+            this.pick((i));
+            })
+          }, (i: number) => 'cfp' + i)
+        }
+        .width('100%')
+
+        Row({ space: Space.md }) {
+          Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : '点色块染左上角连通区')
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.sm)
+            .fontColor(this.theme.inkSoft)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(Cell.of(44))
+            .enabled(false)
+          Button(TG('提示'))
+            .fontSize(FontSize.sm)
+            .fontColor(this.theme.ink)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(44)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
+            .onClick(() => {
+              this.askHint();
+            })
+          Button(TG('重开'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor(Color.White)
+            .backgroundColor(Palette.primary)
+            .borderRadius(Radius.md)
+            .width(96)
+            .height(Cell.of(44))
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.reset();
+            })
+        }
+        .width('100%')
       }
+      .onTouch((e: TouchEvent) => {
+        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+      })
       .width('100%')
+      .constraintSize({ minHeight: '100%' })
+      .justifyContent(FlexAlign.Start)
     }
-    .onTouch((e: TouchEvent) => {
-      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    })
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Start)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring)
   }
 
 
