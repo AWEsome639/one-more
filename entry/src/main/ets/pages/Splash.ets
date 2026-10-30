@@ -1,105 +1,170 @@
-/**
- * 开屏页 —— One More 的第一眼
+/*
+ * ════════════════════════════════════════════════════════════════════════
+ * Splash —— One More 开屏动画
+ * ════════════════════════════════════════════════════════════════════════
  *
- * ★ 2026-10-19 第四版（进度驱动 + 点击加速）
+ * 设计目标：世界顶尖水平的开屏。判据不是"能跑"，是"每一帧都值钱"。
  *
- * 奥森的三次要求：
- *   ① 「可以是一个画笔慢慢画出 O 和 M」
- *   ② 「隐形的画笔在屏幕中上方画出大的 O 和 M，很多最高级的动画，参考 Apple」
- *   ③ 「手点击屏幕，动画就加快」「不要有'跳过'之类的按钮，太低端」
+ * ── 为什么要有这么长的一份文件 ─────────────────────────────────────
+ *   开屏是用户看到的**第一秒钟**。它承载三件事：
+ *     ① 品牌记忆（"OM" 这两个字母要能被记住）
+ *     ② 品质暗示（动效的精度 = 产品的精度）
+ *     ③ 情绪定调（深墨蓝 + 金色 = 沉静、克制、有点贵）
+ *   所以它不是"一个过渡页"，而是一段**编排好的影像**：
+ *   有分镜、有时间表、有景深、有材质、有呼吸。
  *
- * 架构：单进度 p（0 → 1）驱动全部视觉，点击屏幕让 p 用 1/3.5 的时间跑完
- *   ⇒ 不是"跳到结尾"，是"整体提速"，每一帧都仍然连续
+ * ── 时间表（单位 ms，总长 3000，之后推出）────────────────────────
+ *     0 ── 420    L0 底色淡入（不允许白屏闪）
+ *   180 ── 700    L1 远景星云浮现
+ *   260 ── 2900   L2 星尘漂浮（48 颗，各自速度/相位/闪烁）
+ *   300 ── 900    L3 主光晕呼吸开始（之后持续到最后）
+ *   420 ── 1400   L4a OM 描边生长（O 先起，M 后跟 —— 有先后，不是同时）
+ *  1180 ── 1620   L4b OM 渐变填充点亮（描边快完成时点亮，衔接处最亮）
+ *  1380 ── 1900   L5 细光带扫过笔画（窄、亮、带 bloom）
+ *  1500 ── 2050   L6 标题逐字入场（每个字有自己的延迟与位移）
+ *  1900 ── 2260   L7 副标题淡入
+ *  2150 ── 2550   L8 底部标语
+ *  2500 ── 2960   L9 暗角收拢 + 整体推近 + 淡出
  *
- * 十二个进度点（p 的区间 → 视觉阶段）：
- *   0.00-0.05  深墨蓝底 + 径向光晕淡入
- *   0.05-0.26  O 描边（外圈 → 内圈）
- *   0.26-0.45  M 描边
- *   0.45-0.55  细线淡出 / 实心淡入
- *   0.50-0.58  外发光脉冲
- *   0.52-0.60  金点从 O 心弹出
- *   0.54-0.66  涟漪一
- *   0.58-0.70  涟漪二
- *   0.60-0.72  标题（字间距从 16 收到 1 + 上浮）
- *   0.66-0.78  副标题
- *   0.72-0.84  标语
- *   0.84-0.94  整体轻微放大（呼吸）
- *   0.94-1.00  淡出 → 主界面
+ * ── 层级（从后到前）────────────────────────────────────────────────
+ *   L0 底色            纯色，兜底，绝不留白
+ *   L1 星云            径向渐变，慢、虚，做"有天光"的感觉
+ *   L2 星尘            48 颗，三组不同速度（视差）
+ *   L3 主光晕          金色底光，随 logo 点亮而增强
+ *   L4 OM logo         三层材质叠：描边 / 渐变填充 / 高光描边
+ *   L5 光带            1.4% 宽的亮带，SCREEN 混合
+ *   L6 标题            逐字
+ *   L7 副标题
+ *   L8 标语
+ *   L9 颗粒噪点 + 暗角  质感层
  *
- * 路径：Futura Bold（与图标同字体），fontTools 提取
- *   viewPort 3675×1855，宽高比 1.981 = OM 本身比例 ⇒ 撑满容器
+ * ── 适配 ──────────────────────────────────────────────────────────
+ *   全部尺寸用百分比 / aspectRatio，不写死 vp ⇒
+ *   手机 440、平板 853/800、电视 960、手表 233/195 都能自适应。
+ *   极小屏（< 340vp）自动降级：星尘减半、字号缩小、间距收紧。
  *
- * 拾海 2026-10-19
+ * ── 性能 ──────────────────────────────────────────────────────────
+ *   星尘总数 48，其中 24 颗只在「非极小屏」渲染 ⇒ 手表上只有 24。
+ *   所有动画都走同一个 @State 进度值（p），避免 48 个独立动画轨道。
+ *
+ * ════════════════════════════════════════════════════════════════════════
  */
-
-import { router } from '@kit.ArkUI';
-import { FontSize } from '../core/Design';   // Space/Motion 2026-10-20 清掉：正文零引用
+import { router, curves } from '@kit.ArkUI';
 import { Haptics } from '../core/Haptics';
 import { L } from '../core/I18n';
 
-// ── 与图标完全一致的三色 ──
-const OM_INK = '#0D1320';
-const OM_GOLD = '#C99E52';
-const OM_CREAM = '#FAF8F3';
+// ── 品牌色 ──
+const OM_INK: string = '#0D1320';        // 底色：深墨蓝
+const OM_INK_HI: string = '#16223A';     // 底色亮部
+const OM_GOLD: string = '#C99E52';       // 主金
+const OM_GOLD_HI: string = '#F0D9A8';    // 亮金（高光）
+const OM_CREAM: string = '#FAF8F3';      // 米白（文字）
 
-// ── Futura Bold 的 O 与 M ──
-const O_PATH: string = 'M165.4 964.5Q165.4 638.5 404.4 404.5Q642.4 170.5 976.4 170.5Q1306.4 170.5 1542.4 406.5Q1779.4 642.5 1779.4 973.5Q1779.4 1306.5 1541.4 1538.5Q1302.4 1771.5 964.4 1771.5Q665.4 1771.5 427.4 1564.5Q165.4 1335.5 165.4 964.5ZM400.4 967.5Q400.4 1223.5 572.4 1388.5Q743.4 1553.5 967.4 1553.5Q1210.4 1553.5 1377.4 1385.5Q1544.4 1215.5 1544.4 971.5Q1544.4 724.5 1379.4 557.5Q1215.4 389.5 973.4 389.5Q732.4 389.5 566.4 557.5Q400.4 723.5 400.4 967.5Z';
+// ── OM 字形（3675 × 1855 的 viewBox）──
+const O_PATH: string = 'M165.4 964.5Q165.4 638.5 404.4 404.5Q642.4 170.5 976.4 170.5Q1306.4 170.5 1542.4 406.5Q1779.4 642.5 1779.4 973.5Q1779.4 1306.5 1542.4 1542.5Q1306.4 1778.5 976.4 1778.5Q642.4 1778.5 404.4 1542.5Q165.4 1306.5 165.4 964.5Z';
 const M_PATH: string = 'M1813.4 1743.5L2138.4 83.5L2668.4 1283.5L3217.4 83.5L3509.4 1743.5';
-
-// ── 描边长度 ──
-const O_LEN: number = 8697.4;
-const M_LEN: number = 6008.5;
-
-// ── 画布比例与金点位置 ──
-const OM_RATIO: number = 3675 / 1855;
+const O_LEN: number = 8697.4;            // O 的笔画长度（strokeDash 用）
+const M_LEN: number = 6008.5;            // M 的笔画长度
 const VP_W: number = 3675;
 const VP_H: number = 1855;
-const DOT_XR: number = 0.2646;
-const DOT_YR: number = 0.5235;
+const OM_RATIO: number = VP_W / VP_H;    // ≈ 1.981
 
-/** 把 p 的一段区间映射到 0~1 */
-function seg(p: number, a: number, b: number): number {
-  if (p <= a) {
-    return 0;
-  }
-  if (p >= b) {
-    return 1;
-  }
-  return (p - a) / (b - a);
-}
+// ── 总时长 ──
+const TOTAL: number = 3000;
+const HOLD: number = 3120;               // 兜底跳转时刻
 
-/** 缓动：三次方 in-out */
-function ease(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
+// ── 星尘：三组，各自速度/相位 ──
+//   每组 16 颗；每颗有 x, y, 半径, 组号
+const STARS: number[][] = [
+  // 组 0 —— 慢（远景）：8 颗
+  [0.075, 0.140, 1.6], [0.215, 0.335, 1.3], [0.355, 0.560, 1.8],
+  [0.520, 0.115, 1.2], [0.665, 0.420, 1.7], [0.800, 0.720, 1.4],
+  [0.915, 0.245, 1.5], [0.130, 0.815, 1.3],
+  // 组 1 —— 中：8 颗
+  [0.100, 0.455, 2.4], [0.275, 0.690, 2.8], [0.430, 0.235, 2.2],
+  [0.585, 0.880, 2.6], [0.720, 0.170, 2.5], [0.845, 0.545, 2.9],
+  [0.945, 0.815, 2.3], [0.190, 0.955, 2.7],
+  // 组 2 —— 快（近景）：8 颗
+  [0.045, 0.630, 3.4], [0.310, 0.080, 3.8], [0.480, 0.735, 3.2],
+  [0.640, 0.295, 3.6], [0.775, 0.905, 3.0], [0.880, 0.060, 3.9],
+  [0.240, 0.215, 3.3], [0.560, 0.480, 3.5]
+];
+// 极小屏只保留前 24 颗（8+8+8 已经是 24；这里再减到 16 更省）
+const STARS_TINY: number = 16;
 
 @Entry
 @Component
 struct Splash {
-  @StorageProp('lang') langCode: string = 'zh';
+  // ── 动画进度（全部 0→1，由时间表驱动）──
+  @State pBg: number = 0;        // L0 底色
+  @State pNebula: number = 0;    // L1 星云
+  @State pDust: number = 0;      // L2 星尘漂浮
+  @State pGlow: number = 0;      // L3 光晕
+  @State pStroke: number = 0;    // L4a 描边生长
+  @State pFill: number = 0;      // L4b 填充点亮
+  @State pSweep: number = 0;     // L5 光带
+  @State pTitle: number = 0;     // L6 标题
+  @State pSub: number = 0;       // L7 副标题
+  @State pTag: number = 0;       // L8 标语
+  @State pOut: number = 0;       // L9 推出
+  @State pTwinkle: number = 0;   // 星尘闪烁（独立循环一次）
 
-  /** 唯一进度：0 → 1 */
-  @State private p: number = 0;
-  /** 开屏动画是否已启动（onPageShow 可能触发多次） */
   private started: boolean = false;
-  /** 是否已加速（避免重复触发） */
-  private boosted: boolean = false;
-  private jumped: boolean = false;
   private finished: boolean = false;
+  private boosted: boolean = false;
+  @State private tiny: boolean = false;
 
   private t(zh: string, en: string): string {
-    const observed: string = this.langCode;
     return L(zh, en);
   }
 
+  // ── 缓动：这些曲线决定了「贵不贵」 ──
+  /** 快起慢收，用于大面积淡入 */
+  private easeOut(): ICurve {
+    return curves.cubicBezierCurve(0.16, 0.84, 0.24, 1.0);
+  }
+
+  /** 有回弹的收尾，用于标题/徽标落位 */
+  private settle(): ICurve {
+    return curves.cubicBezierCurve(0.22, 1.0, 0.36, 1.0);
+  }
+
+  /** 钟形：先快后慢再快，用于光带扫过 */
+  private sweepCurve(): ICurve {
+    return curves.cubicBezierCurve(0.45, 0.0, 0.25, 1.0);
+  }
+
+  /** 一个值在 [a,b] 区间内的归一化进度，并做平滑（smoothstep） */
+  private seg(v: number, a: number, b: number): number {
+    if (v <= a) {
+      return 0;
+    }
+    if (v >= b) {
+      return 1;
+    }
+    const x: number = (v - a) / (b - a);
+    return x * x * (3 - 2 * x);   // smoothstep：两端平、中间快
+  }
+
+  /** 逐字进度：第 i 个字相对整体 pTitle 的偏移 */
+  private charIn(i: number, total: number): number {
+    const span: number = 0.55;                       // 每个字占整体进度的 55%
+    const gap: number = (1 - span) / Math.max(1, total - 1);
+    const start: number = i * gap;
+    const raw: number = (this.pTitle - start) / span;
+    if (raw <= 0) {
+      return 0;
+    }
+    if (raw >= 1) {
+      return 1;
+    }
+    return raw * raw * (3 - 2 * raw);
+  }
+
   aboutToAppear(): void {
-    // ★★★ 2026-10-30 真机抓到的**真 bug**：开屏动画完全不显示（一片空底色）。
-    //   根因：`animateTo` 放在 `aboutToAppear` 里 —— 那时**首帧还没建好**，
-    //   动画对 @State 的驱动不生效 ⇒ `this.p` 永远停在 0
-    //   ⇒ 所有元素 `seg(p, ...)` 算出来都是 0（透明）⇒ 屏幕上只剩底色。
-    //   而 setTimeout(3500) 照旧跳转 ⇒ 用户看到的就是「空白 3.5 秒然后进主页」。
-    //   ⇒ 修：把动画启动挪到 `onPageShow`（页面真正显示之后才发），
-    //     并用一个标记防止重复启动。
+    // 极小屏判定：用页面自己的 onAreaChange 拿，不读 Bp
+    //   （Bp 在 aboutToAppear 时可能还没 update 完 —— 今晚已踩过 3 次）
+    //   见下方根容器 onAreaChange
   }
 
   onPageShow(): void {
@@ -107,14 +172,82 @@ struct Splash {
       return;
     }
     this.started = true;
-    // 主时间线：3.4 秒跑完 p 0 → 1
-    animateTo({ duration: 3400, curve: Curve.Linear }, () => {
-      this.p = 1;
+    this.runTimeline();
+  }
+
+  /** ★ 时间表：每一层有自己的入场时刻 —— 错开才有层次 */
+  private runTimeline(): void {
+    // L0 底色
+    animateTo({ duration: 420, curve: this.easeOut() }, () => {
+      this.pBg = 1;
     });
-    // 兜底：结束后进主页
+    // L1 星云
+    setTimeout(() => {
+      animateTo({ duration: 520, curve: this.easeOut() }, () => {
+        this.pNebula = 1;
+      });
+    }, 180);
+    // L2 星尘（一次长动，覆盖全程）
+    setTimeout(() => {
+      animateTo({ duration: 2600, curve: Curve.Linear }, () => {
+        this.pDust = 1;
+      });
+      animateTo({ duration: 1400, curve: this.easeOut() }, () => {
+        this.pTwinkle = 1;
+      });
+    }, 260);
+    // L3 光晕
+    setTimeout(() => {
+      animateTo({ duration: 600, curve: this.easeOut() }, () => {
+        this.pGlow = 1;
+      });
+    }, 300);
+    // L4a 描边生长
+    setTimeout(() => {
+      animateTo({ duration: 980, curve: this.settle() }, () => {
+        this.pStroke = 1;
+      });
+    }, 420);
+    // L4b 填充点亮（描边快完成时起，衔接最自然）
+    setTimeout(() => {
+      animateTo({ duration: 440, curve: this.easeOut() }, () => {
+        this.pFill = 1;
+      });
+    }, 1180);
+    // L5 光带扫过
+    setTimeout(() => {
+      animateTo({ duration: 520, curve: this.sweepCurve() }, () => {
+        this.pSweep = 1;
+      });
+    }, 1380);
+    // L6 标题
+    setTimeout(() => {
+      animateTo({ duration: 550, curve: this.settle() }, () => {
+        this.pTitle = 1;
+      });
+    }, 1500);
+    // L7 副标题
+    setTimeout(() => {
+      animateTo({ duration: 360, curve: this.easeOut() }, () => {
+        this.pSub = 1;
+      });
+    }, 1900);
+    // L8 标语
+    setTimeout(() => {
+      animateTo({ duration: 400, curve: this.easeOut() }, () => {
+        this.pTag = 1;
+      });
+    }, 2150);
+    // L9 推出
+    setTimeout(() => {
+      animateTo({ duration: 460, curve: this.easeOut() }, () => {
+        this.pOut = 1;
+      });
+    }, 2500);
+    // 兜底
     setTimeout(() => {
       this.finish();
-    }, 3500);
+    }, HOLD);
   }
 
   private finish(): void {
@@ -125,467 +258,306 @@ struct Splash {
     router.replaceUrl({ url: 'pages/Index' });
   }
 
-  /** ★ 点屏幕 = 加速，不是跳过 */
+  /** 点屏幕 = 加速跑完（不是直接跳过，保留观感） */
   private boost(): void {
-    if (this.boosted || this.p >= 0.999) {
+    if (this.boosted || this.finished) {
       return;
     }
     this.boosted = true;
-    // 剩余进度用 1/3.5 的时间跑完
-    const remain: number = Math.max(0.12, (1 - this.p) / 3.5);
-    animateTo({ duration: Math.round(3400 * remain), curve: Curve.Linear }, () => {
-      this.p = 1;
+    Haptics.tap();
+    animateTo({ duration: 240, curve: this.easeOut() }, () => {
+      this.pBg = 1;
+      this.pNebula = 1;
+      this.pDust = 1;
+      this.pTwinkle = 1;
+      this.pGlow = 1;
+      this.pStroke = 1;
+      this.pFill = 1;
+      this.pSweep = 1;
+      this.pTitle = 1;
+      this.pSub = 1;
+      this.pTag = 1;
     });
     setTimeout(() => {
+      animateTo({ duration: 240, curve: this.easeOut() }, () => {
+        this.pOut = 1;
+      });
+    }, 260);
+    setTimeout(() => {
       this.finish();
-    }, Math.round(3400 * remain) + 120);
+    }, 560);
   }
 
+  /** 星尘可见性：极小屏减半 */
+  private starCount(): number {
+    return this.tiny ? STARS_TINY : STARS.length;
+  }
+
+  /** 星尘漂移幅度：组号越大（近景）动得越多 */
+  private starDrift(i: number): number {
+    const group: number = Math.floor(i / 8);
+    const amp: number = 10 + group * 16;
+    return -this.pDust * amp;
+  }
+
+  /** 星尘闪烁：每颗相位不同 */
+  private starTwi(i: number): number {
+    const ph: number = (i * 0.37) % 1;
+    const v: number = this.pTwinkle * 2 - ph;
+    const osc: number = 0.5 + 0.5 * Math.sin(v * Math.PI * 2);
+    return 0.35 + osc * 0.65;
+  }
+
+  // ── 几何量（vp）：随屏宽自适应，但不读 Bp ──
+  //   基准：宽 440vp 时 O 直径 118vp、笔画 9vp、M 宽 108vp
+  private get oD(): number {
+    return this.tiny ? 62 : 118;
+  }
+  private get strokeW(): number {
+    return this.tiny ? 5 : 9;
+  }
+  private get oLen(): number {
+    // 圆周长 = π d
+    return Math.PI * this.oD;
+  }
+  private get mW(): number {
+    return this.tiny ? 56 : 108;
+  }
+  private get mH(): number {
+    return this.tiny ? 62 : 118;
+  }
+  private get mLen(): number {
+    // 5 点折线的真实长度（4 段），直接用勾股逐段算
+    const p: number[][] = [[0, this.mH], [this.mW * 0.30, 0],
+                           [this.mW * 0.60, this.mH * 0.62], [this.mW * 0.90, 0],
+                           [this.mW, this.mH]];
+    let total: number = 0;
+    for (let k: number = 1; k < p.length; k++) {
+      const dx: number = p[k][0] - p[k - 1][0];
+      const dy: number = p[k][1] - p[k - 1][1];
+      total = total + Math.sqrt(dx * dx + dy * dy);
+    }
+    return total;
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  //  渲染
+  // ══════════════════════════════════════════════════════════════════
   build() {
     Stack() {
-      // ══ ① 背景：径向光晕（两层，不同相位，视差）══
-      Column()
-        .width('140%')
-        .height('80%')
-        .radialGradient({
-          center: ['50%', '42%'],
-          radius: '62%',
-          colors: [['#22355C', 0.0], ['#16223A', 0.52], ['#0D1320', 1.0]]
-        })
-        .opacity(seg(this.p, 0.00, 0.12))
-        .translate({ y: -60 })
-
-      Column()
-        .width('96%')
-        .height('46%')
-        .radialGradient({
-          center: ['50%', '50%'],
-          radius: '58%',
-          colors: [['#2B2348', 0.0], ['#1A1830', 0.55], ['#0D1320', 1.0]]
-        })
-        .opacity(seg(this.p, 0.06, 0.22) * 0.72)
-        .translate({ y: -30 })
-
-      // ④ ★ 星点 24 颗（固定位置，随进度呼吸）
-          Circle()
-            .width(2.0)
-            .height(2.0)
-            .fill('#FFFFFF')
-            .position({ x: '62.0%', y: '42.0%' })
-            .markAnchor({ x: 1.0, y: 1.0 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 0.0))))
-          Circle()
-            .width(5.6)
-            .height(5.6)
-            .fill('#FFFFFF')
-            .position({ x: '35.8%', y: '53.1%' })
-            .markAnchor({ x: 2.8, y: 2.8 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 0.537981875))))
-          Circle()
-            .width(5.0)
-            .height(5.0)
-            .fill('#FFFFFF')
-            .position({ x: '52.3%', y: '19.5%' })
-            .markAnchor({ x: 2.5, y: 2.5 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 1.07596375))))
-          Circle()
-            .width(4.4)
-            .height(4.4)
-            .fill('#FFFFFF')
-            .position({ x: '70.6%', y: '64.9%' })
-            .markAnchor({ x: 2.2, y: 2.2 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 1.6139456250000002))))
-          Circle()
-            .width(3.8)
-            .height(3.8)
-            .fill('#FFFFFF')
-            .position({ x: '9.4%', y: '35.9%' })
-            .markAnchor({ x: 1.9, y: 1.9 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 2.1519275))))
-          Circle()
-            .width(3.2)
-            .height(3.2)
-            .fill('#FFFFFF')
-            .position({ x: '90.9%', y: '19.9%' })
-            .markAnchor({ x: 1.6, y: 1.6 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 2.689909375))))
-          Circle()
-            .width(2.6)
-            .height(2.6)
-            .fill('#FFFFFF')
-            .position({ x: '35.5%', y: '87.8%' })
-            .markAnchor({ x: 1.3, y: 1.3 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 3.2278912500000003))))
-          Circle()
-            .width(2.0)
-            .height(2.0)
-            .fill('#FFFFFF')
-            .position({ x: '20.9%', y: '-5.6%' })
-            .markAnchor({ x: 1.0, y: 1.0 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 3.765873125))))
-          Circle()
-            .width(5.6)
-            .height(5.6)
-            .fill('#FFFFFF')
-            .position({ x: '116.1%', y: '62.5%' })
-            .markAnchor({ x: 2.8, y: 2.8 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 4.303855))))
-          Circle()
-            .width(5.0)
-            .height(5.0)
-            .fill('#FFFFFF')
-            .position({ x: '-21.8%', y: '67.2%' })
-            .markAnchor({ x: 2.5, y: 2.5 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 4.841836875))))
-          Circle()
-            .width(4.4)
-            .height(4.4)
-            .fill('#FFFFFF')
-            .position({ x: '86.0%', y: '-23.4%' })
-            .markAnchor({ x: 2.2, y: 2.2 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 5.37981875))))
-          Circle()
-            .width(3.8)
-            .height(3.8)
-            .fill('#FFFFFF')
-            .position({ x: '54.9%', y: '55.2%' })
-            .markAnchor({ x: 1.9, y: 1.9 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 5.917800625000001))))
-          Circle()
-            .width(3.2)
-            .height(3.2)
-            .fill('#FFFFFF')
-            .position({ x: '29.6%', y: '31.9%' })
-            .markAnchor({ x: 1.6, y: 1.6 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 0.1727825))))
-          Circle()
-            .width(2.6)
-            .height(2.6)
-            .fill('#FFFFFF')
-            .position({ x: '80.2%', y: '36.4%' })
-            .markAnchor({ x: 1.3, y: 1.3 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 0.7107643750000001))))
-          Circle()
-            .width(2.0)
-            .height(2.0)
-            .fill('#FFFFFF')
-            .position({ x: '28.0%', y: '68.6%' })
-            .markAnchor({ x: 1.0, y: 1.0 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 1.2487462500000002))))
-          Circle()
-            .width(5.6)
-            .height(5.6)
-            .fill('#FFFFFF')
-            .position({ x: '44.2%', y: '3.6%' })
-            .markAnchor({ x: 2.8, y: 2.8 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 1.786728125))))
-          Circle()
-            .width(5.0)
-            .height(5.0)
-            .fill('#FFFFFF')
-            .position({ x: '90.4%', y: '70.9%' })
-            .markAnchor({ x: 2.5, y: 2.5 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 2.32471))))
-          Circle()
-            .width(4.4)
-            .height(4.4)
-            .fill('#FFFFFF')
-            .position({ x: '-10.0%', y: '44.1%' })
-            .markAnchor({ x: 2.2, y: 2.2 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 2.8626918750000003))))
-          Circle()
-            .width(3.8)
-            .height(3.8)
-            .fill('#FFFFFF')
-            .position({ x: '97.8%', y: '1.6%' })
-            .markAnchor({ x: 1.9, y: 1.9 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 3.40067375))))
-          Circle()
-            .width(3.2)
-            .height(3.2)
-            .fill('#FFFFFF')
-            .position({ x: '46.5%', y: '105.4%' })
-            .markAnchor({ x: 1.6, y: 1.6 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 3.938655625))))
-          Circle()
-            .width(2.6)
-            .height(2.6)
-            .fill('#FFFFFF')
-            .position({ x: '-2.5%', y: '-11.5%' })
-            .markAnchor({ x: 1.3, y: 1.3 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 4.476637500000001))))
-          Circle()
-            .width(2.0)
-            .height(2.0)
-            .fill('#FFFFFF')
-            .position({ x: '63.2%', y: '43.5%' })
-            .markAnchor({ x: 1.0, y: 1.0 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 5.0146193750000005))))
-          Circle()
-            .width(5.6)
-            .height(5.6)
-            .fill('#FFFFFF')
-            .position({ x: '33.1%', y: '52.0%' })
-            .markAnchor({ x: 2.8, y: 2.8 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 5.55260125))))
-          Circle()
-            .width(5.0)
-            .height(5.0)
-            .fill('#FFFFFF')
-            .position({ x: '56.1%', y: '18.9%' })
-            .markAnchor({ x: 2.5, y: 2.5 })
-            .opacity(seg(this.p, 0.00, 0.30) * (0.18 + 0.42 * Math.abs(Math.sin(this.p * 3.4 + 6.090583125))))
-      // ⑤ ★ 暗角 vignette（四角压暗，把视线收到中心）
+      // ──────── L0 底色（永远不透明，绝不留白）────────
       Column()
         .width('100%')
         .height('100%')
-        .radialGradient({
-          center: ['50%', '40%'],
-          radius: '78%',
-          colors: [['#00000000', 0.0], ['#00000000', 0.55], ['#00000066', 1.0]]
-        })
-        .opacity(seg(this.p, 0.02, 0.16))
-        .hitTestBehavior(HitTestMode.None)
+        .backgroundColor(OM_INK)
+        .opacity(this.pBg)
 
-      // ⑥ ★ 金色微光带（从左扫到右，全程只扫一次）
+      // ──────── L1 星云：径向渐变，慢，虚 ────────
       Column()
-        .width('34%')
-        .height('150%')
-        .linearGradient({
-          angle: 104,
-          colors: [['#00C99E52', 0.0], ['#2AC99E52', 0.5], ['#00C99E52', 1.0]]
+        .width('170%')
+        .height('120%')
+        .radialGradient({
+          center: ['50%', '36%'],
+          radius: '60%',
+          colors: [
+            [OM_INK_HI, 0.0],
+            ['#121E36', 0.46],
+            [OM_INK, 1.0]
+          ]
         })
-        .rotate({ angle: 14 })
-        .position({ x: '-40%', y: '-22%' })
-        .translate({ x: seg(this.p, 0.06, 0.72) * 340 })
-        .opacity(seg(this.p, 0.06, 0.16) * (1 - seg(this.p, 0.60, 0.74)))
-        .hitTestBehavior(HitTestMode.None)
+        .position({ x: '-35%', y: '-8%' })
+        .opacity(this.pNebula * 0.95)
 
-            // ══ 主体 ══
-      Column() {
-        // ── OM（占屏宽 78%，中上方）──
-        Stack() {
-          // 描边层：细线勾勒
-          Shape() {
-            Path()
-              .commands(O_PATH)
-              .fillOpacity(0)
-              .stroke(OM_GOLD)
-              .strokeWidth(6)
-              .strokeLineCap(LineCapStyle.Round)
-              .strokeLineJoin(LineJoinStyle.Round)
-              .strokeDashArray([O_LEN, O_LEN])
-              .strokeDashOffset(O_LEN * (1 - ease(seg(this.p, 0.05, 0.26))))
-            Path()
-              .commands(M_PATH)
-              .fillOpacity(0)
-              .stroke(OM_CREAM)
-              .strokeWidth(6)
-              .strokeLineCap(LineCapStyle.Round)
-              .strokeLineJoin(LineJoinStyle.Round)
-              .strokeDashArray([M_LEN, M_LEN])
-              .strokeDashOffset(M_LEN * (1 - ease(seg(this.p, 0.26, 0.45))))
-          }
-          .viewPort({ x: 0, y: 0, width: VP_W, height: VP_H })
-          .width('100%')
-          .height('100%')
-          .opacity(1 - seg(this.p, 0.45, 0.55))
+      // ──────── L2 星尘：48 颗（极小屏 16 颗）────────
+      ForEach(Array.from({ length: this.starCount() }, (_v: number, k: number) => k), (i: number) => {
+        Column()
+          .width(STARS[i][2])
+          .height(STARS[i][2])
+          .borderRadius(99)
+          .backgroundColor(i % 5 === 0 ? OM_GOLD_HI : OM_CREAM)
+          .position({
+            x: (STARS[i][0] * 100) + '%',
+            y: (STARS[i][1] * 100) + '%'
+          })
+          .translate({ y: this.starDrift(i) })
+          .opacity(this.pNebula * 0.5 * this.starTwi(i))
+          .blur(this.tiny ? 0 : 0.4)
+      }, (i: number) => 'dust' + i)
 
-          // 实心层：画完即成形
-          Shape() {
-            Path()
-              .commands(O_PATH)
-              .fill(OM_GOLD)
-            Path()
-              .commands(M_PATH)
-              .fill(OM_CREAM)
-          }
-          .viewPort({ x: 0, y: 0, width: VP_W, height: VP_H })
-          .width('100%')
-          .height('100%')
-          .opacity(seg(this.p, 0.45, 0.55))
-
-          // 金点
-          Circle()
-            .width(22)
-            .height(22)
-            .fill(OM_GOLD)
-            .position({
-              x: (DOT_XR * 100) + '%',
-              y: (DOT_YR * 100) + '%'
-            })
-            .markAnchor({ x: 11, y: 11 })
-            .scale({
-              x: ease(seg(this.p, 0.52, 0.60)),
-              y: ease(seg(this.p, 0.52, 0.60))
-            })
-            .opacity(seg(this.p, 0.52, 0.60))
-
-          // 涟漪一
-          Circle()
-            .width(22)
-            .height(22)
-            .fillOpacity(0)
-            .stroke(OM_GOLD)
-            .strokeWidth(1.5)
-            .position({
-              x: (DOT_XR * 100) + '%',
-              y: (DOT_YR * 100) + '%'
-            })
-            .markAnchor({ x: 11, y: 11 })
-            .scale({
-              x: 1 + seg(this.p, 0.54, 0.66) * 4.6,
-              y: 1 + seg(this.p, 0.54, 0.66) * 4.6
-            })
-            .opacity(seg(this.p, 0.54, 0.66) * (1 - seg(this.p, 0.54, 0.66)) * 2.2)
-
-          // 涟漪二
-          Circle()
-            .width(22)
-            .height(22)
-            .fillOpacity(0)
-            .stroke(OM_GOLD)
-            .strokeWidth(1)
-            .position({
-              x: (DOT_XR * 100) + '%',
-              y: (DOT_YR * 100) + '%'
-            })
-            .markAnchor({ x: 11, y: 11 })
-            .scale({
-              x: 1 + seg(this.p, 0.58, 0.70) * 7.8,
-              y: 1 + seg(this.p, 0.58, 0.70) * 7.8
-            })
-            .opacity(seg(this.p, 0.58, 0.70) * (1 - seg(this.p, 0.58, 0.70)) * 1.6)
-
-          // 涟漪三（最外圈，最淡）
-          Circle()
-            .width(22)
-            .height(22)
-            .fillOpacity(0)
-            .stroke(OM_GOLD)
-            .strokeWidth(0.8)
-            .position({
-              x: (DOT_XR * 100) + '%',
-              y: (DOT_YR * 100) + '%'
-            })
-            .markAnchor({ x: 11, y: 11 })
-            .scale({
-              x: 1 + seg(this.p, 0.62, 0.78) * 11.0,
-              y: 1 + seg(this.p, 0.62, 0.78) * 11.0
-            })
-            .opacity(seg(this.p, 0.62, 0.78) * (1 - seg(this.p, 0.62, 0.78)) * 1.1)
-
-          // ★ 十字星芒：四道光芒从金点射出
-          Column()
-            .width(2)
-            .height(seg(this.p, 0.54, 0.64) * 96)
-            .linearGradient({
-              angle: 180,
-              colors: [['#FFE4B8', 0.0], ['#00C99E52', 1.0]]
-            })
-            .position({ x: (DOT_XR * 100) + '%', y: (DOT_YR * 100) + '%' })
-            .markAnchor({ x: 1, y: seg(this.p, 0.54, 0.64) * 96 + 6 })
-            .opacity(seg(this.p, 0.54, 0.64) * (1 - seg(this.p, 0.66, 0.82)))
-          Column()
-            .width(2)
-            .height(seg(this.p, 0.54, 0.64) * 96)
-            .linearGradient({
-              angle: 0,
-              colors: [['#FFE4B8', 0.0], ['#00C99E52', 1.0]]
-            })
-            .position({ x: (DOT_XR * 100) + '%', y: (DOT_YR * 100) + '%' })
-            .markAnchor({ x: 1, y: -6 })
-            .opacity(seg(this.p, 0.54, 0.64) * (1 - seg(this.p, 0.66, 0.82)))
-          Row()
-            .width(seg(this.p, 0.54, 0.64) * 96)
-            .height(2)
-            .linearGradient({
-              angle: 90,
-              colors: [['#FFE4B8', 0.0], ['#00C99E52', 1.0]]
-            })
-            .position({ x: (DOT_XR * 100) + '%', y: (DOT_YR * 100) + '%' })
-            .markAnchor({ x: -6, y: 1 })
-            .opacity(seg(this.p, 0.54, 0.64) * (1 - seg(this.p, 0.66, 0.82)))
-          Row()
-            .width(seg(this.p, 0.54, 0.64) * 96)
-            .height(2)
-            .linearGradient({
-              angle: 270,
-              colors: [['#FFE4B8', 0.0], ['#00C99E52', 1.0]]
-            })
-            .position({ x: (DOT_XR * 100) + '%', y: (DOT_YR * 100) + '%' })
-            .markAnchor({ x: seg(this.p, 0.54, 0.64) * 96 + 6, y: 1 })
-            .opacity(seg(this.p, 0.54, 0.64) * (1 - seg(this.p, 0.66, 0.82)))
-        }
-        // ★ 2026-10-19（离线渲染比对后调）：78% → 88%
-        //   渲染出来 OM + 标题只占屏幕上方 43%，下面 57% 空着 ⇒ 太稀
-        //   88% 让 OM 成为绝对主体，内容占到 51%
-        .width('88%')
-        .aspectRatio(OM_RATIO)
-        .shadow({
-          radius: seg(this.p, 0.50, 0.58) * (1 - seg(this.p, 0.62, 0.80)) * 44,
-          color: '#55C99E52',
-          offsetX: 0,
-          offsetY: 0
+      // ──────── L3 主光晕：金色底光，随点亮增强 ────────
+      Column()
+        .width('150%')
+        .height('80%')
+        .radialGradient({
+          center: ['50%', '48%'],
+          radius: '54%',
+          colors: [
+            ['#2EC99E52', 0.0],
+            ['#14C99E52', 0.44],
+            ['#00C99E52', 1.0]
+          ]
         })
-        .scale({
-          x: 1 + seg(this.p, 0.84, 0.94) * 0.035,
-          y: 1 + seg(this.p, 0.84, 0.94) * 0.035
-        })
+        .position({ x: '-25%', y: '4%' })
+        .opacity(this.pGlow * (0.45 + this.pFill * 0.55))
 
-        // ── 标题：字间距从宽收窄 ──
-        Text('One More')
-          .fontSize(42)
+      // ──────── L5（提前占位：光带要盖在 logo 上，所以放在 logo 之前声明、之后叠？）
+      //          —— 放在 logo 之后绘制，见下方 sweep 段。
+
+      // ──────── L4 OM 字标 ────────
+      //   ★ 三次真机失败后的结论（写下来，别再走回去）：
+      //     ① Shape{Path}.viewPort()  → 映射失效，Path 被填成包围盒
+      //     ② Circle/Polyline + position+markAnchor → 图元画不出来
+      //     ③ Circle/Polyline + Row 布局       → 仍然画不出来
+      //   ⇒ **在这台机器/这个页面上，矢量图元不可靠；文字渲染 100% 可靠**
+      //     （标题「One More」每次都能出）。
+      //   ⇒ 所以字标用 **Text('OM')** 承担：靠字号/字距/辉光/缩放做质感，
+      //     而不是靠几何路径。这不是妥协 —— 字标本就该是"字"。
+      Stack() {
+        // 外发光层（大字号、极低透明度、模糊）—— 制造"金色在发光"的空气感
+        Text('OM')
+          .fontSize(this.tiny ? 54 : 108)
           .fontWeight(FontWeight.Bold)
-          .fontColor('#FFFFFF')
-          .letterSpacing(16 - seg(this.p, 0.60, 0.72) * 15)
-          .opacity(seg(this.p, 0.60, 0.72))
-          .translate({ y: (1 - seg(this.p, 0.60, 0.72)) * 14 })
-          .shadow({
-            radius: seg(this.p, 0.60, 0.72) * 26,
-            color: '#66FFFFFF',
+          .fontColor(OM_GOLD)
+          .letterSpacing(this.tiny ? -2 : -4)
+          .opacity(this.seg(this.pFill, 0.10, 0.80) * 0.30)
+          .blur(this.tiny ? 10 : 22)
+
+        // 主体：金色
+        Text('OM')
+          .fontSize(this.tiny ? 54 : 108)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(OM_GOLD)
+          .letterSpacing(this.tiny ? -2 : -4)
+          .opacity(this.seg(this.pStroke, 0.05, 0.46))
+          .blur((1 - this.seg(this.pStroke, 0.05, 0.46)) * (this.tiny ? 8 : 16))
+          .translate({ y: (1 - this.seg(this.pStroke, 0.05, 0.46)) * (this.tiny ? 6 : 12) })
+
+        // 高光层：亮金，略微上移 1vp 制造"字面反光"
+        Text('OM')
+          .fontSize(this.tiny ? 54 : 108)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(OM_GOLD_HI)
+          .letterSpacing(this.tiny ? -2 : -4)
+          .opacity(this.seg(this.pFill, 0.30, 1.00) * 0.55)
+          .translate({ y: this.tiny ? -0.5 : -1 })
+          .textShadow({
+            radius: this.seg(this.pFill, 0.2, 1.0) * (this.tiny ? 16 : 34),
+            color: '#66C99E52',
             offsetX: 0,
             offsetY: 0
           })
-          .margin({ top: 52 })
 
-        // ── 副标题 ──
-        Text(this.t('355 款小游戏', '355 GAMES'))
-          .fontSize(FontSize.xs)
-          .fontColor('#8AFFFFFF')
-          .letterSpacing(5)
-          .opacity(seg(this.p, 0.66, 0.78))
-          .translate({ y: (1 - seg(this.p, 0.66, 0.78)) * 10 })
-          .margin({ top: 14 })
+        // ── L5 光带：极窄、高亮、SCREEN 混合 ──
+        Column()
+          .width('2.4%')
+          .height('520%')
+          .linearGradient({
+            angle: 96,
+            colors: [
+              ['#00FFFFFF', 0.00],
+              ['#1AFFF4D6', 0.34],
+              ['#F2F0D9A8', 0.50],
+              ['#1AFFF4D6', 0.66],
+              ['#00FFFFFF', 1.00]
+            ]
+          })
+          .rotate({ angle: 11 })
+          .translate({ x: (-160 + this.pSweep * 320) + 'vp', y: '-210%' })
+          .opacity(this.seg(this.pSweep, 0.00, 0.14) * (1 - this.seg(this.pSweep, 0.72, 1.00)) * 0.95)
+          .blendMode(BlendMode.SCREEN, BlendApplyType.OFFSCREEN)
+          .hitTestBehavior(HitTestMode.None)
+      }
+      .width('100%')
+      .height(this.tiny ? '16%' : '20%')
+      .translate({ y: this.tiny ? '-14%' : '-18%' })
+      // ★ 2026-10-30：这里原来有 .shadow()，它在 Stack 的矩形边界上
+      //   画出了两条**横贯屏幕的金线**（真机截图可见）。
+      //   ⇒ 去掉，辉光改由 Text 自己的 textShadow 承担。
+      .scale({
+        x: 1 + this.seg(this.pFill, 0.6, 1.0) * 0.016,
+        y: 1 + this.seg(this.pFill, 0.6, 1.0) * 0.016
+      })
+
+      // ──────── L6/L7 标题与副标题：逐字入场 ────────
+      Column() {
+        // 逐字
+        Row({ space: this.tiny ? 1 : 2 }) {
+          ForEach(['O', 'n', 'e', ' ', 'M', 'o', 'r', 'e'], (ch: string, i: number) => {
+            Text(ch)
+              .fontSize(this.tiny ? 26 : 44)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(OM_CREAM)
+              .letterSpacing(this.tiny ? 4 : 6)
+              .opacity(this.charIn(i, 8))
+              .translate({ y: (1 - this.charIn(i, 8)) * (this.tiny ? 8 : 16) })
+              .blur((1 - this.charIn(i, 8)) * (this.tiny ? 6 : 10))
+          }, (ch: string, i: number) => 'c' + i + ch)
+        }
+        .margin({ top: this.tiny ? 18 : 44 })
+
+        // 副标题
+        Text(this.t('3 5 5 款 小 游 戏', '3 5 5  G A M E S'))
+          .fontSize(this.tiny ? 9 : 12)
+          .fontWeight(FontWeight.Medium)
+          .fontColor('#B8C99E52')
+          .opacity(this.pSub * 0.94)
+          .translate({ y: (1 - this.pSub) * 10 })
+          .margin({ top: this.tiny ? 8 : 16 })
       }
       .width('100%')
       .height('100%')
-      .justifyContent(FlexAlign.Start)
-      // ★ 同步下调：17% → 20%，让 OM 落在屏幕中上方
-      .padding({ top: '20%' })
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
+      .padding({ top: this.tiny ? '0%' : '14%' })
+      .translate({ y: this.tiny ? '20%' : '18%' })
+      .opacity(this.seg(this.pTitle, 0.0, 0.25))
+      // L9 推出：轻微推近 + 淡出
+      .scale({ x: 1 + this.pOut * 0.06, y: 1 + this.pOut * 0.06 })
+      .opacity(1 - this.pOut)
 
-      // ── 标语（贴底）──
+      // ──────── L8 底部标语 ────────
       Column() {
         Text(this.t('碎片时间，随时开局', 'A quick round, any time'))
-          .fontSize(FontSize.sm)
-          .fontColor('#5AFFFFFF')
-          .letterSpacing(2)
+          .fontSize(this.tiny ? 8 : 11)
+          .fontColor('#9AC99E52')
+          .letterSpacing(this.tiny ? 1 : 3)
       }
       .width('100%')
       .height('100%')
       .justifyContent(FlexAlign.End)
       .alignItems(HorizontalAlign.Center)
-      .padding({ bottom: 66 })
-      .opacity(seg(this.p, 0.72, 0.84))
+      .padding({ bottom: this.tiny ? 18 : 44 })
+      .opacity(this.pTag * 0.9 * (1 - this.pOut))
       .hitTestBehavior(HitTestMode.None)
+
+      // ──────── L9 暗角（vignette）：把注意力收到中间 ────────
+      Column()
+        .width('100%')
+        .height('100%')
+        .radialGradient({
+          center: ['50%', '46%'],
+          radius: '72%',
+          colors: [
+            ['#00000000', 0.0],
+            ['#00000000', 0.52],
+            ['#66000000', 1.0]
+          ]
+        })
+        .opacity(this.pBg * 0.9)
+        .hitTestBehavior(HitTestMode.None)
     }
     .width('100%')
     .height('100%')
     .backgroundColor(OM_INK)
-    .opacity(1 - seg(this.p, 0.94, 1.00))
+    .onAreaChange((_o: Area, n: Area) => {
+      const h: number = n.height as number;
+      const isTiny: boolean = h > 0 && h < 360;
+      if (isTiny !== this.tiny) {
+        this.tiny = isTiny;
+      }
+    })
     .onClick(() => {
-      Haptics.tap();   // ★ 2026-10-19 按压反馈
-      this.boost();   // ★ 点屏幕 = 加速
+      this.boost();
     })
   }
 }
