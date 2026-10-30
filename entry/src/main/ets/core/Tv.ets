@@ -24,7 +24,16 @@ import { ColorMetrics, LengthMetrics } from '@kit.ArkUI';
 export class Tv {
   /** 是否开启焦点导航（只有智慧屏才开） */
   static on(): boolean {
-    return Bp.isTv();
+    // ★★★ 2026-10-30（项目 F 阶段 2 补齐）：原来只认 `Bp.isTv()`。
+    //   后果：**PC / 2in1 / 平板横屏（lg）上，卡片完全没有焦点能力** ——
+    //   明明有键盘，方向键却在列表里点不动，只能拿鼠标一张张点。
+    //   ⇒ 扩成「电视 + 桌面类 + 大屏」三类：
+    //     · 电视      —— 遥控器方向键
+    //     · 桌面/2in1 —— 键盘方向键
+    //     · lg 大屏    —— 平板接键盘 / 智慧屏
+    //   这三类的共同点：**用户手里有"方向键"这种输入方式**。
+    //   手机（sm/md 触屏）仍然不启用 —— 避免无谓的焦点框干扰点按。
+    return Bp.isTv() || Bp.isDesktop() || Bp.isLg();
   }
 
   /**
