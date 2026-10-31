@@ -11,6 +11,8 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { DemoBar } from '../components/DemoBar';
+import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -119,6 +121,10 @@ export struct GSudoku {
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
   @State private demoLeft: number = 0;
+  // ★ 2026-11-01 演示三拍（共用组件 DemoBar 承载展示）
+  @State private demoMsg: string = '';
+  @State private demoPhase: number = 0;
+  @State private demoRound: number = 0;
   /** ★ 路线 B：模型预测的本局难度（-1 = 模型不可用） */
   private aiDifficulty: number = -1;
   @State private label: string = '';          // 用的第几道底
@@ -255,35 +261,65 @@ export struct GSudoku {
   // ★ 两条退出路径：
   //   ① 演完 6 步（demoFinish）⇒ **必须 reset()**：成绩/记录回到干净开局
   //   ② 玩家碰了（demoStop）  ⇒ **不 reset**：他们那一下就是要开始玩
+  // ═══════════ 演示动画 · 三拍（2026-11-01）
+  // ★ 旧版 `demoStep()` 一个 tick 直接 `autoStep()`，匀速连发 ⇒ 玩家看不出在演什么。
+  // ★ 新版三拍：引导(720) → 执行(280) → 结果(1150)，3 轮 ≈ 6.5 秒。
+  // ★ 引导拍的文案用**本游戏自己的 computeHint()** —— 它本来就知道该指哪里。
+  // ★ 演示期间按钮置灰（本页 demoId 直传），结束后 reset 回干净开局。
+  private demoBeat(): number {
+    if (this.demoId < 0) { return -1; }
+
+    if (this.demoPhase === 0) {
+      if (this.demoRound >= 3) { this.demoFinish(); return -1; }
+      const hr: HintResult = this.computeHint();
+      if (hr.ok && hr.zh.length > 0) {
+        this.demoMsg = TG2('看这里：{0}', hr.zh);
+      } else {
+        this.demoMsg = TG2('看清楚：这是第 {0} 步', String(this.demoRound + 1));
+      }
+      Haptics.tick();
+      this.demoPhase = 1;
+      return Demo.GUIDE_MS;
+    }
+
+    if (this.demoPhase === 1) {
+      const more: boolean = this.autoStep();
+      if (!more) { this.demoFinish(); return -1; }
+      Haptics.tap();
+      this.demoPhase = 2;
+      return Demo.ACT_MS;
+    }
+
+    this.demoRound = this.demoRound + 1;
+    this.demoMsg = this.demoRound >= 3
+      ? TG('就是这样玩。碰一下屏幕，换你来')
+      : TG('看到了吗？再看一遍');
+    this.demoPhase = 0;
+    if (this.demoRound >= 3) { this.demoFinish(); }
+    return Demo.RESULT_MS;
+  }
+
   private demoFinish(): void {
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoMsg = '';
     if (this.demoId >= 0) {
-      Hint.autoStop(this.demoId);
+      Demo.stop(this.demoId);
       this.demoId = -1;
     }
-    this.demoLeft = 0;
     this.reset();
   }
 
   private demoStop(): void {
-    if (this.demoId >= 0) {
-      Hint.autoStop(this.demoId);
-      this.demoId = -1;
-    }
-    this.demoLeft = 0;
-  }
-
-  private demoStep(): boolean {
-    if (this.demoId < 0) { return false; }
-    if (this.demoLeft <= 0) { this.demoFinish(); return false; }
-    this.demoLeft = this.demoLeft - 1;
-    this.autoStep();
-    return true;
+    this.demoFinish();
   }
 
   private demoStart(): void {
     if (this.demoId >= 0) { return; }
-    this.demoLeft = Hint.DEMO_STEPS;
-    this.demoId = Hint.demoRun(() => this.demoStep());
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoMsg = TG('看清楚：接下来演示给你看');
+    this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
   private autoStep(): boolean {
@@ -803,6 +839,8 @@ export struct GSudoku {
 
   build() {
     Column({ space: Space.md }) {
+      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         this.infoBox(0)
         this.infoBox(1)
