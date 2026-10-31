@@ -341,6 +341,7 @@ export struct GTangram {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2('铺对 {0} / {1}　次数 {2}', String(this.scan()[0]), String(this.scan()[1]),Digits(String(this.moves), this.langCode)))

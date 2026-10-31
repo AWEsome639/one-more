@@ -269,6 +269,7 @@ export struct GTowerOfHanoi {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG('步数 ') + String(this.moves) + ' · 最少 ' + String(BEST) + ' · 上限 ' + String(this.diffTotal) +

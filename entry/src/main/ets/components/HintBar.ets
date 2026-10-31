@@ -38,6 +38,11 @@ export struct HintBar {
    *  ★ 2026-10-31：单独一行 Text 在某些布局里不渲染（真机 dump 抓不到），
    *    但这一行**确定会渲染** ⇒ 直接挂在这里，不再另开一行。 */
   @Prop demoMsg: string = '';
+  /** 演示进行中 ⇒ 提示/代打按钮不可用（置灰、不可点）。
+   *  ★ 与 `demoOn` 的区别：`demoOn` 会把两个按钮**整个换掉**成一行文字；
+   *    而演示文案已由 DemoBar 承载，这里只需要"按钮还能看见但点不了"。
+   *    用 `demoOn` 会造成"演示中"重复显示两遍。 */
+  @Prop disabled: boolean = false;
 
   build() {
     Row({ space: Space.sm }) {
@@ -57,17 +62,19 @@ export struct HintBar {
           .layoutWeight(1)
           .height(this.barHeight)
           .fontSize(FontSize.sm)
-          .backgroundColor(Palette.cyan)
+          .backgroundColor(this.disabled ? Palette.lineSoft : Palette.cyan)
+          .fontColor(this.disabled ? Palette.inkFaint : Color.White)
+          .enabled(!this.disabled)
           .borderRadius(Radius.md)
           // ★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
           //   Tv.on() 在非电视上恒为 false ⇒ 手机/平板/PC 零影响
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => {
-            Tv.handleKey(e, () => { this.onHintTap(); });
+            Tv.handleKey(e, () => { if (!this.disabled) { this.onHintTap(); } });
           })
           .onClick(() => {
-            this.onHintTap();
+            if (!this.disabled) { this.onHintTap(); }
           })
       }
       if (!this.demoOn) {
@@ -80,11 +87,11 @@ export struct HintBar {
         .layoutWeight(1)
         .height(this.barHeight)
         .fontSize(FontSize.sm)
-        .backgroundColor(LanRace.isRacing()
+        .backgroundColor((LanRace.isRacing() || this.disabled)
           ? Palette.lineSoft
           : (this.autoOn ? Palette.rose : Palette.cyan))
-        .fontColor(LanRace.isRacing() ? Palette.inkFaint : Color.White)
-        .enabled(!LanRace.isRacing())
+        .fontColor((LanRace.isRacing() || this.disabled) ? Palette.inkFaint : Color.White)
+        .enabled(!LanRace.isRacing() && !this.disabled)
         .borderRadius(Radius.md)
         // ★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
         .focusable(Tv.on())
@@ -92,11 +99,11 @@ export struct HintBar {
         .onKeyEvent((e: KeyEvent) => {
           Tv.handleKey(e, () => {
             // 联机中不响应（.enabled 已挡一层，这里是双保险）
-            if (!LanRace.isRacing()) { this.onAutoTap(); }
+            if (!LanRace.isRacing() && !this.disabled) { this.onAutoTap(); }
           });
         })
         .onClick(() => {
-          if (!LanRace.isRacing()) { this.onAutoTap(); }
+          if (!LanRace.isRacing() && !this.disabled) { this.onAutoTap(); }
         })
       }
     }

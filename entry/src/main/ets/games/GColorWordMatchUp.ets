@@ -240,6 +240,8 @@ export struct GColorWordMatchUp {
 
         demoOn: false,
 
+        disabled: this.demoId >= 0,
+
         autoOn: this.autoId >= 0
 
       })

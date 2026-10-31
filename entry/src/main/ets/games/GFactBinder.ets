@@ -272,6 +272,7 @@ export struct GFactBinder {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2("已绑定 {0}/{1}", this.bound(), IDX.length))

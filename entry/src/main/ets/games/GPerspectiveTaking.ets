@@ -294,6 +294,7 @@ export struct GPerspectiveTaking {
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG('第 ') + String(this.q) + '/' + String(TOTAL) + ' 题 · 答对 ' + String(this.correct)

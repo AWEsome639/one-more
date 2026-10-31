@@ -291,6 +291,7 @@ export struct GAreaPerimeterMatch {
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))

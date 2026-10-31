@@ -252,6 +252,7 @@ export struct GMathGuess {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2('已用 {0}/{1}　范围 {2}', String(this.tries), String(this.diffTotal), String(this.lowBound))

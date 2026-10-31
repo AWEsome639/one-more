@@ -279,6 +279,7 @@ export struct GGravitySort {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2("已消 {0}/{1}", (ROWS * COLS - this.remain()), (ROWS * COLS)))

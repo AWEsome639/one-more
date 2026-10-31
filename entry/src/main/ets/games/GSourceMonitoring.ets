@@ -239,6 +239,7 @@ export struct GSourceMonitoring {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text((this.phase === 'study' ? TG('记忆') : TG('题号 ') + Math.min(this.q + 1, this.diffTotal) + '/' + this.diffTotal)

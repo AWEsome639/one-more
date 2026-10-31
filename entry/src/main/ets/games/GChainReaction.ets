@@ -498,6 +498,7 @@ export struct GChainReaction {
         showHint: false,
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2('步数 {0}/{1}', Digits(String(this.steps), this.langCode), Digits(String(this.limit), this.langCode))

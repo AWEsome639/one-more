@@ -233,6 +233,7 @@ export struct GSternbergTask {
   onAutoTap: () => { this.askAuto(); },
         showHint: true,
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {

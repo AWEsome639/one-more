@@ -626,6 +626,7 @@ export struct GMinesweeper {
         showHint: false,
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       // 数据条

@@ -311,6 +311,7 @@ export struct GClassicMaze {
      onAutoTap: () => { this.askAuto(); },
      autoOn: this.autoId >= 0,
      demoOn: false,
+     disabled: this.demoId >= 0,
    })
  Text(TG2("步数 {0}/{1}　位置 {2}排",Digits(String(this.steps), this.langCode), this.dmax(), (Math.floor(this.pos / this.diffTotal) + 1))
  + (this.pos % this.diffTotal + 1) + TG2('列　出口 {0}排{1}列', this.diffTotal, this.diffTotal)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')

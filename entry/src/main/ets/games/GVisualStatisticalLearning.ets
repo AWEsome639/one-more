@@ -258,6 +258,7 @@ export struct GVisualStatisticalLearning {
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG('第 ') + String(Math.min(this.round + 1, ROUNDS)) + '/' + String(ROUNDS) + ' 轮 · 答对 ' +

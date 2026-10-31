@@ -309,6 +309,7 @@ export struct GColorMazeNav {
      onAutoTap: () => { this.askAuto(); },
      autoOn: this.autoId >= 0,
      demoOn: false,
+     disabled: this.demoId >= 0,
    })
  Text(TG2("步数 {0}/{1}　脚下 {2}",Digits(String(this.steps), this.langCode), DMAX, (this.color[this.pos] + 1))
  + TG2(' 号色　终点 {0} 号色', (this.color[this.goal] + 1))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')

@@ -310,6 +310,7 @@ export struct GBoxCompletion {
      onAutoTap: () => { this.askAuto(); },
      autoOn: this.autoId >= 0,
      demoOn: false,
+     disabled: this.demoId >= 0,
    })
  Text(TG2('已补 {0}/{1} 格　步数 {2}', this.litCount(), PERIM,Digits(String(this.moves), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: Space.xs }) {

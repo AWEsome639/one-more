@@ -591,6 +591,7 @@ export struct GSokoban {
         onAutoTap: () => { this.askAuto(); },
         autoOn: this.autoId >= 0,
         demoOn: false,
+        disabled: this.demoId >= 0,
       })
       // ── 关卡名 + 进度 ──
       Row({ space: Space.md }) {

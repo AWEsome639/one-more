@@ -253,6 +253,7 @@ export struct GFocusTunnel {
   onAutoTap: () => { this.askAuto(); },
         showHint: true,
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2('目标 {0}/{1}　余命 {2}',Digits(String(this.found), this.langCode),Digits(String(NEED), this.langCode),Digits(String(this.lives), this.langCode))

@@ -269,6 +269,7 @@ export struct GTripleSequence {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2('第 {0}/{1} 拍 · 命中 {2}', String(Math.min(this.rounds + 1, this.diffTotal)),Digits(String(this.diffTotal), this.langCode),Digits(String(this.hits), this.langCode)) +

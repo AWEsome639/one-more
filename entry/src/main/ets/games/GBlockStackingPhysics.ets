@@ -255,6 +255,7 @@ export struct GBlockStackingPhysics {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2("第 {0}/{1} 关　已放 {2}/", (this.level + 1), LEVELS.length, this.placed())

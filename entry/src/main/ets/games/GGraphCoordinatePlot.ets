@@ -251,6 +251,7 @@ export struct GGraphCoordinatePlot {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG2("已绘 {0}/{1}", this.step, NEED))

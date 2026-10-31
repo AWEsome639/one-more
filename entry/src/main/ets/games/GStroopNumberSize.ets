@@ -251,6 +251,7 @@ export struct GStroopNumberSize {
   onAutoTap: () => { this.askAuto(); },
           showHint: true,
           demoOn: false,
+          disabled: this.demoId >= 0,
           autoOn: this.autoId >= 0
         })
         Button(TG('比 5 大'))

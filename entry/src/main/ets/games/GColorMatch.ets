@@ -147,6 +147,7 @@ export struct GColorMatch {
      onAutoTap: () => { this.askAuto(); },
      autoOn: this.autoId >= 0,
      demoOn: false,
+     disabled: this.demoId >= 0,
    })
  Text(TG('得分 ') + this.score + '/' + this.goalScore + '　步数 ' + this.moves + '/' + MAX
  + TG2('　进度 {0}%', Math.min(100, Math.floor(this.score * 100 / this.goalScore))))

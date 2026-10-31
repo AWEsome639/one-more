@@ -549,6 +549,7 @@ export struct GSlide15 {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       // ── 顶部三个数字 ──

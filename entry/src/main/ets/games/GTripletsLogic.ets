@@ -244,6 +244,7 @@ export struct GTripletsLogic {
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Text(TG('第 ') + String(Math.min(this.asked + 1, this.diffTotal)) + '/' + String(this.diffTotal) + ' 题 · 答对 ' +

@@ -423,6 +423,7 @@ export struct GBaseConversionRun {
         showHint: false,
         onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {

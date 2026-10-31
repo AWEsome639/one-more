@@ -277,6 +277,7 @@ export struct GWireframe3dRotation {
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
         demoOn: false,
+        disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
       Button(this.over ? (this.win() ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
