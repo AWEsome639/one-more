@@ -135,6 +135,10 @@ export struct GTrailMaking {
       Demo.stop(this.demoId);
       this.demoId = -1;
     }
+    // ★★ 2026-11-01 修回归：演示**自然结束**时也必须 reset。
+    //   否则棋盘停在"演示玩过的状态"、分数是演示加的分 —— 玩家一进来就是残局。
+    //   （第一版模板漏了这一句，333 款全部中招；真机"步数 1/25"就是它。）
+    this.reset();
   }
 
   private demoStop(): void {
@@ -142,9 +146,7 @@ export struct GTrailMaking {
       Demo.stop(this.demoId);
       this.demoId = -1;
     }
-    const wasOn: boolean = this.demoPhase > 0 || this.demoRound > 0;
-    this.demoFinish();
-    if (wasOn) { this.reset(); }
+    this.demoFinish();   // 里面已 reset，不再重复
   }
 
   private demoStart(): void {
