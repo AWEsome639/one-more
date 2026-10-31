@@ -14,6 +14,7 @@
  *             autoOn: this.autoId >= 0 })
  */
 import { Tv } from '../core/Tv';
+import { LanRace } from '../core/LanRace';
 import { TG } from '../core/GameI18n';
 import { FontSize, Space, Radius, Palette } from '../core/Design';
 
@@ -64,20 +65,32 @@ export struct HintBar {
           })
       }
       if (!this.demoOn) {
-      Button(this.autoOn ? TG('停代打') : TG('AI 代打'))
+      // ★★ 2026-10-31 奥森要求：**AI 代打在联机对战中不能启用**
+      //   理由很硬：代打会让对手面对一个"机器"，对局不公平，也毁掉联机的意义。
+      //   ⇒ 联机进行中（LanRace.isRacing()）把按钮置灰、文案改「联机禁用」、点击无效。
+      Button(LanRace.isRacing()
+        ? TG('联机禁用')
+        : (this.autoOn ? TG('停代打') : TG('AI 代打')))
         .layoutWeight(1)
         .height(this.barHeight)
         .fontSize(FontSize.sm)
-        .backgroundColor(this.autoOn ? Palette.rose : Palette.cyan)
+        .backgroundColor(LanRace.isRacing()
+          ? Palette.lineSoft
+          : (this.autoOn ? Palette.rose : Palette.cyan))
+        .fontColor(LanRace.isRacing() ? Palette.inkFaint : Color.White)
+        .enabled(!LanRace.isRacing())
         .borderRadius(Radius.md)
         // ★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
         .focusable(Tv.on())
         .focusBox(Tv.box())
         .onKeyEvent((e: KeyEvent) => {
-          Tv.handleKey(e, () => { this.onAutoTap(); });
+          Tv.handleKey(e, () => {
+            // 联机中不响应（.enabled 已挡一层，这里是双保险）
+            if (!LanRace.isRacing()) { this.onAutoTap(); }
+          });
         })
         .onClick(() => {
-          this.onAutoTap();
+          if (!LanRace.isRacing()) { this.onAutoTap(); }
         })
       }
     }

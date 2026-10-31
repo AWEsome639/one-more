@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -51,6 +52,20 @@ export struct GBejeweled {
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
   @State private demoLeft: number = 0;
+  // ★ 2026-10-31 演示动画改造：三拍节拍 + 强视觉引导
+  //   奥森原话：「我认为的'演示'不是这样的呀！应该就是一段演示动画」
+  //   旧实现一个 tick 内 tap(a);tap(b) 全做完 ⇒ 玩家只看到格子瞬间变了。
+  @State private demoGuideA: number = -1;   // 第 1 拍要高亮的格（交换源）
+  @State private demoGuideB: number = -1;   // 第 1 拍要高亮的格（交换目标）
+  @State private demoRound: number = 0;     // 演到第几轮
+  @State private demoPhase: number = 0;     // 0=引导 1=执行 2=结果
+  // ★★ 2026-10-31 奥森要求：**演示不该让玩家得分** —— 它是一段动画，不是一局游戏。
+  //   ⇒ 演示前把（棋盘/得分/剩余步数）快照下来，演示结束后**原样恢复**。
+  //     演示期间屏上看到的是"预演"，玩家的真实对局状态从头到尾没被动过。
+  private demoSnapBoard: number[] = [];
+  private demoSnapScore: number = 0;
+  private demoSnapLeft: number = 0;
+  @State private demoScored: number = 0;    // 演示期间"假的"得分（只显示，不进记录）
   @State private board: number[] = [];
   @State private sel: number = -1;
   @State private score: number = 0;
@@ -254,28 +269,95 @@ export struct GBejeweled {
   // ═══════════ 演示动画（项目 C）═══════════
   // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
   //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
-  private demoStep(): boolean {
-    if (this.demoId < 0) { return false; }
-    if (this.demoLeft <= 0) { this.demoStop(); return false; }
-    this.demoLeft = this.demoLeft - 1;
-    this.autoStep();
-    return true;
+  /** 演示：**三拍**（引导 → 执行 → 结果），演 2 轮 ≈ 4.6 秒
+   *  ★ 为什么改：旧版一个 tick 内做完交换，玩家看不到"在指哪、做了什么"。
+   *    新版第 1 拍先把两颗要交换的宝石**圈出来并放大**，配一句"看这两颗"；
+   *    第 2 拍才真正交换（280ms 短促）；第 3 拍留 1.15 秒让你看清"消掉了"。
+   */
+  private demoBeat(): number {
+    if (this.demoId < 0) { return -1; }
+    if (this.over) { this.demoFinish(); return -1; }
+
+    // ── 第 1 拍：引导 ──
+    if (this.demoPhase === 0) {
+      this.sel = -1;
+      const m: number = this.aiFindPair();
+      if (m < 0 || this.demoRound >= 2) { this.demoFinish(); return -1; }
+      this.demoGuideA = Math.floor(m / 100);
+      this.demoGuideB = m % 100;
+      this.msg = TG('看这两颗：交换它们，三个同色就消掉');
+      Haptics.tick();
+      this.demoPhase = 1;
+      return Demo.GUIDE_MS;
+    }
+
+    // ── 第 2 拍：执行 ──
+    if (this.demoPhase === 1) {
+      const a: number = this.demoGuideA;
+      const b: number = this.demoGuideB;
+      this.demoGuideA = -1;
+      this.demoGuideB = -1;
+      if (a >= 0 && b >= 0) {
+        this.tap(a);
+        this.tap(b);
+      }
+      Haptics.tap();
+      this.demoPhase = 2;
+      return Demo.ACT_MS;
+    }
+
+    // ── 第 3 拍：结果 ──
+    this.demoRound = this.demoRound + 1;
+    this.demoScored = this.score - this.demoSnapScore;
+    this.msg = this.demoRound >= 2
+      ? TG('就这样连。这就是全部玩法 —— 碰一下屏幕，换你来')
+      : TG2('消掉了！这一下能拿 +{0} 分（演示不计分）', String(this.demoScored));
+    this.demoPhase = 0;
+    if (this.demoRound >= 2) {
+      this.demoFinish();
+      return Demo.RESULT_MS;
+    }
+    return Demo.RESULT_MS;
+  }
+
+  private demoFinish(): void {
+    this.demoGuideA = -1;
+    this.demoGuideB = -1;
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    // 原样恢复 —— 演示期间的一切改动都被抹掉
+    if (this.demoSnapBoard.length === this.board.length) {
+      this.board = this.demoSnapBoard;
+    }
+    this.score = this.demoSnapScore;
+    this.left = this.demoSnapLeft;
+    this.demoScored = 0;
+    this.demoSnapBoard = [];
+    this.over = false;
+    this.won = false;
+    this.sel = -1;
   }
 
   private demoStop(): void {
     if (this.demoId >= 0) {
-      Hint.autoStop(this.demoId);
+      Demo.stop(this.demoId);
       this.demoId = -1;
     }
-    const wasOn: boolean = this.demoLeft > 0;
-    this.demoLeft = 0;
+    const wasOn: boolean = this.demoPhase > 0 || this.demoRound > 0;
+    this.demoFinish();
     if (wasOn) { this.reset(); }
   }
 
   private demoStart(): void {
     if (this.demoId >= 0) { return; }
-    this.demoLeft = Hint.DEMO_STEPS;
-    this.demoId = Hint.demoRun(() => this.demoStep());
+    // 演示前快照：演完原样恢复 ⇒ **玩家不可能因为看演示而得分/失分**
+    this.demoSnapBoard = this.board.slice();
+    this.demoSnapScore = this.score;
+    this.demoSnapLeft = this.left;
+    this.demoScored = 0;
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
   private autoStep(): boolean {
@@ -435,7 +517,7 @@ export struct GBejeweled {
         Row({ space: Space.sm }) {
           Column({ space: 2 }) {
           Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-          Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
+          Text((this.demoId >= 0 ? '—' : Digits(String(this.score), this.langCode))).fontSize(FontSize.lg)
           // ★ 得分跳动
           .scale({ x: this.scorePulse, y: this.scorePulse })
           .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
@@ -456,7 +538,7 @@ export struct GBejeweled {
           .shadow(Shadow.card)
           Column({ space: 2 }) {
           Text((TG('剩余步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-          Text(Digits(String(this.left), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+          Text((this.demoId >= 0 ? '—' : Digits(String(this.left), this.langCode))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
           }
           .layoutWeight(1)
           .padding(Space.sm)
@@ -479,9 +561,19 @@ export struct GBejeweled {
                 .backgroundColor(GEM_COLORS[this.board.length > (this.idx(r, c)) ? this.board[(this.idx(r, c))] : 0])
                 .borderRadius(Radius.sm)
                 .scale({
-                x: this.sel === (this.idx(r, c)) ? 1.14 : 1,
-                y: this.sel === (this.idx(r, c)) ? 1.14 : 1
+                x: (this.demoGuideA === (this.idx(r, c)) || this.demoGuideB === (this.idx(r, c)))
+                  ? 1.24 : (this.sel === (this.idx(r, c)) ? 1.14 : 1),
+                y: (this.demoGuideA === (this.idx(r, c)) || this.demoGuideB === (this.idx(r, c)))
+                  ? 1.24 : (this.sel === (this.idx(r, c)) ? 1.14 : 1)
                 })
+                // ★ 演示引导：被指到的两颗加描边 + 光晕，玩家一眼知道"看这里"
+                .border({
+                  width: (this.demoGuideA === (this.idx(r, c)) || this.demoGuideB === (this.idx(r, c))) ? 3 : 0,
+                  color: Palette.amber
+                })
+                .shadow((this.demoGuideA === (this.idx(r, c)) || this.demoGuideB === (this.idx(r, c)))
+                  ? { radius: 18, color: '#99FFFFFF', offsetX: 0, offsetY: 0 }
+                  : Shadow.card)
                 .animation({ duration: Motion.fast, curve: Motion.snap() })
                 // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
                 .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
