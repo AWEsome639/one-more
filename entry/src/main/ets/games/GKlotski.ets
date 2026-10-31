@@ -273,7 +273,7 @@ export struct GKlotski {
 
     // ── 第 1 拍：引导（找**任意**一步合法走法，不依赖预置解法）──
     if (this.demoPhase === 0) {
-      if (this.demoRound >= 2) { this.demoFinish(); return -1; }
+      if (this.demoRound >= 3) { this.demoFinish(); return -1; }
       const mv: number[] | null = this.demoFindMove();
       if (mv === null) { this.demoFinish(); return -1; }
       this.demoBlk = mv[0];
@@ -300,12 +300,12 @@ export struct GKlotski {
 
     // ── 第 3 拍：结果 ──
     this.demoRound = this.demoRound + 1;
-    this.demoMsg = this.demoRound >= 2
+    this.demoMsg = this.demoRound >= 3
       ? TG('就是这样挪。碰一下屏幕，换你来')
       : TG2('推过去了。已走 {0} 步，最多 {1} 步', String(this.moves), String(this.diffTotal));
     this.tip = this.demoMsg;
     this.demoPhase = 0;
-    if (this.demoRound >= 2) { this.demoFinish(); }
+    if (this.demoRound >= 3) { this.demoFinish(); }
     return Demo.RESULT_MS;
   }
 
@@ -495,14 +495,32 @@ export struct GKlotski {
 
   build() {
     Column({ space: Space.md }) {
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-        onAutoTap: () => { this.askAuto(); },
-        demoOn: this.demoId >= 0,
-        demoMsg: this.demoMsg,
-        autoOn: this.autoId >= 0
-      })
+      // ★★★ 2026-10-31 真机定位（第 3 次 @Prop 出问题）：
+      //   HintBar 的 `@Prop demoOn` **只进不出** —— 演示结束后它仍停在 true，
+      //   导致界面永远显示「演示中…」、且演示文案永远传不进去。
+      //   ⇒ 演示态**不再交给 HintBar**，由游戏页自己渲染（本页 @State 直接生效）。
+      if (this.demoId >= 0) {
+        Row() {
+          Text(this.demoMsg.length > 0
+            ? (TG('演示中') + ' ｜ ' + this.demoMsg)
+            : TG('演示中…（碰一下就停）'))
+            .fontSize(FontSize.sm)
+            .fontColor(Palette.amber)
+            .textAlign(TextAlign.Center)
+            .maxLines(2)
+            .width('100%')
+        }
+        .width('100%')
+        .height(38)
+      } else {
+        HintBar({
+          showHint: true,
+          onHintTap: () => { this.askHint(); },
+          onAutoTap: () => { this.askAuto(); },
+          demoOn: false,
+          autoOn: this.autoId >= 0
+        })
+      }
       Row({ space: Space.sm }) {
         this.head(0)
         this.head(1)
