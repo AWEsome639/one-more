@@ -729,6 +729,10 @@ export struct GHitori {
         Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .layoutWeight(1)
           .height(44)
+          // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
+          //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
@@ -739,7 +743,7 @@ export struct GHitori {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor(Color.White)
-          .backgroundColor(Palette.primary)
+          .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .width(96)
           .height(Cell.of(44))

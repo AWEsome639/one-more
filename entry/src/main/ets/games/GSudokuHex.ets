@@ -638,6 +638,10 @@ export struct GSudokuHex {
           .onClick(() => {
             this.askHint();
           })
+          // ★★★ 2026-10-31：这个「提示」按钮原来**没有 backgroundColor** ⇒
+          //   用 ArkUI 平台默认色，与全项目 HintBar 的 Palette.cyan 不一致。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
@@ -647,6 +651,10 @@ export struct GSudokuHex {
           .onClick(() => {
             this.askAuto();
           })
+          // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
+          //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })

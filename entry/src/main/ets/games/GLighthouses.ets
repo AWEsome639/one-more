@@ -576,6 +576,9 @@ export struct GLighthouses {
         Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .layoutWeight(1)
           .height(Cell.of(38))
+          // ★★★ 2026-10-31：原来**没有 backgroundColor** ⇒ 用平台默认蓝，与 HintBar 的 cyan 不一致
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })

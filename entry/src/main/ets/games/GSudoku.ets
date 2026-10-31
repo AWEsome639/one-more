@@ -897,7 +897,7 @@ export struct GSudoku {
         Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
           .fontSize(FontSize.sm)
           .fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt)
+          .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(44)
