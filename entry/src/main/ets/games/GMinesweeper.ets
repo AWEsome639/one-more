@@ -12,6 +12,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -640,102 +641,113 @@ export struct GMinesweeper {
   }
 
   build() {
-    Column({ space: Space.md }) {
-      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-      HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
-        demoOn: false,
-        disabled: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
-      // 数据条
-      Row({ space: Space.sm }) {
-        this.infoBox(0)
-        this.infoBox(1)
-        this.infoBox(2)
-      }
-      .width('100%')
+    // ★★ 2026-11-01 真机（横屏 853×533）：内容总高约 456vp，可用仅 377vp
+    //   ⇒ 底部「插旗模式 / 提示 / 重开」露出一条却点不到。
+    //   套 Scroll 兜底（本项目已有 5 款用同一模板：GColorFlood / GFillomino 等）。
+    Scroll() {
+      Column({ space: Space.md }) {
+        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          demoOn: false,
+          disabled: this.demoId >= 0,
+          autoOn: this.autoId >= 0
+        })
+        // 数据条
+        Row({ space: Space.sm }) {
+          this.infoBox(0)
+          this.infoBox(1)
+          this.infoBox(2)
+        }
+        .width('100%')
 
-      // 雷区
-      Column({ space: Space.xs }) {
-        ForEach(IDX9, (r: number) => {
-          Row({ space: Space.xs }) {
-            ForEach(IDX9, (c: number) => {
-              this.cellView(r * SIDE + c)
-            }, (c: number) => 'c' + c)
-          }
-          .width('100%')
-        }, (r: number) => 'r' + r)
-      }
-      .width('100%')
-      .padding(Space.xs)
-      .backgroundColor(this.theme.isDark ? BOARD_DARK : BOARD_LIGHT)
-      .borderRadius(Radius.lg)
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.Center)
+        // 雷区
+        Column({ space: Space.xs }) {
+          ForEach(IDX9, (r: number) => {
+            Row({ space: Space.xs }) {
+              ForEach(IDX9, (c: number) => {
+                this.cellView(r * SIDE + c)
+              }, (c: number) => 'c' + c)
+            }
+            .width('100%')
+          }, (r: number) => 'r' + r)
+        }
+        // ★★ 2026-11-01 真机（横屏 853×533）：棋盘原来是 `width('100%')` +
+        //   每格 `layoutWeight(1) + aspectRatio(1)` ⇒ **棋盘高 = 棋盘宽 = 813vp**，
+        //   而游戏区只有约 377vp ⇒ 棋盘撑破页面，把「插旗模式 / 提示 / 重开」
+        //   压在格子上（真机截图拍到）。
+        //   ⇒ 用 min(可用宽, 可用高) 限死边长，与 GGo9 的 boardMax() 同一类。
+        .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360)))
+        .padding(Space.xs)
+        .backgroundColor(this.theme.isDark ? BOARD_DARK : BOARD_LIGHT)
+        .borderRadius(Radius.lg)
+        .justifyContent(FlexAlign.Center)
 
-      Text(this.statusText())
-        .fontSize(FontSize.sm)
-        .fontColor(this.won ? Palette.emerald : (this.over ? Palette.rose : this.theme.inkFaint))
-
-      // 操作
-      Row({ space: Space.md }) {
-        Button(this.flagMode ? '🚩 插旗模式：开' : '🚩 插旗模式：关')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        Text(this.statusText())
           .fontSize(FontSize.sm)
-          .fontColor(this.flagMode ? Color.White : this.theme.ink)
-          .backgroundColor(this.flagMode ? Palette.berry : this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(Cell.of(44))
-          .onClick(() => {
-            Haptics.tap();
-            this.flagMode = !this.flagMode;
-          })
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.flagMode = !this.flagMode; }); })
-        Button(TG('提示'))
-          .fontSize(FontSize.sm)
-          .fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
-          .width(64)
-          .height(Cell.of(44))
-          .onClick(() => {
-            this.askHint();
-          })
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
-        Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.primary)
-          .borderRadius(Radius.md)
-          .width(96)
-          .height(Cell.of(44))
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+          .fontColor(this.won ? Palette.emerald : (this.over ? Palette.rose : this.theme.inkFaint))
+
+        // 操作
+        Row({ space: Space.md }) {
+          Button(this.flagMode ? '🚩 插旗模式：开' : '🚩 插旗模式：关')
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.sm)
+            .fontColor(this.flagMode ? Color.White : this.theme.ink)
+            .backgroundColor(this.flagMode ? Palette.berry : this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(Cell.of(44))
+            .onClick(() => {
+              Haptics.tap();
+              this.flagMode = !this.flagMode;
+            })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.flagMode = !this.flagMode; }); })
+          Button(TG('提示'))
+            .fontSize(FontSize.sm)
+            .fontColor(this.theme.ink)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .width(64)
+            .height(Cell.of(44))
+            .onClick(() => {
+              this.askHint();
+            })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
+          Button(TG('重开'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor(Color.White)
+            .backgroundColor(Palette.primary)
+            .borderRadius(Radius.md)
+            .width(96)
+            .height(Cell.of(44))
+            .onClick(() => {
+              Haptics.tap();
+              this.reset();
+            })
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+        }
+        .justifyContent(FlexAlign.Start)
+        .width('100%')
       }
-      .width('100%')
     }
+    .scrollBar(BarState.Off)
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
       if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
     })
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Start)
   }
+
 
   /** kind: 0=剩余雷 1=已翻开 2=用时（值在 Builder 内部读状态，保证刷新） */
   @Builder
