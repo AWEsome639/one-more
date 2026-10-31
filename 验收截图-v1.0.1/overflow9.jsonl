@@ -1,0 +1,9 @@
+{"cls": "GBejeweled", "id": "bejeweled", "name": "宝石迷阵", "lowY": 1390, "hasBtn": true, "ok": true, "shot": "j9_bejeweled_ok.jpeg"}
+{"cls": "GBlockEscape", "id": "block_escape", "name": "华容道逃脱", "lowY": 1359, "hasBtn": false, "ok": false, "shot": "j9_block_escape.jpeg"}
+{"cls": "GCheckers", "id": "checkers", "name": "跳棋", "lowY": 1414, "hasBtn": true, "ok": true, "shot": "j9_checkers_ok.jpeg"}
+{"cls": "GColorFlood", "id": "color_flood", "name": "色彩洪水", "lowY": 1421, "hasBtn": true, "ok": true, "shot": "j9_color_flood_ok.jpeg"}
+{"cls": "GFillomino", "id": "fillomino", "name": "填数拼图", "lowY": 1391, "hasBtn": false, "ok": false, "shot": "j9_fillomino.jpeg"}
+{"cls": "GGo9", "id": "go9", "name": "9 路围棋", "lowY": 1549, "hasBtn": true, "ok": true, "shot": "j9_go9_ok.jpeg"}
+{"cls": "GMirrorTracing", "id": "mirror_tracing", "name": "镜像描线", "lowY": 1210, "hasBtn": true, "ok": true, "shot": "j9_mirror_tracing_ok.jpeg"}
+{"cls": "GNavonHierarchical", "id": "navon_hierarchical", "name": "整体局部", "lowY": 1416, "hasBtn": true, "ok": true, "shot": "j9_navon_hierarchical_ok.jpeg"}
+{"cls": "GSieveVisualizer", "id": "sieve_visualizer", "name": "筛法可视化", "lowY": 1528, "hasBtn": true, "ok": true, "shot": "j9_sieve_visualizer_ok.jpeg"}
