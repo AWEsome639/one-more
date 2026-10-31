@@ -397,141 +397,158 @@ export struct GBejeweled {
   }
 
   build() {
-    Column({ space: Space.sm }) {
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-        onAutoTap: () => { this.askAuto(); },
-        demoOn: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
-      Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
-        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
-        // ★ 得分跳动
-        .scale({ x: this.scorePulse, y: this.scorePulse })
-        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(Digits(String(TARGET), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text((TG('剩余步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(Digits(String(this.left), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-      }
-      .width('100%')
-
-      Column({ space: Space.xs }) {
-        ForEach(this.rows, (r: number) => {
-          Row({ space: Space.xs }) {
-            ForEach(this.rows, (c: number) => {
-              Stack() {
-              Text(GEMS[this.board.length > (this.idx(r, c)) ? this.board[(this.idx(r, c))] : 0])
-              .fontSize(FontSize.xl)
-              }
-              .layoutWeight(1)
-              .aspectRatio(1)
-              .backgroundColor(GEM_COLORS[this.board.length > (this.idx(r, c)) ? this.board[(this.idx(r, c))] : 0])
-              .borderRadius(Radius.sm)
-              .scale({
-              x: this.sel === (this.idx(r, c)) ? 1.14 : 1,
-              y: this.sel === (this.idx(r, c)) ? 1.14 : 1
-              })
-              .animation({ duration: Motion.fast, curve: Motion.snap() })
-              // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
-              .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
-                .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-              .focusable(Tv.on())
-              .focusBox(Tv.box())
-              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
-              .onClick(() => {
-              Haptics.tick();
-              this.tap((this.idx(r, c)));
-              })
-            }, (c: number) => 'c' + c)
+    // ★★★ 2026-10-30：横屏 853×533 下「其余部分就有 368vp」，
+    //   棋盘 maxHeight 即便降到 45%（240vp），总计仍有 608vp > 533vp。
+    //   ⇒ **必须套 Scroll 兜底**，让玩家能滚到「重开 / 提示 / AI 代打」。
+    //   这是本项目第 4 款用同一个 Scroll 模板修好的游戏（前 3 款：
+    //   GColorFlood / GFillomino / GBlockEscape 系列）。
+    Scroll() {
+      Column({ space: Space.sm }) {
+        HintBar({
+          showHint: true,
+          onHintTap: () => { this.askHint(); },
+          onAutoTap: () => { this.askAuto(); },
+          demoOn: this.demoId >= 0,
+          autoOn: this.autoId >= 0
+        })
+        Row({ space: Space.sm }) {
+          Column({ space: 2 }) {
+          Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
+          // ★ 得分跳动
+          .scale({ x: this.scorePulse, y: this.scorePulse })
+          .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
           }
-          .width('100%')
           .layoutWeight(1)
-        }, (r: number) => 'r' + r)
-      }
-      .width('100%')
-      .aspectRatio(1)
-      // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
-      //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: '70%' })
-      .padding(Space.xs)
-      .backgroundColor(this.theme.surfaceAlt)
-      .borderRadius(Radius.lg)
-      .shadow(Shadow.card)
-
-      Text(this.msg)
-        .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
-
-      Row({ space: Space.md }) {
-        Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.primary)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
           .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(Digits(String(TARGET), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+          }
           .layoutWeight(1)
-          .height(Cell.of(46))
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
-        Button(TG('取消选择'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(this.theme.inkSoft)
-          .backgroundColor(this.theme.surfaceAlt)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
           .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text((TG('剩余步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(Digits(String(this.left), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+          }
           .layoutWeight(1)
-          .height(Cell.of(46))
-          .enabled(!this.over)
-          .focusable(Tv.on())
-          .focusBox(Tv.box())
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.sel = -1; }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.sel = -1;
-          })
-      }
-      .width('100%')
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+        }
+        .width('100%')
 
-      Text(TG2('每消一颗 +{0}，连消翻倍；{1} 步内拿到 {2} 分算通关',Digits(String(PER_GEM), this.langCode),Digits(String(MOVE_LIMIT), this.langCode),Digits(String(TARGET), this.langCode)))
-        .fontSize(FontSize.xxs)
-        .fontColor(this.theme.inkFaint)
+        Column({ space: Space.xs }) {
+          ForEach(this.rows, (r: number) => {
+            Row({ space: Space.xs }) {
+              ForEach(this.rows, (c: number) => {
+                Stack() {
+                Text(GEMS[this.board.length > (this.idx(r, c)) ? this.board[(this.idx(r, c))] : 0])
+                .fontSize(FontSize.xl)
+                }
+                .layoutWeight(1)
+                .aspectRatio(1)
+                .backgroundColor(GEM_COLORS[this.board.length > (this.idx(r, c)) ? this.board[(this.idx(r, c))] : 0])
+                .borderRadius(Radius.sm)
+                .scale({
+                x: this.sel === (this.idx(r, c)) ? 1.14 : 1,
+                y: this.sel === (this.idx(r, c)) ? 1.14 : 1
+                })
+                .animation({ duration: Motion.fast, curve: Motion.snap() })
+                // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
+                .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
+                  .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+                .focusable(Tv.on())
+                .focusBox(Tv.box())
+                .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
+                .onClick(() => {
+                Haptics.tick();
+                this.tap((this.idx(r, c)));
+                })
+              }, (c: number) => 'c' + c)
+            }
+            .width('100%')
+            .layoutWeight(1)
+          }, (r: number) => 'r' + r)
+        }
+        .width('100%')
+        .aspectRatio(1)
+        // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
+        //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
+        // ★★★ 2026-10-30（平板横屏 853×533 真机实测）：
+        //   70% × 533 = 373vp 正方形，但**其余部分就有 368vp**
+        //   ⇒ 总计 741vp，超出屏高 208vp ⇒ **底部按钮被切，点不到**。
+        //   （截图 landscape_games_bejeweled_CUT.jpeg）
+        //   ⇒ 改成 45%：棋盘 240vp，7×7 每格 34vp ≈ 103px，够点。
+        //   ⇒ 同时外面套 Scroll 兜底（极小屏/大字模式仍可能超高）。
+        .constraintSize({ maxHeight: '45%' })
+        .padding(Space.xs)
+        .backgroundColor(this.theme.surfaceAlt)
+        .borderRadius(Radius.lg)
+        .shadow(Shadow.card)
+
+        Text(this.msg)
+          .fontSize(FontSize.sm)
+          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+
+        Row({ space: Space.md }) {
+          Button(TG('重开'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor(Color.White)
+            .backgroundColor(Palette.primary)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(Cell.of(46))
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.reset();
+            })
+          Button(TG('取消选择'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor(this.theme.inkSoft)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(Cell.of(46))
+            .enabled(!this.over)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.sel = -1; }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.sel = -1;
+            })
+        }
+        .width('100%')
+
+        Text(TG2('每消一颗 +{0}，连消翻倍；{1} 步内拿到 {2} 分算通关',Digits(String(PER_GEM), this.langCode),Digits(String(MOVE_LIMIT), this.langCode),Digits(String(TARGET), this.langCode)))
+          .fontSize(FontSize.xxs)
+          .fontColor(this.theme.inkFaint)
+      }
+      .onTouch((e: TouchEvent) => {
+        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+      })
+      .width('100%')
+      .constraintSize({ minHeight: '100%' })
+      .justifyContent(FlexAlign.Start)
     }
-    .onTouch((e: TouchEvent) => {
-      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    })
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Start)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring)
   }
 
 
