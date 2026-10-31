@@ -973,20 +973,11 @@ export struct GGo9 {
       }
       .width('100%')
       .aspectRatio(1)
-      // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
-      //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      // ★★★ 2026-10-30（平板横屏 853×533 真机实测，dump 量的）：
-      //   70%% × 533 = 373vp 棋盘，加固定部分（标题+HintBar+三信息卡+状态+重开）
-      //   ⇒ 「重开」y=1590/1594，超出安全区 1480，**被导航栏遮住点不到**。
-      //   ⇒ 改成 45%%，与 GBejeweled / GCheckers / GReversi 同一口径。
-            // ★★★ 2026-10-30（真机实测横屏 853×533，「重开」y=1594 被导航栏遮住）
-      //   ⚠️ 本款有**源码级断言**要求必须保留 `.width('100%')` + `.aspectRatio(1)`
-      //      （verify_go9.mjs 用例 7「棋盘宽驱动」）⇒ **不能改成 width/height 计算值**。
-      //   ⇒ 在保持宽驱动写法的前提下，用 maxWidth 限宽（aspectRatio 会自动反推高度）。
-      //     ★ 2026-10-31：改为按屏幕算的 `boardMax()`（原来写死 300 在竖屏只用 24% 宽）。
-      //     · 横屏 853×533 ⇒ min(813, 163) = **163vp**（比原来 300 更保守，不会挤屏）
-      //     · 竖屏 800×1280 ⇒ min(760, 686) = **686vp**（原来只有 300）
-      //        因为不能改宽驱动写法；但**保证两种比例都不溢出**。
+      // ★★★ 本款有**源码级断言**要求保留 `.width('100%')` + `.aspectRatio(1)` 的宽驱动写法
+      //   （verify_go9.mjs 用例 7「棋盘宽驱动」）⇒ 不能改成 width/height 计算值。
+      //   ⇒ 在保持宽驱动的条件下，用 `maxWidth` 限宽（aspectRatio 会自动反推高度）。
+      //   maxWidth 由 `boardMax()` 按朝向算：横屏 h-360（实测 173vp）、竖屏 min(w-40, h-400)。
+      //   详见 boardMax() 上方注释（三个尺寸各抓到一次问题的完整记录）。
       .constraintSize({ maxWidth: this.boardMax() })
       .padding(Space.xs)
       .backgroundColor(this.theme.isDark ? '#2A2118' : '#E8C88C')
