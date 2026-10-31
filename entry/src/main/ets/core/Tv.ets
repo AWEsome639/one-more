@@ -69,8 +69,18 @@ export class Tv {
       return false;
     }
     const code: number = e.keyCode;
-    // KEYCODE_ENTER = 2054 / KEYCODE_DPAD_CENTER = 2019 / KEYCODE_NUMPAD_ENTER = 2054
-    if (code === 2054 || code === 2019) {
+    // ★★★★★ 2026-10-30 修正（真找到一个致命 bug）：
+    //   原注释写「KEYCODE_DPAD_CENTER = 2019」，**但 SDK 实际值是**：
+    //     KEYCODE_ENTER       = 2054
+    //     KEYCODE_DPAD_CENTER = **2016**   ← 遥控器 OK 键
+    //     KEYCODE_C           = **2019**   ← 字母 C（原代码检查的是它！）
+    //   ⇒ 后果①：**遥控器按 OK 永远不生效** ⇒ 电视上一个游戏都进不去
+    //             （项目 F 的全部设计就是为了电视，等于核心功能从未工作）
+    //   ⇒ 后果②：**按键盘字母 C 会意外"进游戏"**
+    //   ⇒ 这个 bug 只读代码发现不了（注释自洽、还定义了常量），
+    //      是 `uinput` 真机注入 + 对照 SDK 常量才钉住的（第 562~563 轮）。
+    //   常量定义在下面 KEY_DPAD_CENTER（也已同步修正）。
+    if (code === Tv.KEY_ENTER || code === Tv.KEY_DPAD_CENTER) {
       fire();
       return true;
     }
@@ -118,7 +128,9 @@ export class Tv {
    */
   static readonly KEY_ESC: number = 2070;
   static readonly KEY_ESC_ASCII: number = 27;
-  static readonly KEY_DPAD_CENTER: number = 2019;
+  /** ★ 2026-10-30 修正：SDK 里 KEYCODE_DPAD_CENTER = **2016**（2019 是字母 C）。
+   *  遥控器 OK 键就是 2016 —— 原来写成 2019，导致电视上按 OK 完全没反应。 */
+  static readonly KEY_DPAD_CENTER: number = 2016;
 
   /** 是不是 ESC（两种键码都认） */
   static isEsc(code: number): boolean {
