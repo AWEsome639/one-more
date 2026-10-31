@@ -927,11 +927,21 @@ export struct GGo9 {
    *  ⚠️ 保留 `.width('100%').aspectRatio(1)` 的宽驱动写法 —— 有源码级断言要求。
    */
   private boardMax(): number {
-    const FIXED: number = 300;
-    const w: number = Math.max(160, Bp.width - 40);
-    const h: number = Math.max(120, (Bp.height - FIXED) * 0.70);
-    return Math.min(w, h);
+    //    ★★★ 2026-10-31 真机实测（三个尺寸各抓到一次问题，最后收敛成下面两分支）：
+    //      · 平板竖 800×1280：原值 300 只占 **24%** 屏宽 ⇒ 竖屏按 h-400 得 686vp ✅
+    //      · 手机竖 440×744：h-340=404 时「规则说明」仍被底部导航栏切 ⇒ 竖屏按 h-400 得 344vp ✅
+    //      · 平板横 853×533：原值 300 时「停一手 / 重开 / 规则说明」**全被裁掉** ⇒ h-360=173vp ✅
+    //    ⇒ 统一规则：**高度永远是瓶颈**；竖屏能多留一点（400），横屏少一点（340）。
+    const w: number = Bp.width;
+    const h: number = Bp.height;
+    if (w > h) {
+      // 横屏（533 / 540 高）：顶部固定件 241vp + 底部按钮与规则 ~106vp
+      return Math.max(140, h - 360);
+    }
+    // 竖屏（含平板竖、手机竖）：固定件更多（标题栏换行 + 三卡 + 底部导航栏），留 400
+    return Math.min(Math.max(160, w - 40), Math.max(120, h - 400));
   }
+
 
   build() {
     Column({ space: Space.sm }) {
