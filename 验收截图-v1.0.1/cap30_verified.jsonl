@@ -28,3 +28,6 @@
 {"name": "矢印", "acts": ["重开", "提示"], "low": 1435, "ok": true}
 {"name": "向量对齐", "acts": ["提示"], "low": 1450, "ok": true}
 {"name": "空间广度", "acts": ["重开", "提示"], "low": 1505, "ok": true}
+{"name": "变化盲视", "acts": ["重开", "提示"], "low": 1537, "ok": true}
+{"name": "物体位移", "acts": ["重开", "提示"], "low": 1543, "ok": true}
+{"name": "周边视野", "acts": ["提示"], "low": 1482, "ok": true}

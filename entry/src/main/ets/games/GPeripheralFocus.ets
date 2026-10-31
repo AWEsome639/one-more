@@ -4,6 +4,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -249,7 +250,9 @@ export struct GPeripheralFocus {
           .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
 
         } }, (i: number) => 'pf' + i)
-      }.columnsTemplate('1fr 1fr 1fr').rowsGap(Space.sm).columnsGap(Space.sm).width('100%').height(258)
+      // ★ 2026-10-31 真机：原写死 .height(258)，在 533 高的横屏上占 47~49%，
+      //   加上 HintBar 与统计行后底部按钮被切。改成按屏高自适应（上限仍是原值）。
+      }.columnsTemplate('1fr 1fr 1fr').rowsGap(Space.sm).columnsGap(Space.sm).width('100%').height(Math.min(258, Bp.height * 0.35))
       Row({ space: Space.sm }) {
         ForEach(OPTS, (i: number) => { Button(this.opts.length > (i) ? this.opts[(i)] : '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xxl).fontColor('#FFFFFF').backgroundColor(this.pick === this.opts[(i)] ? Palette.cyan : Palette.primary)

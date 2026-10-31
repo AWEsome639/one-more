@@ -3,6 +3,7 @@
  * 胜负：6 轮答对 4 轮以上 ⇒ 通关；进度：轮次 / 答对 / 得分
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -267,7 +268,9 @@ export struct GChangeBlindness {
         .onClick(() => { Haptics.tick(); this.answer((i)); })
 
         } }, (i: number) => 'cb' + i)
-      }.columnsTemplate('1fr 1fr 1fr').rowsGap(Space.sm).columnsGap(Space.sm).width('100%').height(250)
+      // ★ 2026-10-31 真机：原写死 .height(250)，在 533 高的横屏上占 47~49%，
+      //   加上 HintBar 与统计行后底部按钮被切。改成按屏高自适应（上限仍是原值）。
+      }.columnsTemplate('1fr 1fr 1fr').rowsGap(Space.sm).columnsGap(Space.sm).width('100%').height(Math.min(250, Bp.height * 0.35))
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
