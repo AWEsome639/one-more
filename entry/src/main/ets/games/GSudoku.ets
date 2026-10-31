@@ -852,8 +852,15 @@ export struct GSudoku {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
             .fontSize(FontSize.md)
             .fontWeight(FontWeight.Bold)
-            .fontColor(Color.White)
-            .backgroundColor(Palette.teal)
+            // ★★★ 2026-10-30：数字键从「饱和 teal」改成「浅底 + 深字 + 细边」
+            //   按"它凭什么算顶尖"审：数字键是**输入工具**，棋盘才是数据。
+            //   原来的青色与棋盘的**多色格子**抢注意力；
+            //   工具应当低调、数据应当突出 ⇒ 与「擦除」形成同一套「工具=浅色」语义。
+            .fontColor(this.theme.ink)
+            .backgroundColor(this.theme.surface)
+            // ⚠️ 不要加 `.border()`：实测加了之后 Button 内容区变小，
+            //    **数字被竖向截断**（只露出上半部分，真机截图抓到）。
+            //    ⇒ 只用「浅底 + 深字」就够低调，边框反而带来布局问题。
             .borderRadius(Radius.sm)
             .layoutWeight(1)
             .height(Cell.of(44))
@@ -915,7 +922,11 @@ export struct GSudoku {
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.erase(); }); })
-        Button(TG('重开（新题）'))
+        // ★★★ 2026-10-30：文案从「重开（新题）」缩短为「重开」
+        //   原因：四个按钮 layoutWeight(1) 均分，手机竖屏每份约 91vp，
+        //   「重开（新题）」放不下 ⇒ 被截断成「重开...」（真机截图抓到）。
+        //   ⇒ 缩短文案 + 加 textOverflow 兜底（万一将来语言变长也不会硬切）。
+        Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor(Color.White)
@@ -923,6 +934,8 @@ export struct GSudoku {
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(Cell.of(44))
+          // 兜底：任何语言下都不硬切
+          .labelStyle({ maxLines: 1, overflow: TextOverflow.Ellipsis })
           .onClick(() => {
             Haptics.tap();
             this.reset();
