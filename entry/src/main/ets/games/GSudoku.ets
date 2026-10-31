@@ -884,7 +884,7 @@ export struct GSudoku {
           .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor('#FFFFFF')
-          .backgroundColor(Palette.amber !== undefined ? Palette.amber : Palette.cyan)
+          .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .width(96)
           .height(Cell.of(44))

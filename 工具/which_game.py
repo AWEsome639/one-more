@@ -160,9 +160,17 @@ def main():
 
     q = args[-1]
     fuzzy = '--fuzzy' in args
-    hits = [r for r in reg
-            if (q in r['name'] or q == r['id'] or q.lower() == r['en'].lower())
-            or (fuzzy and q in r['name'])]
+    # ★ 精确优先：完全同名 / 同 id / 同英文名 ⇒ 只返回那一条
+    #   否则「数独」会先匹配到「六宫数独」「数独九宫」之类（子串陷阱）
+    exact = [r for r in reg
+             if q == r['name'] or q == r['id'] or q.lower() == r['en'].lower()]
+    if exact and not fuzzy:
+        hits = exact
+    else:
+        hits = [r for r in reg if q in r['name'] or q == r['id']
+                or q.lower() == r['en'].lower()]
+        # 子串命中时，把「名字更短（更可能是本体）」的排前面
+        hits.sort(key=lambda r: len(r['name']))
 
     if not hits:
         print('❌ 没找到「%s」' % q)
