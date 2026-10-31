@@ -502,17 +502,15 @@ export struct GKlotski {
       //   ⇒ 演示态**不再交给 HintBar**，由游戏页自己渲染（本页 @State 直接生效）。
       // ★ 演示条（共用组件）：`on` 由本页 @State 直传，不走 HintBar 的 @Prop
       //   （那个 @Prop 在演示结束后不复位，本项目已踩三次）
-       if (this.demoId >= 0) {
-         DemoBar({ on: true, msg: this.demoMsg })
-       } else {
-         HintBar({
-           showHint: true,
-           onHintTap: () => { this.askHint(); },
-           onAutoTap: () => { this.askAuto(); },
-           demoOn: false,
-           autoOn: this.autoId >= 0
-         })
-       }
+       // ★ 演示条与 HintBar 恒显示：DemoBar 在未演示时高度为 0，不占位
+       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+       HintBar({
+         showHint: true,
+         onHintTap: () => { this.askHint(); },
+         onAutoTap: () => { this.askAuto(); },
+         demoOn: false,
+         autoOn: this.autoId >= 0
+       })
       Row({ space: Space.sm }) {
         this.head(0)
         this.head(1)

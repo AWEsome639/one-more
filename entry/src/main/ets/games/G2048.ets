@@ -555,16 +555,14 @@ export struct G2048 {
   build() {
     Column({ space: Space.md }) {
       // ★ 2026-11-01 演示条走共用组件（DemoBar），不再借 HintBar 的 @Prop
-      if (this.demoId >= 0) {
-        DemoBar({ on: true, msg: this.demoMsg })
-      } else {
-        HintBar({
-          showHint: false,
-          onAutoTap: () => { this.askAuto(); },
-          demoOn: false,
-          autoOn: this.autoId >= 0
-        })
-      }
+      // ★ 演示条与 HintBar 恒显示：DemoBar 在未演示时高度为 0，不占位
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      HintBar({
+        showHint: false,
+        onAutoTap: () => { this.askAuto(); },
+        demoOn: false,
+        autoOn: this.autoId >= 0
+      })
       // 得分条
       // ⚠️ 只传「种类」不传「值」—— 见 scoreBox 的注释（@Builder 按值传参不建立观察）
       Row({ space: Space.md }) {
