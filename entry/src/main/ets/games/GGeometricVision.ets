@@ -110,7 +110,16 @@ export struct GGeometricVision {
 
     if (this.demoPhase === 0) {
       if (this.demoRound >= 3) { this.demoFinish(); return -1; }
-      this.demoMsg = TG2('看清楚：这是第 {0} 步', String(this.demoRound + 1));
+      // ★★ 2026-11-01：演示文案改用**游戏自己算出来的提示**（computeHint 的 zh）。
+      //   原来这里写的是通用的「看清楚：这是第 N 步」，等于什么都没说；
+      //   而每款游戏本来就知道"这一步该指哪里"，它的 zh 就是最好的演示文案。
+      //   算不出来（预算超时/无解）时才退回通用文案。
+      const hr: HintResult = this.computeHint();
+      if (hr.ok && hr.zh.length > 0) {
+        this.demoMsg = TG2('看这里：{0}', hr.zh);
+      } else {
+        this.demoMsg = TG2('看清楚：这是第 {0} 步', String(this.demoRound + 1));
+      }
       Haptics.tick();
       this.demoPhase = 1;
       return Demo.GUIDE_MS;
