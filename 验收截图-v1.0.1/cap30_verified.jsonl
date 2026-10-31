@@ -1,4 +1,25 @@
-{"name": "自定顺序", "acts": ["重开", "提示"], "low": 1450, "ok": true, "note": "真机 853×533，批量修复后验证"}
-{"name": "联合特征", "acts": ["重开", "再来一局", "提示"], "low": 1505, "ok": true, "note": "真机 853×533，批量修复后验证"}
-{"name": "华容道", "acts": ["重开", "←", "↑", "↓", "→"], "low": 1403, "ok": true, "note": "真机 853×533，五个控件同一行，截图 fix_KLOTSKI_landscape_all_controls_one_row.jpeg"}
-{"name": "9 路围棋", "acts": ["停一手", "重开"], "low": 1433, "ok": true, "note": "真机 853×533，截图 fix_GO9_landscape_173vp_all_visible.jpeg"}
+{"name": "联合特征", "acts": ["提示", "提交"], "low": 1504, "ok": true}
+{"name": "计数广度", "acts": ["重开", "提示"], "low": 1511, "ok": true}
+{"name": "动态凸显", "acts": ["重开", "提示"], "low": 1524, "ok": true}
+{"name": "特征矩阵", "acts": ["重开", "提示"], "low": 1548, "ok": true}
+{"name": "特征回忆", "acts": ["重开", "提示"], "low": 1484, "ok": true}
+{"name": "幽灵点击", "acts": ["重开", "再来一局", "提示"], "low": 1484, "ok": true}
+{"name": "重力排序", "acts": ["重开", "再来一局", "提示"], "low": 1351, "ok": true}
+{"name": "网格位移", "acts": ["重开", "再来一局", "提示"], "low": 1351, "ok": true}
+{"name": "色相排序", "acts": ["提示"], "low": 1520, "ok": true}
+{"name": "互锁拼图", "acts": ["重开", "提示"], "low": 1440, "ok": true}
+{"name": "激光连线", "acts": ["重开", "提示"], "low": 1342, "ok": true}
+{"name": "镜面反射", "acts": ["重开", "提示"], "low": 1342, "ok": true}
+{"name": "幻方", "acts": ["提示"], "low": 1520, "ok": true}
+{"name": "曼陀罗回忆", "acts": ["重开", "提示"], "low": 1440, "ok": true}
+{"name": "矩阵推理", "acts": ["提示"], "low": 1456, "ok": true}
+{"name": "记忆矩阵", "acts": ["重开", "提示"], "low": 1533, "ok": true}
+{"name": "记忆宫殿", "acts": ["重开", "提示"], "low": 1540, "ok": true}
+{"name": "多目标追踪", "acts": ["重开", "提示"], "low": 1440, "ok": true}
+{"name": "反应点击", "acts": ["重开", "提示"], "low": 1523, "ok": true}
+{"name": "自定顺序", "acts": ["重开", "提示"], "low": 1450, "ok": true}
+{"name": "对称", "acts": ["提示"], "low": 1423, "ok": true}
+{"name": "对称广度", "acts": ["重开", "提示"], "low": 1517, "ok": true}
+{"name": "七巧板", "acts": ["重开", "再来一局", "提示"], "low": 1448, "ok": true}
+{"name": "折纸", "acts": ["再来一局", "提示"], "low": 1529, "ok": true}
+{"name": "视角切换", "acts": ["提示"], "low": 1292, "ok": true}
