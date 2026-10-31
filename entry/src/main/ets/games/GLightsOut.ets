@@ -281,6 +281,7 @@ export struct GLightsOut {
       if (this.demoRound === 0) {
         const hr: HintResult = this.computeHint();
         this.demoHintText = (hr.ok && hr.zh.length > 0) ? hr.zh : '';
+        this.hintIdx = (hr.ok && hr.cells.length > 0) ? hr.cells[0] : -1;
       }
       if (this.demoHintText.length > 0) {
         this.demoMsg = TG2('看这里：{0}', this.demoHintText);
@@ -293,6 +294,7 @@ export struct GLightsOut {
     }
 
     if (this.demoPhase === 1) {
+      this.hintIdx = -1;
       const more: boolean = this.autoStep();
       if (!more) { this.demoFinish(); return -1; }
       Haptics.tap();
@@ -451,6 +453,8 @@ export struct GLightsOut {
               }
               .layoutWeight(1)
               .aspectRatio(1)
+              // ★ 2026-11-01：hintIdx 原来只设不画 ⇒ 提示/演示在盘面上没有指向。
+              .border({ width: this.hintIdx === r * N + c ? 3 : 0, color: Palette.amber })
               .backgroundColor(this.on[(r * N + c)] ? '#33F59E0B' : (this.theme.isDark ? '#111111' : '#DDE3EC'))
               .borderRadius(Radius.sm)
               .border({ width: 1, color: this.on[(r * N + c)] ? Palette.amber : this.theme.line })

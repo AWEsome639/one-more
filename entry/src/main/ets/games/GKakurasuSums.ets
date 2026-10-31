@@ -335,6 +335,7 @@ export struct GKakurasuSums {
       if (this.demoRound === 0) {
         const hr: HintResult = this.computeHint();
         this.demoHintText = (hr.ok && hr.zh.length > 0) ? hr.zh : '';
+        this.hintIdx = (hr.ok && hr.cells.length > 0) ? hr.cells[0] : -1;
       }
       if (this.demoHintText.length > 0) {
         this.demoMsg = TG2('看这里：{0}', this.demoHintText);
@@ -347,6 +348,7 @@ export struct GKakurasuSums {
     }
 
     if (this.demoPhase === 1) {
+      this.hintIdx = -1;
       const more: boolean = this.autoStep();
       if (!more) { this.demoFinish(); return -1; }
       Haptics.tap();
@@ -556,6 +558,8 @@ export struct GKakurasuSums {
               }
               .layoutWeight(1)
               .aspectRatio(1)
+              // ★ 2026-11-01：hintIdx 原来只设不画 ⇒ 提示/演示在盘面上没有指向。
+              .border({ width: this.hintIdx === r * N + c ? 3 : 0, color: Palette.amber })
               .backgroundColor(this.black[(r * N + c)] ? (this.theme.isDark ? '#0B0B0B' : '#1F2937') : this.theme.surface)
               .borderRadius(Radius.xs)
               .scale({
