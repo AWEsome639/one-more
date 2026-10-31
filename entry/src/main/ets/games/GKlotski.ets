@@ -493,7 +493,17 @@ export struct GKlotski {
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
 
-      if (Bp.width <= Bp.height) {
+      // ★ 2026-10-31 真机：横屏时为了给方向键腾地方，把 tip 藏了 ——
+      //   但**演示动画必须有文案**（"看这块关羽，往右推一格"），否则只剩方块在动。
+      //   ⇒ 演示期间单独显示一行，横屏也显示；非演示时竖屏才显示。
+      if (this.demoId >= 0) {
+        Text(this.tip)
+          .fontSize(FontSize.sm)
+          .fontColor(Palette.amber)
+          .width('100%')
+          .textAlign(TextAlign.Center)
+      }
+      if (this.demoId < 0 && Bp.width <= Bp.height) {
       Text(this.tip)
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
