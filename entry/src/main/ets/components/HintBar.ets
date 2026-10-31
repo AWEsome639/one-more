@@ -34,13 +34,19 @@ export struct HintBar {
   /** 演示动画是否在跑（项目 C）：跑的时候显示「演示中…」而不是两个按钮
    *  ★ 必须 @Prop：普通成员不会随父组件状态刷新（实测 demoOn 不生效） */
   @Prop demoOn: boolean = false;
+  /** 演示中的引导文案（"看这块关羽，往右推一格"）
+   *  ★ 2026-10-31：单独一行 Text 在某些布局里不渲染（真机 dump 抓不到），
+   *    但这一行**确定会渲染** ⇒ 直接挂在这里，不再另开一行。 */
+  @Prop demoMsg: string = '';
 
   build() {
     Row({ space: Space.sm }) {
       // ★ 演示动画进行中（项目 C）：不显示按钮，只显示「演示中…」
       //   ⇒ 玩家一眼知道"现在不是我在玩"，一碰屏幕就会停
       if (this.demoOn) {
-        Text(TG('演示中…（碰一下就停）'))
+        Text(this.demoMsg.length > 0
+          ? (TG('演示中') + ' ｜ ' + this.demoMsg)
+          : TG('演示中…（碰一下就停）'))
           .layoutWeight(1)
           .height(this.barHeight)
           .fontSize(FontSize.sm)

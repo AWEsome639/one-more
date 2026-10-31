@@ -110,6 +110,8 @@ export struct GKlotski {
   //   华容道是「移动」类：第 1 拍先把要推的那块**圈出来并说往哪推**，
   //   第 2 拍才真的推，第 3 拍亮一下剩余步数。
   @State private demoGuideBlk: number = -1;   // 第 1 拍高亮哪块
+  // ★ 演示专用文案（不复用 tip —— tip 会被 tryMove/check 反复覆盖）
+  @State private demoMsg: string = '';
   @State private demoRound: number = 0;       // 演到第几轮
   @State private demoPhase: number = 0;       // 0=引导 1=执行 2=结果
   private demoSnapSel: number = -1;
@@ -255,7 +257,8 @@ export struct GKlotski {
       for (let j = 0; j < this.blocks.length; j++) {
         if (this.blocks[j].x === px && this.blocks[j].y === py) {
           this.demoGuideBlk = j;
-          this.tip = TG2('看这块「{0}」：往{1}推一格', this.blocks[j].label, DIR_NAME[d]);
+          this.demoMsg = TG2('看这块「{0}」：往{1}推一格', this.blocks[j].label, DIR_NAME[d]);
+          this.tip = this.demoMsg;
           break;
         }
       }
@@ -274,9 +277,10 @@ export struct GKlotski {
 
     // ── 第 3 拍：结果 ──
     this.demoRound = this.demoRound + 1;
-    this.tip = this.demoRound >= 2
+    this.demoMsg = this.demoRound >= 2
       ? TG('就是这样挪。碰一下屏幕，换你来')
       : TG2('推过去了。已走 {0} 步，最多 {1} 步', String(this.moves), String(this.diffTotal));
+    this.tip = this.demoMsg;
     this.demoPhase = 0;
     if (this.demoRound >= 2) { this.demoFinish(); }
     return Demo.RESULT_MS;
@@ -286,6 +290,13 @@ export struct GKlotski {
     this.demoGuideBlk = -1;
     this.demoPhase = 0;
     this.demoRound = 0;
+    this.demoMsg = '';
+    // ★ 2026-10-31：演示**自然结束**时也必须归 -1，
+    //   否则 HintBar 永远停在「演示中…」，玩家以为还在演（真机抓到了）。
+    if (this.demoId >= 0) {
+      Demo.stop(this.demoId);
+      this.demoId = -1;
+    }
   }
 
   private demoStop(): void {
@@ -302,6 +313,7 @@ export struct GKlotski {
     if (this.demoId >= 0) { return; }
     this.demoPhase = 0;
     this.demoRound = 0;
+    this.demoMsg = TG('看清楚：接下来会告诉你要推哪一块');
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
@@ -450,7 +462,12 @@ export struct GKlotski {
       this.finish(false);
       return;
     }
-    this.tip = TG2("曹操距出口还差 {0} 格", String(this.away()));
+    // ★ 2026-10-31：演示期间**不许写这句** —— 它会把第 1 拍的
+    //   「看这块「卒」：往右推一格」顶掉（真机 dump 抓到过）。
+    //   演示要能独占文案通道。
+    if (this.demoId < 0) {
+      this.tip = TG2("曹操距出口还差 {0} 格", String(this.away()));
+    }
   }
 
   build() {
@@ -460,6 +477,7 @@ export struct GKlotski {
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         demoOn: this.demoId >= 0,
+        demoMsg: this.demoMsg,
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
@@ -493,16 +511,8 @@ export struct GKlotski {
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
 
-      // ★ 2026-10-31 真机：横屏时为了给方向键腾地方，把 tip 藏了 ——
-      //   但**演示动画必须有文案**（"看这块关羽，往右推一格"），否则只剩方块在动。
-      //   ⇒ 演示期间单独显示一行，横屏也显示；非演示时竖屏才显示。
-      if (this.demoId >= 0) {
-        Text(this.tip)
-          .fontSize(FontSize.sm)
-          .fontColor(Palette.amber)
-          .width('100%')
-          .textAlign(TextAlign.Center)
-      }
+      // ★ 2026-10-31：演示文案改由 HintBar 那一行承载（demoMsg），
+      //   不再另开一行 Text —— 单独那行在横屏布局里**不渲染**（真机 dump 抓不到）。
       if (this.demoId < 0 && Bp.width <= Bp.height) {
       Text(this.tip)
         .fontSize(FontSize.sm)
@@ -625,11 +635,10 @@ export struct GKlotski {
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
     .focusBox(Tv.box())
-    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = i; this.tip = TG2("{0} 已选中，点方向键移动", this.blocks[i].label); }); })
     .onClick(() => {
       Haptics.tick();
       this.sel = i;
-      this.tip = TG2("{0} 已选中，点方向键移动", this.blocks[i].label);
+      if (this.demoId < 0) { this.tip = TG2("{0} 已选中，点方向键移动", this.blocks[i].label); }
     })
     // ★ P9：手指直接在方块上朝想去的方向一拖 = 推它一格（不用先选中、再点下面的方向键）
     .gesture(
