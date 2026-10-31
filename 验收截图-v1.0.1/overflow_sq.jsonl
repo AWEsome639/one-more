@@ -1,0 +1,5 @@
+{"id": "compound_connect", "name": "多重条件连线", "lowY": 1531, "hasBtn": true, "ok": true, "shot": "sq_compound_connect.jpeg"}
+{"id": "reversi", "name": "黑白棋", "lowY": 1486, "hasBtn": true, "ok": true, "shot": "sq_reversi.jpeg"}
+{"id": "sieve_visualizer", "name": "筛法可视化", "lowY": 1528, "hasBtn": true, "ok": true, "shot": "sq_sieve_visualizer.jpeg"}
+{"id": "slitherlink", "name": "数回环", "lowY": 1504, "hasBtn": true, "ok": true, "shot": "sq_slitherlink.jpeg"}
+{"id": "slide_puzzle", "name": "数字华容道", "lowY": 1505, "hasBtn": true, "ok": true, "shot": "sq_slide_puzzle.jpeg"}
