@@ -10,3 +10,16 @@
 {"cls": "GLockPattern", "id": "lock_pattern", "name": "图案锁", "elements": 21, "lowY": 838, "hasBtn": true, "ok": true, "shot": ""}
 {"cls": "GMandalaRecall", "id": "mandala_recall", "name": "曼陀罗回忆", "elements": 20, "lowY": 1451, "hasBtn": true, "ok": true, "shot": ""}
 {"cls": "GMandelbrot", "id": "mandelbrot", "name": "分形探索", "elements": 21, "lowY": 814, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GMemoryMatrix", "id": "memory_matrix", "name": "记忆矩阵", "elements": 19, "lowY": 1555, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GMemoryPalace", "id": "memory_palace", "name": "记忆宫殿", "elements": 29, "lowY": 1406, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GMultipleObjectTracking", "id": "multiple_object_tracking", "name": "多目标追踪", "elements": 28, "lowY": 1451, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GObjectDisplacement", "id": "object_displacement", "name": "物体位移", "elements": 25, "lowY": 1332, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GObjectShuffle", "id": "object_shuffle", "name": "物体换位", "elements": 28, "lowY": 1435, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GPaperFolding", "id": "paper_folding", "name": "折纸", "elements": 25, "lowY": 1548, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GPathRecall", "id": "path_recall", "name": "路径回忆", "elements": 21, "lowY": 799, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GPegSolitaire", "id": "peg_solitaire", "name": "孔明棋", "elements": 22, "lowY": 1478, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GPeripheralFocus", "id": "peripheral_focus", "name": "周边视野", "elements": 25, "lowY": 826, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GPerspectiveShiftView", "id": "perspective_shift_view", "name": "视角切换", "elements": 23, "lowY": 1454, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GPixelMimic", "id": "pixel_mimic", "name": "像素临摹", "elements": 23, "lowY": 914, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GPolyominoTiling", "id": "polyomino_tiling", "name": "多联骨牌", "elements": 21, "lowY": 776, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GPong", "id": "pong", "name": "乒乓", "elements": 21, "lowY": 778, "hasBtn": true, "ok": true, "shot": ""}
