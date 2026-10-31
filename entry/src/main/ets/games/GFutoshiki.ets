@@ -6,6 +6,8 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { DemoBar } from '../components/DemoBar';
+import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -68,6 +70,10 @@ export struct GFutoshiki {
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
   @State private demoLeft: number = 0;
+  // ★ 2026-11-01 演示三拍（共用组件 DemoBar 承载展示）
+  @State private demoMsg: string = '';
+  @State private demoPhase: number = 0;
+  @State private demoRound: number = 0;
 
   @State private vals: number[] = [];
   @State private given: boolean[] = [];
@@ -269,29 +275,63 @@ export struct GFutoshiki {
    * 用出题时保留的完整解，一格一格填到位。
    */
   // ═══════════ 演示动画（项目 C）═══════════
+  // ═══════════ 演示动画 · 三拍（2026-11-01 手工接）
+  // ★ 旧版一个 tick 直接 autoStep()，匀速连发 ⇒ 看不出在演什么。
+  // ★ 新版：引导(720) → 执行(280) → 结果(1150)，3 轮，结束后 this.reset()。
+  private demoBeat(): number {
+    if (this.demoId < 0) { return -1; }
+
+    if (this.demoPhase === 0) {
+      if (this.demoRound >= 3) { this.demoFinish(); return -1; }
+      const hr: HintResult = this.computeHint();
+      if (hr.ok && hr.zh.length > 0) {
+        this.demoMsg = TG2('看这里：{0}', hr.zh);
+      } else {
+        this.demoMsg = TG2('看清楚：这是第 {0} 步', String(this.demoRound + 1));
+      }
+      Haptics.tick();
+      this.demoPhase = 1;
+      return Demo.GUIDE_MS;
+    }
+
+    if (this.demoPhase === 1) {
+      const more: boolean = this.autoStep();
+      if (!more) { this.demoFinish(); return -1; }
+      Haptics.tap();
+      this.demoPhase = 2;
+      return Demo.ACT_MS;
+    }
+
+    this.demoRound = this.demoRound + 1;
+    this.demoMsg = this.demoRound >= 3
+      ? TG('就是这样玩。碰一下屏幕，换你来')
+      : TG('看到了吗？再看一遍');
+    this.demoPhase = 0;
+    if (this.demoRound >= 3) { this.demoFinish(); }
+    return Demo.RESULT_MS;
+  }
+
   private demoFinish(): void {
-    if (this.demoId >= 0) { Hint.autoStop(this.demoId); this.demoId = -1; }
-    this.demoLeft = 0;
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoMsg = '';
+    if (this.demoId >= 0) {
+      Demo.stop(this.demoId);
+      this.demoId = -1;
+    }
     this.reset();
   }
 
   private demoStop(): void {
-    if (this.demoId >= 0) { Hint.autoStop(this.demoId); this.demoId = -1; }
-    this.demoLeft = 0;
-  }
-
-  private demoStep(): boolean {
-    if (this.demoId < 0) { return false; }
-    if (this.demoLeft <= 0) { this.demoFinish(); return false; }
-    this.demoLeft = this.demoLeft - 1;
-    this.autoStep();
-    return true;
+    this.demoFinish();
   }
 
   private demoStart(): void {
     if (this.demoId >= 0) { return; }
-    this.demoLeft = Hint.DEMO_STEPS;
-    this.demoId = Hint.demoRun(() => this.demoStep());
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoMsg = TG('看清楚：接下来演示给你看');
+    this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
   private autoStep(): boolean {
@@ -441,6 +481,7 @@ export struct GFutoshiki {
 
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('已填'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

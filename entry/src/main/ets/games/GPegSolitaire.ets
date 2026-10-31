@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -15,6 +16,7 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
+import { DemoBar } from '../components/DemoBar';
 
 const SIZE: number = 7;
 const CELLS: number = SIZE * SIZE;
@@ -53,6 +55,10 @@ export struct GPegSolitaire {
   @State private autoId: number = -1;
   @State private demoId: number = -1;
   @State private demoLeft: number = 0;
+  // ★ 2026-11-01 演示三拍
+  @State private demoMsg: string = '';
+  @State private demoPhase: number = 0;
+  @State private demoRound: number = 0;
   @State private hintMsg: string = '';
   @State private hintFrom: number = -1;
   @State private hintTo: number = -1;
@@ -391,46 +397,60 @@ export struct GPegSolitaire {
   }
 
   // ═══════════ 演示动画（项目 C）═══════════
-  private demoStart(): void {
-    if (this.demoId >= 0) {
-      return;
+  // ═══════════ 演示动画 · 三拍（2026-11-01 手工接）
+  // ★ 旧版一个 tick 直接走一步，匀速连发 ⇒ 看不出在演什么。
+  // ★ 新版：引导(720) → 执行(280) → 结果(1150)，3 轮，结束后 reset。
+  private demoBeat(): number {
+    if (this.demoId < 0) { return -1; }
+
+    if (this.demoPhase === 0) {
+      if (this.demoRound >= 3) { this.demoFinish(); return -1; }
+      this.demoMsg = TG2('看清楚：这是第 {0} 步', String(this.demoRound + 1));
+      Haptics.tick();
+      this.demoPhase = 1;
+      return Demo.GUIDE_MS;
     }
-    this.demoLeft = Hint.DEMO_STEPS;
-    this.demoId = Hint.demoRun(() => this.demoStep());
+
+    if (this.demoPhase === 1) {
+      const mv: number = this.anyLegalMove();
+      if (mv < 0) { this.demoFinish(); return -1; }
+      const more: boolean = this.autoStep();
+      if (!more) { this.demoFinish(); return -1; }
+      Haptics.tap();
+      this.demoPhase = 2;
+      return Demo.ACT_MS;
+    }
+
+    this.demoRound = this.demoRound + 1;
+    this.demoMsg = this.demoRound >= 3
+      ? TG('就是这样跳。碰一下屏幕，换你来')
+      : TG('看到了吗？再看一遍');
+    this.demoPhase = 0;
+    if (this.demoRound >= 3) { this.demoFinish(); }
+    return Demo.RESULT_MS;
   }
 
-  private demoStep(): boolean {
-    if (this.demoLeft <= 0 || this.over || this.won) {
-      this.demoFinish();
-      return false;
-    }
-    const mv: number = this.anyLegalMove();
-    if (mv < 0) {
-      this.demoFinish();
-      return false;
-    }
-    this.demoLeft = this.demoLeft - 1;
-    this.doMove(mv);
-    return this.demoLeft > 0 && !this.over && !this.won;
-  }
-
-  /** 演示结束：**必须 reset()**（沙盒规则，成绩/记录不能被污染） */
   private demoFinish(): void {
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoMsg = '';
     if (this.demoId >= 0) {
-      Hint.autoStop(this.demoId);
+      Demo.stop(this.demoId);
       this.demoId = -1;
     }
-    this.demoLeft = 0;
     this.reset();
   }
 
-  /** 玩家碰了一下：停演示，但**不 reset**（他们那一下就是要开始玩） */
   private demoStop(): void {
-    if (this.demoId >= 0) {
-      Hint.autoStop(this.demoId);
-      this.demoId = -1;
-      this.demoLeft = 0;
-    }
+    this.demoFinish();
+  }
+
+  private demoStart(): void {
+    if (this.demoId >= 0) { return; }
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoMsg = TG('看清楚：接下来演示给你看');
+    this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
   private status(): string {
@@ -577,12 +597,14 @@ export struct GPegSolitaire {
       }
 
       // ★ 提示 / AI 代打 / 演示 三合一（项目 A·B·C 统一入口）
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
         showHint: true,
         onHintTap: () => { this.askHint(); },
         onAutoTap: () => { this.askAuto(); },
         autoOn: this.autoId >= 0,
-        demoOn: this.demoId >= 0
+        demoOn: false,
+        disabled: this.demoId >= 0,
       })
     }
     .width('100%')
