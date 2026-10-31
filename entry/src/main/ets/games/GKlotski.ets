@@ -428,26 +428,53 @@ export struct GKlotski {
       .aspectRatio(COLS / ROWS)
       // ★ 2026-10-31 真机：宽驱动 + 无高度上限 ⇒ 横屏 853×533 上棋盘撑到 813vp 高，
       //   把「重开」等按钮挤出屏幕。限高让它按 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Bp.height - 300 })
+      .constraintSize({ maxHeight: Bp.height - 360 })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
 
+      if (Bp.width <= Bp.height) {
       Text(this.tip)
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+      }
 
-      Column({ space: Space.xs }) {
-        this.moveBtn('↑', 0, -1)
+      // ★ 2026-10-31 真机（横屏 853×533）：原来是「↑ 一行 + ←↓→ 一行」两行，
+      //   加上方的四行 UI ⇒ 下面的「←↓→」和「重开」被挤出屏幕，用户点不到。
+      //   ⇒ 横屏时把四个方向键并成**一行**，省下一行高度（竖屏空间够，保持原布局）。
+      if (Bp.width > Bp.height) {
         Row({ space: Space.xs }) {
           this.moveBtn('←', -1, 0)
+          this.moveBtn('↑', 0, -1)
           this.moveBtn('↓', 0, 1)
           this.moveBtn('→', 1, 0)
+          Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开'))
+            .fontSize(FontSize.sm)
+            .fontColor(Color.White)
+            .backgroundColor(Palette.amber)
+            .borderRadius(Radius.md)
+            .height(Cell.of(44))
+            .layoutWeight(1)
+            .focusable(Tv.on())
+            .focusBox(Tv.box())
+            .onClick(() => { Haptics.tap(); this.reset(); })
         }
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
+      } else {
+        Column({ space: Space.xs }) {
+          this.moveBtn('↑', 0, -1)
+          Row({ space: Space.xs }) {
+            this.moveBtn('←', -1, 0)
+            this.moveBtn('↓', 0, 1)
+            this.moveBtn('→', 1, 0)
+          }
+        }
+        .width('100%')
       }
-      .width('100%')
 
+      if (Bp.width <= Bp.height) {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md)
@@ -463,6 +490,7 @@ export struct GKlotski {
           Haptics.tap();
           this.reset();
         })
+      }
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
