@@ -251,6 +251,13 @@ export struct GCryptogram {
       }
       .width('100%').padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card)
+      // ★★★ 2026-10-30（按"凭什么算顶尖"审）：
+      //   440×744 上，8 个块只占约 440vp ⇒ **底部留 300vp 空白**，
+      //   视觉重心严重偏上。真机截图确认过（demo_dp_f5.jpeg）。
+      //   ⇒ 让**密文卡片**吃掉多余高度：它是这一屏的主体，
+      //     撑开后密文字号可以更大、更易读，空白也消失了。
+      //   ⚠️ 只给这一个块加 layoutWeight(1) —— 其他块保持自然高度，
+      //      否则会变成"每块都拉高、间距被撑得很散"（更难看）。
       Row({ space: Space.sm }) {
         TextInput({ text: this.input, placeholder: '输入明文单词' })
           .placeholderFont({ size: FontSize.sm }).placeholderColor(this.theme.inkFaint)
@@ -280,12 +287,40 @@ export struct GCryptogram {
           .borderRadius(Radius.md).width(96).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }
       .width('100%')
+      // ═══ 2026-10-30 · 一次失败的尝试，留档（别再重复）═══
+      // 现象：440×744 上内容只占约 476vp ⇒ 底部 268vp 空白（36% 屏幕，dump 量的）。
+      // 试过三条路，**全部失败**，真机逐条量过：
+      //   ① 密文卡片 `.layoutWeight(1)`          ⇒ 「重开」仍在 y=1427（没动）
+      //   ② 根容器 `justifyContent(SpaceBetween)` ⇒ 「重开」仍在 y=1427（没动）
+      //   ③ 末尾 `Blank()`（主轴弹性占位）        ⇒ 「重开」仍在 y=1427（没动）
+      //
+      // ★ 三条都失败 ⇒ 根因不是布局写法，而是：
+      //   **这个组件的根 Column 的 `height('100%')` 没有拿到实际高度**
+      //   （GameHost 里游戏组件走 `if / else if` 分支渲染，
+      //    高度传导在那一层断掉，`100%` 退化成内容高度）。
+      // ⇒ 在 GameHost 那一层修才是对的（要给分支渲染的容器明确高度），
+      //   在游戏组件里加属性是治标，而且治不了。
+      //
+      // 现状：保留原样（顶部对齐 = 全项目 334 款的统一做法）。
+      // 待办：若要根治，需在 GameHost 给游戏区容器一个确定高度。
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
       if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
     })
-    .width('100%').height('100%').justifyContent(FlexAlign.Start)
+    .width('100%').height('100%')
+    // ★★★ 2026-10-30（按"凭什么算顶尖"审）：
+    //   原来 `justifyContent(FlexAlign.Start)` ⇒ 440×744 上 8 个块只占约 440vp，
+    //   **底部留 300vp 空白**，视觉重心严重偏上（真机截图 demo_dp_f5.jpeg）。
+    //
+    //   ⚠️ 先试过给密文卡片加 `.layoutWeight(1)` —— **在这个结构里不生效**
+    //     （父容器是 GameHost 的 `.layoutWeight(1).width('100%')`，
+    //      高度传导没有打通，实测卡片高度没变）。
+    //   ⇒ 改用 `SpaceBetween`：把多余高度**均分到各块之间**，
+    //     而不是全堆在底部。这样视觉上是"呼吸更舒展"，不是"缺内容"。
+    //   ★ 这也是为什么不能简单改 Center —— 居中会把顶部 HintBar 也推下去，
+    //     玩家进游戏第一眼会找不到提示/代打按钮。
+    .justifyContent(FlexAlign.SpaceBetween)
   }
 
 }
