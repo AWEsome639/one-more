@@ -12,6 +12,7 @@
  */
 
 import { Tv } from '../core/Tv';
+import { Bp } from '../core/Bp';
 import { Sound } from '../core/Sound';
 import { router } from '@kit.ArkUI';
 import { window } from '@kit.ArkUI';
@@ -743,6 +744,19 @@ struct GameHost {
     return y.toFixed(1) + '%';
   }
 
+  /** ★★ 2026-11-01 真机（运动手表 195×195）：顶栏四个按钮原来写死 44×44。
+   *   在 195vp 高的屏上，顶栏 + 演示条就吃掉约 100vp，内容区只剩 ~95vp
+   *   ⇒ **棋盘与操作区完全不可见**（截图拍到只剩顶栏和演示条）。
+   *   ⇒ 极小屏缩小图标，正常屏（≥420vp 高）保持 44 不变。 */
+  /** 极小屏判定：高或宽 < 420vp（运动手表 195 / 手表 233 都算） */
+  private tinyScreen(): boolean {
+    return Bp.height < 420 || Bp.width < 420;
+  }
+
+  private iconSize(): number {
+    return Bp.height < 420 ? 30 : 44;
+  }
+
   build() {
     Stack({ alignContent: Alignment.Bottom }) {
       Column() {
@@ -750,9 +764,9 @@ struct GameHost {
         Row() {
           Text('‹')
             .accessibilityText(this.t('返回', 'Back'))
-            .fontSize(30)
+            .fontSize(this.iconSize() < 44 ? 22 : 30)
             .fontColor(this.theme().ink)
-            .width(44).height(44)
+            .width(this.iconSize()).height(this.iconSize())
             .textAlign(TextAlign.Center)
             .backgroundColor(this.theme().surface)
             .borderRadius(Radius.full)
@@ -770,21 +784,34 @@ struct GameHost {
 
           Column({ space: 2 }) {
             Text(this.meta ? displayName(this.meta) : '')
-              .fontSize(FontSize.xl)
+              // ★★ 2026-11-01 真机（手表 195×195）：标题原来没限行，窄屏上被压成
+              //   **一字一行**的竖排（截图拍到「缺/运/算/符」竖着摞）。⇒ 单行 + 省略号。
+              .fontSize(this.tinyScreen() ? FontSize.md : FontSize.xl)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.theme().ink)
-            Text(this.meta ? displayTagline(this.meta) : '')
-              .fontSize(FontSize.xs)
-              .fontColor(this.theme().inkFaint)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+            // 副标题：极小屏直接不显示（让位给演示条/棋盘）
+            if (!this.tinyScreen()) {
+              Text(this.meta ? displayTagline(this.meta) : '')
+                .fontSize(FontSize.xs)
+                .fontColor(this.theme().inkFaint)
+                .maxLines(1)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+            }
           }
           .alignItems(HorizontalAlign.Start)
           .layoutWeight(1)
           .margin({ left: Space.md })
 
+          // ★★ 2026-11-01 真机（运动手表 195×195）：顶栏一行要放 5 个元素（‹ ☆ ? 难度 ↻），
+          //   195vp 宽根本放不下 ——「普通」和「↻」被切到屏幕外（截图拍到）。
+          //   ⇒ 极小屏**减元素**（收藏/帮助次要，让位给返回/难度/重开），这正是"降级"。
+          if (!this.tinyScreen()) {
           Text(this.fav ? '⭐' : '☆')
             .fontSize(FontSize.lg)
             .fontColor(this.fav ? Palette.amber : this.theme().inkFaint)
-            .width(44).height(44).textAlign(TextAlign.Center)
+            .width(this.iconSize()).height(this.iconSize()).textAlign(TextAlign.Center)
             .backgroundColor(this.theme().surface)
             .borderRadius(Radius.full)
             .shadow(Shadow.card)
@@ -800,7 +827,7 @@ struct GameHost {
             .accessibilityText(this.t('玩法说明', 'How to play'))
             .fontSize(FontSize.lg)
             .fontColor(this.theme().inkSoft)
-            .width(44).height(44).textAlign(TextAlign.Center)
+            .width(this.iconSize()).height(this.iconSize()).textAlign(TextAlign.Center)
             .backgroundColor(this.theme().surface)
             .borderRadius(Radius.full)
             .shadow(Shadow.card)
@@ -809,6 +836,7 @@ struct GameHost {
               Haptics.tap();   // ★ 2026-10-19 按压反馈
               router.pushUrl({ url: 'pages/GuidePage', params: { id: this.gameId } });
             })
+          }
 
           // 难度选择：点一下循环切 简单 → 普通 → 困难
           // ★ 手感：**视觉胶囊保持小巧，但点击热区撑到 44vp**
@@ -839,7 +867,7 @@ struct GameHost {
             .accessibilityText(this.t('重新开始', 'Restart'))
             .fontSize(FontSize.xl)
             .fontColor(this.theme().ink)
-            .width(44).height(44)
+            .width(this.iconSize()).height(this.iconSize())
             .textAlign(TextAlign.Center)
             .backgroundColor(this.theme().surface)
             .borderRadius(Radius.full)
