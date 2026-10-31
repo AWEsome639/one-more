@@ -112,6 +112,8 @@ export struct GKlotski {
   @State private demoGuideBlk: number = -1;   // 第 1 拍高亮哪块
   // ★ 演示专用文案（不复用 tip —— tip 会被 tryMove/check 反复覆盖）
   @State private demoMsg: string = '';
+  private demoBlk: number = -1;   // 本拍要推的方块下标
+  private demoDir: number = 0;     // 本拍方向（0上 1右 2下 3左）
   @State private demoRound: number = 0;       // 演到第几轮
   @State private demoPhase: number = 0;       // 0=引导 1=执行 2=结果
   private demoSnapSel: number = -1;
@@ -217,6 +219,32 @@ export struct GKlotski {
   }
 
   /** 执行路线上的第 i 步：按「推之前的位置」找方块，不存下标 —— 四卒换了身份也推不错 */
+  /** 演示专用：找**任意一步合法走法**（不依赖预置解法）
+   *  ★ 2026-10-31 真机定位：原演示用 `aiAt()`，而它只在「局面恰好在预置解法的
+   *    某一步上」时才返回下标，否则 -1 ⇒ 演示第 1 拍就 `demoFinish()`，
+   *    **0 帧结束**（探针实测 demoId 当时已是 -1）。
+   *  ⇒ 演示不该问"解法走到哪了"，该问"现在能怎么走"。
+   *  @returns [方块下标, 方向] 或 null
+   */
+  private demoFindMove(): number[] | null {
+    for (let j = 0; j < this.blocks.length; j++) {
+      const b: Blk = this.blocks[j];
+      for (let d = 0; d < 4; d++) {
+        const nx: number = b.x + AI_DXS[d];
+        const ny: number = b.y + AI_DYS[d];
+        if (nx < 0 || ny < 0 || nx + b.w > COLS || ny + b.h > ROWS) { continue; }
+        const probe: Blk = { x: nx, y: ny, w: b.w, h: b.h, label: b.label, color: b.color };
+        let blocked: boolean = false;
+        for (let k = 0; k < this.blocks.length; k++) {
+          if (k === j) { continue; }
+          if (this.hit(probe, this.blocks[k])) { blocked = true; break; }
+        }
+        if (!blocked) { return [j, d]; }
+      }
+    }
+    return null;
+  }
+
   private aiApply(i: number): void {
     const e: number = KLO_MOVES[i];
     const d: number = e % 4;
@@ -243,25 +271,16 @@ export struct GKlotski {
     if (this.demoId < 0) { return -1; }
     if (this.over) { this.demoFinish(); return -1; }
 
-    const i: number = this.aiAt();
-
-    // ── 第 1 拍：引导 ──
+    // ── 第 1 拍：引导（找**任意**一步合法走法，不依赖预置解法）──
     if (this.demoPhase === 0) {
-      if (i < 0 || i >= KLO_STEPS || this.demoRound >= 2) { this.demoFinish(); return -1; }
-      const e: number = KLO_MOVES[i];
-      const d: number = e % 4;
-      const px: number = Math.floor(e / 4) % COLS;
-      const py: number = Math.floor(e / 4) / COLS | 0;
-      // 找出这块在 blocks 里的下标，高亮它
-      this.demoGuideBlk = -1;
-      for (let j = 0; j < this.blocks.length; j++) {
-        if (this.blocks[j].x === px && this.blocks[j].y === py) {
-          this.demoGuideBlk = j;
-          this.demoMsg = TG2('看这块「{0}」：往{1}推一格', this.blocks[j].label, DIR_NAME[d]);
-          this.tip = this.demoMsg;
-          break;
-        }
-      }
+      if (this.demoRound >= 2) { this.demoFinish(); return -1; }
+      const mv: number[] | null = this.demoFindMove();
+      if (mv === null) { this.demoFinish(); return -1; }
+      this.demoBlk = mv[0];
+      this.demoDir = mv[1];
+      this.demoGuideBlk = mv[0];
+      this.demoMsg = TG2('看这块「{0}」：往{1}推一格', this.blocks[mv[0]].label, DIR_NAME[mv[1]]);
+      this.tip = this.demoMsg;
       Haptics.tick();
       this.demoPhase = 1;
       return Demo.GUIDE_MS;
@@ -269,7 +288,11 @@ export struct GKlotski {
 
     // ── 第 2 拍：执行 ──
     if (this.demoPhase === 1) {
-      if (i >= 0 && i < KLO_STEPS) { this.aiApply(i); }
+      if (this.demoBlk >= 0 && this.demoBlk < this.blocks.length) {
+        this.sel = this.demoBlk;
+        this.tryMove(AI_DXS[this.demoDir], AI_DYS[this.demoDir]);
+      }
+      this.demoGuideBlk = -1;
       Haptics.tap();
       this.demoPhase = 2;
       return Demo.ACT_MS;
