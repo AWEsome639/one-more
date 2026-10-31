@@ -8,6 +8,7 @@
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
@@ -615,6 +616,9 @@ export struct GConnectFour {
       }
       .width('100%')
       .aspectRatio(COLS / this.diffTotal)
+      // ★ 2026-10-31 真机：宽驱动 + 无高度上限 ⇒ 横屏 853×533 上棋盘撑到 813vp 高，
+      //   把「重开」等按钮挤出屏幕。限高让它按 aspectRatio 反推宽度。
+      .constraintSize({ maxHeight: Bp.height - 300 })
       .padding(Space.xs)
       .backgroundColor(Palette.primary)
       .borderRadius(Radius.lg)
