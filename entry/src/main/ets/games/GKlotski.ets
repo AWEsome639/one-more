@@ -495,6 +495,7 @@ export struct GKlotski {
 
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       // ★★★ 2026-10-31 真机定位（第 3 次 @Prop 出问题）：
       //   HintBar 的 `@Prop demoOn` **只进不出** —— 演示结束后它仍停在 true，
       //   导致界面永远显示「演示中…」、且演示文案永远传不进去。
@@ -502,7 +503,6 @@ export struct GKlotski {
       // ★ 演示条（共用组件）：`on` 由本页 @State 直传，不走 HintBar 的 @Prop
       //   （那个 @Prop 在演示结束后不复位，本项目已踩三次）
        // ★ 演示条与 HintBar 恒显示：DemoBar 在未演示时高度为 0，不占位
-       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
        HintBar({
          showHint: true,
          onHintTap: () => { this.askHint(); },

@@ -683,6 +683,7 @@ export struct GBlockEscape {
     //   ⇒ **套 Scroll**：超高时可滚，棋盘尺寸不再受"必须一屏装下"约束。
     Scroll() {
       Column({ space: Space.md }) {
+        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         Row({ space: Space.sm }) {
           this.infoBox(0)
           this.infoBox(1)
@@ -718,7 +719,6 @@ export struct GBlockEscape {
 
         // ★ 2026-10-28：提示 + 代打走通用组件（父容器是 Row、每个按钮 layoutWeight(1)）
         // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         HintBar({
           showHint: true,
           onHintTap: () => { this.askHint(); },

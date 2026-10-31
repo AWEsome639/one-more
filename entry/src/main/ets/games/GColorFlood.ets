@@ -476,8 +476,8 @@ export struct GColorFlood {
     //     上真机验过（第 511 轮），三款都成立。
     Scroll() {
       Column({ space: Space.md }) {
-        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
         HintBar({
           showHint: false,
           onAutoTap: () => { this.askAuto(); },

@@ -390,6 +390,7 @@ export struct GBinaryMatrixRank {
 
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         this.stat(0)
         this.stat(1)
@@ -453,7 +454,6 @@ export struct GBinaryMatrixRank {
         .width('100%')
 
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
 
         showHint: true,

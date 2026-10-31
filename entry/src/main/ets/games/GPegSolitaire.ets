@@ -468,6 +468,7 @@ export struct GPegSolitaire {
 
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('剩余棋子'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -597,7 +598,6 @@ export struct GPegSolitaire {
       }
 
       // ★ 提示 / AI 代打 / 演示 三合一（项目 A·B·C 统一入口）
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
         showHint: true,
         onHintTap: () => { this.askHint(); },

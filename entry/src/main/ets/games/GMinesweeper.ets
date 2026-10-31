@@ -646,8 +646,8 @@ export struct GMinesweeper {
     //   套 Scroll 兜底（本项目已有 5 款用同一模板：GColorFlood / GFillomino 等）。
     Scroll() {
       Column({ space: Space.md }) {
-        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
         HintBar({
           showHint: false,
           onAutoTap: () => { this.askAuto(); },

@@ -279,6 +279,7 @@ export struct GFlankerTest {
 
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -321,7 +322,6 @@ export struct GFlankerTest {
 
       Row({ space: Space.md }) {
         // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         HintBar({
           onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },

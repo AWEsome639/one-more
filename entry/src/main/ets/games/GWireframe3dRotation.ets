@@ -274,6 +274,7 @@ export struct GWireframe3dRotation {
   }
   build() {
     Column({ space: Space.sm }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Text(TG('第 ') + String(Math.min(this.asked + 1, ROUNDS)) + '/' + String(ROUNDS) + ' 题 · 答对 ' +
         String(this.hits) + '/' + String(this.diffTotal))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').padding(Space.sm)
@@ -290,7 +291,6 @@ export struct GWireframe3dRotation {
       }, (r: number) => 'orow' + r)
       Text(this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).width('100%')
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
         showHint: true,
         onHintTap: () => { this.askHint(); },

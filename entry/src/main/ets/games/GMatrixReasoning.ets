@@ -303,6 +303,7 @@ export struct GMatrixReasoning {
 
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -364,7 +365,6 @@ export struct GMatrixReasoning {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
 
         showHint: true,

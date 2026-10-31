@@ -348,6 +348,7 @@ export struct GModuloClock {
 
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG(TG('第几题')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -386,7 +387,6 @@ export struct GModuloClock {
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').animation({ duration: Motion.fast, curve: Motion.snap() })
 
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
 
         showHint: true,

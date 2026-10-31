@@ -349,6 +349,7 @@ export struct GPercentageShopping {
 
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('第几件'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -391,7 +392,6 @@ export struct GPercentageShopping {
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').animation({ duration: Motion.fast, curve: Motion.snap() })
 
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
 
         showHint: true,

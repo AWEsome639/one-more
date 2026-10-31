@@ -245,6 +245,7 @@ export struct GStroopNumberSize {
 
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row() {
         Text(TG2("题号 {0}/{1}", String(this.round), String(this.diffTotal))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG('答对 ') + String(this.right)).fontSize(FontSize.sm).fontColor(Palette.amber)
@@ -264,7 +265,6 @@ export struct GStroopNumberSize {
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.md }) {
         // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         HintBar({
           onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },

@@ -873,8 +873,8 @@ export struct GCheckers {
     //   让玩家总能滚到「重开」。与 GBejeweled / GColorFlood / GFillomino 同一模板。
     Scroll() {
       Column({ space: Space.sm }) {
-        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
         HintBar({
           showHint: true,
           onHintTap: () => { this.askHint(); },

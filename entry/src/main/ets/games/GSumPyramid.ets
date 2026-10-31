@@ -3,6 +3,7 @@
  *  胜负：6 格全填对 ⇒ 通关；错 3 次 ⇒ 失败 */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -263,6 +264,7 @@ export struct GSumPyramid {
   }
   build() {
     Column({ space: Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已填'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -299,7 +301,8 @@ export struct GSumPyramid {
             }, (idx: number) => 'c' + idx + '_' + this.vals[idx] + (idx === this.current() ? 'a' : ''))
           }.width(String((lvl + 1) * 25) + '%')
         }, (lvl: number) => 'r' + lvl)
-      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
+      }// ★★ 2026-11-01 真机（横屏 853×533）：金字塔无宽度上限，格子 1:1 ⇒ 高度 = 宽度，撑破屏幕
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360))).padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
@@ -309,7 +312,6 @@ export struct GSumPyramid {
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => {
           // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-          DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
           HintBar({
             onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
