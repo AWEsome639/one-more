@@ -8,6 +8,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch, Side } from '../core/LanMatch';
@@ -783,6 +784,17 @@ export struct GCheckers {
     this.targets = [];
   }
 
+  /** 棋盘边长（vp）：按「可用宽 / 可用高」取小值
+   *  ★★★ 2026-10-30：百分比（70% / 45%）在横竖屏下不可能同时最优
+   *    ⇒ 按真实可用空间算。模式已在 GBejeweled / GReversi 真机验过：
+   *      横屏 293vp（装得下、按钮可见）/ 竖屏 704vp（尽量大、无空白）。
+   */
+  private boardPx(): number {
+    const w: number = Math.max(160, Bp.width - 40);
+    const h: number = Math.max(120, Bp.height * 0.55);
+    return Math.min(w, h);
+  }
+
   build() {
     // ★★★ 2026-10-30：横屏 853×533 下，maxHeight 45%（240vp）+ 固定部分 350vp
     //   仍可能超过 533vp（大字模式/极小屏）⇒ **套 Scroll 兜底**，
@@ -892,16 +904,9 @@ export struct GCheckers {
             .layoutWeight(1)
           }, (r: number) => 'r' + r)
         }
-        .width('100%')
-        .aspectRatio(1)
-        // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
-        //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-        // ★★★ 2026-10-30（平板横屏 853×533 真机实测）：
-        //   70% × 533 = 373vp，但固定部分（标题+HintBar+三信息卡+说明+重开）约 350vp
-        //   ⇒ 总计约 723vp，超出屏高 190vp ⇒ **「重开」按钮 y=1594px 被导航栏遮住**。
-        //   （landscape_checkers_BUTTON_CUT.jpeg，dump 量的 y 坐标）
-        //   ⇒ 改成 45%，与 GBejeweled 同一口径。
-        .constraintSize({ maxHeight: '45%' })
+        // ★★★ 2026-10-30 · 用「算出来的边长」，不用百分比（见 boardPx 注释）
+        .width(this.boardPx())
+        .height(this.boardPx())
         .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg)

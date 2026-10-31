@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -280,6 +281,17 @@ export struct GSieveVisualizer {
     return this.theme.surface;
   }
 
+  /** 棋盘边长（vp）：按「可用宽 / 可用高」取小值
+   *  ★★★ 2026-10-30：百分比（70% / 45%）在横竖屏下不可能同时最优
+   *    ⇒ 按真实可用空间算。模式已在 GBejeweled / GReversi 真机验过：
+   *      横屏 293vp（装得下、按钮可见）/ 竖屏 704vp（尽量大、无空白）。
+   */
+  private boardPx(): number {
+    const w: number = Math.max(160, Bp.width - 40);
+    const h: number = Math.max(120, Bp.height * 0.55);
+    return Math.min(w, h);
+  }
+
   build() {
     Column({ space: Space.sm }) {
       HintBar({
@@ -349,15 +361,9 @@ export struct GSieveVisualizer {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('100%')
-      .aspectRatio(1)
-      // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
-      //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      // ★★★ 2026-10-30（平板横屏 853×533 真机实测，dump 量的 重开 y=1590）：
-      //   70% × 533 = 373vp 棋盘 + 固定部分（标题+HintBar+信息+按钮）
-      //   ⇒ 底部按钮超出安全区 1480，**被导航栏遮住点不到**。
-      //   ⇒ 改成 45%，与 GBejeweled / GCheckers / GReversi / GCompoundConnect 同一口径。
-      .constraintSize({ maxHeight: '45%' })
+      // ★★★ 2026-10-30 · 用「算出来的边长」，不用百分比（见 boardPx 注释）
+      .width(this.boardPx())
+      .height(this.boardPx())
 
       Text(this.done
         ? '🎉 筛完！100 以内共 ' + this.found + ' 个素数'
