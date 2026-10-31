@@ -276,7 +276,6 @@ export struct GBejeweled {
    */
   private demoBeat(): number {
     if (this.demoId < 0) { return -1; }
-    if (this.over) { this.demoFinish(); return -1; }
 
     // ── 第 1 拍：引导 ──
     if (this.demoPhase === 0) {

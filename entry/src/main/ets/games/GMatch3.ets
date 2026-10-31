@@ -212,7 +212,6 @@ export struct GMatch3 {
   // ★ 不计分：演示前快照，结束或一碰屏幕时原样恢复。
   private demoBeat(): number {
     if (this.demoId < 0) { return -1; }
-    if (this.over) { this.demoFinish(); return -1; }
 
     if (this.demoPhase === 0) {
       if (this.demoRound >= 3) { this.demoFinish(); return -1; }

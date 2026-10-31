@@ -6,11 +6,13 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
+import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -40,6 +42,10 @@ export struct GPercentagePeak {
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
   @State private demoLeft: number = 0;
+  // ★ 2026-11-01 演示三拍（共用组件 DemoBar 承载展示）
+  @State private demoMsg: string = '';
+  @State private demoPhase: number = 0;
+  @State private demoRound: number = 0;
   @State private opts: number[] = [];
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
@@ -182,35 +188,65 @@ export struct GPercentagePeak {
   // ★ 两条退出路径：
   //   ① 演完 6 步（demoFinish）⇒ **必须 reset()**：成绩/记录回到干净开局
   //   ② 玩家碰了（demoStop）  ⇒ **不 reset**：他们那一下就是要开始玩
+  // ═══════════ 演示动画 · 三拍（2026-11-01 批量铺）
+  // ★ 为什么改：旧版是 `demoStep()` 里一个 tick 直接 `autoStep()`，
+  //   匀速连发 ⇒ 玩家看到的是"格子自己在变"，不知道在演什么。
+  //   新版分三拍：引导(720ms) → 执行(280ms) → 结果(1150ms)，3 轮 ≈ 6.5 秒。
+  // ★ 不计分：演示前快照，结束或一碰屏幕时原样恢复。
+  private demoBeat(): number {
+    if (this.demoId < 0) { return -1; }
+
+    if (this.demoPhase === 0) {
+      if (this.demoRound >= 3) { this.demoFinish(); return -1; }
+      this.demoMsg = TG2('看清楚：这是第 {0} 步', String(this.demoRound + 1));
+      Haptics.tick();
+      this.demoPhase = 1;
+      return Demo.GUIDE_MS;
+    }
+
+    if (this.demoPhase === 1) {
+      const more: boolean = this.autoStep();
+      if (!more) { this.demoFinish(); return -1; }
+      Haptics.tap();
+      this.demoPhase = 2;
+      return Demo.ACT_MS;
+    }
+
+    this.demoRound = this.demoRound + 1;
+    this.demoMsg = this.demoRound >= 3
+      ? TG('就是这样玩。碰一下屏幕，换你来')
+      : TG('看到了吗？再看一遍');
+    this.demoPhase = 0;
+    if (this.demoRound >= 3) { this.demoFinish(); }
+    return Demo.RESULT_MS;
+  }
+
   private demoFinish(): void {
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoMsg = '';
     if (this.demoId >= 0) {
-      Hint.autoStop(this.demoId);
+      Demo.stop(this.demoId);
       this.demoId = -1;
     }
-    this.demoLeft = 0;
-    this.reset();
   }
 
   private demoStop(): void {
     if (this.demoId >= 0) {
-      Hint.autoStop(this.demoId);
+      Demo.stop(this.demoId);
       this.demoId = -1;
     }
-    this.demoLeft = 0;
-  }
-
-  private demoStep(): boolean {
-    if (this.demoId < 0) { return false; }
-    if (this.demoLeft <= 0) { this.demoFinish(); return false; }
-    this.demoLeft = this.demoLeft - 1;
-    this.autoStep();
-    return true;
+    const wasOn: boolean = this.demoPhase > 0 || this.demoRound > 0;
+    this.demoFinish();
+    if (wasOn) { this.reset(); }
   }
 
   private demoStart(): void {
     if (this.demoId >= 0) { return; }
-    this.demoLeft = Hint.DEMO_STEPS;
-    this.demoId = Hint.demoRun(() => this.demoStep());
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoMsg = TG('看清楚：接下来演示给你看');
+    this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
   private autoStep(): boolean {
@@ -378,6 +414,8 @@ export struct GPercentagePeak {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%')
 
+      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
 
         showHint: true,
@@ -385,7 +423,7 @@ export struct GPercentagePeak {
         onHintTap: () => { this.askHint(); },
   onAutoTap: () => { this.askAuto(); },
 
-        demoOn: this.demoId >= 0,
+        demoOn: false,
 
         autoOn: this.autoId >= 0
 

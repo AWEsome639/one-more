@@ -270,7 +270,6 @@ export struct GKlotski {
    */
   private demoBeat(): number {
     if (this.demoId < 0) { return -1; }
-    if (this.over) { this.demoFinish(); return -1; }
 
     // ── 第 1 拍：引导（找**任意**一步合法走法，不依赖预置解法）──
     if (this.demoPhase === 0) {
