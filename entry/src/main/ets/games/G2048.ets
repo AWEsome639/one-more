@@ -12,7 +12,9 @@
 
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
+import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 路线 C：价值网络（提示用）
@@ -140,6 +142,9 @@ function sameCells(a: number[], b: number[]): boolean {
   return true;
 }
 
+/** 方向名（d=0 左 / 1 右 / 2 上 / 3 下）—— 提到模块级，演示与提示共用 */
+const DIR_CN: string[] = ['左', '右', '上', '下'];
+
 @Component
 export struct G2048 {
   @Prop theme: Theme = Theme.light();
@@ -155,6 +160,15 @@ export struct G2048 {
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
   @State private demoLeft: number = 0;
+  // ★ 2026-11-01 演示动画三拍（与宝石迷阵/华容道同一套 core/Demo.ets）
+  //  2048 是「滑方向」类：第 1 拍先指出**要滑的方向**，第 2 拍才滑，
+  //  第 3 拍亮出合并结果；全程**不计分**（演完原样恢复）。
+  @State private demoMsg: string = '';
+  @State private demoPhase: number = 0;
+  @State private demoRound: number = 0;
+  @State private demoGuideDir: number = -1;
+  private demoSnapCells: number[] = [];
+  private demoSnapScore: number = 0;
   @State private cells: number[] = [];
   @State private hintDir: number = -1;
   @State private hintText: string = '';
@@ -333,28 +347,83 @@ export struct G2048 {
   // ═══════════ 演示动画（项目 C）═══════════
   // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
   //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
-  private demoStep(): boolean {
-    if (this.demoId < 0) { return false; }
-    if (this.demoLeft <= 0) { this.demoStop(); return false; }
-    this.demoLeft = this.demoLeft - 1;
-    this.autoStep();
-    return true;
+  /** 2048 的三拍演示：**指方向 → 滑 → 看结果**，且**不计分** */
+  private demoBeat(): number {
+    if (this.demoId < 0) { return -1; }
+    if (this.over || this.won) { this.demoFinish(); return -1; }
+
+    if (this.demoPhase === 0) {
+      if (this.demoRound >= 3) { this.demoFinish(); return -1; }
+      const d: number = this.bestDir();
+      if (d < 0) { this.demoFinish(); return -1; }
+      this.demoGuideDir = d;
+      this.hintDir = d;
+      this.demoMsg = TG2('看这里：现在往{0}滑最划算', TG(DIR_CN[d]));
+      this.hintText = this.demoMsg;
+      Haptics.tick();
+      this.demoPhase = 1;
+      return Demo.GUIDE_MS;
+    }
+
+    if (this.demoPhase === 1) {
+      this.demoGuideDir = -1;
+      this.hintDir = -1;
+      this.hintText = '';
+      const d: number = this.bestDir();
+      if (d >= 0) { this.move(d); }
+      Haptics.tap();
+      this.demoPhase = 2;
+      return Demo.ACT_MS;
+    }
+
+    this.demoRound = this.demoRound + 1;
+    this.demoMsg = this.demoRound >= 3
+      ? TG('就是这样合。碰一下屏幕，换你来')
+      : TG2('滑过去了，这一下能拿 +{0} 分（演示不计分）',
+          String(this.score - this.demoSnapScore));
+    this.hintText = this.demoMsg;
+    this.demoPhase = 0;
+    if (this.demoRound >= 3) { this.demoFinish(); }
+    return Demo.RESULT_MS;
+  }
+
+  private demoFinish(): void {
+    this.demoGuideDir = -1;
+    this.hintDir = -1;
+    this.hintText = '';
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    if (this.demoSnapCells.length === this.cells.length) {
+      this.cells = this.demoSnapCells;
+    }
+    this.score = this.demoSnapScore;
+    this.over = false;
+    this.won = false;
+    this.demoSnapCells = [];
+    if (this.demoId >= 0) {
+      Demo.stop(this.demoId);
+      this.demoId = -1;
+    }
   }
 
   private demoStop(): void {
     if (this.demoId >= 0) {
-      Hint.autoStop(this.demoId);
+      Demo.stop(this.demoId);
       this.demoId = -1;
     }
-    const wasOn: boolean = this.demoLeft > 0;
-    this.demoLeft = 0;
+    const wasOn: boolean = this.demoPhase > 0 || this.demoRound > 0;
+    this.demoFinish();
     if (wasOn) { this.reset(); }
   }
 
   private demoStart(): void {
     if (this.demoId >= 0) { return; }
-    this.demoLeft = Hint.DEMO_STEPS;
-    this.demoId = Hint.demoRun(() => this.demoStep());
+    this.demoSnapCells = this.cells.slice();
+    this.demoSnapScore = this.score;
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoMsg = TG('看清楚：接下来会告诉你要往哪滑');
+    this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
   private autoStep(): boolean {
@@ -485,12 +554,17 @@ export struct G2048 {
 
   build() {
     Column({ space: Space.md }) {
-      HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
-        demoOn: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
+      // ★ 2026-11-01 演示条走共用组件（DemoBar），不再借 HintBar 的 @Prop
+      if (this.demoId >= 0) {
+        DemoBar({ on: true, msg: this.demoMsg })
+      } else {
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          demoOn: false,
+          autoOn: this.autoId >= 0
+        })
+      }
       // 得分条
       // ⚠️ 只传「种类」不传「值」—— 见 scoreBox 的注释（@Builder 按值传参不建立观察）
       Row({ space: Space.md }) {
@@ -649,7 +723,9 @@ export struct G2048 {
   scoreBox(kind: number) {
     Column({ space: 2 }) {
       Text(kind === 0 ? TG('得分') : TG('最大')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-      Text(String(kind === 0 ? this.score : Math.max(...this.cells, 0)))
+      Text(this.demoId >= 0
+        ? (kind === 0 ? '—' : String(Math.max(...this.cells, 0)))
+        : String(kind === 0 ? this.score : Math.max(...this.cells, 0)))
         .fontSize(FontSize.xl)
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
