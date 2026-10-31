@@ -14,6 +14,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
+import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
@@ -499,29 +500,19 @@ export struct GKlotski {
       //   HintBar 的 `@Prop demoOn` **只进不出** —— 演示结束后它仍停在 true，
       //   导致界面永远显示「演示中…」、且演示文案永远传不进去。
       //   ⇒ 演示态**不再交给 HintBar**，由游戏页自己渲染（本页 @State 直接生效）。
-      if (this.demoId >= 0) {
-        Row() {
-          // ★ 2026-10-31 演示文案：由游戏页自己渲染（不走 HintBar 的 @Prop）。
-          Text(this.demoMsg.length > 0
-            ? (TG('演示中') + ' ｜ ' + this.demoMsg)
-            : TG('演示中…（碰一下就停）'))
-            .fontSize(FontSize.sm)
-            .fontColor(Palette.amber)
-            .textAlign(TextAlign.Center)
-            .maxLines(2)
-            .width('100%')
-        }
-        .width('100%')
-        .height(38)
-      } else {
-        HintBar({
-          showHint: true,
-          onHintTap: () => { this.askHint(); },
-          onAutoTap: () => { this.askAuto(); },
-          demoOn: false,
-          autoOn: this.autoId >= 0
-        })
-      }
+      // ★ 演示条（共用组件）：`on` 由本页 @State 直传，不走 HintBar 的 @Prop
+      //   （那个 @Prop 在演示结束后不复位，本项目已踩三次）
+       if (this.demoId >= 0) {
+         DemoBar({ on: true, msg: this.demoMsg })
+       } else {
+         HintBar({
+           showHint: true,
+           onHintTap: () => { this.askHint(); },
+           onAutoTap: () => { this.askAuto(); },
+           demoOn: false,
+           autoOn: this.autoId >= 0
+         })
+       }
       Row({ space: Space.sm }) {
         this.head(0)
         this.head(1)
