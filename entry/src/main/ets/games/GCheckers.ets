@@ -784,153 +784,167 @@ export struct GCheckers {
   }
 
   build() {
-    Column({ space: Space.sm }) {
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-        onAutoTap: () => { this.askAuto(); },
-        demoOn: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
-      Row({ space: Space.sm }) {
-        // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这三格整局不刷新
-        Column({ space: 2 }) {
-        Text(true ? (LanMatch.isActive() ? '我的吃子' : '你的吃子')
-        : (false ? (LanMatch.isActive() ? '我的子' : '你的子')
-        : (LanMatch.isActive() ? '对手的子' : '电脑的子')))
-        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(true ? String(this.cap)
-        : (false ? String(this.countOf(this.board, 1)) : String(this.countOf(this.board, 3))))
-        .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
-        .fontColor(true ? Palette.emerald : (false ? Palette.primary : Palette.rose))
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text(false ? (LanMatch.isActive() ? '我的吃子' : '你的吃子')
-        : (true ? (LanMatch.isActive() ? '我的子' : '你的子')
-        : (LanMatch.isActive() ? '对手的子' : '电脑的子')))
-        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(false ? String(this.cap)
-        : (true ? String(this.countOf(this.board, 1)) : String(this.countOf(this.board, 3))))
-        .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
-        .fontColor(false ? Palette.emerald : (true ? Palette.primary : Palette.rose))
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text(false ? (LanMatch.isActive() ? '我的吃子' : '你的吃子')
-        : (false ? (LanMatch.isActive() ? '我的子' : '你的子')
-        : (LanMatch.isActive() ? '对手的子' : '电脑的子')))
-        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(false ? String(this.cap)
-        : (false ? String(this.countOf(this.board, 1)) : String(this.countOf(this.board, 3))))
-        .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
-        .fontColor(false ? Palette.emerald : (false ? Palette.primary : Palette.rose))
-        }
-        .layoutWeight(1)
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md)
-        .shadow(Shadow.card)
-      }
-      .width('100%')
-
-      Column() {
-        ForEach(this.rowIdx(), (r: number) => {
-          Row() {
-            ForEach(this.rowIdx(), (c: number) => {
-              Stack() {
-              if (this.board.length > (this.idx(r, c)) && this.board[(this.idx(r, c))] !== EMPTY) {
-              Row()
-              .width('74%')
-              .aspectRatio(1)
-              .backgroundColor(this.isPlayer(this.board[(this.idx(r, c))]) ? Palette.rose : '#1F2937').animation({ duration: Motion.fast, curve: Motion.snap() })
-              .borderRadius(Radius.full)
-              .border({
-              width: this.sel === (this.idx(r, c)) ? 3 : 1,
-              color: this.sel === (this.idx(r, c)) ? Palette.amber : '#33FFFFFF'
-              })
-              .shadow(Shadow.card)
-              if (this.board[(this.idx(r, c))] === P_KING || this.board[(this.idx(r, c))] === A_KING) {
-              Text('♛').accessibilityLevel('no').fontSize(FontSize.sm).fontColor(Palette.amber)
-              }
-              } else if (this.targets.indexOf((this.idx(r, c))) >= 0) {
-              Row()
-              .width('34%')
-              .aspectRatio(1)
-              .backgroundColor(Palette.amber)
-              .borderRadius(Radius.full)
-              .opacity(0.75)
-              }
-              }
-              .layoutWeight(1)
-              .aspectRatio(1)
-              .backgroundColor(this.dark((r), (c)) ? this.theme.surfaceAlt : this.theme.surface)
-              .borderRadius(Radius.xs)
-              .animation({ duration: Motion.fast, curve: Motion.snap() })
-              .focusable(Tv.on())
-              .focusBox(Tv.box())
-              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
-              .onClick(() => {
-              Haptics.tick();
-              this.tap((this.idx(r, c)));
-              })
-            }, (c: number) => 'c' + c)
-          }
-          .width('100%')
-          .layoutWeight(1)
-        }, (r: number) => 'r' + r)
-      }
-      .width('100%')
-      .aspectRatio(1)
-      // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
-      //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: '70%' })
-      .padding(Space.xs)
-      .backgroundColor(this.theme.surface)
-      .borderRadius(Radius.lg)
-      .shadow(Shadow.card)
-
-      Text(this.msg)
-        .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
-
-      Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .fontSize(FontSize.md)
-        .fontColor(Color.White)
-        .backgroundColor(Palette.primary)
-        .borderRadius(Radius.md)
-        .width('100%')
-        .height(Cell.of(46))
-        .focusable(Tv.on())
-        .focusBox(Tv.box())
-        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.restartTap(); }); })
-        .onClick(() => {
-          Haptics.tap();
-          this.restartTap();
+    // ★★★ 2026-10-30：横屏 853×533 下，maxHeight 45%（240vp）+ 固定部分 350vp
+    //   仍可能超过 533vp（大字模式/极小屏）⇒ **套 Scroll 兜底**，
+    //   让玩家总能滚到「重开」。与 GBejeweled / GColorFlood / GFillomino 同一模板。
+    Scroll() {
+      Column({ space: Space.sm }) {
+        HintBar({
+          showHint: true,
+          onHintTap: () => { this.askHint(); },
+          onAutoTap: () => { this.askAuto(); },
+          demoOn: this.demoId >= 0,
+          autoOn: this.autoId >= 0
         })
+        Row({ space: Space.sm }) {
+          // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这三格整局不刷新
+          Column({ space: 2 }) {
+          Text(true ? (LanMatch.isActive() ? '我的吃子' : '你的吃子')
+          : (false ? (LanMatch.isActive() ? '我的子' : '你的子')
+          : (LanMatch.isActive() ? '对手的子' : '电脑的子')))
+          .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(true ? String(this.cap)
+          : (false ? String(this.countOf(this.board, 1)) : String(this.countOf(this.board, 3))))
+          .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+          .fontColor(true ? Palette.emerald : (false ? Palette.primary : Palette.rose))
+          }
+          .layoutWeight(1)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text(false ? (LanMatch.isActive() ? '我的吃子' : '你的吃子')
+          : (true ? (LanMatch.isActive() ? '我的子' : '你的子')
+          : (LanMatch.isActive() ? '对手的子' : '电脑的子')))
+          .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(false ? String(this.cap)
+          : (true ? String(this.countOf(this.board, 1)) : String(this.countOf(this.board, 3))))
+          .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+          .fontColor(false ? Palette.emerald : (true ? Palette.primary : Palette.rose))
+          }
+          .layoutWeight(1)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text(false ? (LanMatch.isActive() ? '我的吃子' : '你的吃子')
+          : (false ? (LanMatch.isActive() ? '我的子' : '你的子')
+          : (LanMatch.isActive() ? '对手的子' : '电脑的子')))
+          .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(false ? String(this.cap)
+          : (false ? String(this.countOf(this.board, 1)) : String(this.countOf(this.board, 3))))
+          .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+          .fontColor(false ? Palette.emerald : (false ? Palette.primary : Palette.rose))
+          }
+          .layoutWeight(1)
+          .padding(Space.sm)
+          .backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+        }
+        .width('100%')
 
-      Text(LanMatch.isActive()
-        ? '联机：你执下方（房主先手）；斜走一格，跳过对方子到空格即吃子，能跳必须跳、可连跳；到底线升王（♛）'
-        : '斜走一格；跳过对方子到空格即吃子。能跳必须跳，可连跳；到底线升王（♛）')
-        .fontSize(FontSize.xxs)
-        .fontColor(this.theme.inkFaint)
+        Column() {
+          ForEach(this.rowIdx(), (r: number) => {
+            Row() {
+              ForEach(this.rowIdx(), (c: number) => {
+                Stack() {
+                if (this.board.length > (this.idx(r, c)) && this.board[(this.idx(r, c))] !== EMPTY) {
+                Row()
+                .width('74%')
+                .aspectRatio(1)
+                .backgroundColor(this.isPlayer(this.board[(this.idx(r, c))]) ? Palette.rose : '#1F2937').animation({ duration: Motion.fast, curve: Motion.snap() })
+                .borderRadius(Radius.full)
+                .border({
+                width: this.sel === (this.idx(r, c)) ? 3 : 1,
+                color: this.sel === (this.idx(r, c)) ? Palette.amber : '#33FFFFFF'
+                })
+                .shadow(Shadow.card)
+                if (this.board[(this.idx(r, c))] === P_KING || this.board[(this.idx(r, c))] === A_KING) {
+                Text('♛').accessibilityLevel('no').fontSize(FontSize.sm).fontColor(Palette.amber)
+                }
+                } else if (this.targets.indexOf((this.idx(r, c))) >= 0) {
+                Row()
+                .width('34%')
+                .aspectRatio(1)
+                .backgroundColor(Palette.amber)
+                .borderRadius(Radius.full)
+                .opacity(0.75)
+                }
+                }
+                .layoutWeight(1)
+                .aspectRatio(1)
+                .backgroundColor(this.dark((r), (c)) ? this.theme.surfaceAlt : this.theme.surface)
+                .borderRadius(Radius.xs)
+                .animation({ duration: Motion.fast, curve: Motion.snap() })
+                .focusable(Tv.on())
+                .focusBox(Tv.box())
+                .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
+                .onClick(() => {
+                Haptics.tick();
+                this.tap((this.idx(r, c)));
+                })
+              }, (c: number) => 'c' + c)
+            }
+            .width('100%')
+            .layoutWeight(1)
+          }, (r: number) => 'r' + r)
+        }
+        .width('100%')
+        .aspectRatio(1)
+        // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
+        //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
+        // ★★★ 2026-10-30（平板横屏 853×533 真机实测）：
+        //   70% × 533 = 373vp，但固定部分（标题+HintBar+三信息卡+说明+重开）约 350vp
+        //   ⇒ 总计约 723vp，超出屏高 190vp ⇒ **「重开」按钮 y=1594px 被导航栏遮住**。
+        //   （landscape_checkers_BUTTON_CUT.jpeg，dump 量的 y 坐标）
+        //   ⇒ 改成 45%，与 GBejeweled 同一口径。
+        .constraintSize({ maxHeight: '45%' })
+        .padding(Space.xs)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.lg)
+        .shadow(Shadow.card)
+
+        Text(this.msg)
+          .fontSize(FontSize.sm)
+          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+
+        Button(TG('重开'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .width('100%')
+          .height(Cell.of(46))
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.restartTap(); }); })
+          .onClick(() => {
+            Haptics.tap();
+            this.restartTap();
+          })
+
+        Text(LanMatch.isActive()
+          ? '联机：你执下方（房主先手）；斜走一格，跳过对方子到空格即吃子，能跳必须跳、可连跳；到底线升王（♛）'
+          : '斜走一格；跳过对方子到空格即吃子。能跳必须跳，可连跳；到底线升王（♛）')
+          .fontSize(FontSize.xxs)
+          .fontColor(this.theme.inkFaint)
+      }
+      .onTouch((e: TouchEvent) => {
+        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+      })
+      .width('100%')
+      .constraintSize({ minHeight: '100%' })
+      .justifyContent(FlexAlign.Start)
     }
-    .onTouch((e: TouchEvent) => {
-      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    })
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Start)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring)
   }
 
   /** 顶部小格：kind 0=吃子 1=我的子 2=对方的子（联机时叫"对手"） */
