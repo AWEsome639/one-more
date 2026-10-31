@@ -213,6 +213,7 @@ export struct GAlphabetSudoku {
   @State private demoMsg: string = '';
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
+  private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
 
   @State private cells: number[] = [];
   @State private fixed: boolean[] = [];
@@ -350,9 +351,16 @@ export struct GAlphabetSudoku {
 
     if (this.demoPhase === 0) {
       if (this.demoRound >= 3) { this.demoFinish(); return -1; }
-      const hr: HintResult = this.computeHint();
-      if (hr.ok && hr.zh.length > 0) {
-        this.demoMsg = TG2('看这里：{0}', hr.zh);
+      // ★★ 2026-11-01：`computeHint()` 在部分游戏里很贵（数独要回溯求解）。
+      //   演示 3 轮各调一次 = 3 次昂贵计算，可能把主线程拖到 ANR
+      //   （真机上抓到过一次 THREAD_BLOCK_6S）。
+      //   ⇒ **只在第 1 轮算一次**，后续轮次复用同一句；算不出来才退回通用文案。
+      if (this.demoRound === 0) {
+        const hr: HintResult = this.computeHint();
+        this.demoHintText = (hr.ok && hr.zh.length > 0) ? hr.zh : '';
+      }
+      if (this.demoHintText.length > 0) {
+        this.demoMsg = TG2('看这里：{0}', this.demoHintText);
       } else {
         this.demoMsg = TG2('看清楚：这是第 {0} 步', String(this.demoRound + 1));
       }

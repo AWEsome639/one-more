@@ -108,6 +108,7 @@ export struct GSokoban {
   @State private demoMsg: string = '';
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
+  private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private diffTotal: number = GameDiff.sizeNow(300);
   /** ★★ 2026-10-14 滑行（奥森：部分游戏应该有动态的运动过程）：
    *  玩家与箱子【各自】从「来处」方向滑到新格子 */
@@ -408,9 +409,16 @@ export struct GSokoban {
       //   原来这里写的是通用的「看清楚：这是第 N 步」，等于什么都没说；
       //   而每款游戏本来就知道"这一步该指哪里"，它的 zh 就是最好的演示文案。
       //   算不出来（预算超时/无解）时才退回通用文案。
-      const hr: HintResult = this.computeHint();
-      if (hr.ok && hr.zh.length > 0) {
-        this.demoMsg = TG2('看这里：{0}', hr.zh);
+      // ★★ 2026-11-01：`computeHint()` 在部分游戏里很贵（数独要回溯求解）。
+      //   演示 3 轮各调一次 = 3 次昂贵计算，可能把主线程拖到 ANR
+      //   （真机上抓到过一次 THREAD_BLOCK_6S）。
+      //   ⇒ **只在第 1 轮算一次**，后续轮次复用同一句；算不出来才退回通用文案。
+      if (this.demoRound === 0) {
+        const hr: HintResult = this.computeHint();
+        this.demoHintText = (hr.ok && hr.zh.length > 0) ? hr.zh : '';
+      }
+      if (this.demoHintText.length > 0) {
+        this.demoMsg = TG2('看这里：{0}', this.demoHintText);
       } else {
         this.demoMsg = TG2('看清楚：这是第 {0} 步', String(this.demoRound + 1));
       }

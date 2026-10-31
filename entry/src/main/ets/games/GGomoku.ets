@@ -399,6 +399,7 @@ export struct GGomoku {
   @State private demoMsg: string = '';
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
+  private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private diffTotal: number = GameDiff.sizeNow(15);
   /** ★★ 2026-10-14 修复【死动画】：原来 .scale({x:1,y:1}) 是常量 ⇒ 落子动效从没生效
    *  现在：落子时先 0.6 再弹回 1（注释里原本就写着「从 0.6 弹到 1」）*/
@@ -638,9 +639,16 @@ export struct GGomoku {
       //   原来这里写的是通用的「看清楚：这是第 N 步」，等于什么都没说；
       //   而每款游戏本来就知道"这一步该指哪里"，它的 zh 就是最好的演示文案。
       //   算不出来（预算超时/无解）时才退回通用文案。
-      const hr: HintResult = this.computeHint();
-      if (hr.ok && hr.zh.length > 0) {
-        this.demoMsg = TG2('看这里：{0}', hr.zh);
+      // ★★ 2026-11-01：`computeHint()` 在部分游戏里很贵（数独要回溯求解）。
+      //   演示 3 轮各调一次 = 3 次昂贵计算，可能把主线程拖到 ANR
+      //   （真机上抓到过一次 THREAD_BLOCK_6S）。
+      //   ⇒ **只在第 1 轮算一次**，后续轮次复用同一句；算不出来才退回通用文案。
+      if (this.demoRound === 0) {
+        const hr: HintResult = this.computeHint();
+        this.demoHintText = (hr.ok && hr.zh.length > 0) ? hr.zh : '';
+      }
+      if (this.demoHintText.length > 0) {
+        this.demoMsg = TG2('看这里：{0}', this.demoHintText);
       } else {
         this.demoMsg = TG2('看清楚：这是第 {0} 步', String(this.demoRound + 1));
       }
