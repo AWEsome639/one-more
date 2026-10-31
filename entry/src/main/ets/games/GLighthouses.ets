@@ -562,6 +562,11 @@ export struct GLighthouses {
         Button(TG('提示'))
           .layoutWeight(1)
           .height(Cell.of(38))
+          // ★★★ 2026-10-31：这个按钮原来**没有任何 backgroundColor** ⇒
+          //   用 ArkUI 平台默认色（蓝），与全项目 339 款 HintBar 的 Palette.cyan 不一致。
+          //   ⇒ 补上，与其他提示按钮统一。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })

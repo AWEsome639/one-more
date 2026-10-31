@@ -383,8 +383,8 @@ export struct GArithmeticChain {
       Row({ space: Space.sm }) {
         Button(TG('提示'))
           .fontSize(FontSize.sm)
-          .fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .width('100%')
           .height(Cell.of(42))

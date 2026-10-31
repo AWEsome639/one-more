@@ -643,8 +643,8 @@ export struct GAlphabetSudoku {
       Row({ space: Space.sm }) {
         Button(TG('提示'))
           .fontSize(FontSize.sm)
-          .fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .layoutWeight(1)
           .height(44)

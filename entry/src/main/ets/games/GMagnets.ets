@@ -583,9 +583,9 @@ export struct GMagnets {
 
           .fontSize(FontSize.sm)
 
-          .fontColor(this.theme.ink)
+          .fontColor('#FFFFFF')
 
-          .backgroundColor(this.theme.surfaceAlt)
+          .backgroundColor(Palette.cyan)
 
           .borderRadius(Radius.md)
 
