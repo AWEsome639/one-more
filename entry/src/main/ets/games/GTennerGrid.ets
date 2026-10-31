@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -458,7 +459,10 @@ export struct GTennerGrid {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('100%')
+      // ★★ 2026-11-01 真机（横屏 853×533）：棋盘无宽度上限，
+      //   而格子在 Row 里 `layoutWeight(1) + aspectRatio(1)` ⇒ 高度 = 宽度
+      //   ⇒ 10×10 撑破屏幕，数字键与按钮全不可见（截图拍到）。
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360)))
 
       Column({ space: Space.xs }) {
         Row({ space: Space.xs }) {
@@ -569,7 +573,7 @@ export struct GTennerGrid {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
       if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
     })
-    .width('100%')
+.width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Start)
   }
