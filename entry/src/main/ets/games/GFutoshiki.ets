@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -1583,7 +1584,11 @@ export struct GFutoshiki {
         }
         .width('100%')
       }
-      .width('100%')
+      // ★★ 2026-11-01 真机（横屏 853×533）：棋盘没有宽度上限，
+      //   而格子在 Row(width 100%) 里 `layoutWeight(1) + aspectRatio(1)`
+      //   ⇒ **棋盘高 = 棋盘宽**，整块撑出屏幕（截图拍到格子巨大、4 行装不下）。
+      //   ⇒ 与扫雷同一类修法：边长取 min(可用宽, 可用高)。
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360)))
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
