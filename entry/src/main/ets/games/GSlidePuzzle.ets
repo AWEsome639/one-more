@@ -394,7 +394,11 @@ export struct GSlidePuzzle {
       .aspectRatio(1)
       // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
       //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: '70%' })
+      // ★★★ 2026-10-30（平板横屏 853×533 真机实测，dump 量的 提示 y=1570 / 重开 y=1566）：
+      //   70% × 533 = 373vp 棋盘 + 固定部分（标题+HintBar+信息+按钮）
+      //   ⇒ 底部按钮超出安全区 1480，**被导航栏遮住点不到**。
+      //   ⇒ 改成 45%，与 GBejeweled / GCheckers / GReversi / GCompoundConnect 同一口径。
+      .constraintSize({ maxHeight: '45%' })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
