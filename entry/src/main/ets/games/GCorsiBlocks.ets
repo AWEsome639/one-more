@@ -4,6 +4,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -287,6 +288,8 @@ export struct GCorsiBlocks {
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('100%').aspectRatio(1).layoutWeight(1).padding(Space.sm)
+      // ★ 2026-10-31 真机：宽驱动 aspectRatio 无上限 ⇒ 矮屏（横屏 533）棋盘撑爆、下方按钮在窗外。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg)
 
       Text(this.msg).fontSize(FontSize.sm)

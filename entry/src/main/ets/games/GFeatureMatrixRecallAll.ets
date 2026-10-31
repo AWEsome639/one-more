@@ -3,6 +3,7 @@
  * 胜负：6 格完全正确 ⇒ 通关；进度：倒计时 / 已选 n/6 / 点对数
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -288,6 +289,9 @@ export struct GFeatureMatrixRecallAll {
           }.width('100%')
         }, (row: number) => 'r' + row)
       }.width('100%').aspectRatio(1).padding(Space.sm)
+      // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
+      //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
       Button(this.phase === 2 ? TG('再来一局') : TG('提交'))

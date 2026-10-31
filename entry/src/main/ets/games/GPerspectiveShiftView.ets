@@ -4,6 +4,7 @@
  * 胜负：8 题答对 ≥6 ⇒ 通关；否则失败。　进度：第几题 / 已答对
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -308,6 +309,8 @@ export struct GPerspectiveShiftView {
         }.width('100%')
       }, (r: number) => 'r' + r)
     }.width('100%').aspectRatio(1).padding(Space.xs)
+    // ★ 2026-10-31 真机：宽驱动 aspectRatio 无上限 ⇒ 矮屏（横屏 533）棋盘撑爆、下方按钮在窗外。
+    .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
     .backgroundColor(this.theme.surface).borderRadius(Radius.md)
     .borderWidth(2).borderColor(this.borderOf(kind))
     .animation({ duration: Motion.fast, curve: Motion.snap() })

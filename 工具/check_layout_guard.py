@@ -23,8 +23,30 @@ TOT = 0
 for f in sorted(glob.glob(os.path.join(ROOT, 'entry/src/main/ets/games/*.ets'))):
     s = io.open(f, encoding='utf-8').read()
     n = os.path.basename(f)
-    # 找每一处 width('100%') 紧跟 aspectRatio(...) 的块
-    for m in re.finditer(r"\.width\('100%'\)\s*\n\s*\.aspectRatio\(([^)]*)\)", s):
+    # ★ 2026-10-31：原来只认「跨行」写法（.width 换行 .aspectRatio），
+    #   而 28 款是**同一行** `}.width('100%').aspectRatio(1).padding(...)`
+    #   ⇒ 守卫全漏。两种写法都要认。
+    PATTERNS = [
+        r"\.width\('100%'\)\s*\n\s*\.aspectRatio\(([^)]*)\)",
+        r"\.width\('100%'\)\.aspectRatio\(([^)]*)\)",
+    ]
+    for m in (mm for pat in PATTERNS for mm in re.finditer(pat, s)):
+        # ── 假阳性过滤 ①：注释里的伪代码（GGo9:16 / :927 就踩过）──
+        line_start = s.rfind('\n', 0, m.start()) + 1
+        line_text = s[line_start: m.end()]
+        if '//' in line_text or line_text.strip().startswith('*'):
+            continue
+        # ── 假阳性过滤 ②：layoutWeight 决定高度 ⇒ 不是"宽驱动" ──
+        #   （GCorsiBlocks:289 / GPong:496 这种：高度由 layoutWeight 分配，不溢出）
+        if '.layoutWeight(' in line_text:
+            continue
+        # ── 假阳性过滤 ③：Grid/GridItem 里的 cell，父 Grid 有定高 ──
+        #   这类 aspectRatio 只决定"格子的形状"，高度由 Grid 的轨道定。
+        #   判据：往回 30 行内若有 `Grid(` 或 `GridItem(`，跳过。
+        head = s[max(0, m.start() - 3000): m.start()]
+        tail_head = head[-3000:]
+        if ('Grid(' in tail_head or 'GridItem(' in tail_head):
+            continue
         TOT += 1
         # 看该块后续**有效代码行**（跳过注释与空行，最多看 12 行代码）内有没有 constraintSize
         tail = s[m.end(): m.end() + 2000]

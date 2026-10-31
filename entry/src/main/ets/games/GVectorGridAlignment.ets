@@ -5,6 +5,7 @@
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -252,6 +253,9 @@ export struct GVectorGridAlignment {
             }.width('100%')
           }, (r: number) => 'r' + r)
         }.width('100%').aspectRatio(1).padding(Space.xs).backgroundColor(this.theme.surfaceAlt)
+        // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
+        //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
+        .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
         .borderRadius(Radius.lg)
         Text(TG('(dx, dy)：+ 列向右、+ 行向下')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
