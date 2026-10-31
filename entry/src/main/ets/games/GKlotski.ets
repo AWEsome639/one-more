@@ -501,6 +501,7 @@ export struct GKlotski {
       //   ⇒ 演示态**不再交给 HintBar**，由游戏页自己渲染（本页 @State 直接生效）。
       if (this.demoId >= 0) {
         Row() {
+          // ★ 2026-10-31 演示文案：由游戏页自己渲染（不走 HintBar 的 @Prop）。
           Text(this.demoMsg.length > 0
             ? (TG('演示中') + ' ｜ ' + this.demoMsg)
             : TG('演示中…（碰一下就停）'))
