@@ -1,0 +1,12 @@
+{"cls": "GGomoku", "id": "gomoku", "name": "五子棋", "elements": 21, "lowY": 814, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GGravitySort", "id": "gravity_sort", "name": "重力排序", "elements": 41, "lowY": 1313, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GGridDisplacement", "id": "grid_displacement", "name": "网格位移", "elements": 18, "lowY": 1290, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GInterlockPuzzle", "id": "interlock_puzzle", "name": "互锁拼图", "elements": 24, "lowY": 1503, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GKenken", "id": "kenken", "name": "聪明格", "elements": 23, "lowY": 1419, "hasBtn": false, "ok": false, "shot": "l25_kenken.jpeg"}
+{"cls": "GLaserLink", "id": "laser_link", "name": "激光连线", "elements": 39, "lowY": 1504, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GLaserReflect", "id": "laser_reflect", "name": "镜面反射", "elements": 43, "lowY": 1504, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GLifeGame", "id": "life_game", "name": "生命游戏", "elements": 19, "lowY": 814, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GLightsOut", "id": "lights_out", "name": "灭灯", "elements": 22, "lowY": 1185, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GLockPattern", "id": "lock_pattern", "name": "图案锁", "elements": 21, "lowY": 838, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GMandalaRecall", "id": "mandala_recall", "name": "曼陀罗回忆", "elements": 20, "lowY": 1451, "hasBtn": true, "ok": true, "shot": ""}
+{"cls": "GMandelbrot", "id": "mandelbrot", "name": "分形探索", "elements": 21, "lowY": 814, "hasBtn": true, "ok": true, "shot": ""}
