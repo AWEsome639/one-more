@@ -21,6 +21,7 @@
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 第二期：围棋上 MCTS（工作线程）
@@ -910,6 +911,28 @@ export struct GGo9 {
       && (!LanMatch.isActive() || LanMatch.myTurn());
   }
 
+  /** 棋盘最大边长（vp）—— 按屏幕动态算，不再写死 300
+   *  ★★★ 2026-10-31 真机（平板竖屏 800×1280）抓到：
+   *    原来 `.constraintSize({ maxWidth: 300 })` 是**按横屏 533 高**算的。
+   *    竖屏 1280 高时高度绰绰有余，但宽度仍被限在 300 ⇒
+   *    棋盘实测只占 **184vp**（可用宽度 760vp 的 24%），下半屏空出 1400px。
+   *
+   *  ⇒ 改成与其它 7 款同口径的 `boardPx()` 公式（固定件约 300vp，占剩余 70%）：
+   *      w = Bp.width  - 40      （左右各 20 留白）
+   *      h = (Bp.height - 300) * 0.70
+   *      maxWidth = min(w, h)
+   *    横屏 853×533 ⇒ min(813, 163) = **163vp**（比原来的 300 更保守，不会再挤出屏幕）
+   *    竖屏 800×1280 ⇒ min(760, 686) = **686vp**（原来只有 184vp）
+   *
+   *  ⚠️ 保留 `.width('100%').aspectRatio(1)` 的宽驱动写法 —— 有源码级断言要求。
+   */
+  private boardMax(): number {
+    const FIXED: number = 300;
+    const w: number = Math.max(160, Bp.width - 40);
+    const h: number = Math.max(120, (Bp.height - FIXED) * 0.70);
+    return Math.min(w, h);
+  }
+
   build() {
     Column({ space: Space.sm }) {
       HintBar({
@@ -950,11 +973,11 @@ export struct GGo9 {
       //   ⚠️ 本款有**源码级断言**要求必须保留 `.width('100%')` + `.aspectRatio(1)`
       //      （verify_go9.mjs 用例 7「棋盘宽驱动」）⇒ **不能改成 width/height 计算值**。
       //   ⇒ 在保持宽驱动写法的前提下，用 maxWidth 限宽（aspectRatio 会自动反推高度）。
-      //     maxWidth 取 **300vp**：横屏 533 高时棋盘 300×300（离安全区还差 33vp），
-      //     竖屏 800 宽时棋盘 = min(800-40, 300) = **300vp** ——
-      //     ⚠️ 这里比 boardPx() 保守（那个能给 704vp），
+      //     ★ 2026-10-31：改为按屏幕算的 `boardMax()`（原来写死 300 在竖屏只用 24% 宽）。
+      //     · 横屏 853×533 ⇒ min(813, 163) = **163vp**（比原来 300 更保守，不会挤屏）
+      //     · 竖屏 800×1280 ⇒ min(760, 686) = **686vp**（原来只有 300）
       //        因为不能改宽驱动写法；但**保证两种比例都不溢出**。
-      .constraintSize({ maxWidth: 300 })
+      .constraintSize({ maxWidth: this.boardMax() })
       .padding(Space.xs)
       .backgroundColor(this.theme.isDark ? '#2A2118' : '#E8C88C')
       .borderRadius(Radius.md)
