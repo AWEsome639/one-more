@@ -23,3 +23,8 @@
 {"name": "七巧板", "acts": ["重开", "再来一局", "提示"], "low": 1448, "ok": true}
 {"name": "折纸", "acts": ["再来一局", "提示"], "low": 1529, "ok": true}
 {"name": "视角切换", "acts": ["提示"], "low": 1292, "ok": true}
+{"name": "负空间", "acts": ["提示"], "low": 1443, "ok": true}
+{"name": "数量直觉", "acts": ["提示"], "low": 1466, "ok": true}
+{"name": "矢印", "acts": ["重开", "提示"], "low": 1435, "ok": true}
+{"name": "向量对齐", "acts": ["提示"], "low": 1450, "ok": true}
+{"name": "空间广度", "acts": ["重开", "提示"], "low": 1505, "ok": true}
