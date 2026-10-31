@@ -565,7 +565,12 @@ export struct GReversi {
       .aspectRatio(1)
       // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
       //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: '70%' })
+      // ★★★ 2026-10-30（平板横屏 853×533 真机实测）：
+      //   70% × 533 = 373vp 棋盘，加固定部分（标题+演示提示+HintBar+三信息卡+状态文字）
+      //   ⇒ 底部「电脑思考中…」只露出上半，被导航栏切掉。
+      //   （landscape_reversi_TEXT_CUT.jpeg）
+      //   ⇒ 改成 45%，与 GBejeweled / GCheckers 同一口径。
+      .constraintSize({ maxHeight: '45%' })
       .padding(Space.xs)
       .backgroundColor(this.theme.isDark ? '#0B3B2E' : Palette.emerald)
       .borderRadius(Radius.lg)
