@@ -27,14 +27,16 @@ export class Back {
       // getLength() 返回 string（旧 API，但可用）；拿不到就按 -1 处理
       const s: string = router.getLength();
       const n: number = Number(s);
-      if (!isNaN(n) && n > 0) {
+      // ★ 必须用 >= 0：getLength() 返回 "0" 时也要认（否则 depth 停在 -1，
+      //   会落到 router.back() 分支 —— 那正是"栈空就退出应用"的老 bug）。
+      if (!isNaN(n) && n >= 0) {
         depth = n;
       }
     } catch (e) {
       depth = -1;
     }
-    if (depth === 1) {
-      // 只剩这一页 ⇒ back() 会退出应用 ⇒ 换成 replace
+    if (depth <= 1) {
+      // 只剩这一页（或已经空栈）⇒ back() 会退出应用 ⇒ 换成 replace
       router.replaceUrl({ url: fallback });
       return;
     }

@@ -428,7 +428,7 @@ export struct GKlotski {
       .aspectRatio(COLS / ROWS)
       // ★ 2026-10-31 真机：宽驱动 + 无高度上限 ⇒ 横屏 853×533 上棋盘撑到 813vp 高，
       //   把「重开」等按钮挤出屏幕。限高让它按 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Bp.height - 360 })
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
@@ -450,6 +450,7 @@ export struct GKlotski {
           this.moveBtn('↓', 0, 1)
           this.moveBtn('→', 1, 0)
           Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开'))
+            .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
             .fontSize(FontSize.sm)
             .fontColor(Color.White)
             .backgroundColor(Palette.amber)
@@ -458,6 +459,8 @@ export struct GKlotski {
             .layoutWeight(1)
             .focusable(Tv.on())
             .focusBox(Tv.box())
+            // ★ 2026-10-31：横屏这个「重开」漏了 onKeyEvent ⇒ 遥控器 OK 键点不动（审计抓到）
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
             .onClick(() => { Haptics.tap(); this.reset(); })
         }
         .width('100%')

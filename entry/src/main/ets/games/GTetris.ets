@@ -548,7 +548,7 @@ export struct GTetris {
       .aspectRatio(COLS / ROWS)
       // ★ 2026-10-31 真机：宽驱动 + 无高度上限 ⇒ 横屏 853×533 上棋盘撑到 813vp 高，
       //   把「重开」等按钮挤出屏幕。限高让它按 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Bp.height - 360 })
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
       .padding(GAP)
       .backgroundColor(this.theme.isDark ? '#0B0B12' : '#E2E8F0')
       .borderRadius(Radius.lg)
