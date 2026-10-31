@@ -16,6 +16,7 @@
 
 import { router } from '@kit.ArkUI';
 import { Digits } from '../core/I18n';   // ★ 2026-10-16 数字本地化
+import { Bp } from '../core/Bp';
 // ★ 2026-10-13「动画拉满」：数字滚动（从 GameHost 提取成公共件，见 core/MotionKit.ets）
 import { RollingNumber } from '../core/MotionKit';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Layout, Accent, Cell } from '../core/Design';
@@ -324,7 +325,14 @@ export struct StatsTab {
           .textAlign(TextAlign.Center)
       }
       .width('100%')
-      .padding({ left: Space.lg, right: Space.lg, top: Space.xl, bottom: Space.xxxl })
+      // ★★★ 2026-10-30：底部原来写 `Space.xxxl`(=48)，**比导航栏(60)还小**
+      //   ⇒ 960×540 下滚到底，「成就」卡片仍被导航栏遮住约 40%，
+      //     右侧滚动条已到底 ⇒ **用户永远看不到那两张卡的下半**。
+      //   ⇒ 与 SettingsTab 统一：按导航栏实际高度现算（barHeight + 48 余量）。
+      .padding({
+        left: Space.lg, right: Space.lg, top: Space.xl,
+        bottom: (Bp.isWatch() || Bp.tinyScreen() ? 36 : 60) + 48
+      })
       .opacity(this.entered ? 1 : 0)
       .translate({ y: this.entered ? 0 : ENTER_RISE })
       .animation({ duration: Motion.slow, curve: Motion.spring() })
