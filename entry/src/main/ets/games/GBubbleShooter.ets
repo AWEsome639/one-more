@@ -9,6 +9,7 @@
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { A11y } from '../core/A11y';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -429,6 +430,15 @@ export struct GBubbleShooter {
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+              // ★★★ 2026-10-31 色盲支持：气泡是**纯色圆**，红绿色盲无法区分
+              //   ⇒ 按颜色下标画一个字母（A11y 统一 8 色→A/B/C…）
+              //   白色 + 阴影，在任何底色上都看得清（见 A11y.glyphInk 的注释）
+              //   字号按格子边长自动夹在 8~20，不会破坏色块观感。
+              Text(A11y.glyph(this.field[(this.idx(r, c))]))
+                .fontSize(A11y.glyphSize(this.cellPx()))
+                .fontColor(A11y.glyphInk(this.field[(this.idx(r, c))]))
+                .textShadow(A11y.glyphShadow())
+                .fontWeight(FontWeight.Bold)
               }
               }
               .width(this.cellPx())
