@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -73,6 +74,8 @@ const KLO_TRACE: string =
   '300320102200021223343003201022000212333430132010220002123334';
 /** 方向表：与 tryMove(dx, dy) 一致 */
 const AI_DXS: number[] = [0, 1, 0, -1];
+/** 方向名（d=0 上 / 1 右 / 2 下 / 3 左，与 AI_DXS/AI_DYS 同序） */
+const DIR_NAME: string[] = ['上', '右', '下', '左'];
 const AI_DYS: number[] = [-1, 0, 1, 0];
 
 interface Blk {
@@ -103,6 +106,14 @@ export struct GKlotski {
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
   @State private demoLeft: number = 0;
+  // ★ 2026-10-31 演示动画三拍（与宝石迷阵同一套节拍器 core/Demo.ets）
+  //   华容道是「移动」类：第 1 拍先把要推的那块**圈出来并说往哪推**，
+  //   第 2 拍才真的推，第 3 拍亮一下剩余步数。
+  @State private demoGuideBlk: number = -1;   // 第 1 拍高亮哪块
+  @State private demoRound: number = 0;       // 演到第几轮
+  @State private demoPhase: number = 0;       // 0=引导 1=执行 2=结果
+  private demoSnapSel: number = -1;
+  private demoSnapBlk: string = '';
   @State private tip: string = TG('点方块选中，再点方向键移动');
 
   private startAt: number = 0;
@@ -222,28 +233,76 @@ export struct GKlotski {
   // ═══════════ 演示动画（项目 C）═══════════
   // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
   //   ⇒ 演完就是干净开局，成绩/记录不可能被污染
-  private demoStep(): boolean {
-    if (this.demoId < 0) { return false; }
-    if (this.demoLeft <= 0) { this.demoStop(); return false; }
-    this.demoLeft = this.demoLeft - 1;
-    this.autoStep();
-    return true;
+  /** 华容道的三拍演示：**引导（圈出方块 + 说往哪推）→ 执行 → 结果**
+   *  为什么不用旧版：旧版一个 tick 内 `aiApply()` 直接推完，
+   *  玩家只看到"方块瞬移"，不知道该看哪、也不知道刚才是往哪推的。
+   */
+  private demoBeat(): number {
+    if (this.demoId < 0) { return -1; }
+    if (this.over) { this.demoFinish(); return -1; }
+
+    const i: number = this.aiAt();
+
+    // ── 第 1 拍：引导 ──
+    if (this.demoPhase === 0) {
+      if (i < 0 || i >= KLO_STEPS || this.demoRound >= 2) { this.demoFinish(); return -1; }
+      const e: number = KLO_MOVES[i];
+      const d: number = e % 4;
+      const px: number = Math.floor(e / 4) % COLS;
+      const py: number = Math.floor(e / 4) / COLS | 0;
+      // 找出这块在 blocks 里的下标，高亮它
+      this.demoGuideBlk = -1;
+      for (let j = 0; j < this.blocks.length; j++) {
+        if (this.blocks[j].x === px && this.blocks[j].y === py) {
+          this.demoGuideBlk = j;
+          this.tip = TG2('看这块「{0}」：往{1}推一格', this.blocks[j].label, DIR_NAME[d]);
+          break;
+        }
+      }
+      Haptics.tick();
+      this.demoPhase = 1;
+      return Demo.GUIDE_MS;
+    }
+
+    // ── 第 2 拍：执行 ──
+    if (this.demoPhase === 1) {
+      if (i >= 0 && i < KLO_STEPS) { this.aiApply(i); }
+      Haptics.tap();
+      this.demoPhase = 2;
+      return Demo.ACT_MS;
+    }
+
+    // ── 第 3 拍：结果 ──
+    this.demoRound = this.demoRound + 1;
+    this.tip = this.demoRound >= 2
+      ? TG('就是这样挪。碰一下屏幕，换你来')
+      : TG2('推过去了。已走 {0} 步，最多 {1} 步', String(this.moves), String(this.diffTotal));
+    this.demoPhase = 0;
+    if (this.demoRound >= 2) { this.demoFinish(); }
+    return Demo.RESULT_MS;
+  }
+
+  private demoFinish(): void {
+    this.demoGuideBlk = -1;
+    this.demoPhase = 0;
+    this.demoRound = 0;
   }
 
   private demoStop(): void {
     if (this.demoId >= 0) {
-      Hint.autoStop(this.demoId);
+      Demo.stop(this.demoId);
       this.demoId = -1;
     }
-    const wasOn: boolean = this.demoLeft > 0;
-    this.demoLeft = 0;
+    const wasOn: boolean = this.demoPhase > 0 || this.demoRound > 0;
+    this.demoFinish();
     if (wasOn) { this.reset(); }
   }
 
   private demoStart(): void {
     if (this.demoId >= 0) { return; }
-    this.demoLeft = Hint.DEMO_STEPS;
-    this.demoId = Hint.demoRun(() => this.demoStep());
+    this.demoPhase = 0;
+    this.demoRound = 0;
+    this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
   private autoStep(): boolean {
@@ -539,7 +598,11 @@ export struct GKlotski {
       .justifyContent(FlexAlign.Center)
       .backgroundColor(this.blocks[i].color)
       .borderRadius(Radius.sm)
-      .border({ width: this.sel === i ? 3 : 0, color: '#FFFFFF' })
+      // ★ 演示引导：被圈中的那块加**金色描边 + 浮起阴影**，一眼知道"看这里"
+      .border({
+        width: (this.demoGuideBlk === i || this.sel === i) ? 3 : 0,
+        color: this.demoGuideBlk === i ? Palette.amber : '#FFFFFF'
+      })
       .shadow(this.sel === i ? Shadow.lifted : Shadow.card)
     }
     .width((this.blocks[i].w * 100 / COLS) + '%')
