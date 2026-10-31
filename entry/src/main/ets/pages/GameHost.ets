@@ -23,6 +23,7 @@ import { ProgressStore } from '../core/ProgressStore';
 import { GameLog } from '../core/GameLog';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Haptics } from '../core/Haptics';
+import { Back } from '../core/Back';
 import { SparkBurst } from '../components/SparkBurst';
 import { GameDiff } from '../core/GameDiff';
 import { AppClock } from '../core/AppClock';
@@ -486,26 +487,6 @@ struct GameHost {
   @State private backPressed: boolean = false;
   @State levelUpTo: number = 0;
 
-  /** 返回列表 —— 但要处理「路由栈里只有游戏页」的情况
-   *  ★★★ 2026-10-31 真机发现：应用被系统杀掉后恢复，会**直接回到游戏页**
-   *     （系统任务快照恢复，不经过 Splash）⇒ 此时路由栈里**没有列表页**。
-   *     `router.back()` 在栈空时会**退出应用** —— 玩家看到游戏页，点一下返回就回到桌面。
-   *  ⇒ 修法：栈深 ≤ 1 时用 `replaceUrl` 补回列表页，而不是 back()。
-   *    这样「恢复后点返回」= 正常回到列表（而不是退出）。
-   */
-  private goBack(): void {
-    try {
-      const n: number = Number(router.getLength());
-      if (!isNaN(n) && n <= 1) {
-        router.replaceUrl({ url: 'pages/Index' });
-        return;
-      }
-    } catch (e) {
-      // getLength 拿不到就退回原来的行为
-    }
-    router.back();
-  }
-
   aboutToAppear(): void {
     // ★ 路线 E：记下进游戏页的时刻（中途退出时用它算时长）
     this.startedAt = Date.now();
@@ -784,7 +765,7 @@ struct GameHost {
             })
             .onClick(() => {
               Haptics.tap();
-              this.goBack();
+              Back.go();
             })
 
           Column({ space: 2 }) {
@@ -3103,7 +3084,7 @@ struct GameHost {
             .borderRadius(Radius.md)
             .width('100%').height(46)
             .onClick(() => {
-              this.goBack();
+              Back.go();
             })
         }
         .width('100%')
@@ -3162,7 +3143,7 @@ struct GameHost {
       }
       if (Tv.isEsc(e.keyCode)) {
         Haptics.tap();
-        this.goBack();
+        Back.go();
       }
     })
     // ★ 动画 ①：与首页那张 GameCard 配对（同名 id）—— 卡片"长大"成整页。

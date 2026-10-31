@@ -14,6 +14,7 @@ import { LanRace, RaceScore } from '../core/LanRace';
 import { LanMatch } from '../core/LanMatch';
 import { GAMES, GameMeta, findGame, displayName } from '../core/GameRegistry';
 import { Haptics } from '../core/Haptics';
+import { Back } from '../core/Back';
 import { L } from '../core/I18n';
 
 /** 可联机的游戏（回合制对战型） */
@@ -98,7 +99,7 @@ struct LanLobby {
           })
           .onClick(() => {
             Haptics.tap();
-            router.back();
+            Back.go();
           })
         Text(this.t('局域网对战', 'LAN Play')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink).layoutWeight(1)

@@ -13,6 +13,7 @@
 import { router } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Accent } from '../core/Design';
 import { Haptics } from '../core/Haptics';
+import { Back } from '../core/Back';
 // ★★★ 2026-10-16 BUG #26 补完：★ 指南页的游戏名/分类/说明原来用【原文】直接渲染
 //   ⇒ 阿语下显示【中文】⇒ 改用 GameRegistry 的本地化助手（GameCard 用的就是这套）
 import { findGame, GameMeta, GameCategory, displayName, displayTagline, catLabelEn } from '../core/GameRegistry';
@@ -176,7 +177,7 @@ struct GuidePage {
           })
           .onClick(() => {
             Haptics.tap();
-            router.back();
+            Back.go();
           })
         Text(this.isPrivacy ? this.t('隐私政策', 'Privacy policy') : this.t('怎么玩', 'How to play'))
           .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
@@ -318,7 +319,7 @@ struct GuidePage {
       .width('100%').height(46)
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
-        router.back();
+        Back.go();
       })
   }
 
