@@ -9,6 +9,7 @@
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -353,6 +354,23 @@ export struct GBubbleShooter {
     this.onFinish(r);
   }
 
+  /** 每格边长（vp）：按「可用高度 / 行数」算，不按宽度算
+   *  ★★★ 2026-10-30（平板横屏 853×533 真机实测）：
+   *    原来只用 `.layoutWeight(1) + aspectRatio(1)`：
+   *      每格宽 = 屏宽/9 ≈ 88vp ⇒ 每格高也 88vp ⇒ **9 行 = 792vp**，
+   *      远超可用高度（约 400vp）⇒ 气泡网格**溢出，压到三张信息卡上**，
+   *      把「得分 / 剩余 / 剩余发射」的数字全遮住。
+   *    ⇒ 改成按高度算：每格 ≤ 可用高度/9。
+   *    ⚠️ 试过 `.constraintSize({maxHeight:'100%'})` —— 溢出是没了，
+   *      但格子在 `layoutWeight` 压扁的行里变得**极小**（挤在左上角），更糟。
+   */
+  private cellPx(): number {
+    // 9 行 + 8 个 2vp 间隙 ⇒ 每格 = (可用高 - 间隙) / 9
+    const gap: number = 2 * (ROWS - 1);
+    const avail: number = Math.max(120, Bp.height * 0.30);   // 横屏 533 ⇒ 160vp
+    return Math.max(10, (avail - gap) / ROWS);
+  }
+
   build() {
     Column({ space: Space.sm }) {
       HintBar({
@@ -413,8 +431,8 @@ export struct GBubbleShooter {
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               }
               }
-              .layoutWeight(1)
-              .aspectRatio(1)
+              .width(this.cellPx())
+              .height(this.cellPx())
               .focusable(Tv.on())
               .focusBox(Tv.box())
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.fire((c)); }); })
@@ -425,11 +443,11 @@ export struct GBubbleShooter {
             }, (c: number) => 'c' + c)
           }
           .width('100%')
-          .layoutWeight(1)
         }, (r: number) => 'r' + r)
       }
       .width('100%')
-      .layoutWeight(1)
+      // 容器按内容高度（不再 layoutWeight ⇒ 不会把行压扁）
+      .clip(true)
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
