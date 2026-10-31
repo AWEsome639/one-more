@@ -35,9 +35,11 @@ export struct DemoBar {
   build() {
     Row() {
       if (this.on) {
-        Text(this.msg.length > 0
-          ? (TG('演示中') + ' ｜ ' + this.msg)
-          : TG('演示中…（碰一下就停）'))
+        Text(TG('演示中') + ' ｜ '
+          + (this.msg.length > 0 ? this.msg : TG('碰一下就停'))
+          // ★ 不计分提示：335 款共用这一条，省得每款各写一遍。
+          //   已经写明「不计分」的（3 款手工版）就不重复。
+          + (this.msg.indexOf(TG('不计分')) >= 0 ? '' : TG('（演示不计分）')))
           .fontSize(FontSize.sm)
           .fontColor(Palette.amber)
           .textAlign(TextAlign.Center)
@@ -47,6 +49,8 @@ export struct DemoBar {
       }
     }
     .width('100%')
-    .height(38)
+    // ★ 未演示时高度归 0 —— 这样 355 款都可以**恒显示**这个组件，
+    //   调用方不必写 if/else 包一层（少一层缩进就少一类改错）。
+    .height(this.on ? 38 : 0)
   }
 }
