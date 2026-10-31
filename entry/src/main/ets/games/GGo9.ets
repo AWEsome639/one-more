@@ -946,7 +946,15 @@ export struct GGo9 {
       //   70%% × 533 = 373vp 棋盘，加固定部分（标题+HintBar+三信息卡+状态+重开）
       //   ⇒ 「重开」y=1590/1594，超出安全区 1480，**被导航栏遮住点不到**。
       //   ⇒ 改成 45%%，与 GBejeweled / GCheckers / GReversi 同一口径。
-      .constraintSize({ maxHeight: '45%' })
+            // ★★★ 2026-10-30（真机实测横屏 853×533，「重开」y=1594 被导航栏遮住）
+      //   ⚠️ 本款有**源码级断言**要求必须保留 `.width('100%')` + `.aspectRatio(1)`
+      //      （verify_go9.mjs 用例 7「棋盘宽驱动」）⇒ **不能改成 width/height 计算值**。
+      //   ⇒ 在保持宽驱动写法的前提下，用 maxWidth 限宽（aspectRatio 会自动反推高度）。
+      //     maxWidth 取 **300vp**：横屏 533 高时棋盘 300×300（离安全区还差 33vp），
+      //     竖屏 800 宽时棋盘 = min(800-40, 300) = **300vp** ——
+      //     ⚠️ 这里比 boardPx() 保守（那个能给 704vp），
+      //        因为不能改宽驱动写法；但**保证两种比例都不溢出**。
+      .constraintSize({ maxWidth: 300 })
       .padding(Space.xs)
       .backgroundColor(this.theme.isDark ? '#2A2118' : '#E8C88C')
       .borderRadius(Radius.md)
