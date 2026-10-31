@@ -279,6 +279,8 @@ export struct GSudoku {
       if (this.demoRound === 0) {
         const hr: HintResult = this.computeHint();
         this.demoHintText = (hr.ok && hr.zh.length > 0) ? hr.zh : '';
+        // ★ 把提示指向的格号交给 hintCell ⇒ 盘面上直接亮出金色描边
+        this.hintCell = (hr.ok && hr.cells.length > 0) ? hr.cells[0] : -1;
       }
       if (this.demoHintText.length > 0) {
         this.demoMsg = TG2('看这里：{0}', this.demoHintText);
@@ -291,6 +293,7 @@ export struct GSudoku {
     }
 
     if (this.demoPhase === 1) {
+      this.hintCell = -1;               // 描边只在引导拍亮
       const more: boolean = this.autoStep();
       if (!more) { this.demoFinish(); return -1; }
       Haptics.tap();
@@ -311,6 +314,8 @@ export struct GSudoku {
     this.demoPhase = 0;
     this.demoRound = 0;
     this.demoMsg = '';
+    this.hintCell = -1;
+    this.demoHintText = '';
     if (this.demoId >= 0) {
       Demo.stop(this.demoId);
       this.demoId = -1;
@@ -1038,6 +1043,9 @@ export struct GSudoku {
     }
     .layoutWeight(1)
     .aspectRatio(1)
+    // ★ 2026-11-01：`hintCell` 原来**只设不画** —— 提示只出一个文字，盘面上没有指向。
+    //   补上金色描边：提示与演示都能看见"是哪一格"。
+    .border({ width: this.hintCell === i ? 3 : 0, color: Palette.amber })
     .backgroundColor(this.cellBg(i))
     .borderRadius(Radius.xs)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
