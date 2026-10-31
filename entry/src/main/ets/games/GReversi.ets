@@ -8,6 +8,7 @@
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
@@ -477,6 +478,17 @@ export struct GReversi {
     this.onFinish(r);
   }
 
+  /** 棋盘边长（vp）：按「可用宽 / 可用高」取小值
+   *  ★★★ 2026-10-30：见 build() 里那段注释的③——
+   *    一个固定百分比（70% / 45%）不可能同时对横屏和竖屏都好。
+   *    ⇒ 按真实可用空间算，两种比例都尽量大、又一定装得下。
+   */
+  private boardPx(): number {
+    const w: number = Math.max(160, Bp.width - 40);      // 40 = 游戏区左右 padding
+    const h: number = Math.max(120, Bp.height * 0.55);   // 55% 留给棋盘，其余给标题/卡片/按钮
+    return Math.min(w, h);
+  }
+
   build() {
     Column({ space: Space.md }) {
       HintBar({
@@ -562,15 +574,22 @@ export struct GReversi {
         }, (r: number) => 'r' + r)
       }
       .width('100%')
-      .aspectRatio(1)
-      // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
-      //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      // ★★★ 2026-10-30（平板横屏 853×533 真机实测）：
-      //   70% × 533 = 373vp 棋盘，加固定部分（标题+演示提示+HintBar+三信息卡+状态文字）
-      //   ⇒ 底部「电脑思考中…」只露出上半，被导航栏切掉。
-      //   （landscape_reversi_TEXT_CUT.jpeg）
-      //   ⇒ 改成 45%，与 GBejeweled / GCheckers 同一口径。
-      .constraintSize({ maxHeight: '45%' })
+      // ★★★ 2026-10-30 · 用「算出来的边长」而不是百分比
+      //
+      //   历史（两次都是同一个坑）：
+      //     ① 原来只有 `.aspectRatio(1)`      ⇒ 横屏 1280vp 宽 ⇒ 1280vp 高，超出 533 ⇒ 场地被裁
+      //     ② 加 `.maxHeight: '70%'`           ⇒ 横屏 373vp，仍溢出（底部按钮被切）
+      //     ③ 改成 `.maxHeight: '45%'`         ⇒ **横屏好了，但竖屏 1280vp 下只剩 576vp，下方 380vp 空白**
+      //                                        （pts_reversi 实测，这是我引入的回归）
+      //
+      //   ★ 根因：**百分比是相对父容器，而父容器在横竖屏差一倍多**，
+      //     一个固定百分比不可能同时对两种比例都好。
+      //   ⇒ 改成按「可用宽 / 可用高」算边长，取小的那个：
+      //       横屏 533×853：min(853-40, 533*0.55) = min(813, 293) = 293vp
+      //       竖屏 1280×800：min(800-40, 1280*0.55) = min(760, 704) = 704vp
+      //     ⇒ **两种比例下棋盘都尽量大，而且一定装得下。**
+      .width(this.boardPx())
+      .height(this.boardPx())
       .padding(Space.xs)
       .backgroundColor(this.theme.isDark ? '#0B3B2E' : Palette.emerald)
       .borderRadius(Radius.lg)

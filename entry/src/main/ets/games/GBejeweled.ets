@@ -7,6 +7,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -396,6 +397,16 @@ export struct GBejeweled {
     this.onFinish(r);
   }
 
+  /** 棋盘边长（vp）：按「可用宽 / 可用高」取小值
+   *  ★★★ 2026-10-30：百分比（70% / 45%）在横竖屏下不可能同时最优
+   *    ⇒ 按真实可用空间算。
+   */
+  private boardPx(): number {
+    const w: number = Math.max(160, Bp.width - 40);
+    const h: number = Math.max(120, Bp.height * 0.55);
+    return Math.min(w, h);
+  }
+
   build() {
     // ★★★ 2026-10-30：横屏 853×533 下「其余部分就有 368vp」，
     //   棋盘 maxHeight 即便降到 45%（240vp），总计仍有 608vp > 533vp。
@@ -478,17 +489,13 @@ export struct GBejeweled {
             .layoutWeight(1)
           }, (r: number) => 'r' + r)
         }
-        .width('100%')
-        .aspectRatio(1)
-        // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
-        //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-        // ★★★ 2026-10-30（平板横屏 853×533 真机实测）：
-        //   70% × 533 = 373vp 正方形，但**其余部分就有 368vp**
-        //   ⇒ 总计 741vp，超出屏高 208vp ⇒ **底部按钮被切，点不到**。
-        //   （截图 landscape_games_bejeweled_CUT.jpeg）
-        //   ⇒ 改成 45%：棋盘 240vp，7×7 每格 34vp ≈ 103px，够点。
-        //   ⇒ 同时外面套 Scroll 兜底（极小屏/大字模式仍可能超高）。
-        .constraintSize({ maxHeight: '45%' })
+      // ★★★ 2026-10-30 · 用「算出来的边长」，不用百分比
+      //   百分比是相对父容器，而父容器横竖屏差一倍多 ⇒ 一个数不可能两头都好：
+      //     70%  ⇒ 横屏 373vp 溢出（底部按钮被切）
+      //     45%  ⇒ 横屏好了，但**竖屏 1280vp 下只剩 576vp，下方大片空白**（回归）
+      //   ⇒ 改成 min(可用宽, 可用高)，两种比例都尽量大、又一定装得下。
+      .width(this.boardPx())
+      .height(this.boardPx())
         .padding(Space.xs)
         .backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.lg)
