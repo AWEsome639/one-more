@@ -377,9 +377,19 @@ export struct GCompoundConnect {
    *    ⇒ 按真实可用空间算。模式已在 GBejeweled / GReversi 真机验过：
    *      横屏 293vp（装得下、按钮可见）/ 竖屏 704vp（尽量大、无空白）。
    */
-  private boardPx(): number {
+    private boardPx(): number {
+    // ★★★ 2026-10-31 · 第四版（前三版都错，完整记录）：
+    //   ① `Bp.height * 0.55`          ⇒ 横屏 293vp，把「重开」挤出屏幕
+    //   ② `(Bp.height - 260) * 0.85`  ⇒ 横屏 232vp，**仍然超 27vp**
+    //      （实测：棋盘 232vp 时「重开」y=1562px，安全上限 1480px）
+    //   ③ 错误原因：**固定部分是绝对值**（顶栏/HintBar/三信息卡/状态/按钮），
+    //      不是比例；且我两次都把固定部分估小了。
+    //   ④ 用实测数据反推：需要棋盘 ≤ 205vp ⇒ 比例取 **0.70**。
+    //      横屏 (533-260)*0.70 = 191vp ⇒ 「重开」约 480vp（安全）
+    //      竖屏 (1280-260)*0.70 = 714vp（受宽度限，仍比旧 704 大）
+    const FIXED: number = 300;   // ★ 第五版：实测黑白棋固定部分更大，取 300 覆盖所有款
     const w: number = Math.max(160, Bp.width - 40);
-    const h: number = Math.max(120, Bp.height * 0.55);
+    const h: number = Math.max(120, (Bp.height - FIXED) * 0.70);
     return Math.min(w, h);
   }
 
