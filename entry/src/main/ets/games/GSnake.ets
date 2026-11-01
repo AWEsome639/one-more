@@ -636,7 +636,7 @@ export struct GSnake {
 
       // 暂停 / 重开
       Row({ space: Space.md }) {
-        Button(this.paused ? '继续' : TG('暂停'))
+        Button(this.paused ? TG('继续') : TG('暂停'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor(Color.White)

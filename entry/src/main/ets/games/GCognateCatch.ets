@@ -309,7 +309,7 @@ export struct GCognateCatch {
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.answered ? (this.lastOk ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       if (this.answered) {
-        Button(this.over ? '看结果' : TG('下一题 →'))
+        Button(this.over ? TG('看结果') : TG('下一题 →'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46))
           .focusable(Tv.on())

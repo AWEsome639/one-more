@@ -330,7 +330,7 @@ export struct GLogicalSyllogisms {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.judge(false, ''); }); }).onClick(() => { Haptics.tap(); this.judge(false, ''); })
       }.width('100%')
-      Text(this.feedback.length > 0 ? this.feedback : '结论能从两个前提必然推出吗？')
+      Text(this.feedback.length > 0 ? this.feedback : TG('结论能从两个前提必然推出吗？'))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         .padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       Row({ space: Space.md }) {

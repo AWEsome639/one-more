@@ -790,7 +790,7 @@ export struct GBlockEscape {
   @Builder
   infoBox(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? TG('步数') : (kind === 1 ? '距出口' : TG('用时')))
+      Text(kind === 0 ? TG('步数') : (kind === 1 ? TG('距出口') : TG('用时')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.moves)

@@ -312,7 +312,7 @@ export struct GSequenceStack {
           .layoutWeight(1).height(Cell.of(48)).backgroundColor((Palette.sky)).borderRadius(Radius.sm)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
         }.width('100%')
-        Text(this.terms.length >= 2 ? '相邻两项差相同 ⇒ 等差；比相同 ⇒ 等比' : TG('先算出第二项，规律就露出来了')).fontSize(FontSize.xxs)
+        Text(this.terms.length >= 2 ? TG('相邻两项差相同 ⇒ 等差；比相同 ⇒ 等比') : TG('先算出第二项，规律就露出来了')).fontSize(FontSize.xxs)
           .fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card)

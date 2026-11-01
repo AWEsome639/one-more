@@ -300,7 +300,7 @@ export struct GPrimeFactorTrees {
         Text(Digits(String(this.rest), this.langCode)).fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
           .fontColor(this.rest > 1 ? this.theme.ink : Palette.emerald)
         Text(TG2('目标数 {0}', String(this.target))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
-        Text(this.chain.length > 0 ? this.chain.join(' × ') + (this.rest > 1 ? ' × …' : '') : '还没有拆下任何因子')
+        Text(this.chain.length > 0 ? this.chain.join(' × ') + (this.rest > 1 ? ' × …' : '') : TG('还没有拆下任何因子'))
           .fontSize(FontSize.lg).fontColor(Palette.cyan)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })

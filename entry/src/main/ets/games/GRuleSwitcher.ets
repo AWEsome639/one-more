@@ -285,7 +285,7 @@ export struct GRuleSwitcher {
         Text((this.avg() > 0 ? String(this.avg()) + 'ms' : '—')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
-      Text(this.rule === 0 ? '规则：看奇偶' : '规则：比 50 大小')
+      Text(this.rule === 0 ? TG('规则：看奇偶') : TG('规则：比 50 大小'))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor('#FFFFFF').textAlign(TextAlign.Center)
         .width('100%').height(Cell.of(40)).borderRadius(Radius.full)
         .backgroundColor(this.rule === 0 ? Palette.sky : Palette.violet)

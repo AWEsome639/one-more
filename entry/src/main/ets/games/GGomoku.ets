@@ -1098,7 +1098,7 @@ export struct GGomoku {
       .width('100%')
 
       Text(LanMatch.isActive()
-        ? '联机：你执 ● 先行（房主先手）；对方落 ○，五子连珠即胜 · 悔棋已禁用'
+        ? TG('联机：你执 ● 先行（房主先手）；对方落 ○，五子连珠即胜 · 悔棋已禁用')
         : TG('你执黑先行；电脑用启发式评分抢攻与堵截，连成五子即胜'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

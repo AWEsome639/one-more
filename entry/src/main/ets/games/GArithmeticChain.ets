@@ -411,7 +411,7 @@ export struct GArithmeticChain {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
       }.width('100%')
 
-      Text(this.chain.length > 0 ? this.chain.join('  →  ') : '还没有任何运算')
+      Text(this.chain.length > 0 ? this.chain.join('  →  ') : TG('还没有任何运算'))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
       Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)

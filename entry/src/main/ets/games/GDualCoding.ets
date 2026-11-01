@@ -303,7 +303,7 @@ export struct GDualCoding {
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.phase === 0 ? TG('记忆') : '答题')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.phase === 0 ? TG('记忆') : TG('答题'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((this.phase === 0 ? TG('倒计时') : TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

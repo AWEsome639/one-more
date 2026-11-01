@@ -309,7 +309,7 @@ export struct GSpellingSprint {
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
 
       Row({ space: Space.sm }) {
-        TextInput({ text: this.input, placeholder: '输入英文单词' })
+        TextInput({ text: this.input, placeholder: TG('输入英文单词') })
           .placeholderFont({ size: FontSize.sm }).placeholderColor(this.theme.inkFaint)
           .fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))

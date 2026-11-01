@@ -282,14 +282,14 @@ export struct GRunningMemorySpan {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.phase === 'show' ? '闪数字' : (this.phase === 'input' ? TG('回忆') : TG('结束')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.phase === 'show' ? TG('闪数字') : (this.phase === 'input' ? TG('回忆') : TG('结束')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
         Text(this.phase === 'show' ? (this.cur < 0 ? '…' : String(this.cur)) : this.slots())
           .fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
           .fontColor(this.phase === 'show' ? Palette.rose : this.theme.ink).scale({ x: this.phase === 'show' ? 1.08 : 1, y: this.phase === 'show' ? 1.08 : 1 })
-        Text(this.phase === 'show' ? '看，别点' : '点出最后 ' + String(this.span) + TG(' 个'))
+        Text(this.phase === 'show' ? TG('看，别点') : '点出最后 ' + String(this.span) + TG(' 个'))
           .fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%').height(130).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)

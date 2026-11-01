@@ -668,7 +668,7 @@ export struct GTetris {
   @Builder
   infoBox(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? TG('得分') : (kind === 1 ? TG('消行') : '等级'))
+      Text(kind === 0 ? TG('得分') : (kind === 1 ? TG('消行') : TG('等级')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.score)

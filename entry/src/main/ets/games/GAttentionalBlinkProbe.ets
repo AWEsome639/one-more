@@ -339,7 +339,7 @@ export struct GAttentionalBlinkProbe {
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.inkFaint); Text((this.score + '/' + this.diffTotal * 2)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.phase === 0 ? '闪现中' : (this.phase === 1 ? '答数字' : '答探针'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.phase === 0 ? TG('闪现中') : (this.phase === 1 ? TG('答数字') : TG('答探针')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Stack() {

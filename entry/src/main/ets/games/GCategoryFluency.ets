@@ -322,7 +322,7 @@ export struct GCategoryFluency {
           .borderRadius(Radius.md).width(84).height(Cell.of(46))
           .enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); }).onClick(() => { Haptics.tap(); this.submit(); })
       }.width('100%')
-      Text(this.used.length > 0 ? this.used.join(' · ') : '（还没列出来）')
+      Text(this.used.length > 0 ? this.used.join(' · ') : TG('（还没列出来）'))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         .maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)

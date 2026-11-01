@@ -699,11 +699,11 @@ export struct GFlappy {
   @Builder
   stat(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '穿过' : (kind === 1 ? TG('用时') : TG('状态')))
+      Text(kind === 0 ? TG('穿过') : (kind === 1 ? TG('用时') : TG('状态')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? this.score + ' / ' + PIPE_GOAL
         : (kind === 1 ? this.secs + 's'
-          : (this.over ? (this.won ? '通关' : TG('结束')) : '飞行中')))
+          : (this.over ? (this.won ? TG('通关') : TG('结束')) : TG('飞行中'))))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(kind === 0 ? Palette.primary
           : (kind === 1 ? Palette.sky

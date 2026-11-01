@@ -256,7 +256,7 @@ export struct GAreaPerimeterMatch {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }
       .width('100%')
-      Text(this.metric === 0 ? '谁的面积更大？' : '谁的周长更大？')
+      Text(this.metric === 0 ? TG('谁的面积更大？') : TG('谁的周长更大？'))
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
         .fontColor(Palette.primaryDeep)
       Row({ space: Space.sm }) {

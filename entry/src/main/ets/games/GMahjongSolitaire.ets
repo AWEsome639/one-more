@@ -527,7 +527,7 @@ export struct GMahjongSolitaire {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
 
-      Text(this.over ? (this.won ? '🎉 全部消完，通关！' : TG('无解了…重开一局')) :
+      Text(this.over ? (this.won ? TG('🎉 全部消完，通关！') : TG('无解了…重开一局')) :
         (this.sel === -1 ? TG('点第一张牌，再点能和它连起来的同款牌') : TG('已选中，找它的搭档')))
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)

@@ -585,7 +585,7 @@ export struct GMathMaze {
               .fontSize(FontSize.xl)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.theme.ink)
-              Text((r * this.diffTotal + c) === GOAL ? '🏁' : (this.trail.length > 0 && (r * this.diffTotal + c) === this.trail[0] ? '起' : ''))
+              Text((r * this.diffTotal + c) === GOAL ? '🏁' : (this.trail.length > 0 && (r * this.diffTotal + c) === this.trail[0] ? TG('起') : ''))
               .fontSize(FontSize.xxs)
               .fontColor(this.theme.inkFaint)
               }

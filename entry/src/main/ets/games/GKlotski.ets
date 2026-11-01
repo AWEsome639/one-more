@@ -647,7 +647,7 @@ export struct GKlotski {
   @Builder
   head(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? TG('步数') : (kind === 1 ? '距出口' : TG('已选')))
+      Text(kind === 0 ? TG('步数') : (kind === 1 ? TG('距出口') : TG('已选')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       // ★★★ 2026-11-01（奥森原话「演示动画不应该让玩家得分…就是一段动画，不计分」）：
       //   这一款的演示**会真的 tryMove**（`moves++`），第 661 轮我加了「演完快照恢复」，

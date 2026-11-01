@@ -624,11 +624,11 @@ export struct GDoodleJump {
   @Builder
   stat(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '高度' : (kind === 1 ? TG('目标') : TG('状态')))
+      Text(kind === 0 ? TG('高度') : (kind === 1 ? TG('目标') : TG('状态')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? TG2('{0} 米', Math.floor(this.climbed))
         : (kind === 1 ? TG2('{0} 米', GOAL_M)
-          : (this.over ? (this.won ? '通关' : TG('结束')) : '进行中')))
+          : (this.over ? (this.won ? TG('通关') : TG('结束')) : TG('进行中'))))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(kind === 0 ? Palette.primary
           : (kind === 1 ? Palette.emerald

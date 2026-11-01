@@ -369,7 +369,7 @@ export struct GVektorVector {
       .focusable(Tv.on())
       .focusBox(Tv.box())
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((3)); }); }) }.width('100%')
-      Text(this.msg.length > 0 ? this.msg : '选一个正确答案').fontSize(FontSize.sm)
+      Text(this.msg.length > 0 ? this.msg : TG('选一个正确答案')).fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')

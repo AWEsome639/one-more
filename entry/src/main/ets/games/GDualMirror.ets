@@ -398,7 +398,7 @@ export struct GDualMirror {
         .shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('状态'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.over ? (this.won ? '通关' : TG('结束')) : '进行中')).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((this.over ? (this.won ? Palette.emerald : Palette.rose) : Palette.sky))
+        Text((this.over ? (this.won ? TG('通关') : TG('结束')) : TG('进行中'))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((this.over ? (this.won ? Palette.emerald : Palette.rose) : Palette.sky))
         }
         .layoutWeight(1)
         .padding(Space.sm)

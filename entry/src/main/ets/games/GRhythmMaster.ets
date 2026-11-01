@@ -327,7 +327,7 @@ export struct GRhythmMaster {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.phase === 'demo' ? '示范' : (this.phase === 'tap' ? '跟拍' : TG('结束')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.phase === 'demo' ? TG('示范') : (this.phase === 'tap' ? TG('跟拍') : TG('结束')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('已敲'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

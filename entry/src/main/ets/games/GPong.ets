@@ -582,7 +582,7 @@ export struct GPong {
       )
 
       Row({ space: Space.md }) {
-        Button(this.running ? TG('暂停') : '继续')
+        Button(this.running ? TG('暂停') : TG('继续'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor(Color.White)
