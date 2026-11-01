@@ -796,7 +796,10 @@ struct Splash {
               [this.omPxV() * 0.5071, this.omPxV() * 0.4961]
             ])
             .fill('#FAF8F3')
-            .position({ x: this.omPxV() * 0.4929, y: this.omPxV() * 0.0 })
+            // 2026-11-01 device pixel measure: O bottom y=1104, M bottom y=1046
+            // => M sits 58px (14% of ring height) too high; code math says only 10px.
+            // => reversible experiment: shift M down by 0.056 x omPxV, measure again.
+            .position({ x: this.omPxV() * 0.4929, y: this.omPxV() * 0.0560 })
             // ★ 两拍节奏：环先到（pStroke），M 晚 70ms 到（pM）
             .opacity(this.seg(this.pM, 0.001, 0.55))
             .scale({ x: 0.94 + this.seg(this.pM, 0.0, 1.0) * 0.06,
