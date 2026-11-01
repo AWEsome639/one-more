@@ -15,7 +15,7 @@ import { Tv } from '../core/Tv';
 import { router } from '@kit.ArkUI';
 import { About } from '../core/About';
 import { Haptics } from '../core/Haptics';
-import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Layout, Accent } from '../core/Design';
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Layout, Accent, Cell } from '../core/Design';
 import {GAMES, GameMeta, GameCategory, gamesByCategory, categoryList, findGame, displayName, displayTagline, catLabelEn, BUILD_TAG } from '../core/GameRegistry';
 import { ProgressStore } from '../core/ProgressStore';
 import { I18n, L, TN, Digits } from '../core/I18n';
@@ -115,6 +115,15 @@ export struct GamesTab {
   @State private flyingId: string = '';
 
   /** 顶栏两个图标按钮的按下态（按下放大 1.08 —— item ④「图标按下弹一下」） */
+  /** ★ 2026-11-01（第 822 轮）：**搜索**。
+   *  文件头注释一直写着「游戏页 —— 等级条 + 搜索 + 今日挑战 + …」，
+   *  但 2026-10-10 那次清理重写时，因为「一搜索整个列表区就不渲染」
+   *  这个**补丁残留**问题，把搜索整个去掉了 —— 355 款游戏从此没有搜索框。
+   *  ⇒ 本轮干净重做：只动 list() 的缓存 key 与 computeList() 的过滤，
+   *    不碰 Grid / 虚拟化 / 布局结构（那次事故的根因在结构，不在逻辑）。
+   */
+  @State private searchText: string = '';
+  @State private searchOpen: boolean = false;
   @State private darkPressed: boolean = false;
   @State private langPressed: boolean = false;
   /** A-Z 索引条当前高亮（跟着列表滚动走） */
@@ -316,7 +325,9 @@ export struct GamesTab {
 
   /** 当前该显示哪些游戏（带记忆化） */
   private list(): GameMeta[] {
-    const key: string = this.seg + '|' + this.category + '|' + this.picked.join(',');
+    // ★ 搜索文本必须进 key，否则输入后命中旧缓存、列表不动（加搜索最容易踩的坑）
+    const key: string = this.seg + '|' + this.category + '|' + this.picked.join(',') +
+      '|s:' + this.searchText.trim().toLowerCase();
     if (key === this.listCacheKey) {
       return this.listCache;
     }
@@ -385,6 +396,20 @@ export struct GamesTab {
       base = this.byIds(ProgressStore.recent());
     } else {
       base = gamesByCategory(this.category);
+    }
+    // ★ 搜索：按「中文名 / 英文名 / 副标题」三路匹配，不区分大小写
+    const q: string = this.searchText.trim().toLowerCase();
+    if (q.length > 0) {
+      const hit: GameMeta[] = [];
+      for (let i = 0; i < base.length; i++) {
+        const g: GameMeta = base[i];
+        if (g.name.toLowerCase().indexOf(q) >= 0 ||
+            (g.enName !== undefined && g.enName.toLowerCase().indexOf(q) >= 0) ||
+            (g.tagline !== undefined && g.tagline.toLowerCase().indexOf(q) >= 0)) {
+          hit.push(g);
+        }
+      }
+      base = hit;
     }
     if (this.picked.length === 0) {
       return base;
@@ -783,6 +808,10 @@ build() {
         } else {
           this.topBar()
         }
+        // ★ 搜索栏：紧跟在顶栏之后（"想找东西"的第一反应位置）
+        if (this.searchOpen) {
+          this.searchBar()
+        }
         // ★ 极小屏（含手机「显示大小」调到最小）只留标题 + 列表
         if (!Bp.tinyScreen()) {
           this.levelStrip()
@@ -1178,6 +1207,18 @@ build() {
           ProgressStore.saveLang(next);   // ★ 落盘
           this.renderRev = this.renderRev + 1;
         })
+        // ★ 搜索入口（第 822 轮）：355 款游戏没有搜索不可接受
+        Text('🔍')
+          .fontSize(FontSize.lg).width(Layout.touchMin).height(Layout.touchMin).textAlign(TextAlign.Center)
+          .backgroundColor(this.searchOpen ? Palette.primary : this.theme().surface)
+          .borderRadius(Radius.full)
+          .shadow(Shadow.card)
+          .onClick(() => {
+            Haptics.tap();
+            this.searchOpen = !this.searchOpen;
+            if (!this.searchOpen) { this.searchText = ''; }
+          })
+
       }
     }
     .width('100%')
@@ -1848,6 +1889,47 @@ build() {
       Haptics.tap();   // ★ 2026-10-19 按压反馈
       this.openGame(m.id);
     })
+  }
+
+  /** ★ 2026-11-01（第 822 轮）：**搜索栏**。
+   *  文件头注释一直写着「游戏页 —— 等级条 + 搜索 + 今日挑战 + …」，
+   *  但 2026-10-10 那次清理重写时，因为「一搜索整个列表区就不渲染」
+   *  这个**补丁残留**问题把搜索整个去掉了 —— 355 款游戏此后没有搜索框。
+   *  ⇒ 本轮干净重做：只动 list() 的缓存 key 与 computeList() 的过滤，不碰 Grid 结构。
+   *  位置：顶栏下方、等级条之前 —— 它是"想找东西时的第一反应"。
+   */
+  @Builder
+  searchBar() {
+    Column() {
+      Row({ space: Space.xs }) {
+        Text('🔍').fontSize(FontSize.sm).fontColor(this.theme().inkFaint)
+        TextInput({ text: this.searchText, placeholder: this.t('搜游戏名或玩法', 'Search games') })
+          .layoutWeight(1)
+          .height(Cell.of(38))
+          .fontSize(FontSize.sm)
+          .backgroundColor(Color.Transparent)
+          .placeholderColor(this.theme().inkFaint)
+          .onChange((v: string) => {
+            this.searchText = v;
+          })
+        if (this.searchText.length > 0) {
+          Text('✕')
+            .fontSize(FontSize.sm).fontColor(this.theme().inkFaint)
+            .width(Cell.of(32)).height(Cell.of(32)).textAlign(TextAlign.Center)
+            .onClick(() => {
+              Haptics.tap();
+              this.searchText = '';
+            })
+        }
+      }
+      .width('100%')
+      .padding({ left: Space.md, right: Space.xs })
+      .backgroundColor(this.theme().surface)
+      .borderRadius(Radius.full)
+      .shadow(Shadow.card)
+    }
+    .width('100%')
+    .padding({ left: Space.lg, right: Space.lg, top: Space.xs })
   }
 
   @Builder
