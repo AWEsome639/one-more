@@ -343,7 +343,7 @@ export struct GRhythmMaster {
           .accessibilityLevel('no')
           .scale({ x: this.pulse ? 1.3 : 1, y: this.pulse ? 1.3 : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-        Text(this.phase === 'demo' ? TG('第 ') + String(this.beat) + ' 拍' : '目标间隔 ' + String(this.diffTotal) + ' ms')
+        Text(this.phase === 'demo' ? TG2('第 {0} 拍', this.beat) : TG2('目标间隔 {0} ms', this.diffTotal))
           .fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
       }.width('100%').height(140).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)

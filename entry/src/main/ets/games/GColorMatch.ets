@@ -11,7 +11,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/D
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -150,7 +150,7 @@ export struct GColorMatch {
      demoOn: false,
      disabled: this.demoId >= 0,
    })
- Text(TG('得分 ') + this.score + '/' + this.goalScore + '　步数 ' + this.moves + '/' + MAX
+ Text(TG4('得分 {0}/{1}　步数 {2}/{3}', this.score, this.goalScore, this.moves, MAX)
  + TG2('　进度 {0}%', Math.min(100, Math.floor(this.score * 100 / this.goalScore))))
         .fontSize(FontSize.sm)
         // ★ 得分跳动：分数一变就弹一下

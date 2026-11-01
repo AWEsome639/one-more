@@ -5,7 +5,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -286,9 +286,9 @@ export struct GVisualSearchAll {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
-      Text(TG('第 ') + String(Math.min(this.round + 1, this.diffTotal)) + '/' + String(this.diffTotal) + ' 轮 · 找到 ' +
-        String(this.foundCount()) + '/' + String(this.need()) +
-        TG2(' · 剩余 {0}', String(Math.max(this.left, 0))) + TG2('s · 得分 {0}',Digits(String(this.score), this.langCode)))
+      Text(TG4('第 {0}/{1} 轮 · 找到 {2}/{3}', Math.min(this.round + 1, this.diffTotal), this.diffTotal, this.foundCount(), this.need())
+
+        + TG2(' · 剩余 {0}', Math.max(this.left, 0)) + TG2('s · 得分 {0}', this.score))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         .padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       Column({ space: Space.xs }) {

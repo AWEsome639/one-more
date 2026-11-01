@@ -10,7 +10,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
@@ -262,7 +262,7 @@ export struct GSourceMonitoring {
         autoOn: this.autoId >= 0
       })
       Text((this.phase === 'study' ? TG('记忆') : TG('题号 ') + Math.min(this.q + 1, this.diffTotal) + '/' + this.diffTotal)
-        + TG('　答对 ') + this.score + '/' + NEED + '　倒计时 ' + this.left + 's')
+        + TG4('　答对 {0}/{1}　倒计时 {2}s', this.score, NEED, this.left, ''))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       if (this.phase === 'study') {
         ForEach(Q_IDX, (i: number) => {

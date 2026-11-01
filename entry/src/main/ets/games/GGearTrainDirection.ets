@@ -8,7 +8,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -271,8 +271,8 @@ export struct GGearTrainDirection {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
-      Text(TG('第 ') + Math.min(this.idx + 1, this.diffTotal) + '/' + this.diffTotal + ' 题　得分 ' + this.score
-        + TG('　失误 ') + this.wrong + '/' + LIVES)
+      Text(TG4('第 {0}/{1} 题　得分 {2}', Math.min(this.idx + 1, this.diffTotal), this.diffTotal, this.score)
+        + TG2('　失误 {0}/{1}', this.wrong, LIVES))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       Column({ space: Space.xs }) {
         ForEach(this.gearIds, (i: number) => {

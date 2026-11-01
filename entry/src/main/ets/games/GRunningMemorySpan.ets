@@ -289,7 +289,7 @@ export struct GRunningMemorySpan {
         Text(this.phase === 'show' ? (this.cur < 0 ? '…' : String(this.cur)) : this.slots())
           .fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
           .fontColor(this.phase === 'show' ? Palette.rose : this.theme.ink).scale({ x: this.phase === 'show' ? 1.08 : 1, y: this.phase === 'show' ? 1.08 : 1 })
-        Text(this.phase === 'show' ? TG('看，别点') : '点出最后 ' + String(this.span) + TG(' 个'))
+        Text(this.phase === 'show' ? TG('看，别点') : TG2('点出最后 {0} 个', this.span))
           .fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%').height(130).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)

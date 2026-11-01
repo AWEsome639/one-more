@@ -481,7 +481,7 @@ export struct GSlidePuzzle {
 
       Row({ space: Space.md }) {
         Text(this.hintMsg.length > 0 ? this.hintMsg : (this.over
-          ? (this.won ? '全部归位 🎉 得分 ' + String(this.score) : TG('步数用尽，本局失败'))
+          ? (this.won ? TG2('全部归位 🎉 得分 {0}', this.score) : TG('步数用尽，本局失败'))
           : TG('点空格旁边的块把它推进去')))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)

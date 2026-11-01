@@ -5,7 +5,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -280,7 +280,7 @@ export struct GVisualStatisticalLearning {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
-      Text(TG('第 ') + String(Math.min(this.round + 1, ROUNDS)) + '/' + String(ROUNDS) + ' 轮 · 答对 ' +
+      Text(TG4('第 {0}/{1} 轮 · 答对 {2}', Math.min(this.round + 1, ROUNDS), ROUNDS, '') +
         String(this.hits) + '/' + String(NEED) + ' · ' + String(Math.min(this.cursor + 1, this.diffTotal)) +
         '/' + String(this.diffTotal))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')

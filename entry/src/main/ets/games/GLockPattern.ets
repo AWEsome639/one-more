@@ -407,7 +407,7 @@ export struct GLockPattern {
       .shadow(Shadow.card)
 
       Text(this.phase === 0 ? TG('👀 记住顺序…') :
-        (this.phase === 1 ? '按顺序点出来（已连 ' + String(this.input.length) + TG(' 个）')
+        (this.phase === 1 ? TG2('按顺序点出来（已连 {0} 个）', this.input.length)
           : (this.won ? TG('🎉 五关全过！') : TG('❌ 点错了，重开一局'))))
         .fontSize(FontSize.md)
         .fontColor(this.phase === 2 ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)

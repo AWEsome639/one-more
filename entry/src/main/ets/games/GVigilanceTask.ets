@@ -309,7 +309,7 @@ export struct GVigilanceTask {
 
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
-      Button(this.over ? TG('已结束') : ('看到 ' + TARGET + ' 就点我'))
+      Button(this.over ? TG('已结束') : TG2('看到 {0} 就点我', TARGET))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.lg).fontColor('#FFFFFF').enabled(!this.over)
         .backgroundColor(this.over ? this.theme.lineSoft : Palette.primary)

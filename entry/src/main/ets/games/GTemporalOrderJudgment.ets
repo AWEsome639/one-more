@@ -305,7 +305,7 @@ export struct GTemporalOrderJudgment {
         .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
       }.width('100%').height(180)
       Row({ space: Space.sm }) {
-        Button((true ? '⬅️ ' : '➡️ ') + this.embAt((0)) + (true ? ' 左边先' : ' 右边先'))
+        Button((true ? '⬅️ ' : '➡️ ') + this.embAt((0)) + (true ? TG(' 左边先') : TG(' 右边先')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(true ? Palette.sky : Palette.violet)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).enabled(this.phase === 3 && !this.over)
@@ -313,7 +313,7 @@ export struct GTemporalOrderJudgment {
         .focusable(Tv.on())
         .focusBox(Tv.box())
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((0)); }); })
-        Button((false ? '⬅️ ' : '➡️ ') + this.embAt((1)) + (false ? ' 左边先' : ' 右边先'))
+        Button((false ? '⬅️ ' : '➡️ ') + this.embAt((1)) + (false ? TG(' 左边先') : TG(' 右边先')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(false ? Palette.sky : Palette.violet)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).enabled(this.phase === 3 && !this.over)

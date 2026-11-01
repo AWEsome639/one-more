@@ -13,7 +13,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -524,7 +524,7 @@ export struct GSortingVisualizer {
       .alignItems(VerticalAlign.Bottom)
 
       Text(this.sorted
-        ? this.msg + ' · 比较 ' + this.comps + ' 次，交换 ' + this.swaps + TG(' 次')
+        ? this.msg + TG4(' · 比较 {0} 次，交换 {1} 次', this.comps, this.swaps, '', '')
         : (this.running ? TG('播放中…') : TG('点「开始」播放；也可单步看每一次比较与交换')))
         .fontSize(FontSize.sm)
         .fontColor(this.sorted ? Palette.emerald : this.theme.inkSoft)

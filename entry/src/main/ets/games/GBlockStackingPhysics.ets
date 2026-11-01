@@ -311,7 +311,7 @@ export struct GBlockStackingPhysics {
         }, (k: number) => 'k' + k)
       }.width('100%').alignItems(VerticalAlign.Bottom)
       Column({ space: Space.xs }) {
-        Text(this.queue.length > 0 ? '待放 ' + this.queue.length + TG(' 块') : TG('清单已空'))
+        Text(this.queue.length > 0 ? TG2('待放 {0} 块', this.queue.length) : TG('清单已空'))
 .fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
         Text(this.queue.length > 0 ? TG2('{0} 宽 {1}', EMJ[this.queue[0]], this.queue[0]) : '🏁')
 .fontSize(FontSize.xxl)

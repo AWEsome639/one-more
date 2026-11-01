@@ -7,7 +7,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/D
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -316,8 +316,7 @@ export struct GPerspectiveTaking {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
-      Text(TG('第 ') + String(this.q) + '/' + String(TOTAL) + ' 题 · 答对 ' + String(this.correct)
-        + ' · 需要 ' + String(NEED) + TG(' 题'))
+      Text(TG4('第 {0}/{1} 题 · 答对 {2} · 需要 {3} 题', this.q, TOTAL, this.correct, NEED))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       Row({ space: Space.md }) {
         Column({ space: 2 }) {

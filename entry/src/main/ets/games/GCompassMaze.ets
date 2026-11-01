@@ -11,7 +11,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/D
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
@@ -406,7 +406,7 @@ export struct GCompassMaze {
      demoOn: false,
      disabled: this.demoId >= 0,
    })
- Text(TG('步数 ') + this.steps + '/' + DMAX + '　指令 ' + (this.idx + 1) + '/' + this.cmds.length
+ Text(TG4('步数 {0}/{1}　指令 {2}/{3}', this.steps, DMAX, this.idx + 1, this.cmds.length)
  + TG2('　出口 {0}排{1}列', this.diffTotal, this.diffTotal)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: 0 }) {
  ForEach(this.rowIdx(), (r: number) => {

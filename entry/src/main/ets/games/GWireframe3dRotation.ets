@@ -5,7 +5,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -275,8 +275,7 @@ export struct GWireframe3dRotation {
   build() {
     Column({ space: Space.sm }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-      Text(TG('第 ') + String(Math.min(this.asked + 1, ROUNDS)) + '/' + String(ROUNDS) + ' 题 · 答对 ' +
-        String(this.hits) + '/' + String(this.diffTotal))
+      Text(TG4('第 {0}/{1} 题 · 答对 {2}/{3}', Math.min(this.asked + 1, ROUNDS), ROUNDS, this.hits, this.diffTotal))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md)
       Text(art(this.targetMarks)).fontSize(FontSize.sm).lineHeight(Space.md)

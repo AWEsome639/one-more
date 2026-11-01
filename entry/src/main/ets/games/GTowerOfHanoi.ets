@@ -7,7 +7,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
@@ -291,8 +291,8 @@ export struct GTowerOfHanoi {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
-      Text(TG('步数 ') + String(this.moves) + ' · 最少 ' + String(BEST) + ' · 上限 ' + String(this.diffTotal) +
-        ' · 右柱 ' + String(this.pegs.length > 2 ? this.pegs[2].length : 0) + '/' + String(DISKS))
+      Text(TG4('步数 {0} · 最少 {1} · 上限 {2}', this.moves, BEST, this.diffTotal, '')
+          + TG2(' · 右柱 {0}/{1}', this.pegs.length > 2 ? this.pegs[2].length : 0, DISKS))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         .padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       Row({ space: Space.xs }) {

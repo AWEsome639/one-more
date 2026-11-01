@@ -626,7 +626,7 @@ export struct GPathIntersect {
 
       Row({ space: Space.md }) {
         Text(this.over
-          ? (this.won ? '四线齐通 🎉 得分 ' + String(this.score) : TG('步数用尽，本局失败'))
+          ? (this.won ? TG2('四线齐通 🎉 得分 {0}', this.score) : TG('步数用尽，本局失败'))
           : TG('点端点起线，再点相邻格延伸；点线即撤销'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)

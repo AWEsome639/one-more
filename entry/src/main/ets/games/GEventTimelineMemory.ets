@@ -342,7 +342,7 @@ export struct GEventTimelineMemory {
                 Column({ space: 2 }) {
                 Text(this.cards.length > (r * 2 + c) ? this.cards[(r * 2 + c)].icon : '·').fontSize(FontSize.xxl)
                 Text(this.cards.length > (r * 2 + c) ? this.cards[(r * 2 + c)].label : '').fontSize(FontSize.xs).fontColor(this.theme.inkSoft)
-                Text(this.picks.indexOf((r * 2 + c)) >= 0 ? TG('第 ') + String(this.picks.indexOf((r * 2 + c)) + 1) + ' 位' : ' ')
+                Text(this.picks.indexOf((r * 2 + c)) >= 0 ? TG2('第 {0} 位', this.picks.indexOf((r * 2 + c)) + 1) : ' ')
                 .fontSize(FontSize.xxs).fontColor(this.picks.indexOf((r * 2 + c)) >= 0 ? Palette.berry : this.theme.inkFaint)
                 }.layoutWeight(1).padding(Space.sm).backgroundColor(this.picks.indexOf((r * 2 + c)) >= 0 ? '#22EC4899' : this.theme.surfaceAlt)
                 .borderRadius(Radius.md).borderWidth(2).borderColor(this.picks.indexOf((r * 2 + c)) >= 0 ? Palette.berry : this.theme.line)
