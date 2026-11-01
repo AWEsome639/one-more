@@ -651,6 +651,32 @@ export struct GBejeweled {
                 //   当前状态：格子保持 focusable + id + onKeyEvent 导航代码
                 //   （失败路径已做安全处理：requestFocus 失败就不 stopPropagation），
                 //   升 API 后这段代码会**直接生效**，无需再改。
+                // ★★★★ 2026-11-01 **最终结论（9 条假设全排除，含升 API 实验）**：
+                //
+                //   ✅ 已查清的事实（全部真机证据）：
+                //     · id 建成了（dump 能看到 cell_0_0 … cell_6_6）
+                //     · requestFocus 返回 false（hilog 实测）
+                //     · TAB 遍历从不经过它们（9 次 TAB 逐次 dump，全在 hdr-0..4 和
+                //       Scroll/Button 之间循环）⇒ **格子完全不在焦点树里**
+                //
+                //   ❌ 9 条假设全排除：
+                //     ① 去根 defaultFocus ② 根 focusable(false) ③ 上下键不吃掉
+                //     ④ 显式 requestFocus ⑤ GameHost 外包层 focusScopeId
+                //     ⑥ 游戏组件根 focusScopeId ⑦ 游戏组件根 focusable
+                //     ⑧ nextFocus（API 12 下编译过但运行时无效）
+                //     ⑨ **升 compatibleSdkVersion 到 5.1.0(18) 后再试 nextFocus**
+                //        —— 能编译、能装、能跑，但 **TAB 路径一字未变**
+                //        ⇒ 已回退（升 API 不影响设备范围之外的东西，没必要）
+                //
+                //   ★ 关键认识（省掉了一次不该做的产品决策）：
+                //     `nextFocus` 管的是「**已经聚焦时**按方向键跳到哪个 id」，
+                //     不是「把这个组件注册进焦点树」。
+                //     ⇒ 格子不在焦点树里，nextFocus 就无事可做。
+                //     ⇒ **升 API 不解决这个问题** —— 不用为此缩小设备支持范围。
+                //
+                //   ⇒ 剩下的方向只有架构级：让棋盘元素成为**页面级**的焦点参与者
+                //     （把格子渲染上移到 GameHost 层，或用 Builder 展开到同一层）。
+                //     那是 355 款的改造，需独立排期。
                 .focusable(Tv.on())
                 .focusBox(Tv.box())
                 // ★ 自绘焦点框的真实驱动（focusBox 只改样式，不负责出现）
