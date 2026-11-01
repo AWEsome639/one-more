@@ -334,7 +334,7 @@ export struct GFeatureMatrixRecallAll {
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
 
-      Text(this.phase === 0 ? ('⏳ ' + String(this.secLeft) + ' 秒后遮蔽') : this.msg)
+      Text(this.phase === 0 ? TG2('⏳ {0} 秒后遮蔽', this.secLeft) : this.msg)
         .fontSize(FontSize.sm).fontColor(this.phase === 0 ? Palette.amber : this.theme.inkSoft)
         .width('100%').textAlign(TextAlign.Center)
 

@@ -439,7 +439,7 @@ export struct GKakuroMini {
     const hc: number = (this.sel % N) + 1;
     const pos: string = '第 ' + String(hr) + ' 行第 ' + String(hc) + ' 列填 ' + String(v);
     return Hint.make([this.sel],
-      pos + ' —— 整盘解是 ' + sol.slice(0, 3).join(' ') + ' / ' + sol.slice(3, 6).join(' '),
+      TG2('{0} —— 整盘解是 {1}', pos, sol.slice(0, 3).join(' ') + ' / ' + sol.slice(3, 6).join(' ')),
       'Fill ' + String(v) + ' here; the full solution is ' + sol.join(' '), t0);
   }
   private askAuto(): void {

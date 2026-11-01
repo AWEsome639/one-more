@@ -257,7 +257,7 @@ export struct GLockPattern {
     if (cells.length === 0) {
       return Hint.none('none');
     }
-    return Hint.make(cells, '按顺序点：' + parts.join(' → '), 'Tap in order: ' + parts.join(' -> '), t0);
+    return Hint.make(cells, TG2('按顺序点：{0}', parts.join(' → ')), TG2('Tap in order: {0}', parts.join(' -> ')), t0);
   }
   private askAuto(): void {
     Haptics.tap();

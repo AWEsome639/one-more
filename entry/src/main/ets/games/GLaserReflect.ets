@@ -381,7 +381,7 @@ export struct GLaserReflect {
       .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
       .backgroundColor(this.theme.isDark ? '#0B0B0B' : '#EEF2F7').borderRadius(Radius.lg)
       Row({ space: Space.md }) {
-        Text(this.msg + '　🔦发射器 🎯探头').fontSize(FontSize.xs).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Text(TG2('{0}　🔦发射器 🎯探头', this.msg)).fontSize(FontSize.xs).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
           .fontColor(this.theme.inkSoft).layoutWeight(1)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)

@@ -9,7 +9,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -208,7 +208,7 @@ export struct GFrequencyTap {
     }
     const last: number = this.beatTs[this.beatTs.length - 1];
     const next: number = last + GAP;
-    return Hint.make([], '跟着节拍点：下一拍还有 ' + String(Math.max(0, next - Date.now())) + ' ms（已命中 ' + String(this.hitN) + '/' + String(this.diffTotal) + '）',
+    return Hint.make([], TG4('跟着节拍点：下一拍还有 {0} ms（已命中 {1}/{2}）', Math.max(0, next - Date.now()), this.hitN, this.diffTotal, ''),
       'Next beat in ' + String(Math.max(0, next - Date.now())) + ' ms', t0);
   }
   private askAuto(): void {

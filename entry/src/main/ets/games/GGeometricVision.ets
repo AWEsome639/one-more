@@ -10,7 +10,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/D
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -238,7 +238,7 @@ export struct GGeometricVision {
       this.note = TG2('对！A {0} 格、B {1} 格 ✅', na, nb);
     } else {
       this.wrong++; this.shakeX = 8; setTimeout(() => { this.shakeX = -8; }, 60); setTimeout(() => { this.shakeX = 0; }, 120);
-      this.note = '错：A ' + na + ' 格、B ' + nb + ' 格（失误 ' + this.wrong + '/' + LIVES + '）';
+      this.note = TG4('错：A {0} 格、B {1} 格（失误 {2}/{3}）', na, nb, this.wrong, LIVES);
     }
     this.idx++;
     if (this.wrong >= LIVES) { this.finish(false); return; }

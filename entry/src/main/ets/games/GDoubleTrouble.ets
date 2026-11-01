@@ -327,7 +327,7 @@ export struct GDoubleTrouble {
     this.over = true;
     this.won = solved;
     this.msg = solved
-      ? '🎉 撑过 ' + ROUNDS + ' 轮，答对 ' + this.right + ' 个小任务'
+      ? TG2('🎉 撑过 {0} 轮，答对 {1} 个小任务', ROUNDS, this.right)
       : TG2('结束：撑到第 {0} 轮，答对 {1} 个小任务', this.round, this.right);
     this.finish(solved);
   }

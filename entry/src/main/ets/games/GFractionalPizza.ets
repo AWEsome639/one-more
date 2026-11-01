@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -228,7 +228,7 @@ export struct GFractionalPizza {
     this.checked = true; this.ok = this.onCount === this.n;
     if (this.ok) {
       this.right = this.right + 1; this.score += 150; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
-      this.msg = '✅ 正好 ' + String(this.n) + '/' + String(this.d) + '，答对 ' + String(this.right) + '/' + this.diffTotal;
+      this.msg = TG4('✅ 正好 {0}/{1}，答对 {2}/{3}', this.n, this.d, this.right, this.diffTotal);
     } else {
       this.score = Math.max(0, this.score - 20); this.msg = TG2('❌ 你点亮了 {0} 片，应该是 {1} 片', String(this.onCount), String(this.n)); this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
     }
