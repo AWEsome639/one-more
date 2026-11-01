@@ -3241,9 +3241,17 @@ struct GameHost {
     //   · 只在桌面/大屏上生效（`Tv.desktopKeys()`）⇒ 手机/平板零影响
     //   ⚠️ 必须 focusable + 默认焦点，否则键盘事件收不到
     .focusable(Tv.desktopKeys())
-    // ★★★ 2026-11-01：ESC 需要这个默认焦点（否则键盘事件收不到）。
-    //   ⚠️ 已实测：去掉它也**不能**让 ArkUI 的默认方向键遍历恢复（DOWN/CENTER 差异仍 0），
-    //      所以保留 —— 它至少保证了 ESC 可用。
+    // ★★★ 2026-11-01：ESC 需要这个默认焦点。
+    //   🔬 **已做过的实验（全部失败，不要再试）**：
+    //     ① 去掉 .defaultFocus ⇒ DOWN/CENTER 差异仍 0
+    //     ② 根容器 .focusable(false) ⇒ 差异仍 0
+    //     ③ 上下键不吃掉、交给默认遍历 ⇒ 差异 0
+    //     ④ 去掉根容器 focusable 后显式 requestFocus 到格子 ⇒ 1166 处全无 id，做不到
+    //   ⇒ 结论：**ArkUI 的默认方向键遍历不进入游戏棋盘区**（与根容器无关）。
+    //     游戏内焦点需要另一套方案（给格子加 tabIndex 或稳定 id + 显式导航），
+    //     那是 1166 处 × 3 行的独立工程，不在本页修。
+    //   ✅ 已验证有效的是「顶栏 5 个按钮 + 显式 requestFocus('hdr-N')」，
+    //      那块请勿回退（差异 24699 像素，见台账第 657~658 轮）。
     .defaultFocus(Tv.desktopKeys())
     .onKeyEvent((e: KeyEvent) => {
       if (!Tv.desktopKeys()) {
