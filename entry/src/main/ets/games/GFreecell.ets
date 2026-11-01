@@ -272,7 +272,7 @@ export struct GFreecell {
 
   /** 牌面文字：♠5 / ♥3（空位写「空」） */
   private cardText(c: Card): string {
-    return c.rank === 0 ? '空' : suitChar(c.suit) + String(c.rank);
+    return c.rank === 0 ? TG('空') : suitChar(c.suit) + String(c.rank);
   }
 
   // ═══════════ 代打求解（16 张小空当接龙 ⇒ 可以完全搜）═══════════

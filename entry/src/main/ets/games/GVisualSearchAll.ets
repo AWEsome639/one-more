@@ -288,7 +288,7 @@ export struct GVisualSearchAll {
       })
       Text(TG4('第 {0}/{1} 轮 · 找到 {2}/{3}', Math.min(this.round + 1, this.diffTotal), this.diffTotal, this.foundCount(), this.need())
 
-        + TG2(' · 剩余 {0}', Math.max(this.left, 0)) + TG2('s · 得分 {0}', this.score))
+        + TG2(' · 剩余 {0}s · 得分 {1}', Math.max(this.left, 0), this.score))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         .padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       Column({ space: Space.xs }) {

@@ -93,12 +93,12 @@ export struct GTaskSwitching {
     this.qAt = Date.now();
   }
 
-  private ruleName(): string { return this.rule === 0 ? '判形状' : '判颜色'; }
+  private ruleName(): string { return this.rule === 0 ? TG('判形状') : TG('判颜色'); }
   private avgRep(): number { return this.repN > 0 ? Math.round(this.repSum / this.repN) : 0; }
   private avgSw(): number { return this.swN > 0 ? Math.round(this.swSum / this.swN) : 0; }
   private cost(): number { return this.avgSw() - this.avgRep(); }
   private optName(i: number): string {
-    return this.rule === 0 ? (i === 0 ? '● 圆' : '■ 方') : (i === 0 ? '🔴 红' : '🔵 蓝');
+    return this.rule === 0 ? (i === 0 ? TG('● 圆') : TG('■ 方')) : (i === 0 ? TG('🔴 红') : TG('🔵 蓝'));
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════

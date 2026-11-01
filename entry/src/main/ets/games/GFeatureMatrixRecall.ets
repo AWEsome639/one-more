@@ -98,7 +98,7 @@ export struct GFeatureMatrixRecall {
   }
 
   private colorName(c: string): string {
-    return c === Palette.rose ? '红色' : '蓝色';
+    return c === Palette.rose ? TG('红色') : TG('蓝色');
   }
 
   /** 代打/提示共用：该点的目标色格子（没有就 -1） */

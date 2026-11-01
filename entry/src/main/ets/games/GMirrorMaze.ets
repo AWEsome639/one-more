@@ -155,15 +155,15 @@ export struct GMirrorMaze {
   /** 方向名（提示用） */
   private dirName(d: number): string {
     if (d === 0) {
-      return '上';
+      return TG('上');
     }
     if (d === 1) {
-      return '右';
+      return TG('右');
     }
     if (d === 2) {
-      return '下';
+      return TG('下');
     }
-    return '左';
+    return TG('左');
   }
 
   /** 代打：BFS 到终点，返回下一步该按的方向（-1 = 走不到） */
