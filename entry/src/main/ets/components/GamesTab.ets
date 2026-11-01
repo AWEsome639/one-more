@@ -1289,7 +1289,7 @@ build() {
       }
       .width('100%')
       .padding(Space.md)
-      .margin({ left: Space.lg, right: Space.lg, top: Space.sm })
+      .margin({ left: Space.lg, right: Space.lg, top: Space.xs })
       .backgroundColor(this.accentColor())
       .borderRadius(Radius.md)
       .shadow(Shadow.card)
@@ -1318,7 +1318,7 @@ build() {
     }
     .width('100%')
     .padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm })
-    .margin({ left: Space.lg, right: Space.lg, top: Space.sm })
+    .margin({ left: Space.lg, right: Space.lg, top: Space.xs })
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
@@ -1374,7 +1374,7 @@ build() {
     }
     .width('100%')
     .padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm })
-    .margin({ left: Space.lg, right: Space.lg, top: Space.sm })
+    .margin({ left: Space.lg, right: Space.lg, top: Space.xs })
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
@@ -1411,7 +1411,7 @@ build() {
     }
     .width('100%')
     .constraintSize({ maxHeight: 300 })
-    .margin({ left: Space.lg, right: Space.lg, top: Space.sm })
+    .margin({ left: Space.lg, right: Space.lg, top: Space.xs })
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
@@ -1447,7 +1447,7 @@ build() {
       this.segBtn(Seg.RECENT, '🕐 玩过的', '🕐 Played')
     }
     .width('100%')
-    .padding({ left: Space.lg, right: Space.lg, top: Space.sm })
+    .padding({ left: Space.lg, right: Space.lg, top: Space.xs })
   }
 
   @Builder
@@ -1507,6 +1507,17 @@ build() {
     return 46;
   }
 
+  /** ★ 2026-11-01（第 762 轮）：**为了在 440×744 上多露一行游戏卡**。
+   *
+   *  实测（dump 坐标）：
+   *    Grid 可用高度 ≈ 169vp ｜ 一行卡 84vp + rowsGap 12vp = 96vp
+   *    ⇒ 169 − 96 = 73vp < 96vp ⇒ 第二行**差 11vp** 才放得下
+   *    ⇒ 屏幕上看就是「只有 2 张卡 + 下方 70vp 空白」（不是布局 bug，是装不下）
+   *
+   *  ⇒ 把三处 10vp 的顶间距收到 6vp（dailyCard / randomCard / segRow），共省 12vp：
+   *    12 > 11 ⇒ 刚好让第二行露出来。
+   *  ⇒ 这 4vp 的差在大屏上肉眼不可见，但把竖屏手机的可见游戏数从 2 提到 4。
+   */
   private cardH(): number {
     // ★★★ 2026-10-19 真机大字模式实拍后重算（奥森：「任何地方都要注意」）
     //   实拍现象：elder 下「宝石迷阵」被挤成两行、「打砖块」副标题被截
