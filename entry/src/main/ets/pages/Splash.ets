@@ -708,7 +708,11 @@ struct Splash {
               .stroke('#E8CE96')
               .strokeWidth(this.omPxV() * GLINT_WIDTH[0])
               .strokeDashArray([this.omPxV() * 0.0832, this.omPxV() * 1.5140])
-              .strokeDashOffset(-this.omPxV() * 0.3785 * i)
+              // ★★★ 2026-11-01 真机放大看到：`-0.3785 * i` = **每 90° 一个 20° 弧**，
+              //   读作「四个等分的装饰条」，不像环面受光。
+              //   ⇒ 改成 **每 17° 一段（略重叠）** ⇒ 四段连成一条 ~68° 的**连续高光带**，
+              //     随 pGlint 旋转 ⇒ 是「一束光扫过环面」，这才是金属环的正确读法。
+              .strokeDashOffset(-this.omPxV() * 0.0710 * i)
               .scale({ x: GLINT_SCALE[0], y: GLINT_SCALE[0] })
               .rotate({ angle: this.pGlint * 90 })
               .opacity(this.pGlint * GLINT_ALPHA[0] * GLINT_PHASE[i])
@@ -723,7 +727,7 @@ struct Splash {
               .stroke('#FFF0CE')
               .strokeWidth(this.omPxV() * GLINT_WIDTH[1])
               .strokeDashArray([this.omPxV() * 0.0832, this.omPxV() * 1.5140])
-              .strokeDashOffset(-this.omPxV() * 0.3785 * i)
+              .strokeDashOffset(-this.omPxV() * 0.0710 * i)
               .scale({ x: GLINT_SCALE[1], y: GLINT_SCALE[1] })
               .rotate({ angle: this.pGlint * 90 })
               .opacity(this.pGlint * GLINT_ALPHA[1] * GLINT_PHASE[i])
@@ -738,7 +742,7 @@ struct Splash {
               .stroke('#F5DFB0')
               .strokeWidth(this.omPxV() * GLINT_WIDTH[2])
               .strokeDashArray([this.omPxV() * 0.0832, this.omPxV() * 1.5140])
-              .strokeDashOffset(-this.omPxV() * 0.3785 * i)
+              .strokeDashOffset(-this.omPxV() * 0.0710 * i)
               .scale({ x: GLINT_SCALE[2], y: GLINT_SCALE[2] })
               .rotate({ angle: this.pGlint * 90 })
               .opacity(this.pGlint * GLINT_ALPHA[2] * GLINT_PHASE[i])
