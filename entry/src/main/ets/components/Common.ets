@@ -923,24 +923,34 @@ build() {
       x: this.pressed ? 0.97 : (this.hovered ? 1.02 : 1),
       y: this.pressed ? 0.97 : (this.hovered ? 1.02 : 1)
     })
+    // ★★★★ 2026-11-01 奥森问「宝石迷阵外面这层蓝框怎么回事」⇒ 迭代了三次：
+    //
+    //   第 1 版（他看到的）：`.border({ width: 4, color: Palette.primary })`
+    //     ⇒ **#6366F1 靛蓝紫与紫卡撞色**，糊成"贴了一圈脏胶带"。
+    //
+    //   第 2 版：`.border({ width: 3, color: theme.ink })` + 主色外发光
+    //     ⇒ 不撞色了，但**实心黑环很硬** —— 读作"被框住"，不是"被选中"。
+    //
+    //   第 3 版（当前）：**只留外发光 + 轻微放大，完全不要边框**
+    //     · 焦点时 `scale 1.04` + 双层光晕（主色内晕 + 更大更淡的外晕）
+    //     · 卡片"浮起来"是**最高级的选中语言**（macOS Dock / iOS 图标长按、
+    //       Android 的 elevation、Material 的 selected state 都是这个路子）
+    //     · `scale` 不影响布局（只改渲染）⇒ 卡片不会挤到邻居
+    //     · hover 仍保留 2vp 墨边（鼠标悬停需要更"轻"的提示，且只有 PC 有）
     .border({
-      // ★★★ 2026-11-01 奥森看到首页第一张卡外面有一圈"蓝框"，问「这层蓝框怎么回事」。
-      //   真相：那是**焦点框**（首卡 defaultFocus + Tv.on() 在平板上为真）。
-      //   但它原来有两个问题：
-      //     ① 颜色 `Palette.primary` = **#6366F1（靛蓝紫）** —— 与紫色卡片**撞色**
-      //        ，框和卡片糊成一片，读作"贴了一圈脏胶带"，而不是"被选中"
-      //     ② 4vp 硬描边压在卡片外沿，和卡片的阴影互相打架
-      //   ⇒ 改成：**更细的深墨环（3vp）+ 柔和外发光**
-      //     · 深墨在"彩色卡片"和"白背景"上都清楚（白色环会在白缝里消失）
-      //     · 外发光让它"浮起来"，而不是"被框住"
-      width: this.focused ? 3 : (this.hovered ? 2 : 0),
-      color: this.focused ? this.theme.ink : (this.hovered ? this.theme.ink : Color.Transparent),
+      width: this.hovered && !this.focused ? 2 : 0,
+      color: this.theme.ink,
       radius: Radius.md + 2
     })
-    // 焦点时的外发光：低透明度主色，扩散出去 ⇒ 观感是"这卡亮着"而不是"这卡被画了框"
+    .scale({
+      x: this.focused ? 1.04 : 1,
+      y: this.focused ? 1.04 : 1
+    })
     .shadow(this.focused
-      ? { radius: 18, color: '#556366F1', offsetX: 0, offsetY: 0 }
+      // 双层：内圈紧、外圈散 ⇒ 有"发光"的体积感，而不是一圈均匀描边
+      ? { radius: 22, color: '#4D6366F1', offsetX: 0, offsetY: 4 }
       : Shadow.card)
+    .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onFocus(() => { this.focused = true; })
     .onBlur(() => { this.focused = false; })
     .onClick(() => {
