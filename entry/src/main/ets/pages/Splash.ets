@@ -186,8 +186,6 @@ struct Splash {
   private born: number = 0;
   private finished: boolean = false;
   private boosted: boolean = false;
-  /** 点屏幕加速时给 ticker 时间轴加的偏移（ms）—— 让当前时刻一下跳到快结束 */
-  private boostOffset: number = 0;
   @State private tiny: boolean = false;
   /** 极小屏（< 260vp，如运动手表 195）：只留 OM + 标题，其余省略 */
   @State private ultraTiny: boolean = false;
@@ -307,7 +305,9 @@ struct Splash {
     //              `sm` smoothstep e²(3−2e)（其余全部，等效 ease-in-out）。
     const T0: number = Date.now();
     const tick = setInterval(() => {
-      const t: number = Date.now() - T0 + this.boostOffset;
+      // ★ 点屏幕加速：直接把时间轴顶到终点（等价于旧版把值硬置 1 的观感）
+      //   区别：现在是「时间轴到头」而不是「逐个字段硬写」，逻辑只有一个入口。
+      const t: number = this.boosted ? TOTAL : (Date.now() - T0);
       const lin = (st: number, dur: number): number => {
         const e: number = (t - st) / dur;
         return e <= 0 ? 0 : (e >= 1 ? 1 : e);
@@ -368,17 +368,22 @@ struct Splash {
     }
     this.boosted = true;
     Haptics.tap();
-    // ★★★ 2026-11-01（第 799 轮）：改成 ticker 后，boost 必须改时间轴而不是改值。
-    //   旧写法用 animateTo 直接把 11 个值设到 1 —— 但 ticker 每 16ms 按时间表重算，
-    //   立刻把这些值拉回按原进度的值 => 点屏幕加速完全失效（回退）。
-    //   新写法：给时间轴加偏移，让当前时刻一下跳到 TOTAL−240ms 处 =>
-    //     · ticker 自然把所有值推到接近 1（保留数值连续性，不是硬置 1）
-    //     · 240ms 后 t 越过 TOTAL => ticker 自己 clearInterval 并钉到终值
-    //     · 460ms 后 finish()
-    this.boostOffset = Math.max(0, TOTAL - 240 - (Date.now() - this.born));
+    // ★★★ 点屏幕加速（2026-11-01 第 800 轮定稿）
+    //
+    //   演进过程（值得记住，因为踩了两次）：
+    //   ① 初版：`animateTo(240ms, () => { 11 个值 = 1 })`
+    //      ⇒ 换成 ticker 后**完全失效** —— 主驱动每 16ms 会把这些值拉回去。
+    //   ② 第 799 轮：给时间轴加 boostOffset 跳 370ms
+    //      ⇒ 生效但只快 0.4 秒（实测 2.4s vs 2.8s），**用户感知不到**。
+    //   ③ 第 800 轮（本版）：`boosted = true` ⇒ ticker 里 `t = boosted ? TOTAL : ...`
+    //      ⇒ 下次 tick 直接把时间轴顶到终点，15 个值一起到 1（"啪"一下，与旧观感一致）
+    //      ⇒ 240ms 后 finish()。
+    //
+    //   ★ 为什么现在是"一个入口"：加速不再是"另写一套赋值"，
+    //     而是"让时间轴瞬间走完" —— ticker 是唯一写入者，boost 只改它的输入。
     setTimeout(() => {
       this.finish();
-    }, 460);
+    }, 240);
   }
 
   /** 星尘可见性：极小屏减半 */
