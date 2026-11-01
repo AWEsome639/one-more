@@ -41,6 +41,40 @@ export class Tv {
    * ★ 3 米视距 ⇒ 4vp 粗、亮色（用品牌主色，和界面其它强调色一致）
    * ⚠️ ArkUI 的 focusBox 参数类型是 FocusBoxStyle，margin 用于让框离开元素边缘一点
    */
+  /**
+   * ★★★ 2026-11-01 真机（智慧屏 960×540）：**`.focusBox()` 从写下那天起就没生效过**。
+   *
+   *   SDK 文档（common.d.ts:18880）原文：
+   *     「This style affects only the components that **display the system focus box**
+   *      during focus traversal.」
+   *   ⇒ `focusBox()` 只改**样式**，不负责**让框出现**；框出不出现由系统的焦点样式决定。
+   *   ⇒ 所以 355 款游戏 + 首页卡片上的 `focusBox(Tv.box())` 全部是
+   *     「设置了一个永远不会被用到的样式」—— 编译通过、类型正确、注释齐全，
+   *     **但屏幕上从来没有出现过。**
+   *
+   *   ⇒ 替代方案：**自绘**。用 `onFocus/onBlur` 记状态，用 `.border()` 画。
+   *     卡片（Common.ets GameCard）已经这样改过并真机验证：
+   *       像素差分从 0 变成 139204，肉眼可见蓝紫 4vp 外框。
+   *
+   *   ⚠️ 用法（在格子/按钮的属性链上，替换掉原来那行 `.focusBox(Tv.box())`）：
+   *     .focusable(Tv.on())
+   *     .onFocus(() => { this.tvFocus = '<本格唯一 id>'; })
+   *     .onBlur(() => { if (this.tvFocus === '<本格唯一 id>') { this.tvFocus = ''; } })
+   *     .border(Tv.focusBorder(this.tvFocus === '<本格唯一 id>'))
+   *   ⇒ 组件需要先声明 `@State tvFocus: string = '';`
+   *
+   *   ★ 为什么不做成「一行替换」的批量脚本：
+   *     每款的"本格唯一 id"表达式都不一样（(r*N+c) / (r*diffTotal+c) / 字符串拼接…），
+   *     批量插入必然有写错 id 的（表现：焦点框永远不出现，且不报错）。
+   *     ⇒ 先逐款少量改、逐款截图，确认模式稳定后再批量。
+   */
+  static focusBorder(hasFocus: boolean): BorderOptions {
+    return {
+      width: hasFocus ? 4 : 0,
+      color: hasFocus ? Palette.primary : Color.Transparent
+    };
+  }
+
   static box(): FocusBoxStyle {
     // ★ 只用 strokeColor + strokeWidth：margin 不在 FocusBoxStyle 里
     //   （试过 `{...} as FocusBoxStyle` 带 margin ⇒ 编译报"类型不重叠"）
