@@ -327,7 +327,7 @@ export struct GComplexFoldingNets {
       Text(TG(TG('箭头从左往右 = 展开后的纸条；实心块就是 📍 落点'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
 
       Row({ space: Space.sm }) {
-        Button((this.opts[0]) + ' 层')
+        Button(TG2('{0} 层', this.opts[0]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
@@ -337,7 +337,7 @@ export struct GComplexFoldingNets {
         .focusBox(Tv.box())
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[0])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[0])); })
-        Button((this.opts[1]) + ' 层')
+        Button(TG2('{0} 层', this.opts[1]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
@@ -349,7 +349,7 @@ export struct GComplexFoldingNets {
         .onClick(() => { Haptics.tap(); this.pick((this.opts[1])); })
       }.width('100%')
       Row({ space: Space.sm }) {
-        Button((this.opts[2]) + ' 层')
+        Button(TG2('{0} 层', this.opts[2]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
@@ -359,7 +359,7 @@ export struct GComplexFoldingNets {
         .focusBox(Tv.box())
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[2])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[2])); })
-        Button((this.opts[3]) + ' 层')
+        Button(TG2('{0} 层', this.opts[3]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)

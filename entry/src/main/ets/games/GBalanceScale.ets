@@ -134,7 +134,7 @@ export struct GBalanceScale {
     this.used = new Array<boolean>(POOL).fill(false);
     this.target = t;
     this.msg = first
-      ? '点砝码放上右盘，凑到刚好 ' + String(t)
+      ? TG2('点砝码放上右盘，凑到刚好 {0}', t)
       : TG('第 ') + String(this.level) + ' 关：称出 ' + String(t);
   }
 
@@ -305,7 +305,7 @@ export struct GBalanceScale {
       for (let k = 0; k < adds.length; k++) {
         parts.push(String(this.weights[adds[k]]));
       }
-      return Hint.make(adds, '再放 ' + parts.join(' + ') + ' 号砝码，正好等于 ' + String(this.target),
+      return Hint.make(adds, TG2('再放 {0} 号砝码，正好等于 {1}', parts.join(' + '), this.target),
         'Add weights ' + parts.join(' + '), t0);
     }
     return Hint.none('none');
@@ -496,7 +496,7 @@ export struct GBalanceScale {
         .fontSize(FontSize.xxl)
         .fontWeight(FontWeight.Bold)
         .fontColor(kind === 0 ? Palette.teal : Palette.primary)
-      Text(kind === 0 ? '重量' : String(this.countUsed()) + ' 枚砝码')
+      Text(kind === 0 ? TG('重量') : TG2('{0} 枚砝码', this.countUsed()))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
     }

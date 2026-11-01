@@ -401,8 +401,8 @@ export struct GDoodleJump {
     }
     const d: number = this.autoDir();
     const where: string = d > 0 ? '右' : (d < 0 ? '左' : '');
-    const msg: string = where.length > 0 ? '往' + where + '挪，对准上面那块平台' : '位置正好，等它弹上去';
-    return Hint.make([], msg + '（已爬 ' + String(Math.floor(this.climbed)) + ' 米）',
+    const msg: string = where.length > 0 ? TG2('往{0}挪，对准上面那块平台', where) : TG('位置正好，等它弹上去');
+    return Hint.make([], TG2('{0}（已爬 {1} 米）', msg, Math.floor(this.climbed)),
       'Move ' + (where.length > 0 ? where : 'to stay centered') + ' to land on the platform above', t0);
   }
   private askAuto(): void {
@@ -626,8 +626,8 @@ export struct GDoodleJump {
     Column({ space: 2 }) {
       Text(kind === 0 ? '高度' : (kind === 1 ? TG('目标') : TG('状态')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-      Text(kind === 0 ? Math.floor(this.climbed) + ' 米'
-        : (kind === 1 ? GOAL_M + ' 米'
+      Text(kind === 0 ? TG2('{0} 米', Math.floor(this.climbed))
+        : (kind === 1 ? TG2('{0} 米', GOAL_M)
           : (this.over ? (this.won ? '通关' : TG('结束')) : '进行中')))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(kind === 0 ? Palette.primary
