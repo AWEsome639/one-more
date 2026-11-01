@@ -476,6 +476,12 @@ export struct GMagnets {
   }
 
   private askAuto(): void {
+    // ★★★ 2026-11-01 真机排查抓到（批量改造的残留）：
+    //   这 16 款用的是**自绘按钮行**（不是 HintBar），所以 HintBar 那套 `disabled` 保护没轮到它们。
+    //   后果：演示期间按「提示」会在正在变化的棋盘上算 computeHint（结果不可靠）；
+    //         按「AI 代打」会**再起一个计时器**，和演示计时器同时改棋盘 ⇒ 局面乱套。
+    //   ⇒ 这里让「先停演示，再执行」—— 比禁用更符合直觉（用户想操作就给他操作）。
+    if (this.demoId >= 0) { this.demoStop(); }
     Haptics.tap();
     if (this.autoId >= 0) {
       this.stopAuto();
@@ -494,6 +500,12 @@ export struct GMagnets {
   }
 
   private askHint(): void {
+    // ★★★ 2026-11-01 真机排查抓到（批量改造的残留）：
+    //   这 16 款用的是**自绘按钮行**（不是 HintBar），所以 HintBar 那套 `disabled` 保护没轮到它们。
+    //   后果：演示期间按「提示」会在正在变化的棋盘上算 computeHint（结果不可靠）；
+    //         按「AI 代打」会**再起一个计时器**，和演示计时器同时改棋盘 ⇒ 局面乱套。
+    //   ⇒ 这里让「先停演示，再执行」—— 比禁用更符合直觉（用户想操作就给他操作）。
+    if (this.demoId >= 0) { this.demoStop(); }
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
     Hint.toastResult(r, TG('这一步看不出哪格必须填＋'));

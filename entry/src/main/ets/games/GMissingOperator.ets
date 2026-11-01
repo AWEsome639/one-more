@@ -280,102 +280,109 @@ export struct GMissingOperator {
   }
 
   build() {
-    Column({ space: Space.md }) {
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-      Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
-        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.left) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }
-        .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.right) + '/' + String(GOAL))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }
-        .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
-        // ★ 得分跳动
-        .scale({ x: this.scorePulse, y: this.scorePulse })
-        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }
-        .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
-        .borderRadius(Radius.md).shadow(Shadow.card)
-      }.width('100%')
+    // ★★ 2026-11-01 真机（手表 195×195）：内容总高远超 195vp，
+    //   而原 build 没套 Scroll ⇒ 棋盘与操作区完全不可见（截图拍到只剩演示条）。
+    Scroll() {
+      Column({ space: Space.md }) {
+        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+        Row({ space: Space.sm }) {
+          Column({ space: 2 }) {
+          Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((String(this.left) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          }
+          .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md).shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((String(this.right) + '/' + String(GOAL))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          }
+          .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md).shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
+          // ★ 得分跳动
+          .scale({ x: this.scorePulse, y: this.scorePulse })
+          .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          }
+          .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
+          .borderRadius(Radius.md).shadow(Shadow.card)
+        }.width('100%')
 
-      Column({ space: Space.sm }) {
-        Text(String(this.a) + '  ' + (this.picked < 0 ? '?' : OPS[this.picked]) + '  ' +
-          String(this.b) + ' = ' + String(this.c))
-          .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).width('100%')
-          .fontColor(this.picked < 0 ? Palette.primary
-            : (this.picked === this.ansKind ? Palette.emerald : Palette.rose))
-          .animation({ duration: Motion.fast, curve: Motion.snap() })
-        Text(TG2("第 {0} 题 · 连击 ×{1}", String(this.right + 1), String(this.combo)))
+        Column({ space: Space.sm }) {
+          Text(String(this.a) + '  ' + (this.picked < 0 ? '?' : OPS[this.picked]) + '  ' +
+            String(this.b) + ' = ' + String(this.c))
+            .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).width('100%')
+            .fontColor(this.picked < 0 ? Palette.primary
+              : (this.picked === this.ansKind ? Palette.emerald : Palette.rose))
+            .animation({ duration: Motion.fast, curve: Motion.snap() })
+          Text(TG2("第 {0} 题 · 连击 ×{1}", String(this.right + 1), String(this.combo)))
+            .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        }
+        .width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.lg).shadow(Shadow.card)
+
+        Row({ space: Space.sm }) {
+          ForEach(OPT_IDX, (kind: number) => {
+            Text(OPS[kind])
+              .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
+              .fontColor(this.picked < 0 ? this.theme.ink
+                : (kind === this.ansKind ? '#FFFFFF' : (kind === this.picked ? '#FFFFFF' : this.theme.inkFaint)))
+              .layoutWeight(1).height(Cell.of(64)).borderRadius(Radius.md).shadow(Shadow.card)
+              .backgroundColor(this.picked < 0 ? this.theme.surface
+                : (kind === this.ansKind ? Palette.emerald : (kind === this.picked ? Palette.rose : this.theme.surface)))
+              .scale({
+                x: this.press === kind ? Motion.pressScale : 1,
+                y: this.press === kind ? Motion.pressScale : 1
+              })
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+              .onTouch((e: TouchEvent) => { this.press = e.type === TouchType.Down ? kind : -1; })
+              .onClick(() => { Haptics.tick(); this.pick(kind); })
+              .focusable(Tv.on())
+              .focusBox(Tv.box())
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(kind); }); })
+          }, (kind: number) => 'op' + kind)
+        }.width('100%')
+
+        Text(this.msg).fontSize(FontSize.sm).width('100%')
+          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+
+        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+        HintBar({
+
+          onHintTap: () => { this.askHint(); },
+    onAutoTap: () => { this.askAuto(); },
+
+          showHint: true,
+
+          demoOn: false,
+
+          disabled: this.demoId >= 0,
+
+          autoOn: this.autoId >= 0
+
+        })
+
+        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
+          .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
+          .onClick(() => { Haptics.tap(); this.reset(); })
+          .focusable(Tv.on())
+          .focusBox(Tv.box())
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+
+        Text(TG('提示：先估大小 —— 比两个数都大很多，多半是乘'))
           .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }
-      .width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
-      .borderRadius(Radius.lg).shadow(Shadow.card)
-
-      Row({ space: Space.sm }) {
-        ForEach(OPT_IDX, (kind: number) => {
-          Text(OPS[kind])
-            .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
-            .fontColor(this.picked < 0 ? this.theme.ink
-              : (kind === this.ansKind ? '#FFFFFF' : (kind === this.picked ? '#FFFFFF' : this.theme.inkFaint)))
-            .layoutWeight(1).height(Cell.of(64)).borderRadius(Radius.md).shadow(Shadow.card)
-            .backgroundColor(this.picked < 0 ? this.theme.surface
-              : (kind === this.ansKind ? Palette.emerald : (kind === this.picked ? Palette.rose : this.theme.surface)))
-            .scale({
-              x: this.press === kind ? Motion.pressScale : 1,
-              y: this.press === kind ? Motion.pressScale : 1
-            })
-            .animation({ duration: Motion.fast, curve: Motion.snap() })
-            .onTouch((e: TouchEvent) => { this.press = e.type === TouchType.Down ? kind : -1; })
-            .onClick(() => { Haptics.tick(); this.pick(kind); })
-            .focusable(Tv.on())
-            .focusBox(Tv.box())
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(kind); }); })
-        }, (kind: number) => 'op' + kind)
-      }.width('100%')
-
-      Text(this.msg).fontSize(FontSize.sm).width('100%')
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
-
-      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      HintBar({
-
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-
-        showHint: true,
-
-        demoOn: false,
-
-        disabled: this.demoId >= 0,
-
-        autoOn: this.autoId >= 0
-
-      })
-
-      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
-        .onClick(() => { Haptics.tap(); this.reset(); })
-        .focusable(Tv.on())
-        .focusBox(Tv.box())
-        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-
-      Text(TG('提示：先估大小 —— 比两个数都大很多，多半是乘'))
-        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
+    .width('100%')
+    .height('100%')
+    .scrollBar(BarState.Off)
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
       if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
+    })
   }
 
 
