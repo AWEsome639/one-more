@@ -669,7 +669,7 @@ export struct GCrown {
       }
       .width('100%')
 
-      Text(this.over ? (this.won ? '🎉 每行每列每区各一冠，通关！' : TG('步数用尽，重开一题吧')) :
+      Text(this.over ? (this.won ? TG('🎉 每行每列每区各一冠，通关！') : TG('步数用尽，重开一题吧')) :
         TG('同色 = 同一分区；行/列/分区各一个皇冠，且互不相邻'))
         .fontSize(FontSize.xs)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)

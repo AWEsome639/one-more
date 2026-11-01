@@ -691,7 +691,7 @@ export struct GMinesweeper {
 
         // 操作
         Row({ space: Space.md }) {
-          Button(this.flagMode ? '🚩 插旗模式：开' : '🚩 插旗模式：关')
+          Button(this.flagMode ? TG('🚩 插旗模式：开') : TG('🚩 插旗模式：关'))
         .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
             .fontSize(FontSize.sm)
             .fontColor(this.flagMode ? Color.White : this.theme.ink)

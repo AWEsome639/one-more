@@ -711,7 +711,7 @@ export struct GFillomino {
         }
         .width('100%')
 
-        Text(this.over ? (this.won ? '🎉 每块大小都对，通关！' : TG('步数用尽，重开一题吧')) :
+        Text(this.over ? (this.won ? TG('🎉 每块大小都对，通关！') : TG('步数用尽，重开一题吧')) :
           TG('粗体数字是题目给的提示，浅底格是尚未填的'))
           .fontSize(FontSize.xxs)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint).animation({ duration: Motion.fast, curve: Motion.snap() })

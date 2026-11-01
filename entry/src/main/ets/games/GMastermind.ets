@@ -506,7 +506,7 @@ export struct GMastermind {
       .width('100%')
       .scrollBar(BarState.Off)
 
-      Text(this.over ? (this.won ? '🎉 猜中！' : TG('没猜中，答案是上面那四个颜色')) :
+      Text(this.over ? (this.won ? TG('🎉 猜中！') : TG('没猜中，答案是上面那四个颜色')) :
         TG('先点调色盘选颜色，再点上面的圈放进去'))
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)

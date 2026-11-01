@@ -309,8 +309,8 @@ export struct GCountingSheep {
         Text(TG('得分 ') + this.score).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
       }.width('100%')
 
-      Text(this.byArea ? '🐑 按格数：羊占 1 格、狼占 2 格 —— 一共占几格？'
-        : '🐑 按只数：别被狼骗了 —— 真正的羊有几只？')
+      Text(this.byArea ? TG('🐑 按格数：羊占 1 格、狼占 2 格 —— 一共占几格？')
+        : TG('🐑 按只数：别被狼骗了 —— 真正的羊有几只？'))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
 
       Column({ space: Space.xs }) {
@@ -332,7 +332,7 @@ export struct GCountingSheep {
         }, (r: number) => 'r' + r)
       }.width('100%')
 
-      Text(this.hint.length > 0 ? this.hint : '🐺 是干扰项：按格数时它算 2 格，按只数时它不算羊')
+      Text(this.hint.length > 0 ? this.hint : TG('🐺 是干扰项：按格数时它算 2 格，按只数时它不算羊'))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
       Row({ space: Space.sm }) {

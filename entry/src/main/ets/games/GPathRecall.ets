@@ -323,7 +323,7 @@ export struct GPathRecall {
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('86%').aspectRatio(1)
-      Text(this.phase === TG('看') ? '👀 看清顺序' : (this.phase === TG('点') ? '👆 轮到你了' : '🏁 本局结束'))
+      Text(this.phase === TG('看') ? TG('👀 看清顺序') : (this.phase === TG('点') ? TG('👆 轮到你了') : TG('🏁 本局结束')))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.phase === TG('点') ? Palette.emerald : this.theme.inkSoft)
       Text(this.msg).fontSize(FontSize.sm)

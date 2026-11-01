@@ -406,7 +406,7 @@ export struct GLockPattern {
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
 
-      Text(this.phase === 0 ? '👀 记住顺序…' :
+      Text(this.phase === 0 ? TG('👀 记住顺序…') :
         (this.phase === 1 ? '按顺序点出来（已连 ' + String(this.input.length) + TG(' 个）')
           : (this.won ? TG('🎉 五关全过！') : TG('❌ 点错了，重开一局'))))
         .fontSize(FontSize.md)

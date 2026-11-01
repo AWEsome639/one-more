@@ -489,7 +489,7 @@ export struct GBalanceScale {
   @Builder
   pan(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '📦 物体' : '🧱 右盘')
+      Text(kind === 0 ? TG('📦 物体') : TG('🧱 右盘'))
         .fontSize(FontSize.xs)
         .fontColor(this.theme.inkFaint)
       Text(String(kind === 0 ? this.target : this.sum()))

@@ -349,9 +349,9 @@ export struct GMentalMapping {
       .width('100%')
 
       Text(this.showMap
-        ? '👀 记住这几个地点的位置…'
+        ? TG('👀 记住这几个地点的位置…')
         : (this.over
-          ? (this.right >= 8 ? '🎉 地图全记住了！' : TG('结束啦，再来一次？'))
+          ? (this.right >= 8 ? TG('🎉 地图全记住了！') : TG('结束啦，再来一次？'))
           : TG2('从当前位置 🧍 到 {0} 该往哪走？', this.spots[this.ty * N + this.tx])))
         .fontSize(FontSize.sm)
         .fontColor(this.showMap ? Palette.amber : this.theme.inkSoft)

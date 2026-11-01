@@ -563,7 +563,7 @@ export struct GPathFinder {
       Row({ space: Space.md }) {
         Text(this.over
           ? (this.won ? '抵达终点 🎉 得分 ' + String(this.score) : TG('步数用尽，本局失败'))
-          : '🧍 是你，🏁 是终点：按方向键或点相邻格')
+          : TG('🧍 是你，🏁 是终点：按方向键或点相邻格'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)

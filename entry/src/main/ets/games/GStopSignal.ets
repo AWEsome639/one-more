@@ -333,7 +333,7 @@ export struct GStopSignal {
       .focusable(Tv.on())
       .focusBox(Tv.box())
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(); }); })
-      Button(this.kind === 2 ? '🛑 忍住' : TG('⚡ 冲'))
+      Button(this.kind === 2 ? TG('🛑 忍住') : TG('⚡ 冲'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.xxl).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : (this.kind === 2 ? Palette.danger : Palette.emerald))

@@ -400,7 +400,7 @@ export struct GMazeNav3d {
       }
       .width('100%')
 
-      Text(this.done ? '🎉 走通了！' : TG('走到右下角的 🏁 就算通关'))
+      Text(this.done ? TG('🎉 走通了！') : TG('走到右下角的 🏁 就算通关'))
         .fontSize(FontSize.sm)
         .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
 

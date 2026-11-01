@@ -331,7 +331,7 @@ export struct GGearTrainDirection {
 
   @Builder
   linkRow(i: number) {
-    Text(this.links[i] ? TG('⛓ 啮合 ⇒ 反向') : '🪢 皮带 ⇒ 同向')
+    Text(this.links[i] ? TG('⛓ 啮合 ⇒ 反向') : TG('🪢 皮带 ⇒ 同向'))
       .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       .width('100%').textAlign(TextAlign.Center)
   }
