@@ -813,7 +813,11 @@ build() {
           this.searchBar()
         }
         // ★ 极小屏（含手机「显示大小」调到最小）只留标题 + 列表
-        if (!Bp.tinyScreen()) {
+        // ★★★ 2026-11-01（第 824 轮）**真机 853×533 抓到**：
+        //   搜索栏展开后，顶栏 + 搜索栏 + LV条 + 按喜好 + 分类 + 排序行 把 533vp 吃光，
+        //   **游戏列表整个不渲染**（截图里「全部 · 355 款」下面直接是底部标签栏）。
+        //   ⇒ 搜索态下收起"浏览用"的区块 —— 此时玩家只想看搜索结果，不需要这些。
+        if (!Bp.tinyScreen() && !this.searchOpen) {
           this.levelStrip()
           this.tagEntry()
         }
@@ -824,12 +828,13 @@ build() {
           // ★★★ 2026-10-29（六设备实测）：智慧屏只有 540vp 高，
           //   这两块会把游戏列表挤到看不见（而且整页不滚动）⇒ 矮屏时收起。
           //   列表与分类芯片保留 —— 那才是首页的主体。
-          if (!Bp.isShort()) {
+          // ★ 搜索态下也收起（理由同上：让列表有空间）
+          if (!Bp.isShort() && !this.searchOpen) {
             this.dailyCard()
             this.randomCard()
           }
         }
-        if (!Bp.tinyScreen()) {
+        if (!Bp.tinyScreen() && !this.searchOpen) {
           this.segRow()
         }
         if (this.seg === Seg.ALL && !this.showFilter && !Bp.tinyScreen()) {
