@@ -922,11 +922,19 @@ build() {
         this.hovered = isHover;
       });
     })
+    // ★★★★ 2026-11-01 奥森：「就算要有，不也应该和色块紧紧贴合吗？最好就没有」
+    //   上一版焦点态用 `scale 1.04` —— **实测数据（y=405 逐卡量宽）**：
+    //     卡1（焦点）宽 208.0vp ｜ 卡2 194.7 ｜ 卡3 194.3 ｜ 卡4 195.7
+    //     间距：卡1→卡2 **6.0vp** ｜ 卡2→卡3 12.7 ｜ 卡3→卡4 13.0
+    //   ⇒ 焦点卡被放大后**左右各外扩，把右侧间距从 13vp 压到 6vp** ——
+    //     scale 不改变布局，但**视觉上会侵入间距**，读作"这一列挤了"。
+    //   ⇒ **去掉焦点缩放**，焦点只靠光晕表达：
+    //     卡片永远等大、间距永远均匀，这才是"紧紧贴合 / 最好没有"。
+    //   （pressed / hovered 的缩放保留 —— 它们是**交互反馈**，不是"选中状态"，
+    //     而且按下/悬停是瞬时的手感，间距不均看不见。）
     .scale({
-      // 三个状态合在一处（避免重复 .scale 互相覆盖）：
-      //   按下 0.97 < 常态 1 < 悬停 1.02 < 焦点 1.04
-      x: this.pressed ? Motion.pressScale : (this.focused ? 1.04 : (this.hovered ? 1.02 : 1)),
-      y: this.pressed ? Motion.pressScale : (this.focused ? 1.04 : (this.hovered ? 1.02 : 1))
+      x: this.pressed ? Motion.pressScale : (this.hovered ? 1.02 : 1),
+      y: this.pressed ? Motion.pressScale : (this.hovered ? 1.02 : 1)
     })
     // ★★★★ 2026-11-01 奥森问「宝石迷阵外面这层蓝框怎么回事」⇒ 迭代了三次：
     //
@@ -957,7 +965,8 @@ build() {
     //     · 常态：**完全不要阴影** —— 卡片的层次靠色块自身的饱和度 + 白底的对比，
     //       这是奥森要的"紧紧贴合、最好没有"。
     .shadow(this.focused
-      ? { radius: 18, color: '#406366F1', offsetX: 0, offsetY: 0 }
+      // 不再有缩放提示 ⇒ 光晕要更明确一点（半径 24、32% 主色）
+      ? { radius: 24, color: '#526366F1', offsetX: 0, offsetY: 0 }
       : { radius: 0, color: Color.Transparent, offsetX: 0, offsetY: 0 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onFocus(() => { this.focused = true; })
