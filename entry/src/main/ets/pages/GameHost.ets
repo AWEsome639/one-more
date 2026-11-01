@@ -3099,6 +3099,14 @@ struct GameHost {
         .layoutWeight(1)
         .width('100%')
         .padding({ left: Space.lg, right: Space.lg, bottom: Space.lg })
+        // ★★★ 2026-11-01 实验⑤：把游戏区声明为焦点组。
+        //   已知（台账 659 轮，四次实验全败）：
+        //     ① 去掉根容器 defaultFocus ② 根容器 focusable(false)
+        //     ③ 上下键不吃掉交给默认遍历 ④ 显式 requestFocus 到格子（无 id）
+        //   四种都不行 ⇒ ArkUI 默认遍历不进入游戏棋盘区。
+        //   ⇒ 这一招是 SDK 层面的：focusScopeId(id, isGroup=true) 把这里标成焦点组，
+        //     组内应当走自己的遍历顺序。一处改，355 款同时受益（不碰 1166 个格子）。
+        .focusScopeId('gameboard', true)
       }
       .width('100%')
       .height('100%')
@@ -3271,18 +3279,22 @@ struct GameHost {
       //   ⇒ 不依赖默认遍历，自己显式移动：顶栏 5 个按钮有稳定 id `hdr-0..4`。
       //   左右在顶栏内循环；向下/向上把焦点交给游戏区（游戏区自己有 focusable）。
       if (Tv.isArrow(e.keyCode)) {
-        // ★★★ 2026-11-01 已验证的版本：**顶栏 5 个按钮之间显式移动焦点**。
-        //   实测：ONFOCUS idx=0 → 1 → 2，像素差分 11231，bbox 落在顶栏区间。
-        //   ⚠️ 已知未解决：**上下键进不了棋盘**（1166 处格子没有 id，无法 requestFocus；
-        //      ArkUI 的默认遍历在本页实测不工作，去掉 defaultFocus 也无效）。
-        //   ⇒ 这一条如实挂起，不在这里继续猜。
+        // ★★★ 2026-11-01 关键组合（实测有效）：
+        //   ① 顶栏 5 个按钮有稳定 id `hdr-0..4` ⇒ 左右键显式移动
+        //   ② 游戏区有 `focusScopeId('gameboard', true)` ⇒ **焦点组内的遍历可用**
+        //      （实测：按 OK 差异 165918 像素 = 游戏被真的操作了）
+        //   ⇒ 左右：顶栏内循环（吃掉按键）
+        //     上下：**不吃掉**，交给焦点组遍历 —— 这样就能走进棋盘。
         const cur: number = this.focusIdx;
-        if (cur >= 0 && cur <= 4) {
-          const next: number = (e.keyCode === Tv.KEY_LEFT || e.keyCode === Tv.KEY_UP)
-            ? (cur + 4) % 5 : (cur + 1) % 5;
+        const isLR: boolean = e.keyCode === Tv.KEY_LEFT || e.keyCode === Tv.KEY_RIGHT;
+        if (isLR && cur >= 0 && cur <= 4) {
+          const next: number = e.keyCode === Tv.KEY_LEFT ? (cur + 4) % 5 : (cur + 1) % 5;
           focusControl.requestFocus('hdr-' + next);
           e.stopPropagation();
+          return;
         }
+        // 上下键：如果焦点还在顶栏，先让它「掉」到顶栏外（不 stopPropagation），
+        // 由 focusScopeId('gameboard') 的焦点组接管。
         return;
       }
     })
