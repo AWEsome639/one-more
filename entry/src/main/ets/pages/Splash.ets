@@ -874,8 +874,13 @@ struct Splash {
       .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
       // 极小屏：把整组内容上移一点，给底部标语留位置
-      .padding({ bottom: this.tiny ? 34 : 0 })
-      .translate({ y: this.tiny ? -6 : -14 })
+      // ★★★ 2026-11-01 真机 195×195 抓到：**logo 顶距状态栏只有 2px（0.7vp）**，
+      //   原因：tiny 下 `padding bottom 34` 把内容往上推 + `translate -6` 再推 ⇒
+      //   整体上移约 23vp，而 195vp 的屏幕只有 195 高 ⇒ 顶到状态栏。
+      //   但 ultraTiny 时**副标题与标语都已隐藏**（见 pSub / pTag 的 opacity 分支），
+      //   那 34vp 的底部留白本来就是空的 ⇒ ultraTiny 下收到 10vp。
+      .padding({ bottom: this.ultraTiny ? 10 : (this.tiny ? 34 : 0) })
+      .translate({ y: this.ultraTiny ? 0 : (this.tiny ? -6 : -14) })
       .scale({ x: 1 - this.pOut * 0.06, y: 1 - this.pOut * 0.06 })
       .opacity(1 - this.pOut)
 
