@@ -15,6 +15,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
+import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -744,9 +745,22 @@ export struct GBejeweled {
         .borderRadius(Radius.lg)
         .shadow(Shadow.card)
 
-        Text(this.msg)
-          .fontSize(FontSize.sm)
-          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        // ★★★ 2026-11-01（第 814 轮）：**这一款是 355 款里唯一不用 DemoBar 的**。
+        //   扫描结果：`DemoBar` 354/355（缺 GBejeweled），而它有完整演示逻辑
+        //   （demoOnce / demoId / demoStop / 三拍文案都在）。
+        //   后果有两处，都是别的款有、它没有：
+        //     ① 演示时**没有「演示中」标识**（玩家不知道"现在不是我操作"）
+        //     ② **没有极小屏降级**（DemoBar 在 <420vp 时只留「演示中」三个字，
+        //        否则完整文案在 195vp 宽上要占 3 行、24vp 高的条里被切）
+        //   ⇒ 接上 DemoBar；未演示时它高度为 0，不占位（与另外 354 款一致）。
+        DemoBar({ on: this.demoId >= 0, msg: this.msg })
+
+        // 演示进行中时，下面这行普通提示让位（避免两行字同时出现、上下重复）
+        if (this.demoId < 0) {
+          Text(this.msg)
+            .fontSize(FontSize.sm)
+            .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        }
 
         Row({ space: Space.md }) {
           Button(TG('重开'))
