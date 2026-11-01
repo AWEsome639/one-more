@@ -1543,6 +1543,7 @@ const EXTRA: Record<string, Record<string, string>> = {
   "随机来一局": { "ja": "ランダムに一局", "ko": "무작위 한 판", "es": "Una al azar", "fr": "Une au hasard", "de": "Zufallsrunde", "pt": "Uma aleatória", "ru": "Случайная игра", "it": "Una a caso", "ar": "جولة عشوائية", "zh-Hant": "隨機來一局" },
   "开始": { "ja": "開始 ›", "ko": "시작 ›", "es": "Jugar ›", "fr": "Jouer ›", "de": "Start ›", "pt": "Jogar ›", "ru": "Играть ›", "it": "Gioca ›", "ar": "ابدأ ›", "zh-Hant": "開始 ›" },
   "全部": { "ja": "すべて", "ko": "전체", "es": "Todo", "fr": "Tout", "de": "Alle", "pt": "Tudo", "ru": "Все", "it": "Tutti", "ar": "الكل", "zh-Hant": "全部" },
+  "搜游戏名或玩法": { "ja": "ゲーム名や遊び方で検索", "ko": "게임 이름 또는 방식 검색", "es": "Busca por nombre o modo", "fr": "Chercher un nom ou un mode", "de": "Name oder Spielart suchen", "pt": "Buscar nome ou modo", "ru": "Поиск по названию или правилам", "it": "Cerca per nome o modalità", "ar": "ابحث بالاسم أو طريقة اللعب", "zhtw": "搜尋遊戲名稱或玩法" },
   "我收藏的": { "ja": "お気に入り", "ko": "즐겨찾기", "es": "Guardados", "fr": "Favoris", "de": "Gespeichert", "pt": "Salvos", "ru": "Избранное", "it": "Salvati", "ar": "المحفوظة", "zh-Hant": "我收藏的" },
   "玩过的": { "ja": "プレイ済み", "ko": "플레이함", "es": "Jugados", "fr": "Joués", "de": "Gespielt", "pt": "Jogados", "ru": "Игранные", "it": "Giocati", "ar": "الملعوبة", "zh-Hant": "玩過的" },
   "简单": { "ja": "やさしい", "ko": "쉬움", "es": "Fácil", "fr": "Facile", "de": "Leicht", "pt": "Fácil", "ru": "Легко", "it": "Facile", "ar": "سهل", "zh-Hant": "簡單" },
