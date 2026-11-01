@@ -436,7 +436,7 @@ export struct GCheckers {
       this.turn = LanMatch.myTurn() ? 1 : 3;
     }
     this.msg = LanMatch.isActive()
-      ? (this.turn === 1 ? '联机：点自己的棋子，再点高亮格' : '联机：等对手走子…')
+      ? (this.turn === 1 ? TG('联机：点自己的棋子，再点高亮格') : TG('联机：等对手走子…'))
       : TG('点自己的棋子，再点高亮格');
     this.startAt = Date.now();
   }
@@ -550,7 +550,7 @@ export struct GCheckers {
       return;
     }
     if (this.turn === 3) {
-      this.msg = LanMatch.isActive() ? '联机：等对手走子…' : TG('电脑思考中…');
+      this.msg = LanMatch.isActive() ? TG('联机：等对手走子…') : TG('电脑思考中…');
       this.scheduleAi(-1);
     } else {
       this.msg = LanMatch.isActive() ? '联机：轮到你了' : TG('轮到你了');
@@ -598,8 +598,8 @@ export struct GCheckers {
     this.sel = -1;
     this.targets = [];
     this.msg = playerWon
-      ? '🎉 吃掉对手 / 对手无路可走，你赢了'
-      : (LanMatch.isActive() ? '对手赢了，再来一局' : '电脑赢了，再来一局');
+      ? TG('🎉 吃掉对手 / 对手无路可走，你赢了')
+      : (LanMatch.isActive() ? TG('对手赢了，再来一局') : TG('电脑赢了，再来一局'));
     this.clearTimer();
     this.finish(playerWon);
   }
@@ -886,9 +886,9 @@ export struct GCheckers {
         Row({ space: Space.sm }) {
           // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这三格整局不刷新
           Column({ space: 2 }) {
-          Text(true ? (LanMatch.isActive() ? '我的吃子' : '你的吃子')
-          : (false ? (LanMatch.isActive() ? '我的子' : '你的子')
-          : (LanMatch.isActive() ? '对手的子' : '电脑的子')))
+          Text(true ? (LanMatch.isActive() ? TG('我的吃子') : TG('你的吃子'))
+          : (false ? (LanMatch.isActive() ? TG('我的子') : TG('你的子'))
+          : (LanMatch.isActive() ? TG('对手的子') : TG('电脑的子'))))
           .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           Text(true ? String(this.cap)
           : (false ? String(this.countOf(this.board, 1)) : String(this.countOf(this.board, 3))))
@@ -901,9 +901,9 @@ export struct GCheckers {
           .borderRadius(Radius.md)
           .shadow(Shadow.card)
           Column({ space: 2 }) {
-          Text(false ? (LanMatch.isActive() ? '我的吃子' : '你的吃子')
-          : (true ? (LanMatch.isActive() ? '我的子' : '你的子')
-          : (LanMatch.isActive() ? '对手的子' : '电脑的子')))
+          Text(false ? (LanMatch.isActive() ? TG('我的吃子') : TG('你的吃子'))
+          : (true ? (LanMatch.isActive() ? TG('我的子') : TG('你的子'))
+          : (LanMatch.isActive() ? TG('对手的子') : TG('电脑的子'))))
           .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           Text(false ? String(this.cap)
           : (true ? String(this.countOf(this.board, 1)) : String(this.countOf(this.board, 3))))
@@ -916,9 +916,9 @@ export struct GCheckers {
           .borderRadius(Radius.md)
           .shadow(Shadow.card)
           Column({ space: 2 }) {
-          Text(false ? (LanMatch.isActive() ? '我的吃子' : '你的吃子')
-          : (false ? (LanMatch.isActive() ? '我的子' : '你的子')
-          : (LanMatch.isActive() ? '对手的子' : '电脑的子')))
+          Text(false ? (LanMatch.isActive() ? TG('我的吃子') : TG('你的吃子'))
+          : (false ? (LanMatch.isActive() ? TG('我的子') : TG('你的子'))
+          : (LanMatch.isActive() ? TG('对手的子') : TG('电脑的子'))))
           .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           Text(false ? String(this.cap)
           : (false ? String(this.countOf(this.board, 1)) : String(this.countOf(this.board, 3))))
@@ -1008,8 +1008,8 @@ export struct GCheckers {
           })
 
         Text(LanMatch.isActive()
-          ? '联机：你执下方（房主先手）；斜走一格，跳过对方子到空格即吃子，能跳必须跳、可连跳；到底线升王（♛）'
-          : '斜走一格；跳过对方子到空格即吃子。能跳必须跳，可连跳；到底线升王（♛）')
+          ? TG('联机：你执下方（房主先手）；斜走一格，跳过对方子到空格即吃子，能跳必须跳、可连跳；到底线升王（♛）')
+          : TG('斜走一格；跳过对方子到空格即吃子。能跳必须跳，可连跳；到底线升王（♛）'))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme.inkFaint)
       }
