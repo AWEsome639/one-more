@@ -186,6 +186,8 @@ struct Splash {
   private born: number = 0;
   private finished: boolean = false;
   private boosted: boolean = false;
+  /** 点屏幕加速时给 ticker 时间轴加的偏移（ms）—— 让当前时刻一下跳到快结束 */
+  private boostOffset: number = 0;
   @State private tiny: boolean = false;
   /** 极小屏（< 260vp，如运动手表 195）：只留 OM + 标题，其余省略 */
   @State private ultraTiny: boolean = false;
@@ -305,7 +307,7 @@ struct Splash {
     //              `sm` smoothstep e²(3−2e)（其余全部，等效 ease-in-out）。
     const T0: number = Date.now();
     const tick = setInterval(() => {
-      const t: number = Date.now() - T0;
+      const t: number = Date.now() - T0 + this.boostOffset;
       const lin = (st: number, dur: number): number => {
         const e: number = (t - st) / dur;
         return e <= 0 ? 0 : (e >= 1 ? 1 : e);
@@ -366,27 +368,17 @@ struct Splash {
     }
     this.boosted = true;
     Haptics.tap();
-    animateTo({ duration: 240, curve: this.easeOut() }, () => {
-      this.pBg = 1;
-      this.pNebula = 1;
-      this.pDust = 1;
-      this.pTwinkle = 1;
-      this.pGlow = 1;
-      this.pStroke = 1;
-      this.pFill = 1;
-      this.pSweep = 1;
-      this.pTitle = 1;
-      this.pSub = 1;
-      this.pTag = 1;
-    });
-    setTimeout(() => {
-      animateTo({ duration: 240, curve: this.easeOut() }, () => {
-        this.pOut = 1;
-      });
-    }, 260);
+    // ★★★ 2026-11-01（第 799 轮）：改成 ticker 后，boost 必须改时间轴而不是改值。
+    //   旧写法用 animateTo 直接把 11 个值设到 1 —— 但 ticker 每 16ms 按时间表重算，
+    //   立刻把这些值拉回按原进度的值 => 点屏幕加速完全失效（回退）。
+    //   新写法：给时间轴加偏移，让当前时刻一下跳到 TOTAL−240ms 处 =>
+    //     · ticker 自然把所有值推到接近 1（保留数值连续性，不是硬置 1）
+    //     · 240ms 后 t 越过 TOTAL => ticker 自己 clearInterval 并钉到终值
+    //     · 460ms 后 finish()
+    this.boostOffset = Math.max(0, TOTAL - 240 - (Date.now() - this.born));
     setTimeout(() => {
       this.finish();
-    }, 560);
+    }, 460);
   }
 
   /** 星尘可见性：极小屏减半 */
