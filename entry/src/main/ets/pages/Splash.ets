@@ -660,51 +660,66 @@ struct Splash {
             .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
             .opacity(this.seg(this.pStroke, 0.001, 0.10))
 
-          // ── ①b 金属高光：4 段短弧绕环旋转（研究报告 P2-1）──
+          // ── ①b 金属高光：4 段绕环旋转（研究报告 P2-1）──
           //   ★ 金的「贵」来自**会动的高光**，不是金色本身。
           //   ★ 这是全片唯一该用 Linear 的地方：金属反射本就匀速。
           //   做法：4 个同尺寸 Circle，各带一段 dash，初相 0/90/180/270，
           //        整组 rotate 0→90 ⇒ 读作"光在环上走"。
+          //
+          // ★★★ 2026-11-01 **三层同心弧**（外宽内窄、中层最亮）：
+          //   起因：原来每段 `strokeWidth` = 整个环宽（0.1276）⇒ 必然读作「一块」，
+          //        而不是「一道受光」。圆头实验（gl_07）也证明"放大面积只会更糟"。
+          //   ⇒ 三层叠出**横跨环宽方向的亮→更亮→暗**，这才是环面（torus）正面受光的分布。
+          //
+          //   ⚠️ 踩过的坑（别再试）：**不能用嵌套 ForEach**
+          //      （`ForEach([0,1,2], layer => ForEach([0,1,2,3], i => ...))`）
+          //      ArkTS 严格模式直接报 61 个错（arkts-no-comma-outside-loops 等）。
+          //   ⇒ 必须写成**三个并列的 ForEach**，各自用字面量索引 layer 常量。
+
+          // 外层：贴外缘，暗而宽
           ForEach([0, 1, 2, 3], (i: number) => {
             Circle()
               .width(this.omPxV() * 0.4818).height(this.omPxV() * 0.4818)
               .fill(Color.Transparent)
-              .stroke('#F0D9A8')
-              .strokeWidth(this.omPxV() * 0.1276)
-              // ★★★ 2026-11-01 试过并回退（记在这里，别再试）：
-              //   ① `.strokeLineCap(LineCapStyle.Round)` —— 圆头让每段两端的台阶变成半圆。
-              //      真机结果（gl_07）：**比硬切边更糟**。圆头把每段面积放大了
-              //      （两端各多出半个线宽的半圆）⇒ 对比更强 ⇒ 4 个离散块更显眼，
-              //      读作「环上贴了几块饼干」。
-              //   ② **三层同心弧**（外宽内窄、中层最亮）—— 想用径向层次模拟环面受光。
-              //      编译失败 61 个错（`arkts-no-comma-outside-loops` 等），
-              //      根因是 **ArkTS 严格模式不支持这种嵌套 ForEach 写法**。
-              //      ⇒ 真要做，得拆成 3 个并列的 ForEach 或 3 段手写代码，成本高。
-              //
-              //   ★ 结论（机制层面）：当前 4 段高光只能靠**调参数**变柔和
-              //     （透明度 / dash 长度 / strokeWidth），
-              //     要换渲染方式就得先解决 ArkTS 的嵌套限制。
-              //   ★ 而且"4 段离散高光"本身是**设计选择**（会动的高光比静态金色更贵），
-              //     不是 bug —— 所以不急着推翻，先把参数调软。
+              .stroke('#E8CE96')
+              .strokeWidth(this.omPxV() * GLINT_WIDTH[0])
               .strokeDashArray([this.omPxV() * 0.0832, this.omPxV() * 1.5140])
               .strokeDashOffset(-this.omPxV() * 0.3785 * i)
+              .scale({ x: GLINT_SCALE[0], y: GLINT_SCALE[0] })
               .rotate({ angle: this.pGlint * 90 })
-              .opacity(this.pGlint * GLINT_PHASE[i])
+              .opacity(this.pGlint * GLINT_ALPHA[0] * GLINT_PHASE[i])
               .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
-          }, (i: number) => 'glint' + i)
-              // ★★★ 2026-11-01 两次实验记录（都失败，别再试）：
-              //   ① `.strokeLineCap(LineCapStyle.Round)` —— 圆头让两端台阶变半圆。
-              //      真机结果（gl_07）：**比硬切边更糟**。圆头把每段面积放大了
-              //      ⇒ 对比更强 ⇒ 4 个离散块更显眼，读作「环上贴了几块饼干」。
-              //   ② **三层同心弧**（外宽内窄、中层最亮）想模拟环面受光 ——
-              //      编译失败 61 个错（`arkts-no-comma-outside-loops` 等），
-              //      根因是 **ArkTS 严格模式不支持这种嵌套 ForEach 写法**。
-              //      ⇒ 要做需拆成 3 个并列 ForEach 或 3 段手写，成本高。
-              //
-              //   ★ 结论：当前 4 段高光只能**调参数**变柔和（透明度/dash/strokeWidth），
-              //     换渲染方式要先解决 ArkTS 的嵌套限制。
-              //   ★ 而且「4 段离散高光」本身是**设计选择**（会动的高光比静态金色更贵），
-              //     不是 bug —— 所以不推翻，只把参数调软（见 GLINT_PHASE）。
+          }, (i: number) => 'glint0_' + i)
+
+          // 中层：最亮（受光峰值）
+          ForEach([0, 1, 2, 3], (i: number) => {
+            Circle()
+              .width(this.omPxV() * 0.4818).height(this.omPxV() * 0.4818)
+              .fill(Color.Transparent)
+              .stroke('#FFF0CE')
+              .strokeWidth(this.omPxV() * GLINT_WIDTH[1])
+              .strokeDashArray([this.omPxV() * 0.0832, this.omPxV() * 1.5140])
+              .strokeDashOffset(-this.omPxV() * 0.3785 * i)
+              .scale({ x: GLINT_SCALE[1], y: GLINT_SCALE[1] })
+              .rotate({ angle: this.pGlint * 90 })
+              .opacity(this.pGlint * GLINT_ALPHA[1] * GLINT_PHASE[i])
+              .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
+          }, (i: number) => 'glint1_' + i)
+
+          // 内层：窄而柔（向环心收）
+          ForEach([0, 1, 2, 3], (i: number) => {
+            Circle()
+              .width(this.omPxV() * 0.4818).height(this.omPxV() * 0.4818)
+              .fill(Color.Transparent)
+              .stroke('#F5DFB0')
+              .strokeWidth(this.omPxV() * GLINT_WIDTH[2])
+              .strokeDashArray([this.omPxV() * 0.0832, this.omPxV() * 1.5140])
+              .strokeDashOffset(-this.omPxV() * 0.3785 * i)
+              .scale({ x: GLINT_SCALE[2], y: GLINT_SCALE[2] })
+              .rotate({ angle: this.pGlint * 90 })
+              .opacity(this.pGlint * GLINT_ALPHA[2] * GLINT_PHASE[i])
+              .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
+          }, (i: number) => 'glint2_' + i)
 
           // ── ② O 心点（金）：日出时从山脊后升起 ──
           Column()
