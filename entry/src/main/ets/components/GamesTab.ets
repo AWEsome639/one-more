@@ -838,6 +838,8 @@ build() {
             GridItem() {
               GameCard({
                 meta: g,
+                // ★ 2026-11-01（智慧屏）：首屏第一张卡拿默认焦点，让遥控器/键盘方向键有起点
+                first: i === 0,
                 // ★ item ①：只有正在点开的那张卡参与共享元素补间
                 sharedId: this.flyingId === ('card-' + g.id) ? this.flyingId : '',
                 // ★ 2026-10-13「动画拉满」item ③：**只给首屏可见的前几款**排错峰。

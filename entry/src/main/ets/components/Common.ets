@@ -664,6 +664,17 @@ export struct GameCard {
   /** 是否允许右键菜单（只在桌面类为真 —— 见 Tv.on()） */
   @Prop allowMenu: boolean = false;
   /** 当前网格列数（方向键上下移动时要跳一整行）—— 由父组件现算传入 */
+  /**
+   * ★★★ 2026-11-01 真机（智慧屏 960×540）：**电视上打开应用，焦点不知道在哪**。
+   *   全项目查过：只有 GameHost 一处 `.defaultFocus(...)`，首页列表**没有任何初始焦点**。
+   *   ⇒ 方向键没有"当前焦点"可移动 ⇒ 按 DOWN/OK 什么也不发生。
+   *   实测证据（960×540）：进首页 → DOWN ×2 → CENTER(2016)，
+   *     元素列表完全没变；像素差分 bbox = (800,56)-(832,96)，
+   *     **只有状态栏时钟跳了一分钟** —— 按键通道是通的（Back 键能返回），缺的是起点。
+   *   ⇒ 首屏第一张卡 `defaultFocus(true)`，让焦点有个落点。
+   *   ⚠️ 只在 Tv.on() 为真时才生效（手机/平板仍是 false，零回归）。
+   */
+  @Prop first: boolean = false;
   @Prop gridCols: number = 2;
 
   @State private pressed: boolean = false;
@@ -938,6 +949,8 @@ build() {
     //   用 'card-' 前缀与 sharedId 的命名一致（共享元素补间也用这个前缀）
     .id('card-' + this.meta.id)
     .focusable(Tv.on())
+    // ★ 首屏第一张卡默认拿焦点（仅 Tv.on() 时）—— 见 @Prop first 的注释
+    .defaultFocus(this.first && Tv.on())
     .focusBox(Tv.box())
     .onKeyEvent((e: KeyEvent) => {
       if (!Tv.on()) { return; }
