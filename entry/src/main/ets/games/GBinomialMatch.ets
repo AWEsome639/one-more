@@ -518,7 +518,7 @@ export struct GBinomialMatch {
   @Builder
   stat(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '已配对' : (kind === 1 ? TG('失误') : TG('得分')))
+      Text(kind === 0 ? TG('已配对') : (kind === 1 ? TG('失误') : TG('得分')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? this.matched + '/' + this.diffTotal

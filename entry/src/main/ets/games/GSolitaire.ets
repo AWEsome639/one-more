@@ -931,7 +931,7 @@ export struct GSolitaire {
   @Builder
   stat(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '归位' : (kind === 1 ? TG('步数') : TG('洗牌')))
+      Text(kind === 0 ? TG('归位') : (kind === 1 ? TG('步数') : TG('洗牌')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? this.foundTotal() + '/52'
         : (kind === 1 ? String(this.moves) : this.passes + '/' + MAX_PASS))

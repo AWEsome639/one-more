@@ -401,7 +401,7 @@ export struct GSimonSays {
         .shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('状态'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.phase === 'input' ? '你来' : (this.phase === 'show' ? '演示' : TG('结束'))))
+        Text((this.phase === 'input' ? '你来' : (this.phase === 'show' ? TG('演示') : TG('结束'))))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

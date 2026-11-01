@@ -472,7 +472,7 @@ export struct GBinaryScaleBalance {
         .fontSize(FontSize.xxl)
         .fontWeight(FontWeight.Bold)
         .fontColor(kind === 0 ? Palette.teal : Palette.berry)
-      Text(kind === 0 ? '重量' : this.bitsText() + '₂')
+      Text(kind === 0 ? TG('重量') : this.bitsText() + '₂')
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
     }

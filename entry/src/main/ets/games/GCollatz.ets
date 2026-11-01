@@ -495,7 +495,7 @@ export struct GCollatz {
   @Builder
   stat(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '起点' : (kind === 1 ? TG('步数') : TG('失误')))
+      Text(kind === 0 ? TG('起点') : (kind === 1 ? TG('步数') : TG('失误')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.start)

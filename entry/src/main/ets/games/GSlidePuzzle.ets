@@ -530,7 +530,7 @@ export struct GSlidePuzzle {
   @Builder
   statBox(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '已归位' : (kind === 1 ? TG('已用步数') : TG('剩余')))
+      Text(kind === 0 ? TG('已归位') : (kind === 1 ? TG('已用步数') : TG('剩余')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.homeCount()) + '/' + String(this.cellCount() - 1)
         : (kind === 1 ? String(this.steps) + '/' + String(this.budget)

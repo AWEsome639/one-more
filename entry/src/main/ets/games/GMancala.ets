@@ -671,7 +671,7 @@ export struct GMancala {
 
       Text(this.over ? (this.won ? '🎉 你的库更多，赢了！' : '这局输了，再来一局') :
         (this.turn === 0 ? '轮到你：点一个自己的坑撒石子'
-          : (LanMatch.isActive() ? '联机：等对手走子…' : '对手思考中…')))
+          : (LanMatch.isActive() ? TG('联机：等对手走子…') : '对手思考中…')))
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 

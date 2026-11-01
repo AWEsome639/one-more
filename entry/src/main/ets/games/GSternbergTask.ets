@@ -296,7 +296,7 @@ export struct GSternbergTask {
                 .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm)
               }, (s: string, i: number) => 'r' + i + s)
             }.width('100%')
-            Text(TG2("探针 {0}{1}", this.probe, (this.inSet ? ' 在集合里' : ' 不在集合里')))
+            Text(TG2("探针 {0}{1}", this.probe, (this.inSet ? TG(' 在集合里') : TG(' 不在集合里'))))
               .fontSize(FontSize.sm).fontColor(this.inSet ? Palette.emerald : Palette.rose)
           }.width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
         }

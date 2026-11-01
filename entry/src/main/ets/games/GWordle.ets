@@ -468,7 +468,7 @@ export struct GWordle {
   @Builder
   infoBox(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '机会' : (kind === 1 ? '已猜' : TG('用时')))
+      Text(kind === 0 ? TG('机会') : (kind === 1 ? '已猜' : TG('用时')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.diffTotal - this.guesses.length)

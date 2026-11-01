@@ -317,7 +317,7 @@ export struct GFractionalPizza {
             .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
         }, (i: number) => 'pz' + i + '_' + this.d + (this.sel[i] ? 'y' : 'n') + (this.checked ? 'c' : ''))
       }.width('100%').height(Cell.of(64))
-      Button(this.checked ? (this.ok ? '✅ 对了' : '❌ 应是 ' + String(this.n) + '/' + String(this.d)) : TG('确认'))
+      Button(this.checked ? (this.ok ? TG('✅ 对了') : '❌ 应是 ' + String(this.n) + '/' + String(this.d)) : TG('确认'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.checked ? (this.ok ? Palette.emerald : Palette.rose) : Palette.amber)

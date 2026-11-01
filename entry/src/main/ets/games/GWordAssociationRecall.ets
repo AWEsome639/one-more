@@ -289,7 +289,7 @@ export struct GWordAssociationRecall {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
-        Text(TG2("{0}　回忆对 {1}", (this.phase === 0 ? '记忆 ' : TG('题 ') + Math.min(this.qi + 1, SETS) + '/' + SETS), this.right)).fontSize(FontSize.xs).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Text(TG2("{0}　回忆对 {1}", (this.phase === 0 ? TG('记忆 ') : TG('题 ') + Math.min(this.qi + 1, SETS) + '/' + SETS), this.right)).fontSize(FontSize.xs).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
           .fontColor(this.theme.inkSoft).layoutWeight(1)
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(Palette.amber)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)

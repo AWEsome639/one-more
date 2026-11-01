@@ -410,7 +410,7 @@ export struct GHanoi {
       .width('100%')
       .layoutWeight(1)
 
-      Text(this.done ? '🎉 完成！' : (this.sel >= 0 ? '再点一根柱子放过去' : '点一根柱子拿起最上面的盘'))
+      Text(this.done ? TG('🎉 完成！') : (this.sel >= 0 ? '再点一根柱子放过去' : '点一根柱子拿起最上面的盘'))
         .fontSize(FontSize.sm)
         .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
 

@@ -945,7 +945,7 @@ export struct GGomoku {
       Row({ space: Space.md }) {
         // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这三格整局不刷新
         Column({ space: 2 }) {
-        Text(true ? '手数' : (false ? (LanMatch.isActive() ? '我 ●' : '你 ●')
+        Text(true ? TG('手数') : (false ? (LanMatch.isActive() ? '我 ●' : '你 ●')
         : (LanMatch.isActive() ? '对手 ○' : '电脑 ○')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(true ? String(this.steps)
@@ -960,7 +960,7 @@ export struct GGomoku {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text(false ? '手数' : (true ? (LanMatch.isActive() ? '我 ●' : '你 ●')
+        Text(false ? TG('手数') : (true ? (LanMatch.isActive() ? '我 ●' : '你 ●')
         : (LanMatch.isActive() ? '对手 ○' : '电脑 ○')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(false ? String(this.steps)
@@ -975,7 +975,7 @@ export struct GGomoku {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text(false ? '手数' : (false ? (LanMatch.isActive() ? '我 ●' : '你 ●')
+        Text(false ? TG('手数') : (false ? (LanMatch.isActive() ? '我 ●' : '你 ●')
         : (LanMatch.isActive() ? '对手 ○' : '电脑 ○')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(false ? String(this.steps)
