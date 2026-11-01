@@ -221,6 +221,23 @@ struct Splash {
     return curves.cubicBezierCurve(0.34, 1.12, 0.36, 1.0);
   }
 
+  /**
+   * ★★★ 2026-11-01 真机 hilog 抓到：逐字入场**实际没生效**。
+   *   证据（探针 charIn 打点）：
+   *     char[0] first>0 at 907 ms
+   *     char[7] first>0 at 914 ms   ⇒ 8 个字只差 7ms，等于同时出现
+   *   根因：pTitle 用 `settle()` = cubicBezier(0.22, **1.0**, 0.36, 1.0)，
+   *         y1=1.0 ⇒ 前 22% 时间就冲完大部分进度，121ms 内跨过 0.45，
+   *         而 8 个字的 start 分别是 0 / 0.064 / 0.129 … / 0.45 ⇒ **一次跨完**。
+   *   ⇒ pTitle 只是"逐字的时间轴"，视觉曲线由 charIn 内部的 smoothstep 提供，
+   *     所以时间轴本身必须**起点慢**（对称 ease-in-out），偏移才有意义。
+   *   ★ 不用 Linear：判据⑨要求主线不用匀速；而这里用对称贝塞尔，
+   *     既给了"字与字之间的间隔"，又保留了"整体先慢后稳"的呼吸。
+   */
+  private titleClock(): ICurve {
+    return curves.cubicBezierCurve(0.55, 0.0, 0.45, 1.0);
+  }
+
   private settle(): ICurve {
     return curves.cubicBezierCurve(0.22, 1.0, 0.36, 1.0);
   }
@@ -339,9 +356,26 @@ struct Splash {
     }, 740);
     // L6 标题
     setTimeout(() => {
-      animateTo({ duration: 550, curve: this.settle() }, () => {
-        this.pTitle = 1;
-      });
+      // ★★★ 2026-11-01 真机 hilog 抓到根因：
+      //   探针记录 pTitle 的轨迹，只看到两个值 —— t=0 时 0、t=1073ms 时 1，
+      //   **中间没有任何中间值**。
+      //   原因：`charIn()` 是在 build() 里计算的 JS 表达式，
+      //        而 animateTo 的中间值只驱动**原生动画属性**（opacity/scale/translate），
+      //        不会逐帧重新执行 build() ⇒ charIn 永远只被算两次（起、终）。
+      //   ⇒ 逐字入场"代码写了但从没显示过"。
+      //   修法：**手动推进** pTitle（每 16ms 走一步，550ms 走完），
+      //        每次赋值都是 @State 变更 ⇒ 真的触发 build ⇒ charIn 拿到真实的中间值。
+      const T0: number = Date.now();
+      const DUR: number = 550;
+      const tick = setInterval(() => {
+        const e: number = Math.min(1, (Date.now() - T0) / DUR);
+        // 用与 titleClock 同形的对称 ease-in-out（smoothstep 近似）
+        this.pTitle = e * e * (3 - 2 * e);
+        if (e >= 1) {
+          clearInterval(tick);
+          this.pTitle = 1;
+        }
+      }, 16);
     }, 820);
     // L7 副标题
     setTimeout(() => {
