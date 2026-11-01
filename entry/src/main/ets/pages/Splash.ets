@@ -684,6 +684,30 @@ struct Splash {
             .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
             .opacity(this.seg(this.pStroke, 0.001, 0.10))
 
+          // ── ①a 环面明暗（2026-11-01 新增）──
+          //   ★ 真机像素测量：环身实测左 RGB(146,119,74) / 右 RGB(154,126,78)，
+          //     差只有 3%（那是外发光溢出）⇒ **环是纯平色，没有渐变**。
+          //   ★ 金属环（torus）的受光沿**环宽方向**变化：外缘凸起受光 → 内缘收暗。
+          //     做法：在主管上加两条极细的同心弧 ——
+          //       外缘 #E2BE74（亮）/ 内缘 #A87C3E（暗），各占环宽的 14%。
+          //     这样"边缘亮、内侧沉"，读起来才有厚度。
+          //   几何：主管直径 0.4818、环宽 0.1276 ⇒ 环跨半径 0.1771~0.3037；
+          //         圆心 (0.2409, 0.0262+0.2409)。
+          Circle()
+            .width(this.omPxV() * 0.6074).height(this.omPxV() * 0.6074)
+            .fill(Color.Transparent)
+            .stroke('#E2BE74')
+            .strokeWidth(this.omPxV() * 0.0180)
+            .position({ x: this.omPxV() * -0.0628, y: this.omPxV() * -0.0366 })
+            .opacity(this.seg(this.pStroke, 0.001, 0.10) * 0.55)
+          Circle()
+            .width(this.omPxV() * 0.3542).height(this.omPxV() * 0.3542)
+            .fill(Color.Transparent)
+            .stroke('#A87C3E')
+            .strokeWidth(this.omPxV() * 0.0180)
+            .position({ x: this.omPxV() * 0.0638, y: this.omPxV() * 0.0900 })
+            .opacity(this.seg(this.pStroke, 0.001, 0.10) * 0.55)
+
           // ── ①b 金属高光：4 段绕环旋转（研究报告 P2-1）──
           //   ★ 金的「贵」来自**会动的高光**，不是金色本身。
           //   ★ 这是全片唯一该用 Linear 的地方：金属反射本就匀速。
