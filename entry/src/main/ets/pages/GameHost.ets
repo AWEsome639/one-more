@@ -3306,6 +3306,20 @@ struct GameHost {
           const next: number = e.keyCode === Tv.KEY_LEFT ? (cur + 4) % 5 : (cur + 1) % 5;
           focusControl.requestFocus('hdr-' + next);
           e.stopPropagation();
+          return;
+        }
+        // ★★★ 2026-11-01 棋盘焦点试点（第 1/355 款，见 GBejeweled 的 cellId）：
+        //   焦点在顶栏时按 DOWN ⇒ 试着把焦点交给棋盘中心格 `cell_3_3`。
+        //   · 有这格的游戏（当前只有宝石迷阵试点）⇒ 焦点落进棋盘，之后方向键由格子自己接管
+        //   · 没有这格的游戏 ⇒ requestFocus 静默失败（返回 false），行为与之前一致，零风险
+        if (e.keyCode === Tv.KEY_DOWN && cur >= 0 && cur <= 4) {
+          // ★ 2026-11-01 实测（hilog 插桩）：**返回 false**。
+          //   id 确实存在（uitest dumpLayout 能看到 cell_3_3，Stack，16×16vp，
+          //   clickable/enabled/visible 全 true），但焦点系统不接受它。
+          //   ⇒ 这一跳暂时无效，但**保留代码**：等棋盘格的 focusable 问题解决后它就通了。
+          focusControl.requestFocus('cell_3_3');
+          e.stopPropagation();
+          return;
         }
         return;
       }

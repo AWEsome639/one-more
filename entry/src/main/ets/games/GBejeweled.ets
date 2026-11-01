@@ -6,6 +6,7 @@
  * 坐标口径：整盘在 7×7 网格里，格子用 layoutWeight(1) 均分，视觉与机型无关
  */
 
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
@@ -106,6 +107,19 @@ export struct GBejeweled {
 
   private idx(r: number, c: number): number {
     return r * N + c;
+  }
+
+  /**
+   * ★★★ 2026-11-01 **棋盘焦点导航的试点（第 1/355 款）**：
+   *   背景（台账第 665 轮 TAB 对照实验）：ArkUI 的 **2D 方向键遍历在游戏页不工作**，
+   *   但线性 TAB 遍历正常 ⇒ 焦点系统本身是好的。
+   *   ⇒ 唯一出路是**自己实现方向键导航**：每格一个有意义的稳定 id + 显式 requestFocus。
+   *
+   *   id 用 `cell_行_列`（不是下标）—— 下标在换列数时会错位，
+   *   而行列是**几何位置**，换布局也不会指错（判据：锚点要选结构决定的位置）。
+   */
+  private cellId(r: number, c: number): string {
+    return 'cell_' + r + '_' + c;
   }
 
   private reset(): void {
@@ -606,12 +620,44 @@ export struct GBejeweled {
                 // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
                 .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                   .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+                .id(this.cellId(r, c))
                 .focusable(Tv.on())
                 .focusBox(Tv.box())
                 // ★ 自绘焦点框的真实驱动（focusBox 只改样式，不负责出现）
                 .onFocus(() => { this.tvFocus = this.idx(r, c); })
                 .onBlur(() => { if (this.tvFocus === this.idx(r, c)) { this.tvFocus = -1; } })
-                .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
+                .onKeyEvent((e: KeyEvent) => {
+                  if (!Tv.on()) { return; }
+                  // ★ 2026-11-01 试点：方向键在棋盘内**自己移动焦点**（ArkUI 默认遍历不工作）
+                  if (Tv.isArrow(e.keyCode)) {
+                    let nr: number = r;
+                    let nc: number = c;
+                    if (e.keyCode === Tv.KEY_UP) { nr = r - 1; }
+                    else if (e.keyCode === Tv.KEY_DOWN) { nr = r + 1; }
+                    else if (e.keyCode === Tv.KEY_LEFT) { nc = c - 1; }
+                    else { nc = c + 1; }
+                    // 边界内才移动（到边就不动，而不是跳到对面 —— 棋盘上"绕回去"会让人误操作）
+                    if (nr >= 0 && nr < N && nc >= 0 && nc < N) {
+                      let ok: boolean = false;
+                      try {
+                        ok = focusControl.requestFocus(this.cellId(nr, nc));
+                      } catch (err) {
+                        ok = false;
+                      }
+                      // ★★★ 2026-11-01 实测（hilog 插桩）：**requestFocus 返回 false**
+                      //   —— id 确实存在（uitest dumpLayout 里能看到 cell_3_3，类型 Stack，
+                      //   16×16 vp，clickable/enabled/visible 全 true），
+                      //   但焦点系统不接受它。原因未查明（6 次 build 后按判据停手）。
+                      //   ⇒ **只在成功时才吃掉按键**：失败就放行，否则方向键比改之前更没用
+                      //     （吃掉 + 没移动 = 彻底无效）。
+                      if (ok) {
+                        e.stopPropagation();
+                      }
+                    }
+                    return;
+                  }
+                  Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); });
+                })
                 .onClick(() => {
                 Haptics.tick();
                 this.tap((this.idx(r, c)));
