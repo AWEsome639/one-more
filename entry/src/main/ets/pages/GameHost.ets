@@ -749,6 +749,15 @@ struct GameHost {
    *   ⇒ **棋盘与操作区完全不可见**（截图拍到只剩顶栏和演示条）。
    *   ⇒ 极小屏缩小图标，正常屏（≥420vp 高）保持 44 不变。 */
   /** 极小屏判定：高或宽 < 420vp（运动手表 195 / 手表 233 都算） */
+  /**
+   * ★★★ 2026-11-01 真机（智慧屏 853×533）：**游戏页顶栏按钮没有可见焦点框**。
+   *   真机实测：进游戏后按方向键，像素差分 **0** —— 焦点在顶栏移动但屏幕无变化。
+   *   根因：`.focusBox()` 按 SDK 文档「只改样式，不管框出不出现」。
+   *   ⇒ 自绘：用 onFocus/onBlur 记下是哪个按钮，用 `.border()` 画 4vp 主色框。
+   *   4 个按钮（返回 / 收藏 / 帮助 / 重开）+ 难度 = 5 个位置。
+   */
+  @State private focusIdx: number = -1;
+
   private tinyScreen(): boolean {
     return Bp.height < 420 || Bp.width < 420;
   }
@@ -774,6 +783,12 @@ struct GameHost {
             // ★ item ④：游戏页最常点的就是它 ⇒ 按下必须"弹一下"（1 → 1.08 → 1）
             .scale({ x: this.backPressed ? IconPress.scale : 1, y: this.backPressed ? IconPress.scale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
+            // ★★★ 2026-11-01：**原来是 focusBox 但没有 focusable** ⇒
+            //   电视/键盘用户进游戏后，顶栏按钮根本拿不到焦点（连"重开"都按不到）。
+            .focusable(Tv.on())
+            .border(Tv.focusBorder(this.focusIdx === 0))
+            .onFocus(() => { this.focusIdx = 0; })
+            .onBlur(() => { if (this.focusIdx === 0) { this.focusIdx = -1; } })
             .onTouch((e: TouchEvent) => {
               this.backPressed = IconPress.onTouch(this.backPressed, e);
             })
@@ -817,6 +832,12 @@ struct GameHost {
           //   ⇒ 极小屏**减元素**（收藏/帮助次要，让位给返回/难度/重开），这正是"降级"。
           if (!this.tinyScreen()) {
           Text(this.fav ? '⭐' : '☆')
+            // ★★★ 2026-11-01：**原来是 focusBox 但没有 focusable** ⇒
+            //   电视/键盘用户进游戏后，顶栏按钮根本拿不到焦点（连"重开"都按不到）。
+            .focusable(Tv.on())
+            .border(Tv.focusBorder(this.focusIdx === 1))
+            .onFocus(() => { this.focusIdx = 1; })
+            .onBlur(() => { if (this.focusIdx === 1) { this.focusIdx = -1; } })
             .fontSize(FontSize.lg)
             .fontColor(this.fav ? Palette.amber : this.theme().inkFaint)
             .width(this.iconSize()).height(this.iconSize()).textAlign(TextAlign.Center)
@@ -832,6 +853,12 @@ struct GameHost {
             })
 
           Text('?')
+            // ★★★ 2026-11-01：**原来是 focusBox 但没有 focusable** ⇒
+            //   电视/键盘用户进游戏后，顶栏按钮根本拿不到焦点（连"重开"都按不到）。
+            .focusable(Tv.on())
+            .border(Tv.focusBorder(this.focusIdx === 2))
+            .onFocus(() => { this.focusIdx = 2; })
+            .onBlur(() => { if (this.focusIdx === 2) { this.focusIdx = -1; } })
             .accessibilityText(this.t('玩法说明', 'How to play'))
             .fontSize(FontSize.lg)
             .fontColor(this.theme().inkSoft)
@@ -856,6 +883,22 @@ struct GameHost {
           //   `dumpLayout` 报的仍是内部 Text 的尺寸（ArkUI 的命中区跟着最内层文本走）。
           //   ⇒ 必须**直接给 Text 定高**；左右内边距保留，上下内边距去掉（高度已由 height 决定）。
           Text(this.diffLabel())
+            // ★ 电视/键盘：难度胶囊也要能拿焦点（原来完全没有 focusable）
+            .focusable(Tv.on())
+            .border(Tv.focusBorder(this.focusIdx === 3))
+            .onFocus(() => { this.focusIdx = 3; })
+            .onBlur(() => { if (this.focusIdx === 3) { this.focusIdx = -1; } })
+            .onKeyEvent((e: KeyEvent) => {
+              if (!Tv.on()) { return; }
+              // 难度胶囊上按 OK 等价于点一下（切难度）——原来是完全按不到
+              if (Tv.handleKey(e, () => {
+                Haptics.tap();
+                const next: number = (ProgressStore.diffOf(this.gameId) + 1) % ProgressStore.DIFF_COUNT;
+                ProgressStore.setDiff(this.gameId, next);
+                this.diffTick = this.diffTick + 1;
+                this.nonce = this.nonce + 1;
+              })) { e.stopPropagation(); }
+            })
             .fontSize(FontSize.xxs).fontWeight(FontWeight.Bold)
             .fontColor(this.diffColor())
             .height(Layout.touchMin)
@@ -872,6 +915,15 @@ struct GameHost {
             })
 
           Text('↻')
+            // ★ 电视/键盘：重开也要能拿焦点（原来完全没有 focusable ⇒ 电视上按不到重开）
+            .focusable(Tv.on())
+            .border(Tv.focusBorder(this.focusIdx === 4))
+            .onFocus(() => { this.focusIdx = 4; })
+            .onBlur(() => { if (this.focusIdx === 4) { this.focusIdx = -1; } })
+            .onKeyEvent((e: KeyEvent) => {
+              if (!Tv.on()) { return; }
+              if (Tv.handleKey(e, () => { Haptics.tap(); this.nonce = this.nonce + 1; })) { e.stopPropagation(); }
+            })
             .accessibilityText(this.t('重新开始', 'Restart'))
             .fontSize(FontSize.xl)
             .fontColor(this.theme().ink)
