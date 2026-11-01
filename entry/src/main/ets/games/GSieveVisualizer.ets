@@ -441,8 +441,8 @@ export struct GSieveVisualizer {
       .height(this.boardPx())
 
       Text(this.done
-        ? '🎉 筛完！100 以内共 ' + this.found + ' 个素数'
-        : (this.p === 0 ? '点「开始」看筛法怎么划掉合数' : '用 ' + this.p + ' 划倍数：' + this.p + '×' + this.p + ' 起'))
+        ? TG2('🎉 筛完！100 以内共 {0} 个素数', this.found)
+        : (this.p === 0 ? TG('点「开始」看筛法怎么划掉合数') : TG2('用 {0} 划倍数：{0}×{0} 起', this.p)))
         .fontSize(FontSize.sm)
         .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
 

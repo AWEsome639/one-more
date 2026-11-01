@@ -10,7 +10,7 @@ import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
@@ -219,7 +219,7 @@ export struct GGravitySort {
     if (top < 0) {
       return Hint.none('none');
     }
-    return Hint.make([], '点第 ' + String(c + 1) + ' 列，一次吸走 ' + String(cnt) + ' 块同色（还剩 ' + String(this.remain()) + ' 块）',
+    return Hint.make([], TG4('点第 {0} 列，一次吸走 {1} 块同色（还剩 {2} 块）', c + 1, cnt, this.remain(), ''),
       'Tap column ' + String(c + 1) + ' to remove ' + String(cnt) + ' blocks', t0);
   }
   private askAuto(): void {
@@ -277,7 +277,7 @@ export struct GGravitySort {
       this.finish(false);
       return;
     }
-    this.msg = '吸走 ' + gone + ' 块同色' + (gone > 1 ? '（连消 +20）' : '');
+    this.msg = gone > 1 ? TG2('吸走 {0} 块同色（连消 +20）', gone) : TG2('吸走 {0} 块同色', gone);
   }
 
   private finish(solved: boolean): void {

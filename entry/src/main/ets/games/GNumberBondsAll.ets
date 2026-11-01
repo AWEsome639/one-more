@@ -387,7 +387,7 @@ export struct GNumberBondsAll {
         }, (r: number) => 'r' + r)
       }.width('100%').layoutWeight(1)
 
-      Text(this.found.length > 0 ? '已拆出：' + this.found.join('  ') : '还没拆出任何一组').fontSize(FontSize.xs).fontColor(Palette.violet).width('100%')
+      Text(this.found.length > 0 ? TG2('已拆出：{0}', this.found.join('  ')) : TG('还没拆出任何一组')).fontSize(FontSize.xs).fontColor(Palette.violet).width('100%')
 
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝

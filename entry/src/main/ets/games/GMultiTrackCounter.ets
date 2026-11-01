@@ -349,7 +349,7 @@ export struct GMultiTrackCounter {
           Text(TG2('每 {0} 格跳一次', String(this.rounds[(i)])))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme.inkFaint)
-          Text(this.seen[(i)] > 0 ? '已跳 ' + String(this.seen[(i)]) : '…')
+          Text(this.seen[(i)] > 0 ? TG2('已跳 {0}', this.seen[(i)]) : '…')
           .fontSize(FontSize.xs)
           .fontColor(this.theme.inkSoft)
           }

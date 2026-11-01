@@ -203,7 +203,7 @@ export struct GFrequencyTap {
       return Hint.none('none');
     }
     if (this.beatTs.length === 0) {
-      return Hint.make([], '先按「开始」，之后每 ' + String(GAP) + ' 毫秒点一下圆盘（误差 ±' + String(HIT_MS) + 'ms 都算命中）',
+      return Hint.make([], TG2('先按「开始」，之后每 {0} 毫秒点一下圆盘（误差 ±{1}ms 都算命中）', GAP, HIT_MS),
         'Press start, then tap once every ' + String(GAP) + ' ms', t0);
     }
     const last: number = this.beatTs[this.beatTs.length - 1];

@@ -226,7 +226,7 @@ export struct GFeatureMatrixRecall {
       return Hint.none('none');
     }
     return Hint.make(cells,
-      this.colorName(this.askColor) + '三格：' + parts.join('、'),
+      TG2('{0}三格：{1}', this.colorName(this.askColor), parts.join('、')),
       'The ' + String(cells.length) + ' target cells are ' + cells.join(', '), t0);
   }
   private askAuto(): void {
@@ -343,7 +343,7 @@ export struct GFeatureMatrixRecall {
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
 
-      Text(this.phase === 0 ? ('⏳ ' + String(this.secLeft) + ' 秒后遮蔽') : this.msg)
+      Text(this.phase === 0 ? TG2('⏳ {0} 秒后遮蔽', this.secLeft) : this.msg)
         .fontSize(FontSize.sm).fontColor(this.phase === 0 ? Palette.amber : this.theme.inkSoft)
         .width('100%').textAlign(TextAlign.Center)
 

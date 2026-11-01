@@ -10,7 +10,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -232,8 +232,9 @@ export struct GAbReversalOddball {
   private end(): void {
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
     this.over = true; this.won = this.hits >= NEED_HIT && this.fa <= MAX_FA;
-    this.msg = this.won ? '🎉 命中 ' + this.hits + ' 次、误报 ' + this.fa + ' 次，通关！'
-      : '💤 命中 ' + this.hits + '/' + NEED_HIT + '、误报 ' + this.fa + '（限 ' + MAX_FA + '）';
+    this.msg = this.won
+        ? TG2('🎉 命中 {0} 次、误报 {1} 次，通关！', this.hits, this.fa)
+        : TG4('💤 命中 {0}/{1}、误报 {2}（限 {3}）', this.hits, NEED_HIT, this.fa, MAX_FA);
     if (this.finished) { return; }
     this.finished = true;
     const r: GameResult = { gameId: 'ab_reversal_oddball', solved: this.won, score: this.score,

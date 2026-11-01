@@ -307,7 +307,7 @@ export struct GPatternSequenceDraw {
               Stack() {
               Column({ space: 2 }) {
               Text(String((r * SIDE + c + 1))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.rank((r * SIDE + c + 1)) >= 0 ? '#FFFFFF' : this.theme.ink)
-              Text(this.rank((r * SIDE + c + 1)) >= 0 ? '第' + (this.rank((r * SIDE + c + 1)) + 1) + '笔' : '').fontSize(FontSize.xxs).fontColor('#FFFFFF')
+              Text(this.rank((r * SIDE + c + 1)) >= 0 ? TG2('第{0}笔', this.rank((r * SIDE + c + 1)) + 1) : '').fontSize(FontSize.xxs).fontColor('#FFFFFF')
               }
               }.layoutWeight(1).aspectRatio(1).backgroundColor(this.rank((r * SIDE + c + 1)) >= 0 ? Palette.rose : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
               Haptics.tick();
@@ -321,7 +321,7 @@ export struct GPatternSequenceDraw {
         }, (r: number) => 'r' + r)
       }.width('100%').layoutWeight(1)
 
-      Text(this.over ? this.msg : ('下一笔该点 ' + this.want() + ' —— ' + this.msg)).fontSize(FontSize.sm)
+      Text(this.over ? this.msg : TG2('下一笔该点 {0} —— {1}', this.want(), this.msg)).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%')
