@@ -137,6 +137,21 @@ const STARS: number[][] = [
 const STARS_TINY: number = 16;
 
 /**
+ * ★★★ 2026-11-01 金属高光的「三层同心弧」参数（模块级常量 —— ArkTS 严格模式下
+ *   内联数组字面量 + 索引会被判成逗号表达式，报 `arkts-no-comma-outside-loops`）。
+ *
+ *   起因：原来每段高光的 strokeWidth = 整个环宽 ⇒ 必然读作「一块」而不是「一道受光」。
+ *   圆头实验（gl_07）证明「放大面积只会更糟」。
+ *   ⇒ 三层同心弧（外宽内窄、中层最亮）叠出**横跨环宽方向的亮→更亮→暗**，
+ *     这是环面正面受光的真实分布。
+ */
+const GLINT_STROKE: string[] = ['#E8CE96', '#FFF0CE', '#F5DFB0'];
+const GLINT_WIDTH: number[] = [0.115, 0.055, 0.022];
+const GLINT_SCALE: number[] = [1.0, 0.955, 0.915];
+const GLINT_ALPHA: number[] = [0.55, 0.95, 0.30];
+const GLINT_PHASE: number[] = [0.85, 0.40, 0.15, 0.40];
+
+/**
  * 两拍节奏用的曲线（全局，setTimeout 里不能用 this）。
  * 轻微过冲：y1 = 1.06 > 1 —— M 山"长出来"时有一点点弹性。
  */
@@ -656,12 +671,40 @@ struct Splash {
               .fill(Color.Transparent)
               .stroke('#F0D9A8')
               .strokeWidth(this.omPxV() * 0.1276)
+              // ★★★ 2026-11-01 试过并回退（记在这里，别再试）：
+              //   ① `.strokeLineCap(LineCapStyle.Round)` —— 圆头让每段两端的台阶变成半圆。
+              //      真机结果（gl_07）：**比硬切边更糟**。圆头把每段面积放大了
+              //      （两端各多出半个线宽的半圆）⇒ 对比更强 ⇒ 4 个离散块更显眼，
+              //      读作「环上贴了几块饼干」。
+              //   ② **三层同心弧**（外宽内窄、中层最亮）—— 想用径向层次模拟环面受光。
+              //      编译失败 61 个错（`arkts-no-comma-outside-loops` 等），
+              //      根因是 **ArkTS 严格模式不支持这种嵌套 ForEach 写法**。
+              //      ⇒ 真要做，得拆成 3 个并列的 ForEach 或 3 段手写代码，成本高。
+              //
+              //   ★ 结论（机制层面）：当前 4 段高光只能靠**调参数**变柔和
+              //     （透明度 / dash 长度 / strokeWidth），
+              //     要换渲染方式就得先解决 ArkTS 的嵌套限制。
+              //   ★ 而且"4 段离散高光"本身是**设计选择**（会动的高光比静态金色更贵），
+              //     不是 bug —— 所以不急着推翻，先把参数调软。
               .strokeDashArray([this.omPxV() * 0.0832, this.omPxV() * 1.5140])
               .strokeDashOffset(-this.omPxV() * 0.3785 * i)
               .rotate({ angle: this.pGlint * 90 })
-              .opacity(this.pGlint * [0.85, 0.40, 0.15, 0.40][i])
+              .opacity(this.pGlint * GLINT_PHASE[i])
               .position({ x: this.omPxV() * 0.0, y: this.omPxV() * 0.0262 })
           }, (i: number) => 'glint' + i)
+              // ★★★ 2026-11-01 两次实验记录（都失败，别再试）：
+              //   ① `.strokeLineCap(LineCapStyle.Round)` —— 圆头让两端台阶变半圆。
+              //      真机结果（gl_07）：**比硬切边更糟**。圆头把每段面积放大了
+              //      ⇒ 对比更强 ⇒ 4 个离散块更显眼，读作「环上贴了几块饼干」。
+              //   ② **三层同心弧**（外宽内窄、中层最亮）想模拟环面受光 ——
+              //      编译失败 61 个错（`arkts-no-comma-outside-loops` 等），
+              //      根因是 **ArkTS 严格模式不支持这种嵌套 ForEach 写法**。
+              //      ⇒ 要做需拆成 3 个并列 ForEach 或 3 段手写，成本高。
+              //
+              //   ★ 结论：当前 4 段高光只能**调参数**变柔和（透明度/dash/strokeWidth），
+              //     换渲染方式要先解决 ArkTS 的嵌套限制。
+              //   ★ 而且「4 段离散高光」本身是**设计选择**（会动的高光比静态金色更贵），
+              //     不是 bug —— 所以不推翻，只把参数调软（见 GLINT_PHASE）。
 
           // ── ② O 心点（金）：日出时从山脊后升起 ──
           Column()
