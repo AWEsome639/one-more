@@ -428,8 +428,18 @@ export struct GKakuroMini {
       return Hint.none('none');
     }
     const v: number = sol[this.sel];
+    // ★★★ 2026-11-01 全项目扫「提示说"这一格"但没给坐标」时抓到**唯一真的一处**：
+    //   原来只说「这一格填 X」—— 而棋盘上没有高亮（这款不在 13 款描边名单里），
+    //   玩家看到「这一格」却不知道是哪一格 ⇒ **提示等于没给**。
+    //   同批另外两款（GGomoku / GLetterGridSwapper）主文案本来就带行列，是假警报。
+    //   ⚠️ 踩到一个差点用错的变量：
+    //     `this.diffTotal = GameDiff.livesNow(MAX_MOVES)` 是**步数上限**，不是列数！
+    //     网格边长是模块级 `N`（=3）。用 diffTotal 算行列会算错。
+    const hr: number = Math.floor(this.sel / N) + 1;
+    const hc: number = (this.sel % N) + 1;
+    const pos: string = '第 ' + String(hr) + ' 行第 ' + String(hc) + ' 列填 ' + String(v);
     return Hint.make([this.sel],
-      '这一格填 ' + String(v) + ' —— 整盘解是 ' + sol.slice(0, 3).join(' ') + ' / ' + sol.slice(3, 6).join(' ') + ' / ' + sol.slice(6, 9).join(' '),
+      pos + ' —— 整盘解是 ' + sol.slice(0, 3).join(' ') + ' / ' + sol.slice(3, 6).join(' '),
       'Fill ' + String(v) + ' here; the full solution is ' + sol.join(' '), t0);
   }
   private askAuto(): void {
