@@ -968,16 +968,24 @@ build() {
     .onKeyEvent((e: KeyEvent) => {
       if (!Tv.on()) { return; }
       // ① 方向键：交给父组件的网格导航
-      //    ⚠️ 必须**吃掉**这个按键（返回 true），否则 ArkUI 的默认焦点遍历
-      //       会同时把焦点挪到"下一个可聚焦元素"，和我们的网格导航打架。
-      //        实机上表现就是：按一次右键跳两格。
+      // ★★★ 2026-11-01 真机（智慧屏 960×540）**抓到一个从没生效过的注释**：
+      //   原来的注释写「必须**吃掉**这个按键（返回 true），否则 ArkUI 的默认焦点遍历
+      //   会同时把焦点挪到下一个可聚焦元素，和我们的网格导航打架」——
+      //   **但 `onKeyEvent` 的回调签名是 `(e: KeyEvent) => void`，根本没法返回 true。**
+      //   ⇒ 所以"吃掉"从未发生：走到列表边缘时（moveFocus 里 to 越界直接 return），
+      //     按键没人消费 ⇒ ArkUI 默认遍历接手 ⇒ 焦点**溢出到下方页签**。
+      //     实测表现：首页 DOWN×2 + RIGHT ⇒ **页面跳到「统计」页**（底部页签变蓝）。
+      //   ⇒ 正确做法：`e.stopPropagation()` —— 这才是 ArkUI 里"吃掉按键"的 API。
       if (e.type === KeyType.Down && Tv.isArrow(e.keyCode)) {
+        e.stopPropagation();
         const d: number = Tv.arrowDelta(e.keyCode, this.gridCols);
         if (d !== 0) { this.onArrow(this.meta.id, d); }
         return;
       }
-      // ② 确认键：进游戏
-      Tv.handleKey(e, () => { this.onOpen(this.meta.id); });
+      // ② 确认键：进游戏（同样 stopPropagation，避免默认行为叠加）
+      if (Tv.handleKey(e, () => { this.onOpen(this.meta.id); })) {
+        e.stopPropagation();
+      }
     })
   }
 }

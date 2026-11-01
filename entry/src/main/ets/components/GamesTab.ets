@@ -564,8 +564,18 @@ export struct GamesTab {
     // 上下跳行时，若目标列越界（例如最后一行不满），已在 to 上判过长度 ⇒ 安全
     const target: string = arr[to].id;
     focusControl.requestFocus('card-' + target);
-    // 让目标卡进入视野（滚到中间偏上，留出上下文）
-    this.gridScroller.scrollToIndex(Math.max(0, to - cols));
+    // ★★★ 2026-11-01 真机（智慧屏 960×540）：原来的滚动策略**语义错了**。
+    //   旧写法 `scrollToIndex(Math.max(0, to - cols))` 意思是"把 to 前面一整行滚到顶部"，
+    //   实测 to=9 / cols=4 ⇒ scrollToIndex(5) ⇒ **页面滚过头**：
+    //   元素列表变成 ['LV','2','新手上路']（卡片全被滚出视口），
+    //   焦点元素随之离开视口，再按 CENTER 进不去游戏。
+    //   ⇒ 第二次尝试 `scrollToIndex(to, true, ScrollAlign.AUTO)` 也**没解决问题**：
+    //     实测 DOWN×2+RIGHT 后页面滚到了**顶部**（元素变成 ['LV','2','新手上路']），
+    //     因为 Grid 的虚拟化与 `requestFocus` 有竞态：焦点请求时目标 item 还没渲染，
+    //     滚动器不知道往哪滚，退回顶部。
+    //   ⇒ 现在的做法：**不自己滚**。ArkUI 在 `requestFocus` 成功后会自动把聚焦元素
+    //     滚进可见区（这是焦点系统自带的能力）；我们再加一次反而打架。
+    //   ⚠️ 若后续发现"远距离跳转时目标不自动可见"，再考虑 `setTimeout(..., 0)` 延迟滚动。
   }
 
   private gridCols(): string {
