@@ -218,7 +218,8 @@ export struct GFeatureMatrixRecall {
     for (let i = 0; i < TOTAL; i++) {
       if (this.hiColors[i] === this.askColor) {
         cells.push(i);
-        parts.push('第' + String(Math.floor(i / N) + 1) + '行第' + String(i % N + 1) + '列');
+        // ★★★ 2026-11-01 i18n 断点：硬拼行列 ⇒ 改字典模板
+        parts.push(TG2('第 {0} 行第 {1} 列', Math.floor(i / N) + 1, i % N + 1));
       }
     }
     if (cells.length === 0) {

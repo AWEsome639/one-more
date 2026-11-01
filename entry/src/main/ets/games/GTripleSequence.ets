@@ -203,7 +203,8 @@ export struct GTripleSequence {
         return Hint.none('none');
       }
       cells.push(i * CELLS.length + c);
-      parts.push('第' + String(i + 1) + '行第' + String(c + 1) + '格');
+      // ★★★ 2026-11-01 i18n 断点：硬拼行列 ⇒ 改字典模板（「格」用「列」模板，语义同）
+      parts.push(TG2('第 {0} 行第 {1} 列', i + 1, c + 1));
     }
     return Hint.make(cells, '三行各点：' + parts.join('、'),
       'Tap ' + parts.join(' / '), t0);

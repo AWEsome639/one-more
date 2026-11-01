@@ -150,7 +150,8 @@ export struct GLockPattern {
 
   /** 点号 → 「第 r 行第 c 列」（提示用） */
   private dotText(i: number): string {
-    return '第' + String(Math.floor(i / 3) + 1) + '行第' + String(i % 3 + 1) + '列';
+    // ★★★ 2026-11-01 i18n 断点：硬拼行列 ⇒ 改字典模板
+    return TG2('第 {0} 行第 {1} 列', Math.floor(i / 3) + 1, i % 3 + 1);
   }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // ═══════════ 演示动画（项目 C）═══════════

@@ -209,7 +209,8 @@ export struct GFeatureMatrixRecallAll {
       if (this.hiColors[i] !== '') {
         const r: number = Math.floor(i / N) + 1;
         const c: number = i % N + 1;
-        parts.push(r + '排' + c + '列');
+        // ★★★ 2026-11-01 i18n 断点：硬拼行列 ⇒ 改字典模板
+        parts.push(TG2('第 {0} 行第 {1} 列', r, c));
       }
     }
     if (parts.length === 0) {

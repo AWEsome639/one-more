@@ -767,8 +767,10 @@ export struct GBridgesAll {
     const b: number = m % 1000;
     const n: number = this.ix.length;
     const want: number = this.sol[a * n + b];
-    const pa: string = (this.iy[a] + 1) + '排' + (this.ix[a] + 1) + '列';
-    const pb: string = (this.iy[b] + 1) + '排' + (this.ix[b] + 1) + '列';
+    // ★★★ 2026-11-01 i18n 断点（与 GBejeweled 同源）：原来把「排/列」硬拼进数字，
+    //   英文模式下坐标仍是中文。⇒ 用字典模板（10 语言齐全）。
+    const pa: string = TG2('第 {0} 行第 {1} 列', this.iy[a] + 1, this.ix[a] + 1);
+    const pb: string = TG2('第 {0} 行第 {1} 列', this.iy[b] + 1, this.ix[b] + 1);
     return Hint.make([], TG2('{0} 与 {1} 之间要补到 {2} 座桥', pa, pb, want),
       TG2('{0} ↔ {1}: build {2} bridge(s)', pa, pb, want), t0);
   }

@@ -419,8 +419,16 @@ export struct GBejeweled {
     }
     const a: number = Math.floor(m / 100);
     const b: number = m % 100;
-    const pa: string = (Math.floor(a / N) + 1) + '排' + (a % N + 1) + '列';
-    const pb: string = (Math.floor(b / N) + 1) + '排' + (b % N + 1) + '列';
+    // ★★★ 2026-11-01 真机（英文模式）抓到 i18n 断点：
+    //   这里原来把「排/列」**硬拼进数字**（`1 + '排' + 2 + '列'`），
+    //   然后整串塞进 `TG2('换 {0} 与 {1} 这两颗能消')` 的 {0}/{1}。
+    //   ⇒ 中文对了，但**英文模式下坐标仍是中文**：「Swap 1排2列 with 2排2列」。
+    //   ★ 而 i18n 脚本查不出来 —— 它只核对**字典条目**（2888×10），
+    //     查不到**运行时拼接**出来的字符串。这是 i18n 的盲区。
+    //   ⇒ 改用字典里**已有的**模板 `'第 {0} 排第 {1} 列'`
+    //     （10 语言齐全，en = "Row {0}, column {1}"）⇒ 一处复用，不用新增翻译。
+    const pa: string = TG2('第 {0} 排第 {1} 列', Math.floor(a / N) + 1, (a % N) + 1);
+    const pb: string = TG2('第 {0} 排第 {1} 列', Math.floor(b / N) + 1, (b % N) + 1);
     return Hint.make([a, b], TG2('换 {0} 与 {1} 这两颗能消', pa, pb),
       TG2('Swap {0} with {1} to clear', pa, pb), t0);
   }

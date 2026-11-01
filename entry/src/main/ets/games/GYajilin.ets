@@ -303,7 +303,8 @@ export struct GYajilin {
       }
     }
     return Hint.make([i],
-      '第' + String(Math.floor(i / N) + 1) + '行第' + String(i % N + 1) + '列涂黑（本题还差 ' + String(left) + ' 格）',
+      // ★★★ 2026-11-01 i18n 断点：硬拼行列 ⇒ 改字典模板
+      TG2('第 {0} 行第 {1} 列涂黑（本题还差 {2} 格）', Math.floor(i / N) + 1, i % N + 1, left),
       'Blacken row ' + String(Math.floor(i / N) + 1) + ', column ' + String(i % N + 1), t0);
   }
   private askAuto(): void {

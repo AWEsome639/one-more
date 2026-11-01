@@ -311,8 +311,9 @@ export struct GMatch3 {
     }
     const a: number = Math.floor(m / 100);
     const b: number = m % 100;
-    const pa: string = (Math.floor(a / N) + 1) + '排' + (a % N + 1) + '列';
-    const pb: string = (Math.floor(b / N) + 1) + '排' + (b % N + 1) + '列';
+    // ★★★ 2026-11-01 i18n 断点：硬拼行列 ⇒ 改字典模板
+    const pa: string = TG2('第 {0} 行第 {1} 列', Math.floor(a / N) + 1, (a % N) + 1);
+    const pb: string = TG2('第 {0} 行第 {1} 列', Math.floor(b / N) + 1, (b % N) + 1);
     return Hint.make([a, b], TG2('换 {0} 与 {1} 这两个果子能消', pa, pb),
       TG2('Swap {0} with {1} to clear', pa, pb), t0);
   }
