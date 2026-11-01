@@ -68,6 +68,13 @@ export struct GBejeweled {
   @State private demoScored: number = 0;    // 演示期间"假的"得分（只显示，不进记录）
   @State private board: number[] = [];
   @State private sel: number = -1;
+  /**
+   * ★★★ 2026-11-01 真机（智慧屏 960×540）：**游戏内焦点框不可见**。
+   *   根因：`.focusBox()` 按 SDK 文档「只改样式，不管框出不出现」（common.d.ts:18880）。
+   *   ⇒ 用 `onFocus/onBlur` 记下当前聚焦的格子索引，再用 `.border()` 自绘。
+   *   这是「工具先于批量」的第一款试点（Tv.focusBorder 已就绪）。
+   */
+  @State private tvFocus: number = -1;
   @State private score: number = 0;
   /** ★ 2026-10-15 得分跳动 */
   @State private scorePulse: number = 1;
@@ -320,6 +327,19 @@ export struct GBejeweled {
   }
 
   private demoFinish(): void {
+    // ★★★ 2026-11-01 真机（智慧屏 960×540）抓到：**演示 21 秒还没结束**。
+    //   根因：这一款是手工写的 demoFinish，**漏了停计时器**。
+    //     · demoBeat 在 `demoRound >= 2` 时调 `demoFinish()` 并 `return -1`
+    //     · 但 `demoFinish()` 只复位数据，没有 `Demo.stop(demoId)`、没有 `demoId = -1`
+    //     ⇒ `demoId` 仍然是正数 ⇒ 界面 `this.demoId >= 0` 恒真
+    //     ⇒ 演示条永远显示「演示中…」，而真正能停下它的 demoStop() 只挂在 onTouch 上
+    //     ⇒ **遥控器/键盘用户永远停不下来。**
+    //   ★ 全项目查过：355 款里只有这一款漏（其余 354 款由批量脚本生成，都带 Demo.stop）。
+    //     这就是"手工版与批量版分叉"的代价 —— 手工写的那一份没有跟上后续修复。
+    if (this.demoId >= 0) {
+      Demo.stop(this.demoId);
+      this.demoId = -1;
+    }
     this.demoGuideA = -1;
     this.demoGuideB = -1;
     this.demoPhase = 0;
@@ -566,10 +586,14 @@ export struct GBejeweled {
                   ? 1.24 : (this.sel === (this.idx(r, c)) ? 1.14 : 1)
                 })
                 // ★ 演示引导：被指到的两颗加描边 + 光晕，玩家一眼知道"看这里"
-                .border({
-                  width: (this.demoGuideA === (this.idx(r, c)) || this.demoGuideB === (this.idx(r, c))) ? 3 : 0,
-                  color: Palette.amber
-                })
+                // ★ 焦点框（4vp 主色）优先于演示引导（3vp 琥珀）：
+                //   两者都是"看这里"，但焦点是"你现在能操作这里"，优先级更高。
+                .border((this.tvFocus === this.idx(r, c))
+                  ? Tv.focusBorder(true)
+                  : {
+                    width: (this.demoGuideA === this.idx(r, c) || this.demoGuideB === this.idx(r, c)) ? 3 : 0,
+                    color: Palette.amber
+                  })
                 .shadow((this.demoGuideA === (this.idx(r, c)) || this.demoGuideB === (this.idx(r, c)))
                   ? { radius: 18, color: '#99FFFFFF', offsetX: 0, offsetY: 0 }
                   : Shadow.card)
@@ -579,6 +603,9 @@ export struct GBejeweled {
                   .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
                 .focusable(Tv.on())
                 .focusBox(Tv.box())
+                // ★ 自绘焦点框的真实驱动（focusBox 只改样式，不负责出现）
+                .onFocus(() => { this.tvFocus = this.idx(r, c); })
+                .onBlur(() => { if (this.tvFocus === this.idx(r, c)) { this.tvFocus = -1; } })
                 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
                 .onClick(() => {
                 Haptics.tick();
