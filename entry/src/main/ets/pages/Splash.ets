@@ -291,111 +291,54 @@ struct Splash {
 
   /** ★ 时间表：每一层有自己的入场时刻 —— 错开才有层次 */
   private runTimeline(): void {
-    // L0 底色
-    animateTo({ duration: 420, curve: this.easeOut() }, () => {
-      this.pBg = 1;
-    });
-    // L1 星云
-    setTimeout(() => {
-      animateTo({ duration: 520, curve: this.easeOut() }, () => {
-        this.pNebula = 1;
-      });
-    }, 110);
-    // L2 星尘（一次长动，覆盖全程）
-    // ★ 用 `Curve.Linear` 是**特意**的：星尘是 2600ms 的背景漂移，
-    //   如果给它加 ease（前快后慢），星幕会在中段"刹车"，一眼看出是动画。
-    //   真实星空是匀速漂的 ⇒ 只有匀速才"不像是动画"。
-    //   ★ 判据：`Linear` 不是"廉价"，是"匀速"；
-    //     该匀速的（星幕漂移 / 金属高光旋转）用它，该有加减速的绝不用。
-    setTimeout(() => {
-      animateTo({ duration: 2600, curve: Curve.Linear }, () => {
-        this.pDust = 1;
-      });
-      animateTo({ duration: 1400, curve: this.easeOut() }, () => {
-        this.pTwinkle = 1;
-      });
-    }, 170);
-    // L3 光晕
-    setTimeout(() => {
-      animateTo({ duration: 600, curve: this.easeOut() }, () => {
-        this.pGlow = 1;
-      });
-    }, 200);
-    // L4a 描边生长
-    setTimeout(() => {
-      animateTo({ duration: 980, curve: this.settle() }, () => {
-        this.pStroke = 1;
-      });
-      // 日出：比描边快，420ms 内升到位
-      animateTo({ duration: 420, curve: this.sunCurve() }, () => {
-        this.pSun = 1;
-      });
-      // 金属高光：520ms 匀速绕环
-      // 本文件另一处 Linear 是 L2 星尘漂移，两处理由相同：**该匀速的才匀速**。
-      animateTo({ duration: 520, curve: Curve.Linear }, () => {
-        this.pGlint = 1;
-      });
-      // 两拍节奏第二拍：M 山比环晚 70ms 到（scale 0.94→1 + 淡入）
-      setTimeout(() => {
-        animateTo({ duration: 460, curve: sunCurveGlobal() }, () => {
-          this.pM = 1;
-        });
-      }, 70);
-    }, 280);
-    // L4b 填充点亮（描边快完成时起，衔接最自然）
-    setTimeout(() => {
-      animateTo({ duration: 440, curve: this.easeOut() }, () => {
-        this.pFill = 1;
-      });
-    }, 600);
-    // L5 光带扫过
-    setTimeout(() => {
-      animateTo({ duration: 520, curve: this.sweepCurve() }, () => {
-        this.pSweep = 1;
-      });
-    }, 740);
-    // L6 标题
-    setTimeout(() => {
-      // ★★★ 2026-11-01 真机 hilog 抓到根因：
-      //   探针记录 pTitle 的轨迹，只看到两个值 —— t=0 时 0、t=1073ms 时 1，
-      //   **中间没有任何中间值**。
-      //   原因：`charIn()` 是在 build() 里计算的 JS 表达式，
-      //        而 animateTo 的中间值只驱动**原生动画属性**（opacity/scale/translate），
-      //        不会逐帧重新执行 build() ⇒ charIn 永远只被算两次（起、终）。
-      //   ⇒ 逐字入场"代码写了但从没显示过"。
-      //   修法：**手动推进** pTitle（每 16ms 走一步，550ms 走完），
-      //        每次赋值都是 @State 变更 ⇒ 真的触发 build ⇒ charIn 拿到真实的中间值。
-      const T0: number = Date.now();
-      const DUR: number = 550;
-      const tick = setInterval(() => {
-        const e: number = Math.min(1, (Date.now() - T0) / DUR);
-        // 用与 titleClock 同形的对称 ease-in-out（smoothstep 近似）
-        this.pTitle = e * e * (3 - 2 * e);
-        if (e >= 1) {
-          clearInterval(tick);
-          this.pTitle = 1;
-        }
-      }, 16);
-    }, 820);
-    // L7 副标题
-    setTimeout(() => {
-      animateTo({ duration: 360, curve: this.easeOut() }, () => {
-        this.pSub = 1;
-      });
-    }, 1080);
-    // L8 标语
-    setTimeout(() => {
-      animateTo({ duration: 400, curve: this.easeOut() }, () => {
-        this.pTag = 1;
-      });
-    }, 1220);
-    // L9 推出
-    setTimeout(() => {
-      animateTo({ duration: 460, curve: this.easeOut() }, () => {
-        this.pOut = 1;
-      });
-    }, 1400);
-    // 兜底
+    // ★★★★★ 2026-11-01 架构级修复（第 797 轮）
+    //
+    //   上一轮的教训：`animateTo` 只把**渲染属性**在原生侧插值，
+    //   **@State 的 JS 值只在起、终各变一次**。
+    //   而这一屏 15 个进度值**全部**参与 JS 计算（seg / starDrift / translate…），
+    //   ⇒ 实测帧间差出现 0（600ms 内画面完全没变）⇒ 整屏其实是"几张静态画面"。
+    //
+    //   修法：**一个 16ms 的 ticker 统一推进全部 15 个进度值**。
+    //   · 每个值有自己的 (起始延迟, 时长, 曲线类型)，照原时间表原样搬过来；
+    //   · 每步赋值都是 @State 变更 ⇒ 真的触发 build ⇒ 所有 JS 计算拿到真实中间值；
+    //   · 曲线两类：`lin` 线性（星尘漂移 / 金属高光旋转 —— 该匀速的才匀速）、
+    //              `sm` smoothstep e²(3−2e)（其余全部，等效 ease-in-out）。
+    const T0: number = Date.now();
+    const tick = setInterval(() => {
+      const t: number = Date.now() - T0;
+      const lin = (st: number, dur: number): number => {
+        const e: number = (t - st) / dur;
+        return e <= 0 ? 0 : (e >= 1 ? 1 : e);
+      };
+      const sm = (st: number, dur: number): number => {
+        const e: number = (t - st) / dur;
+        if (e <= 0) { return 0; }
+        if (e >= 1) { return 1; }
+        return e * e * (3 - 2 * e);
+      };
+      this.pBg = sm(0, 420);
+      this.pNebula = sm(110, 520);
+      this.pDust = lin(170, 2600);
+      this.pTwinkle = sm(170, 1400);
+      this.pGlow = sm(200, 600);
+      this.pStroke = sm(280, 980);
+      this.pSun = sm(280, 420);
+      this.pGlint = lin(280, 520);
+      this.pM = sm(350, 460);
+      this.pFill = sm(600, 440);
+      this.pSweep = sm(740, 520);
+      this.pTitle = sm(820, 550);
+      this.pSub = sm(1080, 360);
+      this.pTag = sm(1220, 400);
+      this.pOut = sm(1400, 460);
+      if (t >= TOTAL) {
+        clearInterval(tick);
+        this.pBg = 1; this.pNebula = 1; this.pDust = 1; this.pTwinkle = 1;
+        this.pGlow = 1; this.pStroke = 1; this.pSun = 1; this.pGlint = 1;
+        this.pM = 1; this.pFill = 1; this.pSweep = 1; this.pTitle = 1;
+        this.pSub = 1; this.pTag = 1; this.pOut = 1;
+      }
+    }, 16);
     setTimeout(() => {
       this.finish();
     }, HOLD);
