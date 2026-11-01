@@ -885,7 +885,17 @@ struct GameHost {
             })
         }
         .width('100%')
-        .padding({ left: Space.lg, right: Space.lg, top: Space.xl, bottom: Space.md })
+        // ★★★ 2026-11-01 真机（运动手表 195×195）：**顶栏吃掉了 38% 的屏高**。
+        //   实测 dumpLayout：顶栏 Row y 117~381 = **264px = 88vp**，
+        //   而里面按钮只有 30vp（极小屏 iconSize）⇒ padding 上 28 + 下 16 = 44vp 白吃。
+        //   后果：游戏内容 Scroll 只剩 y 381~441 = **60px = 20vp** ⇒ 一屏什么都看不见。
+        //   ⇒ 极小屏 padding 收到 6/6（省 ~32vp），正常屏保持原样。
+        .padding({
+          left: this.tinyScreen() ? Space.xs : Space.lg,
+          right: this.tinyScreen() ? Space.xs : Space.lg,
+          top: this.tinyScreen() ? Space.xs : Space.xl,
+          bottom: this.tinyScreen() ? Space.xs : Space.md
+        })
 
         // ── 游戏区（直接内联，不走 @Builder）──
         Column() {
