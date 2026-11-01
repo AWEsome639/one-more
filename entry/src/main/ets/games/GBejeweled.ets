@@ -531,7 +531,12 @@ export struct GBejeweled {
           onHintTap: () => { this.askHint(); },
           onAutoTap: () => { this.askAuto(); },
           demoOn: this.demoId >= 0,
-          autoOn: this.autoId >= 0
+          autoOn: this.autoId >= 0,
+          // ★★★ 2026-11-01：全项目 339 处 HintBar 里有 338 处带这个保护，
+          //   **唯一漏的就是这一款**（手工版没跟上批量改造）。
+          //   不加的后果：演示期间按「提示」会在正在变化的棋盘上算 computeHint；
+          //   按「AI 代打」会再起一个计时器，与演示计时器同时改棋盘。
+          disabled: this.demoId >= 0
         })
         Row({ space: Space.sm }) {
           Column({ space: 2 }) {
