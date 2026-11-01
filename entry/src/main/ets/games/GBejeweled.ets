@@ -775,7 +775,15 @@ export struct GBejeweled {
         }
         .width('100%')
 
-        Text(TG2('每消一颗 +{0}，连消翻倍；{1} 步内拿到 {2} 分算通关',Digits(String(PER_GEM), this.langCode),Digits(String(MOVE_LIMIT), this.langCode),Digits(String(TARGET), this.langCode)))
+        // ★★★ 2026-11-01 真机（切难度后）抓到：难度显示「困难」、剩余步数 **14**，
+        //   但底部还写「**20** 步内拿到 600 分算通关」—— 文案和实际不一致。
+        //   根因：这里用的是常量 `MOVE_LIMIT`（=20），
+        //        而实际步数走的是 `this.total = GameDiff.timeNow(MOVE_LIMIT)`
+        //        （难度会**缩减**步数，困难档 14 步）。
+        //   ⇒ 文案必须用运行时值 `this.total`，不能用常量。
+        //   ★ 判据：**凡是"规则说明里出现的数字"，都必须是运行时读的，不能是常量。**
+        //     常量写的文案在难度/关卡变化后一定和实际不符，而它**编译通过、断言全绿**。
+        Text(TG2('每消一颗 +{0}，连消翻倍；{1} 步内拿到 {2} 分算通关',Digits(String(PER_GEM), this.langCode),Digits(String(this.total), this.langCode),Digits(String(TARGET), this.langCode)))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme.inkFaint)
       }

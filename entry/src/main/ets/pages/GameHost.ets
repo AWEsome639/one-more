@@ -935,6 +935,7 @@ struct GameHost {
               // 难度胶囊上按 OK 等价于点一下（切难度）——原来是完全按不到
               if (Tv.handleKey(e, () => {
                 Haptics.tap();
+                Hint.stopAllAuto();          // 同 onClick：切难度前停代打
                 const next: number = (ProgressStore.diffOf(this.gameId) + 1) % ProgressStore.DIFF_COUNT;
                 ProgressStore.setDiff(this.gameId, next);
                 this.diffTick = this.diffTick + 1;
@@ -950,6 +951,11 @@ struct GameHost {
             .borderRadius(Radius.full)
             .onClick(() => {
               Haptics.tap();
+              // ★★★ 2026-11-01 判据 56 的**第 4 个出口**：切难度。
+              //   这里原来只 `diffTick+1` + `nonce+1`（组件重建、按钮显示会复位），
+              //   但 **`Hint.autoRun` 的全局计时器还在** ⇒ AI 会继续在新难度上自己玩。
+              //   ⇒ 切难度前先把代打停掉。
+              Hint.stopAllAuto();
               const next: number = (ProgressStore.diffOf(this.gameId) + 1) % ProgressStore.DIFF_COUNT;
               ProgressStore.setDiff(this.gameId, next);
               this.diffTick = this.diffTick + 1;

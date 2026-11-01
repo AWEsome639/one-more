@@ -247,7 +247,7 @@ export struct GFocusTunnel {
       this.finish(false);
       return;
     }
-    this.note = TG2('点错了，那是干扰项 🌀（余命 {0}/{1}）',Digits(String(this.lives), this.langCode),Digits(String(LIVES), this.langCode));
+    this.note = TG2('点错了，那是干扰项 🌀（余命 {0}/{1}）',Digits(String(this.lives), this.langCode),Digits(String(this.total), this.langCode));
   }
 
   private finish(solved: boolean): void {
@@ -276,7 +276,7 @@ export struct GFocusTunnel {
         autoOn: this.autoId >= 0
       })
       Text(TG2('目标 {0}/{1}　余命 {2}',Digits(String(this.found), this.langCode),Digits(String(NEED), this.langCode),Digits(String(this.lives), this.langCode))
-        + TG2('/{0}　隧道 {1}', String(LIVES), this.radius.toFixed(1)))
+        + TG2('/{0}　隧道 {1}', String(this.total), this.radius.toFixed(1)))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         // ★ 错误抖动
         .translate({ x: this.shakeX })

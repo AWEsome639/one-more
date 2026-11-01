@@ -487,7 +487,11 @@ export struct GDoubleTrouble {
           this.reset();
         })
 
-      Text(TG2('每轮两个任务都要答对；答错扣一条命，{0} 条命用完就结束，撑过 {1} 轮通关',Digits(String(LIVES), this.langCode),Digits(String(ROUNDS), this.langCode)))
+      // ★★★ 2026-11-01 与 GBejeweled 同源（全项目扫"文案写常量"时抓到）：
+      //   实际命数走 `this.total = GameDiff.livesNow(LIVES)`（难度会改），
+      //   而这里原来写常量 `LIVES`（=3）⇒ 难度一变文案就和实际不符。
+      //   ⇒ 改用运行时值 `this.total`。
+      Text(TG2('每轮两个任务都要答对；答错扣一条命，{0} 条命用完就结束，撑过 {1} 轮通关',Digits(String(this.total), this.langCode),Digits(String(ROUNDS), this.langCode)))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
     }
