@@ -24,6 +24,7 @@
  */
 import { TG } from '../core/GameI18n';
 import { FontSize, Palette } from '../core/Design';
+import { Bp } from '../core/Bp';
 
 @Component
 export struct DemoBar {
@@ -32,14 +33,23 @@ export struct DemoBar {
   /** 这一拍的文案（可为空，为空时显示通用提示） */
   @Prop msg: string = '';
 
+  /** 极小屏：高或宽 < 420vp（运动手表 195 / 手表 233 都算） */
+  private tiny(): boolean {
+    return Bp.height < 420 || Bp.width < 420;
+  }
+
   build() {
     Row() {
       if (this.on) {
-        Text(TG('演示中') + ' ｜ '
+        // ★★ 2026-11-01 真机（运动手表 195×195）：完整文案在 195vp 宽上要占 3 行、
+        //   而这一拍只有 24vp 高 ⇒ 第二行起被切（截图拍到「答案是第 4」被截断）。
+        //   ⇒ 极小屏**只保留「演示中」三个字** —— 它存在的意义是"现在不是你操作"，
+        //     而不是"把提示读完"（提示在顶栏下方，棋盘上有描边指路）。
+        Text(this.tiny() ? TG('演示中') : (TG('演示中') + ' ｜ '
           + (this.msg.length > 0 ? this.msg : TG('碰一下就停'))
           // ★ 不计分提示：335 款共用这一条，省得每款各写一遍。
           //   已经写明「不计分」的（3 款手工版）就不重复。
-          + (this.msg.indexOf(TG('不计分')) >= 0 ? '' : TG('（演示不计分）')))
+          + (this.msg.indexOf(TG('不计分')) >= 0 ? '' : TG('（演示不计分）'))))
           .fontSize(FontSize.sm)
           .fontColor(Palette.amber)
           .textAlign(TextAlign.Center)
@@ -51,6 +61,8 @@ export struct DemoBar {
     .width('100%')
     // ★ 未演示时高度归 0 —— 这样 355 款都可以**恒显示**这个组件，
     //   调用方不必写 if/else 包一层（少一层缩进就少一类改错）。
-    .height(this.on ? 38 : 0)
+    // ★★ 2026-11-01 真机（手表 195×195）：38vp 在 195 高的屏上占 19%，
+    //   加上顶栏后内容区只剩 86vp。⇒ 极小屏压到 24vp。
+    .height(this.on ? (Bp.height < 420 ? 24 : 38) : 0)
   }
 }

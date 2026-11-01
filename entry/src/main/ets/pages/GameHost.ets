@@ -782,27 +782,35 @@ struct GameHost {
               Back.go();
             })
 
-          Column({ space: 2 }) {
-            Text(this.meta ? displayName(this.meta) : '')
-              // ★★ 2026-11-01 真机（手表 195×195）：标题原来没限行，窄屏上被压成
-              //   **一字一行**的竖排（截图拍到「缺/运/算/符」竖着摞）。⇒ 单行 + 省略号。
-              .fontSize(this.tinyScreen() ? FontSize.md : FontSize.xl)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(this.theme().ink)
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-            // 副标题：极小屏直接不显示（让位给演示条/棋盘）
-            if (!this.tinyScreen()) {
-              Text(this.meta ? displayTagline(this.meta) : '')
-                .fontSize(FontSize.xs)
-                .fontColor(this.theme().inkFaint)
+          // ★★ 2026-11-01 真机（手表 195×195）：标题列在 195vp 上也是多余的 ——
+          //   顶栏 44 + 演示条 38 已经吃掉 109vp，内容区只剩 86vp。
+          //   ⇒ 极小屏**不显示标题**（玩家刚点进来，知道自己在玩什么），
+          //     用空 Row 占 layoutWeight(1) 把「难度 / 重开」推到右侧，保持顶栏不变形。
+          if (!this.tinyScreen()) {
+            Column({ space: 2 }) {
+              Text(this.meta ? displayName(this.meta) : '')
+                // ★★ 2026-11-01 真机（手表 195×195）：标题原来没限行，窄屏上被压成
+                //   **一字一行**的竖排（截图拍到「缺/运/算/符」竖着摞）。⇒ 单行 + 省略号。
+                .fontSize(this.tinyScreen() ? FontSize.md : FontSize.xl)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(this.theme().ink)
                 .maxLines(1)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
+              // 副标题：极小屏直接不显示（让位给演示条/棋盘）
+              if (!this.tinyScreen()) {
+                Text(this.meta ? displayTagline(this.meta) : '')
+                  .fontSize(FontSize.xs)
+                  .fontColor(this.theme().inkFaint)
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+              }
             }
+            .alignItems(HorizontalAlign.Start)
+            .layoutWeight(1)
+            .margin({ left: Space.md })
+          } else {
+            Row() {}.layoutWeight(1)
           }
-          .alignItems(HorizontalAlign.Start)
-          .layoutWeight(1)
-          .margin({ left: Space.md })
 
           // ★★ 2026-11-01 真机（运动手表 195×195）：顶栏一行要放 5 个元素（‹ ☆ ? 难度 ↻），
           //   195vp 宽根本放不下 ——「普通」和「↻」被切到屏幕外（截图拍到）。
