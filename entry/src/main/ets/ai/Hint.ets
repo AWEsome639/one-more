@@ -160,6 +160,34 @@ export class Hint {
    * 开始代打：每 AUTO_MS 调一次 tick，tick 返回 false 就自动停。
    * @returns 计时器 id（传给 autoStop）
    */
+  /**
+   * ★★★★ 2026-11-01 真机端到端抓到：**「再来一局」后 AI 代打还在跑**。
+   *
+   *   机制：`autoRun` 用 `setInterval`（全局计时器），**不随组件销毁而停**。
+   *   而「再来一局」只把 `nonce + 1` ⇒ 触发游戏的 `@Watch('onRestart')` ⇒
+   *   **组件不重建** ⇒ 游戏自己的 `autoId` 仍是原值（按钮还显示"停代打"），
+   *   旧计时器继续调用 `autoStep()` ⇒ **AI 在新的一局里自己玩起来**。
+   *
+   *   ⇒ 用一份**全局活跃登记**，让页面级能一次性停掉所有代打
+   *     （一处改动覆盖 355 款，不用每款去改 onRestart）。
+   */
+  private static autos: Set<number> = new Set<number>();
+
+  /** 停掉所有正在跑的代打（结算 / 再来一局 / 重开 / 切游戏时调用） */
+  static stopAllAuto(): void {
+    Hint.autos.forEach((id: number) => {
+      if (id >= 0) {
+        clearInterval(id);
+      }
+    });
+    Hint.autos.clear();
+  }
+
+  /** 当前有没有代打在跑（调试/断言用） */
+  static anyAuto(): boolean {
+    return Hint.autos.size > 0;
+  }
+
   static autoRun(tick: () => boolean): number {
     let id: number = -1;
     id = setInterval(() => {
@@ -172,9 +200,11 @@ export class Hint {
       if (!more) {
         if (id >= 0) {
           clearInterval(id);
+          Hint.autos.delete(id);
         }
       }
     }, Hint.AUTO_MS);
+    Hint.autos.add(id);
     return id;
   }
 
@@ -182,6 +212,7 @@ export class Hint {
   static autoStop(id: number): void {
     if (id >= 0) {
       clearInterval(id);
+      Hint.autos.delete(id);
     }
   }
 

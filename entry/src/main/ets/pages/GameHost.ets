@@ -11,6 +11,7 @@
  *   onFinish: (r: GameResult) => void
  */
 
+import { Hint } from '../ai/Hint';
 import { Demo } from '../core/Demo';
 import { Tv } from '../core/Tv';
 import { Bp } from '../core/Bp';
@@ -3223,9 +3224,21 @@ struct GameHost {
             .width('100%').constraintSize({ minHeight: Cell.of(46) })
             .onClick(() => {
               Haptics.tap();   // ★ 2026-10-19 按压反馈
+              // ★★★ 2026-11-01 真机抓到：**点「再来一局」后 AI 代打还在跑**。
+              //   因为 `Hint.autoRun` 是全局 setInterval，不随组件重建而停；
+              //   而这里只 `nonce + 1`（触发 @Watch，组件不重建）⇒ 旧计时器继续跑，
+              //   新的一局 AI 又自己玩起来（按钮还显示"停代打"）。
+              //   ⇒ 开新局前先把所有代打停掉（一处覆盖 355 款）。
+              Hint.stopAllAuto();
               animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
                 this.showResult = false;
                 this.nonce = this.nonce + 1;
+                // ★★★ 2026-11-01 **关键：切 diffTick 的奇偶 ⇒ 游戏组件「重建」**。
+                //   只 `nonce + 1` 走的是 `@Watch('onRestart')` ⇒ 组件**不重建** ⇒
+                //   游戏自己的 `autoId` 仍是原值 ⇒ 按钮继续显示"停代打"（虽然计时器已停）。
+                //   切奇偶让 `if (diffTick % 2 === 0)` 的另一支生效 ⇒ 全新实例 ⇒ autoId = -1。
+                //   ⇒ 功能（AI 已停）+ 显示（按钮回到"AI 代打"）两边都对。
+                this.diffTick = this.diffTick + 1;
               });
             })
           Button(this.t('返回列表', 'Back to list'))
