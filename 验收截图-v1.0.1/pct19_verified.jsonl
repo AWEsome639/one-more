@@ -1,0 +1,19 @@
+{"cls": "GBreakout", "id": "breakout", "name": "打砖块", "pct": "100", "lowY": 1390, "hasBtn": true, "ok": true}
+{"cls": "GBubbleShooter", "id": "bubble_shooter", "name": "弹珠消", "pct": "100", "lowY": 1390, "hasBtn": true, "ok": true}
+{"cls": "GDualMirror", "id": "dual_mirror", "name": "双镜像", "pct": "70", "lowY": 1439, "hasBtn": true, "ok": true}
+{"cls": "G2048", "id": "g2048", "name": "2048", "pct": "46", "lowY": 1537, "hasBtn": true, "ok": true}
+{"cls": "GLifeGame", "id": "life_game", "name": "生命游戏", "pct": "70", "lowY": 1382, "hasBtn": true, "ok": true}
+{"cls": "GLockPattern", "id": "lock_pattern", "name": "图案锁", "pct": "70", "lowY": 1382, "hasBtn": true, "ok": true}
+{"cls": "GMahjongSolitaire", "id": "mahjong_solitaire", "name": "麻将连连看", "pct": "70", "lowY": 1389, "hasBtn": true, "ok": true}
+{"cls": "GMatch3", "id": "match3", "name": "三连", "pct": "70", "lowY": 1519, "hasBtn": true, "ok": true}
+{"cls": "GPegSolitaire", "id": "peg_solitaire", "name": "孔明棋", "pct": "50", "lowY": 1493, "hasBtn": true, "ok": true}
+{"cls": "GReversi", "id": "reversi", "name": "黑白棋", "pct": "45,70", "lowY": 1526, "hasBtn": true, "ok": true}
+{"cls": "GSnake", "id": "snake", "name": "贪吃蛇", "pct": "70", "lowY": 1435, "hasBtn": true, "ok": true}
+{"cls": "GColorFlood", "id": "color_flood", "name": "色彩洪水", "pct": "46", "lowY": 1421, "hasBtn": true, "ok": true}
+{"cls": "GFillomino", "id": "fillomino", "name": "填数拼图", "pct": "46", "lowY": 1418, "hasBtn": true, "ok": true}
+{"cls": "GSudoku", "id": "sudoku", "name": "数独", "pct": "52", "lowY": 1505, "hasBtn": true, "ok": true}
+{"cls": "GSumSnake", "id": "sum_snake", "name": "数蛇", "pct": "70", "lowY": 1391, "hasBtn": true, "ok": true}
+{"cls": "GTapa", "id": "tapa", "name": "塔帕", "pct": "70", "lowY": 1541, "hasBtn": true, "ok": true}
+{"cls": "GMirrorMaze", "id": "mirror_maze", "name": "镜像迷宫", "pct": "70", "lowY": 1457, "hasBtn": true, "ok": true}
+{"cls": "", "id": "", "name": "3D 迷宫", "pct": "70", "lowY": 1476, "hasBtn": true, "ok": true}
+{"cls": "", "id": "", "name": "心理地图", "pct": "70", "lowY": 1544, "hasBtn": true, "ok": true}
