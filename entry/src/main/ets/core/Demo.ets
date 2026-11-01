@@ -70,7 +70,39 @@ export class Demo {
   }
 
   /** 是否还在演 */
+  /**
+   * ★★★ 2026-11-01（奥森「演示就是一段动画，不计分」的第三时刻）：
+   *   `handleFinish()` 里会写两样东西：
+   *     · `ProgressStore.finishGame(...)` —— 加经验、记战绩
+   *     · `GameLog.recordResult(...)`     —— 写战绩日志
+   *   而它**原来完全不判断是否在演示** ⇒ 演示过程中若达成胜利条件，
+   *   **演示会写进战绩、给玩家加经验**。
+   *   ⇒ 过程中的 HUD 已经遮挡了（第 675 轮），结束后的状态也恢复了（第 661 轮），
+   *     但「回看记录里的玩家」看到的还是被污染的记录 —— 这是第三个时刻。
+   *
+   *   这里提供全局查询：只要有**任一**演示在跑就返回 true。
+   *   ★ 为什么放这里：355 款各有自己的 `demoId`，GameHost 看不到；
+   *     而 `Demo.live` 本来就是全局的活跃集合 ⇒ 一处判断覆盖全部。
+   */
+  static anyRunning(): boolean {
+    return Demo.live.size > 0;
+  }
+
   static running(id: number): boolean {
     return id >= 0 && Demo.live.has(id);
+  }
+
+  /**
+   * ★★★ 2026-11-01（判据 54 的第三个出口）：**一次性停掉所有演示**。
+   *
+   *   页面销毁时（`aboutToDisappear`）必须停干净 ——
+   *   否则 355 款各自的 `demoId` 计时器会在**已销毁的组件**上继续跑，
+   *   改 @State、算下一步，后台空跑。
+   *
+   *   `Demo.live` 本来就是全局活跃集合 ⇒ 清空它 + 让 step 里的 `has(id)` 变假
+   *   ⇒ 所有在跑的演示在下一拍就自己退出（不用逐个拿句柄）。
+   */
+  static stopAll(): void {
+    Demo.live.clear();
   }
 }
