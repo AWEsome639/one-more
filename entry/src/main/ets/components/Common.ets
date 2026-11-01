@@ -924,11 +924,23 @@ build() {
       y: this.pressed ? 0.97 : (this.hovered ? 1.02 : 1)
     })
     .border({
-      // ★ 焦点框：4vp 主色（电视 3 米视距要看得见）；hover 仍是 2vp 墨色
-      width: this.focused ? 4 : (this.hovered ? 2 : 0),
-      color: this.focused ? Palette.primary : (this.hovered ? this.theme.ink : Color.Transparent),
-      radius: Radius.md + 3
+      // ★★★ 2026-11-01 奥森看到首页第一张卡外面有一圈"蓝框"，问「这层蓝框怎么回事」。
+      //   真相：那是**焦点框**（首卡 defaultFocus + Tv.on() 在平板上为真）。
+      //   但它原来有两个问题：
+      //     ① 颜色 `Palette.primary` = **#6366F1（靛蓝紫）** —— 与紫色卡片**撞色**
+      //        ，框和卡片糊成一片，读作"贴了一圈脏胶带"，而不是"被选中"
+      //     ② 4vp 硬描边压在卡片外沿，和卡片的阴影互相打架
+      //   ⇒ 改成：**更细的深墨环（3vp）+ 柔和外发光**
+      //     · 深墨在"彩色卡片"和"白背景"上都清楚（白色环会在白缝里消失）
+      //     · 外发光让它"浮起来"，而不是"被框住"
+      width: this.focused ? 3 : (this.hovered ? 2 : 0),
+      color: this.focused ? this.theme.ink : (this.hovered ? this.theme.ink : Color.Transparent),
+      radius: Radius.md + 2
     })
+    // 焦点时的外发光：低透明度主色，扩散出去 ⇒ 观感是"这卡亮着"而不是"这卡被画了框"
+    .shadow(this.focused
+      ? { radius: 18, color: '#556366F1', offsetX: 0, offsetY: 0 }
+      : Shadow.card)
     .onFocus(() => { this.focused = true; })
     .onBlur(() => { this.focused = false; })
     .onClick(() => {
