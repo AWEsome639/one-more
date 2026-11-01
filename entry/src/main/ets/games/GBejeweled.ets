@@ -735,6 +735,20 @@ export struct GBejeweled {
     .height('100%')
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
+    // ★★★ 2026-11-01 **试过并回退（第 7 次失败，记在这里别再试）**：
+    //   现象（真机 TAB 连按 9 次，逐次 dump `focused=true` 的节点）：
+    //     焦点只在 `hdr-0..4` 和 `Scroll/Button` 之间循环，
+    //     **从来没到达任何 `cell_*`** ⇒ 那 49 个格子**完全不在焦点树里**。
+    //   试过的两个假设（都无效，TAB 路径一字未变）：
+    //     · 根容器 `.focusScopeId('board', true)` —— 想把它声明成焦点组
+    //     · 根容器 `.focusable(true)` —— 想让子树被注册进焦点树
+    //   ⇒ 结论：**棋盘格子进不了焦点树，与容器的 focusScope/focusable 无关。**
+    //     顶栏按钮能进，是因为它们是 GameHost（页面级）的直接子元素；
+    //     棋盘在**另一个组件的子树**里 —— 而 ArkUI 在本页不把该子树纳入焦点遍历。
+    //   已排除的完整清单（7 条）：
+    //     ① 去掉根 defaultFocus ② 根 focusable(false) ③ 上下键不吃掉
+    //     ④ 显式 requestFocus（id 存在，返回 false） ⑤ GameHost 外包层 focusScopeId
+    //     ⑥ 游戏组件根 focusScopeId ⑦ 游戏组件根 focusable
   }
 
 
