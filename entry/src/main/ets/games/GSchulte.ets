@@ -336,7 +336,7 @@ export struct GSchulte {
       .width('100%')
       .layoutWeight(1)
 
-      Text(this.done ? '🎉 完成！' : '按顺序点：' + this.next)
+      Text(this.done ? TG('🎉 完成！') : TG2('按顺序点：{0}', this.next))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.done ? Palette.emerald : Palette.primary)

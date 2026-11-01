@@ -253,7 +253,7 @@ export struct GWordGridConnection {
       return Hint.none('none');
     }
     return Hint.make([a, b],
-      '把「' + this.cells[a] + '」与「' + this.cells[b] + '」连起来',
+      TG2('把「{0}」与「{1}」连起来', this.cells[a], this.cells[b]),
       'Link "' + this.cells[a] + '" with "' + this.cells[b] + '"', t0);
   }
   private askAuto(): void {

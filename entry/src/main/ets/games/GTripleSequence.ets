@@ -206,7 +206,7 @@ export struct GTripleSequence {
       // ★★★ 2026-11-01 i18n 断点：硬拼行列 ⇒ 改字典模板（「格」用「列」模板，语义同）
       parts.push(TG2('第 {0} 行第 {1} 列', i + 1, c + 1));
     }
-    return Hint.make(cells, '三行各点：' + parts.join('、'),
+    return Hint.make(cells, TG2('三行各点：{0}', parts.join('、')),
       'Tap ' + parts.join(' / '), t0);
   }
   private askAuto(): void {

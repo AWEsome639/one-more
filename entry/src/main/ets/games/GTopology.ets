@@ -271,7 +271,7 @@ export struct GTopology {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text(SHAPES[(this.li)].g).fontSize(FontSize.hero).fontColor(this.theme.ink)
-        Text(this.revealed ? SHAPES[(this.li)].h + ' 个洞' : '?').fontSize(FontSize.sm)
+        Text(this.revealed ? TG2('{0} 个洞', SHAPES[(this.li)].h) : '?').fontSize(FontSize.sm)
         .fontColor(this.revealed ? Palette.orange : this.theme.inkFaint)
         }.layoutWeight(1).height('100%').justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -279,7 +279,7 @@ export struct GTopology {
           .accessibilityLevel('no')
         Column({ space: Space.xs }) {
         Text(SHAPES[(this.ri)].g).fontSize(FontSize.hero).fontColor(this.theme.ink)
-        Text(this.revealed ? SHAPES[(this.ri)].h + ' 个洞' : '?').fontSize(FontSize.sm)
+        Text(this.revealed ? TG2('{0} 个洞', SHAPES[(this.ri)].h) : '?').fontSize(FontSize.sm)
         .fontColor(this.revealed ? Palette.orange : this.theme.inkFaint)
         }.layoutWeight(1).height('100%').justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })

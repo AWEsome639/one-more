@@ -219,7 +219,7 @@ export struct GStroopNumberSize {
     this.pick = saidBig ? 0 : 1;
     if (saidBig === truth) {
       this.right = this.right + 1; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110);
-      this.msg = '✅ ' + String(v) + ' 确实比 ' + String(REF) + (truth ? ' 大' : ' 小');
+      this.msg = truth ? TG2('✅ {0} 确实比 {1} 大', v, REF) : TG2('✅ {0} 确实比 {1} 小', v, REF);
     } else {
       this.msg = TG2('❌ {0} 比 {1}{2}，字形在骗你', String(v), String(REF), truth ? TG(' 大') : TG(' 小'));
     }

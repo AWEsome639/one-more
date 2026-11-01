@@ -9,7 +9,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -206,7 +206,7 @@ export struct GStaircaseMemory {
     }
     const step: number = this.order[this.cur];
     return Hint.make([step],
-      '第 ' + String(this.cur + 1) + ' 个点第 ' + String(step + 1) + ' 阶（本关共 ' + String(this.order.length) + ' 阶）',
+      TG4('第 {0} 个点第 {1} 阶（本关共 {2} 阶）', this.cur + 1, step + 1, this.order.length, ''),
       'Tap step ' + String(step + 1) + ' (number ' + String(this.cur + 1) + ' of ' + String(this.order.length) + ')', t0);
   }
   private askAuto(): void {

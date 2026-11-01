@@ -14,7 +14,7 @@ import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -454,7 +454,7 @@ export struct GReversi {
     const r: number = Math.floor(i / this.diffTotal);
     const c: number = i % this.diffTotal;
     const flips: number = this.flips(this.cells, i, BLACK).length;
-    return Hint.make([i], '下在第 ' + String(r + 1) + ' 行第 ' + String(c + 1) + ' 列，翻 ' + String(flips) + ' 子',
+    return Hint.make([i], TG4('下在第 {0} 行第 {1} 列，翻 {2} 子', r + 1, c + 1, flips, ''),
       'Play row ' + String(r + 1) + ', column ' + String(c + 1) + ' (flips ' + String(flips) + ')', t0);
   }
   private askAuto(): void {

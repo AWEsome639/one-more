@@ -645,7 +645,7 @@ export struct GShikaku {
 
       Row({ space: Space.md }) {
         Text(this.hintMsg.length > 0 ? this.hintMsg : (this.over
-          ? (this.won ? '整盘切好 🎉 得分 ' + String(this.score) : '错手太多，本局失败')
+          ? (this.won ? TG2('整盘切好 🎉 得分 {0}', this.score) : TG('错手太多，本局失败'))
           : '点两格圈矩形：面积要等于里面的数字'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint).animation({ duration: Motion.fast, curve: Motion.snap() })

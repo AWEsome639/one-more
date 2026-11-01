@@ -254,7 +254,7 @@ export struct GWordWheel {
 
   private end(solved: boolean): void {
     this.over = true; this.won = solved;
-    this.msg = solved ? '🎉 找齐 ' + this.goal() + ' 个词，通关！'
+    this.msg = solved ? TG2('🎉 找齐 {0} 个词，通关！', this.goal())
       : '💤 机会用完 —— 本组共有 ' + this.bank.length + TG(' 个词');
     if (this.finished) { return; }
     this.finished = true;
@@ -319,7 +319,7 @@ export struct GWordWheel {
       }
       .width('100%')
 
-      Text(this.found.length === 0 ? '已找到：（空）' : '已找到：' + this.found.join(' · '))
+      Text(this.found.length === 0 ? TG('已找到：（空）') : TG2('已找到：{0}', this.found.join(' · ')))
         .fontSize(FontSize.xs).fontColor(this.theme.inkFaint).width('100%')
 
       Row({ space: Space.sm }) {

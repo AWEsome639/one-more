@@ -423,7 +423,7 @@ export struct GSnake3D {
     if (d < 0) {
       return Hint.none('none');
     }
-    return Hint.make([], '按「' + DIR_LABEL[d] + '」，食物在第 ' + String(Math.floor(this.food / PER) + 1) + ' 层',
+    return Hint.make([], TG2('按「{0}」，食物在第 {1} 层', DIR_LABEL[d], Math.floor(this.food / PER) + 1),
       'Press "' + DIR_LABEL[d] + '" toward the food', t0);
   }
   private askAuto(): void {

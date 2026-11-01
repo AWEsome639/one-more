@@ -114,7 +114,7 @@ export struct GSpatialCabinetMemory {
     this.hideTo = setTimeout(() => {
       this.hideTo = -1;
       this.phase = 1;
-      this.msg = ICONS[this.target] + ' 刚才在哪一格？点它';
+      this.msg = TG2('{0} 刚才在哪一格？点它', ICONS[this.target]);
     }, SHOW_MS);
   }
 

@@ -606,7 +606,7 @@ export struct GSpiderSolitaire {
       const pile: number[] = this.piles[p];
       const top: number = pile.length > 0 ? pile[pile.length - 1] : -1;
       this.msg = top >= 0
-        ? '放不下：这列顶上是 ' + RANKS[rankOf(top)]
+        ? TG2('放不下：这列顶上是 {0}', RANKS[rankOf(top)])
         : '放不下';
       return;
     }

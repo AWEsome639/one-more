@@ -221,7 +221,7 @@ export struct GTargetNumber {
     }
     const i: number = this.ansIdx;
     return Hint.make([i],
-      '答案是「' + this.opts[i] + '」= ' + String(this.target),
+      TG2('答案是「{0}」= {1}', this.opts[i], this.target),
       'The answer is "' + this.opts[i] + '" = ' + String(this.target), t0);
   }
   private askAuto(): void {
