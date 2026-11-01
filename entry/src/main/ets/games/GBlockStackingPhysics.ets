@@ -313,7 +313,7 @@ export struct GBlockStackingPhysics {
       Column({ space: Space.xs }) {
         Text(this.queue.length > 0 ? '待放 ' + this.queue.length + TG(' 块') : '清单已空')
 .fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
-        Text(this.queue.length > 0 ? EMJ[this.queue[0]] + ' 宽 ' + this.queue[0] : '🏁')
+        Text(this.queue.length > 0 ? TG2('{0} 宽 {1}', EMJ[this.queue[0]], this.queue[0]) : '🏁')
 .fontSize(FontSize.xxl)
       }
 .width('100%').padding(Space.sm).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)

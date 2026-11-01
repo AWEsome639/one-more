@@ -249,7 +249,7 @@ export struct GConjunctionSearch {
   private end(solved: boolean): void {
     this.over = true;
     this.won = solved;
-    this.msg = solved ? '🎉 ' + this.diffTotal + ' 关全清，眼力满分'
+    this.msg = solved ? TG2('🎉 {0} 关全清，眼力满分', this.diffTotal)
       : TG2('错 {0} 次，本局结束',Digits(String(this.wrong), this.langCode));
     if (this.finished) { return; }
     this.finished = true;

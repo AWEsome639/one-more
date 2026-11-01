@@ -9,7 +9,7 @@ import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
@@ -197,7 +197,7 @@ export struct GCryptogram {
     }
     const it: Item = this.cur();
     return Hint.make([],
-      '明文是「' + this.word + '」（' + it.hint + '）· 密文每个字母后移了 ' + String(this.k) + ' 位',
+      TG4('明文是「{0}」（{1}）· 密文每个字母后移了 {2} 位', this.word, it.hint, this.k, ''),
       'The plaintext is "' + this.word + '" (shifted by ' + String(this.k) + ')', t0);
   }
   private askAuto(): void {

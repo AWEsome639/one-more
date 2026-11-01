@@ -10,7 +10,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -157,7 +157,7 @@ export struct GBaseShift {
     this.ans = opts.indexOf(correct);
     this.picked = -1;
     this.quiz = TG2("{0} 里 {1} 末尾添 {2} 个 0 = ?", SUBS[bi], toBase(v, b), String(k));
-    this.detail = '（' + String(b) + ' 进制下每添 1 个 0 就是 ×' + String(b) + '，添 ' + String(k) + ' 个 = ×' + String(pown(b, k)) + '）';
+    this.detail = TG4('（{0} 进制下每添 1 个 0 就是 ×{0}，添 {1} 个 = ×{2}）', b, k, pown(b, k), '');
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════

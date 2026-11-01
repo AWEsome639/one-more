@@ -286,7 +286,7 @@ export struct GCollatz {
     if (i === this.ans) {
       this.score += 60;
       this.msg = this.n % 2 === 0
-        ? '✅ ' + String(this.n) + ' 是偶数 → ÷2'
+        ? TG2('✅ {0} 是偶数 → ÷2', this.n)
         : TG2('✅ {0} 是奇数 → ×3＋1', String(this.n));
     } else {
       this.bad = this.bad + 1;

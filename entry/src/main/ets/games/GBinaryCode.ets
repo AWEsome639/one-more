@@ -121,7 +121,7 @@ export struct GBinaryCode {
     this.target = 1 + Math.floor(Math.random() * 255);
     this.flag = new Array<boolean>(BITS).fill(false);
     this.msg = first
-      ? '点亮开关凑出 ' + String(this.target)
+      ? TG2('点亮开关凑出 {0}', this.target)
       : TG('第 ') + String(this.level) + ' 关：凑出 ' + String(this.target);
   }
 

@@ -309,7 +309,7 @@ export struct GDirectionsRecall {
         }, (v: number, i: number) => 's' + i)
       }.width('100%').height(Cell.of(56))
 
-      Text(this.phase === 'input' ? '已按 ' + this.input.length + '/' + this.seq.length : ' ')
+      Text(this.phase === 'input' ? TG2('已按 {0}/{1}', this.input.length, this.seq.length) : ' ')
         .fontSize(FontSize.xs).fontColor(this.theme.inkFaint).width('100%')
 
       Column({ space: Space.sm }) {

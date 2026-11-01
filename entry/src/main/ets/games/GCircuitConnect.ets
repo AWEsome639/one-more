@@ -209,7 +209,7 @@ export struct GCircuitConnect {
    const r: number = Math.floor(best / this.diffTotal);
    const c: number = best % this.diffTotal;
    return Hint.make([best],
-     '转第 ' + String(r + 1) + ' 行第 ' + String(c + 1) + ' 列那颗（顺时针 90°），带电格会变多',
+     TG2('转第 {0} 行第 {1} 列那颗（顺时针 90°），带电格会变多', r + 1, c + 1),
      'Rotate row ' + String(r + 1) + ', column ' + String(c + 1) + ' clockwise', t0);
  }
  private askAuto(): void {

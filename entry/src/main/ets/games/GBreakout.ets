@@ -307,7 +307,7 @@ export struct GBreakout {
     } else if (side.length > 0) {
       msg = '挡板往' + side + '挪，球在 x=' + String(Math.floor(this.ballX)) + '%';
     }
-    return Hint.make([], msg + '（还剩 ' + String(this.left) + ' 块砖）',
+    return Hint.make([], TG2('{0}（还剩 {1} 块砖）', msg, this.left),
       'Move the paddle toward the ball (x = ' + String(Math.floor(this.ballX)) + '%)', t0);
   }
   private askAuto(): void {

@@ -181,7 +181,7 @@ export struct GConsonantReconstruct {
     }
     const it: Item = this.cur();
     return Hint.make([],
-      '答案是「' + it.w + '」（' + it.hint + '）',
+      TG2('答案是「{0}」（{1}）', it.w, it.hint),
       'The answer is "' + it.w + '"', t0);
   }
   private askAuto(): void {
