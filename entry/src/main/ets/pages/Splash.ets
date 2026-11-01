@@ -835,18 +835,24 @@ struct Splash {
         .hitTestBehavior(HitTestMode.None)
 
       // ──────── L11 胶片颗粒 ────────
-      //   10 颗极小的半透明点，散布全屏 —— 给画面"胶片感"，不做噪点贴图（省资源）
-      ForEach([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], (i: number) => {
+      //   ★ 2026-11-01 真机自检抓到：原来只有 **10 颗 1.8vp** 的点，
+      //     #16FFFFFF（8.6% 白）⇒ 在 440×744 上覆盖率约 0.006%，
+      //     **真机截图里根本看不出颗粒感** —— 等于没做这一层。
+      //   ⇒ 提到 60 颗，且大小 / 透明度 / 位置全部伪随机（线性同余），
+      //     读起来才是"胶片噪点"，不是"10 个能数出来的点"。
+      //   ★ 仍然不生成噪点贴图（60 个纯色小圆的开销远小于一张全屏 PNG）。
+      ForEach(Array.from({ length: 60 }, (v: number, i: number) => i), (i: number) => {
         Column()
-          .width(this.tiny ? 1.2 : 1.8)
-          .height(this.tiny ? 1.2 : 1.8)
+          .width(this.tiny ? 1.0 + (i * 7 % 11) * 0.08 : 1.2 + (i * 7 % 11) * 0.10)
+          .height(this.tiny ? 1.0 + (i * 7 % 11) * 0.08 : 1.2 + (i * 7 % 11) * 0.10)
           .borderRadius(99)
-          .backgroundColor('#16FFFFFF')
+          // 透明度 5%~13% 之间伪随机 —— 有明有暗才像噪点
+          .backgroundColor((i * 13 % 9) > 4 ? '#17FFFFFF' : '#0DFFFFFF')
           .position({
             x: (((i * 37 + 11) % 100) * 0.01 * (this.vw > 0 ? this.vw : 440)) + 'vp',
             y: (((i * 61 + 23) % 100) * 0.01 * (this.vh > 0 ? this.vh : 744)) + 'vp'
           })
-          .opacity(this.pBg * 0.55)
+          .opacity(this.pBg * 0.75)
           .hitTestBehavior(HitTestMode.None)
       }, (i: number) => 'grain' + i)
 
