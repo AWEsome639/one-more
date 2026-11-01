@@ -64,6 +64,13 @@ interface GameStreak {
 }
 
 export class ProgressStore {
+  /** ★ 2026-11-01（第 818 轮）：上一局是否刷新了该游戏的最高分。
+   *  由 `finishGame` 写入，结算弹窗读取 —— 让「新纪录」能被庆祝。
+   *  用静态字段而不是改 `finishGame` 的返回值：355 款都在调它，改签名会动到全部调用点。 */
+  static lastWasBest: boolean = false;
+  /** 刷新前的最高分（用于显示「1200 → 1980」的进步幅度） */
+  static prevBest: number = 0;
+
 
   /**
    * ★ 手感：本局**新解锁的成就**（finishGame 跑完后被填上）
@@ -1078,9 +1085,17 @@ export class ProgressStore {
       ProgressStore.putString(Keys.perGamePlays, jp);
 
       // 每款最高分
+      // ★★★ 2026-11-01（第 818 轮）：这里原来**只写不报** ——
+      //   最高分被记下来了，但结算弹窗完全不知道"这一局是不是新纪录"。
+      //   玩家打出 1980 分，屏幕上和打出 600 分长得一模一样。
+      //   ⇒ 置一个静态标志，由 GameHost 在弹窗里读；`prevBest` 也留下，
+      //     让界面能显示"从 1200 到 1980"这种进步幅度。
       const rawB: string = AppStorage.get<string>(Keys.perGameBest) ?? '{}';
       const mb: Record<string, number> = JSON.parse(rawB) as Record<string, number>;
-      if (score > (mb[gameId] ?? 0)) {
+      const prevBest: number = mb[gameId] ?? 0;
+      ProgressStore.prevBest = prevBest;
+      ProgressStore.lastWasBest = score > prevBest;
+      if (score > prevBest) {
         mb[gameId] = score;
         const jb: string = JSON.stringify(mb);
         AppStorage.setOrCreate(Keys.perGameBest, jb);

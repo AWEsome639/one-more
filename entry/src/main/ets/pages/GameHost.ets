@@ -3240,6 +3240,24 @@ struct GameHost {
             .opacity(this.pop ? 1 : 0).translate({ y: this.pop ? 0 : 10 })
             .animation({ duration: Motion.base, curve: Motion.spring(), delay: 160 })
           }
+          // ★★★ 2026-11-01（第 818 轮）：**新纪录**。数据一直在存（`perGameBest`），
+          //   但从来没显示过 —— 玩家打出 1980 分和打出 600 分，屏幕上一模一样。
+          //   ⇒ 只在这一局刷新了该游戏最高分时出现；带原纪录，能看到进步幅度。
+          if (this.lastSolved && ProgressStore.lastWasBest) {
+            Row({ space: 6 }) {
+              Text('🏆').fontSize(FontSize.md)
+              Text(ProgressStore.prevBest > 0
+                ? this.t('新纪录！上次 ' + String(ProgressStore.prevBest),
+                         'New best! Previous ' + String(ProgressStore.prevBest))
+                : this.t('新纪录！', 'New best!'))
+                .fontSize(FontSize.sm)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(Palette.emerald)
+            }
+            .opacity(this.pop ? 1 : 0)
+            .translate({ y: this.pop ? 0 : 8 })
+            .animation({ duration: Motion.base, curve: Motion.spring(), delay: 200 })
+          }
           Button(this.t('再来一局', 'Play again'))
             .fontSize(FontSize.md)
             .fontColor(Color.White)
