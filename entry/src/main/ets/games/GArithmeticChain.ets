@@ -299,6 +299,7 @@ export struct GArithmeticChain {
   }
 
   private askAuto(): void {
+    if (LanRace.isRacing()) { return; }   // 联机禁用（奥森硬约束）
     // ★★★ 2026-11-01 真机排查抓到（批量改造的残留）：
     //   这 16 款用的是**自绘按钮行**（不是 HintBar），所以 HintBar 那套 `disabled` 保护没轮到它们。
     //   后果：演示期间按「提示」会在正在变化的棋盘上算 computeHint（结果不可靠）；
@@ -452,7 +453,8 @@ export struct GArithmeticChain {
           .onClick(() => {
             this.askHint();
           })
-        Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
+        Button(LanRace.isRacing() ? TG('联机禁用')
+          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
           .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor('#FFFFFF')
@@ -460,6 +462,9 @@ export struct GArithmeticChain {
           .borderRadius(Radius.md)
           .width(96)
           .height(Cell.of(44))
+                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
+          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
+          .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })

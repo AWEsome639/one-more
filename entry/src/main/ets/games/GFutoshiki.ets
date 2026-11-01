@@ -363,6 +363,7 @@ export struct GFutoshiki {
   }
 
   private askAuto(): void {
+    if (LanRace.isRacing()) { return; }   // 联机禁用（奥森硬约束）
     // ★★★ 2026-11-01 真机排查抓到（批量改造的残留）：
     //   这 16 款用的是**自绘按钮行**（不是 HintBar），所以 HintBar 那套 `disabled` 保护没轮到它们。
     //   后果：演示期间按「提示」会在正在变化的棋盘上算 computeHint（结果不可靠）；
@@ -1649,13 +1650,17 @@ export struct GFutoshiki {
           })
         // ★ 2026-10-29（lead 补）：演示时这个按钮显示「演示中…」
         //   它原来只认 autoId，演示跑起来界面上什么都看不见（14 款同类都有这层）
-        Button(this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打')))
+        Button(LanRace.isRacing() ? TG('联机禁用')
+          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
           .layoutWeight(1)
           .height(44)
           // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
           //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
           .backgroundColor(Palette.cyan)
           .fontColor('#FFFFFF')
+                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
+          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
+          .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
           .focusBox(Tv.box())
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
