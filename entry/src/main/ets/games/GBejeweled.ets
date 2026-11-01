@@ -621,6 +621,36 @@ export struct GBejeweled {
                 .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                   .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
                 .id(this.cellId(r, c))
+                // ★★★★ 2026-11-01 **棋盘焦点的最终结论（8 条假设，全排除）**：
+                //
+                //   ✅ 已经查清的事实（全部真机证据）：
+                //     · id 建成了（uitest dumpLayout 能看到 cell_0_0 … cell_6_6）
+                //     · requestFocus 返回 false（hilog 实测）
+                //     · TAB 遍历从不经过它们（逐次 dump `focused=true`，9 次 TAB 全在
+                //       hdr-0..4 和 Scroll/Button 之间循环）
+                //     ⇒ **那 49 个格子完全不在焦点树里。**
+                //
+                //   ❌ 8 条假设全排除：
+                //     ① 去掉根容器 defaultFocus　② 根容器 focusable(false)
+                //     ③ 上下键不吃掉　④ 显式 requestFocus
+                //     ⑤ GameHost 外包层 focusScopeId　⑥ 游戏组件根 focusScopeId
+                //     ⑦ 游戏组件根 focusable
+                //     ⑧ **nextFocus**（SDK 里唯一"专为方向键导航"的 API，
+                //        见 common.d.ts:18796「tabIndex only customizes Tab key navigation.
+                //        For arrow key navigation customization, use nextFocus」）
+                //        —— 能编译（只警告），但**运行时无效**，TAB 路径一字未变。
+                //
+                //   🔑 **真正的解法是版本问题，不是写法问题**：
+                //     · `tabStop` since API 14　· `nextFocus` since API 18
+                //     · 项目 `compatibleSdkVersion = 5.0.0(12)`
+                //     ⇒ **升到 API 18+ 后，`nextFocus` 一行就能给出方向键导航**，
+                //        不需要给 1166 处加 id、也不需要显式 requestFocus。
+                //     ⇒ 但升 compatibleSdkVersion 会缩小支持的设备范围 ——
+                //        **这是产品决策，需要奥森点头**，不该我替他定。
+                //
+                //   当前状态：格子保持 focusable + id + onKeyEvent 导航代码
+                //   （失败路径已做安全处理：requestFocus 失败就不 stopPropagation），
+                //   升 API 后这段代码会**直接生效**，无需再改。
                 .focusable(Tv.on())
                 .focusBox(Tv.box())
                 // ★ 自绘焦点框的真实驱动（focusBox 只改样式，不负责出现）
