@@ -958,7 +958,12 @@ struct GameHost {
             .onBlur(() => { if (this.focusIdx === 4) { this.focusIdx = -1; } })
             .onKeyEvent((e: KeyEvent) => {
               if (!Tv.on()) { return; }
-              if (Tv.handleKey(e, () => { Haptics.tap(); this.nonce = this.nonce + 1; })) { e.stopPropagation(); }
+              if (Tv.handleKey(e, () => {
+                Haptics.tap();
+                Hint.stopAllAuto();          // 同 onClick：停代打 + 强制重建
+                this.nonce = this.nonce + 1;
+                this.diffTick = this.diffTick + 1;
+              })) { e.stopPropagation(); }
             })
             .accessibilityText(this.t('重新开始', 'Restart'))
             .fontSize(FontSize.xl)
@@ -969,7 +974,13 @@ struct GameHost {
             .borderRadius(Radius.full)
             .shadow(Shadow.card)
             .onClick(() => {
+              // ★★★ 2026-11-01 与「再来一局」同一个病（判据 54 发现的第二个出口）：
+              //   只 `nonce + 1` 走 `@Watch('onRestart')` ⇒ 组件不重建 ⇒
+              //   游戏自己的 `autoId` 不归零 ⇒ 按钮继续显示"停代打"（虽然计时器已停）。
+              //   ⇒ 同样先停代打、再切 diffTick 强制重建。
+              Hint.stopAllAuto();
               this.nonce = this.nonce + 1;
+              this.diffTick = this.diffTick + 1;
             })
         }
         .width('100%')
