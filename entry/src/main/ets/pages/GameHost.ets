@@ -489,6 +489,8 @@ struct GameHost {
   @State levelUpTo: number = 0;
 
   aboutToAppear(): void {
+    hilog.info(0x0000, 'FocusProbe', 'PAGE Tv.on=%{public}s isLg=%{public}s dev=%{public}s',
+      String(Tv.on()), String(Bp.isLg()), String(Bp.dev));
     // ★ 路线 E：记下进游戏页的时刻（中途退出时用它算时长）
     this.startedAt = Date.now();
     this.finished = false;
@@ -758,6 +760,7 @@ struct GameHost {
    */
   @State private focusIdx: number = -1;
 
+
   private tinyScreen(): boolean {
     return Bp.height < 420 || Bp.width < 420;
   }
@@ -786,8 +789,13 @@ struct GameHost {
             // ★★★ 2026-11-01：**原来是 focusBox 但没有 focusable** ⇒
             //   电视/键盘用户进游戏后，顶栏按钮根本拿不到焦点（连"重开"都按不到）。
             .focusable(Tv.on())
+            .id('hdr-0')
+
             .border(Tv.focusBorder(this.focusIdx === 0))
-            .onFocus(() => { this.focusIdx = 0; })
+            .onFocus(() => {
+              this.focusIdx = 0;
+              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 0, String(Tv.on()));
+            })
             .onBlur(() => { if (this.focusIdx === 0) { this.focusIdx = -1; } })
             .onTouch((e: TouchEvent) => {
               this.backPressed = IconPress.onTouch(this.backPressed, e);
@@ -835,8 +843,13 @@ struct GameHost {
             // ★★★ 2026-11-01：**原来是 focusBox 但没有 focusable** ⇒
             //   电视/键盘用户进游戏后，顶栏按钮根本拿不到焦点（连"重开"都按不到）。
             .focusable(Tv.on())
+            .id('hdr-1')
+
             .border(Tv.focusBorder(this.focusIdx === 1))
-            .onFocus(() => { this.focusIdx = 1; })
+            .onFocus(() => {
+              this.focusIdx = 1;
+              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 1, String(Tv.on()));
+            })
             .onBlur(() => { if (this.focusIdx === 1) { this.focusIdx = -1; } })
             .fontSize(FontSize.lg)
             .fontColor(this.fav ? Palette.amber : this.theme().inkFaint)
@@ -856,8 +869,13 @@ struct GameHost {
             // ★★★ 2026-11-01：**原来是 focusBox 但没有 focusable** ⇒
             //   电视/键盘用户进游戏后，顶栏按钮根本拿不到焦点（连"重开"都按不到）。
             .focusable(Tv.on())
+            .id('hdr-2')
+
             .border(Tv.focusBorder(this.focusIdx === 2))
-            .onFocus(() => { this.focusIdx = 2; })
+            .onFocus(() => {
+              this.focusIdx = 2;
+              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 2, String(Tv.on()));
+            })
             .onBlur(() => { if (this.focusIdx === 2) { this.focusIdx = -1; } })
             .accessibilityText(this.t('玩法说明', 'How to play'))
             .fontSize(FontSize.lg)
@@ -885,8 +903,13 @@ struct GameHost {
           Text(this.diffLabel())
             // ★ 电视/键盘：难度胶囊也要能拿焦点（原来完全没有 focusable）
             .focusable(Tv.on())
+            .id('hdr-3')
+
             .border(Tv.focusBorder(this.focusIdx === 3))
-            .onFocus(() => { this.focusIdx = 3; })
+            .onFocus(() => {
+              this.focusIdx = 3;
+              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 3, String(Tv.on()));
+            })
             .onBlur(() => { if (this.focusIdx === 3) { this.focusIdx = -1; } })
             .onKeyEvent((e: KeyEvent) => {
               if (!Tv.on()) { return; }
@@ -917,8 +940,13 @@ struct GameHost {
           Text('↻')
             // ★ 电视/键盘：重开也要能拿焦点（原来完全没有 focusable ⇒ 电视上按不到重开）
             .focusable(Tv.on())
+            .id('hdr-4')
+
             .border(Tv.focusBorder(this.focusIdx === 4))
-            .onFocus(() => { this.focusIdx = 4; })
+            .onFocus(() => {
+              this.focusIdx = 4;
+              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 4, String(Tv.on()));
+            })
             .onBlur(() => { if (this.focusIdx === 4) { this.focusIdx = -1; } })
             .onKeyEvent((e: KeyEvent) => {
               if (!Tv.on()) { return; }
@@ -3242,6 +3270,25 @@ struct GameHost {
       if (Tv.isEsc(e.keyCode)) {
         Haptics.tap();
         Back.go();
+      }
+      // ★★★ 2026-11-01 真机（853×533）+ hilog 插桩定位：
+      //   根容器 `.focusable(Tv.desktopKeys())` + `.defaultFocus(...)` 抢了焦点系统，
+      //   **ArkUI 的默认方向键遍历在这里不生效** —— 实测按下 RIGHT×2+DOWN 一条新 onFocus 都没有。
+      //   ⇒ 不依赖默认遍历，自己显式移动：顶栏 5 个按钮有稳定 id `hdr-0..4`。
+      //   左右在顶栏内循环；向下/向上把焦点交给游戏区（游戏区自己有 focusable）。
+      if (Tv.isArrow(e.keyCode)) {
+        const cur: number = this.focusIdx;
+        if (cur >= 0 && cur <= 4) {
+          let next: number = cur;
+          if (e.keyCode === Tv.KEY_LEFT || e.keyCode === Tv.KEY_UP) {
+            next = (cur + 4) % 5;
+          } else {
+            next = (cur + 1) % 5;
+          }
+          focusControl.requestFocus('hdr-' + next);
+          e.stopPropagation();
+        }
+        return;
       }
     })
     // ★ 动画 ①：与首页那张 GameCard 配对（同名 id）—— 卡片"长大"成整页。
