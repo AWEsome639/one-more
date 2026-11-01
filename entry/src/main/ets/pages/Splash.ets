@@ -799,7 +799,13 @@ struct Splash {
             // 2026-11-01 device pixel measure: O bottom y=1104, M bottom y=1046
             // => M sits 58px (14% of ring height) too high; code math says only 10px.
             // => reversible experiment: shift M down by 0.056 x omPxV, measure again.
-            .position({ x: this.omPxV() * 0.4929, y: this.omPxV() * 0.0560 })
+            .position({ x: this.omPxV() * 0.4929, y: this.omPxV() * 0.0757 })
+            // ★★★ 2026-11-01 第二版（理论驱动，不是试参数）：
+            //   O 是 Circle + strokeWidth，stroke 画在 width 边界上、一半在外 ⇒
+            //     O 视觉底边 = 0.0262(位置) + 0.4818(直径) + 0.1276/2(半描边) = 0.5718
+            //   M 的底边 = y + 0.4961（points 里最大 y）
+            //   ⇒ 对齐要求 y = 0.5718 - 0.4961 = 0.0757
+            //   （上一版 0.0560 是试出来的，比例 2.7:1 不成正比，因为漏算了半描边）
             // ★ 两拍节奏：环先到（pStroke），M 晚 70ms 到（pM）
             .opacity(this.seg(this.pM, 0.001, 0.55))
             .scale({ x: 0.94 + this.seg(this.pM, 0.0, 1.0) * 0.06,
