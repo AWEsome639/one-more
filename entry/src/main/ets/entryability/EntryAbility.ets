@@ -91,6 +91,14 @@ export default class EntryAbility extends UIAbility {
       const win: window.Window = windowStage.getMainWindowSync();
       // #0D1320 = Splash.ets 的 OM_INK，与开屏、图标底色完全一致
       win.setWindowBackgroundColor('#0D1320');
+      // ★★ 2026-11-01 查证（**没有改**，只留结论）：
+      //   一度以为"状态栏文字在深色开屏上看不见"，准备把 statusBarContentColor 设成 #FFFFFF。
+      //   查日志发现：系统（com.ohos.sceneboard）会把状态栏设成
+      //     `System bar property change ... to #FF000000` + `onPluginContentColorChange #FF000000`
+      //   ⇒ **状态栏是系统画的：白底 + 黑字**，像素取样 y=10~75 是 (255,255,255) 纯白。
+      //   ⇒ 截图里那行黑字是在**白底**上，完全可读 —— 是我看截图时的误读。
+      //   ⛔ 不要把它改成白色：那会变成白字白底，反而看不见。
+
     } catch (e) {
       hilog.warn(DOMAIN, 'testTag', 'setWindowBackgroundColor 失败（不影响启动）: %{public}s', JSON.stringify(e));
     }
