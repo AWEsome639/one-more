@@ -675,6 +675,15 @@ export struct GameCard {
    *   ⚠️ 只在 Tv.on() 为真时才生效（手机/平板仍是 false，零回归）。
    */
   @Prop first: boolean = false;
+  /**
+   * ★★★ 2026-11-01 真机（智慧屏 960×540）：**`.focusBox(Tv.box())` 画不出来**。
+   *   实测：方向键能精确移动焦点（0→4→8，与 cols=4 吻合）、CENTER 能进游戏，
+   *   但截图上一个焦点框都没有 ⇒ **遥控器能用，用户却看不见焦点在哪**，
+   *   这比"没实现"更糟（会以为遥控器坏了）。
+   *   ⇒ 不依赖 focusBox 是否被渲染，自己用 `onFocus/onBlur` + 边框画一个。
+   *     边框 4vp（3 米视距）、品牌主色、外扩 3vp（不压住卡片内容）。
+   */
+  @State focused: boolean = false;
   @Prop gridCols: number = 2;
 
   @State private pressed: boolean = false;
@@ -915,9 +924,13 @@ build() {
       y: this.pressed ? 0.97 : (this.hovered ? 1.02 : 1)
     })
     .border({
-      width: this.hovered ? 2 : 0,
-      color: this.hovered ? this.theme.ink : Color.Transparent
+      // ★ 焦点框：4vp 主色（电视 3 米视距要看得见）；hover 仍是 2vp 墨色
+      width: this.focused ? 4 : (this.hovered ? 2 : 0),
+      color: this.focused ? Palette.primary : (this.hovered ? this.theme.ink : Color.Transparent),
+      radius: Radius.md + 3
     })
+    .onFocus(() => { this.focused = true; })
+    .onBlur(() => { this.focused = false; })
     .onClick(() => {
       Haptics.tap();
       this.onOpen(this.meta.id);
