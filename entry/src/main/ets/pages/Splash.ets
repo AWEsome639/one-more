@@ -413,6 +413,30 @@ struct Splash {
   }
 
   /** 星尘可见性：极小屏减半 */
+  /**
+   * ★★★ 2026-11-01：**景深的后半句 ——「远景虚、近景实」原来没做**。
+   *   查代码发现：所有 24 颗星尘共用同一个 `.blur(this.tiny ? 0 : 0.4)`，
+   *   ⇒ 远景星和近景星**一样清晰** ⇒ 只有"三组不同速度"（视差），没有"虚/实"分档。
+   *   而 `STARS` 的数组已经按组排好（0~7 远景 / 8~15 中景 / 16~23 近景），
+   *   半径也是远小近大（1.2~1.8 / 2.2~2.9 / 3.0~3.9）⇒ 只差模糊这一档。
+   *
+   *   ⇒ 远景模糊 1.4vp、中景 0.6vp、近景 0（实）：
+   *     视觉上远景是"雾里的光点"，近景是"清晰的亮点"，中景过渡。
+   *   ★ 极小屏一律 0 —— 屏幕太小，模糊只会让星点消失（等于没做，见 grain 的教训）。
+   */
+  private starBlur(i: number): number {
+    if (this.tiny) {
+      return 0;
+    }
+    if (i < 8) {
+      return 1.4;      // 组 0 远景：虚
+    }
+    if (i < 16) {
+      return 0.6;      // 组 1 中景：微虚
+    }
+    return 0;          // 组 2 近景：实
+  }
+
   private starCount(): number {
     return this.tiny ? STARS_TINY : STARS.length;
   }
@@ -545,7 +569,7 @@ struct Splash {
           })
           .translate({ y: this.starDrift(i) })
           .opacity(this.pNebula * 0.5 * this.starTwi(i))
-          .blur(this.tiny ? 0 : 0.4)
+          .blur(this.starBlur(i))
       }, (i: number) => 'dust' + i)
 
       // ──────── L3 主光晕：金色底光，随点亮增强 ────────
