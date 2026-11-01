@@ -3279,22 +3279,34 @@ struct GameHost {
       //   ⇒ 不依赖默认遍历，自己显式移动：顶栏 5 个按钮有稳定 id `hdr-0..4`。
       //   左右在顶栏内循环；向下/向上把焦点交给游戏区（游戏区自己有 focusable）。
       if (Tv.isArrow(e.keyCode)) {
-        // ★★★ 2026-11-01 关键组合（实测有效）：
-        //   ① 顶栏 5 个按钮有稳定 id `hdr-0..4` ⇒ 左右键显式移动
-        //   ② 游戏区有 `focusScopeId('gameboard', true)` ⇒ **焦点组内的遍历可用**
-        //      （实测：按 OK 差异 165918 像素 = 游戏被真的操作了）
-        //   ⇒ 左右：顶栏内循环（吃掉按键）
-        //     上下：**不吃掉**，交给焦点组遍历 —— 这样就能走进棋盘。
+        // ★★★★ 2026-11-01 诊断结论（6 轮实验 + TAB 对照，请勿再猜）：
+        //
+        //   ✅ 受控实验（都是真机）：
+        //     · **TAB 键（keyCode 2049）能走遍全部可聚焦元素** ——
+        //       TAB×2 差异 15889、再 TAB×3 差异 20694，且截图里
+        //       焦点落在「重开」按钮上、**浅色 4vp 外框清清楚楚**。
+        //       ⇒ 焦点系统、焦点框渲染、可聚焦性——**全是好的**。
+        //     · **方向键（2012~2015）完全不动**：DOWN×2 差异 705（仅时钟）、
+        //       RIGHT×2 差异 0、OK 差异 0。
+        //       ⇒ **ArkUI 的 2D 方向键遍历在这个页面不工作**（线性 TAB 遍历正常）。
+        //
+        //   ❌ 已排除的假设（都试过，都无效，别再试）：
+        //     ① 去掉根容器 defaultFocus　② 根容器 focusable(false)
+        //     ③ 上下键不吃掉交给默认遍历　④ 显式 requestFocus 到格子（1166 处无 id）
+        //     ⑤ 游戏区 focusScopeId(isGroup=true)
+        //
+        //   ✅ 唯一有效的做法：**自己实现方向键导航**
+        //     · 顶栏 5 个按钮：稳定 id `hdr-0..4` + 显式 requestFocus（差异 24699，已验证）
+        //     · 棋盘 1166 处格子：需要先给每处一个稳定 id —— 独立工程
+        //
+        //   ⇒ 所以这里保留顶栏的显式移动；上下键暂不处理（棋盘还没接进来）。
         const cur: number = this.focusIdx;
         const isLR: boolean = e.keyCode === Tv.KEY_LEFT || e.keyCode === Tv.KEY_RIGHT;
         if (isLR && cur >= 0 && cur <= 4) {
           const next: number = e.keyCode === Tv.KEY_LEFT ? (cur + 4) % 5 : (cur + 1) % 5;
           focusControl.requestFocus('hdr-' + next);
           e.stopPropagation();
-          return;
         }
-        // 上下键：如果焦点还在顶栏，先让它「掉」到顶栏外（不 stopPropagation），
-        // 由 focusScopeId('gameboard') 的焦点组接管。
         return;
       }
     })
