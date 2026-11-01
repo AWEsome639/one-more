@@ -11,6 +11,7 @@
  *   onFinish: (r: GameResult) => void
  */
 
+import { Demo } from '../core/Demo';
 import { Tv } from '../core/Tv';
 import { Bp } from '../core/Bp';
 import { Sound } from '../core/Sound';
@@ -532,7 +533,16 @@ struct GameHost {
     //   时长算到退出这一刻；难度用 GameDiff.now()，与结算时同一口径
     hilog.info(0x0000, 'GameLog', 'leave page finished=%{public}s startedAt=%{public}d gid=%{public}s',
       this.finished ? 'Y' : 'N', this.startedAt, this.gameId);
-    if (!this.finished && this.startedAt > 0 && this.gameId.length > 0) {
+    // ★★★ 2026-11-01 同一个 bug 的**第二个入口**（真机抓到）：
+    //   加了 `handleFinish` 的演示保护后，战绩日志里仍然出现了一条
+    //   `{"g":"bejeweled","ms":18775,"ok":false}` —— 时长正好等于"进游戏到返回"，
+    //   说明**退出时的补记**没被挡住：
+    //     进了游戏页 + 没走 handleFinish ⇒ 就当成"放弃"记一条。
+    //   而"看了个演示就退出"显然不是"放弃了一局"。
+    //   ⇒ 补记也要排除演示期间。
+    //   ★ 教训：一个"写记录"的逻辑有几个入口就要挡几个入口 ——
+    //     只挡结算、不挡补记，记录照样脏（而日志是回看历史的人唯一能看到的东西）。
+    if (!this.finished && this.startedAt > 0 && this.gameId.length > 0 && !Demo.anyRunning()) {
       try {
         const sp: number = Date.now() - this.startedAt;
         GameLog.recordResult(this.gameId, false, this.lastScore, sp, GameDiff.now(), -1);
@@ -585,6 +595,18 @@ struct GameHost {
   }
 
   private handleFinish(r: GameResult): void {
+    // ★★★ 2026-11-01（奥森「演示就是一段动画，不计分」的第三时刻）：
+    //   **演示期间绝不结算。**
+    //   原来这里毫无保护 ⇒ 演示过程中若某款游戏达成胜利条件，
+    //   `ProgressStore.finishGame`（加经验/记战绩）和 `GameLog.recordResult`（写日志）
+    //   都会照常执行 ⇒ **演示会污染战绩、给玩家白加经验**。
+    //   过程 HUD 已遮挡（第 675 轮）、结束状态已恢复（第 661 轮），
+    //   但"回看记录里的玩家"看到的还是脏数据 —— 这是第三个时刻。
+    //   ★ 用 `Demo.anyRunning()` 而不是各款的 `demoId`：GameHost 看不到子组件的状态，
+    //     而 `Demo.live` 本来就是全局活跃集合 ⇒ 一处判断覆盖全部 355 款。
+    if (Demo.anyRunning()) {
+      return;
+    }
     const m: GameMeta | undefined = this.meta;
     const baseXp: number = m ? m.baseXp : 10;
     const factor: number = m ? difficultyFactor(m.difficulty) : 1;
@@ -757,6 +779,23 @@ struct GameHost {
    *   4 个按钮（返回 / 收藏 / 帮助 / 重开）+ 难度 = 5 个位置。
    */
   @State private focusIdx: number = -1;
+
+  /**
+   * ★★★★ 2026-11-01 **棋盘焦点的范式转换（判据 41）**：
+   *
+   *   前 9 次尝试都在同一个范式里：「让游戏格子的 Stack 进焦点树」。
+   *   TAB 逐次 dump 证明它们**根本不在焦点树里**（第 671 轮），
+   *   而升 API + nextFocus 也无效（第 673 轮）—— 这个范式是死的。
+   *
+   *   ⇒ 换范式：**焦点永远留在页面级元素上，游戏自己画光标。**
+   *     · 游戏区覆盖一个**页面级**的可聚焦层 `boardkey`（在 GameHost 的树里 ⇒ 一定进焦点树）
+   *     · 它收到方向键后，通过 `onBoardKey` 回调**转发给当前游戏**
+   *     · 游戏用自己已有的 `tvFocus` 状态移动光标、自己画框（各款早就实现了这套）
+   *   ★ 这样"焦点"和"光标"解耦：焦点只是键盘事件的接收者，光标才是玩家看到的东西。
+   */
+  @State private boardKey: number = 0;      // 每次方向键 +1（作为给游戏的重放信号）
+  @State private lastKey: number = 0;       // 最近一次的键码
+
 
 
   private tinyScreen(): boolean {
@@ -3099,6 +3138,42 @@ struct GameHost {
         .layoutWeight(1)
         .width('100%')
         .padding({ left: Space.lg, right: Space.lg, bottom: Space.lg })
+        // ═══ 棋盘键盘接收层（范式转换的核心）═══
+        //   叠在游戏区之上、**不拦截触摸**（HitTestMode.None）——
+        //   它是"页面级的键盘耳朵"，不是"挡住棋盘的玻璃"。
+        //   · focusable(Tv.on())：电视/键盘场景才启用
+        //   · 稳定 id `boardkey`：可从顶栏的 DOWN 显式跳进来
+        //   · 收到方向键 ⇒ boardKey++ 并把键码存进 lastKey
+        //     （游戏用这两个值驱动自己的 tvFocus 光标）
+        Column()
+          .id('boardkey')
+          .width('100%')
+          .height('100%')
+          // ★★★ 2026-11-01 **这个必须绝对定位**（踩到了）：
+          //   它原来是游戏区 Column 的**兄弟节点**且 `height('100%')`
+          //   ⇒ 在 Column 布局里它自己吃掉整屏高度 ⇒ **把游戏区挤出屏幕**
+          //     （真机截图：只剩顶栏，棋盘/状态卡全不见）。
+          //   `.position()` 让它脱离布局流 ⇒ 只覆盖、不占位。
+          .position({ x: 0, y: 0 })
+          .hitTestBehavior(HitTestMode.None)
+          .focusable(Tv.on())
+          .border(Tv.focusBorder(this.focusIdx === 5))
+          .onFocus(() => { this.focusIdx = 5; })
+          .onBlur(() => { if (this.focusIdx === 5) { this.focusIdx = -1; } })
+          .onKeyEvent((e: KeyEvent) => {
+            if (!Tv.on()) { return; }
+            if (Tv.isArrow(e.keyCode)) {
+              this.lastKey = e.keyCode;
+              this.boardKey = this.boardKey + 1;
+              e.stopPropagation();
+              return;
+            }
+            if (Tv.isOk(e.keyCode)) {
+              this.lastKey = e.keyCode;
+              this.boardKey = this.boardKey + 1;
+              e.stopPropagation();
+            }
+          })
         // ★★★ 2026-11-01 实验⑤：把游戏区声明为焦点组。
         //   已知（台账 659 轮，四次实验全败）：
         //     ① 去掉根容器 defaultFocus ② 根容器 focusable(false)

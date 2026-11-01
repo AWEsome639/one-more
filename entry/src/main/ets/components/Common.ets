@@ -888,7 +888,10 @@ build() {
     // ★★★★★ 2026-10-14 配合 GridItem 的 .height(232)：卡片【撑满】它
     //   ⇒ 每张卡等高 ⇒ 网格行位置可一次算出 ⇒ 滚动连贯（不再"跳着走"）
     .height('100%')
-    .scale({ x: this.pressed ? Motion.pressScale : 1, y: this.pressed ? Motion.pressScale : 1 })
+    // ★★★ 2026-11-01 删掉这一条 `.scale({ pressed ? Motion.pressScale : 1 })`：
+    //   下面（约 922 行）已经有一个把 pressed / focused / hovered **三态合一**的 `.scale()`，
+    //   而 ArkUI 里**后写的同名属性覆盖前面的** ⇒ 这一条是死代码，
+    //   还容易让人误以为"按下用的是这里"。三态统一在下面维护。
     // ★★★★★ 2026-10-14 闪现【第 8 层 · 真凶】（奥森「上面没收起来时也会闪现」「大哥我求你了」）：
     //   根因：`.animation()` 会把【前面整条链】都纳入动画 —— ★ 包括 `.backgroundColor(this.cardColor())`！
     //        而 GridItem 被【回收换成另一个游戏】时，cardColor() 从旧色【插值渐变】到新色
@@ -922,8 +925,8 @@ build() {
     .scale({
       // 三个状态合在一处（避免重复 .scale 互相覆盖）：
       //   按下 0.97 < 常态 1 < 悬停 1.02 < 焦点 1.04
-      x: this.pressed ? 0.97 : (this.focused ? 1.04 : (this.hovered ? 1.02 : 1)),
-      y: this.pressed ? 0.97 : (this.focused ? 1.04 : (this.hovered ? 1.02 : 1))
+      x: this.pressed ? Motion.pressScale : (this.focused ? 1.04 : (this.hovered ? 1.02 : 1)),
+      y: this.pressed ? Motion.pressScale : (this.focused ? 1.04 : (this.hovered ? 1.02 : 1))
     })
     // ★★★★ 2026-11-01 奥森问「宝石迷阵外面这层蓝框怎么回事」⇒ 迭代了三次：
     //
