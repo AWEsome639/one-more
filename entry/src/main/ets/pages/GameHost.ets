@@ -489,8 +489,6 @@ struct GameHost {
   @State levelUpTo: number = 0;
 
   aboutToAppear(): void {
-    hilog.info(0x0000, 'FocusProbe', 'PAGE Tv.on=%{public}s isLg=%{public}s dev=%{public}s',
-      String(Tv.on()), String(Bp.isLg()), String(Bp.dev));
     // ★ 路线 E：记下进游戏页的时刻（中途退出时用它算时长）
     this.startedAt = Date.now();
     this.finished = false;
@@ -792,10 +790,7 @@ struct GameHost {
             .id('hdr-0')
 
             .border(Tv.focusBorder(this.focusIdx === 0))
-            .onFocus(() => {
-              this.focusIdx = 0;
-              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 0, String(Tv.on()));
-            })
+            .onFocus(() => { this.focusIdx = 0; })
             .onBlur(() => { if (this.focusIdx === 0) { this.focusIdx = -1; } })
             .onTouch((e: TouchEvent) => {
               this.backPressed = IconPress.onTouch(this.backPressed, e);
@@ -846,10 +841,7 @@ struct GameHost {
             .id('hdr-1')
 
             .border(Tv.focusBorder(this.focusIdx === 1))
-            .onFocus(() => {
-              this.focusIdx = 1;
-              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 1, String(Tv.on()));
-            })
+            .onFocus(() => { this.focusIdx = 1; })
             .onBlur(() => { if (this.focusIdx === 1) { this.focusIdx = -1; } })
             .fontSize(FontSize.lg)
             .fontColor(this.fav ? Palette.amber : this.theme().inkFaint)
@@ -872,10 +864,7 @@ struct GameHost {
             .id('hdr-2')
 
             .border(Tv.focusBorder(this.focusIdx === 2))
-            .onFocus(() => {
-              this.focusIdx = 2;
-              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 2, String(Tv.on()));
-            })
+            .onFocus(() => { this.focusIdx = 2; })
             .onBlur(() => { if (this.focusIdx === 2) { this.focusIdx = -1; } })
             .accessibilityText(this.t('玩法说明', 'How to play'))
             .fontSize(FontSize.lg)
@@ -906,10 +895,7 @@ struct GameHost {
             .id('hdr-3')
 
             .border(Tv.focusBorder(this.focusIdx === 3))
-            .onFocus(() => {
-              this.focusIdx = 3;
-              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 3, String(Tv.on()));
-            })
+            .onFocus(() => { this.focusIdx = 3; })
             .onBlur(() => { if (this.focusIdx === 3) { this.focusIdx = -1; } })
             .onKeyEvent((e: KeyEvent) => {
               if (!Tv.on()) { return; }
@@ -943,10 +929,7 @@ struct GameHost {
             .id('hdr-4')
 
             .border(Tv.focusBorder(this.focusIdx === 4))
-            .onFocus(() => {
-              this.focusIdx = 4;
-              hilog.info(0x0000, 'FocusProbe', 'ONFOCUS idx=%{public}d Tv.on=%{public}s', 4, String(Tv.on()));
-            })
+            .onFocus(() => { this.focusIdx = 4; })
             .onBlur(() => { if (this.focusIdx === 4) { this.focusIdx = -1; } })
             .onKeyEvent((e: KeyEvent) => {
               if (!Tv.on()) { return; }
@@ -3258,6 +3241,9 @@ struct GameHost {
     //   · 只在桌面/大屏上生效（`Tv.desktopKeys()`）⇒ 手机/平板零影响
     //   ⚠️ 必须 focusable + 默认焦点，否则键盘事件收不到
     .focusable(Tv.desktopKeys())
+    // ★★★ 2026-11-01：ESC 需要这个默认焦点（否则键盘事件收不到）。
+    //   ⚠️ 已实测：去掉它也**不能**让 ArkUI 的默认方向键遍历恢复（DOWN/CENTER 差异仍 0），
+    //      所以保留 —— 它至少保证了 ESC 可用。
     .defaultFocus(Tv.desktopKeys())
     .onKeyEvent((e: KeyEvent) => {
       if (!Tv.desktopKeys()) {
@@ -3277,14 +3263,15 @@ struct GameHost {
       //   ⇒ 不依赖默认遍历，自己显式移动：顶栏 5 个按钮有稳定 id `hdr-0..4`。
       //   左右在顶栏内循环；向下/向上把焦点交给游戏区（游戏区自己有 focusable）。
       if (Tv.isArrow(e.keyCode)) {
+        // ★★★ 2026-11-01 已验证的版本：**顶栏 5 个按钮之间显式移动焦点**。
+        //   实测：ONFOCUS idx=0 → 1 → 2，像素差分 11231，bbox 落在顶栏区间。
+        //   ⚠️ 已知未解决：**上下键进不了棋盘**（1166 处格子没有 id，无法 requestFocus；
+        //      ArkUI 的默认遍历在本页实测不工作，去掉 defaultFocus 也无效）。
+        //   ⇒ 这一条如实挂起，不在这里继续猜。
         const cur: number = this.focusIdx;
         if (cur >= 0 && cur <= 4) {
-          let next: number = cur;
-          if (e.keyCode === Tv.KEY_LEFT || e.keyCode === Tv.KEY_UP) {
-            next = (cur + 4) % 5;
-          } else {
-            next = (cur + 1) % 5;
-          }
+          const next: number = (e.keyCode === Tv.KEY_LEFT || e.keyCode === Tv.KEY_UP)
+            ? (cur + 4) % 5 : (cur + 1) % 5;
           focusControl.requestFocus('hdr-' + next);
           e.stopPropagation();
         }
