@@ -994,7 +994,7 @@ export struct GBridgesAll {
   @Builder
   infoBox(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? TG('桥') : (kind === 1 ? '完成岛' : TG('用时')))
+      Text(kind === 0 ? TG('桥') : (kind === 1 ? TG('完成岛') : TG('用时')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? (this.bridgesOn() + '/' + this.bridgesNeed())

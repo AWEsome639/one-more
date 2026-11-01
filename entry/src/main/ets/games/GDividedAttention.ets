@@ -301,14 +301,14 @@ export struct GDividedAttention {
         Column({ space: Space.xs }) {
         Text(true ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.left).sym).fontSize(FontSize.hero).fontColor(Palette.rose)
-        Text((this.left).done ? ((this.left).on ? '✔ 点对了' : '✘ 误报') : ' ').fontSize(FontSize.xxs).fontColor((this.left).done && (this.left).on ? Palette.success : Palette.danger)
+        Text((this.left).done ? ((this.left).on ? TG('✔ 点对了') : TG('✘ 误报')) : ' ').fontSize(FontSize.xxs).fontColor((this.left).done && (this.left).on ? Palette.success : Palette.danger)
         }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
         .borderColor((this.left).done ? ((this.left).on ? Palette.success : Palette.danger) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0)); }); }).onClick(() => { Haptics.tick(); this.tap((0)); })
         Column({ space: Space.xs }) {
         Text(false ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.right).sym).fontSize(FontSize.hero).fontColor(Palette.rose)
-        Text((this.right).done ? ((this.right).on ? '✔ 点对了' : '✘ 误报') : ' ').fontSize(FontSize.xxs).fontColor((this.right).done && (this.right).on ? Palette.success : Palette.danger)
+        Text((this.right).done ? ((this.right).on ? TG('✔ 点对了') : TG('✘ 误报')) : ' ').fontSize(FontSize.xxs).fontColor((this.right).done && (this.right).on ? Palette.success : Palette.danger)
         }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
         .borderColor((this.right).done ? ((this.right).on ? Palette.success : Palette.danger) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1)); }); }).onClick(() => { Haptics.tick(); this.tap((1)); })

@@ -283,7 +283,7 @@ export struct GTrailMaking {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('下一类'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.step >= this.diffTotal ? '—' : (this.step % 2 === 0 ? '数字' : '字母'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.step >= this.diffTotal ? '—' : (this.step % 2 === 0 ? '数字' : TG('字母')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
 

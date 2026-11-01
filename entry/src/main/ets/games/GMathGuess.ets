@@ -308,7 +308,7 @@ export struct GMathGuess {
         .fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%')
         .padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       Row({ space: Space.md }) {
-        Text(this.over ? (this.won ? TG('已通关 🎉') : '已结束 💤') : '二分法 7 次足够覆盖 1~100')
+        Text(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束 💤')) : TG('二分法 7 次足够覆盖 1~100'))
           .fontSize(FontSize.xs).fontColor(this.theme.inkFaint).layoutWeight(1)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)

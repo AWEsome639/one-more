@@ -389,7 +389,7 @@ export struct GMazeNav3d {
         .layoutWeight(1)
         Column({ space: 2 }) {
         Text(((this.pz + 1) + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.violet))
-        Text(('层')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('层'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         }
         .layoutWeight(1)
         Column({ space: 2 }) {

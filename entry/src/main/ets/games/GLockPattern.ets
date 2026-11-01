@@ -408,7 +408,7 @@ export struct GLockPattern {
 
       Text(this.phase === 0 ? '👀 记住顺序…' :
         (this.phase === 1 ? '按顺序点出来（已连 ' + String(this.input.length) + TG(' 个）')
-          : (this.won ? '🎉 五关全过！' : '❌ 点错了，重开一局')))
+          : (this.won ? '🎉 五关全过！' : TG('❌ 点错了，重开一局'))))
         .fontSize(FontSize.md)
         .fontColor(this.phase === 2 ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 

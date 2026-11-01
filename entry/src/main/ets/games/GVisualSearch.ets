@@ -264,7 +264,7 @@ export struct GVisualSearch {
       })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
-        Text(('局')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('局'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {

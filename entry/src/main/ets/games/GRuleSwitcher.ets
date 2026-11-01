@@ -292,11 +292,11 @@ export struct GRuleSwitcher {
         .animation({ duration: Motion.base, curve: Motion.snap() })
       Column({ space: Space.xs }) {
         Text(Digits(String(this.val), this.langCode)).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(this.rule === 0 ? TG('是奇数还是偶数？') : '大于 50 吗？').fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(this.rule === 0 ? TG('是奇数还是偶数？') : TG('大于 50 吗？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%').height(140).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.md }) {
-        Button((this.rule === 0 ? TG('奇') : '大'))
+        Button((this.rule === 0 ? TG('奇') : TG('大')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xxl).fontColor('#FFFFFF')
         .backgroundColor(this.pick === (0) && (0) !== this.need() ? Palette.primaryDeep : Palette.sky)
         .borderRadius(Radius.lg).layoutWeight(1).height(Cell.of(80))
@@ -306,7 +306,7 @@ export struct GRuleSwitcher {
         .focusable(Tv.on())
         .focusBox(Tv.box())
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((0)); }); })
-        Button((this.rule === 0 ? TG('偶') : '小'))
+        Button((this.rule === 0 ? TG('偶') : TG('小')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xxl).fontColor('#FFFFFF')
         .backgroundColor(this.pick === (1) && (1) !== this.need() ? Palette.primaryDeep : Palette.sky)
         .borderRadius(Radius.lg).layoutWeight(1).height(Cell.of(80))

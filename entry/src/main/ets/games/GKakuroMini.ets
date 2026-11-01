@@ -597,7 +597,7 @@ export struct GKakuroMini {
   @Builder
   head(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? TG('步数') : '完成线')
+      Text(kind === 0 ? TG('步数') : TG('完成线'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.moves) + '/' + String(this.diffTotal)
         : String(this.linesDone()) + '/6')

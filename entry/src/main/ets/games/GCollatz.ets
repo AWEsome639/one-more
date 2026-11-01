@@ -390,7 +390,7 @@ export struct GCollatz {
           .fontSize(FontSize.hero)
           .fontWeight(FontWeight.Bold)
           .fontColor(this.n % 2 === 0 ? Palette.teal : Palette.orange)
-        Text(this.n % 2 === 0 ? '偶数 → 下一步是 ÷2' : '奇数 → 下一步是 ×3＋1')
+        Text(this.n % 2 === 0 ? TG('偶数 → 下一步是 ÷2') : TG('奇数 → 下一步是 ×3＋1'))
           .fontSize(FontSize.sm)
           .fontColor(this.theme.inkSoft)
       }

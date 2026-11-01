@@ -592,7 +592,7 @@ export struct GMasyu {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text(('圈')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('圈'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((String(this.circlesOnPath()) + '/' + String(this.black.length + this.white.length))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)

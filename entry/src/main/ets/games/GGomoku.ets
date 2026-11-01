@@ -945,8 +945,8 @@ export struct GGomoku {
       Row({ space: Space.md }) {
         // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这三格整局不刷新
         Column({ space: 2 }) {
-        Text(true ? TG('手数') : (false ? (LanMatch.isActive() ? '我 ●' : '你 ●')
-        : (LanMatch.isActive() ? '对手 ○' : '电脑 ○')))
+        Text(true ? TG('手数') : (false ? (LanMatch.isActive() ? '我 ●' : TG('你 ●'))
+        : (LanMatch.isActive() ? TG('对手 ○') : '电脑 ○')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(true ? String(this.steps)
         : (false ? String(this.countOf(HUMAN)) : String(this.countOf(AI))))
@@ -960,8 +960,8 @@ export struct GGomoku {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text(false ? TG('手数') : (true ? (LanMatch.isActive() ? '我 ●' : '你 ●')
-        : (LanMatch.isActive() ? '对手 ○' : '电脑 ○')))
+        Text(false ? TG('手数') : (true ? (LanMatch.isActive() ? '我 ●' : TG('你 ●'))
+        : (LanMatch.isActive() ? TG('对手 ○') : '电脑 ○')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(false ? String(this.steps)
         : (true ? String(this.countOf(HUMAN)) : String(this.countOf(AI))))
@@ -975,8 +975,8 @@ export struct GGomoku {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text(false ? TG('手数') : (false ? (LanMatch.isActive() ? '我 ●' : '你 ●')
-        : (LanMatch.isActive() ? '对手 ○' : '电脑 ○')))
+        Text(false ? TG('手数') : (false ? (LanMatch.isActive() ? '我 ●' : TG('你 ●'))
+        : (LanMatch.isActive() ? TG('对手 ○') : '电脑 ○')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(false ? String(this.steps)
         : (false ? String(this.countOf(HUMAN)) : String(this.countOf(AI))))
@@ -1099,7 +1099,7 @@ export struct GGomoku {
 
       Text(LanMatch.isActive()
         ? '联机：你执 ● 先行（房主先手）；对方落 ○，五子连珠即胜 · 悔棋已禁用'
-        : '你执黑先行；电脑用启发式评分抢攻与堵截，连成五子即胜')
+        : TG('你执黑先行；电脑用启发式评分抢攻与堵截，连成五子即胜'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
     }

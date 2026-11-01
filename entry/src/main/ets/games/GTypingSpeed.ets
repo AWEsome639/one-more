@@ -314,7 +314,7 @@ export struct GTypingSpeed {
           .fontColor(this.theme.ink).maxLines(3)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
-      TextInput({ text: this.typed, placeholder: '在这里输入…' })
+      TextInput({ text: this.typed, placeholder: TG('在这里输入…') })
         .placeholderFont({ size: FontSize.sm }).placeholderColor(this.theme.inkFaint)
         .fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).width('100%').height(Cell.of(52)).padding({ left: Space.sm, right: Space.sm })

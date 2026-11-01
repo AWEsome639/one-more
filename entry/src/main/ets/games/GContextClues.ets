@@ -335,7 +335,7 @@ export struct GContextClues {
         .textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Row({ space: Space.sm }) {
-        Button(this.picked < 0 ? '选一个释义' : '下一题 →')
+        Button(this.picked < 0 ? '选一个释义' : TG('下一题 →'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
           .enabled(this.picked >= 0).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nextQ(); }); }).onClick(() => { Haptics.tap(); this.nextQ(); })

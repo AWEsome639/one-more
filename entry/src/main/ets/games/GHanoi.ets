@@ -410,7 +410,7 @@ export struct GHanoi {
       .width('100%')
       .layoutWeight(1)
 
-      Text(this.done ? TG('🎉 完成！') : (this.sel >= 0 ? '再点一根柱子放过去' : '点一根柱子拿起最上面的盘'))
+      Text(this.done ? TG('🎉 完成！') : (this.sel >= 0 ? TG('再点一根柱子放过去') : '点一根柱子拿起最上面的盘'))
         .fontSize(FontSize.sm)
         .fontColor(this.done ? Palette.emerald : this.theme.inkSoft)
 
@@ -427,7 +427,7 @@ export struct GHanoi {
             Haptics.tap();
             this.reset(this.level);
           })
-        Button(this.level === 3 ? '升到 4 盘' : (this.level === 4 ? '升到 5 盘' : '回到 3 盘'))
+        Button(this.level === 3 ? TG('升到 4 盘') : (this.level === 4 ? TG('升到 5 盘') : TG('回到 3 盘')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)

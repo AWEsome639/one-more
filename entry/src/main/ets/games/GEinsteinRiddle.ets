@@ -394,7 +394,7 @@ export struct GEinsteinRiddle {
       Row({ space: Space.md }) {
         Text(TG2("步数 {0}",Digits(String(this.tries), this.langCode))).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG2('线索 {0} 条', this.lines.length)).fontSize(FontSize.md).fontColor(Palette.sky).layoutWeight(1)
-        Text(this.over ? '已解开 🎉' : '唯一解').fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
+        Text(this.over ? TG('已解开 🎉') : TG('唯一解')).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
       }.width('100%')
 
       Text(TG('❓ 三栋排屋住着三个国籍的人，各养一种宠物 —— 按线索推出唯一的排法'))
@@ -427,7 +427,7 @@ export struct GEinsteinRiddle {
         .fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
       Row({ space: Space.sm }) {
-        Button(this.hintOn ? '已看提示' : '提示 −100')
+        Button(this.hintOn ? TG('已看提示') : '提示 −100')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
           .fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)

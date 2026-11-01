@@ -482,7 +482,7 @@ export struct GPong {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text(('你')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('你'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.ps), this.langCode))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)

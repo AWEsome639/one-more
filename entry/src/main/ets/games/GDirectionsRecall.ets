@@ -324,7 +324,7 @@ export struct GDirectionsRecall {
       }.width('100%')
 
       
-      Button(this.phase === 'done' ? '下一关…' : TG('重开'))
+      Button(this.phase === 'done' ? TG('下一关…') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')

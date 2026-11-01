@@ -753,7 +753,7 @@ export struct GMinesweeper {
   @Builder
   infoBox(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '剩余雷' : (kind === 1 ? '已翻开' : TG('用时')))
+      Text(kind === 0 ? TG('剩余雷') : (kind === 1 ? TG('已翻开') : TG('用时')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.minesTotal - this.flags)

@@ -1105,7 +1105,7 @@ export struct GGo9 {
   @Builder
   statBox(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? TG('我提子') : (kind === 1 ? (LanMatch.isActive() ? '对手提子' : '电脑提子') : TG('手数')))
+      Text(kind === 0 ? TG('我提子') : (kind === 1 ? (LanMatch.isActive() ? TG('对手提子') : '电脑提子') : TG('手数')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.myCap) : (kind === 1 ? String(this.foeCap) : String(this.moves)))
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)

@@ -539,7 +539,7 @@ export struct GMatch3 {
       .borderRadius(Radius.md)
 
       Text(this.over ? (this.won ? '🎉 达标通关！' : '步数用完了，再来一局') :
-        (this.sel === -1 ? '点一个果子，再点旁边的换位' : '再点一个相邻的果子交换'))
+        (this.sel === -1 ? '点一个果子，再点旁边的换位' : TG('再点一个相邻的果子交换')))
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 

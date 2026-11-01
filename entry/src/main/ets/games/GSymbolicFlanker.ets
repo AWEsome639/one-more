@@ -292,7 +292,7 @@ export struct GSymbolicFlanker {
             .borderRadius(Radius.sm).animation({ duration: Motion.fast, curve: Motion.snap() })
           }, (o: number) => 'a' + o)
         }.width('100%')
-        Text(this.cong ? '两侧与目标同向' : '两侧与目标反向')
+        Text(this.cong ? TG('两侧与目标同向') : TG('两侧与目标反向'))
           .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 

@@ -422,7 +422,7 @@ export struct GNim {
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('轮到'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.over ? '—' : (this.turn === 0 ? '你' : 'AI'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.over ? '—' : (this.turn === 0 ? TG('你') : 'AI'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
@@ -483,7 +483,7 @@ export struct GNim {
         .animation({ duration: Motion.base, curve: Motion.spring() })
       }, (i: number) => 'pile' + i)
 
-      Text(this.over ? this.msg : (this.turn === 0 ? this.msg : 'AI 思考中…'))
+      Text(this.over ? this.msg : (this.turn === 0 ? this.msg : TG('AI 思考中…')))
         .fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })

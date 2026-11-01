@@ -270,7 +270,7 @@ export struct GSternbergTask {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.sm }) {
-        Text(this.phase === 0 ? '👀 记忆集' : (this.phase === 1 ? '❓ 探针' : '🔍 复盘'))
+        Text(this.phase === 0 ? '👀 记忆集' : (this.phase === 1 ? TG('❓ 探针') : '🔍 复盘'))
           .fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
         if (this.phase === 0) {
           Row({ space: Space.sm }) {

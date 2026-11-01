@@ -306,7 +306,7 @@ export struct GChalkAndTalk {
           .backgroundColor((true) ? Palette.emerald : Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over && !this.sayLock).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.say((true)); }); }).onClick(() => { Haptics.tap(); this.say((true)); })
-          Button(('否'))
+          Button((TG('否')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor((false) ? Palette.emerald : Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))

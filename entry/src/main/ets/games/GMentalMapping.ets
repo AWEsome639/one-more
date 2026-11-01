@@ -544,7 +544,7 @@ export struct GMentalMapping {
       .width('100%')
 
       if (this.lastOk !== 0) {
-        Text(this.lastOk === 1 ? TG('✅ 对了') : '❌ 错了，它在另一边')
+        Text(this.lastOk === 1 ? TG('✅ 对了') : TG('❌ 错了，它在另一边'))
           .fontSize(FontSize.sm)
           .fontColor(this.lastOk === 1 ? Palette.emerald : Palette.rose)
       }

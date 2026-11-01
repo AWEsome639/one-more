@@ -360,7 +360,7 @@ export struct GCryptoArithmetic {
       }.width('100%')
 
       Column({ space: Space.xs }) {
-        Text(this.puz.form === 0 ? '加法式' : '乘法式').fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(this.puz.form === 0 ? TG('加法式') : TG('乘法式')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
         Row({ space: Space.xs }) {
           Stack() {
           Text(this.slots[(0)] < 0 ? this.letterAt((0)) : String(this.slots[(0)])).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)

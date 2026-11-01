@@ -774,7 +774,7 @@ export struct GSkyscrapers {
       Row({ space: Space.md }) {
         Text(this.over
           ? (this.won ? TG2('楼数全对 🎉 得分 {0}', this.score) : TG('错手太多，本局失败'))
-          : (this.hintMsg.length > 0 ? this.hintMsg : '先选数字，再点格子；同一个数字点两次即清空'))
+          : (this.hintMsg.length > 0 ? this.hintMsg : TG('先选数字，再点格子；同一个数字点两次即清空')))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)

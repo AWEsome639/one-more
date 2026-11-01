@@ -328,7 +328,7 @@ export struct GFeatureMatrixRecall {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.phase === 0 ? TG('记忆') : (this.phase === 2 ? '判定' : '作答'))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.phase === 0 ? TG('记忆') : (this.phase === 2 ? TG('判定') : TG('作答')))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {

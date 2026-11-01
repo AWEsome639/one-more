@@ -431,7 +431,7 @@ export struct GMandelbrot {
           .combine(TransitionEffect.scale({ x: 0.94, y: 0.94 }))
           .animation({ duration: Motion.fast, curve: Motion.spring() }))
       } else {
-        Button(this.round >= this.diffTotal ? '看结果' : '下一题')
+        Button(this.round >= this.diffTotal ? '看结果' : TG('下一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
