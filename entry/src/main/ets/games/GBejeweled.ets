@@ -772,7 +772,10 @@ export struct GBejeweled {
             .borderRadius(Radius.md)
             .layoutWeight(1)
             .height(Cell.of(46))
-            .enabled(!this.over)
+            // ★ 2026-11-01（第 812 轮）：原来的 `enabled(!this.over)` **只判"游戏结束"**，
+            //   没判"有没有选中任何宝石" ⇒ 什么都没选时这个按钮仍可点、点完毫无反应。
+            //   按"空操作不该看起来能点"的原则，加上 `this.sel >= 0`。
+            .enabled(!this.over && this.sel >= 0)
             .focusable(Tv.on())
             .focusBox(Tv.box())
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.sel = -1; }); })
