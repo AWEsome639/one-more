@@ -117,6 +117,12 @@ export struct GKlotski {
   private demoDir: number = 0;     // 本拍方向（0上 1右 2下 3左）
   @State private demoRound: number = 0;       // 演到第几轮
   @State private demoPhase: number = 0;       // 0=引导 1=执行 2=结果
+  // ★★★ 2026-11-01：演示会改真实棋盘（demoBeat 真的 tryMove）且原来不恢复。
+  //   这四个字段是补的快照 —— 演完原样恢复，玩家不可能因看演示丢步。
+  private demoSaveBlocks: string = '';
+  private demoSaveMoves: number = 0;
+  private demoSaveOver: boolean = false;
+  private demoSaveWon: boolean = false;
   private demoSnapSel: number = -1;
   private demoSnapBlk: string = '';
   @State private tip: string = TG('点方块选中，再点方向键移动');
@@ -320,6 +326,20 @@ export struct GKlotski {
       Demo.stop(this.demoId);
       this.demoId = -1;
     }
+      // ★ 2026-11-01 真机排查抓到：演示会改真实棋盘（demoBeat 第 2 拍真的 tryMove）
+      //   而原来这里只停计时器、不恢复 ⇒ 玩家看完演示局面已经被推乱。
+      if (this.demoSaveBlocks.length > 0) {
+        try {
+          this.blocks = JSON.parse(this.demoSaveBlocks) as Blk[];
+        } catch (err) {
+          // 解析失败就保留现状，绝不因演示恢复把页面搞崩
+        }
+        this.moves = this.demoSaveMoves;
+        this.over = this.demoSaveOver;
+        this.won = this.demoSaveWon;
+        this.sel = this.demoSnapSel;
+        this.demoSaveBlocks = '';
+      }
   }
 
   private demoStop(): void {
@@ -334,6 +354,12 @@ export struct GKlotski {
 
   private demoStart(): void {
     if (this.demoId >= 0) { return; }
+    // ★ 快照：演示前存下局面，演完恢复
+    this.demoSaveBlocks = JSON.stringify(this.blocks);
+    this.demoSaveMoves = this.moves;
+    this.demoSaveOver = this.over;
+    this.demoSaveWon = this.won;
+    this.demoSnapSel = this.sel;
     this.demoPhase = 0;
     this.demoRound = 0;
     this.demoMsg = TG('看清楚：接下来会告诉你要推哪一块');
