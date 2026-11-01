@@ -649,9 +649,15 @@ export struct GKlotski {
     Column({ space: 2 }) {
       Text(kind === 0 ? TG('步数') : (kind === 1 ? '距出口' : TG('已选')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-      Text(kind === 0 ? String(this.moves) + '/' + String(this.diffTotal)
-        : (kind === 1 ? String(this.away()) + TG(' 格')
-          : (this.blocks.length > 0 ? this.blocks[this.sel].label : '-')))
+      // ★★★ 2026-11-01（奥森原话「演示动画不应该让玩家得分…就是一段动画，不计分」）：
+      //   这一款的演示**会真的 tryMove**（`moves++`），第 661 轮我加了「演完快照恢复」，
+      //   但**过程中玩家仍然看到步数在涨** —— 那不是"不计分"，是"算完再退"。
+      //   ⇒ 演示期间把数值显示成占位符（与 GBejeweled 的做法一致），
+      //     玩家看到的是"这里在演示"，不是"我的步数被动了"。
+      Text(this.demoId >= 0 ? '—'
+        : (kind === 0 ? String(this.moves) + '/' + String(this.diffTotal)
+          : (kind === 1 ? String(this.away()) + TG(' 格')
+            : (this.blocks.length > 0 ? this.blocks[this.sel].label : '-'))))
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
     }
     .layoutWeight(1)
