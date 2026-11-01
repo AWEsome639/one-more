@@ -318,8 +318,11 @@ struct Splash {
         if (e >= 1) { return 1; }
         return e * e * (3 - 2 * e);
       };
-      this.pBg = sm(0, 420);
-      this.pNebula = sm(110, 520);
+      // ★ 2026-11-01（第 804 轮）：底与星云都提前，别让观众先看 600ms 虚空。
+      //   实测 8 帧里第 2/6/7 帧几乎只有几颗点时，就是这段空窗（pNebula 要到 630ms 才满）。
+      //   世界顶尖开屏不会让第一屏是空的 —— 一上来就该有「天光」。
+      this.pBg = sm(0, 240);
+      this.pNebula = sm(0, 380);
       this.pDust = lin(170, 2600);
       this.pTwinkle = sm(170, 1400);
       this.pGlow = sm(200, 600);
@@ -528,7 +531,12 @@ struct Splash {
           ]
         })
         .position({ x: '-35%', y: '-8%' })
-        .opacity(this.pNebula * 0.95)
+        // ★ 2026-11-01（第 804 轮）：星云一开始就要**有底**，不能从 0 起。
+        //   实测 z3/z4 两帧是**全屏单色 (13,19,33)** —— 一点渐变都没有，
+        //   因为 opacity = pNebula × 0.95 且 pNebula 从 0 开始 ⇒ 前 380ms 是纯色。
+        //   世界顶尖开屏的第一帧就该有「天光」（径向渐变的层次），不是一块平色。
+        //   ⇒ 底层给 0.35 的常驻，剩下 0.60 由 pNebula 补上。
+        .opacity(0.35 + this.pNebula * 0.60)
 
       // ──────── L2 星尘：48 颗（极小屏 16 颗）────────
       ForEach(Array.from({ length: this.starCount() }, (_v: number, k: number) => k), (i: number) => {
