@@ -570,7 +570,11 @@ export struct GBubbleShooter {
           this.reset();
         })
 
-      Text(TG2('同色连 3 颗起炸；把全场炸光通关，{0} 次发射用完还有剩就算输',Digits(String(SHOTS), this.langCode)))
+      // ★★★ 2026-11-01 全项目扫「文案写常量」抓到（判据 57 的最后 1 处）：
+      //   实际发射次数走 `this.total = GameDiff.livesNow(SHOTS)`（难度会改），
+      //   而这里写死常量 `SHOTS`（=28）⇒ 难度一变文案就和实际不符。
+      //   ⇒ 用运行时值 `this.total`。
+      Text(TG2('同色连 3 颗起炸；把全场炸光通关，{0} 次发射用完还有剩就算输',Digits(String(this.total), this.langCode)))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
     }
