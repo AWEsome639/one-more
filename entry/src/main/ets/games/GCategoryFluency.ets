@@ -305,7 +305,7 @@ export struct GCategoryFluency {
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
-        Text(this.over ? '本轮结束' : this.cat().name).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+        Text(this.over ? TG('本轮结束') : this.cat().name).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
           .fontColor(this.theme.ink)
         Text(TG('严格属于这一类的词，打出来按回车')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)

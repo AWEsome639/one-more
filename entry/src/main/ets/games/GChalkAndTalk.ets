@@ -301,7 +301,7 @@ export struct GChalkAndTalk {
         Text(TG2('说：「{0}」属于「{1}」吗？', this.word, this.cat)).fontSize(FontSize.lg)
           .fontWeight(FontWeight.Bold).fontColor(this.theme.ink).width('100%').textAlign(TextAlign.Center)
         Row({ space: Space.sm }) {
-          Button(('是'))
+          Button((TG('是')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor((true) ? Palette.emerald : Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))

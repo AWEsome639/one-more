@@ -427,7 +427,7 @@ export struct GEinsteinRiddle {
         .fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
       Row({ space: Space.sm }) {
-        Button(this.hintOn ? TG('已看提示') : '提示 −100')
+        Button(this.hintOn ? TG('已看提示') : TG('提示 −100'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
           .fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)

@@ -628,7 +628,7 @@ export struct GGokigenNaname {
       .borderRadius(Radius.md)
 
       Row({ space: Space.md }) {
-        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : '点方块：空 → ╲ → ╱ → 空')
+        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : TG('点方块：空 → ╲ → ╱ → 空'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
           .fontColor(this.theme.inkSoft)

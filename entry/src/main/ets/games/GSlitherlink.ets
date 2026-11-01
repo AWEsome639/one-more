@@ -637,7 +637,7 @@ export struct GSlitherlink {
       Row({ space: Space.md }) {
         Text(this.over
           ? (this.won ? '回路闭合 🎉 得分 ' + String(this.score) : TG('步数用尽，本局失败'))
-          : '点边线切换；数字变绿说明这一格满足了')
+          : TG('点边线切换；数字变绿说明这一格满足了'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)

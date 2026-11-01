@@ -323,7 +323,7 @@ export struct GDoubleNBack {
         })
       }.width('100%')
       Row({ space: Space.sm }) {
-        Button(this.idx >= this.diffTotal - 1 ? '提交结算' : TG('下一题 ▶'))
+        Button(this.idx >= this.diffTotal - 1 ? TG('提交结算') : TG('下一题 ▶'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.orange).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); }).onClick(() => { Haptics.tap(); this.submit(); })
         Button(this.over ? TG('再来一局') : TG('重开'))

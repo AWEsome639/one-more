@@ -538,7 +538,7 @@ export struct GKakuroMini {
 
       Text(this.over ? (this.won ? '🎉 六条线全对，通关！' : TG('步数用尽，重开一题吧')) :
         (this.hint.length > 0 ? '⚠️ ' + this.hint :
-          (this.sel < 0 ? '点一个格子开始填数' : '点下面数字填入选中格；再点格子可清空')))
+          (this.sel < 0 ? TG('点一个格子开始填数') : TG('点下面数字填入选中格；再点格子可清空'))))
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 

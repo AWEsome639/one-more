@@ -940,7 +940,7 @@ export struct GAkari {
   @Builder
   infoBox(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '照亮' : (kind === 1 ? '灯' : TG('违规')))
+      Text(kind === 0 ? TG('照亮') : (kind === 1 ? TG('灯') : TG('违规')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? (this.litCount() + '/' + this.emptyCount())

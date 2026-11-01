@@ -295,7 +295,7 @@ export struct GWordAssociationRecall {
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Column({ space: Space.xs }) {
         Text(this.phase === 1 ? TG('回忆') : '记忆时间').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(this.phase === 1 ? PAIRS[this.pairIdx()].cue : '把 6 组搭配记牢').fontSize(FontSize.xl)
+        Text(this.phase === 1 ? PAIRS[this.pairIdx()].cue : TG('把 6 组搭配记牢')).fontSize(FontSize.xl)
           .fontWeight(FontWeight.Bold).fontColor(Palette.berry)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       if (this.phase !== 1) {

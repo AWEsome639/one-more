@@ -525,7 +525,7 @@ export struct GSortingVisualizer {
 
       Text(this.sorted
         ? this.msg + ' · 比较 ' + this.comps + ' 次，交换 ' + this.swaps + TG(' 次')
-        : (this.running ? '播放中…' : '点「开始」播放；也可单步看每一次比较与交换'))
+        : (this.running ? TG('播放中…') : TG('点「开始」播放；也可单步看每一次比较与交换')))
         .fontSize(FontSize.sm)
         .fontColor(this.sorted ? Palette.emerald : this.theme.inkSoft)
 

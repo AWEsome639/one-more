@@ -330,7 +330,7 @@ export struct GQuickMath {
       }.width('100%')
       Column({ space: Space.xs }) {
         Text(this.q + ' = ?').fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(this.over ? '本局已结束，点重开再来' : '抢答，答错扣 3 秒').fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(this.over ? TG('本局已结束，点重开再来') : TG('抢答，答错扣 3 秒')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
       Text(this.flash).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)

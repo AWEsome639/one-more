@@ -869,7 +869,7 @@ export struct GFreecell {
       .layoutWeight(1)
 
       Text(this.over ? (this.found[0] === TOP ? '🎉 全部归位，通关！' : '走不动了…重开一局') :
-        (this.sel === -1 ? '点一张牌选中，再点目标位置' : '已选中，点自由格 / 家 / 列放下'))
+        (this.sel === -1 ? TG('点一张牌选中，再点目标位置') : TG('已选中，点自由格 / 家 / 列放下')))
         .fontSize(FontSize.sm)
         .fontColor(this.over ? Palette.emerald : this.theme.inkSoft)
 

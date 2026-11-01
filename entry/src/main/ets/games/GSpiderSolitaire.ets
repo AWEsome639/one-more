@@ -861,7 +861,7 @@ export struct GSpiderSolitaire {
   @Builder
   stat(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? TG('已收组数') : (kind === 1 ? TG('步数') : '牌堆'))
+      Text(kind === 0 ? TG('已收组数') : (kind === 1 ? TG('步数') : TG('牌堆')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? this.done + '/' + this.diffTotal
         : (kind === 1 ? String(this.moves) : (this.stock.length / PILES).toFixed(0) + TG(' 轮')))

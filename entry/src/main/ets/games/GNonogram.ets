@@ -597,7 +597,7 @@ export struct GNonogram {
       Row({ space: Space.md }) {
         Text(this.over
           ? (this.won ? TG2('图案复原 🎉 得分 {0}', this.score) : TG('错涂太多，本局失败'))
-          : (this.hintMsg.length > 0 ? this.hintMsg : '点格子：涂黑 → 打叉 → 清空'))
+          : (this.hintMsg.length > 0 ? this.hintMsg : TG('点格子：涂黑 → 打叉 → 清空')))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)

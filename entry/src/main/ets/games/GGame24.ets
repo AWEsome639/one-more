@@ -735,7 +735,7 @@ export struct GGame24 {
   @Builder
   infoBox(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '本题' : (kind === 1 ? TG('步数') : TG('用时')))
+      Text(kind === 0 ? TG('本题') : (kind === 1 ? TG('步数') : TG('用时')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? this.originText()

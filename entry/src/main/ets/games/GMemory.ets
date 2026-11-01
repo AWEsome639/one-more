@@ -352,7 +352,7 @@ export struct GMemory {
       .width('100%')
       .layoutWeight(1)
 
-      Text(this.done ? '🎉 全部配对！' : (this.tries >= 20 ? '有点多哦，沉住气' : '每次翻两张，找相同的'))
+      Text(this.done ? '🎉 全部配对！' : (this.tries >= 20 ? TG('有点多哦，沉住气') : TG('每次翻两张，找相同的')))
         .fontSize(FontSize.sm)
         .fontColor(this.done ? Palette.emerald : this.theme.inkFaint)
 

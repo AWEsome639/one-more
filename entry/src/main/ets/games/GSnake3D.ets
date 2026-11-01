@@ -625,7 +625,7 @@ export struct GSnake3D {
   @Builder
   stat(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? '所在层' : (kind === 1 ? TG('长度') : TG('得分')))
+      Text(kind === 0 ? TG('所在层') : (kind === 1 ? TG('长度') : TG('得分')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? (this.headZ() + 1) + ' / ' + LAYERS
         : (kind === 1 ? this.len + ' / ' + WIN_LEN : String(this.score)))

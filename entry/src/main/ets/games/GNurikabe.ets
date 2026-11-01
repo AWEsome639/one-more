@@ -714,7 +714,7 @@ export struct GNurikabe {
       Row({ space: Space.md }) {
         Text(this.over
           ? (this.won ? TG2('岛与墙都对了 🎉 得分 {0}', this.score) : TG('墙破岛溢，本局失败'))
-          : '点亮格子涂黑：数字格是岛，其余格成一片连通墙')
+          : TG('点亮格子涂黑：数字格是岛，其余格成一片连通墙'))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
           .layoutWeight(1)

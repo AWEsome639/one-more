@@ -681,7 +681,7 @@ export struct GSlide15 {
       )
 
       // ── 状态 ──
-      Text(this.hintMsg.length > 0 ? this.hintMsg : (this.won ? '🎉 归位完成！' : '点空白格旁边的方块，让它滑过去'))
+      Text(this.hintMsg.length > 0 ? this.hintMsg : (this.won ? '🎉 归位完成！' : TG('点空白格旁边的方块，让它滑过去')))
         .fontSize(FontSize.sm)
         .fontColor(this.won ? Palette.emerald : this.theme.inkSoft)
 

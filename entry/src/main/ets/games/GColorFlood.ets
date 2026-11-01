@@ -581,7 +581,7 @@ export struct GColorFlood {
         .width('100%')
 
         Row({ space: Space.md }) {
-          Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : '点色块染左上角连通区')
+          Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : TG('点色块染左上角连通区'))
         .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
             .fontSize(FontSize.sm)
             .fontColor(this.theme.inkSoft)

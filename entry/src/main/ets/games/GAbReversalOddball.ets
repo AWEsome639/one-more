@@ -301,7 +301,7 @@ export struct GAbReversalOddball {
         .borderRadius(Radius.md).width('100%').height(Cell.of(64)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapFlip(); }); }).onClick(() => { Haptics.tap(); this.tapFlip(); })
 
       Row({ space: Space.sm }) {
-        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : '正在跑…')
+        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('正在跑…'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).enabled(false)

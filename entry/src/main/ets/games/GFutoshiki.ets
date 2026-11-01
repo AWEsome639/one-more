@@ -1686,7 +1686,7 @@ export struct GFutoshiki {
       .width('100%')
 
       Text(this.over ? (this.won ? '🎉 行列不重复且不等号全满足，通关！' : TG('步数用尽，重开一题吧')) :
-        '点格子选中，再点下面数字填入；粗黑数字是题目提示')
+        TG('点格子选中，再点下面数字填入；粗黑数字是题目提示'))
         .fontSize(FontSize.xxs)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
     }

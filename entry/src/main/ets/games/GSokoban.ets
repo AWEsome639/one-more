@@ -791,7 +791,7 @@ export struct GSokoban {
   @Builder
   stat(kind: number) {
     Column({ space: 2 }) {
-      Text(kind === 0 ? TG('步数') : '推动')
+      Text(kind === 0 ? TG('步数') : TG('推动'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.moves) : String(this.pushes))
         .fontSize(FontSize.lg)

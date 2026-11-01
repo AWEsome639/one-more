@@ -304,7 +304,7 @@ export struct GChimpTest {
         .textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Row({ space: Space.md }) {
-        Button(this.hidden ? '数字已藏起' : '看好位置，再点 1')
+        Button(this.hidden ? TG('数字已藏起') : '看好位置，再点 1')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm)
           .fontColor(this.theme.inkSoft).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).enabled(false)

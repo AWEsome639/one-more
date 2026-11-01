@@ -443,7 +443,7 @@ export struct GLifeGame {
       .borderRadius(Radius.md)
 
       Text(this.over ? (this.won ? TG('🎉 存活满 60 代，种群稳定！') : TG2('💀 第 {0} 代灭绝了', this.gen)) :
-        (this.running ? '演化中…点格子可以人工投放生命' : '点格子布种，再按开始'))
+        (this.running ? TG('演化中…点格子可以人工投放生命') : TG('点格子布种，再按开始')))
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 
