@@ -10,7 +10,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -313,7 +313,7 @@ export struct GNumberBondsAll {
       this.finish(false);
       return;
     }
-    this.msg = '❌ ' + a + ' + ' + b + ' = ' + (a + b) + '，不是 ' + this.target;
+    this.msg = TG4('❌ {0} + {1} = {2}，不是 {3}', a, b, a + b, this.target);
   }
 
   private finish(solved: boolean): void {

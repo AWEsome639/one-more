@@ -317,7 +317,7 @@ export struct GMirrorMaze {
     if (d < 0) {
       return Hint.none('none');
     }
-    return Hint.make([], '按「' + this.dirName(d) + '」，能走到 🏁（还剩 ' + String(this.limit - this.steps) + ' 步）',
+    return Hint.make([], TG2('按「{0}」，能走到 🏁（还剩 {1} 步）', this.dirName(d), this.limit - this.steps),
       'Press "' + this.dirName(d) + '" to reach the flag', t0);
   }
   private askAuto(): void {

@@ -578,7 +578,7 @@ export struct GMahjongSolitaire {
   head(label: string, kind: number) {
     Column({ space: 2 }) {
       Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-      Text(kind === 0 ? (String(this.left / 2) + ' 对')
+      Text(kind === 0 ? (TG2('{0} 对', this.left / 2))
         : (kind === 1 ? String(this.moves) : String(this.hints)))
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
     }

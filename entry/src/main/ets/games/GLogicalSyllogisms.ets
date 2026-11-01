@@ -318,7 +318,7 @@ export struct GLogicalSyllogisms {
         Text(this.qIndex >= QN ? '' : this.cur().p2)
           .fontSize(FontSize.md).fontColor(this.theme.ink).width('100%')
         Divider().color(this.theme.line)
-        Text(this.qIndex >= QN ? '' : '结论：' + this.cur().concl)
+        Text(this.qIndex >= QN ? '' : TG2('结论：{0}', this.cur().concl))
           .fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(Palette.cyan).width('100%')
       }
       .width('100%').padding(Space.md).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg)

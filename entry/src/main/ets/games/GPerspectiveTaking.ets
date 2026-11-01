@@ -336,7 +336,7 @@ export struct GPerspectiveTaking {
           Text(TG('他在哪')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           Text(TG2('面朝 {0}', FACING[this.face])).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
             .fontColor(Palette.emerald)
-          Text(ASK[this.ask] + '的是哪一件？').fontSize(FontSize.md).fontColor(this.theme.ink)
+          Text(TG2('{0}的是哪一件？', ASK[this.ask])).fontSize(FontSize.md).fontColor(this.theme.ink)
         }.layoutWeight(1).alignItems(HorizontalAlign.Start)
       }.width('100%').alignItems(VerticalAlign.Center)
       Row({ space: Space.sm }) {

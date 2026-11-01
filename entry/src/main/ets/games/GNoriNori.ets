@@ -656,7 +656,7 @@ export struct GNoriNori {
 
       Row({ space: Space.md }) {
         Text(this.over
-          ? (this.won ? '全部成对 🎉 得分 ' + String(this.score) : '非法落子太多，本局失败')
+          ? (this.won ? TG2('全部成对 🎉 得分 {0}', this.score) : TG('非法落子太多，本局失败'))
           : TG2('点亮格子：{0} 块区域各 2 格，且两两成多米诺', String(REG_CNT)))
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)

@@ -451,7 +451,7 @@ export struct GPhoneticGuess {
           .fontSize(FontSize.xxl)
           .fontWeight(FontWeight.Bold)
           .fontColor(Palette.teal)
-        Text(this.hint ? '释义：' + this.cur().cn : '点「提示」看中文释义')
+        Text(this.hint ? TG2('释义：{0}', this.cur().cn) : TG('点「提示」看中文释义'))
           .fontSize(FontSize.sm)
           .fontColor(this.theme.inkSoft)
       }

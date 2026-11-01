@@ -6,7 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
-import { TG, TG2 } from '../core/GameI18n';
+import { TG, TG2, TG4 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -269,7 +269,9 @@ export struct GMultiTrackCounter {
       this.finish();
       return;
     }
-    this.msg = '真实 ' + String(truth) + '，你报 ' + String(this.answer) + '（差 ' + String(err) + '）⇒ 本轮 ' + String(got) + ' 分 · 累计 ' + String(this.score);
+    // ★★★ 2026-11-01 i18n：原来整句拼接（5 个值）⇒ 拆成两条模板（TG4 只支持 4 参数）
+    this.msg = TG4('真实 {0}，你报 {1}（差 {2}）⇒ 本轮 {3} 分', truth, this.answer, err, got)
+      + TG2(' · 累计 {0} 分', this.score);
     this.round = this.round + 1;
     this.clearNext();
     this.nextTo = setTimeout(() => {

@@ -496,7 +496,7 @@ export struct GPegSolitaire {
         .shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('可跳'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.sel >= 0 ? this.dests.length + ' 处' : '—'))
+        Text((this.sel >= 0 ? TG2('{0} 处', this.dests.length) : '—'))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

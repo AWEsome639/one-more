@@ -305,7 +305,7 @@ export struct GMemoryPalace {
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       .shadow(Shadow.card).justifyContent(FlexAlign.SpaceBetween)
 
-      Text(this.phase === 1 ? '找出 ' + this.slots[this.target] + ' 的位置' : '宫殿')
+      Text(this.phase === 1 ? TG2('找出 {0} 的位置', this.slots[this.target]) : TG('宫殿'))
         .fontSize(FontSize.xl).fontColor(this.theme.ink).width('100%').textAlign(TextAlign.Center)
 
       Column({ space: Space.xs }) {
