@@ -920,8 +920,10 @@ build() {
       });
     })
     .scale({
-      x: this.pressed ? 0.97 : (this.hovered ? 1.02 : 1),
-      y: this.pressed ? 0.97 : (this.hovered ? 1.02 : 1)
+      // 三个状态合在一处（避免重复 .scale 互相覆盖）：
+      //   按下 0.97 < 常态 1 < 悬停 1.02 < 焦点 1.04
+      x: this.pressed ? 0.97 : (this.focused ? 1.04 : (this.hovered ? 1.02 : 1)),
+      y: this.pressed ? 0.97 : (this.focused ? 1.04 : (this.hovered ? 1.02 : 1))
     })
     // ★★★★ 2026-11-01 奥森问「宝石迷阵外面这层蓝框怎么回事」⇒ 迭代了三次：
     //
@@ -937,19 +939,23 @@ build() {
     //       Android 的 elevation、Material 的 selected state 都是这个路子）
     //     · `scale` 不影响布局（只改渲染）⇒ 卡片不会挤到邻居
     //     · hover 仍保留 2vp 墨边（鼠标悬停需要更"轻"的提示，且只有 PC 有）
-    .border({
-      width: this.hovered && !this.focused ? 2 : 0,
-      color: this.theme.ink,
-      radius: Radius.md + 2
-    })
-    .scale({
-      x: this.focused ? 1.04 : 1,
-      y: this.focused ? 1.04 : 1
-    })
+    // ★★★ 2026-11-01 奥森：「就算要有，不也应该和色块紧紧贴合吗？最好就没有」
+    //   ⇒ **不要边框**（这里原来是 hover 的 2vp 墨边，去掉）
+    //   ⚠️ 同时修掉一个我自己引入的回归：下面原本又加了一个 `.scale()`，
+    //      而 ArkUI 里**后写的 scale 覆盖前面的** ⇒
+    //      上面那个 `pressed ? 0.97 : (hovered ? 1.02 : 1)` 会直接失效。
+    //      ⇒ 合并成一个 scale，三个状态都要在里面。
+
+    // ★★★ 2026-11-01 奥森：「所有图标的外面都有一层很淡的黑框…最好就没有」
+    //   真相：那不是边框，是 `Shadow.card`（radius 16、8% 黑、offsetY 4）——
+    //         **在卡片四周扩散出 16vp 的淡黑晕**，所以看着"不贴合"。
+    //   修：
+    //     · 焦点态：只留**主色光晕**（这是"选中"，不是"影子"）
+    //     · 常态：**完全不要阴影** —— 卡片的层次靠色块自身的饱和度 + 白底的对比，
+    //       这是奥森要的"紧紧贴合、最好没有"。
     .shadow(this.focused
-      // 双层：内圈紧、外圈散 ⇒ 有"发光"的体积感，而不是一圈均匀描边
-      ? { radius: 22, color: '#4D6366F1', offsetX: 0, offsetY: 4 }
-      : Shadow.card)
+      ? { radius: 18, color: '#406366F1', offsetX: 0, offsetY: 0 }
+      : { radius: 0, color: Color.Transparent, offsetX: 0, offsetY: 0 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onFocus(() => { this.focused = true; })
     .onBlur(() => { this.focused = false; })
