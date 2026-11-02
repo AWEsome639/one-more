@@ -203,6 +203,78 @@ export const HOW_TO: Record<string, HowTo> = {
       'Get both suits fully home to clear it; if nothing can move any more, you lose'
     ]
   },
+  'reflex_tap': {
+    zh: [
+      '屏幕上一个圆点亮起来时，立刻去点它',
+      '一共 8 次，会算你的平均反应时和最快一次',
+      '平均反应低于 550ms 且点偏不超过 2 次算通关'
+    ],
+    en: [
+      'As soon as a dot lights up on screen, tap it right away',
+      'Eight rounds in total; your average and fastest reaction are tracked',
+      'Clear it with an average under 550 ms and no more than 2 misses'
+    ]
+  },
+  'choice_reaction_time': {
+    zh: [
+      '数字一亮就立刻判断它是奇数还是偶数，按「奇」或「偶」',
+      '一共 10 题，会算你的平均反应时',
+      '平均低于 900ms 且答错不超过 1 次算通关'
+    ],
+    en: [
+      'When a number appears, decide at once whether it is odd or even and press 奇 or 偶',
+      'Ten rounds in total; your average reaction time is tracked',
+      'Clear it with an average under 900 ms and at most one wrong answer'
+    ]
+  },
+  'odd_even_flash': {
+    zh: [
+      '数字在屏幕上一闪就消失，你要判断它刚才是奇数还是偶数',
+      '闪现的时间会越来越短，越往后越看不清',
+      '一共 18 题，答对 13 题以上算通关'
+    ],
+    en: [
+      'A number flashes and vanishes; decide whether it was odd or even',
+      'The flash gets shorter and shorter as you go, so later rounds are harder to catch',
+      'Eighteen rounds in all — get at least 13 right to clear it'
+    ]
+  },
+  'go_no_go': {
+    zh: [
+      '绿灯出现就快点，红灯出现要忍住不点',
+      '点红灯就是误点，会扣分',
+      '20 试里答对 17 次以上、误点不超过 1 次算通关'
+    ],
+    en: [
+      'Tap when the light is green; hold back and do not tap on red',
+      'Tapping on red is a false alarm and counts against you',
+      'Clear it with at least 17 correct out of 20 trials and no more than 1 false alarm'
+    ]
+  },
+  'stop_signal': {
+    zh: [
+      '大多数回合是「冲」—— 看到就立刻点',
+      '偶尔会亮红灯，那时候按下去就算错',
+      '12 回合里答对 10 次以上，且「冲」的平均反应低于 800ms 算通关'
+    ],
+    en: [
+      'Most rounds say go — tap as soon as you see it',
+      'Now and then a red stop signal appears; tapping then is an error',
+      'Clear it with at least 10 correct out of 12 and an average go-reaction under 800 ms'
+    ]
+  },
+  'vigilance_task': {
+    zh: [
+      '符号一个接一个闪现，只有看到 ◆ 才点按钮',
+      '看到别的符号必须忍住 —— 点了就是误报',
+      '40 个刺激里命中 6 次以上、误报不超过 3 次算通关'
+    ],
+    en: [
+      'Symbols flash one after another; tap only when you see ◆',
+      'For any other symbol you must hold back — tapping is a false alarm',
+      'Clear it with at least 6 hits out of 40 stimuli and no more than 3 false alarms'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
