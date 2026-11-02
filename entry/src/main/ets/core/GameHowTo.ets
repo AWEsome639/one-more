@@ -275,6 +275,78 @@ export const HOW_TO: Record<string, HowTo> = {
       'Clear it with at least 6 hits out of 40 stimuli and no more than 3 false alarms'
     ]
   },
+  'stroop_test': {
+    zh: [
+      '屏幕上是一个颜色词，却用另一种颜色印出来（比如“红”字印成绿色）',
+      '要答的是它的墨色，不是字写的是什么',
+      '12 题答对 10 题以上算通关'
+    ],
+    en: [
+      'A colour word appears, printed in a different colour (the word “red” in green ink, say)',
+      'Answer with the INK colour, not the word',
+      'Clear it with at least 10 correct out of 12'
+    ]
+  },
+  'reverse_stroop': {
+    zh: [
+      '同样是「字义与墨色不符」的字，但这一次反过来',
+      '要答的是字写的是什么，不是它的墨色',
+      '12 题答对 10 题以上、且平均反应低于 1800ms 算通关'
+    ],
+    en: [
+      'Same kind of word — meaning and ink disagree — but this time it is the other way round',
+      'Answer with what the word SAYS, not the ink colour',
+      'Clear it with at least 10 correct out of 12 and an average under 1800 ms'
+    ]
+  },
+  'stroop_number_size': {
+    zh: [
+      '一个数字出现，但它的字号大小故意捣乱（小的印得大、大的印得小）',
+      '只看数字本身 —— 它比 5 大还是小',
+      '12 题答对 10 题以上算通关'
+    ],
+    en: [
+      'A digit appears, but its font size is deliberately misleading (small values huge, large values tiny)',
+      'Ignore the size — just judge the value: is it bigger or smaller than 5?',
+      'Clear it with at least 10 correct out of 12'
+    ]
+  },
+  'color_word_match_up': {
+    zh: [
+      '斯特鲁普式的「词义 vs 墨色」判断，两种问法会交替出现',
+      '看清题目问的是「字」还是「墨色」，再看选项',
+      '一共 24 题，答对 16 题以上算通关；错满 6 题判负'
+    ],
+    en: [
+      'Stroop-style judging of word meaning versus ink colour, and the question alternates between the two',
+      'Read carefully whether the prompt asks about the word or the ink, then choose',
+      'Twenty-four rounds in all — at least 16 right to clear it; six wrong and you fail'
+    ]
+  },
+  'dynamic_salience': {
+    zh: [
+      '一屏方块里有一个会发亮，点它就得分',
+      '点掉之后它会自己换个位置再亮起来',
+      '20 秒内命中 10 次以上算通关；点错不扣时间，但会计误点'
+    ],
+    en: [
+      'One square among many lights up — tap it to score',
+      'After you hit it, it moves somewhere else and lights up again',
+      'Clear it with at least 10 hits inside 20 seconds; wrong taps cost no time but are counted'
+    ]
+  },
+  'blink_detector': {
+    zh: [
+      '屏幕上的眼睛偶尔会很快眨一下（大约 0.2 秒）',
+      '看到眨眼就立刻点按钮，没眨就别点',
+      '10 次眨眼内命中 6 次以上、误报不超过 3 次算通关'
+    ],
+    en: [
+      'The eyes on screen blink quickly now and then — about 0.2 seconds',
+      'Tap as soon as you catch a blink; hold back when there is none',
+      'Clear it with at least 6 hits across 10 blinks and no more than 3 false alarms'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
