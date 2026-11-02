@@ -8,6 +8,7 @@ import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
+import { Bp } from '../core/Bp';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -292,15 +293,21 @@ export struct GAffixFactory {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((Math.min(this.qIndex + 1, this.diffTotal) + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
+        Text((Math.min(this.qIndex + 1, this.diffTotal) + '/' + this.diffTotal))
+          // ★ 2026-11-02（第 845 轮）**233×233 真机抓到**：这里原来没限行，
+          //   「0/10」在手表上被折成两行（实测 bounds 高 126px = 2 行）。
+          //   ⇒ 加 maxLines(1) 强制单行；极小屏缩一档字号（lg→md）。
+          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        Text(Digits(String(this.right), this.langCode))
+          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+        Text(Digits(String(this.score), this.langCode))
+          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
