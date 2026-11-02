@@ -3683,6 +3683,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'When unfolded each hole mirrors into four — match the target exactly to clear it, or run out of moves and fail'
     ]
   },
+  'perspective_taking': {
+    zh: [
+      '房间里站着一位观察者，箭头表示他面朝的方向',
+      '要按他看到的方位来选，不是按你的',
+      '选出他视野里对应的那个物品；8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'An observer stands in the room, with an arrow showing which way he faces',
+      'Answer from HIS point of view, not yours',
+      'Pick the object in his view; get at least 6 of 8 right to clear it'
+    ]
+  },
+  'pixel_mimic': {
+    zh: [
+      '左边是一张目标像素图',
+      '在右边点格子，画出一样的图案（再点一次可以擦掉）',
+      '64 格全部对上算通关；步数用尽还没画对就失败'
+    ],
+    en: [
+      'A target pixel image sits on the left',
+      'Tap cells on the right to reproduce it — tapping again erases',
+      'Match all 64 cells to clear it; run out of moves before you do and you fail'
+    ]
+  },
+  'polyomino_tiling': {
+    zh: [
+      '挑一块骨牌，再点棋盘把它放下（点已经铺好的格子能拿起来）',
+      '灰色的格子是墙，放不了',
+      '把所有空格都铺满算通关；步数用尽还没铺满就失败'
+    ],
+    en: [
+      'Pick a polyomino and tap the board to place it; tapping a placed piece picks it back up',
+      'Grey cells are walls and cannot be used',
+      'Cover every empty cell to clear it; run out of moves before that and you fail'
+    ]
+  },
+  'shadow_pivot': {
+    zh: [
+      '给出一个原形，以及光源转过的角度',
+      '从 4 张剪影里挑出「正好转过这个角度」的那一张',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'An original shape is shown, along with the angle the light source has turned',
+      'Pick the shadow among four that shows exactly that rotation',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'shape_shifter': {
+    zh: [
+      '依次给出 4 个方格图',
+      '找出它们之间的变换规律（每步转 90°？右移一格？多长一格？）',
+      '挑出第 5 个；6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'Four grid figures appear in sequence',
+      'Work out the transformation between them — each step rotates 90°, shifts right one, or grows by one?',
+      'Pick the fifth; get at least 4 of 6 right to clear it'
+    ]
+  },
+  'silhouette_match': {
+    zh: [
+      '积木的颜色和花纹都不算数',
+      '剪影只看轮廓 —— 挑出轮廓完全相同的那一张（转过的不算）',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'Colour and pattern do not count here',
+      'Only the outline matters — pick the silhouette whose shape matches exactly (a rotated one does not count)',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'symmetry': {
+    zh: [
+      '屏幕上一个 4×4 的图案',
+      '判断它关于哪一条轴对称',
+      '每题正确答案只有一条；8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A 4×4 pattern appears',
+      'Decide which axis it is symmetrical about',
+      'Each question has exactly one right answer; get at least 6 of 8 right to clear it'
+    ]
+  },
+  'tangram': {
+    zh: [
+      '用 4 块砖把阴影严丝合缝地铺满',
+      '点已经铺好的砖可以把它取回来重放',
+      '铺满算通关；12 次机会用完还没铺满就失败'
+    ],
+    en: [
+      'Fit four tiles into the silhouette with no gaps',
+      'Tap a placed tile to take it back and reposition it',
+      'Cover it completely to clear it; run out of your 12 attempts and you fail'
+    ]
+  },
+  'topology': {
+    zh: [
+      '不看形状，只看「洞」',
+      '两张图的洞数相同，就是拓扑等价（可以互相拉伸变过去）',
+      '8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'Ignore the shape and count the holes',
+      'Two figures with the same number of holes are topologically equivalent — one can be stretched into the other',
+      'Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'tower_of_hanoi': {
+    zh: [
+      '把整摞盘子从最左边的柱子搬到最右边那根',
+      '大盘不能压在小盘上面，一次只能搬一个',
+      '搬完算通关；40 步还搬不完就失败'
+    ],
+    en: [
+      'Move the whole stack of discs from the leftmost peg to the rightmost one',
+      'A larger disc may never sit on a smaller one, and you move one at a time',
+      'Finish the move to clear it; if 40 steps are not enough, you fail'
+    ]
+  },
+  'tower_of_london': {
+    zh: [
+      '一次搬一个球，而且大球不许压小球',
+      '把三个球摆成目标的样子',
+      '摆成算通关；步数超过「最少步数 + 5」就失败'
+    ],
+    en: [
+      'Move one ball at a time, and a larger ball may never sit on a smaller one',
+      'Arrange the three balls to match the goal',
+      'Match it to clear it; exceed the minimum number of moves plus 5 and you fail'
+    ]
+  },
+  'trace_path': {
+    zh: [
+      '先看一遍亮起的路线，然后它会灭掉',
+      '从 🚩 出发，按原来的路线一格一格点下去；点错就断线重来',
+      '3 条路线全部描完算通关；断线 4 次就失败'
+    ],
+    en: [
+      'Watch a route light up once, then it goes dark',
+      'Starting from the 🚩, tap the route back cell by cell; a wrong tap breaks the line and restarts it',
+      'Trace all 3 routes to clear it; four breaks and you fail'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
