@@ -354,9 +354,14 @@ export class Motion {
   /** 按下反馈缩放 */
   static readonly pressScale: number = 0.96;
 
-  /** 断点 */
-  static readonly breakpointMobile: number = 600;
-  static readonly breakpointTablet: number = 1024;
+  // ★★★ 2026-11-02（第 855 轮）**删除了两个死常量**：
+  //   `breakpointMobile = 600` / `breakpointTablet = 1024`（全项目 0 处引用）。
+  //   为什么必须删而不是留着：
+  //     · 它们与 `Bp.MD = 840`（HarmonyOS 官方断点）**值完全不同**
+  //     · 320/600/840 是三套体系：600 是通用 Web、840 是鸿蒙官方
+  //     · 留着它们 ⇒ 后来人 grep "breakpoint" 会先看到 600，
+  //       拿去用就和 `Bp.isLg()` 打架，而且**这种错不会报错**
+  //   ⇒ 断点**只有一个来源**：`core/Bp.ets`（SM/MD/LG，判据见那里的注释）。
 }
 
 /** 主题包：把"当前该用哪套颜色"收成一个对象，组件只认它 */
