@@ -1011,6 +1011,7 @@ struct GameHost {
               //   只 `nonce + 1` 走 `@Watch('onRestart')` ⇒ 组件不重建 ⇒
               //   游戏自己的 `autoId` 不归零 ⇒ 按钮继续显示"停代打"（虽然计时器已停）。
               //   ⇒ 同样先停代打、再切 diffTick 强制重建。
+              Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：重开是重要动作，应有触感
               Hint.stopAllAuto();
               this.nonce = this.nonce + 1;
               this.diffTick = this.diffTick + 1;
@@ -3368,6 +3369,7 @@ struct GameHost {
             // ★ 2026-11-03（第 892 轮）：极小屏 46 → 40（省 6vp，与上面对称）
             .width('100%').height(this.tinyScreen() ? 40 : 46)
             .onClick(() => {
+              Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：这一处原来**没有按压反馈**
               Back.go();
             })
         }

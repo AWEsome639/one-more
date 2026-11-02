@@ -240,7 +240,10 @@ struct LanLobby {
         .width('100%').padding(Space.md)
         .margin({ left: Space.lg, right: Space.lg })
         .backgroundColor(this.theme().surface).borderRadius(Radius.md).shadow(Shadow.card)
-        .onClick(() => this.joinRoom(r))
+        .onClick(() => {
+          Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：加入房间是重要动作
+          this.joinRoom(r);
+        })
       }, (r: LanRoom) => r.ip + ':' + r.port)
 
       Blank()
