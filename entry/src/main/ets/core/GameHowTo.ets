@@ -1835,6 +1835,246 @@ export const HOW_TO: Record<string, HowTo> = {
       'Get 10 right within 60 seconds to clear it; when the clock hits zero you fail'
     ]
   },
+  'modulo_path': {
+    zh: [
+      '5×5 的格子里藏着一条路，起点已经给出',
+      '每次只能走到上下左右相邻、并且数值恰好 +1 的格子（满 8 就归 0）',
+      '把整条路走出来；走满 6 格算通关，踩错 3 次就失败'
+    ],
+    en: [
+      'A hidden path runs through a 5×5 grid, with its start given',
+      'You may only step to an edge-neighbour whose value is exactly one higher, wrapping from 8 back to 0',
+      'Walk the whole path — 6 cells clears it, three wrong steps and you fail'
+    ]
+  },
+  'number_bonds_all': {
+    zh: [
+      '目标数是 n，棋盘上 1 到 n 每个数各出现两次',
+      '每次点两块，只要两块之和 = n 就拆出一组，这两块随即作废',
+      '把所有拆法找齐算通关；点错 3 次就失败'
+    ],
+    en: [
+      'The target is n, and every number from 1 to n appears twice on the board',
+      'Tap two tiles — if they add up to n they form a pair and both are removed',
+      'Find every pairing to clear it; three wrong taps and you fail'
+    ]
+  },
+  'pattern_sequence_draw': {
+    zh: [
+      '3×3 的格子按 1 到 9 编号',
+      '从 1 出发，每次前进 k 格（数到 9 就回到 1），按这个规律依次点格子',
+      '9 格全部按顺序点亮算通关；点错 3 次就失败'
+    ],
+    en: [
+      'A 3×3 grid numbered 1 through 9',
+      'Start at 1 and each time advance k cells, wrapping past 9 back to 1 — tap them in that order',
+      'Light all 9 in sequence to clear it; three wrong taps and you fail'
+    ]
+  },
+  'percentage_shopping': {
+    zh: [
+      '屏幕上一件商品的原价和折扣',
+      '从 4 个选项里算出折后价',
+      '一共 6 件商品，答对 5 件以上算通关'
+    ],
+    en: [
+      'An item’s original price and a discount appear',
+      'Work out the sale price and pick it from four options',
+      'Six items in all; get at least 5 right to clear it'
+    ]
+  },
+  'prime_factor_trees': {
+    zh: [
+      '屏幕上一个合数，要把它一路拆成质因数',
+      '每次都选能整除它的质数，拆到底',
+      '5 棵质因数树里拆对 4 棵算通关'
+    ],
+    en: [
+      'A composite number must be broken down into prime factors',
+      'Each time pick a prime that divides it and keep going to the bottom',
+      'Split 4 of the 5 factor trees correctly to clear it'
+    ]
+  },
+  'prime_gap_hunt': {
+    zh: [
+      '找出相邻两个素数之间的差',
+      '比如 7 和 11 之间隔 4',
+      '一共 10 题，答对 7 题以上算通关'
+    ],
+    en: [
+      'Find the gap between two neighbouring primes',
+      'For example 7 and 11 are 4 apart',
+      'Ten questions in all; get at least 7 right to clear it'
+    ]
+  },
+  'prime_hunter': {
+    zh: [
+      '一个 5×5 的数字阵',
+      '把里面所有素数都点掉，注意别误点合数',
+      '3 关里猎到 2 关算通关'
+    ],
+    en: [
+      'A 5×5 grid of numbers',
+      'Tap away every prime in it, and take care not to hit a composite',
+      'Clear 2 of the 3 rounds to pass'
+    ]
+  },
+  'pythagorean_triple_builder': {
+    zh: [
+      '要构造出一组勾股数（三条边满足 a² + b² = c²）',
+      '按题目要求凑出三条边的长度',
+      '关数按难度（简单 4 / 普通 6 / 困难 8），解出到通关线（3 / 5 / 7）算通关'
+    ],
+    en: [
+      'Build a Pythagorean triple — three sides satisfying a² + b² = c²',
+      'Assemble the side lengths the puzzle asks for',
+      'Rounds depend on difficulty (4 easy, 6 normal, 8 hard); reach the pass line of 3, 5 or 7 to clear it'
+    ]
+  },
+  'radical_roots': {
+    zh: [
+      '把一个根式 √n 化成 a√b 的形式',
+      '要把 n 里所有平方因子都提出来',
+      '一共 8 题，答对 6 题以上算通关'
+    ],
+    en: [
+      'Simplify a radical √n into the form a√b',
+      'Pull every perfect-square factor out of n',
+      'Eight questions in all; get at least 6 right to clear it'
+    ]
+  },
+  'roman_arithmetic': {
+    zh: [
+      '屏幕上是罗马数字写的算式',
+      '算出结果，或者选出正确的罗马数字答案',
+      '一共 8 题，答对 6 题以上算通关'
+    ],
+    en: [
+      'An arithmetic problem written in Roman numerals',
+      'Work out the result, or pick the correct Roman numeral answer',
+      'Eight questions in all; get at least 6 right to clear it'
+    ]
+  },
+  'sequence_sleuth': {
+    zh: [
+      '屏幕上前五项排成一列',
+      '找出它们背后的规律，推出第六项',
+      '一共 8 题，答对 6 题以上算通关'
+    ],
+    en: [
+      'The first five terms of a sequence are laid out',
+      'Spot the rule behind them and work out the sixth',
+      'Eight questions in all; get at least 6 right to clear it'
+    ]
+  },
+  'sequence_stack': {
+    zh: [
+      '屏幕给出已经堆好的数列',
+      '从 4 个候选里选出下一项（规律是等差或等比）',
+      '堆满 8 层算通关；错 3 次就失败'
+    ],
+    en: [
+      'A sequence is shown already stacked up',
+      'Pick the next term from four candidates — the rule is arithmetic or geometric',
+      'Stack all 8 levels to clear it; three mistakes and you fail'
+    ]
+  },
+  'set_theory_venn': {
+    zh: [
+      '给出集合 A、B 和一个数字',
+      '判断这个数字落在哪个区域：只在 A、只在 B、都在、都不在',
+      '一共 8 题，答对 6 题以上算通关'
+    ],
+    en: [
+      'Two sets A and B are given along with a number',
+      'Decide where it lands: only in A, only in B, in both, or in neither',
+      'Eight questions in all; get at least 6 right to clear it'
+    ]
+  },
+  'sum_pyramid': {
+    zh: [
+      '底层 4 个数已经给出',
+      '自下而上把金字塔填满 —— 每个格子是它下面相邻两数之和',
+      '6 格全部填对算通关；错 3 次就失败'
+    ],
+    en: [
+      'The bottom row of four numbers is given',
+      'Fill the pyramid upward — each cell is the sum of the two below it',
+      'Fill all 6 cells correctly to clear it; three mistakes and you fail'
+    ]
+  },
+  'target_10': {
+    zh: [
+      '4×5 的数字格',
+      '点两块相加正好是 10 的牌，把它们消掉',
+      '75 秒内全部消完算通关；时间到还剩牌就失败'
+    ],
+    en: [
+      'A 4×5 grid of numbers',
+      'Tap two tiles that add up to exactly 10 to clear them',
+      'Clear them all within 75 seconds to win; any left when time runs out and you fail'
+    ]
+  },
+  'unit_converter_pro': {
+    zh: [
+      '给一个带单位的数值',
+      '从 4 个选项里选出换算后的正确结果',
+      '一共 10 题，答对 8 题以上算通关'
+    ],
+    en: [
+      'A value arrives with its unit',
+      'Pick the correctly converted result from four options',
+      'Ten questions in all; get at least 8 right to clear it'
+    ]
+  },
+  'vector_dot_product': {
+    zh: [
+      '给出两个向量（2 维或 3 维）',
+      '算出它们的点积',
+      '从 4 个选项里选；一共 8 题，答对 6 题以上算通关'
+    ],
+    en: [
+      'Two vectors are given, either 2D or 3D',
+      'Compute their dot product',
+      'Pick from four options; eight questions, at least 6 right to clear it'
+    ]
+  },
+  'vector_grid_alignment': {
+    zh: [
+      '网格上给出起点和目标格',
+      '按方向键走「向量 (dx, dy)」那么多步，把点走进目标格里',
+      '5 个向量全部对齐算通关；某一回合步数用尽还没对齐就失败'
+    ],
+    en: [
+      'A start and a target cell are marked on a grid',
+      'Step by the vector (dx, dy) to move the point into the target',
+      'Align all 5 vectors to clear it; if a round runs out of steps before you do, you fail'
+    ]
+  },
+  'vektor_vector': {
+    zh: [
+      '给出两个平面向量',
+      '算出 a ± b，从四个候选里选出正确的分量',
+      '8 题里拿到 600 分以上算通关'
+    ],
+    en: [
+      'Two plane vectors are given',
+      'Compute a ± b and pick the correct components from four candidates',
+      'Score above 600 across the 8 questions to clear it'
+    ]
+  },
+  'venn_numbers': {
+    zh: [
+      '两个集合：A 是 3 的倍数，B 是偶数',
+      '把每个数字点进它该在的区域',
+      '6 个数字全部归位、且答错不超过 3 次算通关'
+    ],
+    en: [
+      'Two sets: A holds multiples of 3, B holds even numbers',
+      'Drag each number into the region it belongs to',
+      'Place all 6 correctly with no more than 3 mistakes to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
