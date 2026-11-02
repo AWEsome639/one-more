@@ -22,6 +22,7 @@
 import { fileIo } from '@kit.CoreFileKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
+import { About } from './About';
 
 /** 一条游玩记录（短键名是为了让 JSONL 小一点） */
 export interface PlayRecord {
@@ -275,7 +276,13 @@ export class GameLog {
     };
     const payload: ExportPayload = {
       app: 'One More',
-      version: '1.0.1',
+      // ★ 2026-11-03（第 877 轮）：**版本号只有一个来源**。
+      //   原来这里硬写 '1.0.1'，与 `app.json5` 和 `About.VERSION` 三处并存 ⇒
+      //   改版本要改三处，漏一处就会让导出的备份文件带着旧版本号。
+      //   ⇒ 改为引用 `About.VERSION`（APP 内唯一来源）。
+      //   ⚠️ `app.json5` 那份仍无法运行时读取（ArkTS 没有 BuildConfig 机制），
+      //     所以它需要与 `About.VERSION` **人工同步** —— 这一条已写进 About.ets 注释。
+      version: About.VERSION,
       exportedAt: new Date().toISOString(),
       note: '仅本机生成，未上传任何服务器',
       summary: sum,
