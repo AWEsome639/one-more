@@ -1405,12 +1405,12 @@ export const HOW_TO: Record<string, HowTo> = {
   },
   'algebraic_balance': {
     zh: [
-      '屏幕上一个一元一次方程，比如 3x + 5 = 20，或者 4x - 7 = 9',
+      '屏幕上一个一元一次方程，形如 a·x + b = c（也可能出现减号）',
       '从 4 个候选值里点出 x 的解',
       '一共 10 题，答对 7 题以上算通关'
     ],
     en: [
-      'A one-variable linear equation appears, such as 3x + 5 = 20 or 4x − 7 = 9',
+      'A one-variable linear equation appears, shaped like a·x + b = c (the sign may be a minus too)',
       'Solve for x and tap it among four candidates',
       'Ten questions in all — get at least seven right to clear it'
     ]
