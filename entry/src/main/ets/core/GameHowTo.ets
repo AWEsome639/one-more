@@ -143,6 +143,66 @@ export const HOW_TO: Record<string, HowTo> = {
       'Too many moves and you can restart; “give up” also ends the round'
     ]
   },
+  'continuous_paired_associate': {
+    zh: [
+      '先看 4 组配对（左侧和右侧各自对应），记牢后点「记住了」开始答题',
+      '之后连出 8 题：给出左边那一项，从 4 个右项里挑出刚才配对的它',
+      '中途错满 3 题就失败；答完 8 题算通关'
+    ],
+    en: [
+      'First you see 4 pairs (each left item matched to a right one); memorise them, then tap “got it” to start',
+      'Then 8 questions come in a row: you are shown the left item and must pick its partner from 4 right items',
+      'Three wrong answers and you fail; answer all 8 to clear it'
+    ]
+  },
+  'double_trouble': {
+    zh: [
+      '一屏同时出两个任务：左边算算术，右边认颜色',
+      '颜色题给一个「字义与颜色不符」的字（比如“红”用绿墨水写），要点的是墨水颜色，不是字',
+      '每轮两个都答对才算过；错 3 次生命用尽，撑过 8 轮通关'
+    ],
+    en: [
+      'Two tasks at once on one screen: arithmetic on the left, colour naming on the right',
+      'The colour task shows a word whose meaning fights its ink (say “red” printed in green) — tap the ink colour, not the word',
+      'Both must be right to pass a round; three mistakes cost you all your lives, and surviving 8 rounds clears it'
+    ]
+  },
+  'dual_mirror': {
+    zh: [
+      '两块 4×4 灯板，点一下会让两块同时翻转，而且左右是镜像位置',
+      '点左板 (行,列) 就会同时翻转左板这一格和右板的镜像格；点右板同理',
+      '目标是把两块的灯全部熄灭；步数用完还没灭就算输'
+    ],
+    en: [
+      'Two 4×4 light boards; one tap flips a cell on both boards, at mirrored positions',
+      'Tap a cell on the left board and it flips together with its mirror on the right board; the reverse also holds',
+      'Your goal is to switch every light off on both boards; run out of moves before that and you lose'
+    ]
+  },
+  'flappy': {
+    zh: [
+      '每点一下给一个向上的冲力，不点就一直往下掉',
+      '穿过一根根管道，碰管道或撞地就结束',
+      '穿过指定根数的管道就算通关'
+    ],
+    en: [
+      'Each tap gives an upward kick — stop tapping and you fall',
+      'Fly through the pipes; touching a pipe or the ground ends the run',
+      'Pass the required number of pipes to clear it'
+    ]
+  },
+  'freecell': {
+    zh: [
+      '两门花色各 A~8 共 16 张牌，右上角的「家」按 A→8 的顺序收牌',
+      '列内只能压「刚好小一点」的牌（黑红天然交替），4 个自由格各能暂存 1 张',
+      '两门花色全部归位算通关；再也走不动就输了'
+    ],
+    en: [
+      'Two suits, A to 8, 16 cards in all; the “home” slots at the top right collect them in A→8 order',
+      'Within a column a card may only sit on one exactly one rank higher (black and red alternate naturally); the 4 free cells each hold one card',
+      'Get both suits fully home to clear it; if nothing can move any more, you lose'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
