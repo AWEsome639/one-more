@@ -3325,7 +3325,17 @@ struct GameHost {
         //   ⇒ 给一个**最大宽度**，大屏上就是一个居中卡片。
         .constraintSize({ maxWidth: 560 })
         // ★ 极小屏 padding 减半（32 → 16），再省约 32vp
-        .padding(this.tinyScreen() ? Space.md : Space.xxl)
+        // ★★★ 2026-11-02（第 867 轮）**233 手表真机实测**：
+        //   弹窗是「从底部升起的 sheet」（只有上方圆角），底部原来**零额外 padding**
+        //   ⇒「返回列表」按钮的底边正好落在 y=699 = 屏幕高（**零余量**）。
+        //   在真手表（圆屏）上，底部圆角/手势区会压住它。
+        //   ⇒ 底部单独加 8vp 安全区（其余三边不变）。
+        .padding({
+          left: this.tinyScreen() ? Space.md : Space.xxl,
+          right: this.tinyScreen() ? Space.md : Space.xxl,
+          top: this.tinyScreen() ? Space.md : Space.xxl,
+          bottom: (this.tinyScreen() ? Space.md : Space.xxl) + 8
+        })
         .backgroundColor(this.theme().surface)
         .borderRadius({ topLeft: Radius.xl, topRight: Radius.xl })
         .shadow(Shadow.card)
