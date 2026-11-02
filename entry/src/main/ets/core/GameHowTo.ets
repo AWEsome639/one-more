@@ -1019,6 +1019,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'The number above column c is the sum of the row numbers of that column’s black cells'
     ]
   },
+  'kakuro': {
+    zh: [
+      '4×4 的十字盘，白格里填 1~9，黑格是提示位',
+      '每条横向或竖向的连续串里数字不能重复，且和要等于串首那个提示数',
+      '四条串全部满足算通关；步数用尽就失败'
+    ],
+    en: [
+      'A 4×4 crossword-style grid — fill the white cells with 1–9, the black cells hold the clues',
+      'Within each horizontal or vertical run the digits never repeat, and they add up to the clue at its start',
+      'Satisfy all four runs to clear it; run out of moves and you fail'
+    ]
+  },
+  'kenken': {
+    zh: [
+      '4×4 的盘，每行、每列都要出现 1~4 各一次',
+      '每个同色的「笼」（一组相邻格）里的数字用左上角标出的运算算出目标值',
+      '单格笼就是这个数字本身；行列合法且所有笼都满足算通关'
+    ],
+    en: [
+      'A 4×4 grid where every row and column contains 1–4 exactly once',
+      'Each coloured cage of adjacent cells must reach its target using the operation shown in its corner',
+      'A one-cell cage simply holds that number; satisfy the rows, columns and every cage to clear it'
+    ]
+  },
+  'klotski': {
+    zh: [
+      '经典的「横刀立马」布局：曹操 2×2 在上中，四员大将竖在两侧，关羽横在中间，四卒守底',
+      '点一个方块选中，再点方向键把它推进相邻的空格（一次一格）',
+      '曹操的左上角走到最底部中央那格算通关；步数超过上限就失败'
+    ],
+    en: [
+      'The classic Klotski layout: the 2×2 Cao Cao sits top-centre, four generals stand upright on the sides, Guan Yu lies across the middle, four soldiers guard the bottom',
+      'Tap a block to select it, then press a direction key to slide it into the neighbouring empty space, one step at a time',
+      'Move Cao Cao’s top-left corner to the bottom-centre gap to clear it; exceed the move limit and you fail'
+    ]
+  },
+  'kurodoko': {
+    zh: [
+      '每格可涂黑或留白；带数字的格子一定是白格',
+      '数字 = 从这个格子朝上下左右看出去能看见的黑格数（视线撞到第一个黑格就停）',
+      '两个黑格不能上下左右相邻，而且所有白格必须连成一片'
+    ],
+    en: [
+      'Blacken or leave each cell blank; any cell with a number is always white',
+      'The number counts the black cells visible from that cell in all four directions, stopping at the first black one',
+      'Black cells may not touch edge-to-edge, and every white cell must stay connected'
+    ]
+  },
+  'lighthouses': {
+    zh: [
+      '海面上散布着礁石 🪨 和船只 🚢，要在空水格里放灯塔 💡',
+      '每艘船都必须被至少一座灯塔照到（灯光沿上下左右直射，遇礁石被挡）',
+      '两座灯塔不能互相照到；船全亮且灯塔互不照算通关'
+    ],
+    en: [
+      'Reefs 🪨 and ships 🚢 dot the sea — place lighthouses 💡 in the empty water cells',
+      'Every ship must be lit by at least one lighthouse, whose beam runs straight until a reef blocks it',
+      'No two lighthouses may see each other; light every ship with lighthouses that never meet to clear it'
+    ]
+  },
+  'lights_out': {
+    zh: [
+      '5×5 的灯盘，点一格会让它自己和上下左右四格一起「亮 ↔ 灭」翻转',
+      '每点一下都是这五格同时翻转，没有例外',
+      '全盘熄灭算通关；步数用尽就失败'
+    ],
+    en: [
+      'On a 5×5 board, tapping a cell toggles it and its four edge-neighbours between lit and dark',
+      'Every tap flips exactly those five cells at once',
+      'Switch everything off to clear it; run out of moves and you fail'
+    ]
+  },
+  'magnets': {
+    zh: [
+      '棋盘被切成 8 组横向相邻的两格，每一组就是一块磁铁的两端',
+      '每块磁铁必须一端是正极 ＋、另一端是负极 －，不能两端同极',
+      '最右一列数字 = 该行的正极个数，最下一行数字 = 该列的正极个数'
+    ],
+    en: [
+      'The board is cut into eight horizontal pairs — each pair is the two poles of one magnet',
+      'Every magnet must have one ＋ pole and one － pole; both ends can never be the same',
+      'The rightmost column counts the ＋ poles in that row, and the bottom row counts them in that column'
+    ]
+  },
+  'masyu': {
+    zh: [
+      '用一条不交叉、不自交的闭合回路穿过所有圆圈',
+      '⚫ 黑圈处必须拐弯（前后两格在它的垂直方向上）',
+      '⚪ 白圈处必须直行（前后两格在同一直线上）；回路闭合且所有圆圈规则都满足算通关'
+    ],
+    en: [
+      'Thread one closed loop through every circle — no crossings, no self-intersections',
+      'At a ⚫ black circle the loop must turn, with the two neighbouring cells perpendicular to each other',
+      'At a ⚪ white circle it must run straight; close the loop with every circle rule satisfied to clear it'
+    ]
+  },
+  'math_maze': {
+    zh: [
+      '从左上角走到右下角 🏁，只能上下左右走，而且不能走回头路',
+      '走过的格子数字会全部累加',
+      '到达终点时总路径和必须恰好等于目标数；中途超出、步数用尽、或到了终点但和不对都算失败'
+    ],
+    en: [
+      'Travel from the top-left corner to the 🏁 bottom-right, moving only up, down, left or right, without retracing',
+      'The digits of every cell you cross are added up along the way',
+      'Your total must equal the target exactly when you arrive; overshooting, running out of moves, or arriving with the wrong sum all fail'
+    ]
+  },
+  'nurikabe': {
+    zh: [
+      '每个数字是一块「岛」，岛的格数必须恰好等于那个数字',
+      '其余格子涂黑，全部黑格要连成一整片墙',
+      '墙里不能出现 2×2 的整块黑格；不可逆的错手满 3 次就失败'
+    ],
+    en: [
+      'Each number seeds an island whose size must equal that number exactly',
+      'Every other cell is blackened, and all black cells must form one connected wall',
+      'The wall may never contain a solid 2×2 block; three irreversible mistakes and you fail'
+    ]
+  },
+  'norinori': {
+    zh: [
+      '每块区域里恰好放 2 个黑格',
+      '所有黑格必须两两拼成多米诺（每对横向或竖向相邻）',
+      '4 块区域各 2 个黑格、黑格全部成对算通关；非法落子满 5 次就失败'
+    ],
+    en: [
+      'Each region holds exactly two black cells',
+      'All black cells must pair up into dominoes — each pair adjacent horizontally or vertically',
+      'Two black cells in every region with all of them paired clears it; five illegal placements and you fail'
+    ]
+  },
+  'shikaku': {
+    zh: [
+      '把整盘切成若干个矩形',
+      '每块矩形里恰好有一个数字，而且矩形的格数要等于那个数字',
+      '25 格全部被合法矩形覆盖算通关；非法尝试满 3 次就失败'
+    ],
+    en: [
+      'Cut the whole board into rectangles',
+      'Each rectangle must contain exactly one number, and its cell count must equal that number',
+      'Cover all 25 cells with legal rectangles to clear it; three illegal attempts and you fail'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
