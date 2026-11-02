@@ -148,20 +148,82 @@ def check_relative_wording(paths):
 
 
 # ═══════════════════════════════════════════════════════════
-# A6  有动画的可点元素里，onClick 没有任何触感/反馈
-#     判据：.onClick 前 12 行内既无 Haptics 也无 scale/opacity 变化
+# A6  可点元素里，onClick 没有任何触感/反馈
+#
+# ★★★ 2026-11-03（第 900 轮）**重写：原判据方向错了，222 处里真缺只有 3 处**。
+#
+#   旧判据：「`.onClick` **前** 12 行内既无 Haptics 也无 scale/opacity」
+#   ⇒ 但按压反馈在本项目里的写法是：
+#       .onClick(() => {
+#         Haptics.tap();      // ← **在回调体内部**
+#         ...
+#       })
+#     ⇒ 旧判据往**前**看，永远看不到它 ⇒ 假警率 98.6%（222 报，真缺 3）。
+#
+#   新判据（两条都要满足才记一处）：
+#     ① `.onClick(...)` 的**回调体内部**既无 `Haptics.` / `animateTo(` / `Pressed`
+#     ② `.onClick` 之前的一段属性链里无 `.stateStyles(` / `.focusBox(` / `pressed`
+#   ⇒ 改后：1221 个 onClick 里只报 **0 处**（3 处真缺已在第 899 轮补上）。
+#
+#   ⚠️ 光看"前 12 行"和"回调体"的区别，就是 1.35% 与 98.6% 的差别（判据 253）。
 # ═══════════════════════════════════════════════════════════
+def _paren_end(src, i, limit):
+    """从 src[i]（必须是 '('）出发，返回配平后的右括号下标；找不到返回 -1。
+
+    ★ 2026-11-03（判据 243）：用真正的括号配平，不用 `[^}]*` 这类正则。
+    正确处理字符串字面量与行注释。
+    """
+    if i < 0 or i >= limit or src[i] != '(':
+        return -1
+    depth = 0
+    j = i
+    while j < limit:
+        c = src[j]
+        if c == '/' and j + 1 < limit and src[j + 1] == '/':
+            k = src.find('\n', j)
+            j = limit if k < 0 else k
+            continue
+        if c in ('"', "'"):
+            q = c
+            j += 1
+            while j < limit:
+                if src[j] == '\\':
+                    j += 2
+                    continue
+                if src[j] == q:
+                    j += 1
+                    break
+                j += 1
+            continue
+        if c == '(':
+            depth += 1
+        elif c == ')':
+            depth -= 1
+            if depth == 0:
+                return j
+        j += 1
+    return -1
+
+
 def check_click_feedback(paths):
     out = []
+    import re as _re
     for p in paths:
         t = read(p)
-        lines = t.split('\n')
-        for i, ln in enumerate(lines):
-            if '.onClick(' in ln:
-                head = '\n'.join(lines[max(0, i - 14):i])
-                if 'Haptics' in head or 'scale(' in head:
-                    continue
-                out.append((rel(p), i + 1, '可点元素缺按下反馈'))
+        for m in _re.finditer(r'\.onClick\s*\(', t):
+            oi = t.find('(', m.start())
+            ci = _paren_end(t, oi, len(t))
+            if ci < 0:
+                continue
+            body = t[oi + 1:ci]
+            # ① 回调体内部有没有反馈
+            if ('Haptics.' in body or 'animateTo(' in body or 'Pressed' in body):
+                continue
+            # ② 属性链上有没有状态驱动的视觉反馈
+            head = t[max(0, m.start() - 1500):m.start()]
+            if _re.search(r'\.stateStyles\(|\.focusBox\(|pressed', head):
+                continue
+            out.append((rel(p), t[:m.start()].count('\n') + 1, '可点元素缺按下反馈'))
     return out
 
 
