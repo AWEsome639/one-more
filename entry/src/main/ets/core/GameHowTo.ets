@@ -3827,6 +3827,234 @@ export const HOW_TO: Record<string, HowTo> = {
       'Trace all 3 routes to clear it; four breaks and you fail'
     ]
   },
+  'action_sequence_recall': {
+    zh: [
+      '屏幕上一个机器人依次做几个动作',
+      '看清顺序，然后按同样的顺序把动作点一遍',
+      '6 关全过算通关；错 3 次就失败'
+    ],
+    en: [
+      'A robot performs a few actions in sequence',
+      'Watch the order, then tap those same actions back in that order',
+      'Clear all 6 rounds to win; three mistakes and you fail'
+    ]
+  },
+  'binary_matrix_rank_all': {
+    zh: [
+      '一个 6×6 的 0/1 矩阵',
+      '点一行选中、再点另一行，就把后者异或上前者（秩不变；同样两行再点一遍即复原）',
+      '用这个办法算出矩阵在模 2 下的秩；6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'A 6×6 matrix of zeros and ones',
+      'Tap one row to select it, then another to XOR it into that one — the rank is unchanged, and repeating the same two rows restores it',
+      'Use that to find the matrix rank over GF(2); get at least 4 of 6 right to clear it'
+    ]
+  },
+  'block_stacking_physics': {
+    zh: [
+      '三根柱子，各有自己的内宽和限高',
+      '方块的宽度必须与柱子的内宽完全相等才塞得进 —— 不许悬空压边',
+      '把清单上的方块全部放完算通关；某一根柱超高失衡就失败'
+    ],
+    en: [
+      'Three columns, each with its own inner width and height limit',
+      'A block only fits where its width exactly matches the column’s inner width — no overhanging edges',
+      'Place every block on the list to clear it; if any column is overloaded and topples, you fail'
+    ]
+  },
+  'chain_reaction': {
+    zh: [
+      '棋盘每格有自己的容量（等于它的邻居数）',
+      '点一下给某格加一个光点；一旦超过容量就「炸」—— 那格清空，四邻各 +1，可以连锁下去',
+      '一次点击让全盘每一格都炸开算通关；步数用尽就失败'
+    ],
+    en: [
+      'Each cell has a capacity equal to its number of neighbours',
+      'A tap adds one light to that cell; once it exceeds capacity it bursts — the cell empties and each neighbour gains one, which can chain',
+      'Clear it with a single tap that sets the whole board bursting; run out of moves and you fail'
+    ]
+  },
+  'color_match': {
+    zh: [
+      '5×5 的彩盘',
+      '点中的格子如果和四邻有同色，就连同那一整片同色一起消掉',
+      '消完会塌落、空列左移、顶部补新色；在步数内达到目标分算通关'
+    ],
+    en: [
+      'A 5×5 board of colours',
+      'If the tapped cell touches a neighbour of the same colour, that whole connected patch clears together',
+      'The rest collapses, empty columns shift left and new colours drop in; hit the target score within the move limit to clear it'
+    ]
+  },
+  'complex_folding_nets': {
+    zh: [
+      '一条纸条沿标线依次对折（折痕可能在中间或四分之一处）',
+      '每一次对折都会让纸层叠起来',
+      '问标记处一共叠了几层；8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A strip of paper is folded along marked lines one after another, at the middle or the quarter mark',
+      'Each fold doubles up the layers of paper',
+      'Say how many layers sit at the marked point; get at least 6 of 8 right to clear it'
+    ]
+  },
+  'counting_sheep': {
+    zh: [
+      '狼披着羊皮混进了羊圈：一只羊 🐑 占 1 格，一头狼 🐺 占 2 格',
+      '题型一「按格数」：一共占了几格；题型二「按只数」：真正的羊有几只',
+      '10 题答对 7 题以上算通关'
+    ],
+    en: [
+      'Wolves are hiding among the sheep: each sheep 🐑 takes one cell, each wolf 🐺 takes two',
+      'One question type asks how many cells are occupied; the other asks how many actual sheep there are',
+      'Get at least 7 of 10 right to clear it'
+    ]
+  },
+  'cross_section_slice': {
+    zh: [
+      '5×5×5 的方块堆，只画出第 h 层的平面图（黑格有方块、灰格是空的）',
+      '要靠这张平面图逆推这一层一共有几个方块',
+      '8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A 5×5×5 stack of blocks, with only layer h drawn as a plan view (black cells hold blocks, grey are empty)',
+      'Deduce from that plan how many blocks are on this layer',
+      'Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'cryptogram_all': {
+    zh: [
+      '一段凯撒移位密文 —— 每个字母都被整体平移了 k 位',
+      '密钥只露出其中几位，其余要靠四个候选词反推',
+      '推出原词；8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A Caesar-shifted ciphertext where every letter has been moved by k places',
+      'Only a few key letters are revealed — recover the rest by working back from four candidate words',
+      'Recover the original word; get at least 6 of 8 right to clear it'
+    ]
+  },
+  'directions_recall': {
+    zh: [
+      '一串箭头依次闪出',
+      '凭记忆按原来的顺序把它们点回来',
+      '共 5 关，长度从 3 加到 7；点错本关就失败，自动进下一关（回放不扣分）'
+    ],
+    en: [
+      'A string of arrows flashes past in order',
+      'Tap them back in the original order from memory',
+      'Five rounds growing from 3 arrows to 7; a wrong tap fails that round and moves you on (replays cost nothing)'
+    ]
+  },
+  'distractor_matrix': {
+    zh: [
+      '4×4 的符号矩阵里混着两种符号',
+      '要在限时内数出目标那一种的个数',
+      '干扰项会越来越多；8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'Two kinds of symbol are mixed in a 4×4 matrix',
+      'Count how many of the target kind there are, against the clock',
+      'Distractors increase as you go; get at least 6 of 8 right to clear it'
+    ]
+  },
+  'einstein_riddle': {
+    zh: [
+      '三栋排屋、三种宠物，谜面给出若干线索',
+      '所有线索合起来只能推出唯一答案',
+      '点格子循环切换宠物（🐱🐟🐦，不能重复）；三项都填对算通关'
+    ],
+    en: [
+      'Three houses in a row and three pets, with a handful of clues',
+      'Together the clues admit exactly one arrangement',
+      'Tap a cell to cycle its pet (🐱🐟🐦, no repeats); fill all three correctly to clear it'
+    ]
+  },
+  'fact_binder': {
+    zh: [
+      '左栏 5 条事实，右栏 5 个答案（已经打乱）',
+      '左右各点一个就完成一次配对，配对正确会变绿',
+      '5 组全部绑定算通关；失误满 3 次就失败'
+    ],
+    en: [
+      'Five facts on the left, their five answers shuffled on the right',
+      'Tap one on each side to bind them; a correct pairing turns green',
+      'Bind all 5 pairs to clear it; three mistakes and you fail'
+    ]
+  },
+  'gear_train_direction': {
+    zh: [
+      '一串齿轮首尾相接',
+      '看每个连接处是啮合（反向）还是皮带（同向）',
+      '一段段推理下去，判断末端那个齿轮的转向；8 题全过算通关，答错 3 题就失败'
+    ],
+    en: [
+      'A train of gears joins end to end',
+      'Check whether each link is meshed (reverses) or belted (same direction)',
+      'Reason along the chain to the last gear’s direction; clear all 8 to win, three wrong answers and you fail'
+    ]
+  },
+  'geometric_vision': {
+    zh: [
+      'A、B 两块图形，各自由 12 个小方格里的若干格拼成',
+      '比一比哪一块占的格子更多',
+      '10 题全过算通关；答错 3 题就失败'
+    ],
+    en: [
+      'Two shapes A and B, each assembled from some of the cells in a 12-cell grid',
+      'Decide which one covers more cells',
+      'Clear all 10 to win; three wrong answers and you fail'
+    ]
+  },
+  'graph_coordinate_plot': {
+    zh: [
+      '网格是一张 5×5 的画布',
+      '按给出的坐标顺序依次点格子',
+      '8 个点全部按顺序点亮，会围出一个菱形；全部点上算通关，点错 3 次就失败'
+    ],
+    en: [
+      'The grid is a 5×5 canvas',
+      'Tap the cells in the coordinate order given',
+      'Light all 8 in sequence and a diamond takes shape; plot them all to clear it, three wrong taps and you fail'
+    ]
+  },
+  'gravity_sort': {
+    zh: [
+      '点一列，整列会按重力塌落下来',
+      '同色叠在一起就会被消掉',
+      '22 步内清空棋盘算通关'
+    ],
+    en: [
+      'Tap a column and it collapses under gravity',
+      'Same colours landing together are cleared away',
+      'Empty the board within 22 moves to clear it'
+    ]
+  },
+  'logical_syllogisms': {
+    zh: [
+      '给出两个前提和一个结论',
+      '判断这个推理是否站得住（结论是不是真的能从前提推出来）',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'Two premises and a conclusion are given',
+      'Decide whether the reasoning holds — does the conclusion really follow from the premises?',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'maze_nav_3d': {
+    zh: [
+      '一个 5×5×3 的立体迷宫',
+      '用方向键在水平面上移动，用 ↑↓ 按钮换一层',
+      '从起点走到终点算通关；步数越少分越高'
+    ],
+    en: [
+      'A 5×5×3 three-dimensional maze',
+      'Use the arrow keys to move within a level and the ↑↓ buttons to change floors',
+      'Get from start to finish to clear it; fewer steps scores higher'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
