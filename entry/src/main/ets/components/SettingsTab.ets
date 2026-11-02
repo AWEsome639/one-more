@@ -302,7 +302,7 @@ export struct SettingsTab {
         Text(this.starHint)
           .fontSize(FontSize.xxs).fontColor(Palette.rose)
           .width('100%')
-          .maxLines(3)
+          .maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
       }
     }
     .width('100%')

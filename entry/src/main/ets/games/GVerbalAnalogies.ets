@@ -303,7 +303,7 @@ export struct GVerbalAnalogies {
       Column({ space: Space.xs }) {
         Text(TG('词语类比')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(this.cur().stem).fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
-          .fontColor(Palette.cyan).maxLines(3)
+          .fontColor(Palette.cyan).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
@@ -311,7 +311,7 @@ export struct GVerbalAnalogies {
           (o: Opt, i: number) => 'p' + i + o.text)
       }.width('100%')
       Row({ space: Space.md }) {
-        Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2)
+        Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)

@@ -282,7 +282,7 @@ export struct GStoryBuilder {
           (line: string, i: number) => 'l' + i + line)
       }.width('100%')
       Row({ space: Space.md }) {
-        Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2)
+        Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
@@ -304,7 +304,7 @@ export struct GStoryBuilder {
     Row({ space: Space.sm }) {
       Text(i < this.placed ? '✅' : '＋').fontSize(FontSize.sm)
         .fontColor(i < this.placed ? Palette.emerald : this.theme.inkFaint)
-      Text(line).fontSize(FontSize.md).layoutWeight(1).maxLines(2)
+      Text(line).fontSize(FontSize.md).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(i < this.placed ? this.theme.inkFaint : this.theme.ink)
     }.width('100%').padding(Space.sm).borderRadius(Radius.md).shadow(Shadow.card)
       .backgroundColor(i < this.placed ? this.theme.surfaceAlt : this.theme.surface).animation({ duration: Motion.fast, curve: Motion.snap() })

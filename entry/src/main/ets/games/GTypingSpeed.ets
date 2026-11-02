@@ -311,7 +311,7 @@ export struct GTypingSpeed {
       Column({ space: Space.xs }) {
         Text(TG('照着打这一句')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(this.target()).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
-          .fontColor(this.theme.ink).maxLines(3)
+          .fontColor(this.theme.ink).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
       TextInput({ text: this.typed, placeholder: TG('在这里输入…') })
@@ -327,7 +327,7 @@ export struct GTypingSpeed {
           }
         })
       Row({ space: Space.md }) {
-        Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2)
+        Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)

@@ -1634,7 +1634,7 @@ export struct GFutoshiki {
           .fontSize(FontSize.xs)
           .fontColor(this.theme.inkSoft)
           .layoutWeight(2)
-          .maxLines(2)
+          .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Button(TG('提示'))
           .fontSize(FontSize.sm)
           .fontColor('#FFFFFF')

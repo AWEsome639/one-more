@@ -356,7 +356,7 @@ export struct GWordLadder {
         .focusBox(Tv.box())
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPos((i)); }); }) }, (i: number) => 's' + i)
       }.width('100%')
-      Text(this.trail.join(' → ')).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').maxLines(2)
+      Text(this.trail.join(' → ')).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
