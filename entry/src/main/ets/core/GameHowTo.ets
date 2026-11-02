@@ -3539,6 +3539,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'Tap that cell; get at least 4 of 6 right to clear it'
     ]
   },
+  'hue_sort': {
+    zh: [
+      '16 个色块被打乱排在一格里',
+      '点两个格子就能交换它们的位置',
+      '在步数上限内把色块按色相排成一道严格递增的彩虹算通关（简单 27 步 / 普通 18 / 困难 15）'
+    ],
+    en: [
+      'Sixteen colour tiles sit scrambled in a grid',
+      'Tap two cells to swap their contents',
+      'Arrange them into a strictly ascending rainbow within the move limit (27 easy, 18 normal, 15 hard) to clear it'
+    ]
+  },
+  'interlock_puzzle': {
+    zh: [
+      '几块卡榫互相咬住，压在一起',
+      '只能先抽出「没有被别人压着」的那一块',
+      '在步数预算内全部抽出来算通关（简单 12 步 / 普通 8 / 困难 6）'
+    ],
+    en: [
+      'Several interlocking parts are wedged together',
+      'You may only pull out a part that nothing else is pressing on',
+      'Extract every part within the move budget to clear it (12 easy, 8 normal, 6 hard)'
+    ]
+  },
+  'laser_link': {
+    zh: [
+      '棋盘上摆着镜子和两束激光',
+      '点镜子让它旋转，把激光折进各自的探头（／ 右→上、上→右；＼ 右→下、下→右）',
+      '14 步内点亮全部探头算通关'
+    ],
+    en: [
+      'Mirrors and two laser beams sit on the board',
+      'Tap a mirror to rotate it and steer each beam into its own receiver (／ turns right to up and up to right; ＼ turns right to down and down to right)',
+      'Light every receiver within 14 moves to clear it'
+    ]
+  },
+  'laser_reflect': {
+    zh: [
+      '这一版光路更长更绕，需要用六块镜子导两束光',
+      '点镜子旋转，把两束激光都折进探头',
+      '18 步内点亮全部探头算通关'
+    ],
+    en: [
+      'This version has longer, twistier paths — six mirrors steer two beams',
+      'Tap mirrors to rotate them and bend both beams into their receivers',
+      'Light every receiver within 18 moves to clear it'
+    ]
+  },
+  'mental_mapping': {
+    zh: [
+      '屏幕先亮出几个地点（emoji）在九宫格上的位置，记住后它们会隐去',
+      '然后题目会问「从 A 走到 B 要往哪个方向」',
+      '凭记忆点出那个方向'
+    ],
+    en: [
+      'Several landmarks light up on a 3×3 grid — memorise where, then they vanish',
+      'You are then asked which direction it is from A to B',
+      'Tap that direction from memory'
+    ]
+  },
+  'mental_rotation': {
+    zh: [
+      '左边是一组图形，右边是另一组',
+      '判断右边那组是左边的「纯旋转」，还是被偷偷镜像过了',
+      '10 题答对 8 题以上算通关'
+    ],
+    en: [
+      'A shape sits on the left, another on the right',
+      'Decide whether the right one is a pure rotation of the left, or has been secretly mirrored',
+      'Get at least 8 of 10 right to clear it'
+    ]
+  },
+  'mirror_image': {
+    zh: [
+      '左边一个图形，右边一个图形',
+      '判断右边是不是左边沿中轴翻转出来的真镜像',
+      '10 题答对 8 题以上算通关'
+    ],
+    en: [
+      'One shape on the left, one on the right',
+      'Decide whether the right one is a true mirror image of the left, flipped across the axis',
+      'Get at least 8 of 10 right to clear it'
+    ]
+  },
+  'mirror_maze': {
+    zh: [
+      '屏幕是镜中的世界 —— 世界左右颠倒',
+      '所以按「左」其实会往右走，「右」其实往左',
+      '走到 🏁 算通关；步数耗尽就失败'
+    ],
+    en: [
+      'The screen shows a mirrored world — left and right are swapped',
+      'So pressing “left” actually goes right, and “right” goes left',
+      'Reach the 🏁 to clear it; run out of steps and you fail'
+    ]
+  },
+  'mirror_tracing': {
+    zh: [
+      '你在一面镜子上描线 —— 点左边，画出来的却在右边',
+      '沿着目标形状一点点描过去',
+      '3 关全部画完算通关；笔数耗尽就失败（可以「擦掉」反悔）'
+    ],
+    en: [
+      'You are tracing on a mirror — tap on the left and the line appears on the right',
+      'Trace your way around the target shape',
+      'Complete all 3 rounds to clear it; run out of strokes and you fail (you can erase to undo)'
+    ]
+  },
+  'navon_hierarchical': {
+    zh: [
+      '一张图里，大图形是一个字母，而构成它的小图形又是另一个字母',
+      '每题两问都要答：大图是什么？小图是什么？',
+      '12 题里每题两问全对才算这一题得分；答对 8 题以上算通关'
+    ],
+    en: [
+      'In one image the large shape is one letter, while the small shapes composing it spell another',
+      'Each question asks both: what is the big letter, and what is the small one?',
+      'A question only scores if both answers are right; score 8 of 12 to clear it'
+    ]
+  },
+  'odd_one_out': {
+    zh: [
+      '一格里密密麻麻排着一堆相同字符',
+      '其中混进了一个「不一样的字符」',
+      '把它点出来；10 题答对 8 题以上算通关'
+    ],
+    en: [
+      'A grid is packed with identical characters',
+      'One different character is hidden among them',
+      'Tap it out; get at least 8 of 10 right to clear it'
+    ]
+  },
+  'paper_folding': {
+    zh: [
+      '纸被对折了两次，所以你看到的是左上角那四分之一',
+      '在折好的纸上打孔',
+      '展开后孔会镜像成四份；与目标图案完全一致算通关，步数用尽还没对上就失败'
+    ],
+    en: [
+      'The paper is folded twice, so you only see the top-left quarter',
+      'Punch holes into the folded paper',
+      'When unfolded each hole mirrors into four — match the target exactly to clear it, or run out of moves and fail'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
