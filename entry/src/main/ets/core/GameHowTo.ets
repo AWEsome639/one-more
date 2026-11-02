@@ -563,6 +563,102 @@ export const HOW_TO: Record<string, HowTo> = {
       'Guess it within 10 tries to clear; run out and you fail'
     ]
   },
+  'kakuro_mini': {
+    zh: [
+      '3×3 每格填 1~9，每行、每列的数字都不能重复',
+      '每一行、每一列的数字和必须等于旁边给出的提示数',
+      '六条线（3 行 3 列）全部满足算通关；超过 40 步还没解出就失败'
+    ],
+    en: [
+      'Fill a 3×3 grid with 1–9, no repeats within any row or column',
+      'Each row and column must add up to the clue shown beside it',
+      'Satisfy all six lines (three rows, three columns) to clear it; more than 40 moves and you fail'
+    ]
+  },
+  'life_game': {
+    zh: [
+      '每个细胞看它周围 8 格：活细胞有 2~3 个活邻居就继续活，死细胞恰好 3 个活邻居就诞生',
+      '点格子可以随时人工干预，加上或拿掉一个细胞',
+      '撑满 60 代不灭绝算通关；中途全部死光就失败'
+    ],
+    en: [
+      'Each cell looks at its 8 neighbours: a live cell with 2–3 live neighbours survives, a dead cell with exactly 3 is born',
+      'Tap cells any time to interfere by hand — add one or remove one',
+      'Survive 60 generations without dying out to clear it; if everything dies, you fail'
+    ]
+  },
+  'lock_pattern': {
+    zh: [
+      '3×3 一共九个点，系统先闪一遍图案，然后你来画出同样的图案',
+      '必须按同样的顺序连，点错一个就结束',
+      '连对 5 关算通关，图案会从 3 个点一路加到 7 个点'
+    ],
+    en: [
+      'Nine dots in a 3×3 grid; the game flashes a pattern, then you draw the same one',
+      'Follow the same order — one wrong dot ends the run',
+      'Clear 5 rounds in a row, with the pattern growing from 3 dots all the way to 7'
+    ]
+  },
+  'mandelbrot': {
+    zh: [
+      '每一题给一张放大后的分形局部图，画面正中的 ＋ 就是那个待判定的点',
+      '判断这个点是否属于曼德博集合（迭代不逃逸就属于）',
+      '凭图形边缘的纹路判断 —— 越靠近边界越难'
+    ],
+    en: [
+      'Each round shows a magnified slice of the fractal; the ＋ at the very centre marks the point in question',
+      'Decide whether that point belongs to the Mandelbrot set (it does if the iteration never escapes)',
+      'Judge by the texture around the edges — the closer to the boundary, the harder it gets'
+    ]
+  },
+  'match3': {
+    zh: [
+      '点一个果子，再点它上下左右相邻的一个，两者交换位置',
+      '交换后能连成 3 个以上同色才会生效并消掉，否则会换回去',
+      '消掉后上方的果子落下补新，一次连消越多得分越高'
+    ],
+    en: [
+      'Tap one fruit, then a neighbour above, below, left or right — the two swap places',
+      'The swap only counts if it lines up three or more of a colour; otherwise it swaps back',
+      'Cleared fruit drops in from above and chains score more the longer they run'
+    ]
+  },
+  'minesweeper': {
+    zh: [
+      '9×9 的雷区里埋着 10 颗雷，点格子翻开',
+      '第一次点击一定安全，而且周围会自动留出一片空白',
+      '数字表示它周围 8 格里有几颗雷，据此推断剩下的雷在哪'
+    ],
+    en: [
+      'Ten mines hide in a 9×9 field — tap a cell to open it',
+      'Your first tap is always safe and automatically clears an opening area around it',
+      'A number tells how many of its 8 neighbours are mines; deduce where the rest sit'
+    ]
+  },
+  'peg_solitaire': {
+    zh: [
+      '点一颗棋子选中，再点同一条直线上隔一格的空位',
+      '跳过去之后，被跳过的那颗棋子就拿掉',
+      '全盘没有任何可跳的走法时结算；只剩 1 颗算通关'
+    ],
+    en: [
+      'Tap a peg to select it, then tap an empty hole two steps away in the same line',
+      'The peg jumps over, and the peg it jumped is removed',
+      'The game settles when no jump remains; finish with exactly one peg to clear it'
+    ]
+  },
+  'go9': {
+    zh: [
+      '9×9 的交叉点上落子（不是格子里），你执黑先行，AI 执白',
+      '气就是上下左右相邻的空点；一块棋没气就会被提掉',
+      '按中国规则数子，占地多的一方赢'
+    ],
+    en: [
+      'Play on the 9×9 intersections (not the squares); you take black and move first, the AI plays white',
+      'Liberties are the empty points next to a stone; a group with no liberties is captured',
+      'Scoring follows Chinese rules — whoever holds more territory wins'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
