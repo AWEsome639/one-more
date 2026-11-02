@@ -3240,7 +3240,7 @@ struct GameHost {
               Text(Digits(String(this.scoreShown), this.langCode))
                 // ★ 2026-11-02（第 851 轮）：结算弹窗在 233 手表上会显示，
                 //   这三行是同一套三卡 HUD 布局 ⇒ 同样会折行 ⇒ 同一套修法。
-                .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold)
+                .fontSize(this.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold)
                 .fontColor(this.theme().ink)
               Text(this.t('得分', 'Score')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
             }.layoutWeight(1)
@@ -3248,7 +3248,7 @@ struct GameHost {
             .animation({ duration: Motion.base, curve: Motion.spring() })
             Column({ space: 2 }) {
               Text((this.lastMs / 1000).toFixed(1) + 's')
-                .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold)
+                .fontSize(this.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold)
                 .fontColor(this.theme().ink)
               Text(this.t('用时', 'Time')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
             }.layoutWeight(1)
@@ -3256,7 +3256,7 @@ struct GameHost {
             .animation({ duration: Motion.base, curve: Motion.spring(), delay: 80 })
             Column({ space: 2 }) {
               Text('+' + String(this.gainShown))
-                .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold)
+                .fontSize(this.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold)
                 .fontColor(Palette.emerald)
               Text(this.t('经验', 'XP')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
             }.layoutWeight(1)
