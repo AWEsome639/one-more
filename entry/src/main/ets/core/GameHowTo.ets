@@ -491,6 +491,78 @@ export const HOW_TO: Record<string, HowTo> = {
       'Clear it with 10 hits inside 25 seconds; when time runs out you fail'
     ]
   },
+  'game24': {
+    zh: [
+      '开局给你 4 个数，用 ＋ − × ÷ 把它们的全部用上、凑出 24',
+      '点一个数、再点另一个数、最后点运算符，两个数就合并成一个结果',
+      '每一局都穷举校验过，保证一定有解'
+    ],
+    en: [
+      'You get four numbers — combine all of them with + − × ÷ to reach exactly 24',
+      'Tap one number, then another, then an operator, and the two merge into one result',
+      'Every puzzle is exhaustively verified, so a solution always exists'
+    ]
+  },
+  'gomoku': {
+    zh: [
+      '15×15 棋盘，你执黑先下，目标是把五颗子连成一条线（横竖斜都算）',
+      '电脑会用启发式评分：能成五就直接赢，你要成五就先堵',
+      '谁先连成五颗谁赢'
+    ],
+    en: [
+      'A 15×15 board; you play black and move first — line up five in a row, any direction',
+      'The computer scores heuristically: it wins immediately if it can, and blocks you if you can',
+      'Whoever makes five first wins'
+    ]
+  },
+  'hanoi': {
+    zh: [
+      '一次只能移动一个盘子，而且大盘不能压在小盘上面',
+      '目标是把所有盘子从最左边的柱子搬到最右边那根',
+      '右边柱子上的盘数等于总数时通关'
+    ],
+    en: [
+      'Move one disc at a time, and a larger disc may never sit on a smaller one',
+      'Your goal is to move every disc from the leftmost peg to the rightmost peg',
+      'You clear it when the right peg holds all the discs'
+    ]
+  },
+  'mahjong_solitaire': {
+    zh: [
+      '4×4 共 16 张牌（萬/筒各 1~4 各两张），点两张相同的牌配对',
+      '两张牌之间要能用不超过两个拐弯、且只经过空格的路连起来才能消',
+      '全部消完算通关；重排多次仍无解就失败'
+    ],
+    en: [
+      'Sixteen tiles in a 4×4 grid (1–4 of two suits, two of each); tap two matching tiles to pair them',
+      'They clear only if a path connects them with at most two turns, passing over empty spaces',
+      'Clear every tile to win; if reshuffles leave you stuck, you fail'
+    ]
+  },
+  'mancala': {
+    zh: [
+      '轮到你时选一个自己的坑，把里面的石子一颗颗撒进后面的坑（跳过对手的库）',
+      '最后一颗落进自己的库，就能再来一次',
+      '最后一颗落进自己的空坑，就把对家正对那个坑的石子一起收走'
+    ],
+    en: [
+      'On your turn pick one of your pits and sow its stones one by one into the following pits, skipping your opponent’s store',
+      'If the last stone lands in your own store, you get another turn',
+      'If it lands in an empty pit of yours, you also capture the stones in your opponent’s pit directly opposite'
+    ]
+  },
+  'mastermind': {
+    zh: [
+      '4 个位置、6 种颜色，颜色可以重复；每轮摆出一组猜的组合',
+      '提交后给反馈：● 位置和颜色都对，○ 颜色对但位置不对',
+      '10 次之内猜中算通关；用完 10 次还没中就失败'
+    ],
+    en: [
+      'Four positions, six colours, repeats allowed — set down a guess each round',
+      'After you submit you get feedback: ● right colour and right spot, ○ right colour but wrong spot',
+      'Guess it within 10 tries to clear; run out and you fail'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
