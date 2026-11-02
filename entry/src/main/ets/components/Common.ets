@@ -1056,6 +1056,38 @@ export struct CategoryBar {
     return L(c, catLabelEn(c));
   }
 
+  /**
+   * ★★★ 2026-11-02（第 894 轮）：分类条右端渐隐。
+   *   问题：`scrollBar(BarState.Off)` 让用户看不出"还能往右滑"，
+   *        首屏看到「空间」被切一半（853×533 横屏），以为坏了。
+   *   做法：右端叠一条 12vp 的「页面底色渐隐」，沿 90° 从全透明过渡到不透明。
+   *   ⚠️ **必须用 `overlay` 而不是包一层 Stack**：
+   *      第一版写成 `Stack({ alignContent: End }) { Scroll(); Column().height('100%') }` ⇒
+   *      那个 `height('100%')` 的兄弟把 Stack 撑满父容器，
+   *      **把下面的分类胶囊整个挤出可见区，滚也滚不出来**（真机抓到）。
+   *      `overlay` 不参与布局测量 ⇒ 零影响。
+   *   ⚠️ 12vp < `.padding({ right: Space.lg })` 的 24vp
+   *      ⇒ 即使滚到最右，最后一项也不会被遮住。
+   */
+  private fadeColor(): string {
+    const b: string = this.theme.bg;          // 形如 #FAF8F3
+    return b.length === 7 ? '#00' + b.substring(1) : b;
+  }
+
+  /** 右端渐隐层（@Builder 供 overlay 用，不参与布局） */
+  @Builder
+  fadeHint() {
+    Column()
+      .width(12)
+      .height(28)                  // ★ 与分类胶囊同高（真机 bounds 82px ≈ 27vp），不是 '100%'
+      .linearGradient({
+        angle: 90,
+        colors: [[this.fadeColor(), 0.0], [this.theme.bg, 1.0]]
+      })
+      .hitTestBehavior(HitTestMode.None)
+      .accessibilityLevel('no')    // 纯装饰，读屏跳过
+  }
+
   build() {
     Scroll() {
       Row({ space: Space.md }) {   // ★ 2026-10-13 奥森：「还是挤」⇒ 10vp → 16vp
@@ -1095,6 +1127,8 @@ export struct CategoryBar {
     .scrollable(ScrollDirection.Horizontal)
     .scrollBar(BarState.Off)
     .width('100%')
+    // ── 右端渐隐（12vp）：内容在这里"淡出屏幕"，暗示还能往右滑 ──
+    .overlay(this.fadeHint(), { align: Alignment.End })
     // ★ 2026-10-13 奥森：「两个蓝色按钮连在一起，中间都没有白色间隔」
     //   根因：父 Column 没有 space，两个 chip 行上下紧贴 ⇒ 给分类条自己加上下边距
     .margin({ top: Space.lg, bottom: Space.xs })   // ★ 奥森要求「隔开一定距离」⇒ 10vp → 20vp
