@@ -2507,6 +2507,282 @@ export const HOW_TO: Record<string, HowTo> = {
       'Clear it if your average timing error stays within 150 ms'
     ]
   },
+  'attentional_blink_probe': {
+    zh: [
+      '一串字符快速闪过，其中有一个数字（T1）',
+      '要回答两件事：那个数字是几？它之后有没有闪过一个「探针 ✦」？',
+      '4 轮共 8 分，拿到 6 分以上算通关'
+    ],
+    en: [
+      'A stream of characters flashes past, containing one digit (T1)',
+      'Two questions: what was that digit, and did a ✦ probe flash after it?',
+      'Four rounds worth 8 points in all — score at least 6 to clear it'
+    ]
+  },
+  'corsi_backward_span': {
+    zh: [
+      '方块会依次亮起',
+      '这次要按相反的顺序点回来（倒背，不是正着点）',
+      '答对长度为 5 的一轮算通关；2 条命用完就判负'
+    ],
+    en: [
+      'Blocks light up one after another',
+      'This time tap them back in REVERSE order — backwards, not forwards',
+      'Clear a run of length 5 to win; lose both lives and you fail'
+    ]
+  },
+  'feature_matrix_recall_all': {
+    zh: [
+      '4×4 的格子里会亮起 6 格',
+      '遮蔽之后，要把这 6 格「全部」点回来',
+      '6 格完全正确算通关'
+    ],
+    en: [
+      'Six cells light up on a 4×4 grid',
+      'Once they are hidden, tap back ALL six of them',
+      'All six must be exactly right to clear it'
+    ]
+  },
+  'memory_palace': {
+    zh: [
+      '3 件物品会被摆进 9 个格子里，你先记住位置',
+      '它们熄灭后，凭位置回忆',
+      '3 轮共 9 问，答对 7 问以上算通关'
+    ],
+    en: [
+      'Three objects are placed into nine cells — memorise where',
+      'They disappear, and you recall their positions',
+      'Three rounds of nine questions; get at least 7 right to clear it'
+    ]
+  },
+  'rule_switcher': {
+    zh: [
+      '规则每 3 题就换一次：在「判奇偶」和「比大小」之间来回切',
+      '要看清当前用的是哪条规则再作答',
+      '15 题答对 12 题以上、且平均反应低于 1600ms 算通关'
+    ],
+    en: [
+      'The rule flips every three questions, alternating between odd-or-even and bigger-or-smaller',
+      'Check which rule is in force before answering',
+      'Clear it with at least 12 of 15 right and an average reaction under 1600 ms'
+    ]
+  },
+  'running_memory_span': {
+    zh: [
+      '数字一个接一个闪过，全程都要跟住',
+      '最后只需按顺序点出「最后 N 个」',
+      '连过广度 3 → 4 → 5 三关算通关'
+    ],
+    en: [
+      'Digits flash past one after another and you must track them the whole way',
+      'At the end, tap back only the LAST N of them, in order',
+      'Get through spans of 3 → 4 → 5 to clear it'
+    ]
+  },
+  'sdmt': {
+    zh: [
+      '屏幕上方有一张图例：每个符号对应一个数字',
+      '照着图例把符号换成数字，一题接一题',
+      '90 秒内答对 25 题算通关'
+    ],
+    en: [
+      'A key sits at the top of the screen pairing each symbol with a digit',
+      'Use it to convert symbols into digits, one after another',
+      'Get 25 right within 90 seconds to clear it'
+    ]
+  },
+  'sopt': {
+    zh: [
+      '9 个方格上随机布着 1 到 9 的数字',
+      '按 1→9 的顺序依次点，每轮序号都会重新打乱',
+      '撑过 3 轮算通关；点错 3 次就失败'
+    ],
+    en: [
+      'The digits 1 to 9 are scattered across nine squares',
+      'Tap them in order from 1 to 9, and the layout is reshuffled each round',
+      'Survive 3 rounds to clear it; three wrong taps and you fail'
+    ]
+  },
+  'spatial_cabinet_memory': {
+    zh: [
+      '六个格子里会亮出几件物品，停留 1.5 秒',
+      '之后收起，然后问你「某件物品在哪一格」',
+      '6 轮答对 5 轮以上算通关'
+    ],
+    en: [
+      'Several objects appear in six cells for 1.5 seconds',
+      'They are then hidden, and you are asked which cell a given object was in',
+      'Get at least 5 of 6 rounds right to clear it'
+    ]
+  },
+  'spotlight_track': {
+    zh: [
+      '一块亮斑在 4×5 的网格里来回移动',
+      '停下后点出它最后落脚的格子',
+      '8 轮答对 6 轮以上算通关；轮次越高它挪得越多'
+    ],
+    en: [
+      'A bright spot moves around a 4×5 grid',
+      'When it stops, tap the cell it ended on',
+      'Get at least 6 of 8 rounds right to clear it, and it moves more each round'
+    ]
+  },
+  'staircase_memory': {
+    zh: [
+      '六级台阶会逐级点亮，形成一段升序的路线',
+      '暗下之后，照着顺序点回来',
+      '4 关从 3 级加到 6 级，全过算通关；错一级就失败'
+    ],
+    en: [
+      'Six steps light up one by one, tracing an ascending route',
+      'Once they go dark, tap the steps back in that order',
+      'Four rounds grow from 3 steps to 6 — clear them all; one wrong step and you fail'
+    ]
+  },
+  'subitizing_rush': {
+    zh: [
+      '一团圆点只亮 420 毫秒',
+      '来不及一个个数，只能「一眼看出」有几个',
+      '10 题答对 8 题以上算通关'
+    ],
+    en: [
+      'A cluster of dots shows for only 420 ms',
+      'Too fast to count one by one — you have to just see how many there are',
+      'Get at least 8 of 10 right to clear it'
+    ]
+  },
+  'switch_task': {
+    zh: [
+      '同一个数字，按屏幕上的提示来决定怎么答',
+      '提示会在「比大小」和「判奇偶」之间来回切换',
+      '12 轮答对 9 轮以上算通关'
+    ],
+    en: [
+      'The same number appears, and the on-screen prompt decides how to answer',
+      'The prompt switches back and forth between bigger-or-smaller and odd-or-even',
+      'Get at least 9 of 12 rounds right to clear it'
+    ]
+  },
+  'symbol_digit_assoc': {
+    zh: [
+      '屏幕上方有对照表：每个符号对应一个数字',
+      '给一个符号，选出它对应的数字',
+      '12 题答对 9 题以上算通关'
+    ],
+    en: [
+      'A key at the top of the screen pairs each symbol with a digit',
+      'A symbol appears — pick the digit it maps to',
+      'Get at least 9 of 12 right to clear it'
+    ]
+  },
+  'symbol_logic': {
+    zh: [
+      '用符号代替数字的代数题',
+      '由给出的两条线索，推出第一个符号是几（加或减的题型）',
+      '8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'Algebra where symbols stand in for numbers',
+      'Two clues are given — work out what the first symbol equals (addition or subtraction)',
+      'Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'symbolic_flanker': {
+    zh: [
+      '一排箭头出现，只看正中间那个的方向',
+      '两侧的箭头一律是干扰项，不管它们朝哪边',
+      '16 轮答对 13 轮以上算通关'
+    ],
+    en: [
+      'A row of arrows appears — judge only the direction of the middle one',
+      'The flanking arrows are pure distraction, whichever way they point',
+      'Get at least 13 of 16 rounds right to clear it'
+    ]
+  },
+  'task_switching': {
+    zh: [
+      '同一个刺激，按提示在「判形状」和「判颜色」之间切换',
+      '系统会对比「重复同一规则」和「刚切换过」两种情况的反应时',
+      '16 轮答对 12 轮以上算通关'
+    ],
+    en: [
+      'One stimulus, and the prompt makes you switch between judging shape and judging colour',
+      'The game compares your reaction time when the rule repeats versus when it just switched',
+      'Get at least 12 of 16 rounds right to clear it'
+    ]
+  },
+  'trail_making': {
+    zh: [
+      '要按「1 → A → 2 → B → …」这样数字和字母交替的顺序点格子',
+      '一直连到 13 和 L',
+      '25 个全部连上、错误不超过 4 次算通关；错第 5 次立即失败'
+    ],
+    en: [
+      'Tap the cells alternating between numbers and letters: 1 → A → 2 → B and so on',
+      'Keep going all the way to 13 and L',
+      'Connect all 25 with no more than 4 errors to clear it; a fifth error ends it at once'
+    ]
+  },
+  'visual_crowding_acuity': {
+    zh: [
+      '只回答正中间那个字母是什么',
+      '两侧的干扰字母会越挤越近，越挤越难认',
+      '8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'Answer only what the middle letter is',
+      'Flanking letters crowd in closer and closer, making it harder to read',
+      'Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'visual_search': {
+    zh: [
+      '满屏干扰项里，有一个跟其他都不一样',
+      '一眼把它找出来点掉',
+      '8 局里找出 6 个以上算通关；每局 8 秒，点错罚 1.2 秒'
+    ],
+    en: [
+      'Among a screenful of distractors, one stands out',
+      'Spot it and tap it',
+      'Clear at least 6 of 8 rounds; each gives 8 seconds, and a wrong tap costs 1.2'
+    ]
+  },
+  'visual_search_conjunction': {
+    zh: [
+      '目标要「形状 + 颜色」两个特征同时对上',
+      '干扰项各自只占其中一个 —— 所以只看一样会找错',
+      '6 局里找对 5 局以上算通关；每局 9 秒，点错罚 1.5 秒'
+    ],
+    en: [
+      'The target must match on BOTH shape and colour',
+      'Each distractor matches only one of the two, so watching a single feature misleads you',
+      'Clear at least 5 of 6 rounds; each gives 9 seconds, and a wrong tap costs 1.5'
+    ]
+  },
+  'wisconsin_card_sorting': {
+    zh: [
+      '按一条隐藏的规则把卡片归堆',
+      '规则藏在「颜色 / 形状 / 数量」三者之一，参考堆的三个特征正好对应三张卡片',
+      '连续答对 4 次之后，规则会悄悄换掉 —— 要跟着改'
+    ],
+    en: [
+      'Sort cards into piles following a hidden rule',
+      'The rule is one of colour, shape or number, and the three reference piles each show one of them',
+      'After four correct in a row the rule silently changes — you must follow it'
+    ]
+  },
+  'word_pair_associate_memory': {
+    zh: [
+      '先记住 6 组词对',
+      '之后给出一个词，凭记忆选出它的搭档',
+      '6 题答对 5 题以上算通关'
+    ],
+    en: [
+      'First memorise six word pairs',
+      'Then a word appears, and you pick its partner from memory',
+      'Get at least 5 of 6 right to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
