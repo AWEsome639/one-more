@@ -887,6 +887,138 @@ export const HOW_TO: Record<string, HowTo> = {
       'A complete K→A run is collected automatically — collect the required number of runs to clear it'
     ]
   },
+  'akari': {
+    zh: [
+      '灯的照亮范围是自己所在格，并向上下左右直照，遇到黑墙就停',
+      '两盏灯不能互相照到（中间必须有墙挡着）',
+      '墙上的数字 = 紧挨着它的灯数，必须刚好相等；所有空格都被照亮、数字全满足算通关，违规满 8 次失败'
+    ],
+    en: [
+      'A lamp lights its own cell and shines straight up, down, left and right until a black wall blocks it',
+      'Two lamps may never see each other — a wall must sit between them',
+      'A wall’s number must equal exactly how many lamps touch it; light every empty cell and satisfy every number to clear it, eight violations and you fail'
+    ]
+  },
+  'binary_puzzle': {
+    zh: [
+      '6×6 的盘，每格填 0 或 1',
+      '每行、每列都要正好有 3 个 0 和 3 个 1',
+      '任何一行或一列都不能出现连续三个相同的数'
+    ],
+    en: [
+      'A 6×6 grid where every cell holds a 0 or a 1',
+      'Each row and column must contain exactly three 0s and three 1s',
+      'No row or column may contain three identical digits in a row'
+    ]
+  },
+  'bridges': {
+    zh: [
+      '同一行或同一列上的两个岛才能连桥，中间不能有别的岛',
+      '两座岛之间最多 2 座桥，桥也不能交叉',
+      '岛上的数字 = 连到它的桥数，必须刚好相等；全部满足且所有岛连成一片算通关'
+    ],
+    en: [
+      'Only two islands in the same row or column can be bridged, with no other island between them',
+      'At most two bridges may join a pair, and bridges never cross',
+      'An island’s number must equal exactly how many bridges reach it; satisfy all of them and keep every island connected to clear it'
+    ]
+  },
+  'color_flood': {
+    zh: [
+      '左上角是「洪水」起点，每步选一种颜色',
+      '与左上角连通的一整块会被染成那个颜色',
+      '在步数上限内把整盘染成同一个颜色算通关；步数用尽还没统一就失败'
+    ],
+    en: [
+      'The flood starts in the top-left corner; each move you pick a colour',
+      'Everything connected to the top-left region turns that colour',
+      'Unify the whole board within the move limit to clear it; run out of moves and you fail'
+    ]
+  },
+  'crown': {
+    zh: [
+      '每行、每列、每个同色分区里都各放恰好一个皇冠',
+      '任意两个皇冠不能相邻 —— 上下左右和斜角都不行',
+      '全部要求满足算通关'
+    ],
+    en: [
+      'Every row, every column and every coloured region holds exactly one crown',
+      'No two crowns may touch, not even diagonally',
+      'Satisfy all of it to clear the board'
+    ]
+  },
+  'dominosa': {
+    zh: [
+      '点两个相邻的格子，把它们配成一块骨牌',
+      '每种点数组合（0-0 到 3-3，共 10 种）只能用一次',
+      '铺满棋盘且 10 种骨牌各不相同算通关；步数用尽就失败'
+    ],
+    en: [
+      'Tap two adjacent cells to pair them into a domino',
+      'Each number pair (0-0 through 3-3, ten kinds in all) may be used only once',
+      'Cover the board using all ten different pairs to clear it; run out of moves and you fail'
+    ]
+  },
+  'futoshiki': {
+    zh: [
+      '5×5 每行、每列都要填 1~5 且不重复',
+      '还要满足格与格之间标出的不等号',
+      '填满且行列不重复、所有不等号成立算通关；步数用尽就失败'
+    ],
+    en: [
+      'A 5×5 grid where every row and column holds 1–5 with no repeats',
+      'The inequality signs between cells must hold as well',
+      'Fill it with no repeats and every sign satisfied to clear it; run out of moves and you fail'
+    ]
+  },
+  'gokigen_naname': {
+    zh: [
+      '每个方格里画一条斜线（╲ 或 ╱）',
+      '每个圆点上的数字 = 交汇在这个点的斜线条数',
+      '所有斜线不能围成任何闭合回路；全部满足算通关'
+    ],
+    en: [
+      'Draw one diagonal in every square, either ╲ or ╱',
+      'The number on each dot equals how many diagonals meet at that point',
+      'The diagonals must never form a closed loop; satisfy everything to clear it'
+    ]
+  },
+  'heyawake': {
+    zh: [
+      '涂黑一些格子：每个分区里的黑格数要等于角上标的数字',
+      '黑格之间不能上下左右相邻；所有白格必须连成一片',
+      '一行或一列里连续的白格不能跨越两条以上分区边界'
+    ],
+    en: [
+      'Blacken some cells so that each region holds exactly the number of black cells shown in its corner',
+      'Black cells may not touch edge-to-edge, and all white cells must stay connected',
+      'A run of white cells in any row or column may not cross more than one region border'
+    ]
+  },
+  'hitori': {
+    zh: [
+      '涂黑一些格子，使每行每列没被涂黑的数字都不重复',
+      '涂黑的格子不能上下左右相邻',
+      '所有没涂黑的格子要连成一片；三条全满足算通关'
+    ],
+    en: [
+      'Blacken cells so that the unblackened numbers in every row and column never repeat',
+      'Black cells may not touch edge-to-edge',
+      'Every white cell must stay connected — satisfy all three to clear it'
+    ]
+  },
+  'kakurasu_sums': {
+    zh: [
+      '每格可以涂黑或留白，行列号都从 1 数起',
+      '第 r 行左边的数字 = 这一行黑格所在列号之和',
+      '第 c 列上边的数字 = 这一列黑格所在行号之和'
+    ],
+    en: [
+      'Blacken or leave each cell blank; rows and columns are numbered from 1',
+      'The number left of row r is the sum of the column numbers of that row’s black cells',
+      'The number above column c is the sum of the row numbers of that column’s black cells'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
