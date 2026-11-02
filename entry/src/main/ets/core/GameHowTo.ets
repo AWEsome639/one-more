@@ -2363,6 +2363,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'Clear 5 rounds to win; three wrong taps and you fail'
     ]
   },
+  'multiple_object_tracking': {
+    zh: [
+      '几个圆点会先高亮一下，那就是要盯住的目标',
+      '高亮消失后它们混进其他圆点里一起移动',
+      '停下后指出刚才那几个目标；3 轮里全对 2 轮以上算通关'
+    ],
+    en: [
+      'A few dots light up briefly — those are the targets to watch',
+      'The highlight fades and they move around among all the other dots',
+      'When everything stops, point out the original targets; get at least 2 of 3 rounds fully right to clear it'
+    ]
+  },
+  'n_back': {
+    zh: [
+      '字母一个一个出现',
+      '每次判断：当前这个字母，和 2 步之前的那个是否相同',
+      '一共 12 个试次，答对 9 个以上算通关'
+    ],
+    en: [
+      'Letters appear one at a time',
+      'Each time, decide whether the current letter matches the one from 2 steps back',
+      'Twelve trials in all; get at least 9 right to clear it'
+    ]
+  },
+  'narrative_recall': {
+    zh: [
+      '读一篇很短的小故事',
+      '读完后凭记忆回答细节题（每篇 3 题）',
+      '难度决定通关线：简单 4 题 / 普通 5 题 / 困难 6 题（全场可答 6 题）'
+    ],
+    en: [
+      'Read a very short story',
+      'Then answer detailed questions from memory — three per story',
+      'The pass line depends on difficulty: 4 easy, 5 normal, 6 hard (six questions are available in all)'
+    ]
+  },
+  'negative_space_detection': {
+    zh: [
+      '满屏都是色块，但留白部分拼出了一个形状',
+      '要认出这个「负空间」形状是哪一个',
+      '关数按难度（简单 4 / 普通 6 / 困难 8），答对到通关线（3 / 5 / 7）算通关'
+    ],
+    en: [
+      'The screen is filled with colour blocks, but the gaps between them outline a shape',
+      'Recognise which shape that negative space forms',
+      'Rounds depend on difficulty (4 easy, 6 normal, 8 hard); reach the pass line of 3, 5 or 7 to clear it'
+    ]
+  },
+  'object_displacement': {
+    zh: [
+      '6 个格子里摆着 5 个物件',
+      '遮罩一闪之后，其中一个偷偷换了格子',
+      '指出是谁动了；8 轮答对 6 轮以上算通关'
+    ],
+    en: [
+      'Five objects sit in six cells',
+      'A cover flashes, and one of them sneaks to a different cell',
+      'Point out which one moved; get at least 6 of 8 rounds right to clear it'
+    ]
+  },
+  'object_shuffle': {
+    zh: [
+      '先看清 💎 在哪只盒子底下',
+      '盒子开始两两换位，你要一直盯住它的落点',
+      '8 轮里猜中 6 轮以上算通关'
+    ],
+    en: [
+      'First watch which box the 💎 is under',
+      'The boxes start swapping in pairs — keep your eye on where it ends up',
+      'Get at least 6 of 8 rounds right to clear it'
+    ]
+  },
+  'operation_span': {
+    zh: [
+      '一组小题会按顺序出现，你要一道道算出来',
+      '算完的每个结果都要记住',
+      '题目全部结束后，按原来的顺序把这些结果回忆出来；组长度从 2 → 3 → 4 全部走通算通关'
+    ],
+    en: [
+      'A set of small problems appears in order — work each one out',
+      'Remember every result as you go',
+      'When they are all done, recall those results in the original order; get through set sizes 2 → 3 → 4 to clear it'
+    ]
+  },
+  'peripheral_focus': {
+    zh: [
+      '眼睛盯住屏幕中心的 ➕ 不要移开',
+      '用余光辨认周边一闪而过的符号',
+      '14 次里答对 10 次以上算通关'
+    ],
+    en: [
+      'Keep your eyes fixed on the ➕ in the centre',
+      'Identify the symbol flashing in your peripheral vision without looking at it',
+      'Get at least 10 of 14 right to clear it'
+    ]
+  },
+  'posner_spatial_cueing': {
+    zh: [
+      '先盯住中心的注视点',
+      '然后会给出一个方位提示，接着目标出现',
+      '尽快点目标所在的那一侧；16 次答对 12 次以上算通关（越快分越高）'
+    ],
+    en: [
+      'Fix your gaze on the centre point',
+      'A directional cue appears, then the target does',
+      'Tap the side the target appeared on as fast as you can; get at least 12 of 16 right to clear it, and faster scores higher'
+    ]
+  },
+  'reading_span': {
+    zh: [
+      '一句一句地读，每句判断它通不通顺',
+      '一组读完，要按顺序回忆每句的关键词',
+      '组长度从 2 → 3 → 4 全部走通算通关；判断错或回忆顺序错都算失败'
+    ],
+    en: [
+      'Read sentences one at a time, judging whether each makes sense',
+      'After the set, recall the key word of each sentence in order',
+      'Get through set sizes 2 → 3 → 4 to clear it; a wrong judgment or a wrong recall order fails you'
+    ]
+  },
+  'relational_memory': {
+    zh: [
+      '先记住 6 组配对',
+      '之后给出其中一半，凭记忆点出正确的那一半',
+      '6 题答对 5 题以上算通关'
+    ],
+    en: [
+      'First memorise six pairs',
+      'Then you are shown one half of each and must tap the matching half from memory',
+      'Get at least 5 of 6 right to clear it'
+    ]
+  },
+  'rhythm_master': {
+    zh: [
+      '先看 4 下示范拍，注意它们的间隔',
+      '然后照同样的间隔自己敲 4 下',
+      '平均间隔误差不超过 150ms 算通关'
+    ],
+    en: [
+      'Watch four demonstration beats and note the interval between them',
+      'Then tap four beats yourself at the same interval',
+      'Clear it if your average timing error stays within 150 ms'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
