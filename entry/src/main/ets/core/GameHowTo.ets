@@ -347,6 +347,78 @@ export const HOW_TO: Record<string, HowTo> = {
       'Clear it with at least 6 hits across 10 blinks and no more than 3 false alarms'
     ]
   },
+  'focus_tunnel': {
+    zh: [
+      '5×5 的暗场里只有中央「隧道」半径内的格子是亮的，目标 🎯 一定藏在亮区里',
+      '每找到一次，隧道就收窄一圈，周围干扰项越来越暗',
+      '找到 6 个目标算通关；点错 3 次就失败'
+    ],
+    en: [
+      'On a 5×5 dark board only the cells inside a central “tunnel” are lit, and the 🎯 is always inside that glow',
+      'Each time you find it the tunnel narrows a ring, so the surrounding distractors get dimmer',
+      'Find 6 targets to clear it; three wrong taps and you fail'
+    ]
+  },
+  'spatial_conflict': {
+    zh: [
+      '箭头的「指向 / 文字 / 位置」三样互相捣乱（比如写着左、画着右、位置在上）',
+      '只准跟箭头的实际指向走，别管它写的什么字',
+      '12 题答对 9 题以上算通关'
+    ],
+    en: [
+      'An arrow messes with you three ways at once: where it points, what its label says, and where it sits',
+      'Follow the arrow’s actual direction and ignore the label',
+      'Clear it with at least 9 correct out of 12'
+    ]
+  },
+  'typoglycemia_decoder': {
+    zh: [
+      '每个词只留首尾字母，中间全部打乱（比如 tihs 这种）',
+      '靠语感把整句读出来，再从选项里挑出正确的那一句',
+      '6 句里读对 4 句以上算通关'
+    ],
+    en: [
+      'Each word keeps its first and last letter with the middle shuffled (like tihs)',
+      'Read the sentence by feel, then pick the matching option',
+      'Clear it by getting at least 4 of 6 sentences right'
+    ]
+  },
+  'homophone_hunt': {
+    zh: [
+      '给出发音提示（比如 /aɪ/），从四个词里挑出与它同音的那个',
+      '同一题会混进拼写相近但读音不同的词',
+      '10 题答对 6 题以上算通关；点错罚 2 秒'
+    ],
+    en: [
+      'You are shown a sound like /aɪ/ and must pick the word from four that shares it',
+      'Look-alike words with a different sound are mixed in on purpose',
+      'Clear it with at least 6 correct out of 10; a wrong tap costs 2 seconds'
+    ]
+  },
+  'math_guess': {
+    zh: [
+      '秘密数字在 1 到 100 之间，你有 7 次机会',
+      '每次猜完会告诉你偏大还是偏小，用二分法收窄范围',
+      '7 次内猜中算通关；次数用尽就失败'
+    ],
+    en: [
+      'A secret number sits between 1 and 100 and you get 7 guesses',
+      'After each guess you learn whether you went too high or too low — narrow it like a binary search',
+      'Guess it within 7 tries to clear it; run out and you fail'
+    ]
+  },
+  'quick_math': {
+    zh: [
+      '60 秒限时心算抢答，一题接一题',
+      '答对加分、答错扣时间，节奏越快分越高',
+      '拿到 100 分算过关'
+    ],
+    en: [
+      'Sixty seconds of rapid-fire mental arithmetic, one question after another',
+      'Right answers score, wrong ones cost time — the faster you go the higher you climb',
+      'Reach 100 points to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
