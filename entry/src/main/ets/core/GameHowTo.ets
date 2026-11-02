@@ -659,6 +659,234 @@ export const HOW_TO: Record<string, HowTo> = {
       'Scoring follows Chinese rules — whoever holds more territory wins'
     ]
   },
+  'tetris': {
+    zh: [
+      '← → 左右移动，↻ 旋转，⤓ 速降；方块落到底就固定住',
+      '一整行填满就会被消掉，消满 10 行算通关',
+      '等级越高落得越快；方块堆到顶就失败'
+    ],
+    en: [
+      '← → move sideways, ↻ rotates, ⤓ drops fast; a piece locks once it lands',
+      'A completely filled row clears away — clear 10 rows to pass',
+      'Higher levels fall faster; if the stack reaches the top, you fail'
+    ]
+  },
+  'snake': {
+    zh: [
+      '蛇每 200ms 自动走一格，滑动棋盘或点方向键来转向',
+      '吃到食物身体就变长一格',
+      '吃满目标个数的食物算通关；撞墙或咬到自己就结束'
+    ],
+    en: [
+      'The snake advances one cell every 200 ms — swipe the board or tap an arrow to turn',
+      'Eating food makes it one segment longer',
+      'Eat the target number of food items to clear it; hitting a wall or your own body ends the run'
+    ]
+  },
+  'pong': {
+    zh: [
+      '手指在球场上上下拖动，移动左边的球拍',
+      '右边的球拍由电脑控制，它会跟着球走',
+      '你先拿到 5 分算通关；电脑先到 5 分就失败'
+    ],
+    en: [
+      'Drag up and down on the court to move your left paddle',
+      'The right paddle is computer-controlled and tracks the ball',
+      'Reach 5 points first to clear it; if the computer gets to 5 first, you fail'
+    ]
+  },
+  'tic_tac_toe': {
+    zh: [
+      '你执 ✕ 先下，电脑执 ○，点空格落子',
+      '电脑用极小化极大算法（minimax）应对 —— 它不会犯错',
+      '你先连成三子算通关；电脑连成或平局都算这一局没赢'
+    ],
+    en: [
+      'You play ✕ and move first, the computer plays ○ — tap an empty square',
+      'The computer answers with minimax, so it never makes a mistake',
+      'Line up three first to clear it; a computer win or a draw counts as a loss'
+    ]
+  },
+  'slide15': {
+    zh: [
+      '4×4 的格子里放着 1~15，右下角留空',
+      '点空格旁边的一块就能把它滑进空位',
+      '把 1~15 按顺序归位、右下角还是空，就算通关'
+    ],
+    en: [
+      'Fifteen numbered tiles sit in a 4×4 grid with the bottom-right corner empty',
+      'Tap a tile next to the gap to slide it into the space',
+      'Get 1–15 back in order with the gap still in the corner to clear it'
+    ]
+  },
+  'sokoban': {
+    zh: [
+      '箱子只能推、不能拉，走到箱子旁边朝它的方向走就能推一格',
+      '目标是把所有箱子都推到标记点上',
+      '一关全部箱子归位就过关，可以接着打下一关'
+    ],
+    en: [
+      'Boxes can only be pushed, never pulled — walk up to one and step toward it to shove it along',
+      'Your goal is to get every box onto a marked spot',
+      'Put all boxes in place and the level is done; then the next one begins'
+    ]
+  },
+  'reversi': {
+    zh: [
+      '你执黑先行，落子后把同一条线上被夹住的全部白子翻成黑子',
+      '必须能夹住对方的子才能落，无处可下就自动跳过',
+      '双方都无处可下（或棋盘下满）时数子，黑多算通关'
+    ],
+    en: [
+      'You play black and move first; a move flips every white piece caught in a line between yours',
+      'You may only play where you trap something — if you have no legal move, you pass',
+      'When neither side can move (or the board fills), count: more black means you clear it'
+    ]
+  },
+  'sudoku_hex': {
+    zh: [
+      '6×6 的格子，每行、每列都要出现 1~6 且不重复',
+      '2 行 × 3 列为一宫，每一宫里也要 1~6 不重复',
+      '点空格选中再点下方 1~6 填入，点「✕」擦除；失误满 5 次就失败'
+    ],
+    en: [
+      'A 6×6 grid where every row and column must contain 1–6 with no repeats',
+      'Each 2×3 box must also contain 1–6 exactly once',
+      'Tap a cell then a digit below to fill it, or ✕ to erase; five mistakes and you fail'
+    ]
+  },
+  'wordle': {
+    zh: [
+      '猜一个 5 个字母的英文单词，一共 5 次机会',
+      '用屏幕键盘输入后点 ⏎ 提交',
+      '绿色 = 字母和位置都对，黄色 = 字母对但位置错，灰色 = 这个词里没有它'
+    ],
+    en: [
+      'Guess a five-letter English word, with five tries in total',
+      'Type it on the on-screen keyboard and press ⏎',
+      'Green means right letter in the right spot, yellow means right letter in the wrong spot, grey means the word has no such letter'
+    ]
+  },
+  'schulte': {
+    zh: [
+      '一张方格里打乱排着 1~25，你要按 1 到 25 的顺序依次点',
+      '点错会闪红，用时会被记录',
+      '点完最后一个数算通关'
+    ],
+    en: [
+      'The numbers 1–25 are scattered across a grid; tap them in order from 1 to 25',
+      'A wrong tap flashes red, and your time is recorded',
+      'Tap the final number to clear it'
+    ]
+  },
+  'simon_says': {
+    zh: [
+      '四个色块会依次亮起，你要按同样的顺序点回去',
+      '每过一关，序列就加长一位',
+      '按错一次就失败；撑到第 12 关算通关'
+    ],
+    en: [
+      'Four coloured pads light up one after another — tap them back in the same order',
+      'Each round you pass adds one more step to the sequence',
+      'One wrong tap ends the run; survive to round 12 to clear it'
+    ]
+  },
+  'solitaire': {
+    zh: [
+      '7 列牌堆要按「颜色相反、点数递减」的方式叠放',
+      '空出来的列只能放 K',
+      '52 张牌全部进基础堆算通关；没牌可翻又无处可放就失败'
+    ],
+    en: [
+      'The seven columns build down in alternating colours',
+      'Only a King may move into an empty column',
+      'Get all 52 cards onto the foundations to clear it; if you can neither flip nor move, you fail'
+    ]
+  },
+  'memory': {
+    zh: [
+      '一次翻两张牌，牌面用 emoji 表示',
+      '两张图案相同就保留翻开，不同就翻回去',
+      '全部配成对算通关'
+    ],
+    en: [
+      'Flip two cards at a time; the faces are emoji',
+      'Matching pairs stay face up, mismatches flip back',
+      'Pair up every card to clear it'
+    ]
+  },
+  'nim': {
+    zh: [
+      '三堆石子，分别有 3、5、7 颗；轮流从任意一堆拿走任意多颗',
+      '点第 k 颗石子 = 从这一堆拿走 k 颗',
+      '谁拿走最后一颗谁就输 —— 让 AI 拿走最后一颗算通关'
+    ],
+    en: [
+      'Three piles of 3, 5 and 7 stones; take turns removing any number from any single pile',
+      'Tapping the k-th stone takes k stones from that pile',
+      'Whoever takes the last stone loses — make the AI take it to clear the round'
+    ]
+  },
+  'phonetic_guess': {
+    zh: [
+      '给一个国际音标，从 4 个单词里选出对应的那一个',
+      '一共 8 题',
+      '答对 6 题以上算通关'
+    ],
+    en: [
+      'You are shown a phonetic transcription — pick the matching word from four',
+      'There are 8 questions in total',
+      'Clear it with at least 6 correct'
+    ]
+  },
+  'sieve_visualizer': {
+    zh: [
+      '看埃拉托斯特尼筛怎么把素数筛出来',
+      '找到最小的未划掉数 p（它就是素数），把从 p² 起的倍数一个个划掉',
+      'p² 超过 100 就收工；筛完算通关，积分按找出的素数个数给'
+    ],
+    en: [
+      'Watch the Sieve of Eratosthenes uncover the primes',
+      'Find the smallest unmarked number p (that is a prime), then cross out its multiples from p² upward',
+      'Stop once p² passes 100; finishing clears it, and your score counts the primes found'
+    ]
+  },
+  'snake_3d': {
+    zh: [
+      '3 层 × 4×4 共 48 格的立体盒子，用上下左右移动，另有「升层 / 降层」两个键',
+      '吃到食物身体变长',
+      '长到 8 节算通关；撞墙或咬到自己就失败'
+    ],
+    en: [
+      'A 3D box of 3 layers × 4×4 (48 cells); move with up/down/left/right plus two extra keys to rise or drop a layer',
+      'Eating food makes you longer',
+      'Reach 8 segments to clear it; hitting a wall or yourself ends the run'
+    ]
+  },
+  'sorting_visualizer': {
+    zh: [
+      '12 根柱子随机高低，选一个算法（冒泡 / 插入 / 选择 / 快速）',
+      '自动或单步播放每一次「比较」与「交换」—— 橙色是正在比，绿色是已排好',
+      '整列排好算通关；比较和交换次数越少分越高'
+    ],
+    en: [
+      'Twelve bars of random height — pick an algorithm (bubble, insertion, selection or quick)',
+      'Play back each comparison and swap, automatically or step by step; orange is being compared, green is sorted',
+      'Fully sorted clears it, and fewer comparisons and swaps score higher'
+    ]
+  },
+  'spider_solitaire': {
+    zh: [
+      '8 副黑桃 A~K 共 104 张牌，铺成 10 列',
+      '可以整段搬「点数递减」的正面牌，放到比它大一点的牌上；空列能放任意牌',
+      '集齐 K→A 一整组就自动收走；收满本档组数算通关'
+    ],
+    en: [
+      'Eight decks of spades, A to K, 104 cards laid out in 10 columns',
+      'Move any run of descending face-up cards onto one rank higher; an empty column takes anything',
+      'A complete K→A run is collected automatically — collect the required number of runs to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
