@@ -802,12 +802,17 @@ build() {
           //   ⇒ 极小屏（高 < 210vp）字号从 md 降到 sm、并允许两行，
           //     同时下面把 48vp 的图标藏起来，把宽度全让给标题。
           .fontSize(Bp.tinyWatch() ? FontSize.sm : FontSize.md)
-          .maxLines(Bp.tinyWatch() ? 2 : 1)
+          // ★★★ 2026-11-03（第 880 轮）**修一个从未生效的设计**：
+          //   原来这里**连着两个 `.maxLines()`**：
+          //     .maxLines(Bp.tinyWatch() ? 2 : 1)          ← 手表上允许两行
+          //     .maxLines(this.uiMode === 'elder' ? 2 : 1)  ← **后写的覆盖了它**
+          //   ⇒ ArkUI 里后写的属性覆盖前面的 ⇒ **"手表允许两行"从来没有生效过**，
+          //     手表上一直按 `uiMode==='elder' ? 2 : 1` 走 ⇒ 只有 1 行
+          //     （而 802-803 行的注释明确说"允许两行"，设计意图是相反的）。
+          //   ⇒ 合并成一个条件：**任一条件成立就给两行**。
+          .maxLines((Bp.tinyWatch() || this.uiMode === 'elder') ? 2 : 1)
           .fontWeight(FontWeight.Bold)
           .fontColor(Color.White)
-          // ★★★ 2026-10-16 实拍德语大字模式：名字只剩 4 字（Beje… / Bre…）
-          //   ⇒ 大字模式给【两行】，默认/简约仍一行
-          .maxLines(this.uiMode === 'elder' ? 2 : 1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
 
