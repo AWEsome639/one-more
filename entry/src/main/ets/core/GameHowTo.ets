@@ -3395,6 +3395,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'Find all 5 words to clear it; three wrong attempts and you fail'
     ]
   },
+  'ab_reversal_oddball': {
+    zh: [
+      '圆和菱形会交替出现，偶尔会连续两次相同 —— 那就是「反转」',
+      '看到反转立刻点「反转！」；正常交替时不要点（点了算误报）',
+      '24 帧内命中 5 次以上、且误报不超过 2 次算通关'
+    ],
+    en: [
+      'Circles and diamonds alternate, and now and then the same one appears twice in a row — that is the reversal',
+      'Tap “reversal!” the moment you spot one; on normal alternation do not tap — tapping then counts as a false alarm',
+      'Clear it with at least 5 hits across 24 frames and no more than 2 false alarms'
+    ]
+  },
+  'angle_finder': {
+    zh: [
+      '题目给一个多边形，其中几个角的度数已知',
+      '用内角和公式 (n−2)×180° 减去已知角，求出最后一个角',
+      '8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A polygon appears with several of its angles given',
+      'Use the interior-sum formula (n−2)×180° and subtract the known angles to find the last one',
+      'Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'area_perimeter_match': {
+    zh: [
+      '屏幕上有两个矩形，长宽按真实比例画出，可以直接目测',
+      '题目随机问比面积（长×宽）还是比周长（2×(长+宽)）',
+      '10 题答对 7 题以上算通关'
+    ],
+    en: [
+      'Two rectangles are drawn to true scale, so you can judge by eye',
+      'The prompt randomly asks you to compare areas (length × width) or perimeters (2 × (length + width))',
+      'Get at least 7 of 10 right to clear it'
+    ]
+  },
+  'block_count_3d': {
+    zh: [
+      '3×3 的底座上叠着高度不等的方块塔',
+      '数出一共有多少块 —— 每根塔的高度相加就是总数',
+      '8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'Towers of different heights stand on a 3×3 base',
+      'Count how many blocks there are in all — add up the height of every tower',
+      'Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'box_completion': {
+    zh: [
+      '盘上零散分布着一些格子，其中恰好 12 格能拼成一个矩形的边框',
+      '点亮空格把边框补齐',
+      '恰好点亮 12 格、而且全落在同一个矩形边框上算通关；超过 12 格就失败'
+    ],
+    en: [
+      'Scattered cells sit on the board, and exactly 12 of them outline one rectangle',
+      'Light up cells to complete that outline',
+      'Clear it by lighting exactly 12 cells all on one rectangle’s border; going past 12 fails you'
+    ]
+  },
+  'circuit_connect': {
+    zh: [
+      '4×4 的元件盘，点一下就把该元件顺时针转 90°',
+      '电源从左上角的左边进入，目标是让电流通到右下角那一格',
+      '电流通到右下角、并且朝右出去算通关；步数用尽还没接通就失败'
+    ],
+    en: [
+      'A 4×4 component board — each tap rotates that component 90° clockwise',
+      'Power enters from the left edge of the top-left cell; your goal is to carry it to the bottom-right cell',
+      'Clear it when current reaches the bottom-right cell and exits rightward; run out of moves and you fail'
+    ]
+  },
+  'classic_maze': {
+    zh: [
+      '9×9 的迷宫，只有唯一一条通路',
+      '滑动屏幕或用方向键走球，撞墙就不动',
+      '走到右下角的出口算通关；步数超过上限就失败'
+    ],
+    en: [
+      'A 9×9 maze with exactly one path through',
+      'Swipe or use the arrow keys to move the ball; walking into a wall leaves you in place',
+      'Reach the exit in the bottom-right corner to clear it; exceeding the move limit fails you'
+    ]
+  },
+  'color_maze_nav': {
+    zh: [
+      '6×6 的彩砖盘，起点随机',
+      '只能走进「与脚下同色」的上下左右相邻砖 —— 每走一步，颜色基准就换成新踩的那块',
+      '踩到终点 🏁 算通关；步数超过上限就失败'
+    ],
+    en: [
+      'A 6×6 board of coloured tiles, with a random start',
+      'You may only step onto a neighbouring tile of the SAME colour as the one you stand on, and the colour baseline changes with every step',
+      'Reach the 🏁 exit to clear it; exceeding the move limit fails you'
+    ]
+  },
+  'compass_maze': {
+    zh: [
+      '7×7 的迷宫，保证有路可走',
+      '底部是一条指南针指令带：点「走一步」就按当前指令的方向走，撞墙也会白扣一步',
+      '点 ⇄ 可以反转整条指令带（用来排错，不扣步数）；走到右下角出口算通关，步数用尽就失败'
+    ],
+    en: [
+      'A 7×7 maze that is guaranteed solvable',
+      'A compass ribbon runs along the bottom: tap “step” to move in the direction it currently shows, and a wall still costs you the step',
+      'Tap ⇄ to reverse the whole ribbon (for untangling it — costs no steps); reach the bottom-right exit to clear it, or run out of steps and fail'
+    ]
+  },
+  'cube_net_fold': {
+    zh: [
+      '一个立方体的展开图，六个面两两成对',
+      '点格子循环切换 A / B / C，把配对的字母放进正确的格子里',
+      '全部放对算过关；6 关过 4 关以上算通关'
+    ],
+    en: [
+      'A cube is unfolded flat, with its six faces paired up',
+      'Tap a cell to cycle its letter between A, B and C, placing matching letters in the right cells',
+      'Get every placement right to pass a round; clear 4 of 6 rounds to win overall'
+    ]
+  },
+  'gear_rotation': {
+    zh: [
+      'A 是主动轮，转向已经给出；B 是你要判断的那个轮',
+      '看 A 和 B 之间是「啮合」（齿轮直接咬合）还是「皮带相连」',
+      '口诀：啮合反向、皮带同向；8 题全过算通关，答错 3 题就失败'
+    ],
+    en: [
+      'Gear A is the driver and its direction is given; B is the one you must judge',
+      'Check whether A and B are meshed directly or joined by a belt',
+      'The rule: meshed turns opposite, belted turns the same way; clear all 8 to win, three wrong answers and you fail'
+    ]
+  },
+  'grid_displacement': {
+    zh: [
+      '屏幕给出一个起点和一串位移指令（上/下/左/右各几步）',
+      '在脑子里执行这串指令，算出最后落在哪一格',
+      '点出那个格子；6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'A starting cell and a series of displacement steps appear — so many up, down, left or right',
+      'Run those steps through your head to work out the final cell',
+      'Tap that cell; get at least 4 of 6 right to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
