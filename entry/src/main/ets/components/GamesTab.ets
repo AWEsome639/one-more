@@ -1456,7 +1456,17 @@ build() {
       .padding(Space.md)
     }
     .width('100%')
-    .constraintSize({ maxHeight: 300 })
+    // ★★★ 2026-11-03（第 897 轮）**`maxHeight: 300` 是写死的 —— 在 195 屏上装不下**。
+    //   当时这一行已经是 `Scroll` + `BarState.Off`（内容可达），但**外框**仍按 300vp 排，
+    //   而 195 屏只有 195vp ⇒ 面板会画到屏幕外 105vp，且**看不到滚动条**（BarState.Off）
+    //   ⇒ 玩家会以为"下面没有了"。
+    //   ⇒ 改成跟屏幕高度挂钩：取 min(300, 屏高 - 160)。
+    //     · 233 屏：min(300, 73) = **73**（之前是 300 ⇒ 超出 67vp）
+    //     · 195 屏：min(300, 35) = **35**（之前是 300 ⇒ 超出 105vp）
+    //     · 440 屏：min(300, 280) = **280**
+    //     · 853/800/960：min(300, 693+) = **300**（与改前完全一致）
+    //   ⚠️ 「屏高 - 160」里的 160 是上方仍要留的空间（顶栏 + 分类芯片 + 计数行）。
+    .constraintSize({ maxHeight: Math.max(60, Math.min(300, Bp.height - 160)) })
     .margin({ left: Space.lg, right: Space.lg, top: Space.xs })
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
