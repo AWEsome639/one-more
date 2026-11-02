@@ -419,6 +419,78 @@ export const HOW_TO: Record<string, HowTo> = {
       'Reach 100 points to clear it'
     ]
   },
+  'target_number': {
+    zh: [
+      '给你三个数和一个目标值，下面有 4 个式子',
+      '挑出结果正好等于目标值的那个式子',
+      '6 题答对 5 题以上算通关'
+    ],
+    en: [
+      'You get three numbers and a target value, plus four expressions below',
+      'Pick the expression whose result is exactly the target',
+      'Clear it with at least 5 correct out of 6'
+    ]
+  },
+  'missing_operator': {
+    zh: [
+      '等式里缺了一个 + − × ÷，挑出能让它成立的那个',
+      '一共 60 秒，答得越快题数越多',
+      '60 秒内答对 10 题算通关；时间归零就失败'
+    ],
+    en: [
+      'An equation is missing one of + − × ÷ — pick the one that makes it true',
+      'You have 60 seconds, and the faster you answer the more questions you see',
+      'Get 10 right within 60 seconds to clear it; when the clock hits zero you fail'
+    ]
+  },
+  'digit_span_reverse': {
+    zh: [
+      '数字一个接一个闪现，闪完凭记忆倒序点回去（正着是 1 2 3，你要点 3 2 1）',
+      '一共 6 轮，每两轮位数加长一位',
+      '答对 5 轮以上算通关'
+    ],
+    en: [
+      'Digits flash one after another; afterwards tap them back in reverse order (1 2 3 becomes 3 2 1)',
+      'Six rounds in all, with one more digit added every two rounds',
+      'Clear it with at least 5 rounds right'
+    ]
+  },
+  'probe_digit_span': {
+    zh: [
+      '数字一位一位闪现，闪完之后问你「第 k 位是几」',
+      '用屏幕键盘答出来，答对就加长一位继续',
+      '从 3 位一路答到 8 位算通关；中途答错就失败'
+    ],
+    en: [
+      'Digits flash one at a time; once they are gone you are asked “what was the k-th digit?”',
+      'Type it on the keypad — a correct answer adds one more digit',
+      'Clear it by going from 3 digits all the way to 8; one wrong answer ends the run'
+    ]
+  },
+  'shell_game': {
+    zh: [
+      '先看清球在哪个碗底下',
+      '然后碗开始洗牌，停下来后点出球的位置',
+      '连中 5 关算通关，每过一关多洗 2 次'
+    ],
+    en: [
+      'First watch which cup the ball is under',
+      'Then the cups shuffle; when they stop, tap where the ball is',
+      'Clear it by getting 5 in a row, with two more shuffles added each level'
+    ]
+  },
+  'orbit_tap': {
+    zh: [
+      '环形轨道上排着 12 个落脚点，目标 🛰️ 每 1.1 秒跳到别处',
+      '点中一次 +1，点空会计数',
+      '25 秒内点中 10 次算通关；时间耗尽就失败'
+    ],
+    en: [
+      'Twelve points sit on a ring and the 🛰️ target hops somewhere else every 1.1 seconds',
+      'Each hit is +1, and misses are counted',
+      'Clear it with 10 hits inside 25 seconds; when time runs out you fail'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
