@@ -2219,6 +2219,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'With N = 2, get at least 15 of 20 judgments right to clear it'
     ]
   },
+  'dual_coding': {
+    zh: [
+      '词和图片会一起呈现，你要两条通道都记住',
+      '然后按词找出它对应的那张图',
+      '一共 6 题，答对 5 题以上算通关'
+    ],
+    en: [
+      'Words come paired with pictures — remember both channels at once',
+      'Afterwards you are given a word and must find its picture',
+      'Six questions in all; get at least 5 right to clear it'
+    ]
+  },
+  'dual_task_memory': {
+    zh: [
+      '先记住 4 位数字',
+      '中途会插入一段心算，你要边算边守住那 4 位',
+      '最后回忆数字；3 轮共 12 位，答对 9 位以上算通关'
+    ],
+    en: [
+      'Memorise four digits first',
+      'Then mental arithmetic interrupts — must hold those digits while you calculate',
+      'Finally recall them; across 3 rounds (12 digits), get at least 9 right to clear it'
+    ]
+  },
+  'event_timeline_memory': {
+    zh: [
+      '几个事件会按顺序逐个登场',
+      '之后它们被打乱，你要照原来的顺序点回来',
+      '3 轮里答对 2 轮以上算通关 —— 一轮里 4 个事件全对才算这轮对'
+    ],
+    en: [
+      'Several events appear in order, one after another',
+      'Then they are shuffled and you must tap them back in the original order',
+      'Clear it with at least 2 of 3 rounds right — and a round only counts if all 4 events are in order'
+    ]
+  },
+  'face_name_association': {
+    zh: [
+      '先记住 6 张脸各自的名字',
+      '之后会逐一给出脸，让你配上正确的名字',
+      '6 题答对 5 题以上算通关'
+    ],
+    en: [
+      'First memorise the names attached to six faces',
+      'Then each face appears and you must pair it with the right name',
+      'Get at least 5 of 6 right to clear it'
+    ]
+  },
+  'face_trait_association': {
+    zh: [
+      '先记住 6 张脸各自的「特质」（比如职业或爱好的标签）',
+      '之后凭脸回想它对应的是哪一个',
+      '6 题答对 5 题以上算通关'
+    ],
+    en: [
+      'First memorise the trait attached to each of six faces — a job or hobby label, say',
+      'Then look at a face and recall which trait belongs to it',
+      'Get at least 5 of 6 right to clear it'
+    ]
+  },
+  'feature_matrix_recall': {
+    zh: [
+      '4×4 的格子里会亮起 3 个红格和 3 个蓝格',
+      '遮蔽之后，只点出被指定的那一种颜色',
+      '选中的 3 格全对算通关'
+    ],
+    en: [
+      'Three red and three blue cells light up on a 4×4 grid',
+      'Once they are hidden, tap only the colour you were asked for',
+      'All three of your picks must be right to clear it'
+    ]
+  },
+  'flanker_test': {
+    zh: [
+      '一排箭头出现，只中间那个才是目标',
+      '两侧的箭头可能跟它同向也可能反向 —— 要忽略它们',
+      '12 题答对 11 题以上、且平均反应低于 900ms 算通关'
+    ],
+    en: [
+      'A row of arrows appears; only the middle one is your target',
+      'The flanking arrows may agree with it or point the other way — ignore them',
+      'Clear it with at least 11 of 12 right and an average reaction under 900 ms'
+    ]
+  },
+  'frequency_tap': {
+    zh: [
+      '跟着 100 BPM 的节拍点圆盘',
+      '要尽量踩在拍点上，系统会记录你每次的误差',
+      '20 拍命中 16 拍以上算通关'
+    ],
+    en: [
+      'Tap the disc in time with a 100 BPM beat',
+      'Aim for the beat itself — your timing error is recorded on every tap',
+      'Clear it with at least 16 hits out of 20 beats'
+    ]
+  },
+  'ghost_tap': {
+    zh: [
+      '4×4 的格子里会有幽灵一闪即逝',
+      '趁它还在的时候点中它；越往后它闪得越快',
+      '15 只幽灵里抓到 12 只以上算通关'
+    ],
+    en: [
+      'A ghost flashes briefly somewhere on a 4×4 grid',
+      'Tap it while it is still there — and it gets faster as you go',
+      'Catch at least 12 of the 15 ghosts to clear it'
+    ]
+  },
+  'grocery_list': {
+    zh: [
+      '先记住一份购物清单',
+      '之后逐题判断「这件东西在单子上吗」',
+      '3 轮里答对 75% 以上算通关'
+    ],
+    en: [
+      'First memorise a grocery list',
+      'Then answer one question at a time: was this item on the list?',
+      'Get at least 75% right across 3 rounds to clear it'
+    ]
+  },
+  'mandala_recall': {
+    zh: [
+      '彩格会亮起 2 秒然后熄灭',
+      '凭记忆把亮过的格子全部点回来',
+      '连过 4 关算通关；错一次就判负'
+    ],
+    en: [
+      'Coloured cells light up for 2 seconds, then go dark',
+      'Tap back every cell that was lit, from memory',
+      'Clear 4 rounds in a row to win; a single mistake and you lose'
+    ]
+  },
+  'memory_matrix': {
+    zh: [
+      '一组格子会闪一下',
+      '凭记忆把它们全部点出来',
+      '过 5 关算通关；点错 3 次就失败'
+    ],
+    en: [
+      'A set of cells flashes once',
+      'Tap all of them back from memory',
+      'Clear 5 rounds to win; three wrong taps and you fail'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
