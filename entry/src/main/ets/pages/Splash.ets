@@ -828,10 +828,15 @@ struct Splash {
         Row({ space: this.tiny ? 1 : 2 }) {
           ForEach(['O', 'n', 'e', ' ', 'M', 'o', 'r', 'e'], (ch: string, i: number) => {
             Text(ch)
-              .fontSize(this.tiny ? 26 : this.titlePx)
+              // ★★★ 2026-11-02（第 883 轮）**手表 233×233 真机抓到**：
+              //   tiny 档原来是 fontSize 26 + letterSpacing 4，
+              //   8 个字（含空格）实测宽度 = 26×8 + 4×7 = **236vp > 屏幕 233vp**
+              //   ⇒ 真机截图里「One More」的右侧 "re" 被裁出屏幕外。
+              //   ⇒ 改成 21 + 1.5 ⇒ 21×8 + 1.5×7 = **178.5vp**，留 54vp 余量。
+              .fontSize(this.tiny ? 21 : this.titlePx)
               .fontWeight(FontWeight.Bold)
               .fontColor(OM_CREAM)
-              .letterSpacing(this.tiny ? 4 : 6)
+              .letterSpacing(this.tiny ? 1.5 : 6)
               .opacity(this.charIn(i, 8))
               .translate({ y: (1 - this.charIn(i, 8)) * (this.tiny ? 8 : 16) })
               .blur((1 - this.charIn(i, 8)) * (this.tiny ? 6 : 10))
