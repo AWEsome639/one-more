@@ -297,17 +297,17 @@ export struct GAffixFactory {
           // ★ 2026-11-02（第 845 轮）**233×233 真机抓到**：这里原来没限行，
           //   「0/10」在手表上被折成两行（实测 bounds 高 126px = 2 行）。
           //   ⇒ 加 maxLines(1) 强制单行；极小屏缩一档字号（lg→md）。
-          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
+          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.right), this.langCode))
-          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.score), this.langCode))
-          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {

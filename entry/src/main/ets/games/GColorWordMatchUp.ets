@@ -268,7 +268,7 @@ export struct GColorWordMatchUp {
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((Math.min(this.trial + 1, this.diffTotal) + ' / ' + this.diffTotal)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.primary)).maxLines(1)
+        Text((Math.min(this.trial + 1, this.diffTotal) + ' / ' + this.diffTotal)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.primary)).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
@@ -278,7 +278,7 @@ export struct GColorWordMatchUp {
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('错误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.wrong + ' / ' + MAX_WRONG)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.rose)).maxLines(1)
+        Text((this.wrong + ' / ' + MAX_WRONG)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.rose)).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')

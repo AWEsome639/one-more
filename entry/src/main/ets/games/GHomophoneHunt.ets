@@ -278,15 +278,15 @@ export struct GHomophoneHunt {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((Math.min(this.qIdx + 1, QN) + ' / ' + QN)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.primaryDeep)).maxLines(1)
+        Text((Math.min(this.qIdx + 1, QN) + ' / ' + QN)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.primaryDeep)).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.right + ' / ' + PASS)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.emerald)).maxLines(1)
+        Text((this.right + ' / ' + PASS)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.emerald)).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.leftS + 's')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.rose)).maxLines(1)
+        Text((this.leftS + 's')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.rose)).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
 

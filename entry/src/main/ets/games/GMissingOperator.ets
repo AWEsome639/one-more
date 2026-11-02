@@ -307,21 +307,21 @@ export struct GMissingOperator {
           //   （实测 bounds 88×126，高是宽的 1.43 倍）。
           //   ⇒ maxLines(1) 强制单行；极小屏缩一档（lg→md）。
           Text((String(this.left) + 's'))
-          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
           }
           .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
           .borderRadius(Radius.md).shadow(Shadow.card)
           Column({ space: 2 }) {
           Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           Text((String(this.right) + '/' + String(GOAL)))
-          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
           }
           .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
           .borderRadius(Radius.md).shadow(Shadow.card)
           Column({ space: 2 }) {
           Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           Text(Digits(String(this.score), this.langCode))
-          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1)
+          .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
           // ★ 得分跳动
           .scale({ x: this.scorePulse, y: this.scorePulse })
           .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)

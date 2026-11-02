@@ -328,7 +328,7 @@ export struct GFactBinder {
   tileL(i: number) {
     Stack() {
       Text(this.done[i] ? '✅ ' + PAIRS[i].ans : PAIRS[i].ask)
-        .fontSize(FontSize.sm).maxLines(1)
+        .fontSize(FontSize.sm).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(this.done[i] ? '#FFFFFF' : this.theme.ink)
     }
     .width('100%').height(Space.xxxl)
@@ -345,7 +345,7 @@ export struct GFactBinder {
   tileR(i: number) {
     Stack() {
       Text(this.done[i] ? '✅ ' + PAIRS[i].ans : PAIRS[i].ans)
-        .fontSize(FontSize.sm).maxLines(1)
+        .fontSize(FontSize.sm).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(this.done[i] ? '#FFFFFF' : this.theme.ink)
     }
     .width('100%').height(Space.xxxl)

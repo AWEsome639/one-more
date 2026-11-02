@@ -72,11 +72,11 @@ struct StatsCard {
             .fontSize(13)
             .fontWeight(FontWeight.Bold)
             .fontColor('#F8FAFC')
-            .maxLines(1)
+            .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
           Text(this.played() ? '✅ ' + this.today : '⭕ ' + this.today)
             .fontSize(10)
             .fontColor(this.played() ? '#10B981' : '#94A3B8')
-            .maxLines(1)
+            .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         .alignItems(HorizontalAlign.Start)
         .layoutWeight(1)

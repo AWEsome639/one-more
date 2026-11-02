@@ -260,15 +260,15 @@ export struct GReflexTap {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('第几'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.round) + '/' + String(this.diffTotal))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
+        Text((String(this.round) + '/' + String(this.diffTotal))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('平均'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.avg() > 0 ? String(this.avg()) + 'ms' : '—')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
+        Text((this.avg() > 0 ? String(this.avg()) + 'ms' : '—')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('最快'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.best > 0 ? String(this.best) + 'ms' : '—')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
+        Text((this.best > 0 ? String(this.best) + 'ms' : '—')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.sm }) {
@@ -276,7 +276,7 @@ export struct GReflexTap {
           Row({ space: Space.sm }) {
             ForEach([0, 1, 2], (c: number) => {
               Stack() {
-              Text(this.live && (r * 3 + c) === this.pos ? '⚡' : '').fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.xxl)).maxLines(1)
+              Text(this.live && (r * 3 + c) === this.pos ? '⚡' : '').fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.xxl)).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
               }.layoutWeight(1).aspectRatio(1).borderRadius(Radius.md)
               .backgroundColor(this.flash === (r * 3 + c) ? '#FEE2E2' : (this.live && (r * 3 + c) === this.pos ? Palette.emerald : this.theme.surface))
               .animation({ duration: Motion.fast, curve: Motion.snap() })

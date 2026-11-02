@@ -283,11 +283,11 @@ export struct GShellGame {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('猜中'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.wins) + '/' + String(this.diffTotal))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
+        Text((String(this.wins) + '/' + String(this.diffTotal))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('洗牌'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.swaps) + TG(' 次'))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
+        Text((String(this.swaps) + TG(' 次'))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('状态'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

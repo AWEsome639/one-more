@@ -312,7 +312,7 @@ export struct GGoNoGo {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('试次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.over ? this.diffTotal : this.trialNo) + '/' + String(this.diffTotal))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
+        Text((String(this.over ? this.diffTotal : this.trialNo) + '/' + String(this.diffTotal))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
