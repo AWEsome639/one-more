@@ -793,11 +793,11 @@ struct GameHost {
 
 
   private tinyScreen(): boolean {
-    return Bp.height < 420 || Bp.width < 420;
+    return Bp.narrowScreen();   // ★ 第 854 轮：统一到 Bp，别各自实现
   }
 
   private iconSize(): number {
-    return Bp.height < 420 ? 30 : 44;
+    return Bp.narrowHeight() ? 30 : 44;
   }
 
   build() {

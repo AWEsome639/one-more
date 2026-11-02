@@ -226,6 +226,36 @@ export class Bp {
     return Bp.height > 0 && Bp.height < 340;
   }
 
+  /**
+   * ★★★ 2026-11-02（第 853-854 轮）：**窄屏**（高 < 420 或 宽 < 420）。
+   *
+   * 为什么单独抽出来：
+   *   `DemoBar` 与 `GameHost` 两个文件**各自**写了一遍
+   *   `Bp.height < 420 || Bp.width < 420`（方法名还不一样：`tiny()` / `tinyScreen()`），
+   *   而 `Bp.tinyScreen()` 的阈值是 **340** ⇒ 两套阈值并存，
+   *   在 **360~420** 之间会给出相反结论。
+   *
+   * ⇒ 统一到这里：需要"低于 420 就收紧"的地方一律调 `Bp.narrowScreen()`。
+   *   ⚠️ 它与 `tinyScreen()` **不是同一个概念**：
+   *      · `tinyScreen()`  < 340 ⇒ 只留「标题 + 列表」（更激进的降级）
+   *      · `narrowScreen()` < 420 ⇒ 收紧字号/间距（温和降级）
+   */
+  static narrowScreen(): boolean {
+    return Bp.height < 420 || Bp.width < 420;
+  }
+
+  /**
+   * ★ 2026-11-02（第 854 轮）：**只看高度**的窄判据（高 < 420）。
+   *
+   * 为什么单独一个：`DemoBar` 的演示条高度、`GameHost` 的图标尺寸
+   * 都写成了裸的 `Bp.height < 420 ? A : B` —— 只看高度是有道理的
+   * （这两个量只跟垂直空间有关），但**裸写会让人以为它等于 narrowScreen()**。
+   * ⇒ 抽出来，让"我只关心高度"这件事显式。
+   */
+  static narrowHeight(): boolean {
+    return Bp.height < 420;
+  }
+
   static isShort(): boolean {
     return Bp.height < 620;
   }

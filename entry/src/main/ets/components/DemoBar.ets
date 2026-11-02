@@ -35,7 +35,7 @@ export struct DemoBar {
 
   /** 极小屏：高或宽 < 420vp（运动手表 195 / 手表 233 都算） */
   private tiny(): boolean {
-    return Bp.height < 420 || Bp.width < 420;
+    return Bp.narrowScreen();   // ★ 第 854 轮：统一到 Bp，别各自实现
   }
 
   build() {
@@ -63,6 +63,6 @@ export struct DemoBar {
     //   调用方不必写 if/else 包一层（少一层缩进就少一类改错）。
     // ★★ 2026-11-01 真机（手表 195×195）：38vp 在 195 高的屏上占 19%，
     //   加上顶栏后内容区只剩 86vp。⇒ 极小屏压到 24vp。
-    .height(this.on ? (Bp.height < 420 ? 24 : 38) : 0)
+    .height(this.on ? (Bp.narrowHeight() ? 24 : 38) : 0)
   }
 }
