@@ -3192,7 +3192,19 @@ struct GameHost {
 
       // ── 结算弹窗 ──
       if (this.showResult) {
-        Column({ space: Space.md }) {
+        // ★★★ 2026-11-03（第 892 轮）**结算弹窗第三次踩同一块地板**：
+        //   前两轮（842 / 867）分别隐藏了 emoji、成就列表、并加了底部 8vp 安全区，
+        //   但真机再拍：**「返回列表」仍然落在 y=699（屏幕高）= 零余量，被切掉一半**。
+        //   ⇒ 因为 `padding` 拉不回**溢出的内容** —— 内容比可用高度高时，它只会溢出。
+        //   ⇒ 重新算账（233×233，全部按实际渲染值）：
+        //        padding 24+24 = 48 ｜ 标题 32 ｜ 三数据 56 ｜
+        //        space 16×3 = **48** ｜ 两个按钮 46+46 = 92
+        //        ── 合计 **276vp**，比 233 多 **43vp**。
+        //   ⇒ 本轮两刀（都是极小屏才生效，其它尺寸一字不改）：
+        //        ① `space` 16 → **4**（省 36vp；卡片本来就是圆角块，4vp 也够分开）
+        //        ② 两个按钮 46 → **40**（省 12vp；40 仍是可用触控高度）
+        //        ── 276 − 48 = **228 < 233** ✅
+        Column({ space: this.tinyScreen() ? Space.xs : Space.md }) {
           // ★★★ 2026-11-02（第 842 轮 · 第二轮）**手表 233×233**：
           //   隐藏成就列表后三数据出来了，但**两个按钮仍在屏幕外**。
           //   算过账：padding 64 + emoji 60 + 标题 44 + 三数据 64 + 按钮 108 = **340vp > 233vp**。
@@ -3300,7 +3312,8 @@ struct GameHost {
             .backgroundColor(this.accentColor())
             .borderRadius(Radius.md)
             // ★ 2026-10-19 自查 A3：结算页主按钮写死 46vp，大字模式字会顶出去
-            .width('100%').constraintSize({ minHeight: Cell.of(46) })
+            // ★ 2026-11-03（第 892 轮）：极小屏 46 → 40（省 6vp，仍够点）
+            .width('100%').constraintSize({ minHeight: this.tinyScreen() ? 40 : Cell.of(46) })
             .onClick(() => {
               Haptics.tap();   // ★ 2026-10-19 按压反馈
               // ★★★ 2026-11-01 真机抓到：**点「再来一局」后 AI 代打还在跑**。
@@ -3325,7 +3338,8 @@ struct GameHost {
             .fontColor(this.theme().inkSoft)
             .backgroundColor(this.theme().surfaceAlt)
             .borderRadius(Radius.md)
-            .width('100%').height(46)
+            // ★ 2026-11-03（第 892 轮）：极小屏 46 → 40（省 6vp，与上面对称）
+            .width('100%').height(this.tinyScreen() ? 40 : 46)
             .onClick(() => {
               Back.go();
             })
