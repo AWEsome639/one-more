@@ -1403,6 +1403,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'Complete all four puzzles as valid loops to clear it'
     ]
   },
+  'algebraic_balance': {
+    zh: [
+      '屏幕上一个一元一次方程，比如 3x + 5 = 20，或者 4x - 7 = 9',
+      '从 4 个候选值里点出 x 的解',
+      '一共 10 题，答对 7 题以上算通关'
+    ],
+    en: [
+      'A one-variable linear equation appears, such as 3x + 5 = 20 or 4x − 7 = 9',
+      'Solve for x and tap it among four candidates',
+      'Ten questions in all — get at least seven right to clear it'
+    ]
+  },
+  'arithmetic_chain': {
+    zh: [
+      '从一个起始数出发，依次点运算符，最多 4 步',
+      '每点一个运算符，当前数就按它变一次',
+      '让结果正好落到目标数上；5 关过 4 关算通关'
+    ],
+    en: [
+      'Start from a given number and tap operators one after another, at most four steps',
+      'Each operator you tap transforms the running value',
+      'Land exactly on the target; clear 4 of the 5 stages to pass'
+    ]
+  },
+  'balance_scale': {
+    zh: [
+      '左盘放着要称的物体，重量已经标出来了',
+      '右盘自己挑砝码 —— 点一下放上，再点一下拿回',
+      '右盘砝码刚好等于物体重量就过关，连过 5 关算通关；任何一关右盘超重，天平立刻翻，直接失败'
+    ],
+    en: [
+      'The object to weigh sits on the left pan with its weight shown',
+      'Load the right pan with weights yourself — tap to add one, tap again to take it back',
+      'Match the weight exactly to pass; clear 5 rounds in a row, but overload the pan even once and the scale tips and you fail on the spot'
+    ]
+  },
+  'base_conversion_run': {
+    zh: [
+      '十进制和二进制、八进制、十六进制之间互相换算',
+      '四选一作答；答对连击加分，答错扣 3 秒',
+      '60 秒内答对 10 题算通关；时间归零还没达标就失败'
+    ],
+    en: [
+      'Convert between decimal and binary, octal or hexadecimal',
+      'Pick one of four answers; right answers build a combo, wrong ones cost 3 seconds',
+      'Get 10 right within 60 seconds to clear it; when the clock hits zero short of that, you fail'
+    ]
+  },
+  'binary_code': {
+    zh: [
+      '给出一个目标数（十进制 1~255）',
+      '点亮 8 个位开关拼出它 —— 每个开关就是一个二进制位',
+      '拼对自动进下一关；60 秒内拼对 6 关算通关'
+    ],
+    en: [
+      'A target number appears, from 1 to 255 in decimal',
+      'Light up the eight bit switches to build it — each switch is one binary digit',
+      'A correct total advances you automatically; clear 6 rounds within 60 seconds to pass'
+    ]
+  },
+  'binomial_match': {
+    zh: [
+      '给定 (a+b)ⁿ，左列是 4 个展开项 aᵏb^(n−k)，右列是打乱的 4 个系数',
+      '左边点一个、右边点一个，配对正确就锁定',
+      '4 组全配对算通关；错满 3 次就失败'
+    ],
+    en: [
+      'Given (a+b)ⁿ, the left column holds four expansion terms aᵏb^(n−k) and the right column their four coefficients, shuffled',
+      'Tap one on each side — a correct pairing locks in',
+      'Match all four to clear it; three mistakes and you fail'
+    ]
+  },
+  'calculation_sprint': {
+    zh: [
+      '加减乘除心算，一题接一题',
+      '四选一作答；答对连击加分，答错扣 3 秒',
+      '60 秒内答对 15 题算通关；时间归零还没达标就失败'
+    ],
+    en: [
+      'Mental arithmetic — add, subtract, multiply, divide — one question after another',
+      'Pick one of four answers; right answers build a combo, wrong ones cost 3 seconds',
+      'Get 15 right within 60 seconds to clear it; when the clock runs out short of that, you fail'
+    ]
+  },
+  'collatz': {
+    zh: [
+      '从随机起点出发，每一步从 4 个候选里选出正确的下一项',
+      '规则很简单：偶数除以 2，奇数乘 3 加 1',
+      '一路推到 1 算通关；错满 3 次就失败'
+    ],
+    en: [
+      'Start from a random number and pick the correct next term from four candidates each step',
+      'The rule is simple: halve an even number, or triple an odd one and add 1',
+      'Reach 1 to clear it; three mistakes and you fail'
+    ]
+  },
+  'countdown_math': {
+    zh: [
+      '点一个数字 → 点一个运算符 → 再点一个数字，一步步算出目标数',
+      '目标数显示在屏幕上方；中间结果会保留下来继续运算',
+      '90 秒内解出 3 题以上算通关'
+    ],
+    en: [
+      'Tap a number, then an operator, then another number — build your way to the target',
+      'The target sits at the top of the screen, and intermediate results carry over for the next operation',
+      'Solve at least 3 within 90 seconds to clear it'
+    ]
+  },
+  'crypto_arithmetic': {
+    zh: [
+      '一个竖式里几个字母各代表一个数字，同一个字母代表同一个数字',
+      '给五个字母指派互不相同的数字，而且多位数首位不能是 0',
+      '5 题里解出 4 题以上算通关'
+    ],
+    en: [
+      'In a column sum each letter stands for one digit, and the same letter is always the same digit',
+      'Assign five distinct digits to the letters, keeping in mind a multi-digit number cannot start with 0',
+      'Solve at least 4 of the 5 puzzles to clear it'
+    ]
+  },
+  'digit_swap_eq': {
+    zh: [
+      '屏幕上是几个「被交换了数字」的错误等式',
+      '点两个数字块就能交换它们的位置',
+      '把等式改对；60 秒内改对 5 个以上算通关'
+    ],
+    en: [
+      'Several equations sit on screen with digits swapped into the wrong places',
+      'Tap two digit tiles to swap their positions',
+      'Fix the equations — get at least 5 right within 60 seconds to clear it'
+    ]
+  },
+  'divisibility_dash': {
+    zh: [
+      '屏幕上一个数和一个除数',
+      '快速判断「能整除」还是「不能整除」',
+      '45 秒内答对 12 题以上算通关'
+    ],
+    en: [
+      'A number and a divisor appear together',
+      'Quickly decide whether the division comes out exact',
+      'Get at least 12 right within 45 seconds to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
