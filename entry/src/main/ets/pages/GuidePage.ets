@@ -17,6 +17,7 @@ import { Back } from '../core/Back';
 // ★★★ 2026-10-16 BUG #26 补完：★ 指南页的游戏名/分类/说明原来用【原文】直接渲染
 //   ⇒ 阿语下显示【中文】⇒ 改用 GameRegistry 的本地化助手（GameCard 用的就是这套）
 import { findGame, GameMeta, GameCategory, displayName, displayTagline, catLabelEn } from '../core/GameRegistry';
+import { HOW_TO, HowTo, howToOf } from '../core/GameHowTo';
 import { ProgressStore } from '../core/ProgressStore';
 // ★★★ 2026-10-16 BUG #28：档位进度/次数数字要走 Digits ⇒ 必须导入
 //   （★ 铁律 #43 第二次咬我：加了 Digits 用法就必须补 Digits 导入）
@@ -274,7 +275,10 @@ struct GuidePage {
 
     // 玩法要点
     Column({ space: Space.md }) {
-      Text(this.t('通用玩法', 'General rules')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+      // ★ 2026-11-02：有具体玩法要点时标题叫「玩法要点」，否则诚实叫「通用玩法」
+      Text(this.meta !== undefined && howToOf(this.meta.id) !== null
+        ? this.t('玩法要点', 'How to play')
+        : this.t('通用玩法', 'General rules')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
       ForEach(this.tips(), (t: string, i: number) => {
         Row({ space: Space.sm }) {
           Text(String(i + 1))
@@ -329,6 +333,21 @@ struct GuidePage {
       return [this.t('选一款游戏开始吧', 'Pick a game to get started')];
     }
     const out: string[] = [];
+    // ★★★ 2026-11-02（第 833 轮）：**有具体玩法要点就用它**，没有再退回通用提示。
+    //   数据源 `core/GameHowTo.ets`（每条都读源码确认过，不凭名字猜）。
+    //   ⇒ 没条目的游戏自动降级到「通用玩法」，不显示空白。
+    const h: HowTo | null = howToOf(m.id);
+    if (h !== null) {
+      const arr: string[] = (this.langCode === 'zh' || this.langCode === 'zh-Hant') ? h.zh : h.en;
+      for (let i = 0; i < arr.length; i++) {
+        out.push(arr[i]);
+      }
+      const note0: string = colorVisionNote(m.id, !(this.langCode === 'zh' || this.langCode === 'zh-Hant'));
+      if (note0.length > 0) {
+        out.push(note0);
+      }
+      return out;
+    }
     // ★★★ 2026-11-01（第 829 轮）**真机看出来一个内容缺陷**：
     //   这里原来把 tagline 作为「玩法要点」①，而它**上面「一句话」已经原样显示过一次**
     //   ⇒ 4 条要点里第 1 条是纯重复，剩下 3 条是**分类通用提示**
