@@ -3216,7 +3216,8 @@ struct GameHost {
             .animation({ duration: 480, curve: Motion.snap() })
             .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
           Text(this.lastSolved ? this.t('这一局拿下！', 'You cleared it!') : this.t('再来一局？', 'One more?'))
-            .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
+            // ★ 2026-11-03（第 894 轮）：195 上 xl(20) → md(16)，再省约 6vp
+            .fontSize(Bp.tinyWatch() ? FontSize.md : FontSize.xl).fontWeight(FontWeight.Bold)
             .fontColor(this.theme().ink)
           // ★ 手感：刚解锁的成就**当场亮出来** + 三连庆祝（大时刻）
           if (this.newAch.length > 0) {
@@ -3260,7 +3261,25 @@ struct GameHost {
           // ★ 手感：得分与经验**滚动计数**（从 0 数到最终值）
           //   ⚠️ 必须内联 Text 读 @State —— this.stat(...) 是 @Builder，
           //   它的参数不建立 ArkUI 观察，计数过程中不会刷新（这个坑真踩过）
-          Row({ space: Space.xl }) {
+          // ★★★ 2026-11-03（第 894 轮）**195×195 真机实测：三数据卡换成一行**。
+          //   实测数据（195 上 dump）：只有「再来一局」出现在屏内（y2=569，余 16px），
+          //   **「返回列表」完全不在 dump 里** ⇒ 它被挤到 y > 585 = 屏幕外，玩家点不到。
+          //   ⇒ 三数据卡（数字 FontSize.md + 标签 FontSize.xxs + space 2）约 41vp，
+          //     而 195 上缺的正是这 40 来 vp。⇒ **极小极小屏改成一行紧凑文字**：
+          //     信息不丢（数字全在），高度从 41vp 降到约 17vp，省 **24vp**。
+          if (Bp.tinyWatch()) {
+            Text(Digits(String(this.scoreShown), this.langCode) + ' · '
+                 + (this.lastMs / 1000).toFixed(1) + 's · +' + String(this.gainShown))
+              .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
+              .fontColor(this.theme().ink)
+              .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+              .width('100%').textAlign(TextAlign.Center)
+              .opacity(this.pop ? 1 : 0)
+              .animation({ duration: Motion.base, curve: Motion.spring() })
+          }
+          // 常规尺寸：三卡并排（≥210vp 高才显示）
+          if (!Bp.tinyWatch()) {
+            Row({ space: Space.xl }) {
             Column({ space: 2 }) {
               Text(Digits(String(this.scoreShown), this.langCode))
                 // ★ 2026-11-02（第 851 轮）：结算弹窗在 233 手表上会显示，
@@ -3287,11 +3306,19 @@ struct GameHost {
             }.layoutWeight(1)
             .opacity(this.pop ? 1 : 0).translate({ y: this.pop ? 0 : 10 })
             .animation({ duration: Motion.base, curve: Motion.spring(), delay: 160 })
+            }
           }
           // ★★★ 2026-11-01（第 818 轮）：**新纪录**。数据一直在存（`perGameBest`），
           //   但从来没显示过 —— 玩家打出 1980 分和打出 600 分，屏幕上一模一样。
           //   ⇒ 只在这一局刷新了该游戏最高分时出现；带原纪录，能看到进步幅度。
-          if (this.lastSolved && ProgressStore.lastWasBest) {
+          // ★ 2026-11-03（第 894 轮）**195×195 真机第二轮**：
+          //   单行紧凑数据生效了（`165 · 7.5s · +5`），但「新纪录！」这一行又顶上来
+          //   ⇒ 实测 `返回列表 y2 = 585`（= 屏幕高）= **仍被裁掉**。
+          //   这一行约 20vp，而 195 上正好缺这 20vp。
+          //   ⇒ 极小极小屏（<210）**不显示这一行**：记录本身已经写进 ProgressStore，
+          //     下一局的三数据里也能看出来（分数变高）；
+          //     而「看得到按钮、能离开」远比「看一眼新纪录」重要。
+          if (this.lastSolved && ProgressStore.lastWasBest && !Bp.tinyWatch()) {
             Row({ space: 6 }) {
               Text('🏆').fontSize(FontSize.md)
               Text(ProgressStore.prevBest > 0
