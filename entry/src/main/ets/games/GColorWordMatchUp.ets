@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { Bp } from '../core/Bp';
 
 const NAMES: string[] = [TG('红'), TG('黄'), TG('蓝'), TG('绿')];
 const INKS: string[] = ['#EF4444', '#F59E0B', '#0EA5E9', '#10B981'];
@@ -267,7 +268,7 @@ export struct GColorWordMatchUp {
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((Math.min(this.trial + 1, this.diffTotal) + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
+        Text((Math.min(this.trial + 1, this.diffTotal) + ' / ' + this.diffTotal)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.primary)).maxLines(1)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
@@ -277,7 +278,7 @@ export struct GColorWordMatchUp {
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('错误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.wrong + ' / ' + MAX_WRONG)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
+        Text((this.wrong + ' / ' + MAX_WRONG)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.rose)).maxLines(1)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')

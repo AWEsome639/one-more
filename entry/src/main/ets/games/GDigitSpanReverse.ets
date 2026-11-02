@@ -16,6 +16,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { Bp } from '../core/Bp';
 const TRIALS: number = 6; const NEED: number = 5; const BASE: number = 3;
 const IDLE: number = -3;   // 未开始
 const ASK: number = -2;    // 播完，等作答
@@ -277,7 +278,7 @@ export struct GDigitSpanReverse {
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.trialNo) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((String(this.trialNo) + '/' + String(this.diffTotal))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -298,7 +299,7 @@ export struct GDigitSpanReverse {
         ForEach([0, 1, 2], (r: number) => {
           Row({ space: Space.xs }) {
             ForEach([0, 1, 2], (c: number) => {
-              Text(String((r * 3 + c + 1))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+              Text(String((r * 3 + c + 1))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.xl)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
               .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(48)).backgroundColor(this.theme.surfaceAlt)
               .borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); }); }).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
             }, (c: number) => 'kc' + c)

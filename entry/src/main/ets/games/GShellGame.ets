@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { Bp } from '../core/Bp';
 const LEVELS: number = 5;
 const BASE_SWAPS: number = 4;
 const SHOW_MS: number = 1400;
@@ -282,11 +283,11 @@ export struct GShellGame {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('猜中'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.wins) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((String(this.wins) + '/' + String(this.diffTotal))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('洗牌'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.swaps) + TG(' 次'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((String(this.swaps) + TG(' 次'))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('状态'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
