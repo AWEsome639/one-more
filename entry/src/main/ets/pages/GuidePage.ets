@@ -274,7 +274,7 @@ struct GuidePage {
 
     // 玩法要点
     Column({ space: Space.md }) {
-      Text(this.t('玩法要点', 'Key points')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+      Text(this.t('通用玩法', 'General rules')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
       ForEach(this.tips(), (t: string, i: number) => {
         Row({ space: Space.sm }) {
           Text(String(i + 1))
@@ -329,10 +329,15 @@ struct GuidePage {
       return [this.t('选一款游戏开始吧', 'Pick a game to get started')];
     }
     const out: string[] = [];
-    // ★★★ 2026-10-16 BUG #26 最后一片：原来是 `out.push(m.tagline)` 用【原文】
-    //   ⇒ 实拍阿语指南页：要点①还是中文「交换消宝石」
-    //   ⇒ 改用 displayTagline(m)（走 GAME_TAGLINE 字典，12 语言全覆盖）
-    out.push(displayTagline(m));
+    // ★★★ 2026-11-01（第 829 轮）**真机看出来一个内容缺陷**：
+    //   这里原来把 tagline 作为「玩法要点」①，而它**上面「一句话」已经原样显示过一次**
+    //   ⇒ 4 条要点里第 1 条是纯重复，剩下 3 条是**分类通用提示**
+    //     （「点/滑操作」「有明确胜负判定」「右上角 ↻ 重开」）
+    //   ⇒ 玩家看完还是不知道"这款游戏具体怎么玩"。
+    //   本轮处理：**去掉重复**，并把标题从「玩法要点」改成「通用玩法」——
+    //   它本来就不是"这款的要点"，改标题是不让界面说谎（判据 114 的同一原则）。
+    //   ⚠️ 真正的"每款详细教学"是**未完成的产品需求**（355 款 × 3~5 条 × 10 语言），
+    //      已记入台账待办，不在这里假装做到了。
     // ★ 非中文系一律用英文提示（以前只判 'en'，日语/韩语下会残留中文）
     const zhLike: boolean = this.langCode === 'zh' || this.langCode === 'zh-Hant';
     const t: string[] = categoryTips(m.category, !zhLike);
