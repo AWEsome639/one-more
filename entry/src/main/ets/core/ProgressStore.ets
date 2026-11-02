@@ -67,6 +67,24 @@ export class ProgressStore {
   /** ★ 2026-11-01（第 818 轮）：上一局是否刷新了该游戏的最高分。
    *  由 `finishGame` 写入，结算弹窗读取 —— 让「新纪录」能被庆祝。
    *  用静态字段而不是改 `finishGame` 的返回值：355 款都在调它，改签名会动到全部调用点。 */
+  /** ★ 2026-11-01（第 830 轮）：**游戏总数改成动态的**。
+   *
+   *  真机审计发现两处写死 354：
+   *    ① 成就文案「354 款一款不落」/「354 款全部通关」
+   *    ② **成就判定阈值** `kinds >= 354` / `clearedN >= 354`
+   *  而 `GAMES.length` 实际是 **355**（新增一款后没同步）。
+   *  ⇒ 后果不只是文案矛盾：**玩过 354 款就算"全收集"**，第 355 款没玩也解锁。
+   *  ⇒ 根因：数字被抄进两处而非从唯一来源派生。
+   *  ★ 判据：**"总数"这类数字，全项目只能有一个来源** —— 这里就是 `GAMES.length`。
+   */
+  static totalGames(): number {
+    let n: number = 0;
+    for (let i = 0; i < GAME_IDS_BY_CAT.length; i++) {
+      n += GAME_IDS_BY_CAT[i].length;
+    }
+    return n;
+  }
+
   static lastWasBest: boolean = false;
   /** 刷新前的最高分（用于显示「1200 → 1980」的进步幅度） */
   static prevBest: number = 0;
@@ -481,7 +499,7 @@ export class ProgressStore {
       ['fifty_kinds', '🗺️', '半百猎手', '玩过 50 款不一样的', 'Explorer', 'Try 50 different games'],
       ['hundred_kinds', '🎯', '百款猎手', '玩过 100 款不一样的', 'Century Hunter', 'Try 100 different games'],
       ['two_hundred_kinds', '🧭', '两百款巡礼', '玩过 200 款不一样的', 'Two Hundred Club', 'Try 200 different games'],
-      ['all_kinds', '🌌', '全收集', '354 款一款不落', 'Completionist', 'Try all 354 games'],
+      ['all_kinds', '🌌', '全收集', '全部一款不落', 'Completionist', 'Try every single game'],
 
       // ── 深度（通关多少）──
       ['solve_10', '🏆', '通关达人', '通关 10 局', 'Solver', 'Clear 10 games'],
@@ -489,7 +507,7 @@ export class ProgressStore {
       ['solve_500', '🏅', '五百胜', '通关 500 局', 'Five Hundred', 'Clear 500 games'],
       ['clear_30_kinds', '📚', '通关 30 款', '30 款都通关了', '30 Cleared', 'Clear 30 different games'],
       ['clear_100_kinds', '🏛️', '通关 100 款', '100 款都通关了', '100 Cleared', 'Clear 100 different games'],
-      ['clear_all', '👑', '大满贯', '354 款全部通关', 'Grand Slam', 'Clear all 354 games'],
+      ['clear_all', '👑', '大满贯', '全部通关', 'Grand Slam', 'Clear every game'],
 
       // ── 打卡连胜 ──
       ['streak_3', '🔥', '三日连击', '连着 3 天来玩', 'Three in a Row', 'Come back 3 days running'],
@@ -593,14 +611,14 @@ export class ProgressStore {
       ['fifty_kinds', kinds >= 50 ? '1' : '0'],
       ['hundred_kinds', kinds >= 100 ? '1' : '0'],
       ['two_hundred_kinds', kinds >= 200 ? '1' : '0'],
-      ['all_kinds', kinds >= 354 ? '1' : '0'],
+      ['all_kinds', kinds >= ProgressStore.totalGames() ? '1' : '0'],
 
       ['solve_10', solved >= 10 ? '1' : '0'],
       ['solve_100', solved >= 100 ? '1' : '0'],
       ['solve_500', solved >= 500 ? '1' : '0'],
       ['clear_30_kinds', clearedN >= 30 ? '1' : '0'],
       ['clear_100_kinds', clearedN >= 100 ? '1' : '0'],
-      ['clear_all', clearedN >= 354 ? '1' : '0'],
+      ['clear_all', clearedN >= ProgressStore.totalGames() ? '1' : '0'],
 
       ['streak_3', streak >= 3 ? '1' : '0'],
       ['streak_7', streak >= 7 ? '1' : '0'],
