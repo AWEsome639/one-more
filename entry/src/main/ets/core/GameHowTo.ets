@@ -3071,6 +3071,330 @@ export const HOW_TO: Record<string, HowTo> = {
       'Get at least 4 of 6 right to clear it'
     ]
   },
+  'palindrome_builder': {
+    zh: [
+      '屏幕给出一组字母',
+      '用它们摆出一个回文（正着读和倒着读一样）',
+      '6 题解出 4 题以上算通关'
+    ],
+    en: [
+      'A set of letters is given',
+      'Arrange them into a palindrome — one that reads the same backwards',
+      'Solve at least 4 of 6 to clear it'
+    ]
+  },
+  'pangram_sprint': {
+    zh: [
+      '一个全字母句被抠掉了几个字母',
+      '从 A 到 Z 里挑出缺的那些补回去',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'A pangram has several letters removed',
+      'Pick the missing ones from A to Z to restore it',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'portmanteau_split': {
+    zh: [
+      '屏幕给出一个混合词（比如 brunch）',
+      '选出它是由哪两个词拼成的',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'A portmanteau word appears, like brunch',
+      'Pick the two words it was blended from',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'rhyme_master': {
+    zh: [
+      '屏幕给出一个目标词',
+      '四选一，挑出跟它押韵的那个词',
+      '8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A target word appears',
+      'Pick the word among four that rhymes with it',
+      'Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'semantic_association': {
+    zh: [
+      '屏幕给出一个线索词',
+      '从候选里挑出与它关系最紧密的搭档词',
+      '10 题答对 7 题以上算通关'
+    ],
+    en: [
+      'A cue word appears',
+      'Pick the candidate most tightly associated with it',
+      'Get at least 7 of 10 right to clear it'
+    ]
+  },
+  'semantic_distance': {
+    zh: [
+      '屏幕给出一个锚点词和两个候选词',
+      '判断哪一个离锚点词在意思上更近',
+      '10 题答对 7 题以上算通关'
+    ],
+    en: [
+      'An anchor word and two candidates appear',
+      'Decide which candidate is closer in meaning to the anchor',
+      'Get at least 7 of 10 right to clear it'
+    ]
+  },
+  'semantic_link': {
+    zh: [
+      '一条语义链一环扣一环',
+      '每次挑出能接上下一环的词',
+      '把整条 6 词链接通算通关；生命耗尽即失败'
+    ],
+    en: [
+      'A semantic chain runs link by link',
+      'Each time pick the word that connects to the next link',
+      'Complete the whole six-word chain to clear it; lose all your lives and you fail'
+    ]
+  },
+  'sentence_unscramble': {
+    zh: [
+      '6 个单词被打乱了顺序',
+      '按正确的语序把它们一个个点回去',
+      '5 句答对 4 句以上算通关；错 3 次就失败'
+    ],
+    en: [
+      'Six words arrive in scrambled order',
+      'Tap them back into the correct sentence order',
+      'Get at least 4 of 5 sentences right to clear it; three mistakes and you fail'
+    ]
+  },
+  'silent_letter_search': {
+    zh: [
+      '一个字母格里藏着一个不发音的字母',
+      '把那个不发音的字母点出来',
+      '10 题答对 7 题以上算通关；错 3 次就失败'
+    ],
+    en: [
+      'A silent letter hides somewhere in a grid of letters',
+      'Tap the letter that is not pronounced',
+      'Get at least 7 of 10 right to clear it; three mistakes and you fail'
+    ]
+  },
+  'spelling_sprint': {
+    zh: [
+      '看着中文释义',
+      '在 60 秒内把对应的英文单词敲出来',
+      '答对 8 题以上算通关；超时或错满 3 次就失败'
+    ],
+    en: [
+      'A Chinese definition appears',
+      'Type out the matching English word within 60 seconds',
+      'Get at least 8 right to clear it; running out of time or three mistakes fails you'
+    ]
+  },
+  'spoonerism_solver': {
+    zh: [
+      '首音互换（Spoonerism）：把两个词的开头辅音对调',
+      '挑出互换之后得到的那一对词',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'A spoonerism swaps the opening sounds of two words',
+      'Pick the pair you get after the swap',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'story_builder': {
+    zh: [
+      '几个句子被打乱，讲的是同一件事',
+      '按「事情发生的先后」一段段接回完整故事',
+      '接完 3 段故事算通关；错接 3 次就失败'
+    ],
+    en: [
+      'Several sentences from one story arrive out of order',
+      'Reorder them by when things happened to rebuild the whole story',
+      'Assemble 3 stories to clear it; three wrong connections and you fail'
+    ]
+  },
+  'syllable_stack': {
+    zh: [
+      '屏幕给出中文提示和一组打乱的音节',
+      '把音节按正确顺序叠起来，拼成一个英文单词',
+      '6 个词全部叠对算通关；错叠 3 次就失败'
+    ],
+    en: [
+      'A Chinese hint and a set of shuffled syllables appear',
+      'Stack the syllables in the right order to build the English word',
+      'Build all 6 words correctly to clear it; three wrong stacks and you fail'
+    ]
+  },
+  'typing_speed': {
+    zh: [
+      '屏幕上一句话，照着它打一遍',
+      '系统会实时统计你的 WPM（每分钟词数）和正确率',
+      '5 句都在 25 秒内打完、且正确率 90% 以上算通关'
+    ],
+    en: [
+      'A sentence appears — type it out exactly',
+      'Your words per minute and accuracy are tracked live',
+      'Finish all 5 sentences within 25 seconds each at 90% accuracy or better to clear it'
+    ]
+  },
+  'verbal_analogies': {
+    zh: [
+      '题目是「A 比 B，等于 C 比 ?」',
+      '从四个候选里挑出关系对得上的那个',
+      '8 题答对 6 题以上算通关；答错 3 次就失败'
+    ],
+    en: [
+      'The prompt reads “A is to B as C is to ?”',
+      'Pick the candidate that completes the relationship',
+      'Get at least 6 of 8 right to clear it; three wrong answers and you fail'
+    ]
+  },
+  'vocabulary_builder': {
+    zh: [
+      '给出中文释义和词性',
+      '在同一个词根的派生词里挑出对的那个（要辨析前缀/后缀）',
+      '8 题答对 6 题以上算通关；答错 3 次就失败'
+    ],
+    en: [
+      'A Chinese definition and part of speech appear',
+      'Pick the right derivative of the same root — you must tell the prefixes and suffixes apart',
+      'Get at least 6 of 8 right to clear it; three wrong answers and you fail'
+    ]
+  },
+  'vowel_reconstruct': {
+    zh: [
+      '单词里的元音在 AEIOU 里被整体挪了若干格',
+      '点亮元音，把它一格一格转回正确的位置',
+      '题数按难度（简单 4 / 普通 6 / 困难 8），还原到通关线（3 / 5 / 7）个算通关'
+    ],
+    en: [
+      'Every vowel has been rotated a fixed number of places around AEIOU',
+      'Tap a vowel to turn it back one step at a time',
+      'Rounds depend on difficulty (4 easy, 6 normal, 8 hard); restore the pass line of 3, 5 or 7 to clear it'
+    ]
+  },
+  'word_association_recall': {
+    zh: [
+      '先记住 6 组「词 — 关联词」',
+      '之后凭记忆把每个词和它的关联词配回来',
+      '6 题里回忆对 4 题以上算通关'
+    ],
+    en: [
+      'First memorise six word-and-associate pairs',
+      'Then pair each word back with its associate from memory',
+      'Recall at least 4 of 6 correctly to clear it'
+    ]
+  },
+  'word_grid_connection': {
+    zh: [
+      '4×4 的词格里散布着若干词',
+      '点两个意思相近的词，把它们连成一对',
+      '连完 8 对算通关；连错 5 次就失败'
+    ],
+    en: [
+      'Words are scattered through a 4×4 grid',
+      'Tap two words with similar meaning to link them into a pair',
+      'Link all 8 pairs to clear it; five wrong links and you fail'
+    ]
+  },
+  'word_ladder': {
+    zh: [
+      '从起点词走到目标词',
+      '每步只能换一个字母，而且换完必须是词库里的真实单词',
+      '在步数上限内到达目标词算通关；步数用尽还没到就失败'
+    ],
+    en: [
+      'Travel from the start word to the target word',
+      'Each step changes exactly one letter, and the result must be a real word',
+      'Reach the target within the move limit to clear it; run out of moves and you fail'
+    ]
+  },
+  'word_ladder_step': {
+    zh: [
+      '每题给出四个候选词',
+      '挑出那个「只改一个字母、而且本身是真实单词」的',
+      '10 题内生命不耗尽算通关；生命耗尽就失败'
+    ],
+    en: [
+      'Four candidate words appear',
+      'Pick the one that differs by a single letter and is itself a real word',
+      'Survive 10 questions without losing your lives to clear it'
+    ]
+  },
+  'word_mastermind': {
+    zh: [
+      '一个 5 字母的单词藏着，你要猜出来',
+      '每次猜完逐格给反馈：位置对 / 字母在但位置不对 / 都没有',
+      '7 次之内猜中算通关；次数用完还没中就失败'
+    ],
+    en: [
+      'A five-letter word is hidden and you must guess it',
+      'After each guess every cell reports: right spot, right letter wrong spot, or absent',
+      'Guess it within 7 tries to clear it; run out and you fail'
+    ]
+  },
+  'word_scramble': {
+    zh: [
+      '字母被打乱了，中文释义给出线索',
+      '把字母按正确顺序点回去，拼成单词',
+      '150 秒内拼对 8 个词算通关；超时就失败'
+    ],
+    en: [
+      'The letters are scrambled and a Chinese definition gives the clue',
+      'Tap the letters back in order to spell the word',
+      'Build 8 words correctly within 150 seconds to clear it'
+    ]
+  },
+  'word_search': {
+    zh: [
+      '8×8 的字母阵里藏着 4 个单词',
+      '点每个词的首尾两格，把它圈出来',
+      '90 秒内找齐 4 个算通关；超时就失败'
+    ],
+    en: [
+      'Four words hide in an 8×8 letter grid',
+      'Tap the first and last cell of each word to circle it',
+      'Find all 4 within 90 seconds to clear it'
+    ]
+  },
+  'word_snake_trail': {
+    zh: [
+      '用方向键操纵小蛇在格子里移动',
+      '按顺序去吃字母，拼出目标单词',
+      '拼完 3 个词算通关；生命用完（吃错/撞墙/咬自己）就失败'
+    ],
+    en: [
+      'Steer a snake around the grid with the arrow keys',
+      'Eat the letters in the right order to spell the target word',
+      'Spell 3 words to clear it; losing all lives — wrong letter, wall or your own tail — fails you'
+    ]
+  },
+  'word_surge': {
+    zh: [
+      '60 秒内按中文释义抢答英文单词',
+      '答得越快、连击越长，分越高',
+      '答对 12 个算通关；时间耗尽就失败'
+    ],
+    en: [
+      'Answer English words from their Chinese definitions for 60 seconds',
+      'The faster you answer and the longer your streak, the higher you score',
+      'Get 12 right to clear it; running out of time fails you'
+    ]
+  },
+  'word_wheel': {
+    zh: [
+      '从 6 个字母里拼出英文单词',
+      '每个字母在每一轮里只能用一次',
+      '找齐 5 个词算通关；拼错 3 次就失败'
+    ],
+    en: [
+      'Build English words from six letters',
+      'Each letter may be used only once per round',
+      'Find all 5 words to clear it; three wrong attempts and you fail'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
