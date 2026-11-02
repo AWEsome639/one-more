@@ -3180,11 +3180,16 @@ struct GameHost {
       // ── 结算弹窗 ──
       if (this.showResult) {
         Column({ space: Space.md }) {
+          // ★★★ 2026-11-02（第 842 轮 · 第二轮）**手表 233×233**：
+          //   隐藏成就列表后三数据出来了，但**两个按钮仍在屏幕外**。
+          //   算过账：padding 64 + emoji 60 + 标题 44 + 三数据 64 + 按钮 108 = **340vp > 233vp**。
+          //   ⇒ 再省：**emoji 是纯装饰，极小屏隐藏**（省约 60vp）。
           Text(this.lastSolved ? '🎉' : '💪')
             .fontSize(44)
             .scale({ x: this.pop ? 1 : 0.4, y: this.pop ? 1 : 0.4 })
             .rotate({ angle: this.pop ? 0 : -18 })
             .animation({ duration: 480, curve: Motion.snap() })
+            .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
           Text(this.lastSolved ? this.t('这一局拿下！', 'You cleared it!') : this.t('再来一局？', 'One more?'))
             .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
             .fontColor(this.theme().ink)
@@ -3200,6 +3205,13 @@ struct GameHost {
             .width('100%')
             .padding({ left: Space.md, right: Space.md, top: 8, bottom: 8 })
             .backgroundColor('#1AF59E0B')
+            // ★★★ 2026-11-02（第 842 轮）**手表 233×233 真机抓到**：
+            //   结算弹窗内容比屏幕高，**「再来一局」与「返回列表」两个按钮被挤到屏幕外**
+            //   （截图实拍：只看到 💪 / 再来一局？ / 两条成就，按钮完全没有）。
+            //   ⇒ 玩家只能靠顶栏 ‹ 或系统返回键离开，弹窗自己的按钮点不到。
+            //   ⇒ 修：极小屏隐藏「成就列表」（可选的炫耀内容），
+            //     用 `visibility` 属性而非 if —— 零结构改动（判据 139）。
+            .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
             .borderRadius(Radius.md)
             .scale({ x: this.pop ? 1 : 0.8, y: this.pop ? 1 : 0.8 })
             .opacity(this.pop ? 1 : 0)
@@ -3307,7 +3319,8 @@ struct GameHost {
         //   "解锁成就 初次开局/首次通关/通关达人/百局老手" 四条挤在正中）。
         //   ⇒ 给一个**最大宽度**，大屏上就是一个居中卡片。
         .constraintSize({ maxWidth: 560 })
-        .padding(Space.xxl)
+        // ★ 极小屏 padding 减半（32 → 16），再省约 32vp
+        .padding(this.tinyScreen() ? Space.md : Space.xxl)
         .backgroundColor(this.theme().surface)
         .borderRadius({ topLeft: Radius.xl, topRight: Radius.xl })
         .shadow(Shadow.card)
