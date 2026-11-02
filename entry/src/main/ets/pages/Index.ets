@@ -244,8 +244,19 @@ pageTransition() {
       Text(this.t('「One More」不收集你的个人信息，也不上传你的游戏记录。所有记录只存在你自己的手机里。需联网的只有两项：局域网对战、华为游戏服务的账号校验。',
                   'One More collects nothing and uploads nothing. All records stay on your phone. Only two things use the network: LAN matches and Huawei Game Service sign-in.'))
         .fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
+        // ★★★ 2026-11-02（第 844 轮）**手表 233×233 真机截图抓到**：
+        //   这段摘要没有行数上限，在 233vp 上排了 12 行、把卡片撑破，
+        //   **两个按钮被挤出卡片边界**（截图里按钮贴在屏幕最底、卡片外）。
+        //   ⇒ 加行数上限 + 省略号；**完整内容仍可点「查看全文」看到** ——
+        //     注释说"合规内容不能因为屏小而省"，全文入口还在，没有省。
+        .maxLines(Bp.isWatch() || Bp.tinyScreen() ? 5 : 20)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: 10 }) {
-        Button(this.t('查看全文', 'Read policy'))
+        // ★ 2026-11-02（第 845 轮）**手表 233×233**：两个按钮并排时宽度不够，
+        //   文字被省略成「查看…」「同意…」⇒ 极小屏改用短标签（语义不变）。
+        Button(Bp.isWatch() || Bp.tinyScreen()
+          ? this.t('全文', 'All')
+          : this.t('查看全文', 'Read policy'))
           .layoutWeight(1).height(42)
           .fontSize(FontSize.sm)
           .fontColor(this.theme().ink)
@@ -253,7 +264,9 @@ pageTransition() {
           .borderRadius(Radius.md)
           .accessibilityText(this.t('查看全文', 'Read policy'))
           .onClick(() => { Haptics.tap(); this.openPrivacy(); })
-        Button(this.t('同意并继续', 'Agree and continue'))
+        Button(Bp.isWatch() || Bp.tinyScreen()
+          ? this.t('同意', 'Agree')
+          : this.t('同意并继续', 'Agree and continue'))
           .layoutWeight(1).height(42)
           .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
           .fontColor(Color.White)
