@@ -124,6 +124,8 @@ struct Index {
     this.uiRev = this.uiRev + 1;
   }
   @State current: number = 0;
+  /** ★ 2026-11-03（第 916 轮）**PC hover 状态**：哪个页签在鼠标下（-1 = 无） */
+  @State private barHover: number = -1;
   @State entered: boolean = false;
   /** 首次进入引导卡（项目 D ⑤）：点「开始玩」后落盘，不再出现 */
   @State private showWelcome: boolean = false;
@@ -429,6 +431,24 @@ build() {
     .width('100%')
     .height(Bp.isWatch() || Bp.tinyScreen() ? 36 : 60)
     .justifyContent(FlexAlign.Center)
+    // ★★★ 2026-11-03（第 916 轮）**PC hover：底部标签栏是桌面上最常被点的元素**。
+    //   原来这里只有电视焦点（focusBox），鼠标划过**没有任何反馈** ——
+    //   而同一份代码里的 GameCard 是有 hover 的（Common.ets:922）
+    //   ⇒ 同一个 App 里两种手感，玩家会觉得"下半截没做完"。
+    //   ⚠️ `Bp.isDesktop() || Bp.isLg()` 门控：触屏设备不该有 hover 态。
+    //   ⚠️ 高亮只改**背景色**，不碰内部 Text(icon) 已有的 1.15 scale
+    //      （两层 scale 会相乘，1.06×1.15=1.22 太大）。
+    .onHover((isHover: boolean) => {
+      if (!(Bp.isDesktop() || Bp.isLg())) {
+        return;
+      }
+      animateTo({ duration: Motion.fast, curve: Motion.snap() }, () => {
+        this.barHover = isHover ? idx : -1;
+      });
+    })
+    .backgroundColor(this.barHover === idx && this.current !== idx
+      ? this.theme().surfaceAlt : Color.Transparent)
+    .borderRadius(Radius.sm)
     // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
     //   电视上没有触摸 ⇒ 用遥控器方向键在三个页签间移动，OK 键切换
     //   `this.current = idx` 就是 Tabs 的受控索引，和点击 tabBar 的效果一致
