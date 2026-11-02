@@ -255,7 +255,7 @@ export struct StatsTab {
     return out;
   }
 
-  /** 玩过的 gameId（从 perGamePlays 的键取，省得遍历 354 款） */
+  /** 玩过的 gameId（从 perGamePlays 的键取，省得遍历全部游戏） */
   private playedIds(): string[] {
     const out: string[] = [];
     try {

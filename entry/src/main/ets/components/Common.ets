@@ -15,7 +15,7 @@ import { L, TN } from '../core/I18n';
 
 // ─── ICON_MAP:BEGIN（由 tools/gen_icon_map.py 生成，勿手改）───
 /**
- * 游戏图标资源表（354 款，每款一张预渲染位图）。
+ * 游戏图标资源表（全部游戏，每款一张预渲染位图）。
  *
  * 图标由 `tools/gen_game_icons.py` 生成到 `resources/base/media/gico_<id>.png`：
  *   · 改前 354 款共用 69 个 emoji（327 款跟别人撞脸）
@@ -751,7 +751,7 @@ export struct GameCard {
     return TN(zh, en, n, f1, f2, f5);   // ★ 复数透传（不传则退回旧行为）
   }
 
-  /** 图标资源（354 款各有各的位图）；表里没有就返回 undefined，退回 emoji */
+  /** 图标资源（全部游戏各有各的位图）；表里没有就返回 undefined，退回 emoji */
   private iconRes(): Resource | undefined {
     return iconOf(this.meta.id);
   }

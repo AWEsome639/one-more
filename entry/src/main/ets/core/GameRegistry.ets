@@ -69,7 +69,7 @@ export interface GameMeta {
 export const ACCENT_TAG: string = '@accent';
 export const ACCENT_DEEP_TAG: string = '@accent-deep';
 
-/** 全部 354 款游戏 */
+/** 全部游戏 */
 export const GAMES: GameMeta[] = [
   { id: 'bejeweled', name: '宝石迷阵', tagline: '交换消宝石', category: GameCategory.CLASSIC, icon: '💎', color: ACCENT_TAG, difficulty: Difficulty.NORMAL, baseXp: 12, tags: ['cozy', 'easy', 'logic', 'medium', 'pausable', 'tap', 'untimed'], enName: 'Bejeweled', enTagline: 'Swap gems to line up three or more' },
   { id: 'breakout', name: '打砖块', tagline: '一板一球，清空全场', category: GameCategory.CLASSIC, icon: '🧱', color: Palette.berry, difficulty: Difficulty.NORMAL, baseXp: 12, tags: ['easy', 'endless', 'logic', 'medium', 'swipe', 'timed'], enName: 'Breakout', enTagline: 'Bounce the ball, clear every brick' },
