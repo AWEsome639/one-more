@@ -4055,6 +4055,234 @@ export const HOW_TO: Record<string, HowTo> = {
       'Get from start to finish to clear it; fewer steps scores higher'
     ]
   },
+  'multi_track_counter': {
+    zh: [
+      '三条轨道上各有东西在持续增加',
+      '你不能一条条数完 —— 要凭眼力同时跟住三路，报出总数',
+      '3 轮，每轮速度 +1；误差不超过 2 算通关'
+    ],
+    en: [
+      'Things keep growing along three separate tracks',
+      'You cannot count them one by one — track all three at once and report the total',
+      'Three rounds, each a little faster; finish within an error of 2 to clear it'
+    ]
+  },
+  'odd_rotation': {
+    zh: [
+      '一格里排着一堆相同图形',
+      '其中只有一个转了 90°，其余都停在同一角度',
+      '把转过的那个点出来；10 题答对 8 题以上算通关'
+    ],
+    en: [
+      'A grid is filled with identical shapes',
+      'Exactly one of them is rotated 90° while the rest sit at the same angle',
+      'Tap the rotated one; get at least 8 of 10 right to clear it'
+    ]
+  },
+  'path_recall': {
+    zh: [
+      '格子会依次亮起，连成一条路径',
+      '看完之后，按同样的顺序把这条路径点出来',
+      '连过 6 轮（路径从 3 格加到 8 格）算通关；点错一格就失败'
+    ],
+    en: [
+      'Cells light up one after another, tracing a path',
+      'Afterwards, tap that path back in the same order',
+      'Clear 6 rounds (paths growing from 3 cells to 8) to win; one wrong cell and you fail'
+    ]
+  },
+  'perspective_shift_view': {
+    zh: [
+      '给一张俯视图，以及一个观察方向',
+      '选出「从那一侧看过去」会看到的排列',
+      '8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A top-down view is shown along with a viewing direction',
+      'Pick the arrangement you would see looking in from that side',
+      'Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'room_inspector': {
+    zh: [
+      '屏幕上下各有一间房间',
+      '下面那间有 3 处摆设和上面不一样',
+      '把 3 处都点出来算通关；错点 3 次或超过 60 秒就失败'
+    ],
+    en: [
+      'Two rooms are shown, one above the other',
+      'The lower room has 3 items arranged differently',
+      'Spot all 3 to clear it; three wrong taps or more than 60 seconds and you fail'
+    ]
+  },
+  'rotating_maze': {
+    zh: [
+      '7×7 的迷宫，但你每走 2 步，整个迷宫会顺时针转 90°',
+      '所以刚记住的路会在脚下转走',
+      '走到出口 🏁 算通关；步数用尽就失败'
+    ],
+    en: [
+      'A 7×7 maze — but every 2 steps the whole maze rotates 90° clockwise',
+      'So the route you just memorised turns away beneath you',
+      'Reach the 🏁 exit to clear it; run out of steps and you fail'
+    ]
+  },
+  'silhouette_match_ortho': {
+    zh: [
+      '三层 3×3 的方块叠在一起',
+      '从正上方看下去（正投影）会得到哪个剪影？只要那一格有方块就算',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'Three 3×3 layers of blocks are stacked',
+      'Which silhouette do you get looking straight down from above? A cell counts if any layer has a block there',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'simon_command': {
+    zh: [
+      '屏幕陆续给出指令',
+      '只有以「西蒙说」开头的才照做；没有这句话就必须点「不做动作 ✋」',
+      '每题限时 2.2 秒；答对 10 题算通关，失误 3 次就失败'
+    ],
+    en: [
+      'Instructions appear one after another',
+      'Obey only those starting with “Simon says”; if it is absent you must tap “do nothing ✋”',
+      'Each has a 2.2-second limit; get 10 right to clear it, three mistakes and you fail'
+    ]
+  },
+  'simon_sequence': {
+    zh: [
+      '6 个数字格会按顺序亮起',
+      '照着亮起的顺序点回去',
+      '每过一关序列就加长一位；长度撑到 8 算通关，点错就失败'
+    ],
+    en: [
+      'Six numbered cells light up in sequence',
+      'Tap them back in the order they lit',
+      'Each round adds one more step; reach a length of 8 to clear it, one wrong tap and you fail'
+    ]
+  },
+  'source_monitoring': {
+    zh: [
+      '先记住 5 条消息各自是谁说的（限时 8 秒）',
+      '之后逐条给出消息，问你「这话是谁说的」',
+      '5 题答对 4 题以上算通关'
+    ],
+    en: [
+      'Memorise who said each of 5 messages, in 8 seconds',
+      'Each message then appears and you are asked who said it',
+      'Get at least 4 of 5 right to clear it'
+    ]
+  },
+  'sternberg_task': {
+    zh: [
+      '先记住一组 4 个水果',
+      '然后看一个探针水果，判断它是否在你记住的那组里',
+      '10 次答对 7 次以上算通关（越快分越高）'
+    ],
+    en: [
+      'Memorise a set of four fruits',
+      'A probe fruit then appears — decide whether it was in your set',
+      'Get at least 7 of 10 right to clear it, and faster scores higher'
+    ]
+  },
+  'symmetry_span': {
+    zh: [
+      '一个左右对称的图案',
+      '先记住其中 4 格亮块，然后凭记忆把它们复原',
+      '6 题复原对 4 题以上算通关'
+    ],
+    en: [
+      'A left-right symmetrical pattern appears',
+      'Memorise the four lit cells, then restore them from memory',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'temporal_order': {
+    zh: [
+      '4 件事被打乱了顺序',
+      '按它们「发生的先后」依次点出来',
+      '5 题答对 4 题以上算通关'
+    ],
+    en: [
+      'Four events appear out of order',
+      'Tap them in the sequence they happened',
+      'Get at least 4 of 5 right to clear it'
+    ]
+  },
+  'temporal_order_judgment': {
+    zh: [
+      '左右两侧会先后各亮起一个图形',
+      '判断哪一个先出现',
+      '10 次答对 7 次以上算通关（越快分越高）'
+    ],
+    en: [
+      'A shape lights up on the left and another on the right, one after the other',
+      'Decide which one appeared first',
+      'Get at least 7 of 10 right to clear it, and faster scores higher'
+    ]
+  },
+  'triple_sequence': {
+    zh: [
+      '三行光点各自按自己的固定节拍循环（周期 2 / 3 / 4 不等）',
+      '一次要猜出三行各自的下一拍位置',
+      '5 拍里猜中 11 个以上算通关'
+    ],
+    en: [
+      'Three rows of lights each cycle at their own fixed beat (periods of 2, 3 or 4)',
+      'You must guess the next position on all three rows at once',
+      'Get at least 11 of the 15 right to clear it'
+    ]
+  },
+  'triplets_logic': {
+    zh: [
+      '题目给出三句「谁比谁高」',
+      '从三句里挑出唯一说得通的「从高到低」排序',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'Three statements about who is taller than whom are given',
+      'Pick the one ordering from tallest to shortest that fits all of them',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'visual_search_all': {
+    zh: [
+      '满屏相似的水果里混着若干 🍎',
+      '把每一个 🍎 都点掉，点错会扣 2 秒',
+      '每过一轮目标更多、时间重置；3 轮全找完算通关，任一环超时就失败'
+    ],
+    en: [
+      'A screenful of similar fruit hides several 🍎',
+      'Tap every one of them; a wrong tap costs 2 seconds',
+      'Each round has more targets with the clock reset; finish all 3 rounds to clear it, but timing out anywhere fails you'
+    ]
+  },
+  'visual_statistical_learning': {
+    zh: [
+      '一串图形逐个闪过',
+      '其中某三个图形总是连着一起出现',
+      '看完后从四个组合里挑出那一组；3 轮答对 2 轮以上算通关'
+    ],
+    en: [
+      'Shapes flash past one at a time',
+      'Three of them always appear together in a row',
+      'Afterwards pick that trio from four options; get at least 2 of 3 rounds right to clear it'
+    ]
+  },
+  'wireframe_3d_rotation': {
+    zh: [
+      '题面是 4 块方块搭成的立体形状',
+      '四个点阵里，只有一个是它「转了个方向」之后的正交投影',
+      '4 题答对 3 题以上算通关'
+    ],
+    en: [
+      'A solid shape built from four blocks is shown',
+      'Only one of four dot patterns is its orthographic projection after a rotation',
+      'Get at least 3 of 4 right to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
