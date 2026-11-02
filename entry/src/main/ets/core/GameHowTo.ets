@@ -2075,6 +2075,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'Place all 6 correctly with no more than 3 mistakes to clear it'
     ]
   },
+  'associative_pairs': {
+    zh: [
+      '屏幕给出一个词',
+      '从四个词里挑出跟它成对的那个（联想关系，比如「笔」对「纸」）',
+      '8 题里拿到 600 分以上算通关'
+    ],
+    en: [
+      'One word appears on screen',
+      'Pick the word among four that pairs with it — an associative link, like pen with paper',
+      'Score above 600 across the 8 questions to clear it'
+    ]
+  },
+  'attentional_blink': {
+    zh: [
+      '一串字符一个接一个快速闪过',
+      '其中有一个是数字，你要找出它是几',
+      '5 轮里答对 4 轮以上算通关，每一轮间隔会再快 40ms'
+    ],
+    en: [
+      'A stream of characters flashes past one at a time',
+      'Exactly one of them is a digit — work out which',
+      'Get at least 4 of 5 rounds right to clear it, with each round arriving 40 ms faster'
+    ]
+  },
+  'card_counting_memory': {
+    zh: [
+      '8 张牌会快速闪过一遍，其中有一张出现了两次',
+      '闪完之后点出那张重复的牌',
+      '8 轮里答对 6 轮以上算通关'
+    ],
+    en: [
+      'Eight cards flash past quickly, and one of them appears twice',
+      'Afterwards, tap the card that repeated',
+      'Get at least 6 of 8 rounds right to clear it'
+    ]
+  },
+  'change_blindness': {
+    zh: [
+      '九宫格先闪 1.3 秒让你记住',
+      '画面翻动后第二次呈现时，会悄悄换掉其中一格',
+      '指出是哪一格被换了；6 轮答对 4 轮以上算通关'
+    ],
+    en: [
+      'A 3×3 grid flashes for 1.3 seconds to memorise',
+      'After the screen flips, one cell comes back changed',
+      'Point out which cell — get at least 4 of 6 rounds right to clear it'
+    ]
+  },
+  'conjunction_search': {
+    zh: [
+      '要在一个颜色与形状都混杂的场里找出目标',
+      '颜色和形状两个特征都要对上，不能只看其中一个',
+      '连过 6 关算通关；点错 3 次就判负'
+    ],
+    en: [
+      'Find the target in a field where both colour and shape vary',
+      'Both features must match — watching only one will mislead you',
+      'Clear 6 rounds in a row; three wrong taps and you lose'
+    ]
+  },
+  'corsi_blocks': {
+    zh: [
+      '方块会依次亮起',
+      '按同样的顺序点回来（正着点，不用倒过来）',
+      '答对长度为 6 的一轮算通关；2 条命用完就判负'
+    ],
+    en: [
+      'Blocks light up one after another',
+      'Tap them back in the same order — forwards, no reversing',
+      'Correctly repeat a run of 6 to clear it; lose both lives and you fail'
+    ]
+  },
+  'counting_span': {
+    zh: [
+      '边数边记：每张卡上有若干黄点，先数出来',
+      '全部数完之后，再按顺序回忆每张卡的数目',
+      '全对且张数到 5 算通关；2 条命用完就判负'
+    ],
+    en: [
+      'Count and remember at once: each card holds some yellow dots — count them first',
+      'When all the cards are done, recall each count in order',
+      'Get everything right up to 5 cards to clear it; lose both lives and you fail'
+    ]
+  },
+  'd2_attention': {
+    zh: [
+      '划消测验：在一屏字符里点出所有「带正好两个小撇的 d」',
+      '撇数不对或者字母不对都不能点',
+      '30 秒内找齐 6 个目标算通关；时间到就判负'
+    ],
+    en: [
+      'A cancellation test: tap every “d” carrying exactly two small marks',
+      'Wrong mark count or wrong letter must be left alone',
+      'Find all 6 targets within 30 seconds to clear it; when time runs out you fail'
+    ]
+  },
+  'delayed_match_sample': {
+    zh: [
+      '先看一眼样例图形',
+      '隔一小会儿之后，从 4 个图形里挑出刚才那个',
+      '8 题答对 6 题以上算通关；错满 3 题就判负'
+    ],
+    en: [
+      'Study a sample shape for a moment',
+      'After a short delay, pick that same shape out of four',
+      'Get at least 6 of 8 right to clear it; three wrong answers and you fail'
+    ]
+  },
+  'divided_attention': {
+    zh: [
+      '左右两路符号会同时跳变',
+      '哪一边出现了 🎯 就点哪一边',
+      '12 拍里命中 7 次以上、且误报不超过 2 次算通关'
+    ],
+    en: [
+      'Two streams of symbols change at once, left and right',
+      'Whichever side shows a 🎯 is the side to tap',
+      'Clear it with at least 7 hits across 12 beats and no more than 2 false alarms'
+    ]
+  },
+  'dnms': {
+    zh: [
+      '先记住一组样例图形',
+      '然后从选项里挑出那个「你刚才没见过」的',
+      '6 轮答对 5 轮以上算通关；样例数会一轮比一轮多'
+    ],
+    en: [
+      'Memorise a set of sample shapes',
+      'Then pick the one among the options that you have not just seen',
+      'Get at least 5 of 6 rounds right to clear it, with more samples each round'
+    ]
+  },
+  'double_n_back': {
+    zh: [
+      '位置和字母两条通道同时跟进',
+      '每一条都要和 N 步之前的那个比，看是否相同',
+      'N = 2，20 个判断里答对 15 个以上算通关'
+    ],
+    en: [
+      'Two channels run at once — one for positions, one for letters',
+      'Each must be compared with what it was N steps back',
+      'With N = 2, get at least 15 of 20 judgments right to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
