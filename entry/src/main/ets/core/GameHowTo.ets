@@ -1691,6 +1691,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'Get 12 right to clear it; when the clock runs out short of that, you fail'
     ]
   },
+  'algebraic_inequality_solver': {
+    zh: [
+      '屏幕上一个一元一次不等式',
+      '算出它的解集，从 4 个解集里点出正确的一个',
+      '一共 10 题，答对 7 题以上算通关'
+    ],
+    en: [
+      'A one-variable linear inequality appears',
+      'Work out its solution set and pick the right one from four',
+      'Ten questions in all — get at least seven right to clear it'
+    ]
+  },
+  'base_shift': {
+    zh: [
+      'b 进制下把一个数「左移 k 位」，也就是末尾添上 k 个 0',
+      '选出它对应的十进制值 —— 添 k 个 0 相当于乘以 b 的 k 次方',
+      '四选一，10 题答对 7 题以上算通关；答错 3 次就失败'
+    ],
+    en: [
+      'A number in base b is shifted left by k places — k zeros appended',
+      'Pick its decimal value: appending k zeros multiplies it by b to the k-th power',
+      'Four choices, ten questions; get at least 7 right to clear it, but three wrong answers and you fail'
+    ]
+  },
+  'binary_matrix_rank': {
+    zh: [
+      '给一个 4×4 的 0/1 矩阵',
+      '算它在模 2（GF(2)）下的秩，也就是高斯消元后非零行的个数',
+      '模 2 下「同列相消」就是按位异或；四选一，8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A 4×4 matrix of zeros and ones appears',
+      'Find its rank over GF(2) — the number of non-zero rows after Gaussian elimination',
+      'Over GF(2) elimination is just bitwise XOR; four choices, eight questions, get at least 6 right to clear it'
+    ]
+  },
+  'binary_scale_balance': {
+    zh: [
+      '右盘只有 1、2、4、8、16、32、64 各一枚砝码',
+      '每枚「放 = 1、不放 = 0」，把开关拨到加起来刚好等于物体重量',
+      '连过 6 关算通关；任何一关超重，天平立刻翻，直接失败'
+    ],
+    en: [
+      'The right pan has one weight each of 1, 2, 4, 8, 16, 32 and 64',
+      'Each is “in = 1, out = 0”; set the switches so the total matches the object exactly',
+      'Clear 6 rounds in a row; overload any one of them and the scale tips and you fail at once'
+    ]
+  },
+  'common_denominator': {
+    zh: [
+      '给两个分数',
+      '选出它们的最小公分母（最小公倍数 = 两分母相乘 ÷ 最大公因数）',
+      '四选一，选完会顺带显示通分结果；8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'Two fractions appear',
+      'Pick their least common denominator — the lcm, which is the two denominators multiplied and divided by their gcd',
+      'Four choices, and the converted fractions are shown afterwards; get at least 6 of 8 right to clear it'
+    ]
+  },
+  'fraction_matcher': {
+    zh: [
+      '给出一个分数',
+      '从四个分数里选出与它等值的那个（比如 1/2 与 2/4）',
+      '一共 8 题，答对 6 题以上算通关'
+    ],
+    en: [
+      'One fraction is shown',
+      'Pick the fraction among four that equals it, like 1/2 and 2/4',
+      'Eight questions in all; get at least 6 right to clear it'
+    ]
+  },
+  'fractional_pizza': {
+    zh: [
+      '题目给出一个分数',
+      '按那个分数点亮同样多的披萨片，点「确认」判定',
+      '题数按难度（简单 4 / 普通 6 / 困难 8），答对到通关线（3 / 5 / 7）算通关'
+    ],
+    en: [
+      'A fraction is given',
+      'Light up that many pizza slices and press confirm to check',
+      'The number of rounds depends on difficulty (4 easy, 6 normal, 8 hard) — reach the pass line of 3, 5 or 7 to clear it'
+    ]
+  },
+  'inequality_balance_ops': {
+    zh: [
+      '天平两边各是一个算式',
+      '比较它们的大小，选出正确的 < 、= 或 >',
+      '一共 8 题，答对 6 题以上算通关'
+    ],
+    en: [
+      'Each side of the balance holds an expression',
+      'Compare them and pick the correct <, = or >',
+      'Eight questions in all; get at least 6 right to clear it'
+    ]
+  },
+  'matrix_multiplier': {
+    zh: [
+      '给两个 2×2 矩阵 A 和 B',
+      '求乘积 C 的指定元素 —— A 的那一行和 B 的那一列会高亮出来',
+      '60 秒内答对 8 题算通关；时间归零就失败'
+    ],
+    en: [
+      'Two 2×2 matrices A and B are shown',
+      'Find one specified entry of the product C — the relevant row of A and column of B are highlighted',
+      'Get 8 right within 60 seconds to clear it; when the clock hits zero you fail'
+    ]
+  },
+  'matrix_multiplier_match': {
+    zh: [
+      '左边 3 个「A × B」算式，下边 3 个打乱顺序的乘积矩阵',
+      '左边点一个、右边点一个，配对正确就锁定',
+      '90 秒内完成 3 块题板（每块 3 对）算通关'
+    ],
+    en: [
+      'Three “A × B” expressions sit on the left, three shuffled product matrices below',
+      'Tap one on each side — a correct pairing locks in',
+      'Finish three boards of three pairs each within 90 seconds to clear it'
+    ]
+  },
+  'matrix_reasoning': {
+    zh: [
+      '一个 3×3 的数阵，其中一格被挖掉',
+      '每一行的第三个数，都是由前两个按同一个规律算出来的',
+      '找出这个规律，补上缺的那格；60 秒内答对 8 题算通关'
+    ],
+    en: [
+      'A 3×3 number grid with one cell removed',
+      'In every row the third number comes from the first two by the same rule',
+      'Find the rule and fill the gap; get 8 right within 60 seconds to clear it'
+    ]
+  },
+  'modular_clock_arithmetic': {
+    zh: [
+      '钟面指着某个点',
+      '往前或往后拨若干小时，选出最后落在哪个钟点上（按模 12 算）',
+      '60 秒内答对 10 题算通关；时间归零就失败'
+    ],
+    en: [
+      'A clock face points at some hour',
+      'Wind it forward or back a given number of hours and pick where it lands, modulo 12',
+      'Get 10 right within 60 seconds to clear it; when the clock hits zero you fail'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
