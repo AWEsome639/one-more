@@ -1547,6 +1547,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'Get at least 12 right within 45 seconds to clear it'
     ]
   },
+  'exponent_tower': {
+    zh: [
+      '屏幕上一个幂塔 a^(b^c)',
+      '要算出它的值，从 4 个候选里选一个',
+      '注意是从上往下算：先算 b^c，再拿它当指数。8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A power tower a^(b^c) appears on screen',
+      'Work out its value and pick from four candidates',
+      'Remember it stacks upward: compute b^c first, then raise a to that. Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'factor_finder': {
+    zh: [
+      '屏幕上有一个数 n，下面 12 格候选数',
+      '点出 n 的所有因数；踩到非因数就扣一条命',
+      '3 条命内闯完 4 关算通关'
+    ],
+    en: [
+      'A number n appears with twelve candidate values below it',
+      'Tap every factor of n; touching a non-factor costs one life',
+      'Clear all 4 levels without losing your 3 lives to pass'
+    ]
+  },
+  'fibonacci_merge': {
+    zh: [
+      '点两个相邻的格子',
+      '如果两数之和也是斐波那契数，它们就合并成那个和，另一格补一个新数',
+      '合出 21 算通关；错 3 次就失败'
+    ],
+    en: [
+      'Tap two neighbouring cells',
+      'If their sum is also a Fibonacci number they merge into it, and a fresh number takes the other cell',
+      'Merge your way up to 21 to clear it; three mistakes and you fail'
+    ]
+  },
+  'fraction_match': {
+    zh: [
+      '8 张牌两两成对，每一对是两个等值的分数（比如 1/2 和 2/4）',
+      '每次翻两张，配成就锁定',
+      '60 秒内配齐 4 对算通关；超时就失败'
+    ],
+    en: [
+      'Eight cards form four pairs — each pair is two fractions of equal value, like 1/2 and 2/4',
+      'Flip two at a time; a match locks in',
+      'Match all 4 pairs within 60 seconds to clear it; run over and you fail'
+    ]
+  },
+  'inequality_dash': {
+    zh: [
+      '屏幕上一个不等式 ax + c ⋚ k',
+      '把它解成 x 的范围，四选一',
+      '60 秒内答对 8 题算通关；时间到还没达标就失败'
+    ],
+    en: [
+      'An inequality ax + c ⋚ k appears',
+      'Solve it into a range for x and pick one of four answers',
+      'Get 8 right within 60 seconds to clear it; run out of time short of that and you fail'
+    ]
+  },
+  'magic_squares': {
+    zh: [
+      '3×3 的幻方挖掉了 4 格，要从托盘里选数字填回去',
+      '填满后会校验八条线（3 行 + 3 列 + 2 条对角线）的和是否都相等',
+      '120 秒内过 3 关算通关；超时或错满 4 次就失败'
+    ],
+    en: [
+      'Four cells are missing from a 3×3 magic square — pick numbers from the tray to fill them',
+      'Once full, all eight lines (three rows, three columns, two diagonals) must share the same sum',
+      'Clear 3 levels within 120 seconds; timing out or four mistakes means failure'
+    ]
+  },
+  'mental_abacus': {
+    zh: [
+      '屏幕上一串数连着加减（像算盘上的珠子那样罗列）',
+      '五个数的连加连减，心算最终结果',
+      '四选一作答；60 秒内答对 8 题算通关'
+    ],
+    en: [
+      'A chain of numbers is added and subtracted in a row, laid out like abacus beads',
+      'Work out the final result of the five-term sum in your head',
+      'Pick one of four answers; get 8 right within 60 seconds to clear it'
+    ]
+  },
+  'mental_calendar': {
+    zh: [
+      '给一个日期（1995 到 2035 年之间的任意一天）',
+      '从七个星期里选出它真实是星期几',
+      '90 秒内答对 6 题算通关'
+    ],
+    en: [
+      'Any date between 1995 and 2035 appears',
+      'Pick the weekday it really fell on from the seven',
+      'Get 6 right within 90 seconds to clear it'
+    ]
+  },
+  'modulo_clock': {
+    zh: [
+      '现在是 N 点，再过 M 小时（或者 M 小时前）是几点？',
+      '按模 12 算 —— 过了 12 点就绕回来',
+      '四选一作答，一共 8 题；答对 6 题以上算通关'
+    ],
+    en: [
+      'It is N o’clock — what time will it be in M hours (or M hours ago)?',
+      'Work modulo 12, so the clock wraps around',
+      'Eight questions with four choices each; get at least 6 right to clear it'
+    ]
+  },
+  'number_bonds': {
+    zh: [
+      '一个目标数要拆成两部分',
+      '其中一部分已经给出，从四个选项里补上另一部分',
+      '一共 10 题，答对 8 题以上算通关'
+    ],
+    en: [
+      'A target number must split into two parts',
+      'One part is given — pick the missing part from four options',
+      'Ten questions in all; get at least 8 right to clear it'
+    ]
+  },
+  'numerical_estimation': {
+    zh: [
+      '给一个乘法、除法或百分数的算式',
+      '不用算精确值 —— 从四个选项里挑出最接近的估算结果',
+      '一共 8 题，答对 6 题以上算通关'
+    ],
+    en: [
+      'A multiplication, division or percentage expression appears',
+      'No need for the exact value — pick the closest estimate from four options',
+      'Eight questions in all; get at least 6 right to clear it'
+    ]
+  },
+  'percentage_peak': {
+    zh: [
+      '45 秒内连答百分比题：求百分之几、或者求占比',
+      '四选一作答',
+      '答对 12 题算通关；时间归零还没达标就失败'
+    ],
+    en: [
+      'Answer percentage questions nonstop for 45 seconds — find a percentage, or find the share',
+      'Four choices each time',
+      'Get 12 right to clear it; when the clock runs out short of that, you fail'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
