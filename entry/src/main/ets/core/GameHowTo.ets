@@ -1163,6 +1163,246 @@ export const HOW_TO: Record<string, HowTo> = {
       'Cover all 25 cells with legal rectangles to clear it; three illegal attempts and you fail'
     ]
   },
+  'alphabet_sudoku': {
+    zh: [
+      '6×6 的盘，用 A~F 代替数字，3 行 × 2 列为一宫',
+      '点空格选中，再点下方 A~F 填入；点「✕」擦除',
+      '36 格填满且行、列、宫都不重复算通关；失误满 5 次就失败'
+    ],
+    en: [
+      'A 6×6 grid using A–F instead of digits, with 3×2 boxes',
+      'Tap a cell then a letter below to fill it, or ✕ to erase',
+      'Fill all 36 cells with no repeats in any row, column or box to clear it; five mistakes and you fail'
+    ]
+  },
+  'bridges_all': {
+    zh: [
+      '7×7 的大棋盘、11 座岛，规则和「桥梁」一样，只是更密',
+      '同一行或同一列、中间没有别的岛才能连；两岛之间最多 2 座桥，桥不交叉',
+      '岛上的数字 = 连到它的桥数；全部满足且所有岛连成一片算通关'
+    ],
+    en: [
+      'A bigger 7×7 board with eleven islands — same rules as Bridges, just denser',
+      'Only islands sharing a row or column with nothing between them can connect; at most two bridges per pair, never crossing',
+      'An island’s number must equal its bridge count; satisfy all of them and keep every island connected to clear it'
+    ]
+  },
+  'fillomino': {
+    zh: [
+      '把空格都填上数字',
+      '同数字的连通块，格数必须恰好等于那个数字',
+      '例如数字 4 只能出现在由 4 格连成的一块里'
+    ],
+    en: [
+      'Fill every empty cell with a number',
+      'A connected block of identical numbers must contain exactly that many cells',
+      'So a 4 can only live inside a block of four connected cells'
+    ]
+  },
+  'hitori_all': {
+    zh: [
+      '8×8 的进阶版数壹，规则与 5×5 相同',
+      '涂黑后每行、每列没被涂黑的数字都不重复',
+      '黑格不能上下左右相邻，而且所有白格必须连成一片'
+    ],
+    en: [
+      'An 8×8 version of Hitori with the same rules as the smaller board',
+      'After blackening, the remaining numbers in every row and column must be unique',
+      'Black cells may not touch edge-to-edge, and every white cell must stay connected'
+    ]
+  },
+  'math_path': {
+    zh: [
+      '4×4 的格子里是数字或运算符（＋ － ×）',
+      '从任意格出发，依次点相邻的格子拼出一条路径',
+      '路径必须是「数字 → 运算符 → 数字 → … → 数字」这样交替'
+    ],
+    en: [
+      'A 4×4 grid holding either numbers or operators (+, −, ×)',
+      'Start anywhere and tap neighbouring cells one after another to build a path',
+      'The path must alternate strictly: number → operator → number → … → number'
+    ]
+  },
+  'nonogram': {
+    zh: [
+      '5×5 的格子，行首和列首给出数字线索',
+      '线索表示这一行/列里连续涂黑的段长（比如「2 1」= 先涂 2 格、隔开、再涂 1 格）',
+      '行列线索全部满足、涂出图案算通关；错涂满 3 次就失败'
+    ],
+    en: [
+      'A 5×5 grid with number clues along the top and left',
+      'A clue gives the lengths of consecutive filled runs in that line (so “2 1” means two filled, a gap, then one)',
+      'Satisfy every clue to reveal the picture and clear it; three wrong fills and you fail'
+    ]
+  },
+  'path_finder': {
+    zh: [
+      '7×7 的迷宫，从左上角走到右下角',
+      '点相邻的格子一步步移动',
+      '走到终点算通关；步数超过上限就失败'
+    ],
+    en: [
+      'A 7×7 maze — travel from the top-left corner to the bottom-right',
+      'Tap neighbouring cells to step along',
+      'Reach the goal to clear it; exceed the move limit and you fail'
+    ]
+  },
+  'path_intersect': {
+    zh: [
+      '5×5 的盘上有 4 组同色端点',
+      '把每一组的两端用线连起来',
+      '线不许共用格子（不能交叉），4 组全部连通算通关'
+    ],
+    en: [
+      'Four pairs of matching endpoints sit on a 5×5 board',
+      'Connect each pair with a line',
+      'Lines may never share a cell — get all four pairs connected to clear it'
+    ]
+  },
+  'pipes': {
+    zh: [
+      '5×5 的管道，点格子会把它旋转 90°',
+      '目标是把所有接口都对接上',
+      '所有开口两两对接、水不漏算通关；步数用完就失败'
+    ],
+    en: [
+      'A 5×5 pipe grid — tapping a cell rotates it 90°',
+      'Your goal is to join every connector',
+      'Every opening must meet its partner with no leak to clear it; run out of moves and you fail'
+    ]
+  },
+  'skyscrapers': {
+    zh: [
+      '4×4 的盘，每行每列都要填 1~4 且不重复',
+      '盘外的数字，是从那个方向看过去能看见的楼数（高的会挡住矮的）',
+      '拉丁方成立且四边提示全对算通关；错手 5 次就失败'
+    ],
+    en: [
+      'A 4×4 grid where every row and column holds 1–4 with no repeats',
+      'The numbers outside the grid count the buildings visible from that direction, since taller ones hide shorter ones',
+      'A valid Latin square with every edge clue satisfied clears it; five mistakes and you fail'
+    ]
+  },
+  'slide_puzzle': {
+    zh: [
+      '3×3 的八数码，1~8 打乱摆放，右下角留空',
+      '点空格旁边的一块就能把它滑进空位',
+      '1~8 依次归位算通关；步数用完就失败'
+    ],
+    en: [
+      'A 3×3 sliding puzzle with tiles 1–8 shuffled and the bottom-right corner empty',
+      'Tap a tile next to the gap to slide it in',
+      'Get 1–8 back in order to clear it; run out of moves and you fail'
+    ]
+  },
+  'slitherlink': {
+    zh: [
+      '5×5 的盘，在格子边上画线，拼成一条闭合回路',
+      '每格里的数字 = 这一格四条边中被画上的边数',
+      '线索全对且回路闭合、只有一个环算通关'
+    ],
+    en: [
+      'Draw along cell edges on a 5×5 board to form one closed loop',
+      'A number inside a cell says how many of its four edges carry a line',
+      'Match every clue and close a single loop to clear it'
+    ]
+  },
+  'sudoku': {
+    zh: [
+      '9×9 的数独，每行、每列都要出现 1~9 且不重复',
+      '3×3 为一宫，每一宫里也要 1~9 各一次',
+      '填满且行列宫都不冲突算通关'
+    ],
+    en: [
+      'Classic 9×9 sudoku — every row and column must contain 1–9 exactly once',
+      'Each 3×3 box must also hold 1–9 exactly once',
+      'Fill the board with no conflicts in any row, column or box to clear it'
+    ]
+  },
+  'sum_snake': {
+    zh: [
+      '4×4 的盘上有一条蛇，从蛇头出发沿相邻格延伸',
+      '路径上经过的数字会累加',
+      '和正好等于目标算通关；超过目标就撑爆失败（数字全为正，只能回退）'
+    ],
+    en: [
+      'A snake starts at its head on a 4×4 board and extends through neighbouring cells',
+      'The numbers along its path add up as it grows',
+      'Hit the target exactly to clear it; overshoot and it bursts, since all numbers are positive and you can only back up'
+    ]
+  },
+  'tangle_fix': {
+    zh: [
+      '六个节点排成一行，中间有很多连线互相交叉',
+      '点两个节点就能交换它们的位置',
+      '把交叉数降到 0 算通关；步数用完还有交叉就失败'
+    ],
+    en: [
+      'Six nodes sit in a row with many lines crossing between them',
+      'Tap two nodes to swap their positions',
+      'Reduce the crossings to zero to clear it; run out of moves with any crossing left and you fail'
+    ]
+  },
+  'tapa': {
+    zh: [
+      '5×5 的盘，涂黑一些格子',
+      '每个数字格的八邻域里，黑格要按数字连成相应段数（比如「1 2」= 一段 1 格、隔开、再一段 2 格）',
+      '黑格连成一片、不许出现 2×2 黑块、数字格本身不能涂黑；180 秒倒计时归零就失败'
+    ],
+    en: [
+      'Blacken some cells on a 5×5 board',
+      'Around each clue cell the black cells must form runs matching its digits (so “1 2” means a run of one, a gap, then a run of two)',
+      'Black cells must stay connected with no 2×2 block, and clue cells stay white; the 180-second timer running out means failure'
+    ]
+  },
+  'tenner_grid': {
+    zh: [
+      '10×10 的盘，每行、每列都要恰好含 0~9 各一次',
+      '点空格选中，再点数字键盘填入；再点同一个数字就是擦掉',
+      '填满 100 格且无冲突算通关；冲突满 3 次就失败（冲突的数不会落盘）'
+    ],
+    en: [
+      'A 10×10 grid where every row and column must contain 0–9 exactly once',
+      'Tap a cell then a digit to fill it; tapping the same digit again erases',
+      'Fill all 100 cells with no conflict to clear it; three conflicts and you fail — a conflicting digit never lands'
+    ]
+  },
+  'tents_and_trees': {
+    zh: [
+      '6×6 的盘上，每棵树旁边要放恰好一顶帐篷',
+      '帐篷之间不能相邻 —— 上下左右和斜角都不行',
+      '行列边上的数字是该行/该列的帐篷总数；全部满足算通关，违规摆放 3 次就失败'
+    ],
+    en: [
+      'On a 6×6 board each tree needs exactly one tent beside it',
+      'Tents may never touch, not even diagonally',
+      'The numbers outside count tents in that row or column; satisfy everything to clear it, and three illegal placements mean failure'
+    ]
+  },
+  'water_sort': {
+    zh: [
+      '试管里的颜色一层层叠着',
+      '点一根试管选中，再点另一根把最上面那层倒过去（同色或空管才收）',
+      '每根试管都只剩一种颜色算通关；一步都走不动就失败'
+    ],
+    en: [
+      'Test tubes hold layers of coloured liquid',
+      'Tap a tube to select it, then tap another to pour the top layer across — only onto the same colour or an empty tube',
+      'Get every tube down to a single colour to clear it; if nothing can move, you fail'
+    ]
+  },
+  'yajilin': {
+    zh: [
+      '点白格把它涂黑',
+      '带箭头的线索格不能取消，它告诉你那个方向上有几个黑格',
+      '4 道题全部做成合法的环算通关'
+    ],
+    en: [
+      'Tap white cells to blacken them',
+      'Arrow clues cannot be cancelled — each tells how many black cells lie in that direction',
+      'Complete all four puzzles as valid loops to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
