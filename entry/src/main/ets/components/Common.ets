@@ -969,6 +969,16 @@ build() {
       ? { radius: 24, color: '#526366F1', offsetX: 0, offsetY: 0 }
       : { radius: 0, color: Color.Transparent, offsetX: 0, offsetY: 0 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
+    // ★★★ 2026-11-02（第 856 轮）：**读屏支持**。
+    //   改前：卡片里的图标 / 标题 / 副标题 / ✓ 是四个独立文本节点，
+    //        读屏会念成「💎 宝石迷阵 交换消宝石 ✓」——零散而且没有"这是一张可点的卡片"的信息。
+    //   ⇒ `accessibilityGroup(true)` 把整张卡合成一个可访问对象，
+    //     `accessibilityText` 给它一句完整的描述（名称 + 副标题 + 今日状态）。
+    //   ⚠️ 游戏内棋盘格子**不做** a11y —— 那是视觉玩法，读屏无法等价替代（与色盲的边界同理）。
+    .accessibilityGroup(true)
+    .accessibilityText(
+      this.meta ? (displayName(this.meta) + '，' + displayTagline(this.meta)
+        + (this.playedToday ? '，今日已玩' : '')) : '')
     .onFocus(() => { this.focused = true; })
     .onBlur(() => { this.focused = false; })
     .onClick(() => {
