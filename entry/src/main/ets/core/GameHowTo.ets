@@ -2783,6 +2783,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'Get at least 5 of 6 right to clear it'
     ]
   },
+  'affix_factory': {
+    zh: [
+      '屏幕给出一个词根，还有中文释义',
+      '给词根接上正确的词缀（前缀或后缀），造出符合释义的那个单词',
+      '8 题答对 6 题以上算通关'
+    ],
+    en: [
+      'A root and its Chinese meaning appear',
+      'Attach the right affix — prefix or suffix — to build the word that matches the meaning',
+      'Get at least 6 of 8 right to clear it'
+    ]
+  },
+  'anagram_definition': {
+    zh: [
+      '屏幕给出一个中文释义',
+      '按顺序点字母，把对应的单词拼出来',
+      '6 题答对 4 题以上算通关；每题有倒计时，点错罚 3 秒'
+    ],
+    en: [
+      'A Chinese definition appears',
+      'Tap the letters in order to spell the matching word',
+      'Get at least 4 of 6 right to clear it; each has a timer and a wrong tap costs 3 seconds'
+    ]
+  },
+  'category_fluency': {
+    zh: [
+      '限时列举同一类别的词',
+      '打字输入后回车提交 —— 重复的和词库外的不算分',
+      '4 个类别一共列出 8 个有效词以上算通关'
+    ],
+    en: [
+      'List words from a given category before time runs out',
+      'Type each one and press enter — duplicates and words outside the list do not count',
+      'List at least 8 valid words across 4 categories to clear it'
+    ]
+  },
+  'chalk_and_talk': {
+    zh: [
+      '双任务：一边判断词语的类别（说出来），一边等光标踩中 ✦ 时落笔（写下来）',
+      '说对 +2、说错 −2；写对 +1、写歪 −1',
+      '得分 12 以上且成功落笔 3 次以上算通关'
+    ],
+    en: [
+      'Two tasks at once: judging each word’s category (the “talk”), and writing when the cursor crosses the ✦ (the “chalk”)',
+      'Right judgment +2, wrong −2; well-placed write +1, mistimed −1',
+      'Clear it with a score of at least 12 and at least 3 successful writes'
+    ]
+  },
+  'chimp_test': {
+    zh: [
+      '数字会出现在不同位置上，你先点 1',
+      '点下 1 之后所有数字全部隐藏，但你仍要按升序把它们点完',
+      '连过 7 关（数字从 4 个加到 10 个）算通关；点错扣一条命，命尽即失败'
+    ],
+    en: [
+      'Numbers appear scattered around — start by tapping 1',
+      'The moment you tap 1 every number is hidden, yet you must still finish them in ascending order',
+      'Clear 7 rounds (growing from 4 numbers to 10) to win; a wrong tap costs a life, and losing them all fails you'
+    ]
+  },
+  'cognate_catch': {
+    zh: [
+      '屏幕给出一对词',
+      '判断它们是否同源（是否来自同一个古词根）',
+      '12 题答对 8 题以上算通关；每题答完会给一句词源小注'
+    ],
+    en: [
+      'A pair of words appears',
+      'Decide whether they are cognates — descended from the same ancient root',
+      'Get at least 8 of 12 right to clear it, and each answer comes with a short etymology note'
+    ]
+  },
+  'consonant_reconstruct': {
+    zh: [
+      '单词里的元音全部被挖成下划线',
+      '靠剩下的辅音骨架加上中文提示，把整个词还原出来',
+      '6 个词全部还原算通关；答错或跳过扣一条命，命尽即失败'
+    ],
+    en: [
+      'Every vowel in the word is replaced by an underscore',
+      'Use the consonant skeleton and the Chinese hint to rebuild the whole word',
+      'Restore all 6 words to clear it; a wrong answer or a skip costs a life, and losing them all fails you'
+    ]
+  },
+  'context_clues': {
+    zh: [
+      '读一句英文例句',
+      '从语境推断其中生词的意思，四选一',
+      '10 题答对 8 题以上算通关；错 3 次即失败'
+    ],
+    en: [
+      'Read an English example sentence',
+      'Infer the meaning of the unfamiliar word from context — four choices',
+      'Get at least 8 of 10 right to clear it; three wrong answers and you fail'
+    ]
+  },
+  'conundrum_anagram': {
+    zh: [
+      '读一则英文谜面，猜出一个单词',
+      '卡住可以看字母乱序（anagram）当提示',
+      '6 则谜语猜中 5 则以上算通关；错 3 次或一直放弃即失败'
+    ],
+    en: [
+      'Read an English riddle and guess the word it describes',
+      'Stuck? Reveal the anagram as a hint',
+      'Solve at least 5 of 6 riddles to clear it; three mistakes or giving up repeatedly fails you'
+    ]
+  },
+  'crossword': {
+    zh: [
+      '5×5 的迷你填字，按线索从词库里挑词',
+      '逐个填满每一行',
+      '秘密在于：前五个词横着和竖着都成词（词方阵）'
+    ],
+    en: [
+      'A 5×5 mini crossword — pick words from the bank to match the clues',
+      'Fill the rows one at a time',
+      'The secret: the first five words read as words both across and down, forming a word square'
+    ]
+  },
+  'cryptogram': {
+    zh: [
+      '整段文字被凯撒位移加密（每个字母平移若干位）',
+      '靠已经揭出来的明文映射，把剩下的密文还原',
+      '8 关解出 6 关以上算通关；错 3 次即失败；每揭一条「密文→明文」映射扣 30 分'
+    ],
+    en: [
+      'The text is Caesar-shifted — every letter moved along the alphabet by the same amount',
+      'Use the plaintext mappings you have already found to decode the rest',
+      'Solve at least 6 of 8 rounds to clear it; three mistakes fail you, and each revealed cipher-to-plain pair costs 30 points'
+    ]
+  },
+  'definition_dash': {
+    zh: [
+      '限时选释义，整局 60 秒',
+      '答得越快分越高，答完立刻换下一题',
+      '答对 8 题以上算通关；错 3 次或时间耗尽即失败'
+    ],
+    en: [
+      'Pick the right definition against a 60-second clock',
+      'The faster you answer the more you score, and the next question comes straight away',
+      'Get at least 8 right to clear it; three mistakes or running out of time fails you'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
