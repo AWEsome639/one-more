@@ -92,13 +92,27 @@ def check_hardcoded_cjk(paths):
 
 
 # ═══════════════════════════════════════════════════════════
-# A3  硬编码尺寸 —— 数字直接写在 fontSize/padding/width 里
-#     判据：.fontSize(<数字>) 等；但 0/1/2 这种"零值/描边"不算
+# A3  硬编码文字尺寸
+#
+# ★★★ 2026-11-03（第 901 轮）**重写：原判据 284 处里 273 处是假警（96%）**。
+#
+#   旧判据把 `width` / `height` / `borderRadius` 也算进去，于是一堆
+#   `.width(48).height(48)`（**图标方块**）被报成"硬编码尺寸"。
+#   ⇒ 但图标方块本来就该是固定方寸，不该随「大字模式」缩放（`Cell.k`）。
+#   ⇒ 实测分布：`.width` 148 ｜ `.height` 120 ｜ `.fontSize` 11 ｜ 其它 5
+#      ⇒ **268/284 是 width/height**。
+#
+#   新判据（只查"会跟着字号一起变大"的东西）：
+#     ① `.fontSize(<2位以上数字>)`  —— 文字大小必须走 FontSize 常量或 Cell.k
+#     ② `.padding(<纯数字>)` / `.margin(<纯数字>)` —— 间距要跟字号走
+#     ③ `.borderRadius(<2位以上数字>)` —— 圆角跟尺寸走
+#   ⇒ **不查** `width` / `height`：那一类里绝大多数是图标固定方寸，
+#     真正需要缩放的（按钮高度）项目里已经统一写成 `Cell.of(...)`。
 # ═══════════════════════════════════════════════════════════
 def check_hardcoded_size(paths):
     out = []
     pat = re.compile(
-        r'\.(fontSize|margin|padding|width|height|borderRadius)\(\s*(\d{2,}|"\d+")'
+        r'\.(fontSize|margin|padding|borderRadius)\(\s*(\d{2,}|"\d+")'
     )
     for p in paths:
         if any(s in p.replace('\\', '/') for s in SKIP_FILES):
@@ -106,7 +120,7 @@ def check_hardcoded_size(paths):
         t = read(p)
         for m in pat.finditer(t):
             out.append((rel(p), line_of(t, m.start()),
-                        f'.{m.group(1)}({m.group(2)}) 硬编码尺寸'))
+                        f'.{m.group(1)}({m.group(2)}) 硬编码文字尺寸'))
     return out
 
 
