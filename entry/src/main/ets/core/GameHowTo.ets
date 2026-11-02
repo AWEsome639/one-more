@@ -71,6 +71,78 @@ export const HOW_TO: Record<string, HowTo> = {
       'Clear all 40 bricks (5 rows × 8) to win; if the ball falls past you, you lose'
     ]
   },
+  'bubble_shooter': {
+    zh: [
+      '点泡泡墙的任意一列，底部那颗待发射的泡泡就沿该列升上去',
+      '它停在最下面那颗泡泡的下方；落点周围同色相连 3 颗以上就一起炸掉',
+      '每颗 10 分，一炸一团再额外 +50；发射次数用完还没清空就算输'
+    ],
+    en: [
+      'Tap any column of the bubble wall — the loaded bubble flies up that column',
+      'It stops just below the lowest bubble there; three or more touching of the same colour pop together',
+      'Each popped bubble is 10 points, plus 50 for the cluster; run out of shots before clearing the wall and you lose'
+    ]
+  },
+  'compound_connect': {
+    zh: [
+      '从上往下左角出发，点相邻格把线接长（只能上下左右接在当前末端）',
+      '要同时满足两个条件才算到终点：路径上数字的和 = 目标值，且步数 ≤ 上限',
+      '点一下末端那格可以回退一步；一局最多失败 5 次'
+    ],
+    en: [
+      'Start at the top-left corner and tap neighbouring cells to extend the line (only up, down, left or right from its end)',
+      'To finish you must satisfy both conditions at once: the digits along the path add up to the target, and the step count stays within the limit',
+      'Tap the last cell again to undo one step; you get at most 5 failed attempts per round'
+    ]
+  },
+  'connect_four': {
+    zh: [
+      '点任意一列，你的 🔴 就落到该列最底下的空位',
+      '然后电脑立刻回一手 🟡；双方轮流',
+      '先连成四个（横、竖、斜都算）的人赢；棋盘填满还没连成就是和局算你输'
+    ],
+    en: [
+      'Tap any column and your 🔴 drops to the lowest empty slot there',
+      'The computer answers immediately with a 🟡; you take turns',
+      'Whoever first lines up four — across, down or diagonally — wins; if the board fills with no four, you lose'
+    ]
+  },
+  'continuous_recognition': {
+    zh: [
+      '屏幕上一个接一个出现图形，你要判断「它刚才出现过没有」',
+      '一共 24 题，答对 17 题以上算通关',
+      '累计答错 6 题就判负'
+    ],
+    en: [
+      'Shapes appear one after another; decide whether you have just seen this one before',
+      'There are 24 in total — get at least 17 right to clear it',
+      'Six wrong answers and you lose'
+    ]
+  },
+  'doodle_jump': {
+    zh: [
+      '踩到平台就会自动弹起来，不用点跳',
+      '用屏幕上的 ◀ ▶ 左右平移，去找下一块平台',
+      '爬到标着 GOAL 的高度就算通关；掉出屏幕底部就结束'
+    ],
+    en: [
+      'Landing on a platform bounces you up automatically — there is no jump button',
+      'Use the ◀ ▶ buttons to slide left and right and line up the next platform',
+      'Reach the GOAL height to clear it; fall off the bottom of the screen and it is over'
+    ]
+  },
+  'block_escape': {
+    zh: [
+      '先点一个方块选中它，再用 ← ↑ ↓ → 沿它自己的方向推一格（车只能顺着车身走）',
+      '目标是把 🚗 挪到最右侧的出口',
+      '步数太多可以直接重来，「认输」也能结束本局'
+    ],
+    en: [
+      'Tap a block to select it, then press ← ↑ ↓ → to push it one step along its own axis (a car only moves lengthwise)',
+      'Your goal is to slide the 🚗 out through the exit on the right edge',
+      'Too many moves and you can restart; “give up” also ends the round'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
