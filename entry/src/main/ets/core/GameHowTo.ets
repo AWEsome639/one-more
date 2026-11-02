@@ -2927,6 +2927,150 @@ export const HOW_TO: Record<string, HowTo> = {
       'Get at least 8 right to clear it; three mistakes or running out of time fails you'
     ]
   },
+  'etymology_origin': {
+    zh: [
+      '屏幕给出一个英语单词',
+      '猜它当初借自哪一门语言',
+      '60 秒内答对 8 题以上算通关；答错扣 3 秒，错满 4 次判负'
+    ],
+    en: [
+      'An English word appears',
+      'Guess which language it was borrowed from',
+      'Get at least 8 right within 60 seconds; a wrong answer costs 3 seconds, and four of them fail you'
+    ]
+  },
+  'etymon_oddball': {
+    zh: [
+      '屏幕给出四个词',
+      '挑出那个「词根不属于同一族」的异类',
+      '8 轮答对 5 轮以上算通关'
+    ],
+    en: [
+      'Four words appear',
+      'Pick the odd one out — the one whose root belongs to a different family',
+      'Get at least 5 of 8 rounds right to clear it'
+    ]
+  },
+  'find_word': {
+    zh: [
+      '6×6 的字母盘里藏着词库中的单词',
+      '按顺序连点字母，把它们拼出来',
+      '60 秒内找出 5 个以上算通关'
+    ],
+    en: [
+      'Words from the bank are hidden in a 6×6 letter grid',
+      'Tap letters in sequence to spell them out',
+      'Find at least 5 within 60 seconds to clear it'
+    ]
+  },
+  'grammar_police': {
+    zh: [
+      '每句里有一个词用错了',
+      '把它挑出来；如果这句话本身没错，就点「无错误」',
+      '8 题答对 5 题以上算通关；点错罚 3 秒'
+    ],
+    en: [
+      'Each sentence contains one wrongly used word',
+      'Pick it out — or tap “no error” if the sentence is actually fine',
+      'Get at least 5 of 8 right to clear it; a wrong tap costs 3 seconds'
+    ]
+  },
+  'grammar_sort': {
+    zh: [
+      '给出一批单词',
+      '把它们分进「名词 / 动词 / 形容词 / 副词」四个桶里',
+      '16 个词里正确分类 12 个以上算通关'
+    ],
+    en: [
+      'A batch of words appears',
+      'Sort each into one of four buckets: noun, verb, adjective or adverb',
+      'Classify at least 12 of the 16 correctly to clear it'
+    ]
+  },
+  'letter_bridge': {
+    zh: [
+      '单词缺了一个字母',
+      '从四个候选里把缺的那个补上',
+      '8 题答对 5 题以上算通关；点错罚 2 秒'
+    ],
+    en: [
+      'A word is missing one letter',
+      'Pick the missing letter from four candidates',
+      'Get at least 5 of 8 right to clear it; a wrong tap costs 2 seconds'
+    ]
+  },
+  'letter_cancellation': {
+    zh: [
+      '字母盘里散布着指定的目标字母',
+      '把它们一个个划掉；漏点会扣剩余时间，点错直接罚 3 秒',
+      '划满 3 盘算通关'
+    ],
+    en: [
+      'Target letters are scattered through a letter grid',
+      'Cross them out one by one; missed ones drain your clock and a wrong tap costs 3 seconds outright',
+      'Complete 3 grids to clear it'
+    ]
+  },
+  'letter_frequency_scan': {
+    zh: [
+      '屏幕上一串字母',
+      '数出某个字母在其中出现了几次',
+      '8 题答对 5 题以上算通关'
+    ],
+    en: [
+      'A string of letters appears',
+      'Count how many times a particular letter occurs in it',
+      'Get at least 5 of 8 right to clear it'
+    ]
+  },
+  'letter_grid_swapper': {
+    zh: [
+      '3×3 的格子里排着一组字母',
+      '点两个字母就能交换它们的位置',
+      '把每一行都排成目标单词算通关；步数用尽就失败'
+    ],
+    en: [
+      'A 3×3 grid holds a set of letters',
+      'Tap two letters to swap their positions',
+      'Arrange every row into the target word to clear it; run out of moves and you fail'
+    ]
+  },
+  'missing_vowels': {
+    zh: [
+      '单词里的元音全部被挖空',
+      '按顺序把它们补回去',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'Every vowel in the word has been removed',
+      'Put them back in the right order',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
+  'one_letter_shift': {
+    zh: [
+      '两个单词只差一个字母',
+      '限时点出需要换掉的那一位',
+      '8 题答对 5 题以上算通关'
+    ],
+    en: [
+      'Two words differ by a single letter',
+      'Tap the position that needs changing before time runs out',
+      'Get at least 5 of 8 right to clear it'
+    ]
+  },
+  'oxymoron_hunt': {
+    zh: [
+      '屏幕给出四个搭配',
+      '挑出那个自相矛盾的（比如「震耳欲聋的沉默」）',
+      '6 题答对 4 题以上算通关'
+    ],
+    en: [
+      'Four phrases appear',
+      'Pick the self-contradictory one — like “deafening silence”',
+      'Get at least 4 of 6 right to clear it'
+    ]
+  },
   'checkers': {
     zh: [
       '点自己的棋子，再点高亮的可走格 —— 斜走一格',
