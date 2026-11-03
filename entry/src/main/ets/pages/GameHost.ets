@@ -816,7 +816,17 @@ struct GameHost {
   }
 
   build() {
-    Stack({ alignContent: Alignment.Bottom }) {
+    // ★★★ 2026-11-03（第 927 轮）**判据 273 的落地：主容器不能用 Bottom 对齐**
+    //   同一个 bug 在首页已经修过一次（`GamesTab.ets:799`，见第 926 轮）：
+    //     `Stack(alignContent: Bottom)` + 内容比容器高 ⇒ **向上溢出 ⇒ 顶部被静默裁掉**。
+    //   这里 Stack 只包一个主 Column（顶栏 + 游戏区），Column **没有 `.height('100%')`**
+    //   ⇒ 高度由内容决定 ⇒ 矮屏/大棋盘时内容超高 ⇒
+    //     **顶栏（‹ 返回 / 标题 / ? / 难度 / ↻）整块被裁掉** —— 玩家会**回不去**。
+    //   ⇒ 改 `Top`：顶栏一定在顶部；万一内容超高，被裁的是底部（可以滚动/可接受），
+    //     而不是"回不去的按钮"。
+    //   ⚠️ `Splash.ets:908` 的 `Bottom` **不用改** —— 它只包一个 `Text`（标语贴底），
+    //     内容恒定小于容器，Bottom 是它的正确语义。
+    Stack({ alignContent: Alignment.Top }) {
       Column() {
         // ── 顶栏 ──
         Row() {
