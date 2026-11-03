@@ -549,6 +549,9 @@ build() {
   switchRow(cfg: SwitchCfg) {
     Row({ space: Space.md }) {
       Text(cfg.icon)
+        // ★ 2026-11-03（第 1120 轮）**装饰 emoji 摘出无障碍树**
+        //   否则读屏会念「喇叭」「震动」，然后才念标题，白占一拍。
+        .accessibilityLevel('no')
         .fontSize(FontSize.xl)
         .width(Space.xxl)
         .textAlign(TextAlign.Center)
@@ -568,6 +571,15 @@ build() {
       .layoutWeight(1)
 
       Toggle({ type: ToggleType.Switch, isOn: cfg.on })
+        // ★★★ 2026-11-03（第 1120 轮）**开关必须说清"是哪个设置、现在什么状态"**
+        //   原来 Toggle 只有系统默认的「开关」两个字：
+        //   读屏念「开关」，用户不知道是"声音"还是"震动"。
+        //   ⇒ 标题 + 当前状态一次说完。
+        //   ⚠️ 不用 accessibilityChecked：那是**手动覆盖**用的；
+        //      这里的状态由 Toggle 自己驱动，写成常量会与真实状态不同步。
+        .accessibilityText(this.t(cfg.zh, cfg.en) + this.t('：', ': ') +
+          (cfg.on ? this.t('已开启', 'on') : this.t('已关闭', 'off')))
+        .accessibilityLevel('yes')
         .selectedColor(this.accentColor())
         .onChange((v: boolean) => {
           // ★ 手感：开关拨动要有"咔哒"的确认感
