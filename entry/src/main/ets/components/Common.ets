@@ -763,7 +763,7 @@ build() {
     //   同一个码位在两端量出来的行盒不一样 ⇒ 图标会顶到 52vp 盒子的边缘、
     //   视觉上就"贴着标题"。现在换成**固定尺寸的位图**，盒子与图像都由我们定死。
     Stack({ alignContent: Alignment.BottomEnd }) {
-    Row({ space: Space.sm }) {
+    Row({ space: 8 }) {
       // ── 左：图标（固定 48vp；今日已玩时右上角一枚 ✓）──
       // ★ 2026-10-29（六设备·运动手表 195vp 实测）：48vp 图标 + 标题在 139vp 宽的
       //   卡片里放不下 ⇒ 标题被截成「宝...」⇒ **极小屏（高 < 210vp）直接不画图标**，
@@ -773,12 +773,12 @@ build() {
         Stack({ alignContent: Alignment.TopEnd }) {
           if (this.iconRes() !== undefined) {
             Image(this.iconRes())
-              .width(48).height(48)
+              .width(40).height(40)
               .objectFit(ImageFit.Contain)
               .draggable(false)
           } else {
             // 兜底：资源表里没有这一款（理论上不会发生）⇒ 仍然画 emoji，别开天窗
-            Text(this.meta.icon).fontSize(FontSize.xl).width(48).height(48)
+            Text(this.meta.icon).fontSize(FontSize.xl).width(40).height(40)
               .textAlign(TextAlign.Center)
           }
           if (this.playedToday) {
@@ -792,7 +792,7 @@ build() {
               .textAlign(TextAlign.Center)
           }
         }
-        .width(48).height(48)
+        .width(40).height(40)
       }
 
       // ── 右：名称 + 副标题（与图标之间固定 Space.sm 间距，永不重叠）──
@@ -830,12 +830,29 @@ build() {
           //   ⇒ 改纯白，3.09–4.10，+23%
           //   ⓘ 仍不到正文 4.5：那要把卡片从「实色底」改成「浅色底+深字」，属设计改动，留待真机看过
           .fontColor(Overlay.onColor)
+          // ★★★ 2026-11-03（第 920 轮）**窄屏降级：副标题让位给徽章**
+          //   440×744（真机实测）：「交换消宝石」+「🔥 1 天」**都完整、不重叠** ✅
+          //   但 360vp 宽的手机（真实存在）上：
+          //     文字区 = 82vp，「交换消宝石」需 48vp（minFontSize 8 时），
+          //     徽章实测 **47vp** ⇒ 48 + 47 = **95vp > 82vp** ⇒ **物理放不下**。
+          //   ⇒ 三档处理（判据 268）：
+          //      宽 ≥ 420vp：副标题 + 徽章**都显示**（440 实测通过）
+          //      宽 < 420vp：**有连胜时副标题不显示**（标题 + 徽章是更重要的信息）
+          //      无连胜：副标题永远显示（没有徽章可让位）
+          .visibility((this.streak > 0 && Bp.width < 420)
+            ? Visibility.None : Visibility.Visible)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
           // ★ 真机实测（2026-10-13 模拟器 1320px）：长副标题（「一板一球，清空全场」）
           //   会换行，第二行贴到卡片右缘 ⇒ 给文字块留出右边距
-          .padding({ right: Space.xs })
+          // ★★★ 2026-11-03（第 920 轮）**奥森报"字显示不全"，修完宽度后暴露的新问题**：
+          //   副标题「交换消宝石」被右下角的「🔥 1 天」连胜徽章压住了半个「石」字。
+          //   根因：`Stack` 是 `BottomEnd`（徽章确实在右下角），而副标题
+          //   `.width('100%')` 一直延伸到卡片右缘 ⇒ 与徽章重叠。
+          //   改前只留 `Space.xs`(6vp)，而徽章实测宽约 **48vp**。
+          //   ⇒ 有连胜时让出 48vp，没连胜时保持 6vp（不能无条件留空）。
+          .padding({ right: this.streak > 0 ? 48 : Space.xs })
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
@@ -843,7 +860,17 @@ build() {
     }
     .width('100%')
     .alignItems(VerticalAlign.Center)
-    .padding(Space.md)
+    // ★★★ 2026-11-03（第 919 轮）**奥森报「字没有显示全，变成……了」**
+    //   真机 360×400 截图确认：卡片标题「宝石迷阵」被截成「宝石…」，
+    //   副标题「一板一球，清空」被截成「一板一球，清…」。
+    //   根因：卡片内横向空间被三样东西吃掉 ——
+    //     图标 48 + 内 padding 32（16×2）+ Row 间距 10 = **90vp**
+    //   而卡片总宽（2 列）只有约 152vp ⇒ **文字只剩 62vp**，
+    //   但「宝石迷阵」4 字 × 16 = 64vp、「一板一球，清空」6 字 × 13 = 78vp。
+    //   ⇒ 三处一起收：图标 48→**40**、内 padding 16→**10**、间距 10→**8**
+    //     共省 **18vp** ⇒ 文字从 62 → **80vp** ⇒ 两种文字都放得下。
+    //   ⚠️ 只在内 padding 上收，**外 margin 不动**（卡片之间的呼吸感不能动）。
+    .padding(Space.sm)
     .backgroundColor(this.cardColor())
     .borderRadius(Radius.lg)
     .shadow(Shadow.card)
