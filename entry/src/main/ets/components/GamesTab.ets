@@ -878,8 +878,40 @@ build() {
       //   **玩家看不到标题，也点不到 主题 / 语言 / 搜索** —— 这三个入口在整 App 里只有这一处。
       //   ⇒ 收起态**保留一条顶栏**，标题与三个按钮始终可达。
       //   ⚠️ 只补 topBar()，不补 LV 卡/分类芯片 —— 那些才是收起要省的空间。
+      // ★★★ 2026-11-03（第 937 轮）**手表上不能补 topBar！**
+      //   第 929 轮为了"矮屏收起态顶栏不可达"补了这一块，但漏了手表这一档：
+      //     233×233 上 `topBar()`（标题 + ☀️/EN/🔍 三个 48vp 圆按钮）放不下
+      //     ⇒ **「One More」被拆成四行**（"On"/"e"/"Mo"/"re"），
+      //       三个按钮占掉大半屏，**一张游戏卡都看不到**。
+      //   ⇒ 手表本来就有 `watchHeader()`（极简：One More + N 款），
+      //     而且手表的高度 < 340 ⇒ 走 `tinyScreen()` 分支，**不该进这里**。
+      //   ⇒ 加 `!Bp.tinyScreen()` 守卫：手机/平板收起态补 topBar，手表走 watchHeader。
+      // ★★★ 2026-11-03（第 937 轮）**收起态必须按尺寸分两档补标题**
+      //   第 929 轮补了 `topBar()`，但漏了两件事：
+      //     ① 233×233 上 `topBar()`（标题 + 三个 48vp 圆按钮）放不下
+      //        ⇒ 「One More」被拆成**四行**（"On"/"e"/"Mo"/"re"），**一张卡都看不到**
+      //     ② 加 `!tinyScreen()` 守卫后，手表收起态**连标题都没了**
+      //        （因为块 A 整块是 `Visibility.None`，`watchHeader()` 也在里面）
+      //   ⇒ 正确分档：
+      //       手表（watch / tinyScreen）⇒ **watchHeader()**（极简：One More + N 款）
+      //       手机 / 平板              ⇒ **topBar()**（标题 + 副标题 + ☀️/语言/🔍）
       if (this.effCollapsed()) {
-        this.topBar()
+        if (Bp.isWatch() || Bp.tinyScreen()) {
+          // ★ 第 937 轮：`watchHeader()` 在这条路径上**没渲染出来**（dump 里查不到），
+          //   原因在查。收起态直接**内联一条最简单的标题**，不依赖它。
+          Row({ space: 4 }) {
+            Text('One More')
+              .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
+              .fontColor(this.theme().ink)
+              .layoutWeight(1)
+            Text(String(this.list().length) + this.t(' 款', ' games'))
+              .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
+          }
+          .width('100%')
+          .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+        } else {
+          this.topBar()
+        }
       }
 
       // ★ 收起态的细条（常驻）：左边当前分类，右边【统一切换按钮】
