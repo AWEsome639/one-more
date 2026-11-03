@@ -839,21 +839,22 @@ build() {
           //      宽 ≥ 420vp：副标题 + 徽章**都显示**（440 实测通过）
           //      宽 < 420vp：**有连胜时副标题不显示**（标题 + 徽章是更重要的信息）
           //      无连胜：副标题永远显示（没有徽章可让位）
-          .visibility((this.streak > 0 && Bp.width < 420)
-            ? Visibility.None : Visibility.Visible)
+          // ★★★ 2026-11-03（第 944 轮）**合并条件：两个 `.visibility` 后写覆盖前面的**
+          //   第 920 轮为了"窄屏让位给徽章"写了 `(streak>0 && width<420) ? None : Visible`；
+          //   第 942 轮为了"195 上隐藏副标题"又写了一个 `tinyWatch() ? None : Visible`
+          //   ⇒ **后者无条件覆盖前者**（判据 162：同名属性后写生效）
+          //      ⇒ 233 上 `tinyWatch()=false` ⇒ 返回 Visible ⇒ **副标题没隐藏**
+          //      ⇒ 徽章「1 d」被压成 **3vp**（dump 实测）
+          //   ⇒ 合并成一个条件：**任一情况成立就隐藏**。
+          .visibility(
+            (Bp.tinyWatch() || (this.streak > 0 && Bp.width < 420))
+              ? Visibility.None : Visibility.Visible)
           // ★★★ 2026-11-03（第 932 轮）**英文 tagline 被截成「Bounce the ball, ...」**
           //   中文「一板一球，清空全场」9 字；英文 enTagline 是
           //   'Bounce the ball, clear every brick' **33 字符**（3.7 倍）
           //   ⇒ 卡片副标题区只有 84vp，即使 minFontSize 缩到 8vp 也放不下。
           //   ⇒ **允许 2 行**（信息完整 > 卡片紧凑；奥森要的是"显示全"，不是"省略号"）。
           //   ⚠️ 卡片高度同步 +17（见 GamesTab.cardH()），否则会溢出。
-          // ★★★ 2026-11-03（第 942 轮）**195×195 上副标题必须隐藏**
-          //   算账：网格实际只有 **74vp**（195 − 标题 57 − 标签栏 121）；
-          //   卡片 58 + 间距 16 = 74 ⇒ **刚好放下 1 行标题**，0 空间给副标题。
-          //   ⇒ 而 3 行英文副标题要 51vp ⇒ 放不下 ⇒ 卡片被 Grid 压扁
-          //     （dump 实测卡片内标题只有 **2vp** 高）。
-          //   ⇒ 极小手表隐藏副标题，只留标题（信息不丢：说明页里有完整描述）。
-          .visibility(Bp.tinyWatch() ? Visibility.None : Visibility.Visible)
           .maxLines(3)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
