@@ -496,4 +496,18 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # ★★★ 2026-11-03（第 1124 轮）**崩溃与判定失败用不同退出码**（判据 428）
+    #   原来 `sys.exit(main())`：main 里抛异常就变成非 0 的 traceback 退出（也是 1）
+    #   ⇒ **"检测到不合格"和"脚本自己崩了"退出码一样**
+    #   ⇒ 看到 1 时无法判断该去改代码还是该去查环境
+    #   ⇒ 约定：**0 = 合格 ｜ 1 = 判定不合格 ｜ 2 = 脚本异常**
+    try:
+        _rc = main()
+    except SystemExit:
+        raise
+    except BaseException:
+        import traceback
+        traceback.print_exc()
+        print('🔴 脚本异常退出（退出码 2 = 脚本问题，不是"检查不合格"）', file=sys.stderr)
+        sys.exit(2)
+    sys.exit(_rc if isinstance(_rc, int) else 0)

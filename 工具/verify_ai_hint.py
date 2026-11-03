@@ -147,7 +147,17 @@ def main():
 
 if __name__ == '__main__':
     # ★★★ 2026-11-03（第 1123 轮）**真机验证器必须有失败退出码**（判据 423）
-    rc = main()
+    # ★★★ 2026-11-03（第 1124 轮）**崩溃与判定失败用不同退出码**（判据 428）
+    #   0 = 合格 ｜ 1 = 检测到不合格 ｜ 2 = 脚本异常
+    try:
+        rc = main()
+    except SystemExit:
+        raise
+    except BaseException:
+        import traceback
+        traceback.print_exc()
+        print('🔴 脚本异常退出（退出码 2 = 脚本问题，不是"检查不合格"）', file=sys.stderr)
+        sys.exit(2)
     if '--lenient' in sys.argv:
         sys.exit(0)
     sys.exit(1 if (rc or 0) > 0 else 0)

@@ -161,7 +161,17 @@ if __name__ == '__main__':
     #   原来 main() 跑完就结束 ⇒ 即使「失败 N 款」也退 0
     #   ⇒ 而这是**目标里点名的验证器**（'代打/提示真机验 355 款' 靠它出证据）
     #   ⇒ 它永远退 0 ⇒ 那份证据在自动化里无法复现、失败不会报警
-    rc = main()
+    # ★★★ 2026-11-03（第 1124 轮）**崩溃与判定失败用不同退出码**（判据 428）
+    #   0 = 合格 ｜ 1 = 检测到不合格 ｜ 2 = 脚本异常
+    try:
+        rc = main()
+    except SystemExit:
+        raise
+    except BaseException:
+        import traceback
+        traceback.print_exc()
+        print('🔴 脚本异常退出（退出码 2 = 脚本问题，不是"检查不合格"）', file=sys.stderr)
+        sys.exit(2)
     if '--lenient' in sys.argv:
         sys.exit(0)
     sys.exit(1 if (rc or 0) > 0 else 0)
