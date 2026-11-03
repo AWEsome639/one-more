@@ -904,8 +904,17 @@ struct GameHost {
             .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
             // ★★★ 2026-11-01：**原来是 focusBox 但没有 focusable** ⇒
             //   电视/键盘用户进游戏后，顶栏按钮根本拿不到焦点（连"重开"都按不到）。
+            .backgroundColor(this.hdrHover === 1 ? this.theme().surfaceAlt : Color.Transparent)
+            .borderRadius(Radius.full)
             .focusable(Tv.on())
             .id('hdr-1')
+            // ★ 2026-11-03（第 918 轮）PC hover（同 hdr-0 的做法：只改背景，不叠加 scale）
+            .onHover((isHover: boolean) => {
+              if (!(Bp.isDesktop() || Bp.isLg())) { return; }
+              animateTo({ duration: Motion.fast, curve: Motion.snap() }, () => {
+                this.hdrHover = isHover ? 1 : -1;
+              });
+            })
 
             .border(Tv.focusBorder(this.focusIdx === 1))
             .onFocus(() => { this.focusIdx = 1; })
@@ -998,8 +1007,17 @@ struct GameHost {
 
           Text('↻')
             // ★ 电视/键盘：重开也要能拿焦点（原来完全没有 focusable ⇒ 电视上按不到重开）
+            .backgroundColor(this.hdrHover === 4 ? this.theme().surfaceAlt : Color.Transparent)
+            .borderRadius(Radius.full)
             .focusable(Tv.on())
             .id('hdr-4')
+            // ★ 2026-11-03（第 918 轮）PC hover（同 hdr-0：只改背景，不叠加 scale）
+            .onHover((isHover: boolean) => {
+              if (!(Bp.isDesktop() || Bp.isLg())) { return; }
+              animateTo({ duration: Motion.fast, curve: Motion.snap() }, () => {
+                this.hdrHover = isHover ? 4 : -1;
+              });
+            })
 
             .border(Tv.focusBorder(this.focusIdx === 4))
             .onFocus(() => { this.focusIdx = 4; })
