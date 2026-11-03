@@ -45,6 +45,23 @@ const DICT: Record<string, Record<string, string>> = {
     "it": "(la demo non conta)",
     "ar": "(العرض التوضيحي لا يُحتسب)",
   },
+
+  // ★★★ 2026-11-03（第 1079 轮）**DemoBar 里另一个漏译的片段**
+  //   `DemoBar.ets:49` 用 `TG('碰一下就停')`，而 DICT 里没有这一条
+  //   ⇒ `TG` 走 `return zh` ⇒ 英文界面里会显示中文
+  //   （和「（演示不计分）」是同一类 bug，判据 355）
+  "碰一下就停": {
+    "en": "tap to stop",
+    "ja": "タップで停止",
+    "ko": "탭하면 멈춥니다",
+    "es": "toca para parar",
+    "fr": "touchez pour arrêter",
+    "de": "Tippen zum Stoppen",
+    "pt": "toque para parar",
+    "ru": "коснитесь, чтобы остановить",
+    "it": "tocca per fermare",
+    "ar": "انقر للإيقاف",
+  },
   "看这里：现在往{0}滑最划算": { "en": "Watch here: sliding {0} is best right now", "ja": "ここを見て：今は{0}へスライドするのが一番です", "ko": "여기를 보세요: 지금은 {0}으로 미는 것이 최선입니다", "es": "Mira aquí: ahora lo mejor es deslizar hacia {0}", "fr": "Regarde ici : glisser vers {0} est le meilleur coup", "de": "Schau hier: gerade ist {0} am besten", "pt": "Olha aqui: agora o melhor é deslizar para {0}", "ru": "Смотри сюда: сейчас лучше всего сдвинуть {0}", "it": "Guarda qui: ora conviene scorrere verso {0}", "ar": "انظر هنا: الأفضل الآن هو السحب إلى {0}" },
   "看清楚：这是第 {0} 步": { "en": "Watch closely — this is step {0}", "ja": "よく見て：{0} 手目です", "ko": "잘 보세요 — {0}번째 수입니다", "es": "Mira bien: este es el paso {0}", "fr": "Regarde bien : c'est l'étape {0}", "de": "Schau genau — das ist Schritt {0}", "pt": "Olha bem: este é o passo {0}", "ru": "Смотри внимательно — это шаг {0}", "it": "Guarda bene: questo è il passo {0}", "ar": "انظر بتمعّن — هذه الخطوة {0}" },
   "看这里：{0}": { "en": "Watch here: {0}", "ja": "ここを見て：{0}", "ko": "여기를 보세요: {0}", "es": "Mira aquí: {0}", "fr": "Regarde ici : {0}", "de": "Schau hier: {0}", "pt": "Olha aqui: {0}", "ru": "Смотри сюда: {0}", "it": "Guarda qui: {0}", "ar": "انظر هنا: {0}" },
