@@ -29,12 +29,32 @@ if ! timeout 10 $HC list targets 2>&1 | grep -q "127.0.0.1:5555"; then
 fi
 echo "  设备 OK"
 
+# ★ 按屏幕尺寸算解锁滑动坐标（★ 第 1147 轮：写死坐标在 2880×1620 上无效）
+timeout 20 $HC -t 127.0.0.1:5555 shell "snapshot_display -t png -f /data/local/tmp/_sz.png" >/dev/null 2>&1
+sleep 1
+timeout 20 $HC -t 127.0.0.1:5555 file recv /data/local/tmp/_sz.png /tmp/_sz.png >/dev/null 2>&1
+SZ=$(python3 -c "
+import sys
+try:
+    from PIL import Image
+    im = Image.open('/tmp/_sz.png')
+    print('%d %d' % (im.width, im.height))
+except Exception:
+    print('1320 2232')
+" 2>/dev/null)
+SW=$(echo "$SZ" | awk '{print $1}')
+SH=$(echo "$SZ" | awk '{print $2}')
+SX=$((SW / 2))
+SY1=$((SH * 88 / 100))
+SY2=$((SH * 10 / 100))
+echo "  屏幕 ${SW}×${SH} px ⇒ 滑动 (${SX},${SY1}) → (${SX},${SY2})"
+
 # ★ 解锁：最多试 4 次，每次都验证屏幕内容
 UNLOCKED=0
 for k in 1 2 3 4; do
   timeout 20 $HC -t 127.0.0.1:5555 shell "power-shell wakeup" >/dev/null 2>&1
   sleep 3
-  timeout 20 $HC -t 127.0.0.1:5555 shell "uitest uiInput swipe 660 2000 660 200 1200" >/dev/null 2>&1
+  timeout 20 $HC -t 127.0.0.1:5555 shell "uitest uiInput swipe ${SX} ${SY1} ${SX} ${SY2} 1200" >/dev/null 2>&1
   sleep 4
   timeout 20 $HC -t 127.0.0.1:5555 shell "snapshot_display -t png -f /data/local/tmp/_lk.png" >/dev/null 2>&1
   sleep 1
@@ -79,7 +99,7 @@ STARTED=0
 for attempt in 1 2 3; do
   timeout 20 $HC -t 127.0.0.1:5555 shell "power-shell wakeup" >/dev/null 2>&1
   sleep 2
-  timeout 20 $HC -t 127.0.0.1:5555 shell "uitest uiInput swipe 660 2000 660 200 1200" >/dev/null 2>&1
+  timeout 20 $HC -t 127.0.0.1:5555 shell "uitest uiInput swipe ${SX} ${SY1} ${SX} ${SY2} 1200" >/dev/null 2>&1
   sleep 3
   ST=$(timeout 30 $HC -t 127.0.0.1:5555 shell "aa start -b com.andrewoscar.onemore -a EntryAbility" 2>&1 | tr -d '\r' | head -2)
   echo "  aa start（第 $attempt 次）: $ST"
