@@ -1019,10 +1019,17 @@ build() {
     //     · 焦点态：只留**主色光晕**（这是"选中"，不是"影子"）
     //     · 常态：**完全不要阴影** —— 卡片的层次靠色块自身的饱和度 + 白底的对比，
     //       这是奥森要的"紧紧贴合、最好没有"。
-    .shadow(this.focused
-      // 不再有缩放提示 ⇒ 光晕要更明确一点（半径 24、32% 主色）
-      ? { radius: 24, color: '#526366F1', offsetX: 0, offsetY: 0 }
-      : { radius: 0, color: Color.Transparent, offsetX: 0, offsetY: 0 })
+    // ★★★ 2026-11-03（第 1027 轮）**只在大屏/遥控器上显示焦点光晕**
+//   奥森报「宝石迷阵图标外面像垫了张白纸，只有它有」——
+//   查到最后：不是图标、不是卡片边框，是 **第一张卡自动获得了焦点**，
+//   于是渲染 `radius 24 / #526366F1` 的主色光晕；
+//   而 `#526366F1` 的 32% 靛蓝紫在**白底**上就是一圈**淡紫矩形轮廓**。
+//   ⇒ 焦点光晕是给**遥控器/键盘**用的导航提示（TV、PC、2in1）；
+//     手机/平板上**没有方向键**，自动聚焦第一张卡只是副作用 ⇒ **不该画出来**。
+//   ⚠️ 不改 `focused` 状态本身（`onFocus/onBlur` 还管着别的逻辑），只改渲染条件。
+      .shadow((this.focused && (Bp.isTv() || Bp.isDesktop()))
+        ? { radius: 24, color: '#526366F1', offsetX: 0, offsetY: 0 }
+        : { radius: 0, color: Color.Transparent, offsetX: 0, offsetY: 0 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     // ★★★ 2026-11-02（第 856 轮）：**读屏支持**。
     //   改前：卡片里的图标 / 标题 / 副标题 / ✓ 是四个独立文本节点，
