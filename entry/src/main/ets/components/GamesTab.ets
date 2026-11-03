@@ -789,7 +789,14 @@ export struct GamesTab {
   }
 
 build() {
-    Stack({ alignContent: Alignment.Bottom }) {
+    // ★★★ 2026-11-03（第 925 轮）**真 bug：360vp 宽的手机上，首页顶栏整块被裁掉**
+    //   现象：`dump` 里完全没有「One More」标题、副标题、LV 卡、「按喜好挑游戏」——
+    //     不是被挤出屏幕，是**根本没渲染到可见区**；我插的调试 Text 也没出现。
+    //   根因：Stack 是 `Alignment.Bottom` ⇒ 内容比容器高时**向上溢出** ⇒ 顶部被裁。
+    //     440×744 上内容刚好放得下 ⇒ 顶栏可见；360×400 上放不下 ⇒ 顶栏消失。
+    //   修法：主内容 Column 用 **Top** 对齐；底部弹层（右键菜单/长按提示）
+    //     各自有 `.position()` / 显式定位，不依赖 Stack 的 Bottom。
+    Stack({ alignContent: Alignment.Top }) {
     Column() {
       // ★★★ 2026-10-14 奥森：「我看到了你的自动收起，图标还是会闪现，并且收起动画有点不太好」
       //   ⇒ 根因：上一版用 if/else 切换 ⇒ 展开态组件被【销毁再重建】
@@ -1159,7 +1166,17 @@ build() {
         // ★★★ 2026-10-14 加构建水印（奥森连说三次"还是闪现"而我看不到他的屏）：
         //   目的：他能一眼看出模拟器/真机里装的是【哪一版】⇒ 不再"版本不确定"
         //   水印 = 构建日期时分（用 BUILD_TAG 常量）
-        Text(Digits(this.tn('{n} 款小游戏，不用联网也能玩', '{n} games. No Wi-Fi needed.', GAMES.length), this.langCode) + '  ·  ' + 'v' + About.VERSION)
+        // ★★★ 2026-11-03（第 926 轮）**窄屏不拼版本号** —— 修「· v1.0.1」折到第二行。
+        //   360vp 宽上，完整文案约 190vp，而左侧文字列只有 168vp（右边三个图标占 160vp）
+        //   ⇒ 折行，第二行以「· v1.0.1」开头 —— 比截断更难看。
+        //   ⚠️ **不要用 `minFontSize`/`maxFontSize`**：第 922 轮我那样写，
+        //      `maxFontSize` 需要确定宽度约束才能测量，而这里 Column 是 `layoutWeight(1)`
+        //      ⇒ 测量异常。安全做法就是**缩短文案**，字号固定。
+        //   ⚠️ 也不用 Ellipsis —— 奥森明确不要「…」。
+        //   版本号是"确认装的是哪一版"的水印，**设置页底部也有一份**（SettingsTab:478）
+        //   ⇒ 首页窄屏不显示不丢信息。
+        Text(Digits(this.tn('{n} 款小游戏，不用联网也能玩', '{n} games. No Wi-Fi needed.', GAMES.length), this.langCode)
+          + (Bp.width > 0 && Bp.width < 420 ? '' : '  ·  ' + 'v' + About.VERSION))
           .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
       }
       .alignItems(HorizontalAlign.Start)
