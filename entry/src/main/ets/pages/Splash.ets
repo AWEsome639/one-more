@@ -992,6 +992,12 @@ struct Splash {
     .width('100%')
     .height('100%')
     .backgroundColor(OM_INK)
+    // ★★★ 2026-11-03（第 1004 轮）**真 bug：开屏顶部 37vp 露白**
+    //   440×300 实测：y 0~112 px（= 37.3 vp，正好状态栏高）全是白色（均值 157），
+    //   而 y 112 以下是 OM_INK（均值 30）。⇒ 开屏的根 Stack 没延伸到状态栏区域。
+    //   233/195 上看不到，因为手表没有状态栏。
+    //   ⇒ 加 `expandSafeArea`：开屏是全屏动画，必须盖住状态栏与导航栏。
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
     .onAreaChange((_o: Area, n: Area) => {
       const h: number = n.height as number;
       const w: number = n.width as number;
