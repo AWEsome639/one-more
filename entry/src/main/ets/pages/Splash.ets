@@ -827,7 +827,17 @@ struct Splash {
             // 2026-11-01 device pixel measure: O bottom y=1104, M bottom y=1046
             // => M sits 58px (14% of ring height) too high; code math says only 10px.
             // => reversible experiment: shift M down by 0.056 x omPxV, measure again.
-            .position({ x: this.omPxV() * 0.4929, y: this.omPxV() * 0.0757 })
+            // ★★★ 2026-11-03（第 1046 轮）**奥森：「M 和下面的 More 连到一起了」
+            //   而且「O 和 M 的上下边框要在同一水平线上」**
+            //   根因：上一轮把 M 高度从 **0.4961 → 0.6074**，但 **y 还是 0.0757**
+            //     ⇒ M 底边 = 0.0757 + 0.6074 = **0.6831**
+            //     ⇒ 而 O 视觉底边 = **0.5718**（见下方 2026-11-01 的推导）
+            //     ⇒ 低出 **0.1113 × omPxV** ⇒ **正好撞进标题「One More」** ⇒ 连成一片
+            //   ⇒ 用同一条对齐公式重算：y = 0.5718 − 0.6074 = **−0.0356**
+            //     · M 底边 = −0.0356 + 0.6074 = **0.5718** = O 底边 ✅
+            //     · M 顶点 = −0.0356；O 视觉顶点 = 0.0262 − 0.1276/2 = **−0.0376**
+            //       ⇒ 顶边只差 **0.002 × omPxV**（≈0.4vp）⇒ 视觉上齐平 ✅
+            .position({ x: this.omPxV() * 0.4929, y: this.omPxV() * -0.0356 })
             // ★★★ 2026-11-01 第二版（理论驱动，不是试参数）：
             //   O 是 Circle + strokeWidth，stroke 画在 width 边界上、一半在外 ⇒
             //     O 视觉底边 = 0.0262(位置) + 0.4818(直径) + 0.1276/2(半描边) = 0.5718
