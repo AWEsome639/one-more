@@ -3300,6 +3300,14 @@ struct GameHost {
             .scale({ x: this.pop ? 1 : 0.7, y: this.pop ? 1 : 0.7 })
             .opacity(this.pop ? 1 : 0)
             .animation({ duration: Motion.base, curve: Motion.snap(), delay: 220 })
+            // ★★★ 2026-11-03（第 1007 轮）**判据 274：842 轮修了成就列表，漏了同伙**
+            //   842 轮给「成就列表」加了 `visibility(tinyScreen ? None : Visible)`，
+            //   但紧接着的**「升到 LV」这一段没加** —— 同一类内容、同一屏、同一目的。
+            //   算账（233×233，一局升级时）：
+            //     padding 48 + 标题 32 + 三数据 56 + 按钮 80 + levelUp ≈ 30 = **250 > 233**
+            //     ⇒ 溢出 17vp ⇒ 「返回列表」被切（与 842 轮那次一模一样的表现）。
+            //   ⇒ 同样隐藏。**信息不丢**：升级结果在「统计」页有完整记录（判据 276）。
+            .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
           }
 
           // ★ 手感：得分与经验**滚动计数**（从 0 数到最终值）
