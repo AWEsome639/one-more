@@ -568,7 +568,13 @@ export struct GBejeweled {
     //   ⇒ 先降到 200 试（给棋盘 238vp = 714px，够 8×8 且留余量）。
     const FIXED: number = 200;
     const w: number = Math.max(160, Bp.width - 40);
-    const h: number = Math.max(120, (Bp.height - FIXED) * 0.70);
+    // ★★★ 2026-11-03（第 1126 轮）**实证放大**：0.70 → 0.85
+    //   依据：第 1125 轮在 853×533 真机量得棋盘只有 **233vp（43.7% 屏高）**，
+    //   而左右各空 310vp ⇒ 明显偏小。
+    //   注释里「需要 ≤ 205vp」的结论是基于 **FIXED=300** 推的，
+    //   而第 1012 轮已把 FIXED 改成 200 ⇒ **该论证已失效，必须重新实证**（判据 431）。
+    //   本行先试 0.85 ⇒ 横屏 (533-200)*0.85 = **283vp**，再真机看是否溢出。
+    const h: number = Math.max(120, (Bp.height - FIXED) * 0.85);
     return Math.min(w, h);
   }
 
