@@ -1023,7 +1023,17 @@ struct Splash {
       if (w > 0) {
         // 矮屏（h < 620，如智慧屏 540 / 平板横屏 533）用更小的上限
         const cap: number = h > 0 && h < 620 ? 150 : 200;
-        const om: number = Math.max(96, Math.min(cap, w * 0.245));
+        // ★★★ 2026-11-03（第 1035 轮）**运动手表 195×195 上开屏 logo 比屏幕还宽**
+        //   验算：om = max(**96**, min(150, 195 × 0.245 = 47.8)) = 96
+        //         ⇒ omPxV = 96 × 2.05 = **196.8 > 屏宽 195** ⇒ 占宽 **100.9%**
+        //         ⇒ 竖向也溢出：logo 高 + 标题 + 副标题 ≈ 225 > 195
+        //   根因：**下限 96 在极小屏上比"按宽度算出来的值"还大** ⇒ clamp 反过来放大了它。
+        //   ⇒ 下限降到 **50**（195 × 0.245 = 47.8 ⇒ om = 50 ⇒ omPxV = 102.5 ⇒ 占宽 52.6%）
+        //   ⚠️ 不用 96 是因为：手表屏只有 195vp，96 已经接近半屏；
+        //     而 233 的方块屏上 96 是合适的（233 × 0.245 = 57.1 ⇒ 仍取下限 96？）
+        //     ⇒ 见下：改成**按宽度缩放的软下限**，保留大屏的手感。
+        const omFloor: number = Math.max(50, Math.min(96, w * 0.30));
+        const om: number = Math.max(omFloor, Math.min(cap, w * 0.245));
         const ti: number = Math.max(38, Math.min(104, w * 0.098));
         const su: number = Math.max(11, Math.min(28, w * 0.027));
         const tg: number = Math.max(10, Math.min(24, w * 0.023));
