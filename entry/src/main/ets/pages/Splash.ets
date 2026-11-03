@@ -954,7 +954,10 @@ struct Splash {
       //   ⇒ 提到 60 颗，且大小 / 透明度 / 位置全部伪随机（线性同余），
       //     读起来才是"胶片噪点"，不是"10 个能数出来的点"。
       //   ★ 仍然不生成噪点贴图（60 个纯色小圆的开销远小于一张全屏 PNG）。
-      ForEach(Array.from({ length: 60 }, (v: number, i: number) => i), (i: number) => {
+      // ★ 2026-11-03（第 1002 轮）**60 → 200**：60 颗时覆盖率仅 0.35%，
+      //   实测背景块 `std` 中位 1.1~1.8（还是暗角渐变贡献的）⇒ 颗粒等于不存在。
+      //   200 颗 ⇒ 覆盖率 ≈ 1.2%，单颗仍弱（不脏），总量可感知。
+      ForEach(Array.from({ length: 200 }, (v: number, i: number) => i), (i: number) => {
         Column()
           .width(this.tiny ? 1.0 + (i * 7 % 11) * 0.08 : 1.2 + (i * 7 % 11) * 0.10)
           .height(this.tiny ? 1.0 + (i * 7 % 11) * 0.08 : 1.2 + (i * 7 % 11) * 0.10)
@@ -962,8 +965,8 @@ struct Splash {
           // 透明度 5%~13% 之间伪随机 —— 有明有暗才像噪点
           .backgroundColor((i * 13 % 9) > 4 ? '#17FFFFFF' : '#0DFFFFFF')
           .position({
-            x: (((i * 37 + 11) % 100) * 0.01 * (this.vw > 0 ? this.vw : 440)) + 'vp',
-            y: (((i * 61 + 23) % 100) * 0.01 * (this.vh > 0 ? this.vh : 744)) + 'vp'
+            x: (((i * 37 + 11) % 100)) + '%',   // ★ 第 1002 轮：绝对 vp → 百分比（原来在 233 上跑出屏幕）
+            y: (((i * 61 + 23) % 100)) + '%'   // ★ 第 1002 轮：同上
           })
           .opacity(this.pBg * 0.75)
           .hitTestBehavior(HitTestMode.None)
