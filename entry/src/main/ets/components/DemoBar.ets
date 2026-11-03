@@ -65,6 +65,19 @@ export struct DemoBar {
           .textAlign(TextAlign.Center)
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
+          // ★★★ 2026-11-03（第 1118 轮）**无障碍：读屏要念完整文案，不是屏幕上截断的那版**
+          //   这个 Text 是 `.maxLines(2) + Ellipsis` —— 小屏上（尤其手表 195/233）
+          //   完整文案会被截成「演示中 ｜ 答案是第 4…」。
+          //   ⇒ 视觉截断是为了布局，但**读屏不该跟着截断**：
+          //     演示文案的意义就是"告诉你这一步该怎么走"，念一半等于没念。
+          //   ⇒ accessibilityText 给**未截断的完整串**（与上面同一个表达式，不重复拼）
+          //   ⚠️ ArkTS 里不能把长表达式抽成局部变量再两处引用（build 内不允许语句），
+          //     所以这里用同一表达式再写一遍；改文案时**两处必须同步**。
+          .accessibilityText(this.tiny() ? TG('演示中') : (TG('演示中') + ' ｜ '
+            + (this.msg.length > 0 ? this.msg : TG('碰一下就停'))
+            + (this.msg.indexOf(DEMO_NO_SCORE_TAG) >= 0 ? '' : TG('（演示不计分）'))))
+          .accessibilityLevel('yes')
+          .accessibilityGroup(true)
           .width('100%')
       }
     }

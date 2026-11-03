@@ -57,6 +57,9 @@ export struct HintBar {
           .fontSize(FontSize.sm)
           .fontColor(Palette.amber)
           .textAlign(TextAlign.Center)
+          // ★ 无障碍：这行本身就是给用户的完整说明，直接可读
+          .accessibilityLevel('yes')
+          .accessibilityGroup(true)
       } else if (this.showHint) {
         Button(TG('提示'))
           .layoutWeight(1)
@@ -66,6 +69,14 @@ export struct HintBar {
           .fontColor(this.disabled ? Palette.inkFaint : Color.White)
           .enabled(!this.disabled)
           .borderRadius(Radius.md)
+          // ★★★ 2026-11-03（第 1118 轮）**无障碍：按钮要有"点了会做什么"，不只是"提示"两个字**
+          //   原来按钮的唯一标签就是 `TG('提示')` —— 读屏念「提示」，
+          //   但用户不知道是"给我一个提示"还是"显示提示历史"。
+          //   ⇒ 补 accessibilityText 说清动作；禁用时说明**为什么**不能点。
+          .accessibilityText(this.disabled
+            ? TG('提示（演示进行中，暂不可用）')
+            : TG('提示：看这一步该怎么走'))
+          .accessibilityLevel('yes')
           // ★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
           //   Tv.on() 在非电视上恒为 false ⇒ 手机/平板/PC 零影响
           .focusable(Tv.on())
@@ -93,6 +104,15 @@ export struct HintBar {
         .fontColor((LanRace.isRacing() || this.disabled) ? Palette.inkFaint : Color.White)
         .enabled(!LanRace.isRacing() && !this.disabled)
         .borderRadius(Radius.md)
+        // ★ 无障碍：代打按钮同理 —— 说明动作 + 说明禁用原因
+        //   联机中禁用是**产品决策**（代打会让对手面对机器，不公平），
+        //   所以理由必须能被读屏说出来，否则残障用户只会觉得"按钮坏了"。
+        .accessibilityText(LanRace.isRacing()
+          ? TG('AI 代打（联机对战中不可用）')
+          : (this.disabled
+            ? TG('AI 代打（演示进行中，暂不可用）')
+            : (this.autoOn ? TG('停止 AI 代打') : TG('AI 代打：让电脑替你走这一步'))))
+        .accessibilityLevel('yes')
         // ★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
         .focusable(Tv.on())
         .focusBox(Tv.box())
