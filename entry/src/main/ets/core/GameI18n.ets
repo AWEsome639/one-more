@@ -62,6 +62,22 @@ const DICT: Record<string, Record<string, string>> = {
     "it": "tocca per fermare",
     "ar": "انقر للإيقاف",
   },
+
+  // ★★★ 2026-11-03（第 1080 轮）**扩扫后发现 HintBar 的第三处漏译**
+  //   `HintBar.ets:54` 用 `TG('演示中…（碰一下就停）')`
+  //   ⇒ 扩扫到 components/ 才暴露（之前只扫 games/，这一整类都漏了）
+  "演示中…（碰一下就停）": {
+    "en": "Demo… (tap to stop)",
+    "ja": "デモ中…（タップで停止）",
+    "ko": "데모 중… (탭하면 멈춥니다)",
+    "es": "Demo… (toca para parar)",
+    "fr": "Démo… (touchez pour arrêter)",
+    "de": "Demo… (Tippen zum Stoppen)",
+    "pt": "Demo… (toque para parar)",
+    "ru": "Демо… (коснитесь, чтобы остановить)",
+    "it": "Demo… (tocca per fermare)",
+    "ar": "عرض… (انقر للإيقاف)",
+  },
   "看这里：现在往{0}滑最划算": { "en": "Watch here: sliding {0} is best right now", "ja": "ここを見て：今は{0}へスライドするのが一番です", "ko": "여기를 보세요: 지금은 {0}으로 미는 것이 최선입니다", "es": "Mira aquí: ahora lo mejor es deslizar hacia {0}", "fr": "Regarde ici : glisser vers {0} est le meilleur coup", "de": "Schau hier: gerade ist {0} am besten", "pt": "Olha aqui: agora o melhor é deslizar para {0}", "ru": "Смотри сюда: сейчас лучше всего сдвинуть {0}", "it": "Guarda qui: ora conviene scorrere verso {0}", "ar": "انظر هنا: الأفضل الآن هو السحب إلى {0}" },
   "看清楚：这是第 {0} 步": { "en": "Watch closely — this is step {0}", "ja": "よく見て：{0} 手目です", "ko": "잘 보세요 — {0}번째 수입니다", "es": "Mira bien: este es el paso {0}", "fr": "Regarde bien : c'est l'étape {0}", "de": "Schau genau — das ist Schritt {0}", "pt": "Olha bem: este é o passo {0}", "ru": "Смотри внимательно — это шаг {0}", "it": "Guarda bene: questo è il passo {0}", "ar": "انظر بتمعّن — هذه الخطوة {0}" },
   "看这里：{0}": { "en": "Watch here: {0}", "ja": "ここを見て：{0}", "ko": "여기를 보세요: {0}", "es": "Mira aquí: {0}", "fr": "Regarde ici : {0}", "de": "Schau hier: {0}", "pt": "Olha aqui: {0}", "ru": "Смотри сюда: {0}", "it": "Guarda qui: {0}", "ar": "انظر هنا: {0}" },
