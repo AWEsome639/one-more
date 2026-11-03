@@ -1,0 +1,15 @@
+{"name": "双镜像", "acts": ["重开", "再来一局", "提示"], "low": 1533, "ok": true}
+{"name": "生命游戏", "acts": ["提示"], "low": 652, "ok": true}
+{"name": "图案锁", "acts": ["提示"], "low": 664, "ok": true}
+{"name": "麻将连连看", "acts": ["提示"], "low": 1405, "ok": true}
+{"name": "三连", "acts": ["提示"], "low": 1447, "ok": true}
+{"name": "3D 迷宫", "acts": ["提示"], "low": 1447, "ok": true}
+{"name": "心理地图", "acts": ["提示"], "low": 1189, "ok": true}
+{"name": "镜像迷宫", "acts": ["提示"], "low": 1451, "ok": true}
+{"name": "黑白棋", "acts": ["提示", "开始"], "low": 1466, "ok": true}
+{"name": "贪吃蛇", "acts": ["重开", "再来一局", "提示"], "low": 1435, "ok": true}
+{"name": "数蛇", "acts": ["重开", "再来一局", "提示"], "low": 1450, "ok": true}
+{"name": "塔帕", "acts": ["提示"], "low": 1398, "ok": true}
+{"name": "2048", "acts": [], "low": 1532, "ok": false}
+{"name": "色彩洪水", "acts": [], "low": 1426, "ok": false}
+{"name": "填数拼图", "acts": [], "low": 1402, "ok": false}
