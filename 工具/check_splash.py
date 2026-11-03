@@ -11,7 +11,8 @@ check_splash.py —— 开屏动画九条要求的静态审计器
 
 用法：
   python3 工具/check_splash.py           # 只报告
-  python3 工具/check_splash.py --strict  # 有不合格项则退出码 1
+  python3 工具/check_splash.py            # 默认严格：有不合格项退出码 1
+  python3 工具/check_splash.py --lenient  # 只看报告、不判失败（CI 里别用）
 
 ⚠️ 它只做静态核对，**不能代替真机连拍**（第 ⑧ 条永远是"需设备"）。
 """
@@ -258,7 +259,14 @@ def check_evidence_freshness(base_override: float = None):
 
 
 def main():
-    strict = "--strict" in sys.argv
+    # ★★★ 2026-11-03（第 1121 轮）**默认改为严格**
+    #   原来是「默认宽松、加 --strict 才失败」：
+    #     `python3 工具/check_splash.py` 即使打印 🔴 也返回 **0**
+    #   ⇒ 而我在前面几轮的验收里，一直用不带 --strict 的调用
+    #     去判断"是否全绿" ⇒ **那个 0 是假的**
+    #   ⇒ 判据 423：**检查器的默认行为必须是"有问题就失败"**；
+    #     要宽松请显式 `--lenient`（默认拿到 0 才是真绿）。
+    strict = "--lenient" not in sys.argv
     if not os.path.exists(SPLASH):
         print("  ❌ 找不到 %s" % SPLASH)
         return 2
