@@ -847,6 +847,13 @@ build() {
           //   ⇒ 卡片副标题区只有 84vp，即使 minFontSize 缩到 8vp 也放不下。
           //   ⇒ **允许 2 行**（信息完整 > 卡片紧凑；奥森要的是"显示全"，不是"省略号"）。
           //   ⚠️ 卡片高度同步 +17（见 GamesTab.cardH()），否则会溢出。
+          // ★★★ 2026-11-03（第 942 轮）**195×195 上副标题必须隐藏**
+          //   算账：网格实际只有 **74vp**（195 − 标题 57 − 标签栏 121）；
+          //   卡片 58 + 间距 16 = 74 ⇒ **刚好放下 1 行标题**，0 空间给副标题。
+          //   ⇒ 而 3 行英文副标题要 51vp ⇒ 放不下 ⇒ 卡片被 Grid 压扁
+          //     （dump 实测卡片内标题只有 **2vp** 高）。
+          //   ⇒ 极小手表隐藏副标题，只留标题（信息不丢：说明页里有完整描述）。
+          .visibility(Bp.tinyWatch() ? Visibility.None : Visibility.Visible)
           .maxLines(3)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
