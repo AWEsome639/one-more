@@ -427,6 +427,14 @@ def main():
         save(results)
     ok = sum(1 for v in results.values() if v['status'] == 'pass')
     print("\n  ══ 累计：验过 %d 款 / 共试过 %d 款" % (ok, len(results)))
+    return len(results) - ok
 
 if __name__ == '__main__':
-    main()
+    # ★★★ 2026-11-03（第 1123 轮）**真机验证器必须有失败退出码**（判据 423）
+    #   原来 main() 跑完就结束 ⇒ 即使「失败 N 款」也退 0
+    #   ⇒ 而这是**目标里点名的验证器**（'代打/提示真机验 355 款' 靠它出证据）
+    #   ⇒ 它永远退 0 ⇒ 那份证据在自动化里无法复现、失败不会报警
+    rc = main()
+    if '--lenient' in sys.argv:
+        sys.exit(0)
+    sys.exit(1 if (rc or 0) > 0 else 0)

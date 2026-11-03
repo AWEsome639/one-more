@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -78,10 +79,22 @@ def try_hint():
 
 
 def main():
-    budget = int(sys.argv[1]) if len(sys.argv) > 1 else 20
+    # ★★★ 2026-11-03（第 1123 轮）**位置参数不能吞掉 --flag**
+    #   原来 `int(sys.argv[1])` ⇒ 传 `--limit 2` 时抛
+    #     ValueError: invalid literal for int() with base 10: '--limit'
+    #   ⇒ 更糟的是：**崩了也退出 1**，看起来像"检测到失败"，实则没跑
+    #   ⇒ 只认"不以 - 开头的第一个参数"当数字。
+    _pos = [a for a in sys.argv[1:] if not a.startswith('-')]
+    budget = int(_pos[0]) if _pos and _pos[0].isdigit() else 20
     names = registry_names()
     got = load_verified(names)
     print('  在架 %d ｜ 提示已验 %d ｜ 待验 %d' % (len(names), len(got), len(names) - len(got)))
+    # ★★★ 2026-11-03（第 1123 轮）**待验为 0 时立刻退出**（同 verify_ai_play）
+    #   否则会进入下面的循环，`cs` 恒空 ⇒ 只 swipe + sleep ⇒ 空转到超时，
+    #   退出码 124 看起来像失败，实则"全部已验"。
+    if not names or len(got) >= len(names):
+        print('  ⇒ 待验 0：全部已验，无需再跑（返回 0）')
+        return 0
 
     to_list()
     for _ in range(20):
@@ -129,7 +142,12 @@ def main():
 
     print('  ── 本轮 通过 %d ｜ 无提示 %d ｜ 无按钮 %d ｜ 累计 %d/%d (%.0f%%)'
           % (ok, bad, skip, len(got), len(names), len(got) * 100.0 / len(names)))
+    return bad
 
 
 if __name__ == '__main__':
-    main()
+    # ★★★ 2026-11-03（第 1123 轮）**真机验证器必须有失败退出码**（判据 423）
+    rc = main()
+    if '--lenient' in sys.argv:
+        sys.exit(0)
+    sys.exit(1 if (rc or 0) > 0 else 0)

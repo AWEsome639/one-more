@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -86,10 +87,24 @@ def try_click(nm):
 
 
 def main():
-    budget = int(sys.argv[1]) if len(sys.argv) > 1 else 20
+    # ★★★ 2026-11-03（第 1123 轮）**位置参数不能吞掉 --flag**
+    #   原来 `int(sys.argv[1])` ⇒ 传 `--limit 2` 时抛
+    #     ValueError: invalid literal for int() with base 10: '--limit'
+    #   ⇒ 更糟的是：**崩了也退出 1**，看起来像"检测到失败"，实则没跑
+    #   ⇒ 只认"不以 - 开头的第一个参数"当数字。
+    _pos = [a for a in sys.argv[1:] if not a.startswith('-')]
+    budget = int(_pos[0]) if _pos and _pos[0].isdigit() else 20
     names = registry_names()
     got = load_verified(names)
     print('  在架 %d ｜ 已验 %d ｜ 待验 %d' % (len(names), len(got), len(names) - len(got)))
+    # ★★★ 2026-11-03（第 1123 轮）**待验为 0 时立刻退出**
+    #   实测：355 款早已全部验过（待验 0），但脚本仍会进入下面的循环 ——
+    #   循环里 `cs` 恒为空 ⇒ 只做 swipe + sleep ⇒ **空转到超时**，
+    #   退出码变成 124（被外层 timeout 杀掉），看起来像"失败"，实则"没事可做"。
+    #   ⇒ 待验 0 直接返回 0（全部验完 = 达标），并打印一行说明。
+    if not names or len(got) >= len(names):
+        print('  ⇒ 待验 0：全部已验，无需再跑（返回 0）')
+        return 0
 
     to_list()
     for _ in range(20):
@@ -138,7 +153,15 @@ def main():
 
     print('  ── 本轮 启动 %d ｜ 失败 %d ｜ 无按钮 %d ｜ 累计 %d/%d (%.0f%%)'
           % (ok, bad, skip, len(got), len(names), len(got) * 100.0 / len(names)))
+    return bad
 
 
 if __name__ == '__main__':
-    main()
+    # ★★★ 2026-11-03（第 1123 轮）**真机验证器必须有失败退出码**（判据 423）
+    #   原来 main() 跑完就结束 ⇒ 即使「失败 N 款」也退 0
+    #   ⇒ 而这是**目标里点名的验证器**（'代打/提示真机验 355 款' 靠它出证据）
+    #   ⇒ 它永远退 0 ⇒ 那份证据在自动化里无法复现、失败不会报警
+    rc = main()
+    if '--lenient' in sys.argv:
+        sys.exit(0)
+    sys.exit(1 if (rc or 0) > 0 else 0)
