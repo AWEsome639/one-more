@@ -26,6 +26,16 @@ import { TG } from '../core/GameI18n';
 import { FontSize, Palette } from '../core/Design';
 import { Bp } from '../core/Bp';
 
+// ★★★ 2026-11-03（第 1083 轮）**内部标识不能包 TG**
+//   原来：`this.msg.indexOf(DEMO_NO_SCORE_TAG) >= 0`
+//   ⇒ `TG()` 是**翻译函数**，而「不计分」在这里是**内部匹配用的标识**，
+//     不是给用户看的文案。用 TG 包它有两个坏处：
+//       ① 一旦给它加了翻译，`indexOf` 在英文界面下**永远匹配不到**
+//          ⇒ 会重复追加「（演示不计分）」
+//       ② 它会一直挂在 i18n 检查的「缺键」名单里，让真正的缺译被淹没
+//   ⇒ 抽成不带 TG 的常量，语义明确：这是标识，不是文案。
+const DEMO_NO_SCORE_TAG: string = '不计分';
+
 @Component
 export struct DemoBar {
   /** 是否在演（由游戏页自己传，不依赖 HintBar） */
@@ -49,7 +59,7 @@ export struct DemoBar {
           + (this.msg.length > 0 ? this.msg : TG('碰一下就停'))
           // ★ 不计分提示：335 款共用这一条，省得每款各写一遍。
           //   已经写明「不计分」的（3 款手工版）就不重复。
-          + (this.msg.indexOf(TG('不计分')) >= 0 ? '' : TG('（演示不计分）'))))
+          + (this.msg.indexOf(DEMO_NO_SCORE_TAG) >= 0 ? '' : TG('（演示不计分）'))))
           .fontSize(FontSize.sm)
           .fontColor(Palette.amber)
           .textAlign(TextAlign.Center)
