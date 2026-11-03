@@ -841,7 +841,13 @@ build() {
           //      无连胜：副标题永远显示（没有徽章可让位）
           .visibility((this.streak > 0 && Bp.width < 420)
             ? Visibility.None : Visibility.Visible)
-          .maxLines(1)
+          // ★★★ 2026-11-03（第 932 轮）**英文 tagline 被截成「Bounce the ball, ...」**
+          //   中文「一板一球，清空全场」9 字；英文 enTagline 是
+          //   'Bounce the ball, clear every brick' **33 字符**（3.7 倍）
+          //   ⇒ 卡片副标题区只有 84vp，即使 minFontSize 缩到 8vp 也放不下。
+          //   ⇒ **允许 2 行**（信息完整 > 卡片紧凑；奥森要的是"显示全"，不是"省略号"）。
+          //   ⚠️ 卡片高度同步 +17（见 GamesTab.cardH()），否则会溢出。
+          .maxLines(3)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
           // ★ 真机实测（2026-10-13 模拟器 1320px）：长副标题（「一板一球，清空全场」）

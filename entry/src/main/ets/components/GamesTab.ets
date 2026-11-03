@@ -1613,12 +1613,12 @@ build() {
     //   normal / simple 也是零余量：normal 需 84 恰好写 84，simple 需 76 恰好写 76
     //   ⇒ 三档全部加 8–31 vp 余量（不会明显变稀，因为多的是留白）
     if (this.uiMode === 'elder') {
-      return 146;   // 需 142.6，给 3.4 余量
+      return 180;   // 146 + 34（第 933 轮：副标题允许 3 行）
     }
     if (this.uiMode === 'simple') {
-      return 84;    // 需 76，给 8 余量
+      return 118;   // 84 + 34
     }
-    return 92;      // 需 84，给 8 余量
+    return 126;     // 92 + 34
   }
 
   @Builder
