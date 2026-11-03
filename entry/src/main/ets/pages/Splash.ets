@@ -1034,9 +1034,21 @@ struct Splash {
         //     ⇒ 见下：改成**按宽度缩放的软下限**，保留大屏的手感。
         const omFloor: number = Math.max(50, Math.min(96, w * 0.30));
         const om: number = Math.max(omFloor, Math.min(cap, w * 0.245));
-        const ti: number = Math.max(38, Math.min(104, w * 0.098));
-        const su: number = Math.max(11, Math.min(28, w * 0.027));
-        const tg: number = Math.max(10, Math.min(24, w * 0.023));
+        // ★★★ 2026-11-03（第 1036 轮）**字号也有同一个坑（判据 320 的同伙）**
+        //   195×195 实测验算：ti = max(**38**, min(104, 195 × 0.098 = 19.1)) = **38**
+        //     ⇒ 标题「One More」8 字符 × 0.62 × 38 = **188 vp / 屏宽 195 = 96.7%**
+        //     ⇒ **几乎贴边**（233 手表上也是 80.9%，同样偏挤）
+        //   ⇒ 和 om 一样的修法：**硬下限改成随宽度缩放的软下限**
+        //     ti：max(24, min(38, w*0.16))  ⇒ 195→31.2（79.3%）｜233→37.3（79.4%）｜440+ 仍 38
+        //     su：max(7,  min(11, w*0.055)) ⇒ 195→10.7 ｜233→11（不变）
+        //     tg：max(6,  min(10, w*0.048)) ⇒ 195→9.4  ｜233→10（不变）
+        //   ⚠️ 大屏完全不受影响：w*0.16 ≥ 38 当 w ≥ 238，而 440+ 本来 ti ≥ 43
+        const tiFloor: number = Math.max(24, Math.min(38, w * 0.16));
+        const suFloor: number = Math.max(7, Math.min(11, w * 0.055));
+        const tgFloor: number = Math.max(6, Math.min(10, w * 0.048));
+        const ti: number = Math.max(tiFloor, Math.min(104, w * 0.098));
+        const su: number = Math.max(suFloor, Math.min(28, w * 0.027));
+        const tg: number = Math.max(tgFloor, Math.min(24, w * 0.023));
         if (Math.abs(om - this.omPx) > 1) {
           this.omPx = om;
         }
