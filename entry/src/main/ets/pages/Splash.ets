@@ -213,6 +213,12 @@ struct Splash {
    *   恰好在这之后到达 ⇒ 护栏已过 ⇒ boost 立刻 finish ⇒ **用户看到的就是首页**。
    */
   private animMs: number = 0;
+  /** 帧间隔直方图（第 1111 轮）：fast<=20 / mid 21~33 / slow 34~50 / vslow 51~100 / drop>100 */
+  private nFast: number = 0;
+  private nMid: number = 0;
+  private nSlow: number = 0;
+  private nVerySlow: number = 0;
+  private nDrop: number = 0;
   @State private tiny: boolean = false;
   /** 极小屏（< 260vp，如运动手表 195）：只留 OM + 标题，其余省略 */
   @State private ultraTiny: boolean = false;
@@ -369,13 +375,33 @@ struct Splash {
     let accum: number = 0;      // 累计动画时间（ms），只加正常帧
     let lastMs: number = Date.now();
     let finishedByTimeline: boolean = false;
+    // ★ 2026-11-03（第 1111 轮）**帧间隔直方图**（判据 403）
+    //   动机：开屏首帧前的空窗（2.75~3.99 秒）在模拟器上**噪声 1.24 秒**，
+    //         无法做 A/B（判据 401）。
+    //   但"动画期间有没有掉帧"是另一个问题，而且**没有冷启动噪声**：
+    //         2.24 秒 / 16ms ≈ 137 个样本，落在动画期间，
+    //         与"应用启动多慢"无关。
+    //   ⇒ 数一遍帧间隔落在各桶里的次数，就能回答"252 个节点是否拖慢了渲染"。
+    let nFast = 0;   // <= 20ms（流畅）
+    let nMid = 0;    // 21~33ms（掉到 30fps）
+    let nSlow = 0;   // 34~50ms
+    let nVerySlow = 0; // 51~100ms
+    let nDrop = 0;   // > 100ms（被判为卡顿，不计入 accum）
     const tick = setInterval(() => {
       // ★ 累计动画时间（第 1094 轮）：只加"正常帧"，渲染阻塞的大 gap 不计
       const nowMs: number = Date.now();
       const gap: number = nowMs - lastMs;
       lastMs = nowMs;
-      if (gap > 0 && gap <= 100) {
-        accum += gap;
+      if (gap > 0 && gap <= 20) {
+        nFast += 1; accum += gap;
+      } else if (gap > 20 && gap <= 33) {
+        nMid += 1; accum += gap;
+      } else if (gap > 33 && gap <= 50) {
+        nSlow += 1; accum += gap;
+      } else if (gap > 50 && gap <= 100) {
+        nVerySlow += 1; accum += gap;
+      } else if (gap > 100) {
+        nDrop += 1;
       }
       this.animMs = accum;
       // ★ 点屏幕加速：直接把时间轴顶到终点
@@ -415,6 +441,9 @@ struct Splash {
         this.pM = 1; this.pFill = 1; this.pSweep = 1; this.pTitle = 1;
         this.pSub = 1; this.pTag = 1; this.pOut = 1;
       }
+      // 把直方图同步到成员（finish 里要读）
+      this.nFast = nFast; this.nMid = nMid; this.nSlow = nSlow;
+      this.nVerySlow = nVerySlow; this.nDrop = nDrop;
       // ★ HOLD 改为按**累计动画时间**判断（不再是墙钟 setTimeout）
       //   否则渲染阻塞时定时器会比首帧还早触发 ⇒ 用户直接看到首页
       if (!finishedByTimeline && (this.boosted || t >= HOLD)) {
@@ -427,7 +456,10 @@ struct Splash {
 
   private finish(): void {
     // ★ 临时诊断（第 1094 轮）：把真实播放时长打出来
-    hilog.info(0x0001, 'SplashDiag', 'finish: animMs=%{public}d boosted=%{public}s', this.animMs, String(this.boosted));
+    hilog.info(0x0001, 'SplashDiag',
+      'finish: animMs=%{public}d boosted=%{public}s | frames fast=%{public}d mid=%{public}d slow=%{public}d vslow=%{public}d drop=%{public}d',
+      this.animMs, String(this.boosted),
+      this.nFast, this.nMid, this.nSlow, this.nVerySlow, this.nDrop);
     if (this.finished) {
       return;
     }
