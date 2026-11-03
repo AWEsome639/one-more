@@ -28,6 +28,23 @@ const DICT: Record<string, Record<string, string>> = {
   "看这块「{0}」：往{1}推一格": { "en": "Look at “{0}”: push it one step {1}", "ja": "この「{0}」を見て：{1}へ一つ押します", "ko": "이 「{0}」을 보세요: {1}으로 한 칸 밉니다", "es": "Mira «{0}»: empújalo un paso hacia {1}", "fr": "Regarde « {0} » : pousse-le d'un pas vers {1}", "de": "Schau «{0}» an: schiebe es einen Schritt nach {1}", "pt": "Olha «{0}»: empurra-o um passo para {1}", "ru": "Посмотри на «{0}»: толкни на шаг {1}", "it": "Guarda «{0}»: spingilo di un passo verso {1}", "ar": "انظر إلى «{0}»: ادفعه خطوة {1}" },
   "消掉了！这一下能拿 +{0} 分（演示不计分）": { "en": "Cleared! That move is worth +{0} points (demo doesn't score)", "ja": "消えました！この一手で +{0} 点（デモは加点されません）", "ko": "지웠습니다! 이 수로 +{0}점 (데모는 점수에 포함되지 않습니다)", "es": "¡Eliminado! Esa jugada vale +{0} puntos (la demo no puntúa)", "fr": "Éliminé ! Ce coup vaut +{0} points (la démo ne compte pas)", "de": "Weg! Dieser Zug bringt +{0} Punkte (Demo zählt nicht)", "pt": "Eliminado! Essa jogada vale +{0} pontos (a demo não conta)", "ru": "Убрано! Этот ход даёт +{0} очков (демо не считается)", "it": "Eliminato! Questa mossa vale +{0} punti (la demo non conta)", "ar": "تم الإزالة! هذه الحركة تساوي +{0} نقطة (العرض لا يُحتسب)" },
   "滑过去了，这一下能拿 +{0} 分（演示不计分）": { "en": "Slid — that move is worth +{0} points (demo doesn't score)", "ja": "スライドしました — この一手で +{0} 点（デモは加点されません）", "ko": "밀었습니다 — 이 수로 +{0}점 (데모는 점수에 포함되지 않습니다)", "es": "Deslizado: esa jugada vale +{0} puntos (la demo no puntúa)", "fr": "Glissé — ce coup vaut +{0} points (la démo ne compte pas)", "de": "Verschoben — dieser Zug bringt +{0} Punkte (Demo zählt nicht)", "pt": "Deslizado — essa jogada vale +{0} pontos (a demo não conta)", "ru": "Сдвинуто — этот ход даёт +{0} очков (демо не считается)", "it": "Scivolato — questa mossa vale +{0} punti (la demo non conta)", "ar": "تم السحب — هذه الحركة تساوي +{0} نقطة (العرض لا يُحتسب)" },
+  // ★★★ 2026-11-03（第 1078 轮）**真机发现：英文界面里漏出中文「（演示不计分）」**
+  //   根因：`DemoBar.ets:52` 用 `TG('（演示不计分）')` 单独翻译这个片段，
+  //         而 DICT 里只有**完整句**的条目（"消掉了！…（演示不计分）"），
+  //         没有这个**独立片段** ⇒ `TG` 走了 `return zh` ⇒ 直接吐中文。
+  //   ⇒ 补上独立条目。括号保留（它是追加在句子尾部的）。
+  "（演示不计分）": {
+    "en": "(demo doesn't score)",
+    "ja": "（デモは採点されません）",
+    "ko": "(데모는 점수에 포함되지 않습니다)",
+    "es": "(la demo no puntúa)",
+    "fr": "(la démo ne compte pas)",
+    "de": "(Demo zählt nicht)",
+    "pt": "(a demo não pontua)",
+    "ru": "(демо не засчитывается)",
+    "it": "(la demo non conta)",
+    "ar": "(العرض التوضيحي لا يُحتسب)",
+  },
   "看这里：现在往{0}滑最划算": { "en": "Watch here: sliding {0} is best right now", "ja": "ここを見て：今は{0}へスライドするのが一番です", "ko": "여기를 보세요: 지금은 {0}으로 미는 것이 최선입니다", "es": "Mira aquí: ahora lo mejor es deslizar hacia {0}", "fr": "Regarde ici : glisser vers {0} est le meilleur coup", "de": "Schau hier: gerade ist {0} am besten", "pt": "Olha aqui: agora o melhor é deslizar para {0}", "ru": "Смотри сюда: сейчас лучше всего сдвинуть {0}", "it": "Guarda qui: ora conviene scorrere verso {0}", "ar": "انظر هنا: الأفضل الآن هو السحب إلى {0}" },
   "看清楚：这是第 {0} 步": { "en": "Watch closely — this is step {0}", "ja": "よく見て：{0} 手目です", "ko": "잘 보세요 — {0}번째 수입니다", "es": "Mira bien: este es el paso {0}", "fr": "Regarde bien : c'est l'étape {0}", "de": "Schau genau — das ist Schritt {0}", "pt": "Olha bem: este é o passo {0}", "ru": "Смотри внимательно — это шаг {0}", "it": "Guarda bene: questo è il passo {0}", "ar": "انظر بتمعّن — هذه الخطوة {0}" },
   "看这里：{0}": { "en": "Watch here: {0}", "ja": "ここを見て：{0}", "ko": "여기를 보세요: {0}", "es": "Mira aquí: {0}", "fr": "Regarde ici : {0}", "de": "Schau hier: {0}", "pt": "Olha aqui: {0}", "ru": "Смотри сюда: {0}", "it": "Guarda qui: {0}", "ar": "انظر هنا: {0}" },
