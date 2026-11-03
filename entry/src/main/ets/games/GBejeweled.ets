@@ -535,7 +535,14 @@ export struct GBejeweled {
     //   ④ 用实测数据反推：需要棋盘 ≤ 205vp ⇒ 比例取 **0.70**。
     //      横屏 (533-260)*0.70 = 191vp ⇒ 「重开」约 480vp（安全）
     //      竖屏 (1280-260)*0.70 = 714vp（受宽度限，仍比旧 704 大）
-    const FIXED: number = 300;   // ★ 第五版：实测黑白棋固定部分更大，取 300 覆盖所有款
+    // ★★★ 2026-11-03（第 1012 轮）**300 → 200**：
+    //   奥森截图报「宝石错位」⇒ 实测是 **7 列而不是 8 列**（宝石 49 个，应 64）。
+    //   算账：格子 51px、间距 18px ⇒ 8×51 + 7×18 = **534px**，
+    //         而 `boardPx` 给的容器只有 **504px** ⇒ 溢出 30px ⇒ 第 8 列被挤掉。
+    //   而 dump 实测：游戏区可用高 **1155px = 385vp**，
+    //         540 − 385 = **155vp** 才是真正的固定部分 ⇒ **300 高估了 145vp**。
+    //   ⇒ 先降到 200 试（给棋盘 238vp = 714px，够 8×8 且留余量）。
+    const FIXED: number = 200;
     const w: number = Math.max(160, Bp.width - 40);
     const h: number = Math.max(120, (Bp.height - FIXED) * 0.70);
     return Math.min(w, h);
@@ -601,7 +608,16 @@ export struct GBejeweled {
               ForEach(this.rows, (c: number) => {
                 Stack() {
                 Text(GEMS[this.board.length > (this.idx(r, c)) ? this.board[(this.idx(r, c))] : 0])
-                .fontSize(FontSize.xl)
+                .fontSize(FontSize.lg)   // xl → lg：留边距，压掉字形偏差
+                // ★★★ 2026-11-03（第 1012 轮）**emoji 在圆盘里不居中**（奥森截图报的）
+                //   现象：🔥 / 💧 偏下，💎 / 🍀 偏上 —— 同一行里"重心"各不相同，像错位。
+                //   根因：`Stack` 的 alignContent 只让**文本框**居中，
+                //     而 emoji 的**图形**在字体的 em box 里本身偏上/偏下（各字形不同）。
+                //   ⇒ 让文本盒子填满格子，再用 textAlign + align 双轴居中；
+                //     同时把 fontSize 从 xl 降到 lg —— 留出边距，让 1~2px 的字形偏差不显眼。
+                .textAlign(TextAlign.Center)
+                .width('100%').height('100%')
+                .align(Alignment.Center)
                 }
                 .layoutWeight(1)
                 .aspectRatio(1)
