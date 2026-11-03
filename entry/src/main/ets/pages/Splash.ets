@@ -1100,26 +1100,44 @@ struct Splash {
       //     第一次把它塞进 OM 的 Stack 里 ⇒ **把 Stack 撑高、OM 被顶出屏幕**。
       //     正确做法：作为**根 Stack 的独立层 + `.position()` 绝对定位**，
       //     不参与其它兄弟的布局测量。
+      // ★★★ 2026-11-03（第 1135 轮）**真机截图抓到：这条光带读作「灰色柱子」**
+      //   证据：853×533 真机开屏帧（/tmp/S6.png）里，
+      //         OM 左下方有一根 **x 180~277vp、宽 38vp 的灰色圆柱**，斜 12°
+      //   根因（三条叠加）：
+      //     ① 宽度 **38vp**（vw×0.045 在 853 上是 0.045×853=38）⇒ 是"柱子"不是"光"
+      //     ② `.blur(16)` ⇒ 16vp 的模糊把金色 `#CFF0D9A8` 与墨蓝底 `#0D1320`
+      //        充分混合 ⇒ **金色被洗成灰**（亮度对了，色相没了）
+      //     ③ 峰值色 `#CFF0D9A8` 的 alpha 只有 0xCF=81%，
+      //        再乘 `.opacity(×0.85)` ⇒ 22vp 上的实际不透明度约 0.69
+      //   ⇒ 修：**变窄 + 提纯 + 减模糊**
+      //     · 宽 0.045 → **0.014**（853 上 12vp、440 上 6vp）⇒ 读作"一道光"
+      //     · blur 16 → **9**（tiny 8 → 6）⇒ 保留柔边，但不再跨色相混合
+      //     · 峰值色 alpha 0xCF → **0xF5**，且色值提到 **#FFE9B8**（更暖更亮）
+      //     · 峰值 opacity ×0.85 → **×0.62**（细了就更该亮而不糊）
+      //   ★ 判据 452：**"发光"元素在暗底上会丢色相 ——
+      //     模糊半径 ≥ 元素宽度的 40% 时，它读出的是"亮度"而不是"颜色"。**
+      //     本条：16 / 38 = **42%** ⇒ 超过阈值 ⇒ 变灰。修后 9 / 12 = 75%… 
+      //     ⚠️ 但宽度也一起改了 ⇒ 新判据不能只看比值，见台账完整推导。
       Column()
-        .width(this.vw > 0 ? this.vw * 0.045 : 20)
-        .height(this.vw > 0 ? this.vw * 0.22 : 100)
+        .width(this.vw > 0 ? this.vw * 0.014 : 6)
+        .height(this.vw > 0 ? this.vw * 0.20 : 90)
         .linearGradient({
           angle: 96,
           colors: [
             ['#00FFFFFF', 0.00],
-            ['#22FFF4D6', 0.36],
-            ['#CFF0D9A8', 0.50],
-            ['#22FFF4D6', 0.64],
+            ['#33FFE9B8', 0.40],
+            ['#F5FFE9B8', 0.50],
+            ['#33FFE9B8', 0.60],
             ['#00FFFFFF', 1.00]
           ]
         })
         .rotate({ angle: 12 })
-        .blur(this.tiny ? 8 : 16)
+        .blur(this.tiny ? 6 : 9)
         .position({
           x: ((this.vw > 0 ? this.vw * 0.18 : 80) + this.pSweep * (this.vw > 0 ? this.vw * 0.62 : 270)) + 'vp',
           y: (this.vh > 0 ? this.vh * 0.30 : 230) + 'vp'
         })
-        .opacity(this.seg(this.pSweep, 0.00, 0.12) * (1 - this.seg(this.pSweep, 0.78, 1.00)) * 0.85)
+        .opacity(this.seg(this.pSweep, 0.00, 0.12) * (1 - this.seg(this.pSweep, 0.78, 1.00)) * 0.62)
         .hitTestBehavior(HitTestMode.None)
 
       // ──────── L11 胶片颗粒 ────────
