@@ -1011,6 +1011,31 @@ struct Splash {
           .opacity(this.ultraTiny ? 0 : this.pSub * 0.94)
           .translate({ y: (1 - this.pSub) * 10 })
           .margin({ top: this.tiny ? 4 : 14 })
+
+        // ──────── L8 标语 ────────
+        // ★★★ 2026-11-03（第 1097 轮）**放进 Column，不再贴屏底**
+        //
+        //   演进史（三次，前两次都只对了一半）：
+        //     ① 最早：`height('100%') + justifyContent(End)`
+        //        ⇒ 853×533 上没落到最底，反而压到副标题上 ❌
+        //     ② 2026-10-30：改 `Stack({alignContent: Alignment.Bottom})`
+        //        ⇒ 853×533 对了，但 **440×744 上标语被推到 270vp 之外** ❌
+        //          （同一套贴底策略，矮屏≈紧跟内容，高屏＝断裂）
+        //     ③ 2026-11-03：`vh >= 620` 分支 + `length * 0.615` 偏移
+        //        ⇒ 440×744 对了，但 **800×1280 上偏移 787vp 会撞进内容** ❌
+        //          （`vh × 0.615` 与内容高度不成比例，屏越高差得越多）
+        //   ⇒ **最终解**：标语就是**文字组的一部分**，放进同一个 Column，
+        //     用 `margin top` 跟在副标题后面。
+        //     ✅ 任何尺寸都成立：它永远在副标题下方固定距离，不会断裂、不会撞。
+        //     ✅ 也顺带修好了 ①（不再可能压到副标题上）
+        //   ★ 判据 376/377 的落地形态：**与其按尺寸分支，不如让布局本身与尺寸无关**。
+        Text(this.t('碎片时间，随时开局', 'A quick round, any time'))
+          .fontSize(this.tiny ? 8 : this.tagPx)
+          .fontColor('#CC9E52')
+          .letterSpacing(this.tiny ? 1 : 3)
+          .opacity(this.ultraTiny ? 0 : this.pTag)
+          .translate({ y: (1 - this.pTag) * 8 })
+          .margin({ top: this.tiny ? 8 : (this.vh > 0 && this.vh < 620 ? 20 : 26) })
       }
       .width('100%')
       .height('100%')
@@ -1027,46 +1052,6 @@ struct Splash {
       .scale({ x: 1 - this.pOut * 0.06, y: 1 - this.pOut * 0.06 })
       .opacity(1 - this.pOut)
 
-      // ──────── L8 底部标语 ────────
-      // ★ 2026-10-30 平板横屏真机抓到：标语原来用 height('100%') + justifyContent(End)，
-      //   在 533vp 高的横屏上**没有落到最底**，反而压到了副标题上。
-      //   ⇒ 改用 Stack 的 align(Alignment.Bottom)：位置由 Stack 决定，与高度无关。
-      // ★ 2026-10-30：`.align(Alignment.Bottom)` 在 Stack 的直接子节点上不生效
-      //   （容器没有高度 ⇒ 没有"底"可对齐）。
-      //   ⇒ 用一个**撑满高度的内层 Stack** + `alignContent: Bottom`，
-      //     文字就一定贴底，与屏幕高度无关（440/533/1280/540 都成立）。
-      //
-      // ★★★ 2026-11-03（第 1096 轮）**真 bug：440×744 手机竖屏上标语与内容断裂**
-      //   440×744 实测（1320×2232 px）：
-      //     logo y≈520..840 ｜ One More y≈940..1040 ｜ 分隔线 y≈1065 ｜ 355 GAMES y≈1120
-      //     标语 y≈1930  ⇒ **离副标题 810 px = 270 vp**，底部还一大片空白
-      //   ⇒ 视觉上"标语孤零零挂在屏幕底"，与上面那组内容没有任何关系。
-      //   根因：`Alignment.Bottom` 是**无条件贴底** ——
-      //     矮屏（533）上屏幕本来就短，贴底≈紧跟内容，看起来是对的；
-      //     高屏（744）上贴底就变成了"隔 270vp"。
-      //   ⇒ 修法：**按高度分支**
-      //     · 矮屏（vh < 620，如 853×533 / 960×540）：仍然贴底（原设计，横屏就该这样）
-      //     · 高屏（vh ≥ 620，如 440×744 / 800×1280）：改为 `Alignment.Top` +
-      //       一个"跟着内容走"的 top 偏移，让标语紧接副标题下方 ~26vp
-      //     ⚠️ 偏移量不能写死像素 —— 用 vh 的比例（0.60），
-      //        因为内容组是居中的，标语要落在"内容组底部 + 26vp"附近。
-      Stack({ alignContent: this.vh > 0 && this.vh >= 620 ? Alignment.Top : Alignment.Bottom }) {
-        Text(this.t('碎片时间，随时开局', 'A quick round, any time'))
-          .fontSize(this.tiny ? 8 : this.tagPx)
-          // ★ 2026-10-30：原来是 '#9AC99E52'（alpha 0x9A=60%）× opacity 0.9
-          //   ⇒ 最终约 54% ⇒ 真机上"几乎看不见"，等于没做这一层。
-          //   ⇒ 提到 0xCC（80%）：可读、但仍低于标题与副标题的亮度（不抢戏）。
-          .fontColor('#CC9E52')  // ★ 注意：这是 6 位 hex = 全不透明（不是 80%）
-          .letterSpacing(this.tiny ? 1 : 3)
-          // 矮屏贴底（bottom 留白）；高屏跟随内容（top 偏移）
-          .margin(this.vh > 0 && this.vh >= 620
-            ? { top: this.vh * 0.615 }
-            : { bottom: this.tiny ? 16 : 40 })
-      }
-      .width('100%')
-      .height('100%')
-      .opacity(this.ultraTiny ? 0 : this.pTag * (1 - this.pOut))
-      .hitTestBehavior(HitTestMode.None)
 
       // ──────── L10 细光带：从 OM 左侧扫到右侧 ────────
       //   ★ 2026-10-30（第二次尝试，这次对了）：
