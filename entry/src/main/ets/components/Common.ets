@@ -1038,9 +1038,14 @@ build() {
     //     `accessibilityText` 给它一句完整的描述（名称 + 副标题 + 今日状态）。
     //   ⚠️ 游戏内棋盘格子**不做** a11y —— 那是视觉玩法，读屏无法等价替代（与色盲的边界同理）。
     .accessibilityGroup(true)
+    // ★★★ 2026-11-03（第 1081 轮）**无障碍文本漏译**
+    //   原代码把「，」和「，今日已玩」硬编码中文
+    //   ⇒ 英文界面下，读屏（TalkBack / VoiceOver）会用**英文语音念中文** ⇒ 乱码
+    //   ⇒ 对**盲人用户**是实打实的 bug（比视觉漏译更严重：他们别无选择）
+    //   修：两处都走 L(zh, en)
     .accessibilityText(
-      this.meta ? (displayName(this.meta) + '，' + displayTagline(this.meta)
-        + (this.playedToday ? '，今日已玩' : '')) : '')
+      this.meta ? (displayName(this.meta) + L('，', ', ') + displayTagline(this.meta)
+        + (this.playedToday ? L('，今日已玩', ', played today') : '')) : '')
     .onFocus(() => { this.focused = true; })
     .onBlur(() => { this.focused = false; })
     .onClick(() => {
