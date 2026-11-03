@@ -1665,9 +1665,11 @@ build() {
       return 180;   // 146 + 34（第 933 轮：副标题允许 3 行）
     }
     if (this.uiMode === 'simple') {
-      return 118;   // 84 + 34
+      return Math.max(58, Math.min(118, Bp.height > 0 ? Bp.height - 123 : 118));
     }
-    return 126;     // 92 + 34
+    // ★ 第 945 轮：按可用高度自适应（233 实测可用 ≈ Bp.height − 123），
+    //   并以 58 兜底 —— 这样 Bp.height 首帧为 0 时也不会被 Grid 压扁。
+    return Math.max(58, Math.min(126, Bp.height > 0 ? Bp.height - 123 : 126));
   }
 
   @Builder
