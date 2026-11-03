@@ -205,6 +205,14 @@ struct Splash {
   private born: number = 0;
   private finished: boolean = false;
   private boosted: boolean = false;
+  /**
+   * 已播放的动画时长（ms）—— 只累计"正常帧"，渲染阻塞不计。
+   * ★ 第 1094 轮：boost() 的护栏必须用它，不能用墙钟。
+   *   原因：`Date.now() - born < 900` 在冷启动时会失效 ——
+   *   页面显示后要等约 1.5 秒才首次绘制，而系统传下来的残留触摸
+   *   恰好在这之后到达 ⇒ 护栏已过 ⇒ boost 立刻 finish ⇒ **用户看到的就是首页**。
+   */
+  private animMs: number = 0;
   @State private tiny: boolean = false;
   /** 极小屏（< 260vp，如运动手表 195）：只留 OM + 标题，其余省略 */
   @State private ultraTiny: boolean = false;
@@ -322,11 +330,56 @@ struct Splash {
     //   · 每步赋值都是 @State 变更 ⇒ 真的触发 build ⇒ 所有 JS 计算拿到真实中间值；
     //   · 曲线两类：`lin` 线性（星尘漂移 / 金属高光旋转 —— 该匀速的才匀速）、
     //              `sm` smoothstep e²(3−2e)（其余全部，等效 ease-in-out）。
-    const T0: number = Date.now();
+    // ★★★ 2026-11-03（第 1094 轮）**真 bug：冷启动时整个入场动画被跳过**
+    //
+    //   现象（853×533 真机连拍 12 帧）：开屏只出现 **1 帧**，且那帧就是**终态**。
+    //   根因：`onPageShow` 之后，**首次真正绘制还要等约 1.5 秒**
+    //        （页面构建 + 布局 + 首帧光栅）—— 这段时间 JS 线程被占住，
+    //        `setInterval` 的回调**一次都没跑**。
+    //        ⇒ 等回调终于跑起来时，`Date.now() - T0` 已经 ≈1500ms
+    //        ⇒ 而 pTag 止点是 1480 ⇒ **一上来就是终态**
+    //        ⇒ 同时 HOLD 定时器仍在 T0+2230 触发 ⇒ 只停了约 0.7 秒
+    //
+    //   ⇒ 修法：**自愈**。首帧 tick 若发现"已落后很久"，说明前面被阻塞了，
+    //          就把 T0 推回现在、HOLD 定时器重排，让动画**从头完整播一遍**。
+    //   ⚠️ 试过用 `onAppear` 替代 `onPageShow` —— **更糟**（开屏一帧都没了）：
+    //      `onAppear` 在组件挂载时触发，比 onPageShow **更早**
+    //      ⇒ T0 更早 ⇒ 跳得更快。所以不能用生命周期钩子，只能自愈。
+    // ★★★ 2026-11-03（第 1094 轮，第二次尝试）**真 bug：冷启动时整个入场动画被跳过**
+    //
+    //   现象（853×533 真机，14 帧连拍）：开屏只出现 **1 帧**（且无内容），随后直接是首页。
+    //
+    //   根因链（三次猜测，前两次都错，记下来）：
+    //     ① 以为是 T0 取太早 ⇒ 试 `onAppear` 替代 `onPageShow`
+    //        ⇒ **更糟**（开屏一帧都没了）：`onAppear` 在组件挂载时触发，
+    //          比 `onPageShow` **更早**。❌
+    //     ② 以为是「首帧 tick 落后」⇒ 自愈只在 `firstTick` 时检测
+    //        ⇒ **没触发**：`onPageShow` 之后有一小段空闲，ticker 正常跑了十几拍，
+    //          之后才开始渲染阻塞。阻塞发生在**第 N 拍**，不是第一拍。❌
+    //     ③ **真根因**：`setInterval(16ms)` 的回调在渲染阻塞期间**完全不执行**，
+    //        而 `Date.now() - T0` 是**墙钟时间** —— 它照常流走。
+    //        ⇒ 阻塞 1.5 秒后，时间轴已经"跑过"1.5 秒 ⇒ 一渲染就是中后段；
+    //        ⇒ 而 `setTimeout(HOLD)` 同样是墙钟 ⇒ 2230ms 后必定 finish，
+    //          可能比首帧绘制还早 ⇒ 用户直接看到首页。
+    //
+    //   ⇒ 修法：**动画时间只累计"正常帧"**（gap ≤ 100ms），
+    //     渲染阻塞造成的大 gap **不计入**。
+    //     `finish()` 也改为在 ticker 里按累计时间判断，不再用墙钟 setTimeout。
+    //     ⇒ 无论首帧多晚，动画都会**从头完整播一遍**。
+    let accum: number = 0;      // 累计动画时间（ms），只加正常帧
+    let lastMs: number = Date.now();
+    let finishedByTimeline: boolean = false;
     const tick = setInterval(() => {
-      // ★ 点屏幕加速：直接把时间轴顶到终点（等价于旧版把值硬置 1 的观感）
-      //   区别：现在是「时间轴到头」而不是「逐个字段硬写」，逻辑只有一个入口。
-      const t: number = this.boosted ? TOTAL : (Date.now() - T0);
+      // ★ 累计动画时间（第 1094 轮）：只加"正常帧"，渲染阻塞的大 gap 不计
+      const nowMs: number = Date.now();
+      const gap: number = nowMs - lastMs;
+      lastMs = nowMs;
+      if (gap > 0 && gap <= 100) {
+        accum += gap;
+      }
+      this.animMs = accum;
+      // ★ 点屏幕加速：直接把时间轴顶到终点
+      const t: number = this.boosted ? TOTAL : accum;
       const lin = (st: number, dur: number): number => {
         const e: number = (t - st) / dur;
         return e <= 0 ? 0 : (e >= 1 ? 1 : e);
@@ -362,13 +415,19 @@ struct Splash {
         this.pM = 1; this.pFill = 1; this.pSweep = 1; this.pTitle = 1;
         this.pSub = 1; this.pTag = 1; this.pOut = 1;
       }
+      // ★ HOLD 改为按**累计动画时间**判断（不再是墙钟 setTimeout）
+      //   否则渲染阻塞时定时器会比首帧还早触发 ⇒ 用户直接看到首页
+      if (!finishedByTimeline && (this.boosted || t >= HOLD)) {
+        finishedByTimeline = true;
+        clearInterval(tick);
+        this.finish();
+      }
     }, 16);
-    setTimeout(() => {
-      this.finish();
-    }, HOLD);
   }
 
   private finish(): void {
+    // ★ 临时诊断（第 1094 轮）：把真实播放时长打出来
+    hilog.info(0x0001, 'SplashDiag', 'finish: animMs=%{public}d boosted=%{public}s', this.animMs, String(this.boosted));
     if (this.finished) {
       return;
     }
@@ -385,7 +444,10 @@ struct Splash {
     //   根因：根 Stack 的 `onClick` 在启动过程中被触发（系统把启动触摸传了下来）
     //   ⇒ boost() 立刻跑完 ⇒ 560ms 后就 finish()。
     //   ⇒ 加时间护栏：**前 900ms 的点击一律忽略**。
-    if (Date.now() - this.born < 900) {
+    // ★ 第 1094 轮：护栏从「墙钟 900ms」改成「**已播放 900ms**」
+    //   墙钟版在冷启动时失效（首帧晚到 1.5 秒，残留触摸恰好落在护栏之后）
+    //   ⇒ 开屏被 boost 瞬间跳完 ⇒ 用户只看到首页。
+    if (this.animMs < 900) {
       return;
     }
     this.boosted = true;
