@@ -1004,9 +1004,19 @@ struct Splash {
               .opacity(this.charIn(i, 8))
               .translate({ y: (1 - this.charIn(i, 8)) * (this.tiny ? 8 : 16) })
               .blur((1 - this.charIn(i, 8)) * (this.tiny ? 6 : 10))
+              // ★ 2026-11-03（第 1117 轮）**只清空字符节点的无障碍文本，不摘出树**
+              //   试过 accessibilityLevel('no')：text 变空、originalText 仍暴露单字符、
+              //   且容器的 accessibilityText 没生效 ⇒ 可能完全读不到，比逐字念更糟（已回滚）。
+              //   现在的做法：字符节点仍可遍历，但无障碍文本留空；由容器统一读。
+              .accessibilityText('')
           }, (ch: string, i: number) => 'c' + i + ch)
         }
         .margin({ top: this.tiny ? 6 : (this.vh > 0 && this.vh < 620 ? 12 : 40) })
+        // ★ 容器合并：8 个字符读作一个整体（'One More' 由子文本拼出）
+        .accessibilityGroup(true)
+        // ★ 容器自己给出完整无障碍文本（否则 group 会把子文本用「,」拼起来，
+        //   读作「O 逗号 n 逗号 e…」—— 实测 dumpLayout 的 Row.text = 'O, n, e,  , M, o, r, e'）
+        .accessibilityText(this.t('One More', 'One More'))
 
         // ═══ 金线（2026-10-30 新增 · 在临时页 TitleTest 里先验过）═══
         //   研究报告的「轮廓先行」思路，落不到 dash 上（见第 503 轮实测），
