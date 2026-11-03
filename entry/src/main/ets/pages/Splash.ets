@@ -806,14 +806,22 @@ struct Splash {
           //     ⚠️ 台账 522/561 轮记录：`Polygon` 上 `linearGradient` 只铺矩形不填路径，
           //        但**归一化 points + width/height** 与"渐变"是两件事，未试过，仍可试
           //   ⇒ **当前保持原样（M 偏宽 76%），这是已知遗留，不是新 bug。**
+          // ★★★ 2026-11-03（第 1044 轮）**奥森：「O 和 M 大小差别还是很大」**
+          //   设计值实测：M 高 = omPxV × 0.4961，而 O 外径 = omPxV × 0.6074
+          //     ⇒ **M 高 / O 外径 = 0.817** ⇒ M 只有 O 的 **81.7%**
+          //   而且 O 是**镂空圆环**、M 是**实心三角** ⇒ 视觉重量差得更多
+          //   ⇒ 放大 **×1.2244**（= 0.6074 / 0.4961），让 **M 高与 O 外径齐平**
+          //     · points 的归一化坐标与 width/height **按同一系数缩放**（保持设计值一致）
+          //     · M 起点(0.4929)不变 ⇒ 右边缘到 0.4929 + 0.5071×1.2244 = **1.1136**
+          //       ⇒ logo 总宽从 1.000 变 **1.114 × omPxV**（仍在屏宽占比内，见验算）
           Polygon()
-            .width(this.omPxV() * 0.5071).height(this.omPxV() * 0.4961)
+            .width(this.omPxV() * 0.6207).height(this.omPxV() * 0.6074)
             .points([
-              [0, this.omPxV() * 0.4961],
-              [this.omPxV() * 0.0945, 0],
-              [this.omPxV() * 0.2520, this.omPxV() * 0.3512],
-              [this.omPxV() * 0.4173, 0],
-              [this.omPxV() * 0.5071, this.omPxV() * 0.4961]
+              [0, this.omPxV() * 0.6074],
+              [this.omPxV() * 0.1157, 0],
+              [this.omPxV() * 0.3085, this.omPxV() * 0.4300],
+              [this.omPxV() * 0.5109, 0],
+              [this.omPxV() * 0.6207, this.omPxV() * 0.6074]
             ])
             .fill('#FAF8F3')
             // 2026-11-01 device pixel measure: O bottom y=1104, M bottom y=1046
