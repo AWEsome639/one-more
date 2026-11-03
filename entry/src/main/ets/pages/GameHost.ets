@@ -801,6 +801,8 @@ struct GameHost {
    *   4 个按钮（返回 / 收藏 / 帮助 / 重开）+ 难度 = 5 个位置。
    */
   @State private focusIdx: number = -1;
+  /** ★ 2026-11-03（第 917 轮）**PC hover**：顶栏哪个按钮在鼠标下（-1 = 无） */
+  @State private hdrHover: number = -1;
 
 
 
@@ -834,6 +836,19 @@ struct GameHost {
             //   电视/键盘用户进游戏后，顶栏按钮根本拿不到焦点（连"重开"都按不到）。
             .focusable(Tv.on())
             .id('hdr-0')
+            // ★★★ 2026-11-03（第 917 轮）**PC hover：顶栏是游戏页最常点的区域**。
+            //   原来只有按下的 1.08 弹动（`IconPress`）+ 电视焦点框，
+            //   **鼠标划过没有任何反馈**。GameCard（Common.ets:922）与
+            //   底部标签栏（Index.ets:441）都有 hover ⇒ 顶栏不该缺。
+            //   ⚠️ 用**阴影加深 + 背景提亮**表达 hover，不叠加 scale
+            //      （否则会与 `backPressed` 的 1.08 相乘）。
+            .onHover((isHover: boolean) => {
+              if (!(Bp.isDesktop() || Bp.isLg())) { return; }
+              animateTo({ duration: Motion.fast, curve: Motion.snap() }, () => {
+                this.hdrHover = isHover ? 0 : -1;
+              });
+            })
+            .backgroundColor(this.hdrHover === 0 ? this.theme().surfaceAlt : this.theme().surface)
 
             .border(Tv.focusBorder(this.focusIdx === 0))
             .onFocus(() => { this.focusIdx = 0; })
