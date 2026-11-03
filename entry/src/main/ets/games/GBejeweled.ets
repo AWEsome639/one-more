@@ -28,6 +28,18 @@ const TARGET: number = 600;        // 通关分数线
 const PER_GEM: number = 10;        // 每消一颗的分
 
 const GEMS: string[] = ['💎', '🔥', '🍀', '🔮', '💧'];
+
+// ★★★ 2026-11-03（第 1014 轮）**逐字形垂直微调**（奥森报「水滴没在圆盘里居中」）
+//   实测：49 颗宝石的**几何重心**偏差全部 < 0.25px（数学上完美居中），
+//        但 emoji 是彩色字形，**视觉重心**与几何重心不同：
+//          💎 上宽下尖（倒三角）⇒ 视觉重心**偏上** ⇒ 需**下移**
+//          🔥 火苗上窜、底部宽   ⇒ 视觉重心**偏下** ⇒ 需**上移**
+//          🍀 近似圆形           ⇒ 对称 ⇒ **不动**
+//          🔮 球体 + 底座         ⇒ 视觉重心**偏下** ⇒ 需**上移**
+//          💧 上尖下圆           ⇒ 视觉重心**偏下** ⇒ 需**上移**
+//   ⇒ 用 `.offset({ y })` 补偿（**只做视觉平移，不影响布局**，判据 305）。
+//   ⚠️ 数值是按"目测视觉重心 × 格子占比"定的；换字号时需要等比缩放。
+const GEM_DY: number[] = [1.0, -1.0, 0, -1.0, -1.5];
 const GEM_COLORS: string[] = [
   Palette.sky, Palette.orange, Palette.emerald, Palette.violet, Palette.primary
 ];
@@ -618,6 +630,8 @@ export struct GBejeweled {
                 .textAlign(TextAlign.Center)
                 .width('100%').height('100%')
                 .align(Alignment.Center)
+                // ★ 逐字形微调（见 GEM_DY 的注释）
+                .offset({ y: GEM_DY[this.board.length > (this.idx(r, c)) ? this.board[(this.idx(r, c))] : 0] })
                 }
                 .layoutWeight(1)
                 .aspectRatio(1)
