@@ -375,7 +375,15 @@ def main():
 
     fout.close()
     print('\n  本轮：成功 %d ｜ 失败 %d ｜ 总已测 %d' % (ok, fail, len(done) + ok + fail))
+    # ★ 判据 423：把失败数返回给 __main__，让退出码能反映结果
+    return fail
 
 
 if __name__ == '__main__':
-    main()
+    # ★★★ 2026-11-03（第 1122 轮）**冒烟测试必须有失败退出码**（判据 423）
+    #   原来 main() 跑完就结束 ⇒ 即使「失败 N 款」也返回 0
+    #   ⇒ 在自动化里它永远不会报警，只是"打印了一行失败数"
+    rc = main()
+    if '--lenient' in sys.argv:
+        sys.exit(0)
+    sys.exit(1 if (rc or 0) > 0 else 0)

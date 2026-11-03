@@ -1277,6 +1277,14 @@ build() {
           //   读屏把放大镜念成「放大镜」；开/关状态也要能听出来。
           .accessibilityText(this.searchOpen ? this.t('关闭搜索', 'Close search') : this.t('搜索游戏', 'Search games'))
           .accessibilityLevel('yes')
+          // ★★★ 2026-11-03（第 1122 轮）**视觉重心补偿（判据 305）**
+          //   `🔍` 是 emoji：字形在字框里**偏下**（emoji 的 design box 下沿留白更多）。
+          //   放进 touchMin×touchMin 的圆形按钮并用 textAlign(Center) 时，
+          //   几何居中 ⇒ 看起来偏低 1~2vp。
+          //   ⇒ `offset({ y: -1 })` 把字形上提 1vp。
+          //   ⚠️ 这个值必须在真机上看过才算定；本检查器只能保证"有 offset"，
+          //      不能判断方向与幅度（判据 305 明写了：像素测量证明不了视觉重心）。
+          .offset({ y: -1 })
           .fontSize(FontSize.lg).width(Layout.touchMin).height(Layout.touchMin).textAlign(TextAlign.Center)
           .backgroundColor(this.searchOpen ? Palette.primary : this.theme().surface)
           .borderRadius(Radius.full)

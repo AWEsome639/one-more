@@ -17,7 +17,8 @@ check_emoji_centering.py —— 「emoji 放在有色底上却没垂直微调」
 
 用法：
   python3 工具/check_emoji_centering.py          # 只报告
-  python3 工具/check_emoji_centering.py --strict # 有未处理项则退出码 1
+  python3 工具/check_emoji_centering.py           # 默认严格：有未处理项退出码 1
+  python3 工具/check_emoji_centering.py --lenient # 只看报告（CI 里别用）
 
 ⚠️ 它只做**静态筛查**，不能代替真机截图：
    有 `.offset()` 也可能调错方向；没有也未必真难看（比如底很大、emoji 很小）。
@@ -31,8 +32,17 @@ import glob
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 单个 emoji 字面量（Text('💧') 这种）
+# ★★★ 2026-11-03（第 1122 轮）**收窄到真 emoji 区间**
+#   原来还包含 `\u2600-\u27BF`（杂项符号区），把下面这些也当成了 emoji：
+#     ✓(2713) ✕(2715) ♛(265B) ⚖(2696) ⚙(2699)
+#   ⇒ 它们**不是彩色 emoji**，字形在字框里本来就更接近居中
+#   ⇒ 判据 305 讲的「emoji 字形偏下」对它们**不适用**
+#   ⇒ 结果：检查器报了 5 处假阳性 ⇒ 一旦默认严格，CI 就永远红 ⇒ 严格模式等于没用
+#   ⚠️ 边界说明：`❓❤➕➗⚠✉` 这几个是"带 VS16 才会彩色呈现"的，
+#      本检查器**不再报告**它们（它们大多出现在文字里，不是独占色块）；
+#      若将来真的单独放进色块，请手工判断并用 .offset({y:-1}) 修。
 EMOJI_LITERAL = re.compile(
-    r"Text\(\s*['\"]([\U0001F300-\U0001FAFF\u2600-\u27BF])['\"]"
+    r"Text\(\s*['\"]([\U0001F300-\U0001FAFF])['\"]"
 )
 # Text(ARRAY[i] ...) 这种（棋盘类）
 # ⚠️ 2026-11-03 第 1019 轮修正：原来写的是 `Text\((?:this\.)?([A-Z]...)`，
@@ -79,10 +89,29 @@ def scan_file(path):
                     continue
         if not text_m:
             continue
-        # 往后看 16 行（一个组件的属性链）
-        seg_lines = lines[i : i + 17]
+        # ★★★ 2026-11-03（第 1122 轮）**只看"这个 Text 自己"的属性链**
+        #   原来取 `lines[i : i+17]`，那 17 行里可能包含**下一个 Text** 或**父容器**，
+        #   于是把"跟文字并排的 emoji"（父容器有底色）也当成了"emoji 独占色块"。
+        #   实测误报：Common.ets:446 的 🔥、StatsTab.ets:969 的 🌱
+        #     · 🔥 在 Row 里跟「{n} 天」并排 ⇒ 色块是 Row 的，emoji 只是行内字符
+        #     · 🌱 是 Column 的第一个元素 ⇒ 同样不是独占色块
+        #   ⇒ 正确的判据：**这个 Text 自己**有 width + height + backgroundColor
+        #     才是"emoji 放进一个按它尺寸画的色块里"，才需要 offset。
+        seg_lines = []
+        for l2 in lines[i : i + 17]:
+            seg_lines.append(l2)
+            # 遇到下一处 **独立的** Text( 就停（不含）
+            #   ⚠️ 不能用 `'Text(' in l2` —— `accessibilityText(` 里也含 "Text("，
+            #      会把属性链在第 2 行就截断，导致 width/height 找不到、全部漏报。
+            #   （判据 419 同一个坑：子串匹配会把"形名相似的东西"算进来）
+            if len(seg_lines) > 1 and re.search(r'(?<![A-Za-z])Text\(', l2):
+                seg_lines.pop()
+                break
         seg = "\n".join(seg_lines)
         if BG not in seg or not RADIUS.search(seg):
+            continue
+        # 必须**自己**有 width 与 height（父容器的尺寸不会写在这个 Text 的属性链里）
+        if 'width(' not in seg or 'height(' not in seg:
             continue
         # 排除"文字行里夹 emoji"（同一行还有别的中文/英文说明）
         stripped = re.sub(r"Text\([^)]*\)", "", l)
@@ -94,10 +123,14 @@ def scan_file(path):
 
 
 def main():
-    strict = "--strict" in sys.argv
+    # ★★★ 2026-11-03（第 1122 轮）**默认改为严格**（判据 423）
+    #   原来「默认宽松、加 --strict 才失败」⇒ 不带参数时永远退出 0，
+    #   在自动化里完全失效。改为一律严格，要宽松请显式 --lenient。
+    strict = "--lenient" not in sys.argv
     files = sorted(glob.glob(os.path.join(ROOT, "entry/src/main/ets/**/*.ets"), recursive=True))
     total = 0
     missing = 0
+    details = {}      # ★ 第 1122 轮：记录每处的行号，供输出用
     rows = []
     for f in files:
         if ".bak-" in f:
@@ -110,6 +143,7 @@ def main():
         total += len(hits)
         missing += len(bad)
         rows.append((rel, len(hits), len(bad)))
+        details[rel] = hits
 
     rows.sort(key=lambda r: -r[2])
     print("=" * 66)
@@ -122,6 +156,10 @@ def main():
     for rel, n, bad in rows:
         flag = "  ← 需要看" if bad else ""
         print("  %-44s %3d  %4d%s" % (rel[:44], n, bad, flag))
+        # ★ 2026-11-03（第 1122 轮）**必须打出具体行号**，否则"需要看"无从下手
+        for ln, has_off, frag in details.get(rel, []):
+            if not has_off:
+                print("      L%-5d %s" % (ln, frag[:70]))
     print()
     if missing == 0:
         print("  ⇒ 全部已有 offset（但请记住：offset 也可能调错方向，需真机看）")
