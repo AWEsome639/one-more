@@ -316,7 +316,11 @@ export struct GRomanArithmetic {
       }.width('100%')
       Column({ space: Space.xs }) {
         Text(this.q).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text('= ?').fontSize(FontSize.md).fontColor(this.theme.inkFaint)
+        Text('= ?')          // ★ 2026-11-03（第 1119 轮）**装饰性元素从无障碍树摘掉**
+          //   「= ?」是题目版式的一部分（题目本身由 q 表达），
+          //   读屏念「等于问号」只是噪音 ⇒ accessibilityLevel('no')
+          .accessibilityLevel('no')
+          .fontSize(FontSize.md).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
       Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)

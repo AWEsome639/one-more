@@ -1273,6 +1273,10 @@ build() {
         })
         // ★ 搜索入口（第 822 轮）：355 款游戏没有搜索不可接受
         Text('🔍')
+          // ★ 2026-11-03（第 1119 轮）无障碍：图标按钮必须说清是干什么的，
+          //   读屏把放大镜念成「放大镜」；开/关状态也要能听出来。
+          .accessibilityText(this.searchOpen ? this.t('关闭搜索', 'Close search') : this.t('搜索游戏', 'Search games'))
+          .accessibilityLevel('yes')
           .fontSize(FontSize.lg).width(Layout.touchMin).height(Layout.touchMin).textAlign(TextAlign.Center)
           .backgroundColor(this.searchOpen ? Palette.primary : this.theme().surface)
           .borderRadius(Radius.full)

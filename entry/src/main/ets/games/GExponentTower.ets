@@ -295,7 +295,11 @@ export struct GExponentTower {
           .accessibilityLevel('no')
         Text(String(this.a) + ' ^ ( ' + String(this.b) + ' ^ ' + String(this.c) + ' )')
           .fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.cyan)
-        Text('= ?').fontSize(FontSize.xl).fontColor(this.theme.inkFaint)
+        Text('= ?')          // ★ 2026-11-03（第 1119 轮）**装饰性元素从无障碍树摘掉**
+          //   「= ?」是题目版式的一部分（题目本身由 q 表达），
+          //   读屏念「等于问号」只是噪音 ⇒ accessibilityLevel('no')
+          .accessibilityLevel('no')
+          .fontSize(FontSize.xl).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
         ForEach(this.slots, (i: number) => {

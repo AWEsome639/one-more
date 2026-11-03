@@ -361,7 +361,9 @@ export struct GNumberBonds {
 
       Column({ space: Space.xs }) {
         Text(Digits(String(this.target), this.langCode)).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
-        Text('╱  ╲').fontSize(FontSize.lg).fontColor(this.theme.inkFaint)
+        Text('╱  ╲')          // ★ 2026-11-03（第 1119 轮）装饰性连线符号从无障碍树摘掉
+          .accessibilityLevel('no')
+          .fontSize(FontSize.lg).fontColor(this.theme.inkFaint)
         Row({ space: Space.lg }) {
           Text((this.hideFirst) ? '?' : String((this.shown))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor((this.hideFirst) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).width(84).height(Cell.of(64)).backgroundColor((this.hideFirst) ? Palette.teal : this.theme.surfaceAlt).borderRadius(Radius.md)
           Text((!this.hideFirst) ? '?' : String((this.shown))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor((!this.hideFirst) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).width(84).height(Cell.of(64)).backgroundColor((!this.hideFirst) ? Palette.teal : this.theme.surfaceAlt).borderRadius(Radius.md)

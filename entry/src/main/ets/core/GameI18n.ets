@@ -66,6 +66,45 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★★ 2026-11-03（第 1080 轮）**扩扫后发现 HintBar 的第三处漏译**
   //   `HintBar.ets:54` 用 `TG('演示中…（碰一下就停）')`
   //   ⇒ 扩扫到 components/ 才暴露（之前只扫 games/，这一整类都漏了）
+  // ★★★ 2026-11-03（第 1119 轮）**图标按钮 / 方向键的无障碍文案**
+  //   只出现在 accessibilityText 里（读屏用），屏幕上仍是箭头符号；
+  //   但必须翻译 —— 否则英文界面下读屏会念中文。
+  "向上移动": {
+    "en": "Move up", "ja": "上へ移動", "ko": "위로 이동",
+    "es": "Mover arriba", "fr": "Monter", "de": "Nach oben",
+    "pt": "Mover para cima", "ru": "Двигаться вверх",
+    "it": "Sposta su", "ar": "التحرك للأعلى",
+  },
+  "向下移动": {
+    "en": "Move down", "ja": "下へ移動", "ko": "아래로 이동",
+    "es": "Mover abajo", "fr": "Descendre", "de": "Nach unten",
+    "pt": "Mover para baixo", "ru": "Двигаться вниз",
+    "it": "Sposta giù", "ar": "التحرك للأسفل",
+  },
+  "向左移动": {
+    "en": "Move left", "ja": "左へ移動", "ko": "왼쪽으로 이동",
+    "es": "Mover a la izquierda", "fr": "Aller à gauche", "de": "Nach links",
+    "pt": "Mover para a esquerda", "ru": "Двигаться влево",
+    "it": "Sposta a sinistra", "ar": "التحرك لليسار",
+  },
+  "向右移动": {
+    "en": "Move right", "ja": "右へ移動", "ko": "오른쪽으로 이동",
+    "es": "Mover a la derecha", "fr": "Aller à droite", "de": "Nach rechts",
+    "pt": "Mover para a direita", "ru": "Двигаться вправо",
+    "it": "Sposta a destra", "ar": "التحرك لليمين",
+  },
+  "搜索游戏": {
+    "en": "Search games", "ja": "ゲームを検索", "ko": "게임 검색",
+    "es": "Buscar juegos", "fr": "Rechercher des jeux", "de": "Spiele suchen",
+    "pt": "Pesquisar jogos", "ru": "Поиск игр",
+    "it": "Cerca giochi", "ar": "ابحث عن الألعاب",
+  },
+  "关闭搜索": {
+    "en": "Close search", "ja": "検索を閉じる", "ko": "검색 닫기",
+    "es": "Cerrar búsqueda", "fr": "Fermer la recherche", "de": "Suche schließen",
+    "pt": "Fechar pesquisa", "ru": "Закрыть поиск",
+    "it": "Chiudi ricerca", "ar": "إغلاق البحث",
+  },
   // ★★★ 2026-11-03（第 1118 轮）**无障碍文案（HintBar / DemoBar 共享，覆盖 355 款）**
   //   这批键只在 `accessibilityText` 里出现（读屏用），屏幕上不显示；
   //   但**必须翻译** —— 否则英文界面下读屏会念中文。

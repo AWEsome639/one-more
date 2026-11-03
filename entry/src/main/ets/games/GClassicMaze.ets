@@ -365,12 +365,28 @@ export struct GClassicMaze {
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
  Row({ space: Space.xs }) {
  Button('↑')
+      // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
+      //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
+      .accessibilityText(TG('向上移动'))
+      .accessibilityLevel('yes')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(0); }); }).onClick(() => { Haptics.tap(); this.step(0); })
  Button('↓')
+      // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
+      //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
+      .accessibilityText(TG('向下移动'))
+      .accessibilityLevel('yes')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(2); }); }).onClick(() => { Haptics.tap(); this.step(2); })
  Button('←')
+      // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
+      //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
+      .accessibilityText(TG('向左移动'))
+      .accessibilityLevel('yes')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(3); }); }).onClick(() => { Haptics.tap(); this.step(3); })
  Button('→')
+      // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
+      //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
+      .accessibilityText(TG('向右移动'))
+      .accessibilityLevel('yes')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(1); }); }).onClick(() => { Haptics.tap(); this.step(1); })
  Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

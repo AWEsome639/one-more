@@ -3372,7 +3372,8 @@ struct GameHost {
           //     而「看得到按钮、能离开」远比「看一眼新纪录」重要。
           if (this.lastSolved && ProgressStore.lastWasBest && !Bp.tinyWatch()) {
             Row({ space: 6 }) {
-              Text('🏆').fontSize(FontSize.md)
+              // ★ 2026-11-03（第 1119 轮）奖杯是装饰，语义由旁边「新纪录！」承担
+              Text('🏆').accessibilityLevel('no').fontSize(FontSize.md)
               Text(ProgressStore.prevBest > 0
                 ? this.t('新纪录！上次 ' + String(ProgressStore.prevBest),
                          'New best! Previous ' + String(ProgressStore.prevBest))
