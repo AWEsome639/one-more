@@ -72,7 +72,7 @@ while :; do
   timeout 3 "$HC" tconn "$TARGET" >/dev/null 2>&1
   L=$(lum)
   if python3 -c "import sys; sys.exit(0 if float('${L:--1}') > 20 else 1)" 2>/dev/null; then
-    log "   屏幕亮（${EL}s，亮度 $L）"
+    log "   屏幕亮（${EL}s，亮度 ${L}）"
     ON=1
     break
   fi
@@ -130,7 +130,16 @@ PY
 )
 case "$VERDICT" in
   OK:*)
-    log "   已到桌面（${VERDICT#OK:} 条文本）"
+    NTEXTS="${VERDICT#OK:}"
+    # ★ 判据 839（第 1321 轮）：**桌面的 dumpLayout 可能**不含文本节点**
+    #   实证：解锁后 dump 有效但 0 条文本 ⇒ 若用「文本数 ≥ 3」会**假失败**
+    #   ⇒ 正确判据：**dump ≥ 400 字节** + **`pidof com.ohos.sceneboard` 非空**
+    SB=$(A "pidof com.ohos.sceneboard" | head -1)
+    if ! printf '%s' "$SB" | grep -qE '^[0-9]+$'; then
+      log "🔴 桌面进程不在（com.ohos.sceneboard pidof: $(printf '%s' "$SB" | cut -c1-30)）"
+      exit 2
+    fi
+    log "   已到桌面（sceneboard PID=${SB}，dump 文本 ${NTEXTS} 条）"
     ;;
   LOCK)
     log "🔴 仍在锁屏（判据 833：可能是 swipe 起点/终点不对）"
