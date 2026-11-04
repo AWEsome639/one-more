@@ -265,9 +265,20 @@ def main():
 
     print('  ② 调用处外层也有 padding（⇒ 内边距叠加）：%d 处' % len(risks))
     for name, f, line, g, cl, pl in risks:
-        print('     🔴 %s（自身 padding @%s:%d）' % (name, os.path.basename(f), line))
+        print('     ⚠️ %s（自身 padding @%s:%d）' % (name, os.path.basename(f), line))
         print('        被 %s:%d 调用，外层 padding @%s:%d'
               % (os.path.basename(g), cl, os.path.basename(g), pl))
+        # ★ 判据 765/766/767（第 1281 轮）：**风险不是「有/没有」，而是「占比」**
+        #   同一组 40 vp 叠加：
+        #     195 vp 屏 ⇒ 41% 总宽 ⇒ 内容被挤死（真 bug，第 1272 轮）
+        #     800 vp 屏 ⇒ 10% 总宽 ⇒ 只是留白（没问题）
+        #   ⇒ 计算「(20+20)×2 ÷ 屏宽」，按窄屏最坏情况给结论
+        print('        ⇒ **必须按最小屏判**：若双层合计 40 vp，')
+        print('          195 vp 屏 = 41% 总宽（挤死）｜800 vp 屏 = 10%（正常）')
+    print()
+    print('  📖 判据 765：**「外层留白」与「内容内边距」是不同视觉层 ⇒ 不算 bug**；')
+    print('     只有「同一视觉层重复 padding」才是 bug（LevelHeader 那种）。')
+    print('     判据 767：**风险按「(外层+内层)×2 ÷ 屏宽」算，> 30% 才算挤死**。')
     print()
     print('=' * 74)
     if risks:
