@@ -18,6 +18,8 @@
  */
 
 import { Bp } from './Bp';
+// ★ 第 1158 轮：focusOutline 要用 Radius（`Radius.md` 圆角跟元素对齐）
+import { Radius } from './Design';
 import { Palette } from './Design';
 import { ColorMetrics, LengthMetrics } from '@kit.ArkUI';
 
@@ -72,6 +74,28 @@ export class Tv {
     return {
       width: hasFocus ? 4 : 0,
       color: hasFocus ? Palette.primary : Color.Transparent
+    };
+  }
+
+  /**
+   * ★★★ 2026-11-03（第 1158 轮）**焦点框改用 `.outline()` 而不是 `.border()`**
+   *
+   *   为什么不用 `.border()`：
+   *     · `.border()` 会**覆盖元素原有的边框**（355 款里有 **54 款**文件本身就有 `.border(`）
+   *     · 而 `Tv.focusBorder(false)` 返回 `width: 0` ⇒ 会把圆角描边、卡片边线**清掉**
+   *   ⇒ `.outline()` 的语义就是「外描边」：**不覆盖 border、不参与布局**
+   *     （SDK: units.d.ts `OutlineOptions { width?, color?, radius?, style? }`）
+   *
+   *   ⚠️ 但 `.outline()` 也属于「配置型 API」—— 按判据 492，
+   *      **必须像素差分证明它真的出现了**，不能因为编译通过就当生效。
+   *      试点：GTypingSpeed「重开」按钮（本文件下方 L335 处）。
+   */
+  static focusOutline(hasFocus: boolean): OutlineOptions {
+    return {
+      width: hasFocus ? 4 : 0,
+      color: hasFocus ? Palette.primary : Color.Transparent,
+      radius: Radius.md,
+      style: OutlineStyle.SOLID
     };
   }
 

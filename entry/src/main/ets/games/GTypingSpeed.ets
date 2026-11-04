@@ -56,6 +56,8 @@ export struct GTypingSpeed {
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
   @State private autoId: number = -1;
+  /** ★ 第 1158 轮：焦点框自绘（`.outline()`）。空串 = 无焦点 */
+  @State private tvFocus: string = '';
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
   @State private demoLeft: number = 0;
@@ -333,7 +335,9 @@ export struct GTypingSpeed {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md).width(88).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L336'; })
+          .onBlur(() => { if (this.tvFocus === 'L336') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L336'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }.width('100%')
       Text(TG('提示：不区分大小写；25 秒没打完算这句错')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
