@@ -218,6 +218,13 @@ export class ProgressStore {
       AppStorage.setOrCreate(Keys.firstDay, firstDayRaw);
       const dailyGameRaw: string = p.getSync(Keys.dailyGame, '') as string;
       AppStorage.setOrCreate(Keys.dailyGame, dailyGameRaw);
+      // ★★★ 2026-11-05（第 1348 轮）：**`dailyPick` 原来完全没恢复**
+      //   ⇒ 重启后 `dailyPick()` 返回 `''` ⇒ `markDaily` 的匹配检查永远失败
+      //   ⇒ 「今日挑战」永远完不成（判据 918 的另一半）
+      const dailyPickRaw: string = p.getSync('dailyPick', '') as string;
+      AppStorage.setOrCreate('dailyPick', dailyPickRaw);
+      const dailyBonusRaw: number = p.getSync(Keys.dailyBonus, 0) as number;
+      AppStorage.setOrCreate(Keys.dailyBonus, dailyBonusRaw);
       const dailyDoneRaw: string = p.getSync(Keys.dailyDone, '') as string;
       AppStorage.setOrCreate(Keys.dailyDone, dailyDoneRaw === 'true');
       const bestRaw: string = p.getSync(Keys.perGameBest, '{}') as string;
@@ -815,6 +822,17 @@ export class ProgressStore {
     AppStorage.setOrCreate(Keys.dailyDone, false);
     AppStorage.setOrCreate(Keys.dailyBonus, 0);
     ProgressStore.putString(Keys.dailyGame, today);
+    // ★★★ 2026-11-05（第 1348 轮）**修「今日挑战永远无法完成」（判据 918）**：
+    //   原来这里只 `putString(Keys.dailyGame)`，而 `'dailyPick'` **只写了内存**。
+    //   ⇒ 重启后 `dailyPick()` 返回 `''`
+    //   ⇒ `markDaily()` 里 `if (ProgressStore.dailyPick() !== gameId) { return 0; }`
+    //     **永远成立** ⇒ `dailyDone` 永远不会被置 true
+    //   ⇒ 「今日挑战」永远显示「通关 +50 经验」，**那 50 经验永远拿不到**
+    //   ⚠️ 而 `dailyPick` 是**裸字符串 key**（不是 `Keys.X` 常量）
+    //     ⇒ 我的 `check_persist_roundtrip.py` 也漏了它（判据 919）
+    ProgressStore.putString('dailyPick', gid);
+    ProgressStore.putString(Keys.dailyDone, 'false');
+    ProgressStore.putNumber(Keys.dailyBonus, 0);
   }
 
   /** 标记今日挑战完成，返回奖励 XP（没完成/已领过 ⇒ 0） */

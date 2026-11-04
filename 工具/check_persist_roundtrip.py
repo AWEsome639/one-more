@@ -35,6 +35,12 @@ def analyze(src):
         writes.add(m.group(1))
     for m in re.finditer(r"putSync\(\s*'([A-Za-z][A-Za-z0-9]*)'", src):
         writes.add(m.group(1))
+    # ★★★ 2026-11-05（第 1348 轮，判据 919）：**裸字符串 key 也要算写入**
+    #   实证：`ProgressStore.putString('dailyPick', gid)` 是裸字符串 key
+    #     ⇒ 第一版检查器只认 `Keys.X` ⇒ **漏了它**
+    #     ⇒ 而它正是「今日挑战永远无法完成」的根因（判据 918）
+    for m in re.finditer(r"putString\(\s*'([A-Za-z][A-Za-z0-9]*)'", src):
+        writes.add(m.group(1))
     for m in re.finditer(r"setOrCreate\(\s*Keys\.([A-Za-z][A-Za-z0-9]*)", src):
         pass  # setOrCreate 也是写内存，但不是「写盘」
 
@@ -49,6 +55,28 @@ def analyze(src):
     restores |= set(re.findall(r"setOrCreate\(\s*'([A-Za-z][A-Za-z0-9]*)'", seg))
     getsonly = set(re.findall(r"getSync\(\s*Keys\.([A-Za-z][A-Za-z0-9]*)", seg))
     getsonly |= set(re.findall(r"getSync\(\s*'([A-Za-z][A-Za-z0-9]*)'", seg))
+    # ★★★ 2026-11-05（第 1348 轮，判据 921）：**收集「直读 pref」的 key**
+    #   这类 key（`privacyAgreed` / `onboarded`）**每次调用都 `pr.getSync`**，
+    #   根本不经过 AppStorage ⇒ **不需要 `setOrCreate` 恢复**
+    direct_pref = set()
+    for km in re.finditer(r'static\s+(?:async\s+)?(\w+)\s*\(', src):
+        if km.group(1) == 'init':
+            continue
+        bi = src[:km.start()].count('\n')
+        blines = src.split('\n')
+        d = 0; bg = False; body = []
+        for q in range(bi, min(len(blines), bi + 45)):
+            d += blines[q].count('{') - blines[q].count('}')
+            if '{' in blines[q]: bg = True
+            body.append(blines[q])
+            if bg and d <= 0: break
+        btext = '\n'.join(body)
+        for gm in re.finditer(r"getSync\(\s*'([A-Za-z][A-Za-z0-9]*)'", btext):
+            direct_pref.add(gm.group(1))
+        for gm in re.finditer(r'getSync\(\s*Keys\.([A-Za-z][A-Za-z0-9]*)', btext):
+            direct_pref.add(gm.group(1))
+    restores = restores | direct_pref          # 视作「已处理」
+    getsonly = getsonly | direct_pref
     return writes, restores, getsonly, True
 
 
