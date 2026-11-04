@@ -13,6 +13,7 @@
  *             onAutoTap: () => { this.askAuto(); },
  *             autoOn: this.autoId >= 0 })
  */
+import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
 import { LanRace } from '../core/LanRace';
 import { TG } from '../core/GameI18n';
@@ -33,6 +34,34 @@ export struct HintBar {
   @Prop autoOn: boolean = false;
   /** 高度，默认 38（比主按钮矮一点，不和它们抢视觉） */
   barHeight: number = 38;
+
+  /**
+   * ★★★ 2026-11-04（第 1210 轮）**极小屏文字降级**（判据 588）
+   *
+   * 真机抓到的 bug（195×195 圆屏，585×585 px）：
+   *   「提示」按钮渲染正常（2 字），
+   *   而「AI 代打」被截成 **「AI ...」** —— 后半句完全丢失。
+   *
+   * 为什么会漏：`dump` 里 `text` 字段读的是**逻辑文字**（完整「AI 代打」），
+   * 只有**截图**才看得出被省略号截了。
+   * ⇒ **判据 588：dump 显示完整 ≠ 屏幕上完整，涉及长文字必须看图。**
+   *
+   * 修法：极小屏改用**短标签**，但保留「AI」这个关键信息
+   *   （「AI」说明是机器替你走，不能丢；「代打」是动作，
+   *    在 195 上被截掉的正是它，所以缩成「AI」+ 无障碍补全说明）。
+   *   ⚠️ 只改**视觉标签**，`accessibilityText` 仍是完整句子 ⇒ 读屏用户信息不减。
+   */
+  private tinyLabel(): boolean {
+    return Bp.tinyScreen() || Bp.isWatch();
+  }
+
+  /** 主按钮标签：极小屏用「AI」，其余用「AI 代打」/「停代打」 */
+  private autoLabel(): string {
+    if (this.tinyLabel()) {
+      return this.autoOn ? TG('停') : TG('AI');
+    }
+    return this.autoOn ? TG('停代打') : TG('AI 代打');
+  }
   /** 是否显示「提示」按钮（默认显示；游戏自带提示时传 false） */
   showHint: boolean = true;
   /** 演示动画是否在跑（项目 C）：跑的时候显示「演示中…」而不是两个按钮
@@ -99,8 +128,8 @@ export struct HintBar {
       //   理由很硬：代打会让对手面对一个"机器"，对局不公平，也毁掉联机的意义。
       //   ⇒ 联机进行中（LanRace.isRacing()）把按钮置灰、文案改「联机禁用」、点击无效。
       Button(LanRace.isRacing()
-        ? TG('联机禁用')
-        : (this.autoOn ? TG('停代打') : TG('AI 代打')))
+        ? (this.tinyLabel() ? TG('联机') : TG('联机禁用'))
+        : this.autoLabel())
         .layoutWeight(1)
         .height(this.barHeight)
         .fontSize(FontSize.sm)
