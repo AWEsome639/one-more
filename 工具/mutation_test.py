@@ -24,6 +24,7 @@
         1 = 有检查器抓不到（失效）
 """
 import io
+import json
 import os
 import shutil
 import subprocess
@@ -132,6 +133,13 @@ MUTATIONS = [
         create_file='变异测试-未跟踪文档.md',
         expect_desc='造一个未纳入 git 的 .md ⇒ check_docs_tracked 应报 🔴 未跟踪',
     ),
+    Mutation(
+        name='text_squeeze',
+        tool=['python3', '工具/check_text_squeeze.py', '/tmp/_mutation_squeeze.json'],
+        path='', old='', new='',
+        create_file='/tmp/_mutation_squeeze.json',
+        expect_desc='造一个「18x246 的 4 字标题」假 dump ⇒ check_text_squeeze 应报挤压',
+    ),
 ]
 
 
@@ -161,12 +169,18 @@ def apply_and_test(m: Mutation) -> tuple:
 
     # ── 造文件型（判据 651）：不改现有文件，只造一个该被抓住的新文件 ──
     if m.create_file:
-        target = os.path.join(ROOT, m.create_file)
+        target = os.path.join(ROOT, m.create_file) if not m.create_file.startswith('/') else m.create_file
         if os.path.exists(target):
             return None, '目标文件已存在（跳过）：%s' % m.create_file
         rc0, _ = run_check(m.tool)
         try:
-            io.open(target, 'w', encoding='utf-8').write('# 变异测试用临时文件\n')
+            if target.endswith('.json'):
+                fake = {"attributes": {"type": "root", "bounds": "[0,0][585,585]"}, "children": [
+                    {"attributes": {"type": "Text", "text": "新手上路",
+                                    "bounds": "[336,261][354,507]"}}]}
+                io.open(target, 'w', encoding='utf-8').write(json.dumps(fake))
+            else:
+                io.open(target, 'w', encoding='utf-8').write('# 变异测试用临时文件\n')
             rc1, out1 = run_check(m.tool)
             if rc1 == 0:
                 return False, '造出未跟踪 .md 后检查器**仍返回 0** ⇒ 失效！'
