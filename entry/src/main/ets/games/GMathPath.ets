@@ -642,7 +642,7 @@ export struct GMathPath {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L640'; })
               .onBlur(() => { if (this.tvFocus === 'L640') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L640'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L640', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();

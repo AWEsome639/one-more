@@ -319,7 +319,7 @@ export struct GFrequencyTap {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L317'; })
       .onBlur(() => { if (this.tvFocus === 'L317') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L317'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L317', Radius.full))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(); }); })
       .onClick(() => { Haptics.tick(); this.tap(); })
 

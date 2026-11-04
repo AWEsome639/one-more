@@ -499,7 +499,7 @@ export struct GSortingVisualizer {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L497'; })
             .onBlur(() => { if (this.tvFocus === 'L497') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L497'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L497', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pickAlgo(k); }); })
         }, (k: number) => 'a' + k)
       }

@@ -960,7 +960,7 @@ export struct GSpiderSolitaire {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L954'; })
     .onBlur(() => { if (this.tvFocus === 'L954') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L954'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L954', Radius.xs))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPileBlank(p); }); })
   }
 

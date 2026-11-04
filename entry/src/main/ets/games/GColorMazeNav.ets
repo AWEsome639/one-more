@@ -354,7 +354,7 @@ export struct GColorMazeNav {
  }.layoutWeight(1).height(Cell.of(44)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
  .onFocus(() => { this.tvFocus = 'L351'; })
  .onBlur(() => { if (this.tvFocus === 'L351') { this.tvFocus = ''; } })
- .outline(Tv.focusOutline(this.tvFocus === 'L351')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); }); }).onClick(() => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); })
+ .outline(Tv.focusOutline(this.tvFocus === 'L351', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); }); }).onClick(() => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); })
  }, (c: number) => 'c' + c) }.width('100%')
  }, (r: number) => 'r' + r)
  }.width('100%').gesture(

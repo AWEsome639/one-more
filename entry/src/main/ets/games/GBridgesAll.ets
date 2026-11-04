@@ -1048,7 +1048,7 @@ export struct GBridgesAll {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L1038'; })
     .onBlur(() => { if (this.tvFocus === 'L1038') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L1038'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L1038', Radius.full))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell(cell); }); })
     .onClick(() => {
       Haptics.tick();

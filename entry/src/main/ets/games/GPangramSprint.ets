@@ -317,7 +317,7 @@ export struct GPangramSprint {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L315'; })
             .onBlur(() => { if (this.tvFocus === 'L315') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L315'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L315', Radius.xs))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); })
           }, (i: number) => 'lt' + i)
         }.width('100%')

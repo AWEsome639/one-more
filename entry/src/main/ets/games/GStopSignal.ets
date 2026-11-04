@@ -336,7 +336,7 @@ export struct GStopSignal {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L334'; })
       .onBlur(() => { if (this.tvFocus === 'L334') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L334'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L334', Radius.lg))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(); }); })
       Button(this.kind === 2 ? TG('🛑 忍住') : TG('⚡ 冲'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

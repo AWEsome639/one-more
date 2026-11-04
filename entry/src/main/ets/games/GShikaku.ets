@@ -636,7 +636,7 @@ export struct GShikaku {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L634'; })
               .onBlur(() => { if (this.tvFocus === 'L634') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L634'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L634', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }

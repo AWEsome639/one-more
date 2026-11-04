@@ -143,26 +143,31 @@ def strip_comments_from_lines(lines):
 def find_owner(lines, idx):
     """找 `.outline` 所在属性链的**归属元素**。
 
-    规则：从 idx 往回走，跳过属性行（以 `.` 开头）与空行，
-    第一个「非属性、非空、缩进 <= outline 缩进」的行就是归属元素
-    （它可能自己就是元素起始行，也可能是 `if (...) {` 之类的包裹——后者算 UNKNOWN）。
+    第 1189 轮改进：改用**括号深度**而不是纯缩进。
+    原因：属性链可以跨 `}`（例如 `Row{...}` 收尾后，后面的 `.width()` `.outline()`
+    其实是**外层 Stack** 的属性）。纯缩进在那种情况下会误判成"越界" ⇒ 报 UNKNOWN。
+
+    算法：从 idx 往回走，维护括号平衡 `depth`（遇到 `}` +1、遇到 `{` -1）。
+    当 depth 变成 -1 时，说明刚跨出当前块 ⇒ 该块的**起始行**就是归属元素。
     """
-    base = len(lines[idx]) - len(lines[idx].lstrip())
-    for k in range(idx - 1, max(-1, idx - 200), -1):
+    depth = 0
+    for k in range(idx - 1, max(-1, idx - 300), -1):
         l = lines[k]
-        s = l.strip()
-        if not s:
+        # 抹掉属性行里的 `{`/`}` 噪声（如 `.stateStyles({ ... })` 是一行内成对的）
+        opens = l.count('{')
+        closes = l.count('}')
+        depth += closes - opens
+        if depth < 0:
+            # 刚跨出当前块 ⇒ k 这一行是"开块"的那行？
+            # 注意：真正的开块行是**同一次循环里**让 depth 从 -1 变 0 的那行
+            if EL_START.match(l):
+                return k, l.strip()[:60]
+            # 不是元素起始（可能是 if/ForEach/{}）⇒ 继续往外找
+            depth = 0
             continue
-        if ATTR.match(l):
-            continue
-        ind = len(l) - len(l.lstrip())
-        if ind > base:
-            # 更深的非属性行（比如内层元素的属性）——继续往上
-            continue
-        if EL_START.match(l):
+        if depth == 0 and EL_START.match(l) and '}' not in l:
+            # 同一层里更上面的元素起始（说明 outline 属于它）
             return k, l.strip()[:60]
-        # 缩进相同或更浅，但不是元素起始 ⇒ 不是这个属性链的归属
-        return None, None
     return None, None
 
 
@@ -194,8 +199,18 @@ def scan():
                     # 内容控件：盒子就是内容本身，没有 backgroundColor 是正常的
                     ok.append((rel, i + 1, otxt))
                 elif kind in LAYOUT_BOX:
-                    # 布局容器：尺寸可能由父容器决定 ⇒ 可疑
-                    suspect.append((rel, i + 1, otxt))
+                    # 布局容器：若**自己有明确的 width/height**，
+                    # 则盒子边界 = 它自己，描边会贴合 ⇒ 算 OK
+                    # （第 1189 轮：GSolitaire/SpiderSolitaire 的牌位 Stack 就是这样，
+                    #   有 `.height(CARD_H)` + `.position(...)`，盒子=可见牌位）
+                    seg2 = lines[oi:i + 1]
+                    has_size = any(
+                        ('.height(' in x or '.width(' in x) and not x.strip().startswith('//')
+                        for x in seg2)
+                    if has_size:
+                        ok.append((rel, i + 1, otxt))
+                    else:
+                        suspect.append((rel, i + 1, otxt))
                 else:
                     unknown.append((rel, i + 1, otxt))
 
@@ -216,6 +231,21 @@ def scan():
                         if rr and rr[-1] != passed:
                             radius_bad.append((rel, i + 1, rr[-1], passed))
     return ok, suspect, unknown, radius_bad
+
+
+def report_three(checked, passed, skipped, label):
+    """判据 546：输出必须区分「已检查 / 通过 / 未检查」，
+    且通过率只按**已检查数**算（不能按总数算）。"""
+    failed = checked - passed
+    rate = (passed / checked * 100) if checked else 0.0
+    print('  [%s] 已检查 **%d** ｜ 通过 **%d** ｜ 失败 **%d** ｜ 未检查 **%d**'
+          % (label, checked, passed, failed, skipped))
+    print('        ⇒ 通过率 = %d / %d = **%.1f%%**（**按已检查数算，未检查不计入**）'
+          % (passed, checked, rate))
+    if skipped:
+        print('        ⚠️ 那 %d 处**没查过**，不能当成通过（判据 546）' % skipped)
+    print()
+    return failed
 
 
 def main():
@@ -251,6 +281,17 @@ def main():
         print('  ⚠️ UNKNOWN 不等于「已通过」——它是**本工具的盲区**（判据 480）。')
         print('     人工核对时：看那一行的属性链里 `.borderRadius(` / `.backgroundColor(` 在不在。')
         print()
+
+    # ── 判据 546：三段式统计 ──
+    print('── 判据 546：已检查 / 通过 / 未检查 三段式 ──')
+    # 挂载位置：OK + SUSPECT 都算"查过"；UNKNOWN 是没查
+    pos_checked = len(ok) + len(suspect)
+    pos_passed = len(ok)
+    report_three(pos_checked, pos_passed, len(unknown), '挂载位置')
+    # 圆角一致性：只有在 oi 认得出时才查 ⇒ 与 UNKNOWN 同一批没查
+    rad_checked = pos_checked
+    rad_passed = pos_checked - len(radius_bad)
+    report_three(rad_checked, rad_passed, len(unknown), '圆角一致性')
 
     # 参考数据：有多少归属元素「附近有明确 width+height」
     sized = 0

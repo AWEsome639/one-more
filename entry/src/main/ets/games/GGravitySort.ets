@@ -361,7 +361,7 @@ export struct GGravitySort {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L354'; })
     .onBlur(() => { if (this.tvFocus === 'L354') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L354'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L354', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.drop(c); }); })
     .onClick(() => { Haptics.tick(); this.drop(c); })
   }

@@ -582,7 +582,7 @@ export struct GLighthouses {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L580'; })
               .onBlur(() => { if (this.tvFocus === 'L580') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L580'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L580', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

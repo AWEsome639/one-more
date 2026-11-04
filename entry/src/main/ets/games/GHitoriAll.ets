@@ -670,7 +670,7 @@ export struct GHitoriAll {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L667'; })
               .onBlur(() => { if (this.tvFocus === 'L667') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L667'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L667', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

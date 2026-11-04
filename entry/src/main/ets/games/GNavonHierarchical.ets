@@ -469,7 +469,7 @@ export struct GNavonHierarchical {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L467'; })
         .onBlur(() => { if (this.tvFocus === 'L467') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L467'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L467', Radius.sm))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (((true))) { this.pickGlobal((i)); } else { this.pickLocal((i)); } }); })
         }, (i: number) => 'k' + i)
         }
@@ -501,7 +501,7 @@ export struct GNavonHierarchical {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L497'; })
         .onBlur(() => { if (this.tvFocus === 'L497') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L497'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L497', Radius.sm))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (((false))) { this.pickGlobal((i)); } else { this.pickLocal((i)); } }); })
         }, (i: number) => 'k' + i)
         }

@@ -309,7 +309,7 @@ export struct GSimonSequence {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L307'; })
         .onBlur(() => { if (this.tvFocus === 'L307') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L307'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L307', Radius.lg))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((i)); }); }) }, (i: number) => 'a' + i)
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -324,7 +324,7 @@ export struct GSimonSequence {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L320'; })
         .onBlur(() => { if (this.tvFocus === 'L320') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L320'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L320', Radius.lg))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((i)); }); }) }, (i: number) => 'b' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md)

@@ -646,7 +646,7 @@ export struct GReversi {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L644'; })
               .onBlur(() => { if (this.tvFocus === 'L644') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L644'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L644', Radius.full))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r) * this.diffTotal + (c)); }); })
             }, (c: number) => 'c' + c)
           }

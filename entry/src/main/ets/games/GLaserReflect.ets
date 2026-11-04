@@ -409,7 +409,7 @@ export struct GLaserReflect {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L404'; })
     .onBlur(() => { if (this.tvFocus === 'L404') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L404'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L404', Radius.xs))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.slots.indexOf(i) >= 0) { this.rotateAt(i); } }); })
     .onClick(() => { Haptics.tap(); if (this.slots.indexOf(i) >= 0) { this.rotateAt(i); } })
   }

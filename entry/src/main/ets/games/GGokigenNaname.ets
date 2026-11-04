@@ -616,7 +616,7 @@ export struct GGokigenNaname {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L614'; })
               .onBlur(() => { if (this.tvFocus === 'L614') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L614'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L614', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r), (c)); }); })
               .onClick(() => {
               Haptics.tick();

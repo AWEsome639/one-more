@@ -613,7 +613,7 @@ export struct GMancala {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L611'; })
               .onBlur(() => { if (this.tvFocus === 'L611') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L611'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L611', Radius.full))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (false) { this.playerMove((i)); } }); })
               .onClick(() => {
               Haptics.tick();
@@ -646,7 +646,7 @@ export struct GMancala {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L642'; })
               .onBlur(() => { if (this.tvFocus === 'L642') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L642'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L642', Radius.full))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (true) { this.playerMove((i)); } }); })
               .onClick(() => {
               Haptics.tick();

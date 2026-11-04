@@ -756,7 +756,7 @@ export struct GHitori {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L753'; })
               .onBlur(() => { if (this.tvFocus === 'L753') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L753'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L753', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

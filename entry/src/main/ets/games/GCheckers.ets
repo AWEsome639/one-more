@@ -972,7 +972,7 @@ export struct GCheckers {
                 .focusable(Tv.on())
                 .onFocus(() => { this.tvFocus = 'L970'; })
                 .onBlur(() => { if (this.tvFocus === 'L970') { this.tvFocus = ''; } })
-                .outline(Tv.focusOutline(this.tvFocus === 'L970'))
+                .outline(Tv.focusOutline(this.tvFocus === 'L970', Radius.xs))
                 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
                 .onClick(() => {
                 Haptics.tick();

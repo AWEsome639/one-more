@@ -390,7 +390,7 @@ export struct GLockPattern {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L388'; })
               .onBlur(() => { if (this.tvFocus === 'L388') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L388'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L388', Radius.full))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDot((r * 3 + c)); }); })
               .onClick(() => {
               Haptics.tick();

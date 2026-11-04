@@ -468,7 +468,7 @@ export struct GLightsOut {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L466'; })
               .onBlur(() => { if (this.tvFocus === 'L466') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L466'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L466', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

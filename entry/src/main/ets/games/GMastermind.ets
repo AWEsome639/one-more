@@ -402,7 +402,7 @@ export struct GMastermind {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L400'; })
             .onBlur(() => { if (this.tvFocus === 'L400') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L400'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L400', Radius.full))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = c; }); })
             .onClick(() => {
               Haptics.tick();
@@ -434,7 +434,7 @@ export struct GMastermind {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L430'; })
             .onBlur(() => { if (this.tvFocus === 'L430') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L430'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L430', Radius.full))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapSlot(i); }); })
             .onClick(() => {
               Haptics.tick();

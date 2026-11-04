@@ -548,7 +548,7 @@ export struct GPegSolitaire {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L546'; })
               .onBlur(() => { if (this.tvFocus === 'L546') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L546'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L546', Radius.full))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(at((r), (c))); }); })
             }, (c: number) => 'c' + c)
           }

@@ -1041,7 +1041,7 @@ export struct GGomoku {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L1039'; })
               .onBlur(() => { if (this.tvFocus === 'L1039') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L1039'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L1039', Radius.full))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.humanTap((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();

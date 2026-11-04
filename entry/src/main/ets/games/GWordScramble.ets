@@ -326,7 +326,7 @@ export struct GWordScramble {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L324'; })
         .onBlur(() => { if (this.tvFocus === 'L324') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L324'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L324', Radius.sm))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); }) }, (c: string, i: number) => 't' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)

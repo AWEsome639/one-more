@@ -637,7 +637,7 @@ export struct GHeyawake {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L635'; })
               .onBlur(() => { if (this.tvFocus === 'L635') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L635'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L635', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

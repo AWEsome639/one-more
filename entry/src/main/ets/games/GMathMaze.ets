@@ -604,7 +604,7 @@ export struct GMathMaze {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L602'; })
               .onBlur(() => { if (this.tvFocus === 'L602') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L602'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L602', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.step((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();

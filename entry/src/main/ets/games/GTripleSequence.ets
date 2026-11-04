@@ -350,7 +350,7 @@ export struct GTripleSequence {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L346'; })
     .onBlur(() => { if (this.tvFocus === 'L346') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L346'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L346', Radius.xs))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i, c); }); })
   }
 }

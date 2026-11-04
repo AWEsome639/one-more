@@ -581,7 +581,7 @@ export struct GFillomino {
                 .focusable(Tv.on())
                 .onFocus(() => { this.tvFocus = 'L579'; })
                 .onBlur(() => { if (this.tvFocus === 'L579') { this.tvFocus = ''; } })
-                .outline(Tv.focusOutline(this.tvFocus === 'L579'))
+                .outline(Tv.focusOutline(this.tvFocus === 'L579', Radius.xs))
                 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[(r * N + c)]) { this.sel = (r * N + c); } }); })
                 .onClick(() => {
                 Haptics.tick();

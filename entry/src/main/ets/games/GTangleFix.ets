@@ -568,7 +568,7 @@ export struct GTangleFix {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L566'; })
           .onBlur(() => { if (this.tvFocus === 'L566') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L566'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L566', Radius.full))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((p)); }); })
         }, (p: number) => 'p' + p)
       }

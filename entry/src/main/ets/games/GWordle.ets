@@ -522,7 +522,7 @@ export struct GWordle {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L518'; })
       .onBlur(() => { if (this.tvFocus === 'L518') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L518'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L518', Radius.xs))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapKey(ch); }); })
   }
 

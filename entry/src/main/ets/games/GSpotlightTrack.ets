@@ -352,7 +352,7 @@ export struct GSpotlightTrack {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L348'; })
     .onBlur(() => { if (this.tvFocus === 'L348') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L348'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L348', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(cell); }); })
   }
 }

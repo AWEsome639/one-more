@@ -512,7 +512,7 @@ export struct GMahjongSolitaire {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L510'; })
               .onBlur(() => { if (this.tvFocus === 'L510') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L510'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L510', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(r * PC + c); }); })
               .onClick(() => {
                 Haptics.tick();
@@ -615,7 +615,7 @@ export struct GMahjongSolitaire {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L607'; })
     .onBlur(() => { if (this.tvFocus === 'L607') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L607'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L607', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
     .onClick(() => {
       Haptics.tick();

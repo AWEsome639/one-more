@@ -629,7 +629,7 @@ export struct GMasyu {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L627'; })
               .onBlur(() => { if (this.tvFocus === 'L627') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L627'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L627', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();

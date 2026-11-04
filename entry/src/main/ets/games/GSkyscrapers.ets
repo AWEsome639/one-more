@@ -741,7 +741,7 @@ export struct GSkyscrapers {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L739'; })
               .onBlur(() => { if (this.tvFocus === 'L739') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L739'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L739', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.skyTap((gr), (gc)); }); })
             }, (gc: number) => 'g' + gc)
           }
@@ -772,7 +772,7 @@ export struct GSkyscrapers {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L768'; })
             .onBlur(() => { if (this.tvFocus === 'L768') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L768'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L768', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick = v; }); })
         }, (v: number) => 'p' + v)
       }

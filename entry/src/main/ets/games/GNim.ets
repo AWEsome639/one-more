@@ -472,7 +472,7 @@ export struct GNim {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L470'; })
         .onBlur(() => { if (this.tvFocus === 'L470') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L470'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L470', Radius.sm))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.take((i), k); }); })
         }
         }, (k: number) => 'p' + (i) + '-' + k)

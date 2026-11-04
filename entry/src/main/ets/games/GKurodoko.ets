@@ -686,7 +686,7 @@ export struct GKurodoko {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L684'; })
               .onBlur(() => { if (this.tvFocus === 'L684') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L684'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L684', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

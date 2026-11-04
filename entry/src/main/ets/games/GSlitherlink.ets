@@ -625,7 +625,7 @@ export struct GSlitherlink {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L623'; })
               .onBlur(() => { if (this.tvFocus === 'L623') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L623'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L623', Radius.full))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.gridTap((gr), (gc)); }); })
             }, (gc: number) => 'g' + gc)
           }

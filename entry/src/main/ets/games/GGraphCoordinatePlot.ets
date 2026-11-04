@@ -327,7 +327,7 @@ export struct GGraphCoordinatePlot {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L323'; })
     .onBlur(() => { if (this.tvFocus === 'L323') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L323'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L323', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
     .onClick(() => { Haptics.tick(); this.tap(i); })
   }

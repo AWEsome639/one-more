@@ -295,7 +295,7 @@ export struct GChimpTest {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L293'; })
               .onBlur(() => { if (this.tvFocus === 'L293') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L293'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L293', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
             }, (c: number) => 'c' + c)

@@ -349,7 +349,7 @@ export struct GD2Attention {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L347'; })
               .onBlur(() => { if (this.tvFocus === 'L347') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L347'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L347', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * COLS + c)); }); })
               .onClick(() => { Haptics.tick(); this.tap((r * COLS + c)); })
             }, (c: number) => 'c' + c)

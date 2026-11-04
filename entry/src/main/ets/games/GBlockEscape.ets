@@ -829,7 +829,7 @@ export struct GBlockEscape {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L823'; })
     .onBlur(() => { if (this.tvFocus === 'L823') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L823'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L823', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(cell); }); })
     .onClick(() => {
       Haptics.tick();

@@ -431,7 +431,7 @@ export struct GYajilin {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L429'; })
               .onBlur(() => { if (this.tvFocus === 'L429') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L429'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L429', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })

@@ -288,7 +288,7 @@ export struct GCubeNetFold {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L286'; })
     .onBlur(() => { if (this.tvFocus === 'L286') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L286'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L286', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
     .onClick(() => { Haptics.tick(); this.tap(i); })
   }

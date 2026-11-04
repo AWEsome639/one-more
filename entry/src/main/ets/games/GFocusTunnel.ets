@@ -330,7 +330,7 @@ export struct GFocusTunnel {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L326'; })
     .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L326'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L326', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
     .onClick(() => { Haptics.tick(); this.tap(i); })
   }

@@ -436,7 +436,7 @@ export struct GDualMirror {
                   .focusable(Tv.on())
                   .onFocus(() => { this.tvFocus = 'L434'; })
                   .onBlur(() => { if (this.tvFocus === 'L434') { this.tvFocus = ''; } })
-                  .outline(Tv.focusOutline(this.tvFocus === 'L434'))
+                  .outline(Tv.focusOutline(this.tvFocus === 'L434', Radius.xs))
                   .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0), (r * N + c)); }); })
                   .onClick(() => {
                   Haptics.tick();
@@ -486,7 +486,7 @@ export struct GDualMirror {
                   .focusable(Tv.on())
                   .onFocus(() => { this.tvFocus = 'L482'; })
                   .onBlur(() => { if (this.tvFocus === 'L482') { this.tvFocus = ''; } })
-                  .outline(Tv.focusOutline(this.tvFocus === 'L482'))
+                  .outline(Tv.focusOutline(this.tvFocus === 'L482', Radius.xs))
                   .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1), (r * N + c)); }); })
                   .onClick(() => {
                   Haptics.tick();

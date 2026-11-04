@@ -647,7 +647,7 @@ export struct GNoriNori {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L645'; })
               .onBlur(() => { if (this.tvFocus === 'L645') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L645'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L645', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }

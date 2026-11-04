@@ -427,7 +427,7 @@ export struct GMirrorTracing {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L425'; })
         .onBlur(() => { if (this.tvFocus === 'L425') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L425'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L425', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (((false))) { this.tap((r * N + c)); } }); })
         }, (c: number) => 'c' + c)
         }
@@ -468,7 +468,7 @@ export struct GMirrorTracing {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L464'; })
         .onBlur(() => { if (this.tvFocus === 'L464') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L464'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L464', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (((true))) { this.tap((r * N + c)); } }); })
         }, (c: number) => 'c' + c)
         }

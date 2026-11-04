@@ -594,7 +594,7 @@ export struct GCrown {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L592'; })
               .onBlur(() => { if (this.tvFocus === 'L592') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L592'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L592', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

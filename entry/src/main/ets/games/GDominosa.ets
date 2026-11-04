@@ -665,7 +665,7 @@ export struct GDominosa {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L663'; })
               .onBlur(() => { if (this.tvFocus === 'L663') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L663'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L663', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * W + c)); }); })
               .onClick(() => {
               Haptics.tick();

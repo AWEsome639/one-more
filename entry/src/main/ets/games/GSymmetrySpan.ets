@@ -322,7 +322,7 @@ export struct GSymmetrySpan {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L320'; })
               .onBlur(() => { if (this.tvFocus === 'L320') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L320'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L320', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })

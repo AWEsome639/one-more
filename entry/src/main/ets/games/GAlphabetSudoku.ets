@@ -669,7 +669,7 @@ export struct GAlphabetSudoku {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L666'; })
               .onBlur(() => { if (this.tvFocus === 'L666') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L666'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L666', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();

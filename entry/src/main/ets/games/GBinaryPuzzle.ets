@@ -755,7 +755,7 @@ export struct GBinaryPuzzle {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L752'; })
               .onBlur(() => { if (this.tvFocus === 'L752') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L752'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L752', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();

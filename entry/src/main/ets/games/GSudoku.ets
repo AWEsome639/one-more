@@ -938,7 +938,7 @@ export struct GSudoku {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L936'; })
             .onBlur(() => { if (this.tvFocus === 'L936') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L936'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L936', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.fill(d); }); })
         }, (d: number) => 'd' + d)
       }
@@ -1086,7 +1086,7 @@ export struct GSudoku {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L1074'; })
     .onBlur(() => { if (this.tvFocus === 'L1074') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L1074'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L1074', Radius.xs))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = i; }); })
   }
 }

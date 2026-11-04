@@ -343,7 +343,7 @@ export struct GFactBinder {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L339'; })
     .onBlur(() => { if (this.tvFocus === 'L339') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L339'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L339', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapL(i); }); })
     .onClick(() => { Haptics.tick(); this.tapL(i); })
   }
@@ -362,7 +362,7 @@ export struct GFactBinder {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L356'; })
     .onBlur(() => { if (this.tvFocus === 'L356') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L356'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L356', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapR(i); }); })
     .onClick(() => { Haptics.tick(); this.tapR(i); })
   }

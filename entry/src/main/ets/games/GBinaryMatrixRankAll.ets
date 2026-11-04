@@ -293,7 +293,7 @@ export struct GBinaryMatrixRankAll {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L291'; })
           .onBlur(() => { if (this.tvFocus === 'L291') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L291'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L291', Radius.xs))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapRow((r)); }); })
           .onClick(() => { Haptics.tick(); this.tapRow((r)); })
         }, (r: number) => 'mr' + r)
@@ -310,7 +310,7 @@ export struct GBinaryMatrixRankAll {
           .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L305'; })
           .onBlur(() => { if (this.tvFocus === 'L305') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L305')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((v)); }); }).onClick(() => { Haptics.tick(); this.pick((v)); })
+          .outline(Tv.focusOutline(this.tvFocus === 'L305', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((v)); }); }).onClick(() => { Haptics.tick(); this.pick((v)); })
         }, (v: number) => 'op' + v)
       }
       .width('100%')

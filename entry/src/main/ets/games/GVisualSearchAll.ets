@@ -341,7 +341,7 @@ export struct GVisualSearchAll {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L337'; })
     .onBlur(() => { if (this.tvFocus === 'L337') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L337'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L337', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
   }
 }

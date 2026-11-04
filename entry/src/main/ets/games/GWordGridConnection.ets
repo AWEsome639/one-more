@@ -352,7 +352,7 @@ export struct GWordGridConnection {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L350'; })
             .onBlur(() => { if (this.tvFocus === 'L350') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L350'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L350', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)

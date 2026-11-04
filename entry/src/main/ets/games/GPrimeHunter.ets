@@ -329,7 +329,7 @@ export struct GPrimeHunter {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L327'; })
             .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L327'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L327', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * SIZE + c)); }); }); }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)

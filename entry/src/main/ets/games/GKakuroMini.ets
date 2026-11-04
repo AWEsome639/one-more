@@ -670,7 +670,7 @@ export struct GKakuroMini {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L664'; })
     .onBlur(() => { if (this.tvFocus === 'L664') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L664'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L664', Radius.sm))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell(i); }); })
     .onClick(() => {
       Haptics.tick();

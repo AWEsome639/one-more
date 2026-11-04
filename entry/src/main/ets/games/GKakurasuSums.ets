@@ -583,7 +583,7 @@ export struct GKakurasuSums {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L581'; })
               .onBlur(() => { if (this.tvFocus === 'L581') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L581'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L581', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

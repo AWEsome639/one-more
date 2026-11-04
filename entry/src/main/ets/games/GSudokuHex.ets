@@ -644,7 +644,7 @@ export struct GSudokuHex {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L642'; })
               .onBlur(() => { if (this.tvFocus === 'L642') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L642'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L642', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
@@ -676,7 +676,7 @@ export struct GSudokuHex {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L672'; })
             .onBlur(() => { if (this.tvFocus === 'L672') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L672'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L672', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.put(v); }); })
         }, (v: number) => 'n' + v)
       }

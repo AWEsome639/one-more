@@ -725,7 +725,7 @@ export struct GTetris {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L721'; })
       .onBlur(() => { if (this.tvFocus === 'L721') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L721'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L721', Radius.sm))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (kind === 0) { this.move(-1); } else if (kind === 1) { this.turn(); } else if (kind === 2) { this.move(1); } else { this.drop(); } }); })
   }
 

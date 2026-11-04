@@ -370,7 +370,7 @@ export struct GWordSearch {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L368'; })
             .onBlur(() => { if (this.tvFocus === 'L368') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L368'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L368', Radius.xs))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)

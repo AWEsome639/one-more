@@ -313,7 +313,7 @@ export struct GSilentLetterSearch {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L311'; })
             .onBlur(() => { if (this.tvFocus === 'L311') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L311'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L311', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); })
           }, (c: string, i: number) => 'L' + i)
         }.width('100%')

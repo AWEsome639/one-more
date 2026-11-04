@@ -734,7 +734,7 @@ export struct GBejeweled {
                 .focusable(Tv.on())
                 .onFocus(() => { this.tvFocusBtn = 'L735'; })
                 .onBlur(() => { if (this.tvFocusBtn === 'L735') { this.tvFocusBtn = ''; } })
-                .outline(Tv.focusOutline(this.tvFocusBtn === 'L735'))
+                .outline(Tv.focusOutline(this.tvFocusBtn === 'L735', Radius.sm))
                 // ★ 自绘焦点框的真实驱动（focusBox 只改样式，不负责出现）
                 .onFocus(() => { this.tvFocus = this.idx(r, c); })
                 .onBlur(() => { if (this.tvFocus === this.idx(r, c)) { this.tvFocus = -1; } })

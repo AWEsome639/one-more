@@ -399,7 +399,7 @@ export struct GTangram {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L395'; })
               .onBlur(() => { if (this.tvFocus === 'L395') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L395'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L395', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.boardN + c)); }); })
             }, (c: number) => 'c' + r + '_' + c)
           }.width('100%').layoutWeight(1)

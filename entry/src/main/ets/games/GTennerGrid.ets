@@ -470,7 +470,7 @@ export struct GTennerGrid {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L468'; })
               .onBlur(() => { if (this.tvFocus === 'L468') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L468'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L468', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (this.over) { return; } this.sel = (r * this.diffTotal + c); }); })
             }, (c: number) => 'c' + c)
           }
@@ -502,7 +502,7 @@ export struct GTennerGrid {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L498'; })
             .onBlur(() => { if (this.tvFocus === 'L498') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L498'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L498', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((d)); }); })
           }, (d: number) => 'd' + d)
         }
@@ -526,7 +526,7 @@ export struct GTennerGrid {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L520'; })
             .onBlur(() => { if (this.tvFocus === 'L520') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L520'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L520', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((d)); }); })
           }, (d: number) => 'e' + d)
         }

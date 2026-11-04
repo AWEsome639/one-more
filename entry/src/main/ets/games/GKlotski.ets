@@ -706,7 +706,7 @@ export struct GKlotski {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L700'; })
     .onBlur(() => { if (this.tvFocus === 'L700') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L700'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L700', Radius.sm))
     .onClick(() => {
       Haptics.tick();
       this.sel = i;

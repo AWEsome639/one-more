@@ -706,7 +706,7 @@ export struct GSnake3D {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L700'; })
       .onBlur(() => { if (this.tvFocus === 'L700') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L700'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L700', Radius.sm))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setDir(d); }); })
   }
 }

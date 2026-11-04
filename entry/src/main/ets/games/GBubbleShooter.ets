@@ -514,7 +514,7 @@ export struct GBubbleShooter {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L512'; })
               .onBlur(() => { if (this.tvFocus === 'L512') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L512'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L512', Radius.full))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.fire((c)); }); })
               .onClick(() => {
               Haptics.tick();

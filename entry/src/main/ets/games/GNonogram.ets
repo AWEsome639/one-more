@@ -587,7 +587,7 @@ export struct GNonogram {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L585'; })
               .onBlur(() => { if (this.tvFocus === 'L585') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L585'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L585', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }

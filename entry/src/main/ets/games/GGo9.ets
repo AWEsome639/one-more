@@ -1163,7 +1163,7 @@ export struct GGo9 {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L1157'; })
     .onBlur(() => { if (this.tvFocus === 'L1157') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L1157'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L1157', Radius.full))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPoint(r, c); }); })
     .onClick(() => {
       Haptics.tick();

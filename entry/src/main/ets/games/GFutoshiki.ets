@@ -580,7 +580,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L577'; })
         .onBlur(() => { if (this.tvFocus === 'L577') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L577'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L577', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 0)]) { this.sel = ((0) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -619,7 +619,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L614'; })
         .onBlur(() => { if (this.tvFocus === 'L614') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L614'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L614', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 1)]) { this.sel = ((0) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -658,7 +658,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L651'; })
         .onBlur(() => { if (this.tvFocus === 'L651') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L651'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L651', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 2)]) { this.sel = ((0) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -697,7 +697,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L688'; })
         .onBlur(() => { if (this.tvFocus === 'L688') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L688'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L688', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 3)]) { this.sel = ((0) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -736,7 +736,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L725'; })
         .onBlur(() => { if (this.tvFocus === 'L725') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L725'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L725', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((0) * N + 4)]) { this.sel = ((0) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -806,7 +806,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L793'; })
         .onBlur(() => { if (this.tvFocus === 'L793') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L793'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L793', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 0)]) { this.sel = ((1) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -845,7 +845,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L830'; })
         .onBlur(() => { if (this.tvFocus === 'L830') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L830'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L830', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 1)]) { this.sel = ((1) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -884,7 +884,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L867'; })
         .onBlur(() => { if (this.tvFocus === 'L867') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L867'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L867', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 2)]) { this.sel = ((1) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -923,7 +923,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L904'; })
         .onBlur(() => { if (this.tvFocus === 'L904') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L904'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L904', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 3)]) { this.sel = ((1) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -962,7 +962,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L941'; })
         .onBlur(() => { if (this.tvFocus === 'L941') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L941'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L941', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((1) * N + 4)]) { this.sel = ((1) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1032,7 +1032,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1009'; })
         .onBlur(() => { if (this.tvFocus === 'L1009') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1009'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1009', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 0)]) { this.sel = ((2) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1071,7 +1071,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1046'; })
         .onBlur(() => { if (this.tvFocus === 'L1046') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1046'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1046', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 1)]) { this.sel = ((2) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1110,7 +1110,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1083'; })
         .onBlur(() => { if (this.tvFocus === 'L1083') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1083'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1083', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 2)]) { this.sel = ((2) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1149,7 +1149,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1120'; })
         .onBlur(() => { if (this.tvFocus === 'L1120') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1120'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1120', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 3)]) { this.sel = ((2) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1188,7 +1188,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1157'; })
         .onBlur(() => { if (this.tvFocus === 'L1157') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1157'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1157', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((2) * N + 4)]) { this.sel = ((2) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1258,7 +1258,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1225'; })
         .onBlur(() => { if (this.tvFocus === 'L1225') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1225'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1225', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 0)]) { this.sel = ((3) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1297,7 +1297,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1262'; })
         .onBlur(() => { if (this.tvFocus === 'L1262') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1262'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1262', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 1)]) { this.sel = ((3) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1336,7 +1336,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1299'; })
         .onBlur(() => { if (this.tvFocus === 'L1299') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1299'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1299', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 2)]) { this.sel = ((3) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1375,7 +1375,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1336'; })
         .onBlur(() => { if (this.tvFocus === 'L1336') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1336'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1336', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 3)]) { this.sel = ((3) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1414,7 +1414,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1373'; })
         .onBlur(() => { if (this.tvFocus === 'L1373') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1373'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1373', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((3) * N + 4)]) { this.sel = ((3) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1484,7 +1484,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1441'; })
         .onBlur(() => { if (this.tvFocus === 'L1441') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1441'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1441', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 0)]) { this.sel = ((4) * N + 0); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1523,7 +1523,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1478'; })
         .onBlur(() => { if (this.tvFocus === 'L1478') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1478'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1478', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 1)]) { this.sel = ((4) * N + 1); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1562,7 +1562,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1515'; })
         .onBlur(() => { if (this.tvFocus === 'L1515') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1515'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1515', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 2)]) { this.sel = ((4) * N + 2); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1601,7 +1601,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1552'; })
         .onBlur(() => { if (this.tvFocus === 'L1552') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1552'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1552', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 3)]) { this.sel = ((4) * N + 3); } }); })
         .onClick(() => {
         Haptics.tick();
@@ -1640,7 +1640,7 @@ export struct GFutoshiki {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L1589'; })
         .onBlur(() => { if (this.tvFocus === 'L1589') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L1589'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L1589', Radius.xs))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[((4) * N + 4)]) { this.sel = ((4) * N + 4); } }); })
         .onClick(() => {
         Haptics.tick();

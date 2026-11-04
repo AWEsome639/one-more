@@ -310,7 +310,7 @@ export struct GDividedAttention {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L307'; })
         .onBlur(() => { if (this.tvFocus === 'L307') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L307')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0)); }); }).onClick(() => { Haptics.tick(); this.tap((0)); })
+        .outline(Tv.focusOutline(this.tvFocus === 'L307', Radius.lg)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0)); }); }).onClick(() => { Haptics.tick(); this.tap((0)); })
         Column({ space: Space.xs }) {
         Text(false ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.right).sym).fontSize(FontSize.hero).fontColor(Palette.rose)
@@ -320,7 +320,7 @@ export struct GDividedAttention {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L314'; })
         .onBlur(() => { if (this.tvFocus === 'L314') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L314')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1)); }); }).onClick(() => { Haptics.tick(); this.tap((1)); })
+        .outline(Tv.focusOutline(this.tvFocus === 'L314', Radius.lg)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1)); }); }).onClick(() => { Haptics.tick(); this.tap((1)); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
       Button(this.over ? TG('再来一局') : TG('重开'))

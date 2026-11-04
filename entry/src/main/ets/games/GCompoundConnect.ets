@@ -527,7 +527,7 @@ export struct GCompoundConnect {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L525'; })
               .onBlur(() => { if (this.tvFocus === 'L525') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L525'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L525', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
               .onClick(() => {
               Haptics.tick();

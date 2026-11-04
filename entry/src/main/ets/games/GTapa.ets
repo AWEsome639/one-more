@@ -690,7 +690,7 @@ export struct GTapa {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L688'; })
               .onBlur(() => { if (this.tvFocus === 'L688') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L688'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L688', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }

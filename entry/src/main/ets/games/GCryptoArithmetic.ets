@@ -437,7 +437,7 @@ export struct GCryptoArithmetic {
           .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L424'; })
           .onBlur(() => { if (this.tvFocus === 'L424') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L424')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapDigit((d)); }); }).onClick(() => { Haptics.tap(); this.tapDigit((d)); }) }, (d: number) => 'p' + d)
+          .outline(Tv.focusOutline(this.tvFocus === 'L424', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapDigit((d)); }); }).onClick(() => { Haptics.tap(); this.tapDigit((d)); }) }, (d: number) => 'p' + d)
         }.width('100%')
         Row({ space: Space.xs }) {
           ForEach([5, 6, 7, 8, 9], (d: number) => { Button(String((d)))
@@ -446,7 +446,7 @@ export struct GCryptoArithmetic {
           .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L430'; })
           .onBlur(() => { if (this.tvFocus === 'L430') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L430')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapDigit((d)); }); }).onClick(() => { Haptics.tap(); this.tapDigit((d)); }) }, (d: number) => 'q' + d)
+          .outline(Tv.focusOutline(this.tvFocus === 'L430', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapDigit((d)); }); }).onClick(() => { Haptics.tap(); this.tapDigit((d)); }) }, (d: number) => 'q' + d)
         }.width('100%')
       }.width('100%')
 

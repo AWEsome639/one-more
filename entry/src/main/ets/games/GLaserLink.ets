@@ -386,7 +386,7 @@ export struct GLaserLink {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L381'; })
     .onBlur(() => { if (this.tvFocus === 'L381') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L381'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L381', Radius.xs))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.slots.indexOf(i) >= 0) { this.rotateAt(i); } }); })
     .onClick(() => { Haptics.tap(); if (this.slots.indexOf(i) >= 0) { this.rotateAt(i); } })
   }

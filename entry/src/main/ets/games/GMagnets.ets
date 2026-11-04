@@ -584,7 +584,7 @@ export struct GMagnets {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L581'; })
               .onBlur(() => { if (this.tvFocus === 'L581') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L581'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L581', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

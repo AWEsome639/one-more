@@ -545,7 +545,7 @@ export struct GPipes {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L543'; })
               .onBlur(() => { if (this.tvFocus === 'L543') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L543'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L543', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }

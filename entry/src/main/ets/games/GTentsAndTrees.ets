@@ -672,7 +672,7 @@ export struct GTentsAndTrees {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L670'; })
               .onBlur(() => { if (this.tvFocus === 'L670') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L670'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L670', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }

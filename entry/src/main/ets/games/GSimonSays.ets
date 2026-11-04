@@ -454,7 +454,7 @@ export struct GSimonSays {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L452'; })
           .onBlur(() => { if (this.tvFocus === 'L452') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L452'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L452', Radius.lg))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((0)); }); })
           Stack() {
           Text(PAD_ICON[(1)]).fontSize(FontSize.xxxl)
@@ -485,7 +485,7 @@ export struct GSimonSays {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L481'; })
           .onBlur(() => { if (this.tvFocus === 'L481') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L481'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L481', Radius.lg))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((1)); }); })
         }
         .width('100%')
@@ -519,7 +519,7 @@ export struct GSimonSays {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L513'; })
           .onBlur(() => { if (this.tvFocus === 'L513') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L513'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L513', Radius.lg))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((2)); }); })
           Stack() {
           Text(PAD_ICON[(3)]).fontSize(FontSize.xxxl)
@@ -550,7 +550,7 @@ export struct GSimonSays {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L542'; })
           .onBlur(() => { if (this.tvFocus === 'L542') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L542'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L542', Radius.lg))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((3)); }); })
         }
         .width('100%')

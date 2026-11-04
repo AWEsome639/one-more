@@ -285,7 +285,7 @@ export struct GOrbitTap {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L283'; })
         .onBlur(() => { if (this.tvFocus === 'L283') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L283'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L283', Radius.full))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); }) }, (i: number) => 'slot' + i)
       }.width(ARENA).height(ARENA).backgroundColor(this.theme.surface)
       .borderRadius(Radius.xl).shadow(Shadow.card)

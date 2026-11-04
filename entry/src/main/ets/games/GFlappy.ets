@@ -638,7 +638,7 @@ export struct GFlappy {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L636'; })
       .onBlur(() => { if (this.tvFocus === 'L636') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L636'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L636', Radius.lg))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.flap(); }); })
       .onClick(() => {
         Haptics.tick();

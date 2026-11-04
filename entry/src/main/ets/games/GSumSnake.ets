@@ -507,7 +507,7 @@ export struct GSumSnake {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L505'; })
               .onBlur(() => { if (this.tvFocus === 'L505') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L505'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L505', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }

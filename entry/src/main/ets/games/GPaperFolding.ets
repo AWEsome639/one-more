@@ -320,7 +320,7 @@ export struct GPaperFolding {
                 .focusable(Tv.on())
                 .onFocus(() => { this.tvFocus = 'L318'; })
                 .onBlur(() => { if (this.tvFocus === 'L318') { this.tvFocus = ''; } })
-                .outline(Tv.focusOutline(this.tvFocus === 'L318'))
+                .outline(Tv.focusOutline(this.tvFocus === 'L318', Radius.sm))
                 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.punch((r * this.diffTotal + c)); }); }) }, (c: number) => 'fc' + c)
               }.width('100%')
             }, (r: number) => 'fr' + r)

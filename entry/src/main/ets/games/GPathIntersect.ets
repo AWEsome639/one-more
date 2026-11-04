@@ -617,7 +617,7 @@ export struct GPathIntersect {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L615'; })
               .onBlur(() => { if (this.tvFocus === 'L615') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L615'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L615', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
             }, (c: number) => 'c' + c)
           }

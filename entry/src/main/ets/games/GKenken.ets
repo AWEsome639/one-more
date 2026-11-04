@@ -596,7 +596,7 @@ export struct GKenken {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L593'; })
               .onBlur(() => { if (this.tvFocus === 'L593') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L593'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L593', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

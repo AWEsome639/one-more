@@ -523,7 +523,7 @@ export struct GMatch3 {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L521'; })
               .onBlur(() => { if (this.tvFocus === 'L521') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L521'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L521', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();

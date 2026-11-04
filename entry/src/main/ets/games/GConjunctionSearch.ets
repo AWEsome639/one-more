@@ -310,7 +310,7 @@ export struct GConjunctionSearch {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L308'; })
               .onBlur(() => { if (this.tvFocus === 'L308') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L308'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L308', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * SIZE + c)); }); })
               .onClick(() => { Haptics.tick(); this.tap((r * SIZE + c)); })
             }, (c: number) => 'c' + c)

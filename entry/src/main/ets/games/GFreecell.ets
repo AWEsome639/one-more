@@ -804,7 +804,7 @@ export struct GFreecell {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L802'; })
           .onBlur(() => { if (this.tvFocus === 'L802') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L802'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L802', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapFree((i)); }); })
           .onClick(() => {
           Haptics.tick();
@@ -826,7 +826,7 @@ export struct GFreecell {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L822'; })
           .onBlur(() => { if (this.tvFocus === 'L822') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L822'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L822', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapFound((s)); }); })
           .onClick(() => {
           Haptics.tick();
@@ -866,7 +866,7 @@ export struct GFreecell {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L860'; })
           .onBlur(() => { if (this.tvFocus === 'L860') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L860'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L860', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCol((i)); }); })
           .onClick(() => {
           Haptics.tick();
