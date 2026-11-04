@@ -7,6 +7,7 @@
  * 拾海 2026-10-11
  */
 
+import { Bp } from '../core/Bp';
 import { router } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Layout, Accent, Cell } from '../core/Design';
 import { Lan, LanRoom, LanMsg } from '../core/Lan';
@@ -211,7 +212,9 @@ struct LanLobby {
       .backgroundColor(this.theme().surface).borderRadius(Radius.md).shadow(Shadow.card)
 
       // 开房
-      Button(this.t('开个房间（我来当房主）', 'Host a room'))
+      Button(Bp.tinyScreen() || Bp.isWatch()
+          ? this.t('开个房间', 'Host')
+          : this.t('开个房间（我来当房主）', 'Host a room'))
         // ★ 2026-10-19 自查 A3：开房按钮写死 48vp，大字模式会裁
         .width('100%').constraintSize({ minHeight: Cell.of(48) })
         .backgroundColor(this.accentColor())

@@ -2,6 +2,7 @@
  * 密文破译 —— 单词被整体平移若干位（凯撒位移），靠已知映射还原明文
  * 胜负：8 关解出 ≥6 关通关，错 3 次即失败；每揭一条「密文→明文」映射扣 30 分
  */
+import { Bp } from '../core/Bp';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -348,7 +349,9 @@ export struct GCryptogram {
         .textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
       Row({ space: Space.sm }) {
-        Button(TG('揭一条映射（-30 分）'))
+        Button(Bp.tinyScreen() || Bp.isWatch()
+          ? TG('揭映射 -30')
+          : TG('揭一条映射（-30 分）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
           .enabled(!this.over).focusable(Tv.on())

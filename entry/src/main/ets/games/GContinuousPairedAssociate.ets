@@ -6,6 +6,7 @@
  * 胜负：答完 8 题 ⇒ solved=true；中途错满 3 题 ⇒ solved=false（答完立刻出下一题，节奏不断）
  */
 
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -408,7 +409,9 @@ export struct GContinuousPairedAssociate {
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
 
-        Button(TG('记住了，开始答题'))
+        Button(Bp.tinyScreen() || Bp.isWatch()
+          ? TG('开始答题')
+          : TG('记住了，开始答题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor(Color.White)

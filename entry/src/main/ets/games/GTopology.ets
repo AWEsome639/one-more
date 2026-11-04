@@ -3,6 +3,7 @@
  * 胜负：8 题答对 ≥ 6 ⇒ 通关　｜　进度：题号 / 答对 / 得分
  */
 
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -288,7 +289,9 @@ export struct GTopology {
         .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
       }.width('100%').height(170)
       Row({ space: Space.sm }) {
-        Button((TG('等价（洞数相同）')))
+        Button(Bp.tinyScreen() || Bp.isWatch()
+          ? TG('等价')
+          : TG('等价（洞数相同）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor((true) ? Palette.teal : Palette.rose)
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).enabled(!this.revealed && !this.over)
         .onClick(() => { Haptics.tap(); this.answer((true)); })

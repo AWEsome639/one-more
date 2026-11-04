@@ -2,6 +2,7 @@
  * 谜语字谜 —— 读英文谜面猜一个单词；卡住可看字母乱序（anagram）提示
  * 胜负：6 则谜语猜中 ≥5 则通关，错 3 次或一直放弃即失败　进度：题号 / 猜中 / 生命 / 得分
  */
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -339,7 +340,9 @@ export struct GConundrumAnagram {
         .textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
       Row({ space: Space.sm }) {
-        Button(TG('字母乱序（-40 分）'))
+        Button(Bp.tinyScreen() || Bp.isWatch()
+          ? TG('乱序 -40')
+          : TG('字母乱序（-40 分）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
           .enabled(!this.over).focusable(Tv.on())
