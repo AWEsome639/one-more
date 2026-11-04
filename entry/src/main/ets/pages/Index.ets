@@ -542,7 +542,7 @@ build() {
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'L475'; })
     .onBlur(() => { if (this.tvFocus === 'L475') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L475'))
+    .outline(Tv.focusOutline(this.tvFocus === 'L475', Radius.sm))
     .onKeyEvent((e: KeyEvent) => {
       Tv.handleKey(e, () => {
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
