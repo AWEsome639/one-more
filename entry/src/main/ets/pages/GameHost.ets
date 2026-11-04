@@ -829,7 +829,22 @@ struct GameHost {
     Stack({ alignContent: Alignment.Top }) {
       Column() {
         // ── 顶栏 ──
-        Row() {
+        // ★★★ 2026-11-04（第 1170 轮）**奥森报的：「收藏」「?」等图标挤到一起**
+        //
+        //   根因：这个 `Row()` **没有 `space` 参数**，5 个元素（‹ ☆ ? 难度 ↻）的间距
+        //        全靠各自的 `.margin()` 撑 —— 而实际只有 `?` 有 `.margin({right: Space.sm})`：
+        //          ‹  ：无 margin ｜ ☆ ：**无 margin** ← 漏 ｜ 难度：无 ｜ ↻：无
+        //        ⇒ **4 个间隙里有 3 个是 0** ⇒ 视觉上挤成一坨。
+        //
+        //   ⇒ 改成由 `Row` 的 `space` 统一管间距，并删掉 `?` 那个 margin（否则双倍）。
+        //
+        //   ⚠️ 空间预算（判据 465：常量要在最小尺寸上验）：
+        //      Space.sm = 10vp ｜ Space.xs = 6vp
+        //      960/853/440（5 元素 × 44）：5×44 + 4×10 = 260（+padding 32 = 292）<< 屏宽 ✅
+        //      233/195（4 元素 × 30，☆ 已 visibility.None 不占位）：
+        //        用 sm：4×30 + 3×10 = 150（+32 = 182）⇒ 195 上余量仅 13，偏紧
+        //        **改用 xs**：4×30 + 3×6 = 138（+32 = 170）⇒ 余量 25 ✅
+        Row({ space: this.tinyScreen() ? Space.xs : Space.sm }) {
           Text('‹')
             .accessibilityText(this.t('返回', 'Back'))
             .fontSize(this.iconSize() < 44 ? 22 : 30)
@@ -959,7 +974,8 @@ struct GameHost {
             .backgroundColor(this.theme().surface)
             .borderRadius(Radius.full)
             .shadow(Shadow.card)
-            .margin({ right: Space.sm })
+            // ★ 2026-11-04（第 1170 轮）：删掉 `.margin({ right: Space.sm })` ——
+            //   间距已由顶栏 `Row({ space: ... })` 统一管，留着会变成 space + sm 双倍
             .onClick(() => {
               Haptics.tap();   // ★ 2026-10-19 按压反馈
               router.pushUrl({ url: 'pages/GuidePage', params: { id: this.gameId } });
