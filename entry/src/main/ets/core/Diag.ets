@@ -58,7 +58,19 @@ export class Diag {
    * 注：本文件**不进** `Splash.ets` 的开屏证据哈希 ⇒ 改这里不影响开屏证据。
    *     `GamesTab.ets` 也不在哈希范围内 ⇒ 这次改动不影响任何已有证据。
    */
-  static readonly forceMenu: boolean = false;
+  static readonly forceMenu: boolean = false;   // ← 已改回（第 1332 轮验过，结论见下）
+  // ★★★ 2026-11-05（第 1332 轮）**把「验不了」追到了底，结论是环境锁死**：
+  //   三层排查：
+  //     ① 开关：`forceMenu = true` 后 `allowMenu = Tv.on() || Diag.forceMenu` **确实生效**
+  //     ② 语法：`uinput -M -m <dx> <dy>`（相对移动）+ `uinput -M -c 1`（右键）**语法正确**
+  //     ③ **设备没有鼠标**：`uinput -M -q` 报 **「Mouse is invisible」**
+  //        `/dev/input/` 报 Permission denied，`/proc/bus/input/devices` **空的**
+  //   ⇒ `uinput -M -m/-c/-d/-u` 全部**打印成功但效果为零**（dump 恒为 42,349 字节，
+  //     内容哈希 `1092f510b7e7` 前后完全相同）
+  //   ⇒ **判据 862：命令回显成功 ≠ 事件被投递**
+  //   ⇒ 要在本轮真验，只能：① 用真 PC/2in1 设备 ② 给模拟器加鼠标设备（需 root，
+  //     而 `param set` 返回 errNum 1001）⇒ **本会话做不到**
+  //   ⚠️ 上线前必须保持 `false`（真机上 `Tv.on()` 自己会开启）
 
   /**
    * **强制按「电视机」处理**（临时验证用）
