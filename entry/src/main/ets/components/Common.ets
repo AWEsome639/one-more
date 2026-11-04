@@ -896,6 +896,10 @@ build() {
     .padding(Space.sm)
     .backgroundColor(this.cardColor())
     .borderRadius(Radius.lg)
+    // ★★★ 2026-11-04（第 1182 轮）：焦点描边画在**可见的胶囊**上（不是外层 Stack）
+    //   ⇒ 与 backgroundColor/borderRadius 同层 ⇒ 描边形状与胶囊完全一致
+    //   `Radius.lg` 必须与上一行的 borderRadius 相同（判据：描边圆角 = 元素圆角）
+    .outline(Tv.focusOutline(this.focused && Tv.on(), Radius.lg))
     .shadow(Shadow.card)
     // ★ 动画 ①（2026-10-13）：与 GameHost 的整页容器配对做**跨页面**共享元素补间。
     //   ★ 用 `sharedTransition` 而不是 `geometryTransition`：
@@ -1051,7 +1055,14 @@ build() {
       //     `.outline()` 是**外描边**，不覆盖 border、不参与布局
       //     4vp 实心主色环，在浅色卡片上对比度高、一眼可见
       //   ✅ 已 A/B 对照（第 1160 轮：卡片区 15,942 像素差）+ 游戏内两支写法（第 1162/1163 轮）
-      .outline(Tv.focusOutline(this.focused && Tv.on()))
+      //
+      // ★★★ 2026-11-04（第 1182 轮）**把 `.outline()` 从这里的 Stack 移到了内层 Row**
+      //   奥森报「宝石迷阵卡片旁边又有多余的东西了」⇒ 真因：
+      //     · 这个 `Stack` 没有 `.height()`，被 `GridItem.height(cardH())` 撑到 **126vp**
+      //     · 而可见的胶囊是内层 `Row`（有 backgroundColor + borderRadius），只有约 **61vp**
+      //     · `Stack({ alignContent: BottomEnd })` 把 Row 压在底部 ⇒ 上半 65vp 是空的
+      //   ⇒ 描边画在空 Stack 上 ⇒ **在胶囊上方多出一大块直角框**（截图实测）
+      //   ⇒ 移到 Row 上，并传 `Radius.lg`（与胶囊的 borderRadius 一致）
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     // ★★★ 2026-11-02（第 856 轮）：**读屏支持**。
     //   改前：卡片里的图标 / 标题 / 副标题 / ✓ 是四个独立文本节点，

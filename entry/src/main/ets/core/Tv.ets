@@ -90,11 +90,17 @@ export class Tv {
    *      **必须像素差分证明它真的出现了**，不能因为编译通过就当生效。
    *      试点：GTypingSpeed「重开」按钮（本文件下方 L335 处）。
    */
-  static focusOutline(hasFocus: boolean): OutlineOptions {
+  static focusOutline(hasFocus: boolean, radius: number = Radius.md): OutlineOptions {
+    // ★★★ 2026-11-04（第 1182 轮）**加 `radius` 参数**
+    //   奥森报「宝石迷阵卡片旁边又有多余的东西了」⇒ 查清是两道不匹配：
+    //     ① 描边挂在**外层 Stack**（被 GridItem 撑高到 126vp），
+    //        而可见胶囊是内层 `Row`（只有约 61vp）⇒ 描边上方多出一大块
+    //     ② 描边圆角 `Radius.md`，而胶囊是 `Radius.lg` ⇒ 形状也不同
+    //   ⇒ 描边必须与「可见的那个盒子」同尺寸同圆角 ⇒ 需要能指定 radius
     return {
       width: hasFocus ? 4 : 0,
       color: hasFocus ? Palette.primary : Color.Transparent,
-      radius: Radius.md,
+      radius: radius,
       style: OutlineStyle.SOLID
     };
   }
