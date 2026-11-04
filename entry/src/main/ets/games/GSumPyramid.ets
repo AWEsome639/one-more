@@ -103,9 +103,18 @@ export struct GSumPyramid {
     if (this.over) {
       return Hint.none('none');
     }
-    return Hint.make([this.answer],
-      TG2('答案是第 {0} 个', String(this.answer + 1)),
-      TG2('The answer is option {0}', String(this.answer + 1)), t0);
+    // ★★★ 2026-11-04（第 1225 轮）**与 GQuickMath 同一 bug：数值当索引用**
+    //   `this.answer` 是**答案的数值**（L97 `this.answer = this.sol[idx]`，
+    //   判定处 L235 `if (v === this.answer)` 按值比）；
+    //   而 `HintResult.cells` 的定义是「提示指向的**格子下标**」
+    //   （`ai/Hint.ets` L39-40），文案 `「答案是第 {0} 个」` 也要的是**选项序号**。
+    //   ⇒ 传数值会让文案变成「第 33 个」这种荒谬值（选项只有 4 个）。
+    //   对照正确写法：`GLetterFrequencyScan` 存的时候就是 `ans: opts.indexOf(ans)`。
+    const idxRaw: number = this.opts.indexOf(this.answer);
+    const idx: number = idxRaw < 0 ? 0 : idxRaw;
+    return Hint.make([idx],
+      TG2('答案是第 {0} 个', String(idx + 1)),
+      TG2('The answer is option {0}', String(idx + 1)), t0);
   }
 
   private askHint(): void {
