@@ -202,19 +202,26 @@ PY
   #   ⇒ 根因：**没有任何一个词能保证「全项目唯一」**（设备不同、布局不同）
   #   ⇒ 修法：只要求「**本页有、上一页没有**」（差异指纹）：
   #     它不需要词在全项目唯一，只需要在**相邻两页**之间有区分力
+  # ★★★ 判据 712（第 1269 轮）：**指纹必须按「设备类别」各备一套**
+  #   踩坑（233×233 = watch 布局）：
+  #     游戏页是「24 款」不是「款小游戏」
+  #     统计页只有 LV/新手上路/通关 N 局（成就区被折叠）
+  #     设置页是「外观」不是「隐私」
+  #   ⇒ 单一指纹在 watch 布局上**全不命中** ⇒ 3 个页签全记 SKIP
+  #   ⇒ 修法：每个页签给**「或」组合**，覆盖普通布局与 watch 布局
   case "${TAB}" in
-    游戏) FP='款小游戏' ;;
-    统计) FP='成就' ;;
-    设置) FP='隐私' ;;
+    游戏) FP='款小游戏|24 款' ;;
+    统计) FP='成就|新手上路' ;;
+    设置) FP='隐私|外观' ;;
     *)    FP='' ;;
   esac
   if [ -n "${FP}" ]; then
-    if ! grep -q "${FP}" "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null; then
+    if ! grep -qE "${FP}" "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null; then
       echo "  ⚠️ ${TAB}: 指纹「${FP}」不命中（判据 699）⇒ 记 SKIP"
       SKIP=$((SKIP+1)); continue
     fi
     # ★ 差异检查：这一页有的词，上一页不应该有（除了第一个页签）
-    if [ -n "${PREV_DUMP}" ] && [ -f "${PREV_DUMP}" ] && grep -q "${FP}" "${PREV_DUMP}" 2>/dev/null; then
+    if [ -n "${PREV_DUMP}" ] && [ -f "${PREV_DUMP}" ] && grep -qE "${FP}" "${PREV_DUMP}" 2>/dev/null; then
       echo "  ⚠️ ${TAB}: 指纹「${FP}」**上一页也有** ⇒ 无法区分（判据 711）⇒ 记 SKIP"
       SKIP=$((SKIP+1)); continue
     fi
