@@ -77,4 +77,24 @@ export class Diag {
    *    那需要真人站在电视机前，任何模拟都替代不了。
    */
   static readonly forceTv: boolean = false;
+
+  /**
+   * ★★★ 2026-11-05（第 1277 轮）：**调试期强制默认页签**（-1 = 不强制）
+   *
+   * ★ 为什么需要
+   *   800×1280 这台模拟器的**输入层坏了**（判据 746）：
+   *     `eventManager receive DOWN event twice` + `Touch test result is empty`
+   *     ⇒ **六种输入方式全部无法切换页签**（click / uinput / longPress /
+   *       微动 swipe / doubleClick / 大 swipe，内容哈希全部相同）
+   *   而**布局仍必须验**（判据 ④：按"玩家看到什么"验收）。
+   *
+   * ★ 做法
+   *   把「初始页签」暴露成一个常量 ⇒ 编译时装成 1（统计）或 2（设置）
+   *   ⇒ **不点也能到那一页** ⇒ dump + 截图 ⇒ 布局可验。
+   *   ⚠️ 验完必须改回 `-1`（不强制）并重新编译，否则用户一进来就在统计页。
+   *
+   * ⚠️ 本文件不进 `Splash.ets` 的哈希 ⇒ 改这里**不会**让 24 条开屏证据失效
+   *    （这正是建 Diag.ets 的初衷，判据 564）。
+   */
+  static forceTab: number = -1;
 }

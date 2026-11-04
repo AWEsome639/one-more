@@ -24,6 +24,7 @@ import { L } from '../core/I18n';
 import { GamesTab } from '../components/GamesTab';
 import { StatsTab } from '../components/StatsTab';
 import { SettingsTab } from '../components/SettingsTab';
+import { Diag } from '../core/Diag';
 
 @Entry
 @Component
@@ -126,7 +127,8 @@ struct Index {
     UiModeMgr.apply(this.uiMode);
     this.uiRev = this.uiRev + 1;
   }
-  @State current: number = 0;
+  // ★ 第 1277 轮：允许诊断期强制默认页签（-1 = 不强制），用于「输入层坏了但布局要验」
+  @State current: number = Diag.forceTab >= 0 ? Diag.forceTab : 0;
   /** ★ 2026-11-03（第 916 轮）**PC hover 状态**：哪个页签在鼠标下（-1 = 无） */
   @State private barHover: number = -1;
   @State entered: boolean = false;
