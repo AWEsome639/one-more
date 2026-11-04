@@ -309,7 +309,17 @@ pageTransition() {
         }
         .width('100%')
       }
-      .layoutWeight(1)                       // ★ 吃掉剩余高度
+      // ★★★ 2026-11-04（第 1175 轮）**去掉 `layoutWeight(1)`**（奥森：「好像不太协调？」）
+      //
+      //   第 1172 轮我用 `.layoutWeight(1)` 让 Scroll 吃掉剩余高度 ——
+      //   目的达到了（按钮被推到卡片底部、不会溢出），
+      //   但**副作用**是：正文只有 2 行时，Scroll 仍然把剩余空间全部占住
+      //     ⇒ 正文与按钮之间空出 **246 vp** 的大白块（440×744 实测 739 px）。
+      //
+      //   ⇒ 改成给 Scroll 一个**明确的高度上限**：
+      //     内容少 ⇒ Scroll 按内容收缩（空白消失）
+      //     内容多 ⇒ Scroll 到上限后内部滚动（按钮仍在卡片内）
+      .constraintSize({ maxHeight: this.privacyCompact() ? 120 : 300 })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
       .width('100%')
@@ -359,7 +369,7 @@ pageTransition() {
     //   ⇒ 极小屏仍用 100%（内容真的需要那么多），其余给 **80%**（上下各留 10% 呼吸）
     // ★ 第 1173 轮二调：大屏 80% 仍然偏高（卡片占屏 71%、正文与按钮之间空白大）
     //   ⇒ 收到 **60%**：实测内容只需约 420 px，60% of 1620 = 972 px ⇒ 绰绰有余
-    .constraintSize({ maxHeight: this.privacyCompact() ? '100%' : '60%' })
+    .constraintSize({ maxHeight: this.privacyCompact() ? '95%' : '85%' })
     .padding(this.privacyCompact() ? Space.md : Space.lg)
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.lg)
