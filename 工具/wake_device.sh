@@ -74,20 +74,36 @@ for attempt in 1 2 3; do
       echo "FAIL:dump_empty(lum=$L,size=$SZ,attempt=$attempt)"; exit 3
     fi
 
-    # ── ⑤ ⚠️⚠️ 判据 639：**PID 有值 ≠ App 在前台**
-    #   第 1237 轮实测：`pidof` = 3472（进程在跑），
-    #   但 dump 里全是「设置 / 图库 / 文件管理 / 日历」= **桌面**。
-    #   ⇒ 只查 PID 会得出"App 可用"的错误结论，而每一步 UI 操作都会打到桌面。
-    #   修法：查 dump 里有没有 App 独有的文字；没有就 `aa start` 拉起来再查。
+    # ── ⑤ ⚠️⚠️ 判据 639 + 642：**PID 有值 ≠ App 在前台**
+    #   判据 639（第 1237 轮）：`pidof` = 3472 但 dump 全是
+    #     「设置 / 图库 / 文件管理 / 日历」= 桌面 ⇒ 每步操作都打到桌面。
+    #
+    #   ⚠️ 判据 642（第 1239 轮纠正）：**不能用「主页标题」当特征文字**
+    #     一开始我写的是 `grep -q "One More"`（主页顶栏文字）
+    #     ⇒ 但 App **进到游戏内页后**，标题变成游戏名（如「字谜定义」），
+    #       「One More」**不再出现** ⇒ 断言必然误判为"不在前台"
+    #     实测：`FAIL:app_not_foreground(lum=239.4, pid=3472)` 而屏幕明明亮着、
+    #            App 明明在跑，只是停在游戏内页。
+    #
+    #   ⇒ 正确做法：断言「**不是桌面**」，而不是「是主页」：
+    #     · 桌面（启动器）有稳定的图标名：「图库 / 文件管理 / 日历 / 设置」
+    #     · App 的任何页面都**不会有**这些
+    #     ⇒ 用「桌面特征文字」做**否定**判断，才在全 App 范围内成立。
     FG=0
+    LAUNCHER_RE='图库|文件管理|日历|相机|应用市场|备忘录'
     for ft in 1 2 3; do
-      if grep -q "One More" /tmp/_wk.json 2>/dev/null; then FG=1; break; fi
+      if [ -f /tmp/_wk.json ] && ! grep -qE "$LAUNCHER_RE" /tmp/_wk.json 2>/dev/null; then
+        FG=1; break
+      fi
+      # 在桌面 ⇒ 拉起来
       A "aa start -b $BUNDLE -a $ABILITY" >/dev/null 2>&1
       sleep 6
       A "uitest dumpLayout -p /data/local/tmp/_wk.json" >/dev/null 2>&1
       sleep 1
       timeout 25 $T file recv /data/local/tmp/_wk.json /tmp/_wk.json >/dev/null 2>&1
-      if grep -q "One More" /tmp/_wk.json 2>/dev/null; then FG=1; break; fi
+      if [ -f /tmp/_wk.json ] && ! grep -qE "$LAUNCHER_RE" /tmp/_wk.json 2>/dev/null; then
+        FG=1; break
+      fi
     done
     if [ "$FG" != "1" ]; then
       echo "FAIL:app_not_foreground(lum=$L,pid=$P)"; exit 5
