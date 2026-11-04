@@ -117,6 +117,9 @@ export struct GSudoku {
   /** ★ 第二期：提示说了什么（空 = 没提示） */
   @State private hintMsg: string = '';
   /** 代打计时器（-1 = 未运行）。★ 必须是 @State，否则按钮文字不会变「停代打」 */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -933,7 +936,9 @@ export struct GSudoku {
               this.fill(d);
             })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L936'; })
+            .onBlur(() => { if (this.tvFocus === 'L936') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L936'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.fill(d); }); })
         }, (d: number) => 'd' + d)
       }
@@ -956,7 +961,9 @@ export struct GSudoku {
             this.askHint();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L959'; })
+          .onBlur(() => { if (this.tvFocus === 'L959') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L959'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(LanRace.isRacing() ? TG('联机禁用')
           : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
@@ -973,7 +980,9 @@ export struct GSudoku {
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L976'; })
+          .onBlur(() => { if (this.tvFocus === 'L976') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L976'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
         Button(TG('擦除'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -988,7 +997,9 @@ export struct GSudoku {
             this.erase();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L991'; })
+          .onBlur(() => { if (this.tvFocus === 'L991') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L991'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.erase(); }); })
         // ★★★ 2026-10-30：文案从「重开（新题）」缩短为「重开」
         //   原因：四个按钮 layoutWeight(1) 均分，手机竖屏每份约 91vp，
@@ -1009,7 +1020,9 @@ export struct GSudoku {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L1012'; })
+          .onBlur(() => { if (this.tvFocus === 'L1012') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L1012'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
@@ -1071,7 +1084,9 @@ export struct GSudoku {
       this.sel = i;
     })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L1074'; })
+    .onBlur(() => { if (this.tvFocus === 'L1074') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L1074'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = i; }); })
   }
 }

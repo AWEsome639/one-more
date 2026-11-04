@@ -36,6 +36,9 @@ export struct GMentalMapping {
 
   // ★ 难度作用到玩法：要记住几个地点（简单 3 / 普通 4 / 困难 6）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -405,7 +408,9 @@ export struct GMentalMapping {
           this.answer((0));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L408'; })
+          .onBlur(() => { if (this.tvFocus === 'L408') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L408'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
           Text(DIRS[(1)])
           .fontSize(FontSize.lg)
@@ -421,7 +426,9 @@ export struct GMentalMapping {
           this.answer((1));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L424'; })
+          .onBlur(() => { if (this.tvFocus === 'L424') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L424'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); })
           Text(DIRS[(2)])
           .fontSize(FontSize.lg)
@@ -437,7 +444,9 @@ export struct GMentalMapping {
           this.answer((2));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L440'; })
+          .onBlur(() => { if (this.tvFocus === 'L440') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L440'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); })
         }
         Row({ space: Space.xs }) {
@@ -455,7 +464,9 @@ export struct GMentalMapping {
           this.answer((3));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L458'; })
+          .onBlur(() => { if (this.tvFocus === 'L458') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L458'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((3)); }); })
           Text(DIRS[(4)])
           .fontSize(FontSize.lg)
@@ -471,7 +482,9 @@ export struct GMentalMapping {
           this.answer((4));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L474'; })
+          .onBlur(() => { if (this.tvFocus === 'L474') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L474'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((4)); }); })
           Text(DIRS[(5)])
           .fontSize(FontSize.lg)
@@ -487,7 +500,9 @@ export struct GMentalMapping {
           this.answer((5));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L490'; })
+          .onBlur(() => { if (this.tvFocus === 'L490') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L490'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((5)); }); })
         }
         Row({ space: Space.xs }) {
@@ -505,7 +520,9 @@ export struct GMentalMapping {
           this.answer((6));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L508'; })
+          .onBlur(() => { if (this.tvFocus === 'L508') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L508'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((6)); }); })
           Text(DIRS[(7)])
           .fontSize(FontSize.lg)
@@ -521,7 +538,9 @@ export struct GMentalMapping {
           this.answer((7));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L524'; })
+          .onBlur(() => { if (this.tvFocus === 'L524') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L524'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((7)); }); })
           Text(DIRS[(8)])
           .fontSize(FontSize.lg)
@@ -537,7 +556,9 @@ export struct GMentalMapping {
           this.answer((8));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L540'; })
+          .onBlur(() => { if (this.tvFocus === 'L540') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L540'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((8)); }); })
         }
       }
@@ -560,7 +581,9 @@ export struct GMentalMapping {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L563'; })
+        .onBlur(() => { if (this.tvFocus === 'L563') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L563'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

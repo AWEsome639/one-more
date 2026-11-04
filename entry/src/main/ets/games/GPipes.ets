@@ -73,6 +73,9 @@ export struct GPipes {
    *   修法：棋盘固定 5×5，难度改到**步数预算**上。
    */
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -540,7 +543,9 @@ export struct GPipes {
               this.tap((r * this.diffTotal + c));
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L543'; })
+              .onBlur(() => { if (this.tvFocus === 'L543') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L543'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
@@ -570,7 +575,9 @@ export struct GPipes {
             this.askHint();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L573'; })
+          .onBlur(() => { if (this.tvFocus === 'L573') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L573'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -585,7 +592,9 @@ export struct GPipes {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L588'; })
+          .onBlur(() => { if (this.tvFocus === 'L588') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L588'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')

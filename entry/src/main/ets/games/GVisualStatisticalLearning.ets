@@ -27,6 +27,9 @@ export struct GVisualStatisticalLearning {
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -305,7 +308,9 @@ export struct GVisualStatisticalLearning {
         .backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L308'; })
+        .onBlur(() => { if (this.tvFocus === 'L308') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L308'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
@@ -325,7 +330,9 @@ export struct GVisualStatisticalLearning {
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => { Haptics.tick(); this.pick(i); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L328'; })
+      .onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L328'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
   }
 }

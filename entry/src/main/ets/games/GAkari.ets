@@ -198,6 +198,9 @@ export struct GAkari {
 
   // ★ 难度作用到玩法：容错次数（简单 12 / 普通 8 / 困难 5）
   /** 代打计时器（-1 = 未运行）。必须 @State，按钮文字才会变 */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -846,7 +849,9 @@ export struct GAkari {
           .layoutWeight(1)
           .height(KEY_H)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L849'; })
+          .onBlur(() => { if (this.tvFocus === 'L849') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L849'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -860,7 +865,9 @@ export struct GAkari {
           .layoutWeight(1)
           .height(44)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L863'; })
+          .onBlur(() => { if (this.tvFocus === 'L863') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L863'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
@@ -877,7 +884,9 @@ export struct GAkari {
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L880'; })
+          .onBlur(() => { if (this.tvFocus === 'L880') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L880'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .onClick(() => {
             this.askAuto();
@@ -891,7 +900,9 @@ export struct GAkari {
           .layoutWeight(1)
           .height(KEY_H)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L894'; })
+          .onBlur(() => { if (this.tvFocus === 'L894') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L894'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.done && !this.finished) { this.bulbs = new Array<number>(CELLS).fill(0); this.status = TG('灯都撤掉了'); } }); })
           .onClick(() => {
             Haptics.tap();
@@ -909,7 +920,9 @@ export struct GAkari {
           .layoutWeight(1)
           .height(KEY_H)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L912'; })
+          .onBlur(() => { if (this.tvFocus === 'L912') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L912'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.finished) { this.done = true; this.status = TG('已放弃这一局'); this.finish(false); } }); })
           .onClick(() => {
             Haptics.tap();
@@ -970,7 +983,9 @@ export struct GAkari {
     .borderRadius(this.isWall(i) ? Radius.xs : Radius.sm)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L973'; })
+    .onBlur(() => { if (this.tvFocus === 'L973') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L973'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
     .onClick(() => {
       Haptics.tick();

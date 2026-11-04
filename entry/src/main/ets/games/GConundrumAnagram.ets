@@ -43,6 +43,9 @@ export struct GConundrumAnagram {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -325,7 +328,9 @@ export struct GConundrumAnagram {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
           .borderRadius(Radius.md).width(84).height(Cell.of(46)).enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L328'; })
+          .onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L328'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); })
           .onClick(() => { Haptics.tap(); this.submit(); })
       }
@@ -337,16 +342,25 @@ export struct GConundrumAnagram {
         Button(TG('字母乱序（-40 分）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
-          .enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint(); }); }).onClick(() => { Haptics.tap(); this.hint(); })
+          .enabled(!this.over).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L340'; })
+          .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L340')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint(); }); }).onClick(() => { Haptics.tap(); this.hint(); })
         Button(TG('放弃（-1 命）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
-          .enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.skip(); }); }).onClick(() => { Haptics.tap(); this.skip(); })
+          .enabled(!this.over).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L344'; })
+          .onBlur(() => { if (this.tvFocus === 'L344') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L344')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.skip(); }); }).onClick(() => { Haptics.tap(); this.skip(); })
       }
       .width('100%')
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L349'; })
+        .onBlur(() => { if (this.tvFocus === 'L349') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L349')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

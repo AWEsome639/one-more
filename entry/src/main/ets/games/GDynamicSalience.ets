@@ -28,6 +28,9 @@ export struct GDynamicSalience {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -285,7 +288,10 @@ export struct GDynamicSalience {
               Text((r * SIDE + c) === this.hot ? '🌟' : '').fontSize(FontSize.lg)
               }.layoutWeight(1).aspectRatio(1).backgroundColor((r * SIDE + c) === this.hot ? Palette.amber : this.theme.surfaceAlt)
               .borderRadius(Radius.md).scale({ x: (r * SIDE + c) === this.hot ? 1.06 : 1, y: (r * SIDE + c) === this.hot ? 1.06 : 1 })
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * SIDE + c)); }); }).onClick(() => { Haptics.tick(); this.tap((r * SIDE + c)); })
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+              .onFocus(() => { this.tvFocus = 'L288'; })
+              .onBlur(() => { if (this.tvFocus === 'L288') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L288')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * SIDE + c)); }); }).onClick(() => { Haptics.tick(); this.tap((r * SIDE + c)); })
             }, (c: number) => 'sc' + c)
           }.width('100%')
         }, (r: number) => 'sr' + r)
@@ -297,7 +303,10 @@ export struct GDynamicSalience {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
-        .width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L300'; })
+        .onBlur(() => { if (this.tvFocus === 'L300') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L300')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：它每 1.5 秒换一次位置，手快一点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

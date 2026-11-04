@@ -32,6 +32,9 @@ export struct GDividedAttention {
 
   // ★ 难度作用到玩法（size）：TICKS 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -304,20 +307,29 @@ export struct GDividedAttention {
         Text((this.left).done ? ((this.left).on ? TG('✔ 点对了') : TG('✘ 误报')) : ' ').fontSize(FontSize.xxs).fontColor((this.left).done && (this.left).on ? Palette.success : Palette.danger)
         }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
         .borderColor((this.left).done ? ((this.left).on ? Palette.success : Palette.danger) : this.theme.line)
-        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0)); }); }).onClick(() => { Haptics.tick(); this.tap((0)); })
+        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L307'; })
+        .onBlur(() => { if (this.tvFocus === 'L307') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L307')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0)); }); }).onClick(() => { Haptics.tick(); this.tap((0)); })
         Column({ space: Space.xs }) {
         Text(false ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.right).sym).fontSize(FontSize.hero).fontColor(Palette.rose)
         Text((this.right).done ? ((this.right).on ? TG('✔ 点对了') : TG('✘ 误报')) : ' ').fontSize(FontSize.xxs).fontColor((this.right).done && (this.right).on ? Palette.success : Palette.danger)
         }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
         .borderColor((this.right).done ? ((this.right).on ? Palette.success : Palette.danger) : this.theme.line)
-        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1)); }); }).onClick(() => { Haptics.tick(); this.tap((1)); })
+        .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L314'; })
+        .onBlur(() => { if (this.tvFocus === 'L314') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L314')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1)); }); }).onClick(() => { Haptics.tick(); this.tap((1)); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
-        .width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L320'; })
+        .onBlur(() => { if (this.tvFocus === 'L320') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L320')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：只点 🎯 那一边；点错和漏掉都扣分')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

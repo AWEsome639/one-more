@@ -42,6 +42,9 @@ export struct GYajilin {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -426,7 +429,9 @@ export struct GYajilin {
               .borderRadius(Radius.sm).borderWidth(this.blackAt((r * N + c)) ? 0 : 2).borderColor(this.deg((r * N + c)) === 2 ? Palette.emerald : this.theme.line)
               .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L429'; })
+              .onBlur(() => { if (this.tvFocus === 'L429') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L429'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -448,13 +453,17 @@ export struct GYajilin {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over).onClick(() => { Haptics.tap(); this.hint(); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L451'; })
+          .onBlur(() => { if (this.tvFocus === 'L451') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L451'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.teal).borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L457'; })
+          .onBlur(() => { if (this.tvFocus === 'L457') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L457'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }.width('100%')
     }

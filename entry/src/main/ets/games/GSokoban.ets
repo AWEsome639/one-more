@@ -100,6 +100,9 @@ export struct GSokoban {
 
   // ★ 难度作用到玩法（size）：原 MAX_UNDO=300
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -724,7 +727,9 @@ export struct GSokoban {
             this.go(this.level - 1);
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L727'; })
+          .onBlur(() => { if (this.tvFocus === 'L727') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L727'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(this.level - 1); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -739,7 +744,9 @@ export struct GSokoban {
             this.load(this.level);
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L742'; })
+          .onBlur(() => { if (this.tvFocus === 'L742') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L742'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.load(this.level); }); })
         Button(TG('撤销'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -754,7 +761,9 @@ export struct GSokoban {
             this.undo();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L757'; })
+          .onBlur(() => { if (this.tvFocus === 'L757') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L757'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.undo(); }); })
         Button(TG('下一关'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -770,7 +779,9 @@ export struct GSokoban {
             this.go(this.level + 1);
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L773'; })
+          .onBlur(() => { if (this.tvFocus === 'L773') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L773'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(this.level + 1); }); })
       }
       .width('100%')
@@ -830,7 +841,9 @@ export struct GSokoban {
         this.step(dx, dy);
       })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L833'; })
+      .onBlur(() => { if (this.tvFocus === 'L833') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L833'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(dx, dy); }); })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
   }

@@ -31,6 +31,9 @@ export struct GVisualCrowdingAcuity {
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -340,7 +343,9 @@ export struct GVisualCrowdingAcuity {
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .onClick(() => { Haptics.tick(); this.answer((r * 2 + c)); })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L343'; })
+              .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L343'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((r * 2 + c)); }); })
             }, (c: number) => 'o' + c)
           }.width('100%')
@@ -353,7 +358,9 @@ export struct GVisualCrowdingAcuity {
         .backgroundColor(Palette.berry).borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L356'; })
+        .onBlur(() => { if (this.tvFocus === 'L356') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L356'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：越挤越要靠特征辨认，别猜整体轮廓'))

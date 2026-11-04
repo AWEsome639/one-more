@@ -68,6 +68,9 @@ export struct GAffixFactory {
 
   // ★ 难度作用到玩法（size）：QN 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -323,7 +326,9 @@ export struct GAffixFactory {
         .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
           .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L326'; })
+        .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L326'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((o)); }); })
         .onClick(() => { Haptics.tap(); this.pick((o)); }) }, (o: string) => o)
       }.width('100%')
@@ -331,7 +336,10 @@ export struct GAffixFactory {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L334'; })
+        .onBlur(() => { if (this.tvFocus === 'L334') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L334')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：un- / re- / dis- 走前面，-ful / -less / -ness 挂后面'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

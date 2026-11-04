@@ -46,6 +46,9 @@ export struct GMastermind {
 
   // ★ 难度作用到玩法（size）：原 SLOTS=4，按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -397,7 +400,9 @@ export struct GMastermind {
             .border({ width: this.sel === c ? 3 : 1, color: this.sel === c ? this.theme.ink : this.theme.line })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L400'; })
+            .onBlur(() => { if (this.tvFocus === 'L400') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L400'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = c; }); })
             .onClick(() => {
               Haptics.tick();
@@ -427,7 +432,9 @@ export struct GMastermind {
             .border({ width: 1, color: this.theme.line })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L430'; })
+            .onBlur(() => { if (this.tvFocus === 'L430') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L430'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapSlot(i); }); })
             .onClick(() => {
               Haptics.tick();
@@ -446,7 +453,9 @@ export struct GMastermind {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L449'; })
+          .onBlur(() => { if (this.tvFocus === 'L449') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L449'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -459,7 +468,9 @@ export struct GMastermind {
           .width(80).height(Cell.of(44))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L462'; })
+          .onBlur(() => { if (this.tvFocus === 'L462') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L462'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.clearCur(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -471,7 +482,9 @@ export struct GMastermind {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .width(80).height(Cell.of(44))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L474'; })
+          .onBlur(() => { if (this.tvFocus === 'L474') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L474'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();

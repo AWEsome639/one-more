@@ -25,6 +25,9 @@ export struct GFractionMatch {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -335,7 +338,10 @@ export struct GFractionMatch {
               Stack() {
               Text(this.face((row * 4 + col))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.cardInk((row * 4 + col)))
               }.layoutWeight(1).aspectRatio(1).backgroundColor(this.cardBg((row * 4 + col))).borderRadius(Radius.md).shadow(Shadow.card)
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.flip((row * 4 + col)); }); }).onClick(() => { Haptics.tick(); this.flip((row * 4 + col)); })
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+              .onFocus(() => { this.tvFocus = 'L338'; })
+              .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L338')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.flip((row * 4 + col)); }); }).onClick(() => { Haptics.tick(); this.flip((row * 4 + col)); })
             }, (col: number) => 'fmc' + col)
           }.width('100%')
         }, (row: number) => 'fmr' + row)
@@ -348,7 +354,10 @@ export struct GFractionMatch {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.berry)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L351'; })
+        .onBlur(() => { if (this.tvFocus === 'L351') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L351')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：2/4 与 1/2 等值 —— 同乘（同除）同一个数，分数大小不变')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

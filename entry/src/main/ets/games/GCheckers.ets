@@ -267,6 +267,9 @@ export struct GCheckers {
   // ★ 难度作用到玩法：棋盘边长（原 N=6）
   //   ⚠️ 渲染原本用 ForEach(this.rows)，已改成 ForEach(this.rowIdx())
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -967,7 +970,9 @@ export struct GCheckers {
                 .borderRadius(Radius.xs)
                 .animation({ duration: Motion.fast, curve: Motion.snap() })
                 .focusable(Tv.on())
-                .focusBox(Tv.box())
+                .onFocus(() => { this.tvFocus = 'L970'; })
+                .onBlur(() => { if (this.tvFocus === 'L970') { this.tvFocus = ''; } })
+                .outline(Tv.focusOutline(this.tvFocus === 'L970'))
                 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
                 .onClick(() => {
                 Haptics.tick();
@@ -1000,7 +1005,9 @@ export struct GCheckers {
           .width('100%')
           .height(Cell.of(46))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L1003'; })
+          .onBlur(() => { if (this.tvFocus === 'L1003') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L1003'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.restartTap(); }); })
           .onClick(() => {
             Haptics.tap();

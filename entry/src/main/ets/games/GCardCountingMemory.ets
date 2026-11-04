@@ -33,6 +33,9 @@ export struct GCardCountingMemory {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -331,7 +334,9 @@ export struct GCardCountingMemory {
         .scale({ x: this.pick === (i) ? Motion.pressScale : 1, y: this.pick === (i) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L334'; })
+        .onBlur(() => { if (this.tvFocus === 'L334') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L334'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((i)); }); })
         .onClick(() => { Haptics.tick(); this.answer((i)); })
 
@@ -341,7 +346,10 @@ export struct GCardCountingMemory {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L344'; })
+        .onBlur(() => { if (this.tvFocus === 'L344') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L344')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：下面 8 张就是刚才闪过的牌，只有一张出现两次')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

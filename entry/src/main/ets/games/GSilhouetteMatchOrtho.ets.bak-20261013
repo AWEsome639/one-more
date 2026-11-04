@@ -1,0 +1,157 @@
+/**
+ * 正交剪影 📐（id: silhouette_match_ortho）
+ * 三层 3×3 方块叠在一起，从正上方看（正投影）得到哪个剪影？——「有方块就算」。
+ * 胜负：6 题答对 ≥4 ⇒ 通关；进度：题号 / 答对。
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const M: number = 3; const CELLS: number = M * M; const LAYERS: number = 3;
+const ROUNDS: number = 6; const NEED: number = 4;
+const ROWS: number[] = [0, 1, 2]; const LAYER_IDX: number[] = [0, 1, 2];
+const LAYER_NAMES: string[] = ['1层 底', '2层', '3层 顶'];
+
+function sig(a: number[]): string { return a.join(''); }
+
+@Component
+export struct GSilhouetteMatchOrtho {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State layers: number[][] = []; @State opts: number[][] = []; @State answerAt: number = 0;
+  @State asked: number = 0; @State hits: number = 0; @State picked: number = -1;
+  @State over: boolean = false; @State won: boolean = false; @State note: string = '';
+  private startAt: number = 0; private done: boolean = false; private nextTimer: number = -1;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+     this.reset(); }
+  aboutToDisappear(): void { this.stopTimer(); }
+  private stopTimer(): void { if (this.nextTimer >= 0) { clearTimeout(this.nextTimer); this.nextTimer = -1; } }
+  private reset(): void {
+    this.stopTimer(); this.asked = 0; this.hits = 0; this.picked = -1;
+    this.over = false; this.won = false; this.done = false; this.startAt = Date.now();
+    const ls: number[][] = [[1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 1, 0], [0, 0, 1, 1, 0, 0, 1, 0, 0]];
+    const uni: number[] = [1, 1, 1, 1, 1, 0, 1, 1, 0];
+    this.layers = ls; this.opts = [uni, ls[0], ls[1], ls[2]]; this.answerAt = 0;
+    this.note = '把三层压在一起，就是俯视剪影';
+    this.newRound();
+  }
+  private newRound(): void {
+    for (let attempt = 0; attempt < 90; attempt++) {
+      const ls: number[][] = [];
+      for (let l = 0; l < LAYERS; l++) {
+        const g: number[] = new Array<number>(CELLS).fill(0);
+        const n: number = 2 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < n; i++) { g[Math.floor(Math.random() * CELLS)] = 1; }
+        ls.push(g);
+      }
+      const uni: number[] = new Array<number>(CELLS).fill(0); let filled: number = 0;
+      for (let i = 0; i < CELLS; i++) {
+        if (ls[0][i] === 1 || ls[1][i] === 1 || ls[2][i] === 1) { uni[i] = 1; filled++; }
+      }
+      const su: string = sig(uni);
+      if (filled < 4) { continue; }                                        // 太稀疏不好看
+      if (sig(ls[0]) === su || sig(ls[1]) === su || sig(ls[2]) === su) { continue; }  // 一层就看穿 ⇒ 换题
+      if (sig(ls[0]) === sig(ls[1]) || sig(ls[1]) === sig(ls[2]) || sig(ls[0]) === sig(ls[2])) { continue; }
+      // 一正三误：正确投影 + 三层各自的样子（经典错误：只盯着一层看）
+      const list: number[][] = [uni, ls[0], ls[1], ls[2]];
+      const shift: number = Math.floor(Math.random() * 4);
+      const opts: number[][] = [list[shift], list[(shift + 1) % 4], list[(shift + 2) % 4], list[(shift + 3) % 4]];
+      let ans: number = 0;
+      for (let i = 0; i < 4; i++) { if (opts[i] === uni) { ans = i; } }
+      this.layers = ls; this.opts = opts; this.answerAt = ans; this.picked = -1;
+      this.note = '三层压在一起，俯视剪影是哪个？';
+      return;
+    }
+  }
+  private pick(i: number): void {
+    if (this.over || this.picked >= 0) { return; }
+    this.picked = i; this.asked++;
+    if (i === this.answerAt) { this.hits++; this.note = '✅ 投影就是这个'; }
+    else { this.note = '❌ 漏层或多算了，绿框才对'; }
+    this.stopTimer();
+    this.nextTimer = setTimeout(() => {
+      this.nextTimer = -1;
+      if (this.asked >= this.diffTotal) { this.finish(this.hits >= NEED); return; }
+      this.newRound();
+    }, 900);
+  }
+  private finish(solved: boolean): void {
+    if (this.done) { return; }
+    this.done = true; this.over = true; this.won = solved; this.stopTimer();
+    const res: GameResult = { gameId: 'silhouette_match_ortho', solved: solved, score: this.hits * 15, durationMs: Date.now() - this.startAt, levelReached: this.hits };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(res);
+  }
+  /** mode < 0 ⇒ 单层方块（青）；mode ≥ 0 ⇒ 第 mode 个剪影选项 */
+  private cellColor(cells: number[], mode: number, i: number): string {
+    if (cells.length <= i || cells[i] !== 1) { return this.theme.surfaceAlt; }
+    if (mode < 0) { return Palette.cyan; }
+    return this.picked >= 0 && mode === this.answerAt ? Palette.emerald : (this.theme.isDark ? '#E2E8F0' : '#334155');
+  }
+
+  build() {
+    Column({ space: Space.sm }) {
+      Text(TG('题号 ') + Math.min(this.asked + 1, this.diffTotal) + '/' + this.diffTotal + TG('　答对 ') + this.hits + '/' + NEED
+        + '　👁️ 俯视正投影：有方块就算')
+        .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Row({ space: Space.sm }) {
+        ForEach(LAYER_IDX, (l: number) => {
+          Column({ space: 2 }) {
+            Column() { this.grid(this.layers[l], -1) }.width('74%')
+            Text(LAYER_NAMES[l]).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.xs)
+            .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        }, (l: number) => 'ly' + l)
+      }.width('100%')
+      Text(this.note).fontSize(FontSize.sm)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      Row({ space: Space.sm }) {
+        this.option(0)
+        this.option(1)
+      }.width('100%')
+      Row({ space: Space.sm }) {
+        this.option(2)
+        this.option(3)
+      }.width('100%')
+      Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
+        .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
+        .borderRadius(Radius.md).width('100%').height(46).onClick(() => { this.reset(); })
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  grid(cells: number[], mode: number) {
+    Column({ space: 2 }) {
+      ForEach(ROWS, (r: number) => {
+        Row({ space: 2 }) {
+          ForEach(ROWS, (c: number) => {
+            Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+              .backgroundColor(this.cellColor(cells, mode, r * M + c))
+          }, (c: number) => 'gc' + c)
+        }.width('100%')
+      }, (r: number) => 'gr' + r)
+    }.width('100%')
+  }
+  @Builder
+  option(i: number) {
+    Column({ space: 2 }) {
+      Column() { this.grid(this.opts[i], i) }.width('64%')
+    }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.sm)
+      .backgroundColor(this.theme.surface).borderRadius(Radius.md)
+      .borderWidth(this.picked >= 0 || this.over ? 3 : 1)
+      .borderColor(this.picked >= 0 || this.over
+        ? (i === this.answerAt ? Palette.emerald : Palette.rose) : this.theme.line)
+      .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onClick(() => { this.pick(i); })
+  }
+}

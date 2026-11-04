@@ -101,6 +101,9 @@ export struct GBejeweled {
    *   这是「工具先于批量」的第一款试点（Tv.focusBorder 已就绪）。
    */
   @State private tvFocus: number = -1;
+  /** ★ 第 1161 轮：**按钮**用的焦点 id（格子用上面的 number 版 `tvFocus`）
+   *   `.focusBox()` 从不渲染 ⇒ 按钮改用 `.outline()` 自绘 */
+  @State private tvFocusBtn: string = '';
   @State private score: number = 0;
   /** ★ 2026-10-15 得分跳动 */
   @State private scorePulse: number = 1;
@@ -729,7 +732,9 @@ export struct GBejeweled {
                 //     （把格子渲染上移到 GameHost 层，或用 Builder 展开到同一层）。
                 //     那是 355 款的改造，需独立排期。
                 .focusable(Tv.on())
-                .focusBox(Tv.box())
+                .onFocus(() => { this.tvFocusBtn = 'L735'; })
+                .onBlur(() => { if (this.tvFocusBtn === 'L735') { this.tvFocusBtn = ''; } })
+                .outline(Tv.focusOutline(this.tvFocusBtn === 'L735'))
                 // ★ 自绘焦点框的真实驱动（focusBox 只改样式，不负责出现）
                 .onFocus(() => { this.tvFocus = this.idx(r, c); })
                 .onBlur(() => { if (this.tvFocus === this.idx(r, c)) { this.tvFocus = -1; } })
@@ -814,7 +819,9 @@ export struct GBejeweled {
             .layoutWeight(1)
             .height(Cell.of(46))
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocusBtn = 'L820'; })
+            .onBlur(() => { if (this.tvFocusBtn === 'L820') { this.tvFocusBtn = ''; } })
+            .outline(Tv.focusOutline(this.tvFocusBtn === 'L820'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
             .onClick(() => {
               Haptics.tap();
@@ -833,7 +840,9 @@ export struct GBejeweled {
             //   按"空操作不该看起来能点"的原则，加上 `this.sel >= 0`。
             .enabled(!this.over && this.sel >= 0)
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocusBtn = 'L839'; })
+            .onBlur(() => { if (this.tvFocusBtn === 'L839') { this.tvFocusBtn = ''; } })
+            .outline(Tv.focusOutline(this.tvFocusBtn === 'L839'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.sel = -1; }); })
             .onClick(() => {
               Haptics.tap();

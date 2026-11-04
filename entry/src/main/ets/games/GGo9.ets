@@ -277,6 +277,9 @@ export struct GGo9 {
   onFinish: (r: GameResult) => void = () => {};
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -1064,7 +1067,9 @@ export struct GGo9 {
           .height(Cell.of(46))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L1067'; })
+          .onBlur(() => { if (this.tvFocus === 'L1067') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L1067'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.passTap(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -1079,7 +1084,9 @@ export struct GGo9 {
           .layoutWeight(1)
           .height(Cell.of(46))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L1082'; })
+          .onBlur(() => { if (this.tvFocus === 'L1082') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L1082'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.restartTap(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -1154,7 +1161,9 @@ export struct GGo9 {
     .backgroundColor(this.canTap(r, c) ? '#15FFFFFF' : Color.Transparent)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L1157'; })
+    .onBlur(() => { if (this.tvFocus === 'L1157') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L1157'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPoint(r, c); }); })
     .onClick(() => {
       Haptics.tick();

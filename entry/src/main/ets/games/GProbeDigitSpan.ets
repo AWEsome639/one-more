@@ -32,6 +32,9 @@ export struct GProbeDigitSpan {
 
   // ★ 难度作用到玩法（size）：原 MAX_LEN=8
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -289,7 +292,9 @@ export struct GProbeDigitSpan {
             .enabled(this.phase === 1)
             .onClick(() => { Haptics.tap(); this.answer((row * 5 + col)); })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L292'; })
+            .onBlur(() => { if (this.tvFocus === 'L292') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L292'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((row * 5 + col)); }); }) }, (col: number) => 'dk' + row + '_' + col)
           }.width('100%')
         }, (row: number) => 'dr' + row)
@@ -298,7 +303,9 @@ export struct GProbeDigitSpan {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L301'; })
+      .onBlur(() => { if (this.tvFocus === 'L301') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L301'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG2('提示：位数从 {0} 涨到 {1}，答错一次就结束',Digits(String(START_LEN), this.langCode),Digits(String(this.diffTotal), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

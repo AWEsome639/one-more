@@ -41,6 +41,9 @@ export struct GBoxCompletion {
   // ★ 难度作用到玩法：棋盘边长（简单 3 / 普通 4 / 困难 5）
   //   ⚠️ 光改 this.diffTotal 不够 —— 渲染用的是写死的 [0,1,2,3]，必须同时改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -340,7 +343,10 @@ export struct GBoxCompletion {
  Text(this.cells[r * this.diffTotal + c] && this.lit[r * this.diffTotal + c] ? '✨'
  : (this.cells[r * this.diffTotal + c] ? '⬛'
  : (this.lit[r * this.diffTotal + c] ? '🟨' : ''))).fontSize(FontSize.xxl)
- }.layoutWeight(1).height(Cell.of(62)).backgroundColor(this.lit[r * this.diffTotal + c] ? Palette.amber : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] ? Palette.ink : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(r * this.diffTotal + c); }); }).onClick(() => { Haptics.tick(); this.pick(r * this.diffTotal + c); })
+ }.layoutWeight(1).height(Cell.of(62)).backgroundColor(this.lit[r * this.diffTotal + c] ? Palette.amber : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] ? Palette.ink : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+ .onFocus(() => { this.tvFocus = 'L343'; })
+ .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
+ .outline(Tv.focusOutline(this.tvFocus === 'L343')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(r * this.diffTotal + c); }); }).onClick(() => { Haptics.tick(); this.pick(r * this.diffTotal + c); })
  }, (c: number) => 'c' + c) }.width('100%')
  }, (r: number) => 'r' + r) }.width('100%')
  Text(this.note).fontSize(FontSize.sm)
@@ -349,12 +355,18 @@ export struct GBoxCompletion {
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
  Row({ space: Space.sm }) {
  Button(TG('清空点亮'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.over) { this.lit = new Array<boolean>(MAX_CELLS).fill(false); } }); }).onClick(() => {
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L352'; })
+      .onBlur(() => { if (this.tvFocus === 'L352') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L352')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.over) { this.lit = new Array<boolean>(MAX_CELLS).fill(false); } }); }).onClick(() => {
  Haptics.tap();
  if (!this.over) { this.lit = new Array<boolean>(MAX_CELLS).fill(false); }
  })
  Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L357'; })
+      .onBlur(() => { if (this.tvFocus === 'L357') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L357')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
  }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

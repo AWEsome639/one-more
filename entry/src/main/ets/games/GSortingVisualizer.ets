@@ -43,6 +43,9 @@ export struct GSortingVisualizer {
 
   // ★ 难度作用到玩法（size）：COUNT 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -494,7 +497,9 @@ export struct GSortingVisualizer {
               this.pickAlgo(k);
             })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L497'; })
+            .onBlur(() => { if (this.tvFocus === 'L497') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L497'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pickAlgo(k); }); })
         }, (k: number) => 'a' + k)
       }
@@ -548,7 +553,9 @@ export struct GSortingVisualizer {
             }
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L551'; })
+          .onBlur(() => { if (this.tvFocus === 'L551') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L551'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.running) { this.pause(); } else { this.play(); } }); })
         Button(TG('单步'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -565,7 +572,9 @@ export struct GSortingVisualizer {
             this.step();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L568'; })
+          .onBlur(() => { if (this.tvFocus === 'L568') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L568'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pause(); this.step(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -580,7 +589,9 @@ export struct GSortingVisualizer {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L583'; })
+          .onBlur(() => { if (this.tvFocus === 'L583') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L583'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')

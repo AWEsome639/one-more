@@ -65,6 +65,9 @@ export struct GSolitaire {
 
   // ★ 难度作用到玩法：棋盘边长（原 GAP=4）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -894,7 +897,9 @@ export struct GSolitaire {
             this.autoCollect();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L897'; })
+          .onBlur(() => { if (this.tvFocus === 'L897') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L897'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.autoCollect(); }); })
         Button(TG('重新开始'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -909,7 +914,9 @@ export struct GSolitaire {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L912'; })
+          .onBlur(() => { if (this.tvFocus === 'L912') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L912'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
@@ -1045,7 +1052,9 @@ export struct GSolitaire {
       this.tapStock();
     })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L1048'; })
+    .onBlur(() => { if (this.tvFocus === 'L1048') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L1048'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapStock(); }); })
   }
 
@@ -1062,7 +1071,9 @@ export struct GSolitaire {
       this.tapWaste();
     })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L1065'; })
+    .onBlur(() => { if (this.tvFocus === 'L1065') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L1065'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapWaste(); }); })
   }
 
@@ -1088,7 +1099,9 @@ export struct GSolitaire {
       this.tapFound(f);
     })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L1091'; })
+    .onBlur(() => { if (this.tvFocus === 'L1091') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L1091'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapFound(f); }); })
   }
 
@@ -1117,7 +1130,9 @@ export struct GSolitaire {
       this.tapPileBlank(p);
     })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L1120'; })
+    .onBlur(() => { if (this.tvFocus === 'L1120') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L1120'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPileBlank(p); }); })
   }
 
@@ -1134,7 +1149,9 @@ export struct GSolitaire {
       this.tapPileCard(p, i);
     })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L1137'; })
+    .onBlur(() => { if (this.tvFocus === 'L1137') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L1137'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPileCard(p, i); }); })
   }
 }

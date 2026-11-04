@@ -84,6 +84,9 @@ export struct GCompassMaze {
   // ★ 难度作用到玩法：棋盘边长（原 N=7；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5, 6]，上面已一并改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -431,11 +434,20 @@ export struct GCompassMaze {
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
  Row({ space: Space.xs }) {
  Button(TG2('走一步 {0}', ARROW[this.cmds[this.idx]]))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(2).height(Cell.of(46)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.follow(); }); }).onClick(() => { Haptics.tap(); this.follow(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(2).height(Cell.of(46)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L434'; })
+      .onBlur(() => { if (this.tvFocus === 'L434') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L434')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.follow(); }); }).onClick(() => { Haptics.tap(); this.follow(); })
  Button(TG('⇄ 反转'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(46)).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.flip(); }); }).onClick(() => { Haptics.tap(); this.flip(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(46)).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L436'; })
+      .onBlur(() => { if (this.tvFocus === 'L436') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L436')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.flip(); }); }).onClick(() => { Haptics.tap(); this.flip(); })
  Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(46)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.violet).borderRadius(Radius.md).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(46)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.violet).borderRadius(Radius.md).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L438'; })
+      .onBlur(() => { if (this.tvFocus === 'L438') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L438')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
  }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

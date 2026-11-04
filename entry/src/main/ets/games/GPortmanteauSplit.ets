@@ -50,6 +50,9 @@ export struct GPortmanteauSplit {
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -319,7 +322,9 @@ export struct GPortmanteauSplit {
         })
         .onClick(() => { Haptics.tick(); this.tap((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L322'; })
+        .onBlur(() => { if (this.tvFocus === 'L322') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L322'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0)); }); })
         Text(this.q.opts.length > (1) ? this.q.opts[(1)] : '')
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
@@ -333,7 +338,9 @@ export struct GPortmanteauSplit {
         })
         .onClick(() => { Haptics.tick(); this.tap((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L336'; })
+        .onBlur(() => { if (this.tvFocus === 'L336') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L336'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -349,7 +356,9 @@ export struct GPortmanteauSplit {
         })
         .onClick(() => { Haptics.tick(); this.tap((2)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L352'; })
+        .onBlur(() => { if (this.tvFocus === 'L352') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L352'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((2)); }); })
         Text(this.q.opts.length > (3) ? this.q.opts[(3)] : '')
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
@@ -363,7 +372,9 @@ export struct GPortmanteauSplit {
         })
         .onClick(() => { Haptics.tick(); this.tap((3)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L366'; })
+        .onBlur(() => { if (this.tvFocus === 'L366') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L366'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((3)); }); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
@@ -372,7 +383,9 @@ export struct GPortmanteauSplit {
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L375'; })
+        .onBlur(() => { if (this.tvFocus === 'L375') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L375'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

@@ -31,6 +31,9 @@ export struct GSemanticDistance {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -279,7 +282,9 @@ export struct GSemanticDistance {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .enabled(!this.over && this.picked < 0).onClick(() => { Haptics.tap(); this.pick((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L282'; })
+        .onBlur(() => { if (this.tvFocus === 'L282') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L282'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((0)); }); })
         Button(this.opts.length > (1) ? this.opts[(1)] : '')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF')
@@ -289,7 +294,9 @@ export struct GSemanticDistance {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .enabled(!this.over && this.picked < 0).onClick(() => { Haptics.tap(); this.pick((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L292'; })
+        .onBlur(() => { if (this.tvFocus === 'L292') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L292'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((1)); }); })
       }.width('100%')
 
@@ -299,7 +306,9 @@ export struct GSemanticDistance {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L302'; })
+        .onBlur(() => { if (this.tvFocus === 'L302') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L302'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG2("{0} 题，答对 ≥{1} 通关：词义越近越好",Digits(String(this.diffTotal), this.langCode), PASS))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

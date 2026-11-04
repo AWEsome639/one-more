@@ -37,6 +37,9 @@ export struct GBinaryCode {
   onFinish: (r: GameResult) => void = () => {};
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -442,7 +445,9 @@ export struct GBinaryCode {
         .width('100%')
         .height(Cell.of(42))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L445'; })
+        .onBlur(() => { if (this.tvFocus === 'L445') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L445'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         .onClick(() => {
           this.askHint();
@@ -456,7 +461,9 @@ export struct GBinaryCode {
         .width('100%')
         .height(Cell.of(46))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L459'; })
+        .onBlur(() => { if (this.tvFocus === 'L459') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L459'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
@@ -519,7 +526,9 @@ export struct GBinaryCode {
     .scale({ x: this.flag[i] ? 1.03 : 1, y: this.flag[i] ? 1.03 : 1 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L522'; })
+    .onBlur(() => { if (this.tvFocus === 'L522') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L522'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.toggle(i); }); })
     .onClick(() => {
       Haptics.tick();

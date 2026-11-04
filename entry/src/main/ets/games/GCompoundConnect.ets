@@ -42,6 +42,9 @@ export struct GCompoundConnect {
 
   // ★ 难度作用到玩法（lives）：MAX_FAIL 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -522,7 +525,9 @@ export struct GCompoundConnect {
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L525'; })
+              .onBlur(() => { if (this.tvFocus === 'L525') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L525'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.idx(r, c))); }); })
               .onClick(() => {
               Haptics.tick();
@@ -560,7 +565,9 @@ export struct GCompoundConnect {
           .height(Cell.of(46))
           .enabled(!this.over && this.path.length > 0)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L563'; })
+          .onBlur(() => { if (this.tvFocus === 'L563') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L563'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); const p: number[] = this.path.slice(); p.pop(); this.path = p; this.msg = TG('退回一步'); }); })
           .onClick(() => {
             Haptics.tap();
@@ -579,7 +586,9 @@ export struct GCompoundConnect {
           .height(Cell.of(46))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L582'; })
+          .onBlur(() => { if (this.tvFocus === 'L582') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L582'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.path = []; this.msg = TG('从左上角重新起步'); }); })
           .onClick(() => {
             Haptics.tap();
@@ -595,7 +604,9 @@ export struct GCompoundConnect {
           .layoutWeight(1)
           .height(Cell.of(46))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L598'; })
+          .onBlur(() => { if (this.tvFocus === 'L598') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L598'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();

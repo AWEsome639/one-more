@@ -82,6 +82,9 @@ export struct GPathFinder {
    *     （budget 本来就是 par * 2，现在按难度给不同倍率）
    */
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -480,7 +483,9 @@ export struct GPathFinder {
               this.tap((r * MC + c));
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L483'; })
+              .onBlur(() => { if (this.tvFocus === 'L483') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L483'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * MC + c)); }); })
             }, (c: number) => 'c' + c)
           }
@@ -507,7 +512,9 @@ export struct GPathFinder {
         this.move((0), (-1));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L510'; })
+        .onBlur(() => { if (this.tvFocus === 'L510') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L510'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move((0), (-1)); }); })
         Text(('↑'))
         .fontSize(FontSize.lg)
@@ -523,7 +530,9 @@ export struct GPathFinder {
         this.move((-1), (0));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L526'; })
+        .onBlur(() => { if (this.tvFocus === 'L526') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L526'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move((-1), (0)); }); })
         Text(('↓'))
         .fontSize(FontSize.lg)
@@ -539,7 +548,9 @@ export struct GPathFinder {
         this.move((1), (0));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L542'; })
+        .onBlur(() => { if (this.tvFocus === 'L542') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L542'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move((1), (0)); }); })
         Text(('→'))
         .fontSize(FontSize.lg)
@@ -555,7 +566,9 @@ export struct GPathFinder {
         this.move((0), (1));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L558'; })
+        .onBlur(() => { if (this.tvFocus === 'L558') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L558'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move((0), (1)); }); })
       }
       .width('100%')
@@ -578,7 +591,9 @@ export struct GPathFinder {
             this.askHint();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L581'; })
+          .onBlur(() => { if (this.tvFocus === 'L581') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L581'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -593,7 +608,9 @@ export struct GPathFinder {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L596'; })
+          .onBlur(() => { if (this.tvFocus === 'L596') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L596'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')

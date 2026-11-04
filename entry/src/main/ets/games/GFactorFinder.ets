@@ -23,6 +23,9 @@ export struct GFactorFinder {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -317,7 +320,10 @@ export struct GFactorFinder {
               Stack() {
               Text(String(this.cands[(row * COLS + col)])).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.cellInk((row * COLS + col)))
               }.layoutWeight(1).aspectRatio(1).backgroundColor(this.cellBg((row * COLS + col))).borderRadius(Radius.md).shadow(Shadow.card)
-              .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((row * COLS + col)); }); }).onClick(() => { Haptics.tick(); this.tap((row * COLS + col)); })
+              .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+              .onFocus(() => { this.tvFocus = 'L320'; })
+              .onBlur(() => { if (this.tvFocus === 'L320') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L320')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((row * COLS + col)); }); }).onClick(() => { Haptics.tick(); this.tap((row * COLS + col)); })
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
@@ -335,13 +341,19 @@ export struct GFactorFinder {
         .fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md)
-        .width('100%').height(Cell.of(40)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); }).onClick(() => {
+        .width('100%').height(Cell.of(40)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L338'; })
+        .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L338')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); }).onClick(() => {
           this.askHint();
         })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L344'; })
+        .onBlur(() => { if (this.tvFocus === 'L344') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L344')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：因数成对出现 —— 找到 v 就顺手想想 n÷v；1 与 n 本身也算')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

@@ -52,6 +52,9 @@ export struct GTennerGrid {
   // ★ 难度作用到玩法：棋盘边长（原 N=10；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]，上面已一并改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State，按钮文字才会变 */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -465,7 +468,9 @@ export struct GTennerGrid {
               this.sel = (r * this.diffTotal + c);
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L468'; })
+              .onBlur(() => { if (this.tvFocus === 'L468') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L468'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (this.over) { return; } this.sel = (r * this.diffTotal + c); }); })
             }, (c: number) => 'c' + c)
           }
@@ -495,7 +500,9 @@ export struct GTennerGrid {
             this.place((d));
             })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L498'; })
+            .onBlur(() => { if (this.tvFocus === 'L498') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L498'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((d)); }); })
           }, (d: number) => 'd' + d)
         }
@@ -517,7 +524,9 @@ export struct GTennerGrid {
             this.place((d));
             })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L520'; })
+            .onBlur(() => { if (this.tvFocus === 'L520') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L520'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((d)); }); })
           }, (d: number) => 'e' + d)
         }
@@ -544,7 +553,9 @@ export struct GTennerGrid {
             this.askHint();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L547'; })
+          .onBlur(() => { if (this.tvFocus === 'L547') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L547'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(LanRace.isRacing() ? TG('联机禁用')
           : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
@@ -562,7 +573,9 @@ export struct GTennerGrid {
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L565'; })
+          .onBlur(() => { if (this.tvFocus === 'L565') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L565'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -577,7 +590,9 @@ export struct GTennerGrid {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L580'; })
+          .onBlur(() => { if (this.tvFocus === 'L580') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L580'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')

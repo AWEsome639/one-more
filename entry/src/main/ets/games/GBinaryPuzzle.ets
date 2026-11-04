@@ -220,6 +220,10 @@ export struct GBinaryPuzzle {
   private solCells: number[] = [];
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+
+  @State private tvFocus: string = '';
 
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
@@ -749,7 +753,9 @@ export struct GBinaryPuzzle {
               .borderRadius(Radius.sm)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L752'; })
+              .onBlur(() => { if (this.tvFocus === 'L752') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L752'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -776,7 +782,9 @@ export struct GBinaryPuzzle {
           .borderRadius(Radius.md)
           .height(44)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L779'; })
+          .onBlur(() => { if (this.tvFocus === 'L779') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L779'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
@@ -790,7 +798,9 @@ export struct GBinaryPuzzle {
           .layoutWeight(1)
           .height(KEY_H)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L793'; })
+          .onBlur(() => { if (this.tvFocus === 'L793') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L793'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.done || this.finished) { return; } const cells: number[] = this.cells.slice(); for (let i = 0; i < this.diffTotal * this.diffTotal; i++) { if (!this.isFixed(i)) { cells[i] = EMPTY; } } this.cells = cells; this.status = TG('已清空你填的格子'); }); })
           .onClick(() => {
             Haptics.tap();
@@ -818,7 +828,9 @@ export struct GBinaryPuzzle {
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L821'; })
+          .onBlur(() => { if (this.tvFocus === 'L821') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L821'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .onClick(() => {
             this.askAuto();
@@ -832,7 +844,9 @@ export struct GBinaryPuzzle {
           .layoutWeight(1)
           .height(KEY_H)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L835'; })
+          .onBlur(() => { if (this.tvFocus === 'L835') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L835'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -847,7 +861,9 @@ export struct GBinaryPuzzle {
           .layoutWeight(1)
           .height(KEY_H)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L850'; })
+          .onBlur(() => { if (this.tvFocus === 'L850') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L850'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); })
           .onClick(() => {
             Haptics.tap();

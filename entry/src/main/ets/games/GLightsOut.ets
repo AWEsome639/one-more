@@ -51,6 +51,9 @@ export struct GLightsOut {
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -463,7 +466,9 @@ export struct GLightsOut {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L466'; })
+              .onBlur(() => { if (this.tvFocus === 'L466') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L466'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -486,7 +491,9 @@ export struct GLightsOut {
         .borderRadius(Radius.md)
         .height(Cell.of(40))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L489'; })
+        .onBlur(() => { if (this.tvFocus === 'L489') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L489'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         .onClick(() => {
           this.askHint();
@@ -509,7 +516,9 @@ export struct GLightsOut {
         .width('100%')
         .height(Cell.of(44))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L512'; })
+        .onBlur(() => { if (this.tvFocus === 'L512') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L512'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();

@@ -34,6 +34,9 @@ export struct GCorsiBlocks {
 
   // ★ 难度作用到玩法（lives）：LIVES 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -340,7 +343,9 @@ export struct GCorsiBlocks {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L343'; })
+              .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L343'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * 3 + c)); }); })
               .onClick(() => { Haptics.tick(); this.tap((r * 3 + c)); })
             }, (c: number) => 'c' + c)
@@ -357,7 +362,10 @@ export struct GCorsiBlocks {
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L360'; })
+        .onBlur(() => { if (this.tvFocus === 'L360') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L360')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('顺背：长度升到 {0} 即通关',Digits(String(WIN_SPAN), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

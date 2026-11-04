@@ -66,6 +66,9 @@ export struct GSequenceStack {
   /** ★ 2026-10-15 得分跳动 */
   @State private scorePulse: number = 1;
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -335,7 +338,9 @@ export struct GSequenceStack {
           if (this.opts.length > (i)) { this.choose(this.opts[(i)]); }
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L338'; })
+          .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L338'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.opts.length > (i)) { this.choose(this.opts[(i)]); } }); })
         }, (i: number) => 'o' + i)
       }.width('100%')
@@ -348,7 +353,9 @@ export struct GSequenceStack {
           this.askHint();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L351'; })
+        .onBlur(() => { if (this.tvFocus === 'L351') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L351'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
@@ -358,7 +365,9 @@ export struct GSequenceStack {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L361'; })
+        .onBlur(() => { if (this.tvFocus === 'L361') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L361'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：答错不换题，想清楚再点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }

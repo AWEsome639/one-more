@@ -44,6 +44,9 @@ export struct GModuloClock {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -379,7 +382,9 @@ export struct GModuloClock {
             this.pick(i);
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L382'; })
+          .onBlur(() => { if (this.tvFocus === 'L382') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L382'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
         }, (i: number) => 'mc' + i)
       }.width('100%')
@@ -408,7 +413,9 @@ export struct GModuloClock {
           this.reset();
         })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L411'; })
+      .onBlur(() => { if (this.tvFocus === 'L411') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L411'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

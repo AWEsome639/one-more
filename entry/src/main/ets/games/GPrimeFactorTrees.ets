@@ -27,6 +27,9 @@ export struct GPrimeFactorTrees {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -311,7 +314,9 @@ export struct GPrimeFactorTrees {
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(52)).enabled(!this.over && this.rest > 1)
         .onClick(() => { Haptics.tap(); this.tap((p)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L314'; })
+        .onBlur(() => { if (this.tvFocus === 'L314') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L314'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tap((p)); }); }); }, (p: number) => 'p' + p)
       }.width('100%')
       Row({ space: Space.md }) {
@@ -326,13 +331,17 @@ export struct GPrimeFactorTrees {
             this.askHint();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L329'; })
+          .onBlur(() => { if (this.tvFocus === 'L329') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L329'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.cyan)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L335'; })
+          .onBlur(() => { if (this.tvFocus === 'L335') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L335'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Text(TG('质因数连乘起来 = 目标数')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')

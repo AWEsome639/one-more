@@ -39,6 +39,9 @@ export struct GAssociativePairs {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -333,7 +336,9 @@ export struct GAssociativePairs {
       .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L336'; })
+      .onBlur(() => { if (this.tvFocus === 'L336') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L336'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
       .onClick(() => { Haptics.tick(); this.answer((0)); }); Text(this.opts[(1)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
@@ -343,7 +348,9 @@ export struct GAssociativePairs {
       .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L346'; })
+      .onBlur(() => { if (this.tvFocus === 'L346') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L346'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); })
       .onClick(() => { Haptics.tick(); this.answer((1)); }); Text(this.opts[(2)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (2) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
@@ -353,7 +360,9 @@ export struct GAssociativePairs {
       .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L356'; })
+      .onBlur(() => { if (this.tvFocus === 'L356') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L356'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); })
       .onClick(() => { Haptics.tick(); this.answer((2)); }); Text(this.opts[(3)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (3) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center)
@@ -363,7 +372,9 @@ export struct GAssociativePairs {
       .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L366'; })
+      .onBlur(() => { if (this.tvFocus === 'L366') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L366'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((3)); }); })
       .onClick(() => { Haptics.tick(); this.answer((3)); }) }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
@@ -372,7 +383,10 @@ export struct GAssociativePairs {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L375'; })
+        .onBlur(() => { if (this.tvFocus === 'L375') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L375')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG2('用时 {0}s · 连对越长分越高',Digits(String(this.clock), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

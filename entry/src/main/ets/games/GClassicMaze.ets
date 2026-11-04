@@ -58,6 +58,9 @@ export struct GClassicMaze {
   // ★ 难度作用到玩法：棋盘边长（原 N=9；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5, 6, 7, 8]，上面已一并改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -369,27 +372,42 @@ export struct GClassicMaze {
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向上移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(0); }); }).onClick(() => { Haptics.tap(); this.step(0); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L372'; })
+      .onBlur(() => { if (this.tvFocus === 'L372') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L372')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(0); }); }).onClick(() => { Haptics.tap(); this.step(0); })
  Button('↓')
       // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向下移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(2); }); }).onClick(() => { Haptics.tap(); this.step(2); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L378'; })
+      .onBlur(() => { if (this.tvFocus === 'L378') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L378')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(2); }); }).onClick(() => { Haptics.tap(); this.step(2); })
  Button('←')
       // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向左移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(3); }); }).onClick(() => { Haptics.tap(); this.step(3); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L384'; })
+      .onBlur(() => { if (this.tvFocus === 'L384') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L384')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(3); }); }).onClick(() => { Haptics.tap(); this.step(3); })
  Button('→')
       // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向右移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(1); }); }).onClick(() => { Haptics.tap(); this.step(1); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L390'; })
+      .onBlur(() => { if (this.tvFocus === 'L390') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L390')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(1); }); }).onClick(() => { Haptics.tap(); this.step(1); })
  Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L392'; })
+      .onBlur(() => { if (this.tvFocus === 'L392') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L392')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
  }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

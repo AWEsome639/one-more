@@ -31,6 +31,9 @@ export struct GAttentionalBlinkProbe {
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -354,11 +357,17 @@ export struct GAttentionalBlinkProbe {
           Button(TG('有 ✦'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
             .backgroundColor(this.pick === 1 ? Palette.primaryDeep : Palette.sky)
-            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answerProbe(true); }); }).onClick(() => { Haptics.tap(); this.answerProbe(true); })
+            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L357'; })
+            .onBlur(() => { if (this.tvFocus === 'L357') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L357')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answerProbe(true); }); }).onClick(() => { Haptics.tap(); this.answerProbe(true); })
           Button(TG('没有'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
             .backgroundColor(this.pick === 0 ? Palette.primaryDeep : Palette.inkFaint)
-            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answerProbe(false); }); }).onClick(() => { Haptics.tap(); this.answerProbe(false); })
+            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L361'; })
+            .onBlur(() => { if (this.tvFocus === 'L361') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L361')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answerProbe(false); }); }).onClick(() => { Haptics.tap(); this.answerProbe(false); })
         }.width('100%')
       } else {
         Row({ space: Space.sm }) { Text(this.opts[(0)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
@@ -369,7 +378,9 @@ export struct GAttentionalBlinkProbe {
         .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L372'; })
+        .onBlur(() => { if (this.tvFocus === 'L372') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L372'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answerDigit((0)); }); })
         .onClick(() => { Haptics.tick(); this.answerDigit((0)); }); Text(this.opts[(1)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (1) ? '#FFFFFF' : (this.phase === 1 ? this.theme.ink : this.theme.inkFaint))
@@ -379,7 +390,9 @@ export struct GAttentionalBlinkProbe {
         .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L382'; })
+        .onBlur(() => { if (this.tvFocus === 'L382') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L382'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answerDigit((1)); }); })
         .onClick(() => { Haptics.tick(); this.answerDigit((1)); }) }.width('100%')
         Row({ space: Space.sm }) { Text(this.opts[(2)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
@@ -390,7 +403,9 @@ export struct GAttentionalBlinkProbe {
         .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L393'; })
+        .onBlur(() => { if (this.tvFocus === 'L393') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L393'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answerDigit((2)); }); })
         .onClick(() => { Haptics.tick(); this.answerDigit((2)); }); Text(this.opts[(3)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (3) ? '#FFFFFF' : (this.phase === 1 ? this.theme.ink : this.theme.inkFaint))
@@ -400,14 +415,19 @@ export struct GAttentionalBlinkProbe {
         .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L403'; })
+        .onBlur(() => { if (this.tvFocus === 'L403') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L403'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answerDigit((3)); }); })
         .onClick(() => { Haptics.tick(); this.answerDigit((3)); }) }.width('100%')
       }
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L410'; })
+        .onBlur(() => { if (this.tvFocus === 'L410') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L410')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：探针只会出现在数字之后，出现与否各半')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

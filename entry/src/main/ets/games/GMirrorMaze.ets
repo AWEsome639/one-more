@@ -100,6 +100,9 @@ export struct GMirrorMaze {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=6）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -483,7 +486,9 @@ export struct GMirrorMaze {
         .shadow(Shadow.card)
         .onClick(() => { Haptics.tick(); this.tap((3)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L486'; })
+        .onBlur(() => { if (this.tvFocus === 'L486') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L486'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((3)); }); })
         Text(('▲'))
         .fontSize(FontSize.lg)
@@ -496,7 +501,9 @@ export struct GMirrorMaze {
         .shadow(Shadow.card)
         .onClick(() => { Haptics.tick(); this.tap((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L499'; })
+        .onBlur(() => { if (this.tvFocus === 'L499') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L499'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((0)); }); })
         Text(('▼'))
         .fontSize(FontSize.lg)
@@ -509,7 +516,9 @@ export struct GMirrorMaze {
         .shadow(Shadow.card)
         .onClick(() => { Haptics.tick(); this.tap((2)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L512'; })
+        .onBlur(() => { if (this.tvFocus === 'L512') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L512'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((2)); }); })
         Text(('▶'))
         .fontSize(FontSize.lg)
@@ -522,7 +531,9 @@ export struct GMirrorMaze {
         .shadow(Shadow.card)
         .onClick(() => { Haptics.tick(); this.tap((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L525'; })
+        .onBlur(() => { if (this.tvFocus === 'L525') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L525'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((1)); }); })
       }
       .width('100%')
@@ -536,7 +547,9 @@ export struct GMirrorMaze {
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L539'; })
+        .onBlur(() => { if (this.tvFocus === 'L539') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L539'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：走到 🏁 通关 · 步数上限 = 最短路径 + 7'))
         .fontSize(FontSize.xxs)

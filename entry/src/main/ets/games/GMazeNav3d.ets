@@ -34,6 +34,9 @@ export struct GMazeNav3d {
 
   // ★ 难度作用到玩法：迷宫层数（简单 2 / 普通 3 / 困难 4）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -447,7 +450,9 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .enabled(this.pz > 0)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L450'; })
+          .onBlur(() => { if (this.tvFocus === 'L450') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L450'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tryMove(0, 0, -1); }); })
           .onClick(() => {
             Haptics.tap();
@@ -459,7 +464,9 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .enabled(this.pz < this.diffTotal - 1)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L462'; })
+          .onBlur(() => { if (this.tvFocus === 'L462') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L462'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tryMove(0, 0, 1); }); })
           .onClick(() => {
             Haptics.tap();
@@ -479,7 +486,9 @@ export struct GMazeNav3d {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L482'; })
+        .onBlur(() => { if (this.tvFocus === 'L482') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L482'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tryMove((0), (-1), 0); }); })
         .onClick(() => {
         Haptics.tap();
@@ -495,7 +504,9 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L498'; })
+          .onBlur(() => { if (this.tvFocus === 'L498') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L498'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove((-1), (0), 0); }); })
           .onClick(() => {
           Haptics.tick();
@@ -510,7 +521,9 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L513'; })
+          .onBlur(() => { if (this.tvFocus === 'L513') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L513'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove((0), (1), 0); }); })
           .onClick(() => {
           Haptics.tick();
@@ -525,7 +538,9 @@ export struct GMazeNav3d {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L528'; })
+          .onBlur(() => { if (this.tvFocus === 'L528') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L528'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove((1), (0), 0); }); })
           .onClick(() => {
           Haptics.tick();
@@ -540,7 +555,9 @@ export struct GMazeNav3d {
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(44))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L543'; })
+        .onBlur(() => { if (this.tvFocus === 'L543') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L543'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();

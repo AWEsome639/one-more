@@ -41,6 +41,9 @@ export struct GMissingVowels {
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -327,7 +330,9 @@ export struct GMissingVowels {
           .onTouch((e: TouchEvent) => { if (e.type === TouchType.Down) { this.pressed = (i); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; } })
           .onClick(() => { Haptics.tick(); this.tap(VOWELS[(i)]); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L330'; })
+          .onBlur(() => { if (this.tvFocus === 'L330') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L330'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(VOWELS[(i)]); }); })
         }, (i: number) => 'v' + i)
       }.width('100%')
@@ -337,14 +342,18 @@ export struct GMissingVowels {
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
           .onClick(() => { Haptics.tap(); this.back(); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L340'; })
+          .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L340'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.back(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
           .onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L347'; })
+          .onBlur(() => { if (this.tvFocus === 'L347') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L347'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)

@@ -41,6 +41,9 @@ export struct GSetTheoryVenn {
 
   // ★ 难度作用到玩法（size）：原 ROUNDS=8
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -318,7 +321,9 @@ export struct GSetTheoryVenn {
         this.submit((0));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L321'; })
+        .onBlur(() => { if (this.tvFocus === 'L321') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L321'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((0)); }); })
         Button(REGION[(1)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
@@ -331,7 +336,9 @@ export struct GSetTheoryVenn {
         this.submit((1));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L334'; })
+        .onBlur(() => { if (this.tvFocus === 'L334') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L334'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -346,7 +353,9 @@ export struct GSetTheoryVenn {
         this.submit((2));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L349'; })
+        .onBlur(() => { if (this.tvFocus === 'L349') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L349'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((2)); }); })
         Button(REGION[(3)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.pick === (3) ? '#FFFFFF' : this.theme.ink)
@@ -359,7 +368,9 @@ export struct GSetTheoryVenn {
         this.submit((3));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L362'; })
+        .onBlur(() => { if (this.tvFocus === 'L362') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L362'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((3)); }); })
       }.width('100%')
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
@@ -370,7 +381,9 @@ export struct GSetTheoryVenn {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L373'; })
+        .onBlur(() => { if (this.tvFocus === 'L373') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L373'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：先看这个数在不在 A 里，再看在不在 B 里')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }

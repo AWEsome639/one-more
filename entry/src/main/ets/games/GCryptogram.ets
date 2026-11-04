@@ -42,6 +42,9 @@ export struct GCryptogram {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -334,7 +337,9 @@ export struct GCryptogram {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.teal)
           .borderRadius(Radius.md).width(84).height(Cell.of(46)).enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L337'; })
+          .onBlur(() => { if (this.tvFocus === 'L337') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L337'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); })
           .onClick(() => { Haptics.tap(); this.submit(); })
       }
@@ -346,10 +351,16 @@ export struct GCryptogram {
         Button(TG('揭一条映射（-30 分）'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
-          .enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint(); }); }).onClick(() => { Haptics.tap(); this.hint(); })
+          .enabled(!this.over).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L349'; })
+          .onBlur(() => { if (this.tvFocus === 'L349') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L349')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint(); }); }).onClick(() => { Haptics.tap(); this.hint(); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(46)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L352'; })
+          .onBlur(() => { if (this.tvFocus === 'L352') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L352')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }
       .width('100%')
       // ═══ 2026-10-30 · 一次失败的尝试，留档（别再重复）═══

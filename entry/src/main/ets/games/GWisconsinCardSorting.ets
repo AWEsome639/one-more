@@ -32,6 +32,9 @@ export struct GWisconsinCardSorting {
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -303,7 +306,9 @@ export struct GWisconsinCardSorting {
           .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.put((i)); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L306'; })
+          .onBlur(() => { if (this.tvFocus === 'L306') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L306'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put((i)); }); })
         }, (i: number) => 'p' + i)
       }.width('100%')
@@ -314,7 +319,9 @@ export struct GWisconsinCardSorting {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L317'; })
+        .onBlur(() => { if (this.tvFocus === 'L317') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L317'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：规则只认颜色 / 形状 / 数量之一，连对 4 次就换')).fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

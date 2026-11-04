@@ -31,6 +31,9 @@ export struct GLifeGame {
 
   // ★ 难度作用到玩法（size）：GOAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -422,7 +425,9 @@ export struct GLifeGame {
               .backgroundColor(this.cells[(r * G + c)] ? Palette.violet : this.theme.surface)
               .borderRadius(Radius.xs)
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L425'; })
+              .onBlur(() => { if (this.tvFocus === 'L425') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L425'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * G + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -455,7 +460,9 @@ export struct GLifeGame {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L458'; })
+          .onBlur(() => { if (this.tvFocus === 'L458') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L458'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.play(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -468,7 +475,9 @@ export struct GLifeGame {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.running && !this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L471'; })
+          .onBlur(() => { if (this.tvFocus === 'L471') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L471'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -484,7 +493,9 @@ export struct GLifeGame {
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L487'; })
+          .onBlur(() => { if (this.tvFocus === 'L487') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L487'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -497,7 +508,9 @@ export struct GLifeGame {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L500'; })
+          .onBlur(() => { if (this.tvFocus === 'L500') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L500'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.stop(); this.running = false; this.cells = new Array<boolean>(G * G).fill(false); this.aliveN = 0; }); })
           .onClick(() => {
             Haptics.tap();

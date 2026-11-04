@@ -209,6 +209,9 @@ export struct GSudokuHex {
   /** 出题时的完整解 */
   private solCells: number[] = [];
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -639,7 +642,9 @@ export struct GSudokuHex {
               this.tapCell((r * this.diffTotal + c));
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L642'; })
+              .onBlur(() => { if (this.tvFocus === 'L642') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L642'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
@@ -669,7 +674,9 @@ export struct GSudokuHex {
               this.put(v);
             })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L672'; })
+            .onBlur(() => { if (this.tvFocus === 'L672') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L672'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.put(v); }); })
         }, (v: number) => 'n' + v)
       }
@@ -689,7 +696,9 @@ export struct GSudokuHex {
             this.put(0);
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L692'; })
+          .onBlur(() => { if (this.tvFocus === 'L692') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L692'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.put(0); }); })
         Button(TG('提示'))
           .layoutWeight(1)
@@ -702,7 +711,9 @@ export struct GSudokuHex {
           .backgroundColor(Palette.cyan)
           .fontColor('#FFFFFF')
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L705'; })
+          .onBlur(() => { if (this.tvFocus === 'L705') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L705'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(LanRace.isRacing() ? TG('联机禁用')
           : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
@@ -719,7 +730,9 @@ export struct GSudokuHex {
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L722'; })
+          .onBlur(() => { if (this.tvFocus === 'L722') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L722'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
         Button(TG('换一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -734,7 +747,9 @@ export struct GSudokuHex {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L737'; })
+          .onBlur(() => { if (this.tvFocus === 'L737') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L737'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Button(TG('放弃'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -753,7 +768,9 @@ export struct GSudokuHex {
             }
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L756'; })
+          .onBlur(() => { if (this.tvFocus === 'L756') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L756'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.finished) { this.done = true; this.status = TG('已放弃这一局'); this.finish(false); } }); })
       }
       .width('100%')

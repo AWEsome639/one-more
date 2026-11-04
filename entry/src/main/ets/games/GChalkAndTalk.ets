@@ -34,6 +34,9 @@ export struct GChalkAndTalk {
 
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -305,12 +308,18 @@ export struct GChalkAndTalk {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor((true) ? Palette.emerald : Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))
-          .enabled(!this.over && !this.sayLock).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.say((true)); }); }).onClick(() => { Haptics.tap(); this.say((true)); })
+          .enabled(!this.over && !this.sayLock).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L308'; })
+          .onBlur(() => { if (this.tvFocus === 'L308') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L308')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.say((true)); }); }).onClick(() => { Haptics.tap(); this.say((true)); })
           Button((TG('否')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
           .backgroundColor((false) ? Palette.emerald : Palette.rose)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))
-          .enabled(!this.over && !this.sayLock).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.say((false)); }); }).onClick(() => { Haptics.tap(); this.say((false)); })
+          .enabled(!this.over && !this.sayLock).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L313'; })
+          .onBlur(() => { if (this.tvFocus === 'L313') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L313')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.say((false)); }); }).onClick(() => { Haptics.tap(); this.say((false)); })
         }.width('100%')
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Text(TG2("写：光标踩中 ✦ 时落笔　得分 ≥{0} 且落笔 ≥{1} 通关",Digits(String(this.diffTotal), this.langCode), WRITE_MIN)).fontSize(FontSize.xs)
@@ -324,12 +333,18 @@ export struct GChalkAndTalk {
       Button(TG('落笔 ✍️'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(Palette.orange)
         .borderRadius(Radius.md).width('100%').height(Cell.of(56))
-        .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.write(); }); }).onClick(() => { Haptics.tap(); this.write(); })
+        .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L327'; })
+        .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L327')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.write(); }); }).onClick(() => { Haptics.tap(); this.write(); })
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L332'; })
+        .onBlur(() => { if (this.tvFocus === 'L332') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L332')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

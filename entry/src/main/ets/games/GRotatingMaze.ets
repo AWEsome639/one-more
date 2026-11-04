@@ -73,6 +73,9 @@ export struct GRotatingMaze {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=7）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -376,25 +379,33 @@ export struct GRotatingMaze {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surface).borderRadius(Radius.sm).onClick(() => { Haptics.tap(); this.step((3)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L379'; })
+        .onBlur(() => { if (this.tvFocus === 'L379') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L379'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step((3)); }); })
         Button(('↑'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surface).borderRadius(Radius.sm).onClick(() => { Haptics.tap(); this.step((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L385'; })
+        .onBlur(() => { if (this.tvFocus === 'L385') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L385'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step((0)); }); })
         Button(('↓'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surface).borderRadius(Radius.sm).onClick(() => { Haptics.tap(); this.step((2)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L391'; })
+        .onBlur(() => { if (this.tvFocus === 'L391') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L391'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step((2)); }); })
         Button(('→'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(42)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surface).borderRadius(Radius.sm).onClick(() => { Haptics.tap(); this.step((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L397'; })
+        .onBlur(() => { if (this.tvFocus === 'L397') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L397'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step((1)); }); })
       }.width('100%')
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
@@ -402,7 +413,9 @@ export struct GRotatingMaze {
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L405'; })
+        .onBlur(() => { if (this.tvFocus === 'L405') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L405'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

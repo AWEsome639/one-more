@@ -26,6 +26,9 @@ export struct GSdmt {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -292,7 +295,9 @@ export struct GSdmt {
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => { Haptics.tick(); this.keyTap((d)); })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L295'; })
+            .onBlur(() => { if (this.tvFocus === 'L295') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L295'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.keyTap((d)); }); })
           }, (d: number) => 'k' + d)
         }.width('100%')
@@ -305,7 +310,9 @@ export struct GSdmt {
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => { Haptics.tick(); this.keyTap((d)); })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L308'; })
+            .onBlur(() => { if (this.tvFocus === 'L308') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L308'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.keyTap((d)); }); })
           }, (d: number) => 'k' + d)
         }.width('100%')
@@ -318,7 +325,9 @@ export struct GSdmt {
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => { Haptics.tick(); this.keyTap((d)); })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L321'; })
+            .onBlur(() => { if (this.tvFocus === 'L321') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L321'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.keyTap((d)); }); })
           }, (d: number) => 'k' + d)
         }.width('100%')
@@ -330,7 +339,9 @@ export struct GSdmt {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L333'; })
+        .onBlur(() => { if (this.tvFocus === 'L333') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L333'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：90 秒内答对 ≥ 25 个通关（答错只影响分数）'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')

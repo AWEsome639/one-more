@@ -35,6 +35,9 @@ export struct GOddOneOut {
 
   // ★ 难度作用到玩法（size）：原 ROUNDS=10
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -328,7 +331,9 @@ export struct GOddOneOut {
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .onClick(() => { Haptics.tick(); this.tap((r * 3 + c)); })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L331'; })
+              .onBlur(() => { if (this.tvFocus === 'L331') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L331'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * 3 + c)); }); })
             }, (c: number) => 'c' + c)
           }
@@ -351,7 +356,9 @@ export struct GOddOneOut {
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L354'; })
+        .onBlur(() => { if (this.tvFocus === 'L354') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L354'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：10 题答对 ≥ 8 题 · 6→9→12 格逐轮变难'))
         .fontSize(FontSize.xxs)

@@ -204,6 +204,10 @@ export struct GAlphabetSudoku {
   private solCells: number[] = [];
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+
+  @State private tvFocus: string = '';
 
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
@@ -663,7 +667,9 @@ export struct GAlphabetSudoku {
               .scale({ x: this.sel === (r * this.diffTotal + c) ? 1.06 : 1, y: this.sel === (r * this.diffTotal + c) ? 1.06 : 1 })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L666'; })
+              .onBlur(() => { if (this.tvFocus === 'L666') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L666'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -693,7 +699,9 @@ export struct GAlphabetSudoku {
             .layoutWeight(1)
             .height(KEY_H)
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L696'; })
+            .onBlur(() => { if (this.tvFocus === 'L696') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L696'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.put(k + 1); }); })
             .onClick(() => {
               Haptics.tap();
@@ -712,7 +720,9 @@ export struct GAlphabetSudoku {
           .layoutWeight(1)
           .height(44)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L715'; })
+          .onBlur(() => { if (this.tvFocus === 'L715') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L715'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
@@ -726,7 +736,9 @@ export struct GAlphabetSudoku {
           .layoutWeight(1)
           .height(KEY_H)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L729'; })
+          .onBlur(() => { if (this.tvFocus === 'L729') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L729'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.put(0); }); })
           .onClick(() => {
             Haptics.tap();
@@ -744,7 +756,9 @@ export struct GAlphabetSudoku {
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L747'; })
+          .onBlur(() => { if (this.tvFocus === 'L747') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L747'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .onClick(() => {
             this.askAuto();
@@ -758,7 +772,9 @@ export struct GAlphabetSudoku {
           .layoutWeight(1)
           .height(KEY_H)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L761'; })
+          .onBlur(() => { if (this.tvFocus === 'L761') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L761'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -773,7 +789,9 @@ export struct GAlphabetSudoku {
           .layoutWeight(1)
           .height(KEY_H)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L776'; })
+          .onBlur(() => { if (this.tvFocus === 'L776') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L776'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.finished) { this.done = true; this.status = TG('已放弃这一局'); this.finish(false); } }); })
           .onClick(() => {
             Haptics.tap();

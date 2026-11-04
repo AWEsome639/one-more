@@ -45,6 +45,9 @@ export struct GWordLadderStep {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -330,7 +333,9 @@ export struct GWordLadderStep {
       Column({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => { Text(this.opts.length > (i) ? this.opts[(i)].text : '').fontSize(FontSize.xl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.opts.length > (i) && this.picked >= 0 && ((i) === this.picked || this.opts[(i)].ok) ? '#FFFFFF' : this.theme.ink).width('100%').height(Cell.of(52)).backgroundColor(this.toneOf((i))).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((i)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L333'; })
+        .onBlur(() => { if (this.tvFocus === 'L333') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L333'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); }) }, (i: number) => 'o' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
@@ -340,7 +345,9 @@ export struct GWordLadderStep {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L343'; })
+      .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L343'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：选「改一个字母就是真词」的那个；另外三个其实不是单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

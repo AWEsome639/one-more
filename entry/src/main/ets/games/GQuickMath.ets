@@ -62,6 +62,9 @@ export struct GQuickMath {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -340,7 +343,9 @@ export struct GQuickMath {
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
         .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L343'; })
+        .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L343'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.choose(this.opts[(i)]); }); }); }, (i: number) => 'a' + i)
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -349,7 +354,9 @@ export struct GQuickMath {
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
         .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L352'; })
+        .onBlur(() => { if (this.tvFocus === 'L352') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L352'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.choose(this.opts[(i)]); }); }); }, (i: number) => 'b' + i)
       }.width('100%')
       Row({ space: Space.md }) {
@@ -357,7 +364,9 @@ export struct GQuickMath {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
           .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L360'; })
+          .onBlur(() => { if (this.tvFocus === 'L360') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L360'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Text(TG('连击越高分越多')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')

@@ -28,6 +28,9 @@ export struct GBlinkDetector {
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -330,14 +333,19 @@ export struct GBlinkDetector {
 
       Button(TG('眨眼了！'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF').backgroundColor(Palette.teal)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(64)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tap(); }); }).onClick(() => { Haptics.tap(); this.tap(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(64)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L333'; })
+        .onBlur(() => { if (this.tvFocus === 'L333') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L333')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tap(); }); }).onClick(() => { Haptics.tap(); this.tap(); })
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L340'; })
+        .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L340'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 

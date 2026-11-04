@@ -50,6 +50,9 @@ export struct GUnitConverterPro {
 
   // ★ 难度作用到玩法（size）：原 ROUNDS=10
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -326,7 +329,9 @@ export struct GUnitConverterPro {
         this.submit((0));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L329'; })
+        .onBlur(() => { if (this.tvFocus === 'L329') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L329'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((0)); }); })
         Button(this.opts.length > (1) ? this.opts[(1)] : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
@@ -339,7 +344,9 @@ export struct GUnitConverterPro {
         this.submit((1));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L342'; })
+        .onBlur(() => { if (this.tvFocus === 'L342') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L342'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -354,7 +361,9 @@ export struct GUnitConverterPro {
         this.submit((2));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L357'; })
+        .onBlur(() => { if (this.tvFocus === 'L357') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L357'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((2)); }); })
         Button(this.opts.length > (3) ? this.opts[(3)] : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
@@ -367,7 +376,9 @@ export struct GUnitConverterPro {
         this.submit((3));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L370'; })
+        .onBlur(() => { if (this.tvFocus === 'L370') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L370'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((3)); }); })
       }.width('100%')
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
@@ -378,7 +389,9 @@ export struct GUnitConverterPro {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L381'; })
+        .onBlur(() => { if (this.tvFocus === 'L381') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L381'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：长度 10 进、数据 1024 进、时间 60 进')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }

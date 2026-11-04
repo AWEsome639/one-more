@@ -65,6 +65,9 @@ export struct GFlappy {
 
   // ★ 难度作用到玩法（time）：原 TICK_MS=33
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -633,7 +636,9 @@ export struct GFlappy {
       .clip(true)
       .shadow(Shadow.card)
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L636'; })
+      .onBlur(() => { if (this.tvFocus === 'L636') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L636'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.flap(); }); })
       .onClick(() => {
         Haptics.tick();
@@ -655,7 +660,9 @@ export struct GFlappy {
           .height(Cell.of(52))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L658'; })
+          .onBlur(() => { if (this.tvFocus === 'L658') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L658'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.flap(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -670,7 +677,9 @@ export struct GFlappy {
           .layoutWeight(1)
           .height(Cell.of(52))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L673'; })
+          .onBlur(() => { if (this.tvFocus === 'L673') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L673'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();

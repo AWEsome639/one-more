@@ -25,6 +25,9 @@ export struct GBinaryMatrixRankAll {
   // ★ 难度作用到玩法：棋盘边长（原 N=6；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5]，上面已一并改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -288,7 +291,9 @@ export struct GBinaryMatrixRankAll {
           .width('100%').borderRadius(Radius.xs)
           .borderWidth(this.sel === (r) ? 2 : 0).borderColor(Palette.amber)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L291'; })
+          .onBlur(() => { if (this.tvFocus === 'L291') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L291'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapRow((r)); }); })
           .onClick(() => { Haptics.tick(); this.tapRow((r)); })
         }, (r: number) => 'mr' + r)
@@ -302,7 +307,10 @@ export struct GBinaryMatrixRankAll {
           .backgroundColor(this.picked < 0 ? this.theme.surface
           : ((v) === this.realRank ? Palette.emerald : ((v) === this.picked ? Palette.rose : this.theme.surface)))
           .borderRadius(Radius.sm).shadow(Shadow.card)
-          .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((v)); }); }).onClick(() => { Haptics.tick(); this.pick((v)); })
+          .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L305'; })
+          .onBlur(() => { if (this.tvFocus === 'L305') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L305')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((v)); }); }).onClick(() => { Haptics.tick(); this.pick((v)); })
         }, (v: number) => 'op' + v)
       }
       .width('100%')
@@ -320,7 +328,10 @@ export struct GBinaryMatrixRankAll {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L323'; })
+        .onBlur(() => { if (this.tvFocus === 'L323') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L323')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：秩 = 行阶梯里非零行的行数；异或两次等于没做，点错就再点一遍那两行'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

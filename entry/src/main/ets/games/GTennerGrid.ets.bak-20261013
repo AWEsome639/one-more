@@ -1,0 +1,311 @@
+/**
+ * 十格 tenner_grid（10×10）—— 每行每列都要恰好含 0~9 各一次（拉丁方）
+ *
+ * 操作：点空格选中 → 点数字键盘填入（再点同一个数字 = 擦掉）
+ * 胜负：填满 100 格且无冲突 ⇒ 通关；冲突 3 次 ⇒ 失败（冲突的数不会落盘）
+ * 进度：已填 x/100 ／ 冲突 x/3 ／ 得分
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const N: number = 10;
+const CELLS: number = N * N;
+const ERR_MAX: number = 3;
+const GIVEN_RATE: number = 0.7;
+
+function shuffled(n: number): number[] {
+  const a: number[] = [];
+  for (let i = 0; i < n; i++) {
+    a.push(i);
+  }
+  for (let i = n - 1; i > 0; i--) {
+    const j: number = Math.floor(Math.random() * (i + 1));
+    const t: number = a[i];
+    a[i] = a[j];
+    a[j] = t;
+  }
+  return a;
+}
+
+@Component
+export struct GTennerGrid {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法：棋盘边长（原 N=10；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
+  //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]，上面已一并改成按尺寸生成
+  @State private diffTotal: number = GameDiff.sizeNow(10);
+
+  /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
+  private rowIdx(): number[] {
+    const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const a2: number[] = [];
+    for (let i2 = 0; i2 < n2; i2++) { a2.push(i2); }
+    return a2;
+  }
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State grid: number[] = [];
+  @State fixed: number[] = [];
+  @State sel: number = -1;
+  @State errors: number = 0;
+  @State placed: number = 0;
+  @State over: boolean = false;
+  @State won: boolean = false;
+  @State score: number = 0;
+
+  private startAt: number = 0;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now();
+    this.reset();
+  }
+
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(10);
+    this.reset();
+  }
+
+  private reset(): void {
+    const rp: number[] = shuffled(this.diffTotal);
+    const cp: number[] = shuffled(this.diffTotal);
+    const vp: number[] = shuffled(this.diffTotal);
+    const sol: number[] = new Array<number>(CELLS).fill(0);
+    for (let i = 0; i < this.diffTotal; i++) {
+      for (let j = 0; j < this.diffTotal; j++) {
+        sol[rp[i] * this.diffTotal + cp[j]] = vp[(i + j) % this.diffTotal];
+      }
+    }
+    const grid: number[] = new Array<number>(CELLS).fill(-1);
+    const fixed: number[] = new Array<number>(CELLS).fill(0);
+    let givens: number = 0;
+    for (let i = 0; i < CELLS; i++) {
+      if (Math.random() < GIVEN_RATE) {
+        grid[i] = sol[i];
+        fixed[i] = 1;
+        givens++;
+      }
+    }
+    let guard: number = 0;
+    while (givens < 55 && guard < 400) {
+      guard++;
+      const i: number = Math.floor(Math.random() * CELLS);
+      if (fixed[i] === 0) {
+        grid[i] = sol[i];
+        fixed[i] = 1;
+        givens++;
+      }
+    }
+    this.grid = grid;
+    this.fixed = fixed;
+    this.sel = -1;
+    this.errors = 0;
+    this.placed = givens;
+    this.over = false;
+    this.won = false;
+    this.score = 0;
+    this.startAt = Date.now();
+  }
+
+  /** 行/列里是否已经有这个数字 */
+  private conflict(idx: number, d: number): boolean {
+    const r: number = Math.floor(idx / this.diffTotal);
+    const c: number = idx % this.diffTotal;
+    for (let k = 0; k < this.diffTotal; k++) {
+      if (k !== c && this.grid[r * this.diffTotal + k] === d) {
+        return true;
+      }
+      if (k !== r && this.grid[k * this.diffTotal + c] === d) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private place(d: number): void {
+    if (this.over || this.sel < 0) {
+      return;
+    }
+    const idx: number = this.sel;
+    if (this.fixed[idx] === 1) {
+      return;
+    }
+    const next: number[] = this.grid.slice();
+    if (next[idx] === d) {
+      next[idx] = -1;                 // 再点一次同一个数字 = 擦掉
+      this.grid = next;
+      this.placed--;
+      return;
+    }
+    if (this.conflict(idx, d)) {
+      this.errors++;
+      if (this.errors >= ERR_MAX) {
+        this.over = true;
+        this.won = false;
+        this.score = 0;
+        this.finish(false);
+      }
+      return;
+    }
+    const was: number = next[idx];
+    next[idx] = d;
+    this.grid = next;
+    this.placed += was < 0 ? 1 : 0;
+    if (this.placed === CELLS) {
+      this.over = true;
+      this.won = true;
+      const sec: number = Math.floor((Date.now() - this.startAt) / 1000);
+      this.score = Math.max(80, 620 - this.errors * 90 - sec);
+      this.finish(true);
+    }
+  }
+
+  private finish(solved: boolean): void {
+    const r: GameResult = {
+      gameId: 'tenner_grid',
+      solved: solved,
+      score: this.score,
+      durationMs: Date.now() - this.startAt,
+      levelReached: this.placed
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  private tip(): string {
+    if (this.over) {
+      return this.won ? '整盘排好 🎉 得分 ' + String(this.score) : '冲突太多，本局失败';
+    }
+    return this.sel < 0 ? '先点一个空格，再点下面数字' : '已选中第 ' + String(Math.floor(this.sel / this.diffTotal) + 1) + ' 行';
+  }
+
+  build() {
+    Column({ space: Space.sm }) {
+      Row({ space: Space.sm }) {
+        this.statBox(TG('已填'), String(this.placed) + '/' + String(CELLS))
+        this.statBox('冲突', String(this.errors) + '/' + String(ERR_MAX))
+        this.statBox(TG('得分'), String(this.score))
+      }
+      .width('100%')
+
+      Column({ space: Space.xs }) {
+        ForEach(this.rowIdx(), (r: number) => {
+          Row({ space: Space.xs }) {
+            ForEach(this.rowIdx(), (c: number) => {
+              this.cell(r * this.diffTotal + c)
+            }, (c: number) => 'c' + c)
+          }
+          .width('100%')
+        }, (r: number) => 'r' + r)
+      }
+      .width('100%')
+
+      Column({ space: Space.xs }) {
+        Row({ space: Space.xs }) {
+          ForEach([0, 1, 2, 3, 4], (d: number) => {
+            this.padBtn(d)
+          }, (d: number) => 'd' + d)
+        }
+        .width('100%')
+        Row({ space: Space.xs }) {
+          ForEach([5, 6, 7, 8, 9], (d: number) => {
+            this.padBtn(d)
+          }, (d: number) => 'e' + d)
+        }
+        .width('100%')
+      }
+      .width('100%')
+
+      Text(this.tip())
+        .fontSize(FontSize.xs)
+        .fontColor(this.over
+          ? (this.won ? Palette.emerald : Palette.rose)
+          : this.theme.inkSoft)
+        .width('100%')
+
+      Row({ space: Space.md }) {
+        Button(TG('重开'))
+          .fontSize(FontSize.md)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.berry)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(44)
+          .onClick(() => {
+            this.reset();
+          })
+      }
+      .width('100%')
+
+      Text('每行每列都要有 0~9 各一次；灰底是题目给的数')
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  statBox(label: string, value: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value)
+        .fontSize(FontSize.md)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+    }
+    .layoutWeight(1)
+    .padding(Space.xs)
+    .backgroundColor(this.theme.surface)
+    .borderRadius(Radius.sm)
+    .shadow(Shadow.card)
+  }
+
+  @Builder
+  cell(i: number) {
+    Stack() {
+      Text(this.grid[i] < 0 ? '' : String(this.grid[i]))
+        .fontSize(FontSize.xxs)
+        .fontWeight(this.fixed[i] === 1 ? FontWeight.Bold : FontWeight.Normal)
+        .fontColor(this.grid[i] < 0 ? this.theme.inkFaint : this.theme.ink)
+    }
+    .layoutWeight(1)
+    .aspectRatio(1)
+    .backgroundColor(this.fixed[i] === 1 ? this.theme.surfaceAlt : this.theme.surface)
+    .borderRadius(Radius.xs)
+    .border({
+      width: this.sel === i ? 2 : 1,
+      color: this.sel === i ? Palette.violet : this.theme.line
+    })
+    .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .onClick(() => {
+      if (this.over) {
+        return;
+      }
+      this.sel = i;
+    })
+  }
+
+  @Builder
+  padBtn(d: number) {
+    Text(String(d))
+      .fontSize(FontSize.md)
+      .fontWeight(FontWeight.Bold)
+      .fontColor(this.theme.ink)
+      .textAlign(TextAlign.Center)
+      .layoutWeight(1)
+      .height(38)
+      .backgroundColor(this.theme.surface)
+      .borderRadius(Radius.sm)
+      .shadow(Shadow.card)
+      .onClick(() => {
+        this.place(d);
+      })
+  }
+}

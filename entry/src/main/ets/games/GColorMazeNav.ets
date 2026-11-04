@@ -70,6 +70,9 @@ export struct GColorMazeNav {
   // ★ 难度作用到玩法：棋盘边长（原 N=6；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4, 5]，上面已一并改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -348,7 +351,10 @@ export struct GColorMazeNav {
    .textShadow(A11y.glyphShadow())
  Text(this.pos === r * this.diffTotal + c ? '🔵' : (r * this.diffTotal + c === this.goal ? '🏁' : '')).fontSize(FontSize.md)
  }
- }.layoutWeight(1).height(Cell.of(44)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); }); }).onClick(() => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); })
+ }.layoutWeight(1).height(Cell.of(44)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+ .onFocus(() => { this.tvFocus = 'L351'; })
+ .onBlur(() => { if (this.tvFocus === 'L351') { this.tvFocus = ''; } })
+ .outline(Tv.focusOutline(this.tvFocus === 'L351')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); }); }).onClick(() => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); })
  }, (c: number) => 'c' + c) }.width('100%')
  }, (r: number) => 'r' + r)
  }.width('100%').gesture(
@@ -370,27 +376,42 @@ export struct GColorMazeNav {
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向上移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(-1, 0); }); }).onClick(() => { Haptics.tap(); this.go(-1, 0); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L373'; })
+      .onBlur(() => { if (this.tvFocus === 'L373') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L373')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(-1, 0); }); }).onClick(() => { Haptics.tap(); this.go(-1, 0); })
  Button('↓')
       // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向下移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(1, 0); }); }).onClick(() => { Haptics.tap(); this.go(1, 0); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L379'; })
+      .onBlur(() => { if (this.tvFocus === 'L379') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L379')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(1, 0); }); }).onClick(() => { Haptics.tap(); this.go(1, 0); })
  Button('←')
       // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向左移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(0, -1); }); }).onClick(() => { Haptics.tap(); this.go(0, -1); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L385'; })
+      .onBlur(() => { if (this.tvFocus === 'L385') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L385')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(0, -1); }); }).onClick(() => { Haptics.tap(); this.go(0, -1); })
  Button('→')
       // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向右移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(0, 1); }); }).onClick(() => { Haptics.tap(); this.go(0, 1); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L391'; })
+      .onBlur(() => { if (this.tvFocus === 'L391') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L391')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(0, 1); }); }).onClick(() => { Haptics.tap(); this.go(0, 1); })
  Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.sm).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L393'; })
+      .onBlur(() => { if (this.tvFocus === 'L393') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L393')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
  }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

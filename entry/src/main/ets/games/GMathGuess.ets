@@ -29,6 +29,9 @@ export struct GMathGuess {
 
   // ★ 难度作用到玩法（lives）：原 MAX_TRIES=7，按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -291,19 +294,31 @@ export struct GMathGuess {
       Row({ space: Space.sm }) {
         Button('−1')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nudge(-1); }); }).onClick(() => { Haptics.tap(); this.nudge(-1); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L294'; })
+          .onBlur(() => { if (this.tvFocus === 'L294') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L294')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nudge(-1); }); }).onClick(() => { Haptics.tap(); this.nudge(-1); })
         Button(TG('中位'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.violet)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nudge(0); }); }).onClick(() => { Haptics.tap(); this.nudge(0); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L297'; })
+          .onBlur(() => { if (this.tvFocus === 'L297') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L297')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nudge(0); }); }).onClick(() => { Haptics.tap(); this.nudge(0); })
         Button('+1')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nudge(1); }); }).onClick(() => { Haptics.tap(); this.nudge(1); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L300'; })
+          .onBlur(() => { if (this.tvFocus === 'L300') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L300')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nudge(1); }); }).onClick(() => { Haptics.tap(); this.nudge(1); })
       }.width('100%')
       Button(TG2('就猜 {0}', Math.round(this.guess)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
         .borderRadius(Radius.md).width('100%').height(Cell.of(48))
-        .enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); }).onClick(() => { Haptics.tap(); this.submit(); })
+        .enabled(!this.over).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L306'; })
+        .onBlur(() => { if (this.tvFocus === 'L306') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L306')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); }).onClick(() => { Haptics.tap(); this.submit(); })
       Text(this.recentText())
         .fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%')
         .padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
@@ -312,7 +327,10 @@ export struct GMathGuess {
           .fontSize(FontSize.xs).fontColor(this.theme.inkFaint).layoutWeight(1)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L315'; })
+          .onBlur(() => { if (this.tvFocus === 'L315') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L315')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .onTouch((e: TouchEvent) => {

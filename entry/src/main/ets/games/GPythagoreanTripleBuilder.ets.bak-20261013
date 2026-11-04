@@ -1,0 +1,176 @@
+/** 勾股数 —— 构造勾股三元组｜6 关解出 5 关过关 */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const LEVELS: number = 6;
+const PASS: number = 5;
+
+interface Tri { a: number; b: number; c: number }
+
+const TRIPLES: Tri[] = [
+  { a: 3, b: 4, c: 5 }, { a: 5, b: 12, c: 13 }, { a: 6, b: 8, c: 10 },
+  { a: 7, b: 24, c: 25 }, { a: 8, b: 15, c: 17 }, { a: 9, b: 12, c: 15 },
+  { a: 9, b: 40, c: 41 }, { a: 12, b: 16, c: 20 }, { a: 15, b: 20, c: 25 },
+  { a: 20, b: 21, c: 29 }, { a: 10, b: 24, c: 26 }, { a: 18, b: 24, c: 30 }
+];
+
+@Component
+export struct GPythagoreanTripleBuilder {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(LEVELS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State private ask: string = '';
+  @State private ans: number = 5;
+  @State private typed: string = '';
+  @State private level: number = 0;
+  @State private clears: number = 0;
+  @State private miss: number = 0;
+  @State private score: number = 0;
+  @State private over: boolean = false;
+  @State private tip: string = '';
+  private startAt: number = 0;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now();
+    this.reset();
+  }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(LEVELS);
+     this.reset(); }
+
+  private reset(): void {
+    this.startAt = Date.now();
+    this.level = 0;
+    this.clears = 0;
+    this.score = 0;
+    this.over = false;
+    this.load();
+  }
+
+  private load(): void {
+    const t: Tri = TRIPLES[Math.floor(Math.random() * TRIPLES.length)];
+    const flip: boolean = Math.random() < 0.5;
+    const ax: number = flip ? t.b : t.a;
+    const bx: number = flip ? t.a : t.b;
+    if (Math.random() < 0.5) {
+      this.ask = '两条直角边 ' + String(ax) + TG(' 与 ') + String(bx) + '，斜边 = ?';
+      this.ans = t.c;
+    } else {
+      this.ask = '斜边 ' + String(t.c) + '，一条直角边 ' + String(ax) + '，另一边 = ?';
+      this.ans = bx;
+    }
+    this.typed = '';
+    this.miss = 0;
+    this.tip = 'a² + b² = c²，输入整数后点确认';
+  }
+
+  private typedValue(): number {
+    let v: number = 0;
+    for (let i = 0; i < this.typed.length; i++) { v = v * 10 + (this.typed.charCodeAt(i) - 48); }
+    return v;
+  }
+
+  private pickKey(s: string): void {
+    if (this.over) { return; }
+    if (s === '⌫') {
+      this.typed = this.typed.length > 0 ? this.typed.substring(0, this.typed.length - 1) : '';
+      return;
+    }
+    if (s === TG('确认')) { this.submit(); return; }
+    if (this.typed.length < 3) { this.typed = this.typed + s; }
+  }
+
+  private submit(): void {
+    if (this.typed.length === 0) { this.tip = '先输入一个数'; return; }
+    const v: number = this.typedValue();
+    if (v === this.ans) {
+      this.clears++;
+      this.score += 14;
+      this.next('✓ 正是 ' + String(this.ans));
+      return;
+    }
+    this.miss++;
+    this.score -= 3;
+    if (this.miss >= 2) { this.next('✗ 正确答案是 ' + String(this.ans)); return; }
+    this.tip = String(v) + ' 不对，再算一次（a² + b² = c²）';
+    this.typed = '';
+  }
+
+  private next(msg: string): void {
+    this.level++;
+    if (this.level >= this.diffTotal) {
+      this.over = true;
+      this.tip = msg + '｜共解出 ' + String(this.clears) + '/' + String(this.diffTotal) + TG(' 关');
+      const res: GameResult = {
+        gameId: 'pythagorean_triple_builder', solved: this.clears >= PASS,
+        score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.clears
+      };
+      LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+      this.onFinish(res);
+      return;
+    }
+    this.load();
+    this.tip = msg + '，第 ' + String(this.level + 1) + TG(' 关');
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat(TG('关卡'), String(Math.min(this.level + 1, this.diffTotal)) + '/' + String(this.diffTotal))
+        this.stat('已解出', String(this.clears))
+        this.stat(TG('答错'), String(this.miss))
+      }.width('100%')
+      Column({ space: Space.sm }) {
+        Text(this.ask).fontSize(FontSize.lg).fontColor(this.theme.ink).textAlign(TextAlign.Center).width('100%')
+        Text(this.typed.length > 0 ? this.typed : '?')
+          .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.berry)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
+      .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+      Column({ space: Space.xs }) {
+        this.padRow('1', '2', '3')
+        this.padRow('4', '5', '6')
+        this.padRow('7', '8', '9')
+        this.padRow('⌫', '0', TG('确认'))
+      }.width('100%')
+      Row({ space: Space.md }) {
+        Button(TG('重开')).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.berry)
+          .borderRadius(Radius.md).width(120).height(44).onClick(() => { this.reset(); })
+        Text('背熟的勾股数：3-4-5、5-12-13、8-15-17').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      }.width('100%')
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  stat(label: string, value: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+    }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
+  }
+
+  @Builder
+  padRow(a: string, b: string, c: string) {
+    Row({ space: Space.xs }) {
+      this.padBtn(a)
+      this.padBtn(b)
+      this.padBtn(c)
+    }.width('100%')
+  }
+
+  @Builder
+  padBtn(s: string) {
+    Button(s).fontSize(s === TG('确认') ? FontSize.md : FontSize.xl)
+      .fontColor(s === TG('确认') ? '#FFFFFF' : this.theme.ink)
+      .backgroundColor(s === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
+      .borderRadius(Radius.md).layoutWeight(1).height(48).enabled(!this.over)
+      .onClick(() => { this.pickKey(s); })
+  }
+}

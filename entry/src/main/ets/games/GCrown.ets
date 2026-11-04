@@ -122,6 +122,9 @@ export struct GCrown {
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -589,7 +592,9 @@ export struct GCrown {
               }
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L592'; })
+              .onBlur(() => { if (this.tvFocus === 'L592') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L592'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -616,7 +621,9 @@ export struct GCrown {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L619'; })
+        .onBlur(() => { if (this.tvFocus === 'L619') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L619'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.mode = (1); }); })
         .onClick(() => {
         Haptics.tick();
@@ -632,7 +639,9 @@ export struct GCrown {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L635'; })
+        .onBlur(() => { if (this.tvFocus === 'L635') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L635'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.mode = (2); }); })
         .onClick(() => {
         Haptics.tick();
@@ -646,7 +655,9 @@ export struct GCrown {
           .layoutWeight(1)
           .height(44)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L649'; })
+          .onBlur(() => { if (this.tvFocus === 'L649') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L649'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
@@ -660,7 +671,9 @@ export struct GCrown {
           .width(88)
           .height(Cell.of(44))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L663'; })
+          .onBlur(() => { if (this.tvFocus === 'L663') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L663'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();

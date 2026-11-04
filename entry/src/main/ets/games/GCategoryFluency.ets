@@ -40,6 +40,9 @@ export struct GCategoryFluency {
 
   // ★ 难度作用到玩法（time）：LIMIT_S 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -320,7 +323,10 @@ export struct GCategoryFluency {
         Button(TG('提交'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.lime)
           .borderRadius(Radius.md).width(84).height(Cell.of(46))
-          .enabled(!this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); }).onClick(() => { Haptics.tap(); this.submit(); })
+          .enabled(!this.over).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L323'; })
+          .onBlur(() => { if (this.tvFocus === 'L323') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L323')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); }).onClick(() => { Haptics.tap(); this.submit(); })
       }.width('100%')
       Text(this.used.length > 0 ? this.used.join(' · ') : TG('（还没列出来）'))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
@@ -332,12 +338,17 @@ export struct GCategoryFluency {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L335'; })
+          .onBlur(() => { if (this.tvFocus === 'L335') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L335'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nextCat(); }); })
           .onClick(() => { Haptics.tap(); this.nextCat(); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L340'; })
+          .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L340')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(TG2('提示：每类 {0} 秒，共列 {1} 个有效词即通关（词库有限，常见词优先）',Digits(String(this.diffTotal), this.langCode), PASS))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

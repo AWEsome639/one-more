@@ -31,6 +31,9 @@ export struct GGridDisplacement {
 
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -288,7 +291,10 @@ export struct GGridDisplacement {
         Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L291'; })
+          .onBlur(() => { if (this.tvFocus === 'L291') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L291')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(TG('🚩 是起点，点你心里算出来的落点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
@@ -308,7 +314,9 @@ export struct GGridDisplacement {
     .backgroundColor(cell === this.startPos ? Palette.violet : this.theme.line)
     .borderRadius(Radius.sm).animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L311'; })
+    .onBlur(() => { if (this.tvFocus === 'L311') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L311'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(cell); }); })
     .onClick(() => { Haptics.tick(); this.tap(cell); })
   }

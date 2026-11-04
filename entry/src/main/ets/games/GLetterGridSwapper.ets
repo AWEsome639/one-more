@@ -35,6 +35,9 @@ export struct GLetterGridSwapper {
   // ★ 难度作用到玩法：棋盘边长（原 N=3；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2]，上面已一并改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -306,7 +309,9 @@ export struct GLetterGridSwapper {
               if (e.type === TouchType.Down) { this.pressed = (r * this.diffTotal + c); } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; }
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L309'; })
+              .onBlur(() => { if (this.tvFocus === 'L309') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L309'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               .onClick(() => { Haptics.tick(); this.tap((r * this.diffTotal + c)); })
             }, (c: number) => 'c' + c)
@@ -322,7 +327,9 @@ export struct GLetterGridSwapper {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L325'; })
+        .onBlur(() => { if (this.tvFocus === 'L325') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L325'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：按行从左到右读，读出来就是目标单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -66,6 +66,9 @@ export struct GTangram {
    *   难度改到**步数上限**上（上限越少越难）—— 这本来就是这款游戏的压力来源。
    */
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -377,7 +380,9 @@ export struct GTangram {
           if (this.pieceAt.indexOf((p)) < 0 && !this.over) { this.sel = this.sel === (p) ? -1 : (p); }
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L380'; })
+          .onBlur(() => { if (this.tvFocus === 'L380') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L380'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (this.pieceAt.indexOf((p)) < 0 && !this.over) { this.sel = this.sel === (p) ? -1 : (p); } }); })
         }, (p: number) => 'p' + p)
       }.width('100%')
@@ -392,7 +397,9 @@ export struct GTangram {
               : (this.target[(r * this.boardN + c)] === 1 ? (this.theme.isDark ? '#220EA5E9' : '#330EA5E9') : this.theme.surfaceAlt))
               .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * this.boardN + c)); })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L395'; })
+              .onBlur(() => { if (this.tvFocus === 'L395') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L395'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.boardN + c)); }); })
             }, (c: number) => 'c' + r + '_' + c)
           }.width('100%').layoutWeight(1)
@@ -411,7 +418,9 @@ export struct GTangram {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L414'; })
+        .onBlur(() => { if (this.tvFocus === 'L414') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L414'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

@@ -25,6 +25,9 @@ export struct GVectorGridAlignment {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=5）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -339,7 +342,9 @@ export struct GVectorGridAlignment {
         this.move((-1), (0));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L342'; })
+        .onBlur(() => { if (this.tvFocus === 'L342') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L342'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.move((-1), (0)); }); })
         Button(('↑'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
@@ -349,7 +354,9 @@ export struct GVectorGridAlignment {
         this.move((0), (-1));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L352'; })
+        .onBlur(() => { if (this.tvFocus === 'L352') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L352'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.move((0), (-1)); }); })
         Button(('↓'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
@@ -359,7 +366,9 @@ export struct GVectorGridAlignment {
         this.move((0), (1));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L362'; })
+        .onBlur(() => { if (this.tvFocus === 'L362') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L362'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.move((0), (1)); }); })
         Button(('→'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
@@ -369,7 +378,9 @@ export struct GVectorGridAlignment {
         this.move((1), (0));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L372'; })
+        .onBlur(() => { if (this.tvFocus === 'L372') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L372'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.move((1), (0)); }); })
       }.width('100%')
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
@@ -380,7 +391,9 @@ export struct GVectorGridAlignment {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L383'; })
+        .onBlur(() => { if (this.tvFocus === 'L383') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L383'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：走错一步要花两步补回来，步数很紧')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }

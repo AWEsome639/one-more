@@ -26,6 +26,9 @@ export struct GChimpTest {
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -290,7 +293,9 @@ export struct GChimpTest {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L293'; })
+              .onBlur(() => { if (this.tvFocus === 'L293') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L293'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
             }, (c: number) => 'c' + c)
@@ -310,7 +315,10 @@ export struct GChimpTest {
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).enabled(false)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(46)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L313'; })
+          .onBlur(() => { if (this.tvFocus === 'L313') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L313')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }
       .width('100%')
       Text(TG('提示：点下 1 之后数字全部消失，全靠脑内地图；点错会重新显示但扣一条命'))

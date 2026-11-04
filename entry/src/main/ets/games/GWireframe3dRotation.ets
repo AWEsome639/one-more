@@ -58,6 +58,9 @@ export struct GWireframe3dRotation {
 
   // ★ 难度作用到玩法（size）：原 NEED=3
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -304,7 +307,9 @@ export struct GWireframe3dRotation {
         .backgroundColor(this.win() ? Palette.emerald : Palette.primary)
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L307'; })
+        .onBlur(() => { if (this.tvFocus === 'L307') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L307'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {
@@ -327,7 +332,9 @@ export struct GWireframe3dRotation {
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => { Haptics.tick(); this.pick(i); })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L330'; })
+    .onBlur(() => { if (this.tvFocus === 'L330') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L330'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
   }
 }

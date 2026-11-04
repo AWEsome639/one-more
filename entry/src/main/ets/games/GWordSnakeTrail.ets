@@ -37,6 +37,9 @@ export struct GWordSnakeTrail {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -365,27 +368,37 @@ export struct GWordSnakeTrail {
         Button(('↑'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(42)).onClick(() => { Haptics.tap(); this.turn((0)); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L368'; })
+      .onBlur(() => { if (this.tvFocus === 'L368') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L368'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.turn((0)); }); })
         Button(('←'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(42)).onClick(() => { Haptics.tap(); this.turn((3)); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L373'; })
+      .onBlur(() => { if (this.tvFocus === 'L373') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L373'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.turn((3)); }); })
         Button(('↓'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(42)).onClick(() => { Haptics.tap(); this.turn((2)); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L378'; })
+      .onBlur(() => { if (this.tvFocus === 'L378') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L378'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.turn((2)); }); })
         Button(('→'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(42)).onClick(() => { Haptics.tap(); this.turn((1)); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L383'; })
+      .onBlur(() => { if (this.tvFocus === 'L383') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L383'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.turn((1)); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(42)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L388'; })
+      .onBlur(() => { if (this.tvFocus === 'L388') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L388'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }.width('100%')
       Text(TG('提示：吃错字母、撞墙、咬自己都扣一条命')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

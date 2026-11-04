@@ -40,6 +40,9 @@ export struct GSimonSays {
   onFinish: (r: GameResult) => void = () => {};
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -449,7 +452,9 @@ export struct GSimonSays {
           this.tapPad((0));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L452'; })
+          .onBlur(() => { if (this.tvFocus === 'L452') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L452'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((0)); }); })
           Stack() {
           Text(PAD_ICON[(1)]).fontSize(FontSize.xxxl)
@@ -478,7 +483,9 @@ export struct GSimonSays {
           this.tapPad((1));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L481'; })
+          .onBlur(() => { if (this.tvFocus === 'L481') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L481'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((1)); }); })
         }
         .width('100%')
@@ -510,7 +517,9 @@ export struct GSimonSays {
           this.tapPad((2));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L513'; })
+          .onBlur(() => { if (this.tvFocus === 'L513') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L513'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((2)); }); })
           Stack() {
           Text(PAD_ICON[(3)]).fontSize(FontSize.xxxl)
@@ -539,7 +548,9 @@ export struct GSimonSays {
           this.tapPad((3));
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L542'; })
+          .onBlur(() => { if (this.tvFocus === 'L542') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L542'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((3)); }); })
         }
         .width('100%')
@@ -567,7 +578,9 @@ export struct GSimonSays {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L570'; })
+        .onBlur(() => { if (this.tvFocus === 'L570') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L570'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

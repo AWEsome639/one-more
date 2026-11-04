@@ -1,0 +1,158 @@
+/** 文氏图 —— 集合运算
+ *  玩法：给出集合 A、B 与一个数字，判断它落在哪个区域（只在 A / 只在 B / 都在 / 都不在）
+ *  胜负：8 题答对 ≥6 ⇒ 通关；否则失败 */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+const ROUNDS: number = 8; const PASS: number = 6; const NEXT_MS: number = 850; const UNIVERSE: number = 12;
+const REGION: string[] = ['只在 A', '只在 B', 'A、B 都有', '都不在'];
+function sample(k: number, hi: number): number[] {
+  const pool: number[] = [];
+  for (let i = 1; i <= hi; i++) { pool.push(i); }
+  const out: number[] = [];
+  for (let i = 0; i < k; i++) {
+    const j: number = Math.floor(Math.random() * pool.length); out.push(pool[j]); pool.splice(j, 1);
+  }
+  for (let i = 1; i < out.length; i++) {
+    const cur: number = out[i]; let j: number = i - 1;
+    while (j >= 0 && out[j] > cur) { out[j + 1] = out[j]; j--; }
+    out[j + 1] = cur;
+  }
+  return out;
+}
+function setText(name: string, arr: number[]): string {
+  return name + ' = { ' + arr.join(', ') + ' }';
+}
+@Component
+export struct GSetTheoryVenn {
+  @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：原 ROUNDS=8
+  @State private diffTotal: number = GameDiff.sizeNow(8);
+  onFinish: (r: GameResult) => void = () => {};
+  @State private setA: number[] = []; @State private setB: number[] = []; @State private probe: number = 1;
+  @State private round: number = 1; @State private right: number = 0; @State private score: number = 0;
+  @State private pick: number = -1; @State private answered: boolean = false; @State private msg: string = '';
+  @State private over: boolean = false; @State private won: boolean = false;
+  private startAt: number = 0; private nextTo: number = -1; private done: boolean = false;
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(8);
+     this.reset(); }
+  aboutToDisappear(): void { if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; } }
+  private reset(): void {
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
+    this.startAt = Date.now(); this.done = false; this.round = 1; this.right = 0; this.score = 0; this.over = false;
+    this.won = false; this.ask(); this.msg = '看这个数字落在哪个区域';
+  }
+  private ask(): void {
+    this.setA = sample(4, UNIVERSE); this.setB = sample(4, UNIVERSE);
+    this.probe = 1 + Math.floor(Math.random() * UNIVERSE); this.pick = -1; this.answered = false;
+  }
+  /** 0 只在 A ／ 1 只在 B ／ 2 都在 ／ 3 都不在 */
+  private solution(): number {
+    const a: number[] = this.setA; const b: number[] = this.setB; const n: number = this.probe;
+    const inA: boolean = a.indexOf(n) >= 0; const inB: boolean = b.indexOf(n) >= 0;
+    if (inA && inB) { return 2; }
+    if (inA) { return 0; }
+    if (inB) { return 1; }
+    return 3;
+  }
+  private submit(k: number): void {
+    if (this.answered || this.over) { return; }
+    this.answered = true; this.pick = k; const ans: number = this.solution();
+    if (k === ans) {
+      this.right = this.right + 1; this.score = this.score + 120;
+      this.msg = '✅ ' + String(this.probe) + ' 确实「' + REGION[ans] + '」';
+    } else {
+      this.score = Math.max(0, this.score - 20); this.msg = '❌ ' + String(this.probe) + ' 应该是「' + REGION[ans] + '」';
+    }
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); }
+    this.nextTo = setTimeout(() => {
+      this.nextTo = -1; this.next();
+    }, NEXT_MS);
+  }
+  private next(): void {
+    if (this.over) { return; }
+    if (this.round >= this.diffTotal) {
+      this.over = true; this.won = this.right >= PASS;
+      this.msg = this.won
+        ? TG('🎉 答对 ') + String(this.right) + '/' + String(this.diffTotal) + TG('，通关！')
+        : TG('😵 只答对 ') + String(this.right) + '/' + String(this.diffTotal) + TG('，差 ') + String(PASS - this.right) + TG(' 题');
+      this.finish(this.won); return;
+    }
+    this.round = this.round + 1; this.ask(); this.msg = '看这个数字落在哪个区域';
+  }
+  private finish(solved: boolean): void { if (this.done) { return; } this.done = true;
+    const r: GameResult = { gameId: 'set_theory_venn', solved: solved, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.right };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r); }
+
+  @Builder
+  zone(label: string, sub: string, bg: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
+      Text(sub).fontSize(FontSize.xxs).fontColor('#FFFFFF')
+    }.layoutWeight(1).padding(Space.sm).backgroundColor(bg).borderRadius(Radius.lg).shadow(Shadow.card)
+  }
+  @Builder
+  regionBtn(k: number) {
+    Button(REGION[k]).fontSize(FontSize.sm).fontColor(this.pick === k ? '#FFFFFF' : this.theme.ink)
+      .backgroundColor(this.pick === k
+        ? (k === this.solution() ? Palette.emerald : Palette.rose)
+        : this.theme.surfaceAlt)
+      .borderRadius(Radius.md).layoutWeight(1).height(50).animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onClick(() => {
+        this.submit(k);
+      })
+  }
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat(TG('题号'), String(this.round) + '/' + String(this.diffTotal))
+        this.stat(TG('答对'), String(this.right) + '/' + String(PASS))
+        this.stat(TG('得分'), String(this.score))
+      }.width('100%')
+      Column({ space: Space.sm }) {
+        Text('🔵 A ∪ 🔴 B，问 ' + String(this.probe) + ' 在哪').fontSize(FontSize.md).fontWeight(FontWeight.Bold)
+          .fontColor(this.theme.ink)
+        Row({ space: Space.xs }) {
+          this.zone('🔵 A', String(this.setA.length) + TG(' 个'), Palette.sky)
+          this.zone('🟣 A∩B', '重叠区', Palette.violet)
+          this.zone('🔴 B', String(this.setB.length) + TG(' 个'), Palette.rose)
+        }.width('100%')
+        Text(setText('A', this.setA)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+        Text(setText('B', this.setB)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
+      .shadow(Shadow.card)
+      Text(this.msg).fontSize(FontSize.sm)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%')
+      Row({ space: Space.sm }) {
+        this.regionBtn(0)
+        this.regionBtn(1)
+      }.width('100%')
+      Row({ space: Space.sm }) {
+        this.regionBtn(2)
+        this.regionBtn(3)
+      }.width('100%')
+      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开')).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
+        .width('100%').height(46).onClick(() => {
+          this.reset();
+        })
+      Text('提示：先看这个数在不在 A 里，再看在不在 B 里').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+  @Builder
+  stat(label: string, value: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+    }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
+    .shadow(Shadow.card)
+  }
+}

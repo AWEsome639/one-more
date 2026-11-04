@@ -29,6 +29,9 @@ export struct GSilhouetteMatchOrtho {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -305,7 +308,9 @@ export struct GSilhouetteMatchOrtho {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L308'; })
+        .onBlur(() => { if (this.tvFocus === 'L308') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L308'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((0)); }); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
@@ -326,7 +331,9 @@ export struct GSilhouetteMatchOrtho {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L329'; })
+        .onBlur(() => { if (this.tvFocus === 'L329') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L329'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -349,7 +356,9 @@ export struct GSilhouetteMatchOrtho {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((2)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L352'; })
+        .onBlur(() => { if (this.tvFocus === 'L352') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L352'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((2)); }); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
@@ -370,7 +379,9 @@ export struct GSilhouetteMatchOrtho {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((3)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L373'; })
+        .onBlur(() => { if (this.tvFocus === 'L373') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L373'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((3)); }); })
       }.width('100%')
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
@@ -378,7 +389,9 @@ export struct GSilhouetteMatchOrtho {
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L381'; })
+        .onBlur(() => { if (this.tvFocus === 'L381') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L381'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

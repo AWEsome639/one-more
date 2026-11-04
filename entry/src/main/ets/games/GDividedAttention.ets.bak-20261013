@@ -1,0 +1,135 @@
+/**
+ * 分配注意 —— 左右两路符号同时跳变，哪边出现 🎯 就点哪边
+ *
+ * 胜负：12 拍里命中 ≥7 且误报 ≤2 ⇒ 通关
+ * 进度：拍数 / 命中 / 误报 / 漏报
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+const TICKS: number = 12; const PACE: number = 1100; const TARGET: string = '🎯';
+const DECOYS: string[] = ['🍀', '⭐', '🔷', '🌙', '🔺', '🎈', '🧩', '⚡'];
+interface Side {
+  sym: string;
+  on: boolean;     // 这一拍是不是靶
+  done: boolean;   // 这一拍已经点过
+}
+@Component
+export struct GDividedAttention {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TICKS 按难度换算
+  @State private diffTotal: number = GameDiff.sizeNow(TICKS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State private left: Side = { sym: '·', on: false, done: false };
+  @State private right: Side = { sym: '·', on: false, done: false };
+  @State private tickNo: number = 0;
+  @State private hits: number = 0;
+  @State private fa: number = 0;
+  @State private miss: number = 0;
+  @State private msg: string = '';
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  private startAt: number = 0;
+  private timer: number = -1;
+  private done: boolean = false;
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now(); this.reset();
+  }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TICKS);
+     this.reset(); }
+  aboutToDisappear(): void { this.stop(); }
+  private stop(): void {
+    if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
+  }
+  private reset(): void {
+    this.stop(); this.hits = 0; this.fa = 0; this.miss = 0; this.over = false; this.won = false;
+    this.done = false; this.tickNo = 1; this.left = this.roll(); this.right = this.roll();
+    this.msg = '两边一起看：出现 🎯 就点那一边'; this.startAt = Date.now();
+    this.timer = setInterval(() => { this.tick(); }, PACE);
+  }
+  private roll(): Side {
+    const isOn: boolean = Math.random() < 0.42;
+    const sym: string = isOn ? TARGET : DECOYS[Math.floor(Math.random() * DECOYS.length)];
+    const made: Side = { sym: sym, on: isOn, done: false };
+    return made;
+  }
+  private tick(): void {
+    if (this.over) { return; }
+    let missCount: number = this.miss;
+    if (this.left.on && !this.left.done) { missCount = missCount + 1; }
+    if (this.right.on && !this.right.done) { missCount = missCount + 1; }
+    this.miss = missCount;
+    if (this.tickNo >= this.diffTotal) {
+      this.finish();
+      return;
+    }
+    this.tickNo = this.tickNo + 1; this.left = this.roll(); this.right = this.roll();
+  }
+  private tap(idx: number): void {
+    if (this.over || this.tickNo === 0) { return; }
+    const side: Side = idx === 0 ? this.left : this.right;
+    if (side.done) { return; }
+    const next: Side = { sym: side.sym, on: side.on, done: true };
+    if (idx === 0) { this.left = next; } else { this.right = next; }
+    if (side.on) {
+      this.hits = this.hits + 1;
+    } else {
+      this.fa = this.fa + 1;
+    }
+  }
+  private finish(): void {
+    if (this.done) { return; }
+    this.done = true; this.stop(); this.over = true; this.won = this.hits >= 7 && this.fa <= 2;
+    this.msg = (this.won ? TG('🎉 通关！') : TG('💤 本局结束：'))
+      + '命中 ' + String(this.hits) + ' · 误报 ' + String(this.fa) + ' · 漏报 ' + String(this.miss);
+    const raw: number = this.hits * 100 - this.fa * 40 - this.miss * 30; const r: GameResult = {
+      gameId: 'divided_attention', solved: this.won,
+      score: raw > 0 ? raw : 0, durationMs: Date.now() - this.startAt,
+      levelReached: this.hits
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat('拍数', String(this.tickNo) + '/' + String(this.diffTotal))
+        this.stat(TG('命中'), String(this.hits))
+        this.stat('误报', String(this.fa))
+        this.stat('漏报', String(this.miss))
+      }.width('100%')
+      Row({ space: Space.md }) {
+        this.panel(0, this.left)
+        this.panel(1, this.right)
+      }.width('100%')
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Button(this.over ? TG('再来一局') : TG('重开')).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
+        .width('100%').height(46).onClick(() => { this.reset(); })
+      Text('提示：只点 🎯 那一边；点错和漏掉都扣分').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+  @Builder
+  stat(label: string, value: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+    }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+  }
+  @Builder
+  panel(idx: number, side: Side) {
+    Column({ space: Space.xs }) {
+      Text(idx === 0 ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(side.sym).fontSize(FontSize.hero).fontColor(Palette.rose)
+      Text(side.done ? (side.on ? '✔ 点对了' : '✘ 误报') : ' ').fontSize(FontSize.xxs).fontColor(side.done && side.on ? Palette.success : Palette.danger)
+    }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
+    .borderColor(side.done ? (side.on ? Palette.success : Palette.danger) : this.theme.line)
+    .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { this.tap(idx); })
+  }
+}

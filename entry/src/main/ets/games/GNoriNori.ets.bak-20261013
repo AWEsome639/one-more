@@ -1,0 +1,313 @@
+/**
+ * 两格方块 norinori（5×5）—— 每块区域里恰好放 2 个黑格，且黑格两两拼成多米诺
+ *
+ * 契约：@Prop theme ／ @Prop @Watch('onRestart') restartToken ／ onFinish
+ * 胜负：4 块区域各 2 个黑格、黑格全部成对 ⇒ solved:true；非法落子 5 次 ⇒ solved:false
+ * 进度：已满足区域 ／ 落子数 ／ 错手数
+ */
+
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const N: number = 5;
+const CELLS: number = N * N;
+const REG_CNT: number = 4;
+const ERR_MAX: number = 5;
+
+/** 3 关区域划分（每格数字 = 区域号 1..4），每关都存在"每区两个黑格"的解 */
+const REGION_LIB: number[][] = [
+  // 第 1 关
+  [
+    1,1,1,4,4,
+    1,4,4,4,4,
+    1,3,3,3,3,
+    3,3,3,3,2,
+    3,3,3,2,2
+  ],
+  // 第 2 关
+  [
+    4,4,3,3,3,
+    4,4,3,1,3,
+    2,2,1,1,1,
+    2,2,2,1,1,
+    2,2,2,1,1
+  ],
+  // 第 3 关
+  [
+    2,2,2,3,3,
+    1,2,2,3,3,
+    1,1,1,1,3,
+    4,1,1,1,1,
+    4,4,4,4,1
+  ]
+];
+
+/** 区域底色（半透明叠加，深浅主题各一套） */
+function tintOf(hex: string, isDark: boolean): string {
+  return (isDark ? '#3A' : '#26') + hex.substring(1);
+}
+
+@Component
+export struct GNoriNori {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法：棋盘边长（原 N=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
+  //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4]，上面已一并改成按尺寸生成
+  @State private diffTotal: number = GameDiff.sizeNow(5);
+
+  /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
+  private rowIdx(): number[] {
+    const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const a2: number[] = [];
+    for (let i2 = 0; i2 < n2; i2++) { a2.push(i2); }
+    return a2;
+  }
+  onFinish: (r: GameResult) => void = () => {};
+
+  @State regions: number[] = [];
+  @State blacks: number[] = [];   // 1 = 涂黑
+  @State errors: number = 0;
+  @State placed: number = 0;
+  @State over: boolean = false;
+  @State won: boolean = false;
+  @State score: number = 0;
+
+  private startAt: number = 0;
+
+  aboutToAppear(): void {
+    LanRace.noteStart();  // ★ 竞速模式：本局开始计时
+    this.startAt = Date.now();
+    this.reset();
+  }
+
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(5);
+    this.reset();
+  }
+
+  private reset(): void {
+    const k: number = Math.floor(Math.random() * REGION_LIB.length);
+    this.regions = REGION_LIB[k].slice();
+    this.blacks = new Array<number>(CELLS).fill(0);
+    this.errors = 0;
+    this.placed = 0;
+    this.over = false;
+    this.won = false;
+    this.score = 0;
+    this.startAt = Date.now();
+  }
+
+  private blackNbrs(arr: number[], i: number): number {
+    const r: number = Math.floor(i / this.diffTotal);
+    const c: number = i % this.diffTotal;
+    let n: number = 0;
+    if (r > 0 && arr[i - this.diffTotal] === 1) {
+      n++;
+    }
+    if (r < this.diffTotal - 1 && arr[i + this.diffTotal] === 1) {
+      n++;
+    }
+    if (c > 0 && arr[i - 1] === 1) {
+      n++;
+    }
+    if (c < this.diffTotal - 1 && arr[i + 1] === 1) {
+      n++;
+    }
+    return n;
+  }
+
+  /** 落子合法性：本区不超 2 个黑格；任何黑格的邻居都不超过 1 个（防三连与 2×2） */
+  private legal(arr: number[], i: number): boolean {
+    const rid: number = this.regions[i];
+    let cnt: number = 0;
+    for (let k = 0; k < CELLS; k++) {
+      if (arr[k] !== 1) {
+        continue;
+      }
+      if (this.regions[k] === rid) {
+        cnt++;
+      }
+      if (this.blackNbrs(arr, k) > 1) {
+        return false;
+      }
+    }
+    return cnt <= 2;
+  }
+
+  /** 已完成区域数：该区恰好 2 个黑格 */
+  private regionDone(rid: number): boolean {
+    let n: number = 0;
+    for (let k = 0; k < CELLS; k++) {
+      if (this.blacks[k] === 1 && this.regions[k] === rid) {
+        n++;
+      }
+    }
+    return n === 2;
+  }
+
+  private doneRegions(): number {
+    let n: number = 0;
+    for (let rid = 1; rid <= REG_CNT; rid++) {
+      if (this.regionDone(rid)) {
+        n++;
+      }
+    }
+    return n;
+  }
+
+  private isWin(): boolean {
+    if (this.placed !== REG_CNT * 2) {
+      return false;
+    }
+    for (let rid = 1; rid <= REG_CNT; rid++) {
+      if (!this.regionDone(rid)) {
+        return false;
+      }
+    }
+    for (let k = 0; k < CELLS; k++) {
+      if (this.blacks[k] === 1 && this.blackNbrs(this.blacks, k) !== 1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private tap(i: number): void {
+    if (this.over) {
+      return;
+    }
+    if (this.blacks[i] === 1) {
+      const cleared: number[] = this.blacks.slice();
+      cleared[i] = 0;
+      this.blacks = cleared;
+      this.placed--;
+      return;
+    }
+    const next: number[] = this.blacks.slice();
+    next[i] = 1;
+    if (!this.legal(next, i)) {
+      this.errors++;
+      if (this.errors >= ERR_MAX) {
+        this.over = true;
+        this.won = false;
+        this.score = 0;
+        this.finish(false);
+      }
+      return;
+    }
+    this.blacks = next;
+    this.placed++;
+    if (this.isWin()) {
+      this.over = true;
+      this.won = true;
+      const sec: number = Math.floor((Date.now() - this.startAt) / 1000);
+      this.score = Math.max(60, 360 - this.errors * 40 - sec * 2);
+      this.finish(true);
+    }
+  }
+
+  private finish(solved: boolean): void {
+    const r: GameResult = {
+      gameId: 'norinori',
+      solved: solved,
+      score: this.score,
+      durationMs: Date.now() - this.startAt,
+      levelReached: this.doneRegions()
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  private cellColor(i: number): string {
+    if (this.blacks[i] === 1) {
+      return this.theme.isDark ? '#E2E8F0' : '#1E293B';
+    }
+    return tintOf(Palette.wheel[(this.regions[i] - 1) % Palette.wheel.length], this.theme.isDark);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.statBox('已满足区域', String(this.doneRegions()) + '/' + String(REG_CNT))
+        this.statBox('已放黑格', String(this.placed) + '/' + String(REG_CNT * 2))
+        this.statBox('错手', String(this.errors) + '/' + String(ERR_MAX))
+      }
+      .width('100%')
+
+      Column({ space: Space.xs }) {
+        ForEach(this.rowIdx(), (r: number) => {
+          Row({ space: Space.xs }) {
+            ForEach(this.rowIdx(), (c: number) => {
+              this.cell(r * this.diffTotal + c)
+            }, (c: number) => 'c' + c)
+          }
+          .width('100%')
+        }, (r: number) => 'r' + r)
+      }
+      .width('100%')
+      .padding(Space.sm)
+      .backgroundColor(this.theme.surfaceAlt)
+      .borderRadius(Radius.lg)
+
+      Row({ space: Space.md }) {
+        Text(this.over
+          ? (this.won ? '全部成对 🎉 得分 ' + String(this.score) : '非法落子太多，本局失败')
+          : '点亮格子：' + String(REG_CNT) + ' 块区域各 2 格，且两两成多米诺')
+          .fontSize(FontSize.sm)
+          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
+          .layoutWeight(1)
+        Button(TG('重开'))
+          .fontSize(FontSize.md)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .width(96)
+          .height(44)
+          .onClick(() => {
+            this.reset();
+          })
+      }
+      .width('100%')
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  statBox(label: string, value: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value)
+        .fontSize(FontSize.md)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.ink)
+    }
+    .layoutWeight(1)
+    .padding(Space.xs)
+    .backgroundColor(this.theme.surface)
+    .borderRadius(Radius.sm)
+    .shadow(Shadow.card)
+  }
+
+  @Builder
+  cell(i: number) {
+    Stack() {
+      Text(this.blacks[i] === 1 ? '' : String(this.regions[i]))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+    }
+    .layoutWeight(1)
+    .aspectRatio(1)
+    .backgroundColor(this.cellColor(i))
+    .borderRadius(Radius.xs)
+    .animation({ duration: Motion.fast, curve: Motion.snap() })
+    .onClick(() => {
+      this.tap(i);
+    })
+  }
+}

@@ -37,6 +37,9 @@ export struct GSieveVisualizer {
 
   // ★ 难度作用到玩法（time）：原 TICK_MS=240
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -465,7 +468,9 @@ export struct GSieveVisualizer {
             }
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L468'; })
+          .onBlur(() => { if (this.tvFocus === 'L468') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L468'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.running) { this.pause(); } else { this.play(); } }); })
         Button(TG('单步'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -482,7 +487,9 @@ export struct GSieveVisualizer {
             this.step();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L485'; })
+          .onBlur(() => { if (this.tvFocus === 'L485') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L485'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pause(); this.step(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -497,7 +504,9 @@ export struct GSieveVisualizer {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L500'; })
+          .onBlur(() => { if (this.tvFocus === 'L500') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L500'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')

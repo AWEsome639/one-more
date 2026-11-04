@@ -50,6 +50,9 @@ export struct GSpiderSolitaire {
   //     base 改 6 ⇒ 4 / 6 / 8，再用 min(难度值, SETS) 兜底：困难档刚好用满 8 组（能赢的最难值），
   //     简单档只收 4 组 ⇒ 仍是 易 < 普 < 难。牌堆、发牌、收组判定一概没动。
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -821,7 +824,9 @@ export struct GSpiderSolitaire {
             this.deal();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L824'; })
+          .onBlur(() => { if (this.tvFocus === 'L824') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L824'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.deal(); }); })
         Button(TG('重新开始'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -836,7 +841,9 @@ export struct GSpiderSolitaire {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L839'; })
+          .onBlur(() => { if (this.tvFocus === 'L839') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L839'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
@@ -951,7 +958,9 @@ export struct GSpiderSolitaire {
       this.tapPileBlank(p);
     })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L954'; })
+    .onBlur(() => { if (this.tvFocus === 'L954') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L954'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPileBlank(p); }); })
   }
 
@@ -968,7 +977,9 @@ export struct GSpiderSolitaire {
       this.tapPileCard(p, i);
     })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L971'; })
+    .onBlur(() => { if (this.tvFocus === 'L971') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L971'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPileCard(p, i); }); })
   }
 }

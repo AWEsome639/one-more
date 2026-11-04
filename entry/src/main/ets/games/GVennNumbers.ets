@@ -31,6 +31,9 @@ export struct GVennNumbers {
 
   // ★ 难度作用到玩法：要归类的数字个数（简单 4 / 普通 6 / 困难 8）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -311,21 +314,27 @@ export struct GVennNumbers {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.tapZone((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L314'; })
+        .onBlur(() => { if (this.tvFocus === 'L314') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L314'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapZone((0)); }); }); Text(('B')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         .textAlign(TextAlign.Center).width((96)).height(Cell.of(44)).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).border({ width: 2, color: this.fb === 1 ? Palette.rose : this.theme.line })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.tapZone((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L321'; })
+        .onBlur(() => { if (this.tvFocus === 'L321') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L321'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapZone((1)); }); }); Text(('A∩B')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         .textAlign(TextAlign.Center).width((74)).height(Cell.of(44)).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).border({ width: 2, color: this.fb === 1 ? Palette.rose : this.theme.line })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.tapZone((2)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L328'; })
+        .onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L328'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapZone((2)); }); }) }
           .width('100%').height(150).justifyContent(FlexAlign.Center)
       }.width('100%').height(150)
@@ -340,7 +349,9 @@ export struct GVennNumbers {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.tapChip((i)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L343'; })
+        .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L343'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapChip((i)); }); }) }, (i: number) => 'vn' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
@@ -351,7 +362,9 @@ export struct GVennNumbers {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L354'; })
+        .onBlur(() => { if (this.tvFocus === 'L354') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L354'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：A ∩ B = 既是 3 的倍数又是偶数，比如 6')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

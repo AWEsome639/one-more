@@ -64,6 +64,9 @@ export struct GSlide15 {
   @State private slideDY: number = 0;
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -651,7 +654,9 @@ export struct GSlide15 {
               this.tap((r * this.diffTotal + c));
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L654'; })
+              .onBlur(() => { if (this.tvFocus === 'L654') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L654'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
             }, (c: number) => 's15c' + r + '-' + c)
@@ -698,7 +703,9 @@ export struct GSlide15 {
             this.askHint();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L701'; })
+          .onBlur(() => { if (this.tvFocus === 'L701') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L701'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(TG('打乱重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -713,7 +720,9 @@ export struct GSlide15 {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L716'; })
+          .onBlur(() => { if (this.tvFocus === 'L716') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L716'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Button(TG('重玩本局'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -728,7 +737,9 @@ export struct GSlide15 {
             this.retrySame();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L731'; })
+          .onBlur(() => { if (this.tvFocus === 'L731') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L731'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.retrySame(); }); })
       }
       .width('100%')

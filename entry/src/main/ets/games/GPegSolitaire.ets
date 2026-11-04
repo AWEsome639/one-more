@@ -52,6 +52,9 @@ export struct GPegSolitaire {
   onFinish: (r: GameResult) => void = () => {};
 
   @State private cells: number[] = [];
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   @State private demoId: number = -1;
   @State private demoLeft: number = 0;
@@ -543,7 +546,9 @@ export struct GPegSolitaire {
               this.tap(at((r), (c)));
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L546'; })
+              .onBlur(() => { if (this.tvFocus === 'L546') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L546'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(at((r), (c))); }); })
             }, (c: number) => 'c' + c)
           }
@@ -580,7 +585,9 @@ export struct GPegSolitaire {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L583'; })
+        .onBlur(() => { if (this.tvFocus === 'L583') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L583'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('目标：最后只剩 1 颗（中央开局，32 颗）'))

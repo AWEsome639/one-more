@@ -34,6 +34,9 @@ export struct GBinaryScaleBalance {
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -420,7 +423,9 @@ export struct GBinaryScaleBalance {
         .width('100%')
         .height(Cell.of(46))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L423'; })
+        .onBlur(() => { if (this.tvFocus === 'L423') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L423'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
@@ -504,7 +509,9 @@ export struct GBinaryScaleBalance {
     .scale({ x: this.on[i] ? 1.04 : 1, y: this.on[i] ? 1.04 : 1 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L507'; })
+    .onBlur(() => { if (this.tvFocus === 'L507') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L507'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.toggle(i); }); })
     .onClick(() => {
       Haptics.tick();

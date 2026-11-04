@@ -35,6 +35,9 @@ export struct GRhythmMaster {
   @State private over: boolean = false;
   @State private won: boolean = false;
   /** 代打计时器（-1 = 未运行）。必须 @State，否则按钮文字不刷新 */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -353,7 +356,9 @@ export struct GRhythmMaster {
         .borderRadius(Radius.lg).width('100%').height(Cell.of(84))
         .onClick(() => { Haptics.tap(); this.tapBeat(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L356'; })
+        .onBlur(() => { if (this.tvFocus === 'L356') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L356'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapBeat(); }); })
       Text(this.msg).fontSize(FontSize.sm).textAlign(TextAlign.Center).width('100%')
         .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft)
@@ -362,7 +367,9 @@ export struct GRhythmMaster {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L365'; })
+        .onBlur(() => { if (this.tvFocus === 'L365') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L365'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：4 下平均间隔误差 ≤ 150 ms（目标间隔 600 ms）'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')

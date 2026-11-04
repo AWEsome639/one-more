@@ -29,6 +29,9 @@ export struct GSymbolLogic {
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -310,7 +313,9 @@ export struct GSymbolLogic {
           .borderRadius(Radius.md).shadow(Shadow.card).scale({ x: this.pick === (i) ? Motion.pressScale : 1, y: this.pick === (i) ? Motion.pressScale : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.answer((i)); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L313'; })
+          .onBlur(() => { if (this.tvFocus === 'L313') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L313'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((i)); }); })
           // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
           .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -323,7 +328,9 @@ export struct GSymbolLogic {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.lime).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L326'; })
+        .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L326'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：先算第二个符号，再回代求第一个'))

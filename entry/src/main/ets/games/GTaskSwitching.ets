@@ -27,6 +27,9 @@ export struct GTaskSwitching {
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -304,7 +307,9 @@ export struct GTaskSwitching {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.answer((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L307'; })
+        .onBlur(() => { if (this.tvFocus === 'L307') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L307'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
         Text(this.optName((1))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
         .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64)).backgroundColor(this.pick === (1) ? Palette.cyan : this.theme.surfaceAlt)
@@ -312,7 +317,9 @@ export struct GTaskSwitching {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.answer((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L315'; })
+        .onBlur(() => { if (this.tvFocus === 'L315') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L315'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); })
       }.width('100%')
 
@@ -324,7 +331,9 @@ export struct GTaskSwitching {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.cyan).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L327'; })
+        .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L327'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：切换试次比重复试次慢多少，就是这一局的「切换代价」')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

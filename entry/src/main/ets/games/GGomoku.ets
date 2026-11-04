@@ -391,6 +391,9 @@ export struct GGomoku {
   // ★ 难度作用到玩法：棋盘边长（原 SIZE=15）
   //   ⚠️ 原本 ForEach(IDX, …) 是常量数组，已改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -1036,7 +1039,9 @@ export struct GGomoku {
               .layoutWeight(1)
               .aspectRatio(1)
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L1039'; })
+              .onBlur(() => { if (this.tvFocus === 'L1039') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L1039'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.humanTap((r * this.diffTotal + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -1073,7 +1078,9 @@ export struct GGomoku {
           .height(Cell.of(48))
           .enabled(!LanMatch.isActive())      // ★ 联机不能单方悔棋
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L1076'; })
+          .onBlur(() => { if (this.tvFocus === 'L1076') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L1076'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.undo(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -1088,7 +1095,9 @@ export struct GGomoku {
           .layoutWeight(1)
           .height(Cell.of(48))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L1091'; })
+          .onBlur(() => { if (this.tvFocus === 'L1091') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L1091'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.restartTap(); }); })
           .onClick(() => {
             Haptics.tap();

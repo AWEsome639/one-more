@@ -38,6 +38,9 @@ export struct GFaceNameAssociation {
   onFinish: (r: GameResult) => void = () => {};
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -367,7 +370,9 @@ export struct GFaceNameAssociation {
         .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L370'; })
+        .onBlur(() => { if (this.tvFocus === 'L370') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L370'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
         .onClick(() => { Haptics.tick(); this.answer((0)); }); Text(this.opts[(1)].label)
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
@@ -378,7 +383,9 @@ export struct GFaceNameAssociation {
         .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L381'; })
+        .onBlur(() => { if (this.tvFocus === 'L381') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L381'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); })
         .onClick(() => { Haptics.tick(); this.answer((1)); }); Text(this.opts[(2)].label)
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
@@ -389,7 +396,9 @@ export struct GFaceNameAssociation {
         .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L392'; })
+        .onBlur(() => { if (this.tvFocus === 'L392') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L392'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); })
         .onClick(() => { Haptics.tick(); this.answer((2)); }); Text(this.opts[(3)].label)
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
@@ -400,7 +409,9 @@ export struct GFaceNameAssociation {
         .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L403'; })
+        .onBlur(() => { if (this.tvFocus === 'L403') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L403'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((3)); }); })
         .onClick(() => { Haptics.tick(); this.answer((3)); }) }.width('100%')
       } else {
@@ -421,7 +432,9 @@ export struct GFaceNameAssociation {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.emerald)
         .borderRadius(Radius.md).width('100%').height(Space.xxxl)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L424'; })
+        .onBlur(() => { if (this.tvFocus === 'L424') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L424'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 

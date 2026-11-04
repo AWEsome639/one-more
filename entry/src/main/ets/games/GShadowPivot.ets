@@ -54,6 +54,9 @@ export struct GShadowPivot {
 
   // ★ 难度作用到玩法（size）：原 M=5
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -316,7 +319,9 @@ export struct GShadowPivot {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L319'; })
+        .onBlur(() => { if (this.tvFocus === 'L319') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L319'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((0)); }); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
@@ -337,7 +342,9 @@ export struct GShadowPivot {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L340'; })
+        .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L340'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -360,7 +367,9 @@ export struct GShadowPivot {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((2)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L363'; })
+        .onBlur(() => { if (this.tvFocus === 'L363') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L363'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((2)); }); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
@@ -381,7 +390,9 @@ export struct GShadowPivot {
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((3)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L384'; })
+        .onBlur(() => { if (this.tvFocus === 'L384') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L384'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((3)); }); })
       }.width('100%')
       Text(this.note).fontSize(FontSize.sm)
@@ -391,7 +402,9 @@ export struct GShadowPivot {
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L394'; })
+        .onBlur(() => { if (this.tvFocus === 'L394') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L394'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

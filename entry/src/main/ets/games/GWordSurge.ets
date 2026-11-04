@@ -52,6 +52,9 @@ export struct GWordSurge {
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -325,7 +328,9 @@ export struct GWordSurge {
       Column({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => { Text(this.opts.length > (i) ? this.opts[(i)] : '').fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkAt((i))).width('100%').height(Cell.of(52)).backgroundColor(this.toneAt((i))).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((i)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L328'; })
+        .onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L328'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); }) }, (i: number) => 'o' + i)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
@@ -335,7 +340,9 @@ export struct GWordSurge {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L338'; })
+      .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L338'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG2("得分 {0}｜最好连击 {1}｜答错扣 3 秒",Digits(String(this.score), this.langCode),Digits(String(this.best), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

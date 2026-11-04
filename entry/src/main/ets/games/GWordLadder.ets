@@ -39,6 +39,9 @@ export struct GWordLadder {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -353,7 +356,9 @@ export struct GWordLadder {
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => { Text(this.word.length > (i) ? this.word.charAt((i)) : '').fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(60)).backgroundColor(this.pick === (i) ? Palette.primary : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapPos((i)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L356'; })
+        .onBlur(() => { if (this.tvFocus === 'L356') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L356'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPos((i)); }); }) }, (i: number) => 's' + i)
       }.width('100%')
       Text(this.trail.join(' → ')).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -368,7 +373,9 @@ export struct GWordLadder {
               if (r * 7 + c < LETTERS.length) {
                 Text((LETTERS.charAt(r * 7 + c))).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(36)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).shadow(Shadow.card).onClick(() => { Haptics.tick(); this.tapLetter((LETTERS.charAt(r * 7 + c))); })
                 .focusable(Tv.on())
-                .focusBox(Tv.box())
+                .onFocus(() => { this.tvFocus = 'L371'; })
+                .onBlur(() => { if (this.tvFocus === 'L371') { this.tvFocus = ''; } })
+                .outline(Tv.focusOutline(this.tvFocus === 'L371'))
                 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapLetter((LETTERS.charAt(r * 7 + c))); }); })
               }
             }, (c: number) => 'c' + c)
@@ -378,7 +385,9 @@ export struct GWordLadder {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L381'; })
+      .onBlur(() => { if (this.tvFocus === 'L381') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L381'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG2('提示：起点 {0} → 目标 {1}，词库里都是常见 {2} 字母单词', this.from, this.to, LEN)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

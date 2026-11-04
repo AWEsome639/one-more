@@ -30,6 +30,9 @@ export struct GDigitSpanReverse {
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -301,7 +304,10 @@ export struct GDigitSpanReverse {
             ForEach([0, 1, 2], (c: number) => {
               Text(String((r * 3 + c + 1))).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.xl)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
               .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(48)).backgroundColor(this.theme.surfaceAlt)
-              .borderRadius(Radius.sm).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); }); }).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
+              .borderRadius(Radius.sm).focusable(Tv.on())
+              .onFocus(() => { this.tvFocus = 'L304'; })
+              .onBlur(() => { if (this.tvFocus === 'L304') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L304')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); }); }).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
             }, (c: number) => 'kc' + c)
           }.width('100%')
         }, (r: number) => 'kr' + r)
@@ -310,7 +316,10 @@ export struct GDigitSpanReverse {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky).borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
-        .width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L313'; })
+        .onBlur(() => { if (this.tvFocus === 'L313') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L313')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

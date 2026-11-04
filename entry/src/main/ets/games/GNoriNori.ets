@@ -80,6 +80,9 @@ export struct GNoriNori {
    *   难度改到**容错次数**上（本来就是它的压力来源）。
    */
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -642,7 +645,9 @@ export struct GNoriNori {
               this.tap((r * this.diffTotal + c));
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L645'; })
+              .onBlur(() => { if (this.tvFocus === 'L645') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L645'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
@@ -672,7 +677,9 @@ export struct GNoriNori {
             this.askHint();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L675'; })
+          .onBlur(() => { if (this.tvFocus === 'L675') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L675'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
                 Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -687,7 +694,9 @@ export struct GNoriNori {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L690'; })
+          .onBlur(() => { if (this.tvFocus === 'L690') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L690'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')

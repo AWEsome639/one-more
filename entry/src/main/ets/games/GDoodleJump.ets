@@ -60,6 +60,9 @@ export struct GDoodleJump {
 
   // ★ 难度作用到玩法（time）：原 TICK_MS=33
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -559,7 +562,9 @@ export struct GDoodleJump {
           .height(Cell.of(52))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L562'; })
+          .onBlur(() => { if (this.tvFocus === 'L562') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L562'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.move(-1); }); })
           .onClick(() => {
             Haptics.tap();
@@ -575,7 +580,9 @@ export struct GDoodleJump {
           .height(Cell.of(52))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L578'; })
+          .onBlur(() => { if (this.tvFocus === 'L578') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L578'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.move(1); }); })
           .onClick(() => {
             Haptics.tap();
@@ -597,7 +604,9 @@ export struct GDoodleJump {
         .width('100%')
         .height(Cell.of(46))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L600'; })
+        .onBlur(() => { if (this.tvFocus === 'L600') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L600'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();

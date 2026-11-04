@@ -29,6 +29,9 @@ export struct GLetterCancellation {
 
   // ★ 难度作用到玩法（time）：LIMIT_S 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -324,7 +327,10 @@ export struct GLetterCancellation {
         ForEach([0, 1, 2, 3, 4, 5], (r: number) => {
           Row({ space: Space.xs }) {
             ForEach([0, 1, 2, 3, 4, 5], (c: number) => {
-              Text(this.g.length > (r * N + c) ? this.g[(r * N + c)] : '').fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.hit.indexOf((r * N + c)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).aspectRatio(1).backgroundColor(this.hit.indexOf((r * N + c)) >= 0 ? Palette.berry : this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }).onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
+              Text(this.g.length > (r * N + c) ? this.g[(r * N + c)] : '').fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.hit.indexOf((r * N + c)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).aspectRatio(1).backgroundColor(this.hit.indexOf((r * N + c)) >= 0 ? Palette.berry : this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+              .onFocus(() => { this.tvFocus = 'L327'; })
+              .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L327')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }).onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
@@ -337,7 +343,10 @@ export struct GLetterCancellation {
 
 
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L340'; })
+      .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L340')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2('划满 {0} 盘通关；漏一个罚 3 秒，点错也罚 3 秒', PLATES)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

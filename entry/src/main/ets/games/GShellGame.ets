@@ -28,6 +28,9 @@ export struct GShellGame {
 
   // ★ 难度作用到玩法（size）：LEVELS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -307,7 +310,9 @@ export struct GShellGame {
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.pick((slot)); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L310'; })
+          .onBlur(() => { if (this.tvFocus === 'L310') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L310'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((slot)); }); })
         }, (slot: number) => 's' + slot)
       }.width('100%')
@@ -318,7 +323,9 @@ export struct GShellGame {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.orange)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L321'; })
+        .onBlur(() => { if (this.tvFocus === 'L321') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L321'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：连中 5 关通关；每过一关多洗 2 次'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')

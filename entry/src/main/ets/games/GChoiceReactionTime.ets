@@ -29,6 +29,9 @@ export struct GChoiceReactionTime {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -306,7 +309,9 @@ export struct GChoiceReactionTime {
           .scale({ x: this.pick === 0 ? Motion.pressScale : 1, y: this.pick === 0 ? Motion.pressScale : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L309'; })
+          .onBlur(() => { if (this.tvFocus === 'L309') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L309'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(false); }); })
           .onClick(() => { Haptics.tap(); this.answer(false); })
         Button(TG('偶'))
@@ -316,14 +321,19 @@ export struct GChoiceReactionTime {
           .scale({ x: this.pick === 1 ? Motion.pressScale : 1, y: this.pick === 1 ? Motion.pressScale : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L319'; })
+          .onBlur(() => { if (this.tvFocus === 'L319') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L319'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(true); }); })
           .onClick(() => { Haptics.tap(); this.answer(true); })
       }.width('100%')
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.orange)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L326'; })
+        .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L326')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG2('判定：平均 < {0} ms 且答错 ≤ 1 次（答错一题按 1800 ms 计）',Digits(String(LIMIT_MS), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

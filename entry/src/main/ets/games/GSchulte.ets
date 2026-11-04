@@ -29,6 +29,9 @@ export struct GSchulte {
   // ★ 难度作用到玩法：棋盘边长（原 SIZE=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3, 4]，上面已一并改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -326,7 +329,9 @@ export struct GSchulte {
               this.tap((this.nums[r * this.diffTotal + c]), (r * this.diffTotal + c));
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L329'; })
+              .onBlur(() => { if (this.tvFocus === 'L329') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L329'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.nums[r * this.diffTotal + c]), (r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
@@ -351,7 +356,9 @@ export struct GSchulte {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L354'; })
+        .onBlur(() => { if (this.tvFocus === 'L354') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L354'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

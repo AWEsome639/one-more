@@ -100,6 +100,9 @@ export struct GMentalRotation {
 
   // ★ 难度作用到玩法（size）：原 ROUNDS=10
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -402,7 +405,9 @@ export struct GMentalRotation {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tap(); this.answer(false); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L405'; })
+        .onBlur(() => { if (this.tvFocus === 'L405') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L405'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(false); }); })
         Button((TG('镜像 🪞')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -416,7 +421,9 @@ export struct GMentalRotation {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tap(); this.answer(true); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L419'; })
+        .onBlur(() => { if (this.tvFocus === 'L419') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L419'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(true); }); })
       }
       .width('100%')
@@ -430,7 +437,9 @@ export struct GMentalRotation {
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L433'; })
+        .onBlur(() => { if (this.tvFocus === 'L433') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L433'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：10 题答对 ≥ 8 题 · 提示：不对称图形转过 90/180/270° 的样子'))
         .fontSize(FontSize.xxs)

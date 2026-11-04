@@ -60,6 +60,9 @@ export struct GVectorDotProduct {
 
   // ★ 难度作用到玩法（size）：原 ROUNDS=8
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -322,7 +325,9 @@ export struct GVectorDotProduct {
         this.submit((0));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L325'; })
+        .onBlur(() => { if (this.tvFocus === 'L325') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L325'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((0)); }); })
         Button(this.opts.length > (1) ? String(this.opts[(1)]) : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
@@ -335,7 +340,9 @@ export struct GVectorDotProduct {
         this.submit((1));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L338'; })
+        .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L338'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -350,7 +357,9 @@ export struct GVectorDotProduct {
         this.submit((2));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L353'; })
+        .onBlur(() => { if (this.tvFocus === 'L353') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L353'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((2)); }); })
         Button(this.opts.length > (3) ? String(this.opts[(3)]) : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
@@ -363,7 +372,9 @@ export struct GVectorDotProduct {
         this.submit((3));
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L366'; })
+        .onBlur(() => { if (this.tvFocus === 'L366') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L366'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((3)); }); })
       }.width('100%')
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
@@ -374,7 +385,9 @@ export struct GVectorDotProduct {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L377'; })
+        .onBlur(() => { if (this.tvFocus === 'L377') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L377'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：对应分量相乘再全部相加，负号也算进去')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }

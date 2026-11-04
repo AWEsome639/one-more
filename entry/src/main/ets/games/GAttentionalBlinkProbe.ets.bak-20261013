@@ -1,0 +1,197 @@
+/**
+ * 瞬脱探针 —— 两问：流里那个数字 T1 是几？T1 之后有没有闪过「探针 ✦」？
+ * 胜负：4 轮共 8 分，拿到 6 分以上 ⇒ 通关；进度：轮次 / 得分 / 阶段
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const TRIALS: number = 4;
+const NEED: number = 6;
+const LEN: number = 14;
+const GAP: number = 3;               // 探针出现在 T1 之后第 3 个位置（正是瞬脱窗口）
+const LETTERS: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K', 'M', 'P', 'R', 'S', 'T', 'V', 'X', 'Z'];
+const SLOTS: number[] = [0, 1, 2, 3];
+
+@Component
+export struct GAttentionalBlinkProbe {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State private seq: string[] = [];
+  @State private t1: string = '0';
+  @State private hasProbe: boolean = false;
+  @State private idx: number = -1;
+  @State private showing: boolean = false;
+  @State private phase: number = 0;    // 0=播流 1=问T1 2=问探针
+  @State private trialNo: number = 1;
+  @State private score: number = 0;
+  @State private opts: string[] = [];
+  @State private pick: number = -1;
+  @State private msg: string = '';
+  @State private over: boolean = false;
+  @State private won: boolean = false;
+  private startAt: number = 0;
+  private tickTo: number = -1;
+  private nextTo: number = -1;
+  private done: boolean = false;
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TRIALS);
+     this.reset(); }
+  aboutToDisappear(): void { this.clearAll(); }
+  private clearAll(): void {
+    if (this.tickTo >= 0) { clearTimeout(this.tickTo); this.tickTo = -1; }
+    if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
+  }
+  private reset(): void {
+    this.clearAll();
+    this.trialNo = 1; this.score = 0; this.over = false; this.won = false; this.done = false;
+    this.startAt = Date.now();
+    this.newTrial();
+  }
+  private newTrial(): void {
+    const digits: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const list: string[] = [];
+    for (let i = 0; i < LEN; i++) { list.push(LETTERS[Math.floor(Math.random() * LETTERS.length)]); }
+    const at: number = 3 + Math.floor(Math.random() * 4);
+    const t1: string = digits[Math.floor(Math.random() * digits.length)];
+    list[at] = t1;
+    const probe: boolean = Math.random() < 0.5;
+    if (probe && at + GAP < LEN) { list[at + GAP] = '✦'; }
+    const pool: string[] = [t1];
+    while (pool.length < 4) {
+      const x: string = digits[Math.floor(Math.random() * digits.length)];
+      if (pool.indexOf(x) < 0) { pool.push(x); }
+    }
+    const mixed: string[] = [];
+    while (pool.length > 0) { mixed.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]); }
+    this.seq = list;
+    this.t1 = t1;
+    this.hasProbe = probe;
+    this.opts = mixed;
+    this.pick = -1; this.idx = -1; this.showing = false; this.phase = 0;
+    this.msg = TG('第 ') + String(this.trialNo) + ' 轮：记住数字，并留意它之后有没有 ✦';
+    this.nextTo = setTimeout(() => { this.nextTo = -1; this.play(0); }, 700);
+  }
+  private play(k: number): void {
+    if (k >= this.seq.length) {
+      this.idx = LEN;
+      this.showing = false;
+      this.phase = 1;
+      this.msg = '第一问：刚才的数字是几？';
+      return;
+    }
+    this.idx = k;
+    this.showing = true;
+    this.tickTo = setTimeout(() => {
+      this.tickTo = -1;
+      this.showing = false;
+      this.tickTo = setTimeout(() => { this.tickTo = -1; this.play(k + 1); }, 60);
+    }, 190);
+  }
+  private answerDigit(i: number): void {
+    if (this.phase !== 1 || this.pick >= 0) { return; }
+    this.pick = i;
+    if (this.opts[i] === this.t1) {
+      this.score = this.score + 1;
+      this.msg = '✅ 数字对了（+1）';
+    } else {
+      this.msg = '❌ 数字是 ' + this.t1;
+    }
+    this.nextTo = setTimeout(() => {
+      this.nextTo = -1;
+      this.phase = 2;
+      this.pick = -1;
+      this.msg = '第二问：数字之后出现过 ✦ 探针吗？';
+    }, 750);
+  }
+  private answerProbe(said: boolean): void {
+    if (this.phase !== 2 || this.pick >= 0) { return; }
+    this.pick = said ? 1 : 0;
+    if (said === this.hasProbe) {
+      this.score = this.score + 1;
+      this.msg = '✅ 探针判断对了（+1）';
+    } else {
+      this.msg = this.hasProbe ? '❌ 这轮其实有 ✦' : '❌ 这轮没有 ✦';
+    }
+    this.nextTo = setTimeout(() => {
+      this.nextTo = -1;
+      if (this.trialNo >= this.diffTotal) {
+        this.over = true;
+        this.won = this.score >= NEED;
+        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + TG('共 ') + String(this.score) + '/' + String(this.diffTotal * 2) + TG(' 分');
+        this.clearAll();
+        this.finish(this.won);
+        return;
+      }
+      this.trialNo = this.trialNo + 1;
+      this.newTrial();
+    }, 800);
+  }
+  private finish(solved: boolean): void {
+    if (this.done) { return; }
+    this.done = true;
+    const r: GameResult = {
+      gameId: 'attentional_blink_probe', solved: solved, score: this.score * 150,
+      durationMs: Date.now() - this.startAt, levelReached: this.trialNo
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat(TG('轮次'), this.trialNo + '/' + this.diffTotal)
+        this.stat(TG('得分'), this.score + '/' + this.diffTotal * 2)
+        this.stat(TG('阶段'), this.phase === 0 ? '闪现中' : (this.phase === 1 ? '答数字' : '答探针'))
+      }.width('100%')
+      Stack() {
+        Text(this.showing && this.idx >= 0 ? this.seq[this.idx] : '·')
+          .fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
+          .fontColor(this.idx >= 0 && this.idx < this.seq.length && this.seq[this.idx] === '✦' ? Palette.sky : Palette.violet)
+      }.width('100%').height(120).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      Text(this.msg).fontSize(FontSize.sm)
+        .fontColor(this.phase === 0 ? this.theme.inkFaint : this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      if (this.phase === 2) {
+        Row({ space: Space.sm }) {
+          Button('有 ✦').fontSize(FontSize.lg).fontColor('#FFFFFF')
+            .backgroundColor(this.pick === 1 ? Palette.primaryDeep : Palette.sky)
+            .borderRadius(Radius.md).layoutWeight(1).height(56).onClick(() => { this.answerProbe(true); })
+          Button('没有').fontSize(FontSize.lg).fontColor('#FFFFFF')
+            .backgroundColor(this.pick === 0 ? Palette.primaryDeep : Palette.inkFaint)
+            .borderRadius(Radius.md).layoutWeight(1).height(56).onClick(() => { this.answerProbe(false); })
+        }.width('100%')
+      } else {
+        Row({ space: Space.sm }) { this.optBtn(0); this.optBtn(1) }.width('100%')
+        Row({ space: Space.sm }) { this.optBtn(2); this.optBtn(3) }.width('100%')
+      }
+      Button(this.over ? TG('再来一局') : TG('重开')).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky)
+        .borderRadius(Radius.md).width('100%').height(46).onClick(() => { this.reset(); })
+      Text('提示：探针只会出现在数字之后，出现与否各半').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+  @Builder
+  stat(label: string, value: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(value).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+    }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+  }
+  @Builder
+  optBtn(i: number) {
+    Text(this.opts[i]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+      .fontColor(this.pick === i ? '#FFFFFF' : (this.phase === 1 ? this.theme.ink : this.theme.inkFaint))
+      .textAlign(TextAlign.Center).layoutWeight(1).height(64)
+      .backgroundColor(this.pick === i ? Palette.primaryDeep : this.theme.surfaceAlt)
+      .borderRadius(Radius.md).opacity(this.phase === 1 ? 1 : 0.4).shadow(Shadow.card)
+      .scale({ x: this.pick === i ? Motion.pressScale : 1, y: this.pick === i ? Motion.pressScale : 1 })
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onClick(() => { this.answerDigit(i); })
+  }
+}

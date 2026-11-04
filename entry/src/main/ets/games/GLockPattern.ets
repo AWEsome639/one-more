@@ -31,6 +31,9 @@ export struct GLockPattern {
 
   // ★ 难度作用到玩法（size）：DOTS 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -385,7 +388,9 @@ export struct GLockPattern {
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L388'; })
+              .onBlur(() => { if (this.tvFocus === 'L388') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L388'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDot((r * 3 + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -420,7 +425,9 @@ export struct GLockPattern {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(this.phase === 1)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L423'; })
+          .onBlur(() => { if (this.tvFocus === 'L423') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L423'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.peek(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -432,7 +439,9 @@ export struct GLockPattern {
           .backgroundColor(Palette.sky).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L435'; })
+          .onBlur(() => { if (this.tvFocus === 'L435') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L435'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.newGame(); }); })
           .onClick(() => {
             Haptics.tap();

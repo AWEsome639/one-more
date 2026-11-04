@@ -37,6 +37,9 @@ export struct GDefinitionDash {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -330,13 +333,22 @@ export struct GDefinitionDash {
 
       Text((this.opts.length > 0 ? this.opts[0] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
-      .shadow(Shadow.card).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); }).onClick(() => { Haptics.tick(); this.answer((0)); })
+      .shadow(Shadow.card).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L333'; })
+      .onBlur(() => { if (this.tvFocus === 'L333') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L333')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); }).onClick(() => { Haptics.tick(); this.answer((0)); })
       Text((this.opts.length > 1 ? this.opts[1] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
-      .shadow(Shadow.card).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); }).onClick(() => { Haptics.tick(); this.answer((1)); })
+      .shadow(Shadow.card).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L336'; })
+      .onBlur(() => { if (this.tvFocus === 'L336') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L336')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); }).onClick(() => { Haptics.tick(); this.answer((1)); })
       Text((this.opts.length > 2 ? this.opts[2] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
-      .shadow(Shadow.card).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); }).onClick(() => { Haptics.tick(); this.answer((2)); })
+      .shadow(Shadow.card).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L339'; })
+      .onBlur(() => { if (this.tvFocus === 'L339') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L339')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); }).onClick(() => { Haptics.tick(); this.answer((2)); })
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%')
         .textAlign(TextAlign.Center)
@@ -345,7 +357,10 @@ export struct GDefinitionDash {
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L348'; })
+        .onBlur(() => { if (this.tvFocus === 'L348') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L348')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

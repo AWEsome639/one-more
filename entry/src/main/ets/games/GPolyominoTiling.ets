@@ -59,6 +59,9 @@ export struct GPolyominoTiling {
   // ★ 难度作用到玩法：棋盘边长（原 N=5）
   //   ⚠️ 原本 ForEach(IDXN, …) 是常量数组，已改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -344,7 +347,9 @@ export struct GPolyominoTiling {
             .animation({ duration: Motion.fast, curve: Motion.snap() })
             .onClick(() => { Haptics.tick(); this.place((r * this.diffTotal + c)); })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L347'; })
+            .onBlur(() => { if (this.tvFocus === 'L347') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L347'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((r * this.diffTotal + c)); }); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
@@ -362,7 +367,9 @@ export struct GPolyominoTiling {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.sel = (s); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L365'; })
+        .onBlur(() => { if (this.tvFocus === 'L365') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L365'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.sel = (s); }); }) }, (s: number) => 'sh' + s)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
@@ -374,7 +381,9 @@ export struct GPolyominoTiling {
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L377'; })
+        .onBlur(() => { if (this.tvFocus === 'L377') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L377'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
     }
     .onTouch((e: TouchEvent) => {

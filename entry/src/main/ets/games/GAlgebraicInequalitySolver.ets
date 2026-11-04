@@ -70,6 +70,9 @@ export struct GAlgebraicInequalitySolver {
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -337,28 +340,43 @@ export struct GAlgebraicInequalitySolver {
           Button(this.quiz.choices[(0)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-          .enabled(!this.lockTap && !this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(0)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(0)] ?? '?'); })
+          .enabled(!this.lockTap && !this.over).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L340'; })
+          .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L340')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(0)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(0)] ?? '?'); })
           Button(this.quiz.choices[(1)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-          .enabled(!this.lockTap && !this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(1)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(1)] ?? '?'); })
+          .enabled(!this.lockTap && !this.over).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L344'; })
+          .onBlur(() => { if (this.tvFocus === 'L344') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L344')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(1)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(1)] ?? '?'); })
         }.width('100%')
         Row({ space: Space.sm }) {
           Button(this.quiz.choices[(2)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-          .enabled(!this.lockTap && !this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(2)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(2)] ?? '?'); })
+          .enabled(!this.lockTap && !this.over).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L350'; })
+          .onBlur(() => { if (this.tvFocus === 'L350') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L350')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(2)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(2)] ?? '?'); })
           Button(this.quiz.choices[(3)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
-          .enabled(!this.lockTap && !this.over).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(3)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(3)] ?? '?'); })
+          .enabled(!this.lockTap && !this.over).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L354'; })
+          .onBlur(() => { if (this.tvFocus === 'L354') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L354')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(3)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(3)] ?? '?'); })
         }.width('100%')
       }.width('100%')
 
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.sky).borderRadius(Radius.md)
-          .width(120).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+          .width(120).height(Cell.of(44)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L361'; })
+          .onBlur(() => { if (this.tvFocus === 'L361') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L361')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('严格/非严格要看清楚')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }

@@ -1,0 +1,159 @@
+/**
+ * 警觉任务（vigilance_task）—— CPT：符号逐个闪现，只在看到 ◆ 时点按钮，其余一律忍住
+ * 胜负：40 个刺激里命中 ≥6 且误报 ≤3 ⇒ 通关；进度：进度 / 命中 / 误报 / 漏报
+ */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const TARGET: string = '◆';
+const OTHERS: string[] = ['●', '▲', '■', '★', '✚', '◇'];
+const TOTAL: number = 40;
+const ON_MS: number = 620;
+const OFF_MS: number = 380;
+const NEED_HIT: number = 6;
+const MAX_FA: number = 3;
+
+@Component
+export struct GVigilanceTask {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
+  onFinish: (r: GameResult) => void = () => {};
+  @State idx: number = 0;
+  @State visible: boolean = false;
+  @State cur: string = '';
+  @State hit: number = 0;
+  @State fa: number = 0;
+  @State miss: number = 0;
+  @State msg: string = '';
+  @State over: boolean = false;
+  @State won: boolean = false;
+  @State pressing: boolean = false;
+  private stream: string[] = [];
+  private tapped: boolean = false;
+  private startAt: number = 0;
+  private to: number = -1;
+  private done: boolean = false;
+
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.sizeNow(TOTAL);
+     this.reset(); }
+  aboutToDisappear(): void { this.clearAll(); }
+  private clearAll(): void { if (this.to >= 0) { clearTimeout(this.to); this.to = -1; } }
+
+  private reset(): void {
+    this.clearAll();
+    this.idx = 0; this.visible = false; this.hit = 0; this.fa = 0; this.miss = 0;
+    this.over = false; this.won = false; this.done = false; this.pressing = false;
+    this.tapped = false; this.cur = '';
+    this.msg = '盯住屏幕：只有 ' + TARGET + ' 要点，其它都别点';
+    // 目标固定 8~12 个（不是纯随机）：保证这一局一定拿得到通关线，其余位置全是干扰项
+    const s: string[] = [];
+    for (let i = 0; i < this.diffTotal; i++) { s.push(OTHERS[Math.floor(Math.random() * OTHERS.length)]); }
+    const nT: number = 8 + Math.floor(Math.random() * 5);
+    for (let k = 0; k < nT; k++) {
+      let p: number = Math.floor(Math.random() * this.diffTotal);
+      while (s[p] === TARGET) { p = (p + 1) % this.diffTotal; }
+      s[p] = TARGET;
+    }
+    this.stream = s;
+    this.startAt = Date.now();
+    this.to = setTimeout(() => { this.to = -1; this.show(); }, 900);
+  }
+
+  private show(): void {
+    if (this.idx >= this.diffTotal) { this.finishUp(); return; }
+    this.cur = this.stream[this.idx];
+    this.visible = true;
+    this.tapped = false;
+    this.to = setTimeout(() => { this.to = -1; this.afterShow(); }, ON_MS);
+  }
+
+  private afterShow(): void {
+    this.visible = false;
+    if (this.stream[this.idx] === TARGET && !this.tapped) {
+      this.miss = this.miss + 1;
+      this.msg = '😴 漏掉了一个 ' + TARGET;
+    }
+    this.idx = this.idx + 1;
+    this.to = setTimeout(() => { this.to = -1; this.show(); }, OFF_MS);
+  }
+
+  private strike(): void {
+    if (this.over || !this.visible) { return; }
+    if (this.cur === TARGET) {
+      if (this.tapped) { return; }
+      this.tapped = true;
+      this.hit = this.hit + 1;
+      this.msg = '✅ 命中！';
+      return;
+    }
+    this.fa = this.fa + 1;
+    this.msg = '⚠️ 误报：这不是目标';
+  }
+
+  private finishUp(): void {
+    if (this.done) { return; }
+    this.done = true;
+    this.over = true;
+    this.won = this.hit >= NEED_HIT && this.fa <= MAX_FA;
+    this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + '命中 ' + String(this.hit)
+      + ' · 误报 ' + String(this.fa) + ' · 漏报 ' + String(this.miss);
+    this.clearAll();
+    const r: GameResult = {
+      gameId: 'vigilance_task', solved: this.won,
+      score: this.hit * 120 - this.fa * 60 - this.miss * 30,
+      durationMs: Date.now() - this.startAt, levelReached: this.hit
+    };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.xs }) {
+        this.stat(TG('进度'), String(this.idx) + '/' + String(this.diffTotal))
+        this.stat(TG('命中'), String(this.hit))
+        this.stat('误报', String(this.fa))
+        this.stat('漏报', String(this.miss))
+      }.width('100%')
+
+      Text(this.visible ? this.cur : '·').fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
+        .fontColor(this.visible && this.cur === TARGET ? Palette.primary : this.theme.inkSoft)
+        .textAlign(TextAlign.Center).width('100%').height(148).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
+
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+
+      Button(this.over ? TG('已结束') : ('看到 ' + TARGET + ' 就点我'))
+        .fontSize(FontSize.lg).fontColor('#FFFFFF').enabled(!this.over)
+        .backgroundColor(this.over ? this.theme.lineSoft : Palette.primary)
+        .borderRadius(Radius.md).width('100%').height(64)
+        .onTouch((e: TouchEvent) => { this.pressing = e.type === TouchType.Down; })
+        .scale({ x: this.pressing ? Motion.pressScale : 1, y: this.pressing ? Motion.pressScale : 1 })
+        .animation({ duration: Motion.fast, curve: Motion.snap() })
+        .onClick(() => { this.strike(); })
+
+      Button(this.over ? TG('再来一局') : TG('重开')).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .backgroundColor(Palette.primaryDeep).borderRadius(Radius.md).width('100%').height(46)
+        .onClick(() => { this.reset(); })
+
+      Text('提示：这一局考的是「忍住」—— 乱点扣分，漏掉也扣分')
+        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  stat(label: string, value: string) {
+    Column({ space: 2 }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+    }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+  }
+}

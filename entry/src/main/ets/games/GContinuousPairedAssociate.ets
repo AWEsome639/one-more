@@ -51,6 +51,9 @@ export struct GContinuousPairedAssociate {
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -414,7 +417,9 @@ export struct GContinuousPairedAssociate {
           .width('100%')
           .height(Cell.of(48))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L417'; })
+          .onBlur(() => { if (this.tvFocus === 'L417') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L417'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.phase = 1; this.lastMsg = TG('选出刚才和它配对的'); this.startTrial(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -451,7 +456,9 @@ export struct GContinuousPairedAssociate {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L454'; })
+              .onBlur(() => { if (this.tvFocus === 'L454') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L454'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer(o); }); })
               .onClick(() => {
                 Haptics.tick();
@@ -476,7 +483,9 @@ export struct GContinuousPairedAssociate {
         .width('100%')
         .height(Cell.of(46))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L479'; })
+        .onBlur(() => { if (this.tvFocus === 'L479') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L479'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();

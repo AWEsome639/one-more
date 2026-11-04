@@ -32,6 +32,9 @@ export struct GCryptogramAll {
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -314,7 +317,9 @@ export struct GCryptogramAll {
         .layoutWeight(1).height(Cell.of(48)).fontSize(FontSize.md).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).shadow(Shadow.card)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L317'; })
+        .onBlur(() => { if (this.tvFocus === 'L317') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L317'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts.length > 0 ? this.opts[0] : '')); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts.length > 0 ? this.opts[0] : '')); })
         Button((this.opts.length > 0 ? this.opts[1] : ''))
@@ -322,7 +327,9 @@ export struct GCryptogramAll {
         .layoutWeight(1).height(Cell.of(48)).fontSize(FontSize.md).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).shadow(Shadow.card)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L325'; })
+        .onBlur(() => { if (this.tvFocus === 'L325') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L325'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts.length > 0 ? this.opts[1] : '')); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts.length > 0 ? this.opts[1] : '')); })
       }.width('100%')
@@ -332,7 +339,9 @@ export struct GCryptogramAll {
         .layoutWeight(1).height(Cell.of(48)).fontSize(FontSize.md).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).shadow(Shadow.card)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L335'; })
+        .onBlur(() => { if (this.tvFocus === 'L335') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L335'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts.length > 0 ? this.opts[2] : '')); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts.length > 0 ? this.opts[2] : '')); })
         Button((this.opts.length > 0 ? this.opts[3] : ''))
@@ -340,7 +349,9 @@ export struct GCryptogramAll {
         .layoutWeight(1).height(Cell.of(48)).fontSize(FontSize.md).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).shadow(Shadow.card)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L343'; })
+        .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L343'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts.length > 0 ? this.opts[3] : '')); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts.length > 0 ? this.opts[3] : '')); })
       }.width('100%')
@@ -350,7 +361,9 @@ export struct GCryptogramAll {
         .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L353'; })
+        .onBlur(() => { if (this.tvFocus === 'L353') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L353'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
     }

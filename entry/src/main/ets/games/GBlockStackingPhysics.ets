@@ -38,6 +38,9 @@ export struct GBlockStackingPhysics {
 
   // ★ 难度作用到玩法（size）：原 SLOT=5
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -305,7 +308,9 @@ export struct GBlockStackingPhysics {
           }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
 .borderRadius(Radius.md).borderWidth(1).borderColor(this.theme.line)
 .focusable(Tv.on())
-.focusBox(Tv.box())
+.onFocus(() => { this.tvFocus = 'L308'; })
+.onBlur(() => { if (this.tvFocus === 'L308') { this.tvFocus = ''; } })
+.outline(Tv.focusOutline(this.tvFocus === 'L308'))
 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place(k); }); })
 .onClick(() => { Haptics.tick(); this.place(k); })
         }, (k: number) => 'k' + k)
@@ -325,10 +330,16 @@ export struct GBlockStackingPhysics {
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
-.backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+.backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on())
+.onFocus(() => { this.tvFocus = 'L328'; })
+.onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })
+.outline(Tv.focusOutline(this.tvFocus === 'L328')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
         Button(TG('换一关'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor(this.theme.ink)
-.backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); const n: number = (this.level + 1) % LEVELS.length; this.reset(); this.level = n; this.queue = LEVELS[n].queue.slice(); }); }).onClick(() => {
+.backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on())
+.onFocus(() => { this.tvFocus = 'L331'; })
+.onBlur(() => { if (this.tvFocus === 'L331') { this.tvFocus = ''; } })
+.outline(Tv.focusOutline(this.tvFocus === 'L331')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); const n: number = (this.level + 1) % LEVELS.length; this.reset(); this.level = n; this.queue = LEVELS[n].queue.slice(); }); }).onClick(() => {
             Haptics.tap();
             const n: number = (this.level + 1) % LEVELS.length; this.reset();
             this.level = n; this.queue = LEVELS[n].queue.slice();

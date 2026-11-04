@@ -39,6 +39,9 @@ export struct GOneLetterShift {
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -297,7 +300,9 @@ export struct GOneLetterShift {
             })
             .onClick(() => { Haptics.tick(); if ((true)) { this.pick((i)); } })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L300'; })
+            .onBlur(() => { if (this.tvFocus === 'L300') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L300'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if ((true)) { this.pick((i)); } }); })
           }, (i: number) => 'a' + i)
         }.width('100%')
@@ -314,7 +319,9 @@ export struct GOneLetterShift {
             })
             .onClick(() => { Haptics.tick(); if ((false)) { this.pick((i)); } })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L317'; })
+            .onBlur(() => { if (this.tvFocus === 'L317') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L317'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if ((false)) { this.pick((i)); } }); })
           }, (i: number) => 'b' + i)
         }.width('100%')
@@ -328,7 +335,9 @@ export struct GOneLetterShift {
         .borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L331'; })
+        .onBlur(() => { if (this.tvFocus === 'L331') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L331'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：换掉一个字母就变成另一个词，位置就是两词不一样的地方'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

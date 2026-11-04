@@ -36,6 +36,9 @@ export struct GWordSearch {
 
   // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -365,7 +368,9 @@ export struct GWordSearch {
           Row({ space: Space.xs }) {
             ForEach([0, 1, 2, 3, 4, 5, 6, 7], (c: number) => { Text(this.grid.length > (r * N + c) ? this.grid[(r * N + c)] : '').fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.mark.indexOf((r * N + c)) >= 0 || this.sel.indexOf((r * N + c)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).aspectRatio(1).backgroundColor(this.toneAt((r * N + c))).borderRadius(Radius.xs).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L368'; })
+            .onBlur(() => { if (this.tvFocus === 'L368') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L368'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
@@ -378,7 +383,9 @@ export struct GWordSearch {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L381'; })
+      .onBlur(() => { if (this.tvFocus === 'L381') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L381'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：单词只横放或竖放，点首尾两格即可（倒着也算）')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }

@@ -48,6 +48,9 @@ export struct GCrossword {
   // ★ 难度作用到玩法：**行数**（原 SIZE=5；简单 ×0.7 / 普通 ×1 / 困难 ×1.3 ⇒ 4 / 5 / 7 行）
   //   列数固定 = 词长 5（COLS）—— 词都是 5 字母，列数跟着行数变只会把词截短
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -324,7 +327,9 @@ export struct GCrossword {
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((0)) ? this.theme.surfaceAlt : Palette.primary)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L327'; })
+        .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L327'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((0)); }); })
         .onClick(() => { Haptics.tick(); this.place((0)); })
         Text((1) < this.bank.length ? this.bank[(1)] : '')
@@ -333,7 +338,9 @@ export struct GCrossword {
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((1)) ? this.theme.surfaceAlt : Palette.primary)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L336'; })
+        .onBlur(() => { if (this.tvFocus === 'L336') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L336'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((1)); }); })
         .onClick(() => { Haptics.tick(); this.place((1)); })
         Text((2) < this.bank.length ? this.bank[(2)] : '')
@@ -342,7 +349,9 @@ export struct GCrossword {
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((2)) ? this.theme.surfaceAlt : Palette.primary)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L345'; })
+        .onBlur(() => { if (this.tvFocus === 'L345') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L345'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((2)); }); })
         .onClick(() => { Haptics.tick(); this.place((2)); })
         Text((3) < this.bank.length ? this.bank[(3)] : '')
@@ -351,7 +360,9 @@ export struct GCrossword {
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((3)) ? this.theme.surfaceAlt : Palette.primary)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L354'; })
+        .onBlur(() => { if (this.tvFocus === 'L354') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L354'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((3)); }); })
         .onClick(() => { Haptics.tick(); this.place((3)); })
       }
@@ -363,7 +374,9 @@ export struct GCrossword {
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((4)) ? this.theme.surfaceAlt : Palette.primary)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L366'; })
+        .onBlur(() => { if (this.tvFocus === 'L366') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L366'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((4)); }); })
         .onClick(() => { Haptics.tick(); this.place((4)); })
         Text((5) < this.bank.length ? this.bank[(5)] : '')
@@ -372,7 +385,9 @@ export struct GCrossword {
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((5)) ? this.theme.surfaceAlt : Palette.primary)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L375'; })
+        .onBlur(() => { if (this.tvFocus === 'L375') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L375'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((5)); }); })
         .onClick(() => { Haptics.tick(); this.place((5)); })
         Text((6) < this.bank.length ? this.bank[(6)] : '')
@@ -381,14 +396,19 @@ export struct GCrossword {
         .layoutWeight(1).height(Cell.of(42)).borderRadius(Radius.sm).shadow(Shadow.card)
         .backgroundColor(this.isUsed((6)) ? this.theme.surfaceAlt : Palette.primary)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L384'; })
+        .onBlur(() => { if (this.tvFocus === 'L384') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L384'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.place((6)); }); })
         .onClick(() => { Haptics.tick(); this.place((6)); })
       }
       .width('100%')
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L391'; })
+        .onBlur(() => { if (this.tvFocus === 'L391') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L391')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

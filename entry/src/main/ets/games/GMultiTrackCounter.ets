@@ -27,6 +27,9 @@ export struct GMultiTrackCounter {
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -380,7 +383,9 @@ export struct GMultiTrackCounter {
         .scale({ x: Motion.pressScale, y: Motion.pressScale })
         .onClick(() => { Haptics.tap(); this.bump((-1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L383'; })
+        .onBlur(() => { if (this.tvFocus === 'L383') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L383'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.bump((-1)); }); })
         Button((1) > 0 ? '+' + String((1)) : String((1)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -393,7 +398,9 @@ export struct GMultiTrackCounter {
         .scale({ x: Motion.pressScale, y: Motion.pressScale })
         .onClick(() => { Haptics.tap(); this.bump((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L396'; })
+        .onBlur(() => { if (this.tvFocus === 'L396') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L396'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.bump((1)); }); })
         Button((5) > 0 ? '+' + String((5)) : String((5)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -406,7 +413,9 @@ export struct GMultiTrackCounter {
         .scale({ x: Motion.pressScale, y: Motion.pressScale })
         .onClick(() => { Haptics.tap(); this.bump((5)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L409'; })
+        .onBlur(() => { if (this.tvFocus === 'L409') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L409'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.bump((5)); }); })
       }
       .width('100%')
@@ -420,7 +429,9 @@ export struct GMultiTrackCounter {
         .height(Cell.of(48))
         .onClick(() => { Haptics.tap(); this.submit(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L423'; })
+        .onBlur(() => { if (this.tvFocus === 'L423') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L423'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit(); }); })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -432,7 +443,9 @@ export struct GMultiTrackCounter {
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L435'; })
+        .onBlur(() => { if (this.tvFocus === 'L435') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L435'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：3 轮各报一次，命中 ≤ 2 通关（每差 1 扣 100 分）'))
         .fontSize(FontSize.xxs)

@@ -35,6 +35,9 @@ export struct GMissingOperator {
   onFinish: (r: GameResult) => void = () => {};
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -360,7 +363,9 @@ export struct GMissingOperator {
               .onTouch((e: TouchEvent) => { this.press = e.type === TouchType.Down ? kind : -1; })
               .onClick(() => { Haptics.tick(); this.pick(kind); })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L363'; })
+              .onBlur(() => { if (this.tvFocus === 'L363') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L363'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(kind); }); })
           }, (kind: number) => 'op' + kind)
         }.width('100%')
@@ -377,7 +382,9 @@ export struct GMissingOperator {
           .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
           .onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L380'; })
+          .onBlur(() => { if (this.tvFocus === 'L380') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L380'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
         Text(TG('提示：先估大小 —— 比两个数都大很多，多半是乘'))

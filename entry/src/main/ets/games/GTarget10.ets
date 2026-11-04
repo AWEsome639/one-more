@@ -38,6 +38,9 @@ export struct GTarget10 {
   @Prop theme: Theme = Theme.light(); @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -334,7 +337,9 @@ export struct GTarget10 {
               this.tap((r * COLS + c));
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L337'; })
+              .onBlur(() => { if (this.tvFocus === 'L337') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L337'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * COLS + c)); }); })
             }, (c: number) => this.tileKey(r * COLS + c))
           }.width('100%')
@@ -354,7 +359,9 @@ export struct GTarget10 {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L357'; })
+        .onBlur(() => { if (this.tvFocus === 'L357') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L357'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：连续消对会加连击分，消错会掉分')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }

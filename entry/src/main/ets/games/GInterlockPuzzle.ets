@@ -32,6 +32,9 @@ export struct GInterlockPuzzle {
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -309,7 +312,10 @@ export struct GInterlockPuzzle {
         Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L312'; })
+          .onBlur(() => { if (this.tvFocus === 'L312') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L312')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
       Text(TG('格子里的数字 = 还压着它的零件数（灰色 = 抽不动）'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -331,7 +337,9 @@ export struct GInterlockPuzzle {
     .backgroundColor(this.cellColor(slot))
     .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L334'; })
+    .onBlur(() => { if (this.tvFocus === 'L334') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L334'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pull(slot); }); })
     .onClick(() => { Haptics.tick(); this.pull(slot); })
   }

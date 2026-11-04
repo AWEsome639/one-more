@@ -103,6 +103,9 @@ export struct GKlotski {
   @State private over: boolean = false;
   @State private won: boolean = false;
   /** 代打计时器（-1 = 未运行）。必须 @State，否则按钮文字不刷新 */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -594,7 +597,9 @@ export struct GKlotski {
             .height(Cell.of(44))
             .layoutWeight(1)
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L597'; })
+            .onBlur(() => { if (this.tvFocus === 'L597') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L597'))
             // ★ 2026-10-31：横屏这个「重开」漏了 onKeyEvent ⇒ 遥控器 OK 键点不动（审计抓到）
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
             .onClick(() => { Haptics.tap(); this.reset(); })
@@ -623,7 +628,9 @@ export struct GKlotski {
         .width('100%')
         .height(Cell.of(44))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L626'; })
+        .onBlur(() => { if (this.tvFocus === 'L626') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L626'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
@@ -697,7 +704,9 @@ export struct GKlotski {
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L700'; })
+    .onBlur(() => { if (this.tvFocus === 'L700') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L700'))
     .onClick(() => {
       Haptics.tick();
       this.sel = i;
@@ -744,7 +753,9 @@ export struct GKlotski {
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L747'; })
+      .onBlur(() => { if (this.tvFocus === 'L747') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L747'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove(dx, dy); }); })
       .onClick(() => {
         Haptics.tick();

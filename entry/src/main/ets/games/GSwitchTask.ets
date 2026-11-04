@@ -27,6 +27,9 @@ export struct GSwitchTask {
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -307,7 +310,9 @@ export struct GSwitchTask {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.answer((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L310'; })
+        .onBlur(() => { if (this.tvFocus === 'L310') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L310'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
         Text(this.optName((1))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
         .fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
@@ -318,7 +323,9 @@ export struct GSwitchTask {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.answer((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L321'; })
+        .onBlur(() => { if (this.tvFocus === 'L321') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L321'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); })
       }.width('100%')
 
@@ -331,7 +338,9 @@ export struct GSwitchTask {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L334'; })
+        .onBlur(() => { if (this.tvFocus === 'L334') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L334'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：数字不变，换规则那几轮手会明显慢一拍'))

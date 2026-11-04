@@ -47,6 +47,9 @@ export struct GSumPyramid {
 
   // ★ 难度作用到玩法（lives）：原 LIVES=3
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -332,7 +335,9 @@ export struct GSumPyramid {
           if (this.opts.length > (i)) { this.choose(this.opts[(i)]); }
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L335'; })
+          .onBlur(() => { if (this.tvFocus === 'L335') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L335'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.opts.length > (i)) { this.choose(this.opts[(i)]); } }); })
         }, (i: number) => 'o' + i)
       }.width('100%')
@@ -344,7 +349,9 @@ export struct GSumPyramid {
           this.reset();
         })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L347'; })
+        .onBlur(() => { if (this.tvFocus === 'L347') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L347'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('提示：相邻两格之和往上搬，一层层来')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }

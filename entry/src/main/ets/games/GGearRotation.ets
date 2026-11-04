@@ -30,6 +30,9 @@ export struct GGearRotation {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -332,14 +335,18 @@ export struct GGearRotation {
           .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L335'; })
+          .onBlur(() => { if (this.tvFocus === 'L335') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L335'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(true); }); })
           .onClick(() => { Haptics.tap(); this.answer(true); })
         Button(TG('↺ 逆时针'))
           .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.violet)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L342'; })
+          .onBlur(() => { if (this.tvFocus === 'L342') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L342'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(false); }); })
           .onClick(() => { Haptics.tap(); this.answer(false); })
       }.width('100%')
@@ -347,7 +354,9 @@ export struct GGearRotation {
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
         .borderRadius(Radius.md).width('100%').height(Cell.of(44))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L350'; })
+        .onBlur(() => { if (this.tvFocus === 'L350') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L350'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('口诀：啮合反向 · 皮带同向'))

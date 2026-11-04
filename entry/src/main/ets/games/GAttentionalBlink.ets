@@ -30,6 +30,9 @@ export struct GAttentionalBlink {
 
   // ★ 难度作用到玩法（size）：TRIALS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -325,7 +328,9 @@ export struct GAttentionalBlink {
       .scale({ x: this.pick === (0) ? Motion.pressScale : 1, y: this.pick === (0) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L328'; })
+      .onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L328'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
       .onClick(() => { Haptics.tick(); this.answer((0)); }); Text(this.opts[(1)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (1) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
@@ -335,7 +340,9 @@ export struct GAttentionalBlink {
       .scale({ x: this.pick === (1) ? Motion.pressScale : 1, y: this.pick === (1) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L338'; })
+      .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L338'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); })
       .onClick(() => { Haptics.tick(); this.answer((1)); }) }.width('100%')
       Row({ space: Space.sm }) { Text(this.opts[(2)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
@@ -346,7 +353,9 @@ export struct GAttentionalBlink {
       .scale({ x: this.pick === (2) ? Motion.pressScale : 1, y: this.pick === (2) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L349'; })
+      .onBlur(() => { if (this.tvFocus === 'L349') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L349'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((2)); }); })
       .onClick(() => { Haptics.tick(); this.answer((2)); }); Text(this.opts[(3)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (3) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
@@ -356,13 +365,18 @@ export struct GAttentionalBlink {
       .scale({ x: this.pick === (3) ? Motion.pressScale : 1, y: this.pick === (3) ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L359'; })
+      .onBlur(() => { if (this.tvFocus === 'L359') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L359'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((3)); }); })
       .onClick(() => { Haptics.tick(); this.answer((3)); }) }.width('100%')
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L365'; })
+        .onBlur(() => { if (this.tvFocus === 'L365') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L365')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：数字只出现一次，其余字母都是干扰项')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

@@ -46,6 +46,9 @@ export struct GMahjongSolitaire {
 
   // ★ 难度作用到玩法（size）：原 KINDS=8
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -507,7 +510,9 @@ export struct GMahjongSolitaire {
               })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L510'; })
+              .onBlur(() => { if (this.tvFocus === 'L510') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L510'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(r * PC + c); }); })
               .onClick(() => {
                 Haptics.tick();
@@ -540,7 +545,9 @@ export struct GMahjongSolitaire {
           .layoutWeight(1).height(Cell.of(44))
           .enabled(!this.over)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L543'; })
+          .onBlur(() => { if (this.tvFocus === 'L543') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L543'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.useHint(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -552,7 +559,9 @@ export struct GMahjongSolitaire {
           .backgroundColor(Palette.rose).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L555'; })
+          .onBlur(() => { if (this.tvFocus === 'L555') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L555'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -604,7 +613,9 @@ export struct GMahjongSolitaire {
     })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L607'; })
+    .onBlur(() => { if (this.tvFocus === 'L607') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L607'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
     .onClick(() => {
       Haptics.tick();

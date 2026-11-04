@@ -55,6 +55,9 @@ export struct GOddRotation {
 
   // ★ 难度作用到玩法（size）：原 ROUNDS=10
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -361,7 +364,9 @@ export struct GOddRotation {
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .onClick(() => { Haptics.tick(); this.tap((r * 3 + c)); })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L364'; })
+              .onBlur(() => { if (this.tvFocus === 'L364') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L364'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * 3 + c)); }); })
             }, (c: number) => 'c' + c)
           }
@@ -384,7 +389,9 @@ export struct GOddRotation {
         .height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L387'; })
+        .onBlur(() => { if (this.tvFocus === 'L387') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L387'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG('判定：10 题答对 ≥ 8 题 · 图案角度每轮随机，别看错基准'))
         .fontSize(FontSize.xxs)

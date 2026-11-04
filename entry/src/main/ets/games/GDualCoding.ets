@@ -39,6 +39,9 @@ export struct GDualCoding {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -340,7 +343,10 @@ export struct GDualCoding {
                 .backgroundColor(this.pick === (r * 2 + c) ? Palette.primaryDeep : this.theme.surfaceAlt)
                 .borderRadius(Radius.md).opacity(this.pick >= 0 && this.pick !== (r * 2 + c) ? 0.5 : 1)
                 .scale({ x: this.pick === (r * 2 + c) ? Motion.pressScale : 1, y: this.pick === (r * 2 + c) ? Motion.pressScale : 1 })
-                .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((r * 2 + c)); }); }).onClick(() => { Haptics.tick(); this.answer((r * 2 + c)); })
+                .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+                .onFocus(() => { this.tvFocus = 'L343'; })
+                .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
+                .outline(Tv.focusOutline(this.tvFocus === 'L343')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((r * 2 + c)); }); }).onClick(() => { Haptics.tick(); this.answer((r * 2 + c)); })
               }, (c: number) => 'qc' + c)
             }.width('100%')
           }, (r: number) => 'qr' + r)
@@ -351,12 +357,18 @@ export struct GDualCoding {
         if (this.phase === 0) {
           Button(TG('我记住了 ▶'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.cyan)
-            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.startQuiz(); }); }).onClick(() => { Haptics.tap(); this.startQuiz(); })
+            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L354'; })
+            .onBlur(() => { if (this.tvFocus === 'L354') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L354')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.startQuiz(); }); }).onClick(() => { Haptics.tap(); this.startQuiz(); })
         }
         Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.phase === 0 ? '#FFFFFF' : this.theme.ink)
           .backgroundColor(this.phase === 0 ? Palette.primary : this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L359'; })
+          .onBlur(() => { if (this.tvFocus === 'L359') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L359')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       }.width('100%')
     }
     .onTouch((e: TouchEvent) => {

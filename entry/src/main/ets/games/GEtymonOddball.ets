@@ -59,6 +59,9 @@ export struct GEtymonOddball {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -301,19 +304,34 @@ export struct GEtymonOddball {
 
       Column({ space: Space.sm }) {
         Button((0) < this.shown.length ? this.shown[(0)] : '')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(0)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(0)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L304'; })
+      .onBlur(() => { if (this.tvFocus === 'L304') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L304')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(0)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(0)]); })
         Button((1) < this.shown.length ? this.shown[(1)] : '')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(1)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(1)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L306'; })
+      .onBlur(() => { if (this.tvFocus === 'L306') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L306')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(1)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(1)]); })
         Button((2) < this.shown.length ? this.shown[(2)] : '')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(2)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(2)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L308'; })
+      .onBlur(() => { if (this.tvFocus === 'L308') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L308')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(2)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(2)]); })
         Button((3) < this.shown.length ? this.shown[(3)] : '')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(3)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(3)]); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L310'; })
+      .onBlur(() => { if (this.tvFocus === 'L310') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L310')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(3)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(3)]); })
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L316'; })
+      .onBlur(() => { if (this.tvFocus === 'L316') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L316')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(TG2("共 {0} 轮，答对 ≥{1} 通关；每题 {2} 秒",Digits(String(this.diffTotal), this.langCode), PASS,Digits(String(LIMIT_S), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

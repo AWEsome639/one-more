@@ -54,6 +54,9 @@ export struct GCryptoArithmetic {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -368,7 +371,9 @@ export struct GCryptoArithmetic {
           }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (0) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L371'; })
+          .onBlur(() => { if (this.tvFocus === 'L371') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L371'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over) { this.sel = (0); this.tip = TG2('给 {0} 选数字', this.letterAt((0))); } }); })
           .onClick(() => { Haptics.tick(); if (!this.over) { this.sel = (0); this.tip = TG2('给 {0} 选数字', this.letterAt((0))); } })
           Stack() {
@@ -377,7 +382,9 @@ export struct GCryptoArithmetic {
           }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (1) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L380'; })
+          .onBlur(() => { if (this.tvFocus === 'L380') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L380'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over) { this.sel = (1); this.tip = TG2('给 {0} 选数字', this.letterAt((1))); } }); })
           .onClick(() => { Haptics.tick(); if (!this.over) { this.sel = (1); this.tip = TG2('给 {0} 选数字', this.letterAt((1))); } })
           Text(this.puz.form === 0 ? '+' : '×')
@@ -388,7 +395,9 @@ export struct GCryptoArithmetic {
           }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (2) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L391'; })
+          .onBlur(() => { if (this.tvFocus === 'L391') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L391'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over) { this.sel = (2); this.tip = TG2('给 {0} 选数字', this.letterAt((2))); } }); })
           .onClick(() => { Haptics.tick(); if (!this.over) { this.sel = (2); this.tip = TG2('给 {0} 选数字', this.letterAt((2))); } })
           Text('=').accessibilityText(TG('等于')).fontSize(FontSize.xxl).fontColor(this.theme.inkSoft).width(Space.xl).textAlign(TextAlign.Center)
@@ -399,7 +408,9 @@ export struct GCryptoArithmetic {
           }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (3) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L402'; })
+          .onBlur(() => { if (this.tvFocus === 'L402') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L402'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over) { this.sel = (3); this.tip = TG2('给 {0} 选数字', this.letterAt((3))); } }); })
           .onClick(() => { Haptics.tick(); if (!this.over) { this.sel = (3); this.tip = TG2('给 {0} 选数字', this.letterAt((3))); } })
           Stack() {
@@ -408,7 +419,9 @@ export struct GCryptoArithmetic {
           }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (4) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L411'; })
+          .onBlur(() => { if (this.tvFocus === 'L411') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L411'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over) { this.sel = (4); this.tip = TG2('给 {0} 选数字', this.letterAt((4))); } }); })
           .onClick(() => { Haptics.tick(); if (!this.over) { this.sel = (4); this.tip = TG2('给 {0} 选数字', this.letterAt((4))); } })
         }
@@ -421,20 +434,29 @@ export struct GCryptoArithmetic {
           ForEach([0, 1, 2, 3, 4], (d: number) => { Button(String((d)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.usedDigit((d)) ? this.theme.inkFaint : this.theme.ink)
           .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(48))
-          .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapDigit((d)); }); }).onClick(() => { Haptics.tap(); this.tapDigit((d)); }) }, (d: number) => 'p' + d)
+          .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L424'; })
+          .onBlur(() => { if (this.tvFocus === 'L424') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L424')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapDigit((d)); }); }).onClick(() => { Haptics.tap(); this.tapDigit((d)); }) }, (d: number) => 'p' + d)
         }.width('100%')
         Row({ space: Space.xs }) {
           ForEach([5, 6, 7, 8, 9], (d: number) => { Button(String((d)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.usedDigit((d)) ? this.theme.inkFaint : this.theme.ink)
           .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(48))
-          .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapDigit((d)); }); }).onClick(() => { Haptics.tap(); this.tapDigit((d)); }) }, (d: number) => 'q' + d)
+          .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L430'; })
+          .onBlur(() => { if (this.tvFocus === 'L430') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L430')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapDigit((d)); }); }).onClick(() => { Haptics.tap(); this.tapDigit((d)); }) }, (d: number) => 'q' + d)
         }.width('100%')
       }.width('100%')
 
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(44)).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+          .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(44)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L437'; })
+          .onBlur(() => { if (this.tvFocus === 'L437') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L437')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
         Text(TG('五个字母的数字两两不同')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }

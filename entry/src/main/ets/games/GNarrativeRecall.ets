@@ -65,6 +65,9 @@ export struct GNarrativeRecall {
 
   // ★ 难度作用到玩法（size）：PASS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -349,7 +352,9 @@ export struct GNarrativeRecall {
           .borderRadius(Radius.md).width('100%').height(Cell.of(46))
           .onClick(() => { Haptics.tap(); this.phase = 1; this.msg = TG(TG(TG('第 1 题'))); })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L352'; })
+          .onBlur(() => { if (this.tvFocus === 'L352') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L352'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.phase = 1; this.msg = TG(TG(TG('第 1 题'))); }); })
       } else if (this.phase === 1 && this.qIdx < this.story.qs.length) {
         ForEach([0, 1, 2], (k: number) => { this.optBtn(k) }, (k: number) => 'o' + k)
@@ -361,7 +366,9 @@ export struct GNarrativeRecall {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal)
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L364'; })
+        .onBlur(() => { if (this.tvFocus === 'L364') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L364'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：不用背原文，抓住时间、地点、数字与人名'))
@@ -383,7 +390,9 @@ export struct GNarrativeRecall {
       .animation({ duration: Motion.fast, curve: Motion.snap() })
       .onClick(() => { Haptics.tick(); this.answer(k); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L386'; })
+      .onBlur(() => { if (this.tvFocus === 'L386') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L386'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer(k); }); })
   }
 }

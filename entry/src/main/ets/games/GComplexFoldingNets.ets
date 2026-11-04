@@ -67,6 +67,9 @@ export struct GComplexFoldingNets {
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -334,7 +337,9 @@ export struct GComplexFoldingNets {
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L337'; })
+        .onBlur(() => { if (this.tvFocus === 'L337') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L337'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[0])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[0])); })
         Button(TG2('{0} 层', this.opts[1]))
@@ -344,7 +349,9 @@ export struct GComplexFoldingNets {
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L347'; })
+        .onBlur(() => { if (this.tvFocus === 'L347') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L347'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[1])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[1])); })
       }.width('100%')
@@ -356,7 +363,9 @@ export struct GComplexFoldingNets {
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L359'; })
+        .onBlur(() => { if (this.tvFocus === 'L359') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L359'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[2])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[2])); })
         Button(TG2('{0} 层', this.opts[3]))
@@ -366,7 +375,9 @@ export struct GComplexFoldingNets {
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L369'; })
+        .onBlur(() => { if (this.tvFocus === 'L369') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L369'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((this.opts[3])); }); })
         .onClick(() => { Haptics.tap(); this.pick((this.opts[3])); })
       }.width('100%')
@@ -376,7 +387,9 @@ export struct GComplexFoldingNets {
         .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L379'; })
+        .onBlur(() => { if (this.tvFocus === 'L379') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L379'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
     }

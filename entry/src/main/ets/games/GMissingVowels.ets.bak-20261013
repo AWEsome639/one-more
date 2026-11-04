@@ -1,0 +1,156 @@
+/** 缺元音 —— 元音被挖空，按顺序补回去（6 题答对 ≥4 通关 ｜ 进度：题号/答对/倒计时） */
+import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { GameDiff } from '../core/GameDiff';
+import { TG } from '../core/GameI18n';
+import { GameResult } from '../core/GameRegistry';
+import { LanRace } from '../core/LanRace';
+
+const QN: number = 6; const PASS: number = 4; const FEED_MS: number = 900;
+const LIMIT_MS: number = 15000; const TICK_MS: number = 100;
+const VOWELS: string[] = ['A', 'E', 'I', 'O', 'U']; const VS: number[] = [0, 1, 2, 3, 4];
+interface VQ { word: string; def: string }
+const BANK: VQ[] = [
+  { word: 'APPLE', def: TG('苹果') }, { word: 'ORANGE', def: '橙子' },
+  { word: 'BANANA', def: TG('香蕉') }, { word: 'RIVER', def: TG('河流') },
+  { word: 'MUSIC', def: '音乐' }, { word: 'PLANET', def: '行星' },
+  { word: 'GARDEN', def: TG('花园') }, { word: 'PENCIL', def: TG('铅笔') },
+  { word: 'CASTLE', def: '城堡' }, { word: 'TIGER', def: TG('老虎') },
+  { word: 'ROBOT', def: '机器人' }, { word: 'WINTER', def: TG('冬天') },
+  { word: 'DOCTOR', def: '医生' }, { word: 'SUGAR', def: '糖' }
+];
+function isVowel(ch: string): boolean { return VOWELS.indexOf(ch) >= 0; }
+function pickIndexes(total: number, k: number): number[] {
+  const pool: number[] = []; const out: number[] = []; for (let i = 0; i < total; i++) { pool.push(i); }
+  while (out.length < k) { out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]); }
+  return out;
+}
+
+@Component
+export struct GMissingVowels {
+  @Prop theme: Theme = Theme.light();
+  @Prop @Watch('onRestart') restartToken: number = 0;
+
+  // ★ 难度作用到玩法（time）：LIMIT_MS 按难度换算（简单/普通/困难）
+  @State private diffTotal: number = GameDiff.timeNow(LIMIT_MS);
+  onFinish: (r: GameResult) => void = () => {};
+  @State queue: number[] = []; @State qIndex: number = 0; @State right: number = 0;
+  @State score: number = 0; @State filled: string[] = []; @State leftMs: number = this.diffTotal;
+  @State msg: string = ''; @State over: boolean = false; @State won: boolean = false;
+  @State pressed: number = -1;
+  private startAt: number = 0; private roundAt: number = 0; private timer: number = -1;
+  private feed: number = -1; private done: boolean = false;
+  aboutToAppear(): void { LanRace.noteStart(); this.startAt = Date.now(); this.reset(); }
+  onRestart(): void {
+    this.diffTotal = GameDiff.timeNow(LIMIT_MS);
+     this.reset(); }
+  aboutToDisappear(): void { this.stop(); }
+  private stop(): void {
+    if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; } if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; }
+  }
+  private reset(): void {
+    this.stop(); this.queue = pickIndexes(BANK.length, QN);
+    this.qIndex = 0; this.right = 0; this.score = 0; this.over = false; this.won = false;
+    this.done = false; this.pressed = -1; this.startAt = Date.now(); this.load();
+    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+  }
+  private word(): string { return this.qIndex >= QN ? '' : BANK[this.queue[this.qIndex]].word; }
+  private blanks(): number {
+    let n: number = 0; const w: string = this.word();
+    for (let i = 0; i < w.length; i++) { if (isVowel(w.charAt(i))) { n = n + 1; } }
+    return n;
+  }
+  private load(): void { this.filled = []; this.leftMs = this.diffTotal; this.roundAt = Date.now(); this.msg = '依次点元音，补全这个单词'; }
+  private tick(): void {
+    if (this.over || this.feed >= 0) { return; } const gap: number = Date.now() - this.roundAt;
+    this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
+    if (gap >= this.diffTotal) { this.msg = '⌛ 超时：答案是 ' + this.word(); this.advance(); }
+  }
+  private tap(v: string): void {
+    if (this.over || this.feed >= 0 || this.filled.length >= this.blanks()) { return; }
+    const next: string[] = this.filled.concat([v]); this.filled = next;
+    if (next.length === this.blanks()) { this.check(); }
+  }
+  private back(): void {
+    if (this.over || this.feed >= 0 || this.filled.length === 0) { return; } else { this.filled = this.filled.slice(0, this.filled.length - 1); }
+  }
+  private fill(forShow: boolean): string {
+    const w: string = this.word(); const parts: string[] = []; let k: number = 0;
+    for (let i = 0; i < w.length; i++) {
+      const ch: string = w.charAt(i);
+      if (isVowel(ch)) { parts.push(k < this.filled.length ? this.filled[k] : (forShow ? '_' : '')); k = k + 1; } else { parts.push(ch); }
+    }
+    return parts.join(forShow ? ' ' : '');
+  }
+  private check(): void {
+    const w: string = this.word();
+    if (this.fill(false) === w) {
+      const gain: number = 100 + Math.floor(this.leftMs / 40); this.right = this.right + 1; this.score = this.score + gain;
+      this.msg = '✅ ' + w + '　' + BANK[this.queue[this.qIndex]].def + '　+' + String(gain);
+    } else { this.msg = TG('❌ 应该是 ') + w; }
+    this.advance();
+  }
+  private advance(): void {
+    this.qIndex = this.qIndex + 1; if (this.qIndex >= QN) {
+      this.over = true; this.won = this.right >= PASS;
+      this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) + TG('答对 ') + String(this.right) + '/' + String(QN);
+      this.finish(this.won);
+      return;
+    }
+    this.feed = setTimeout(() => { this.feed = -1; this.load(); }, FEED_MS);
+  }
+  private finish(solved: boolean): void {
+    if (this.done) { return; } this.done = true;
+    const r: GameResult = { gameId: 'missing_vowels', solved: solved, score: this.score,
+      durationMs: Date.now() - this.startAt, levelReached: this.right };
+    LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.onFinish(r);
+  }
+  build() {
+    Column({ space: Space.md }) {
+      Row({ space: Space.sm }) {
+        this.stat(TG('题'), Math.min(this.qIndex + 1, QN) + '/' + QN, Palette.teal)
+        this.stat(TG('答对'), String(this.right), Palette.emerald)
+        this.stat(TG('剩余'), (this.leftMs / 1000).toFixed(1) + 's', Palette.amber)
+      }.width('100%')
+      Column({ space: Space.sm }) {
+        Text(this.qIndex < QN ? BANK[this.queue[this.qIndex]].def : '')
+          .fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text(this.fill(true)).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
+          .textAlign(TextAlign.Center).width('100%')
+        Text('缺 ' + String(this.blanks()) + ' 个元音').fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
+        .borderRadius(Radius.lg).shadow(Shadow.card)
+      Row({ space: Space.sm }) {
+        ForEach(VS, (i: number) => {
+          this.vowel(i)
+        }, (i: number) => 'v' + i)
+      }.width('100%')
+      Row({ space: Space.sm }) {
+        Button('退一格').fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md).layoutWeight(1).height(46)
+          .onClick(() => { this.back(); })
+        Button(TG('重开')).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
+          .borderRadius(Radius.md).layoutWeight(1).height(46)
+          .onClick(() => { this.reset(); })
+      }.width('100%')
+      Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+    }.width('100%').height('100%').justifyContent(FlexAlign.Start)
+  }
+  @Builder
+  stat(label: string, value: string, tone: string) {
+    Column({ space: Space.xs }) {
+      Text(label).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(value).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(tone)
+    }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+  }
+  @Builder
+  vowel(i: number) {
+    Text(VOWELS[i]).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
+      .fontColor(this.theme.ink).layoutWeight(1).height(58).backgroundColor(this.theme.surface)
+      .borderRadius(Radius.md).shadow(Shadow.card)
+      .scale({ x: this.pressed === i ? Motion.pressScale : 1, y: this.pressed === i ? Motion.pressScale : 1 })
+      .animation({ duration: Motion.fast, curve: Motion.snap() })
+      .onTouch((e: TouchEvent) => { if (e.type === TouchType.Down) { this.pressed = i; } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; } })
+      .onClick(() => { this.tap(VOWELS[i]); })
+  }
+}

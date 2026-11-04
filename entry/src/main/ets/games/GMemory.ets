@@ -35,6 +35,9 @@ export struct GMemory {
 
   // ★ 难度作用到玩法：对数（简单 4 对 / 普通 6 对 / 困难 8 对）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -338,7 +341,9 @@ export struct GMemory {
               .rotate({ angle: ((this.cards[r * 4 + c]) !== undefined && (this.cards[r * 4 + c]).open) ? 0 : 180 })
               .animation({ duration: Motion.base, curve: Motion.snap() })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L341'; })
+              .onBlur(() => { if (this.tvFocus === 'L341') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L341'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * 4 + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -362,7 +367,9 @@ export struct GMemory {
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L365'; })
+        .onBlur(() => { if (this.tvFocus === 'L365') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L365'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();

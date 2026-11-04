@@ -54,6 +54,9 @@ export struct GPhoneticGuess {
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -487,7 +490,9 @@ export struct GPhoneticGuess {
             this.pick(i);
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L490'; })
+          .onBlur(() => { if (this.tvFocus === 'L490') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L490'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
         }, (i: number) => 'o' + i)
       }
@@ -520,7 +525,9 @@ export struct GPhoneticGuess {
             this.hint = true;
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L523'; })
+          .onBlur(() => { if (this.tvFocus === 'L523') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L523'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint = true; }); })
         Button(TG('重新开始'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -535,7 +542,9 @@ export struct GPhoneticGuess {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L538'; })
+          .onBlur(() => { if (this.tvFocus === 'L538') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L538'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')

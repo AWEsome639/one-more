@@ -225,6 +225,10 @@ export struct GHitori {
   private solShade: boolean[] = [];
 
   /** 代打计时器（-1 = 未运行）。必须 @State，按钮文字才会变 */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+
+  @State private tvFocus: string = '';
 
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
@@ -750,7 +754,9 @@ export struct GHitori {
               }
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L753'; })
+              .onBlur(() => { if (this.tvFocus === 'L753') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L753'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -784,7 +790,9 @@ export struct GHitori {
           .width(64)
           .height(Cell.of(44))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L787'; })
+          .onBlur(() => { if (this.tvFocus === 'L787') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L787'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
@@ -801,7 +809,9 @@ export struct GHitori {
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L804'; })
+          .onBlur(() => { if (this.tvFocus === 'L804') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L804'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .onClick(() => {
             this.askAuto();
@@ -815,7 +825,9 @@ export struct GHitori {
           .width(96)
           .height(Cell.of(44))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L818'; })
+          .onBlur(() => { if (this.tvFocus === 'L818') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L818'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();

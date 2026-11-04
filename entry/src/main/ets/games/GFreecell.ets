@@ -52,6 +52,9 @@ export struct GFreecell {
   // ★ 难度作用到玩法：棋盘边长（原 COLS=4；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3]，上面已一并改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -799,7 +802,9 @@ export struct GFreecell {
           .border({ width: 1, color: this.sel === (i) ? Palette.primary : this.theme.line })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L802'; })
+          .onBlur(() => { if (this.tvFocus === 'L802') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L802'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapFree((i)); }); })
           .onClick(() => {
           Haptics.tick();
@@ -819,7 +824,9 @@ export struct GFreecell {
           .borderRadius(Radius.sm)
           .border({ width: 1, color: this.found[(s)] === TOP ? Palette.emerald : this.theme.line })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L822'; })
+          .onBlur(() => { if (this.tvFocus === 'L822') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L822'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapFound((s)); }); })
           .onClick(() => {
           Haptics.tick();
@@ -857,7 +864,9 @@ export struct GFreecell {
           .borderRadius(Radius.sm)
           .justifyContent(FlexAlign.End)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L860'; })
+          .onBlur(() => { if (this.tvFocus === 'L860') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L860'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCol((i)); }); })
           .onClick(() => {
           Haptics.tick();
@@ -880,7 +889,9 @@ export struct GFreecell {
           .backgroundColor(Palette.primary).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L883'; })
+          .onBlur(() => { if (this.tvFocus === 'L883') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L883'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
           .onClick(() => {
             Haptics.tap();
@@ -892,7 +903,9 @@ export struct GFreecell {
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
           .layoutWeight(1).height(Cell.of(44))
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L895'; })
+          .onBlur(() => { if (this.tvFocus === 'L895') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L895'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.autoHome(); }); })
           .onClick(() => {
             Haptics.tap();

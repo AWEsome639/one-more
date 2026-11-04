@@ -70,6 +70,10 @@ export struct GKenken {
   private solCells: number[] = [];
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+
+  @State private tvFocus: string = '';
 
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
@@ -590,7 +594,9 @@ export struct GKenken {
               .border({ width: this.sel === (r * N + c) ? 2 : 1, color: this.sel === (r * N + c) ? Palette.primary : this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L593'; })
+              .onBlur(() => { if (this.tvFocus === 'L593') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L593'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapCell((r * N + c)); }); })
               .onClick(() => {
               Haptics.tick();
@@ -623,7 +629,9 @@ export struct GKenken {
           .backgroundColor(Palette.cyan)
           .fontColor('#FFFFFF')
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L626'; })
+          .onBlur(() => { if (this.tvFocus === 'L626') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L626'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
             this.askHint();
@@ -636,7 +644,9 @@ export struct GKenken {
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L639'; })
+          .onBlur(() => { if (this.tvFocus === 'L639') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L639'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
           .onClick(() => {
             this.askAuto();
@@ -657,7 +667,9 @@ export struct GKenken {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L660'; })
+          .onBlur(() => { if (this.tvFocus === 'L660') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L660'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put((d)); }); })
           .onClick(() => {
           Haptics.tick();
@@ -676,7 +688,9 @@ export struct GKenken {
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L679'; })
+          .onBlur(() => { if (this.tvFocus === 'L679') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L679'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put((d)); }); })
           .onClick(() => {
           Haptics.tick();
@@ -696,7 +710,9 @@ export struct GKenken {
         .width('100%')
         .height(Cell.of(44))
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L699'; })
+        .onBlur(() => { if (this.tvFocus === 'L699') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L699'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => {
           Haptics.tap();
@@ -750,7 +766,9 @@ export struct GKenken {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.sm)
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L753'; })
+      .onBlur(() => { if (this.tvFocus === 'L753') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L753'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.clearSel(); }); })
       .onClick(() => {
         Haptics.tick();

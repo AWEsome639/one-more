@@ -42,6 +42,9 @@ export struct GSentenceUnscramble {
 
   // ★ 难度作用到玩法（size）：ROUNDS 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -312,7 +315,9 @@ export struct GSentenceUnscramble {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((0)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L315'; })
+        .onBlur(() => { if (this.tvFocus === 'L315') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L315'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((0)); }); })
         Text(this.tiles.length > (1) ? this.tiles[(1)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).textAlign(TextAlign.Center)
@@ -322,7 +327,9 @@ export struct GSentenceUnscramble {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((1)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L325'; })
+        .onBlur(() => { if (this.tvFocus === 'L325') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L325'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((1)); }); })
         Text(this.tiles.length > (2) ? this.tiles[(2)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).textAlign(TextAlign.Center)
@@ -332,7 +339,9 @@ export struct GSentenceUnscramble {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((2)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L335'; })
+        .onBlur(() => { if (this.tvFocus === 'L335') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L335'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((2)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
@@ -344,7 +353,9 @@ export struct GSentenceUnscramble {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((3)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L347'; })
+        .onBlur(() => { if (this.tvFocus === 'L347') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L347'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((3)); }); })
         Text(this.tiles.length > (4) ? this.tiles[(4)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).textAlign(TextAlign.Center)
@@ -354,7 +365,9 @@ export struct GSentenceUnscramble {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((4)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L357'; })
+        .onBlur(() => { if (this.tvFocus === 'L357') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L357'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((4)); }); })
         Text(this.tiles.length > (5) ? this.tiles[(5)] : '')
         .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).textAlign(TextAlign.Center)
@@ -364,7 +377,9 @@ export struct GSentenceUnscramble {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.pick((5)); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L367'; })
+        .onBlur(() => { if (this.tvFocus === 'L367') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L367'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((5)); }); })
       }.width('100%')
 
@@ -374,7 +389,9 @@ export struct GSentenceUnscramble {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L377'; })
+        .onBlur(() => { if (this.tvFocus === 'L377') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L377'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       Text(TG2("{0} 句，答对 ≥{1} 通关",Digits(String(this.diffTotal), this.langCode), PASS)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

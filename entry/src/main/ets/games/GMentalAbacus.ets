@@ -33,6 +33,9 @@ export struct GMentalAbacus {
   onFinish: (r: GameResult) => void = () => {};
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -348,7 +351,9 @@ export struct GMentalAbacus {
         : ((i) === this.ans ? Palette.emerald : ((i) === this.picked ? Palette.rose : this.theme.surface)))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L351'; })
+        .onBlur(() => { if (this.tvFocus === 'L351') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L351'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); })
         .onClick(() => { Haptics.tick(); this.pick((i)); }) }, (i: number) => 'ao' + i)
       }.width('100%')
@@ -377,7 +382,9 @@ export struct GMentalAbacus {
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.cyan)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L380'; })
+        .onBlur(() => { if (this.tvFocus === 'L380') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L380'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 

@@ -27,6 +27,9 @@ export struct GMemoryMatrix {
   @Prop @Watch('onRestart') restartToken: number = 0;
   onFinish: (r: GameResult) => void = () => {};
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -371,7 +374,9 @@ export struct GMemoryMatrix {
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L374'; })
+        .onBlur(() => { if (this.tvFocus === 'L374') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L374'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
@@ -394,7 +399,9 @@ export struct GMemoryMatrix {
     .layoutWeight(1).aspectRatio(1).backgroundColor(this.tint(i)).borderRadius(Radius.md)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L397'; })
+    .onBlur(() => { if (this.tvFocus === 'L397') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L397'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
     .onClick(() => { Haptics.tick(); this.tap(i); })
   }

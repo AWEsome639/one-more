@@ -33,6 +33,9 @@ export struct GWordMastermind {
 
   // ★ 难度作用到玩法（size）：原 LEN=5
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -308,7 +311,9 @@ export struct GWordMastermind {
               if (r * 7 + c < KEYS) {
                 Text(this.keyLabel((r * 7 + c))).fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(36)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).shadow(Shadow.card).onClick(() => { Haptics.tick(); this.press((r * 7 + c)); })
                 .focusable(Tv.on())
-                .focusBox(Tv.box())
+                .onFocus(() => { this.tvFocus = 'L311'; })
+                .onBlur(() => { if (this.tvFocus === 'L311') { this.tvFocus = ''; } })
+                .outline(Tv.focusOutline(this.tvFocus === 'L311'))
                 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.press((r * 7 + c)); }); })
               }
             }, (c: number) => 'c' + c)
@@ -319,12 +324,16 @@ export struct GWordMastermind {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L322'; })
+      .onBlur(() => { if (this.tvFocus === 'L322') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L322'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Button(TG('删一个'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.press(26); })
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L327'; })
+      .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L327'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.press(26); }); })
       }.width('100%')
       Text(TG('提示：🟩 字母与位置都对｜🟨 字母在词里但位置错｜⬜ 词里没有')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)

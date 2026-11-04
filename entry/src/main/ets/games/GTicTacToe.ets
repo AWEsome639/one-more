@@ -145,6 +145,9 @@ export struct GTicTacToe {
   // ★ 难度作用到玩法：棋盘边长（原 N=3；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2]，上面已一并改成按尺寸生成
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -681,7 +684,9 @@ export struct GTicTacToe {
               this.tap((r * this.diffTotal + c));
               })
               .focusable(Tv.on())
-              .focusBox(Tv.box())
+              .onFocus(() => { this.tvFocus = 'L684'; })
+              .onBlur(() => { if (this.tvFocus === 'L684') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L684'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
@@ -717,7 +722,9 @@ export struct GTicTacToe {
             this.reset();
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L720'; })
+          .onBlur(() => { if (this.tvFocus === 'L720') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L720'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Button(TG('我认输'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -737,7 +744,9 @@ export struct GTicTacToe {
             }
           })
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L740'; })
+          .onBlur(() => { if (this.tvFocus === 'L740') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L740'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.over && !this.finished) { this.over = true; this.status = TG('已认输'); this.finish(false); } }); })
       }
       .width('100%')

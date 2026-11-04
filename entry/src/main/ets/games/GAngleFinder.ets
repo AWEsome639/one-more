@@ -26,6 +26,9 @@ export struct GAngleFinder {
 
   // ★ 难度作用到玩法（size）：TOTAL 按难度换算（简单/普通/困难）
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -291,14 +294,20 @@ export struct GAngleFinder {
             .backgroundColor(this.picked < 0 ? this.theme.surface
             : ((r * 2) === this.ansIdx ? Palette.emerald : ((r * 2) === this.picked ? Palette.rose : this.theme.surface)))
             .borderRadius(Radius.md).shadow(Shadow.card)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((r * 2)); }); }).onClick(() => { Haptics.tick(); this.pick((r * 2)); })
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L294'; })
+            .onBlur(() => { if (this.tvFocus === 'L294') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L294')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((r * 2)); }); }).onClick(() => { Haptics.tick(); this.pick((r * 2)); })
             Text(LETTERS[(r * 2 + 1)] + '. ' + this.opts[(r * 2 + 1)] + '°').fontSize(FontSize.md).fontWeight(FontWeight.Bold)
             .fontColor(this.picked >= 0 && ((r * 2 + 1) === this.ansIdx || (r * 2 + 1) === this.picked) ? '#FFFFFF' : this.theme.ink)
             .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(56))
             .backgroundColor(this.picked < 0 ? this.theme.surface
             : ((r * 2 + 1) === this.ansIdx ? Palette.emerald : ((r * 2 + 1) === this.picked ? Palette.rose : this.theme.surface)))
             .borderRadius(Radius.md).shadow(Shadow.card)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((r * 2 + 1)); }); }).onClick(() => { Haptics.tick(); this.pick((r * 2 + 1)); })
+            .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L301'; })
+            .onBlur(() => { if (this.tvFocus === 'L301') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L301')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((r * 2 + 1)); }); }).onClick(() => { Haptics.tick(); this.pick((r * 2 + 1)); })
           }
           .width('100%')
         }, (r: number) => 'or' + r)
@@ -318,7 +327,10 @@ export struct GAngleFinder {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
-        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).focusable(Tv.on()).focusBox(Tv.box()).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L321'; })
+        .onBlur(() => { if (this.tvFocus === 'L321') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L321')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：先把已知角加起来，再用内角和去减')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {

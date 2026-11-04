@@ -182,6 +182,9 @@ export struct GFillomino {
   @State private given: boolean[] = [];
   @State private vals: number[] = [];
   /** 代打计时器（-1 = 未运行）。必须 @State */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -576,7 +579,9 @@ export struct GFillomino {
                 }
                 })
                 .focusable(Tv.on())
-                .focusBox(Tv.box())
+                .onFocus(() => { this.tvFocus = 'L579'; })
+                .onBlur(() => { if (this.tvFocus === 'L579') { this.tvFocus = ''; } })
+                .outline(Tv.focusOutline(this.tvFocus === 'L579'))
                 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (!this.over && !this.given[(r * N + c)]) { this.sel = (r * N + c); } }); })
                 .onClick(() => {
                 Haptics.tick();
@@ -614,7 +619,9 @@ export struct GFillomino {
             .borderRadius(Radius.sm)
             .shadow(Shadow.card)
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L617'; })
+            .onBlur(() => { if (this.tvFocus === 'L617') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L617'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setVal((d)); }); })
             .onClick(() => {
             Haptics.tick();
@@ -637,7 +644,9 @@ export struct GFillomino {
             .borderRadius(Radius.sm)
             .shadow(Shadow.card)
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L640'; })
+            .onBlur(() => { if (this.tvFocus === 'L640') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L640'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setVal((d)); }); })
             .onClick(() => {
             Haptics.tick();
@@ -657,7 +666,9 @@ export struct GFillomino {
             .layoutWeight(1)
             .height(Cell.of(44))
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L660'; })
+            .onBlur(() => { if (this.tvFocus === 'L660') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L660'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.setVal(0); }); })
             .onClick(() => {
               Haptics.tap();
@@ -671,7 +682,9 @@ export struct GFillomino {
           .backgroundColor(Palette.cyan)
           .fontColor('#FFFFFF')
           .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L674'; })
+            .onBlur(() => { if (this.tvFocus === 'L674') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L674'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
             .onClick(() => {
               this.askHint();
@@ -688,7 +701,9 @@ export struct GFillomino {
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
           .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L691'; })
+            .onBlur(() => { if (this.tvFocus === 'L691') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L691'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
             .onClick(() => {
               this.askAuto();
@@ -702,7 +717,9 @@ export struct GFillomino {
             .width(96)
             .height(Cell.of(44))
             .focusable(Tv.on())
-            .focusBox(Tv.box())
+            .onFocus(() => { this.tvFocus = 'L705'; })
+            .onBlur(() => { if (this.tvFocus === 'L705') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L705'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
             .onClick(() => {
               Haptics.tap();
