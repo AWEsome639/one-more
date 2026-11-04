@@ -67,6 +67,29 @@ class Mutation:
         self.rename_from = rename_from      # 改名型：把该文件临时改走（模拟"丢了"）
 
 
+# ★★★ 判据 648 的**第二种形态**（第 1285 轮）：**自带 `--selftest` 的检查器**
+#
+# 为什么需要单独一张表
+#   「变异测试」的语义是：**注入一个坏数据 ⇒ 检查器必须报错**。
+#   但有些检查器的有效性可以用更直接的方式证明：
+#     它自己带一段**最小 fixture**，跑一遍必须通过。
+#   ⇒ `check_double_padding.py --selftest` 就是这种：
+#       在临时目录造「内层有 padding + 外层也有 padding」两个组件，
+#       要求工具报出「1 处风险 / 双层 40 vp / 195 vp 占比 41.0% 🔴」
+#     五项全中才 exit 0。
+#
+# 为什么它比「造变异」更强
+#   本工具前 5 版都报「0 风险」（判据 759 的假阴性），
+#   而 `--selftest` 就是专门用来抓这种「永远报 0」的检查器。
+#
+# 语义：**这些检查器的 exit 0 本身就是「它还能工作」的证明**
+SELFTESTS = [
+    ('check_double_padding',
+     ['python3', '工具/check_double_padding.py', '--selftest'],
+     '内置 fixture：内层 padding 20 vp + 外层 20 vp ⇒ 应报 1 处风险 / 40 vp / 195vp 41.0%'),
+]
+
+
 MUTATIONS = [
     Mutation(
         name='text_fit',
@@ -262,11 +285,28 @@ def main():
             bad += 1
         print()
 
+    # ── 自检型检查器（判据 648 第二种形态）──
+    if not only:
+        for name, cmd, desc in SELFTESTS:
+            print('  ── %s（自检型）──' % name)
+            print('     fixture：%s' % desc)
+            # ⚠️ `run_check` 返回的是元组（rc, out）—— 第 1285 轮这里曾
+            #   用 `'…rc=%s…' % rc` 直接格式化元组 ⇒ TypeError
+            res = run_check(cmd)
+            rc = res[0] if isinstance(res, (tuple, list)) else res
+            if rc == 0:
+                print('     ✅ **自检通过**（它能证明自己还能工作）')
+            else:
+                print('     🔴 **自检失败**（rc=%s）⇒ 检查器已失效' % rc)
+                bad += 1
+            print()
+
     total = len(MUTATIONS) if not only else 1
     good = total - bad - skip
     print('=' * 68)
-    print('  汇总：%d 个变异 · 有效 %d ｜ 失效 %d ｜ **跳过 %d**'
-          % (total, good, bad, skip))
+    n_self = 0 if only else len(SELFTESTS)
+    print('  汇总：%d 个变异 · 有效 %d ｜ 失效 %d ｜ **跳过 %d** ｜ 自检型 %d'
+          % (total, good, bad, skip, n_self))
     print('=' * 68)
     if skip:
         print('  ⚠️ 跳过 %d 个 = **这 %d 个检查器未经验证**（判据 649）' % (skip, skip))
