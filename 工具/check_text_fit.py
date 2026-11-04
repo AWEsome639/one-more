@@ -105,9 +105,54 @@ def em_width(t):
 #   `Text` 会换行/省略，长段落是**正常**的，混进来会产生大量假阳性
 #   （第 1212 轮实测：把 Text 也扫进来会报 400 个「会截」，
 #     其中几乎全是提示正文/隐私条款这类本来就该多行的文字。）
-PAT = re.compile(
-    r"Button\(\s*(?:\(?\s*)?(?:TG|L|this\.t)\(\s*'([^'\\]{1,80})'(?:\s*,\s*'([^'\\]{1,80})')?",
-    re.M)
+#
+# ★ 判据 593（第 1213 轮）：**在 `Button(...)` 的整个括号范围内**扫字面量，
+#   而不是只取紧跟 `Button(` 的第一个表达式。
+#   原因：三元表达式 `this.over ? TG('再来一局') : TG('重开')` 里有 2~4 个
+#   字面量，只取第一个会**漏掉**它们，然后被错误地算进「跳过」。
+#   实测：370 个"跳过"里有 86 个其实是可解析的三元/括号表达式。
+BUTTON_HEAD = re.compile(r"Button\(", re.M)
+LITERAL = re.compile(r"(?:TG|L|this\.t)\(\s*'([^'\\]{1,80})'(?:\s*,\s*'([^'\\]{1,80})')?", re.M)
+
+
+def find_button_literals(src):
+    """返回 [(match, zh, en)] —— 扫每个 Button(...) 括号范围内的所有字面量。
+
+    ⚠️ 只做**括号配平**，不理解字符串里的括号/转义 —— 对本项目够用，
+       但若某标签里含未转义的 `)`，会把范围算短（会在 skipped 里体现）。
+    """
+    out = []
+    for head in BUTTON_HEAD.finditer(src):
+        i = head.end() - 1          # 指向 '('
+        depth = 0
+        end = None
+        for k in range(i, min(i + 6000, len(src))):
+            c = src[k]
+            if c == '(':
+                depth += 1
+            elif c == ')':
+                depth -= 1
+                if depth == 0:
+                    end = k
+                    break
+        if end is None:
+            continue
+        seg = src[i:end + 1]
+        # ★ 判据 594（第 1213 轮）：**识别 tiny 分支**
+        #   若同一个 Button 里出现 `Bp.tinyScreen()` / `Bp.isWatch()`
+        #   ⇒ 说明作者已经为极小屏写了短标签，
+        #     此时**按最短的那个字面量**算宽度（最坏情况仍要放得下）。
+        #   不识别它 ⇒ 会拿"全称"去算，报出假阳性
+        #   （第 1213 轮实测：LanLobby / GCryptogram 两处已被误报）。
+        has_tiny = ('Bp.tinyScreen()' in seg) or ('Bp.isWatch()' in seg)
+        lits = [(m.group(1), m.group(2) or '') for m in LITERAL.finditer(seg)]
+        if not lits:
+            continue
+        if has_tiny:
+            lits = [min(lits, key=lambda z: em_width(z[0]))]
+        for zh, en in lits:
+            out.append((head.start(), zh, en))
+    return out
 
 
 def scan(paths):
@@ -118,27 +163,25 @@ def scan(paths):
         s = strip_comments(io.open(p, encoding='utf-8', errors='ignore').read())
         files += 1
         rel = os.path.relpath(p, SRC)
-        # 统计跳过的（含 ${} 或变量）
-        for m in re.finditer(r"Button\(([^\n]{1,120})", s):
-            body = m.group(1)
-            if ('${' in body or 'this.' in body) and not re.search(r"(TG|L|this\.t)\('", body):
-                skipped += 1
+        # 每个 Button(...) 里的所有字面量
+        found = find_button_literals(s)
+        # 没抓到任何字面量的 Button ⇒ 真不可解析（this.xxx / String(...) 等）
+        n_buttons = len(list(BUTTON_HEAD.finditer(s)))
+        n_resolved_buttons = len(set(off for off, _, _ in found))
+        skipped += max(0, n_buttons - n_resolved_buttons)
         # 取行号
         line_of = {}
         off = 0
         for idx, ln in enumerate(s.split('\n'), 1):
             line_of[off] = idx
             off += len(ln) + 1
-        for m in PAT.finditer(s):
-            zh = m.group(1)
-            en = m.group(2) or ''
+        for off0, zh, en in found:
             em = max(em_width(zh), em_width(en)) if en else em_width(zh)
             if em <= 0:
                 continue
-            # 取最近的行号
             ln = 1
             for off2 in sorted(line_of):
-                if off2 <= m.start():
+                if off2 <= off0:
                     ln = line_of[off2]
                 else:
                     break
@@ -220,7 +263,7 @@ def report(paths, label='全项目'):
     print()
 
     print('  ══ 汇总（判据 546：通过 / 失败 / 没查）══')
-    print('    已分析 %d ｜ 🔴 会截 %d ｜ 🟡 必须看图 %d ｜ ✅ 够 %d ｜ ⚪ 没查 %d'
+    print('    已分析 %d ｜ 🔴 会截 %d ｜ 🟡 必须看图 %d ｜ ✅ 够 %d ｜ ⚪ 没查 %d（Button 无字面量）'
           % (len(hits), len(bad), len(crit), len(ok), skipped))
     if skipped > len(hits) * 0.10:
         print('    ⚠️ 跳过 %d > 已分析×10%% ⇒ 按判据 548，**先改进本工具再下结论**'

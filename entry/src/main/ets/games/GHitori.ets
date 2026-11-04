@@ -8,6 +8,7 @@
  * 胜负：三条全满足 = 通关；步数用尽 = 失败。
  */
 
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
@@ -773,7 +774,7 @@ export struct GHitori {
       .borderRadius(Radius.md)
 
       Row({ space: Space.md }) {
-        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : TG('点格子涂黑 / 取消'))
+        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : (Bp.tinyScreen() || Bp.isWatch() ? TG('涂黑 / 取消') : TG('点格子涂黑 / 取消')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
           .fontColor(this.theme.inkSoft)

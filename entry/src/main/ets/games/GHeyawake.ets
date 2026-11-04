@@ -9,6 +9,7 @@
  * 胜负：四条全满足 = 通关；步数用尽 = 失败。
  */
 
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -654,7 +655,7 @@ export struct GHeyawake {
       .borderRadius(Radius.md)
 
       Row({ space: Space.md }) {
-        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : TG('点格子涂黑 / 擦白'))
+        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : (Bp.tinyScreen() || Bp.isWatch() ? TG('涂黑 / 擦白') : TG('点格子涂黑 / 擦白')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
           .fontColor(this.theme.inkSoft)

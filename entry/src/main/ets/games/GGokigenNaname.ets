@@ -6,6 +6,7 @@
  * 胜负：16 格全部画线且数字全对、无回路 = 通关；步数用尽 = 失败。
  */
 
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -633,7 +634,7 @@ export struct GGokigenNaname {
       .borderRadius(Radius.md)
 
       Row({ space: Space.md }) {
-        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : TG('点方块：空 → ╲ → ╱ → 空'))
+        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : (Bp.tinyScreen() || Bp.isWatch() ? TG('点方块循环') : TG('点方块：空 → ╲ → ╱ → 空')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
           .fontColor(this.theme.inkSoft)

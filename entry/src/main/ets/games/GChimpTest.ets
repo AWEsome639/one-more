@@ -3,6 +3,7 @@
  * 胜负：连过 7 关（4→10 个数字）通关；点错扣一条命，命尽即失败
  * 进度：关卡 / 本关个数 / 得分 / 生命
  */
+import { Bp } from '../core/Bp';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -309,7 +310,7 @@ export struct GChimpTest {
         .textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
       Row({ space: Space.md }) {
-        Button(this.hidden ? TG('数字已藏起') : TG('看好位置，再点 1'))
+        Button(this.hidden ? TG('数字已藏起') : (Bp.tinyScreen() || Bp.isWatch() ? TG('记住再点 1') : TG('看好位置，再点 1')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm)
           .fontColor(this.theme.inkSoft).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).enabled(false)
