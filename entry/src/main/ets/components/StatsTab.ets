@@ -367,13 +367,26 @@ export struct StatsTab {
         .height(BADGE_SIZE)
 
         Column({ space: Space.xs }) {
+          // ★★★ 2026-11-04（第 1255 轮）**真 bug：233×233 上标题逐字竖排**
+          //   实测（真机 dump）：`Text(新手上路)` 的 bounds = [336,261][354,507]
+          //     ⇒ 宽度只有 **18 px = 6 vp**，而 `FontSize.xl = 20 vp`（一个字要 60 px）
+          //     ⇒ 每行只放得下半边 ⇒ **逐字竖排**
+          //   根因：`Column().alignItems(HorizontalAlign.Start)` ⇒ 子元素**只占内容宽度**，
+          //         不拉伸到列宽；而 Text 的「最窄可行宽度」= 一个字符宽
+          //         （被下面那行 FontSize.xxs 的副标题拉到 ~18 px）
+          //   修法：① 标题 `.width('100%')` 取满列宽 ② `.maxLines(1)` 绝不折行
+          //         ③ 极小屏字号降一档（xl=20 → lg=18），保证 4 个汉字放得下
           Text(this.titleForLevel())
-            .fontSize(FontSize.xl)
+            .fontSize(Bp.isWatch() || Bp.tinyScreen() ? FontSize.lg : FontSize.xl)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.theme().ink)
+            .width('100%')
+            .maxLines(1)
           Text(this.solvedToday ? this.t('✅ 今日已打卡', '✅ Checked in today') : this.t('⭕ 还没玩 · 来一局就打卡', '⭕ Nothing yet — play one to check in'))
             .fontSize(FontSize.xxs)
             .fontColor(this.solvedToday ? Palette.emerald : this.theme().inkFaint)
+            .width('100%')
+            .maxLines(2)
         }
         .alignItems(HorizontalAlign.Start)
         .layoutWeight(1)
