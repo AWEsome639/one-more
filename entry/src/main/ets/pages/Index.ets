@@ -352,8 +352,14 @@ pageTransition() {
       .width('100%')
     }
     .width('88%')
-    // ★ 卡片本身不超出屏幕（配合内部 Scroll，内容再多也不会把按钮挤出卡片）
-    .constraintSize({ maxHeight: '100%' })
+    // ★★★ 2026-11-04（第 1173 轮）**上限给"够用"而不是"满屏"**
+    //   第 1172 轮用了 `maxHeight: '100%'`（判据 522 的方案）——
+    //   在 195（内容刚好占满）上效果完美，但在 960×540 上**卡片被撑到屏高 87%**，
+    //   而实际内容只有 3 行字 + 两个按钮 ⇒ 大片空白，观感差。
+    //   ⇒ 极小屏仍用 100%（内容真的需要那么多），其余给 **80%**（上下各留 10% 呼吸）
+    // ★ 第 1173 轮二调：大屏 80% 仍然偏高（卡片占屏 71%、正文与按钮之间空白大）
+    //   ⇒ 收到 **60%**：实测内容只需约 420 px，60% of 1620 = 972 px ⇒ 绰绰有余
+    .constraintSize({ maxHeight: this.privacyCompact() ? '100%' : '60%' })
     .padding(this.privacyCompact() ? Space.md : Space.lg)
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.lg)
