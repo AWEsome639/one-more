@@ -180,6 +180,62 @@ export class ProgressStore {
       AppStorage.setOrCreate(Keys.themeMode, mode);
       ProgressStore.applyThemeMode(mode);
 
+      // ═════════════════════════════════════════════════════════════════════
+      // ★★★ 2026-11-05（第 1339 轮）**修 13 个 key「写了盘却从不读回」**
+      //
+      // 为什么必须补（判据 878/879）：
+      //   这些 key 的写入端都是 `AppStorage.setOrCreate` + `putString`（**写盘成功**），
+      //   但读取端全是 `AppStorage.get<…>`（**只读内存**），
+      //   而 `init()` 里**从来没有**把这些 key 从磁盘读回 AppStorage
+      //   ⇒ **当次会话可用，重启即失**
+      //
+      // 实证（第 1337 → 1338 轮）：
+      //   第 1337 轮：点游戏内 ⭐ ⇒ 首页「收藏 · 1」，收藏列表 1 张卡 card-bejeweled
+      //   第 1338 轮重启后：**「收藏 · 0」，0 张卡** ⇒ 收藏丢了
+      //
+      // 影响范围（这 13 个正好是「玩家的全部进度」）：
+      //   收藏 / 成就 / 通关记录 / 每款最高分 / 每款通关次数 /
+      //   每款难度 / 每款游玩次数 / 最近游玩 / 今日推荐 / 今日已完成 /
+      //   首玩日 / 总时长 / 总局数
+      //   ⇒ **玩家第二天打开，什么都不在了**
+      //
+      // 默认值按「读取点用的类型」定（不是按写入点）：
+      //   · `AppStorage.get<string>(…) ?? ''`     ⇒ 默认 `''`
+      //   · `AppStorage.get<string>(…) ?? '{}'`   ⇒ 默认 `'{}'`
+      //   · `AppStorage.get<boolean>(…) ?? false` ⇒ 默认 `false`
+      //   · `AppStorage.get<number>(…) ?? 0`      ⇒ 默认 `0`
+      // ⚠️ 特别注意 `Keys.cleared` 的**存储名是 `'clearedGames'`**（不是 'cleared'）
+      // ═════════════════════════════════════════════════════════════════════
+      const favRaw: string = p.getSync(Keys.favorites, '') as string;
+      AppStorage.setOrCreate(Keys.favorites, favRaw);
+      const recentRaw: string = p.getSync(Keys.recent, '') as string;
+      AppStorage.setOrCreate(Keys.recent, recentRaw);
+      const clearedRaw: string = p.getSync(Keys.cleared, '') as string;
+      AppStorage.setOrCreate(Keys.cleared, clearedRaw);
+      const achRaw: string = p.getSync(Keys.achievements, '') as string;
+      AppStorage.setOrCreate(Keys.achievements, achRaw);
+      const firstDayRaw: string = p.getSync(Keys.firstDay, '') as string;
+      AppStorage.setOrCreate(Keys.firstDay, firstDayRaw);
+      const dailyGameRaw: string = p.getSync(Keys.dailyGame, '') as string;
+      AppStorage.setOrCreate(Keys.dailyGame, dailyGameRaw);
+      const dailyDoneRaw: string = p.getSync(Keys.dailyDone, '') as string;
+      AppStorage.setOrCreate(Keys.dailyDone, dailyDoneRaw === 'true');
+      const bestRaw: string = p.getSync(Keys.perGameBest, '{}') as string;
+      AppStorage.setOrCreate(Keys.perGameBest, bestRaw);
+      const clearsRaw: string = p.getSync(Keys.perGameClears, '{}') as string;
+      AppStorage.setOrCreate(Keys.perGameClears, clearsRaw);
+      const diffRaw: string = p.getSync(Keys.perGameDiff, '{}') as string;
+      AppStorage.setOrCreate(Keys.perGameDiff, diffRaw);
+      const playsRaw: string = p.getSync(Keys.perGamePlays, '{}') as string;
+      AppStorage.setOrCreate(Keys.perGamePlays, playsRaw);
+      const totalMsRaw: number = p.getSync(Keys.totalMs, 0) as number;
+      AppStorage.setOrCreate(Keys.totalMs, totalMsRaw);
+      const totalPlaysRaw: number = p.getSync(Keys.totalPlays, 0) as number;
+      AppStorage.setOrCreate(Keys.totalPlays, totalPlaysRaw);
+      // ★ 另补 2 个「getSync 读了但没 setOrCreate」（判据 879 的半缺口）
+      AppStorage.setOrCreate('lastDay', lastDay);
+      AppStorage.setOrCreate('streaks', rawStreaks);
+
       // ★ 2026-10-13：语言 / 主题色恢复 —— 走 preferences（与进度同一个库）
       //   为什么不用 PersistentStorage：模拟器实测「写进去 ✅、重启读不回来 ✗」
       //   （文件里存着 zh-Hant，#EF4444 也在，但启动后 UI 仍是默认值；而且它会在启动时把文件覆盖回默认）
