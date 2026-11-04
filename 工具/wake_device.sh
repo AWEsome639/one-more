@@ -61,17 +61,47 @@ for attempt in 1 2 3; do
     # ── ④ UI 树必须可读（判据 636：这是"目标正常"而不是"仪表正常"）──
     #   ⚠️ 判据 638：刚唤醒时 dump 可能只返回 **几百字节**（还没就绪），
     #     所以这里要**重试几次**，不能一次 420 字节就判"设备不可用"。
-    SZ=0
-    for dt in 1 2 3 4; do
+    #
+    #   ⚠️⚠️ 判据 644（第 1240 轮纠正）：**不能用「dump 字节数」判"页面就绪"**
+    #     实测：`aa start` 之后立刻 dump ⇒ **25366 字节**（远超任何合理阈值）
+    #     但文字只有 **5 条**：['07:29', '07', ':', '29', '100'] = **纯状态栏**
+    #     ⇒ App 还没渲染完，而字节数断言已经"通过"
+    #     ⇒ 之后去取 🔍 当然取不到，还以为是"App 坏了"
+    #
+    #   ⇒ 正确判据：**「有内容的文字节点数」≥ 8**
+    #     （状态栏单独就有 5 条：时间 3 段 + 电量 2 段 ⇒ 必须明显多于它）
+    NTXT=0
+    for dt in 1 2 3 4 5 6; do
       A "uitest dumpLayout -p /data/local/tmp/_wk.json" >/dev/null 2>&1
       sleep 1
       timeout 25 $T file recv /data/local/tmp/_wk.json /tmp/_wk.json >/dev/null 2>&1
       SZ=$(stat -f%z /tmp/_wk.json 2>/dev/null || stat -c%s /tmp/_wk.json 2>/dev/null || echo 0)
-      [ "$SZ" -ge 500 ] && break
+      if [ "$SZ" -ge 500 ]; then
+        NTXT=$(python3 - <<'PY2' 2>/dev/null || echo 0
+import json, os
+p = '/tmp/_wk.json'
+try:
+    d = json.load(open(p, encoding='utf-8'))
+except Exception:
+    print(0); raise SystemExit
+n = 0
+def f(node):
+    global n
+    if not isinstance(node, dict): return
+    if (node.get('attributes', {}).get('text') or '').strip():
+        n += 1
+    for c in node.get('children', []) or []:
+        f(c)
+f(d)
+print(n)
+PY2
+)
+        [ "${NTXT:-0}" -ge 8 ] && break
+      fi
       sleep 1
     done
-    if [ "$SZ" -lt 500 ]; then
-      echo "FAIL:dump_empty(lum=$L,size=$SZ,attempt=$attempt)"; exit 3
+    if [ "${NTXT:-0}" -lt 8 ]; then
+      echo "FAIL:page_not_rendered(lum=$L,size=${SZ:-0},texts=${NTXT:-0},attempt=$attempt)"; exit 3
     fi
 
     # ── ⑤ ⚠️⚠️ 判据 639 + 642：**PID 有值 ≠ App 在前台**
