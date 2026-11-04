@@ -103,9 +103,14 @@ MUTATIONS = [
         name='outline_owner',
         tool=['python3', '工具/check_outline_owner.py'],
         path='entry/src/main/ets/games/GTopology.ets',
-        old=".borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54))",
-        new=".borderRadius(Radius.full).layoutWeight(1).height(Cell.of(54))",
-        expect_desc='描边圆角(full) ≠ 元素圆角 ⇒ check_outline_owner 应报 SUSPECT',
+        # ⚠️ 判据 782（第 1291 轮）：原来的**单行**锚点在文件内出现 **2 次**
+        #   （L296 与 L305 完全相同）⇒ `replace(..., 1)` 只改第一处，
+        #   而恢复可能落在另一处 ⇒ 脆弱。
+        #   ⇒ 改成**多行锚点**（含下一行 `.onClick(... answer((true)) ...)`），
+        #     在文件内**唯一**；已用 count() 验证 == 1。
+        old='        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).enabled(!this.revealed && !this.over)\n        .onClick(() => { Haptics.tap(); this.answer((true)); })',
+        new='        .borderRadius(Radius.full).layoutWeight(1).height(Cell.of(54)).enabled(!this.revealed && !this.over)\n        .onClick(() => { Haptics.tap(); this.answer((true)); })',
+        expect_desc='描边圆角(full) ≠ 元素圆角 ⇒ check_outline_owner 应报 SUSPECT（多行锚点，文件内唯一）',
     ),
     Mutation(
         name='splash_hash',
@@ -163,11 +168,37 @@ MUTATIONS = [
         create_file='/tmp/_mutation_squeeze.json',
         expect_desc='造一个「18x246 的 4 字标题」假 dump ⇒ check_text_squeeze 应报挤压',
     ),
+    # ── 第 1291 轮：check_regressions 的变异（判据 782：锚点**文件内唯一**）──
+    #   目标：基线要求 `.focusBox(` 真实调用 = 0
+    #        （bug ⑰：1175 处死代码已全迁到 `.outline()`）
+    #   ⇒ 注入一行真实 `.focusBox(Tv.box())` ⇒ 检查器必须报「真实调用 1」
+    #   ⚠️ 不能造新文件：`check_regressions` 同时检查「游戏文件数 == 355」，
+    #      造文件会让它因**另一个原因**失败 ⇒ 变异无效
+    #   ⚠️ 锚点在 `G2048.ets` 内**出现 1 次**（已用 Counter 验证；判据 782）
+    Mutation(
+        name='regressions_focusbox',
+        tool=['python3', '工具/check_regressions.py'],
+        path='entry/src/main/ets/games/G2048.ets',
+        old=".outline(Tv.focusOutline(this.tvFocus === 'L673'))",
+        new=".focusBox(Tv.box()).outline(Tv.focusOutline(this.tvFocus === 'L673'))",
+        expect_desc='注入一行 .focusBox( ⇒ check_regressions 应报「.focusBox 真实调用 1」(锚点在 G2048.ets 内唯一)',
+    ),
 ]
 
 
 def apply_and_test(m: Mutation) -> tuple:
     """返回 (有效?, 说明)"""
+    # ★ 判据 782（第 1291 轮）：**变异锚点必须在目标文件内唯一**
+    #   理由：替换用 `orig.replace(m.old, m.new, 1)`（只改第一处），
+    #     恢复用反向替换 —— 若 old 在文件内出现多次，
+    #     两次替换可能落在**不同位置** ⇒ 恢复后文件与原文不一致
+    #     （第 1290 轮曾因此误判「文件被改坏」）
+    if m.old and m.path:
+        _whole = read(os.path.join(ROOT, m.path))
+        _cnt = _whole.count(m.old)
+        if _cnt != 1:
+            return None, ('锚点在 %s 内出现 %d 次（必须恰好 1 次）⇒ 拒绝执行（判据 782）'
+                          % (m.path, _cnt))
     # ── 改名型（判据 653）：把一份 MUST_TRACK 文档临时改走，模拟"文件丢了" ──
     if m.rename_from:
         src = os.path.join(ROOT, m.rename_from)
