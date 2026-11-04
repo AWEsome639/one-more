@@ -17,34 +17,34 @@ set -u
 HC="/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc"
 EMU="/Applications/DevEco-Studio.app/Contents/tools/emulator/Emulator"
 # ★ 用函数而不是变量：`$A` 含空格，直接当命令会报 "No such file or directory"
-sh_dev() { "$HC" -t 127.0.0.1:5555 shell "$@"; }
+sh_dev() { "${HC}" -t 127.0.0.1:5555 shell "$@"; }
 PKG="com.andrewoscar.onemore"
 
 # ── 可选：重启模拟器 ──
 if [ "${1:-}" = "--restart" ]; then
   echo "  重启模拟器…"
-  "$EMU" -stop onemore2 >/dev/null 2>&1; sleep 5
+  "${EMU}" -stop onemore2 >/dev/null 2>&1; sleep 5
   for pid in $(ps aux | grep -iE "qemu|emulator" | grep -v grep | awk '{print $2}'); do
-    kill "$pid" 2>/dev/null
+    kill "${pid}" 2>/dev/null
   done
   sleep 12
-  nohup "$EMU" -start onemore2 -instancePath "$HOME/.Huawei/Emulator/deployed" \
+  nohup "${EMU}" -start onemore2 -instancePath "${HOME}/.Huawei/Emulator/deployed" \
     > /tmp/emu_ready.log 2>&1 &
   sleep 128
 fi
 
 # ── 连设备 ──
-"$HC" kill >/dev/null 2>&1; sleep 3
-"$HC" start -p 8710 >/dev/null 2>&1; sleep 10
+"${HC}" kill >/dev/null 2>&1; sleep 3
+"${HC}" start -p 8710 >/dev/null 2>&1; sleep 10
 ok=0
 for i in $(seq 1 30); do
-  "$HC" tconn 127.0.0.1:5555 >/dev/null 2>&1
-  if "$HC" list targets 2>/dev/null | grep -q "127.0.0.1:5555"; then
-    echo "  ✅ 设备已连接（第 $i 次）"; ok=1; break
+  "${HC}" tconn 127.0.0.1:5555 >/dev/null 2>&1
+  if "${HC}" list targets 2>/dev/null | grep -q "127.0.0.1:5555"; then
+    echo "  ✅ 设备已连接（第 ${i} 次）"; ok=1; break
   fi
   sleep 5
 done
-[ "$ok" = 1 ] || { echo "  ❌ 连不上设备"; exit 1; }
+[ "${ok}" = 1 ] || { echo "  ❌ 连不上设备"; exit 1; }
 
 # ── ★ 唤醒 + 上滑解锁（这一步以前一直漏） ──
 sh_dev "power-shell wakeup" >/dev/null 2>&1; sleep 4
@@ -55,25 +55,25 @@ echo "  ✅ 已唤醒并解锁"
 # ── 可选：装包并启动 ──
 if [ "${1:-}" = "--install" ] || [ "${2:-}" = "--install" ]; then
   HAP="entry/build/default/outputs/default/entry-default-signed.hap"
-  [ -f "$HAP" ] || { echo "  ❌ 找不到 $HAP"; exit 1; }
-  timeout 900 "$HC" -t 127.0.0.1:5555 install -r "$HAP" 2>&1 | tr -d '\r' \
+  [ -f "${HAP}" ] || { echo "  ❌ 找不到 ${HAP}"; exit 1; }
+  timeout 900 "${HC}" -t 127.0.0.1:5555 install -r "${HAP}" 2>&1 | tr -d '\r' \
     | grep -oE "install bundle successfully" | head -1 | sed 's/^/  装: /'
-  sh_dev "aa force-stop $PKG" >/dev/null 2>&1; sleep 3
-  sh_dev "aa start -b $PKG -a EntryAbility" 2>&1 | tr -d '\r' | head -1 | sed 's/^/  start: /'
+  sh_dev "aa force-stop ${PKG}" >/dev/null 2>&1; sleep 3
+  sh_dev "aa start -b ${PKG} -a EntryAbility" 2>&1 | tr -d '\r' | head -1 | sed 's/^/  start: /'
   sleep 16
   # ★ 2026-11-02 判据 145：启动失败必须看错误码，不要盲目重启
-  pid=$(sh_dev "pidof $PKG" 2>&1 | tr -d '\r')
-  if [ -z "$pid" ]; then
+  pid=$(sh_dev "pidof ${PKG}" 2>&1 | tr -d '\r')
+  if [ -z "${pid}" ]; then
     echo "  ⚠️ 启动失败，重试一次（已知：首次常失败）"
     sh_dev "power-shell wakeup" >/dev/null 2>&1; sleep 3
     # ★★★ swipe **速度 1200** 是关键：慢速（600）在锁屏上不触发解锁，快速才识别为"上滑解锁"
 sh_dev "uitest uiInput swipe 660 1900 660 500 1200" >/dev/null 2>&1; sleep 3
-    sh_dev "aa start -b $PKG -a EntryAbility" 2>&1 | tr -d '\r' | head -1 | sed 's/^/  start2: /'
+    sh_dev "aa start -b ${PKG} -a EntryAbility" 2>&1 | tr -d '\r' | head -1 | sed 's/^/  start2: /'
     sleep 14
-    pid=$(sh_dev "pidof $PKG" 2>&1 | tr -d '\r')
+    pid=$(sh_dev "pidof ${PKG}" 2>&1 | tr -d '\r')
   fi
   echo "  pid: ${pid:-（空）}"
-  [ -n "$pid" ] || { echo "  ❌ 仍未起来 —— 看上面的错误码"; exit 1; }
+  [ -n "${pid}" ] || { echo "  ❌ 仍未起来 —— 看上面的错误码"; exit 1; }
 fi
 
 echo "  ✅ 设备就绪"
