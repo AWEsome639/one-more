@@ -56,7 +56,29 @@ def scan(path):
             walk(c)
 
     walk(d)
+
+    # ★ 判据 701（第 1263 轮）：**排除「横向滚动容器右边缘」的文字**
+    #   踩坑：800×1280 上 `空间 79` 报 36×91（高/宽 2.5）
+    #     但它在 `Scroll [0,1217][2400,1308]`（2400 宽）的最右端 x 2364~2400
+    #     ⇒ 那是**被滚动边界裁切**，可以滚出来 ⇒ **不是挤压 bug**
+    edge_x = None
+    def find_scroll(n):
+        nonlocal edge_x
+        if not isinstance(n, dict): return
+        a = n.get('attributes', {})
+        ty = a.get('type') or ''
+        m = re.findall(r'\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]', a.get('bounds') or '')
+        if ty == 'Scroll' and m:
+            b = [int(v) for v in m[0]]
+            # 很宽（> 1000 px）的 Scroll 视为「横向滚动容器」
+            if b[2] - b[0] > 1000:
+                edge_x = b[2]
+        for c in n.get('children', []) or []:
+            find_scroll(c)
+    find_scroll(d)
+
     bad = []
+    clipped = []
     for t, x, y, w, h, ty in rows:
         if len(t) <= 1 or w <= 0 or h <= 0:
             continue
@@ -64,8 +86,12 @@ def scan(path):
             continue
         r = h / w
         if r > RATIO:
-            bad.append((t, x, y, w, h, r, ty))
-    return (len(rows), bad), None
+            # 判据 701：贴着横向 Scroll 右边缘 ⇒ 归为「被裁切」，不算挤压
+            if edge_x is not None and x + w >= edge_x - 6:
+                clipped.append((t, x, y, w, h, r, ty))
+            else:
+                bad.append((t, x, y, w, h, r, ty))
+    return (len(rows), bad, clipped), None
 
 
 def main():
@@ -86,13 +112,16 @@ def main():
         res, err = scan(p)
         if err:
             print('  ⚠️ %-40s %s' % (os.path.basename(p), err)); continue
-        n, bad = res
+        n, bad, clipped = res
         mark = '🔴' if bad else '✅'
-        print('  %s %-38s 文字 %3d 条 ｜ 挤压 %d' % (mark, os.path.basename(p), n, len(bad)))
+        print('  %s %-38s 文字 %3d 条 ｜ 挤压 %d ｜ 边缘裁切 %d'
+              % (mark, os.path.basename(p), n, len(bad), len(clipped)))
         for t, x, y, w, h, r, ty in bad[:8]:
             print('       「%s」 %dx%d 高/宽=%.1f  @(%d,%d)' % (t[:14], w, h, r, x, y))
         if len(bad) > 8:
             print('       …还有 %d 条' % (len(bad) - 8))
+        for t, x, y, w, h, r, ty in clipped[:3]:
+            print('       （跳过·滚动边缘）「%s」 %dx%d @(%d,%d)' % (t[:12], w, h, x, y))
         total_bad += len(bad)
     print('=' * 72)
     print('  合计挤压 **%d** 条' % total_bad)

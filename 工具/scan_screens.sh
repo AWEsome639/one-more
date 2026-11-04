@@ -152,7 +152,13 @@ def walk(n):
             if 0 <= cx < W and 0 <= cy < H: hits.append((cy, cx))
     for c in n.get('children', []) or []: walk(c)
 walk(d)
-print('%d %d' % (hits[0][1], hits[0][0]) if hits else 'NO')
+# ★ 判据 700（第 1263 轮）：**页签取「最靠下」的那个**，不是最靠上的
+#   踩坑：800×1280 平板上按 y 升序取第一个「统计」
+#     ⇒ 点到页面别处的同名文字 ⇒ **三个页签 dump 完全相同（md5 一致）**
+#     ⇒ 脚本仍报「检查 3/3 ｜ 0 挤压」= 假通过
+#   理由：本项目的页签栏固定在**底部**，所以同名文字中「y 最大」的才是页签
+hits.sort()
+print('%d %d' % (hits[-1][1], hits[-1][0]) if hits else 'NO')
 PY
 )
   case "${XY}" in
