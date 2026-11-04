@@ -69,13 +69,23 @@ export struct StatsTab {
   @StorageProp('accent') accentId: string = Palette.primary;
   @State achvExpanded: boolean = false;
   @State renderRev: number = 0;
-  @StorageProp('totalPlays') plays: number = 0;      // 累计开局（必须用 StorageProp，函数调用不会触发重渲染）
+  // ★★★ 2026-11-05（第 1345 轮）**修「显示停住」bug（判据 897/898）**：
+  //   现象：结算后统计页「🎯 一共玩了 **0** 局」，而成就墙已解锁「初次开局」（2/53）
+  //     ⇒ **数据是对的（totalPlays 真的变了），显示停在初值**
+  //   根因：`playsShown` / `solvedShown` 是 `@State`，只在 `aboutToAppear` 里滚一次，
+  //     而 `StatsTab` 是**页签内容，一直挂着**（切走再切回不重建）
+  //     ⇒ `aboutToAppear` 只跑一次 ⇒ 之后再玩多少局，显示永远停在初值
+  //   对照：同页的「⏱️ 玩了多久」走 `ProgressStore.totalMs()` **函数调用** ⇒ 永远最新
+  //     ⇒ **同一页面两种读法会分叉**（判据 898）
+  //   修法：`@Watch` 监听 `@StorageProp` 变化 ⇒ 重新滚到新值
+  //     （项目已有先例：`SparkBurst.ets:46` 的 `@Prop @Watch('redraw')`）
+  @StorageProp('totalPlays') @Watch('onPlaysChanged') plays: number = 0;      // 累计开局（必须用 StorageProp，函数调用不会触发重渲染）
   @StorageProp('totalMs') totalMs: number = 0;       // 累计时长
   @StorageProp('clearedGames') clearedRaw: string = '';
   @StorageProp('themeDark') dark: boolean = false;
   @StorageProp('xp') xp: number = 0;
   @StorageProp('level') level: number = 1;
-  @StorageProp('totalSolved') totalSolved: number = 0;
+  @StorageProp('totalSolved') @Watch('onSolvedChanged') totalSolved: number = 0;
   @StorageProp('superStreak') superStreak: number = 0;
   @StorageProp('bestStreak') bestStreak: number = 0;
   @StorageProp('dailyCount') dailyCount: number = 0;
@@ -92,6 +102,29 @@ export struct StatsTab {
   @State playsShown: number = 0;
   private rollSolved: RollingNumber = new RollingNumber();
   private rollPlays: RollingNumber = new RollingNumber();
+
+  /**
+   * ★★★ 2026-11-05（第 1345 轮）：`totalPlays` 变了 ⇒ 重新滚到新值
+   *   为什么必须加：`playsShown` 是 `@State`，只在 `aboutToAppear` 里被赋值一次，
+   *   而本组件**一直挂着不重建** ⇒ 不重滚的话显示永久停在初值（判据 897/898）。
+   *   ⚠️ 不用 `animateTo` 包 —— `RollingNumber.to` 自己逐帧推 @State，
+   *     再包一层动画会抢帧（项目纪律：别在后台每帧 setState）。
+   */
+  onPlaysChanged(): void {
+    this.rollPlays.to(this.plays, (v: number) => {
+      this.playsShown = v;
+    });
+  }
+
+  /**
+   * ★★★ 2026-11-05（第 1345 轮）：`totalSolved` 变了 ⇒ 重新滚到新值
+   *   同一个 bug 的第二个受害者（「🏆 通关了 N 局」原来也停在初值）。
+   */
+  onSolvedChanged(): void {
+    this.rollSolved.to(this.totalSolved, (v: number) => {
+      this.solvedShown = v;
+    });
+  }
 
   aboutToAppear(): void {
     setTimeout(() => {
@@ -479,8 +512,15 @@ export struct StatsTab {
   statGrid() {
     Column({ space: Space.md }) {
       Row({ space: Space.md }) {
-        this.statCell('🏆', String(this.solvedShown), '局', 'rounds', '通关了', 'Cleared', Palette.amber)
-        this.statCell('🎯', String(this.playsShown), '局', 'rounds', '一共玩了', 'Played', this.accentColor())
+        // ★★★ 2026-11-05（第 1345 轮）**三层保险显示（判据 902）**：
+        //   1. `Math.max(缓存, 真值)` —— 动画没跟上时也显示真值（永不小于真值）
+        //   2. `@Watch` —— 处理「运行中变化」
+        //   3. `aboutToAppear` 的滚动 —— 处理「首次落位」
+        //   为什么必须加 max：`aboutToAppear` 在 `init()`（异步读盘）完成前跑，
+        //   那一刻 `totalSolved` 还是 0 ⇒ `rollSolved.to(0)` 直接 `apply(0)`（target<=0 早退）
+        //   ⇒ 显示永久停在 0。实测：磁盘上 totalPlays=3，界面显示 0。
+        this.statCell('🏆', String(Math.max(this.solvedShown, this.totalSolved)), '局', 'rounds', '通关了', 'Cleared', Palette.amber)
+        this.statCell('🎯', String(Math.max(this.playsShown, this.plays)), '局', 'rounds', '一共玩了', 'Played', this.accentColor())
       }
       .width('100%')
 
