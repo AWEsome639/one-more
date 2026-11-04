@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
+import { Diag } from '../core/Diag';
 import { Sound } from '../core/Sound';
-import { Bp } from '../core/Bp';
+import { Bp, BpDev } from '../core/Bp';
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
@@ -126,6 +127,10 @@ export default class EntryAbility extends UIAbility {
       //   ⇒ 必须先用 px2vp 换成 vp（ArkUI 里所有布局单位都是 vp）
       const wVp: number = px2vp(prop.windowRect.width);
       const hVp: number = px2vp(prop.windowRect.height);
+      // ★ 第 1207 轮：`Diag.forceTv` 用于在模拟器上验电视字号（1.45 倍）
+      if (Diag.forceTv) {
+        dev = BpDev.TV;
+      }
       Bp.update(wVp, hVp, dev);
       try {
         mainWin.on('windowSizeChange', (sz: window.Size) => {
@@ -134,8 +139,8 @@ export default class EntryAbility extends UIAbility {
       } catch (e2) {
         hilog.warn(DOMAIN, 'testTag', 'windowSizeChange 监听失败（不影响使用）: %{public}s', JSON.stringify(e2));
       }
-      hilog.info(DOMAIN, 'testTag', 'Bp 初始化: %{public}s x %{public}s (%{public}s)',
-        String(wVp), String(hVp), Bp.tag());
+      hilog.info(DOMAIN, 'testTag', 'Bp 初始化: %{public}s x %{public}s | tag=%{public}s dev=%{public}s forceTv=%{public}s scale=%{public}s',
+        String(wVp), String(hVp), Bp.tag(), Bp.dev, String(Diag.forceTv), String(Bp.scale()));
     } catch (e) {
       hilog.warn(DOMAIN, 'testTag', '读窗口尺寸失败，按手机 360vp 走: %{public}s', JSON.stringify(e));
     }

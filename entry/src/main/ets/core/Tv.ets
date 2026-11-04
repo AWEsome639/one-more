@@ -104,18 +104,6 @@ export class Tv {
       style: OutlineStyle.SOLID
     };
   }
-
-  static box(): FocusBoxStyle {
-    // ★ 只用 strokeColor + strokeWidth：margin 不在 FocusBoxStyle 里
-    //   （试过 `{...} as FocusBoxStyle` 带 margin ⇒ 编译报"类型不重叠"）
-    // ★ FocusBoxStyle 要的是 ColorMetrics / LengthMetrics，不是裸 string/number
-    let st: FocusBoxStyle = {
-      strokeColor: ColorMetrics.resourceColor(Palette.primary),
-      strokeWidth: LengthMetrics.vp(4)
-    };
-    return st;
-  }
-
   /**
    * 处理一次按键。
    * @param e    onKeyEvent 给的事件
@@ -208,33 +196,4 @@ export class Tv {
   static desktopKeys(): boolean {
     return Bp.isDesktop() || Bp.isLg();
   }
-
-  static isUp(code: number): boolean {
-    return code === Tv.KEY_UP;
   }
-
-  static isDown(code: number): boolean {
-    return code === Tv.KEY_DOWN;
-  }
-
-  static isLeft(code: number): boolean {
-    return code === Tv.KEY_LEFT;
-  }
-
-  static isRight(code: number): boolean {
-    return code === Tv.KEY_RIGHT;
-  }
-
-  static isOk(code: number): boolean {
-    return code === Tv.KEY_ENTER || code === Tv.KEY_DPAD_CENTER;
-  }
-
-  /**
-   * 智慧屏上的字号放大系数（3 米视距）。
-   * ★ 与 Bp.scale() 分开：那个是"格子大小"，这个是"字"
-   *   电视上字要更大，但格子不能无限大（否则一屏放不下几个）
-   */
-  static fontScale(): number {
-    return Bp.isTv() ? 1.25 : 1.0;
-  }
-}

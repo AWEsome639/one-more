@@ -59,4 +59,22 @@ export class Diag {
    *     `GamesTab.ets` 也不在哈希范围内 ⇒ 这次改动不影响任何已有证据。
    */
   static readonly forceMenu: boolean = true;
+
+  /**
+   * **强制按「电视机」处理**（临时验证用）
+   *
+   * ★ 为什么需要（第 1207 轮）
+   *   模拟器 `deviceInfo.deviceType` 恒为 `phone`，且 `param set const.product.devicetype tv`
+   *   被拒（`errNum 1001`，`uid=2000(shell)` 不是 root）⇒ **无法真机模拟电视**。
+   *
+   *   而电视**唯一独有**的行为是字号缩放：
+   *     `Bp.scale()`：TV = **1.45**（3 米视距）｜ lg 1.12 ｜ md 1.06 ｜ 其他 1.0
+   *     通过 `Cell.of(base) = round(base × Cell.k × Bp.scale())` 生效（**901 处调用**）
+   *
+   *   ⇒ 置 `true` 可在模拟器上验「1.45 倍字放大后布局是否撑破」。
+   * ⚠️ 上线前必须是 `false`。
+   * ⚠️ 它**验不了**「3 米视距下 1.45 倍看着合不合适」——
+   *    那需要真人站在电视机前，任何模拟都替代不了。
+   */
+  static readonly forceTv: boolean = false;
 }
