@@ -374,6 +374,21 @@ struct Splash {
     //     ⇒ 无论首帧多晚，动画都会**从头完整播一遍**。
     let accum: number = 0;      // 累计动画时间（ms），只加正常帧
     let lastMs: number = Date.now();
+    // ★★★ 2026-11-04（第 1196 轮）**判据 557 的落地：量出"时间轴 vs 墙钟"的偏离**
+    //
+    //   第 1195 轮核清：「环先到、M 晚 70ms」来自代码常量（`pStroke` 280ms / `pM` 350ms），
+    //   而**不是**从真机帧测的 —— 因为 `snapshot_display` 单帧要 1300~1800ms，
+    //   物理上分辨不出 70ms（奈奎斯特：需 ≤35ms）。
+    //
+    //   ⇒ 但"时间轴上的 70ms"与"墙钟上的 70ms"**不是一回事**：
+    //     这里的 `accum` 只累加 ≤100ms 的正常帧 ⇒ 卡顿帧（>100ms）被丢弃
+    //     ⇒ 动画比墙钟**慢**，真实墙钟上的错峰会**大于** 70ms
+    //
+    //   ⇒ 加两个里程碑日志（只在首次跨过时打一次，不刷屏）：
+    //     记录 `pStroke` 首次 >0 与 `pM` 首次 >0 时的【accum 与 墙钟偏移】。
+    const wallT0: number = Date.now();
+    let logStroke: boolean = false;
+    let logM: boolean = false;
     let finishedByTimeline: boolean = false;
     // ★ 2026-11-03（第 1111 轮）**帧间隔直方图**（判据 403）
     //   动机：开屏首帧前的空窗（2.75~3.99 秒）在模拟器上**噪声 1.24 秒**，
@@ -434,6 +449,25 @@ struct Splash {
       this.pSub = sm(1050, 300);
       this.pTag = sm(1180, 300);
       this.pOut = sm(1950, 320);
+      // ★ 判据 557：里程碑日志（每条只打一次）
+      if (!logStroke && this.pStroke > 0) {
+        logStroke = true;
+        hilog.info(0x0001, 'SplashTiming',
+          'MILESTONE pStroke>0 | accum=%{public}dms ｜ wall=%{public}dms ｜ drift=%{public}dms',
+          accum, Date.now() - wallT0, (Date.now() - wallT0) - accum);
+      }
+      if (!logM && this.pM > 0) {
+        logM = true;
+        hilog.info(0x0001, 'SplashTiming',
+          'MILESTONE pM>0 | accum=%{public}dms ｜ wall=%{public}dms ｜ drift=%{public}dms',
+          accum, Date.now() - wallT0, (Date.now() - wallT0) - accum);
+      }
+      // ★ 判据 557：动画结束时打出总偏离
+      if (!finishedByTimeline && (this.boosted || t >= HOLD)) {
+        hilog.info(0x0001, 'SplashTiming',
+          'END | accum=%{public}dms ｜ wall=%{public}dms ｜ drift=%{public}dms ｜ dropped=%{public}d',
+          accum, Date.now() - wallT0, (Date.now() - wallT0) - accum, nDrop);
+      }
       if (t >= TOTAL) {
         clearInterval(tick);
         this.pBg = 1; this.pNebula = 1; this.pDust = 1; this.pTwinkle = 1;
