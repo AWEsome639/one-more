@@ -517,50 +517,146 @@ export struct LevelHeader {
       //   修法：**极小屏把 StreakFlame 挪到下一行**（不删，只是换行），
       //     ⇒ Row 只剩 Stack + Column ⇒ Column 拿到 ~81 vp ⇒ 4 个汉字放得下。
       //   同时给标题 `.width('100%')` + `.maxLines(1)` 作第二道保险。
-        Row() {
-          // 等级徽章
-          Stack() {
-            Circle({ width: 56, height: 56 })
-              .fill(this.accentColor())
-              .shadow(Shadow.card)
-            Column() {
-              Text('LV').fontSize(FontSize.xxs).fontColor(Overlay.onColorSoft)
-              Text(Digits(String(this.level), this.langCode))
-                .fontSize(FontSize.xl)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(Color.White)
+        // ★★★ 2026-11-04（第 1272 轮）**195×195 上标题被截断成「新手」两个字**
+        //   上一轮（1257）把 StreakFlame 挪到第二行，解决了 233 的逐字竖排；
+        //   但 195 上标题仍然只显示 2 个字 ⇒ 真因是**双重 padding 吃掉了宽度**：
+        //     StatsTab 的 Column `.padding({left/right: Space.lg})` = 20 vp 每边
+        //     + LevelHeader 自己 `.padding(Space.lg)`     = 20 vp 每边
+        //     ⇒ 每边 **40 vp** ⇒ 585 px 屏幕只剩 **345 px** 给第一行
+        //     ⇒ 徽章 168 + margin 48 = 216 ⇒ 标题只剩 **129 px = 2 个字**
+        //   修法：**极小屏改成竖排**（徽章居中、标题/副标题全宽居中、火焰在下）
+        //     ⇒ 标题拿到 **345 px 全宽** ⇒ 4 个汉字（216 px）放得下
+        //   ⚠️ 不改 padding 是因为它同时决定卡片的内边距观感（判据：一次改一处）。
+        // ★★★ 2026-11-04（第 1272 轮）**195×195 上标题被截断成「新手」两个字**
+        //   【根因】双重 padding：
+        //     StatsTab 的 Column `.padding({left/right: Space.lg})` = 20 vp 每边
+        //     + LevelHeader 自己 `.padding(Space.lg)`            = 20 vp 每边
+        //     ⇒ 每边 **40 vp** ⇒ 585 px 屏幕只剩 **345 px** 给第一行
+        //     ⇒ 徽章 168 + margin 48 = 216 ⇒ 标题只剩 **129 px = 2 个字**
+        //   【排除竖排】第 1272 轮先试过竖排 ⇒ 徽章 168 + 标题 63 + 副标题 30
+        //     = **261 px > 卡片高 192 px** ⇒ 标题被推出卡片（判据 723）
+        //   【最终修法】按屏高分三档：
+        //     · `tinyWatch()`（高 < 210 ⇒ **195**）⇒ 紧凑横排：徽章 40vp + 标题 sm
+        //       可用 345 px，需 120 + 24 + 168 = **312 px** ✅
+        //     · `isWatch() || tinyScreen()`（**233** 等）⇒ 徽章 56 + 标题 lg
+        //       （第 1258 轮真机已验证 **243×63**）✅
+        //     · 其余 ⇒ 原样横排（火焰在同一行）
+        if (Bp.tinyWatch()) {
+          // ── 195×195：紧凑横排 ──
+          Row() {
+            Stack() {
+              Circle({ width: 40, height: 40 })
+                .fill(this.accentColor())
+                .shadow(Shadow.card)
+              Column() {
+                Text('LV').fontSize(FontSize.xxs).fontColor(Overlay.onColorSoft)
+                Text(Digits(String(this.level), this.langCode))
+                  .fontSize(FontSize.sm)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(Color.White)
+              }
             }
-          }
-          .width(Cell.of(56)).height(Cell.of(56))
+            .width(40).height(40)
 
-          Column({ space: Space.xs }) {
-            Text(this.titleForLevel())
-              .fontSize(FontSize.lg)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(this.theme.ink)
-              .width('100%')
-              .maxLines(1)
-            Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
-              .fontSize(FontSize.xs)
-              .fontColor(this.theme.inkFaint)
-              .width('100%')
-              .maxLines(1)
+            Column({ space: Space.xs }) {
+              Text(this.titleForLevel())
+                .fontSize(FontSize.sm)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(this.theme.ink)
+                .width('100%')
+                .maxLines(1)
+              Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
+                .fontSize(FontSize.xxs)
+                .fontColor(this.theme.inkFaint)
+                .width('100%')
+                .maxLines(1)
+            }
+            .alignItems(HorizontalAlign.Start)
+            .layoutWeight(1)
+            .margin({ left: Space.xs })
           }
-          .alignItems(HorizontalAlign.Start)
-          .layoutWeight(1)
-          .margin({ left: Space.md })
+          .width('100%')
 
-          // ★ 极小屏不在本行放 StreakFlame（它会抢走 75 vp，把标题压成 6 vp）
-          if (!(Bp.isWatch() || Bp.tinyScreen())) {
-            StreakFlame({ streak: this.streak, theme: this.theme })
-          }
-        }
-        .width('100%')
-
-        // ★ 极小屏：StreakFlame 单独一行（右对齐，保持视觉重心）
-        if (Bp.isWatch() || Bp.tinyScreen()) {
           Row() {
             Blank()
+            StreakFlame({ streak: this.streak, theme: this.theme })
+          }
+          .width('100%')
+        } else if (Bp.isWatch() || Bp.tinyScreen()) {
+          // ── 233 等小屏：徽章 56 + 标题 lg（真机已验证 243×63）──
+          Row() {
+            Stack() {
+              Circle({ width: 56, height: 56 })
+                .fill(this.accentColor())
+                .shadow(Shadow.card)
+              Column() {
+                Text('LV').fontSize(FontSize.xxs).fontColor(Overlay.onColorSoft)
+                Text(Digits(String(this.level), this.langCode))
+                  .fontSize(FontSize.xl)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(Color.White)
+              }
+            }
+            .width(Cell.of(56)).height(Cell.of(56))
+
+            Column({ space: Space.xs }) {
+              Text(this.titleForLevel())
+                .fontSize(FontSize.lg)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(this.theme.ink)
+                .width('100%')
+                .maxLines(1)
+              Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
+                .fontSize(FontSize.xs)
+                .fontColor(this.theme.inkFaint)
+                .width('100%')
+                .maxLines(1)
+            }
+            .alignItems(HorizontalAlign.Start)
+            .layoutWeight(1)
+            .margin({ left: Space.md })
+          }
+          .width('100%')
+
+          Row() {
+            Blank()
+            StreakFlame({ streak: this.streak, theme: this.theme })
+          }
+          .width('100%')
+        } else {
+          // ── 常规：火焰在同一行 ──
+          Row() {
+            Stack() {
+              Circle({ width: 56, height: 56 })
+                .fill(this.accentColor())
+                .shadow(Shadow.card)
+              Column() {
+                Text('LV').fontSize(FontSize.xxs).fontColor(Overlay.onColorSoft)
+                Text(Digits(String(this.level), this.langCode))
+                  .fontSize(FontSize.xl)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(Color.White)
+              }
+            }
+            .width(Cell.of(56)).height(Cell.of(56))
+
+            Column({ space: Space.xs }) {
+              Text(this.titleForLevel())
+                .fontSize(FontSize.lg)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(this.theme.ink)
+                .width('100%')
+                .maxLines(1)
+              Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
+                .fontSize(FontSize.xs)
+                .fontColor(this.theme.inkFaint)
+                .width('100%')
+                .maxLines(1)
+            }
+            .alignItems(HorizontalAlign.Start)
+            .layoutWeight(1)
+            .margin({ left: Space.md })
+
             StreakFlame({ streak: this.streak, theme: this.theme })
           }
           .width('100%')
