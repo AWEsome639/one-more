@@ -901,6 +901,20 @@ build() {
       //   ⇒ 正确分档：
       //       手表（watch / tinyScreen）⇒ **watchHeader()**（极简：One More + N 款）
       //       手机 / 平板              ⇒ **topBar()**（标题 + 副标题 + ☀️/语言/🔍）
+      // ★★★ 2026-11-04（第 1215 轮）**真 bug：收起态下点 🔍 只变色，搜索栏永不出现**
+      //   现象（853×533 真机 + dump + 截图三重确认）：
+      //     · 点右上 🔍 ⇒ 图标**变紫**（`.backgroundColor(searchOpen ? primary : surface)` 生效）
+      //     · 但 `dump` 里**没有任何 `TextInput`**，截图里也没有搜索框
+      //     · 同时 `levelStrip` 确实被隐藏了（`!searchOpen` 条件也生效）
+      //     ⇒ 说明 `searchOpen` 状态**真的**变了、也被渲染逻辑用到了，唯独搜索栏没出来
+      //   根因：
+      //     块 A（`topBar` + `searchBar` + `levelStrip` + …）整块带
+      //       `.visibility(this.effCollapsed() ? Visibility.None : Visibility.Visible)`
+      //     ⇒ **收起态时搜索栏跟着块 A 一起被完全移除布局**
+      //     而收起态为了"标题/主题/语言/搜索仍可达"，在下面**另外内联了一个 `topBar`**
+      //     ⇒ 那个 `topBar` 里的 🔍 能改 `searchOpen`，但**搜索栏不在它这一支** ⇒ 永远看不到
+      //   修法：收起态补的 `topBar` 后面**也补一个 `searchBar`**（仅非手表/非极小屏）
+      //     ⚠️ 手表/极小屏本来就没有搜索入口（`watchHeader()` 不带 🔍）⇒ 不加
       if (this.effCollapsed()) {
         if (Bp.isWatch() || Bp.tinyScreen()) {
           // ★ 第 937 轮：`watchHeader()` 在这条路径上**没渲染出来**（dump 里查不到），
@@ -917,6 +931,10 @@ build() {
           .padding({ left: 6, right: 6, top: 2, bottom: 2 })
         } else {
           this.topBar()
+          // ★ 第 1215 轮：收起态也要能展开搜索（否则 🔍 只变色，用户以为坏了）
+          if (this.searchOpen) {
+            this.searchBar()
+          }
         }
       }
 
