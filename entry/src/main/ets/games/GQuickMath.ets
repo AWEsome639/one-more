@@ -142,9 +142,26 @@ export struct GQuickMath {
     if (this.over) {
       return Hint.none('none');
     }
-    return Hint.make([this.ans],
-      TG2('答案是第 {0} 个', String(this.ans + 1)),
-      TG2('The answer is option {0}', String(this.ans + 1)), t0);
+    // ★★★ 2026-11-04（第 1224 轮）**真 bug：这里把「答案数值」当「选项下标」用了**
+    //   现象（440×744 真机 + dump 抓到）：
+    //     题目 `43 − 11 = ?`（答案 32，选项 34/33/31/32）
+    //     演示条显示 **「演示中 ｜ 看这里：答案是第 101 个（演示不计分）」**
+    //     ⇒ 答案 100 的一题会显示「第 101 个」，而**选项只有 4 个**
+    //   根因：
+    //     · `HintResult.cells` 的定义是「提示指向的**格子下标**」
+    //       （`ai/Hint.ets` L39-40：`/** 提示指向的格子下标 … */ cells: number[]`）
+    //     · 而 `this.ans` 是**答案的数值**（`choose()` 里 `v === this.ans` 是按值比）
+    //     · 本游戏 4 个选项的「第几个」= `this.opts.indexOf(this.ans) + 1`（1..4）
+    //   ⇒ 对照同模板的正确写法（`GUnitConverterPro` L221-223）：
+    //     它传的是 `this.ansIdx`（索引）⇒ 文案正确、`cells` 也正确
+    //   修法：把「数值」换成「该数值在 opts 里的下标」
+    //     ⚠️ `indexOf` 返回 -1 时（不该发生，但防御）文案会变成「第 0 个」，
+    //        所以先夹到 0..3 再 +1。
+    const idxRaw: number = this.opts.indexOf(this.ans);
+    const idx: number = idxRaw < 0 ? 0 : idxRaw;
+    return Hint.make([idx],
+      TG2('答案是第 {0} 个', String(idx + 1)),
+      TG2('The answer is option {0}', String(idx + 1)), t0);
   }
 
   private askHint(): void {
