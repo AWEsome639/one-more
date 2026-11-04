@@ -40,4 +40,23 @@ export class Diag {
    * ⚠️ 默认关：只在需要复算时序时打开。
    */
   static readonly splashTiming: boolean = false;
+
+  /**
+   * **强制启用右键菜单**（临时验证用）
+   *
+   * ★ 为什么需要（第 1203 轮）
+   *   `GamesTab.ets` L958 传的是 `allowMenu: Tv.on()`
+   *   ⇒ 模拟器 `deviceType` 报 `phone` ⇒ `Tv.on()` = **false**
+   *   ⇒ `Common.ets` L1093 `if (!this.allowMenu) { return; }` **直接返回**
+   *   ⇒ **右键菜单在模拟器上永远弹不出来** —— 这才是「菜单 UI 验不了」的真因
+   *     （不是我以前以为的「`uitest` 没有右键注入」；
+   *      实测 `uinput -M -c 1` **能**注入右键，判据 484 又一次应验）
+   *
+   * ⇒ 临时置 `true` ⇒ 在模拟器上也能验菜单 UI；验完改回 `false`
+   * ⚠️ 上线前必须是 `false`（真机上 `Tv.on()` 自己会开启）
+   *
+   * 注：本文件**不进** `Splash.ets` 的开屏证据哈希 ⇒ 改这里不影响开屏证据。
+   *     `GamesTab.ets` 也不在哈希范围内 ⇒ 这次改动不影响任何已有证据。
+   */
+  static readonly forceMenu: boolean = true;
 }

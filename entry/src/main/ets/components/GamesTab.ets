@@ -9,6 +9,7 @@
  *   「一搜索整个列表区就不渲染」——根因是补丁残留，不是逻辑）
  */
 
+import { Diag } from '../core/Diag';
 import { WatchGames } from '../core/WatchGames';
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
@@ -955,7 +956,9 @@ build() {
                   this.openGame(id);
                 },
                 // 右键菜单（只在桌面类启用；手机/平板零影响）
-                allowMenu: Tv.on(),
+                // ★ 第 1203 轮：`Diag.forceMenu` 用于在模拟器上验菜单 UI
+                //   （模拟器 deviceType 报 phone ⇒ `Tv.on()` false ⇒ 菜单永不弹）
+                allowMenu: Tv.on() || Diag.forceMenu,
                 onMenu: (id: string, x: number, y: number) => {
                   this.menuId = id;
                   this.menuX = x;
