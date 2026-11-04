@@ -132,6 +132,7 @@ done
 BAD=0
 SKIP=0
 PREV_MD5=''
+PREV_DUMP=''
 for TAB in 游戏 统计 设置; do
   rm -f /tmp/_scan_d.json
   sh_retry "uitest dumpLayout -p /data/local/tmp/_scand.json" >/dev/null
@@ -192,16 +193,34 @@ PY
     SKIP=$((SKIP+1)); continue
   fi
   PREV_MD5="${CUR_MD5}"
+  # ★★★ 判据 711（第 1266 轮）：**用「差异指纹」代替「互斥指纹」**
+  #   两个坑（连起来看）：
+  #     ① 第 1264 轮：指纹不互斥（首页含「通关 +50 经验」⇒ 统计指纹命中）
+  #     ② 第 1266 轮：`隐私` 在**游戏页底部也有**（隐私说明）
+  #        ⇒ 800 上的「设置」那份 dump 其实有 **94 条文字**（游戏页的量），
+  #          却因为含「隐私」而通过了指纹检查
+  #   ⇒ 根因：**没有任何一个词能保证「全项目唯一」**（设备不同、布局不同）
+  #   ⇒ 修法：只要求「**本页有、上一页没有**」（差异指纹）：
+  #     它不需要词在全项目唯一，只需要在**相邻两页**之间有区分力
   case "${TAB}" in
     游戏) FP='款小游戏' ;;
     统计) FP='成就' ;;
     设置) FP='隐私' ;;
     *)    FP='' ;;
   esac
-  if [ -n "${FP}" ] && ! grep -q "${FP}" "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null; then
-    echo "  ⚠️ ${TAB}: **内容指纹「${FP}」不命中**（判据 704/699）⇒ 记 SKIP"
-    SKIP=$((SKIP+1)); continue
+  if [ -n "${FP}" ]; then
+    if ! grep -q "${FP}" "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null; then
+      echo "  ⚠️ ${TAB}: 指纹「${FP}」不命中（判据 699）⇒ 记 SKIP"
+      SKIP=$((SKIP+1)); continue
+    fi
+    # ★ 差异检查：这一页有的词，上一页不应该有（除了第一个页签）
+    if [ -n "${PREV_DUMP}" ] && [ -f "${PREV_DUMP}" ] && grep -q "${FP}" "${PREV_DUMP}" 2>/dev/null; then
+      echo "  ⚠️ ${TAB}: 指纹「${FP}」**上一页也有** ⇒ 无法区分（判据 711）⇒ 记 SKIP"
+      SKIP=$((SKIP+1)); continue
+    fi
   fi
+  PREV_DUMP="/tmp/dump_${TAG}_${TAB}.json"
+  echo "  ${TAB}: md5 ${CUR_MD5:0:12} ｜ 指纹「${FP}」命中且与上页不同 ✅"
   echo "  ${TAB}: md5 ${CUR_MD5:0:12} ｜ 指纹「${FP}」命中 ✅"
 
   OUT=$(python3 工具/check_text_squeeze.py "/tmp/dump_${TAG}_${TAB}.json" 2>&1)
