@@ -83,8 +83,13 @@ export struct GPegSolitaire {
     this.reset();
     // ★ 演示（项目 C）：每款游戏**只演一次**（Hint.demoOnce 落盘）
     //   ★ 2026-10-29 记：API 是 `Hint.demoOnce('类名')`，不是 ProgressStore.demoOnce
+    // ★★★ 2026-11-05（第 1314 轮）：**补上与其他 354 款一致的 3000ms 延时**
+    //   实测分布：`setTimeout(… demoStart(), 3000)` 在 **354 款**里都一样，
+    //     只有本款是「直接调用」⇒ 这不是特例，是**遗漏**（判据 821）。
+    //   为什么必须延时：根容器有 `.onTouch`（L619 附近）⇒ 一碰就停演示。
+    //     不延时 ⇒ 用户还没看清棋盘，演示已经被自己的第一下触摸打断了。
     if (Hint.demoOnce('GPegSolitaire')) {
-      this.demoStart();
+      setTimeout(() => { this.demoStart(); }, 3000);
     }
   }
 
