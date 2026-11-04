@@ -371,7 +371,7 @@ export struct GCountingSpan {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L367'; })
             .onBlur(() => { if (this.tvFocus === 'L367') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L367'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L367', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answerCount((k)); }); })
             .onClick(() => { Haptics.tap(); this.answerCount((k)); })
           }, (k: number) => 'n' + k)

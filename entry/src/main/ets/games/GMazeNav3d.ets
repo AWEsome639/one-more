@@ -452,7 +452,7 @@ export struct GMazeNav3d {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L450'; })
           .onBlur(() => { if (this.tvFocus === 'L450') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L450'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L450', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tryMove(0, 0, -1); }); })
           .onClick(() => {
             Haptics.tap();
@@ -466,7 +466,7 @@ export struct GMazeNav3d {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L462'; })
           .onBlur(() => { if (this.tvFocus === 'L462') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L462'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L462', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tryMove(0, 0, 1); }); })
           .onClick(() => {
             Haptics.tap();
@@ -488,7 +488,7 @@ export struct GMazeNav3d {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L482'; })
         .onBlur(() => { if (this.tvFocus === 'L482') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L482'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L482', Radius.sm))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tryMove((0), (-1), 0); }); })
         .onClick(() => {
         Haptics.tap();
@@ -506,7 +506,7 @@ export struct GMazeNav3d {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L498'; })
           .onBlur(() => { if (this.tvFocus === 'L498') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L498'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L498', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove((-1), (0), 0); }); })
           .onClick(() => {
           Haptics.tick();
@@ -523,7 +523,7 @@ export struct GMazeNav3d {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L513'; })
           .onBlur(() => { if (this.tvFocus === 'L513') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L513'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L513', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove((0), (1), 0); }); })
           .onClick(() => {
           Haptics.tick();
@@ -540,7 +540,7 @@ export struct GMazeNav3d {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L528'; })
           .onBlur(() => { if (this.tvFocus === 'L528') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L528'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L528', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tryMove((1), (0), 0); }); })
           .onClick(() => {
           Haptics.tick();

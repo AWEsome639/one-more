@@ -784,7 +784,7 @@ export struct G2048 {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L778'; })
       .onBlur(() => { if (this.tvFocus === 'L778') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L778'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L778', Radius.sm))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.move(dir); }); })
       .onClick(() => {
         Haptics.tick();

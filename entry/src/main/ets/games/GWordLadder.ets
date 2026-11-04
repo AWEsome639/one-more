@@ -375,7 +375,7 @@ export struct GWordLadder {
                 .focusable(Tv.on())
                 .onFocus(() => { this.tvFocus = 'L371'; })
                 .onBlur(() => { if (this.tvFocus === 'L371') { this.tvFocus = ''; } })
-                .outline(Tv.focusOutline(this.tvFocus === 'L371'))
+                .outline(Tv.focusOutline(this.tvFocus === 'L371', Radius.xs))
                 .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapLetter((LETTERS.charAt(r * 7 + c))); }); })
               }
             }, (c: number) => 'c' + c)

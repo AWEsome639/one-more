@@ -669,7 +669,7 @@ export struct GKenken {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L660'; })
           .onBlur(() => { if (this.tvFocus === 'L660') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L660'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L660', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put((d)); }); })
           .onClick(() => {
           Haptics.tick();
@@ -690,7 +690,7 @@ export struct GKenken {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L679'; })
           .onBlur(() => { if (this.tvFocus === 'L679') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L679'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L679', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put((d)); }); })
           .onClick(() => {
           Haptics.tick();
@@ -768,7 +768,7 @@ export struct GKenken {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L753'; })
       .onBlur(() => { if (this.tvFocus === 'L753') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L753'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L753', Radius.sm))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.clearSel(); }); })
       .onClick(() => {
         Haptics.tick();

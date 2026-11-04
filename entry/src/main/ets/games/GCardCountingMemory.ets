@@ -336,7 +336,7 @@ export struct GCardCountingMemory {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L334'; })
         .onBlur(() => { if (this.tvFocus === 'L334') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L334'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L334', Radius.sm))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((i)); }); })
         .onClick(() => { Haptics.tick(); this.answer((i)); })
 

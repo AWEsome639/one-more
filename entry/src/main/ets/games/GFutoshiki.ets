@@ -1675,7 +1675,7 @@ export struct GFutoshiki {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L1622'; })
           .onBlur(() => { if (this.tvFocus === 'L1622') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L1622'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L1622', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put((d)); }); })
           .onClick(() => {
           Haptics.tick();

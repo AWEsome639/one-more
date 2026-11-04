@@ -307,7 +307,7 @@ export struct GDigitSpanReverse {
               .borderRadius(Radius.sm).focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L304'; })
               .onBlur(() => { if (this.tvFocus === 'L304') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L304')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); }); }).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
+              .outline(Tv.focusOutline(this.tvFocus === 'L304', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); }); }).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
             }, (c: number) => 'kc' + c)
           }.width('100%')
         }, (r: number) => 'kr' + r)

@@ -347,7 +347,7 @@ export struct GStaircaseMemory {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L343'; })
         .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L343'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L343', Radius.sm))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
     }.width('100%')
   }

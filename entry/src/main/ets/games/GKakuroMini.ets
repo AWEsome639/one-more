@@ -691,7 +691,7 @@ export struct GKakuroMini {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L683'; })
       .onBlur(() => { if (this.tvFocus === 'L683') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L683'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L683', Radius.sm))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.put(d); }); })
       .onClick(() => {
         Haptics.tick();
@@ -712,7 +712,7 @@ export struct GKakuroMini {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L702'; })
       .onBlur(() => { if (this.tvFocus === 'L702') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L702'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L702', Radius.sm))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.backspace(); }); })
       .onClick(() => {
         Haptics.tick();

@@ -330,7 +330,7 @@ export struct GLetterCancellation {
               Text(this.g.length > (r * N + c) ? this.g[(r * N + c)] : '').fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.hit.indexOf((r * N + c)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).aspectRatio(1).backgroundColor(this.hit.indexOf((r * N + c)) >= 0 ? Palette.berry : this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L327'; })
               .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L327')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }).onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
+              .outline(Tv.focusOutline(this.tvFocus === 'L327', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }).onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)

@@ -344,7 +344,7 @@ export struct GAnagramDefinition {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L336'; })
       .onBlur(() => { if (this.tvFocus === 'L336') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L336'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L336', Radius.sm))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
       .onClick(() => { Haptics.tick(); this.tap(i); })
   }

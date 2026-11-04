@@ -407,7 +407,7 @@ export struct GMentalRotation {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L405'; })
         .onBlur(() => { if (this.tvFocus === 'L405') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L405'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L405', Radius.lg))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(false); }); })
         Button((TG('镜像 🪞')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -423,7 +423,7 @@ export struct GMentalRotation {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L419'; })
         .onBlur(() => { if (this.tvFocus === 'L419') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L419'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L419', Radius.lg))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(true); }); })
       }
       .width('100%')

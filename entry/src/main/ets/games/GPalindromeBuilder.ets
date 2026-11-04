@@ -346,7 +346,7 @@ export struct GPalindromeBuilder {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L344'; })
           .onBlur(() => { if (this.tvFocus === 'L344') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L344'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L344', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); })
         }, (ch: string, i: number) => 'p' + i)
       }.width('100%')

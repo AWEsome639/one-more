@@ -350,7 +350,7 @@ export struct GVowelReconstruct {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L346'; })
       .onBlur(() => { if (this.tvFocus === 'L346') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L346'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L346', Radius.sm))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap(i); }); })
       .onTouch((e: TouchEvent) => { if (e.type === TouchType.Down) { this.pressed = i; } else if (e.type === TouchType.Up || e.type === TouchType.Cancel) { this.pressed = -1; } })
   }

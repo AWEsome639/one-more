@@ -318,7 +318,7 @@ export struct GWordWheel {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L316'; })
           .onBlur(() => { if (this.tvFocus === 'L316') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L316'))
+          .outline(Tv.focusOutline(this.tvFocus === 'L316', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((i)); }); })
         }, (i: number) => 'L' + i)
       }

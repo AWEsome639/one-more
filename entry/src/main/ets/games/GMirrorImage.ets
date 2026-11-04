@@ -417,7 +417,7 @@ export struct GMirrorImage {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L415'; })
         .onBlur(() => { if (this.tvFocus === 'L415') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L415'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L415', Radius.lg))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(true); }); })
         Button((TG('不是')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -433,7 +433,7 @@ export struct GMirrorImage {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L429'; })
         .onBlur(() => { if (this.tvFocus === 'L429') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L429'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L429', Radius.lg))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(false); }); })
       }
       .width('100%')

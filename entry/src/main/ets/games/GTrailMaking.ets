@@ -307,7 +307,7 @@ export struct GTrailMaking {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L305'; })
               .onBlur(() => { if (this.tvFocus === 'L305') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L305'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L305', Radius.sm))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * SIZE + c)); }); })
             }, (c: number) => 'c' + c)
           }.width('100%')

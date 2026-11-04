@@ -314,7 +314,7 @@ export struct GStroopTest {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L310'; })
       .onBlur(() => { if (this.tvFocus === 'L310') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L310'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L310', Radius.lg))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(k); }); })
   }
 }

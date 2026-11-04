@@ -428,7 +428,7 @@ export struct GDigitSwapEq {
             .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L425'; })
             .onBlur(() => { if (this.tvFocus === 'L425') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L425')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((this.puz.tokens[i]).pos); }); }).onClick(() => { Haptics.tick(); this.tapDigit((this.puz.tokens[i]).pos); })
+            .outline(Tv.focusOutline(this.tvFocus === 'L425', Radius.xs)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((this.puz.tokens[i]).pos); }); }).onClick(() => { Haptics.tick(); this.tapDigit((this.puz.tokens[i]).pos); })
             }
           }, (i: number) => 't' + i)
         }.width('100%')

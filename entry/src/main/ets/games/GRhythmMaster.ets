@@ -358,7 +358,7 @@ export struct GRhythmMaster {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L356'; })
         .onBlur(() => { if (this.tvFocus === 'L356') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L356'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L356', Radius.lg))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tapBeat(); }); })
       Text(this.msg).fontSize(FontSize.sm).textAlign(TextAlign.Center).width('100%')
         .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft)

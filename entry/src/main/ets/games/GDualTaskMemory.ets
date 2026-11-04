@@ -376,7 +376,7 @@ export struct GDualTaskMemory {
                 .borderRadius(Radius.sm).focusable(Tv.on())
                 .onFocus(() => { this.tvFocus = 'L370'; })
                 .onBlur(() => { if (this.tvFocus === 'L370') { this.tvFocus = ''; } })
-                .outline(Tv.focusOutline(this.tvFocus === 'L370')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); }); }).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
+                .outline(Tv.focusOutline(this.tvFocus === 'L370', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); }); }).onClick(() => { Haptics.tick(); this.tapDigit((r * 3 + c + 1)); })
               }, (c: number) => 'dc' + c)
             }.width('100%')
           }, (r: number) => 'dr' + r)

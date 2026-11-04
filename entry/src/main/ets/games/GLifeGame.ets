@@ -427,7 +427,7 @@ export struct GLifeGame {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L425'; })
               .onBlur(() => { if (this.tvFocus === 'L425') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'L425'))
+              .outline(Tv.focusOutline(this.tvFocus === 'L425', Radius.xs))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * G + c)); }); })
               .onClick(() => {
               Haptics.tick();

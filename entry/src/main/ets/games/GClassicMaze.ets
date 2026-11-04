@@ -375,7 +375,7 @@ export struct GClassicMaze {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L372'; })
       .onBlur(() => { if (this.tvFocus === 'L372') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L372')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(0); }); }).onClick(() => { Haptics.tap(); this.step(0); })
+      .outline(Tv.focusOutline(this.tvFocus === 'L372', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(0); }); }).onClick(() => { Haptics.tap(); this.step(0); })
  Button('↓')
       // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
@@ -384,7 +384,7 @@ export struct GClassicMaze {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L378'; })
       .onBlur(() => { if (this.tvFocus === 'L378') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L378')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(2); }); }).onClick(() => { Haptics.tap(); this.step(2); })
+      .outline(Tv.focusOutline(this.tvFocus === 'L378', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(2); }); }).onClick(() => { Haptics.tap(); this.step(2); })
  Button('←')
       // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
@@ -393,7 +393,7 @@ export struct GClassicMaze {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L384'; })
       .onBlur(() => { if (this.tvFocus === 'L384') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L384')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(3); }); }).onClick(() => { Haptics.tap(); this.step(3); })
+      .outline(Tv.focusOutline(this.tvFocus === 'L384', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(3); }); }).onClick(() => { Haptics.tap(); this.step(3); })
  Button('→')
       // ★ 2026-11-03（第 1119 轮）无障碍：方向键要念出方向词，
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
@@ -402,12 +402,12 @@ export struct GClassicMaze {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L390'; })
       .onBlur(() => { if (this.tvFocus === 'L390') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L390')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(1); }); }).onClick(() => { Haptics.tap(); this.step(1); })
+      .outline(Tv.focusOutline(this.tvFocus === 'L390', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.step(1); }); }).onClick(() => { Haptics.tap(); this.step(1); })
  Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(40)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L392'; })
       .onBlur(() => { if (this.tvFocus === 'L392') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L392')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+      .outline(Tv.focusOutline(this.tvFocus === 'L392', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
  }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

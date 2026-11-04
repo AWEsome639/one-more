@@ -621,7 +621,7 @@ export struct GFillomino {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L617'; })
             .onBlur(() => { if (this.tvFocus === 'L617') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L617'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L617', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setVal((d)); }); })
             .onClick(() => {
             Haptics.tick();
@@ -646,7 +646,7 @@ export struct GFillomino {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L640'; })
             .onBlur(() => { if (this.tvFocus === 'L640') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L640'))
+            .outline(Tv.focusOutline(this.tvFocus === 'L640', Radius.sm))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.setVal((d)); }); })
             .onClick(() => {
             Haptics.tick();

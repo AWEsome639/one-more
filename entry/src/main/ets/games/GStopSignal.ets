@@ -349,7 +349,7 @@ export struct GStopSignal {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L345'; })
         .onBlur(() => { if (this.tvFocus === 'L345') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L345'))
+        .outline(Tv.focusOutline(this.tvFocus === 'L345', Radius.lg))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tap(); }); })
       if (this.over) {
         Button(TG('重开'))

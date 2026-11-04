@@ -856,7 +856,7 @@ export struct GBlockEscape {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L848'; })
       .onBlur(() => { if (this.tvFocus === 'L848') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L848'))
+      .outline(Tv.focusOutline(this.tvFocus === 'L848', Radius.sm))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.go(dir); }); })
       .onClick(() => {
         Haptics.tick();
