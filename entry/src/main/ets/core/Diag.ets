@@ -58,7 +58,7 @@ export class Diag {
    * 注：本文件**不进** `Splash.ets` 的开屏证据哈希 ⇒ 改这里不影响开屏证据。
    *     `GamesTab.ets` 也不在哈希范围内 ⇒ 这次改动不影响任何已有证据。
    */
-  static readonly forceMenu: boolean = true;
+  static readonly forceMenu: boolean = false;
 
   /**
    * **强制按「电视机」处理**（临时验证用）
