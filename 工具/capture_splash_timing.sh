@@ -89,8 +89,16 @@ log "④ 抓 SplashTiming"
 A "hilog -x" 2>/dev/null | grep -E "$PATTERN" > "$OUT" 2>/dev/null || true
 
 # ── ★ 判据 810：非空断言 ──
+# ── ★★ 判据 848（第 1325 轮）：**`grep -c` 匹配 0 行时退出码是 1，不是 0**
+#     实证：`LINES=$(grep -c ... || echo 0)` ⇒ grep 输出 "0" 且退出 1
+#           ⇒ `|| echo 0` **也执行** ⇒ LINES = "0\n0"（两行）
+#           ⇒ `[ "$LINES" -lt 1 ]` 报 "integer expression expected"
+#           ⇒ **非空断言被跳过** ⇒ 打印「✅ 抓到 0 行」（假成功）
+#     ⇒ 正确写法：只取 grep 的输出，**不要 `|| echo 0`**
 BYTES=$(stat -f%z "$OUT" 2>/dev/null || echo 0)
-LINES=$(grep -c "$PATTERN" "$OUT" 2>/dev/null || echo 0)
+LINES=$(grep -c "$PATTERN" "$OUT" 2>/dev/null || true)
+LINES=$(printf '%s' "${LINES:-0}" | head -1 | tr -d ' \r')
+case "$LINES" in ''|*[!0-9]*) LINES=0 ;; esac
 
 log "⑤ 校验"
 log "   文件: $OUT"
