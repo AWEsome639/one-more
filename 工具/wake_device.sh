@@ -73,6 +73,26 @@ for attempt in 1 2 3; do
     if [ "$SZ" -lt 500 ]; then
       echo "FAIL:dump_empty(lum=$L,size=$SZ,attempt=$attempt)"; exit 3
     fi
+
+    # ── ⑤ ⚠️⚠️ 判据 639：**PID 有值 ≠ App 在前台**
+    #   第 1237 轮实测：`pidof` = 3472（进程在跑），
+    #   但 dump 里全是「设置 / 图库 / 文件管理 / 日历」= **桌面**。
+    #   ⇒ 只查 PID 会得出"App 可用"的错误结论，而每一步 UI 操作都会打到桌面。
+    #   修法：查 dump 里有没有 App 独有的文字；没有就 `aa start` 拉起来再查。
+    FG=0
+    for ft in 1 2 3; do
+      if grep -q "One More" /tmp/_wk.json 2>/dev/null; then FG=1; break; fi
+      A "aa start -b $BUNDLE -a $ABILITY" >/dev/null 2>&1
+      sleep 6
+      A "uitest dumpLayout -p /data/local/tmp/_wk.json" >/dev/null 2>&1
+      sleep 1
+      timeout 25 $T file recv /data/local/tmp/_wk.json /tmp/_wk.json >/dev/null 2>&1
+      if grep -q "One More" /tmp/_wk.json 2>/dev/null; then FG=1; break; fi
+    done
+    if [ "$FG" != "1" ]; then
+      echo "FAIL:app_not_foreground(lum=$L,pid=$P)"; exit 5
+    fi
+
     echo "OK $P"
     exit 0
   fi
