@@ -507,38 +507,64 @@ export struct LevelHeader {
 
   build() {
     Column({ space: Space.md }) {
-      Row() {
-        // 等级徽章
-        Stack() {
-          Circle({ width: 56, height: 56 })
-            .fill(this.accentColor())
-            .shadow(Shadow.card)
-          Column() {
-            Text('LV').fontSize(FontSize.xxs).fontColor(Overlay.onColorSoft)
-            Text(Digits(String(this.level), this.langCode))
-              .fontSize(FontSize.xl)
+      // ★★★ 2026-11-04（第 1257 轮）**233×233 上「新手上路」逐字竖排的真根因**
+      //   前两轮我改的是 `StatsTab.heroCard`，**改错了组件**（判据 687）：
+      //     统计页顶部的 LV 卡其实是本组件的 `LevelHeader()`（StatsTab.build 第一个调用），
+      //     而 heroCard 在它下面、屏幕上根本看不到。
+      //   本组件真根因（几何实测，699×699 = 233 vp）：
+      //     Row 153 vp = Stack(56) + margin(16) + **Column(6)** + StreakFlame(**75**)
+      //     ⇒ Column 只剩 6 vp ⇒ `FontSize.lg`(18vp) 的标题每行放半个字 ⇒ 逐字竖排
+      //   修法：**极小屏把 StreakFlame 挪到下一行**（不删，只是换行），
+      //     ⇒ Row 只剩 Stack + Column ⇒ Column 拿到 ~81 vp ⇒ 4 个汉字放得下。
+      //   同时给标题 `.width('100%')` + `.maxLines(1)` 作第二道保险。
+        Row() {
+          // 等级徽章
+          Stack() {
+            Circle({ width: 56, height: 56 })
+              .fill(this.accentColor())
+              .shadow(Shadow.card)
+            Column() {
+              Text('LV').fontSize(FontSize.xxs).fontColor(Overlay.onColorSoft)
+              Text(Digits(String(this.level), this.langCode))
+                .fontSize(FontSize.xl)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(Color.White)
+            }
+          }
+          .width(Cell.of(56)).height(Cell.of(56))
+
+          Column({ space: Space.xs }) {
+            Text(this.titleForLevel())
+              .fontSize(FontSize.lg)
               .fontWeight(FontWeight.Bold)
-              .fontColor(Color.White)
+              .fontColor(this.theme.ink)
+              .width('100%')
+              .maxLines(1)
+            Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
+              .fontSize(FontSize.xs)
+              .fontColor(this.theme.inkFaint)
+              .width('100%')
+              .maxLines(1)
+          }
+          .alignItems(HorizontalAlign.Start)
+          .layoutWeight(1)
+          .margin({ left: Space.md })
+
+          // ★ 极小屏不在本行放 StreakFlame（它会抢走 75 vp，把标题压成 6 vp）
+          if (!(Bp.isWatch() || Bp.tinyScreen())) {
+            StreakFlame({ streak: this.streak, theme: this.theme })
           }
         }
-        .width(Cell.of(56)).height(Cell.of(56))
+        .width('100%')
 
-        Column({ space: Space.xs }) {
-          Text(this.titleForLevel())
-            .fontSize(FontSize.lg)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(this.theme.ink)
-          Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
-            .fontSize(FontSize.xs)
-            .fontColor(this.theme.inkFaint)
+        // ★ 极小屏：StreakFlame 单独一行（右对齐，保持视觉重心）
+        if (Bp.isWatch() || Bp.tinyScreen()) {
+          Row() {
+            Blank()
+            StreakFlame({ streak: this.streak, theme: this.theme })
+          }
+          .width('100%')
         }
-        .alignItems(HorizontalAlign.Start)
-        .layoutWeight(1)
-        .margin({ left: Space.md })
-
-        StreakFlame({ streak: this.streak, theme: this.theme })
-      }
-      .width('100%')
 
       // XP 进度条
       Column({ space: Space.xs }) {
