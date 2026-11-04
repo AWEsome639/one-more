@@ -224,6 +224,112 @@ def enclosing_has_padding(src, call_line, window=None):
 
 
 
+# ★ 判据 767（第 1282 轮）：把「双层 padding 合计」换算成**占比**
+#   Space 值来自 core/Design.ets（实测：xs=6 sm=10 md=16 lg=20 xl=28 xxl=32 xxxl=48）
+SPACE = {'xs': 6, 'sm': 10, 'md': 16, 'lg': 20, 'xl': 28, 'xxl': 32, 'xxxl': 48}
+
+# 六设备的 vp 宽度（与 工具/scan_screens.sh 的六个分辨率一致）
+DEVICE_VP = [('195×195', 195), ('233×233', 233), ('440×744', 440),
+             ('853×533', 853), ('960×540', 960), ('800×1280', 800)]
+
+
+def parse_pad_vp(text):
+    """从一行（或拼好的多行）`.padding(...)` 里取**水平单边**的 vp 值
+
+    ★ 判据 770（第 1282 轮）：**只算水平方向（left / right）**
+      实证（GamesTab:1038）：
+        `.padding({ left: … ? 2 : Space.lg, right: … ? 2 : Space.lg,
+                    bottom: … ? 4 : Space.xxxl })`
+      ⇒ 之前的实现把 `bottom: Space.xxxl`(=48) 也算进去 ⇒ 报 **58 vp**
+      ⇒ 但 48 是**竖向留白**，与「文字被横向挤死」无关
+      ⇒ 正确值 = `max(2, Space.lg)` = **20 vp**
+
+    ★ 判据 771（第 1282 轮）：**三元解析不能跨属性**
+      ⇒ 必须先把 `left:` / `right:` 之后的片段切出来，再在那个片段里解析
+
+    取不到 ⇒ 返回 None（**不猜**）
+    """
+    # ① 简单写法 `.padding(Space.lg)` / `.padding(10)`
+    m = re.search(r'\.padding\(\s*Space\.(\w+)', text)
+    if m and '{' not in text:
+        return SPACE.get(m.group(1))
+    m = re.search(r'\.padding\(\s*(\d+)\s*\)', text)
+    if m:
+        return int(m.group(1))
+
+    # ② 对象写法：只切出 left / right 的片段（判据 771）
+    best = None
+    for key in ('left', 'right'):
+        mm = re.search(r'%s:\s*([^,}]+)' % key, text)
+        if not mm:
+            continue
+        seg = mm.group(1)
+        # 2a 片段里只有一个 Space.xxx
+        sm = re.search(r'Space\.(\w+)', seg)
+        nm = re.search(r'(\d+)', seg)
+        if '?' in seg:
+            # 2b 三元：取两个分支的最大值（最坏情况）
+            vals = []
+            if sm:
+                vals += [SPACE[v] for v in re.findall(r'Space\.(\w+)', seg) if v in SPACE]
+            vals += [int(v) for v in re.findall(r'[?:]\s*(\d+)', seg)]
+            if vals:
+                cand = max(vals)
+                best = cand if best is None else max(best, cand)
+        elif sm:
+            cand = SPACE.get(sm.group(1))
+            if cand is not None:
+                best = cand if best is None else max(best, cand)
+        elif nm:
+            cand = int(nm.group(1))
+            best = cand if best is None else max(best, cand)
+    return best
+
+
+
+def ratio_table(total_vp):
+    """返回 [(设备名, 屏宽 vp, 占比%, 判定)]"""
+    out = []
+    for name, w in DEVICE_VP:
+        if total_vp is None:
+            out.append((name, w, None, '?'))
+            continue
+        pct = total_vp * 2 / w * 100.0
+        if pct > 30:
+            verdict = '🔴 挤死'
+        elif pct >= 15:
+            verdict = '⚠️ 偏多'
+        else:
+            verdict = '✅ 正常'
+        out.append((name, w, pct, verdict))
+    return out
+
+
+def get_pad_line(src, lineno):
+    """取 padding 行的**完整文本**——多行写法要把后续几行也带上
+
+    ★ 判据 768（第 1282 轮）：**`.padding({` 的数值在后续行**
+      实证：
+        `.padding({`                       ← 只有这一行取不到值
+        `  left: Space.lg, right: Space.lg,`
+        `  bottom: …`
+        `})`
+      ⇒ 解析必须看接下来 5 行
+    """
+    lines = src.split('\n')
+    idx = lineno - 1
+    if not (0 <= idx < len(lines)):
+        return ''
+    txt = lines[idx]
+    # 若这一行以 `.padding({` 结尾（没有闭合），继续往后拼
+    if '.padding(' in txt and '{' in txt and '}' not in txt:
+        for q in range(idx + 1, min(len(lines), idx + 6)):
+            txt += ' ' + lines[q].strip()
+            if '}' in lines[q]:
+                break
+    return txt
+
+
 def main():
     root = sys.argv[1] if len(sys.argv) > 1 else 'entry/src/main/ets'
     if not os.path.isdir(root):
@@ -265,16 +371,28 @@ def main():
 
     print('  ② 调用处外层也有 padding（⇒ 内边距叠加）：%d 处' % len(risks))
     for name, f, line, g, cl, pl in risks:
-        print('     ⚠️ %s（自身 padding @%s:%d）' % (name, os.path.basename(f), line))
-        print('        被 %s:%d 调用，外层 padding @%s:%d'
-              % (os.path.basename(g), cl, os.path.basename(g), pl))
-        # ★ 判据 765/766/767（第 1281 轮）：**风险不是「有/没有」，而是「占比」**
-        #   同一组 40 vp 叠加：
-        #     195 vp 屏 ⇒ 41% 总宽 ⇒ 内容被挤死（真 bug，第 1272 轮）
-        #     800 vp 屏 ⇒ 10% 总宽 ⇒ 只是留白（没问题）
-        #   ⇒ 计算「(20+20)×2 ÷ 屏宽」，按窄屏最坏情况给结论
-        print('        ⇒ **必须按最小屏判**：若双层合计 40 vp，')
-        print('          195 vp 屏 = 41% 总宽（挤死）｜800 vp 屏 = 10%（正常）')
+        inner = parse_pad_vp(get_pad_line(read(f), line))
+        outer = parse_pad_vp(get_pad_line(read(g), pl))
+        total = (inner + outer) if (inner is not None and outer is not None) else None
+        print('     ⚠️ %s（自身 padding @%s:%d = %s vp）'
+              % (name, os.path.basename(f), line,
+                 inner if inner is not None else '?'))
+        print('        被 %s:%d 调用，外层 padding @%s:%d = %s vp'
+              % (os.path.basename(g), cl, os.path.basename(g), pl,
+                 outer if outer is not None else '?'))
+        if total is None:
+            print('        ⇒ 🔴 **取不到 padding 数值** ⇒ 不猜，请人工确认')
+            continue
+        print('        双层合计 %s vp ⇒ 各屏占比：' % total)
+        worst = None
+        for dname, dw, pct, verdict in ratio_table(total):
+            print('           %-9s %4d vp ⇒ %5.1f%%  %s' % (dname, dw, pct, verdict))
+            if verdict.startswith('🔴') and worst is None:
+                worst = dname
+        if worst:
+            print('        ⇒ 🔴 **在 %s 上会挤死**（占比 > 30%%，判据 767）' % worst)
+        else:
+            print('        ⇒ ✅ 全部设备占比 < 30%% ⇒ 属「有意留白」（判据 765）')
     print()
     print('  📖 判据 765：**「外层留白」与「内容内边距」是不同视觉层 ⇒ 不算 bug**；')
     print('     只有「同一视觉层重复 padding」才是 bug（LevelHeader 那种）。')
