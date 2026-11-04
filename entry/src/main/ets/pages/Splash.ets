@@ -113,6 +113,10 @@
 import { router, curves } from '@kit.ArkUI';
 import { PathShape } from '@ohos.arkui.shape';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+// ★★★ 2026-11-04（第 1201 轮）判据 564 的落地：
+//   诊断开关挪到 `core/Diag.ets`（**不进本文件的哈希**）
+//   ⇒ 以后调开关不再让 24 条开屏证据失效
+import { Diag } from '../core/Diag';
 import { Haptics } from '../core/Haptics';
 import { L } from '../core/I18n';
 
@@ -384,6 +388,8 @@ struct Splash {
     //     这里的 `accum` 只累加 ≤100ms 的正常帧 ⇒ 卡顿帧（>100ms）被丢弃
     //     ⇒ 动画比墙钟**慢**，真实墙钟上的错峰会**大于** 70ms
     //
+    //   ★ 第 1201 轮：开关已挪到 `core/Diag.ets`（`Diag.splashTiming`）
+    //     ⇒ **以后调开关不再改本文件的哈希** ⇒ 24 条开屏证据不会失效（判据 564）
     //   ⇒ 加两个里程碑日志（只在首次跨过时打一次，不刷屏）：
     //     记录 `pStroke` 首次 >0 与 `pM` 首次 >0 时的【accum 与 墙钟偏移】。
     const wallT0: number = Date.now();
@@ -450,20 +456,20 @@ struct Splash {
       this.pTag = sm(1180, 300);
       this.pOut = sm(1950, 320);
       // ★ 判据 557：里程碑日志（每条只打一次）
-      if (!logStroke && this.pStroke > 0) {
+      if (Diag.splashTiming && !logStroke && this.pStroke > 0) {
         logStroke = true;
         hilog.info(0x0001, 'SplashTiming',
           'MILESTONE pStroke>0 | accum=%{public}dms ｜ wall=%{public}dms ｜ drift=%{public}dms',
           accum, Date.now() - wallT0, (Date.now() - wallT0) - accum);
       }
-      if (!logM && this.pM > 0) {
+      if (Diag.splashTiming && !logM && this.pM > 0) {
         logM = true;
         hilog.info(0x0001, 'SplashTiming',
           'MILESTONE pM>0 | accum=%{public}dms ｜ wall=%{public}dms ｜ drift=%{public}dms',
           accum, Date.now() - wallT0, (Date.now() - wallT0) - accum);
       }
       // ★ 判据 557：动画结束时打出总偏离
-      if (!finishedByTimeline && (this.boosted || t >= HOLD)) {
+      if (Diag.splashTiming && !finishedByTimeline && (this.boosted || t >= HOLD)) {
         hilog.info(0x0001, 'SplashTiming',
           'END | accum=%{public}dms ｜ wall=%{public}dms ｜ drift=%{public}dms ｜ dropped=%{public}d',
           accum, Date.now() - wallT0, (Date.now() - wallT0) - accum, nDrop);
