@@ -9,6 +9,7 @@
  *   「一搜索整个列表区就不渲染」——根因是补丁残留，不是逻辑）
  */
 
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Diag } from '../core/Diag';
 import { WatchGames } from '../core/WatchGames';
 import { Bp } from '../core/Bp';
