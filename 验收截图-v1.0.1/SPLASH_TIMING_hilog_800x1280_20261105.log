@@ -1,0 +1,44 @@
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
+11-05 05:52:28.554  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=285ms ｜ wall=444ms ｜ drift=159ms
+11-05 05:52:28.621  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=352ms ｜ wall=511ms ｜ drift=159ms
+11-05 05:52:30.513  3656  3656 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2244ms ｜ wall=2403ms ｜ drift=159ms ｜ dropped=1
+11-05 05:52:30.514  3656  3656 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2244 boosted=false | frames fast=78 mid=31 slow=0 vslow=1 drop=1
