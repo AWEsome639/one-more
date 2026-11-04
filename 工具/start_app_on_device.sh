@@ -134,9 +134,13 @@ case "$VERDICT" in
     # ★ 判据 839（第 1321 轮）：**桌面的 dumpLayout 可能**不含文本节点**
     #   实证：解锁后 dump 有效但 0 条文本 ⇒ 若用「文本数 ≥ 3」会**假失败**
     #   ⇒ 正确判据：**dump ≥ 400 字节** + **`pidof com.ohos.sceneboard` 非空**
-    SB=$(A "pidof com.ohos.sceneboard" | head -1)
+    # ★ 判据 876（第 1336 轮）：**`pidof <系统进程>` 可能返回多个 PID**
+    #   实证：`pidof com.ohos.sceneboard` ⇒ **"1463 1566"**（空格分隔）
+    #   ⇒ 原来的 `^[0-9]+$` 不匹配 ⇒ **误报「桌面进程不在」**
+    #   ⇒ 改成「取出第一个 PID，再校验它是纯数字」
+    SB=$(A "pidof com.ohos.sceneboard" | head -1 | awk '{print $1}')
     if ! printf '%s' "$SB" | grep -qE '^[0-9]+$'; then
-      log "🔴 桌面进程不在（com.ohos.sceneboard pidof: $(printf '%s' "$SB" | cut -c1-30)）"
+      log "🔴 桌面进程不在（com.ohos.sceneboard pidof 首个: $(printf '%s' "$SB" | cut -c1-30)）"
       exit 2
     fi
     log "   已到桌面（sceneboard PID=${SB}，dump 文本 ${NTEXTS} 条）"
@@ -157,7 +161,7 @@ A "aa start -b $PKG -a EntryAbility" >/dev/null 2>&1
 PID=""
 for t in 2 3 3 4 5 6; do
   sleep "$t"
-  PID=$(A "pidof $PKG" | head -1)
+  PID=$(A "pidof $PKG" | head -1 | awk '{print $1}')
   printf '%s' "$PID" | grep -qE '^[0-9]+$' && break
 done
 if ! printf '%s' "$PID" | grep -qE '^[0-9]+$'; then
