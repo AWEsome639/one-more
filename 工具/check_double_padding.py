@@ -330,8 +330,113 @@ def get_pad_line(src, lineno):
     return txt
 
 
+def selftest():
+    """内置自检：用**已知正例**验证检查器真能报出来（判据 648 / 759）
+
+    ★ 为什么必须有
+      本工具前 5 版都报「0 风险」，而**已知的真案例就摆在项目里**
+      （第 1272 轮刚修过 `LevelHeader` 双重 padding）
+      ⇒ 一个从没在真案例上通过的检查器，报「0」毫无信息量。
+
+    ★ 做法
+      在临时目录里造两个最小 .ets 文件：
+        · Inner.ets —— 一个组件，根容器带 `.padding(Space.lg)`（20 vp）
+        · Outer.ets —— 调用 `Inner()`，其父 Column 也带 `.padding(Space.lg)`
+      ⇒ 必须有 **1 处风险**、双层合计 **40 vp**、195 vp 屏占比 **41.0%** 🔴
+    三项全中才算自检通过。
+    """
+    import tempfile
+    import shutil
+
+    inner = """@Component
+export struct Inner {
+  build() {
+    Column({ space: 8 }) {
+      Text('x')
+    }
+    .width('100%')
+    .padding(Space.lg)
+  }
+}
+"""
+    # ⚠️ 自检第一版把 `Outer` 的根容器写成 `Scroll`（无 padding），
+    #   而 padding 在其内部的 `Column` 上 ⇒ 工具正确地报「Outer 无根 padding」，
+    #   是**我的 fixture 写错了**，不是工具错。
+    #   ⇒ 改成「根容器就是带 padding 的 Column」，这样两个组件都有根 padding，
+    #     且 `Inner()` 的父容器（Outer 的根 Column）也有 padding ⇒ 构成叠加。
+    outer = """@Component
+export struct Outer {
+  build() {
+    Column({ space: Space.lg }) {
+      Inner()
+    }
+    .width('100%')
+    .padding({ left: Space.lg, right: Space.lg })
+  }
+}
+"""
+    tmp = tempfile.mkdtemp(prefix='dp_selftest_')
+    try:
+        io.open(os.path.join(tmp, 'Inner.ets'), 'w', encoding='utf-8').write(inner)
+        io.open(os.path.join(tmp, 'Outer.ets'), 'w', encoding='utf-8').write(outer)
+
+        # 收集
+        padded = []
+        for fn in ('Inner.ets', 'Outer.ets'):
+            f = os.path.join(tmp, fn)
+            padded += [(n, f, l) for n, l in structs_with_padded_root(read(f))]
+
+        names = [n for n, _, _ in padded]
+        assert 'Inner' in names, '自检失败：没识别出 Inner 的根容器 padding（得到 %s）' % names
+        assert 'Outer' in names, '自检失败：没识别出 Outer 的根容器 padding（得到 %s）' % names
+
+        # 风险配对
+        risks = []
+        for name, f, line in padded:
+            for fn in ('Inner.ets', 'Outer.ets'):
+                g = os.path.join(tmp, fn)
+                if os.path.abspath(g) == os.path.abspath(f):
+                    continue
+                src = read(g)
+                for cl in calls_of(src, name):
+                    pl = enclosing_has_padding(src, cl)
+                    if pl:
+                        risks.append((name, f, line, g, cl, pl))
+        assert len(risks) == 1, '自检失败：应报 1 处风险，实报 %d' % len(risks)
+
+        name, f, line, g, cl, pl = risks[0]
+        assert name == 'Inner', '自检失败：风险对象应是 Inner，实为 %s' % name
+
+        inner_vp = parse_pad_vp(get_pad_line(read(f), line))
+        outer_vp = parse_pad_vp(get_pad_line(read(g), pl))
+        assert inner_vp == 20, '自检失败：内层 padding 应为 20，实为 %s' % inner_vp
+        assert outer_vp == 20, '自检失败：外层 padding 应为 20，实为 %s' % outer_vp
+
+        total = inner_vp + outer_vp
+        assert total == 40, '自检失败：双层合计应为 40，实为 %s' % total
+
+        row = [r for r in ratio_table(total) if r[0] == '195×195'][0]
+        assert abs(row[2] - 41.0) < 0.1, '自检失败：195 vp 占比应 41.0%%，实为 %.1f%%' % row[2]
+        assert row[3].startswith('🔴'), '自检失败：195 vp 应判「挤死」，实为 %s' % row[3]
+
+        print('  ✅ 自检通过：识别 2 个带 padding 的组件 ｜ 1 处风险 ｜ 双层 40 vp ｜ 195 vp = 41.0%% 🔴')
+        return 0
+    except AssertionError as e:
+        print('  🔴 %s' % e)
+        return 1
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def main():
-    root = sys.argv[1] if len(sys.argv) > 1 else 'entry/src/main/ets'
+    if '--selftest' in sys.argv:
+        print('=' * 74)
+        print('  双重 padding 检查器 · 内置自检（判据 648 / 759）')
+        print('=' * 74)
+        return selftest()
+
+    root = [a for a in sys.argv[1:] if not a.startswith('-')]
+    root = root[0] if root else 'entry/src/main/ets'
     if not os.path.isdir(root):
         print('目录不存在: %s' % root); return 2
 
