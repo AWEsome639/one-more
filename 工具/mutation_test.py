@@ -87,6 +87,14 @@ SELFTESTS = [
     ('check_double_padding',
      ['python3', '工具/check_double_padding.py', '--selftest'],
      '内置 fixture：内层 padding 20 vp + 外层 20 vp ⇒ 应报 1 处风险 / 40 vp / 195vp 41.0%'),
+    # ★ 第 1293 轮新增：历史 bug 复发检查器的自检
+    #   它验 13 项（其中 **4 项是反例**，判据 784）：
+    #     strip_comments 剥注释且保留行号 ／ .focusBox 计数跳过注释
+    #     ／ HintBar 扫描跳过注释 ／ px-as-vp 只命中 4 位数
+    #   ⇒ 它证明「这个检查器不会把注释当调用、不会把 3 位数当 px」
+    ('check_regressions',
+     ['python3', '工具/check_regressions.py', '--selftest'],
+     '13 项自检（含 4 项反例）：剥注释 / ·focusBox 计数 / HintBar 扫描 / px-as-vp 正则'),
 ]
 
 
