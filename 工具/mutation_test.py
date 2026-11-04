@@ -48,13 +48,20 @@ def run_check(cmd):
 
 
 class Mutation:
-    def __init__(self, name, tool, path, old, new, expect_desc):
+    """一种变异。
+
+    ★ 两种形态（判据 651）：
+      · `old` 非空 ⇒ **文本替换型**（改现有文件里的一段）
+      · `create_file` 非空 ⇒ **造文件型**（造一个该被检查器抓住的新文件）
+    """
+    def __init__(self, name, tool, path, old, new, expect_desc, create_file=None):
         self.name = name
         self.tool = tool            # 检查器命令（list）
         self.path = path            # 被变异的文件（相对 ROOT）
         self.old = old
         self.new = new
         self.expect_desc = expect_desc
+        self.create_file = create_file      # 造文件型：要创建的相对路径
 
 
 MUTATIONS = [
@@ -82,11 +89,39 @@ MUTATIONS = [
         new="@Entry  /* mutation-test-injected */",
         expect_desc='改 Splash.ets ⇒ check_splash 应报证据 hash 失效',
     ),
+    Mutation(
+        name='docs_tracked',
+        tool=['python3', '工具/check_docs_tracked.py'],
+        path='', old='', new='',
+        create_file='变异测试-未跟踪文档.md',
+        expect_desc='造一个未纳入 git 的 .md ⇒ check_docs_tracked 应报 🔴 未跟踪',
+    ),
 ]
 
 
 def apply_and_test(m: Mutation) -> tuple:
     """返回 (有效?, 说明)"""
+    # ── 造文件型（判据 651）：不改现有文件，只造一个该被抓住的新文件 ──
+    if m.create_file:
+        target = os.path.join(ROOT, m.create_file)
+        if os.path.exists(target):
+            return None, '目标文件已存在（跳过）：%s' % m.create_file
+        rc0, _ = run_check(m.tool)
+        try:
+            io.open(target, 'w', encoding='utf-8').write('# 变异测试用临时文件\n')
+            rc1, out1 = run_check(m.tool)
+            if rc1 == 0:
+                return False, '造出未跟踪 .md 后检查器**仍返回 0** ⇒ 失效！'
+            ev = ''
+            for line in out1.split('\n'):
+                if any(k in line for k in ('🔴', '未跟踪', 'SUSPECT', 'FAIL')):
+                    ev = line.strip()[:88]; break
+            return True, '基线 rc=%d → 造文件后 rc=%d ✅\n    证据行：%s' % (rc0, rc1, ev or '（无关键行）')
+        finally:
+            if os.path.exists(target):
+                os.remove(target)
+        # unreachable
+
     full = os.path.join(ROOT, m.path)
     if not os.path.exists(full):
         return None, '文件不存在：%s' % m.path
@@ -127,6 +162,16 @@ def main():
     print('=' * 68)
     print()
 
+    # ★ 判据 652：记录**测试开始前**的工作区状态
+    #   否则「恢复后要干净」会把「本来就有的改动」算进来 ——
+    #   而正在迭代这个工具本身时，那个改动必然存在。
+    def wt_snapshot():
+        r = subprocess.run(['git', 'status', '--porcelain'], cwd=ROOT,
+                           capture_output=True, text=True)
+        return set(x for x in r.stdout.strip().split('\n') if x)
+
+    WT_BEFORE = wt_snapshot()
+
     bad = 0
     skip = 0
     for m in MUTATIONS:
@@ -153,12 +198,18 @@ def main():
     print('=' * 68)
     if skip:
         print('  ⚠️ 跳过 %d 个 = **这 %d 个检查器未经验证**（判据 649）' % (skip, skip))
-    # 恢复后必须干净
-    if subprocess.run(['git', 'status', '--porcelain'], cwd=ROOT,
-                      capture_output=True, text=True).stdout.strip():
-        print('  🔴 恢复后工作区不干净，请检查')
+    # 恢复后不允许**新增**改动（判据 652：只比差异，不比绝对状态）
+    # 恢复后不允许**新增**改动（判据 652：只比差异，不比绝对状态）
+    WT_AFTER = wt_snapshot()
+    NEW_CHANGES = WT_AFTER - WT_BEFORE
+    if NEW_CHANGES:
+        print('  🔴 恢复后**新增**了 %d 处改动（变异没恢复干净）：' % len(NEW_CHANGES))
+        for x in sorted(NEW_CHANGES):
+            print('       %s' % x)
         return 3
-    print('  ✅ 恢复后工作区干净（git status 为空）')
+    print('  ✅ 恢复后无新增改动（测试前已有 %d 处改动，不归本次测试负责）' % len(WT_BEFORE))
+    print('  ✅ 恢复后无新增改动（测试前已有 %d 处改动，不归本次测试负责）'
+          % len(WT_BEFORE))
 
     # ★ 判据 649：退出码三态 —— 跳过不能算通过
     if bad:
