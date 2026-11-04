@@ -167,7 +167,8 @@ def find_owner(lines, idx):
 
 
 def scan():
-    ok, suspect, unknown = [], [], []
+    ok, suspect, unknown, radius_bad = [], [], [], []
+
     for root, _, fs in os.walk(ROOT):
         for f in sorted(fs):
             if not f.endswith('.ets'):
@@ -197,7 +198,24 @@ def scan():
                     suspect.append((rel, i + 1, otxt))
                 else:
                     unknown.append((rel, i + 1, otxt))
-    return ok, suspect, unknown
+
+                # ── 附加：圆角一致性（判据 537/544）──
+                if oi is not None:
+                    mm = re.search(r'focusOutline\([^,()]+\)', l)
+                    if mm:
+                        passed = 'Radius.md'          # 未传 ⇒ 默认 md
+                    else:
+                        mm2 = re.search(r'focusOutline\([^,]+,\s*([A-Za-z.]+)\s*\)', l)
+                        passed = mm2.group(1).strip() if mm2 else None
+                    if passed and passed.startswith('Radius.'):
+                        rr = []
+                        for x in lines[oi:i + 1]:
+                            m3 = re.search(r'\.borderRadius\(\s*(Radius\.[a-z]+)\s*\)', x)
+                            if m3:
+                                rr.append(m3.group(1))
+                        if rr and rr[-1] != passed:
+                            radius_bad.append((rel, i + 1, rr[-1], passed))
+    return ok, suspect, unknown, radius_bad
 
 
 def main():
@@ -205,7 +223,7 @@ def main():
         print('找不到目录: %s' % ROOT)
         return 2
 
-    ok, suspect, unknown = scan()
+    ok, suspect, unknown, radius_bad = scan()
     tot = len(ok) + len(suspect) + len(unknown)
 
     print('══ `.outline()` 挂载位置审计（共 %d 处）══' % tot)
@@ -256,10 +274,26 @@ def main():
         print('    不存在「布局容器被父容器撑高」这种结构性问题（判据 536 的成因）。')
     print()
 
+    if radius_bad:
+        print('── RADIUS_BAD 明细（描边圆角 ≠ 元素圆角，判据 537）──')
+        aggr = collections.Counter((br, ps) for _, _, br, ps in radius_bad)
+        for (br, ps), n in aggr.most_common():
+            print('  元素 %-12s vs 描边 %-12s ⇒ **%d 处**' % (br, ps, n))
+        print()
+        for rel, ln, br, ps in radius_bad[:12]:
+            print('  %-46s L%-5d 元素 %-12s 描边 %s' % (rel, ln, br, ps))
+        if len(radius_bad) > 12:
+            print('  … 还有 %d 处' % (len(radius_bad) - 12))
+        print()
+
     if suspect:
         print('结论: ❌ 有 %d 处 SUSPECT —— 描边可能挂在纯布局容器上，需人工核对' % len(suspect))
         return 1
-    print('结论: ✅ 没有 SUSPECT' + ('（但仍有 %d 处 UNKNOWN 需人工看）' % len(unknown) if unknown else ''))
+    if radius_bad:
+        print('结论: ❌ 有 %d 处 RADIUS_BAD —— 描边圆角与元素圆角不一致' % len(radius_bad))
+        return 2
+    print('结论: ✅ 没有 SUSPECT、没有 RADIUS_BAD'
+          + ('（但仍有 %d 处 UNKNOWN 需人工看）' % len(unknown) if unknown else ''))
     return 0
 
 
