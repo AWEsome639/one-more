@@ -276,10 +276,26 @@ pageTransition() {
     //   ⚠️ **仍未彻底解决**：按钮仍超出卡片下边界。正确方案是把按钮移出滚动区、
     //      固定在卡片底部（`Column { Scroll(标题+正文) ; Row(按钮) }`），
     //      本轮试过 `Scroll` 包整卡 ⇒ 按钮被滚到可视区外，更糟，已回退。
+    // ★★★ 2026-11-04（第 1172 轮）**彻底修法：按钮移出滚动区，固定在卡片底部**
+    //
+    //   上一轮（1171）只做了"收紧三项"，按钮高度恢复正常（36vp），但**仍伸出卡片 75 px**。
+    //   上一轮还试过"整卡包 Scroll" ⇒ 按钮被压到 41px 且滚出可视区 ⇒ 更糟，已回退。
+    //
+    //   本轮正解（判据 519）：
+    //     卡片 = Column {
+    //              Scroll(标题 + 正文)   ← layoutWeight(1)，内容超高时只滚文字
+    //              Row(两个按钮)         ← **在 Scroll 之外，永远可见**
+    //            }
+    //     .constraintSize({ maxHeight: '100%' })   ← 卡片本身不超出屏幕
+    //
+    //   ⇒ 效果：内容再多，按钮也永远在卡片底部、永远可点。
     Column({ space: this.privacyCompact() ? 6 : 12 }) {
-      Text(this.t('隐私说明', 'Privacy'))
-        .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
-      Text(this.t('「One More」不收集你的个人信息，也不上传你的游戏记录。所有记录只存在你自己的手机里。需联网的只有两项：局域网对战、华为游戏服务的账号校验。',
+      Scroll() {
+        Column({ space: this.privacyCompact() ? 4 : 8 }) {
+          Text(this.t('隐私说明', 'Privacy'))
+            .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
+            .width('100%')
+          Text(this.t('「One More」不收集你的个人信息，也不上传你的游戏记录。所有记录只存在你自己的手机里。需联网的只有两项：局域网对战、华为游戏服务的账号校验。',
                   'One More collects nothing and uploads nothing. All records stay on your phone. Only two things use the network: LAN matches and Huawei Game Service sign-in.'))
         .fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
         // ★★★ 2026-11-02（第 844 轮）**手表 233×233 真机截图抓到**：
@@ -289,6 +305,16 @@ pageTransition() {
         //     注释说"合规内容不能因为屏小而省"，全文入口还在，没有省。
         .maxLines(this.privacyCompact() ? 4 : 20)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .width('100%')
+        }
+        .width('100%')
+      }
+      .layoutWeight(1)                       // ★ 吃掉剩余高度
+      .scrollBar(BarState.Off)
+      .align(Alignment.Top)
+      .width('100%')
+
+      // ★ 按钮在 Scroll **之外** ⇒ 永远可见（判据 519）
       Row({ space: 10 }) {
         // ★ 2026-11-02（第 845 轮）**手表 233×233**：两个按钮并排时宽度不够，
         //   文字被省略成「查看…」「同意…」⇒ 极小屏改用短标签（语义不变）。
@@ -326,6 +352,8 @@ pageTransition() {
       .width('100%')
     }
     .width('88%')
+    // ★ 卡片本身不超出屏幕（配合内部 Scroll，内容再多也不会把按钮挤出卡片）
+    .constraintSize({ maxHeight: '100%' })
     .padding(this.privacyCompact() ? Space.md : Space.lg)
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.lg)
