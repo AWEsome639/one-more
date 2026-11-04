@@ -131,6 +131,7 @@ done
 #   修：单独统计 SKIP，且 SKIP > 0 ⇒ 退出码 2（未验 ≠ 通过）
 BAD=0
 SKIP=0
+PREV_MD5=''
 for TAB in 游戏 统计 设置; do
   rm -f /tmp/_scan_d.json
   sh_retry "uitest dumpLayout -p /data/local/tmp/_scand.json" >/dev/null
@@ -175,16 +176,33 @@ PY
   #     ⇒ 脚本仍报「检查 3/3 ｜ 0 挤压」= **检查了三遍同一个首页**
   #   ⇒ 修法：每个页签声明一个「只有该页才有的文字」，
   #     不在 dump 里 ⇒ 记 SKIP（判据 697），而不是继续
-  case "${TAB}" in
-    游戏) FP='款小游戏|全部 [0-9]+|按喜好挑游戏' ;;
-    统计) FP='成就|连胜|通关 [0-9]+ 局' ;;
-    设置) FP='隐私|主题|无障碍|色盲' ;;
-    *)    FP='' ;;
-  esac
-  if [ -n "${FP}" ] && ! grep -qE "${FP}" "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null; then
-    echo "  ⚠️ ${TAB}: **内容指纹不匹配**（未切成，判据 699）⇒ 记 SKIP"
+  # ★★★ 判据 707（第 1265 轮）：**「切换成功」的硬判据是「前后 dump 不同」**
+  #   第 1263~1264 轮踩了两个坑：
+  #     ① 三页签 dump **md5 完全相同**（页签没切成）却报「3/3」
+  #     ② 我加的「内容指纹」**不互斥**（首页含「通关 +50 经验」⇒ 匹配了统计的指纹）
+  #   ⇒ 所以指纹靠不住；**md5 变化**才是「确实换了一页」的直接证据
+  #   ⚠️ 但 md5 变化只证明「变了」，不证明「变成了目标页」
+  #     ⇒ 所以：**md5 必须变化 + 指纹必须命中**（两道一起过才算真切成）
+  #   指纹尽量选**互斥**的词（判据 704）：
+  #     游戏页有「款小游戏」；统计页有「成就」；设置页有「隐私」
+  #     （这三个词在其它页不出现，已用 5 台设备的 dump 交叉确认）
+  CUR_MD5=$( (md5 -q "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null               || python3 -c "import hashlib,sys;print(hashlib.md5(open(sys.argv[1],'rb').read()).hexdigest())" "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null) )
+  if [ "${TAB}" != "游戏" ] && [ -n "${PREV_MD5}" ] && [ "${CUR_MD5}" = "${PREV_MD5}" ]; then
+    echo "  ⚠️ ${TAB}: **dump 与上一页完全相同**（md5 ${CUR_MD5:0:12}）⇒ 页签没切成（判据 707）⇒ 记 SKIP"
     SKIP=$((SKIP+1)); continue
   fi
+  PREV_MD5="${CUR_MD5}"
+  case "${TAB}" in
+    游戏) FP='款小游戏' ;;
+    统计) FP='成就' ;;
+    设置) FP='隐私' ;;
+    *)    FP='' ;;
+  esac
+  if [ -n "${FP}" ] && ! grep -q "${FP}" "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null; then
+    echo "  ⚠️ ${TAB}: **内容指纹「${FP}」不命中**（判据 704/699）⇒ 记 SKIP"
+    SKIP=$((SKIP+1)); continue
+  fi
+  echo "  ${TAB}: md5 ${CUR_MD5:0:12} ｜ 指纹「${FP}」命中 ✅"
 
   OUT=$(python3 工具/check_text_squeeze.py "/tmp/dump_${TAG}_${TAB}.json" 2>&1)
   S=$(printf '%s' "${OUT}" | grep -oE '挤压 [0-9]+' | head -1 | grep -oE '[0-9]+')
