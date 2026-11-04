@@ -17,14 +17,14 @@ BUNDLE="${1:-com.andrewoscar.onemore}"
 ABILITY="${2:-EntryAbility}"
 
 HC="/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc"
-T="$HC -t 127.0.0.1:5555"
+T="${HC} -t 127.0.0.1:5555"
 
-A() { timeout 30 $T shell "$@" 2>&1 | tr -d '\r'; }
+A() { timeout 30 ${T} shell "$@" 2>&1 | tr -d '\r'; }
 lum() {
-  timeout 30 $T shell "snapshot_display -t png -f /data/local/tmp/_wk.png" >/dev/null 2>&1
+  timeout 30 ${T} shell "snapshot_display -t png -f /data/local/tmp/_wk.png" >/dev/null 2>&1
   # ★ 判据 669：**先删本地再 recv** —— 否则 hdc 失败时会读到上一次的旧截图
   rm -f /tmp/_wk.png
-  timeout 30 $T file recv /data/local/tmp/_wk.png /tmp/_wk.png >/dev/null 2>&1
+  timeout 30 ${T} file recv /data/local/tmp/_wk.png /tmp/_wk.png >/dev/null 2>&1
   python3 - <<'PY'
 import os
 try:
@@ -39,7 +39,7 @@ except Exception:
 PY
 }
 
-timeout 15 $T shell "echo t" >/dev/null 2>&1 || timeout 15 $HC tconn 127.0.0.1:5555 >/dev/null 2>&1
+timeout 15 ${T} shell "echo t" >/dev/null 2>&1 || timeout 15 ${HC} tconn 127.0.0.1:5555 >/dev/null 2>&1
 
 # ── ① 唤醒 + 解锁（多手段，幂等）──
 # ★ 判据 637：单一手段唤不醒 ⇒ **多手段连打**
@@ -52,16 +52,16 @@ for attempt in 1 2 3 4; do
   A "uitest uiInput swipe 660 1900 660 300 500" >/dev/null 2>&1; sleep 2
   L=$(lum)
   # ── ② 屏幕亮了（mean > 20）才继续 ──
-  if python3 -c "import sys; sys.exit(0 if float('$L') > 20 else 1)" 2>/dev/null; then
+  if python3 -c "import sys; sys.exit(0 if float('${L}') > 20 else 1)" 2>/dev/null; then
     # ── ③ App 必须在跑 ──
-    P=$(A "pidof $BUNDLE" | head -1 | tr -d ' \r')
-    if ! echo "$P" | grep -qE '^[0-9]+$'; then
-      A "aa start -b $BUNDLE -a $ABILITY" >/dev/null 2>&1
+    P=$(A "pidof ${BUNDLE}" | head -1 | tr -d ' \r')
+    if ! echo "${P}" | grep -qE '^[0-9]+$'; then
+      A "aa start -b ${BUNDLE} -a ${ABILITY}" >/dev/null 2>&1
       sleep 8
-      P=$(A "pidof $BUNDLE" | head -1 | tr -d ' \r')
+      P=$(A "pidof ${BUNDLE}" | head -1 | tr -d ' \r')
     fi
-    if ! echo "$P" | grep -qE '^[0-9]+$'; then
-      echo "FAIL:app_not_running(lum=$L)"; exit 2
+    if ! echo "${P}" | grep -qE '^[0-9]+$'; then
+      echo "FAIL:app_not_running(lum=${L})"; exit 2
     fi
     # ── ④ UI 树必须可读（判据 636：这是"目标正常"而不是"仪表正常"）──
     #   ⚠️ 判据 638：刚唤醒时 dump 可能只返回 **几百字节**（还没就绪），
@@ -80,9 +80,9 @@ for attempt in 1 2 3 4; do
       A "uitest dumpLayout -p /data/local/tmp/_wk.json" >/dev/null 2>&1
       sleep 1
       rm -f /tmp/_wk.json            # 判据 669：先删再收
-      timeout 25 $T file recv /data/local/tmp/_wk.json /tmp/_wk.json >/dev/null 2>&1
+      timeout 25 ${T} file recv /data/local/tmp/_wk.json /tmp/_wk.json >/dev/null 2>&1
       SZ=$(stat -f%z /tmp/_wk.json 2>/dev/null || stat -c%s /tmp/_wk.json 2>/dev/null || echo 0)
-      if [ "$SZ" -ge 500 ]; then
+      if [ "${SZ}" -ge 500 ]; then
         NTXT=$(python3 - <<'PY2' 2>/dev/null || echo 0
 import json, os
 p = '/tmp/_wk.json'
@@ -107,7 +107,7 @@ PY2
       sleep 1
     done
     if [ "${NTXT:-0}" -lt 8 ]; then
-      echo "FAIL:page_not_rendered(lum=$L,size=${SZ:-0},texts=${NTXT:-0},attempt=$attempt)"; exit 3
+      echo "FAIL:page_not_rendered(lum=${L},size=${SZ:-0},texts=${NTXT:-0},attempt=${attempt})"; exit 3
     fi
 
     # ── ⑤ ⚠️⚠️ 判据 639 + 642：**PID 有值 ≠ App 在前台**
@@ -128,28 +128,28 @@ PY2
     FG=0
     LAUNCHER_RE='图库|文件管理|日历|相机|应用市场|备忘录'
     for ft in 1 2 3; do
-      if [ -f /tmp/_wk.json ] && ! grep -qE "$LAUNCHER_RE" /tmp/_wk.json 2>/dev/null; then
+      if [ -f /tmp/_wk.json ] && ! grep -qE "${LAUNCHER_RE}" /tmp/_wk.json 2>/dev/null; then
         FG=1; break
       fi
       # 在桌面 ⇒ 拉起来
-      A "aa start -b $BUNDLE -a $ABILITY" >/dev/null 2>&1
+      A "aa start -b ${BUNDLE} -a ${ABILITY}" >/dev/null 2>&1
       sleep 6
       A "uitest dumpLayout -p /data/local/tmp/_wk.json" >/dev/null 2>&1
       sleep 1
-      timeout 25 $T file recv /data/local/tmp/_wk.json /tmp/_wk.json >/dev/null 2>&1
-      if [ -f /tmp/_wk.json ] && ! grep -qE "$LAUNCHER_RE" /tmp/_wk.json 2>/dev/null; then
+      timeout 25 ${T} file recv /data/local/tmp/_wk.json /tmp/_wk.json >/dev/null 2>&1
+      if [ -f /tmp/_wk.json ] && ! grep -qE "${LAUNCHER_RE}" /tmp/_wk.json 2>/dev/null; then
         FG=1; break
       fi
     done
-    if [ "$FG" != "1" ]; then
-      echo "FAIL:app_not_foreground(lum=$L,pid=$P)"; exit 5
+    if [ "${FG}" != "1" ]; then
+      echo "FAIL:app_not_foreground(lum=${L},pid=${P})"; exit 5
     fi
 
-    echo "OK $P"
+    echo "OK ${P}"
     exit 0
   fi
   sleep 1
 done
 
-echo "FAIL:screen_still_black(lum=$L)"
+echo "FAIL:screen_still_black(lum=${L})"
 exit 4

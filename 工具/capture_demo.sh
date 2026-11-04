@@ -17,13 +17,13 @@ FRAMES="${3:-14}"
 DURATION="${4:-9}"
 
 HC="/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc"
-T="$HC -t 127.0.0.1:5555"
+T="${HC} -t 127.0.0.1:5555"
 OUT="/tmp/demo_${CID}"
 XYTOOL="工具/ui_get_xy.py"
 
 die() { echo "  🔴 $*"; exit 1; }
-A() { timeout 30 $T shell "$@" 2>&1 | tr -d '\r'; }
-dump() { A "uitest dumpLayout -p /data/local/tmp/_d.json" >/dev/null 2>&1; sleep 1; timeout 25 $T file recv /data/local/tmp/_d.json "$1" >/dev/null 2>&1; }
+A() { timeout 30 ${T} shell "$@" 2>&1 | tr -d '\r'; }
+dump() { A "uitest dumpLayout -p /data/local/tmp/_d.json" >/dev/null 2>&1; sleep 1; timeout 25 ${T} file recv /data/local/tmp/_d.json "$1" >/dev/null 2>&1; }
 
 # 断言：dump 里必须出现某段文字（判据 628）
 assert_text() {  # $1=json $2=期望文字 $3=阶段名
@@ -45,9 +45,9 @@ f(d)
 print('OK:'+hit[0] if hit else 'NO')
 PY
 )
-  case "$got" in
+  case "${got}" in
     OK:*) echo "    ✅ [$3] 见到「$2」" ;;
-    *)    die "[$3] 断言失败：期望出现「$2」，实际 $got" ;;
+    *)    die "[$3] 断言失败：期望出现「$2」，实际 ${got}" ;;
   esac
 }
 
@@ -59,8 +59,8 @@ for a in 1 2 3; do
   A "aa start -b com.andrewoscar.onemore -a EntryAbility" >/dev/null 2>&1
   sleep 15
   P=$(A "pidof com.andrewoscar.onemore" | head -1 | tr -d ' \r')
-  echo "$P" | grep -qE '^[0-9]+$' && { echo "    ✅ 启动（PID=${P}）"; break; }
-  [ "$a" = "3" ] && die "启动失败"
+  echo "${P}" | grep -qE '^[0-9]+$' && { echo "    ✅ 启动（PID=${P}）"; break; }
+  [ "${a}" = "3" ] && die "启动失败"
 done
 sleep 2
 
@@ -68,8 +68,8 @@ echo "══ ② 断言在首页 + 关弹窗（判据 628）══"
 for r in 1 2 3; do
   dump /tmp/_home.json
   B=$(python3 ${XYTOOL} /tmp/_home.json "" --text 开始玩 2>/dev/null) || B=$(python3 ${XYTOOL} /tmp/_home.json "" --text 同意并继续 2>/dev/null) || B=""
-  case "$B" in
-    [0-9]*" "[0-9]*) A "uitest uiInput click $B" >/dev/null 2>&1; sleep 4 ;;
+  case "${B}" in
+    [0-9]*" "[0-9]*) A "uitest uiInput click ${B}" >/dev/null 2>&1; sleep 4 ;;
     *) break ;;
   esac
 done
@@ -78,7 +78,7 @@ assert_text /tmp/_home.json "款小游戏" "首页"
 
 echo "══ ③ 搜索（判据 627：白名单守卫）══"
 SR=$(python3 ${XYTOOL} /tmp/_home.json "" --text 🔍) || die "取不到搜索图标"
-A "uitest uiInput click $SR" >/dev/null 2>&1; sleep 3
+A "uitest uiInput click ${SR}" >/dev/null 2>&1; sleep 3
 dump /tmp/_srch.json
 IB=$(python3 ${XYTOOL} /tmp/_srch.json "" --text "" 2>/dev/null) || true
 IB=$(python3 - /tmp/_srch.json <<'PY'
@@ -97,21 +97,21 @@ def f(n):
 f(d); print('%d %d'%out[0] if out else 'MISS')
 PY
 )
-case "$IB" in [0-9]*" "[0-9]*) : ;; *) die "取不到搜索框（${IB}）" ;; esac
-A "uitest uiInput inputText $IB $NAME" >/dev/null 2>&1; sleep 4
+case "${IB}" in [0-9]*" "[0-9]*) : ;; *) die "取不到搜索框（${IB}）" ;; esac
+A "uitest uiInput inputText ${IB} ${NAME}" >/dev/null 2>&1; sleep 4
 dump /tmp/_res.json
-CARD=$(python3 ${XYTOOL} /tmp/_res.json "card-$CID") || die "搜索结果里没有 card-$CID"
-echo "    ✅ 找到卡片：$CARD"
+CARD=$(python3 ${XYTOOL} /tmp/_res.json "card-${CID}") || die "搜索结果里没有 card-${CID}"
+echo "    ✅ 找到卡片：${CARD}"
 
 echo "══ ④ 进游戏 + 断言（判据 628）══"
-A "uitest uiInput click $CARD" >/dev/null 2>&1
+A "uitest uiInput click ${CARD}" >/dev/null 2>&1
 sleep 1
 dump /tmp/_ingame.json
-assert_text /tmp/_ingame.json "$NAME" "已进游戏"
+assert_text /tmp/_ingame.json "${NAME}" "已进游戏"
 
 echo "══ ⑤ 密集截图（判据 604/607：只拍截图，${FRAMES} 帧 / ~${DURATION}s）══"
 rm -f ${OUT}_*.png
-python3 - "$FRAMES" "$DURATION" "$OUT" <<'PY'
+python3 - "${FRAMES}" "${DURATION}" "${OUT}" <<'PY'
 import subprocess, sys, time
 frames, dur, out = int(sys.argv[1]), float(sys.argv[2]), sys.argv[3]
 HC='/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
@@ -130,7 +130,7 @@ print('    ✅ 采完（实际 %.2fs）' % (time.time()-t0))
 PY
 
 echo "══ ⑥ 帧分析（判据 608：另外取状态量）══"
-python3 - "$OUT" "$FRAMES" <<'PY'
+python3 - "${OUT}" "${FRAMES}" <<'PY'
 import os, sys, hashlib
 import numpy as np
 from PIL import Image

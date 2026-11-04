@@ -3,7 +3,7 @@
 # ★ 判据：每条都同时给出「做了多少」和「还有多少该做」
 cd "$(dirname "$0")/.." || exit 1
 G=entry/src/main/ets/games
-n() { grep -lF "$1" $G/*.ets 2>/dev/null | wc -l | tr -d ' '; }
+n() { grep -lF "$1" ${G}/*.ets 2>/dev/null | wc -l | tr -d ' '; }
 
 echo "══════════ 六个想法 · 全项现算 ($(date '+%m-%d %H:%M')) ══════════"
 echo
@@ -20,7 +20,7 @@ echo
 echo "【③ 演示动画】"
 echo "  三拍 demoBeat       $(n 'private demoBeat')/355"
 echo "  DemoBar             $(n 'DemoBar(')/355"
-echo "  盘面描边            $(grep -lE 'hintIdx ===|hintCell ===' $G/*.ets 2>/dev/null | wc -l | tr -d ' ') 款"
+echo "  盘面描边            $(grep -lE 'hintIdx ===|hintCell ===' ${G}/*.ets 2>/dev/null | wc -l | tr -d ' ') 款"
 echo
 echo "【④ 提高效率】"
 echo "  Bp 断点缩放         $(n "from '../core/Bp'") 款"
