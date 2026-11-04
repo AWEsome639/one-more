@@ -168,6 +168,24 @@ PY
   rm -f /tmp/dump_${TAG}_${TAB}.json
   sh_retry "uitest dumpLayout -p /data/local/tmp/_scanx.json" >/dev/null
   recv_fresh /data/local/tmp/_scanx.json "/tmp/dump_${TAG}_${TAB}.json" || { echo "  ⚠️ ${TAB}: dump 失败（未检查）"; SKIP=$((SKIP+1)); continue; }
+  # ★★★ 判据 699（第 1264 轮）：**切换后必须有「内容指纹断言」**
+  #   踩坑（第 1263 轮，800×1280 平板）：点了「统计」页签，sleep 3，直接 dump
+  #     ⇒ 完全没检查「现在是不是统计页」
+  #     ⇒ 三个页签的 dump md5 完全相同（e970fc2f4bae）
+  #     ⇒ 脚本仍报「检查 3/3 ｜ 0 挤压」= **检查了三遍同一个首页**
+  #   ⇒ 修法：每个页签声明一个「只有该页才有的文字」，
+  #     不在 dump 里 ⇒ 记 SKIP（判据 697），而不是继续
+  case "${TAB}" in
+    游戏) FP='款小游戏|全部 [0-9]+|按喜好挑游戏' ;;
+    统计) FP='成就|连胜|通关 [0-9]+ 局' ;;
+    设置) FP='隐私|主题|无障碍|色盲' ;;
+    *)    FP='' ;;
+  esac
+  if [ -n "${FP}" ] && ! grep -qE "${FP}" "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null; then
+    echo "  ⚠️ ${TAB}: **内容指纹不匹配**（未切成，判据 699）⇒ 记 SKIP"
+    SKIP=$((SKIP+1)); continue
+  fi
+
   OUT=$(python3 工具/check_text_squeeze.py "/tmp/dump_${TAG}_${TAB}.json" 2>&1)
   S=$(printf '%s' "${OUT}" | grep -oE '挤压 [0-9]+' | head -1 | grep -oE '[0-9]+')
   echo "  ${TAB}: 挤压 ${S:-?}"
