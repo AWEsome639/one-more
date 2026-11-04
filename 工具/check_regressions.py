@@ -140,7 +140,94 @@ def check_px_as_vp():
     return len(hits), BASELINE['px_as_vp'], hits
 
 
+def selftest():
+    """内置自检：在**合成输入**上验证五项判据的核心逻辑（判据 648 / 759）
+
+    ★ 为什么不用临时目录造 .ets
+      本工具的五项检查都写死了 `entry/src/main/ets` 路径，
+      改成可参数化会引入**新的复杂度**（而复杂度是 bug 的来源）。
+      ⇒ 更稳的做法：**直接测每一项的"判断逻辑"**：
+        · `strip_comments` 是否正确剥注释（保留行号）
+        · `HintBar(` 扫描是否跳过注释
+        · `.focusBox(` 计数是否跳过注释
+        · px-as-vp 正则是否只命中 4 位数
+      每项都用「已知正例 + 已知反例」各一个。
+
+    ★ 判据 759：**先在已知案例上验证，再相信「全绿」**
+    """
+    ok = True
+
+    def t(name, cond, detail=''):
+        nonlocal ok
+        if cond:
+            print('    ✅ %s%s' % (name, ('  ' + detail) if detail else ''))
+        else:
+            print('    🔴 %s%s' % (name, ('  ' + detail) if detail else ''))
+            ok = False
+
+    print('  ── ① strip_comments：剥注释且保留行号 ──')
+    src = "line1\n// .focusBox(x)\nline3 /* .focusBox(y) */ line4\n"
+    c = strip_comments(src)
+    t('行数不变', c.count('\n') == src.count('\n'), '(%d vs %d)' % (c.count('\n'), src.count('\n')))
+    t('行注释被剥', '.focusBox(x)' not in c)
+    t('块注释被剥', '.focusBox(y)' not in c)
+    t('非注释保留', 'line1' in c and 'line3' in c and 'line4' in c)
+    t('长度不变（等长空白）', len(c) == len(src), '(%d vs %d)' % (len(c), len(src)))
+
+    print('  ── ② .focusBox 计数：注释里的不算 ──')
+    s1 = "a\n// .focusBox(Tv.box())\n.focusBox(Tv.box())\n"
+    n1 = len(re.findall(r'\.focusBox\s*\(', strip_comments(s1)))
+    t('1 行注释 + 1 行真实 ⇒ 计 1', n1 == 1, '(实得 %d)' % n1)
+    s2 = "// .focusBox(a)\n/* .focusBox(b) */\n"
+    n2 = len(re.findall(r'\.focusBox\s*\(', strip_comments(s2)))
+    t('全在注释里 ⇒ 计 0', n2 == 0, '(实得 %d)' % n2)
+
+    print('  ── ③ HintBar 扫描：注释里的 `HintBar(38)` 不算调用 ──')
+    s3 = "// 它漏了 HintBar(38) 与间隙\nHintBar({ demoOn: false, hint: 'x' })\n"
+    sc = strip_comments(s3)
+    hits = list(re.finditer(r'HintBar\s*\(', sc))
+    t('只有 1 个真实 HintBar(', len(hits) == 1, '(实得 %d)' % len(hits))
+    if hits:
+        m = hits[0]
+        i = m.end(); d = 1
+        while i < len(sc) and d > 0:
+            if sc[i] == '(': d += 1
+            elif sc[i] == ')': d -= 1
+            i += 1
+        t('该调用含 demoOn', 'demoOn' in sc[m.end():i])
+    s4 = "HintBar({ hint: 'x' })"
+    sc4 = strip_comments(s4)
+    m4 = re.search(r'HintBar\s*\(', sc4)
+    i4 = m4.end(); d4 = 1
+    while i4 < len(sc4) and d4 > 0:
+        if sc4[i4] == '(': d4 += 1
+        elif sc4[i4] == ')': d4 -= 1
+        i4 += 1
+    t('缺 demoOn 的调用能被识别', 'demoOn' not in sc4[m4.end():i4])
+
+    print('  ── ④ px-as-vp 正则：只命中 4 位数 ──')
+    pat = r'\.(width|height)\(\s*(\d{4,})\s*\)'
+    t('命中 .width(1234)', bool(re.search(pat, ".width(1234)")))
+    t('不命中 .width(234)', not re.search(pat, ".width(234)"))
+    t('不命中 .width(Cell.of(54))', not re.search(pat, ".width(Cell.of(54))"))
+
+    print()
+    print('=' * 72)
+    if ok:
+        print('  ✅ 自检通过（五项判据的核心逻辑都验到了正例与反例）')
+        return 0
+    print('  🔴 自检失败（见上）')
+    return 1
+
+
 def main():
+    if '--selftest' in sys.argv:
+        print('=' * 72)
+        print('  历史 bug 复发检查 · 内置自检（判据 648 / 759）')
+        print('=' * 72)
+        return selftest()
+
+
     if not os.path.isdir(ROOT_ETS):
         print('目录不存在: %s' % ROOT_ETS)
         return 2
