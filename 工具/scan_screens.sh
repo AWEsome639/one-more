@@ -125,7 +125,12 @@ for i in 1 2 3; do
 done
 
 # ⑤ 逐个页签 dump + 挤压检查
+# ★★★ 判据 697（第 1262 轮）：**「跳过」不能算「通过」**
+#   踩坑：853×533 上「游戏」页签未找到 ⇒ 脚本仍报 `OK: 全部页签 0 挤压`
+#     ⇒ 与判据 651（"有列表却报全部通过"）**一模一样的病**
+#   修：单独统计 SKIP，且 SKIP > 0 ⇒ 退出码 2（未验 ≠ 通过）
 BAD=0
+SKIP=0
 for TAB in 游戏 统计 设置; do
   rm -f /tmp/_scan_d.json
   sh_retry "uitest dumpLayout -p /data/local/tmp/_scand.json" >/dev/null
@@ -152,11 +157,11 @@ PY
 )
   case "${XY}" in
     [0-9]*" "[0-9]*) sh_retry "uitest uiInput click ${XY}" >/dev/null; sleep 3 ;;
-    *) echo "  ⚠️ ${TAB}: 页签未找到"; continue ;;
+    *) echo "  ⚠️ ${TAB}: 页签未找到（**未检查**）"; SKIP=$((SKIP+1)); continue ;;
   esac
   rm -f /tmp/dump_${TAG}_${TAB}.json
   sh_retry "uitest dumpLayout -p /data/local/tmp/_scanx.json" >/dev/null
-  recv_fresh /data/local/tmp/_scanx.json "/tmp/dump_${TAG}_${TAB}.json" || { echo "  ⚠️ ${TAB}: dump 失败"; continue; }
+  recv_fresh /data/local/tmp/_scanx.json "/tmp/dump_${TAG}_${TAB}.json" || { echo "  ⚠️ ${TAB}: dump 失败（未检查）"; SKIP=$((SKIP+1)); continue; }
   OUT=$(python3 工具/check_text_squeeze.py "/tmp/dump_${TAG}_${TAB}.json" 2>&1)
   S=$(printf '%s' "${OUT}" | grep -oE '挤压 [0-9]+' | head -1 | grep -oE '[0-9]+')
   echo "  ${TAB}: 挤压 ${S:-?}"
@@ -168,5 +173,11 @@ PY
 done
 
 echo
-if [ "${BAD}" = "0" ]; then echo "OK: 全部页签 0 挤压（${TAG}）"; exit 0; fi
+CHECKED=$((3 - SKIP))
+echo "  检查 ${CHECKED}/3 ｜ 跳过 ${SKIP} ｜ 有挤压 ${BAD}"
+if [ "${SKIP}" != "0" ]; then
+  echo "FAIL: ${SKIP} 个页签**未检查**（未验 ≠ 通过，判据 697/634）⇒ 退出码 2"
+  exit 2
+fi
+if [ "${BAD}" = "0" ]; then echo "OK: 全部 3 个页签 0 挤压（${TAG}）"; exit 0; fi
 echo "FAIL: ${BAD} 个页签有挤压（${TAG}）"; exit 1
