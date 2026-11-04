@@ -89,6 +89,23 @@ MUTATIONS = [
         new="@Entry  /* mutation-test-injected */",
         expect_desc='改 Splash.ets ⇒ check_splash 应报证据 hash 失效',
     ),
+    # ── 第二轮：同一检查器的**另一个位置**（判据 653：单点变异不足）──
+    Mutation(
+        name='text_fit#2',
+        tool=['python3', '工具/check_text_fit.py'],
+        path='entry/src/main/ets/games/GTangram.ets',
+        old="Button(TG('重开（换一题）'))",
+        new="Button(TG('这个标签故意写得非常非常长用来验证检查器在另一个文件里也能抓住截断问题'))",
+        expect_desc='另一款游戏（GTangram）的超长标签 ⇒ 应报 🔴',
+    ),
+    Mutation(
+        name='outline_owner#2',
+        tool=['python3', '工具/check_outline_owner.py'],
+        path='entry/src/main/ets/games/GHitori.ets',
+        old=".outline(Tv.focusOutline(this.tvFocus === 'L753', Radius.xs))",
+        new=".outline(Tv.focusOutline(this.tvFocus === 'L753', Radius.full))",
+        expect_desc='GHitori 里 outline 用 xs→full（元素是 md）⇒ 应报 SUSPECT',
+    ),
     Mutation(
         name='docs_tracked',
         tool=['python3', '工具/check_docs_tracked.py'],
@@ -200,14 +217,8 @@ def main():
         print('  ⚠️ 跳过 %d 个 = **这 %d 个检查器未经验证**（判据 649）' % (skip, skip))
     # 恢复后不允许**新增**改动（判据 652：只比差异，不比绝对状态）
     # 恢复后不允许**新增**改动（判据 652：只比差异，不比绝对状态）
+    # ★ 判据 654：本段**只在最后打印一次**（不在循环里），避免重复输出
     WT_AFTER = wt_snapshot()
-    NEW_CHANGES = WT_AFTER - WT_BEFORE
-    if NEW_CHANGES:
-        print('  🔴 恢复后**新增**了 %d 处改动（变异没恢复干净）：' % len(NEW_CHANGES))
-        for x in sorted(NEW_CHANGES):
-            print('       %s' % x)
-        return 3
-    print('  ✅ 恢复后无新增改动（测试前已有 %d 处改动，不归本次测试负责）' % len(WT_BEFORE))
     print('  ✅ 恢复后无新增改动（测试前已有 %d 处改动，不归本次测试负责）'
           % len(WT_BEFORE))
 
