@@ -182,6 +182,35 @@ export struct GamesTab {
    * ⚠️ 延迟 260ms 再清：**返回时那一下反向补间还没走完**，立刻清会把动画掐断。
    */
   onPageShow(): void {
+
+    // ═════════════════════════════════════════════════════════════════════
+    // ★★★ 2026-11-05（第 1346 轮）**修「今日挑战卡片读一次即定格」（判据 903/909/910/911）**
+    //
+    // 为什么必须在这里刷新：
+    //   `@State dailyId` / `dailyDone` 原来**只在 `aboutToAppear` 里读一次**
+    //   （`ProgressStore.dailyPick()` / `dailyDoneToday()`），而
+    //   ① `aboutToAppear` 早于异步 `init()` 完成 ⇒ 那一刻 AppStorage 里还是默认值
+    //      ⇒ 读到 `dailyDone = false`
+    //   ② `aboutToAppear` **只跑一次**；之后玩家打完一局回来**不会重读**
+    //   ⇒ 卡片永久显示「🎯 通关 +50 经验」，**哪怕今天已经通关过**
+    //   ⇒ 玩家在被要求做一件已经做过的事（判据 910：读一次即定格）
+    //
+    // 为什么不是 `@StorageProp`：
+    //   `dailyDone` 在 AppStorage 里是 **boolean**，但磁盘上存的是字符串 `'true'`
+    //   ⇒ 挂 `@StorageProp` 要额外处理类型转换；而这里**已经有 `onPageShow`**
+    //   （返回首页时必触发）⇒ **用它刷新最直接、零风险**
+    //
+    // 顺序注意：`dailyPick()` 读 `'dailyPick'`，`dailyDoneToday()` 读 `dailyGame`+`dailyDone`
+    //   两者都在 `init()` 里恢复过（第 1339 轮）⇒ 这里读到的是**磁盘真值**
+    // ═════════════════════════════════════════════════════════════════════
+    const idsNow: string[] = [];
+    for (let i = 0; i < GAMES.length; i++) {
+      idsNow.push(GAMES[i].id);
+    }
+    ProgressStore.ensureDaily(idsNow);
+    this.dailyId = ProgressStore.dailyPick();
+    this.dailyDone = ProgressStore.dailyDoneToday();
+
     // ★ 2026-10-13：这里的清理现在是【兜底】——
     //   正常情况下进游戏后 400ms 就已经清掉了（见 openGame），
     //   返回时 flyingId 本就是空 ⇒ 不会有幽灵共享元素。
