@@ -11,10 +11,21 @@ check_outline_owner.py —— 焦点描边「挂载位置」审计
 而真正「用户看得见的那个盒子」是它内部的 `Row`（有 backgroundColor + borderRadius），
 那么描边就会**比可见内容大一圈** ⇒ 视觉上「多出来一块」。
 
-第 1182 轮真机踩过这个坑：
-  `GameCard` 的 `Stack`（被 GridItem 撑到 126 vp）挂了 `.outline()`，
-  而可见胶囊是内层 `Row`（只有 61 vp）
-  ⇒ 描边在胶囊上方多出一大块直角框（奥森：「宝石迷阵卡片旁边又有多余的东西了」）
+第 1182 轮真机踩过这个坑（**根因后来更正过，见下**）：
+  症状：`GameCard` 的焦点描边读起来"多出一块"
+  最初误判：`Stack`（被 GridItem 撑高）挂了 outline，而可见胶囊是内层 `Row`
+  **1184 轮用括号深度追踪更正**：
+      `Row({ space: 8 }) {` 在 L766 **开始**、L883 **结束**；
+      `.backgroundColor` / `.borderRadius` / `.outline` 全在 L884 之后
+      ⇒ **它们都属于外层 Stack** ⇒ Stack 就是可见胶囊
+      ⇒ **"描边挂错盒子"这个判断是错的**
+  真根因：`Tv.focusOutline` 的默认 `Radius.md` ≠ 胶囊的 `Radius.lg`
+      ⇒ 描边画成**直角矩形** ⇒ 在胶囊圆角处"多出四块"
+      ⇒ 改成 `Radius.lg` 后描边跟着圆角走 ⇒ 视觉贴合 ✅
+
+  ★ 这个工具仍然有价值：它防的是"描边真的挂在**无背景无圆角的布局容器**上"，
+    即 `Row/Column/Stack` 上没有 backgroundColor 也没有 borderRadius 的情形。
+    那是另一类真实风险（描边会包住一个不可见的大盒子）。
 
 判据（本系列第 536 条）
 ====================
