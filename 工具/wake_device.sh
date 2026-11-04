@@ -42,11 +42,14 @@ PY
 timeout 15 $T shell "echo t" >/dev/null 2>&1 || timeout 15 $HC tconn 127.0.0.1:5555 >/dev/null 2>&1
 
 # ── ① 唤醒 + 解锁（多手段，幂等）──
-for attempt in 1 2 3; do
-  A "power-shell wakeup" >/dev/null 2>&1
-  sleep 1
-  A "uitest uiInput swipe 660 1900 660 300 500" >/dev/null 2>&1
-  sleep 1
+# ★ 判据 637：单一手段唤不醒 ⇒ **多手段连打**
+for attempt in 1 2 3 4; do
+  A "power-shell wakeup" >/dev/null 2>&1;                       sleep 1
+  A "uitest uiInput swipe 660 1900 660 300 500" >/dev/null 2>&1; sleep 1
+  A "uitest uiInput click 660 1116" >/dev/null 2>&1;             sleep 1
+  A "uitest uiInput keyEvent 2047" >/dev/null 2>&1;              sleep 2
+  A "power-shell wakeup" >/dev/null 2>&1;                       sleep 1
+  A "uitest uiInput swipe 660 1900 660 300 500" >/dev/null 2>&1; sleep 2
   L=$(lum)
   # ── ② 屏幕亮了（mean > 20）才继续 ──
   if python3 -c "import sys; sys.exit(0 if float('$L') > 20 else 1)" 2>/dev/null; then
