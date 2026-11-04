@@ -1,5 +1,16 @@
 #!/bin/bash
 # 提交前依次跑三项；任何一项红就停。
+#
+# ⚠️ 2026-11-05（第 1330 轮）**读到这里的人请注意**：
+#   本文件是**旧版**（三项，且引用的 verify_*.mjs 在 ~/.dsh/storages/ 下）。
+#   **One More 现在的提交前检查是七项**，请用：
+#       bash 工具/precommit_onemore.sh
+#   七项 = 断言基线 / check_splash / check_docs_tracked /
+#          check_outline_owner / check_text_fit / mutation_test /
+#          check_shell_pitfalls（第 1329 轮新增）
+#   本文件保留不动（可能被其它脚本引用）。
+#   ★ 另注：`~/dev/yiju` 是 `~/dev/One More` 的**符号链接**（同一目录），
+#     所以下面 `cd ~/dev/yiju` 与 `cd ~/dev/One More` 等价。
 set -e
 cd ~/dev/yiju
 echo "  ① 占位符:"
