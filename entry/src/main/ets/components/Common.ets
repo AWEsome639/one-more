@@ -1041,6 +1041,14 @@ build() {
       .shadow((this.focused && Tv.on())
         ? { radius: 24, color: '#526366F1', offsetX: 0, offsetY: 0 }
         : { radius: 0, color: Color.Transparent, offsetX: 0, offsetY: 0 })
+      // ★★★ 2026-11-03（第 1160 轮）**焦点框改用 `.outline()`**
+      //   为什么加这条：第 1159 轮 A/B 对照证明 `.shadow()` 在 isLg 上**根本不渲染**
+      //     （条件为真、日志显示 FOCUS 触发，但卡片区像素差 **0**）
+      //   ⇒ 按判据 492/495，换一种"能证明会渲染"的手段：
+      //     `.outline()` 是**外描边**，不覆盖 border、不参与布局
+      //     4vp 实心主色环，在浅色卡片上对比度高、一眼可见
+      //   ⚠️ 这条也要做 A/B 对照（width 0 vs 4）
+      .outline(Tv.focusOutline(this.focused && Tv.on()))
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     // ★★★ 2026-11-02（第 856 轮）：**读屏支持**。
     //   改前：卡片里的图标 / 标题 / 副标题 / ✓ 是四个独立文本节点，
