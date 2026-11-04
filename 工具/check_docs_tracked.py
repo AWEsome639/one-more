@@ -49,12 +49,21 @@ def main():
     print('=' * 60)
     print('根级文档跟踪检查（判据 409）')
     print('=' * 60)
+    # ★★★ 2026-11-04（第 1246 轮）**真 bug：必进文档"不存在"被 continue 掉了**
+    #   变异测试（docs_tracked#2）把一份 MUST_TRACK 文档临时改名，
+    #   检查器输出 `⚠️ 不存在` 然后 `continue`，**没进 missing 列表**
+    #   ⇒ 最后打印「✅ 全部已跟踪」，rc=0
+    #   ⇒ 「一份必进文档整个不见了」这件事被彻底掩盖
+    #   这是判据 651（"看见了不判"）的**第二种形态**：
+    #     上一轮抓到的是「未跟踪被归为提示」，这次是「不存在被 continue 掉」
     missing = []
+    absent = []
     for f in MUST_TRACK:
         p = os.path.join(ROOT, f)
         exists = os.path.exists(p)
         if not exists:
-            print('  ⚠️ 不存在      %s' % f)
+            print('  🔴 **不存在**    %s' % f)
+            absent.append(f)          # ← 必须计入失败
             continue
         ok = tracked(f)
         lines = sum(1 for _ in open(p, encoding='utf-8', errors='ignore'))
@@ -90,6 +99,11 @@ def main():
     #     ② **待判断也返回非 0**（退出码 2）——
     #        因为「有文件待判断」本身就是需要人去处理的状态，
     #        不能算「通过」（判据 649 同一精神）
+    if absent:
+        print('🔴 **%d 份必进文档不存在**：%s' % (len(absent), ' '.join(absent)))
+        print('   可能被误删/改名 —— 必须恢复或从 MUST_TRACK 里移除并说明原因')
+        print('=' * 60)
+        return 1
     if missing:
         print('🔴 %d 份必进文档未被跟踪' % len(missing))
         print('   修复：git add -f %s' % ' '.join(missing))

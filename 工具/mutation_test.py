@@ -54,7 +54,8 @@ class Mutation:
       · `old` 非空 ⇒ **文本替换型**（改现有文件里的一段）
       · `create_file` 非空 ⇒ **造文件型**（造一个该被检查器抓住的新文件）
     """
-    def __init__(self, name, tool, path, old, new, expect_desc, create_file=None):
+    def __init__(self, name, tool, path, old, new, expect_desc,
+                 create_file=None, rename_from=None):
         self.name = name
         self.tool = tool            # 检查器命令（list）
         self.path = path            # 被变异的文件（相对 ROOT）
@@ -62,6 +63,7 @@ class Mutation:
         self.new = new
         self.expect_desc = expect_desc
         self.create_file = create_file      # 造文件型：要创建的相对路径
+        self.rename_from = rename_from      # 改名型：把该文件临时改走（模拟"丢了"）
 
 
 MUTATIONS = [
@@ -106,6 +108,23 @@ MUTATIONS = [
         new=".outline(Tv.focusOutline(this.tvFocus === 'L753', Radius.full))",
         expect_desc='GHitori 里 outline 用 xs→full（元素是 md）⇒ 应报 SUSPECT',
     ),
+    # ── 第三轮：补齐 splash_hash 与 docs_tracked 的第二个位置（判据 653）──
+    Mutation(
+        name='splash_hash#2',
+        tool=['python3', '工具/check_splash.py'],
+        path='entry/src/main/ets/pages/Splash.ets',
+        old="@Component",
+        new="@Component  /* mutation-test-2 */",
+        expect_desc='改 Splash.ets 另一行（@Component）⇒ 应报证据 hash 失效',
+    ),
+    Mutation(
+        name='docs_tracked#2',
+        tool=['python3', '工具/check_docs_tracked.py'],
+        path='',
+        old='', new='',
+        rename_from='判据索引-9到364.md',
+        expect_desc='临时把一份 MUST_TRACK 文档改名 ⇒ 应报 ⚠️ 不存在',
+    ),
     Mutation(
         name='docs_tracked',
         tool=['python3', '工具/check_docs_tracked.py'],
@@ -118,6 +137,28 @@ MUTATIONS = [
 
 def apply_and_test(m: Mutation) -> tuple:
     """返回 (有效?, 说明)"""
+    # ── 改名型（判据 653）：把一份 MUST_TRACK 文档临时改走，模拟"文件丢了" ──
+    if m.rename_from:
+        src = os.path.join(ROOT, m.rename_from)
+        dst = src + '.mutation_moved'
+        if not os.path.exists(src):
+            return None, '源文件不存在（跳过）：%s' % m.rename_from
+        rc0, _ = run_check(m.tool)
+        try:
+            os.rename(src, dst)
+            rc1, out1 = run_check(m.tool)
+            if rc1 == 0:
+                return False, 'MUST_TRACK 文档被移走后检查器**仍返回 0** ⇒ 失效！'
+            ev = ''
+            for line in out1.split('\n'):
+                if any(k in line for k in ('⚠️ 不存在', '🔴', '未跟踪', 'FAIL')):
+                    ev = line.strip()[:88]; break
+            return True, '基线 rc=%d → 移走后 rc=%d ✅\n    证据行：%s' % (rc0, rc1, ev or '（无关键行）')
+        finally:
+            if os.path.exists(dst) and not os.path.exists(src):
+                os.rename(dst, src)
+        # unreachable
+
     # ── 造文件型（判据 651）：不改现有文件，只造一个该被抓住的新文件 ──
     if m.create_file:
         target = os.path.join(ROOT, m.create_file)
