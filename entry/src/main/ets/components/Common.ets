@@ -1027,7 +1027,18 @@ build() {
 //   ⇒ 焦点光晕是给**遥控器/键盘**用的导航提示（TV、PC、2in1）；
 //     手机/平板上**没有方向键**，自动聚焦第一张卡只是副作用 ⇒ **不该画出来**。
 //   ⚠️ 不改 `focused` 状态本身（`onFocus/onBlur` 还管着别的逻辑），只改渲染条件。
-      .shadow((this.focused && (Bp.isTv() || Bp.isDesktop()))
+      // ★★★ 2026-11-03（第 1159 轮）**修「能用但看不见」**（判据 493）
+      //
+      //   原条件：`this.focused && (Bp.isTv() || Bp.isDesktop())`
+      //   而方向键能力条件是 `Tv.on() = Bp.isTv() || Bp.isDesktop() || **Bp.isLg()**`
+      //   ⇒ **两者不一致**：在 `isLg`（平板横屏 / 智慧屏 960×540）上
+      //      方向键能移焦点（`Tv.on()` 为真、`onKeyEvent` 生效），
+      //      但光晕不画（此条件为假）⇒ **焦点在动，屏幕上什么都不变**
+      //      ⇒ 用户会以为"方向键坏了"
+      //
+      //   ⇒ 改成**跟随能力开关** `Tv.on()`：
+      //      方向键能用 ⇒ 焦点框就画；方向键不能用 ⇒ 不画（手机/手表上零回归）
+      .shadow((this.focused && Tv.on())
         ? { radius: 24, color: '#526366F1', offsetX: 0, offsetY: 0 }
         : { radius: 0, color: Color.Transparent, offsetX: 0, offsetY: 0 })
     .animation({ duration: Motion.fast, curve: Motion.snap() })
