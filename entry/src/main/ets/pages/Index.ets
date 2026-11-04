@@ -303,7 +303,7 @@ pageTransition() {
         //   **两个按钮被挤出卡片边界**（截图里按钮贴在屏幕最底、卡片外）。
         //   ⇒ 加行数上限 + 省略号；**完整内容仍可点「查看全文」看到** ——
         //     注释说"合规内容不能因为屏小而省"，全文入口还在，没有省。
-        .maxLines(this.privacyCompact() ? 4 : 20)
+        .maxLines(this.privacyCompact() ? 3 : 20)   // ★ 第 1176 轮：4→3（195 上省 49 px，让按钮回到卡片内）
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .width('100%')
         }
@@ -369,7 +369,13 @@ pageTransition() {
     //   ⇒ 极小屏仍用 100%（内容真的需要那么多），其余给 **80%**（上下各留 10% 呼吸）
     // ★ 第 1173 轮二调：大屏 80% 仍然偏高（卡片占屏 71%、正文与按钮之间空白大）
     //   ⇒ 收到 **60%**：实测内容只需约 420 px，60% of 1620 = 972 px ⇒ 绰绰有余
-    .constraintSize({ maxHeight: this.privacyCompact() ? '95%' : '85%' })
+    .constraintSize({
+      // ★★★ 2026-11-04（第 1176 轮）**compact 必须 '100%'，不能 '95%'**
+      //   第 1175 轮我把它改成 95%，结果 195 上卡片被压到 323 px
+      //   （内容需要 ~497 px）⇒ **按钮又伸出卡片底边**
+      //   ⇒ 极小屏本来就只有 195 vp 高，任何"留边"都会挤掉内容
+      maxHeight: this.privacyCompact() ? '100%' : '85%'
+    })
     .padding(this.privacyCompact() ? Space.md : Space.lg)
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.lg)
