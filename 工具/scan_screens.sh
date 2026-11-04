@@ -187,7 +187,7 @@ PY
   #   指纹尽量选**互斥**的词（判据 704）：
   #     游戏页有「款小游戏」；统计页有「成就」；设置页有「隐私」
   #     （这三个词在其它页不出现，已用 5 台设备的 dump 交叉确认）
-  CUR_MD5=$( (md5 -q "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null               || python3 -c "import hashlib,sys;print(hashlib.md5(open(sys.argv[1],'rb').read()).hexdigest())" "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null) )
+CUR_MD5=$(python3 工具/content_hash.py "/tmp/dump_${TAG}_${TAB}.json" 2>/dev/null | awk '/^  [0-9a-f]{12}/ {print $1; exit}')
   if [ "${TAB}" != "游戏" ] && [ -n "${PREV_MD5}" ] && [ "${CUR_MD5}" = "${PREV_MD5}" ]; then
     echo "  ⚠️ ${TAB}: **dump 与上一页完全相同**（md5 ${CUR_MD5:0:12}）⇒ 页签没切成（判据 707）⇒ 记 SKIP"
     SKIP=$((SKIP+1)); continue
