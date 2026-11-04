@@ -43,7 +43,14 @@ MEASURED_MIN_VIEWPORT_VP = 92.0
 
 SPACE = {'xs': 6, 'sm': 10, 'md': 16, 'lg': 20, 'xl': 28, 'xxl': 32, 'xxxl': 48}
 
-THRESHOLD = 60.0   # 占比超过这个数 ⇒ 报「滚到底几乎全空」
+# ★ 判据 791（第 1298 轮）：**这个数不是「bug 阈值」，是「代价阈值」**
+#   历史两次真实故障记录都说「留白不够」：
+#     · StatsTab  ：`Space.xxxl`(48) ⇒ 960×540 下「成就」卡片被遮 40%
+#     · SettingsTab：写死 84       ⇒ 960×540 下「界面模式」按钮被遮约 20vp
+#   ⇒ 留白是**为了修「被遮」而付的代价**
+#   ⇒ 占比偏大 = **代价偏大**，⛔ 不等于 bug
+#   ⇒ 真正的判据是「最后一项是否可见/可达」——那**必须真机验证**
+THRESHOLD = 60.0
 
 
 def strip_comments(src):
@@ -246,7 +253,7 @@ def report(hits, viewport=None, src=None):
             print('  %-38s %-5d %-9s %-8s ⚠️ 取不到值（不猜）' % (rel[:38], line, '?', '?'))
             continue
         pct = vp / den * 100.0
-        flag = '🔴 超标' if pct > THRESHOLD else '✅'
+        flag = '⚠️ 代价偏大' if pct > THRESHOLD else '✅'
         if pct > THRESHOLD:
             over += 1
         print('  %-38s %-5d %-9d %-8.1f%% %s' % (rel[:38], line, vp, pct, flag))
@@ -258,10 +265,16 @@ def report(hits, viewport=None, src=None):
     print('     底部 padding **不需要再加一次 `barHeight`**（36/60）。')
     print('     实测：`Scroll` 结束于 393，`TabBar` 起始于 393 ⇒ **零重叠**。')
     print()
+    print('  📖 判据 791：**留白占比大 ≠ bug**。')
+    print('     历史两次真实故障都因「留白不够」而内容被遮')
+    print('     ⇒ 留白是**为修「被遮」而付的代价**；')
+    print('     真正的判据是「最后一项是否可见/可达」——**必须真机验证**。')
+    print()
     if over:
-        print('  🔴 **%d 处超标**（占比 > %.0f%%）' % (over, THRESHOLD))
+        print('  ⚠️ **%d 处留白代价偏大**（占比 > %.0f%%）' % (over, THRESHOLD))
+        print('     ⇒ ⛔ 不要直接改小；先确认「最后一项仍可见」（判据 790/791）')
         return over
-    print('  ✅ 未发现超标')
+    print('  ✅ 未发现留白代价偏大的项')
     return 0
 
 
