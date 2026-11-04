@@ -22,6 +22,32 @@ OUT="/tmp/demo_${CID}"
 XYTOOL="工具/ui_get_xy.py"
 
 die() { echo "  🔴 $*"; exit 1; }
+
+# ★ 判据 813（第 1311 轮）：**空 dump 会在下游伪装成「元素不存在」**
+#   实证：`dump /tmp/_res.json` 之后取 card 坐标失败
+#     ⇒ 原来的 die 写「搜索结果里没有 card-xxx」
+#     ⇒ 但若 dump 本身是空的（设备刚亮屏/还没画完），真实原因是「**dump 抓空了**」
+#     ⇒ 两条完全不同的修法，被一条消息混在一起
+#   ⇒ 本函数：**先断言 dump 非空**，失败时直接报「dump 空」，并删掉空文件（判据 812）
+DUMP_MIN_BYTES="${DUMP_MIN_BYTES:-500}"
+dump_safe() {  # $1=本地路径 $2=阶段名
+  local f="$1" stage="${2:-dump}"
+  if [ ! -f "$f" ]; then
+    echo "  🔴 [$stage] dump 文件不存在：$f"
+    echo "     ⇒ 判据 813：这是「抓取失败」，不是「元素不存在」"
+    exit 1
+  fi
+  local sz
+  sz=$(stat -f%z "$f" 2>/dev/null || echo 0)
+  if [ "${sz}" -lt "${DUMP_MIN_BYTES}" ]; then
+    echo "  🔴 [$stage] **dump 是空的**（${sz} 字节 < ${DUMP_MIN_BYTES}）：$f"
+    echo "     ⇒ 判据 813：这是「抓取失败/界面没画完」，不是「元素不存在」"
+    echo "     ⇒ 判据 812：删除空文件，避免后续误用"
+    rm -f "$f"
+    exit 1
+  fi
+  echo "    dump ${stage}: ${sz} 字节 ✅"
+}
 A() { timeout 30 ${T} shell "$@" 2>&1 | tr -d '\r'; }
 dump() { A "uitest dumpLayout -p /data/local/tmp/_d.json" >/dev/null 2>&1; sleep 1; timeout 25 ${T} file recv /data/local/tmp/_d.json "$1" >/dev/null 2>&1; }
 
@@ -67,6 +93,11 @@ sleep 2
 echo "══ ② 断言在首页 + 关弹窗（判据 628）══"
 for r in 1 2 3; do
   dump /tmp/_home.json
+  # 循环内**不 die**（可能还没画完，允许重试）；但要把「空」与「没有按钮」分开报
+  if [ -f /tmp/_home.json ] && [ "$(stat -f%z /tmp/_home.json 2>/dev/null || echo 0)" -lt "${DUMP_MIN_BYTES:-500}" ]; then
+    echo "    ⚠️ [首页] dump 空（第 ${r} 次），重试（判据 813：不是「没有开始玩按钮」）"
+    sleep 2; continue
+  fi
   B=$(python3 ${XYTOOL} /tmp/_home.json "" --text 开始玩 2>/dev/null) || B=$(python3 ${XYTOOL} /tmp/_home.json "" --text 同意并继续 2>/dev/null) || B=""
   case "${B}" in
     [0-9]*" "[0-9]*) A "uitest uiInput click ${B}" >/dev/null 2>&1; sleep 4 ;;
@@ -100,7 +131,8 @@ PY
 case "${IB}" in [0-9]*" "[0-9]*) : ;; *) die "取不到搜索框（${IB}）" ;; esac
 A "uitest uiInput inputText ${IB} ${NAME}" >/dev/null 2>&1; sleep 4
 dump /tmp/_res.json
-CARD=$(python3 ${XYTOOL} /tmp/_res.json "card-${CID}") || die "搜索结果里没有 card-${CID}"
+dump_safe /tmp/_res.json "搜索结果"
+CARD=$(python3 ${XYTOOL} /tmp/_res.json "card-${CID}") || die "dump 非空但没找到 card-${CID}（判据 813：这次才是真的没有）"
 echo "    ✅ 找到卡片：${CARD}"
 
 echo "══ ④ 进游戏 + 断言（判据 628）══"
