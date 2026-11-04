@@ -112,6 +112,181 @@ def load_text_blocks(src):
     return out
 
 
+def est_max_chars(block, src):
+    """估算这段 Text 的**最长可能渲染内容**（字符数）—— 判据 657 的第 ① 步。
+
+    ★ 为什么需要（第 1248 轮）
+      原实现只看「大字号 + 无 maxLines + 多段拼接」⇒ 报 **218 处**。
+      但按判据 657：**折行风险 = 最长内容长度 ÷ 可用字符数**；
+      「无 maxLines」本身不是判据。
+
+      实测分类：
+        · 30 处是 `this.paired() + '/' + this.diffTotal` 这类分数
+          ⇒ 最长「12/12」= 5~6 字符 ⇒ 安全
+        · 若干处是单个数字 `String(this.num)` ⇒ 1~4 字符 ⇒ 安全
+        · 只有 `bitsText() + '₂ = ' + value() + '₁₀'` 达 **17 字符** ⇒ 真风险
+
+    ⇒ 本函数按「每段拼接的保守上限」累加：
+        · `String(const)` / `'字面量'`      ⇒ len(字面量)
+        · `String(this.x)` / `String(this.x())` ⇒ 4（数字最多 4 位，保守）
+        · `'/'`、`' ÷ '`、`'s'` 等短字面量 ⇒ len(字面量)
+        · 已知「固定宽度」的调用（如 bitsText）⇒ 查同名循环里出现的常量
+      返回 (max_chars, 依据字符串)
+    """
+    total = 0
+    why = []
+
+    # ① 先找"固定宽度生成函数"（如 bitsText 里 `i < BITS` ⇒ 输出 BITS 个字符）
+    fixed_len = {}
+    for m in re.finditer(
+            r'private\s+(\w+)\([^)]*\)[^{]*\{([^}]{0,300})\}', src, re.S):
+        fname, body = m.group(1), m.group(2)
+        mm = re.search(r'for\s*\([^;]*;\s*\w+\s*<\s*(\w+)\s*;', body)
+        if mm and ("= s +" in body or "s = s +" in body or "+=" in body):
+            const = mm.group(1)
+            cm = re.search(r'(?:const|let)\s+' + re.escape(const) + r'\s*:\s*number\s*=\s*(\d+)', src)
+            if cm:
+                fixed_len[fname] = int(cm.group(1))
+
+    # ★★ 判据 660（第 1248 轮）**三元表达式要取「各分支的最大值」，不能求和**
+    #   踩坑：`Text(kind === 0 ? A : (kind === 1 ? B : C))` 有三个分支，
+    #   只有**一个**会被渲染 ⇒ 求和会把 14 字符算成 42
+    #   实测：`this.filled() + '/' + diffTotal*diffTotal` 最长只 7 字符，
+    #   而求和估算报 14 ⇒ **218 项里大半是这个原因虚高**
+    #   做法：若块里有 `? … :`，按顶层 `?` / `:` 切开，各分支独立估算后取 max
+    def _seg_max(text):
+        """对一段（可能含三元）的表达式求「最长分支」的字符数"""
+        # 找顶层三元（简化的括号配平）
+        depth = 0
+        qpos = -1
+        for i, ch in enumerate(text):
+            if ch in '([':
+                depth += 1
+            elif ch in ')]':
+                depth -= 1
+            elif ch == '?' and depth == 0:
+                qpos = i
+                break
+        if qpos < 0:
+            return _plain_max(text), None
+        # 切分支：从 ? 之后按顶层 : 分
+        rest = text[qpos + 1:]
+        parts = []
+        depth = 0
+        cur = ''
+        for ch in rest:
+            if ch in '([':
+                depth += 1
+            elif ch in ')]':
+                depth -= 1
+            if ch == ':' and depth == 0:
+                parts.append(cur)
+                cur = ''
+                continue
+            cur += ch
+        parts.append(cur)
+        vals = []
+        for pt in parts:
+            v, _ = _seg_max(pt)          # 递归（可能嵌套三元）
+            vals.append(v)
+        return max(vals) if vals else 0, 'ternary=%s' % vals
+
+    def _plain_max(text):
+        """不含三元的表达式：按 `+` 切段累加"""
+        total = 0
+        for part in re.split(r'\s*\+\s*', text):
+            part = part.strip()
+            if not part:
+                continue
+            part = re.sub(r'\.[a-zA-Z]+\([^()]*\)', '', part).strip()
+            lit = re.findall(r"'([^']*)'", part)
+            if lit:
+                total += sum(len(x) for x in lit)
+                continue
+            fn = re.search(r'this\.(\w+)\(\)', part)
+            if fn and fn.group(1) in fixed_len:
+                total += fixed_len[fn.group(1)]
+                continue
+            if re.search(r'String\(|this\.', part):
+                total += 4
+            else:
+                total += 3
+        return total
+
+    # ★ 判据 661（第 1248 轮）：**先剥掉 `Text(...)` 外壳**再分析三元
+    #   踩坑：`block` 以 `Text(` 开头 ⇒ 扫描时深度立刻变 1
+    #   ⇒ 顶层三元的 `?` 被判为「深度 1」⇒ **三元没被识别** ⇒ 仍走求和
+    #   实测：`this.filled() + '/' + String(diffTotal²)` 最长 9 字符，
+    #        而没剥壳时报 14（把多个分支加起来了）
+    inner = block
+    m0 = re.match(r'\s*Text\s*\((.*)\)\s*$', block, re.S)
+    if m0:
+        inner = m0.group(1)
+    # 去掉尾部的链式调用（.fontSize(...) 等，可能嵌套括号 ⇒ 按最后一层 `)` 配平）
+    depth = 0
+    cut = len(inner)
+    for i in range(len(inner) - 1, -1, -1):
+        ch = inner[i]
+        if ch == ')':
+            depth += 1
+        elif ch == '(':
+            depth -= 1
+            if depth == 0:
+                # 看这个 `(` 前面是不是 `.xxx`
+                j = i - 1
+                while j >= 0 and (inner[j].isalnum() or inner[j] == '_'):
+                    j -= 1
+                if j >= 0 and inner[j] == '.':
+                    cut = j
+                else:
+                    break
+    inner = inner[:cut].strip()
+
+    _mc, _basis = _seg_max(inner)
+    return _mc, _basis or 'plain'
+
+    # ② 按 `+` 切段，逐段估上限（原实现，保留在 _plain_max 里）
+    for part in re.split(r'\s*\+\s*', block):
+        part = part.strip()
+        if not part:
+            continue
+        # 去掉尾部的链式调用（.fontSize(...) 等）
+        part = re.sub(r'\.[a-zA-Z]+\([^()]*\)', '', part).strip()
+        lit = re.findall(r"'([^']*)'", part)
+        if lit and not re.search(r'this\.', part):
+            n = sum(len(x) for x in lit)
+            total += n
+            why.append("'%s'=%d" % (''.join(lit)[:8], n))
+            continue
+        # 固定宽度函数调用
+        fn = re.search(r'this\.(\w+)\(\)', part)
+        if fn and fn.group(1) in fixed_len:
+            n = fixed_len[fn.group(1)]
+            total += n
+            why.append('%s()=%d' % (fn.group(1), n))
+            continue
+        # 字面量（含在拼接里的短符号）
+        if lit:
+            n = sum(len(x) for x in lit)
+            total += n
+            why.append("'%s'=%d" % (''.join(lit)[:6], n))
+            continue
+        # 其它（数字/字符串表达式）⇒ 保守 4
+        if re.search(r'String\(|this\.', part):
+            total += 4
+            why.append('expr=4')
+        else:
+            total += 3
+            why.append('?=3')
+
+    return total, ' + '.join(why)
+
+
+# ★ 判据 657 的门槛：**最长内容 ≥ 8 字符**才值得看
+#   （依据：分数「12/12」= 5~6 字符实测安全；17 字符实测卡边）
+MAXCHARS_ALERT = 8
+
+
 def check_file(path):
     with io.open(path, encoding='utf-8') as f:
         src = f.read()
@@ -127,8 +302,12 @@ def check_file(path):
         # ③ 多段拼接？
         if not is_concat_text(block):
             continue
+        # ④ ★ 判据 657：最长内容不足 MAXCHARS_ALERT ⇒ **跳过**（不报）
+        mc, basis = est_max_chars(block, src)
+        if mc < MAXCHARS_ALERT:
+            continue
         snippet = ' '.join(block.split())[:90]
-        hits.append((line_no, snippet))
+        hits.append((line_no, snippet, mc, basis))
     return hits
 
 
@@ -349,11 +528,13 @@ def main():
     shown = 0
     for fn, hits in per_file:
         print('  ── %s（%d 处）' % (fn, len(hits)))
-        for line_no, snip in hits:
+        # ★ 判据 659：返回值从 2 元组变 4 元组时，**所有解包点都要改**
+        #   （本轮踩了：改完 check_file 忘了改这里 ⇒ ValueError）
+        for line_no, snip, mc_len, basis in hits:
             if shown >= limit:
                 print('     …还有更多（用 --limit 放大）')
                 break
-            print('     L%-5d %s' % (line_no, snip))
+            print('     L%-5d 最长≈%-3d %s' % (line_no, mc_len, snip))
             shown += 1
         if shown >= limit:
             break
