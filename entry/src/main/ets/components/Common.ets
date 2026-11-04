@@ -1094,7 +1094,16 @@ build() {
       if (e.button === MouseButton.Right && e.action === MouseAction.Press) {
         Haptics.press();
         // 把点击位置传上去 —— 菜单要在鼠标处弹出，不是屏幕中央
-        this.onMenu(this.meta.id, e.x, e.y);
+        // ★★★ 2026-11-04（第 1204 轮）**修坐标空间用错**：
+        //   `e.x` / `e.y` 的 SDK 定义是
+        //     「X/Y coordinate of the mouse point in the **component coordinate system
+        //       based on the event-responsive component**」
+        //   ⇒ 是**相对被点卡片**的坐标（0..卡片宽/高），不是窗口坐标！
+        //   而 `GamesTab` 的 `.position({x, y})` 需要的是**相对父容器**的坐标
+        //   ⇒ 菜单会跑到屏幕上方（实测：y=118vp，而鼠标在 498..625vp 之间）
+        //   ⇒ 改用 `e.windowX` / `e.windowY`（SDK：「coordinate system of the
+        //     **current application window**」），与父容器（铺满窗口）一致
+        this.onMenu(this.meta.id, e.windowX, e.windowY);
       }
     })
     .gesture(
