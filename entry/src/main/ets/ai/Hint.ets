@@ -137,6 +137,14 @@ export class Hint {
   //   踩坑：先用 `private static DEMO_SEEN: Set<string>` —— **翻页后没保住**
   //        （struct 的静态成员在页面重建时会被重新初始化）
   //   ⇒ 改用 ArkUI 原生全局存储 AppStorage（页面重建不收走）
+  // ⚠️⚠️ **作用域说明（2026-11-04 第 1229 轮补，判据 602）**：
+  //   `AppStorage` 是**进程级**存储 ⇒ 这里的「一次」= **每次 App 生命周期一次**，
+  //   不是「每次进入这个游戏一次」。
+  //   ⇒ 实测（第 1217 轮）：`aa force-stop` 后重启动 ⇒ 首次进游戏**会演示**；
+  //     BACK 出游戏再点进去 ⇒ **不会演示**（key 还在）
+  //   ⇒ 所以自动化里要重看演示，必须 `aa force-stop` 后重新启动 App。
+  //   📖 文案两种形态（具体指引 / 通用回退）的完整说明见
+  //      `文档/演示文案两形态-20261104.md`（判据 622）
   static demoOnce(key: string): boolean {
     const k: string = 'demo_seen_' + key;
     if (AppStorage.has(k)) {
