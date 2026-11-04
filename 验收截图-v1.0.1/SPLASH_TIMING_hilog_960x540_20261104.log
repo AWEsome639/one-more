@@ -1,0 +1,4 @@
+11-04 15:54:42.236  3595  3595 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pStroke>0 | accum=289ms ｜ wall=415ms ｜ drift=126ms
+11-04 15:54:42.310  3595  3595 I A00001/com.andrewoscar.onemore/SplashTiming: MILESTONE pM>0 | accum=364ms ｜ wall=489ms ｜ drift=125ms
+11-04 15:54:44.194  3595  3595 I A00001/com.andrewoscar.onemore/SplashTiming: END | accum=2247ms ｜ wall=2373ms ｜ drift=126ms ｜ dropped=1
+11-04 15:54:44.194  3595  3595 I A00001/com.andrewoscar.onemore/SplashDiag: finish: animMs=2247 boosted=false | frames fast=45 mid=46 slow=4 vslow=2 drop=1
