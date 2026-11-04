@@ -1096,14 +1096,18 @@ build() {
     // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点导航
     //   遥控器方向键在这里移动焦点，OK 键进游戏
     //   · Tv.on() 只在 Bp.isTv() 时为真 ⇒ 手机/平板/PC 上完全不起作用（零回归）
-    //   · focusBox 用 4vp 粗框（3 米视距要看得见）
+    //   · 焦点框由上面的 `.outline()` 画（第 1160 轮起）——
+    //     原来这里还有 `.focusBox(Tv.box())`，但第 1159 轮 A/B 已证明它**从不渲染**
+    //     （条件为真、FOCUS 日志触发，卡片区像素差 0）⇒ 第 1179 轮删掉（同上面对 `.shadow()` 的处理）
     // ★★★ 2026-10-30（PC / 2in1）：**稳定 id** —— 方向键导航靠它 requestFocus
     //   用 'card-' 前缀与 sharedId 的命名一致（共享元素补间也用这个前缀）
     .id('card-' + this.meta.id)
     .focusable(Tv.on())
     // ★ 首屏第一张卡默认拿焦点（仅 Tv.on() 时）—— 见 @Prop first 的注释
     .defaultFocus(this.first && Tv.on())
-    .focusBox(Tv.box())
+    // ★ 2026-11-04（第 1179 轮）：**删掉 `.focusBox(Tv.box())`**
+    //   它是死代码：焦点框已由 L1054 的 `.outline()` 绘制。
+    //   留着会让后来者以为"焦点框是它画的"（判据 494：效果必须能追到真正画它的那行）
     .onKeyEvent((e: KeyEvent) => {
       if (!Tv.on()) { return; }
       // ① 方向键：交给父组件的网格导航

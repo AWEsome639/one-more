@@ -62,6 +62,10 @@ export struct GamesTab {
   @StorageProp('level') level: number = 1;
   @StorageProp('xp') xp: number = 0;
   @StorageProp('solvedToday') playedTodayAll: boolean = false;
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+
+  @State private tvFocus: string = '';
 
   @State category: GameCategory = GameCategory.ALL;
   @State seg: Seg = Seg.ALL;
@@ -1412,7 +1416,9 @@ build() {
       .shadow(Shadow.card)
       // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
       .focusable(Tv.on())
-      .focusBox(Tv.box())
+      .onFocus(() => { this.tvFocus = 'L1415'; })
+      .onBlur(() => { if (this.tvFocus === 'L1415') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L1415'))
       .onKeyEvent((e: KeyEvent) => {
         Tv.handleKey(e, () => { this.openGame(this.dailyId); });
       })
@@ -1441,7 +1447,9 @@ build() {
     .shadow(Shadow.card)
     // ★★★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L1444'; })
+    .onBlur(() => { if (this.tvFocus === 'L1444') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L1444'))
     .onKeyEvent((e: KeyEvent) => {
       // ★ 遥控器 OK 键 = 随机来一局（动作与下面的 onClick 完全一致）
       Tv.handleKey(e, () => {

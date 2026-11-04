@@ -20,6 +20,10 @@ import { FontSize, Space, Radius, Palette } from '../core/Design';
 
 @Component
 export struct HintBar {
+
+  /** ★ 2026-11-04（第 1179 轮）：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   /** 点「提示」时回调（游戏自己实现 askHint） */
   onHintTap: () => void = () => {};
   /** 点「代打/停代打」时回调（游戏自己实现 askAuto） */
@@ -80,7 +84,9 @@ export struct HintBar {
           // ★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
           //   Tv.on() 在非电视上恒为 false ⇒ 手机/平板/PC 零影响
           .focusable(Tv.on())
-          .focusBox(Tv.box())
+          .onFocus(() => { this.tvFocus = 'L87'; })
+          .onBlur(() => { if (this.tvFocus === 'L87') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L87'))
           .onKeyEvent((e: KeyEvent) => {
             Tv.handleKey(e, () => { if (!this.disabled) { this.onHintTap(); } });
           })
@@ -115,7 +121,9 @@ export struct HintBar {
         .accessibilityLevel('yes')
         // ★ 2026-10-29（项目 F 阶段 2）：智慧屏焦点
         .focusable(Tv.on())
-        .focusBox(Tv.box())
+        .onFocus(() => { this.tvFocus = 'L122'; })
+        .onBlur(() => { if (this.tvFocus === 'L122') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L122'))
         .onKeyEvent((e: KeyEvent) => {
           Tv.handleKey(e, () => {
             // 联机中不响应（.enabled 已挡一层，这里是双保险）
