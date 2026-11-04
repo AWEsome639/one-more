@@ -325,12 +325,18 @@ def main():
         return 2
 
     total = 0
+    unread = []       # 读不了 ⇒ 未检查（判据 655）
     per_file = []
     for f in files:
+        # ★★★ 2026-11-04（第 1247 轮，判据 655）**「没查」不能算「通过」**
+        #   原来：读不了文件 ⇒ 打印「⚠️ 读不了」⇒ continue
+        #   ⇒ 那个文件**没被检查**，而 total 可能仍为 0 ⇒ 报告说「✅ 没有可疑项」
+        #   修：计入 `unread`，最后由它决定 rc=2
         try:
             h = check_file(f)
         except Exception as e:
-            print('  ⚠️ 读不了 %s: %s' % (os.path.basename(f), e))
+            print('  🔴 **读不了，无法检查** %s: %s' % (os.path.basename(f), e))
+            unread.append(os.path.basename(f))
             continue
         if h:
             per_file.append((os.path.basename(f), h))
@@ -353,6 +359,10 @@ def main():
             break
 
     print()
+    if unread:
+        print('  🔴 **%d 个文件读不了，未做检查**：%s' % (len(unread), ' '.join(unread[:5])))
+        print('  ⇒ 退出码 2（**未检查 ≠ 通过**，判据 655/546）')
+        return 2
     if total == 0:
         print('  ✅ 没有可疑项')
         return 0

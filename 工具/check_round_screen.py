@@ -69,9 +69,15 @@ def main():
     print('=' * 70)
     print('  圆屏裁切检查（内切圆 R = min(w,h)/2）')
     print('=' * 70)
+    # ★★★ 2026-11-04（第 1247 轮，判据 655）**「没查」不能算「通过」**
+    #   原来：截图不存在 ⇒ 打印「⚠️ 跳过（不存在）」⇒ continue
+    #   ⇒ 这张截图**没被检查**，而 rc 仍是 0 ⇒ 报告会说"全部通过"
+    #   修：计入 `missing`，最后由它决定 rc=2（区分"脚本问题"与"检查不合格"）
+    missing = []
     for p in paths:
         if not os.path.exists(p):
-            print('  ⚠️ 跳过（不存在）: %s' % p)
+            print('  🔴 **截图不存在，无法检查**: %s' % p)
+            missing.append(p)          # ← 必须计入
             continue
         ok, ratio, far, (w, h, R) = check(p)
         name = os.path.basename(p)
@@ -93,6 +99,13 @@ def main():
     print('     手机 / 平板 / 智慧屏都是矩形屏 ⇒ 不用跑这个检查')
     print('     （否则任何矩形布局都会"超出一大片"，那是假警报）')
     print('=' * 70)
+    if missing:
+        print()
+        print('  🔴 **%d 张截图不存在，未做检查**：' % len(missing))
+        for p in missing:
+            print('     · %s' % p)
+        print('  ⇒ 退出码 2（**未检查 ≠ 通过**，判据 655/546）')
+        return 2
     return rc
 
 

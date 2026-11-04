@@ -5,6 +5,7 @@
  * 胜负：60 秒内拼对 6 关 ⇒ 通关；时间归零还没拼够 ⇒ 失败。
  */
 
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -409,8 +410,16 @@ export struct GBinaryCode {
           .fontSize(FontSize.hero)
           .fontWeight(FontWeight.Bold)
           .fontColor(this.value() === this.target ? Palette.emerald : Palette.primaryDeep)
+        // ★★★ 2026-11-04（第 1247 轮，判据 657）**动态文本折行风险**
+        //   本行内容 = `bitsText()`（BITS 位 '0'/'1'）+ `'₂ = '` + 十进制 + `'₁₀'`
+        //   ⇒ 最长 = **BITS + 9 个字符**（如 8 位 ⇒ `11111111₂ = 255₁₀` = 17 字符）
+        //   而 195×195 上本卡片可用宽度 ≈ 151 vp = 10.8 em
+        //   ⇒ 17 字符 × ~0.6em ≈ 10.2 em ⇒ **卡在边缘**
+        //   修法：极小屏降一档字号 + `maxLines(1)` 保证不折行（宁可变小不换行）
         Text(this.bitsText() + '₂ = ' + String(this.value()) + '₁₀')
-          .fontSize(FontSize.lg)
+          .fontSize(Bp.tinyScreen() || Bp.isWatch() ? FontSize.sm : FontSize.lg)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontColor(this.theme.inkSoft)
       }
       .width('100%')
