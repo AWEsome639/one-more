@@ -22,6 +22,8 @@ T="$HC -t 127.0.0.1:5555"
 A() { timeout 30 $T shell "$@" 2>&1 | tr -d '\r'; }
 lum() {
   timeout 30 $T shell "snapshot_display -t png -f /data/local/tmp/_wk.png" >/dev/null 2>&1
+  # ★ 判据 669：**先删本地再 recv** —— 否则 hdc 失败时会读到上一次的旧截图
+  rm -f /tmp/_wk.png
   timeout 30 $T file recv /data/local/tmp/_wk.png /tmp/_wk.png >/dev/null 2>&1
   python3 - <<'PY'
 import os
@@ -74,6 +76,7 @@ for attempt in 1 2 3; do
     for dt in 1 2 3 4 5 6; do
       A "uitest dumpLayout -p /data/local/tmp/_wk.json" >/dev/null 2>&1
       sleep 1
+      rm -f /tmp/_wk.json            # 判据 669：先删再收
       timeout 25 $T file recv /data/local/tmp/_wk.json /tmp/_wk.json >/dev/null 2>&1
       SZ=$(stat -f%z /tmp/_wk.json 2>/dev/null || stat -c%s /tmp/_wk.json 2>/dev/null || echo 0)
       if [ "$SZ" -ge 500 ]; then
