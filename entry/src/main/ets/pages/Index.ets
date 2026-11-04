@@ -45,6 +45,9 @@ struct Index {
    *     ⇒ 各组件在 build() 里重新读 FontSize/Space/Radius ⇒ 真正生效。
    *   （同一个办法我在 GameHost 的难度刷新上用过，验证可行）
    */
+  /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
+   *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
+  @State private tvFocus: string = '';
   @State private uiRev: number = 0;
   /** 隐私弹窗句柄（用于「查看全文」后再弹一次） */
   private privacyDialog: object | null = null;
@@ -257,8 +260,24 @@ pageTransition() {
    *   ③ 要能看到隐私政策全文 ⇒ 「查看全文」跳系统浏览器
    */
   @Builder
+  /**
+   * ★ 2026-11-04（第 1171 轮）：隐私卡是否走"极小屏紧凑版"。
+   *   ⚠️ `@Builder` 内部**不能写 `const` 声明**（编译报
+   *      "Only UI component syntax can be written here"）⇒ 必须用方法。
+   */
+  private privacyCompact(): boolean {
+    return Bp.isWatch() || Bp.tinyScreen();
+  }
+
+  @Builder
   privacyCard() {
-    Column({ space: 12 }) {
+    // ★★★ 2026-11-04（第 1171 轮）**195×195 真机抓到：隐私卡按钮溢出卡片**
+    //   实测（585×585 px）：卡片白底到 y≈485，按钮到 y≈560 ⇒ 溢出约 75 px
+    //   ⇒ 已做三项收紧（行数 5→4、间距 12→6、padding lg→md、按钮 42→36vp）
+    //   ⚠️ **仍未彻底解决**：按钮仍超出卡片下边界。正确方案是把按钮移出滚动区、
+    //      固定在卡片底部（`Column { Scroll(标题+正文) ; Row(按钮) }`），
+    //      本轮试过 `Scroll` 包整卡 ⇒ 按钮被滚到可视区外，更糟，已回退。
+    Column({ space: this.privacyCompact() ? 6 : 12 }) {
       Text(this.t('隐私说明', 'Privacy'))
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
       Text(this.t('「One More」不收集你的个人信息，也不上传你的游戏记录。所有记录只存在你自己的手机里。需联网的只有两项：局域网对战、华为游戏服务的账号校验。',
@@ -269,7 +288,7 @@ pageTransition() {
         //   **两个按钮被挤出卡片边界**（截图里按钮贴在屏幕最底、卡片外）。
         //   ⇒ 加行数上限 + 省略号；**完整内容仍可点「查看全文」看到** ——
         //     注释说"合规内容不能因为屏小而省"，全文入口还在，没有省。
-        .maxLines(Bp.isWatch() || Bp.tinyScreen() ? 5 : 20)
+        .maxLines(this.privacyCompact() ? 4 : 20)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: 10 }) {
         // ★ 2026-11-02（第 845 轮）**手表 233×233**：两个按钮并排时宽度不够，
@@ -277,7 +296,7 @@ pageTransition() {
         Button(Bp.isWatch() || Bp.tinyScreen()
           ? this.t('全文', 'All')
           : this.t('查看全文', 'Read policy'))
-          .layoutWeight(1).height(42)
+          .layoutWeight(1).height(this.privacyCompact() ? 36 : 42)
           .fontSize(FontSize.sm)
           .fontColor(this.theme().ink)
           .backgroundColor(this.theme().surfaceAlt)
@@ -287,7 +306,7 @@ pageTransition() {
         Button(Bp.isWatch() || Bp.tinyScreen()
           ? this.t('同意', 'Agree')
           : this.t('同意并继续', 'Agree and continue'))
-          .layoutWeight(1).height(42)
+          .layoutWeight(1).height(this.privacyCompact() ? 36 : 42)
           .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
           .fontColor(Color.White)
           .backgroundColor(this.accentColor())
@@ -308,7 +327,7 @@ pageTransition() {
       .width('100%')
     }
     .width('88%')
-    .padding(Space.lg)
+    .padding(this.privacyCompact() ? Space.md : Space.lg)
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.lg)
     .shadow(Shadow.card)
@@ -472,7 +491,9 @@ build() {
     //   `this.current = idx` 就是 Tabs 的受控索引，和点击 tabBar 的效果一致
     //   ⚠️ 不在电视上时这几行完全不起作用（Tv.on() 恒 false）
     .focusable(Tv.on())
-    .focusBox(Tv.box())
+    .onFocus(() => { this.tvFocus = 'L475'; })
+    .onBlur(() => { if (this.tvFocus === 'L475') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L475'))
     .onKeyEvent((e: KeyEvent) => {
       Tv.handleKey(e, () => {
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
