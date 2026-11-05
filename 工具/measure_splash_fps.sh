@@ -28,7 +28,7 @@ HAP="entry/build/default/outputs/default/entry-default-signed.hap"
 OUT="验收截图-v1.0.1/splash_fps_${DEV}_$(date +%Y%m%d)"
 mkdir -p "$OUT"
 
-ONLINE() { [ "$(timeout 6 "$HC" list targets 2>/dev/null | grep -c '127.0.0.1:5555')" -ge 1 ]; }
+ONLINE() { timeout 10 "$HC" -t 127.0.0.1:5555 shell 'echo ok' 2>/dev/null | grep -qx 'ok'; }
 A() { ONLINE || return 1; timeout 25 "$HC" -t 127.0.0.1:5555 shell "$@" 2>&1 | tr -d '\r'; }
 
 # ★★★ 判据 1490：`aa start` 必须**本身**重试（不是只查 pidof）

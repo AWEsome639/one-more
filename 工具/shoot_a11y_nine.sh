@@ -113,13 +113,16 @@ echo '──────────────── 起机 ──────
 for N in onemore onemore2 onemore3 onemore4 onemore5 onemore6; do timeout 20 "$EMU" -stop "$N" >/dev/null 2>&1; done
 sleep 6
 nohup bash -c "\"$EMU\" -start \"$INST\" < \"$YF\"" > /tmp/s9_boot.log 2>&1 &
+# ★ 判据 1584：`list targets` ≠ 可用 ⇒ 必须 `shell echo ok`
 ON=0
 for i in $(seq 1 45); do
   sleep 10
-  T=$(timeout 6 "$HC" list targets 2>/dev/null | grep -c '127.0.0.1:5555')
-  [ "${T:-0}" -ge 1 ] && { echo "  在线 @ $((i*10))s"; ON=1; break; }
+  if timeout 10 "$HC" -t 127.0.0.1:5555 shell 'echo ok' 2>/dev/null | grep -qx 'ok'; then
+    echo "  在线且可用 @ $((i*10))s"; ON=1; break
+  fi
+  timeout 6 "$HC" tconn 127.0.0.1:5555 >/dev/null 2>&1
 done
-[ "$ON" != "1" ] && { echo '🔴 未在线'; exit 1; }
+[ "$ON" != "1" ] && { echo '🔴 通道未建立（判据 1584）'; exit 1; }
 timeout 6 "$HC" tconn 127.0.0.1:5555 >/dev/null 2>&1
 for k in $(seq 1 15); do
   sleep 10

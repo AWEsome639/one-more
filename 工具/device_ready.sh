@@ -36,15 +36,18 @@ fi
 # ── 连设备 ──
 "${HC}" kill >/dev/null 2>&1; sleep 3
 "${HC}" start -p 8710 >/dev/null 2>&1; sleep 10
+# ★★★ 判据 1584：**`list targets` ≠ 可用** —— 必须 `shell echo ok` 真的返回 ok
+#   而本脚本后面 `sh_dev` 全是 `>/dev/null 2>&1` ⇒ 通道未通会**静默失败**
+#   ⇒ 这是三处里**最危险**的（判据 1595）
 ok=0
-for i in $(seq 1 30); do
+for i in $(seq 1 40); do
   "${HC}" tconn 127.0.0.1:5555 >/dev/null 2>&1
-  if "${HC}" list targets 2>/dev/null | grep -q "127.0.0.1:5555"; then
-    echo "  ✅ 设备已连接（第 ${i} 次）"; ok=1; break
+  if "${HC}" -t 127.0.0.1:5555 shell 'echo ok' 2>/dev/null | grep -qx 'ok'; then
+    echo "  ✅ 设备已连接且可用（第 ${i} 次，shell 已探活）"; ok=1; break
   fi
   sleep 5
 done
-[ "${ok}" = 1 ] || { echo "  ❌ 连不上设备"; exit 1; }
+[ "${ok}" = 1 ] || { echo "  ❌ 设备通道未建立（判据 1584）"; exit 1; }
 
 # ── ★ 唤醒 + 上滑解锁（这一步以前一直漏） ──
 sh_dev "power-shell wakeup" >/dev/null 2>&1; sleep 4

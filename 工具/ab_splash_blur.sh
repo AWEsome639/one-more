@@ -37,7 +37,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-ONLINE() { [ "$(timeout 6 "$HC" list targets 2>/dev/null | grep -c '127.0.0.1:5555')" -ge 1 ]; }
+ONLINE() { timeout 10 "$HC" -t 127.0.0.1:5555 shell 'echo ok' 2>/dev/null | grep -qx 'ok'; }
 A() { ONLINE || return 1; timeout 25 "$HC" -t 127.0.0.1:5555 shell "$@" 2>&1 | tr -d '\r'; }
 
 # ★★★ 判据 1490：**每次重试都重发 `aa start`**

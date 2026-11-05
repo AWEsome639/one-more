@@ -24,10 +24,20 @@ OUT="验收截图-v1.0.1"
 
 # ★ 探针：设备必须在
 timeout 10 ${HC} tconn 127.0.0.1:5555 >/dev/null 2>&1
-if ! timeout 10 ${HC} list targets 2>&1 | grep -q "127.0.0.1:5555"; then
-  echo "🔴 设备不可用（先确认模拟器已启动）"; exit 1
+# ★★★ 判据 1584：**`list targets` ≠ 可用** —— 必须 `shell echo ok` 真的返回 ok
+#   实测：`list targets` 已返回设备，而 `hdc shell` 仍报
+#        [Fail][E000004]:The communication channel is being established.
+#   ⇒ 而后面直接截图 ⇒ 会拿到空图
+ok=0
+for _i in $(seq 1 30); do
+  if timeout 10 ${HC} -t 127.0.0.1:5555 shell 'echo ok' 2>/dev/null | grep -qx 'ok'; then ok=1; break; fi
+  timeout 6 ${HC} tconn 127.0.0.1:5555 >/dev/null 2>&1
+  sleep 5
+done
+if [ "${ok}" != "1" ]; then
+  echo "🔴 设备不可用（通道未建立，判据 1584；先确认模拟器已启动）"; exit 1
 fi
-echo "  设备 OK"
+echo "  设备 OK（shell 已探活）"
 
 # ★ 按屏幕尺寸算解锁滑动坐标（★ 第 1147 轮：写死坐标在 2880×1620 上无效）
 timeout 20 ${HC} -t 127.0.0.1:5555 shell "snapshot_display -t png -f /data/local/tmp/_sz.png" >/dev/null 2>&1

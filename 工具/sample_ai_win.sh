@@ -31,7 +31,7 @@ mkdir -p "$OUT"
 RES="$OUT/result.tsv"
 : > "$RES"
 
-ONLINE() { [ "$(timeout 6 "$HC" list targets 2>/dev/null | grep -c '127.0.0.1:5555')" -ge 1 ]; }
+ONLINE() { timeout 10 "$HC" -t 127.0.0.1:5555 shell 'echo ok' 2>/dev/null | grep -qx 'ok'; }
 A() { ONLINE || return 1; timeout 25 "$HC" -t 127.0.0.1:5555 shell "$@" 2>&1 | tr -d '\r'; }
 DK() { rm -f /tmp/sw.json; A "uitest dumpLayout -p /data/local/tmp/_sw.json" >/dev/null 2>&1; timeout 20 "$HC" -t 127.0.0.1:5555 file recv /data/local/tmp/_sw.json /tmp/sw.json >/dev/null 2>&1; }
 
