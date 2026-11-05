@@ -176,11 +176,11 @@ echo "$GAMES" | while IFS=$'\t' read -r GID NAME; do
   A "uitest uiInput inputText ${SB} ${NAME}" >/dev/null 2>&1
   sleep 4; DK
   CK=$(CARDPOS "$GID")
-  if [ -z "$CK" ]; then echo "    🔴 搜索无结果（$(TXT | cut -c1-40)）"; continue; fi
+  if [ -z "$CK" ]; then echo "    🔴 搜索无结果（"$(TXT | cut -c1-40)"）"; continue; fi
   A "uitest uiInput click ${CK}" >/dev/null 2>&1
   sleep 6; DK
   GOT=$(TXT)
-  if ! printf '%s' "$GOT" | grep -q "$NAME"; then echo "    🔴 进错（$(printf '%s' "$GOT" | cut -c1-40)）"; continue; fi
+  if ! printf '%s' "$GOT" | grep -q "$NAME"; then echo "    🔴 进错（"$(printf '%s' "$GOT" | cut -c1-40)"）"; continue; fi
   # 停演示（若有）
   for a in 1 2 3; do DK; if TXT | grep -q '演示中'; then A 'uitest uiInput click 660 300' >/dev/null 2>&1; sleep 2; else break; fi; done
   sleep 2

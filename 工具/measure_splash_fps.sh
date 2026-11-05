@@ -52,7 +52,7 @@ START_APP() {
       ok=1
       return 0
     fi
-    echo "      第 $TRY 次 ⇒ 未起来（$out）" >&2
+    echo "      第 ${TRY} 次 ⇒ 未起来（${out}）" >&2
   done
   return 1
 }

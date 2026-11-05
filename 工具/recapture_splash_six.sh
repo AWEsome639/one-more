@@ -48,7 +48,7 @@ for pair in "${SIZES[@]}"; do
     sleep 5
     continue
   fi
-  echo "  ✅ 启动（$(echo "$OUT_S" | tail -1 | tr -d '\r')）"
+  echo "  ✅ 启动（"$(echo "$OUT_S" | tail -1 | tr -d '\r')"）"
 
   # ② 装机
   timeout 900 $HC -t 127.0.0.1:5555 install -r "$HAP" > /tmp/splash_recap/i_$INST.log 2>&1

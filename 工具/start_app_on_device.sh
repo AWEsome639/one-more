@@ -155,7 +155,7 @@ case "$VERDICT" in
     #   ⇒ 改成「取出第一个 PID，再校验它是纯数字」
     SB=$(A "pidof com.ohos.sceneboard" | head -1 | awk '{print $1}')
     if ! printf '%s' "$SB" | grep -qE '^[0-9]+$'; then
-      log "🔴 桌面进程不在（com.ohos.sceneboard pidof 首个: $(printf '%s' "$SB" | cut -c1-30)）"
+      log "🔴 桌面进程不在（com.ohos.sceneboard pidof 首个: "$(printf '%s' "$SB" | cut -c1-30)"）"
       exit 2
     fi
     log "   已到桌面（sceneboard PID=${SB}，dump 文本 ${NTEXTS} 条）"
@@ -187,7 +187,7 @@ if ! printf '%s' "$PID" | grep -qE '^[0-9]+$'; then
     *10106102*) log "   ⇒ **屏幕锁着**（判据 966：错误码已明说）⇒ 解锁手势无效" ;;
     *'not installed'*|*'failed to install'*) log "   ⇒ **app 未安装** ⇒ 先 install" ;;
   esac
-  log "🔴 app 启动失败（pidof: $(printf '%s' "$PID" | cut -c1-40)）"
+  log "🔴 app 启动失败（pidof: "$(printf '%s' "$PID" | cut -c1-40)"）"
   log "   ⇒ 判据 804：失败时显示 NOT_RUNNING，不是把错误串当 PID"
   exit 3
 fi

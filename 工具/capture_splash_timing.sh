@@ -76,7 +76,7 @@ for t in 3 4 5 6; do
   printf '%s' "$PID" | grep -qE '^[0-9]+$' && break
 done
 if ! printf '%s' "$PID" | grep -qE '^[0-9]+$'; then
-  log "🔴 app 没起来（pidof 返回: $(printf '%s' "$PID" | cut -c1-40)）"
+  log "🔴 app 没起来（pidof 返回: "$(printf '%s' "$PID" | cut -c1-40)"）"
   log "   ⇒ 判据 804：失败时显示 NOT_RUNNING，不是把错误串当 PID"
   exit 2
 fi

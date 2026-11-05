@@ -60,10 +60,10 @@ for i in $(seq 1 "${TRIES}"); do
   sleep 1
   REMOTE=$(get_remote)
   if [ -n "${REMOTE}" ] && [ "${REMOTE}" = "${LOCAL}" ]; then
-    echo "  ✅ 第 ${i} 次推送后确认同步（远端 = $(echo "${REMOTE}" | cut -c1-7)）"
+    echo "  ✅ 第 ${i} 次推送后确认同步（远端 = "$(echo "${REMOTE}" | cut -c1-7)"）"
     exit 0
   fi
-  echo "  第 ${i} 次未同步（远端=$(echo "${REMOTE:-空}" | cut -c1-7)），重试…"
+  echo "  第 ${i} 次未同步（远端="$(echo "${REMOTE:-空}" | cut -c1-7)"），重试…"
   sleep 2
 done
 
