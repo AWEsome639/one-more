@@ -250,7 +250,7 @@ export struct GWaterSort {
   }
 
   /** 贪心求解器：能解出来的牌面才发给玩家 */
-  private pickMove(st: number[], visited: Set<string> | null): number {
+  private pickMove(st: number[], lastA: number, lastB: number): number {
     let best: number = -1;
     const cand: number[] = [];
     for (let a = 0; a < this.tubeCount(); a++) {
@@ -258,11 +258,11 @@ export struct GWaterSort {
         if (!this.legal(st, a, b)) {
           continue;
           }
-          if (visited !== null) {
-            const nxt: number[] = this.poured(st, a, b);
-            if (visited.has(this.stKey(nxt))) {
-              continue;
-            }
+        // ★★★ 判据 1659：**禁止立刻反向**（把刚倒进 b 的又倒回 a）
+        //   倒水排序的死循环只有这一个形状 ⇒ 禁掉它循环就断
+        //   而**不会走进死路**（第一版用 visited：那会堵死，steps=6 就卡）
+        if (a === lastB && b === lastA) {
+          continue;
         }
         const n: number = this.runTop(st, a);
         const space: number = this.freeOf(st, b);
@@ -291,18 +291,18 @@ export struct GWaterSort {
   private solvable(start: number[]): boolean {
     for (let attempt = 0; attempt < 16; attempt++) {
       let st: number[] = start.slice();
-      // ★ 判据 1619：`solvable` 也走贪心 ⇒ 同样要防往复倒
-      const visited: Set<string> = new Set<string>();
-      visited.add(this.stKey(st));
+      // ★★★ 判据 1659：`solvable` 也走贪心 ⇒ 同样禁止立刻反向
+      let lastA: number = -1; let lastB: number = -1;
+
       let steps: number = 0;
       while (!this.isDone(st) && steps < 160) {
         steps++;
-        const mv: number = this.pickMove(st, visited);
+        const mv: number = this.pickMove(st, lastA, lastB);
         if (mv < 0) {
           break;
         }
         st = this.poured(st, Math.floor(mv / 100), mv % 100);
-        visited.add(this.stKey(st));
+        lastA = Math.floor(mv / 100); lastB = mv % 100;
       }
       if (this.isDone(st)) {
         return true;
@@ -511,19 +511,19 @@ export struct GWaterSort {
     for (let attempt = 0; attempt < 16; attempt++) {
       let st: number[] = this.flat.slice();
       const path: number[] = [];
-      // ★ 判据 1619：**已访问状态** ⇒ 贪心 + 无回访 ⇒ 不往复倒
-      const visited: Set<string> = new Set<string>();
-      visited.add(this.stKey(st));
+      // ★★★ 判据 1659：**只记上一步，禁止立刻反向**（A→B 然后 B→A）
+      //   倒水排序的死循环只有这一个形状 ⇒ 禁掉它循环就断，而**不会走进死路**
+      let lastA: number = -1; let lastB: number = -1;
       let steps: number = 0;
       while (!this.isDone(st) && steps < 200) {
         steps = steps + 1;
-        const mv: number = this.pickMove(st, visited);
+        const mv: number = this.pickMove(st, lastA, lastB);
         if (mv < 0) {
           break;
         }
         path.push(mv);
         st = this.poured(st, Math.floor(mv / 100), mv % 100);
-        visited.add(this.stKey(st));
+        lastA = Math.floor(mv / 100); lastB = mv % 100;
       }
       if (this.isDone(st)) {
         return path;
@@ -538,7 +538,7 @@ export struct GWaterSort {
     if (this.over) {
       return Hint.none('none');
     }
-    const mv: number = this.pickMove(this.flat, null);
+    const mv: number = this.pickMove(this.flat, -1, -1);
     if (mv < 0) {
       return Hint.none(TG('倒不动了'));
     }
