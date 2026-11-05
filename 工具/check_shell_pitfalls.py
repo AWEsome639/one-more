@@ -39,11 +39,23 @@ def _rule_sc01(lines):
 
 
 def _rule_sc02(lines):
-    """判据 836：`$VAR）` ⇒ bash 把全角符号算进变量名"""
-    fw = '（）【】，。：；、\u201c\u201d\u2018\u2019！？～'
+    """判据 836/1207：`$VAR` 紧跟**任何非 ASCII 字节** ⇒ bash 把它算进变量名
+
+    ★ 2026-11-05（第 1382 轮）**从「枚举全角字符」改成「任何非 ASCII」**
+      原来只列了 `（）【】，。：；、""''！？～`
+      ⇒ 而真实世界里紧跟变量的可能是 `→` `｜` `·` `（` 之后的任何东西
+      ⇒ 我因此**同一个坑踩了五次**（957 / 1004 / 1165 / 1199 / 1205）
+      ⇒ 根治：**机器不管哪个字符，只要不是 ASCII 就报**
+      ⚠️ 例外：`${VAR}` 是正确写法，不该报 ⇒ 正则用负向后视排除花括号
+    """
     out = []
     for i, l in enumerate(lines, 1):
-        for m in re.finditer(r'(?<![{$\w])\$([A-Za-z_]\w*)([%s])' % re.escape(fw), l):
+        # 跳过纯注释行（注释里的示例不该报错）
+        st = l.lstrip()
+        if st.startswith('#'):
+            continue
+        # $VAR 后紧跟任何非 ASCII 字符（且不是 ${VAR} 形式）
+        for m in re.finditer(r'(?<![{$\w])\$([A-Za-z_]\w*)([^\x00-\x7f])', l):
             out.append((i, l.strip()[:100]))
             break
     return out
