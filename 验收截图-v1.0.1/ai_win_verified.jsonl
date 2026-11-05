@@ -36,3 +36,6 @@
 {"name": "指数塔", "verdict": "FAIL", "detail": "回不到列表"}
 {"name": "三重序列", "verdict": "FAIL", "detail": "回不到列表"}
 {"name": "截面切片", "verdict": "FAIL", "detail": "回不到列表"}
+{"name": "弹珠消", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '14.9s'}", "ts": "2026-11-06T02:32:02"}
+{"name": "叠方块", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '10.4s'}", "ts": "2026-11-06T02:32:54"}
+{"name": "方向回忆", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '31.3s'}", "ts": "2026-11-06T02:34:05"}

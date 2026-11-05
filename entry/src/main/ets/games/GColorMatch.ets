@@ -318,7 +318,7 @@ Text(this.colors[r * N + c] >= 0 ? A11y.glyph(this.colors[r * N + c]) : '')
       return;
     }
     Hint.toast(TG('AI 开始代打…'));
-    this.autoId = Hint.autoRun(() => this.autoStep());
+    this.autoId = Hint.autoRun(() => this.autoStep(), () => { this.autoId = -1; });
   }
 
   private stopAuto(): void {

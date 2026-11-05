@@ -430,7 +430,7 @@ export struct GMathMaze {
       return;
     }
     Hint.toast(TG('AI 开始代打…'));
-    this.autoId = Hint.autoRun(() => this.autoStep());
+    this.autoId = Hint.autoRun(() => this.autoStep(), () => { this.autoId = -1; });
   }
 
   private stopAuto(): void {

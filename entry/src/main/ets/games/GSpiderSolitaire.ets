@@ -583,7 +583,7 @@ export struct GSpiderSolitaire {
     Hint.toast(TG('AI 开始代打…'));
     this.spSeen = new Map<string, number>();
     this.spStall = 0;
-    this.autoId = Hint.autoRun(() => this.autoStep());
+    this.autoId = Hint.autoRun(() => this.autoStep(), () => { this.autoId = -1; });
   }
 
   private stopAuto(): void {

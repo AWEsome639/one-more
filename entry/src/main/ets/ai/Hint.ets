@@ -207,8 +207,18 @@ export class Hint {
     return Hint.autos.size > 0;
   }
 
-  static autoRun(tick: () => boolean): number {
+  /**
+   * ★ 判据 1685：代打**自然停下**时，必须给游戏一次清 `autoId` 的机会。
+   *
+   * 为什么：按钮文案只取决于游戏的 `autoId >= 0`（HintBar 的 autoOn）。
+   * `autoRun` 收到 tick 返回 false 时只 clearInterval + 从 autos 删掉，
+   * **碰不到游戏自己的 autoId 字段** ⇒ 353/355 款会出现「AI 已停、按钮还写停代打」。
+   *
+   * onStop 保证**只调一次**；用户手动 `autoStop(id)` 不触发（那条路游戏自己清）。
+   */
+  static autoRun(tick: () => boolean, onStop?: () => void): number {
     let id: number = -1;
+    let fired: boolean = false;
     id = setInterval(() => {
       let more: boolean = false;
       try {
@@ -220,6 +230,10 @@ export class Hint {
         if (id >= 0) {
           clearInterval(id);
           Hint.autos.delete(id);
+        }
+        if (!fired && onStop !== undefined) {
+          fired = true;
+          onStop();
         }
       }
     }, Hint.AUTO_MS);

@@ -131,7 +131,7 @@ keep = [n for n in names if not skipped(n)]
 io.open(pend, 'w', encoding='utf-8').write(''.join(n + '\n' for n in keep))
 print('  待验 %d 款（名单 %d，按 SKIP=%s 跳过 %d）' % (len(keep), len(names), skip, len(names) - len(keep)))
 PY
-[ -f "$PENDING" ] || { echo "🔴 预处理名单失败（没有生成 $PENDING）" >&2; exit 2; }
+[ -f "$PENDING" ] || { echo "🔴 预处理名单失败（没有生成 ${PENDING}）" >&2; exit 2; }
 
 TOTAL="$(awk 'END{print NR+0}' "$PENDING" 2>/dev/null || echo 0)"
 TOTAL="${TOTAL:-0}"
