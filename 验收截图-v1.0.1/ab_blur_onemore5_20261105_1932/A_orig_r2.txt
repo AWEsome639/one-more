@@ -1,0 +1,1 @@
+frames fast=75 mid=24 slow=4 vslow=2 drop=1
