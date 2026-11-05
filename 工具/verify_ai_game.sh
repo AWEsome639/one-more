@@ -68,6 +68,29 @@ w(d)
 print('%d %d'%r if r else '')
 PY
 }
+# ★ 判据 1231：按**卡片文本**找（id 是内部实现，文本是用户看到的）
+CARD_BY_TEXT() { python3 - "$1" <<'PY' 2>/dev/null
+import json, re, sys
+want = sys.argv[1]
+d = json.load(open('/tmp/vg.json', encoding='utf-8'))
+def b(x):
+    mm=re.findall(r'\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]', x.get('bounds') or '')
+    return tuple(int(v) for v in mm[0]) if mm else None
+r=None
+def w(n):
+    global r
+    if not isinstance(n,dict) or r: return
+    at=n.get('attributes',{})
+    t=(at.get('text') or '').strip()
+    if t == want and b(at):
+        bb=b(at)
+        if bb[1] > 400:
+            r=((bb[0]+bb[2])//2,(bb[1]+bb[3])//2)
+    for c in n.get('children',[]) or []: w(c)
+w(d)
+print('%d %d'%r if r else '')
+PY
+}
 CARD() { python3 - "$1" <<'PY' 2>/dev/null
 import json, re, sys
 want = 'card-' + sys.argv[1]
@@ -107,10 +130,33 @@ print('%d %d'%r if r else '')
 " 2>/dev/null | tr -d '\r\n'; }
 
 echo "════════ ${NAME}（${GID}）════════"
-# ★ 判据 1212：`Back` × 2 会**退出 app**（dump 到系统桌面「联系人」）
-#   ⇒ 只用 **一次** Back（从游戏回首页），再 ensure_ready 兜底
-#   ⚠️ 若已在首页，一次 Back 也可能无事发生 —— 那正是想要的
-A 'uitest uiInput keyEvent Back' >/dev/null 2>&1; sleep 3
+# ★★★ 判据 1235：强制冷启 ⇒ 重置所有 @State（searchOpen/searchText/seg/滚动位置）
+echo "  冷启（重置 @State）…"
+A 'aa force-stop com.andrewoscar.onemore' >/dev/null 2>&1
+sleep 2
+A 'aa start -b com.andrewoscar.onemore -a EntryAbility' >/dev/null 2>&1
+for _t in 3 4 5; do
+  sleep $_t
+  _pv="$(A 'pidof com.andrewoscar.onemore' 2>/dev/null | head -1 | awk '{print $1}')"
+  printf '%s' "$_pv" | grep -qE '^[0-9]+$' && break
+done
+echo "  冷启 pid: [${_pv}]"
+sleep 8
+# ★★★ 判据 1212/1229：`Back` 在**首页**上会**退出 app**
+#   ⇒ 必须先判断当前在哪一页，再决定按不按
+DK
+CUR_PAGE="$(TX)"
+if printf '%s' "$CUR_PAGE" | grep -qE "联系人|拨号|信息|相机"; then
+  echo "  ⚠️ 在**系统桌面** ⇒ 重新启动 app（判据 1229）"
+  A 'aa start -b com.andrewoscar.onemore -a EntryAbility' >/dev/null 2>&1
+  sleep 8
+elif printf '%s' "$CUR_PAGE" | grep -qE "AI 代打|重开|再来一局"; then
+  echo "  在**游戏内** ⇒ 按一次 Back"
+  A 'uitest uiInput keyEvent Back' >/dev/null 2>&1
+  sleep 3
+else
+  echo "  已在**首页** ⇒ 不按 Back（判据 1229）"
+fi
 bash 工具/ensure_ready.sh onemore3 >/dev/null 2>&1
 # ★ 判据 530：启动后必须校验进程活着
 PV="$(A 'pidof com.andrewoscar.onemore' 2>/dev/null | head -1 | awk '{print $1}')"
@@ -137,6 +183,14 @@ if [ -z "$C" ]; then
     SB="$(INPUT)"
     echo "  搜索框 @ (${SB:-无})"
     if [ -n "$SB" ]; then
+      # ★ 判据 1232：`inputText` 是**追加**不是替换 ⇒ 先清空（Backspace × 12）
+      A "uitest uiInput click ${SB}" >/dev/null 2>&1
+      sleep 1
+      for _b in 1 2 3 4 5 6 7 8 9 10 11 12; do
+        A "uitest uiInput keyEvent 2055" >/dev/null 2>&1
+      done
+      sleep 1; DK
+      SB="$(INPUT)"
       A "uitest uiInput inputText ${SB} ${NAME}" >/dev/null 2>&1
       sleep 3; DK
       C="$(CARD "$GID")"
