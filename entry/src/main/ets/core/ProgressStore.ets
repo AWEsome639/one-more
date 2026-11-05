@@ -13,6 +13,7 @@
  * 响应式：状态写进 AppStorage，组件用 @StorageProp/@StorageLink 读
  */
 
+import { HintCost } from './HintCost';
 import { GAME_IDS_BY_CAT } from './GameRegistry';
 import { I18n, toTrad } from './I18n';
 import { Accent } from './Design';
@@ -395,8 +396,17 @@ export class ProgressStore {
 
     // 本款连胜局数（单游戏连胜成就用）—— gs 就是本款刚更新后的连胜
     AppStorage.setOrCreate(Keys.streak, gs);
+    // ★★★ 2026-11-05（第 1393 轮）**「完美」必须同时满足「没用过提示」**
+    //   判据 1314/1315：审计发现提示**完全免费**（355 款 0 款记录次数），
+    //   而部分提示**直接给答案**（「答案是 X」「解集是 X」）⇒ 点一下就能通关。
+    //   而成就「完美主义 💎」原来只看「得分 ≥ 基准 ×10」⇒ 用过提示也能拿。
+    //   ⇒ 现在要求 `hintsUsed === 0`。
+    //   ⚠️ 计数是**局内**的：`take()` 读走并清零，不会串到下一局。
+    const hintsUsed: number = HintCost.take();
+    AppStorage.setOrCreate('lastHintsUsed', hintsUsed);
     // 满分通关：得分达到该局基准的 10 倍以上（各游戏分值口径不同，用相对值判定）
-    if (solved && score > 0 && score >= baseXp * 10) {
+    //   ★ 且这一局**一次提示都没用过**
+    if (solved && score > 0 && score >= baseXp * 10 && hintsUsed === 0) {
       const pc: number = (AppStorage.get<number>('perfectCount') ?? 0) + 1;
       AppStorage.setOrCreate('perfectCount', pc);
       ProgressStore.putNumber('perfectCount', pc);

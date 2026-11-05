@@ -18,6 +18,7 @@ import { Tv } from '../core/Tv';
 import { LanRace } from '../core/LanRace';
 import { TG } from '../core/GameI18n';
 import { FontSize, Space, Radius, Palette } from '../core/Design';
+import { HintCost } from '../core/HintCost';
 
 @Component
 export struct HintBar {
@@ -117,10 +118,14 @@ export struct HintBar {
           .onBlur(() => { if (this.tvFocus === 'L87') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L87'))
           .onKeyEvent((e: KeyEvent) => {
-            Tv.handleKey(e, () => { if (!this.disabled) { this.onHintTap(); } });
+            // ★★★ 2026-11-05（第 1393 轮）**记一笔「用过提示」**（判据 1314/1319）
+            //   这里是 `onHintTap()` 的**两个调用点之一**（键盘）⇒ 覆盖全部 355 款
+            //   计数由 `ProgressStore.finishGame` 在结算时读走并清零
+            Tv.handleKey(e, () => { if (!this.disabled) { HintCost.note(); this.onHintTap(); } });
           })
           .onClick(() => {
-            if (!this.disabled) { this.onHintTap(); }
+            // ★ 另一个调用点（点击）—— 同上
+              if (!this.disabled) { HintCost.note(); this.onHintTap(); }
           })
       }
       if (!this.demoOn) {

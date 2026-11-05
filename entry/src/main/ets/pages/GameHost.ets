@@ -462,6 +462,15 @@ struct GameHost {
   @State lastGain: number = 0;
   /** ★ 本局新解锁的成就（结算面板要展示并庆祝） */
   @State newAch: string[] = [];
+  /**
+   * ★★★ 2026-11-05（第 1393 轮）**本局用过几次提示**
+   *
+   *   判据 1314/1315/1321：审计发现提示**完全免费**，而部分提示**直接给答案**，
+   *   且「完美主义 💎」原来只看得分 ⇒ 点提示也能拿。
+   *   现已由 `HintCost` + `ProgressStore.finishGame` 修正，
+   *   而**成本必须让玩家看见**（判据 1324：在结算时说，不打断操作）。
+   */
+  @State lastHintsUsed: number = 0;
   /** ★ 滚动计数用（0 → 最终值）：直接内联 Text 读它，才能逐帧刷新 */
   @State gainShown: number = 0;
   @State scoreShown: number = 0;
@@ -665,6 +674,8 @@ struct GameHost {
     }, 140);
     // ★ 手感：解锁成就 = 大时刻 ⇒ 三连庆祝（优先于普通通关）
     this.newAch = ProgressStore.lastNewAch;
+    // ★ 第 1393 轮：本局用过几次提示（由 ProgressStore.finishGame 写进 AppStorage）
+    this.lastHintsUsed = AppStorage.get<number>('lastHintsUsed') ?? 0;
     if (r.solved) {
       if (this.levelUpTo > 0 || this.newAch.length > 0) {
         Haptics.celebrate();
@@ -3324,6 +3335,30 @@ struct GameHost {
             //     ⇒ 溢出 17vp ⇒ 「返回列表」被切（与 842 轮那次一模一样的表现）。
             //   ⇒ 同样隐藏。**信息不丢**：升级结果在「统计」页有完整记录（判据 276）。
             .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
+          }
+          // ★★★ 2026-11-05（第 1393 轮）**把「用过提示」的代价说清楚**（判据 1324）
+          //   为什么在这里说而不是点提示时弹窗：
+          //     点提示时弹窗会**打断操作**，而这个代价是"事后"才知道的
+          //     （玩家往往已经用完提示才看到结算）
+          //   为什么只在这一局用过提示时才显示：没用过的人不需要看到这条
+          //   ⚠️ 极小屏隐藏（与成就块同一个理由：结算弹窗比屏幕高，判据 842）
+          if (this.lastHintsUsed > 0) {
+            Row({ space: 6 }) {
+              Text('💡').accessibilityLevel('no').fontSize(FontSize.sm)
+              Text(this.t('本局用了 ' + this.lastHintsUsed + ' 次提示，不计满分',
+                          'Used ' + this.lastHintsUsed + ' hint(s) — not a perfect run'))
+                .fontSize(FontSize.xxs).fontColor(this.theme().inkSoft)
+                .layoutWeight(1).maxLines(2)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+            }
+            .width('100%')
+            .padding({ left: Space.md, right: Space.md, top: 5, bottom: 5 })
+            .backgroundColor('#1464748B')
+            .borderRadius(Radius.sm)
+            .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
+            .scale({ x: this.pop ? 1 : 0.8, y: this.pop ? 1 : 0.8 })
+            .opacity(this.pop ? 1 : 0)
+            .animation({ duration: Motion.base, curve: Motion.snap(), delay: 260 })
           }
 
           // ★ 手感：得分与经验**滚动计数**（从 0 数到最终值）
