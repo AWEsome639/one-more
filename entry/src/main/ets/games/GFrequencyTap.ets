@@ -99,6 +99,27 @@ export struct GFrequencyTap {
     this.hitFlags.push(false);
     this.beatN = this.beatN + 1;
     this.pulse = !this.pulse;
+    // ═════════════════════════════════════════════════════════════════════
+    // ★★★ 2026-11-05（第 1365 轮）**修「代打等于随机」的真 bug**
+    //
+    // 现象（真机实测）：AI 代打跑满 20 拍，命中 **11 拍 = 55%**
+    //
+    // 根因（可复算）：
+    //   · 代打原来只靠 `Hint.autoRun` 每 **`AUTO_MS = 320ms`** 轮询 `autoStep()`
+    //   · 而本游戏节拍周期 **`GAP = 600ms`**、命中窗口 **`HIT_MS = 170ms`**
+    //   · 320 与 600 **无公倍对齐** ⇒ 点击相位会**扫过全部偏移**
+    //     ⇒ 期望命中率 = 2×170/600 = **56.7%**
+    //   · 而实测 11/20 = **55%** ⇒ **代打就是随机敲击**
+    //   · 更糟的是 `AUTO_MS(320) > HIT_MS(170)`
+    //     ⇒ 即使每次都在节拍后立刻 tick，也可能**已经超窗**
+    //
+    // 修法（判据 1045：事件驱动 > 轮询）：
+    //   节拍一响就**立刻**替玩家点一下 ⇒ 此刻误差 ≈ 0ms
+    //   `autoStep()` 只负责「开局 + 保活」，不再盲点
+    // ═════════════════════════════════════════════════════════════════════
+    if (this.autoId >= 0) {
+      this.tap();
+    }
     if (this.beatN >= this.diffTotal) {
       this.clearAll();
       this.endTo = setTimeout(() => { this.endTo = -1; this.judge(); }, GAP + 200);
@@ -188,6 +209,13 @@ export struct GFrequencyTap {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * 代打的一步。
+   * ★★★ 2026-11-05（第 1365 轮，判据 1045）：**点击已交给 `onBeat` 事件驱动**
+   *   原来这里每 tick 都 `tap()` ⇒ 点击频率 = `Hint.AUTO_MS(320)`，
+   *   与节拍 600ms 无公倍对齐 ⇒ 命中率等于随机（实测 55% ≈ 期望 57%）。
+   *   ⇒ 现在这里只做两件事：① `phase === 0` 时开局 ② 保活（返回 true 让 tick 继续）
+   */
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -195,8 +223,11 @@ export struct GFrequencyTap {
     if (this.phase === 2) {
       return true;
     }
-    this.tap();
-    return !this.over;
+    if (this.phase === 0) {
+      this.start();
+      return true;
+    }
+    return true;
   }
 
   // 这款没有"答案格"，只有节拍 ⇒ 提示报节拍间隔与本拍进度
