@@ -129,6 +129,13 @@ export struct GWaterSort {
     return st[t * CAP + k];
   }
 
+  /**
+   * ★ 第 1418 轮：状态的字符串键 —— 供 `pickMove` 的 `visited` 集合用（判据 1619）。
+   */
+  private stKey(st: number[]): string {
+    return st.join(',');
+  }
+
   private topOf(st: number[], t: number): number {
     for (let k = CAP - 1; k >= 0; k--) {
       if (this.at(st, t, k) >= 0) {
@@ -243,13 +250,19 @@ export struct GWaterSort {
   }
 
   /** 贪心求解器：能解出来的牌面才发给玩家 */
-  private pickMove(st: number[]): number {
+  private pickMove(st: number[], visited: Set<string> | null): number {
     let best: number = -1;
     const cand: number[] = [];
     for (let a = 0; a < this.tubeCount(); a++) {
       for (let b = 0; b < this.tubeCount(); b++) {
         if (!this.legal(st, a, b)) {
           continue;
+          }
+          if (visited !== null) {
+            const nxt: number[] = this.poured(st, a, b);
+            if (visited.has(this.stKey(nxt))) {
+              continue;
+            }
         }
         const n: number = this.runTop(st, a);
         const space: number = this.freeOf(st, b);
@@ -278,14 +291,18 @@ export struct GWaterSort {
   private solvable(start: number[]): boolean {
     for (let attempt = 0; attempt < 16; attempt++) {
       let st: number[] = start.slice();
+      // ★ 判据 1619：`solvable` 也走贪心 ⇒ 同样要防往复倒
+      const visited: Set<string> = new Set<string>();
+      visited.add(this.stKey(st));
       let steps: number = 0;
       while (!this.isDone(st) && steps < 160) {
         steps++;
-        const mv: number = this.pickMove(st);
+        const mv: number = this.pickMove(st, visited);
         if (mv < 0) {
           break;
         }
         st = this.poured(st, Math.floor(mv / 100), mv % 100);
+        visited.add(this.stKey(st));
       }
       if (this.isDone(st)) {
         return true;
@@ -454,6 +471,11 @@ export struct GWaterSort {
       this.wsPlan = this.wsPlanGreedy();
       this.wsAt = 0;
       if (this.wsPlan.length === 0) {
+        // ★★★ 判据 1611/1618：**必须清 autoId**
+        //   否则 `Hint.autoRun` 内部停了，而游戏字段仍 >= 0
+        //   ⇒ UI 一直显示「停代打」⇒ 用户以为 AI 在思考，其实早放弃了
+        this.stopAuto();
+        Hint.toast(TG('这一局 AI 没找到解法，请自己来'));
         return false;
       }
     }
@@ -489,15 +511,19 @@ export struct GWaterSort {
     for (let attempt = 0; attempt < 16; attempt++) {
       let st: number[] = this.flat.slice();
       const path: number[] = [];
+      // ★ 判据 1619：**已访问状态** ⇒ 贪心 + 无回访 ⇒ 不往复倒
+      const visited: Set<string> = new Set<string>();
+      visited.add(this.stKey(st));
       let steps: number = 0;
       while (!this.isDone(st) && steps < 200) {
         steps = steps + 1;
-        const mv: number = this.pickMove(st);
+        const mv: number = this.pickMove(st, visited);
         if (mv < 0) {
           break;
         }
         path.push(mv);
         st = this.poured(st, Math.floor(mv / 100), mv % 100);
+        visited.add(this.stKey(st));
       }
       if (this.isDone(st)) {
         return path;
@@ -512,7 +538,7 @@ export struct GWaterSort {
     if (this.over) {
       return Hint.none('none');
     }
-    const mv: number = this.pickMove(this.flat);
+    const mv: number = this.pickMove(this.flat, null);
     if (mv < 0) {
       return Hint.none(TG('倒不动了'));
     }
