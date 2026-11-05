@@ -813,9 +813,32 @@ export class ProgressStore {
   static ensureDaily(allIds: string[]): void {
     const today: string = ProgressStore.today();
     const day: string = AppStorage.get<string>(Keys.dailyGame) ?? '';
-    if (day === today) {
-      return;
-    }
+      // ═══════════════════════════════════════════════════════════════
+      // 2026-11-05（第 1376 轮）**修「dailyPick 空 ⇒ 今日挑战永久消失」（判据 1173/1177）**
+      //
+      // 现象（800×1280 真机）：Home 页**没有今日挑战卡**，而 LV 条在（= 展开态）
+      //   磁盘 pref 只有 **124 字节**、只有 **1 个 key**：
+      //     dailyGame = 2026-11-05
+      //     dailyPick = **不存在**
+      //
+      // 根因（本行以下就是它）：
+      //   早退条件只查 `dailyGame`，不查 `dailyPick`
+      //   ⇒ 只要 dailyGame 被写过一次（哪怕同一次里 dailyPick 写失败/为空）
+      //   ⇒ 之后每次启动都走「已是今天 => 早退」
+      //   ⇒ **dailyPick 永远补不上** ⇒ `dailyMeta()` 永远 undefined
+      //   ⇒ `dailyCard()` / `dailyStrip()` 的守卫**静默跳过** ⇒ 功能消失且无提示
+      //
+      // 而 `dailyGameId()` 在 `allIds.length === 0` 时**返回空串**
+      //   ⇒ 存在「dailyGame 写了、dailyPick 写成空」的合法路径
+      //
+      // 修法：早退条件加一条 **dailyPick 非空** ——
+      //   这就是「完整性检查」：两个字段必须**同时**成立才算已初始化
+      //   ⇒ 若 dailyPick 为空，**继续往下走**，重新挑一局并写盘（自愈）
+      // ═══════════════════════════════════════════════════════════════
+      // 判据 1175：预置/恢复流程要有**完整性检查**，不能只看一个字段
+      if (day === today && ProgressStore.dailyPick().length > 0) {
+        return;
+      }
     const gid: string = ProgressStore.dailyGameId(allIds);
     AppStorage.setOrCreate(Keys.dailyGame, today);
     AppStorage.setOrCreate('dailyPick', gid);
