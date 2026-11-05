@@ -17,7 +17,14 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const TOTAL: number = 24; const FRAME_MS: number = 700; const BLINK_MS: number = 260;
-const FLIP_CHANCE: number = 0.2; const NEED_HIT: number = 5; const MAX_FA: number = 2;
+const FLIP_CHANCE: number = 0.2; // ★★★ 2026-11-05（第 1386 轮）**修「完美操作也可能输」（判据 1262/1263）**
+//   二项分布验算：TOTAL 24 帧 × FLIP_CHANCE 0.20 ⇒ **E[X] = 4.80**、σ = 1.96
+//   而原来 `NEED_HIT = 5` ⇒ **门槛高于期望** ⇒
+//     P(X ≥ 5) = **54.0%** ⇒ **即使每一帧都抓对，通过率也只有一半**
+//   ⇒ 真机实测印证：AI **命中 4/5、误报 0**（把出现的那 4 次全抓住了）
+//     而提示说「漏掉的反转 1 次」—— **其实是「反转只出现了 4 次」**
+//   ⇒ 改成 **4** ⇒ P(X ≥ 4) = **73.6%**（合理：完美操作大多能过）
+const NEED_HIT: number = 4; const MAX_FA: number = 2;
 const A: string = '●'; const B: string = '◆';
 
 @Component
@@ -336,7 +343,24 @@ export struct GAbReversalOddball {
 
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
-      Text(TG2('提示：漏掉的反转 {0} 次 —— 只在连续两次同一个时点才抓对了',Digits(String(this.miss), this.langCode)))
+      // ★★★ 2026-11-05（第 1386 轮）**修「提示文案误导」（判据 1268）**
+      //   原文：「漏掉的反转 {0} 次 —— 只在连续两次同一个时点才抓对了」
+      //   问题：
+      //     ① `miss` 统计的是「翻转出现而没响应」的帧 —— 而**帧数由随机决定**
+      //        ⇒ 一局只刷出 4 次翻转、门槛是 5 ⇒ `miss` 可能为 0 却仍然输
+      //        ⇒ 文案却让玩家以为「是你手慢了」
+      //     ② 「只在连续两次同一个时点才抓对了」是**答非所问**（答的是「怎么抓」，
+      //        而玩家想知道「为什么没过」）
+      //   ⇒ 改成**如实描述两种失败原因**：
+      //      · 翻转出现得不够（随机运气）
+      //      · 翻转出现了但没抓住（手慢）
+      Text(this.over
+        ? TG2('这一局只刷出 {0} 次反转（需 {1} 次）⇒ 没抓住 {2} 次',
+            Digits(String(this.hits + this.miss), this.langCode),
+            Digits(String(NEED_HIT), this.langCode),
+            Digits(String(this.miss), this.langCode))
+        : TG2('提示：这一局会刷出多少反转是随机的；连续两次同一个时点才点', Digits('', this.langCode)))
+        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {
