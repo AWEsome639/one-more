@@ -101,7 +101,7 @@ case "${TAG}" in
 esac
 ER_SH="$(dirname "$0")/ensure_ready.sh"
 if [ -n "$ER_INST" ] && [ -f "$ER_SH" ]; then
-  echo "  ①' 按层就绪（ensure_ready.sh $ER_INST）—— 判据 1002/1003"
+  echo "  ①' 按层就绪（ensure_ready.sh ${ER_INST}）—— 判据 1002/1003"
   bash "$ER_SH" "$ER_INST" 2>&1 | tail -3 | sed 's/^/     /' || true
 fi
 
