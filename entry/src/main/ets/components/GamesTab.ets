@@ -867,22 +867,15 @@ build() {
           // ★ 展开筛选时收起下面的卡片：面板较高，不收起来会把计数行与网格挤出屏幕
           this.tagPanel()
         } else {
-          // ★★★ 2026-10-29（六设备实测）：智慧屏只有 540vp 高，
-          //   这两块会把游戏列表挤到看不见（而且整页不滚动）⇒ 矮屏时收起。
-          //   列表与分类芯片保留 —— 那才是首页的主体。
-          // ★ 搜索态下也收起（理由同上：让列表有空间）
-          // ★★★ 2026-11-05（第 1371 轮）**修「今日挑战在 2/6 设备上不可达」**
-          //   矮屏原来整块拿掉 ⇒ 853×533 / 960×540 上**看不到今日挑战**（核心功能丢失）
-          //   而整卡又放不下（实测：268vp 卡区 − 148vp 双卡 = 120vp < 单卡 126vp ⇒ 0 行）
-          //   ⇒ 矮屏改走 **dailyStrip()（40vp 单行）**：功能在、列表也还在 1 行
-          //   ⇒ `randomCard()` 在矮屏**仍然不显示**（它是"消遣"，不是核心）
-          if (!this.searchOpen) {
-            if (Bp.isShort()) {
-              this.dailyStrip()
-            } else {
-              this.dailyCard()
-              this.randomCard()
-            }
+          // 2026-11-05（第 1373 轮）**真正的根因**：
+          //   这里（块 A）整块带 `.visibility(effCollapsed() ? None : Visible)`
+          //   而 `Bp.isShort()`（高 < 690）在 `aboutToAppear` 就把 `topCollapsed` 置 true
+          //   => **853x533 / 960x540 / 所有矮屏默认都是收起态** => 块 A 整块移除布局
+          //   => 所以第 1371 轮把 `dailyStrip()` 放在这里 **等于没修**（判据 1162）
+          //   => 现在：日卡只在**展开态**放在这里；收起态的那一份在 `collapsedBar()` 之后
+          if (!this.searchOpen && !this.effCollapsed()) {
+            this.dailyCard()
+            this.randomCard()
           }
         }
         if (!Bp.tinyScreen() && !this.searchOpen) {
@@ -981,6 +974,28 @@ build() {
       //   加上页签 36 + 顶栏 30 + 计数行 25 ⇒ 列表只剩 ~60vp < 卡片 ⇒ 一张都看不到
       if (!Bp.tinyScreen()) {
         this.collapsedBar()
+      }
+
+      // ═══════════════════════════════════════════════════════════
+      // 2026-11-05（第 1373 轮）**修「今日挑战在收起态完全不可达」（真根因）**
+      //
+      // 为什么必须放在这里（而不是块 A 里）：
+      //   块 A（topBar + LV 条 + 筛选 + 页签 + 分类 + 整张日卡）整块带
+      //     `.visibility(this.effCollapsed() ? Visibility.None : Visibility.Visible)`
+      //   而 `Bp.isShort()`（高 < 690）在 `aboutToAppear` 就把 `topCollapsed` 置 true
+      //   => **853x533(533) / 960x540(540) 默认都是收起态** => 块 A 整块移除布局
+      //   => 所以第 1371 轮把 `dailyStrip()` 放进块 A **等于没修**（判据 1162）
+      //
+      // 实测依据（真机 dump / 冷启 3 次稳定复现）：
+      //   960：Circle 0（levelStrip 的圆点没有）｜无「今天这一局」｜只有「展开」开关
+      //   853：Circle 1 + 日卡（**偶然**被滚动的滞回逻辑改回展开态才有）
+      //
+      // 高度预算（40vp 单行，判据 1090：矮屏降级 = 更紧凑的同一形态）：
+      //   960x540：卡区原 268vp -> 228vp => 仍放得下 1 行卡（单卡 126vp）
+      //   极小屏（< 340）与手表不显示 —— 它们连 LV 条都没有，日卡更放不下
+      // ═══════════════════════════════════════════════════════════
+      if (this.effCollapsed() && !Bp.tinyScreen() && !Bp.isWatch() && !this.searchOpen) {
+        this.dailyStrip()
       }
 
       if (this.list().length === 0) {
