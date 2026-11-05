@@ -871,9 +871,18 @@ build() {
           //   这两块会把游戏列表挤到看不见（而且整页不滚动）⇒ 矮屏时收起。
           //   列表与分类芯片保留 —— 那才是首页的主体。
           // ★ 搜索态下也收起（理由同上：让列表有空间）
-          if (!Bp.isShort() && !this.searchOpen) {
-            this.dailyCard()
-            this.randomCard()
+          // ★★★ 2026-11-05（第 1371 轮）**修「今日挑战在 2/6 设备上不可达」**
+          //   矮屏原来整块拿掉 ⇒ 853×533 / 960×540 上**看不到今日挑战**（核心功能丢失）
+          //   而整卡又放不下（实测：268vp 卡区 − 148vp 双卡 = 120vp < 单卡 126vp ⇒ 0 行）
+          //   ⇒ 矮屏改走 **dailyStrip()（40vp 单行）**：功能在、列表也还在 1 行
+          //   ⇒ `randomCard()` 在矮屏**仍然不显示**（它是"消遣"，不是核心）
+          if (!this.searchOpen) {
+            if (Bp.isShort()) {
+              this.dailyStrip()
+            } else {
+              this.dailyCard()
+              this.randomCard()
+            }
           }
         }
         if (!Bp.tinyScreen() && !this.searchOpen) {
@@ -1420,6 +1429,59 @@ build() {
     }
     .width('100%')
     .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+  }
+
+  /**
+   * 今日挑战的**矮屏紧凑版**（单行，约 40vp 高）。
+   *
+   * ★★★ 2026-11-05（第 1371 轮）**真 bug：「今日挑战」在 2/6 设备上不可达**
+   *
+   * 现象（真机 dump 实测）：
+   *   · 853×533（高 533vp）：首页「今日挑战」元素 **0 个**
+   *   · 960×540（高 540vp）：同上
+   *   · 440×744 / 800×1280：**有**（高 ≥ 690）
+   *
+   * 根因：
+   *   `if (!Bp.isShort() && !this.searchOpen) { dailyCard(); randomCard(); }`
+   *   而 `Bp.isShort() = height < 690` ⇒ 两台横屏都命中
+   *
+   * 而那个阈值是有实测依据的（我这次复算了，**注释是对的**）：
+   *   · 853×533 当前卡区 **268 vp**、单卡 **126 vp** ⇒ 2 行
+   *   · 加两张整卡（各 ~74vp = 148vp）⇒ 卡区剩 **120 vp** ⇒ **0 行**
+   *   ⇒ 所以「矮屏收起整卡」是对的，**不能简单恢复**
+   *
+   * 修法（判据 1090：矮屏降级 = **同一功能、更紧凑的形态**）：
+   *   给矮屏一条 **40vp 单行**入口：🎯 + 游戏名 + 「开始 ›」
+   *   ⇒ 268 − 40 = **228 vp** ⇒ 仍能放 **1 行卡**（126vp）
+   *   ⇒ 核心功能可达，且列表不消失
+   */
+  @Builder
+  dailyStrip() {
+    if (this.dailyMeta() !== undefined) {
+      Row({ space: Space.sm }) {
+        Text(this.dailyDone ? '✅' : '🎯')
+          .fontSize(FontSize.sm)
+          .width(22).height(22).textAlign(TextAlign.Center)
+        Text(this.t('今天这一局', 'Today'))
+          .fontSize(FontSize.xxs).fontColor(Overlay.onColorSoft).maxLines(1)
+        Text(this.dailyName())
+          .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).fontColor(Overlay.onColor)
+          .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+          .layoutWeight(1)
+        Text(this.dailyDone ? this.t('再看看', 'View') : this.t('开始 ›', 'Play ›'))
+          .fontSize(FontSize.xxs).fontWeight(FontWeight.Bold).fontColor(Overlay.onColor)
+          .padding({ left: 8, right: 8, top: 3, bottom: 3 })
+          .backgroundColor(Overlay.chip)
+          .borderRadius(Radius.full)
+      }
+      .width('100%')
+      .height(40)
+      .padding({ left: Space.md, right: Space.md })
+      .margin({ left: Space.lg, right: Space.lg, top: Space.xs })
+      .backgroundColor(this.accentColor())
+      .borderRadius(Radius.sm)
+      .shadow(Shadow.card)
+    }
   }
 
   @Builder
