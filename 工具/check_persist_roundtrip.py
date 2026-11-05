@@ -138,6 +138,16 @@ static toggleFavorite(id) {
 
     missing = sorted(writes - restores - getsonly)
     readonly = sorted((writes & getsonly) - restores)
+    # ★★★ 2026-11-05（第 1354 轮，判据 949）：**已知误报白名单**
+    #   `lang` / `accent` 走的是**另一条状态层**：
+    #     · `lang`   → `I18n.set(savedLang)`（I18n 自己持有语言状态）
+    #     · `accent` → `Accent.set(savedAccent)`（Accent 自己持有主题色）
+    #   ⇒ 它们**不是 AppStorage 键** ⇒ 不需要 `setOrCreate` 恢复
+    #   ⇒ 报「缺口」是误报，**必须显式白名单**
+    #   ⚠️ 检查器若永远红着，就失去信号价值 —— 白名单要「显式 + 带理由」
+    OTHER_LAYER_OK = {'lang', 'accent'}
+    readonly = [k for k in readonly if k not in OTHER_LAYER_OK]
+    missing = [k for k in missing if k not in OTHER_LAYER_OK]
 
     if missing:
         print('  🔴 **写了但 init 完全没碰（重启即失）: %d 个**' % len(missing))
