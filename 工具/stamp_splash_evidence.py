@@ -152,6 +152,32 @@ def main():
         print('  ✅ %s' % os.path.basename(rel))
     with io.open(MANIFEST, 'w', encoding='utf-8') as f:
         for e in by_file.values():
+            # ★★★ 2026-11-05（第 1357 轮，判据 959/960）：**拒绝「比 HAP 旧」的截图**
+            #   实证：`853×533` 那台启动失败被跳过，脚本仍把 **Nov 4 的旧图**拿去盖章
+            #     ⇒ 旧图（修前拍的 OM 未对齐）被绑上**当前源码哈希**
+            #     ⇒ **证据撒谎**：它证明不了当前这版
+            #   ⇒ 判据：盖章前必须核对 `mtime(截图) >= mtime(HAP)`，
+            #     **更旧直接拒绝**（不静默放行）
+            try:
+                _hap_m = os.path.getmtime(hap_path) if 'hap_path' in dir() else 0.0
+            except Exception:
+                _hap_m = 0.0
+            if _hap_m > 0:
+                _fresh, _stale = [], []
+                for f in fps:
+                    try:
+                        if os.path.getmtime(f) + 1.0 < _hap_m:
+                            _stale.append(f)
+                        else:
+                            _fresh.append(f)
+                    except Exception:
+                        pass
+                if _stale:
+                    print('  🔴 **拒绝盖章（比 HAP 旧，证明不了当前这版）**：')
+                    for f in _stale:
+                        print('      %s' % f)
+                    print('  ⇒ 请重拍这些尺寸后再盖章')
+                fps = _fresh
             f.write(json.dumps(e, ensure_ascii=False) + '\n')
     print()
     print('  已绑到 **Splash.ets** sha256=%s…' % sh[:16])

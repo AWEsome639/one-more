@@ -91,13 +91,28 @@ p='/tmp/_saod.png'
 print(Image.open(p).height if (os.path.exists(p) and os.path.getsize(p)>2000) else 585)
 " 2>/dev/null | tr -d '\r\n')
 CX=$((W/2))
-Y0=$(( H * 95 / 100 ))
+# ★★★ 2026-11-05（第 1358 轮，判据 968）：**解锁起点必须落在「底部指示条」上**
+#   实证：`onemore`（2560×1600 横屏）锁屏截图的指示条在 **y ≈ 1568 = 98% 屏高**
+#     ⇒ 而原公式 `H*95/100 = 1520` **落在指示条上方的空白处**
+#     ⇒ 手势被当普通滑动 ⇒ **解锁失败** ⇒ `aa start` 报 10106102
+#   修法：
+#     ① 起点取 **98%**（指示条实测位置）
+#     ② 保留 95% 作为**第二次尝试**（不同实例的指示条位置略有差异）
+#     ③ 每次尝试都**重新截图判断是否还在锁屏**，成功即停
+Y0=$(( H * 98 / 100 ))
 Y1=$(( H * 30 / 100 ))
 log "③ swipe 解锁（${W}x${H}）：${CX} ${Y0} → ${CX} ${Y1}"
-for k in 1 2 3; do
+# ★ 判据 968：两档起点各试一次（98% 与 95%），每次都验「还在不在锁屏」
+LOCKW='锁屏|请输入密码|向上滑动|无服务'
+for k in 1 2 3 4; do
+  if [ "$k" -le 2 ]; then
+    SY=$Y0                                   # 第 1~2 次：98%（指示条实测位置）
+  else
+    SY=$(( H * 95 / 100 ))                   # 第 3~4 次：95%（旧公式兜底）
+  fi
   A "power-shell wakeup" >/dev/null 2>&1
-  A "uitest uiInput swipe ${CX} ${Y0} ${CX} ${Y1} 120" >/dev/null 2>&1
-  sleep 1
+  A "uitest uiInput swipe ${CX} ${SY} ${CX} ${Y1} 120" >/dev/null 2>&1
+  sleep 2
 done
 
 # ── ④ 校验「已到桌面」──
@@ -165,6 +180,13 @@ for t in 2 3 3 4 5 6; do
   printf '%s' "$PID" | grep -qE '^[0-9]+$' && break
 done
 if ! printf '%s' "$PID" | grep -qE '^[0-9]+$'; then
+  # ★ 判据 966：失败时把 `aa start` 的**错误码**打出来
+  AR=$(A 'aa start -b com.andrewoscar.onemore -a EntryAbility' 2>&1 | tr -d '\r')
+  log "   aa start 回执: ${AR}" | head -1
+  case "$AR" in
+    *10106102*) log "   ⇒ **屏幕锁着**（判据 966：错误码已明说）⇒ 解锁手势无效" ;;
+    *'not installed'*|*'failed to install'*) log "   ⇒ **app 未安装** ⇒ 先 install" ;;
+  esac
   log "🔴 app 启动失败（pidof: $(printf '%s' "$PID" | cut -c1-40)）"
   log "   ⇒ 判据 804：失败时显示 NOT_RUNNING，不是把错误串当 PID"
   exit 3
