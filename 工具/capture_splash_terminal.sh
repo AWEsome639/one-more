@@ -85,7 +85,9 @@ rm -f "$TMP"/scan_*.png
 A "aa force-stop com.andrewoscar.onemore" >/dev/null 2>&1
 sleep 1
 A "aa start -b com.andrewoscar.onemore -a EntryAbility" >/dev/null 2>&1
-SCAN_N=60
+# ★ 判据 1018：**紧贴 `aa start` 开始扫**（原来有 `sleep 1`，会错过前 1 秒）
+#   且**总时长 ≤ 8s**（26 帧 × 0.3s），而不是 18s
+SCAN_N=26
 for i in $(seq -w 1 $SCAN_N); do
   # ★ 判据 1016：`-h 0` 非法（`error: width W height 0 invalid!`）⇒ **显式算高度**
   #   按 TAG 的宽高比算：SCANH = SCANW × (H/W)
