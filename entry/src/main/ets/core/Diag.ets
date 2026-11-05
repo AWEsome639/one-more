@@ -39,7 +39,7 @@ export class Diag {
    *
    * ⚠️ 默认关：只在需要复算时序时打开。
    */
-  static readonly splashTiming: boolean = true;
+  static readonly splashTiming: boolean = false;
 
   /**
    * **强制启用右键菜单**（临时验证用）
