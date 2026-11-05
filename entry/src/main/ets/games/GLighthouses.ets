@@ -526,9 +526,64 @@ export struct GLighthouses {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    // ★ 判据 1690：853×533 横屏上内容比 533vp 高，底部按钮行被挤出屏幕 ⇒ 套 Scroll
+    Scroll() {
+    Column({ space: Space.sm }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      Row({ space: Space.sm }) {
+        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.violet)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(Cell.of(44))
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L615'; })
+          .onBlur(() => { if (this.tvFocus === 'L615') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L615'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+          .onClick(() => {
+            Haptics.tap();
+            this.reset();
+          })
+        Button(TG('提示'))
+          .layoutWeight(1)
+          .height(Cell.of(38))
+          // ★★★ 2026-10-31：这个按钮原来**没有任何 backgroundColor** ⇒
+          //   用 ArkUI 平台默认色（蓝），与全项目 339 款 HintBar 的 Palette.cyan 不一致。
+          //   ⇒ 补上，与其他提示按钮统一。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L630'; })
+          .onBlur(() => { if (this.tvFocus === 'L630') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L630'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
+          .onClick(() => {
+            this.askHint();
+          })
+        Button(LanRace.isRacing() ? TG('联机禁用')
+          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
+          .layoutWeight(1)
+          .height(Cell.of(38))
+          // ★★★ 2026-10-31：原来**没有 backgroundColor** ⇒ 用平台默认蓝，与 HintBar 的 cyan 不一致
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
+                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
+          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
+          .enabled(!LanRace.isRacing())
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L646'; })
+          .onBlur(() => { if (this.tvFocus === 'L646') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L646'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
+          .onClick(() => {
+            this.askAuto();
+          })
+      }
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -607,59 +662,6 @@ export struct GLighthouses {
         .fontColor(this.theme.inkFaint)
 
 
-      Row({ space: Space.sm }) {
-        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
-        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.violet)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(Cell.of(44))
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L615'; })
-          .onBlur(() => { if (this.tvFocus === 'L615') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L615'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
-        Button(TG('提示'))
-          .layoutWeight(1)
-          .height(Cell.of(38))
-          // ★★★ 2026-10-31：这个按钮原来**没有任何 backgroundColor** ⇒
-          //   用 ArkUI 平台默认色（蓝），与全项目 339 款 HintBar 的 Palette.cyan 不一致。
-          //   ⇒ 补上，与其他提示按钮统一。
-          .backgroundColor(Palette.cyan)
-          .fontColor('#FFFFFF')
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L630'; })
-          .onBlur(() => { if (this.tvFocus === 'L630') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L630'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
-          .onClick(() => {
-            this.askHint();
-          })
-        Button(LanRace.isRacing() ? TG('联机禁用')
-          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
-          .layoutWeight(1)
-          .height(Cell.of(38))
-          // ★★★ 2026-10-31：原来**没有 backgroundColor** ⇒ 用平台默认蓝，与 HintBar 的 cyan 不一致
-          .backgroundColor(Palette.cyan)
-          .fontColor('#FFFFFF')
-                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
-          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
-          .enabled(!LanRace.isRacing())
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L646'; })
-          .onBlur(() => { if (this.tvFocus === 'L646') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L646'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
-          .onClick(() => {
-            this.askAuto();
-          })
-      }
       .width('100%')
     }
     .onTouch((e: TouchEvent) => {
@@ -667,8 +669,11 @@ export struct GLighthouses {
       if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
     })
     .width('100%')
-    .height('100%')
     .justifyContent(FlexAlign.Start)
+    }
+    .width('100%')
+    .height('100%')
+    .scrollBar(BarState.Off)
   }
 
 

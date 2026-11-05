@@ -274,8 +274,20 @@ export struct GExponentTower {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    // ★ 判据 1690：853×533 横屏上内容比 533vp 高，底部 HintBar/按钮被挤出屏幕
+    //   （实测 dump 最大 y=1600，A/B/C 选项已到屏幕底）⇒ 套 Scroll，保证按钮可达
+    Scroll() {
+    Column({ space: Space.sm }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        demoOn: false,
+        disabled: this.demoId >= 0,
+        autoOn: this.autoId >= 0
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -297,7 +309,7 @@ export struct GExponentTower {
         Text('🔢').fontSize(FontSize.xxl)
           .accessibilityLevel('no')
         Text(String(this.a) + ' ^ ( ' + String(this.b) + ' ^ ' + String(this.c) + ' )')
-          .fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.cyan)
+          .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.cyan)
         Text('= ?')          // ★ 2026-11-03（第 1119 轮）**装饰性元素从无障碍树摘掉**
           //   「= ?」是题目版式的一部分（题目本身由 q 表达），
           //   读屏念「等于问号」只是噪音 ⇒ accessibilityLevel('no')
@@ -309,7 +321,7 @@ export struct GExponentTower {
           Row({ space: Space.sm }) {
             Text(LETTERS[i]).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
             Text(String(this.opts[i])).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
-          }.width('100%').height(Cell.of(48)).padding({ left: Space.md, right: Space.md })
+          }.width('100%').height(Cell.of(42)).padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L311'; })
@@ -322,15 +334,6 @@ export struct GExponentTower {
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
-      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        demoOn: false,
-        disabled: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.cyan)
@@ -343,7 +346,10 @@ export struct GExponentTower {
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
       if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
+    }).width('100%').justifyContent(FlexAlign.Start)
+    }
+    .width('100%').height('100%')
+    .scrollBar(BarState.Off)
   }
 
 

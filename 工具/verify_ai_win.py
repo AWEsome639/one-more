@@ -443,19 +443,29 @@ def _input_text(ti, name):
     ★ 为什么必须回读：`uitest uiInput inputText` 偶发丢字（输入法建议框抢焦点）。
       旧版不校验，表现就是「进不去游戏」——错在输入，锅却记给游戏。
     """
+    # ★ 判据 1688：`inputText` 遇到**空格会截断**（实测「AB 反转」只进了「AB」）
+    #   ⇒ 含空格的名字再试一个「去空格」变体（搜索本身是模糊匹配）
+    # ★ 判据 1691：列表搜索按**词**匹配 —— 实测「AB反转」0 结果、「反转」命中
+    #   含空格的名字**先试尾词**（命中率最高）；卡片定位仍用完整名字，不会进错游戏
+    variants = []
+    if ' ' in name:
+        variants.append(name.split()[-1])
+        variants.append(name.replace(' ', ''))
+    variants.append(name)
     for attempt in (1, 2):
-        tap(ti, 1.0)
-        _clear_input(name)
-        cx, cy = center(ti)
-        sh("uitest uiInput inputText %d %d %s" % (cx, cy, name))
-        time.sleep(0.6)
-        d = dump()
-        got = ''
-        if d:
-            ti2 = _text_input(nodes(d))
-            got = ti2['text'] if ti2 else ''
-        if _norm(name) and _norm(name) in _norm(got):
-            return True
+        for q in variants:
+            tap(ti, 1.0)
+            _clear_input(name)
+            cx, cy = center(ti)
+            sh("uitest uiInput inputText %d %d %s" % (cx, cy, q))
+            time.sleep(0.6)
+            d = dump()
+            got = ''
+            if d:
+                ti2 = _text_input(nodes(d))
+                got = ti2['text'] if ti2 else ''
+            if _norm(q) and _norm(q) in _norm(got):
+                return True
         if attempt == 1:
             print('   ⚠️ 搜索词没进输入框（回读=%r），再输一次…' % got[:40], flush=True)
     return False
@@ -534,12 +544,18 @@ def open_game(name):
 
 
 def stop_demo():
-    """demo 3 秒后启动；点屏幕空白停掉它（判据 1667）"""
+    """demo 3 秒后启动；点屏幕空白停掉它（判据 1667/1689）。
+
+    ★ 判据 1689：演示期间 HintBar 的 AI 按钮**整个不渲染**（HintBar.ets `if (!this.demoOn)`）
+      ⇒ 只点一次标题区不够稳（有的游戏根容器 onTouch 在棋盘上）
+      ⇒ 点屏幕中心 + 顶部各一次，再给 1.5s 让 demoId 归零
+    """
     _BUDGET.check()
     time.sleep(3.5)
-    # 点顶部标题区（非按钮、非棋盘）
+    sh("uitest uiInput click 1280 800")
+    time.sleep(1.0)
     sh("uitest uiInput click 1280 220")
-    time.sleep(1.2)
+    time.sleep(1.5)
 
 
 def read_readouts(ns):
@@ -630,7 +646,9 @@ def verify(name):
     stop_demo()
     # ★ 判据 1672：页面/演示过渡时按钮可能还没渲染 ⇒ 找 AI 代打必须**重试**
     ai = None
-    for _ in range(4):
+    # ★ 判据 1689：演示最长约 10s（5 拍），期间 HintBar 按钮**整个不渲染**
+    #   ⇒ 重试 6 次 × 2s，别在演示中途就判「找不到按钮」
+    for _ in range(6):
         _BUDGET.check()
         d = dump()
         ns = nodes(d) if d else []
