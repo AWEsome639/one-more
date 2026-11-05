@@ -84,6 +84,12 @@ export struct GAbReversalOddball {
     let next: string = last === A ? B : A;
     if (Math.random() < FLIP_CHANCE) { next = last; }
     this.flip = next === last; this.sym = next; this.resp = false; this.frame = this.frame + 1;
+    // ★★★ 2026-11-05（第 1366 轮，判据 1055/1056）：**翻转一发生就立刻响应**
+    //   翻转窗口 BLINK_MS = 260ms < 代打轮询 AUTO_MS = 320ms
+    //   ⇒ 轮询可能一次都碰不到 ⇒ 在这里事件驱动
+    if (this.flip && this.autoId >= 0 && !this.resp) {
+      this.tapFlip();
+    }
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
@@ -169,15 +175,23 @@ export struct GAbReversalOddball {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * 代打的一步。
+   * ★★★ 2026-11-05（第 1366 轮，判据 1055/1058）：**点击已交给 `tick()` 事件驱动**
+   *
+   * 为什么删掉这里的 `tapFlip()`：
+   *   · 翻转窗口 `BLINK_MS = 260ms`，而代打轮询 `AUTO_MS = 320ms`
+   *     ⇒ **320 > 260** ⇒ 轮询**可能一次都碰不到**
+   *   · 已在 `tick()` 里加了「翻转一发生就立刻响应」
+   *   · 轮询再点虽然被 `if (this.resp) return;` 挡住（无害），
+   *     但**白跑一次**、且让「谁负责响应」变得模糊
+   *   ⇒ 只保活
+   */
   private autoStep(): boolean {
     if (this.over) {
       return false;
     }
-    if (!this.flip || this.resp) {
-      return true;
-    }
-    this.tapFlip();
-    return !this.over;
+    return true;
   }
 
   private computeHint(): HintResult {

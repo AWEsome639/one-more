@@ -89,6 +89,20 @@ export struct GBlinkDetector {
 
   private openBlink(): void {
     this.eye = true; this.responded = false;
+    // ═════════════════════════════════════════════════════════════════════
+    // ★★★ 2026-11-05（第 1366 轮，判据 1043/1055/1056）：**修「代打可能完全错过眨眼」**
+    //
+    // 根因（可复算）：
+    //   · 眨眼窗口 `BLINK_MS = 200ms`
+    //   · 而代打靠 `Hint.autoRun` 每 `AUTO_MS = 320ms` 轮询一次
+    //   · **320 > 200** ⇒ 一次眨眼可能**一次都没被采样到** ⇒ 必 miss
+    //
+    // 修法（判据 1056）：**在事件产生的那一行之后，立刻替玩家响应**
+    //   ⛔ 不改轮询频率（那是全局的，会影响 355 款）
+    // ═════════════════════════════════════════════════════════════════════
+    if (this.autoId >= 0) {
+      this.tap();
+    }
     if (this.blinkTo >= 0) { clearTimeout(this.blinkTo); }
     this.blinkTo = setTimeout(() => { this.blinkTo = -1; this.eye = false; }, BLINK_MS);
   }
@@ -176,15 +190,25 @@ export struct GBlinkDetector {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * 代打的一步。
+   * ★★★ 2026-11-05（第 1366 轮，判据 1055/1058）：**点击已交给 `openBlink` 事件驱动**
+   *
+   * 为什么必须删掉这里的 `tap()`：
+   *   · 眨眼窗口 `BLINK_MS = 200ms`，而代打轮询 `AUTO_MS = 320ms`
+   *     ⇒ **320 > 200** ⇒ 轮询**结构上可能一次都碰不到**
+   *   · 已在 `openBlink()` 里加了「事件驱动响应」（眨眼一出现就点，误差 ≈ 0）
+   *   · 而 `tap()` 的实现是：
+   *       `if (this.eye && !this.responded) { 命中 } else { **误报 +1** }`
+   *     ⇒ 事件响应把 `responded` 置 true 后，
+   *       **轮询再点一次就会落到 else ⇒ 命中被变成误报**（判据 1058）
+   *   ⇒ 所以这里**只保活**，绝不再点
+   */
   private autoStep(): boolean {
     if (this.over) {
       return false;
     }
-    if (!this.eye || this.responded) {
-      return true;
-    }
-    this.tap();
-    return !this.over;
+    return true;
   }
 
   /** 下一次眨眼还有几拍（-1 = 本局不再眨眼） */
