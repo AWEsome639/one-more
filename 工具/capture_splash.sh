@@ -79,6 +79,32 @@ INST=$(timeout 900 ${HC} -t 127.0.0.1:5555 install -r "${HAP}" 2>&1 | tr -d '\r'
 [ "${INST}" = "0" ] && { echo "🔴 装包失败"; exit 1; }
 echo "  装包 OK"
 
+
+# ★★★ 2026-11-05（第 1361 轮，判据 1002/1003）：**先跑「按层就绪」再抓帧**
+#
+#   实证：`onemore3` 曾被 `bm clean -d` 清过数据
+#     ⇒ 每次启动都要过**隐私卡 + 引导页**
+#     ⇒ 若只做「解锁」不做「关弹窗」⇒ **弹窗盖住 ⇒ 点击全被吃掉**
+#     ⇒ 而这已经是**第四次**同类失败（第 1350/1351/1352/1353 轮）
+#
+#   ⇒ 修法：把 `ensure_ready.sh` **内建**进本脚本
+#     它负责：开屏 boost → 关隐私卡 → 关引导页 → 确认到桌面/首页
+#     ⚠️ 若 ensure_ready 不可用（文件缺失），退化为「跳过」而不是报错
+case "${TAG}" in
+  853x533)  ER_INST=onemore  ;;
+  800x1280) ER_INST=onemore2 ;;
+  440x744)  ER_INST=onemore3 ;;
+  233x233)  ER_INST=onemore4 ;;
+  960x540)  ER_INST=onemore5 ;;
+  195x195)  ER_INST=onemore6 ;;
+  *)        ER_INST=""       ;;
+esac
+ER_SH="$(dirname "$0")/ensure_ready.sh"
+if [ -n "$ER_INST" ] && [ -f "$ER_SH" ]; then
+  echo "  ①' 按层就绪（ensure_ready.sh $ER_INST）—— 判据 1002/1003"
+  bash "$ER_SH" "$ER_INST" 2>&1 | tail -3 | sed 's/^/     /' || true
+fi
+
 # ★ force-stop 并确认进程死透（★ 关键：这是之前反复漏的一步）
 timeout 20 ${HC} -t 127.0.0.1:5555 shell "aa force-stop com.andrewoscar.onemore" >/dev/null 2>&1
 DEAD=0
