@@ -269,8 +269,13 @@ export struct GBubbleShooter {
     if (this.over) {
       return false;
     }
-    if (this.over || this.bestCol() < 0) {
-      return true;
+    if (this.bestCol() < 0) {
+      // ★ 判据 1674：墙堆到顶 ⇒ 没有列能落 ⇒ 本局死局，必须判失败（否则 autoRun 永久空转）
+      this.over = true;
+      this.won = false;
+      this.msg = TG('墙堆到顶，没地方落了');
+      this.finish(false);
+      return false;
     }
     this.fire(this.bestCol());
     return !this.over;

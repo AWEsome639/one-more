@@ -52,6 +52,7 @@ export struct GDirectionsRecall {
   @State private score: number = 0;
   @State private note: string = '';
   private startAt: number = 0;
+  private over: boolean = false;
   private timers: number[] = [];
 
   aboutToAppear(): void {
@@ -74,6 +75,7 @@ export struct GDirectionsRecall {
     this.clearTimers();
     this.round = 0; this.wins = 0; this.score = 0; this.note = '';
     this.startAt = Date.now();
+    this.over = false;
     this.show(0);
   }
 
@@ -179,7 +181,7 @@ export struct GDirectionsRecall {
   }
 
   private autoStep(): boolean {
-    if (this.phase === 'done') {
+    if (this.over) {
       return false;
     }
     if (this.phase !== 'input') {
@@ -247,6 +249,7 @@ export struct GDirectionsRecall {
   private nextRound(): void {
     this.phase = 'done';
     if (this.round + 1 >= ROUNDS.length) {
+      this.over = true;
       LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
       this.onFinish({
         gameId: 'directions_recall', solved: this.wins >= this.diffTotal,

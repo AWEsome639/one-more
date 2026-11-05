@@ -1,0 +1,38 @@
+{"name": "倒水排序", "verdict": "FAIL", "detail": "回不到列表"}
+{"name": "倒水排序", "verdict": "WIN", "detail": "结算出现 · 读数={'归位': '5/4', '步数': '14', '得分': '13.4s'}"}
+{"name": "8", "verdict": "FAIL", "detail": "进不去游戏"}
+{"name": "方向回忆", "verdict": "FAIL", "detail": "进错游戏"}
+{"name": "方向回忆", "verdict": "FAIL", "detail": "进错游戏（无 AI 代打按钮）"}
+{"name": "方向回忆", "verdict": "FAIL", "detail": "进不去游戏"}
+{"name": "方向回忆", "verdict": "FAIL", "detail": "进不去游戏"}
+{"name": "方向回忆", "verdict": "TIMEOUT", "detail": "读数={} 步数历史=['']"}
+{"name": "方向回忆", "verdict": "TIMEOUT", "detail": "读数={} 步数历史=['']"}
+{"name": "方向回忆", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '28.7s'}"}
+{"name": "蜘蛛纸牌", "verdict": "TIMEOUT", "detail": "读数={'步数': '78'} 步数历史=['', '17', '25', '34', '42', '50', '57', '65', '7', '73', '78']"}
+{"name": "跳棋", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '25.3s'}"}
+{"name": "四子棋", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '7.8s'}"}
+{"name": "双重麻烦", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '9.5s'}"}
+{"name": "黑白和", "verdict": "WIN", "detail": "结算出现 · 读数={'步数': '10', '得分': '7.4s'}"}
+{"name": "明灯", "verdict": "TIMEOUT", "detail": "读数={} 步数历史=['']"}
+{"name": "塔帕", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '7.6s'}"}
+{"name": "灯塔", "verdict": "FAIL", "detail": "找不到 AI 代打"}
+{"name": "幻方", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '12.4s'}"}
+{"name": "指数塔", "verdict": "FAIL", "detail": "找不到 AI 代打"}
+{"name": "向量对齐", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '9.9s'}"}
+{"name": "素数间隔", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '14.8s'}"}
+{"name": "注意瞬脱", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '27.5s'}"}
+{"name": "数牌记忆", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '44.7s'}"}
+{"name": "倒背数字", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '37.8s'}"}
+{"name": "频率点击", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '13.1s'}"}
+{"name": "同音词", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '8.3s'}"}
+{"name": "谜语字谜", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '7.0s'}"}
+{"name": "密文破译", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '8.0s'}"}
+{"name": "字母划消", "verdict": "WIN", "detail": "结算出现 · 读数={'得分': '14.4s'}"}
+{"name": "三重序列", "verdict": "FAIL", "detail": "进不去游戏"}
+{"name": "截面切片", "verdict": "FAIL", "detail": "进不去游戏"}
+{"name": "多轨计数", "verdict": "FAIL", "detail": "进不去游戏"}
+{"name": "AB 反转", "verdict": "FAIL", "detail": "进不去游戏"}
+{"name": "灯塔", "verdict": "FAIL", "detail": "回不到列表"}
+{"name": "指数塔", "verdict": "FAIL", "detail": "回不到列表"}
+{"name": "三重序列", "verdict": "FAIL", "detail": "回不到列表"}
+{"name": "截面切片", "verdict": "FAIL", "detail": "回不到列表"}

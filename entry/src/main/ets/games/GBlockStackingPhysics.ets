@@ -174,8 +174,15 @@ export struct GBlockStackingPhysics {
     if (this.over) {
       return false;
     }
-    if (this.queue.length === 0 || this.bestPillar() < 0) {
-      return true;
+    if (this.queue.length === 0) {
+      // ★ 判据 1675：清单空但还没结算 ⇒ 兜底判完成（正常路径在 place 里已经 finish）
+      if (!this.over) { this.finish(true); }
+      return false;
+    }
+    if (this.bestPillar() < 0) {
+      // ★ 判据 1675：没有任何柱子接得住 ⇒ 死局，必须判失败（否则 autoRun 永久空转）
+      this.finish(false);
+      return false;
     }
     this.place(this.bestPillar());
     return !this.over;
