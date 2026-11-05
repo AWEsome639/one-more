@@ -161,12 +161,20 @@ export struct GWaterSort {
       return 0;
     }
     let n: number = 0;
+    let started: boolean = false;
     for (let k = CAP - 1; k >= 0; k--) {
-      if (this.at(st, t, k) === c) {
-        n++;
-      } else {
+      const v: number = this.at(st, t, k);
+      if (v < 0) {
+        if (started) {
+          break;
+        }
+        continue;
+      }
+      if (v !== c) {
         break;
       }
+      n++;
+      started = true;
     }
     return n;
   }
