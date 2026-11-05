@@ -54,6 +54,13 @@ def w(x):
 w(d)
 j = ' '.join(t)
 # ① 弹窗层（最高优先）
+# ★★★ 2026-11-05（第 1362 轮，判据 1013）：**锁屏层（最底下一层）**
+#   实证：锁屏时 dump 只有「11月5日, 星期四, 九月廿七 | 无服务 | 100」几条
+#     ⇒ 而 `ensure_ready` 原来只处理「弹窗层」⇒ 落到 `OTHER` ⇒ 无法处理
+#     ⇒ 先认它，并交给下面的 LOCK 分支去 swipe 解锁
+if ('无服务' in j or '飞行模式' in j) and ('星期' in j or '廿' in j or '月' in j):
+    print('LOCK'); raise SystemExit
+if '请输入密码' in j or '向上滑动' in j:          print('LOCK');     raise SystemExit
 if '隐私说明' in j or '同意并继续' in j:      print('PRIVACY');  raise SystemExit
 if '欢迎来到' in j or '开始玩' in j:          print('ONBOARD');  raise SystemExit
 # ② 开屏层
@@ -100,6 +107,31 @@ for round in 1 2 3 4 5 6; do
   L=$(LAYER)
   printf '  第 %d 轮：%-10s' "$round" "$L"
   case "$L" in
+    LOCK)
+      # ★ 判据 1013 + 968：解锁起点取 **98% 屏高**（指示条实测位置），
+      #   并保留 95% 作为兜底（第 4 次起）
+      echo ' ⇒ 锁屏 ⇒ swipe 解锁（98% 起点）'
+      if [ "$CHECK_ONLY" = "0" ]; then
+        W=$(python3 -c "
+from PIL import Image; import os
+p='/tmp/_er.png'
+print(Image.open(p).width if (os.path.exists(p) and os.path.getsize(p)>2000) else 1320)
+" 2>/dev/null | tr -d '\r\n')
+        H=$(python3 -c "
+from PIL import Image; import os
+p='/tmp/_er.png'
+print(Image.open(p).height if (os.path.exists(p) and os.path.getsize(p)>2000) else 2232)
+" 2>/dev/null | tr -d '\r\n')
+        if [ "$round" -le 2 ]; then
+          SY=$(( H * 98 / 100 ))
+        else
+          SY=$(( H * 95 / 100 ))
+        fi
+        A 'power-shell wakeup' >/dev/null 2>&1
+        A "uitest uiInput swipe $((W/2)) ${SY} $((W/2)) $((H*30/100)) 120" >/dev/null 2>&1
+      fi
+      sleep 2
+      ;;
     SPLASH)
       # 开屏：点屏幕中央触发 boost（判据 934：按累计动画帧时间算，墙钟约 4s）
       echo ' ⇒ 点屏幕中央 boost'
