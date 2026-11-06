@@ -23,7 +23,7 @@ const BANK: Entry[] = [
   { w: 'PENCIL', hint: TG('铅笔') }, { w: 'FLOWER', hint: '花朵' }, { w: 'WINDOW', hint: '窗户' },
   { w: 'GARDEN', hint: TG('花园') }, { w: 'SUMMER', hint: '夏天' }, { w: 'WINTER', hint: TG('冬天') },
   { w: 'MUSIC', hint: '音乐' }, { w: 'RIVER', hint: TG('河流') }, { w: 'CANDLE', hint: '蜡烛' },
-  { w: 'KITCHEN', hint: '厨房' }, { w: 'MORNING', hint: '早晨' }, { w: 'MONKEY', hint: '猴子' }
+  { w: 'KITCHEN', hint: TG('厨房') }, { w: 'MORNING', hint: '早晨' }, { w: 'MONKEY', hint: TG('猴子') }
 ];
 function mixEntries(src: Entry[]): Entry[] {
   const out: Entry[] = src.slice();

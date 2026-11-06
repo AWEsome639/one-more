@@ -17,7 +17,7 @@ const SLOTS: number = 8; const SLOT_IDX: number[] = [0, 1, 2, 3, 4, 5, 6, 7];
 const TOTAL_S: number = 30; const TICK_MS: number = 500;
 const PASS: number = 12; const WRITE_MIN: number = 3; const SAY_GAP_MS: number = 600;
 
-const CAT_NAMES: string[] = ['水果', '动物', '颜色', '交通工具'];
+const CAT_NAMES: string[] = [TG('水果'), TG('动物'), TG('颜色'), TG('交通工具')];
 const CATS: string[][] = [
   [TG('苹果'), TG('香蕉'), '橙子', '葡萄'],
   [TG('老虎'), '大象', '熊猫', '兔子'],

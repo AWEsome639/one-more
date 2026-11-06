@@ -289,7 +289,7 @@ export struct GPerspectiveTaking {
     const solved: boolean = this.correct >= NEED;
     const raw: number = this.correct * 60 - (TOTAL - this.correct) * 20;
     this.over = true; this.won = solved;
-    this.msg = solved ? '🎉 视角全对！' : TG2("本局答对 {0}/{1} 题",Digits(String(this.correct), this.langCode), String(TOTAL));
+    this.msg = solved ? TG('🎉 视角全对！') : TG2("本局答对 {0}/{1} 题",Digits(String(this.correct), this.langCode), String(TOTAL));
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({
       gameId: 'perspective_taking', solved: solved, score: raw > 0 ? raw : 0,

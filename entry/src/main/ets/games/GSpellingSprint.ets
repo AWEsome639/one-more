@@ -22,7 +22,7 @@ const BANK: SPW[] = [
   { zh: '沉默', w: 'SILENCE' }, { zh: '勇气', w: 'COURAGE' }, { zh: TG('森林'), w: 'FOREST' },
   { zh: '窗户', w: 'WINDOW' }, { zh: TG('铅笔'), w: 'PENCIL' }, { zh: '海洋', w: 'OCEAN' },
   { zh: '灯笼', w: 'LANTERN' }, { zh: '友谊', w: 'FRIENDSHIP' }, { zh: '影子', w: 'SHADOW' },
-  { zh: '旅程', w: 'JOURNEY' }, { zh: '珍珠', w: 'PEARL' }, { zh: '图书馆', w: 'LIBRARY' },
+  { zh: '旅程', w: 'JOURNEY' }, { zh: '珍珠', w: 'PEARL' }, { zh: TG('图书馆'), w: 'LIBRARY' },
   { zh: '清晨', w: 'MORNING' }
 ];
 

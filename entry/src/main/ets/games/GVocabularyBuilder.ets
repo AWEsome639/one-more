@@ -21,11 +21,11 @@ interface Item { gloss: string; pos: string; root: string; opts: string[]; ans: 
 interface Opt { text: string; ok: boolean }
 
 const BANK: Item[] = [
-  { gloss: '不快乐的', pos: 'adj', root: 'happy', opts: ['unhappy', 'happiness', 'happily', 'unhappily'], ans: 0 },
+  { gloss: TG('不快乐的'), pos: 'adj', root: 'happy', opts: ['unhappy', 'happiness', 'happily', 'unhappily'], ans: 0 },
   { gloss: '幸福；快乐', pos: 'n', root: 'happy', opts: ['unhappy', 'happiness', 'happily', 'unhappily'], ans: 1 },
   { gloss: '仔细的', pos: 'adj', root: 'care', opts: ['careful', 'careless', 'carelessly', 'caring'], ans: 0 },
   { gloss: '粗心地', pos: 'adv', root: 'care', opts: ['careful', 'careless', 'carelessly', 'caring'], ans: 2 },
-  { gloss: '重写', pos: 'v', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 1 },
+  { gloss: TG('重写'), pos: 'v', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 1 },
   { gloss: '作家', pos: 'n', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 0 },
   { gloss: '不可能的', pos: 'adj', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 1 },
   { gloss: '可能性', pos: 'n', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 2 },

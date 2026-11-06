@@ -17,8 +17,8 @@ const QN: number = 8; const PASS: number = 5; const FEED_MS: number = 800;
 const LIMIT_MS: number = 5000; const TICK_MS: number = 100;
 interface WordPair { a: string; b: string; da: string; db: string }
 const PAIRS: WordPair[] = [
-  { a: 'MILK', b: 'SILK', da: '牛奶', db: '丝绸' }, { a: 'CAT', b: 'HAT', da: '猫', db: '帽子' },
-  { a: 'HOUSE', b: 'MOUSE', da: '房子', db: '老鼠' }, { a: 'LIGHT', b: 'NIGHT', da: '光', db: '夜晚' },
+  { a: 'MILK', b: 'SILK', da: '牛奶', db: '丝绸' }, { a: 'CAT', b: 'HAT', da: TG('猫'), db: '帽子' },
+  { a: 'HOUSE', b: 'MOUSE', da: '房子', db: '老鼠' }, { a: 'LIGHT', b: 'NIGHT', da: TG('光'), db: '夜晚' },
   { a: 'TRAIN', b: 'BRAIN', da: TG('火车'), db: '大脑' }, { a: 'SHEEP', b: 'SHEET', da: '绵羊', db: '床单' },
   { a: 'CLOUD', b: 'ALOUD', da: TG('云'), db: '出声的' }, { a: 'PLANT', b: 'PLANE', da: '植物', db: '飞机' },
   { a: 'SNAKE', b: 'SHAKE', da: '蛇', db: '摇动' }, { a: 'HORSE', b: 'HOUSE', da: '马', db: '房子' },

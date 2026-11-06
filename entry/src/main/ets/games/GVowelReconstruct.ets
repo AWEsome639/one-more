@@ -23,10 +23,10 @@ interface VW { w: string; gloss: string }
 
 const BANK: VW[] = [
   { w: 'MUSIC', gloss: '音乐 🎵' }, { w: 'GARDEN', gloss: '花园 🌷' }, { w: 'PENCIL', gloss: TG('铅笔 ✏️') },
-  { w: 'CASTLE', gloss: '城堡 🏰' }, { w: 'RIVER', gloss: '河流 🏞️' }, { w: 'TIGER', gloss: '老虎 🐯' },
+  { w: 'CASTLE', gloss: TG('城堡 🏰') }, { w: 'RIVER', gloss: '河流 🏞️' }, { w: 'TIGER', gloss: '老虎 🐯' },
   { w: 'WINTER', gloss: TG('冬天 ❄️') }, { w: 'DOCTOR', gloss: '医生 🩺' }, { w: 'PLANET', gloss: '行星 🪐' },
-  { w: 'MARKET', gloss: '市场 🛒' }, { w: 'SUMMER', gloss: '夏天 ☀️' }, { w: 'ROBOT', gloss: '机器人 🤖' },
-  { w: 'CANDLE', gloss: '蜡烛 🕯️' }, { w: 'SILVER', gloss: '银 🥈' }, { w: 'WINDOW', gloss: '窗户 🪟' },
+  { w: 'MARKET', gloss: TG('市场 🛒') }, { w: 'SUMMER', gloss: '夏天 ☀️' }, { w: 'ROBOT', gloss: '机器人 🤖' },
+  { w: 'CANDLE', gloss: '蜡烛 🕯️' }, { w: 'SILVER', gloss: TG('银 🥈') }, { w: 'WINDOW', gloss: '窗户 🪟' },
   { w: 'BRIDGE', gloss: '桥 🌉' }, { w: 'KITCHEN', gloss: TG('厨房 🍳') }, { w: 'MONKEY', gloss: '猴子 🐒' }
 ];
 

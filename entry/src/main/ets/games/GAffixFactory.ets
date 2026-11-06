@@ -21,10 +21,10 @@ const QN: number = 8; const PASS: number = 6; const FEED_MS: number = 800;
 interface AffixQ { root: string; affix: string; meaning: string; opts: string[] }
 
 const BANK: AffixQ[] = [
-  { root: 'happy', affix: 'un-', meaning: '不快乐的', opts: ['un-', 're-', '-ful', '-less'] },
+  { root: 'happy', affix: 'un-', meaning: TG('不快乐的'), opts: ['un-', 're-', '-ful', '-less'] },
   { root: 'care', affix: '-ful', meaning: '小心的；关心的', opts: ['-less', '-ful', 'un-', '-ly'] },
   { root: 'hope', affix: '-less', meaning: '没有希望的', opts: ['-ful', '-less', 're-', '-ness'] },
-  { root: 'write', affix: 're-', meaning: '重写', opts: ['re-', 'un-', '-er', 'dis-'] },
+  { root: 'write', affix: 're-', meaning: TG('重写'), opts: ['re-', 'un-', '-er', 'dis-'] },
   { root: 'teach', affix: '-er', meaning: '教师', opts: ['-er', '-ness', '-ing', 'pre-'] },
   { root: 'kind', affix: '-ness', meaning: '善良', opts: ['-ness', '-ly', 'un-', '-ful'] },
   { root: 'possible', affix: 'im-', meaning: '不可能的', opts: ['im-', 'un-', 'dis-', '-less'] },

@@ -30,13 +30,13 @@ const BANK: LB[] = [
   { left: 'CL', right: 'OUD', letter: 'O', cn: TG('云'), opts: ['O', 'A', 'U', 'E'] },
   { left: 'RIV', right: 'R', letter: 'E', cn: TG('河流'), opts: ['E', 'A', 'O', 'I'] },
   { left: 'PLAN', right: 'T', letter: 'E', cn: TG('行星'), opts: ['E', 'A', 'I', 'O'] },
-  { left: 'SIL', right: 'ER', letter: 'V', cn: '银', opts: ['V', 'F', 'W', 'B'] },
+  { left: 'SIL', right: 'ER', letter: 'V', cn: TG('银'), opts: ['V', 'F', 'W', 'B'] },
   { left: 'MUS', right: 'C', letter: 'I', cn: TG('音乐'), opts: ['I', 'E', 'A', 'U'] },
-  { left: 'FLO', right: 'ER', letter: 'W', cn: '花', opts: ['W', 'V', 'R', 'U'] },
+  { left: 'FLO', right: 'ER', letter: 'W', cn: TG('花'), opts: ['W', 'V', 'R', 'U'] },
   { left: 'DOC', right: 'OR', letter: 'T', cn: TG('医生'), opts: ['T', 'D', 'K', 'S'] },
   { left: 'TEA', right: 'ER', letter: 'CH', cn: '老师', opts: ['CH', 'SH', 'TH', 'CK'] },
   { left: 'WEI', right: 'HT', letter: 'G', cn: '重量', opts: ['G', 'K', 'H', 'J'] },
-  { left: 'BR', right: 'AD', letter: 'E', cn: '面包', opts: ['E', 'A', 'O', 'I'] }
+  { left: 'BR', right: 'AD', letter: 'E', cn: TG('面包'), opts: ['E', 'A', 'O', 'I'] }
 ];
 
 function shuffleIdx(): number[] {
