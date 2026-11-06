@@ -18,9 +18,9 @@ import { Tv } from '../core/Tv';
 interface FactPair { ask: string; ans: string; }
 
 const PAIRS: FactPair[] = [
-  { ask: '🇨🇳 中国', ans: '北京' }, { ask: '🇯🇵 日本', ans: '东京' },
-  { ask: '🇫🇷 法国', ans: '巴黎' }, { ask: '🇪🇬 埃及', ans: '开罗' },
-  { ask: '🇦🇺 澳大利亚', ans: '堪培拉' }
+  { ask: TG('🇨🇳 中国'), ans: TG('北京') }, { ask: TG('🇯🇵 日本'), ans: TG('东京') },
+  { ask: TG('🇫🇷 法国'), ans: TG('巴黎') }, { ask: TG('🇪🇬 埃及'), ans: TG('开罗') },
+  { ask: TG('🇦🇺 澳大利亚'), ans: TG('堪培拉') }
 ];
 const IDX: number[] = [0, 1, 2, 3, 4];
 const LIVES: number = 3;

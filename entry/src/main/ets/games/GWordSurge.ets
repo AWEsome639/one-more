@@ -23,7 +23,7 @@ const BANK: Quiz[] = [
   { w: 'GARDEN', hint: TG('花园') }, { w: 'HARBOR', hint: '港口' }, { w: 'ISLAND', hint: '岛屿' },
   { w: 'JUNGLE', hint: '丛林' }, { w: 'KITCHEN', hint: TG('厨房') }, { w: 'LADDER', hint: '梯子' },
   { w: 'MARKET', hint: TG('市场') }, { w: 'NEEDLE', hint: '针' }, { w: 'ORCHID', hint: '兰花' },
-  { w: 'POCKET', hint: '口袋' }, { w: 'QUARTZ', hint: '石英' }, { w: 'RIBBON', hint: '丝带' },
+  { w: 'POCKET', hint: TG('口袋') }, { w: 'QUARTZ', hint: TG('石英') }, { w: 'RIBBON', hint: TG('丝带') },
   { w: 'SILVER', hint: '银' }, { w: 'TEMPLE', hint: '庙宇' }, { w: 'UMBRELLA', hint: TG('雨伞') },
   { w: 'VILLAGE', hint: '村庄' }, { w: 'WHISPER', hint: '低语' }, { w: 'YELLOW', hint: TG('黄色') }
 ];

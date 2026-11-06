@@ -206,7 +206,7 @@ export struct GVectorGridAlignment {
     }
     const gc: number = this.gapCol();
     const gr: number = this.gapRow();
-    const dir: string = gc !== 0 ? (gc > 0 ? '往右走一格' : '往左走一格') : (gr > 0 ? '往下走一格' : '往上走一格');
+    const dir: string = gc !== 0 ? (gc > 0 ? TG('往右走一格') : TG('往左走一格')) : (gr > 0 ? TG('往下走一格') : TG('往上走一格'));
     const gr0: number = Math.floor(this.goal / this.diffTotal) + 1;
     const gc0: number = (this.goal % this.diffTotal) + 1;
     return Hint.make([this.goal],

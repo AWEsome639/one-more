@@ -473,7 +473,7 @@ export struct GSnake {
     let where: string = '';
     where = where + (fy < hy ? '上' : (fy > hy ? '下' : ''));
     where = where + (fx > hx ? '右' : (fx < hx ? '左' : ''));
-    if (where.length === 0) { where = '就在头上'; }
+    if (where.length === 0) { where = TG('就在头上'); }
     return Hint.make([],
       TG2('下一步往{0}走；食物在{1}边', names[d], where),
       TG2('Turn {0} next; the food is {1}', names[d], where), t0);

@@ -22,7 +22,7 @@ const PAIRS: WordPair[] = [
   { a: 'TRAIN', b: 'BRAIN', da: TG('火车'), db: '大脑' }, { a: 'SHEEP', b: 'SHEET', da: '绵羊', db: '床单' },
   { a: 'CLOUD', b: 'ALOUD', da: TG('云'), db: '出声的' }, { a: 'PLANT', b: 'PLANE', da: '植物', db: '飞机' },
   { a: 'SNAKE', b: 'SHAKE', da: '蛇', db: '摇动' }, { a: 'HORSE', b: 'HOUSE', da: '马', db: TG('房子') },
-  { a: 'WATER', b: 'WAFER', da: '水', db: '威化饼干' }, { a: 'TABLE', b: 'CABLE', da: '桌子', db: '电缆' },
+  { a: 'WATER', b: 'WAFER', da: TG('水'), db: TG('威化饼干') }, { a: 'TABLE', b: 'CABLE', da: TG('桌子'), db: '电缆' },
   { a: 'GRAPE', b: 'DRAPE', da: TG('葡萄'), db: '窗帘' }, { a: 'PEACH', b: 'PEACE', da: '桃子', db: '和平' },
   { a: 'CHAIR', b: 'CHAIN', da: '椅子', db: '链条' }, { a: 'HONEY', b: 'MONEY', da: '蜂蜜', db: '钱' },
   { a: 'TIGER', b: 'TIMER', da: TG('老虎'), db: '计时器' }, { a: 'STONE', b: 'STORE', da: '石头', db: '商店' },

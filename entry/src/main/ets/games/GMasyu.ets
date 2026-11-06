@@ -443,8 +443,8 @@ export struct GMasyu {
       return Hint.none('none');
     }
     const n: number = this.diffTotal;
-    const what: string = this.path.length < this.sol.length ? '下一格点 ' : '点回起点闭合（';
-    const tail: string = this.path.length < this.sol.length ? '' : String(this.sol.length) + ' 格）';
+    const what: string = this.path.length < this.sol.length ? TG('下一格点 ') : TG('点回起点闭合（');
+    const tail: string = this.path.length < this.sol.length ? '' : String(this.sol.length) + TG(' 格）');
     // ★★★ 2026-11-01 i18n 断点：硬拼行列 ⇒ 改字典模板
     return Hint.make([i], what + TG2('第 {0} 行第 {1} 列', Math.floor(i / n) + 1, i % n + 1) + tail,
       'Tap row ' + String(Math.floor(i / n) + 1) + ', column ' + String(i % n + 1), t0);

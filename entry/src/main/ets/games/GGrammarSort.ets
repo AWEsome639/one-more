@@ -15,7 +15,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
-const KIND: string[] = ['名词', '动词', '形容词', '副词'];
+const KIND: string[] = [TG('名词'), TG('动词'), TG('形容词'), TG('副词')];
 const KIND_COLOR: string[] = [Palette.sky, Palette.orange, Palette.violet, Palette.emerald];
 const TOTAL: number = 16; const PASS: number = 12; const LIMIT_S: number = 45;
 const TICK_MS: number = 1000;
