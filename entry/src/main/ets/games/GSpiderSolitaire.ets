@@ -865,7 +865,7 @@ export struct GSpiderSolitaire {
       const top: number = pile.length > 0 ? pile[pile.length - 1] : -1;
       this.msg = top >= 0
         ? TG2('放不下：这列顶上是 {0}', RANKS[rankOf(top)])
-        : '放不下';
+        : TG('放不下');
       return;
     }
     const np: number[][] = this.copyPiles();

@@ -24,13 +24,13 @@ const POOL: Q[] = [
   { s: 'The doctor said the drug alleviated her pain.', w: 'alleviated', opts: [TG('减轻了'), TG('加剧了'), TG('忽视了'), TG('引发了')] },
   { s: 'He was meticulous about every detail of the plan.', w: 'meticulous', opts: [TG('一丝不苟的'), TG('粗心大意的'), TG('漫不经心的'), TG('慷慨大方的')] },
   { s: 'The boisterous crowd drowned out the speaker.', w: 'boisterous', opts: ['喧闹的', TG('安静的'), '悲伤的', '整齐的'] },
-  { s: 'They shared a frugal meal of bread and soup.', w: 'frugal', opts: ['节俭的', '奢侈的', '丰盛的', '辛辣的'] },
-  { s: 'The evidence was ambiguous, so the jury hesitated.', w: 'ambiguous', opts: ['模棱两可的', '确凿无疑的', '伪造的', '充分的'] },
-  { s: 'She remained stoic through the whole ordeal.', w: 'stoic', opts: ['坚忍克制的', '惊慌失措的', '兴高采烈的', '犹豫不决的'] },
-  { s: 'The rancid butter made the whole kitchen smell.', w: 'rancid', opts: ['变质发臭的', '新鲜可口的', '香甜的', '昂贵的'] },
-  { s: 'He tends to procrastinate until the last night.', w: 'procrastinate', opts: ['拖延', '提前完成', '彻底放弃', '不断抱怨'] },
-  { s: 'The view from the ridge was sublime.', w: 'sublime', opts: ['壮丽崇高的', '平庸乏味的', '恐怖吓人的', '熟悉亲切的'] },
-  { s: 'Her candid remarks surprised the whole room.', w: 'candid', opts: ['坦率的', '虚伪的', '含糊的', '客套的'] }
+  { s: 'They shared a frugal meal of bread and soup.', w: 'frugal', opts: [TG('节俭的'), TG('奢侈的'), TG('丰盛的'), TG('辛辣的')] },
+  { s: 'The evidence was ambiguous, so the jury hesitated.', w: 'ambiguous', opts: [TG('模棱两可的'), TG('确凿无疑的'), TG('伪造的'), TG('充分的')] },
+  { s: 'She remained stoic through the whole ordeal.', w: 'stoic', opts: [TG('坚忍克制的'), TG('惊慌失措的'), TG('兴高采烈的'), TG('犹豫不决的')] },
+  { s: 'The rancid butter made the whole kitchen smell.', w: 'rancid', opts: [TG('变质发臭的'), TG('新鲜可口的'), TG('香甜的'), TG('昂贵的')] },
+  { s: 'He tends to procrastinate until the last night.', w: 'procrastinate', opts: [TG('拖延'), TG('提前完成'), TG('彻底放弃'), TG('不断抱怨')] },
+  { s: 'The view from the ridge was sublime.', w: 'sublime', opts: [TG('壮丽崇高的'), TG('平庸乏味的'), TG('恐怖吓人的'), TG('熟悉亲切的')] },
+  { s: 'Her candid remarks surprised the whole room.', w: 'candid', opts: [TG('坦率的'), TG('虚伪的'), TG('含糊的'), TG('客套的')] }
 ];
 @Component
 export struct GContextClues {

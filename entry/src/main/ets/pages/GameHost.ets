@@ -11,6 +11,7 @@
  *   onFinish: (r: GameResult) => void
  */
 
+import { FrameSampler } from '../core/FrameSampler';
 import { Hint } from '../ai/Hint';
 import { Demo } from '../core/Demo';
 import { Tv } from '../core/Tv';
@@ -500,6 +501,7 @@ struct GameHost {
   @State levelUpTo: number = 0;
 
   aboutToAppear(): void {
+    FrameSampler.start();   // ★ 判据 1737：临时帧采样（④ 效率取证；测完必删）
     // ★ 路线 E：记下进游戏页的时刻（中途退出时用它算时长）
     this.startedAt = Date.now();
     this.finished = false;

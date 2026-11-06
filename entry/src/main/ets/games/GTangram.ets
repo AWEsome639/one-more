@@ -22,10 +22,10 @@ interface Piece { cells: number[]; icon: string; name: string; }
 interface Slot { p: number; r: number; c: number; }
 
 const PIECES: Piece[] = [
-  { cells: [0, 1], icon: '▬', name: '短条2' },
-  { cells: [0, 1, 4], icon: '◤', name: '直角3' },
-  { cells: [0, 1, 4, 5], icon: '■', name: '方块4' },
-  { cells: [0, 4, 8], icon: '▮', name: '竖条3' }
+  { cells: [0, 1], icon: '▬', name: TG('短条2') },
+  { cells: [0, 1, 4], icon: '◤', name: TG('直角3') },
+  { cells: [0, 1, 4, 5], icon: '■', name: TG('方块4') },
+  { cells: [0, 4, 8], icon: '▮', name: TG('竖条3') }
 ];
 
 const LAYOUTS: Slot[][] = [

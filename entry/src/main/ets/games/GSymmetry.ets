@@ -18,7 +18,7 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const N: number = 4; const ROUNDS: number = 8; const PASS: number = 6; const FEED_MS: number = 900;
-const AXES: string[] = ['左右对称', '上下对称', '主对角', '副对角'];
+const AXES: string[] = ['左右对称', '上下对称', TG('主对角'), TG('副对角')];
 
 function at(r: number, c: number, n: number): number { return r * n + c; }
 

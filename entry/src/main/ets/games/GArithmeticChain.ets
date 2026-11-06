@@ -157,7 +157,7 @@ export struct GArithmeticChain {
     let en: string = '';
     for (let i = 0; i < path.length; i++) {
       if (i > 0) {
-        zh += '，然后 ';
+        zh += TG('，然后 ');
         en += ', then ';
       }
       zh += path[i].label;

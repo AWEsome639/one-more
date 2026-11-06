@@ -922,14 +922,14 @@ export struct GGomoku {
         return TG('🎉 五子连珠，你赢了！');
       }
       if (this.winner === AI) {
-        return LanMatch.isActive() ? '对手连成五子，再来一局？' : '电脑连成五子，再来一局？';
+        return LanMatch.isActive() ? TG('对手连成五子，再来一局？') : TG('电脑连成五子，再来一局？');
       }
       return TG('平局，棋盘满了');
     }
     if (LanMatch.isActive()) {
       return this.turn === HUMAN ? '联机：轮到你落子（你 ●）' : TG('联机：等对手落子…');
     }
-    return this.thinking ? '电脑正在算…' : '轮到你落子（黑先）';
+    return this.thinking ? TG('电脑正在算…') : TG('轮到你落子（黑先）');
   }
 
   build() {

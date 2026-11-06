@@ -18,12 +18,12 @@ import { Tv } from '../core/Tv';
 const ROUNDS: number = 6; const PASS: number = 5; const LIVES: number = 3;
 interface R { q: string; a: string; hint: string }
 const POOL: R[] = [
-  { q: 'What becomes shorter when you add two letters to it?', a: 'SHORT', hint: '加两个字母，它反而更短' }, { q: 'I am an odd number; take away one letter and I become even.', a: 'SEVEN', hint: '去掉一个字母，奇数变偶数' },
-  { q: 'What has a face and two hands but no arms?', a: 'CLOCK', hint: '有脸有手，却无手臂' }, { q: 'What gets wetter the more it dries?', a: 'TOWEL', hint: '越擦越湿' },
-  { q: 'What has a head and a tail but no body?', a: 'COIN', hint: '有头有尾，没有身子' }, { q: 'What has teeth but cannot bite?', a: 'COMB', hint: '有齿不能咬' },
-  { q: 'What has a neck but no head?', a: 'BOTTLE', hint: '有颈无头' }, { q: 'What has an eye but cannot see?', a: 'NEEDLE', hint: '有眼不能看' },
-  { q: 'What has many keys but opens no lock?', a: 'PIANO', hint: '键很多，却开不了锁' }, { q: 'What can travel the world while staying in a corner?', a: 'STAMP', hint: '走遍世界，却一直待在角落' },
-  { q: 'What has words but never speaks?', a: 'BOOK', hint: '满纸文字，从不开口' }, { q: 'The more you take, the more you leave behind.', a: 'FOOTSTEPS', hint: '取得越多，身后留得越多' }
+  { q: 'What becomes shorter when you add two letters to it?', a: 'SHORT', hint: TG('加两个字母，它反而更短') }, { q: 'I am an odd number; take away one letter and I become even.', a: 'SEVEN', hint: TG('去掉一个字母，奇数变偶数') },
+  { q: 'What has a face and two hands but no arms?', a: 'CLOCK', hint: TG('有脸有手，却无手臂') }, { q: 'What gets wetter the more it dries?', a: 'TOWEL', hint: TG('越擦越湿') },
+  { q: 'What has a head and a tail but no body?', a: 'COIN', hint: TG('有头有尾，没有身子') }, { q: 'What has teeth but cannot bite?', a: 'COMB', hint: TG('有齿不能咬') },
+  { q: 'What has a neck but no head?', a: 'BOTTLE', hint: TG('有颈无头') }, { q: 'What has an eye but cannot see?', a: 'NEEDLE', hint: TG('有眼不能看') },
+  { q: 'What has many keys but opens no lock?', a: 'PIANO', hint: TG('键很多，却开不了锁') }, { q: 'What can travel the world while staying in a corner?', a: 'STAMP', hint: TG('走遍世界，却一直待在角落') },
+  { q: 'What has words but never speaks?', a: 'BOOK', hint: TG('满纸文字，从不开口') }, { q: 'The more you take, the more you leave behind.', a: 'FOOTSTEPS', hint: TG('取得越多，身后留得越多') }
 ];
 /** 字母乱序（anagram 提示） */
 function scramble(w: string): string {
