@@ -86,9 +86,16 @@ export struct GBoxCompletion {
  private reset(): void {
  let board: boolean[] | null = null;
  for (let round: number = 0; round < 60; round++) {
- const r1: number = Math.floor(Math.random() * 2); const c1: number = Math.floor(Math.random() * 2);
- const r2: number = r1 + 1 + Math.floor(Math.random() * (this.diffTotal - 1 - r1));
- const c2: number = c1 + 1 + Math.floor(Math.random() * (this.diffTotal - 1 - c1));
+ // ★ 判据 1723：PERIM=12 的语义是「周长 12 格」，而旧生成是随机矩形（可能 3×3 周长 8）
+ //   ⇒ 小矩形盘面永远凑不满 12 格（AI 和玩家都赢不了）
+ //   ⇒ 强制 (r2-r1)+(c2-c1) = 6（周长 = 2×6 = 12），且矩形必须在盘内
+ const n0: number = this.diffTotal;
+ const h0: number = 1 + Math.floor(Math.random() * Math.min(5, n0 - 1));
+ const w0: number = Math.min(6 - h0, n0 - 1);
+ const r1: number = Math.floor(Math.random() * (n0 - h0));
+ const c1: number = Math.floor(Math.random() * (n0 - w0));
+ const r2: number = r1 + h0;
+ const c2: number = c1 + w0;
  const per: number[] = rectCells(r1, c1, r2, c2, this.diffTotal);
  const grid: boolean[] = new Array<boolean>(MAX_CELLS).fill(false); let holes: number = 0;
  for (let t = 0; t < per.length; t++) {
