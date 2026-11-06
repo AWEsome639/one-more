@@ -159,10 +159,10 @@ export struct GKlotski {
     const ma: Blk = { x: 0, y: 2, w: 1, h: 2, label: '马超', color: Palette.violet };
     const guan: Blk = { x: 1, y: 2, w: 2, h: 1, label: '关羽', color: Palette.amber };
     const huang: Blk = { x: 3, y: 2, w: 1, h: 2, label: '黄忠', color: Palette.orange };
-    const z1: Blk = { x: 1, y: 3, w: 1, h: 1, label: '卒', color: Palette.inkFaint };
-    const z2: Blk = { x: 2, y: 3, w: 1, h: 1, label: '卒', color: Palette.inkFaint };
-    const z3: Blk = { x: 0, y: 4, w: 1, h: 1, label: '卒', color: Palette.inkFaint };
-    const z4: Blk = { x: 3, y: 4, w: 1, h: 1, label: '卒', color: Palette.inkFaint };
+    const z1: Blk = { x: 1, y: 3, w: 1, h: 1, label: TG('卒'), color: Palette.inkFaint };
+    const z2: Blk = { x: 2, y: 3, w: 1, h: 1, label: TG('卒'), color: Palette.inkFaint };
+    const z3: Blk = { x: 0, y: 4, w: 1, h: 1, label: TG('卒'), color: Palette.inkFaint };
+    const z4: Blk = { x: 3, y: 4, w: 1, h: 1, label: TG('卒'), color: Palette.inkFaint };
     // push 顺序即下标：0 张飞 · 1 曹操（= CAO）· 2 赵云 · 3 马超 · 4 关羽 · 5 黄忠 · 6~9 四卒
     bs.push(zhang);
     bs.push(cao);

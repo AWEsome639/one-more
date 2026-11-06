@@ -19,11 +19,11 @@ interface VQ { word: string; def: string }
 const BANK: VQ[] = [
   { word: 'APPLE', def: TG('苹果') }, { word: 'ORANGE', def: '橙子' },
   { word: 'BANANA', def: TG('香蕉') }, { word: 'RIVER', def: TG('河流') },
-  { word: 'MUSIC', def: '音乐' }, { word: 'PLANET', def: '行星' },
+  { word: 'MUSIC', def: TG('音乐') }, { word: 'PLANET', def: TG('行星') },
   { word: 'GARDEN', def: TG('花园') }, { word: 'PENCIL', def: TG('铅笔') },
   { word: 'CASTLE', def: '城堡' }, { word: 'TIGER', def: TG('老虎') },
   { word: 'ROBOT', def: '机器人' }, { word: 'WINTER', def: TG('冬天') },
-  { word: 'DOCTOR', def: '医生' }, { word: 'SUGAR', def: '糖' }
+  { word: 'DOCTOR', def: TG('医生') }, { word: 'SUGAR', def: '糖' }
 ];
 function isVowel(ch: string): boolean { return VOWELS.indexOf(ch) >= 0; }
 function pickIndexes(total: number, k: number): number[] {

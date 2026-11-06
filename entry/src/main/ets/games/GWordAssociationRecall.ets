@@ -22,9 +22,9 @@ interface Pair { cue: string; mate: string }
 interface Opt { text: string; ok: boolean }
 
 const PAIRS: Pair[] = [
-  { cue: '医生 👨‍⚕️', mate: '医院 🏥' }, { cue: '蜜蜂 🐝', mate: '蜂蜜 🍯' }, { cue: '下雨 🌧️', mate: '雨伞 ☂️' },
-  { cue: '小鱼 🐟', mate: '河水 💧' }, { cue: '冬天 ❄️', mate: '雪人 ⛄' }, { cue: '钥匙 🔑', mate: '门锁 🔒' },
-  { cue: '月亮 🌙', mate: '夜晚 🌃' }, { cue: '铅笔 ✏️', mate: '白纸 📄' }, { cue: '厨房 🍳', mate: '厨师 👨‍🍳' },
+  { cue: '医生 👨‍⚕️', mate: '医院 🏥' }, { cue: '蜜蜂 🐝', mate: '蜂蜜 🍯' }, { cue: '下雨 🌧️', mate: TG('雨伞 ☂️') },
+  { cue: '小鱼 🐟', mate: '河水 💧' }, { cue: TG('冬天 ❄️'), mate: '雪人 ⛄' }, { cue: '钥匙 🔑', mate: '门锁 🔒' },
+  { cue: '月亮 🌙', mate: '夜晚 🌃' }, { cue: TG('铅笔 ✏️'), mate: '白纸 📄' }, { cue: '厨房 🍳', mate: '厨师 👨‍🍳' },
   { cue: '书本 📚', mate: '书架 🗄️' } ];
 
 /** 从 0..total-1 中随机取 k 个互不相同的下标（k=total 就是整段洗牌） */

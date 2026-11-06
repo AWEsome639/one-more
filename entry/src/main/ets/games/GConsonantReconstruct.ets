@@ -20,7 +20,7 @@ interface Item { w: string; hint: string }
 const POOL: Item[] = [
   { w: 'ELEPHANT', hint: '大象 🐘' }, { w: 'MOUNTAIN', hint: '高山 ⛰️' },
   { w: 'KITCHEN', hint: '厨房 🍳' }, { w: 'WINDOW', hint: '窗户 🪟' },
-  { w: 'GIRAFFE', hint: '长颈鹿 🦒' }, { w: 'UMBRELLA', hint: '雨伞 ☂️' },
+  { w: 'GIRAFFE', hint: '长颈鹿 🦒' }, { w: 'UMBRELLA', hint: TG('雨伞 ☂️') },
   { w: 'BICYCLE', hint: '自行车 🚲' }, { w: 'DOLPHIN', hint: '海豚 🐬' },
   { w: 'LIBRARY', hint: '图书馆 📚' }, { w: 'CHOCOLATE', hint: '巧克力 🍫' },
   { w: 'PENGUIN', hint: '企鹅 🐧' }, { w: 'SANDWICH', hint: '三明治 🥪' }

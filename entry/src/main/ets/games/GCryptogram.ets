@@ -18,12 +18,12 @@ import { Tv } from '../core/Tv';
 const ROUNDS: number = 8; const PASS: number = 6; const LIVES: number = 3; const HINT_COST: number = 30;
 interface Item { w: string; hint: string }
 const POOL: Item[] = [
-  { w: 'GARDEN', hint: '花园 🌷' }, { w: 'WINTER', hint: '冬天 ❄️' },
+  { w: 'GARDEN', hint: '花园 🌷' }, { w: 'WINTER', hint: TG('冬天 ❄️') },
   { w: 'SILVER', hint: '银 🥈' }, { w: 'ORANGE', hint: '橙子 🍊' },
   { w: 'PLANET', hint: '行星 🪐' }, { w: 'MARKET', hint: '市场 🛒' },
   { w: 'ISLAND', hint: '岛屿 🏝️' }, { w: 'CASTLE', hint: '城堡 🏰' },
   { w: 'DRAGON', hint: '龙 🐉' }, { w: 'FOREST', hint: '森林 🌲' },
-  { w: 'PENCIL', hint: '铅笔 ✏️' }, { w: 'ROCKET', hint: '火箭 🚀' }
+  { w: 'PENCIL', hint: TG('铅笔 ✏️') }, { w: 'ROCKET', hint: '火箭 🚀' }
 ];
 /** 凯撒位移：每个字母在 A–Z 里向后挪 k 位 */
 const AZ: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

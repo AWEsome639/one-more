@@ -22,8 +22,8 @@ interface EtyQ { word: string; cn: string; lang: string; opts: string[] }
 
 const BANK: EtyQ[] = [
   { word: 'ALGEBRA', cn: TG('代数'), lang: TG('阿拉伯语'), opts: [TG('阿拉伯语'), '希腊语', '拉丁语', '法语'] },
-  { word: 'SAUNA', cn: '桑拿浴', lang: '芬兰语', opts: ['芬兰语', '瑞典语', '俄语', '德语'] },
-  { word: 'TSAR', cn: '沙皇', lang: '俄语', opts: ['俄语', '拉丁语', '德语', '波兰语'] },
+  { word: 'SAUNA', cn: '桑拿浴', lang: '芬兰语', opts: ['芬兰语', '瑞典语', TG('俄语'), '德语'] },
+  { word: 'TSAR', cn: '沙皇', lang: TG('俄语'), opts: [TG('俄语'), TG('拉丁语'), '德语', '波兰语'] },
   { word: 'TYCOON', cn: '企业大亨', lang: '日语', opts: ['日语', TG('汉语'), '韩语', '英语'] },
   { word: 'PYJAMAS', cn: '睡衣裤', lang: TG('印地语'), opts: [TG('印地语'), '波斯语', TG('阿拉伯语'), '梵语'] },
   { word: 'COFFEE', cn: '咖啡', lang: TG('阿拉伯语'), opts: [TG('阿拉伯语'), '法语', '拉丁语', '土耳其语'] },
@@ -31,10 +31,10 @@ const BANK: EtyQ[] = [
   { word: 'KETCHUP', cn: '番茄酱', lang: TG('汉语'), opts: [TG('汉语'), '马来语', '英语', '荷兰语'] },
   { word: 'SHAMPOO', cn: '洗发水', lang: TG('印地语'), opts: [TG('印地语'), TG('阿拉伯语'), '梵语', '波斯语'] },
   { word: 'KARAOKE', cn: '卡拉OK', lang: '日语', opts: ['日语', TG('汉语'), '韩语', '英语'] },
-  { word: 'PIANO', cn: '钢琴', lang: '意大利语', opts: ['意大利语', '法语', '拉丁语', '西班牙语'] },
-  { word: 'ROBOT', cn: '机器人', lang: '捷克语', opts: ['捷克语', '德语', '英语', '波兰语'] },
+  { word: 'PIANO', cn: '钢琴', lang: '意大利语', opts: ['意大利语', TG('法语'), TG('拉丁语'), '西班牙语'] },
+  { word: 'ROBOT', cn: '机器人', lang: '捷克语', opts: ['捷克语', '德语', TG('英语'), '波兰语'] },
   { word: 'SAFARI', cn: '野外游猎', lang: '斯瓦希里语', opts: ['斯瓦希里语', TG('阿拉伯语'), '葡萄牙语', TG('印地语')] },
-  { word: 'CHOCOLATE', cn: '巧克力', lang: '纳瓦特尔语', opts: ['纳瓦特尔语', '西班牙语', '法语', '玛雅语'] },
+  { word: 'CHOCOLATE', cn: '巧克力', lang: '纳瓦特尔语', opts: ['纳瓦特尔语', '西班牙语', TG('法语'), '玛雅语'] },
   { word: 'YOGURT', cn: '酸奶', lang: '土耳其语', opts: ['土耳其语', '希腊语', TG('阿拉伯语'), '保加利亚语'] }
 ];
 

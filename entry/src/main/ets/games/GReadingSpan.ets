@@ -24,10 +24,10 @@ interface Sent {
 }
 
 const SENTS: Sent[] = [
-  { text: '太阳从东边升起', ok: true, key: '太阳' }, { text: '鱼在树上打盹', ok: false, key: '鱼' },
+  { text: '太阳从东边升起', ok: true, key: TG('太阳') }, { text: '鱼在树上打盹', ok: false, key: '鱼' },
   { text: '冬天下雪', ok: true, key: TG('冬天') }, { text: '石头会自己走路', ok: false, key: '石头' },
   { text: '春天花开', ok: true, key: '春天' }, { text: '猫会飞上天', ok: false, key: '猫' },
-  { text: '海水是咸的', ok: true, key: '海水' }, { text: '火车在水底跑', ok: false, key: '火车' },
+  { text: '海水是咸的', ok: true, key: '海水' }, { text: '火车在水底跑', ok: false, key: TG('火车') },
   { text: '小鸟会筑巢', ok: true, key: '小鸟' }, { text: '铅笔能写字', ok: true, key: TG('铅笔') },
   { text: '蚂蚁比大象重', ok: false, key: '蚂蚁' }, { text: '雨后常有彩虹', ok: true, key: '彩虹' }
 ];

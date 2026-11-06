@@ -24,7 +24,7 @@ const BANK: Syl[] = [
   { w: 'BASKETBALL', gloss: '篮球 🏀', parts: ['BAS', 'KET', 'BALL'], extra: ['BO', 'NESS'] },
   { w: 'CHOCOLATE', gloss: '巧克力 🍫', parts: ['CHO', 'CO', 'LATE'], extra: ['CHI', 'EST'] },
   { w: 'BICYCLE', gloss: '自行车 🚲', parts: ['BI', 'CY', 'CLE'], extra: ['BY', 'ING'] },
-  { w: 'UMBRELLA', gloss: '雨伞 ☂️', parts: ['UM', 'BREL', 'LA'], extra: ['UN', 'LY'] },
+  { w: 'UMBRELLA', gloss: TG('雨伞 ☂️'), parts: ['UM', 'BREL', 'LA'], extra: ['UN', 'LY'] },
   { w: 'HOSPITAL', gloss: '医院 🏥', parts: ['HOS', 'PI', 'TAL'], extra: ['TEL', 'ER'] },
   { w: 'PINEAPPLE', gloss: '菠萝 🍍', parts: ['PINE', 'AP', 'PLE'], extra: ['PIN', 'ER'] },
   { w: 'COMPUTER', gloss: '电脑 💻', parts: ['COM', 'PU', 'TER'], extra: ['PUT', 'OR'] },

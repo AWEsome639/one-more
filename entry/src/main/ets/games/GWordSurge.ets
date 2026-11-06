@@ -19,10 +19,10 @@ const TARGET: number = 12; const PENALTY_MS: number = 3000; const FEED_MS: numbe
 interface Quiz { w: string; hint: string }
 const BANK: Quiz[] = [
   { w: 'APPLE', hint: TG('苹果') }, { w: 'BRIDGE', hint: TG('桥') }, { w: 'CANDLE', hint: '蜡烛' },
-  { w: 'DOCTOR', hint: '医生' }, { w: 'ENGINE', hint: '发动机' }, { w: 'FOREST', hint: '森林' },
+  { w: 'DOCTOR', hint: TG('医生') }, { w: 'ENGINE', hint: '发动机' }, { w: 'FOREST', hint: TG('森林') },
   { w: 'GARDEN', hint: TG('花园') }, { w: 'HARBOR', hint: '港口' }, { w: 'ISLAND', hint: '岛屿' },
   { w: 'JUNGLE', hint: '丛林' }, { w: 'KITCHEN', hint: '厨房' }, { w: 'LADDER', hint: '梯子' },
-  { w: 'MARKET', hint: '市场' }, { w: 'NEEDLE', hint: '针' }, { w: 'ORCHID', hint: '兰花' },
+  { w: 'MARKET', hint: TG('市场') }, { w: 'NEEDLE', hint: '针' }, { w: 'ORCHID', hint: '兰花' },
   { w: 'POCKET', hint: '口袋' }, { w: 'QUARTZ', hint: '石英' }, { w: 'RIBBON', hint: '丝带' },
   { w: 'SILVER', hint: '银' }, { w: 'TEMPLE', hint: '庙宇' }, { w: 'UMBRELLA', hint: '雨伞' },
   { w: 'VILLAGE', hint: '村庄' }, { w: 'WHISPER', hint: '低语' }, { w: 'YELLOW', hint: '黄色' }

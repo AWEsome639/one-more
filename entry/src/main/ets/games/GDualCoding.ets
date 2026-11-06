@@ -29,7 +29,7 @@ const PAIRS: Pair[] = [
   { word: '雨伞', icon: '☂️' }, { word: '钢琴', icon: '🎹' },
   { word: '相机', icon: '📷' }, { word: '闹钟', icon: '⏰' },
   { word: '足球', icon: '⚽' }, { word: '蛋糕', icon: '🍰' },
-  { word: '灯泡', icon: '💡' }, { word: '钥匙', icon: '🔑' }
+  { word: '灯泡', icon: '💡' }, { word: TG('钥匙'), icon: '🔑' }
 ];
 @Component
 export struct GDualCoding {

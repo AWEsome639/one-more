@@ -31,7 +31,7 @@ const BANK: Word[] = [
   { w: 'university', ipa: '/ˌjuːnɪˈvɜːsəti/', cn: '大学' },
   { w: 'hospital', ipa: '/ˈhɒspɪtl/', cn: '医院' },
   { w: 'computer', ipa: '/kəmˈpjuːtə/', cn: '电脑' },
-  { w: 'elephant', ipa: '/ˈelɪfənt/', cn: '大象' },
+  { w: 'elephant', ipa: '/ˈelɪfənt/', cn: TG('大象') },
   { w: 'weather', ipa: '/ˈweðə/', cn: '天气' },
   { w: 'January', ipa: '/ˈdʒænjuəri/', cn: '一月' },
   { w: 'garden', ipa: '/ˈɡɑːdn/', cn: TG('花园') },
