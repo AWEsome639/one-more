@@ -15,7 +15,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 const ROUNDS: number = 8; const PASS: number = 6; const NEXT_MS: number = 850; const UNIVERSE: number = 12;
-const REGION: string[] = ['只在 A', '只在 B', 'A、B 都有', '都不在'];
+const REGION: string[] = [TG('只在 A'), TG('只在 B'), 'A、B 都有', '都不在'];
 function sample(k: number, hi: number): number[] {
   const pool: number[] = [];
   for (let i = 1; i <= hi; i++) { pool.push(i); }

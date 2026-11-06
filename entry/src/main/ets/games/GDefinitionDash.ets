@@ -23,7 +23,7 @@ interface Q { w: string; opts: string[] }
 const POOL: Q[] = [
   { w: 'ephemeral', opts: ['转瞬即逝的', '坚不可摧的', '笨重迟缓的'] }, { w: 'loquacious', opts: ['话多的', '沉默寡言的', '耳背的'] },
   { w: 'zenith', opts: ['顶点；天顶', '深渊', '起点'] }, { w: 'candor', opts: ['坦率', '欺骗', '胆怯'] },
-  { w: 'obdurate', opts: ['固执的', '温顺的', '慷慨的'] }, { w: 'salient', opts: ['显著的', '隐蔽的', '潮湿的'] },
+  { w: 'obdurate', opts: ['固执的', '温顺的', '慷慨的'] }, { w: 'salient', opts: ['显著的', '隐蔽的', TG('潮湿的')] },
   { w: 'verbose', opts: ['冗长的', '精炼的', '晦涩的'] }, { w: 'benign', opts: ['良性的；和善的', '恶性的', '有毒的'] },
   { w: 'taciturn', opts: ['沉默寡言的', '健谈的', '粗鲁的'] }, { w: 'adroit', opts: ['熟练的', '笨拙的', '迟缓的'] },
   { w: 'myriad', opts: ['无数的', '稀少的', '单一的'] }, { w: 'placate', opts: ['安抚', '激怒', '忽视'] },

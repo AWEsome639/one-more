@@ -322,7 +322,7 @@ export struct GMandelbrot {
     if (this.phase === 0) {
       return TG('画面正中的那个点，在集合内还是集合外？');
     }
-    const head: string = this.lastRight ? '✅ 答对了！' : '❌ 答错了。';
+    const head: string = this.lastRight ? TG('✅ 答对了！') : '❌ 答错了。';
     if (this.inside) {
       return head + TG2('中心点在集合内（迭代 {0} 次仍未逃逸）', String(this.iter));
     }

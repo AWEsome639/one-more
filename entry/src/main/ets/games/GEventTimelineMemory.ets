@@ -23,7 +23,7 @@ interface Ev {
   label: string;
 }
 const POOL: Ev[] = [
-  { k: 0, icon: '🌅', label: '起床' }, { k: 1, icon: '☕', label: '早餐' },
+  { k: 0, icon: '🌅', label: '起床' }, { k: 1, icon: '☕', label: TG('早餐') },
   { k: 2, icon: '🚌', label: '通勤' }, { k: 3, icon: '💻', label: '工作' },
   { k: 4, icon: '🍜', label: '午餐' }, { k: 5, icon: '📞', label: '开会' },
   { k: 6, icon: '🏃', label: '运动' }, { k: 7, icon: '🍽️', label: '晚餐' },

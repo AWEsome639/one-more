@@ -27,7 +27,7 @@ const BANK: VW[] = [
   { w: 'WINTER', gloss: TG('冬天 ❄️') }, { w: 'DOCTOR', gloss: '医生 🩺' }, { w: 'PLANET', gloss: '行星 🪐' },
   { w: 'MARKET', gloss: '市场 🛒' }, { w: 'SUMMER', gloss: '夏天 ☀️' }, { w: 'ROBOT', gloss: '机器人 🤖' },
   { w: 'CANDLE', gloss: '蜡烛 🕯️' }, { w: 'SILVER', gloss: '银 🥈' }, { w: 'WINDOW', gloss: '窗户 🪟' },
-  { w: 'BRIDGE', gloss: '桥 🌉' }, { w: 'KITCHEN', gloss: '厨房 🍳' }, { w: 'MONKEY', gloss: '猴子 🐒' }
+  { w: 'BRIDGE', gloss: '桥 🌉' }, { w: 'KITCHEN', gloss: TG('厨房 🍳') }, { w: 'MONKEY', gloss: '猴子 🐒' }
 ];
 
 function isVowel(ch: string): boolean { return VOWELS.indexOf(ch) >= 0; }

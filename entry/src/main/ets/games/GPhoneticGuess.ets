@@ -27,7 +27,7 @@ interface Word {
 const BANK: Word[] = [
   { w: 'apple', ipa: '/ˈæpl/', cn: TG('苹果') },
   { w: 'banana', ipa: '/bəˈnɑːnə/', cn: TG('香蕉') },
-  { w: 'chocolate', ipa: '/ˈtʃɒklət/', cn: '巧克力' },
+  { w: 'chocolate', ipa: '/ˈtʃɒklət/', cn: TG('巧克力') },
   { w: 'university', ipa: '/ˌjuːnɪˈvɜːsəti/', cn: '大学' },
   { w: 'hospital', ipa: '/ˈhɒspɪtl/', cn: '医院' },
   { w: 'computer', ipa: '/kəmˈpjuːtə/', cn: '电脑' },
@@ -35,7 +35,7 @@ const BANK: Word[] = [
   { w: 'weather', ipa: '/ˈweðə/', cn: '天气' },
   { w: 'January', ipa: '/ˈdʒænjuəri/', cn: '一月' },
   { w: 'garden', ipa: '/ˈɡɑːdn/', cn: TG('花园') },
-  { w: 'silent', ipa: '/ˈsaɪlənt/', cn: '安静的' },
+  { w: 'silent', ipa: '/ˈsaɪlənt/', cn: TG('安静的') },
   { w: 'southern', ipa: '/ˈsʌðən/', cn: '南方的' }
 ];
 

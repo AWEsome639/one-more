@@ -18,12 +18,12 @@ import { Tv } from '../core/Tv';
 const ROUNDS: number = 6; const LIVES: number = 3; const VOWELS: string = 'AEIOU';
 interface Item { w: string; hint: string }
 const POOL: Item[] = [
-  { w: 'ELEPHANT', hint: '大象 🐘' }, { w: 'MOUNTAIN', hint: '高山 ⛰️' },
-  { w: 'KITCHEN', hint: '厨房 🍳' }, { w: 'WINDOW', hint: '窗户 🪟' },
+  { w: 'ELEPHANT', hint: TG('大象 🐘') }, { w: 'MOUNTAIN', hint: TG('高山 ⛰️') },
+  { w: 'KITCHEN', hint: TG('厨房 🍳') }, { w: 'WINDOW', hint: '窗户 🪟' },
   { w: 'GIRAFFE', hint: '长颈鹿 🦒' }, { w: 'UMBRELLA', hint: TG('雨伞 ☂️') },
-  { w: 'BICYCLE', hint: '自行车 🚲' }, { w: 'DOLPHIN', hint: '海豚 🐬' },
-  { w: 'LIBRARY', hint: '图书馆 📚' }, { w: 'CHOCOLATE', hint: '巧克力 🍫' },
-  { w: 'PENGUIN', hint: '企鹅 🐧' }, { w: 'SANDWICH', hint: '三明治 🥪' }
+  { w: 'BICYCLE', hint: TG('自行车 🚲') }, { w: 'DOLPHIN', hint: '海豚 🐬' },
+  { w: 'LIBRARY', hint: '图书馆 📚' }, { w: 'CHOCOLATE', hint: TG('巧克力 🍫') },
+  { w: 'PENGUIN', hint: '企鹅 🐧' }, { w: 'SANDWICH', hint: TG('三明治 🥪') }
 ];
 /** 元音换成下划线，辅音与字母总数原样保留 */
 function skeleton(w: string): string {

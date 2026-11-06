@@ -593,7 +593,7 @@ export struct GBridgesAll {
     this.seg = segments(link, this.ix, this.iy, n, N);
     this.sel = -1;
     this.steps = this.steps + 1;
-    this.status = next === 0 ? '拆掉一座桥' : TG2("架了 {0} 座桥", next);
+    this.status = next === 0 ? TG('拆掉一座桥') : TG2("架了 {0} 座桥", next);
     if (this.isWin()) {
       this.done = true;
       this.status = TG('🎉 数字全对、全岛连通！');

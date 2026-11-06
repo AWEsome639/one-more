@@ -227,7 +227,7 @@ export struct GVennNumbers {
     this.timer = setInterval(() => { if (!this.over) { this.clock = this.clock + 1; } }, 1000);
   }
   private live(i: number): boolean { return this.items[i].zone >= 0; }
-  private zoneName(z: number): string { return z === 0 ? '只在 A' : (z === 1 ? '只在 B' : 'A ∩ B'); }
+  private zoneName(z: number): string { return z === 0 ? TG('只在 A') : (z === 1 ? TG('只在 B') : 'A ∩ B'); }
   private tapChip(i: number): void {
     if (this.over || !this.live(i)) { return; }
     this.sel = i;

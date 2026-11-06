@@ -24,8 +24,8 @@ const BANK: Quiz[] = [
   { w: 'JUNGLE', hint: '丛林' }, { w: 'KITCHEN', hint: '厨房' }, { w: 'LADDER', hint: '梯子' },
   { w: 'MARKET', hint: TG('市场') }, { w: 'NEEDLE', hint: '针' }, { w: 'ORCHID', hint: '兰花' },
   { w: 'POCKET', hint: '口袋' }, { w: 'QUARTZ', hint: '石英' }, { w: 'RIBBON', hint: '丝带' },
-  { w: 'SILVER', hint: '银' }, { w: 'TEMPLE', hint: '庙宇' }, { w: 'UMBRELLA', hint: '雨伞' },
-  { w: 'VILLAGE', hint: '村庄' }, { w: 'WHISPER', hint: '低语' }, { w: 'YELLOW', hint: '黄色' }
+  { w: 'SILVER', hint: '银' }, { w: 'TEMPLE', hint: '庙宇' }, { w: 'UMBRELLA', hint: TG('雨伞') },
+  { w: 'VILLAGE', hint: '村庄' }, { w: 'WHISPER', hint: '低语' }, { w: 'YELLOW', hint: TG('黄色') }
 ];
 function mixQuiz(src: Quiz[]): Quiz[] {
   const out: Quiz[] = src.slice();

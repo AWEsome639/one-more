@@ -440,7 +440,7 @@ export struct GKakuroMini {
     //     网格边长是模块级 `N`（=3）。用 diffTotal 算行列会算错。
     const hr: number = Math.floor(this.sel / N) + 1;
     const hc: number = (this.sel % N) + 1;
-    const pos: string = '第 ' + String(hr) + ' 行第 ' + String(hc) + ' 列填 ' + String(v);
+    const pos: string = '第 ' + String(hr) + TG(' 行第 ') + String(hc) + ' 列填 ' + String(v);
     return Hint.make([this.sel],
       TG2('{0} —— 整盘解是 {1}', pos, sol.slice(0, 3).join(' ') + ' / ' + sol.slice(3, 6).join(' ')),
       'Fill ' + String(v) + ' here; the full solution is ' + sol.join(' '), t0);
