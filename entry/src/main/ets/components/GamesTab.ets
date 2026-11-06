@@ -1859,7 +1859,7 @@ build() {
       Blank()
       // ★ 视图切换：网格 ⇄ 字母表（奥森 2026-10-13「再加一个游戏列表，按字母排序」）
       //   放在这一行是因为它字最少；两个小胶囊，选中态跟随主题色
-      this.viewPill(ViewMode.GRID, '▦', '网格', 'Grid')
+      this.viewPill(ViewMode.GRID, '▦', TG('网格'), 'Grid')
       this.viewPill(ViewMode.AZ, '🔤', 'A-Z', 'A-Z')
       Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
         .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)

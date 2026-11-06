@@ -34,7 +34,7 @@ import { Bp } from '../core/Bp';
 //          ⇒ 会重复追加「（演示不计分）」
 //       ② 它会一直挂在 i18n 检查的「缺键」名单里，让真正的缺译被淹没
 //   ⇒ 抽成不带 TG 的常量，语义明确：这是标识，不是文案。
-const DEMO_NO_SCORE_TAG: string = '不计分';
+const DEMO_NO_SCORE_TAG: string = TG('不计分');
 
 @Component
 export struct DemoBar {
