@@ -171,7 +171,10 @@ export struct GFibonacciMerge {
     }
     const lo: number = this.findPair();
     if (lo < 0) {
-      return false;
+      // ★ 2026-11-06：局面无解时 AI 不能干停（代打的意义是把一局打完）
+      //   ⇒ 自动重开一局（reset 已保证新开局至少有一组可合并，不会死循环）
+      this.reset();
+      return true;
     }
     if (this.sel < 0) {
       this.tap(lo);
