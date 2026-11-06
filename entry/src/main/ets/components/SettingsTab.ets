@@ -395,7 +395,7 @@ build() {
           Text('›').fontSize(FontSize.lg).fontColor(this.theme().inkFaint)
             .accessibilityLevel('no')
         }
-        .width('100%').padding(Space.md)
+        .width('100%').height(64).padding(Space.md)   // ★ 判据 1757 试修：显式高度，防嵌套 Column 塌陷
         .backgroundColor(this.theme().surface).borderRadius(Radius.md).shadow(Shadow.card)
         .onClick(() => {
           Haptics.tap();
