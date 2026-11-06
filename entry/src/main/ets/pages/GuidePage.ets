@@ -477,9 +477,11 @@ struct GuidePage {
   /** 小节卡（同上：字面量对进，内部算） */
   sec(titleZh: string, titleEn: string, bodyZh: string, bodyEn: string) {
     Column({ space: Space.sm }) {
-      Text(this.t(titleZh, titleEn)).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
+      // ★ 判据 1744：隐私政策要 10 语言（不是中英双语）—— TG 查 DICT，
+      //   字典里有整段翻译就直接用；没有时 TG 内部会回退中文（EN 模式下会退英文由 TG 处理）
+      Text(TG(titleZh)).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.theme().ink)
-      Text(this.t(bodyZh, bodyEn)).fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
+      Text(TG(bodyZh)).fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
         .lineHeight(22)
     }
     .width('100%')
