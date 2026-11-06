@@ -208,6 +208,12 @@ export struct GBlinkDetector {
     if (this.over) {
       return false;
     }
+    // ★ 2026-11-06 真机 bug（同 GAbReversalOddball 的 autoStep 空实现）：
+    //   原来什么都不做 ⇒ AI 代打永远不点，永远命中不了。
+    //   「眼睛正闭着」只在 eye 为真时成立，且每题只能判一次（responded）。
+    if (this.eye && !this.responded) {
+      this.tap();
+    }
     return true;
   }
 
