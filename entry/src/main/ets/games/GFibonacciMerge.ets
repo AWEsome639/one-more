@@ -64,9 +64,20 @@ export struct GFibonacciMerge {
     this.total = GameDiff.livesNow(LIVES);   // 难度可能刚变过，必须重算
      this.reset(); }
   private reset(): void {
-    const list: number[] = [];
-    for (let i = 0; i < SLOT; i++) {
-      list.push(SEED[Math.floor(Math.random() * SEED.length)]);
+    // ★ 2026-11-06 真机 bug：开局可能**一组可合并的都没有**（纯随机 SEED）
+    //   ⇒ 玩家一进来就无解，AI 代打也会立刻 return false 停住（TIMEOUT）。
+    //   修法：重生成直到至少有一组相邻和是斐波那契数（最多试 200 次兜底）。
+    let list: number[] = [];
+    for (let attempt = 0; attempt < 200; attempt++) {
+      list = [];
+      for (let i = 0; i < SLOT; i++) {
+        list.push(SEED[Math.floor(Math.random() * SEED.length)]);
+      }
+      let solvable: boolean = false;
+      for (let i = 0; i + 1 < list.length; i++) {
+        if (isFib(list[i] + list[i + 1])) { solvable = true; break; }
+      }
+      if (solvable) { break; }
     }
     this.cells = list; this.sel = -1; this.best = 1; this.lives = this.total; this.score = 0; this.moves = 0; this.shakeX = 8; setTimeout(() => { this.shakeX = -8; }, 60); setTimeout(() => { this.shakeX = 0; }, 120);
     this.over = false; this.won = false; this.finished = false; this.startAt = Date.now(); this.msg = TG('点两个相邻格子：和是斐波那契数就合并');
