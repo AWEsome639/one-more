@@ -13,6 +13,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
@@ -414,16 +415,20 @@ export struct GBinomialMatch {
   private aiPair(_d: number): void {
     if (this.selL >= 0) { this.tapL(this.selL); }
     if (this.selR >= 0) { this.tapR(this.selR); }
+    let found: string = '';
     for (let i = 0; i < this.left.length; i++) {
       if (this.doneL[i]) { continue; }
       for (let j = 0; j < this.right.length; j++) {
         if (!this.doneR[j] && this.right[j] === this.left[i].coef) {
+          hilog.info(0x0000, 'BinomialAI', 'pair i=' + String(i) + ' j=' + String(j) + ' coef=' + String(this.left[i].coef));
           this.tapL(i);
           this.tapR(j);
           return;
         }
       }
+      found = found + '[' + String(i) + ':' + String(this.left[i].coef) + ']';
     }
+    hilog.info(0x0000, 'BinomialAI', 'NO-PAIR left=' + found + ' right=' + this.right.join(',') + ' doneL=' + this.doneL.join(',') + ' doneR=' + this.doneR.join(','));
   }
 
   build() {

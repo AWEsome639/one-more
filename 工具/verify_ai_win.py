@@ -693,6 +693,14 @@ def verify(name):
         time.sleep(2.0)
     if not ai:
         return 'FAIL', '找不到 AI 代打按钮'
+    # ★ 判据 1711：点之前**再 dump 一次拿最新 bounds** —— 演示结束/布局切换会把按钮
+    #   从 y543 挪回 y429，用旧 bounds 会点空（二项式配对就栽在这，误判成 TIMEOUT）
+    time.sleep(0.8)
+    d2 = dump()
+    if d2:
+        ai2 = find(nodes(d2), 'AI 代打')
+        if ai2:
+            ai = ai2
     tap(ai, 0.5)
     # 启动确认：按钮变化 or toast
     time.sleep(1.2)
