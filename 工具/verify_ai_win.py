@@ -886,6 +886,9 @@ def verify(name):
         ai2 = find(nodes(d2), 'AI 代打')
         if ai2:
             ai = ai2
+    # ★ 判据 1720：回合制游戏（井井棋）AI 走完一步就停是正常的 ——
+    #   记下点之前的读数指纹，1717 判「算不出」时要求「读数也没变」才算
+    _sig_before = readout_sig(ns)
     tap(ai, 0.5)
     # ★ 判据 1716：**「点了没反应」必须当场认出来，不许一口气空等 120s**。
     #   由来：11 款 TIMEOUT 里，路径交叉 / 补全盒子的现场页面上按钮还写着「AI 代打」
@@ -916,7 +919,10 @@ def verify(name):
             _, idle3 = ai_state(ns3)      # 只关心它是不是又回到待机
             j3 = '|'.join(x['text'] for x in ns3 if x['text'])
             if idle3 and not WIN_PAT.search(j3) and not LOSE_PAT.search(j3):
-                quit_early = True
+                # ★ 判据 1720：读数变了 ⇒ 它其实走过一步（回合制），不算「算不出」
+                sig3 = readout_sig(ns3)
+                if sig3 == _sig_before:
+                    quit_early = True
             break
         if not idle:
             break                       # 按钮不在页面上（可能瞬间通关回列表）⇒ 交给 watch 判
