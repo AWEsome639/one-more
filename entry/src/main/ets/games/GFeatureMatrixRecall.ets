@@ -203,10 +203,16 @@ export struct GFeatureMatrixRecall {
     if (this.over) {
       return false;
     }
-    if (this.autoCell() < 0) {
-      return true;
+    const c: number = this.autoCell();
+    if (c < 0) {
+      return false;              // ★ 判据 1709：没格子可点 ≠ 等一等（旧版 return true ⇒ 永久空转）
     }
-    this.toggle(this.autoCell());
+    this.toggle(c);
+    // ★ 判据 1709：AI 走的是 toggle()，而判定只挂在 UI 的 onClick 上
+    //   ⇒ 配满 3 格后必须**手动调一次 judge()**，否则永远不判定、autoStep 空转
+    if (this.pickCount() === PER_COLOR) {
+      this.judge();
+    }
     return !this.over;
   }
 
