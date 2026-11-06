@@ -600,6 +600,7 @@ def open_game(name):
         if ' ' in name:
             variants.append(name.replace(' ', ''))
             variants.append(name.split()[-1])
+            variants.append(name.split()[0])   # ★ 判据 1724：首词也要试（「3D 迷宫」→「3D」能搜到）
         any_input = False
         for q in variants:
             if not _input_one(ti, q):
