@@ -22,7 +22,7 @@ const POOL: Item[] = [
   { w: 'SILVER', hint: TG('银 🥈') }, { w: 'ORANGE', hint: '橙子 🍊' },
   { w: 'PLANET', hint: TG('行星 🪐') }, { w: 'MARKET', hint: TG('市场 🛒') },
   { w: 'ISLAND', hint: '岛屿 🏝️' }, { w: 'CASTLE', hint: TG('城堡 🏰') },
-  { w: 'DRAGON', hint: '龙 🐉' }, { w: 'FOREST', hint: '森林 🌲' },
+  { w: 'DRAGON', hint: TG('龙 🐉') }, { w: 'FOREST', hint: TG('森林 🌲') },
   { w: 'PENCIL', hint: TG('铅笔 ✏️') }, { w: 'ROCKET', hint: '火箭 🚀' }
 ];
 /** 凯撒位移：每个字母在 A–Z 里向后挪 k 位 */
@@ -328,7 +328,7 @@ export struct GCryptogram {
       //   ⚠️ 只给这一个块加 layoutWeight(1) —— 其他块保持自然高度，
       //      否则会变成"每块都拉高、间距被撑得很散"（更难看）。
       Row({ space: Space.sm }) {
-        TextInput({ text: this.input, placeholder: '输入明文单词' })
+        TextInput({ text: this.input, placeholder: TG('输入明文单词') })
           .placeholderFont({ size: FontSize.sm }).placeholderColor(this.theme.inkFaint)
           .fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface)
           .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))

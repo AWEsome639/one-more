@@ -520,9 +520,9 @@ export struct GReversi {
     this.turn = EMPTY;
     this.clearTo();
     this.msg = this.won
-      ? '🎉 你赢了 ' + this.bCount + ':' + this.wCount
+      ? TG('🎉 你赢了 ') + this.bCount + ':' + this.wCount
       : (this.bCount === this.wCount
-        ? '🤝 平局 ' + this.bCount + ':' + this.wCount
+        ? TG('🤝 平局 ') + this.bCount + ':' + this.wCount
         : TG2('😵 你输了 {0}:{1}', this.bCount, this.wCount));
     this.finish(this.won);
   }

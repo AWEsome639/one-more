@@ -222,7 +222,7 @@ export struct GKakuroMini {
       return;
     }
     this.hint = this.dupLine()
-      ? '和是对上了，但同一行/列里有重复数字 —— 每条线必须各不相同'
+      ? TG('和是对上了，但同一行/列里有重复数字 —— 每条线必须各不相同')
       : '';
     if (this.moves >= this.diffTotal) {
       this.over = true;

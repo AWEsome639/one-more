@@ -305,7 +305,7 @@ export struct GWordSnakeTrail {
     this.body = grown;
     const cell: string = this.letters[next];
     const g: string[] = this.letters.slice(); g[next] = randLetter();
-    if (cell !== this.target.charAt(this.spelled)) { this.letters = g; this.crash(cell + ' 不是下一个字母'); return; }
+    if (cell !== this.target.charAt(this.spelled)) { this.letters = g; this.crash(cell + TG(' 不是下一个字母')); return; }
     this.spelled = this.spelled + 1; this.score = this.score + 50; this.len = this.len + 1;
     this.letters = g;
     if (this.spelled < this.target.length) {

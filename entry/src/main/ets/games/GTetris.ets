@@ -444,7 +444,7 @@ export struct GTetris {
       this.finish(true);
       return;
     }
-    this.status = cleared > 0 ? TG2("消掉 {0} 行！", cleared) : '继续加油';
+    this.status = cleared > 0 ? TG2("消掉 {0} 行！", cleared) : TG('继续加油');
     this.spawn();
   }
 

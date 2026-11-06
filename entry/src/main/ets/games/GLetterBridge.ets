@@ -34,7 +34,7 @@ const BANK: LB[] = [
   { left: 'MUS', right: 'C', letter: 'I', cn: TG('音乐'), opts: ['I', 'E', 'A', 'U'] },
   { left: 'FLO', right: 'ER', letter: 'W', cn: TG('花'), opts: ['W', 'V', 'R', 'U'] },
   { left: 'DOC', right: 'OR', letter: 'T', cn: TG('医生'), opts: ['T', 'D', 'K', 'S'] },
-  { left: 'TEA', right: 'ER', letter: 'CH', cn: '老师', opts: ['CH', 'SH', 'TH', 'CK'] },
+  { left: 'TEA', right: 'ER', letter: 'CH', cn: TG('老师'), opts: ['CH', 'SH', 'TH', 'CK'] },
   { left: 'WEI', right: 'HT', letter: 'G', cn: '重量', opts: ['G', 'K', 'H', 'J'] },
   { left: 'BR', right: 'AD', letter: 'E', cn: TG('面包'), opts: ['E', 'A', 'O', 'I'] }
 ];

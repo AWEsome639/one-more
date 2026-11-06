@@ -22,7 +22,7 @@ const MAX_N: number = 6;
 const MAX_CELLS: number = MAX_N * MAX_N; const ROUNDS: number = 6; const NEED: number = 4;
 const ROWS: number[] = [0, 1, 2, 3];
 const PATH: number[] = [5, 6, 9, 10, 1, 2, 4, 8, 0, 3, 7, 11, 12, 13, 14, 15];   // 生长规律的固定次序
-const RULE_NAMES: string[] = ['每步顺时针转 90°', '每步整块右移一格', '每步多长出一格'];
+const RULE_NAMES: string[] = [TG('每步顺时针转 90°'), TG('每步整块右移一格'), TG('每步多长出一格')];
 /** 手挑的 6 个小块（4×4，各 5 格），都是「转 4 次才回原位」的非对称形 */
 const BLOBS: number[][] = [
   [0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],

@@ -460,9 +460,9 @@ export struct GTennerGrid {
 
   private tip(): string {
     if (this.over) {
-      return this.won ? TG2("整盘排好 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : '冲突太多，本局失败';
+      return this.won ? TG2("整盘排好 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : TG('冲突太多，本局失败');
     }
-    return this.sel < 0 ? '先点一个空格，再点下面数字' : TG2("已选中第 {0} 行", String(Math.floor(this.sel / this.diffTotal) + 1));
+    return this.sel < 0 ? TG('先点一个空格，再点下面数字') : TG2("已选中第 {0} 行", String(Math.floor(this.sel / this.diffTotal) + 1));
   }
 
   build() {

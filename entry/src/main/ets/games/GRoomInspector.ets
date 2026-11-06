@@ -214,7 +214,7 @@ export struct GRoomInspector {
     const r: number = Math.floor(i / COLS) + 1;
     const c: number = (i % COLS) + 1;
     return Hint.make([i],
-      TG2('第 {0} 行第 {1} 列不同 —— 上面是 {2}', String(r), String(c), this.up[i]) + '，下面是 ' + this.down[i],
+      TG2('第 {0} 行第 {1} 列不同 —— 上面是 {2}', String(r), String(c), this.up[i]) + TG('，下面是 ') + this.down[i],
       TG2('Row {0}, column {1} differs: {2}', String(r), String(c), this.up[i]) + ' → ' + this.down[i], t0);
   }
 
@@ -263,7 +263,7 @@ export struct GRoomInspector {
     if (this.done) { return; }
     this.done = true; this.stop();
     this.over = true; this.won = solved;
-    this.msg = solved ? '🎉 三处全找到了！' : TG2("😵 本局结束 · 找到 {0} 处", String(this.found.length));
+    this.msg = solved ? TG('🎉 三处全找到了！') : TG2("😵 本局结束 · 找到 {0} 处", String(this.found.length));
     const raw: number = solved ? 200 + this.secs * 3 - this.miss * 40 : this.found.length * 40;
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({

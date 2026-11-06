@@ -261,7 +261,7 @@ export struct GBoxCompletion {
     }
     const holes: number[] = this.boxHoles();
     if (holes.length === 0) {
-      return Hint.none('边框已经补齐了，别再点了');
+      return Hint.none(TG('边框已经补齐了，别再点了'));
     }
     const k: number = holes[0];
     const n: number = this.diffTotal;
@@ -333,7 +333,7 @@ export struct GBoxCompletion {
  if (bad === 0 && covered === per.length) {
    this.note = TG('边框合拢，完美盒子 🎉'); this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
  }
- this.note = TG2('已补 {0} 格（边框共 {1} 格）', String(n), String(per.length - covered + n));
+ this.note = TG2(TG('已补 {0} 格（边框共 {1} 格）'), String(n), String(per.length - covered + n));
  }
  private finish(solved: boolean): void {
  this.over = true; this.won = solved;

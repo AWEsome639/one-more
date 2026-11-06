@@ -510,7 +510,7 @@ export struct GSudoku {
     hilog.info(0x0000, 'SudokuDifficulty',
       '本局生成：挖空 %{public}d，模型难度 %{public}s，目标 %{public}s',
       blanks,
-      aiDiff < 0 ? '不可用' : aiDiff.toFixed(3),
+      aiDiff < 0 ? TG('不可用') : aiDiff.toFixed(3),
       SudokuDifficulty.targetFor(GameDiff.now()).toFixed(2));
 
     this.answer = sol;

@@ -20,7 +20,7 @@ interface FaceItem { icon: string; name: string; }
 interface NameChoice { label: string; ok: boolean; }
 
 const POOL: FaceItem[] = [
-  { icon: '🧑‍🚀', name: '阿航' }, { icon: '👩‍🍳', name: '苏眉' }, { icon: '🧑‍🎨', name: '林拓' },
+  { icon: '🧑‍🚀', name: TG('阿航') }, { icon: '👩‍🍳', name: TG('苏眉') }, { icon: '🧑‍🎨', name: TG('林拓') },
   { icon: '👨‍🔬', name: '周原' }, { icon: '🧝', name: '白芨' }, { icon: '🧛', name: '黎夜' },
   { icon: '👩‍🌾', name: '陶然' }, { icon: '🧑‍✈️', name: '陈风' }, { icon: '🤠', name: '韦岚' },
   { icon: '🧜', name: '海玥' }, { icon: '👨‍🚒', name: '石敢' }, { icon: '👩‍⚕️', name: '温言' }
