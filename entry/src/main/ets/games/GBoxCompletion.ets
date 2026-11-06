@@ -287,31 +287,39 @@ export struct GBoxCompletion {
  if (cur[i]) {
  cur[i] = false; this.lit = cur; return;
  }
- cur[i] = true; this.lit = cur; this.moves++; const n: number = this.litCount();
+ cur[i] = true; this.lit = cur; this.moves++;
+ const n: number = this.litCount();
  if (n > PERIM) {
  this.note = TG2('补过头了，多出 {0} 格 ❌', n - PERIM); this.finish(false); return;
  }
- if (n === PERIM) {
+ // ★ 判据 1710：旧判定写死「点亮 12 格」+「周长必须 = 12」，
+ //   而 board 的矩形是随机大小（周长 8/12/16…）⇒ 非 12 的盘面**玩家也永远赢不了**
+ //   + 旧 n 只算 lit、没算题目已给的 cells ⇒ 双重错误
+ //   ⇒ 改为：每次点亮后，检查 (cells ∪ lit) 是否恰好是一个**完整的矩形周长**
  let r1: number = this.diffTotal; let c1: number = this.diffTotal; let r2: number = -1; let c2: number = -1;
- for (let k = 0; k < this.diffTotal * this.diffTotal; k++) {
- if (this.cells[k] || this.lit[k]) {
- const r: number = Math.floor(k / this.diffTotal); const c: number = k - r * this.diffTotal;
- if (r < r1) { r1 = r; }
- if (r > r2) { r2 = r; }
- if (c < c1) { c1 = c; }
- if (c > c2) { c2 = c; }
+ for (let k2 = 0; k2 < this.diffTotal * this.diffTotal; k2++) {
+   if (this.cells[k2] || this.lit[k2]) {
+     const r: number = Math.floor(k2 / this.diffTotal); const c: number = k2 - r * this.diffTotal;
+     if (r < r1) { r1 = r; }
+     if (r > r2) { r2 = r; }
+     if (c < c1) { c1 = c; }
+     if (c > c2) { c2 = c; }
+   }
  }
+ if (r2 < 0) { return; }
+ const per: number[] = rectCells(r1, c1, r2, c2);
+ let bad: number = 0;
+ let covered: number = 0;
+ for (let k3 = 0; k3 < this.diffTotal * this.diffTotal; k3++) {
+   if ((this.cells[k3] || this.lit[k3]) && per.indexOf(k3) < 0) { bad++; }
  }
- const per: number[] = rectCells(r1, c1, r2, c2); let bad: number = 0;
- for (let k = 0; k < this.diffTotal * this.diffTotal; k++) {
- if ((this.cells[k] || this.lit[k]) && per.indexOf(k) < 0) { bad++; }
+ for (let t = 0; t < per.length; t++) {
+   if (this.cells[per[t]] || this.lit[per[t]]) { covered++; }
  }
- if (bad === 0 && per.length === PERIM) {
- this.note = TG('边框合拢，完美盒子 🎉'); this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
+ if (bad === 0 && covered === per.length) {
+   this.note = TG('边框合拢，完美盒子 🎉'); this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
  }
- this.note = TG('12 格了，但凑不成一个完整边框 🤔 撤几格再试'); return;
- }
- this.note = TG2('已补 {0}/{1} 格，还差 {2} 格', n, PERIM, PERIM - n);
+ this.note = TG2('已补 {0} 格（边框共 {1} 格）', String(n), String(per.length - covered + n));
  }
  private finish(solved: boolean): void {
  this.over = true; this.won = solved;
