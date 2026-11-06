@@ -278,6 +278,14 @@ export struct GWireframe3dRotation {
   build() {
     Column({ space: Space.sm }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        demoOn: false,
+        disabled: this.demoId >= 0,
+        autoOn: this.autoId >= 0
+      })
       Text(TG4('第 {0}/{1} 题 · 答对 {2}/{3}', Math.min(this.asked + 1, ROUNDS), ROUNDS, this.hits, this.diffTotal))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md)
@@ -293,14 +301,6 @@ export struct GWireframe3dRotation {
       }, (r: number) => 'orow' + r)
       Text(this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).width('100%')
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      HintBar({
-        showHint: true,
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-        demoOn: false,
-        disabled: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
       Button(this.over ? (this.win() ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
