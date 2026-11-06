@@ -22,11 +22,11 @@ const SIDE: number = 4; const CELLS: number = SIDE * SIDE;
 const MAX_N: number = 6;
 const MAX_CELLS: number = MAX_N * MAX_N; const PERIM: number = 12;
 
-function rectCells(r1: number, c1: number, r2: number, c2: number): number[] {
+function rectCells(r1: number, c1: number, r2: number, c2: number, side: number): number[] {
  const out: number[] = [];
  for (let r = r1; r <= r2; r++) {
  for (let c = c1; c <= c2; c++) {
- if (r === r1 || r === r2 || c === c1 || c === c2) { out.push(r * SIDE + c); }
+ if (r === r1 || r === r2 || c === c1 || c === c2) { out.push(r * side + c); }
  }
  }
  return out;
@@ -88,7 +88,7 @@ export struct GBoxCompletion {
  const r1: number = Math.floor(Math.random() * 2); const c1: number = Math.floor(Math.random() * 2);
  const r2: number = r1 + 1 + Math.floor(Math.random() * (this.diffTotal - 1 - r1));
  const c2: number = c1 + 1 + Math.floor(Math.random() * (this.diffTotal - 1 - c1));
- const per: number[] = rectCells(r1, c1, r2, c2);
+ const per: number[] = rectCells(r1, c1, r2, c2, this.diffTotal);
  const grid: boolean[] = new Array<boolean>(MAX_CELLS).fill(false); let holes: number = 0;
  for (let t = 0; t < per.length; t++) {
  if (Math.random() < 0.6) { grid[per[t]] = true; } else { holes++; }
@@ -97,7 +97,10 @@ export struct GBoxCompletion {
  board = grid; break;
  }
  if (board === null) { // 兜底：整圈边框挖 4 个洞
- const g: boolean[] = new Array<boolean>(MAX_CELLS).fill(true); g[1] = false;
+ // ★ 判据 1717：兜底板必须只在 diffTotal×diffTotal 盘面内 fill(true)
+ const g: boolean[] = new Array<boolean>(MAX_CELLS).fill(false);
+ for (let b = 0; b < this.diffTotal * this.diffTotal; b++) { g[b] = true; }
+ g[1] = false;
  g[2] = false; g[7] = false; g[11] = false; board = g;
  }
  this.cells = board; this.lit = new Array<boolean>(MAX_CELLS).fill(false);
@@ -307,7 +310,7 @@ export struct GBoxCompletion {
    }
  }
  if (r2 < 0) { return; }
- const per: number[] = rectCells(r1, c1, r2, c2);
+ const per: number[] = rectCells(r1, c1, r2, c2, this.diffTotal);
  let bad: number = 0;
  let covered: number = 0;
  for (let k3 = 0; k3 < this.diffTotal * this.diffTotal; k3++) {

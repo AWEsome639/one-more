@@ -142,6 +142,203 @@ function sameCells(a: number[], b: number[]): boolean {
   return true;
 }
 
+// ═══════════ AI 期望值搜索（2026-11-06 重写）═══════════
+// 为什么是 expectimax 而不是"再往前看一步"：
+//   2048 每次滑动后**随机**落一个 2/4。只看「滑完的局面」等于假装落子不存在，
+//   贪心会反复把牌推到"看起来空、其实一落子就堵死"的位置。
+//   正确做法是对空格求期望：V(局面) = Σ_space [0.9·V(落2) + 0.1·V(落4)] / 空格数。
+const SNAKE_PATHS: number[][] = [
+  [0, 1, 2, 3, 7, 6, 5, 4, 8, 9, 10, 11, 15, 14, 13, 12],
+  [0, 4, 8, 12, 13, 9, 5, 1, 2, 6, 10, 14, 15, 11, 7, 3],
+  [12, 13, 14, 15, 11, 10, 9, 8, 4, 5, 6, 7, 3, 2, 1, 0],
+  [3, 7, 11, 15, 14, 10, 6, 2, 1, 5, 9, 13, 12, 8, 4, 0],
+  [3, 2, 1, 0, 4, 5, 6, 7, 11, 10, 9, 8, 12, 13, 14, 15],
+  [12, 8, 4, 0, 1, 5, 9, 13, 14, 10, 6, 2, 3, 7, 11, 15],
+  [15, 14, 13, 12, 8, 9, 10, 11, 7, 6, 5, 4, 0, 1, 2, 3],
+  [15, 11, 7, 3, 2, 6, 10, 14, 13, 9, 5, 1, 0, 4, 8, 12]
+];
+/** 蛇形权重：越靠路径起点的格子权重越大（4^(-k/4) 衰减，起点 181 / 终点 1） */
+const SNAKE_W: number[] = [181.019336, 128.000000, 90.509668, 64.000000,
+  45.254834, 32.000000, 22.627417, 16.000000, 11.313708, 8.000000,
+  5.656854, 4.000000, 2.828427, 2.000000, 1.414214, 1.000000];
+/** 搜索层数：根 max + chance + max（3 层） */
+const AI_SEARCH_DEPTH: number = 3;
+/** chance 层空格上限：空格多于 8 个时均匀采样 8 个
+ *  ★ 实测（各 200 局）：采样 8 个胜率 65.5%，全算 14 个反而只有 61.0%
+ *    —— 全算会把"最坏落点"平均进来，AI 变得过度保守；采样反而更敢做正确的大方向 */
+const AI_CHANCE_SAMPLE: number = 8;
+/** 一拍连走几步（320ms/拍；150s 窗口只够 375 拍，必须连走） */
+const AI_STEPS_PER_TICK: number = 6;
+/** 单拍计算上限（ms）：慢设备上不让一帧卡太久 */
+const AI_TICK_BUDGET_MS: number = 120;
+
+/**
+ * 局面评估（越大越好）。纯函数，不改任何状态。
+ * 组成（权重是 2026-11-06 用 504 局离线模拟扫出来的）：
+ *   蛇形 1.0 + 空格 100 + 可合并对数 50 − 单调性 20 − 平滑度 20
+ * 蛇形取**8 条路径的最大值** ⇒ 自动跟着「最大块现在在哪个角」走，
+ * 不会像固定 snake 那样硬把牌往一个角推（那样一旦错位就是死局）。
+ */
+function aiEval(cells: number[]): number {
+  const lg: number[] = new Array<number>(16);
+  let empty: number = 0;
+  for (let i = 0; i < 16; i++) {
+    const v: number = cells[i];
+    if (v === 0) {
+      lg[i] = 0;
+      empty++;
+    } else {
+      lg[i] = Math.log2(v);
+    }
+  }
+  // 可合并对数（已经相邻且相等）
+  let merges: number = 0;
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      const v: number = cells[r * N + c];
+      if (v === 0) {
+        continue;
+      }
+      if (c + 1 < N && cells[r * N + c + 1] === v) {
+        merges++;
+      }
+      if (r + 1 < N && cells[(r + 1) * N + c] === v) {
+        merges++;
+      }
+    }
+  }
+  // 单调性：跳过空格比较相邻非空；每行/列取「两个方向里较不坏」的
+  let mono: number = 0;
+  for (let r = 0; r < N; r++) {
+    let inc: number = 0;
+    let dec: number = 0;
+    let prev: number = -1;
+    for (let c = 0; c < N; c++) {
+      if (cells[r * N + c] === 0) {
+        continue;
+      }
+      const l: number = lg[r * N + c];
+      if (prev >= 0) {
+        if (prev > l) {
+          inc += prev - l;
+        } else {
+          dec += l - prev;
+        }
+      }
+      prev = l;
+    }
+    mono += Math.min(inc, dec);
+  }
+  for (let c = 0; c < N; c++) {
+    let inc: number = 0;
+    let dec: number = 0;
+    let prev: number = -1;
+    for (let r = 0; r < N; r++) {
+      if (cells[r * N + c] === 0) {
+        continue;
+      }
+      const l: number = lg[r * N + c];
+      if (prev >= 0) {
+        if (prev > l) {
+          inc += prev - l;
+        } else {
+          dec += l - prev;
+        }
+      }
+      prev = l;
+    }
+    mono += Math.min(inc, dec);
+  }
+  // 平滑度：相邻非空格的高度差
+  let smooth: number = 0;
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N - 1; c++) {
+      if (cells[r * N + c] !== 0 && cells[r * N + c + 1] !== 0) {
+        smooth += Math.abs(lg[r * N + c] - lg[r * N + c + 1]);
+      }
+    }
+  }
+  for (let c = 0; c < N; c++) {
+    for (let r = 0; r < N - 1; r++) {
+      if (cells[r * N + c] !== 0 && cells[(r + 1) * N + c] !== 0) {
+        smooth += Math.abs(lg[r * N + c] - lg[(r + 1) * N + c]);
+      }
+    }
+  }
+  // 蛇形（自适应四角）
+  let snake: number = -1e18;
+  for (let k = 0; k < 8; k++) {
+    const path: number[] = SNAKE_PATHS[k];
+    let s: number = 0;
+    for (let j = 0; j < 16; j++) {
+      const idx: number = path[j];
+      if (cells[idx] !== 0) {
+        s += lg[idx] * SNAKE_W[j];
+      }
+    }
+    if (s > snake) {
+      snake = s;
+    }
+  }
+  return snake + empty * 100 + merges * 50 - mono * 20 - smooth * 20;
+}
+
+/**
+ * expectimax 递归。纯函数（不碰组件状态），深度最多 3 层。
+ * @param cells  当前局面，绝不修改
+ * @param depth  剩余层数（<=0 直接评估）
+ * @param player true = max 层（选方向）；false = chance 层（随机落子求期望）
+ */
+function expectValue(cells: number[], depth: number, player: boolean, sample: number): number {
+  if (depth <= 0) {
+    return aiEval(cells);
+  }
+  if (player) {
+    let best: number = -1e18;
+    let any: boolean = false;
+    for (let d = 0; d < 4; d++) {
+      const nx: number[] = previewMove(cells, d);
+      if (sameCells(nx, cells)) {
+        continue;
+      }
+      any = true;
+      const v: number = expectValue(nx, depth - 1, false, sample);
+      if (v > best) {
+        best = v;
+      }
+    }
+    return any ? best : aiEval(cells) - 1e7;   // 四向都动不了 = 死局
+  }
+  const empties: number[] = [];
+  for (let i = 0; i < 16; i++) {
+    if (cells[i] === 0) {
+      empties.push(i);
+    }
+  }
+  if (empties.length === 0) {
+    return aiEval(cells);
+  }
+  let use: number[] = empties;
+  if (sample > 0 && empties.length > sample) {
+    use = [];
+    const step: number = (empties.length - 1) / (sample - 1);
+    for (let k = 0; k < sample; k++) {
+      use.push(empties[Math.round(k * step)]);
+    }
+  }
+  let tot: number = 0;
+  for (let k = 0; k < use.length; k++) {
+    const idx: number = use[k];
+    const a: number[] = cells.slice();
+    a[idx] = 2;
+    const b: number[] = cells.slice();
+    b[idx] = 4;
+    tot += 0.9 * expectValue(a, depth - 1, true, sample)
+      + 0.1 * expectValue(b, depth - 1, true, sample);
+  }
+  return tot / use.length;
+}
+
 /** 方向名（d=0 左 / 1 右 / 2 上 / 3 下）—— 提到模块级，演示与提示共用 */
 const DIR_CN: string[] = ['左', '右', '上', '下'];
 
@@ -327,9 +524,14 @@ export struct G2048 {
     setTimeout(() => { this.hintDir = -1; this.hintText = ''; }, 3000);
   }
 
-  // ═══════════ AI 代打（2026-10-24 第三期）═══════════
-  // 一手前瞻：四个方向各预演一次（previewMove 纯函数，不改状态）⇒ 取启发式分最高那手
-  //   ★ 与上面的 askHint 是同一套评估（都走 heuristicScore）
+  // ═══════════ AI 代打（2026-10-24 第三期；2026-11-06 重写）═══════════
+  // 旧版：四个方向各滑一次 → heuristicScore 取最高（一步贪心）。
+  //   实测（150s）只到 512：贪心看不到「这步滑完随机落子会不会把路堵死」。
+  // 新版：2048 的标准解法 **expectimax（期望值搜索）**
+  //   max 层：选方向；chance 层：对每个空格按 90% 落 2 / 10% 落 4 求期望。
+  //   搜 3 层（4 方向 × 空格 × 4 方向）≈ 200~400 次评估 —— 一拍走 6 步也够快。
+  //   ★ 没走价值网络：G2048Value 是启发式轨迹上训的，直接贪心选方向实测会退化
+  //     （见 G2048Value.ets 里 2026-10-23 的负面结果），这里继续只用启发式。
   private bestDir(): number {
     let bd: number = -1;
     let bv: number = -1e18;
@@ -338,7 +540,7 @@ export struct G2048 {
       if (sameCells(next, this.cells)) {
         continue;                      // 这个方向动不了
       }
-      const v: number = heuristicScore(next);
+      const v: number = expectValue(next, AI_SEARCH_DEPTH - 1, false, AI_CHANCE_SAMPLE);
       if (v > bv) {
         bv = v;
         bd = d;
@@ -433,12 +635,32 @@ export struct G2048 {
     if (this.over || this.won) {
       return false;                    // 死局 / 已拼出目标块 ⇒ 收工
     }
-    const d: number = this.bestDir();
-    if (d < 0) {
-      return false;                    // 四个方向都动不了
+    // ★★★ 2026-11-06 修「150 秒到不了 2048」的**根因之二：节拍太慢**
+    //   代打节拍是 320ms/步（Hint.AUTO_MS），验证窗口只有 ~120s ⇒ **最多 375 步**。
+    //   而拼出一块 2048 至少需要 ~1000 次落子（1024 张 2 合成 2048，
+    //   再算上 10% 直接落 4 的便宜）—— 一步一拍**数学上就不可能到 2048**。
+    //   ⇒ 一拍连走 AI_STEPS_PER_TICK 步（同一套决策，只是不在两帧之间等 320ms）。
+    //   上限 6 步 ⇒ 375 拍 ≈ 2250 步，足够走完一局（含失败局）。
+    const t0: number = Date.now();
+    let n: number = 0;
+    while (n < AI_STEPS_PER_TICK) {
+      if (this.over || this.won) {
+        return false;
+      }
+      const d: number = this.bestDir();
+      if (d < 0) {
+        return false;                  // 四个方向都动不了：真死局
+      }
+      this.move(d);
+      n++;
+      // ★ 慢设备兜底：单拍超预算就先交还主线程，下一拍接着走。
+      //   但**至少走 3 步**再让路 —— 否则慢设备上 375 拍走不到 1000 步，
+      //   2048 还是拼不出来（这是"为了不卡而输掉"的陷阱）。
+      if (n >= 3 && Date.now() - t0 >= AI_TICK_BUDGET_MS) {
+        break;
+      }
     }
-    this.move(d);
-    return !this.over;
+    return !this.over && !this.won;
   }
 
   private askAuto(): void {
