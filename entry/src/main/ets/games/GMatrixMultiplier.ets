@@ -299,6 +299,20 @@ export struct GMatrixMultiplier {
   build() {
     Column({ space: Space.md }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      HintBar({
+
+        showHint: true,
+
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+
+        demoOn: false,
+
+        disabled: this.demoId >= 0,
+
+        autoOn: this.autoId >= 0
+
+      })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -388,20 +402,6 @@ export struct GMatrixMultiplier {
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-      HintBar({
-
-        showHint: true,
-
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
-
-        demoOn: false,
-
-        disabled: this.demoId >= 0,
-
-        autoOn: this.autoId >= 0
-
-      })
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

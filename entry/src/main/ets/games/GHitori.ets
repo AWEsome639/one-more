@@ -687,6 +687,69 @@ export struct GHitori {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.md }) {
+        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : (Bp.tinyScreen() || Bp.isWatch() ? TG('涂黑 / 取消') : TG('点格子涂黑 / 取消')))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.inkSoft)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(Cell.of(44))
+          .enabled(false)
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor('#FFFFFF')
+          .backgroundColor(Palette.cyan)
+          .borderRadius(Radius.md)
+          .width(64)
+          .height(Cell.of(44))
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L787'; })
+          .onBlur(() => { if (this.tvFocus === 'L787') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L787'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
+          .onClick(() => {
+            this.askHint();
+          })
+        Button(LanRace.isRacing() ? TG('联机禁用')
+          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
+          .layoutWeight(1)
+          .height(44)
+          // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
+          //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
+                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
+          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
+          .enabled(!LanRace.isRacing())
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L804'; })
+          .onBlur(() => { if (this.tvFocus === 'L804') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L804'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
+          .onClick(() => {
+            this.askAuto();
+          })
+        Button(TG('重开'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.cyan)
+          .borderRadius(Radius.md)
+          .width(96)
+          .height(Cell.of(44))
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L818'; })
+          .onBlur(() => { if (this.tvFocus === 'L818') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L818'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+          .onClick(() => {
+            Haptics.tap();
+            this.reset();
+          })
+      }
+      .width('100%')
+      Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('已涂黑'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((String(this.shaded())))
@@ -773,69 +836,6 @@ export struct GHitori {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
 
-      Row({ space: Space.md }) {
-        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : (Bp.tinyScreen() || Bp.isWatch() ? TG('涂黑 / 取消') : TG('点格子涂黑 / 取消')))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.sm)
-          .fontColor(this.theme.inkSoft)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(Cell.of(44))
-          .enabled(false)
-        Button(TG('提示'))
-          .fontSize(FontSize.sm)
-          .fontColor('#FFFFFF')
-          .backgroundColor(Palette.cyan)
-          .borderRadius(Radius.md)
-          .width(64)
-          .height(Cell.of(44))
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L787'; })
-          .onBlur(() => { if (this.tvFocus === 'L787') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L787'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
-          .onClick(() => {
-            this.askHint();
-          })
-        Button(LanRace.isRacing() ? TG('联机禁用')
-          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
-          .layoutWeight(1)
-          .height(44)
-          // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
-          //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
-          .backgroundColor(Palette.cyan)
-          .fontColor('#FFFFFF')
-                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
-          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
-          .enabled(!LanRace.isRacing())
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L804'; })
-          .onBlur(() => { if (this.tvFocus === 'L804') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L804'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
-          .onClick(() => {
-            this.askAuto();
-          })
-        Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.cyan)
-          .borderRadius(Radius.md)
-          .width(96)
-          .height(Cell.of(44))
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L818'; })
-          .onBlur(() => { if (this.tvFocus === 'L818') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L818'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
-      }
-      .width('100%')
 
       Text(this.hintMsg.length > 0 ? this.hintMsg : TG('涂黑的格子仍显示数字；每行每列剩下的数字不能重复，白格要连成一片'))
         .fontSize(FontSize.xxs)
