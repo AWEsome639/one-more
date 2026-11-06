@@ -198,6 +198,13 @@ export struct GAbReversalOddball {
     if (this.over) {
       return false;
     }
+    // ★ 2026-11-06 真机 bug：原来是空实现（return true 什么都不做）⇒ AI 代打永远不点，
+    //   永远命中不了（NEED_HIT=4）⇒ 这一款 AI 代打形同虚设。
+    //   flip 的持续时间是 FRAME_MS=700ms（不是 BLINK_MS=260ms，那只是 flash 提示的显示时长）
+    //   ⇒ 320ms 轮询一定能抓到 flip 帧。
+    if (this.flip && !this.resp) {
+      this.tapFlip();
+    }
     return true;
   }
 
