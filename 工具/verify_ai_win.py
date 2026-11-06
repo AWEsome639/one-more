@@ -577,13 +577,26 @@ def _wait_card(name, gid=None, tries=4):
     return None
 
 
+def canonical_name(name):
+    """★ 判据 1725：用户传的名字可能没空格（「3D迷宫」），而注册表是「3D 迷宫」——
+    先把名字映射到注册表标准写法，否则 `' ' in name` 不成立、变体只剩 1 个。"""
+    try:
+        nm = _norm(name)
+        for gid, rname in registry_names():
+            if _norm(rname) == nm:
+                return rname, gid
+    except Exception:
+        pass
+    return name, gid_for(name)
+
+
 def open_game(name):
     """搜索并进入游戏；返回 (ok, why)。
 
     ★ 判据 1678：第一次搜不到 ⇒ **清空搜索框重搜一次**（第 ④ 级兜底），仍无才 FAIL。
       实测「进不去游戏」多数是搜索词没吃进去 / 卡片匹配过严，不是游戏打不开。
     """
-    gid = gid_for(name)
+    name, gid = canonical_name(name)
     for attempt in (1, 2):
         _BUDGET.check()
         ti = _open_search()
@@ -603,10 +616,13 @@ def open_game(name):
             variants.append(name.split()[0])   # ★ 判据 1724：首词也要试（「3D 迷宫」→「3D」能搜到）
         any_input = False
         for q in variants:
-            if not _input_one(ti, q):
+            ok_in = _input_one(ti, q)
+            print('     [variant] %r input=%s' % (q, ok_in), flush=True)
+            if not ok_in:
                 continue
             any_input = True
             card = _wait_card(name, gid)
+            print('     [variant] %r card=%s' % (q, card['id'] if card else None), flush=True)
             if card:
                 tap(card, 6.0)
                 time.sleep(1.5)
