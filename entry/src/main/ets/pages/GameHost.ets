@@ -11,6 +11,7 @@
  *   onFinish: (r: GameResult) => void
  */
 
+import { TG } from '../core/GameI18n';
 import { FrameSampler } from '../core/FrameSampler';
 import { Hint } from '../ai/Hint';
 import { Demo } from '../core/Demo';
@@ -401,7 +402,7 @@ struct GameHost {
     //   只显示"自动"的话，玩家不知道里面在做什么 ⇒ 显示「自动·困难」
     if (raw === 3) {
       const real: number = GameDiff.of(this.gameId);
-      const autoCn: string = this.t('自动', 'Auto');
+      const autoCn: string = this.t(TG('自动'), 'Auto');
       const realCn: string = this.t(ProgressStore.DIFF_NAME[real][0], ProgressStore.DIFF_NAME[real][1]);
       return autoCn + '·' + realCn;
     }
@@ -739,14 +740,14 @@ struct GameHost {
     placeholder() {
     Column({ space: Space.md }) {
       Text(this.meta ? this.meta.icon : '🎮').fontSize(56)
-      Text(this.t('这一款还在路上', 'This one is still on the way')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+      Text(this.t(TG('这一款还在路上'), 'This one is still on the way')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
         .fontColor(this.theme().ink)
       Text(this.meta ? displayName(this.meta) : '')   // ★ 繁體/其它语言都要走 displayName（2026-10-13 模拟器抓到）
         .fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
-      Text(this.t('玩法：', 'How to play: ') + (this.meta ? displayTagline(this.meta) : ''))
+      Text(this.t(TG('玩法：'), 'How to play: ') + (this.meta ? displayTagline(this.meta) : ''))
         .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
         .textAlign(TextAlign.Center)
-      Text(this.t('换一款玩玩？', 'Try another?')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+      Text(this.t(TG('换一款玩玩？'), 'Try another?')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
         .margin({ top: Space.lg })
     }
     .width('100%').height('100%')
@@ -980,7 +981,7 @@ struct GameHost {
             .border(Tv.focusBorder(this.focusIdx === 2))
             .onFocus(() => { this.focusIdx = 2; })
             .onBlur(() => { if (this.focusIdx === 2) { this.focusIdx = -1; } })
-            .accessibilityText(this.t('玩法说明', 'How to play'))
+            .accessibilityText(this.t(TG('玩法说明'), 'How to play'))
             .fontSize(FontSize.lg)
             .fontColor(this.theme().inkSoft)
             .width(this.iconSize()).height(this.iconSize()).textAlign(TextAlign.Center)
@@ -3288,7 +3289,7 @@ struct GameHost {
             .rotate({ angle: this.pop ? 0 : -18 })
             .animation({ duration: 480, curve: Motion.snap() })
             .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
-          Text(this.lastSolved ? this.t('这一局拿下！', 'You cleared it!') : this.t('再来一局？', 'One more?'))
+          Text(this.lastSolved ? this.t(TG('这一局拿下！'), 'You cleared it!') : this.t(TG('再来一局？'), 'One more?'))
             // ★ 2026-11-03（第 894 轮）：195 上 xl(20) → md(16)，再省约 6vp
             .fontSize(Bp.tinyWatch() ? FontSize.md : FontSize.xl).fontWeight(FontWeight.Bold)
             .fontColor(this.theme().ink)
@@ -3296,7 +3297,7 @@ struct GameHost {
           if (this.newAch.length > 0) {
             Column({ space: 4 }) {
               ForEach(this.newAch, (a: string) => {
-                Text(this.t('🏆 解锁成就 ', '🏆 Unlocked ') + a)
+                Text(this.t(TG('🏆 解锁成就 '), '🏆 Unlocked ') + a)
                   .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
                   .fontColor(Palette.amber)
               }, (a: string) => a)
@@ -3319,7 +3320,7 @@ struct GameHost {
           if (this.levelUpTo > 0) {
             Row({ space: Space.sm }) {
               Text('🎊').accessibilityLevel('no').fontSize(FontSize.lg)
-              Text(this.t('升到 LV ', 'Reached LV ') + this.levelUpTo + ' · ' + ProgressStore.titleOf(this.levelUpTo))
+              Text(this.t(TG('升到 LV '), 'Reached LV ') + this.levelUpTo + ' · ' + ProgressStore.titleOf(this.levelUpTo))
                 .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
                 .fontColor(Palette.amber)
             }
@@ -3347,7 +3348,7 @@ struct GameHost {
           if (this.lastHintsUsed > 0) {
             Row({ space: 6 }) {
               Text('💡').accessibilityLevel('no').fontSize(FontSize.sm)
-              Text(this.t('本局用了 ' + this.lastHintsUsed + ' 次提示，不计满分',
+              Text(this.t(TG('本局用了 ') + this.lastHintsUsed + TG(' 次提示，不计满分'),
                           'Used ' + this.lastHintsUsed + ' hint(s) — not a perfect run'))
                 .fontSize(FontSize.xxs).fontColor(this.theme().inkSoft)
                 .layoutWeight(1).maxLines(2)
@@ -3407,7 +3408,7 @@ struct GameHost {
               Text('+' + String(this.gainShown))
                 .fontSize(this.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold)
                 .fontColor(Palette.emerald)
-              Text(this.t('经验', 'XP')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
+              Text(this.t(TG('经验'), 'XP')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
             }.layoutWeight(1)
             .opacity(this.pop ? 1 : 0).translate({ y: this.pop ? 0 : 10 })
             .animation({ duration: Motion.base, curve: Motion.spring(), delay: 160 })
@@ -3428,9 +3429,9 @@ struct GameHost {
               // ★ 2026-11-03（第 1119 轮）奖杯是装饰，语义由旁边「新纪录！」承担
               Text('🏆').accessibilityLevel('no').fontSize(FontSize.md)
               Text(ProgressStore.prevBest > 0
-                ? this.t('新纪录！上次 ' + String(ProgressStore.prevBest),
+                ? this.t(TG('新纪录！上次 ') + String(ProgressStore.prevBest),
                          'New best! Previous ' + String(ProgressStore.prevBest))
-                : this.t('新纪录！', 'New best!'))
+                : this.t(TG('新纪录！'), 'New best!'))
                 .fontSize(FontSize.sm)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(Palette.emerald)
@@ -3466,7 +3467,7 @@ struct GameHost {
                 this.diffTick = this.diffTick + 1;
               });
             })
-          Button(this.t('返回列表', 'Back to list'))
+          Button(this.t(TG('返回列表'), 'Back to list'))
             .fontSize(FontSize.md)
             .fontColor(this.theme().inkSoft)
             .backgroundColor(this.theme().surfaceAlt)

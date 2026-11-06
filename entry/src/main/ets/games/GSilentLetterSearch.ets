@@ -26,7 +26,7 @@ const WORDS: SW[] = [
   { w: 'WRIST', i: 0, zh: TG('手腕') }, { w: 'COMB', i: 3, zh: TG('梳子') },
   { w: 'LISTEN', i: 3, zh: TG('听') }, { w: 'WHISTLE', i: 4, zh: TG('哨子') },
   { w: 'RECEIPT', i: 5, zh: TG('收据') }, { w: 'THUMB', i: 4, zh: '拇指' },
-  { w: 'SWORD', i: 1, zh: '剑' }, { w: 'HALF', i: 2, zh: '一半' },
+  { w: 'SWORD', i: 1, zh: TG('剑') }, { w: 'HALF', i: 2, zh: TG('一半') },
   { w: 'CHRISTMAS', i: 1, zh: '圣诞节' }, { w: 'HOUR', i: 0, zh: TG('小时') }
 ];
 

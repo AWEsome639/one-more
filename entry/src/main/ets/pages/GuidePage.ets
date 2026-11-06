@@ -10,6 +10,7 @@
  * 拾海 2026-10-10
  */
 
+import { TG } from '../core/GameI18n';
 import { router } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Accent } from '../core/Design';
 import { Haptics } from '../core/Haptics';
@@ -53,7 +54,7 @@ function L2(zh: string, en: string, useEN: boolean): string {
  */
 function colorVisionNote(id: string, en: boolean): string {
   if (id === 'color_word_match_up' || id === 'double_trouble') {
-    return L2('这一款需要正常的颜色辨识能力（它考的就是颜色）',
+    return L2(TG('这一款需要正常的颜色辨识能力（它考的就是颜色）'),
               'This one needs normal colour vision — the colour IS the task.', en);
   }
   return '';
@@ -63,43 +64,43 @@ function colorVisionNote(id: string, en: boolean): string {
 function categoryTips(c: GameCategory, en: boolean): string[] {
   if (c === GameCategory.CLASSIC) {
     return [
-      L2('点/滑操作，规则简单，玩起来就懂', 'Tap or swipe. Simple rules, obvious once you start.', en),
-      L2('有明确胜负判定；通关才有经验', 'Clear win or lose — you earn XP only when you clear.', en),
-      L2('右上角 ↻ 可以随时重开这一局', 'Tap ↻ top-right to restart any time.', en)
+      L2(TG('点/滑操作，规则简单，玩起来就懂'), 'Tap or swipe. Simple rules, obvious once you start.', en),
+      L2(TG('有明确胜负判定；通关才有经验'), 'Clear win or lose — you earn XP only when you clear.', en),
+      L2(TG('右上角 ↻ 可以随时重开这一局'), 'Tap ↻ top-right to restart any time.', en)
     ];
   }
   if (c === GameCategory.LOGIC) {
     return [
-      L2('点格子填/涂，满足题目给出的数字条件', 'Tap cells to fill or shade until the number clues are satisfied.', en),
-      L2('「违规」计数表示当前有几处违反规则，归零即通关', 'The "conflicts" counter shows how many rules are broken. Get it to zero and you win.', en),
-      L2('卡住了可以点「换一题」换一个新局面', 'Stuck? Tap "New puzzle" for a fresh board.', en)
+      L2(TG('点格子填/涂，满足题目给出的数字条件'), 'Tap cells to fill or shade until the number clues are satisfied.', en),
+      L2(TG('「违规」计数表示当前有几处违反规则，归零即通关'), 'The "conflicts" counter shows how many rules are broken. Get it to zero and you win.', en),
+      L2(TG('卡住了可以点「换一题」换一个新局面'), 'Stuck? Tap "New puzzle" for a fresh board.', en)
     ];
   }
   if (c === GameCategory.MATH) {
     return [
-      L2('算就完了 —— 结果对就得分，错会扣时间', 'Just do the maths. Right answers score, wrong ones cost you time.', en),
-      L2('多数款有倒计时或步数限制，快比慢强', 'Most have a countdown or a move limit. Fast beats slow.', en),
-      L2('心算不稳的话，先在纸上列一下也行', 'Not confident in your head? Scribble it on paper first.', en)
+      L2(TG('算就完了 —— 结果对就得分，错会扣时间'), 'Just do the maths. Right answers score, wrong ones cost you time.', en),
+      L2(TG('多数款有倒计时或步数限制，快比慢强'), 'Most have a countdown or a move limit. Fast beats slow.', en),
+      L2(TG('心算不稳的话，先在纸上列一下也行'), 'Not confident in your head? Scribble it on paper first.', en)
     ];
   }
   if (c === GameCategory.MEMORY) {
     return [
-      L2('先「看」后「答」：记住闪现的内容，再按提示回忆', 'Look first, answer after. Remember what flashed up, then recall it.', en),
-      L2('答对连续越多，得分越高', 'The longer your streak, the higher the score.', en),
-      L2('错了不要紧，重开一局成本很低', 'Getting it wrong is cheap. Just start again.', en)
+      L2(TG('先「看」后「答」：记住闪现的内容，再按提示回忆'), 'Look first, answer after. Remember what flashed up, then recall it.', en),
+      L2(TG('答对连续越多，得分越高'), 'The longer your streak, the higher the score.', en),
+      L2(TG('错了不要紧，重开一局成本很低'), 'Getting it wrong is cheap. Just start again.', en)
     ];
   }
   if (c === GameCategory.WORD) {
     return [
-      L2('拼词/找词/猜词，考验词汇量与语感', 'Build, find and guess words. Tests vocabulary and feel for language.', en),
-      L2('多数款支持逐字母输入，输错可退格', 'Most accept letter-by-letter input, and you can backspace.', en),
-      L2('不会的可以跳过，不影响其他题', 'Skip anything you do not know. It will not affect the rest.', en)
+      L2(TG('拼词/找词/猜词，考验词汇量与语感'), 'Build, find and guess words. Tests vocabulary and feel for language.', en),
+      L2(TG('多数款支持逐字母输入，输错可退格'), 'Most accept letter-by-letter input, and you can backspace.', en),
+      L2(TG('不会的可以跳过，不影响其他题'), 'Skip anything you do not know. It will not affect the rest.', en)
     ];
   }
   return [
-    L2('观察图形/空间关系，找出规律或路径', 'Study the shapes and space, then find the pattern or the path.', en),
-    L2('方向键或点选操作，走到目标即通关', 'Arrow keys or taps. Reach the goal to win.', en),
-    L2('步数越少得分越高', 'Fewer moves, higher score.', en)
+    L2(TG('观察图形/空间关系，找出规律或路径'), 'Study the shapes and space, then find the pattern or the path.', en),
+    L2(TG('方向键或点选操作，走到目标即通关'), 'Arrow keys or taps. Reach the goal to win.', en),
+    L2(TG('步数越少得分越高'), 'Fewer moves, higher score.', en)
   ];
 }
 
@@ -185,7 +186,7 @@ struct GuidePage {
             Haptics.tap();
             Back.go();
           })
-        Text(this.isPrivacy ? this.t('隐私政策', 'Privacy policy') : this.t('怎么玩', 'How to play'))
+        Text(this.isPrivacy ? this.t('隐私政策', 'Privacy policy') : this.t(TG('怎么玩'), 'How to play'))
           .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink)
           .layoutWeight(1)
@@ -282,8 +283,8 @@ struct GuidePage {
     Column({ space: Space.md }) {
       // ★ 2026-11-02：有具体玩法要点时标题叫「玩法要点」，否则诚实叫「通用玩法」
       Text(this.meta !== undefined && howToOf(this.meta.id) !== null
-        ? this.t('玩法要点', 'How to play')
-        : this.t('通用玩法', 'General rules')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+        ? this.t(TG('玩法要点'), 'How to play')
+        : this.t(TG('通用玩法'), 'General rules')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
       ForEach(this.tips(), (t: string, i: number) => {
         Row({ space: Space.sm }) {
           Text(String(i + 1))
@@ -309,11 +310,11 @@ struct GuidePage {
     // 通用操作
     Column({ space: Space.sm }) {
       this.tierRow(this.meta !== undefined ? this.meta.id : "")
-      Text(this.t('通用操作', 'Controls')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
-      this.kv('↻ 右上角', '↻ top right', '重开这一局', 'Restart this round')
-      this.kv('‹ 左上角', '‹ top left', '返回游戏列表', 'Back to the game list')
-      this.kv('⭐', '⭐', '收藏这一款（在游戏页右上角）', 'Save this game (top right of a game page)')
-      this.kv('结算弹窗', 'Result sheet', '可得经验值，等级会涨', 'Earns XP and levels you up')
+      Text(this.t(TG('通用操作'), 'Controls')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+      this.kv(TG('↻ 右上角'), '↻ top right', TG('重开这一局'), 'Restart this round')
+      this.kv(TG('‹ 左上角'), '‹ top left', TG('返回游戏列表'), 'Back to the game list')
+      this.kv('⭐', '⭐', TG('收藏这一款（在游戏页右上角）'), 'Save this game (top right of a game page)')
+      this.kv(TG('结算弹窗'), 'Result sheet', TG('可得经验值，等级会涨'), 'Earns XP and levels you up')
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
@@ -335,7 +336,7 @@ struct GuidePage {
   private tips(): string[] {
     const m: GameMeta | undefined = this.meta;
     if (m === undefined) {
-      return [this.t('选一款游戏开始吧', 'Pick a game to get started')];
+      return [this.t(TG('选一款游戏开始吧'), 'Pick a game to get started')];
     }
     const out: string[] = [];
     // ★★★ 2026-11-02（第 833 轮）：**有具体玩法要点就用它**，没有再退回通用提示。
@@ -383,7 +384,7 @@ struct GuidePage {
   tierRow(gid: string) {
     Column({ space: 6 }) {
       Row() {
-        Text(this.t('这款的成就', 'Badges for this game'))
+        Text(this.t(TG('这款的成就'), 'Badges for this game'))
           .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
         Blank()
         // ★ BUG #25 同源：档位进度数字没走 Digits ⇒ 阿语下是西文
@@ -466,7 +467,7 @@ struct GuidePage {
 
     this.sec('七、合规声明', '7. Compliance', '本应用为个人开发者独立开发的休闲益智游戏合集：\n· 全部代码为原创编写（ArkTS / ArkUI 原生开发）\n· 玩法均为公有领域的经典益智玩法\n· 未复制、未改编任何第三方项目的代码、美术资源或名称\n· 未使用任何第三方依赖库\n· 图标与界面视觉均为原创设计', 'This is a casual puzzle collection independently developed by a solo developer:\n· All code is originally written (native ArkTS / ArkUI)\n· All gameplay comes from classic puzzles in the public domain\n· No code, artwork or name from any third-party project has been copied or adapted\n· No third-party dependency libraries are used\n· The icon and all interface visuals are original designs')
 
-    Text(this.t('最后更新：2026 年 10 月 10 日', 'Last updated: 10 October 2026'))
+    Text(this.t(TG('最后更新：2026 年 10 月 10 日'), 'Last updated: 10 October 2026'))
       .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
       .width('100%').textAlign(TextAlign.Center)
       .margin({ top: Space.md })

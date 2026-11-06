@@ -110,6 +110,7 @@
  *
  * ════════════════════════════════════════════════════════════════════════
  */
+import { TG } from '../core/GameI18n';
 import { router, curves } from '@kit.ArkUI';
 import { PathShape } from '@ohos.arkui.shape';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -1135,7 +1136,7 @@ struct Splash {
         }
 
         // 副标题（极小屏省略 —— 那里只留 OM + 标题）
-        Text(this.t('355 款小游戏', '355 GAMES'))
+        Text(this.t(TG('355 款小游戏'), '355 GAMES'))
           .fontSize(this.tiny ? 9 : this.subPx)
           .fontWeight(FontWeight.Medium)
           .fontColor('#B8C99E52')
@@ -1160,7 +1161,7 @@ struct Splash {
         //     ✅ 任何尺寸都成立：它永远在副标题下方固定距离，不会断裂、不会撞。
         //     ✅ 也顺带修好了 ①（不再可能压到副标题上）
         //   ★ 判据 376/377 的落地形态：**与其按尺寸分支，不如让布局本身与尺寸无关**。
-        Text(this.t('碎片时间，随时开局', 'A quick round, any time'))
+        Text(this.t(TG('碎片时间，随时开局'), 'A quick round, any time'))
           .fontSize(this.tiny ? 8 : this.tagPx)
           .fontColor('#CC9E52')
           .letterSpacing(this.tiny ? 1 : 3)

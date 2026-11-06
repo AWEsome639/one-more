@@ -7,6 +7,7 @@
  * 拾海 2026-10-11
  */
 
+import { TG } from '../core/GameI18n';
 import { Bp } from '../core/Bp';
 import { router } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Layout, Accent, Cell } from '../core/Design';
@@ -74,12 +75,12 @@ struct LanLobby {
 
   private async doScan(): Promise<void> {
     this.scanning = true;
-    this.status = this.t('正在找同一 Wi-Fi 下的房间…', 'Looking for rooms on your Wi-Fi…');
+    this.status = this.t(TG('正在找同一 Wi-Fi 下的房间…'), 'Looking for rooms on your Wi-Fi…');
     const found: LanRoom[] = await Lan.scan();
     this.rooms = found;
     this.scanning = false;
     this.status = found.length === 0
-      ? this.t('没找到房间 —— 让对手点「开个房间」', 'No rooms found — ask your opponent to host')
+      ? this.t(TG('没找到房间 —— 让对手点「开个房间」'), 'No rooms found — ask your opponent to host')
       : '';
   }
 
@@ -104,13 +105,13 @@ struct LanLobby {
           })
         Text(this.t('局域网对战', 'LAN Play')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink).layoutWeight(1)
-        Text(this.t('重扫', 'Rescan')).fontSize(FontSize.xs).fontColor(this.accentColor())
+        Text(this.t(TG('重扫'), 'Rescan')).fontSize(FontSize.xs).fontColor(this.accentColor())
           .padding(Space.sm)
           .onClick(() => this.doScan())
       }
       .width('100%').padding({ left: Space.sm, right: Space.md, top: Space.xl })
 
-      Text(this.t('同一 Wi-Fi 下的两台设备直接对局 —— 没有服务器，不上传任何数据',
+      Text(this.t(TG('同一 Wi-Fi 下的两台设备直接对局 —— 没有服务器，不上传任何数据'),
                   'Two devices on the same Wi-Fi play directly. No server, nothing uploaded.'))
         .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
         .padding({ left: Space.lg, right: Space.lg })
@@ -120,11 +121,11 @@ struct LanLobby {
       Row({ space: Space.sm }) {
         Text(this.raceMode ? '🏁' : '♟️').fontSize(FontSize.lg)
         Column({ space: 1 }) {
-          Text(this.raceMode ? this.t('竞速模式', 'Race mode') : this.t('回合制对战', 'Turn-based'))
+          Text(this.raceMode ? this.t(TG('竞速模式'), 'Race mode') : this.t(TG('回合制对战'), 'Turn-based'))
             .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
           Text(this.raceMode
-            ? this.t('同一款游戏一起开，谁先完成谁赢；355 款全都能比', 'Same game, first to finish wins — all 355 games')
-            : this.t('井字棋 / 五子棋 / 围棋 等 8 款轮流下', '8 games, take turns'))
+            ? this.t(TG('同一款游戏一起开，谁先完成谁赢；355 款全都能比'), 'Same game, first to finish wins — all 355 games')
+            : this.t(TG('井字棋 / 五子棋 / 围棋 等 8 款轮流下'), '8 games, take turns'))
             .fontSize(FontSize.micro).fontColor(this.theme().inkFaint)
         }
         .alignItems(HorizontalAlign.Start).layoutWeight(1)
@@ -140,16 +141,16 @@ struct LanLobby {
       // ★ 排名榜（竞速模式才有）
       if (this.raceMode) {
         Column({ space: 6 }) {
-          Text(this.t('实时排名', 'Live ranking')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+          Text(this.t(TG('实时排名'), 'Live ranking')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
           if (LanRace.scoresOf().length === 0) {
-            Text(this.t('还没有人完成 —— 开一局吧', 'Nobody finished yet — start a round'))
+            Text(this.t(TG('还没有人完成 —— 开一局吧'), 'Nobody finished yet — start a round'))
               .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
           }
           ForEach(LanRace.ranked(), (sc: RaceScore, i: number) => {
             Row({ space: Space.sm }) {
               Text(i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : String(i + 1))))
                 .fontSize(FontSize.sm).width(28).textAlign(TextAlign.Center)
-              Text(sc.nick + (sc.me ? this.t('（我）', ' (me)') : ''))
+              Text(sc.nick + (sc.me ? this.t(TG('（我）'), ' (me)') : ''))
                 .fontSize(FontSize.sm).fontColor(this.theme().ink).layoutWeight(1)
               Text((sc.ms / 1000).toFixed(1) + 's')
                 .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.accentColor())
@@ -162,7 +163,7 @@ struct LanLobby {
       }
 
       Column({ space: Space.sm }) {
-        Text(this.t('玩哪一款', 'Pick a game')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+        Text(this.t(TG('玩哪一款'), 'Pick a game')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
           .width('100%')
         Flex({ wrap: FlexWrap.Wrap }) {
           ForEach(this.pickList(), (gid: string) => {
@@ -188,7 +189,7 @@ struct LanLobby {
 
       // 手动连接（扫不到房间时用；同一 Wi-Fi 但广播被路由器拦掉的情况很常见）
       Column({ space: 6 }) {
-        Text(this.t('扫不到？直接输房主 IP', 'Nothing found? Type the host IP'))
+        Text(this.t(TG('扫不到？直接输房主 IP'), 'Nothing found? Type the host IP'))
           .fontSize(FontSize.xs).fontColor(this.theme().inkFaint).width('100%')
         Row({ space: Space.sm }) {
           TextInput({ text: this.manualIp, placeholder: '192.168.1.5' })
@@ -199,7 +200,7 @@ struct LanLobby {
             .fontSize(FontSize.sm).layoutWeight(1).height(40)
             .backgroundColor(this.theme().surfaceAlt).borderRadius(Radius.sm)
             .onChange((v: string) => { this.manualPort = v; })
-          Text(this.t('连接', 'Join'))
+          Text(this.t(TG('连接'), 'Join'))
             .fontSize(FontSize.xs).fontColor(Color.White)
             .padding({ left: Space.md, right: Space.md, top: 10, bottom: 10 })
             .backgroundColor(Palette.emerald).borderRadius(Radius.full)
@@ -213,7 +214,7 @@ struct LanLobby {
 
       // 开房
       Button(Bp.tinyScreen() || Bp.isWatch()
-          ? this.t('开个房间', 'Host')
+          ? this.t(TG('开个房间'), 'Host')
           : this.t('开个房间（我来当房主）', 'Host a room'))
         // ★ 2026-10-19 自查 A3：开房按钮写死 48vp，大字模式会裁
         .width('100%').constraintSize({ minHeight: Cell.of(48) })
