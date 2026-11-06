@@ -472,7 +472,8 @@ export struct GPhoneticGuess {
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
 
-      // 四个选项
+      // 四个选项（★ Scroll 兜底：小屏 4 行装不下时可滚，绝不把 C/D 裁掉）
+      Scroll() {
       Column({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => {
           Row({ space: Space.sm }) {
@@ -487,7 +488,7 @@ export struct GPhoneticGuess {
               .layoutWeight(1)
           }
           .width('100%')
-          .height(Cell.of(52))
+          .height(Cell.of(24))   // ★ 2026-11-06 真机 bug：4 选项在小屏装不下（32 仍差 119px，24 才够）
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.pickColor(i))
           .borderRadius(Radius.md)
@@ -505,6 +506,9 @@ export struct GPhoneticGuess {
         }, (i: number) => 'o' + i)
       }
       .width('100%')
+      }
+      .width('100%')
+      .scrollBar(BarState.Off)
 
       Text(this.status())
         .fontSize(FontSize.sm)
