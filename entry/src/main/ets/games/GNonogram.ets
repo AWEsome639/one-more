@@ -409,12 +409,19 @@ export struct GNonogram {
     if (this.over) {
       return false;
     }
-    const r: HintResult = this.computeHint();
-    if (!r.ok || r.cells.length === 0) {
-      return false;
+    const n: number = this.diffTotal;
+    // ★ 判据 1701：数织的答案 `this.art` 就在手里（生成时的解）——
+    //   AI 代打直接照答案标，保证 100% 能赢；
+    //   旧版靠「行列唯一推理」，一旦盘面需要交叉推理就 `return false` 静默放弃
+    for (let i = 0; i < n * n; i++) {
+      const want: number = this.art[i] === 1 ? 1 : 2;
+      if (this.cells[i] === want) {
+        continue;
+      }
+      this.tap(i, want);
+      return !this.over;
     }
-    this.tap(r.cells[0]);
-    return !this.over;
+    return false;
   }
 
   private askAuto(): void {
@@ -449,12 +456,14 @@ export struct GNonogram {
     setTimeout(() => { this.hintMsg = ''; }, 4500);
   }
 
-  private tap(i: number): void {
+  private tap(i: number, direct: number = -1): void {
     if (this.over) {
       return;
     }
     const next: number[] = this.cells.slice();
-    next[i] = (next[i] + 1) % 3;      // 空 → 涂黑 → 打叉 → 空
+    // ★ 判据 1701：direct >= 0 时**直接置为 0/1/2**（AI 用）——
+    //   走循环的话「空→涂黑→打叉」会先经过 1，而答案若是空就白吃一次错误
+    next[i] = direct >= 0 ? direct : (next[i] + 1) % 3;
     this.cells = next;
     const v: number = next[i];
     if (v === 1 && this.art[i] === 0) {
