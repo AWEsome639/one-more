@@ -459,7 +459,9 @@ export struct GShikaku {
         own.push(this.owner[i] > 0 ? 1 : 0);
       }
       const out: number[] = [];
-      const budget: number[] = [40000];
+      // ★ 判据 1702：5×5 盘面 40000 节点不够（DFS 枚举所有矩形）⇒ 提到 50 万
+      //   实测旧值下 autoCell 常返回 -1，而 autoStep 又 `return true` 空转 ⇒ AI 永不动
+      const budget: number[] = [500000];
       if (!this.dfsFill(own, out, budget) || out.length < 2) {
         return -1;
       }

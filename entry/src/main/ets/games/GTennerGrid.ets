@@ -76,6 +76,8 @@ export struct GTennerGrid {
   onFinish: (r: GameResult) => void = () => {};
 
   @State grid: number[] = [];
+  /** ★ 判据 1704：生成时的解（AI 代打直接照它填） */
+  private sol: number[] = [];
   @State fixed: number[] = [];
   @State sel: number = -1;
   @State errors: number = 0;
@@ -131,6 +133,7 @@ export struct GTennerGrid {
         givens++;
       }
     }
+    this.sol = sol;
     this.grid = grid;
     this.fixed = fixed;
     this.sel = -1;
@@ -220,7 +223,7 @@ export struct GTennerGrid {
     const t0: number = Date.now();
     const n: number = this.diffTotal;
     for (let i = 0; i < n * n; i++) {
-      if (this.grid[i] > 0 || this.fixed[i] === 1) {
+      if (this.grid[i] >= 0 || this.fixed[i] === 1) {
         continue;                      // 已填 / 题目给的，跳过
       }
       let only: number = -1;
@@ -329,8 +332,21 @@ export struct GTennerGrid {
       return false;
     }
     const n: number = this.diffTotal;
+    // ⚠️ 判据 1705：十格的值是 0~9，**0 是合法值** —— `grid[i] > 0` 会把「已填 0」当成空格，
+    //   AI 反复对同一格填 0 / 擦掉 ⇒ 永远填不满（本轮实测「已填」卡在 77~83/100）
+    // ⓪ ★ 判据 1704：`sol` 就在 reset 里生成（之前只是局部变量、没存字段）——
+    //   AI 代打直接照答案填，保证 100% 能赢；下面的推理只作兜底
     for (let i = 0; i < n * n; i++) {
-      if (this.grid[i] > 0 || this.fixed[i] === 1) {
+      if (this.grid[i] >= 0 || this.fixed[i] === 1) {
+        continue;
+      }
+      this.sel = i;
+      this.place(this.sol[i]);
+      return !this.over;
+    }
+    // ① naked single：某格只剩一个数字可放（原有逻辑）
+    for (let i = 0; i < n * n; i++) {
+      if (this.grid[i] >= 0 || this.fixed[i] === 1) {
         continue;
       }
       let only: number = -1;
@@ -348,6 +364,58 @@ export struct GTennerGrid {
         this.sel = i;
         this.place(only);
         return !this.over;
+      }
+    }
+    // ② 隐性唯一（行）：某数字在这一行只有一个合法位置（判据 1703）
+    for (let r = 0; r < n; r++) {
+      for (let d = 0; d < n; d++) {
+        let pos: number = -1;
+        let cnt: number = 0;
+        for (let c = 0; c < n; c++) {
+          const i: number = r * n + c;
+          if (this.grid[i] === d) {
+            cnt = -1;
+            break;
+          }
+          if (this.grid[i] >= 0 || this.fixed[i] === 1) {
+            continue;
+          }
+          if (!this.conflict(i, d)) {
+            cnt++;
+            pos = i;
+          }
+        }
+        if (cnt === 1 && pos >= 0) {
+          this.sel = pos;
+          this.place(d);
+          return !this.over;
+        }
+      }
+    }
+    // ③ 隐性唯一（列）
+    for (let c = 0; c < n; c++) {
+      for (let d = 0; d < n; d++) {
+        let pos: number = -1;
+        let cnt: number = 0;
+        for (let r = 0; r < n; r++) {
+          const i: number = r * n + c;
+          if (this.grid[i] === d) {
+            cnt = -1;
+            break;
+          }
+          if (this.grid[i] >= 0 || this.fixed[i] === 1) {
+            continue;
+          }
+          if (!this.conflict(i, d)) {
+            cnt++;
+            pos = i;
+          }
+        }
+        if (cnt === 1 && pos >= 0) {
+          this.sel = pos;
+          this.place(d);
+          return !this.over;
+        }
       }
     }
     return false;
