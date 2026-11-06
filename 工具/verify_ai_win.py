@@ -394,11 +394,15 @@ def to_list():
 
 
 def _search_btn(ns):
-    """**右上角**的 🔍（判据 1670：搜索框内还有一个 🔍，点错会把面板关掉）。"""
-    for x in ns:
-        if x['text'] == '🔍' and x['bounds'] and x['bounds'][0] > 2000:
-            return x
-    return None
+    """**右上角**的 🔍（判据 1670：搜索框内还有一个 🔍，点错会把面板关掉）。
+
+    ★ 判据 1697：不能写死 x>2000 —— 440×744(1320px 宽) 上根本不存在。
+      「x 最大的那个 🔍」才是右上角的，跨尺寸成立。
+    """
+    cands = [x for x in ns if x['text'] == '🔍' and x['bounds']]
+    if not cands:
+        return None
+    return max(cands, key=lambda c: c['bounds'][0])
 
 
 def _text_input(ns):
@@ -543,6 +547,24 @@ def open_game(name):
     return False, '搜不到卡片（清空重搜后仍无）'
 
 
+def _screen_center():
+    """读设备实际屏幕尺寸（`wm size`），返回中心点；失败退 1280×800。"""
+    global _SCREEN
+    if _SCREEN is None:
+        _SCREEN = (2560, 1600)
+        try:
+            out = sh("wm size")
+            m = re.search(r'(\d+)x(\d+)', out)
+            if m:
+                _SCREEN = (int(m.group(1)), int(m.group(2)))
+        except Exception:
+            pass
+    return _SCREEN[0] // 2, _SCREEN[1] // 2
+
+
+_SCREEN = None
+
+
 def stop_demo():
     """demo 3 秒后启动；点屏幕空白停掉它（判据 1667/1689）。
 
@@ -552,10 +574,13 @@ def stop_demo():
     """
     _BUDGET.check()
     time.sleep(3.5)
-    sh("uitest uiInput click 1280 800")
-    time.sleep(1.0)
-    sh("uitest uiInput click 1280 220")
-    time.sleep(1.5)
+    # ★ 判据 1697：坐标必须按**实际屏幕尺寸**算 —— 2560×1600 上写死的
+    #   (1280,800)/(1280,220) 在 440×744(1320×2232) 上会点到屏幕边缘/误触
+    # ★ 判据 1697：不依赖屏幕尺寸 —— 在几个「安全空白点」各点一次（屏幕外点击会被忽略）
+    for (px, py) in [(1280, 800), (660, 800), (660, 220), (1280, 220), (400, 1500), (300, 300), (300, 150), (200, 400)]:
+        sh("uitest uiInput click %d %d" % (px, py))
+        time.sleep(0.4)
+    time.sleep(1.2)
 
 
 def read_readouts(ns):
