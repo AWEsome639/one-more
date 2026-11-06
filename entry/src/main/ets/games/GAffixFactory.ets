@@ -27,11 +27,11 @@ const BANK: AffixQ[] = [
   { root: 'write', affix: 're-', meaning: TG('重写'), opts: ['re-', 'un-', '-er', 'dis-'] },
   { root: 'teach', affix: '-er', meaning: '教师', opts: ['-er', '-ness', '-ing', 'pre-'] },
   { root: 'kind', affix: '-ness', meaning: '善良', opts: ['-ness', '-ly', 'un-', '-ful'] },
-  { root: 'possible', affix: 'im-', meaning: '不可能的', opts: ['im-', 'un-', 'dis-', '-less'] },
+  { root: 'possible', affix: 'im-', meaning: TG('不可能的'), opts: ['im-', 'un-', 'dis-', '-less'] },
   { root: 'agree', affix: 'dis-', meaning: '不同意', opts: ['dis-', 'un-', 're-', '-ment'] },
   { root: 'quick', affix: '-ly', meaning: '迅速地', opts: ['-ly', '-ness', '-er', '-ful'] },
   { root: 'view', affix: 'pre-', meaning: '预览', opts: ['pre-', 're-', 'dis-', '-er'] },
-  { root: 'act', affix: '-or', meaning: '演员', opts: ['-or', '-ness', 'un-', '-ly'] },
+  { root: 'act', affix: '-or', meaning: TG('演员'), opts: ['-or', '-ness', 'un-', '-ly'] },
   { root: 'fair', affix: 'un-', meaning: '不公平的', opts: ['un-', '-ly', 'dis-', '-ness'] }
 ];
 

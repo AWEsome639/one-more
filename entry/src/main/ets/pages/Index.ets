@@ -11,6 +11,7 @@
  * 拾海 2026-10-10（本页 2026-10-13 加转场）
  */
 
+import { TG } from '../core/GameI18n';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
@@ -446,7 +447,7 @@ build() {
         TabContent() {
           if (this.uiRev % 2 === 0) { SettingsTab() } else { SettingsTab() }
         }
-        .tabBar(this.barItem(2, '⚙️', '设置', 'Settings'))
+        .tabBar(this.barItem(2, '⚙️', TG('设置'), 'Settings'))
       }
       // ★ 2026-10-29（六设备·手表实测）：233×233 vp 上 60vp 的页签占掉 1/4 屏
       //   ⇒ 手表缩到 36，给列表让出空间

@@ -9,6 +9,7 @@
  *   「一搜索整个列表区就不渲染」——根因是补丁残留，不是逻辑）
  */
 
+import { TG } from '../core/GameI18n';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Diag } from '../core/Diag';
 import { WatchGames } from '../core/WatchGames';
@@ -1307,7 +1308,7 @@ build() {
         //   ⚠️ 也不用 Ellipsis —— 奥森明确不要「…」。
         //   版本号是"确认装的是哪一版"的水印，**设置页底部也有一份**（SettingsTab:478）
         //   ⇒ 首页窄屏不显示不丢信息。
-        Text(Digits(this.tn('{n} 款小游戏，不用联网也能玩', '{n} games. No Wi-Fi needed.', GAMES.length), this.langCode)
+        Text(Digits(this.tn(TG('{n} 款小游戏，不用联网也能玩'), '{n} games. No Wi-Fi needed.', GAMES.length), this.langCode)
           + (Bp.width > 0 && Bp.width < 420 ? '' : '  ·  ' + 'v' + About.VERSION))
           .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
       }

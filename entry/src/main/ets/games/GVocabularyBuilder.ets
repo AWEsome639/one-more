@@ -27,7 +27,7 @@ const BANK: Item[] = [
   { gloss: '粗心地', pos: 'adv', root: 'care', opts: ['careful', 'careless', 'carelessly', 'caring'], ans: 2 },
   { gloss: TG('重写'), pos: 'v', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 1 },
   { gloss: '作家', pos: 'n', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 0 },
-  { gloss: '不可能的', pos: 'adj', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 1 },
+  { gloss: TG('不可能的'), pos: 'adj', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 1 },
   { gloss: '可能性', pos: 'n', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 2 },
   { gloss: '有用的', pos: 'adj', root: 'use', opts: ['useless', 'useful', 'usage', 'user'], ans: 1 },
   { gloss: '无用的', pos: 'adj', root: 'use', opts: ['useless', 'useful', 'usage', 'user'], ans: 0 },

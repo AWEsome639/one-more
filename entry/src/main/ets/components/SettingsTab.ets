@@ -32,6 +32,7 @@
  *      最后把「深色模式」这个外观偏好写回 —— 重置的是进度，不该顺手改外观。
  */
 
+import { TG } from '../core/GameI18n';
 import { Sound } from '../core/Sound';
 import { Bp } from '../core/Bp';
 import { router } from '@kit.ArkUI';
@@ -436,7 +437,7 @@ build() {
             .backgroundColor(this.theme().surfaceAlt)
             .borderRadius(Radius.sm)
         }
-        this.sectionTitle('数据', 'Your data')
+        this.sectionTitle(TG('数据'), 'Your data')
         this.statCard()
 
         if (this.confirming) {
@@ -467,7 +468,7 @@ build() {
         this.sectionTitle('关于', 'About')
         this.aboutCard()
         this.navRow({
-          icon: '📄', zh: '隐私政策', en: 'Privacy policy',
+          icon: '📄', zh: TG('隐私政策'), en: 'Privacy policy',
           subZh: '这个应用不做什么，都写在这儿', subEn: 'What this app does not do, all written here',
           danger: false, tap: () => {
             this.openPrivacy();
@@ -475,7 +476,7 @@ build() {
         })
         this.starCard()
 
-        Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length))
+        Text('One More · ' + this.tn(TG('{n} 款小游戏，不用联网也能玩'), '{n} mini games, playable offline', GAMES.length))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme().inkFaint)
           .width('100%')
@@ -1079,12 +1080,12 @@ build() {
     Column({ space: Space.sm }) {
       Row({ space: Space.sm }) {
         this.statBox({ icon: '🎖️', zh: '等级', en: 'Level', kind: 'level', num: this.level })
-        this.statBox({ icon: '🏆', zh: '通关了', en: 'Cleared', kind: 'games', num: this.totalSolved })
+        this.statBox({ icon: '🏆', zh: TG('通关了'), en: 'Cleared', kind: 'games', num: this.totalSolved })
       }
       .width('100%')
 
       Row({ space: Space.sm }) {
-        this.statBox({ icon: '🎮', zh: '玩过几款', en: 'Tried', kind: 'kinds', num: this.playedKinds() })
+        this.statBox({ icon: '🎮', zh: TG('玩过几款'), en: 'Tried', kind: 'kinds', num: this.playedKinds() })
         this.statBox({ icon: '⭐', zh: '收藏', en: 'Saved', kind: 'kinds', num: this.favCount() })
       }
       .width('100%')

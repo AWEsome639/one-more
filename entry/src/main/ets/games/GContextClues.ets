@@ -20,9 +20,9 @@ interface Q { s: string; w: string; opts: string[] }
 /** opts[0] 恒为正确释义，运行时打乱 */
 const POOL: Q[] = [
   { s: 'The arid desert offered no shade for miles.', w: 'arid', opts: ['干旱的', TG('潮湿的'), '寒冷的', '肥沃的'] },
-  { s: 'She gave a terse reply and hurried out.', w: 'terse', opts: ['简短生硬的', '冗长啰嗦的', '热情洋溢的', '含糊不清的'] },
-  { s: 'The doctor said the drug alleviated her pain.', w: 'alleviated', opts: ['减轻了', '加剧了', '忽视了', '引发了'] },
-  { s: 'He was meticulous about every detail of the plan.', w: 'meticulous', opts: ['一丝不苟的', '粗心大意的', '漫不经心的', '慷慨大方的'] },
+  { s: 'She gave a terse reply and hurried out.', w: 'terse', opts: [TG('简短生硬的'), TG('冗长啰嗦的'), TG('热情洋溢的'), TG('含糊不清的')] },
+  { s: 'The doctor said the drug alleviated her pain.', w: 'alleviated', opts: [TG('减轻了'), TG('加剧了'), TG('忽视了'), TG('引发了')] },
+  { s: 'He was meticulous about every detail of the plan.', w: 'meticulous', opts: [TG('一丝不苟的'), TG('粗心大意的'), TG('漫不经心的'), TG('慷慨大方的')] },
   { s: 'The boisterous crowd drowned out the speaker.', w: 'boisterous', opts: ['喧闹的', TG('安静的'), '悲伤的', '整齐的'] },
   { s: 'They shared a frugal meal of bread and soup.', w: 'frugal', opts: ['节俭的', '奢侈的', '丰盛的', '辛辣的'] },
   { s: 'The evidence was ambiguous, so the jury hesitated.', w: 'ambiguous', opts: ['模棱两可的', '确凿无疑的', '伪造的', '充分的'] },

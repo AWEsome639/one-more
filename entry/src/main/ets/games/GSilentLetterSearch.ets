@@ -27,7 +27,7 @@ const WORDS: SW[] = [
   { w: 'LISTEN', i: 3, zh: '听' }, { w: 'WHISTLE', i: 4, zh: '哨子' },
   { w: 'RECEIPT', i: 5, zh: '收据' }, { w: 'THUMB', i: 4, zh: '拇指' },
   { w: 'SWORD', i: 1, zh: '剑' }, { w: 'HALF', i: 2, zh: '一半' },
-  { w: 'CHRISTMAS', i: 1, zh: '圣诞节' }, { w: 'HOUR', i: 0, zh: '小时' }
+  { w: 'CHRISTMAS', i: 1, zh: '圣诞节' }, { w: 'HOUR', i: 0, zh: TG('小时') }
 ];
 
 function shufIdx(n: number): number[] {

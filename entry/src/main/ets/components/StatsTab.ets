@@ -14,6 +14,7 @@
  * 拾海 2026-10-10
  */
 
+import { TG } from '../core/GameI18n';
 import { router } from '@kit.ArkUI';
 import { Digits } from '../core/I18n';   // ★ 2026-10-16 数字本地化
 import { Bp } from '../core/Bp';
@@ -519,14 +520,14 @@ export struct StatsTab {
         //   为什么必须加 max：`aboutToAppear` 在 `init()`（异步读盘）完成前跑，
         //   那一刻 `totalSolved` 还是 0 ⇒ `rollSolved.to(0)` 直接 `apply(0)`（target<=0 早退）
         //   ⇒ 显示永久停在 0。实测：磁盘上 totalPlays=3，界面显示 0。
-        this.statCell('🏆', String(Math.max(this.solvedShown, this.totalSolved)), '局', 'rounds', '通关了', 'Cleared', Palette.amber)
-        this.statCell('🎯', String(Math.max(this.playsShown, this.plays)), '局', 'rounds', '一共玩了', 'Played', this.accentColor())
+        this.statCell('🏆', String(Math.max(this.solvedShown, this.totalSolved)), '局', 'rounds', TG('通关了'), 'Cleared', Palette.amber)
+        this.statCell('🎯', String(Math.max(this.playsShown, this.plays)), '局', 'rounds', TG('一共玩了'), 'Played', this.accentColor())
       }
       .width('100%')
 
       Row({ space: Space.md }) {
         this.statCell('⏱️', this.durationText(), '', '', '玩了多久', 'Time played', Palette.emerald)
-        this.statCell('🧩', ProgressStore.playedKinds() + '/' + GAMES.length, '款', 'games', '玩过几款', 'Tried', Palette.violet)
+        this.statCell('🧩', ProgressStore.playedKinds() + '/' + GAMES.length, '款', 'games', TG('玩过几款'), 'Tried', Palette.violet)
       }
       .width('100%')
     }

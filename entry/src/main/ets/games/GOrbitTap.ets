@@ -232,7 +232,7 @@ export struct GOrbitTap {
     if (this.done) { return; }
     this.done = true; this.stop(); this.over = true; this.won = solved;
     if (this.left < 0) { this.left = 0; }
-    this.msg = solved ? '🎉 全部点中！' : TG2("⏰ 时间到，命中 {0} 次",Digits(String(this.hits), this.langCode));
+    this.msg = solved ? TG('🎉 全部点中！') : TG2("⏰ 时间到，命中 {0} 次",Digits(String(this.hits), this.langCode));
     const raw: number = this.hits * 100 - this.miss * 20;
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({

@@ -275,7 +275,7 @@ export struct GFeatureMatrixRecallAll {
       if (this.picked[i] !== (this.hiColors[i] !== '')) { ok = false; }
     }
     this.phase = 2; this.over = true; this.won = ok;
-    this.msg = ok ? '🎉 6 格全中！' : TG2("💤 只对了 {0}/{1} 格", String(this.hitCount()), String(LIT));
+    this.msg = ok ? TG('🎉 6 格全中！') : TG2("💤 只对了 {0}/{1} 格", String(this.hitCount()), String(LIT));
     if (!this.done) {
       this.done = true;
       const r: GameResult = {

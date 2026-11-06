@@ -18,7 +18,7 @@ import { Tv } from '../core/Tv';
 interface WordPair { a: string; b: string; }
 interface WordChoice { w: string; ok: boolean; }
 const PAIRS: WordPair[] = [
-  { a: '☀️ 太阳', b: '🌙 月亮' }, { a: '🔑 钥匙', b: '🔒 锁' }, { a: '🖌️ 画笔', b: '🎨 颜料' },
+  { a: TG('☀️ 太阳'), b: TG('🌙 月亮') }, { a: '🔑 钥匙', b: '🔒 锁' }, { a: '🖌️ 画笔', b: '🎨 颜料' },
   { a: '🐟 鱼', b: '🌊 水' }, { a: '✉️ 信封', b: '📮 邮筒' }, { a: '🧵 针', b: '🪡 线' },
   { a: '⚡ 闪电', b: '⛈️ 雷声' }, { a: '🌱 种子', b: '🌳 大树' }, { a: '🍚 米饭', b: '🥢 筷子' },
   { a: '🚗 汽车', b: '🛣️ 公路' }, { a: '🕯️ 蜡烛', b: '🔥 火苗' }, { a: '🎻 提琴', b: '🎵 旋律' },
@@ -54,7 +54,7 @@ export struct GAssociativePairs {
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State private used: number[] = [];
-  @State private stem: WordPair = { a: '☀️ 太阳', b: '🌙 月亮' };
+  @State private stem: WordPair = { a: TG('☀️ 太阳'), b: TG('🌙 月亮') };
   @State private opts: WordChoice[] = [];
   @State private round: number = 1;
   @State private score: number = 0;
