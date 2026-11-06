@@ -260,7 +260,7 @@ export struct GPixelMimic {
   }
   private finish(solved: boolean): void {
     this.over = true; this.won = solved;
-    this.msg = solved ? '🎉 一模一样！' : '😵 步数用尽，还差几格';
+    this.msg = solved ? TG("🎉 一模一样！") : TG("😵 步数用尽，还差几格");
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({
       gameId: 'pixel_mimic', solved: solved,

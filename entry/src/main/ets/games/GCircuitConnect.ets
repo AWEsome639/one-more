@@ -330,7 +330,7 @@ export struct GCircuitConnect {
  for (let t = 0; t < lit.length; t++) { if (lit[t]) { cnt++; } }
  const solved: boolean = lit[LAST] && has(this.maskAt(LAST), 1);
  if (solved || this.moves >= TURNS) {
- this.note = solved ? '接通了，灯亮 🎉' : '步数用尽，还没接通 😵'; this.finish(solved, cnt); return;
+ this.note = solved ? TG("接通了，灯亮 🎉") : TG("步数用尽，还没接通 😵"); this.finish(solved, cnt); return;
  }
  this.note = TG2('当前带电 {0}/{1} 格 ⚡', cnt, (this.diffTotal * this.diffTotal));
  }

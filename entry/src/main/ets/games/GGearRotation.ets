@@ -242,10 +242,10 @@ export struct GGearRotation {
     const expect: boolean = mesh ? !drive : drive;
     if (userCw === expect) {
       this.score += 10;
-      this.note = mesh ? '对！啮合必然反向 ✅' : '对！皮带传动同向 ✅';
+      this.note = mesh ? TG("对！啮合必然反向 ✅") : TG("对！皮带传动同向 ✅");
     } else {
       this.wrong++;
-      this.note = mesh ? '错：啮合的两轮方向相反' : '错：皮带传动的两轮方向相同';
+      this.note = mesh ? TG("错：啮合的两轮方向相反") : TG("错：皮带传动的两轮方向相同");
       this.note = this.note + TG2('（失误 {0}/{1}）', this.wrong, LIVES);
     }
     this.idx++;

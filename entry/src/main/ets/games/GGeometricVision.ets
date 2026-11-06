@@ -251,7 +251,7 @@ export struct GGeometricVision {
 
   private finish(solved: boolean): void {
     this.over = true; this.won = solved;
-    this.note = solved ? '十道几何判断全过，通关 🎉' : '看走眼三次，这局结束 😵';
+    this.note = solved ? TG("十道几何判断全过，通关 🎉") : TG("看走眼三次，这局结束 😵");
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({ gameId: 'geometric_vision', solved: solved, score: this.score,
       durationMs: Date.now() - this.startAt, levelReached: this.idx + 1 });

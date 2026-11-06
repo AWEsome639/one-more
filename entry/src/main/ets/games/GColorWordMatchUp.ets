@@ -238,7 +238,7 @@ export struct GColorWordMatchUp {
   private end(solved: boolean): void {
     this.over = true;
     this.won = solved;
-    this.msg = solved ? '🎉 通关：答对 ' + this.correct + ' / ' + this.diffTotal
+    this.msg = solved ? TG("🎉 通关：答对 ") + this.correct + ' / ' + this.diffTotal
       : TG('答对 ') + this.correct + ' 题，再来一局';
     if (this.finished) { return; }
     this.finished = true;

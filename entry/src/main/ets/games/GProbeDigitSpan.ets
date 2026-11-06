@@ -246,7 +246,7 @@ export struct GProbeDigitSpan {
     if (this.done) { return; }
     this.done = true;
     this.over = true; this.won = solved; this.phase = 2;
-    this.msg = note + (solved ? '　🎉 通关' : '　💤 结束');
+    this.msg = note + (solved ? TG("　🎉 通关") : TG("　💤 结束"));
     this.clearAll();
     const r: GameResult = { gameId: 'probe_digit_span', solved: solved, score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.len };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）

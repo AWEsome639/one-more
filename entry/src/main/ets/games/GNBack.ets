@@ -242,7 +242,7 @@ export struct GNBack {
     marks.push(hit ? 1 : 0);
     this.marks = marks;
     if (hit) { this.right = this.right + 1; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110); this.msg = TG('✅ 答对了'); }
-    else { this.msg = truth ? '❌ 它们其实一样' : '❌ 它们其实不一样'; }
+    else { this.msg = truth ? TG("❌ 它们其实一样") : TG("❌ 它们其实不一样"); }
     this.waitTo = setTimeout(() => { this.waitTo = -1; this.advance(); }, 720);
   }
 

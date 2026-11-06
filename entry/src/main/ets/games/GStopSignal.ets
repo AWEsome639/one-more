@@ -90,7 +90,7 @@ export struct GStopSignal {
       this.cueAt = Date.now();
       const isStop: boolean = Math.random() < STOP_RATIO;
       this.kind = isStop ? 2 : 1;
-      this.msg = isStop ? '🛑 停！千万别按' : '⚡ 冲！快按';
+      this.msg = isStop ? TG("🛑 停！千万别按") : TG("⚡ 冲！快按");
       this.sigTo = setTimeout(() => { this.sigTo = -1; this.timeout(); },
         380 + Math.floor(Math.random() * 1600));
     }, 500 + Math.floor(Math.random() * 900));

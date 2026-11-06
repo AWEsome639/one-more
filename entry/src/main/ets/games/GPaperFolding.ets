@@ -261,7 +261,7 @@ export struct GPaperFolding {
   }
   private finish(solved: boolean): void {
     this.over = true; this.won = solved;
-    this.msg = solved ? '🎉 展开后与目标完全一致！' : '😵 步数用尽，图案还没对上';
+    this.msg = solved ? TG("🎉 展开后与目标完全一致！") : TG("😵 步数用尽，图案还没对上");
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({
       gameId: 'paper_folding', solved: solved,

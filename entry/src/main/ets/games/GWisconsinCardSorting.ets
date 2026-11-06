@@ -226,7 +226,7 @@ export struct GWisconsinCardSorting {
       this.rule = (this.rule + 1) % 3; this.streak = 0; this.good = false;
       this.msg = TG('⚠️ 连对 4 次 —— 规则悄悄换了');
     } else {
-      this.good = ok; this.msg = ok ? '✅ 放对了 +50' : '❌ 这一堆放错了 -10';
+      this.good = ok; this.msg = ok ? TG("✅ 放对了 +50") : TG("❌ 这一堆放错了 -10");
     }
     this.trial = this.trial + 1;
     if (this.trial > this.diffTotal) {

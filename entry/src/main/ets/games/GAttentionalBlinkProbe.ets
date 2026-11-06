@@ -293,7 +293,7 @@ export struct GAttentionalBlinkProbe {
       this.score = this.score + 1; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
       this.msg = TG('✅ 探针判断对了（+1）');
     } else {
-      this.msg = this.hasProbe ? '❌ 这轮其实有 ✦' : '❌ 这轮没有 ✦';
+      this.msg = this.hasProbe ? TG("❌ 这轮其实有 ✦") : TG("❌ 这轮没有 ✦");
     }
     this.nextTo = setTimeout(() => {
       this.nextTo = -1;

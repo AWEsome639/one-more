@@ -241,7 +241,7 @@ export struct GDoubleNBack {
       return;
     }
     this.idx = this.idx + 1; this.selPos = false; this.selLetter = false;
-    this.msg = this.idx < N ? '前两题没有可比对象，直接下一题' : '位置与字母各判断一次，再进入下一题';
+    this.msg = this.idx < N ? TG("前两题没有可比对象，直接下一题") : TG("位置与字母各判断一次，再进入下一题");
   }
   private finish(): void {
     if (this.done) { return; }

@@ -223,10 +223,10 @@ export struct GSimonCommand {
     const want: number = this.hasWord ? this.color : -1;
     if (act === want) {
       this.correct++;
-      this.note = this.hasWord ? '✅ 听话，做对了' : '✅ 忍住没动，正确';
+      this.note = this.hasWord ? TG("✅ 听话，做对了") : TG("✅ 忍住没动，正确");
     } else {
       this.errors++;
-      this.note = this.hasWord ? '❌ 这句要照做的' : '❌ 没有「西蒙说」，不该动';
+      this.note = this.hasWord ? TG("❌ 这句要照做的") : TG("❌ 没有「西蒙说」，不该动");
     }
     this.phase = 'pause';
     if (this.nextTimer >= 0) { clearTimeout(this.nextTimer); }

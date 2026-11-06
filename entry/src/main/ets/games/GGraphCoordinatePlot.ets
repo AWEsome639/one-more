@@ -253,7 +253,7 @@ export struct GGraphCoordinatePlot {
   private finish(solved: boolean): void {
     this.over = true;
     this.won = solved;
-    this.note = solved ? '菱形画完，通关 🎉' : '画歪三次，这局结束 😵';
+    this.note = solved ? TG("菱形画完，通关 🎉") : TG("画歪三次，这局结束 😵");
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({
       gameId: 'graph_coordinate_plot',

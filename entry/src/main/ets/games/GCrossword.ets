@@ -251,7 +251,7 @@ export struct GCrossword {
   }
   private end(solved: boolean): void {
     this.over = true; this.won = solved;
-    this.msg = solved ? '🎉 通关！横竖同词：HEART · EMBER · ABUSE · RESIN · TREND'
+    this.msg = solved ? TG("🎉 通关！横竖同词：HEART · EMBER · ABUSE · RESIN · TREND")
       : TG2('💤 失误 {0} 次，这一局结束', MAX_MISS);
     if (this.done) { return; }
     this.done = true;

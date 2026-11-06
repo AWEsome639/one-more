@@ -491,7 +491,7 @@ export struct GMathPath {
     const lastIsOp: boolean = this.isOp(last);
     const nowIsOp: boolean = this.isOp(i);
     if (lastIsOp === nowIsOp) {
-      this.tip = lastIsOp ? '运算符后面要接数字' : '数字后面要接运算符';
+      this.tip = lastIsOp ? TG("运算符后面要接数字") : TG("数字后面要接运算符");
       return;
     }
     const np: number[] = this.path.slice();

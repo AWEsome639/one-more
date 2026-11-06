@@ -237,7 +237,7 @@ export struct GObjectDisplacement {
     this.pick = i;
     if (i === this.toAt || i === this.fromAt) {
       this.right = this.right + 1; this.score = this.score + 100;
-      this.msg = i === this.toAt ? '✅ 对！它挪到了这里' : '✅ 对！它从这里挪走了';
+      this.msg = i === this.toAt ? TG("✅ 对！它挪到了这里") : TG("✅ 对！它从这里挪走了");
     } else {
       this.msg = TG2('❌ 挪走的是 {0}（原本在第 {1} 格）', this.second[this.toAt], (this.fromAt + 1));
     }

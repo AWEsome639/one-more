@@ -231,7 +231,7 @@ export struct GChimpTest {
   }
   private end(solved: boolean): void {
     this.over = true; this.won = solved;
-    this.msg = solved ? '🎉 七关全过，通关！' : '💤 命用完了';
+    this.msg = solved ? TG("🎉 七关全过，通关！") : TG("💤 命用完了");
     if (this.done) { return; }
     this.done = true;
     const r: GameResult = { gameId: 'chimp_test', solved: solved, score: this.score,

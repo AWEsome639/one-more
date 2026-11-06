@@ -276,7 +276,7 @@ export struct GFactBinder {
 
   private finish(solved: boolean): void {
     this.over = true; this.won = solved;
-    this.note = solved ? '五组全部绑定，通关 🎉' : '失误太多，这局没绑完 😵';
+    this.note = solved ? TG("五组全部绑定，通关 🎉") : TG("失误太多，这局没绑完 😵");
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({
       gameId: 'fact_binder', solved: solved,

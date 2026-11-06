@@ -259,7 +259,7 @@ export struct GModularClockArithmetic {
     if (i === this.ans) {
       this.right = this.right + 1; this.combo = this.combo + 1;
       this.score = this.score + 55 + this.combo * 10; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110);
-      this.msg = '✅ 答对！' + String(this.start) + (this.forward ? ' + ' : ' − ') + String(this.delta) +
+      this.msg = TG("✅ 答对！") + String(this.start) + (this.forward ? ' + ' : ' − ') + String(this.delta) +
         ' ≡ ' + String(this.opts[this.ans]) + ' (mod 12)';
     } else {
       this.combo = 0; this.score = Math.max(0, this.score - 15);

@@ -344,7 +344,7 @@ export struct GYajilin {
 
   private settle(): void {
     if (!this.loopOk() || !this.cluesOk()) {
-      this.tip = this.cluesOk() ? '白格还不是单回路（每格要 2 个白邻格）' : '箭头计数还没满足';
+      this.tip = this.cluesOk() ? TG("白格还不是单回路（每格要 2 个白邻格）") : TG("箭头计数还没满足");
       return;
     }
     this.score += 10; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);

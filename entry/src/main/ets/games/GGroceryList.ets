@@ -246,7 +246,7 @@ export struct GGroceryList {
     this.pick = yes ? 1 : 0;
     this.asked = this.asked + 1;
     if (hit) { this.right = this.right + 1; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110); this.msg = TG(TG(TG('✅ 答对了'))); }
-    else { this.msg = cur.inside ? '❌ 它在清单里' : '❌ 它不在清单里'; }
+    else { this.msg = cur.inside ? TG("❌ 它在清单里") : TG("❌ 它不在清单里"); }
     this.nextTo = setTimeout(() => {
       this.nextTo = -1;
       if (this.pIdx + 1 < this.probes.length) {

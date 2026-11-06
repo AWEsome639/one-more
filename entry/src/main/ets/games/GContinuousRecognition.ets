@@ -252,7 +252,7 @@ export struct GContinuousRecognition {
       this.msg = TG2("✅ 答对 {0} 题", this.correct);
     } else {
       this.wrong++;
-      this.msg = truth ? '❌ 它前面出现过' : '❌ 它是第一次出现';
+      this.msg = truth ? TG("❌ 它前面出现过") : TG("❌ 它是第一次出现");
     }
     this.trial++;
     if (this.wrong >= MAX_WRONG) { this.end(false); return; }
@@ -262,7 +262,7 @@ export struct GContinuousRecognition {
   private end(solved: boolean): void {
     this.over = true;
     this.won = solved;
-    this.msg = solved ? '🎉 通关：答对 ' + this.correct + ' / ' + this.diffTotal
+    this.msg = solved ? TG("🎉 通关：答对 ") + this.correct + ' / ' + this.diffTotal
       : TG('答对 ') + this.correct + ' 题，再来一局';
     if (this.finished) { return; }
     this.finished = true;

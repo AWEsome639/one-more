@@ -528,7 +528,7 @@ export struct GBejeweled {
   private end(): void {
     this.over = true;
     this.won = this.score >= TARGET;
-    this.msg = this.won ? '🎉 达标！' : '步数用完，差一点';
+    this.msg = this.won ? TG("🎉 达标！") : TG("步数用完，差一点");
     this.finish(this.won);
   }
 

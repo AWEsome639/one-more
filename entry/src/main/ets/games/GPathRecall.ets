@@ -273,7 +273,7 @@ export struct GPathRecall {
     if (this.done) { return; }
     this.done = true; this.halt();
     this.over = true; this.won = solved; this.phase = TG('结束'); this.playIdx = -1;
-    this.msg = solved ? '🎉 六轮全过，路都记住了！' : '❌ 顺序错了，本局结束';
+    this.msg = solved ? TG("🎉 六轮全过，路都记住了！") : TG("❌ 顺序错了，本局结束");
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({
       gameId: 'path_recall', solved: solved,

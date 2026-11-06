@@ -85,7 +85,7 @@ export struct GSwitchTask {
     this.prevRule = this.rule;
     this.digit = 1 + Math.floor(Math.random() * 9);
     this.pick = -1;
-    this.msg = this.switched ? '🔀 规则换了，看清提示再点' : '规则不变，继续';
+    this.msg = this.switched ? TG("🔀 规则换了，看清提示再点") : TG("规则不变，继续");
   }
 
   private ruleName(): string { return this.rule === 0 ? '比大小' : '判奇偶'; }

@@ -277,7 +277,7 @@ export struct GBlockEscape {
       return;
     }
     this.sel = b;
-    this.status = b === TARGET ? '选中了 🚗，把它挪到右边出口' : '选中了这辆车，顺着车身推';
+    this.status = b === TARGET ? TG("选中了 🚗，把它挪到右边出口") : TG("选中了这辆车，顺着车身推");
   }
 
   private go(dir: number): void {
@@ -289,7 +289,7 @@ export struct GBlockEscape {
       return;
     }
     if (!canMove(this.bx, this.by, this.blen, this.bhor, b, dir)) {
-      this.status = this.bhor[b] ? '这辆车只能左右走，或者前面被挡住了' : '这辆车只能上下走，或者前面被挡住了';
+      this.status = this.bhor[b] ? TG("这辆车只能左右走，或者前面被挡住了") : TG("这辆车只能上下走，或者前面被挡住了");
       return;
     }
     push(this.bx, this.by, this.blen, this.bhor, b, dir);

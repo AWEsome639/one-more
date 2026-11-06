@@ -293,9 +293,9 @@ export struct GMirrorImage {
     const hit: boolean = sayMirror === this.truth;
     if (hit) {
       this.rightN = this.rightN + 1; this.rightNPulse = 1.3; setTimeout(() => { this.rightNPulse = 1; }, 140);
-      this.msg = this.truth ? '✅ 是镜像 · 每条横线都左右对调了' : '✅ 不是镜像 · 它被上下翻了';
+      this.msg = this.truth ? TG("✅ 是镜像 · 每条横线都左右对调了") : TG("✅ 不是镜像 · 它被上下翻了");
     } else {
-      this.msg = this.truth ? '❌ 它确实是镜像' : '❌ 它不是镜像（上下翻转／重排）';
+      this.msg = this.truth ? TG("❌ 它确实是镜像") : TG("❌ 它不是镜像（上下翻转／重排）");
     }
     this.nextTo = setTimeout(() => { this.nextTo = -1; this.advance(); }, 800);
   }

@@ -273,7 +273,7 @@ export struct GPerspectiveShiftView {
     if (k < 0 || this.over || this.chosen >= 0) { return; }
     this.chosen = k;
     if (k === this.answer) { this.correct = this.correct + 1; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110); }
-    this.msg = k === this.answer ? '✅ 就是这个视角' : '❌ 正确答案已标绿';
+    this.msg = k === this.answer ? TG("✅ 就是这个视角") : TG("❌ 正确答案已标绿");
     this.halt();
     this.delay = setTimeout(() => { this.delay = -1; this.next(); }, 1000);
   }

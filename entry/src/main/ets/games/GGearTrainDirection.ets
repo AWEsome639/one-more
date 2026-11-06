@@ -254,7 +254,7 @@ export struct GGearTrainDirection {
 
   private finish(solved: boolean): void {
     this.over = true; this.won = solved;
-    this.note = solved ? '八组传动全推对，通关 🎉' : '失误三次，传动链断了 😵';
+    this.note = solved ? TG("八组传动全推对，通关 🎉") : TG("失误三次，传动链断了 😵");
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({
       gameId: 'gear_train_direction', solved: solved, score: this.score,

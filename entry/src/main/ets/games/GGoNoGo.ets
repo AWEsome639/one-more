@@ -237,7 +237,7 @@ export struct GGoNoGo {
       this.waitTo = -1;
       this.shownAt = Date.now();
       this.live = true;
-      this.msg = this.kind === 0 ? '🟢 快按！' : '🔴 别动！';
+      this.msg = this.kind === 0 ? TG("🟢 快按！") : TG("🔴 别动！");
       this.closeTo = setTimeout(() => { this.closeTo = -1; this.resolve(false); }, WINDOW);
     }, 600 + Math.floor(Math.random() * 800));
   }

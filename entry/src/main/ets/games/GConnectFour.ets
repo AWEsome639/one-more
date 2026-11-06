@@ -566,7 +566,7 @@ export struct GConnectFour {
     this.won = playerWon;
     this.busy = false;
     this.clearTimer();
-    this.msg = playerWon ? '🎉 连成四个，你赢了！' : '电脑赢了，再来一局';
+    this.msg = playerWon ? TG("🎉 连成四个，你赢了！") : TG("电脑赢了，再来一局");
     const r: GameResult = {
       gameId: 'connect_four',
       solved: playerWon,

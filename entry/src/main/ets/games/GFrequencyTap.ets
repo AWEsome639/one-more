@@ -288,7 +288,7 @@ export struct GFrequencyTap {
       flags[bestI] = true;
       this.hitFlags = flags;
       this.hitN = this.hitN + 1;
-      this.msg = '✅ 误差 ' + (early ? '' : '+') + String(this.lastErr) + ' ms';
+      this.msg = TG("✅ 误差 ") + (early ? '' : '+') + String(this.lastErr) + ' ms';
     } else {
       this.msg = TG2('😐 偏差 {0} ms（{1}）', String(this.lastErr), early ? TG('偏快') : TG('偏慢'));
     }

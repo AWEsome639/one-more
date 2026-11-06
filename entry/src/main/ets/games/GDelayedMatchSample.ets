@@ -273,7 +273,7 @@ export struct GDelayedMatchSample {
     this.over = true;
     this.won = solved;
     this.phase = 3;
-    this.msg = solved ? '🎉 通关：答对 ' + this.correct + ' / ' + this.diffTotal
+    this.msg = solved ? TG("🎉 通关：答对 ") + this.correct + ' / ' + this.diffTotal
       : TG('答对 ') + this.correct + ' 题，再来一局';
     if (this.finished) { return; }
     this.finished = true;

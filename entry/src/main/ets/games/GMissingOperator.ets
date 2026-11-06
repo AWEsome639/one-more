@@ -253,7 +253,7 @@ export struct GMissingOperator {
     if (kind === this.ansKind) {
       this.right = this.right + 1; this.combo = this.combo + 1;
       this.score = this.score + 50 + this.combo * 10; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
-      this.msg = '✅ 答对！' + String(this.a) + ' ' + OPS[this.ansKind] + ' ' + String(this.b) + ' = ' + String(this.c);
+      this.msg = TG("✅ 答对！") + String(this.a) + ' ' + OPS[this.ansKind] + ' ' + String(this.b) + ' = ' + String(this.c);
     } else {
       this.combo = 0; this.score = Math.max(0, this.score - 15); this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
       this.left = Math.max(0, this.left - PENALTY);

@@ -82,7 +82,7 @@ export struct GRuleSwitcher {
     this.rule = r;
     this.val = 1 + Math.floor(Math.random() * 99);
     this.pick = -1; this.shownAt = Date.now();
-    this.msg = changed ? '⚡ 换规则了！' : '按当前规则作答';
+    this.msg = changed ? TG("⚡ 换规则了！") : TG("按当前规则作答");
   }
   /** 当前题的正确选项：0 = 左键（奇 / 大），1 = 右键（偶 / 小） */
   private need(): number {
