@@ -156,6 +156,16 @@ export struct GPong {
     if (this.over || !this.running) {
       return;
     }
+    // ★ 判据 1732：AI 挡板必须在**帧级**跟随（tick 16ms 一帧），
+    //   而 autoStep 是 Hint.autoRun 的 320ms 节奏 —— 320ms 内挡板不动，球早就飞过去了。
+    //   ⇒ 在 tick 里补一次「跟随」（autoId >= 0 表示 AI 正在代打）
+    if (this.autoId >= 0 && this.vx < 0) {
+      const max2: number = 100 - PADDLE_H;
+      let v2: number = this.predictY() - PADDLE_H / 2;
+      if (v2 < 0) { v2 = 0; }
+      if (v2 > max2) { v2 = max2; }
+      this.px = v2;
+    }
     if (this.wait > 0) {
       this.wait--;
       if (this.wait === 0) {
@@ -365,6 +375,11 @@ export struct GPong {
   private autoStep(): boolean {
     if (this.over) {
       return false;
+    }
+    // ★ 判据 1733：AI 代打开启时如果游戏处于**暂停态**（running=false），球根本不动
+    //   —— 直接恢复（等同点「继续」），否则代打永远 0 分
+    if (!this.running) {
+      this.running = true;
     }
     const max: number = 100 - PADDLE_H;
     // ★ 2026-10-28 修：predictY 给的是**球心**，px 是**拍顶边** ⇒ 要减掉半个拍高，
