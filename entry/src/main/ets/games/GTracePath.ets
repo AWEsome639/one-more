@@ -1,6 +1,7 @@
 /** 描路径 📐（id: trace_path）
  * 先看一遍亮起的路线，灭掉后从 🚩 起按原路一格一格点下去，点错就断线重来；
  * 3 条路线全部描完 ⇒ 通关，断线 4 次 ⇒ 失败。 */
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -240,6 +241,9 @@ export struct GTracePath {
 
   private tap(i: number): void {
     if (this.over || this.show) { return; }
+    // ★ 判据 1728：诊断日志 —— AI 走的 tap(i) 用格号，而玩家 UI 走坐标转换；
+    //   出错时打出 path/traced/点击格号，能一眼看出是「顺序错」还是「坐标换算错」
+    hilog.info(0x0000, 'TraceDiag', 'tap i=' + String(i) + ' expect=' + String(this.path[this.traced.length]) + ' tracedLen=' + String(this.traced.length) + ' pathLen=' + String(this.path.length) + ' err=' + String(this.err));
     if (i === this.path[this.traced.length]) {
       const t: number[] = this.traced.slice();
       t.push(i);
