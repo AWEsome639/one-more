@@ -870,84 +870,6 @@ export struct GSudoku {
     Column({ space: Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-      Row({ space: Space.sm }) {
-        this.infoBox(0)
-        this.infoBox(1)
-        this.infoBox(2)
-      }
-      .width('100%')
-
-      // 棋盘：3×3 个宫，宫与宫之间留大缝，宫内的格子留小缝
-      Column({ space: Space.xs }) {
-        ForEach(IDX3, (br: number) => {
-          Row({ space: Space.xs }) {
-            ForEach(IDX3, (bc: number) => {
-              Column({ space: 2 }) {
-                ForEach(IDX3, (rr: number) => {
-                  Row({ space: 2 }) {
-                    ForEach(IDX3, (cc: number) => {
-                      this.cellView((br * BOX + rr) * SIDE + (bc * BOX + cc))
-                    }, (cc: number) => 'cc' + cc)
-                  }
-                  .width('100%')
-                }, (rr: number) => 'rr' + rr)
-              }
-              .layoutWeight(1)
-            }, (bc: number) => 'bc' + bc)
-          }
-          .width('100%')
-        }, (br: number) => 'br' + br)
-      }
-      .width('100%')
-      .padding(Space.xs)
-      .backgroundColor(this.theme.isDark ? BOARD_DARK : BOARD_LIGHT)
-      .borderRadius(Radius.lg)
-      // ★★★ 2026-10-29 真机 dump 布局树定位到的根因：
-      //   9×9 棋盘的格子是 `layoutWeight(1) + aspectRatio(1)` ⇒ **高度被宽度锁死**
-      //   （1260px），把后面「数字键 + 底部按钮行」全挤出父容器（溢出 144px）。
-      //   表现：底部三个按钮 bounds 下沿 = 2232 = 屏高 ⇒ 被系统手势区吃掉 ⇒ **点不动**。
-      //   （同页证据：棋盘与数字键都能点，已填 41→42）
-      // ⇒ 给棋盘**限高**，让它让出空间，按钮行自然回到可点区域。
-      .width(this.boardPx())
-      .height(this.boardPx())
-      .alignSelf(ItemAlign.Center)
-
-      // 数字键盘
-      Row({ space: Space.xs }) {
-        ForEach(DIGITS, (d: number) => {
-          Button(String(d))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-            .fontSize(FontSize.md)
-            .fontWeight(FontWeight.Bold)
-            // ★★★ 2026-10-30：数字键从「饱和 teal」改成「浅底 + 深字 + 细边」
-            //   按"它凭什么算顶尖"审：数字键是**输入工具**，棋盘才是数据。
-            //   原来的青色与棋盘的**多色格子**抢注意力；
-            //   工具应当低调、数据应当突出 ⇒ 与「擦除」形成同一套「工具=浅色」语义。
-            .fontColor(this.theme.ink)
-            .backgroundColor(this.theme.surface)
-            // ⚠️ 不要加 `.border()`：实测加了之后 Button 内容区变小，
-            //    **数字被竖向截断**（只露出上半部分，真机截图抓到）。
-            //    ⇒ 只用「浅底 + 深字」就够低调，边框反而带来布局问题。
-            .borderRadius(Radius.sm)
-            .layoutWeight(1)
-            .height(Cell.of(44))
-            .onClick(() => {
-              Haptics.tap();
-              this.fill(d);
-            })
-            .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L936'; })
-            .onBlur(() => { if (this.tvFocus === 'L936') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L936', Radius.sm))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.fill(d); }); })
-        }, (d: number) => 'd' + d)
-      }
-      .width('100%')
-
-      Text(this.statusText())
-        .fontSize(FontSize.sm)
-        .fontColor(this.done ? Palette.emerald : this.theme.inkFaint)
-
       Row({ space: Space.md }) {
         Button(TG('提示'))
           .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -1026,6 +948,84 @@ export struct GSudoku {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
+      Row({ space: Space.sm }) {
+        this.infoBox(0)
+        this.infoBox(1)
+        this.infoBox(2)
+      }
+      .width('100%')
+
+      // 棋盘：3×3 个宫，宫与宫之间留大缝，宫内的格子留小缝
+      Column({ space: Space.xs }) {
+        ForEach(IDX3, (br: number) => {
+          Row({ space: Space.xs }) {
+            ForEach(IDX3, (bc: number) => {
+              Column({ space: 2 }) {
+                ForEach(IDX3, (rr: number) => {
+                  Row({ space: 2 }) {
+                    ForEach(IDX3, (cc: number) => {
+                      this.cellView((br * BOX + rr) * SIDE + (bc * BOX + cc))
+                    }, (cc: number) => 'cc' + cc)
+                  }
+                  .width('100%')
+                }, (rr: number) => 'rr' + rr)
+              }
+              .layoutWeight(1)
+            }, (bc: number) => 'bc' + bc)
+          }
+          .width('100%')
+        }, (br: number) => 'br' + br)
+      }
+      .width('100%')
+      .padding(Space.xs)
+      .backgroundColor(this.theme.isDark ? BOARD_DARK : BOARD_LIGHT)
+      .borderRadius(Radius.lg)
+      // ★★★ 2026-10-29 真机 dump 布局树定位到的根因：
+      //   9×9 棋盘的格子是 `layoutWeight(1) + aspectRatio(1)` ⇒ **高度被宽度锁死**
+      //   （1260px），把后面「数字键 + 底部按钮行」全挤出父容器（溢出 144px）。
+      //   表现：底部三个按钮 bounds 下沿 = 2232 = 屏高 ⇒ 被系统手势区吃掉 ⇒ **点不动**。
+      //   （同页证据：棋盘与数字键都能点，已填 41→42）
+      // ⇒ 给棋盘**限高**，让它让出空间，按钮行自然回到可点区域。
+      .width(this.boardPx())
+      .height(this.boardPx())
+      .alignSelf(ItemAlign.Center)
+
+      // 数字键盘
+      Row({ space: Space.xs }) {
+        ForEach(DIGITS, (d: number) => {
+          Button(String(d))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontWeight(FontWeight.Bold)
+            // ★★★ 2026-10-30：数字键从「饱和 teal」改成「浅底 + 深字 + 细边」
+            //   按"它凭什么算顶尖"审：数字键是**输入工具**，棋盘才是数据。
+            //   原来的青色与棋盘的**多色格子**抢注意力；
+            //   工具应当低调、数据应当突出 ⇒ 与「擦除」形成同一套「工具=浅色」语义。
+            .fontColor(this.theme.ink)
+            .backgroundColor(this.theme.surface)
+            // ⚠️ 不要加 `.border()`：实测加了之后 Button 内容区变小，
+            //    **数字被竖向截断**（只露出上半部分，真机截图抓到）。
+            //    ⇒ 只用「浅底 + 深字」就够低调，边框反而带来布局问题。
+            .borderRadius(Radius.sm)
+            .layoutWeight(1)
+            .height(Cell.of(44))
+            .onClick(() => {
+              Haptics.tap();
+              this.fill(d);
+            })
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L936'; })
+            .onBlur(() => { if (this.tvFocus === 'L936') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L936', Radius.sm))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.fill(d); }); })
+        }, (d: number) => 'd' + d)
+      }
+      .width('100%')
+
+      Text(this.statusText())
+        .fontSize(FontSize.sm)
+        .fontColor(this.done ? Palette.emerald : this.theme.inkFaint)
+
       // ★ 2026-10-29：用 margin 把这一行从底部推开（padding 会被 layoutWeight 棋盘吸收）
       .margin({ bottom: 24 })
       // ★★★ 2026-10-29 真机抓到：这一行按钮**贴着屏幕底**（y=2178 / 屏高 2232），
