@@ -301,7 +301,7 @@ export struct GPolyominoTiling {
   }
   private finish(solved: boolean): void {
     this.over = true; this.won = solved;
-    this.msg = solved ? '🎉 一格不剩，全铺满！' : TG2("😵 步数用尽，还剩 {0} 格", String(this.left()));
+    this.msg = solved ? TG('🎉 一格不剩，全铺满！') : TG2("😵 步数用尽，还剩 {0} 格", String(this.left()));
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({
       gameId: 'polyomino_tiling', solved: solved,

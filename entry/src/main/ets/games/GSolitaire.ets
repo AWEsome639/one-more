@@ -634,7 +634,7 @@ export struct GSolitaire {
     }
     if (!this.stackOk(card, p)) {
       this.msg = rankOf(card) === 12
-        ? 'K 只能放到空列'
+        ? TG('K 只能放到空列')
         : TG2('放不下：这列要接 {0} 且颜色相反', RANKS[rankOf(card) + 1]);
       return;
     }

@@ -25,7 +25,7 @@ interface Pair {
 }
 const PAIRS: Pair[] = [
   { word: TG('苹果'), icon: '🍎' }, { word: '汽车', icon: '🚗' },
-  { word: '火箭', icon: '🚀' }, { word: '小猫', icon: '🐱' },
+  { word: TG('火箭'), icon: '🚀' }, { word: TG('小猫'), icon: '🐱' },
   { word: TG('雨伞'), icon: '☂️' }, { word: '钢琴', icon: '🎹' },
   { word: TG('相机'), icon: '📷' }, { word: '闹钟', icon: '⏰' },
   { word: TG('足球'), icon: '⚽' }, { word: '蛋糕', icon: '🍰' },

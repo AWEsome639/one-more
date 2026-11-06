@@ -27,7 +27,7 @@ const POOL: Q[] = [
   { w: 'verbose', opts: [TG('冗长的'), TG('精炼的'), TG('晦涩的')] }, { w: 'benign', opts: [TG('良性的；和善的'), TG('恶性的'), TG('有毒的')] },
   { w: 'taciturn', opts: [TG('沉默寡言的'), '健谈的', '粗鲁的'] }, { w: 'adroit', opts: ['熟练的', '笨拙的', '迟缓的'] },
   { w: 'myriad', opts: [TG('无数的'), TG('稀少的'), TG('单一的')] }, { w: 'placate', opts: [TG('安抚'), TG('激怒'), TG('忽视')] },
-  { w: 'lucid', opts: ['清晰易懂的', '混乱的', '昏暗的'] }, { w: 'audacious', opts: ['大胆的', '胆怯的', '谦逊的'] }
+  { w: 'lucid', opts: [TG('清晰易懂的'), TG('混乱的'), TG('昏暗的')] }, { w: 'audacious', opts: [TG('大胆的'), TG('胆怯的'), TG('谦逊的')] }
 ];
 
 @Component

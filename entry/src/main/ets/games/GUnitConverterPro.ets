@@ -20,9 +20,9 @@ interface Unit { n: string; f: number }
 interface Scale { g: string; us: Unit[] }
 const SCALES: Scale[] = [
   { g: TG('长度'), us: [{ n: 'mm', f: 0.001 }, { n: 'cm', f: 0.01 }, { n: 'm', f: 1 }, { n: 'km', f: 1000 }] },
-  { g: '质量', us: [{ n: 'g', f: 1 }, { n: 'kg', f: 1000 }, { n: 't', f: 1000000 }] },
+  { g: TG('质量'), us: [{ n: 'g', f: 1 }, { n: 'kg', f: 1000 }, { n: 't', f: 1000000 }] },
   { g: TG('时间'), us: [{ n: '秒', f: 1 }, { n: '分', f: 60 }, { n: '时', f: 3600 }] },
-  { g: '容量', us: [{ n: 'mL', f: 1 }, { n: 'L', f: 1000 }] },
+  { g: TG('容量'), us: [{ n: 'mL', f: 1 }, { n: 'L', f: 1000 }] },
   { g: TG('数据'), us: [{ n: 'KB', f: 1 }, { n: 'MB', f: 1024 }] }
 ];
 /** 最多 4 位小数，去掉末尾多余的 0 */

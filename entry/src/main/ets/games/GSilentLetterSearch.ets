@@ -18,14 +18,14 @@ interface SW { w: string; i: number; zh: string }
 
 /** i = 不发音字母的下标 */
 const WORDS: SW[] = [
-  { w: 'KNIFE', i: 0, zh: '小刀' }, { w: 'ISLAND', i: 1, zh: '岛' },
+  { w: 'KNIFE', i: 0, zh: TG('小刀') }, { w: 'ISLAND', i: 1, zh: TG('岛') },
   { w: 'CASTLE', i: 3, zh: TG('城堡') }, { w: 'LAMB', i: 3, zh: '羔羊' },
-  { w: 'HONEST', i: 0, zh: '诚实' }, { w: 'GHOST', i: 1, zh: '幽灵' },
-  { w: 'KNEE', i: 0, zh: '膝盖' }, { w: 'DEBT', i: 3, zh: '债务' },
-  { w: 'SIGN', i: 2, zh: '标志' }, { w: 'CALM', i: 2, zh: '平静' },
-  { w: 'WRIST', i: 0, zh: '手腕' }, { w: 'COMB', i: 3, zh: '梳子' },
-  { w: 'LISTEN', i: 3, zh: '听' }, { w: 'WHISTLE', i: 4, zh: '哨子' },
-  { w: 'RECEIPT', i: 5, zh: '收据' }, { w: 'THUMB', i: 4, zh: '拇指' },
+  { w: 'HONEST', i: 0, zh: TG('诚实') }, { w: 'GHOST', i: 1, zh: TG('幽灵') },
+  { w: 'KNEE', i: 0, zh: TG('膝盖') }, { w: 'DEBT', i: 3, zh: TG('债务') },
+  { w: 'SIGN', i: 2, zh: TG('标志') }, { w: 'CALM', i: 2, zh: TG('平静') },
+  { w: 'WRIST', i: 0, zh: TG('手腕') }, { w: 'COMB', i: 3, zh: TG('梳子') },
+  { w: 'LISTEN', i: 3, zh: TG('听') }, { w: 'WHISTLE', i: 4, zh: TG('哨子') },
+  { w: 'RECEIPT', i: 5, zh: TG('收据') }, { w: 'THUMB', i: 4, zh: '拇指' },
   { w: 'SWORD', i: 1, zh: '剑' }, { w: 'HALF', i: 2, zh: '一半' },
   { w: 'CHRISTMAS', i: 1, zh: '圣诞节' }, { w: 'HOUR', i: 0, zh: TG('小时') }
 ];
