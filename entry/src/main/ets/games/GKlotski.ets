@@ -153,12 +153,12 @@ export struct GKlotski {
   /** 「横刀立马」开局 */
   private layout(): Blk[] {
     const bs: Blk[] = [];
-    const zhang: Blk = { x: 0, y: 0, w: 1, h: 2, label: '张飞', color: Palette.sky };
-    const cao: Blk = { x: 1, y: 0, w: 2, h: 2, label: '曹操', color: Palette.rose };
-    const zhao: Blk = { x: 3, y: 0, w: 1, h: 2, label: '赵云', color: Palette.teal };
-    const ma: Blk = { x: 0, y: 2, w: 1, h: 2, label: '马超', color: Palette.violet };
-    const guan: Blk = { x: 1, y: 2, w: 2, h: 1, label: '关羽', color: Palette.amber };
-    const huang: Blk = { x: 3, y: 2, w: 1, h: 2, label: '黄忠', color: Palette.orange };
+    const zhang: Blk = { x: 0, y: 0, w: 1, h: 2, label: TG('张飞'), color: Palette.sky };
+    const cao: Blk = { x: 1, y: 0, w: 2, h: 2, label: TG('曹操'), color: Palette.rose };
+    const zhao: Blk = { x: 3, y: 0, w: 1, h: 2, label: TG('赵云'), color: Palette.teal };
+    const ma: Blk = { x: 0, y: 2, w: 1, h: 2, label: TG('马超'), color: Palette.violet };
+    const guan: Blk = { x: 1, y: 2, w: 2, h: 1, label: TG('关羽'), color: Palette.amber };
+    const huang: Blk = { x: 3, y: 2, w: 1, h: 2, label: TG('黄忠'), color: Palette.orange };
     const z1: Blk = { x: 1, y: 3, w: 1, h: 1, label: TG('卒'), color: Palette.inkFaint };
     const z2: Blk = { x: 2, y: 3, w: 1, h: 1, label: TG('卒'), color: Palette.inkFaint };
     const z3: Blk = { x: 0, y: 4, w: 1, h: 1, label: TG('卒'), color: Palette.inkFaint };

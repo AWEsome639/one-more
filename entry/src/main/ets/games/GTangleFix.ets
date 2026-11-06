@@ -485,9 +485,9 @@ export struct GTangleFix {
 
   private tip(): string {
     if (this.over) {
-      return this.won ? TG2("全部解开了 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : '交换次数用完，还缠着';
+      return this.won ? TG2("全部解开了 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : TG('交换次数用完，还缠着');
     }
-    return this.sel < 0 ? '点一个节点，再点另一个换位' : TG2("已选中 {0}，点谁与它换？", LABELS[this.order[this.sel]]);
+    return this.sel < 0 ? TG('点一个节点，再点另一个换位') : TG2("已选中 {0}，点谁与它换？", LABELS[this.order[this.sel]]);
   }
 
   build() {

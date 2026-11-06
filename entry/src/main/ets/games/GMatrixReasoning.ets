@@ -21,7 +21,7 @@ const SIDE: number = 3; const CELLS: number = 9; const GOAL: number = 8;
 const LIMIT: number = 60; const TICK_MS: number = 1000; const PENALTY: number = 3; const NEXT_MS: number = 420;
 const ROWS: number[] = [0, 1, 2];
 const OPT_IDX: number[] = [0, 1, 2, 3];
-const RULE_TXT: string[] = ['第三个数 = 前两个数之和', '第三个数 = 前两个数之积', '第三个数 = 前两个数之和再加 1'];
+const RULE_TXT: string[] = [TG('第三个数 = 前两个数之和'), TG('第三个数 = 前两个数之积'), TG('第三个数 = 前两个数之和再加 1')];
 
 function ri(lo: number, hi: number): number {
   return lo + Math.floor(Math.random() * (hi - lo + 1));

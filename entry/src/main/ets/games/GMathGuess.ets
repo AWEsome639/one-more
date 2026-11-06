@@ -217,7 +217,7 @@ export struct GMathGuess {
     if (v === this.secret) {
       const gain: number = 100 + left * 150;
       this.score = this.score + gain;
-      this.history = this.history.concat([line + ' ✅ 命中']);
+      this.history = this.history.concat([line + TG(' ✅ 命中')]);
       this.over = true; this.won = true;
       this.hint = TG2('🎉 就是 {0}！还剩 {1} 次没用，+{2}', v, left, gain);
       this.finish(true);

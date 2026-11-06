@@ -21,13 +21,13 @@ interface Analog { stem: string; opts: string[]; ans: number }
 interface Opt { text: string; ok: boolean }
 
 const BANK: Analog[] = [
-  { stem: 'HOT : COLD ＝ UP : ?', opts: ['DOWN 向下', 'TOP 顶部', 'HIGH 高的', 'OVER 在上'], ans: 0 },
-  { stem: 'BIRD : NEST ＝ BEE : ?', opts: ['HONEY 蜂蜜', 'HIVE 蜂巢', 'FLOWER 花', 'WING 翅膀'], ans: 1 },
-  { stem: 'DOCTOR : HOSPITAL ＝ TEACHER : ?', opts: ['BOOK 书本', 'PUPIL 学生', 'SCHOOL 学校', 'CHALK 粉笔'], ans: 2 },
-  { stem: 'HAND : GLOVE ＝ FOOT : ?', opts: ['SOCK 袜子', 'TOE 脚趾', 'LEG 腿', 'SANDAL 凉鞋'], ans: 0 },
-  { stem: 'PUPPY : DOG ＝ KITTEN : ?', opts: ['CAT 猫', 'MOUSE 老鼠', 'CUB 幼兽', 'LAMB 羔羊'], ans: 0 },
-  { stem: 'PEN : WRITE ＝ KNIFE : ?', opts: ['SHARP 锋利的', 'METAL 金属', 'CUT 切', 'SPOON 勺子'], ans: 2 },
-  { stem: 'EYE : SEE ＝ EAR : ?', opts: ['SOUND 声音', 'HEAR 听见', 'LOUD 响的', 'MUSIC 音乐'], ans: 1 },
+  { stem: 'HOT : COLD ＝ UP : ?', opts: [TG('DOWN 向下'), TG('TOP 顶部'), TG('HIGH 高的'), TG('OVER 在上')], ans: 0 },
+  { stem: 'BIRD : NEST ＝ BEE : ?', opts: [TG('HONEY 蜂蜜'), TG('HIVE 蜂巢'), TG('FLOWER 花'), TG('WING 翅膀')], ans: 1 },
+  { stem: 'DOCTOR : HOSPITAL ＝ TEACHER : ?', opts: [TG('BOOK 书本'), TG('PUPIL 学生'), TG('SCHOOL 学校'), TG('CHALK 粉笔')], ans: 2 },
+  { stem: 'HAND : GLOVE ＝ FOOT : ?', opts: [TG('SOCK 袜子'), TG('TOE 脚趾'), TG('LEG 腿'), TG('SANDAL 凉鞋')], ans: 0 },
+  { stem: 'PUPPY : DOG ＝ KITTEN : ?', opts: [TG('CAT 猫'), TG('MOUSE 老鼠'), TG('CUB 幼兽'), TG('LAMB 羔羊')], ans: 0 },
+  { stem: 'PEN : WRITE ＝ KNIFE : ?', opts: [TG('SHARP 锋利的'), TG('METAL 金属'), TG('CUT 切'), TG('SPOON 勺子')], ans: 2 },
+  { stem: 'EYE : SEE ＝ EAR : ?', opts: [TG('SOUND 声音'), TG('HEAR 听见'), 'LOUD 响的', 'MUSIC 音乐'], ans: 1 },
   { stem: 'SLOW : FAST ＝ QUIET : ?', opts: ['SOFT 软的', 'SILENT 寂静的', 'CALM 平静的', 'LOUD 响亮的'], ans: 3 },
   { stem: 'GALLERY : PAINTINGS ＝ LIBRARY : ?', opts: ['SHELVES 书架', 'BOOKS 书', 'READERS 读者', 'QUIET 安静'], ans: 1 },
   { stem: 'WINTER : SNOW ＝ SUMMER : ?', opts: ['ICE 冰', 'BEACH 沙滩', 'HEAT 炎热', 'COAT 外套'], ans: 2 }

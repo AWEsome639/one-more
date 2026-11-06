@@ -24,9 +24,9 @@ const PAIRS: WordPair[] = [
   { a: 'SNAKE', b: 'SHAKE', da: '蛇', db: '摇动' }, { a: 'HORSE', b: 'HOUSE', da: '马', db: TG('房子') },
   { a: 'WATER', b: 'WAFER', da: TG('水'), db: TG('威化饼干') }, { a: 'TABLE', b: 'CABLE', da: TG('桌子'), db: '电缆' },
   { a: 'GRAPE', b: 'DRAPE', da: TG('葡萄'), db: '窗帘' }, { a: 'PEACH', b: 'PEACE', da: '桃子', db: '和平' },
-  { a: 'CHAIR', b: 'CHAIN', da: '椅子', db: '链条' }, { a: 'HONEY', b: 'MONEY', da: '蜂蜜', db: '钱' },
+  { a: 'CHAIR', b: 'CHAIN', da: TG('椅子'), db: TG('链条') }, { a: 'HONEY', b: 'MONEY', da: TG('蜂蜜'), db: TG('钱') },
   { a: 'TIGER', b: 'TIMER', da: TG('老虎'), db: '计时器' }, { a: 'STONE', b: 'STORE', da: '石头', db: '商店' },
-  { a: 'BEACH', b: 'REACH', da: '海滩', db: '到达' }, { a: 'CANDY', b: 'HANDY', da: '糖果', db: '方便的' },
+  { a: 'BEACH', b: 'REACH', da: TG('海滩'), db: TG('到达') }, { a: 'CANDY', b: 'HANDY', da: TG('糖果'), db: TG('方便的') },
   { a: 'MOON', b: 'SOON', da: TG('月亮'), db: '很快' }
 ];
 

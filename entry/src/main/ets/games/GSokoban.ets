@@ -41,8 +41,8 @@ const DRAG_MIN: number = 18;
 
 const LEVELS: Level[] = [
   {
-    name: '第 1 关 · 一步一推',
-    hint: '人站到箱子对面，才能把它推过去',
+    name: TG('第 1 关 · 一步一推'),
+    hint: TG('人站到箱子对面，才能把它推过去'),
     rows: [
       '########',
       '#      #',
@@ -52,8 +52,8 @@ const LEVELS: Level[] = [
     ]
   },
   {
-    name: '第 2 关 · 双子星',
-    hint: '两个箱子各归各位，先想好路线再推',
+    name: TG('第 2 关 · 双子星'),
+    hint: TG('两个箱子各归各位，先想好路线再推'),
     rows: [
       '#########',
       '#       #',
@@ -64,8 +64,8 @@ const LEVELS: Level[] = [
     ]
   },
   {
-    name: '第 3 关 · 隔墙绕行',
-    hint: '中间那堵墙挡住了直线，绕开它',
+    name: TG('第 3 关 · 隔墙绕行'),
+    hint: TG('中间那堵墙挡住了直线，绕开它'),
     rows: [
       '###########',
       '#         #',
@@ -77,8 +77,8 @@ const LEVELS: Level[] = [
     ]
   },
   {
-    name: '第 4 关 · 柱子挡路',
-    hint: '箱子正上方是墙 ⇒ 先横推一格，再往下推',
+    name: TG('第 4 关 · 柱子挡路'),
+    hint: TG('箱子正上方是墙 ⇒ 先横推一格，再往下推'),
     rows: [
       '##########',
       '#        #',
@@ -595,7 +595,7 @@ export struct GSokoban {
 
   private statusText(): string {
     if (this.solvedNow) {
-      return this.level < LEVELS.length - 1 ? '🎉 过关！点「下一关」继续' : '🏆 全部关卡通关！';
+      return this.level < LEVELS.length - 1 ? TG('🎉 过关！点「下一关」继续') : TG('🏆 全部关卡通关！');
     }
     if (this.blocked > 0 && this.moves === 0) {
       return TG('那个方向被墙挡住了');

@@ -88,14 +88,14 @@ export struct GSwitchTask {
     this.msg = this.switched ? TG("🔀 规则换了，看清提示再点") : TG("规则不变，继续");
   }
 
-  private ruleName(): string { return this.rule === 0 ? '比大小' : '判奇偶'; }
+  private ruleName(): string { return this.rule === 0 ? TG('比大小') : TG('判奇偶'); }
   private want(): number {
     const big: boolean = this.digit > 5;
     const odd: boolean = this.digit % 2 === 1;
     return this.rule === 0 ? (big ? 0 : 1) : (odd ? 0 : 1);
   }
   private optName(i: number): string {
-    if (this.rule === 0) { return i === 0 ? '>5 算大' : '≤5 算小'; }
+    if (this.rule === 0) { return i === 0 ? TG('>5 算大') : TG('≤5 算小'); }
     return i === 0 ? '奇数' : TG('偶数');
   }
 
