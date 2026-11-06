@@ -353,7 +353,7 @@ export struct GModuloPath {
       this.finish(false);
       return;
     }
-    this.msg = near ? TG2("❌ 这一格是 {0}，要的是 {1}", val, want) : '❌ 只能走上下左右相邻的格子';
+    this.msg = near ? TG2("❌ 这一格是 {0}，要的是 {1}", val, want) : TG('❌ 只能走上下左右相邻的格子');
   }
 
   private finish(solved: boolean): void {

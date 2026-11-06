@@ -17,15 +17,15 @@ const LIMIT_MS: number = 10000; const TICK_MS: number = 100;
 interface Blend { word: string; def: string; a: string; b: string; d1: string; d2: string }
 interface BlendRound { word: string; def: string; a: string; b: string; opts: string[] }
 const BANK: Blend[] = [
-  { word: 'SMOG', def: '烟雾', a: 'SMOKE', b: 'FOG', d1: 'SMOOTH', d2: 'FROST' },
-  { word: 'BRUNCH', def: '早午餐', a: 'BREAKFAST', b: 'LUNCH', d1: 'DINNER', d2: 'BUNCH' },
-  { word: 'MOTEL', def: '汽车旅馆', a: 'MOTOR', b: 'HOTEL', d1: 'MOTIVE', d2: 'HOSTEL' },
-  { word: 'SPORK', def: '叉勺', a: 'SPOON', b: 'FORK', d1: 'SPORT', d2: 'CORK' },
-  { word: 'BLOG', def: '博客', a: 'WEB', b: 'LOG', d1: 'GLOBE', d2: 'BOG' },
-  { word: 'CHORTLE', def: '咯咯笑', a: 'CHUCKLE', b: 'SNORT', d1: 'CHORUS', d2: 'TURTLE' },
-  { word: 'EMOTICON', def: '颜文字', a: 'EMOTION', b: 'ICON', d1: 'EMOTIVE', d2: 'TONIC' },
-  { word: 'PIXEL', def: '像素', a: 'PICTURE', b: 'ELEMENT', d1: 'PIXIE', d2: 'EXCEL' },
-  { word: 'CYBORG', def: '半机械人', a: 'CYBERNETIC', b: 'ORGANISM', d1: 'CYPRESS', d2: 'ORGAN' }
+  { word: 'SMOG', def: TG('烟雾'), a: 'SMOKE', b: 'FOG', d1: 'SMOOTH', d2: 'FROST' },
+  { word: 'BRUNCH', def: TG('早午餐'), a: 'BREAKFAST', b: 'LUNCH', d1: 'DINNER', d2: 'BUNCH' },
+  { word: 'MOTEL', def: TG('汽车旅馆'), a: 'MOTOR', b: 'HOTEL', d1: 'MOTIVE', d2: 'HOSTEL' },
+  { word: 'SPORK', def: TG('叉勺'), a: 'SPOON', b: 'FORK', d1: 'SPORT', d2: 'CORK' },
+  { word: 'BLOG', def: TG('博客'), a: 'WEB', b: 'LOG', d1: 'GLOBE', d2: 'BOG' },
+  { word: 'CHORTLE', def: TG('咯咯笑'), a: 'CHUCKLE', b: 'SNORT', d1: 'CHORUS', d2: 'TURTLE' },
+  { word: 'EMOTICON', def: TG('颜文字'), a: 'EMOTION', b: 'ICON', d1: 'EMOTIVE', d2: 'TONIC' },
+  { word: 'PIXEL', def: TG('像素'), a: 'PICTURE', b: 'ELEMENT', d1: 'PIXIE', d2: 'EXCEL' },
+  { word: 'CYBORG', def: TG('半机械人'), a: 'CYBERNETIC', b: 'ORGANISM', d1: 'CYPRESS', d2: 'ORGAN' }
 ];
 function shuffled(arr: string[]): string[] {
   const out: string[] = arr.slice();

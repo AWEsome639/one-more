@@ -255,7 +255,7 @@ export struct GOperationSpan {
   private pickOpt(v: number): void {
     if (this.phase !== 0) { return; }
     if (v !== this.ans) {
-      this.end(false, '❌ 算错了：' + this.lhs + ' ' + this.opSym + ' ' + this.rhs + ' = ' + this.ans);
+      this.end(false, TG('❌ 算错了：') + this.lhs + ' ' + this.opSym + ' ' + this.rhs + ' = ' + this.ans);
       return;
     }
     this.stored = this.stored.concat([this.ans]);

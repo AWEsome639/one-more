@@ -139,7 +139,7 @@ export struct GModuloClock {
     this.picked = -1;
     this.face = FACES[now - 1];
     this.quiz = forward
-      ? '现在 ' + now + ' 点，再过 ' + delta + ' 小时是几点？'
+      ? TG('现在 ') + now + TG(' 点，再过 ') + delta + TG(' 小时是几点？')
       : TG2('现在 {0} 点，{1} 小时前是几点？', now, delta);
   }
 

@@ -20,18 +20,18 @@ const ROUNDS: number = 6; const LIVES: number = 3; const SLOTS: number = 6;
 interface Syl { w: string; gloss: string; parts: string[]; extra: string[] }
 
 const BANK: Syl[] = [
-  { w: 'TELEPHONE', gloss: '电话 ☎️', parts: ['TE', 'LE', 'PHONE'], extra: ['TA', 'ING'] },
-  { w: 'BASKETBALL', gloss: '篮球 🏀', parts: ['BAS', 'KET', 'BALL'], extra: ['BO', 'NESS'] },
+  { w: 'TELEPHONE', gloss: TG('电话 ☎️'), parts: ['TE', 'LE', 'PHONE'], extra: ['TA', 'ING'] },
+  { w: 'BASKETBALL', gloss: TG('篮球 🏀'), parts: ['BAS', 'KET', 'BALL'], extra: ['BO', 'NESS'] },
   { w: 'CHOCOLATE', gloss: TG('巧克力 🍫'), parts: ['CHO', 'CO', 'LATE'], extra: ['CHI', 'EST'] },
   { w: 'BICYCLE', gloss: TG('自行车 🚲'), parts: ['BI', 'CY', 'CLE'], extra: ['BY', 'ING'] },
   { w: 'UMBRELLA', gloss: TG('雨伞 ☂️'), parts: ['UM', 'BREL', 'LA'], extra: ['UN', 'LY'] },
   { w: 'HOSPITAL', gloss: TG('医院 🏥'), parts: ['HOS', 'PI', 'TAL'], extra: ['TEL', 'ER'] },
-  { w: 'PINEAPPLE', gloss: '菠萝 🍍', parts: ['PINE', 'AP', 'PLE'], extra: ['PIN', 'ER'] },
-  { w: 'COMPUTER', gloss: '电脑 💻', parts: ['COM', 'PU', 'TER'], extra: ['PUT', 'OR'] },
+  { w: 'PINEAPPLE', gloss: TG('菠萝 🍍'), parts: ['PINE', 'AP', 'PLE'], extra: ['PIN', 'ER'] },
+  { w: 'COMPUTER', gloss: TG('电脑 💻'), parts: ['COM', 'PU', 'TER'], extra: ['PUT', 'OR'] },
   { w: 'MOUNTAIN', gloss: TG('高山 ⛰️'), parts: ['MOUN', 'TAIN'], extra: ['MOON', 'LY'] },
   { w: 'SANDWICH', gloss: TG('三明治 🥪'), parts: ['SAND', 'WICH'], extra: ['WISH', 'ES'] },
   { w: 'ELEPHANT', gloss: TG('大象 🐘'), parts: ['E', 'LE', 'PHANT'], extra: ['AN', 'EST'] },
-  { w: 'WATERMELON', gloss: '西瓜 🍉', parts: ['WA', 'TER', 'MEL'], extra: ['ON', 'ING'] }
+  { w: 'WATERMELON', gloss: TG('西瓜 🍉'), parts: ['WA', 'TER', 'MEL'], extra: ['ON', 'ING'] }
 ];
 
 /** 从 0..total-1 中随机取 k 个互不相同的下标（k=total 就是整段洗牌） */

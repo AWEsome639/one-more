@@ -520,7 +520,7 @@ export struct GFlappy {
     this.over = true;
     this.won = solved;
     this.stopLoop();
-    this.msg = solved ? '🎉 全部穿过！' : TG2("撞了，穿过 {0} 根", this.score);
+    this.msg = solved ? TG('🎉 全部穿过！') : TG2("撞了，穿过 {0} 根", this.score);
     this.finish(solved);
   }
 

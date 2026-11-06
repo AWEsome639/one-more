@@ -634,9 +634,9 @@ export struct GWaterSort {
 
   private tip(): string {
     if (this.over) {
-      return this.won ? TG2("全部单色 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : '倒不动了，本局失败';
+      return this.won ? TG2("全部单色 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : TG('倒不动了，本局失败');
     }
-    return this.sel < 0 ? '点一根试管选中，再点另一根倒过去' : TG2("已选中第 {0} 管", String(this.sel + 1));
+    return this.sel < 0 ? TG('点一根试管选中，再点另一根倒过去') : TG2("已选中第 {0} 管", String(this.sel + 1));
   }
 
   build() {

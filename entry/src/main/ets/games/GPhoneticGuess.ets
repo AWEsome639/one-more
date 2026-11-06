@@ -28,15 +28,15 @@ const BANK: Word[] = [
   { w: 'apple', ipa: '/ˈæpl/', cn: TG('苹果') },
   { w: 'banana', ipa: '/bəˈnɑːnə/', cn: TG('香蕉') },
   { w: 'chocolate', ipa: '/ˈtʃɒklət/', cn: TG('巧克力') },
-  { w: 'university', ipa: '/ˌjuːnɪˈvɜːsəti/', cn: '大学' },
-  { w: 'hospital', ipa: '/ˈhɒspɪtl/', cn: '医院' },
+  { w: 'university', ipa: '/ˌjuːnɪˈvɜːsəti/', cn: TG('大学') },
+  { w: 'hospital', ipa: '/ˈhɒspɪtl/', cn: TG('医院') },
   { w: 'computer', ipa: '/kəmˈpjuːtə/', cn: '电脑' },
   { w: 'elephant', ipa: '/ˈelɪfənt/', cn: TG('大象') },
-  { w: 'weather', ipa: '/ˈweðə/', cn: '天气' },
-  { w: 'January', ipa: '/ˈdʒænjuəri/', cn: '一月' },
+  { w: 'weather', ipa: '/ˈweðə/', cn: TG('天气') },
+  { w: 'January', ipa: '/ˈdʒænjuəri/', cn: TG('一月') },
   { w: 'garden', ipa: '/ˈɡɑːdn/', cn: TG('花园') },
   { w: 'silent', ipa: '/ˈsaɪlənt/', cn: TG('安静的') },
-  { w: 'southern', ipa: '/ˈsʌðən/', cn: '南方的' }
+  { w: 'southern', ipa: '/ˈsʌðən/', cn: TG('南方的') }
 ];
 
 const PICK: number = 4;          // 每题选项数

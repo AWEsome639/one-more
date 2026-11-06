@@ -469,7 +469,7 @@ export struct GPegSolitaire {
       return TG2('😵 还剩 {0} 颗，没有可跳的走法了',Digits(String(this.pegs), this.langCode));
     }
     if (this.sel >= 0) {
-      return this.dests.length > 0 ? '再点绿点，跳过去' : '这颗跳不动，换一颗试试';
+      return this.dests.length > 0 ? TG('再点绿点，跳过去') : TG('这颗跳不动，换一颗试试');
     }
     return TG('点棋子选中，再点绿点跳过它旁边的棋子');
   }

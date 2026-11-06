@@ -246,7 +246,7 @@ export struct GActionSequenceRecall {
   private end(solved: boolean): void {
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
     this.over = true; this.won = solved; this.playing = false; this.showIdx = -1;
-    this.msg = solved ? '🎉 六关全过，通关！' : TG2("💤 命用完了 —— 撑到第 {0} 关",Digits(String(this.level), this.langCode));
+    this.msg = solved ? TG('🎉 六关全过，通关！') : TG2("💤 命用完了 —— 撑到第 {0} 关",Digits(String(this.level), this.langCode));
     if (this.finished) { return; }
     this.finished = true;
     const r: GameResult = { gameId: 'action_sequence_recall', solved: solved, score: this.score,
