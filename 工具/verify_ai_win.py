@@ -485,16 +485,26 @@ def _card_candidates(ns, name, gid):
     nm = _norm(name)
     cid = ('card-' + gid) if gid else None
     hit = []
+    # ★ 判据 1707：短名字（如「8」）用 `nm in tx` 会误中「2048」——
+    #   ⇒ 匹配分三级：精确 == / 前缀 startsWith / 包含 in，**精确优先**
+    exact = []
+    prefix = []
+    contain = []
     for x in ns:
         if not x['bounds']:
             continue
         if cid and x['id'] == cid:
-            hit.append(x)
+            exact.append(x)
             continue
         if x['id'].startswith('card-') and nm:
             tx = _norm(x['text'])
-            if tx == nm or nm in tx:
-                hit.append(x)
+            if tx == nm:
+                exact.append(x)
+            elif tx.startswith(nm):
+                prefix.append(x)
+            elif nm in tx:
+                contain.append(x)
+    hit = exact + prefix + contain
     if hit:
         return hit
     for x in ns:
