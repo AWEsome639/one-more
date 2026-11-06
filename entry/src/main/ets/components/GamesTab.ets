@@ -1729,7 +1729,8 @@ build() {
   segBtn(s: Seg, zh: string, en: string) {
     // ★ 在 Builder **内部**取词，不要在调用处取 ——
     //   @Builder 的参数会被 ArkUI 记忆化，传进去的字符串换语言时不会重算
-    Text(this.t(zh, en))
+    // ★ 判据 1746：分段按钮要走 10 语言（原来 this.t(zh,en) 只有中英）
+    Text(TG(zh))
       .fontSize(FontSize.xs)
       .fontWeight(this.seg === s ? FontWeight.Bold : FontWeight.Normal)
       .fontColor(this.seg === s ? Color.White : this.theme().inkSoft)

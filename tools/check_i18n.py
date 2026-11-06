@@ -205,7 +205,7 @@ def check_naked_chinese():
       现在按**字符位置**判：中文串必须落在 t()/tn()/L()/… 的括号里。
     """
     print('\n  ═══ ⑤ 裸中文扫描（components / pages）═══')
-    FUNCS = [r'this\.t', r'this\.tn', r'\bL2?', r'\bTN', r'\bTZ', r'this\.sec', r'this\.kv',
+    FUNCS = [r'\bTG[0-9]?', r'this\.t', r'this\.tn', r'\bL2?', r'\bTN', r'\bTZ', r'this\.sec', r'this\.kv',
              r'this\.chip', r'this\.statCell', r'this\.statBox', r'this\.switchRow', r'this\.navRow',
              r'this\.infoRow', r'this\.langChip', r'this\.segBtn', r'this\.sectionHeader',
              r'this\.sectionTitle', r'this\.modeChip', r'this\.barItem']
