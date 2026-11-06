@@ -230,14 +230,14 @@ export struct StatsTab {
 
   private xpLeftText(): string {
     if (this.level >= MAX_LEVEL) {
-      return this.t('已达最高等级', 'Max level reached');
+      return this.t(TG('已达最高等级'), 'Max level reached');
     }
     return this.tn('再攒 {n} 点经验就升级', '{n} XP to next level', ProgressStore.xpToNext(this.xp));
   }
 
   private nextLevelText(): string {
     if (this.level >= MAX_LEVEL) {
-      return 'LV ' + MAX_LEVEL + ' · ' + this.t('满级', 'Max');
+      return 'LV ' + MAX_LEVEL + ' · ' + this.t(TG('满级'), 'Max');
     }
     return 'LV ' + this.level + ' → LV ' + (this.level + 1);
   }
@@ -352,7 +352,7 @@ export struct StatsTab {
           this.recentSection()
           this.topSection()
         }
-        Text(this.t('记录只存在你手机里，不上传、不联网也能看', 'Everything stays on your phone — no uploads, works offline'))
+        Text(this.t(TG('记录只存在你手机里，不上传、不联网也能看'), 'Everything stays on your phone — no uploads, works offline'))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme().inkFaint)
           .width('100%')
@@ -425,7 +425,7 @@ export struct StatsTab {
             .fontColor(this.theme().ink)
             .width('100%')
             .maxLines(1)
-          Text(this.solvedToday ? this.t('✅ 今日已打卡', '✅ Checked in today') : this.t('⭕ 还没玩 · 来一局就打卡', '⭕ Nothing yet — play one to check in'))
+          Text(this.solvedToday ? this.t(TG('✅ 今日已打卡'), '✅ Checked in today') : this.t(TG('⭕ 还没玩 · 来一局就打卡'), '⭕ Nothing yet — play one to check in'))
             .fontSize(FontSize.xxs)
             .fontColor(this.solvedToday ? Palette.emerald : this.theme().inkFaint)
             .width('100%')
@@ -466,7 +466,7 @@ export struct StatsTab {
         .height(BAR_H)
 
         Row() {
-          Text(this.tn('一共攒了 {n} 点经验', '{n} XP earned', this.xp))
+          Text(this.tn(TG('一共攒了 {n} 点经验'), '{n} XP earned', this.xp))
             .fontSize(FontSize.xxs)
             .fontColor(this.theme().inkFaint)
           Blank()
@@ -479,10 +479,10 @@ export struct StatsTab {
       .width('100%')
 
       Flex({ wrap: FlexWrap.Wrap }) {
-        this.chip('🔥', '连胜 {n} 天', 'Streak {n} days', this.superStreak, Palette.orange)
-        this.chip('🏅', '最长连了 {n} 天', 'Longest {n} days', this.bestStreak, Palette.amber)
-        this.chip('📅', '今天玩了 {n} 局', 'Today {n} rounds', this.dailyCount, Palette.sky)
-        this.chip('⭐', '收藏 {n} 款', 'Saved {n}', ProgressStore.favorites().length, Palette.berry)
+        this.chip('🔥', TG('连胜 {n} 天'), 'Streak {n} days', this.superStreak, Palette.orange)
+        this.chip('🏅', TG('最长连了 {n} 天'), 'Longest {n} days', this.bestStreak, Palette.amber)
+        this.chip('📅', TG('今天玩了 {n} 局'), 'Today {n} rounds', this.dailyCount, Palette.sky)
+        this.chip('⭐', TG('收藏 {n} 款'), 'Saved {n}', ProgressStore.favorites().length, Palette.berry)
       }
       .width('100%')
     }
@@ -526,7 +526,7 @@ export struct StatsTab {
       .width('100%')
 
       Row({ space: Space.md }) {
-        this.statCell('⏱️', this.durationText(), '', '', '玩了多久', 'Time played', Palette.emerald)
+        this.statCell('⏱️', this.durationText(), '', '', TG('玩了多久'), 'Time played', Palette.emerald)
         this.statCell('🧩', ProgressStore.playedKinds() + '/' + GAMES.length, '款', 'games', TG('玩过几款'), 'Tried', Palette.violet)
       }
       .width('100%')
@@ -584,7 +584,7 @@ export struct StatsTab {
   @Builder
   recentSection() {
     Column({ space: Space.sm }) {
-      this.sectionHeader('🕐', '最近玩过的', 'Recently played', '点一下直接续上', 'Tap to pick up where you left off')
+      this.sectionHeader('🕐', TG('最近玩过的'), 'Recently played', TG('点一下直接续上'), 'Tap to pick up where you left off')
 
       Scroll() {
         Row({ space: Space.md }) {
@@ -643,7 +643,7 @@ export struct StatsTab {
   @Builder
   topSection() {
     Column({ space: Space.sm }) {
-      this.sectionHeader('📈', '玩得最多的', 'Most played', '按玩的次数排', 'sorted by plays')
+      this.sectionHeader('📈', TG('玩得最多的'), 'Most played', TG('按玩的次数排'), 'sorted by plays')
 
       ForEach(this.topPlayed(), (it: RankItem, i: number) => {
         this.rankRow(it, i)
@@ -680,11 +680,11 @@ export struct StatsTab {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
         Row({ space: Space.xs }) {
-          Text(this.tn('玩过 {n} 次', 'Played {n} times', it.plays))
+          Text(this.tn(TG('玩过 {n} 次'), 'Played {n} times', it.plays))
             .fontSize(FontSize.xxs)
             .fontColor(this.theme().inkFaint)
           if (it.best > 0) {
-            Text(this.tn('最高 {n}', 'Best {n}', it.best))
+            Text(this.tn(TG('最高 {n}'), 'Best {n}', it.best))
               .fontSize(FontSize.xxs)
               .fontColor(Palette.sky)
           }
@@ -765,7 +765,7 @@ export struct StatsTab {
   achvWall() {
     Column({ space: Space.md }) {
       Row() {
-        Text(this.t('🏅 成就', '🏅 Achievements')).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
+        Text(this.t(TG('🏅 成就'), '🏅 Achievements')).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink)
         Blank()
         Text(Digits(String(this.unlockedIds().length), this.langCode) + ' / ' +
@@ -786,7 +786,7 @@ export struct StatsTab {
       // 展开/收起（53 个全铺开会把徽章墙顶到很下面）
       Row({ space: 4 }) {
         Text(this.achvExpanded ? this.t('收起', 'Less')
-            : this.tn('看全部 {n} 个', 'See all {n}', ProgressStore.achievementList().length))
+            : this.tn(TG('看全部 {n} 个'), 'See all {n}', ProgressStore.achievementList().length))
           .fontSize(FontSize.xxs).fontColor(this.accentColor()).fontWeight(FontWeight.Bold)
         Text(this.achvExpanded ? '▲' : '▼').fontSize(FontSize.micro).fontColor(this.accentColor())
       }
@@ -879,7 +879,7 @@ export struct StatsTab {
   badgeWall() {
     Column({ space: Space.md }) {
       Row() {
-        Text(this.t('🎖️ 游戏徽章', '🎖️ Game Badges')).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
+        Text(this.t(TG('🎖️ 游戏徽章'), '🎖️ Game Badges')).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink)
         Blank()
         Text(Digits(String(ProgressStore.tierTotal()), this.langCode) + ' / ' +
@@ -888,7 +888,7 @@ export struct StatsTab {
       }
       .width('100%')
 
-      Text(this.t('每款游戏 4 档：首通 · 熟练 10 次 · 精通 50 次 · 大师 100 次', 'Each game has 4 tiers: first clear, 10, 50, 100'))
+      Text(this.t(TG('每款游戏 4 档：首通 · 熟练 10 次 · 精通 50 次 · 大师 100 次'), 'Each game has 4 tiers: first clear, 10, 50, 100'))
         .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
 
       Stack({ alignContent: Alignment.Start }) {
@@ -915,7 +915,7 @@ export struct StatsTab {
         }
         .width('100%')
       } else {
-        Text(this.t('还没有徽章——通关任意一局就点亮', 'No badges yet — clear any game to start'))
+        Text(this.t(TG('还没有徽章——通关任意一局就点亮'), 'No badges yet — clear any game to start'))
           .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
           .padding({ top: Space.sm, bottom: Space.sm })
       }
@@ -986,7 +986,7 @@ export struct StatsTab {
   @Builder
   suggestSection() {
     Column({ space: Space.sm }) {
-      this.sectionHeader('🎲', '先从这几款开始', 'Start with these', '挑不出就先玩这几个', 'picks to get going')
+      this.sectionHeader('🎲', TG('先从这几款开始'), 'Start with these', TG('挑不出就先玩这几个'), 'picks to get going')
 
       ForEach(this.pickSix(), (g: GameMeta) => {
         Row({ space: Space.md }) {
@@ -1032,7 +1032,7 @@ export struct StatsTab {
       Text('🌱')
         .accessibilityLevel('no')
         .fontSize(FontSize.hero)
-      Text(this.t('这里还空着', 'Nothing here yet'))
+      Text(this.t(TG('这里还空着'), 'Nothing here yet'))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme().ink)

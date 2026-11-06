@@ -5,6 +5,7 @@
  * 动效一律走 Motion 的时长，按下必有 0.96 缩放反馈。
  */
 
+import { TG } from '../core/GameI18n';
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
 import { Haptics } from '../core/Haptics';
@@ -700,8 +701,8 @@ export struct LevelHeader {
       Row({ space: Space.xs }) {
         Text(this.solvedToday ? '✅' : '⭕')
           .fontSize(FontSize.md)
-        Text(this.solvedToday ? this.t('今日已打卡', 'Checked in today')
-                              : this.t('还没玩 · 来一局就打卡', 'Not yet — play one round'))
+        Text(this.solvedToday ? this.t(TG('今日已打卡'), 'Checked in today')
+                              : this.t(TG('还没玩 · 来一局就打卡'), 'Not yet — play one round'))
           .fontSize(FontSize.xs)
           .fontColor(this.solvedToday ? Palette.emerald : this.theme.inkSoft)
       }

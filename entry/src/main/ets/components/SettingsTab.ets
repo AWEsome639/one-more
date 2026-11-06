@@ -66,7 +66,7 @@ const PICK_SCALE: number = 1.1;
 /** 首屏进场延迟 */
 const ENTER_DELAY: number = 30;
 /** 难度名（简/繁/其它语言都走字典） */
-const DIFF_ZH: string[] = ['简单', '普通', '困难'];
+const DIFF_ZH: string[] = [TG('简单'), TG('普通'), TG('困难')];
 const DIFF_EN: string[] = ['Easy', 'Normal', 'Hard'];
 
 /**
@@ -240,7 +240,7 @@ export struct SettingsTab {
     hilog.info(0x0000, 'GameLog', 'doExport count=%{public}d ready-check', n);
     if (n === 0) {
       this.noteOk = false;
-      this.note = this.t('还没有游玩记录 —— 先玩几局再来导出',
+      this.note = this.t(TG('还没有游玩记录 —— 先玩几局再来导出'),
         'No play records yet — play a few games first');
       return;
     }

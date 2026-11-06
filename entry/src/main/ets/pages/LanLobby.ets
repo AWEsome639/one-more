@@ -215,7 +215,7 @@ struct LanLobby {
       // 开房
       Button(Bp.tinyScreen() || Bp.isWatch()
           ? this.t(TG('开个房间'), 'Host')
-          : this.t('开个房间（我来当房主）', 'Host a room'))
+          : this.t(TG('开个房间（我来当房主）'), 'Host a room'))
         // ★ 2026-10-19 自查 A3：开房按钮写死 48vp，大字模式会裁
         .width('100%').constraintSize({ minHeight: Cell.of(48) })
         .backgroundColor(this.accentColor())
@@ -231,13 +231,13 @@ struct LanLobby {
           Text('📶').fontSize(FontSize.lg)
             .accessibilityLevel('no')
           Column({ space: 2 }) {
-            Text(this.t('{s} 的房间', "{s}'s room").replace('{s}', r.host)).fontSize(FontSize.sm)
+            Text(this.t(TG('{s} 的房间'), "{s}'s room").replace('{s}', r.host)).fontSize(FontSize.sm)
               .fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
             Text(this.gameName(r.gameId) + ' · ' + r.ip).fontSize(FontSize.micro)
               .fontColor(this.theme().inkFaint)
           }
           .alignItems(HorizontalAlign.Start).layoutWeight(1)
-          Text(this.t('加入', 'Join')).fontSize(FontSize.xs).fontColor(Color.White)
+          Text(this.t(TG('加入'), 'Join')).fontSize(FontSize.xs).fontColor(Color.White)
             .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
             .backgroundColor(Palette.emerald).borderRadius(Radius.full)
         }
@@ -287,19 +287,19 @@ struct LanLobby {
   /** ★ 竞速模式：房主开一局（广播 race_go，各端同时开始） */
   private async raceHost(): Promise<void> {
     Haptics.press();
-    this.status = this.t('正在开房…', 'Opening room…');
+    this.status = this.t(TG('正在开房…'), 'Opening room…');
     const port: number = await Lan.host(this.picked, (m: LanMsg) => {
       LanRace.receive(m);
       if (m.t === 'hello') {
-        this.status = this.t('有人来了！', 'Someone joined!');
+        this.status = this.t(TG('有人来了！'), 'Someone joined!');
       }
     });
     if (port <= 0) {
-      this.status = this.t('开房失败', 'Failed to open room');
+      this.status = this.t(TG('开房失败'), 'Failed to open room');
       return;
     }
     await LanRace.hostStart(this.picked);
-    this.status = this.t('竞速开始！谁先完成谁赢', 'Race on! First to finish wins');
+    this.status = this.t(TG('竞速开始！谁先完成谁赢'), 'Race on! First to finish wins');
     Haptics.success();
     router.pushUrl({ url: 'pages/GameHost', params: { id: this.picked } });
   }
@@ -311,11 +311,11 @@ struct LanLobby {
       LanRace.receive(m);
     });
     if (!ok) {
-      this.status = this.t('连不上，检查同一 Wi-Fi', 'Cannot connect — check same Wi-Fi');
+      this.status = this.t(TG('连不上，检查同一 Wi-Fi'), 'Cannot connect — check same Wi-Fi');
       return;
     }
     await LanRace.ask();
-    this.status = this.t('已加入，等房主开始', 'Joined — waiting for host');
+    this.status = this.t(TG('已加入，等房主开始'), 'Joined — waiting for host');
     Haptics.success();
     router.pushUrl({ url: 'pages/GameHost', params: { id: room.gameId } });
   }
@@ -334,14 +334,14 @@ struct LanLobby {
       if (m.t === 'hello') {
         // ★ 对手来了 ⇒ 先把我的难度告诉他，保证两边棋盘一致
         LanMatch.broadcastDiff(this.picked);
-        this.status = this.t('对手已连上！开局…', 'Opponent connected! Starting…');
+        this.status = this.t(TG('对手已连上！开局…'), 'Opponent connected! Starting…');
         // ★ 对手来了 ⇒ 直接进游戏（房主先手）
         router.pushUrl({ url: 'pages/GameHost', params: { id: this.picked } });
       }
     });
     this.status = port > 0
-      ? this.t('房间已开（端口 {n}）—— 等对手加入', 'Room open on port {n} — waiting').replace('{n}', String(port))
-      : this.t('开房失败，检查 Wi-Fi', 'Could not host — check your Wi-Fi');
+      ? this.t(TG('房间已开（端口 {n}）—— 等对手加入'), 'Room open on port {n} — waiting').replace('{n}', String(port))
+      : this.t(TG('开房失败，检查 Wi-Fi'), 'Could not host — check your Wi-Fi');
   }
 
   /** 手动输 IP 直连（绕开 UDP 发现） */
@@ -349,12 +349,12 @@ struct LanLobby {
     Haptics.tap();
     const ip: string = this.manualIp.trim();
     if (ip.length === 0) {
-      this.status = this.t('先填房主 IP', 'Enter the host IP first');
+      this.status = this.t(TG('先填房主 IP'), 'Enter the host IP first');
       return;
     }
     const pt: number = Number.parseInt(this.manualPort.trim(), 10);
     const room: LanRoom = { ip: ip, port: isNaN(pt) ? 41235 : pt, host: 'Host', gameId: this.picked };
-    this.status = this.t('正在连接 {s}…', 'Connecting to {s}…').replace('{s}', ip);
+    this.status = this.t(TG('正在连接 {s}…'), 'Connecting to {s}…').replace('{s}', ip);
     LanMatch.begin(false, (d: string) => {
       this.status = this.t('对手落子：', 'Opponent moved: ') + d;
     }, this.picked);          // ★ P12：传 gameId，难度广播才生效
@@ -368,8 +368,8 @@ struct LanLobby {
       }
     });
     this.status = ok
-      ? this.t('连上了！等对手开局', 'Connected! Waiting for the host')
-      : this.t('连不上 —— 检查 IP 和 Wi-Fi', 'Could not connect — check IP and Wi-Fi');
+      ? this.t(TG('连上了！等对手开局'), 'Connected! Waiting for the host')
+      : this.t(TG('连不上 —— 检查 IP 和 Wi-Fi'), 'Could not connect — check IP and Wi-Fi');
   }
 
   private async joinRoom(r: LanRoom): Promise<void> {
@@ -386,6 +386,6 @@ struct LanLobby {
         router.pushUrl({ url: 'pages/GameHost', params: { id: this.picked } });
       }
     });
-    this.status = ok ? this.t('连上了！', 'Connected!') : this.t('连不上，可能房主退出了', 'Could not connect');
+    this.status = ok ? this.t(TG('连上了！'), 'Connected!') : this.t(TG('连不上，可能房主退出了'), 'Could not connect');
   }
 }
