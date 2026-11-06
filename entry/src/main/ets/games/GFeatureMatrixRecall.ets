@@ -290,7 +290,7 @@ export struct GFeatureMatrixRecall {
       if (this.picked[i] !== (this.hiColors[i] === this.askColor)) { ok = false; }
     }
     this.phase = 2; this.over = true; this.won = ok;
-    this.msg = ok ? '🎉 全对！特征记忆通关' : TG2("💤 错了 {0} 格", String(PER_COLOR - this.hitCount()));
+    this.msg = ok ? TG('🎉 全对！特征记忆通关') : TG2("💤 错了 {0} 格", String(PER_COLOR - this.hitCount()));
     if (!this.done) {
       this.done = true;
       const r: GameResult = {

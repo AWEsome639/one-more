@@ -563,7 +563,7 @@ export struct GTentsAndTrees {
 
   private tip(): string {
     if (this.over) {
-      return this.won ? TG2("全部配对 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : '违规太多，本局失败';
+      return this.won ? TG2("全部配对 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : TG('违规太多，本局失败');
     }
     return TG('点格子放帐篷（再点收起）；帐篷之间不能相邻（斜着也不行）');
   }

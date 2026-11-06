@@ -21,9 +21,9 @@ interface NameChoice { label: string; ok: boolean; }
 
 const POOL: FaceItem[] = [
   { icon: '🧑‍🚀', name: TG('阿航') }, { icon: '👩‍🍳', name: TG('苏眉') }, { icon: '🧑‍🎨', name: TG('林拓') },
-  { icon: '👨‍🔬', name: '周原' }, { icon: '🧝', name: '白芨' }, { icon: '🧛', name: '黎夜' },
-  { icon: '👩‍🌾', name: '陶然' }, { icon: '🧑‍✈️', name: '陈风' }, { icon: '🤠', name: '韦岚' },
-  { icon: '🧜', name: '海玥' }, { icon: '👨‍🚒', name: '石敢' }, { icon: '👩‍⚕️', name: '温言' }
+  { icon: '👨‍🔬', name: TG('周原') }, { icon: '🧝', name: TG('白芨') }, { icon: '🧛', name: TG('黎夜') },
+  { icon: '👩‍🌾', name: TG('陶然') }, { icon: '🧑‍✈️', name: TG('陈风') }, { icon: '🤠', name: TG('韦岚') },
+  { icon: '🧜', name: TG('海玥') }, { icon: '👨‍🚒', name: TG('石敢') }, { icon: '👩‍⚕️', name: TG('温言') }
 ];
 const ROUNDS: number = 6;
 const SHOW_SEC: number = 5;

@@ -20,12 +20,12 @@ const ROUNDS: number = 6; const PASS: number = 4; const FEED_MS: number = 1100;
 interface Typh { text: string; d1: string; d2: string; gloss: string }
 
 const BANK: Typh[] = [
-  { text: 'the quick brown fox jumps over the lazy dog', d1: 'the quick brown fox jumps over the lazy cat', d2: 'the quick green fox jumps over the lazy dog', gloss: '疾狐跃过懒狗' },
-  { text: 'a journey of a thousand miles begins with a single step', d1: 'a journey of a thousand miles begins with a single stride', d2: 'a journey of a hundred miles begins with a single step', gloss: '千里之行，始于足下' },
-  { text: 'the early bird catches the worm before sunrise', d1: 'the early bird catches the fish before sunrise', d2: 'the early bird eats the worm before sunrise', gloss: '早起的鸟儿有虫吃' },
-  { text: 'practice makes perfect when the work is repeated daily', d1: 'practice makes progress when the work is repeated daily', d2: 'practice makes perfect when the task is repeated daily', gloss: '熟能生巧' },
-  { text: 'a rolling stone gathers no moss along the long road', d1: 'a rolling stone gathers no dust along the long road', d2: 'a rolling rock gathers no moss along the long road', gloss: '滚石不生苔' },
-  { text: 'every cloud has a silver lining after the storm', d1: 'every cloud has a golden lining after the storm', d2: 'every cloud has a silver lining after the rain', gloss: '乌云镶银边' }
+  { text: 'the quick brown fox jumps over the lazy dog', d1: 'the quick brown fox jumps over the lazy cat', d2: 'the quick green fox jumps over the lazy dog', gloss: TG('疾狐跃过懒狗') },
+  { text: 'a journey of a thousand miles begins with a single step', d1: 'a journey of a thousand miles begins with a single stride', d2: 'a journey of a hundred miles begins with a single step', gloss: TG('千里之行，始于足下') },
+  { text: 'the early bird catches the worm before sunrise', d1: 'the early bird catches the fish before sunrise', d2: 'the early bird eats the worm before sunrise', gloss: TG('早起的鸟儿有虫吃') },
+  { text: 'practice makes perfect when the work is repeated daily', d1: 'practice makes progress when the work is repeated daily', d2: 'practice makes perfect when the task is repeated daily', gloss: TG('熟能生巧') },
+  { text: 'a rolling stone gathers no moss along the long road', d1: 'a rolling stone gathers no dust along the long road', d2: 'a rolling rock gathers no moss along the long road', gloss: TG('滚石不生苔') },
+  { text: 'every cloud has a silver lining after the storm', d1: 'every cloud has a golden lining after the storm', d2: 'every cloud has a silver lining after the rain', gloss: TG('乌云镶银边') }
 ];
 
 /** 从 0..total-1 中随机取 k 个互不相同的下标（k=total 就是整段洗牌） */

@@ -22,16 +22,16 @@ interface Opt { text: string; ok: boolean }
 
 const BANK: Item[] = [
   { gloss: TG('不快乐的'), pos: 'adj', root: 'happy', opts: ['unhappy', 'happiness', 'happily', 'unhappily'], ans: 0 },
-  { gloss: '幸福；快乐', pos: 'n', root: 'happy', opts: ['unhappy', 'happiness', 'happily', 'unhappily'], ans: 1 },
-  { gloss: '仔细的', pos: 'adj', root: 'care', opts: ['careful', 'careless', 'carelessly', 'caring'], ans: 0 },
-  { gloss: '粗心地', pos: 'adv', root: 'care', opts: ['careful', 'careless', 'carelessly', 'caring'], ans: 2 },
+  { gloss: TG('幸福；快乐'), pos: 'n', root: 'happy', opts: ['unhappy', 'happiness', 'happily', 'unhappily'], ans: 1 },
+  { gloss: TG('仔细的'), pos: 'adj', root: 'care', opts: ['careful', 'careless', 'carelessly', 'caring'], ans: 0 },
+  { gloss: TG('粗心地'), pos: 'adv', root: 'care', opts: ['careful', 'careless', 'carelessly', 'caring'], ans: 2 },
   { gloss: TG('重写'), pos: 'v', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 1 },
-  { gloss: '作家', pos: 'n', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 0 },
+  { gloss: TG('作家'), pos: 'n', root: 'write', opts: ['writer', 'rewrite', 'writing', 'written'], ans: 0 },
   { gloss: TG('不可能的'), pos: 'adj', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 1 },
-  { gloss: '可能性', pos: 'n', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 2 },
-  { gloss: '有用的', pos: 'adj', root: 'use', opts: ['useless', 'useful', 'usage', 'user'], ans: 1 },
-  { gloss: '无用的', pos: 'adj', root: 'use', opts: ['useless', 'useful', 'usage', 'user'], ans: 0 },
-  { gloss: '危险的', pos: 'adj', root: 'danger', opts: ['dangerous', 'danger', 'dangerously', 'endanger'], ans: 0 }
+  { gloss: TG('可能性'), pos: 'n', root: 'possible', opts: ['possibly', 'impossible', 'possibility', 'possible'], ans: 2 },
+  { gloss: TG('有用的'), pos: 'adj', root: 'use', opts: ['useless', 'useful', 'usage', 'user'], ans: 1 },
+  { gloss: TG('无用的'), pos: 'adj', root: 'use', opts: ['useless', 'useful', 'usage', 'user'], ans: 0 },
+  { gloss: TG('危险的'), pos: 'adj', root: 'danger', opts: ['dangerous', 'danger', 'dangerously', 'endanger'], ans: 0 }
 ];
 
 /** 从 0..total-1 中随机取 k 个互不相同的下标 */

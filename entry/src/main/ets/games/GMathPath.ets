@@ -525,7 +525,7 @@ export struct GMathPath {
     const np: number[] = this.path.slice();
     np.pop();
     this.path = np;
-    this.tip = this.path.length === 0 ? '已清空算式' : TG2("当前：{0}", this.exprText());
+    this.tip = this.path.length === 0 ? TG('已清空算式') : TG2("当前：{0}", this.exprText());
   }
 
   /** AI 用：深搜一条「数字-运算符-数字…」且左到右算下来等于目标的路径 */

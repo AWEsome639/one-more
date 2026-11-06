@@ -478,12 +478,12 @@ export struct GPong {
 
   private status(): string {
     if (this.over) {
-      return this.won ? '🎉 你赢了！' : '😵 电脑赢了，再来一局';
+      return this.won ? TG('🎉 你赢了！') : TG('😵 电脑赢了，再来一局');
     }
     if (!this.running) {
       return TG('⏸ 已暂停，点「继续」接着打');
     }
-    return this.wait > 0 ? '准备发球…' : '拖动球场上下移动你的拍子';
+    return this.wait > 0 ? TG('准备发球…') : TG('拖动球场上下移动你的拍子');
   }
 
   build() {

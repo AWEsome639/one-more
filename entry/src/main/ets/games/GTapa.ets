@@ -608,7 +608,7 @@ export struct GTapa {
 
   private tip(): string {
     if (this.over) {
-      return this.won ? TG2("全部满足 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : '时间到，还差一点';
+      return this.won ? TG2("全部满足 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : TG('时间到，还差一点');
     }
     return TG('点格子涂黑/擦白；数字 = 8 邻域里连续黑格的段长');
   }

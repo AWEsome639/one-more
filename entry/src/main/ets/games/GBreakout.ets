@@ -304,11 +304,11 @@ export struct GBreakout {
     const mid: number = this.paddleX + PADDLE_W / 2;
     const d: number = this.ballX - mid;
     const side: string = d > 4 ? '右' : (d < -4 ? '左' : '');
-    let msg: string = '对准了，保持住';
+    let msg: string = TG('对准了，保持住');
     if (!this.launched) {
-      msg = '按「发球」先把球打出去';
+      msg = TG('按「发球」先把球打出去');
     } else if (side.length > 0) {
-      msg = '挡板往' + side + '挪，球在 x=' + String(Math.floor(this.ballX)) + '%';
+      msg = TG('挡板往') + side + TG('挪，球在 x=') + String(Math.floor(this.ballX)) + '%';
     }
     return Hint.make([], TG2('{0}（还剩 {1} 块砖）', msg, this.left),
       'Move the paddle toward the ball (x = ' + String(Math.floor(this.ballX)) + '%)', t0);

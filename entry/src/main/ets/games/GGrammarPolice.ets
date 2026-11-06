@@ -251,7 +251,7 @@ export struct GGrammarPolice {
     }
     this.right = this.right + 1;
     this.score = this.score + 100 + this.leftS * 10;
-    this.msg = bad.length > 0 ? TG2("✅ 就是「{0}」用错了", bad) : '✅ 本句确实没有错误';
+    this.msg = bad.length > 0 ? TG2("✅ 就是「{0}」用错了", bad) : TG('✅ 本句确实没有错误');
     this.advance();
   }
   private advance(): void {

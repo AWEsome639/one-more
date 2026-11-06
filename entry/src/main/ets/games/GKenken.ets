@@ -28,7 +28,7 @@ const K2: number[] = [3, 4];
 interface Cage {
   cells: number[];
   target: number;
-  op: string;   // '' 单格 | '+' | '-' | '×' | '÷'
+  op: string;   // 'TG(' 单格 | ')+' | '-' | '×' | '÷'
 }
 
 function range(n: number): number[] {

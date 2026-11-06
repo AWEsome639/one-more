@@ -440,8 +440,8 @@ export struct GGo9 {
     this.thinking = false;
     this.scoreText = TG2('黑 {0} 目 · 白 {1} 目（含贴 {2}）', blackPts, whitePts, KOMI);
     this.msg = this.won
-      ? '🎉 数子：你（黑）赢了'
-      : (blackPts === whitePts ? '和棋' : (LanMatch.isActive() ? '对手（白）赢了' : '电脑（白）赢了'));
+      ? TG('🎉 数子：你（黑）赢了')
+      : (blackPts === whitePts ? TG('和棋') : (LanMatch.isActive() ? TG('对手（白）赢了') : TG('电脑（白）赢了')));
     this.finish(this.won);
   }
 
