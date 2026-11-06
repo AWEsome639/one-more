@@ -404,7 +404,7 @@ export struct GSumSnake {
 
   private tip(): string {
     if (this.over) {
-      return this.won ? TG2("正好等于目标 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : '超过目标，蛇撑爆了';
+      return this.won ? TG2("正好等于目标 🎉 得分 {0}",Digits(String(this.score), this.langCode)) : TG('超过目标，蛇撑爆了');
     }
     return TG('点相邻格延伸；点蛇尾回退一格');
   }

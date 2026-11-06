@@ -36,7 +36,7 @@ const BANK: HP[] = [
   { ipa: '/lesn/', hint: TG('课程'), word: 'LESSON', opts: ['LESSON', 'LESSEN', 'LESSER', 'LISTEN'] },
   { ipa: '/səʊl/', hint: TG('唯一'), word: 'SOLE', opts: ['SOLE', 'SOUL', 'SALE', 'SILL'] },
   { ipa: '/səʊ/', hint: TG('缝纫；播种'), word: 'SEW', opts: ['SEW', 'SO', 'SAW', 'SIP'] },
-  { ipa: '/raɪt/', hint: '写作', word: 'WRITE', opts: ['WRITE', 'RIGHT', 'RITE', 'RATE'] }
+  { ipa: '/raɪt/', hint: TG('写作'), word: 'WRITE', opts: ['WRITE', 'RIGHT', 'RITE', 'RATE'] }
 ];
 
 function shuffleIdx(): number[] {

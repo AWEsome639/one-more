@@ -156,7 +156,7 @@ export struct GBinaryScaleBalance {
         s = s === '' ? String(WEIGHTS[i]) : s + ' + ' + WEIGHTS[i];
       }
     }
-    return s === '' ? '空盘' : s;
+    return s === '' ? TG('空盘') : s;
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════

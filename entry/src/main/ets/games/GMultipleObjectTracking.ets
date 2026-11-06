@@ -285,7 +285,7 @@ export struct GMultipleObjectTracking {
     this.score = this.score + good.length * 100;
     if (good.length === this.targets) { this.hitRounds = this.hitRounds + 1; }
     this.phase = 3;
-    this.msg = good.length === this.targets ? '✅ 全对' : TG2("差了 {0} 个", String(missed.length));
+    this.msg = good.length === this.targets ? TG('✅ 全对') : TG2("差了 {0} 个", String(missed.length));
     this.nextTo = setTimeout(() => {
       this.nextTo = -1;
       if (this.round >= this.diffTotal) {
