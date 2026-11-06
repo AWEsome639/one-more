@@ -9,6 +9,7 @@ import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
@@ -235,6 +236,9 @@ export struct GBoxCompletion {
       return false;
     }
     const holes: number[] = this.boxHoles();
+    let cN: number = 0;
+    for (let ci = 0; ci < this.diffTotal * this.diffTotal; ci++) { if (this.cells[ci]) { cN++; } }
+    hilog.info(0x0000, 'BoxDiag', 'autoStep n=' + String(this.diffTotal) + ' cells=' + String(cN) + ' holes=' + String(holes.length) + ' litCnt=' + String(this.litCount()));
     if (holes.length === 0) {
       return false;
     }

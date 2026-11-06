@@ -511,39 +511,19 @@ def _clear_input(name):
     time.sleep(0.3)
 
 
-def _input_text(ti, name):
-    """点输入框 → 清空 → 输入，并**回读校验搜索词真的进去了**（判据 1678）。
-
-    ★ 为什么必须回读：`uitest uiInput inputText` 偶发丢字（输入法建议框抢焦点）。
-      旧版不校验，表现就是「进不去游戏」——错在输入，锅却记给游戏。
-    """
-    # ★ 判据 1688：`inputText` 遇到**空格会截断**（实测「AB 反转」只进了「AB」）
-    #   ⇒ 含空格的名字再试一个「去空格」变体（搜索本身是模糊匹配）
-    # ★ 判据 1691：列表搜索按**词**匹配 —— 实测「AB反转」0 结果、「反转」命中
-    #   含空格的名字**先试尾词**（命中率最高）；卡片定位仍用完整名字，不会进错游戏
-    variants = []
-    if ' ' in name:
-        variants.append(name.split()[-1])
-        variants.append(name.replace(' ', ''))
-    variants.append(name)
-    for attempt in (1, 2):
-        for q in variants:
-            tap(ti, 1.0)
-            _clear_input(name)
-            cx, cy = center(ti)
-            sh("uitest uiInput inputText %d %d %s" % (cx, cy, q))
-            time.sleep(0.6)
-            d = dump()
-            got = ''
-            if d:
-                ti2 = _text_input(nodes(d))
-                got = ti2['text'] if ti2 else ''
-            if _norm(q) and _norm(q) in _norm(got):
-                return True
-        if attempt == 1:
-            print('   ⚠️ 搜索词没进输入框（回读=%r），再输一次…' % got[:40], flush=True)
-    return False
-
+def _input_one(ti, q):
+    """把 q 输进搜索框并回读校验；成功返回 True。"""
+    tap(ti, 1.0)
+    _clear_input(q)
+    cx, cy = center(ti)
+    sh("uitest uiInput inputText %d %d %s" % (cx, cy, q))
+    time.sleep(0.6)
+    d = dump()
+    got = ''
+    if d:
+        ti2 = _text_input(nodes(d))
+        got = ti2['text'] if ti2 else ''
+    return bool(_norm(q)) and _norm(q) in _norm(got)
 
 def _card_candidates(ns, name, gid):
     """判据 1678 的四级定位（返回候选列表，越靠前越稳）：
@@ -613,18 +593,30 @@ def open_game(name):
                 print('   ⚠️ 点不开搜索面板，重试…', flush=True)
                 continue
             return False, '🔍 点不开搜索面板（重试后仍无）'
-        if not _input_text(ti, name):
+        # ★ 判据 1719：**所有变体都要试** ——
+        #   「AB 反转」完整名被空格截断 ⇒ 要尾词；「3D 迷宫」尾词「迷宫」搜出的是别的迷宫 ⇒ 要完整名
+        #   只试「输入成功的第一个变体」会漏（3D 迷宫就是这么被判 FAIL 的）
+        variants = [name]
+        if ' ' in name:
+            variants.append(name.replace(' ', ''))
+            variants.append(name.split()[-1])
+        any_input = False
+        for q in variants:
+            if not _input_one(ti, q):
+                continue
+            any_input = True
+            card = _wait_card(name, gid)
+            if card:
+                tap(card, 6.0)
+                time.sleep(1.5)
+                return True, ''
+        if not any_input:
             if attempt == 1:
                 continue
             return False, '搜索词输不进去'
-        card = _wait_card(name, gid)
-        if card:
-            tap(card, 6.0)
-            time.sleep(1.5)
-            return True, ''
         if attempt == 1:
-            print('   ⚠️ 第一次没找到卡片，清空搜索框重搜…', flush=True)
-    return False, '搜不到卡片（清空重搜后仍无）'
+            print('   ⚠️ 所有变体都没找到卡片，清空重搜…', flush=True)
+    return False, '搜不到卡片（所有变体 + 重搜后仍无）'
 
 
 def _screen_center():
