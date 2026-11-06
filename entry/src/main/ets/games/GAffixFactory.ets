@@ -22,17 +22,17 @@ interface AffixQ { root: string; affix: string; meaning: string; opts: string[] 
 
 const BANK: AffixQ[] = [
   { root: 'happy', affix: 'un-', meaning: TG('不快乐的'), opts: ['un-', 're-', '-ful', '-less'] },
-  { root: 'care', affix: '-ful', meaning: '小心的；关心的', opts: ['-less', '-ful', 'un-', '-ly'] },
-  { root: 'hope', affix: '-less', meaning: '没有希望的', opts: ['-ful', '-less', 're-', '-ness'] },
+  { root: 'care', affix: '-ful', meaning: TG('小心的；关心的'), opts: ['-less', '-ful', 'un-', '-ly'] },
+  { root: 'hope', affix: '-less', meaning: TG('没有希望的'), opts: ['-ful', '-less', 're-', '-ness'] },
   { root: 'write', affix: 're-', meaning: TG('重写'), opts: ['re-', 'un-', '-er', 'dis-'] },
-  { root: 'teach', affix: '-er', meaning: '教师', opts: ['-er', '-ness', '-ing', 'pre-'] },
-  { root: 'kind', affix: '-ness', meaning: '善良', opts: ['-ness', '-ly', 'un-', '-ful'] },
+  { root: 'teach', affix: '-er', meaning: TG('教师'), opts: ['-er', '-ness', '-ing', 'pre-'] },
+  { root: 'kind', affix: '-ness', meaning: TG('善良'), opts: ['-ness', '-ly', 'un-', '-ful'] },
   { root: 'possible', affix: 'im-', meaning: TG('不可能的'), opts: ['im-', 'un-', 'dis-', '-less'] },
-  { root: 'agree', affix: 'dis-', meaning: '不同意', opts: ['dis-', 'un-', 're-', '-ment'] },
-  { root: 'quick', affix: '-ly', meaning: '迅速地', opts: ['-ly', '-ness', '-er', '-ful'] },
-  { root: 'view', affix: 'pre-', meaning: '预览', opts: ['pre-', 're-', 'dis-', '-er'] },
+  { root: 'agree', affix: 'dis-', meaning: TG('不同意'), opts: ['dis-', 'un-', 're-', '-ment'] },
+  { root: 'quick', affix: '-ly', meaning: TG('迅速地'), opts: ['-ly', '-ness', '-er', '-ful'] },
+  { root: 'view', affix: 'pre-', meaning: TG('预览'), opts: ['pre-', 're-', 'dis-', '-er'] },
   { root: 'act', affix: '-or', meaning: TG('演员'), opts: ['-or', '-ness', 'un-', '-ly'] },
-  { root: 'fair', affix: 'un-', meaning: '不公平的', opts: ['un-', '-ly', 'dis-', '-ness'] }
+  { root: 'fair', affix: 'un-', meaning: TG('不公平的'), opts: ['un-', '-ly', 'dis-', '-ness'] }
 ];
 
 /** 从 0..total-1 里随机取 k 个互不相同的下标 */

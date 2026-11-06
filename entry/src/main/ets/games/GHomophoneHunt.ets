@@ -22,20 +22,20 @@ const LIMIT_S: number = 15; const TICK_MS: number = 1000;
 interface HP { ipa: string; hint: string; word: string; opts: string[] }
 
 const BANK: HP[] = [
-  { ipa: '/aɪ/', hint: '眼睛（单数）', word: 'EYE', opts: ['EYE', 'I\'LL', 'AIL', 'OIL'] },
-  { ipa: '/miː/', hint: '我（宾格）', word: 'ME', opts: ['ME', 'MAY', 'MY', 'MOW'] },
-  { ipa: '/piːs/', hint: '和平；一片', word: 'PEACE', opts: ['PEACE', 'PIECE', 'PEAS', 'PACE'] },
-  { ipa: '/siː/', hint: '看见', word: 'SEE', opts: ['SEE', 'SEA', 'SAY', 'SO'] },
-  { ipa: '/tuː/', hint: '也（用于句末）', word: 'TOO', opts: ['TOO', 'TO', 'TWO', 'TOW'] },
-  { ipa: '/hiːl/', hint: '治愈', word: 'HEAL', opts: ['HEAL', 'HEEL', 'HELL', 'HALE'] },
-  { ipa: '/weɪ/', hint: '称重', word: 'WEIGH', opts: ['WEIGH', 'WAY', 'WHEY', 'WADE'] },
-  { ipa: '/nəʊ/', hint: '知道', word: 'KNOW', opts: ['KNOW', 'NO', 'NOW', 'NOD'] },
-  { ipa: '/sʌn/', hint: '儿子', word: 'SON', opts: ['SON', 'SUN', 'SIN', 'SEWN'] },
-  { ipa: '/flaɪ/', hint: '苍蝇', word: 'FLY', opts: ['FLY', 'FLEA', 'FLEE', 'FLAY'] },
-  { ipa: '/bɔːl/', hint: '碗', word: 'BOWL', opts: ['BOWL', 'BALL', 'BOIL', 'BULL'] },
-  { ipa: '/lesn/', hint: '课程', word: 'LESSON', opts: ['LESSON', 'LESSEN', 'LESSER', 'LISTEN'] },
-  { ipa: '/səʊl/', hint: '唯一', word: 'SOLE', opts: ['SOLE', 'SOUL', 'SALE', 'SILL'] },
-  { ipa: '/səʊ/', hint: '缝纫；播种', word: 'SEW', opts: ['SEW', 'SO', 'SAW', 'SIP'] },
+  { ipa: '/aɪ/', hint: TG('眼睛（单数）'), word: 'EYE', opts: ['EYE', 'I\'LL', 'AIL', 'OIL'] },
+  { ipa: '/miː/', hint: TG('我（宾格）'), word: 'ME', opts: ['ME', 'MAY', 'MY', 'MOW'] },
+  { ipa: '/piːs/', hint: TG('和平；一片'), word: 'PEACE', opts: ['PEACE', 'PIECE', 'PEAS', 'PACE'] },
+  { ipa: '/siː/', hint: TG('看见'), word: 'SEE', opts: ['SEE', 'SEA', 'SAY', 'SO'] },
+  { ipa: '/tuː/', hint: TG('也（用于句末）'), word: 'TOO', opts: ['TOO', 'TO', 'TWO', 'TOW'] },
+  { ipa: '/hiːl/', hint: TG('治愈'), word: 'HEAL', opts: ['HEAL', 'HEEL', 'HELL', 'HALE'] },
+  { ipa: '/weɪ/', hint: TG('称重'), word: 'WEIGH', opts: ['WEIGH', 'WAY', 'WHEY', 'WADE'] },
+  { ipa: '/nəʊ/', hint: TG('知道'), word: 'KNOW', opts: ['KNOW', 'NO', 'NOW', 'NOD'] },
+  { ipa: '/sʌn/', hint: TG('儿子'), word: 'SON', opts: ['SON', 'SUN', 'SIN', 'SEWN'] },
+  { ipa: '/flaɪ/', hint: TG('苍蝇'), word: 'FLY', opts: ['FLY', 'FLEA', 'FLEE', 'FLAY'] },
+  { ipa: '/bɔːl/', hint: TG('碗'), word: 'BOWL', opts: ['BOWL', 'BALL', 'BOIL', 'BULL'] },
+  { ipa: '/lesn/', hint: TG('课程'), word: 'LESSON', opts: ['LESSON', 'LESSEN', 'LESSER', 'LISTEN'] },
+  { ipa: '/səʊl/', hint: TG('唯一'), word: 'SOLE', opts: ['SOLE', 'SOUL', 'SALE', 'SILL'] },
+  { ipa: '/səʊ/', hint: TG('缝纫；播种'), word: 'SEW', opts: ['SEW', 'SO', 'SAW', 'SIP'] },
   { ipa: '/raɪt/', hint: '写作', word: 'WRITE', opts: ['WRITE', 'RIGHT', 'RITE', 'RATE'] }
 ];
 

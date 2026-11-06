@@ -31,10 +31,10 @@ const ALL: Pair[] = [
   { a: 'pain（疼痛）', b: 'pan（西语：面包）', same: false, note: 'pain 出拉丁 poena，pan 出拉丁 panis' },
   { a: 'red（红）', b: 'Rede（德语：演讲）', same: false, note: 'red 出 *raudaz，Rede 出 *raþjō' },
   { a: 'tree（树）', b: 'drei（德语：三）', same: false, note: 'tree 出 *dóru，drei 出 *tréyes' },
-  { a: 'grass（草）', b: 'gris（西语：灰）', same: false, note: 'grass 出 *gʰreh₁-，gris 出 *grēwaz' },
-  { a: 'son（儿子）', b: 'Sonne（德语：太阳）', same: false, note: 'son 出 *suHnus，Sonne 出 *sóh₂wl̥' },
-  { a: 'sun（太阳）', b: 'Sohn（德语：儿子）', same: false, note: 'sun 出 *sóh₂wl̥，Sohn 出 *suHnus' },
-  { a: 'cold（冷）', b: 'Gold（德语：金子）', same: false, note: 'cold 出 *gel-，Gold 出 *ǵʰelh₃-' }
+  { a: 'grass（草）', b: 'gris（西语：灰）', same: false, note: TG('grass 出 *gʰreh₁-，gris 出 *grēwaz') },
+  { a: TG('son（儿子）'), b: TG('Sonne（德语：太阳）'), same: false, note: TG('son 出 *suHnus，Sonne 出 *sóh₂wl̥') },
+  { a: TG('sun（太阳）'), b: TG('Sohn（德语：儿子）'), same: false, note: TG('sun 出 *sóh₂wl̥，Sohn 出 *suHnus') },
+  { a: TG('cold（冷）'), b: TG('Gold（德语：金子）'), same: false, note: TG('cold 出 *gel-，Gold 出 *ǵʰelh₃-') }
 ];
 @Component
 export struct GCognateCatch {

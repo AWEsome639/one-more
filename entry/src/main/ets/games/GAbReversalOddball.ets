@@ -355,11 +355,11 @@ export struct GAbReversalOddball {
       //      · 翻转出现得不够（随机运气）
       //      · 翻转出现了但没抓住（手慢）
       Text(this.over
-        ? TG2('这一局只刷出 {0} 次反转（需 {1} 次）⇒ 没抓住 {2} 次',
+        ? TG2(TG('这一局只刷出 {0} 次反转（需 {1} 次）⇒ 没抓住 {2} 次'),
             Digits(String(this.hits + this.miss), this.langCode),
             Digits(String(NEED_HIT), this.langCode),
             Digits(String(this.miss), this.langCode))
-        : TG2('提示：这一局会刷出多少反转是随机的；连续两次同一个时点才点', Digits('', this.langCode)))
+        : TG2(TG('提示：这一局会刷出多少反转是随机的；连续两次同一个时点才点'), Digits('', this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
