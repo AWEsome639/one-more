@@ -15,7 +15,7 @@ import { Tv } from '../core/Tv';
 
 const QN: number = 6; const PASS: number = 4; const DECOY_N: number = 3;
 const LIMIT_MS: number = 8000; const TICK_MS: number = 100; const FEED_MS: number = 900;
-const OXY: string[] = ['震耳欲聋的沉默', '公开的秘密', '甜蜜的负担', '熟悉的陌生人', '有秩序的混乱',
+const OXY: string[] = [TG('震耳欲聋的沉默'), '公开的秘密', '甜蜜的负担', '熟悉的陌生人', '有秩序的混乱',
   '无声的呐喊', '孤独的人群', '缓慢的冲刺', '温柔的暴力', '明亮的黑夜', '微小的巨变'];
 const PLAIN: string[] = ['温暖的阳光', '广阔的海洋', '快速的列车', '绿色的草地', '香甜的蛋糕',
   '高高的山峰', '明亮的灯光', '坚硬的石头', '深邃的夜空', '整齐的书架', '新鲜的蔬菜', '熟练的工匠'];

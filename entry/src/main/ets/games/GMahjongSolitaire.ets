@@ -24,7 +24,7 @@ const PR: number = R + 2;   // 外圈留空，方便绕行
 const PC: number = C + 2;
 const KINDS: number = 8;
 
-const LABELS: string[] = ['1萬', '2萬', '3萬', '4萬', '1筒', '2筒', '3筒', '4筒'];
+const LABELS: string[] = [TG('1萬'), TG('2萬'), TG('3萬'), TG('4萬'), TG('1筒'), TG('2筒'), TG('3筒'), TG('4筒')];
 
 function labelColor(t: number): string {
   return t < 4 ? Palette.rose : Palette.sky;

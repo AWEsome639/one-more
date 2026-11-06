@@ -29,7 +29,7 @@ const SENTS: Sent[] = [
   { text: '春天花开', ok: true, key: '春天' }, { text: '猫会飞上天', ok: false, key: TG('猫') },
   { text: '海水是咸的', ok: true, key: '海水' }, { text: '火车在水底跑', ok: false, key: TG('火车') },
   { text: '小鸟会筑巢', ok: true, key: '小鸟' }, { text: '铅笔能写字', ok: true, key: TG('铅笔') },
-  { text: '蚂蚁比大象重', ok: false, key: '蚂蚁' }, { text: '雨后常有彩虹', ok: true, key: '彩虹' }
+  { text: TG('蚂蚁比大象重'), ok: false, key: TG('蚂蚁') }, { text: TG('雨后常有彩虹'), ok: true, key: TG('彩虹') }
 ];
 
 const START_SPAN: number = 2;
@@ -261,7 +261,7 @@ export struct GReadingSpan {
     if (this.phase !== 0) { return; }
     const truth: boolean = this.curOk;
     if (sayOk !== truth) {
-      this.end(false, '❌ 「' + this.curText + '」' + (truth ? '是通顺的' : '是不通的'));
+      this.end(false, '❌ 「' + this.curText + '」' + (truth ? TG('是通顺的') : TG('是不通的')));
       return;
     }
     this.right = this.right + 1; this.score = this.score + 30;
