@@ -512,6 +512,77 @@ export struct GFillomino {
       Column({ space: Space.md }) {
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         Row({ space: Space.md }) {
+          Button(TG('清除本格'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.sm)
+            .fontColor(this.theme.inkSoft)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(Cell.of(44))
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L660'; })
+            .onBlur(() => { if (this.tvFocus === 'L660') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L660'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.setVal(0); }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.setVal(0);
+            })
+          Button(TG('提示'))
+            .layoutWeight(1)
+            .height(44)
+            // ★★★ 2026-10-31：这个「提示」按钮原来**没有 backgroundColor** ⇒
+          //   用 ArkUI 平台默认色，与全项目 HintBar 的 Palette.cyan 不一致。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
+          .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L674'; })
+            .onBlur(() => { if (this.tvFocus === 'L674') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L674'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
+            .onClick(() => {
+              this.askHint();
+            })
+          Button(LanRace.isRacing() ? TG('联机禁用')
+          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
+            .layoutWeight(1)
+            .height(44)
+            // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
+          //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
+                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
+          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
+          .enabled(!LanRace.isRacing())
+          .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L691'; })
+            .onBlur(() => { if (this.tvFocus === 'L691') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L691'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
+            .onClick(() => {
+              this.askAuto();
+            })
+          Button(TG('重开'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor('#FFFFFF')
+            .backgroundColor(Palette.cyan)
+            .borderRadius(Radius.md)
+            .width(96)
+            .height(Cell.of(44))
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L705'; })
+            .onBlur(() => { if (this.tvFocus === 'L705') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L705'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.reset();
+            })
+        }
+        .width('100%')
+        Row({ space: Space.md }) {
           Column({ space: 2 }) {
           Text((TG('已填'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           Text((String(this.filledCount()) + '/36'))
@@ -656,77 +727,6 @@ export struct GFillomino {
         }
         .width('100%')
 
-        Row({ space: Space.md }) {
-          Button(TG('清除本格'))
-        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-            .fontSize(FontSize.sm)
-            .fontColor(this.theme.inkSoft)
-            .backgroundColor(this.theme.surfaceAlt)
-            .borderRadius(Radius.md)
-            .layoutWeight(1)
-            .height(Cell.of(44))
-            .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L660'; })
-            .onBlur(() => { if (this.tvFocus === 'L660') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L660'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.setVal(0); }); })
-            .onClick(() => {
-              Haptics.tap();
-              this.setVal(0);
-            })
-          Button(TG('提示'))
-            .layoutWeight(1)
-            .height(44)
-            // ★★★ 2026-10-31：这个「提示」按钮原来**没有 backgroundColor** ⇒
-          //   用 ArkUI 平台默认色，与全项目 HintBar 的 Palette.cyan 不一致。
-          .backgroundColor(Palette.cyan)
-          .fontColor('#FFFFFF')
-          .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L674'; })
-            .onBlur(() => { if (this.tvFocus === 'L674') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L674'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
-            .onClick(() => {
-              this.askHint();
-            })
-          Button(LanRace.isRacing() ? TG('联机禁用')
-          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
-            .layoutWeight(1)
-            .height(44)
-            // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
-          //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
-          .backgroundColor(Palette.cyan)
-          .fontColor('#FFFFFF')
-                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
-          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
-          .enabled(!LanRace.isRacing())
-          .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L691'; })
-            .onBlur(() => { if (this.tvFocus === 'L691') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L691'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
-            .onClick(() => {
-              this.askAuto();
-            })
-          Button(TG('重开'))
-        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-            .fontSize(FontSize.md)
-            .fontColor('#FFFFFF')
-            .backgroundColor(Palette.cyan)
-            .borderRadius(Radius.md)
-            .width(96)
-            .height(Cell.of(44))
-            .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L705'; })
-            .onBlur(() => { if (this.tvFocus === 'L705') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L705'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-            .onClick(() => {
-              Haptics.tap();
-              this.reset();
-            })
-        }
-        .width('100%')
 
         Text(this.over ? (this.won ? TG('🎉 每块大小都对，通关！') : TG('步数用尽，重开一题吧')) :
           TG('粗体数字是题目给的提示，浅底格是尚未填的'))

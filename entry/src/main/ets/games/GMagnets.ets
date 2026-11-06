@@ -532,6 +532,75 @@ export struct GMagnets {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
+        Button(TG('提示'))
+
+          .fontSize(FontSize.sm)
+
+          .fontColor('#FFFFFF')
+
+          .backgroundColor(Palette.cyan)
+
+          .borderRadius(Radius.md)
+
+          // ★ 2026-10-24 修（同一个坑第二次）：Column 的直接子元素不能用 layoutWeight 当宽度
+          .layoutWeight(1)
+          .height(46)
+
+
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L657'; })
+          .onBlur(() => { if (this.tvFocus === 'L657') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L657'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
+          .onClick(() => {
+
+            this.askHint();
+
+          })
+
+        Button(LanRace.isRacing() ? TG('联机禁用')
+          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
+
+          .layoutWeight(1)
+
+          .height(46)
+
+          // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
+          //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
+                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
+          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
+          .enabled(!LanRace.isRacing())
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L680'; })
+          .onBlur(() => { if (this.tvFocus === 'L680') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L680'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
+          .onClick(() => {
+
+            this.askAuto();
+
+          })
+
+        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.rose)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L698'; })
+        .onBlur(() => { if (this.tvFocus === 'L698') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L698'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+        .onClick(() => {
+          Haptics.tap();
+          this.reset();
+        })
+      }
+      Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((String(this.moves) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
@@ -643,76 +712,6 @@ export struct GMagnets {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
 
-      Row({ space: Space.sm }) {
-        Button(TG('提示'))
-
-          .fontSize(FontSize.sm)
-
-          .fontColor('#FFFFFF')
-
-          .backgroundColor(Palette.cyan)
-
-          .borderRadius(Radius.md)
-
-          // ★ 2026-10-24 修（同一个坑第二次）：Column 的直接子元素不能用 layoutWeight 当宽度
-          .layoutWeight(1)
-          .height(46)
-
-
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L657'; })
-          .onBlur(() => { if (this.tvFocus === 'L657') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L657'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
-          .onClick(() => {
-
-            this.askHint();
-
-          })
-
-        Button(LanRace.isRacing() ? TG('联机禁用')
-          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
-
-          .layoutWeight(1)
-
-          .height(46)
-
-          // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
-          //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
-          .backgroundColor(Palette.cyan)
-          .fontColor('#FFFFFF')
-                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
-          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
-          .enabled(!LanRace.isRacing())
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L680'; })
-          .onBlur(() => { if (this.tvFocus === 'L680') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L680'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
-          .onClick(() => {
-
-            this.askAuto();
-
-          })
-
-        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
-        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.rose)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-      }
-      .layoutWeight(1)
-        .focusable(Tv.on())
-        .onFocus(() => { this.tvFocus = 'L698'; })
-        .onBlur(() => { if (this.tvFocus === 'L698') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L698'))
-        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-        .onClick(() => {
-          Haptics.tap();
-          this.reset();
-        })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
