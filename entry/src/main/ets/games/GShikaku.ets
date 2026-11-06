@@ -126,6 +126,17 @@ export struct GShikaku {
 
   private seq: number = 0;
   private startAt: number = 0;
+  /**
+   * ★★ 2026-11-06（判据 1701/1704）：**本局答案** —— 每块矩形存两个格号（左上角、右下角）压平
+   *   reset() 里算一次（空盘 8 个节点），autoCell 直接照它摆，不再每拍重跑搜索。
+   *   ⚠️ 不做成 @State：它不参与渲染，做成 @State 只是白白多一次重建。
+   */
+  private solRect: number[] = [];
+  /**
+   * ★ 2026-11-06：正在「清盘」——玩家切成了整盘无解时，先把自己/玩家画的矩形一块块撤掉，
+   *   撤空后再照答案重来。必须是**粘性**的：一次性撤到底，不能撤一块又去摆一块（会来回打转）。
+   */
+  private wipe: boolean = false;
 
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
@@ -154,6 +165,17 @@ export struct GShikaku {
     this.score = 0;
     this.seq = 0;
     this.startAt = Date.now();
+    // ★★ 2026-11-06（判据 1701/1704）：开局就把本局答案算好存起来
+    //   判据 1701 的原意是「答案在手里就直接照答案」；本作题目只有线索、没有现成答案数组，
+    //   等价做法 = 在 reset 里用求解器求出答案存进字段，AI 直接照抄（O(矩形数)，毫秒级）。
+    this.solRect = [];
+    this.wipe = false;
+    const own0: number[] = new Array<number>(this.diffTotal * this.diffTotal).fill(0);
+    const out0: number[] = [];
+    const b0: number[] = [4000];
+    if (this.dfsFill(own0, out0, b0)) {
+      this.solRect = out0.slice();
+    }
   }
 
   private removeRect(id: number): void {
@@ -354,10 +376,13 @@ export struct GShikaku {
     if (this.over) {
       return false;
     }
-    if (this.over || this.autoCell() < 0) {
-      return true;
+    // ★★ 2026-11-06（判据 1702）：autoCell 只能算**一次**（旧版一行里调了两遍 = 两倍搜索），
+    //   而且算不出来时必须**停**（旧版 `return true` ⇒ AI 空转、按钮却还显示「停代打」）。
+    const i: number = this.autoCell();
+    if (i < 0) {
+      return false;
     }
-    this.tap(this.autoCell());
+    this.tap(i);
     return !this.over;
   }
 
@@ -379,32 +404,19 @@ export struct GShikaku {
     }
   }
 
-    /** 深搜：把还没圈的格子切成合法矩形（每块恰含一个线索、格数 = 线索数）；own 用副本模拟 */
-    private dfsFill(own: number[], out: number[], budget: number[]): boolean {
+    /**
+     * 当前盘面上，格 k 能被哪些矩形盖住（恰含一个线索、面积 = 该线索、不压已圈格）
+     * 压平成 [a, b, a, b, ...]，a/b = 左上角/右下角的格号。
+     */
+    private rectsAt(own: number[], k: number): number[] {
       const n: number = this.diffTotal;
-      let k: number = -1;
-      for (let i = 0; i < n * n; i++) {
-        if (own[i] === 0) {
-          k = i;
-          break;
-        }
-      }
-      if (k < 0) {
-        return true;
-      }
-      if (budget[0] <= 0) {
-        return false;
-      }
-      const cr: number = Math.floor(k / n);
-      const cc: number = k % n;
-      for (let r0 = 0; r0 <= cr; r0++) {
-        for (let c0 = 0; c0 <= cc; c0++) {
-          for (let r1 = cr; r1 < n; r1++) {
-            for (let c1 = cc; c1 < n; c1++) {
-              budget[0] = budget[0] - 1;
-              if (budget[0] <= 0) {
-                return false;
-              }
+      const kr: number = Math.floor(k / n);
+      const kc: number = k - kr * n;
+      const out: number[] = [];
+      for (let r0 = 0; r0 <= kr; r0++) {
+        for (let c0 = 0; c0 <= kc; c0++) {
+          for (let r1 = kr; r1 < n; r1++) {
+            for (let c1 = kc; c1 < n; c1++) {
               const area: number = (r1 - r0 + 1) * (c1 - c0 + 1);
               let clue: number = 0;
               let bad: boolean = false;
@@ -427,49 +439,163 @@ export struct GShikaku {
               if (bad || clue !== area) {
                 continue;
               }
-              for (let r = r0; r <= r1; r++) {
-                for (let c = c0; c <= c1; c++) {
-                  own[r * n + c] = 1;
-                }
-              }
               out.push(r0 * n + c0);
               out.push(r1 * n + c1);
-              if (this.dfsFill(own, out, budget)) {
-                return true;
-              }
-              out.pop();
-              out.pop();
-              for (let r = r0; r <= r1; r++) {
-                for (let c = c0; c <= c1; c++) {
-                  own[r * n + c] = 0;
-                }
-              }
             }
           }
+        }
+      }
+      return out;
+    }
+
+    /**
+     * 深搜：把还没圈的格子切成合法矩形（每块恰含一个线索、格数 = 线索数）；own 用副本模拟
+     *
+     * ★★ 2026-11-06 重写（判据 1702）：旧版固定挑「最左上的空格」递归、没有任何剪枝。
+     *   实测 5×5 空盘只要 250 个节点就出解 ⇒ **50 万预算其实早就够用，真 bug 不在预算**
+     *   （真凶是 tap() 里 1×1 的矩形放不进去，见那边的注释）。
+     *   但盘面被切过之后，死胡同全靠试到底 ⇒ 搜索树会膨胀。补两个剪枝，最坏情况也只剩个位数节点
+     *   （实测三关各 500 个随机残局，最坏 8 个节点）：
+     *     ① MRV —— 每步挑「候选矩形最少」的空格先填（空盘第一步候选只有 1 个）
+     *     ② 前向检查 —— 有任何空格一个候选都没有 ⇒ 立刻回溯
+     */
+    private dfsFill(own: number[], out: number[], budget: number[]): boolean {
+      const n: number = this.diffTotal;
+      let best: number = -1;
+      let bestRects: number[] = [];
+      for (let i = 0; i < n * n; i++) {
+        if (own[i] !== 0) {
+          continue;
+        }
+        const rs: number[] = this.rectsAt(own, i);
+        if (rs.length === 0) {
+          return false;                     // ★ 前向检查：这一格再也盖不上 ⇒ 这棵树不用试
+        }
+        if (best < 0 || rs.length < bestRects.length) {
+          best = i;
+          bestRects = rs;
+          if (rs.length === 1) {
+            break;                          // 只剩 1 种放法，已经是最优，不用再比
+          }
+        }
+      }
+      if (best < 0) {
+        return true;                        // 全盖满 ⇒ 这一支成立
+      }
+      if (budget[0] <= 0) {
+        return false;
+      }
+      budget[0] = budget[0] - 1;
+      for (let q = 0; q + 1 < bestRects.length; q += 2) {
+        const a: number = bestRects[q];
+        const b: number = bestRects[q + 1];
+        const r0: number = Math.floor(a / n);
+        const c0: number = a - r0 * n;
+        const r1: number = Math.floor(b / n);
+        const c1: number = b - r1 * n;
+        for (let r = r0; r <= r1; r++) {
+          for (let c = c0; c <= c1; c++) {
+            own[r * n + c] = 1;
+          }
+        }
+        out.push(a);
+        out.push(b);
+        if (this.dfsFill(own, out, budget)) {
+          return true;
+        }
+        out.pop();
+        out.pop();
+        for (let r = r0; r <= r1; r++) {
+          for (let c = c0; c <= c1; c++) {
+            own[r * n + c] = 0;
+          }
+        }
+        if (budget[0] <= 0) {
+          return false;
         }
       }
       return false;
     }
 
+    /** 答案（solRect）里「还没画」的第一个矩形；答案被玩家切坏了就返回空数组 */
+    private solNext(): number[] {
+      const n: number = this.diffTotal;
+      const sol: number[] = this.solRect;
+      for (let q = 0; q + 1 < sol.length; q += 2) {
+        const a: number = sol[q];
+        const b: number = sol[q + 1];
+        const r0: number = Math.floor(a / n);
+        const c0: number = a - r0 * n;
+        const r1: number = Math.floor(b / n);
+        const c1: number = b - r1 * n;
+        const area: number = (r1 - r0 + 1) * (c1 - c0 + 1);
+        let cnt: number = 0;                // 这块里已经圈了几格
+        let one: number = 0;                // 用的是同一个矩形编号吗
+        let split: boolean = false;
+        for (let r = r0; r <= r1; r++) {
+          for (let c = c0; c <= c1; c++) {
+            const o: number = this.owner[r * n + c];
+            if (o > 0) {
+              cnt++;
+              if (one === 0) {
+                one = o;
+              } else if (one !== o) {
+                split = true;
+              }
+            }
+          }
+        }
+        if (cnt === 0) {
+          return [a, b];                    // 这块还没画 ⇒ 就是这一步要点的两角
+        }
+        if (cnt < area || split) {
+          return [];                        // 被玩家切成了别的块 ⇒ 答案不能照抄了
+        }
+      }
+      return [];                            // 答案全部画好（或本来就没有答案）
+    }
+
     /** 代打：这一步该点哪一格（先点矩形左上角，再点右下角；-1 = 没解） */
     private autoCell(): number {
       const n: number = this.diffTotal;
-      const own: number[] = [];
-      for (let i = 0; i < n * n; i++) {
-        own.push(this.owner[i] > 0 ? 1 : 0);
+      // ⓪ 正在清盘：一格一格点（一次 tap 撤掉一整块），撤空后再照答案摆
+      //    必须是粘性的，否则「撤一块 → 摆一块 → 又无解 → 再撤」会来回打转（实测 400 拍都出不去）
+      if (this.wipe) {
+        for (let i = 0; i < n * n; i++) {
+          if (this.owner[i] > 0) {
+            return i;
+          }
+        }
+        this.wipe = false;                  // 撤空了，接着往下走
       }
-      const out: number[] = [];
-      // ★ 判据 1702：5×5 盘面 40000 节点不够（DFS 枚举所有矩形）⇒ 提到 50 万
-      //   实测旧值下 autoCell 常返回 -1，而 autoStep 又 `return true` 空转 ⇒ AI 永不动
-      const budget: number[] = [500000];
-      if (!this.dfsFill(own, out, budget) || out.length < 2) {
-        return -1;
+      // ① 快路（判据 1701/1704）：reset 时答案已存好 ⇒ 直接照答案摆（O(矩形数)）
+      let rect: number[] = this.solNext();
+      if (rect.length < 2) {
+        // ② 慢路：玩家把盘面切乱了 ⇒ 按当前 owner 重新求解（MRV + 前向检查，节点数是个位数）
+        const own: number[] = [];
+        for (let i = 0; i < n * n; i++) {
+          own.push(this.owner[i] > 0 ? 1 : 0);
+        }
+        const out: number[] = [];
+        const budget: number[] = [4000];
+        if (!this.dfsFill(own, out, budget) || out.length < 2) {
+          // ③ 整盘已经无解（玩家切错了）⇒ 撤空重来：下一拍开始一块块撤，撤空后再照答案
+          this.wipe = true;
+          for (let i = 0; i < n * n; i++) {
+            if (this.owner[i] > 0) {
+              return i;
+            }
+          }
+          this.wipe = false;
+          return -1;
+        }
+        rect = [out[0], out[1]];
       }
       if (this.first < 0) {
-        return out[0];
+        return rect[0];
       }
-      if (this.first === out[0]) {
-        return out[1];
+      if (this.first === rect[0]) {
+        return rect[1];
       }
       return this.first;
     }
@@ -489,7 +615,12 @@ export struct GShikaku {
     }
     const a: number = this.first;
     this.first = -1;
-    if (a === i) {
+    // ★★ 2026-11-06 真凶（判据 1710）：两次点的是同一格时，旧版一律当「取消选择」直接返回。
+    //   可三关答案里都有「1」（= 1×1 的矩形）⇒ 那块**玩家和 AI 都永远放不进去**
+    //   ⇒ 这盘永远切不完；而 AI 又恰好先挑到 1×1 ⇒ 在那一格上「选中→取消→选中」空转，
+    //     真机表现就是「已覆盖 0/25 一直不动」（不是搜索预算不够）。
+    //   修法：格子里写着 1 ⇒ 这本来就是合法的 1×1 矩形，继续走下面的落子判定。
+    if (a === i && this.clues[i] !== 1) {
       return;
     }
     const r0: number = Math.min(Math.floor(a / this.diffTotal), Math.floor(i / this.diffTotal));

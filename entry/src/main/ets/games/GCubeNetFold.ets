@@ -186,7 +186,8 @@ export struct GCubeNetFold {
     }
     for (let i = 0; i < SLOTS; i++) {
       if (this.slots[i] !== this.answer[i]) {
-        this.tap(i);
+        // ★ 判据 1715：AI **直接填对**，不再走 tap() 的循环换字母（理由见 putCell）
+        this.putCell(i);
         return !this.over;
       }
     }
@@ -239,23 +240,52 @@ export struct GCubeNetFold {
     const next: string[] = this.slots.slice();
     next[i] = PICK[nextIdx];
     this.slots = next;
+    this.afterFill();
+  }
+
+  /** 填完一格后的判定（★ 判据 1709：玩家走 tap()、AI 走 putCell()，
+   *  **两个入口都必须过这道判定**，否则 AI 那条路就绕开了胜负与配错计数）。
+   *  只有六格都非空才判：对了进下一关；错了计一次配错并清盘。 */
+  private afterFill(): void {
     for (let k = 0; k < SLOTS; k++) {
-      if (next[k].length === 0) { return; }   // 没填完不判
+      if (this.slots[k].length === 0) { return; }   // 没填完不判
     }
-    const same: number = next.join('') === this.answer.join('') ? 1 : 0;
-    if (same === 1) {
-      this.wins++; this.note = TG(TG(TG('这一关折对了 ✅')));
-    } else {
-      this.wrong++; this.note = TG(TG(TG('配错了 ❌ —— 上下相邻的面折到同一条棱，左右相邻则不是')));
+    const same: number = this.slots.join('') === this.answer.join('') ? 1 : 0;
+    if (same !== 1) {
+      this.wrong++;
+      this.note = TG(TG(TG('配错了 ❌ —— 上下相邻的面折到同一条棱，左右相邻则不是')));
       this.slots = new Array<string>(SLOTS).fill('');
       return;
     }
+    this.wins++; this.note = TG(TG(TG('这一关折对了 ✅')));
     if (this.round + 1 >= this.diffTotal) {
       this.finish(this.wins >= PASS);
       return;
     }
     this.locked = true;
     this.timer = setTimeout(() => { this.round++; this.load(); }, 900);
+  }
+
+  /** ★★★ 判据 1715（2026-11-06）：AI 专用 —— 一锤把这一格填成 answer[i]。
+   *
+   *  为什么不能用 tap()：`tap()` 是**循环换字母**，空格的第一击永远是 `PICK[0] = 'A'`；
+   *  而 `afterFill()` 的判据是「**六格都非空就判**」—— 它会在**最后一格刚拿到第一个字母**
+   *  那一刻触发。AI 按 0→5 顺序逐格填，最后一格固定是第 6 格，于是满盘那一刻必然是
+   *  `answer[0..4]` 全对 + 第 6 格 = 'A'：
+   *    · `answer[5] === 'A'`（AABBCC 的排列里占 2/6）⇒ 通关；
+   *    · 否则 ⇒ wrong++ 并清盘，而 **answer 只在 load() 里重抽**、清盘不重抽
+   *      ⇒ 同一盘面重试结果**完全确定** ⇒ `answer[5] !== 'A'` 的 60/90 种排列**永远通不了关**，
+   *      配错每 ~11 次点击涨 1（真机「配错 28 / 38」是这个死循环的圈数，不是真配错 28 次）。
+   *  ⇒ 改成一步到位：轮到最后一格时满盘**就是答案**，判定必对。
+   *  （玩家侧同一处隐患仍然存在 —— 最后被填满的那一格只能取到 'A'；
+   *    那属于**玩法规则**要不要改，由人定，本条只修 AI 入口。） */
+  private putCell(i: number): void {
+    if (this.locked || this.over) { return; }
+    if (this.slots[i] === this.answer[i]) { return; }
+    const next: string[] = this.slots.slice();
+    next[i] = this.answer[i];
+    this.slots = next;
+    this.afterFill();
   }
 
   private finish(solved: boolean): void {

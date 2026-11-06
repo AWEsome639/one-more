@@ -54,6 +54,46 @@
             `{name, verdict, detail, ts}`，**逐条 flush**（中途掉线也不丢已验完的）。
   判据 1681 退出码：0 全 WIN ｜ 1 有 FAIL/TIMEOUT/ERROR ｜ 2 脚本异常 ｜ 3 设备不可用。
 
+★ 2026-11-06（第 1431 轮）：355 款跑出 344 WIN，剩下 11 款 TIMEOUT 里有一类**不是游戏坏了**：
+  实时对打（乒乓：页面上只有「你 0 / 电脑 3」的比分）、长局（蜘蛛纸牌步数 10→290、
+  2048 得分 5976→6012）、多回合制（路径交叉「已接通 0/4」、描路径「已描 3/7」）——
+  这类游戏**根本没有「结算」可等**。旧判据只认结算 ⇒ 一律 TIMEOUT，
+  看上去像「AI 不会玩」，其实 AI 一直在动。⇒ 补 A~C 三条，判据从两级变三级：
+
+    WIN     ：结算出现（原判据，最强）
+    ACTIVE  ：**读数在动**但没结算 —— 实时游戏 / 长局（新增；统计单列，绝不混进 WIN）
+    TIMEOUT ：读数完全不动（**这才是「AI 没在工作」**）
+
+  判据 1712 读数指纹 `readout_sig()`：把页面文本抽成 `label=value` 对，三个来源
+            ① 标签+取值是两棵树（「步数」「290」）：标签 ≤10 字、不含数字、含进度词
+               ⇒ 取紧邻的下一节点（必须含数字，且不是时钟）
+            ② 读数被写成**一整句话**（「已补 1/12 格　步数 1」「路线 1/3 · 已描 3/7 · 失误 3/4」）
+               ⇒ 按「词+数字」正则拆成多对，旧 read_readouts 这类全抓不到
+            ③ 时钟（`3:21`）**一律排除** —— 计时器每秒都动，会把「卡死的游戏」误判成 ACTIVE
+            同一对标签前后两次取值不同 ⇒ 记一次「读数变化」。
+            分类：进度类（步数/得分/接通/已描…）= AI 在推进；失误类（配错/错手/失误）= AI 在错。
+            **只涨失误计数不算 ACTIVE** —— 那是「AI 在动但每次都错」，仍报 TIMEOUT，
+            并在 detail 里写明「只有失误计数在动」（正好能一眼看出立方体展开那类的病）。
+  判据 1713 ACTIVE 早退（**默认关**）：`--active-window N`（秒）>0 时，累计 ≥2 次进度类变化
+            且已跑满 N 秒 ⇒ 直接判 ACTIVE 收工，不再干等 120s。
+            默认 0 = 不早退：**结算该等的还照等**，免得把「40 秒才结算」的款
+            从 WIN 降级成 ACTIVE（会砸掉 344 WIN 的基线）。批量扫实时游戏时才开。
+  判据 1714 输赢措辞分开：`电脑赢了 / 你输了 / 挑战失败` ⇒ **FAIL**。
+            旧版只看 WIN 正则，而输局弹窗的按钮就写着「再来一局」⇒ **输局被记成 WIN**
+            （乒乓的输局文案「😵 电脑赢了，再来一局」就是这样）。页面另有 🎉/通关 时仍按 WIN。
+  判据 1716 「点了没反应」当场认：点完 AI 代打后，如果按钮**还写着「AI 代打」**
+            （不是「停代打」）⇒ `askAuto()` 根本没执行到 —— 多半是演示期 HintBar 被
+            `disabled` 吞掉了点击、或布局刚变过而点在旧 bounds 上（判据 1708/1711 同一类）。
+            ⇒ **重新取最新 bounds 再点**，最多 3 次；3 次都没启动且最终 TIMEOUT
+            ⇒ 判 **FAIL**「代打按钮点了 3 次都没启动」，而不是白等 120s 记成 TIMEOUT。
+            由来：11 款 TIMEOUT 里「路径交叉」「补全盒子」的现场页面上按钮还是「AI 代打」，
+            说明代打从头到尾没启动，却记成 TIMEOUT 看上去像「游戏打不动」。
+  判据 1717 「起来就走」也认：启动后 1.2s 那次会看到「AI 开始代打…」toast，容易被当成
+            已启动，可 autoStep 可能**第一拍就 return false**（算不出可动的一步）⇒ autoRun 立刻收工。
+            ⇒ 启动后再等 1.5s 看一眼：按钮又变回「AI 代打」且页面没结算 ⇒ 记 `quit_early`；
+            最终 TIMEOUT 时判 **FAIL**「代打启动后 1.5s 内自己就停了」。
+            （补全盒子 TIMEOUT 的现场：按钮「AI 代打」+ 步数 2 + 读数不动，正是这个形状。）
+
 用法：
   python3 工具/verify_ai_win.py water_sort 倒水排序
   python3 工具/verify_ai_win.py --names-file /tmp/names.txt
@@ -62,8 +102,10 @@
   python3 工具/verify_ai_win.py --names-file n.txt --out /tmp/chunk.jsonl
       ↑ 分批跑用（`工具/verify_ai_win_batch.sh` 就是这么调的，判据 1682）
   python3 工具/verify_ai_win.py --device 127.0.0.1:5555      # 换连别的模拟器
+  python3 工具/verify_ai_win.py 乒乓 --active-window 20      # 实时游戏：读数动 20s 就收工（判据 1713）
 
-退出码：0 = 全部 WIN ｜ 1 = 有 FAIL/TIMEOUT ｜ 2 = 脚本异常 ｜ 3 = 设备不可用
+退出码：0 = 全部 WIN ｜ 1 = 有 FAIL/TIMEOUT/ACTIVE ｜ 2 = 脚本异常 ｜ 3 = 设备不可用
+        （ACTIVE ≠ WIN ⇒ 退出码 1；批量脚本 SKIP=win 下次会重验它，这是有意的）
 """
 import io, json, os, random, re, subprocess, sys, time
 from collections import Counter
@@ -80,11 +122,33 @@ HEAL_ROUNDS = 3        # 判据 1674：自愈轮数（1 轮不够常见，3 轮�
 HEALTH_TTL = 3.0       # 判据 1673：探活结论复用 3 秒（一次 dump 里连发好几条 shell，够用）
 DIAG_BUDGET = 30.0     # 判据 1677：失败诊断的独立预算
 RESET_BUDGET = 150.0   # 每款之间「回列表」的复位预算（比单款短：复位失败下一款还会再试）
+# ── 判据 1712/1713 的旋钮 ──
+ACTIVE_WINDOW = 0.0    # 判据 1713：>0 才启用「读数动够就收工」；默认 0 = 不早退（保住 WIN 基线）
+ACTIVE_MIN_MOVES = 2   # 判据 1713：早退要求的最少**进度类**变化次数
 DUMP_REMOTE = '/data/local/tmp/_vaw.json'
 DUMP_LOCAL = '/tmp/_vaw.json'
 
 WIN_PAT = re.compile(r'这一局拿下|再来一局|返回列表|全部单色|通关|🎉')
 FAIL_PAT = re.compile(r'没找到解法|倒不动了|本局失败|无解')
+# 判据 1714：**明确的输局措辞**（收窄到没有歧义的几种，宁可漏也不误伤）
+#   「电脑赢了 / 你输了」实测出现在 5 处游戏；「挑战失败 / 输给」是同类写法。
+LOSE_PAT = re.compile(r'电脑赢了|你输了|AI 赢了|挑战失败|输给')
+# 判据 1714：真·通关标记 —— 页面上同时有这些时，即使出现输局措辞也仍按 WIN
+STRONG_WIN = ('🎉', '通关', '这一局拿下', '全部单色')
+# 判据 1712：读数指纹用的词表
+#   进度类 = 「AI 在推进」（这些变了 ⇒ 至少 AI 在干活）
+PROGRESS_WORDS = ('步数', '得分', '分数', '归位', '最大', '过关', '过局', '接通', '覆盖',
+                  '已补', '已描', '已用', '回合', '轮次', '层数', '关卡', '关数', '剩余',
+                  '连击', '进度', '目标', '生命', '金币', '净胜', '比分', '路线')
+#   失误类 = 「AI 在错」（只有这些在动 ⇒ 不许判 ACTIVE）
+ERROR_WORDS = ('配错', '错手', '失误', '错误', '撞墙', '判错')
+#   比分标签：乒乓是「你」「电脑」两个纯字节点，不放进 PROGRESS_WORDS（单字太泛）
+SCORE_LABELS = ('你', '电脑', '我')
+# 判据 1712 ③：时钟/计时 —— 每秒都在动，必须排除，否则卡死的游戏会被误判成 ACTIVE
+CLOCK_PAT = re.compile(r'\d{1,3}\s*[:：]\s*\d{2}')
+# 判据 1712 ②：从一整句话里拆「词 + 数字（可带 /分母）」
+PAIR_PAT = re.compile(r'([\u4e00-\u9fa5A-Za-z]{1,6})\s*[:：]?\s*(\d+(?:\s*/\s*\d+)?)')
+
 # 判据 1673：hdc 自己的「连不上」措辞各版本不一样，全收进来；只用来**触发核实**，
 #   不做判定依据（真假一律回到 list targets + echo ok 去确认）
 DEAD_PAT = re.compile(
@@ -101,7 +165,8 @@ USAGE = """用法：
   --per-game-timeout <秒>   单款预算（默认 240，判据 1676）
   --out <路径>              结果 jsonl（默认 验收截图-v1.0.1/ai_win_verified.jsonl）
   --device <host:port>      设备地址（默认 127.0.0.1:5555）
-退出码：0 全 WIN ｜ 1 有失败 ｜ 2 脚本异常 ｜ 3 设备不可用
+  --active-window <秒>      读数动够就判 ACTIVE 收工（默认 0 = 不早退，判据 1713）
+退出码：0 全 WIN ｜ 1 有失败/TIMEOUT/ACTIVE ｜ 2 脚本异常 ｜ 3 设备不可用
 """
 
 
@@ -594,7 +659,7 @@ def stop_demo():
 
 
 def read_readouts(ns):
-    """抓读数：步数 / 得分 / 归位 的下一个节点"""
+    """抓读数：步数 / 得分 / 归位 的下一个节点（原判据，保留：detail 里给人看）"""
     txt = [x['text'] for x in ns if x['text']]
     out = {}
     for i, t in enumerate(txt):
@@ -603,9 +668,77 @@ def read_readouts(ns):
     return out
 
 
+def _word_kind(t):
+    """这段文字是「进度读数」还是「失误读数」？（判据 1712 的分类依据）"""
+    for w in ERROR_WORDS:
+        if w in t:
+            return 'e'
+    for w in PROGRESS_WORDS:
+        if w in t:
+            return 'p'
+    return ''
+
+
+def readout_sig(ns):
+    """页面读数指纹（判据 1712）：{'L:标签': 值, 'C:词': 值}。
+
+    ★ 为什么不能只盯「步数/得分/归位」：乒乓的比分是「你」「0」两棵树，
+      蜘蛛纸牌是「步数」+「290」，补全盒子和描路径干脆把读数写成一整句话
+      （「已补 1/12 格　步数 1」「路线 1/3 · 已描 3/7 · 失误 3/4」）
+      ⇒ 旧 `read_readouts` 这三种全抓不到（实测 TIMEOUT 记录的「读数={}」就是它）。
+    """
+    sig = {}
+    txt = [x['text'] for x in ns if x['text']]
+    for i, t in enumerate(txt):
+        if CLOCK_PAT.search(t):
+            continue                     # 判据 1712 ③：时钟不算读数
+        # ① 标签 + 紧邻取值：「步数」→「290」/「电脑」→「3」/「配错」→「38」
+        #   ★ 失误类标签也要收（判据 1712）：不收就分不出「只有失误在涨」的假活动
+        kind = _word_kind(t)
+        if (len(t) <= 10 and not re.search(r'\d', t)
+                and (t in SCORE_LABELS or kind in ('p', 'e'))):
+            if i + 1 < len(txt):
+                v = txt[i + 1]
+                if len(v) <= 16 and re.search(r'\d', v) and not CLOCK_PAT.search(v):
+                    sig['L:' + t] = v.strip()
+        # ② 一整句话里的读数：「已补 1/12 格　步数 1」⇒ 已补=1/12 · 步数=1
+        if len(t) > 40 or not re.search(r'\d', t):
+            continue
+        if not _word_kind(t) and not re.search(r'\d+\s*/\s*\d+', t):
+            continue
+        for m in PAIR_PAT.finditer(t):
+            w = m.group(1)
+            if len(w) < 2 and w not in SCORE_LABELS:
+                continue                 # 单个字母/符号（'v'、'x'）不算读数标签
+            sig['C:' + w] = re.sub(r'\s+', '', m.group(2))
+    return sig
+
+
+def sig_moves(prev, cur):
+    """两次指纹的差异 ⇒ (进度类变化, 失误类变化)，元素形如「步数 10→105」（判据 1712）。"""
+    prog, err = [], []
+    for k, v in cur.items():
+        old = prev.get(k)
+        if old == v:
+            continue
+        kind = _word_kind(k.split(':', 1)[1])
+        item = '%s %s→%s' % (k.split(':', 1)[1], '—' if old is None else old, v)
+        (err if kind == 'e' else prog).append(item)
+    for k, v in prev.items():
+        if k in cur:
+            continue
+        kind = _word_kind(k.split(':', 1)[1])
+        item = '%s %s→—' % (k.split(':', 1)[1], v)
+        (err if kind == 'e' else prog).append(item)
+    return prog, err
+
+
 def watch(seconds=120):
     """轮询直到结算/失败/超时；返回 (verdict, detail)。
 
+    ★ 判据 1712/1713：判据分三级 —— 结算出现 = **WIN**；读数在动但没结算 = **ACTIVE**；
+      读数完全不动 = **TIMEOUT**。ACTIVE 让「实时对打/长局」这类**没有结算可等**的款
+      不再被误记成 TIMEOUT（乒乓：只有「你 0 / 电脑 3」在走）。
     ★ 判据 1676：seconds 被单款剩余预算夹住 —— 否则「watch 等 120s」会把 240s 预算
       整个吃掉，AI 启动前的那几步全白等。
     """
@@ -613,7 +746,11 @@ def watch(seconds=120):
     if left < float('inf'):
         seconds = max(5.0, min(float(seconds), left - 3))
     t0 = time.time()
-    steps_seen = set()
+    steps_seen = []
+    prev_sig = None
+    prog_moves = []        # [(t, [变化…])] 进度类
+    err_moves = []         # [(t, [变化…])] 失误类
+    paused_seen = False
     while time.time() - t0 < seconds:
         d = dump()
         if not d:
@@ -623,18 +760,56 @@ def watch(seconds=120):
         txt = [x['text'] for x in ns if x['text']]
         joined = '|'.join(txt)
         ro = read_readouts(ns)
-        steps_seen.add(ro.get('步数', ''))
+        st = ro.get('步数', '')
+        if st and (not steps_seen or steps_seen[-1] != st):
+            steps_seen.append(st)      # 只留变化序列（旧版用 set，detail 里排不出先后）
+        if '已暂停' in joined or '暂停中' in joined:
+            paused_seen = True         # 只记录，不擅自点「继续」（未在真机验证过，不乱动）
         if FAIL_PAT.search(joined) and ('没找到' in joined or '倒不动' in joined):
             return 'FAIL', 'toast: ' + ','.join(t for t in txt if FAIL_PAT.search(t))[:80]
+        # ★ 判据 1714：输局必须排在 WIN 之前 —— 输局弹窗的按钮就写着「再来一局」，
+        #   旧版会把它记成 WIN（乒乓的「😵 电脑赢了，再来一局」正是这种）。
+        if LOSE_PAT.search(joined) and not any(w in joined for w in STRONG_WIN):
+            return 'FAIL', '结算=输：' + ','.join(t for t in txt if LOSE_PAT.search(t))[:60]
         if WIN_PAT.search(joined):
-            return 'WIN', '结算出现 · 读数=%s' % ro
+            return 'WIN', '结算出现 · 读数=%s' % (readout_sig(ns) or ro)
         # ★ 判据 1671：部分游戏「通关即自动返回列表」⇒ 返回列表页本身要算完成，
         #   否则会一直等到 TIMEOUT（「方向回忆」就栽在这）
         if ('One More' in joined) and ('AI 代打' not in joined) and ('One More' in '|'.join(txt[:3])):
             return 'WIN', '已返回列表（视作完成）'
+        # ── 判据 1712：读数指纹对比 ──
+        sig = readout_sig(ns)
+        if prev_sig is not None:
+            pg, er = sig_moves(prev_sig, sig)
+            if pg:
+                prog_moves.append((round(time.time() - t0, 1), pg))
+            if er:
+                err_moves.append((round(time.time() - t0, 1), er))
+        prev_sig = sig
+        # ── 判据 1713：进度类读数动够 N 次且过窗口 ⇒ ACTIVE 收工（默认关） ──
+        n_prog = sum(len(p[1]) for p in prog_moves)
+        if (ACTIVE_WINDOW > 0 and n_prog >= ACTIVE_MIN_MOVES
+                and (time.time() - t0) >= ACTIVE_WINDOW):
+            return 'ACTIVE', '读数在动但没结算（%.0fs 内 %d 次：%s）' % (
+                time.time() - t0, n_prog,
+                '；'.join(x for p in prog_moves for x in p[1])[:120])
         time.sleep(1.6)
     d = dump()
-    return 'TIMEOUT', '读数=%s 步数历史=%s' % (read_readouts(nodes(d)) if d else {}, sorted(steps_seen))
+    ns = nodes(d) if d else []
+    # ── 窗口结束：读数动过 ⇒ ACTIVE（实时/长局），完全不动 ⇒ TIMEOUT ──
+    if prog_moves:
+        return 'ACTIVE', '读数在动但没结算（%d 次：%s）' % (
+            sum(len(p[1]) for p in prog_moves),
+            '；'.join(x for p in prog_moves for x in p[1])[:120])
+    tail = ''
+    if err_moves:
+        # 判据 1712：只有失误计数在动 ⇒ **不是** ACTIVE，是「AI 在动但每次都错」
+        tail += '；只有失误计数在动：%s（AI 有动作但每次都不对）' % (
+            '；'.join(x for p in err_moves for x in p[1])[:80])
+    if paused_seen:
+        tail += '；页面出现过暂停态（AI 再强也不会得分）'
+    return 'TIMEOUT', '读数=%s 步数历史=%s%s' % (
+        read_readouts(ns), steps_seen[-8:], tail)
 
 
 def diag_page(limit=12, per=100):
@@ -662,6 +837,19 @@ def diag_page(limit=12, per=100):
     if not txt:
         return '页面：无可读文本'
     return '页面(%d): %s' % (len(txt), '|'.join(txt))
+
+
+def ai_state(ns):
+    """代打到底跑起来没有（判据 1716）：返回 (已启动, 仍在待机)。
+
+    · 已启动 = 按钮变成「停代打」，或刚弹出的「AI 开始代打…」toast 还在
+    · 仍在待机 = 按钮**还写着**「AI 代打」——这说明 `askAuto()` 压根没执行到
+      （按钮被 disabled 吞掉 / 点在旧 bounds 上点空了），与 1708/1711 同一类
+    """
+    txt = [x['text'] for x in ns if x['text']]
+    started = any('停代打' in t for t in txt) or any('开始代打' in t for t in txt)
+    idle = any(t.strip() == 'AI 代打' for t in txt)
+    return started, (idle and not started)
 
 
 def verify(name):
@@ -702,15 +890,54 @@ def verify(name):
         if ai2:
             ai = ai2
     tap(ai, 0.5)
-    # 启动确认：按钮变化 or toast
-    time.sleep(1.2)
-    d = dump()
-    txt = [x['text'] for x in (nodes(d) if d else []) if x['text']]
-    if not (any('停代打' in t for t in txt) or any('开始代打' in t for t in txt)):
-        # 可能瞬间通关已回列表
-        if any('One More' in t for t in txt):
-            return 'WIN', '瞬间通关（已回列表）'
-    return watch(120)
+    # ★ 判据 1716：**「点了没反应」必须当场认出来，不许一口气空等 120s**。
+    #   由来：11 款 TIMEOUT 里，路径交叉 / 补全盒子的现场页面上按钮还写着「AI 代打」
+    #   （不是「停代打」）—— 说明代打从头到尾**没启动**，却白等了 120s 记成 TIMEOUT，
+    #   看上去像「游戏打不动」，实际上跟游戏内容无关。
+    #   机制正好是判据 1708/1711 那一类：演示期间 HintBar 是 `disabled`（点了被吞掉）、
+    #   或者布局刚变过（旧 bounds 点空）。
+    #   ⇒ 按钮还写着「AI 代打」就**重新取最新 bounds 再点**，最多 3 次；
+    #     仍然没启动且最终 TIMEOUT ⇒ 判 FAIL 并写明原因（比 TIMEOUT 有用得多）。
+    started = False
+    idle_end = False
+    quit_early = False
+    tries = 0
+    for attempt in (1, 2, 3):
+        time.sleep(1.2 if attempt == 1 else 1.5)
+        d = dump()
+        ns = nodes(d) if d else []
+        ok_start, idle = ai_state(ns)
+        if ok_start:
+            started = True
+            # ★ 判据 1717：**代打起来就走**（autoStep 第一拍就 return false）也认出来。
+            #   1.2s 那次会看到「AI 开始代打…」toast ⇒ 判成已启动；可它 320ms 就自己停了。
+            #   真机例：补全盒子 TIMEOUT 现场按钮仍是「AI 代打」+ 步数 2 + 读数不动 ——
+            #   `boxHoles()` 一上来就是空 ⇒ autoStep 首次返回 false ⇒ autoRun 立刻收工。
+            time.sleep(1.5)
+            d3 = dump()
+            ns3 = nodes(d3) if d3 else []
+            _, idle3 = ai_state(ns3)      # 只关心它是不是又回到待机
+            j3 = '|'.join(x['text'] for x in ns3 if x['text'])
+            if idle3 and not WIN_PAT.search(j3) and not LOSE_PAT.search(j3):
+                quit_early = True
+            break
+        if not idle:
+            break                       # 按钮不在页面上（可能瞬间通关回列表）⇒ 交给 watch 判
+        idle_end = True
+        ai2 = find(ns, 'AI 代打')       # 判据 1711：用**这次** dump 的 bounds
+        if ai2 and attempt < 3:
+            tries = attempt
+            print('   ⚠️ AI 代打点了没启动（第 %d 次），重新取 bounds 再点…' % attempt, flush=True)
+            tap(ai2, 0.5)
+    verdict, detail = watch(120)
+    if (not started) and idle_end and verdict == 'TIMEOUT':
+        return 'FAIL', ('代打按钮点了 %d 次都没启动（页面始终写着「AI 代打」，'
+                        '多半是演示期 disabled / 布局变了点到空处）｜ %s'
+                        % (tries + 1, detail))
+    if quit_early and verdict == 'TIMEOUT':
+        return 'FAIL', ('代打启动后 1.5s 内自己就停了（autoStep 第一拍返回 false：'
+                        '多半是它算不出可动的一步）｜ %s' % detail)
+    return verdict, detail
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -730,9 +957,9 @@ def save(name, verdict, detail):
 
 
 def _stats_line(stats):
-    """判据 1679：一行汇总（WIN/FAIL/TIMEOUT/ERROR 计数）"""
-    return 'WIN %d · FAIL %d · TIMEOUT %d · ERROR %d' % (
-        stats['WIN'], stats['FAIL'], stats['TIMEOUT'], stats['ERROR'])
+    """判据 1679 + 1712：一行汇总（ACTIVE 单列，绝不并进 WIN）"""
+    return 'WIN %d · ACTIVE %d · FAIL %d · TIMEOUT %d · ERROR %d' % (
+        stats['WIN'], stats['ACTIVE'], stats['FAIL'], stats['TIMEOUT'], stats['ERROR'])
 
 
 def _reset_home():
@@ -751,14 +978,16 @@ def _reset_home():
 #  入口
 # ════════════════════════════════════════════════════════════════════════════
 def parse_args(argv):
-    opts = {'names': [], 'limit': 10, 'per_game': PER_GAME, 'out': OUT, 'device': DEV}
+    opts = {'names': [], 'limit': 10, 'per_game': PER_GAME, 'out': OUT, 'device': DEV,
+            'active_window': ACTIVE_WINDOW}
     i = 0
     while i < len(argv):
         a = argv[i]
         if a in ('-h', '--help'):
             print(USAGE)
             raise SystemExit(0)
-        if a in ('--limit', '--per-game-timeout', '--names-file', '--out', '--device'):
+        if a in ('--limit', '--per-game-timeout', '--names-file', '--out', '--device',
+                 '--active-window'):
             if i + 1 >= len(argv):
                 print('🔴 参数缺值：%s\n%s' % (a, USAGE), file=sys.stderr)
                 raise SystemExit(2)
@@ -768,6 +997,8 @@ def parse_args(argv):
                 opts['limit'] = int(v)
             elif a == '--per-game-timeout':
                 opts['per_game'] = float(v)
+            elif a == '--active-window':
+                opts['active_window'] = float(v)
             elif a == '--names-file':
                 try:
                     lines = io.open(v, encoding='utf-8').read().splitlines()
@@ -790,11 +1021,12 @@ def parse_args(argv):
 
 
 def main():
-    global OUT, DEV, PER_GAME, _BUDGET
+    global OUT, DEV, PER_GAME, _BUDGET, ACTIVE_WINDOW
     opts = parse_args(sys.argv[1:])
     OUT = os.path.abspath(opts['out'])
     DEV = opts['device']
     PER_GAME = float(opts['per_game'])
+    ACTIVE_WINDOW = float(opts['active_window'])
 
     if not os.path.exists(HC):
         print('🔴 找不到 hdc：%s' % HC, file=sys.stderr)
@@ -822,12 +1054,15 @@ def main():
         print('DEVICE_DEAD  %s' % e, flush=True)
         return 3
 
-    print('待验 %d 款（单款上限 %.0fs）：%s' % (
-        len(names), PER_GAME, ' '.join(names[:12])), flush=True)
+    print('待验 %d 款（单款上限 %.0fs%s）：%s' % (
+        len(names), PER_GAME,
+        '' if ACTIVE_WINDOW <= 0 else '，ACTIVE 窗口 %.0fs' % ACTIVE_WINDOW,
+        ' '.join(names[:12])), flush=True)
     print('结果：%s' % OUT, flush=True)
 
     stats = Counter()
     bad = []
+    active = []                            # 判据 1712：ACTIVE 单列，不混进「未通过」也不混进 WIN
     total = len(names)
     for i, nm in enumerate(names, 1):
         _BUDGET = Budget(PER_GAME)          # 判据 1676：每款重新计时
@@ -841,12 +1076,14 @@ def main():
             verdict, detail, devdead = 'ERROR', 'DEVICE_DEAD：%s' % str(e)[:60], True
         except Exception as e:
             verdict, detail = 'ERROR', ('%s: %s' % (type(e).__name__, e))[:120]
-        # 判据 1677：只要不是 WIN 就把当时的页面写进 detail
+        # 判据 1677：只要不是 WIN 就把当时的页面写进 detail（ACTIVE 也写：好复盘）
         if verdict != 'WIN':
             detail = '%s ｜ %s' % (detail, diag_page())
         save(nm, verdict, detail)
         stats[verdict] += 1
-        if verdict != 'WIN':
+        if verdict == 'ACTIVE':
+            active.append((nm, detail))
+        elif verdict != 'WIN':
             bad.append((nm, verdict, detail))
         # 判据 1679：每款一行 `[i/N] 名字 => 结果`
         print('[%d/%d] %s => %s（%.1fs） %s' % (
@@ -866,6 +1103,10 @@ def main():
 
     print('\n════ 本轮 WIN %d / %d ── %s ════' % (stats['WIN'], total, _stats_line(stats)),
           flush=True)
+    if active:
+        print('  ACTIVE（读数在动·没等到结算，判据 1712）：', flush=True)
+        for nm, dd in active:
+            print('    %s => %s' % (nm, (dd or '')[:110]), flush=True)
     if bad:
         print('  未通过：', flush=True)
         for nm, v, dd in bad:

@@ -282,8 +282,8 @@ for n in want:
     if v != 'WIN':
         bad.append((n, v, (r or {}).get('detail', '')))
 n_win = c.get('WIN', 0)
-print('════ 本轮名单 %d 款：WIN %d ｜ FAIL %d ｜ TIMEOUT %d ｜ ERROR %d ｜ 未验 %d ════' % (
-    len(want), n_win, c.get('FAIL', 0), c.get('TIMEOUT', 0), c.get('ERROR', 0), c.get('未验', 0)))
+print('════ 本轮名单 %d 款：WIN %d ｜ ACTIVE %d ｜ FAIL %d ｜ TIMEOUT %d ｜ ERROR %d ｜ 未验 %d ════' % (
+    len(want), n_win, c.get('ACTIVE', 0), c.get('FAIL', 0), c.get('TIMEOUT', 0), c.get('ERROR', 0), c.get('未验', 0)))
 if bad:
     print('  未通过：')
     for n, v, d in bad:

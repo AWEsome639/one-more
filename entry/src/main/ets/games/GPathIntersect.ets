@@ -104,6 +104,11 @@ export struct GPathIntersect {
   }
 
   private reset(): void {
+    // ★★ 2026-11-06（判据 1710）：LINK_LIB 每关只有 4 组端点，而困难档 sizeNow(4)=5 组
+    //   ⇒ 第 5 组读到 undefined（ends[NaN]），「已接通 x/5」永远到不了 ⇒ 玩家也赢不了
+    //   ⇒ 夹到题库里真有的组数
+    const want: number = GameDiff.sizeNow(PAIRS);
+    this.diffTotal = want > PAIRS ? PAIRS : (want < 1 ? 1 : want);
     const k: number = Math.floor(Math.random() * LINK_LIB.length);
     const src: number[] = LINK_LIB[k];
     const ends: number[] = new Array<number>(CELLS).fill(0);
@@ -123,6 +128,13 @@ export struct GPathIntersect {
     this.won = false;
     this.score = 0;
     this.startAt = Date.now();
+    // ★★ 2026-11-06（判据 1701/1704/1709）：开局就把 #diffTotal 组的路**一次规划好**
+    //   旧版 autoStep 是「一条一条贪心连」⇒ 先连的那条把后面的路堵死（路径规划的经典坑），
+    //   规划不出来就 return false 停代打，绝不空转（判据 1702）。
+    this.piPlan = this.piPlanAll();
+    this.piP = -1;
+    this.piStarted = false;
+    this.piAt = 0;
   }
 
   private clearPair(p: number): void {
@@ -234,45 +246,70 @@ export struct GPathIntersect {
     if (this.over) {
       return false;
     }
-    if (this.active < 0) {
-      let a: number = -1;
-      let b: number = -1;
-      let pth: number[] = [];
+    const plan: number[][] = this.piPlan;
+    if (plan.length === 0) {
+      return false;                       // 这组端点规划不出解 ⇒ 停，绝不空转（判据 1702）
+    }
+    if (this.piP < 0) {
+      // ★ 判据 1709：AI 接管时先把盘面清干净（玩家名下的残留线会挡住规划好的路），
+      //   只清一次 —— 清完就按规划画，已经画通的组不能再清
+      if (!this.piStarted) {
+        this.piStarted = true;
+        this.piClearAll();
+      }
+      let next: number = -1;
       for (let p = 0; p < this.diffTotal; p++) {
-        if (this.done[p] === 1) {
-          continue;
-        }
-        const es: number[] = this.piEnds(p);
-        if (es[0] < 0 || es[1] < 0) {
-          continue;
-        }
-        const cand: number[] = this.piPath(es[0], es[1], p);
-        if (cand.length > 0) {
-          a = es[0];
-          b = es[1];
-          pth = cand;
+        if (this.done[p] !== 1) {
+          next = p;
           break;
         }
       }
-      if (pth.length === 0) {
+      if (next < 0) {
         return false;
       }
-      this.piTo = pth;
+      this.piP = next;
       this.piAt = 0;
-      this.tap(a);
-      return !this.over;
     }
-    if (this.piAt >= this.piTo.length) {
-      return false;
+    const route: number[] = plan[this.piP];
+    if (this.piAt >= route.length) {
+      this.piP = -1;                      // 这一组画通了，下一拍开下一组
+      return true;
     }
-    this.tap(this.piTo[this.piAt]);
+    if (this.piAt > 0) {
+      // 玩家中途点过棋盘 ⇒ 线头对不上了。线头还在规划路上就从它继续（省步数），
+      // 否则从端点重画（否则后面每一下都点不动）
+      if (this.active !== this.piP || this.head[this.piP] !== route[this.piAt - 1]) {
+        let at: number = -1;
+        const h: number = (this.active === this.piP) ? this.head[this.piP] : -1;
+        if (h >= 0) {
+          for (let i = 0; i < route.length; i++) {
+            if (route[i] === h) {
+              at = i;
+              break;
+            }
+          }
+        }
+        this.piAt = at >= 0 ? at + 1 : 0;
+      }
+    }
+    const cell: number = route[this.piAt];
     this.piAt = this.piAt + 1;
+    this.tap(cell);
     return !this.over;
   }
 
-  /** 计划要依次点的格（一次性算好） */
-  private piTo: number[] = [];
+  /** 规划里当前这一组已经点到第几格（0 = 还没开始） */
   private piAt: number = 0;
+  /**
+   * ★★ 2026-11-06（判据 1701/1704）：reset 时一次规划好的**全部**路
+   *   piPlan[p] = 第 p 组的格号序列（含两端端点）⇒ AI 照答案画
+   *   旧版是一条一条贪心连，先连的那条会把后面的路堵死（实测 6 种关卡组合里 2 种必堵）
+   */
+  private piPlan: number[][] = [];
+  /** 正在画第几组（-1 = 这一组画通了，下一拍换下一组） */
+  private piP: number = -1;
+  /** 这一轮代打是否已经清过盘（只清一次，别把刚画通的线清掉） */
+  private piStarted: boolean = false;
 
   /** 从 from 连到 to 的最短路（避开别组的线与端点），返回要依次点的格（不含 from） */
   private piPath(from: number, to: number, p: number): number[] {
@@ -342,6 +379,137 @@ export struct GPathIntersect {
     out.push(a);
     out.push(b);
     return out;
+  }
+
+  /** 曼哈顿距离（路径长度的下界，用来剪枝） */
+  private piDist(a: number, b: number): number {
+    const ar: number = Math.floor(a / N);
+    const br: number = Math.floor(b / N);
+    return Math.abs(ar - br) + Math.abs((a - ar * N) - (b - br * N));
+  }
+
+  /**
+   * ★★ 2026-11-06（判据 1701/1704/1709）：开局一次把 #diffTotal 组的路**全局规划**好
+   *   返回 piPlan[p] = 第 p 组的格号序列（含两端端点）；规划不出来 ⇒ 返回空数组（AI 就停）
+   */
+  private piPlanAll(): number[][] {
+    const paths: number[][] = [];
+    for (let p = 0; p < this.diffTotal; p++) {
+      paths.push([]);
+    }
+    const used: number[] = new Array<number>(CELLS).fill(0);   // 已经排好的路占掉的格
+    const vis: number[] = new Array<number>(CELLS).fill(0);    // 当前这条路自己走过的格
+    const budget: number[] = [20000];
+    if (!this.piAssign(0, used, vis, paths, budget)) {
+      return [];
+    }
+    return paths;
+  }
+
+  /** 第 k 组：路径长度从短到长试 —— 短路径不容易把后面几组的路堵死 */
+  private piAssign(k: number, used: number[], vis: number[], paths: number[][], budget: number[]): boolean {
+    if (k >= this.diffTotal) {
+      return true;
+    }
+    const es: number[] = this.piEnds(k);
+    if (es[0] < 0 || es[1] < 0) {
+      return false;
+    }
+    for (let len = 2; len <= CELLS; len++) {
+      if (len - 1 < this.piDist(es[0], es[1])) {
+        continue;                        // 步数不够走曼哈顿距离 ⇒ 这个长度不成立
+      }
+      paths[k] = [];
+      paths[k].push(es[0]);
+      vis[es[0]] = 1;
+      if (this.piWalk(k, es[1], len - 1, used, vis, paths, budget)) {
+        vis[es[0]] = 0;
+        return true;
+      }
+      vis[es[0]] = 0;
+      paths[k] = [];
+      if (budget[0] <= 0) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * 从 paths[k] 的尾部继续往 b 走、还剩 left 步；正好用掉 left 步走到 b ⇒ 交给第 k+1 组继续排
+   * 走不通就回溯（used = 已排好的路占过的格；vis = 这一条路自己走过的格）
+   */
+  private piWalk(k: number, b: number, left: number, used: number[],
+                 vis: number[], paths: number[][], budget: number[]): boolean {
+    if (budget[0] <= 0) {
+      return false;
+    }
+    budget[0] = budget[0] - 1;
+    const path: number[] = paths[k];
+    const cur: number = path[path.length - 1];
+    if (cur === b) {
+      if (left !== 0) {
+        return false;
+      }
+      for (let i = 0; i < path.length; i++) {
+        used[path[i]] = 1;
+      }
+      if (this.piAssign(k + 1, used, vis, paths, budget)) {
+        return true;
+      }
+      for (let i = 0; i < path.length; i++) {
+        used[path[i]] = 0;
+      }
+      return false;
+    }
+    if (left <= 0) {
+      return false;
+    }
+    const r: number = Math.floor(cur / N);
+    const c: number = cur - r * N;
+    for (let d = 0; d < 4; d++) {
+      const rr: number = r + (d === 0 ? -1 : (d === 2 ? 1 : 0));
+      const cc: number = c + (d === 1 ? 1 : (d === 3 ? -1 : 0));
+      if (rr < 0 || rr >= N || cc < 0 || cc >= N) {
+        continue;
+      }
+      const ni: number = rr * N + cc;
+      if (vis[ni] !== 0 || used[ni] !== 0) {
+        continue;
+      }
+      const e: number = this.ends[ni];
+      if (e > 0 && e !== k + 1) {
+        continue;                        // 别组的端点不能穿过
+      }
+      if (ni === b) {
+        if (left - 1 !== 0) {
+          continue;                      // 到了 b 但步数没用完 ⇒ 这条长度不成立
+        }
+      } else if (this.piDist(ni, b) > left - 1) {
+        continue;                        // ★ 剪枝：剩下的步数不够走到 b
+      }
+      path.push(ni);
+      vis[ni] = 1;
+      if (this.piWalk(k, b, left - 1, used, vis, paths, budget)) {
+        return true;
+      }
+      vis[ni] = 0;
+      path.pop();
+      if (budget[0] <= 0) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  /** ★ AI 接管：清掉盘上所有线 + 步数归零（否则重画一遍会撞 60 步预算） */
+  private piClearAll(): void {
+    for (let p = 0; p < this.diffTotal; p++) {
+      this.clearPair(p);
+    }
+    this.active = -1;
+    this.steps = 0;
+    this.piAt = 0;
   }
 
   /** 提示：已经起线了 ⇒ 报下一格；还没起 ⇒ 报某个能连通的组从哪端起 */
@@ -417,6 +585,38 @@ export struct GPathIntersect {
       return;
     }
     const p: number = this.ends[i];
+    const a0: number = this.active;
+    // ★★ 2026-11-06 真凶（判据 1709/1710）：点的是「当前这条线的**另一个端点**」而且与线头相邻
+    //   ⇒ 这一组就该**接通**。旧版只在下面「延伸」分支里写了 `other === a + 1` 的接通判定，
+    //   而 i 是端点时会先被「点端点 = 重画该组」那一支截走 ⇒ **接通判定永远走不到**
+    //   ⇒ 已接通恒 0/N，玩家也一样连不通（三关都赢不了，不是 AI 的问题）。
+    if (p > 0 && a0 === p - 1 && this.head[a0] >= 0 && this.adjacent(this.head[a0], i)) {
+      const occ1: number[] = this.occ.slice();
+      occ1[i] = a0 + 1;
+      this.occ = occ1;
+      const head1: number[] = this.head.slice();
+      head1[a0] = i;
+      this.head = head1;
+      this.steps++;
+      const done1: number[] = this.done.slice();
+      done1[a0] = 1;
+      this.done = done1;
+      this.active = -1;
+      if (this.doneCount() === this.diffTotal) {
+        this.over = true;
+        this.won = true;
+        this.score = Math.max(60, 420 - this.steps * 4);
+        this.finish(true);
+        return;
+      }
+      if (this.steps >= STEP_BUDGET) {
+        this.over = true;
+        this.won = false;
+        this.score = 0;
+        this.finish(false);
+      }
+      return;
+    }
     if (p > 0) {
       this.clearPair(p - 1);            // 点端点 = 该组重画
       const occ: number[] = this.occ.slice();
