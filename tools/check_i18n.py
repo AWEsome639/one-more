@@ -105,10 +105,26 @@ def parse_extra(s):
                 break
         k += 1
     block = s[j:k + 1]
-    data = json.loads(re.sub(r',(\s*})$', r'\1', block))
-    # 重复键（JSON 解析会吞掉重复，得单独数）
-    raw = re.findall(r'^\s*("(?:[^"\\]|\\.)*")\s*:', block, re.M)
-    keys = [json.loads(x) for x in raw]
+    # ★ 判据 1740：EXTRA 里允许注释 + 尾逗号 + 未转义反斜杠 —— JSON 太严格，
+    #   改用**正则提取**（key -> 语言列），绕开所有 JSON 语法问题
+    clean = re.sub(r'/\*.*?\*/', '', block, flags=re.S)
+    clean = re.sub(r'//[^\n]*', '', clean)
+    data = {}
+    cur_key = None
+    for line in clean.split('\n'):
+        mk = re.match(r'^\s*("(?:[^"\\]|\\.)*")\s*:\s*\{', line)
+        if mk:
+            try:
+                cur_key = json.loads(mk.group(1))
+            except Exception:
+                cur_key = mk.group(1)
+            data.setdefault(cur_key, {})
+            continue
+        ml = re.match(r'^\s*"([^"]+)"\s*:\s*"(.*)",?\s*$', line)
+        if ml and cur_key is not None:
+            data[cur_key][ml.group(1)] = ml.group(2)
+    raw = re.findall(r'^\s*("(?:[^"\\]|\\.)*")\s*:', clean, re.M)
+    keys = [x for x in raw]
     dup = sorted({x for x in keys if keys.count(x) > 1})
     return data, dup, len(keys)
 
