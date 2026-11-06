@@ -238,8 +238,8 @@ export struct GRuleSwitcher {
       this.right = this.right + 1;
       this.msg = TG2('✅ 对 · {0} ms', String(rt));
     } else {
-      let why: string = v > 50 ? ' 大于 50' : ' 不大于 50';
-      if (r === 0) { why = v % 2 === 1 ? ' 是奇数' : ' 是偶数'; }
+      let why: string = v > 50 ? TG(' 大于 50') : TG(' 不大于 50');
+      if (r === 0) { why = v % 2 === 1 ? TG(' 是奇数') : TG(' 是偶数'); }
       this.msg = '❌ ' + String(v) + why;
     }
     this.toId = setTimeout(() => {

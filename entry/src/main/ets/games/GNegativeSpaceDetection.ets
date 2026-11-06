@@ -22,11 +22,11 @@ interface Fig { icon: string; name: string; cells: number[] }
 
 /** 5×5 里的留白形状（其余格子都是实心块） */
 const FIGS: Fig[] = [
-  { icon: '➕', name: '十字', cells: [7, 11, 12, 13, 17] },
-  { icon: '⬜', name: '方框', cells: [6, 7, 8, 11, 13, 16, 17, 18] },
-  { icon: '⬛', name: '实心块', cells: [6, 7, 8, 11, 12, 13, 16, 17, 18] },
+  { icon: '➕', name: TG('十字'), cells: [7, 11, 12, 13, 17] },
+  { icon: '⬜', name: TG('方框'), cells: [6, 7, 8, 11, 13, 16, 17, 18] },
+  { icon: '⬛', name: TG('实心块'), cells: [6, 7, 8, 11, 12, 13, 16, 17, 18] },
   { icon: '✖️', name: TG(TG('交叉')), cells: [6, 8, 12, 16, 18] },
-  { icon: '🔶', name: '菱形', cells: [7, 11, 13, 17] }
+  { icon: '🔶', name: TG('菱形'), cells: [7, 11, 13, 17] }
 ];
 
 function mixFig(a: Fig[]): Fig[] {

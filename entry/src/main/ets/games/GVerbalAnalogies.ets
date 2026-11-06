@@ -28,9 +28,9 @@ const BANK: Analog[] = [
   { stem: 'PUPPY : DOG ＝ KITTEN : ?', opts: [TG('CAT 猫'), TG('MOUSE 老鼠'), TG('CUB 幼兽'), TG('LAMB 羔羊')], ans: 0 },
   { stem: 'PEN : WRITE ＝ KNIFE : ?', opts: [TG('SHARP 锋利的'), TG('METAL 金属'), TG('CUT 切'), TG('SPOON 勺子')], ans: 2 },
   { stem: 'EYE : SEE ＝ EAR : ?', opts: [TG('SOUND 声音'), TG('HEAR 听见'), 'LOUD 响的', 'MUSIC 音乐'], ans: 1 },
-  { stem: 'SLOW : FAST ＝ QUIET : ?', opts: ['SOFT 软的', 'SILENT 寂静的', 'CALM 平静的', 'LOUD 响亮的'], ans: 3 },
-  { stem: 'GALLERY : PAINTINGS ＝ LIBRARY : ?', opts: ['SHELVES 书架', 'BOOKS 书', 'READERS 读者', 'QUIET 安静'], ans: 1 },
-  { stem: 'WINTER : SNOW ＝ SUMMER : ?', opts: ['ICE 冰', 'BEACH 沙滩', 'HEAT 炎热', 'COAT 外套'], ans: 2 }
+  { stem: 'SLOW : FAST ＝ QUIET : ?', opts: [TG('SOFT 软的'), TG('SILENT 寂静的'), TG('CALM 平静的'), TG('LOUD 响亮的')], ans: 3 },
+  { stem: 'GALLERY : PAINTINGS ＝ LIBRARY : ?', opts: [TG('SHELVES 书架'), TG('BOOKS 书'), TG('READERS 读者'), TG('QUIET 安静')], ans: 1 },
+  { stem: 'WINTER : SNOW ＝ SUMMER : ?', opts: [TG('ICE 冰'), TG('BEACH 沙滩'), TG('HEAT 炎热'), TG('COAT 外套')], ans: 2 }
 ];
 
 /** 从 0..total-1 中随机取 k 个互不相同的下标 */

@@ -20,16 +20,16 @@ const LIMIT_S: number = 20; const TICK_MS: number = 1000;
 
 /** [共同词根含义, 同族词1, 同族词2, 同族词3, 异类词] */
 const GROUPS: string[][] = [
-  ['水 (hydr-)', 'HYDRANT', 'DEHYDRATE', 'HYDROGEN', 'HYGIENE'],
-  ['写 (scrib-)', 'SCRIBBLE', 'DESCRIBE', 'MANUSCRIPT', 'SCRIPTURE'],
-  ['土地 (terr-)', 'TERRACE', 'TERRIER', 'TERRITORY', 'TERMINAL'],
-  ['光 (photo-)', 'PHOTON', 'PHOTOGRAPH', 'PHOTOSYNTHESIS', 'PHONE'],
-  ['书 (bibl-)', 'BIBLE', 'BIBLIOGRAPHY', 'BIBLIOPHILE', 'BICYCLE'],
-  ['生命 (bio-)', 'BIOLOGY', 'BIOPSY', 'BIOGRAPHER', 'BIONIC'],
-  ['看 (spect-)', 'SPECTACLE', 'INSPECT', 'RETROSPECT', 'SPECTACULAR'],
-  ['说 (dict-)', 'DICTION', 'PREDICT', 'VERDICT', 'DICTATOR'],
-  ['手 (manu-)', 'MANUAL', 'MANUFACTURE', 'MANICURE', 'MANNER'],
-  ['心 (cardi-)', 'CARDIAC', 'CARDIOGRAM', 'CARDIOLOGIST', 'CARDINAL']
+  [TG('水 (hydr-)'), 'HYDRANT', 'DEHYDRATE', 'HYDROGEN', 'HYGIENE'],
+  [TG('写 (scrib-)'), 'SCRIBBLE', 'DESCRIBE', 'MANUSCRIPT', 'SCRIPTURE'],
+  [TG('土地 (terr-)'), 'TERRACE', 'TERRIER', 'TERRITORY', 'TERMINAL'],
+  [TG('光 (photo-)'), 'PHOTON', 'PHOTOGRAPH', 'PHOTOSYNTHESIS', 'PHONE'],
+  [TG('书 (bibl-)'), 'BIBLE', 'BIBLIOGRAPHY', 'BIBLIOPHILE', 'BICYCLE'],
+  [TG('生命 (bio-)'), 'BIOLOGY', 'BIOPSY', 'BIOGRAPHER', 'BIONIC'],
+  [TG('看 (spect-)'), 'SPECTACLE', 'INSPECT', 'RETROSPECT', 'SPECTACULAR'],
+  [TG('说 (dict-)'), 'DICTION', 'PREDICT', 'VERDICT', 'DICTATOR'],
+  [TG('手 (manu-)'), 'MANUAL', 'MANUFACTURE', 'MANICURE', 'MANNER'],
+  [TG('心 (cardi-)'), 'CARDIAC', 'CARDIOGRAM', 'CARDIOLOGIST', 'CARDINAL']
 ];
 
 function shuffleIdx(): number[] {

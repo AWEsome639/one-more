@@ -19,14 +19,14 @@ const ROUNDS: number = 12; const PASS: number = 8; const SAME_N: number = 8;
 interface Pair { a: string; b: string; same: boolean; note: string }
 /** 前 8 条真同源，后 8 条形似而实不同源 */
 const ALL: Pair[] = [
-  { a: 'night', b: 'Nacht（德语）', same: true, note: '同出古日耳曼 *nahts：夜' },
-  { a: 'father', b: 'Vater（德语）', same: true, note: '同出原始印欧 *ph₂tḗr：父' },
-  { a: 'three', b: 'trois（法语）', same: true, note: '同出 *tréyes：三' },
-  { a: 'heart', b: 'Herz（德语）', same: true, note: '同出 *ḱerd-：心' },
-  { a: 'water', b: 'Wasser（德语）', same: true, note: '同出 *wódr̥：水' },
-  { a: 'star', b: 'Stern（德语）', same: true, note: '同出 *h₂stḗr：星' },
-  { a: 'tooth', b: 'Zahn（德语）', same: true, note: '同出 *h₃dónts：齿' },
-  { a: 'milk', b: 'Milch（德语）', same: true, note: '同出 *melg-：挤奶' },
+  { a: 'night', b: TG('Nacht（德语）'), same: true, note: TG('同出古日耳曼 *nahts：夜') },
+  { a: 'father', b: TG('Vater（德语）'), same: true, note: TG('同出原始印欧 *ph₂tḗr：父') },
+  { a: 'three', b: TG('trois（法语）'), same: true, note: TG('同出 *tréyes：三') },
+  { a: 'heart', b: TG('Herz（德语）'), same: true, note: TG('同出 *ḱerd-：心') },
+  { a: 'water', b: TG('Wasser（德语）'), same: true, note: TG('同出 *wódr̥：水') },
+  { a: 'star', b: TG('Stern（德语）'), same: true, note: TG('同出 *h₂stḗr：星') },
+  { a: 'tooth', b: TG('Zahn（德语）'), same: true, note: TG('同出 *h₃dónts：齿') },
+  { a: 'milk', b: TG('Milch（德语）'), same: true, note: TG('同出 *melg-：挤奶') },
   { a: 'much（多）', b: 'mucho（西语：多）', same: false, note: 'much 出 *meg-，mucho 出拉丁 multus' },
   { a: 'pain（疼痛）', b: 'pan（西语：面包）', same: false, note: 'pain 出拉丁 poena，pan 出拉丁 panis' },
   { a: 'red（红）', b: 'Rede（德语：演讲）', same: false, note: 'red 出 *raudaz，Rede 出 *raþjō' },

@@ -20,10 +20,10 @@ interface TraitFace { icon: string; trait: string; }
 interface TraitChoice { label: string; ok: boolean; }
 
 const POOL: TraitFace[] = [
-  { icon: '🧑‍🎨', trait: '爱画水彩' }, { icon: '🧑‍🚀', trait: '怕高' }, { icon: '👩‍🍳', trait: '口味偏辣' },
-  { icon: '👨‍🔬', trait: '养了只猫' }, { icon: '🧝', trait: '每天晨跑' }, { icon: '🧛', trait: '只喝黑咖' },
-  { icon: '👩‍🌾', trait: '会吹口琴' }, { icon: '🧑‍✈️', trait: '晕船' }, { icon: '🤠', trait: '收集邮票' },
-  { icon: '🧜', trait: '爱看老电影' }, { icon: '👨‍🚒', trait: '会做甜点' }, { icon: '👩‍⚕️', trait: '怕打雷' }
+  { icon: '🧑‍🎨', trait: TG('爱画水彩') }, { icon: '🧑‍🚀', trait: TG('怕高') }, { icon: '👩‍🍳', trait: TG('口味偏辣') },
+  { icon: '👨‍🔬', trait: TG('养了只猫') }, { icon: '🧝', trait: TG('每天晨跑') }, { icon: '🧛', trait: TG('只喝黑咖') },
+  { icon: '👩‍🌾', trait: TG('会吹口琴') }, { icon: '🧑‍✈️', trait: TG('晕船') }, { icon: '🤠', trait: TG('收集邮票') },
+  { icon: '🧜', trait: TG('爱看老电影') }, { icon: '👨‍🚒', trait: TG('会做甜点') }, { icon: '👩‍⚕️', trait: TG('怕打雷') }
 ];
 const ROUNDS: number = 6;
 const SHOW_SEC: number = 5;
