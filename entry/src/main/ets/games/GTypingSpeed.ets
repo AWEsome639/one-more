@@ -312,7 +312,7 @@ export struct GTypingSpeed {
         .borderRadius(Radius.md).shadow(Shadow.card)
       Column({ space: Space.xs }) {
         Text(TG('照着打这一句')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(this.target()).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+        Text(this.target()).fontSize(FontSize.lg).minFontSize(12).maxFontSize(FontSize.lg).fontWeight(FontWeight.Bold)
           .fontColor(this.theme.ink).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)

@@ -409,7 +409,7 @@ export struct GCommonDenominator {
               .fontWeight(FontWeight.Bold)
               .fontColor(this.theme.inkFaint)
             Text(TG2('公分母 = {0}', String(this.opts[i]))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-              .fontSize(FontSize.lg)
+              .fontSize(FontSize.lg).minFontSize(12).maxFontSize(FontSize.lg)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.optInk(i))
               .layoutWeight(1)

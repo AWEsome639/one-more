@@ -289,7 +289,7 @@ export struct GRuleSwitcher {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Text(this.rule === 0 ? TG('规则：看奇偶') : TG('规则：比 50 大小')).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-        .fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor('#FFFFFF').textAlign(TextAlign.Center)
+        .fontSize(FontSize.md).minFontSize(11).maxFontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor('#FFFFFF').textAlign(TextAlign.Center)
         .width('100%').height(Cell.of(40)).borderRadius(Radius.full)
         .backgroundColor(this.rule === 0 ? Palette.sky : Palette.violet)
         .animation({ duration: Motion.base, curve: Motion.snap() })

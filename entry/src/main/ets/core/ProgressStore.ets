@@ -909,7 +909,21 @@ export class ProgressStore {
   private static mapCacheRaw: string = '';
   private static mapCacheVal: Record<string, number> | undefined = undefined;
 
-  /** 解析 `Record<string, number>` 型的 JSON 串（带缓存 —— 同一个串只 parse 一次） */
+  /**
+   * 解析 `Record<string, number>` 型的 JSON 串（带缓存 —— 同一个串只 parse 一次）。
+   *
+   * ★★★ 2026-11-08 **返回值是缓存对象本体，调用方只读、禁止就地修改**：
+   *   `mapCacheVal` 是**跨调用复用**的同一个对象；谁在这里 `m[k] = v`，
+   *   就会出现「raw 字符串没变、但内容被改了」的脏缓存（下次读取拿到被污染的值）。
+   *
+   *   · 现有 3 个调用点（`playsOf` / `bestOf` / `playedKinds`）都**只读**，所以当前是安全的；
+   *   · **写路径一律不走这里**：`finishGame` 里 `perGamePlays` / `perGameBest` 都是用
+   *     `JSON.parse(raw)` **重新解析**再 `JSON.stringify` 写回（见 :1334 / :1347），
+   *     新串 ≠ 旧串 ⇒ 缓存自然失效。**以后要写也照这个套路**。
+   *   · 为什么不做浅拷贝：一次返回列表会读 355 卡 × 4 次 ≈ **1400+ 次**，
+   *     每次拷贝 355 键的对象 ≈ 50 万次属性复制 —— 这个函数存在的意义就是省这些开销。
+   *     ⇒ 用「注释约束 + 写路径重建」换取零成本，比拷贝更合适。
+   */
   private static parseNumMap(raw: string): Record<string, number> {
     if (raw === ProgressStore.mapCacheRaw && ProgressStore.mapCacheVal !== undefined) {
       return ProgressStore.mapCacheVal;

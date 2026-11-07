@@ -553,7 +553,7 @@ export struct GColorFlood {
           ForEach([0, 1, 2, 3, 4, 5], (i: number) => {
             Stack() {
             Text(this.cells.length > 0 && this.cells[0] === (i) ? TG('起点') : '').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-            .fontSize(FontSize.xxs)
+            .fontSize(FontSize.xxs).minFontSize(9).maxFontSize(FontSize.xxs)
             .fontColor('#FFFFFF')
             }
             .layoutWeight(1)

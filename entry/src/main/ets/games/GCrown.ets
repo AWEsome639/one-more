@@ -612,7 +612,7 @@ export struct GCrown {
 
       Row({ space: Space.sm }) {
         Text((TG('👑 放皇冠'))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-        .fontSize(FontSize.sm)
+        .fontSize(FontSize.sm).minFontSize(10).maxFontSize(FontSize.sm)
         .fontColor(this.mode === (1) ? '#FFFFFF' : this.theme.inkSoft)
         .textAlign(TextAlign.Center)
         .layoutWeight(1)
@@ -630,7 +630,7 @@ export struct GCrown {
         this.mode = (1);
         })
         Text((TG('✕ 标排除'))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-        .fontSize(FontSize.sm)
+        .fontSize(FontSize.sm).minFontSize(10).maxFontSize(FontSize.sm)
         .fontColor(this.mode === (2) ? '#FFFFFF' : this.theme.inkSoft)
         .textAlign(TextAlign.Center)
         .layoutWeight(1)

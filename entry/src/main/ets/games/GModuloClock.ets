@@ -390,7 +390,7 @@ export struct GModuloClock {
         ForEach(this.slots, (i: number) => {
           Row({ space: Space.sm }) {
             Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
-            Text(TG2("{0} 点", String(this.opts[i]))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+            Text(TG2("{0} 点", String(this.opts[i]))).fontSize(FontSize.xl).minFontSize(13).maxFontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           }.width('100%').height(Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
             Haptics.tick();
             this.pick(i);

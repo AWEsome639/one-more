@@ -308,7 +308,7 @@ export struct GDoubleNBack {
       }.width('100%')
       Text(this.msg).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.sm }) {
-        Text((true ? this.selPos : this.selLetter) ? '✔ ' + (TG('位置 = 2-back')) : (TG('位置 = 2-back'))).fontSize(FontSize.sm).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((true ? this.selPos : this.selLetter) ? '✔ ' + (TG('位置 = 2-back')) : (TG('位置 = 2-back'))).fontSize(FontSize.sm).minFontSize(10).maxFontSize(FontSize.sm).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor((true ? this.selPos : this.selLetter) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(44))
         .backgroundColor((true ? this.selPos : this.selLetter) ? Palette.primaryDeep : this.theme.surfaceAlt)
         .borderRadius(Radius.md).opacity(this.idx >= N ? 1 : 0.45).enabled(this.idx >= N)
@@ -319,7 +319,7 @@ export struct GDoubleNBack {
         Haptics.tick();
         if (true) { this.selPos = !this.selPos; } else { this.selLetter = !this.selLetter; }
         })
-        Text((false ? this.selPos : this.selLetter) ? '✔ ' + (TG('字母 = 2-back')) : (TG('字母 = 2-back'))).fontSize(FontSize.sm).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((false ? this.selPos : this.selLetter) ? '✔ ' + (TG('字母 = 2-back')) : (TG('字母 = 2-back'))).fontSize(FontSize.sm).minFontSize(10).maxFontSize(FontSize.sm).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor((false ? this.selPos : this.selLetter) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(44))
         .backgroundColor((false ? this.selPos : this.selLetter) ? Palette.primaryDeep : this.theme.surfaceAlt)
         .borderRadius(Radius.md).opacity(this.idx >= N ? 1 : 0.45).enabled(this.idx >= N)

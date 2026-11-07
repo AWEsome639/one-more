@@ -693,7 +693,7 @@ build() {
     if (GameLog.count() > 0 || this.plays > 0) {
       Column({ space: Space.sm }) {
         Row() {
-          Text('📊 ' + TG('近 7 天'))
+          Text('📊 ' + this.t('近 7 天', 'Last 7 days'))   // ★ 2026-11-08 判据 1805：这 key 在 EXTRA 不在 DICT
             .fontSize(FontSize.md)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.theme().ink)
@@ -719,7 +719,7 @@ build() {
         } else {
           Column({ space: Space.sm }) {
             if (this.weekStat().total === 0) {
-              Text(TG('还没有记录 —— 玩一局就有了'))
+              Text(this.t('还没有记录 —— 玩一局就有了', 'No records yet — play a round'))   // ★ 同上
                 .fontSize(FontSize.xs)
                 .fontColor(this.theme().inkFaint)
                 .width('100%')
