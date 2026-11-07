@@ -34,6 +34,8 @@ export interface Intent {
   untimed: boolean;
   /** 想「多人/联机」 */
   multiplayer: boolean;
+  /** 想「棋牌类」（tags 里有 board/card） */
+  board: boolean;
   /** 命中意图的词（给用户看「我是根据这几个词找的」） */
   hits: string[];
 }
@@ -48,12 +50,13 @@ export interface Suggestion {
 
 /** 类别关键词表（中英都收，因为用户可能用任意语言） */
 const CAT_WORDS: string[][] = [
-  ['逻辑', '推理', '动脑', 'logic', 'puzzle', 'denken', 'logique', 'lógica', 'логик', 'منطق'],
+  // ★ 2026-11-07 模拟验证抓到：「解谜」是中文里**最常见**的说法，原来没在表里 ⇒ 「不太难的解谜」抽不出类别
+  ['逻辑', '推理', '动脑', '解谜', '谜题', '拼图', '脑筋', 'logic', 'puzzle', 'riddle', 'denken', 'logique', 'lógica', 'логик', 'منطق'],
   ['数字', '数学', '算', 'math', 'number', 'zahlen', 'nombre', 'числ', 'أرقام'],
   ['记忆', '记', 'memory', 'memor', 'gedächtnis', 'mémoire', 'memória', 'памят', 'ذاكرة'],
   ['文字', '词', 'word', 'letter', 'wort', 'mot', 'palabra', 'слов', 'كلمات'],
   ['空间', '旋转', '图形', 'spatial', 'shape', 'rotation', 'raum', 'espace', 'espacio', 'простран', 'مكان'],
-  ['经典', '棋', '牌', 'classic', 'board', 'card', 'klassisch', 'classique', 'clásico', 'классик', 'كلاسيك'],
+  ['经典', 'classic', 'klassisch', 'classique', 'clásico', 'классик', 'كلاسيك'],
 ];
 const CATS: GameCategory[] = [GameCategory.LOGIC, GameCategory.MATH, GameCategory.MEMORY,
   GameCategory.WORD, GameCategory.SPATIAL, GameCategory.CLASSIC];
@@ -75,7 +78,7 @@ export class ChatFinder {
     const s: string = text.toLowerCase();
     const it: Intent = {
       category: null, difficulty: null, short: false, long: false,
-      pausable: false, untimed: false, multiplayer: false, hits: []
+      pausable: false, untimed: false, multiplayer: false, board: false, hits: []
     };
     // 类别
     for (let i = 0; i < CAT_WORDS.length; i++) {
@@ -108,13 +111,19 @@ export class ChatFinder {
     if (s.indexOf('暂停') >= 0 || s.indexOf('电话') >= 0 || s.indexOf('pause') >= 0 || s.indexOf('unterbr') >= 0) { it.pausable = true; it.hits.push('可暂停'); }
     if (s.indexOf('不限时') >= 0 || s.indexOf('慢慢') >= 0 || s.indexOf('untimed') >= 0 || s.indexOf('ohne zeit') >= 0) { it.untimed = true; it.hits.push('不限时'); }
     if (s.indexOf('联机') >= 0 || s.indexOf('对打') >= 0 || s.indexOf('朋友') >= 0 || s.indexOf('multi') >= 0 || s.indexOf('freund') >= 0) { it.multiplayer = true; it.hits.push('联机'); }
+    // ★ 2026-11-07 模拟验证抓到：「棋/牌」原来被映射到 CLASSIC 类别 ⇒ 推荐出「宝石迷阵／打砖块」
+    //   因为 CLASSIC 是「经典」不是「棋牌」。改成 **tag 意图**（tags 里有 board/card 的才是棋牌）。
+    if (s.indexOf('棋') >= 0 || s.indexOf('牌') >= 0 || s.indexOf('board') >= 0 || s.indexOf('card') >= 0
+        || s.indexOf('brett') >= 0 || s.indexOf('carte') >= 0 || s.indexOf('juego de mesa') >= 0) {
+      it.board = true; it.hits.push('棋牌');
+    }
     return it;
   }
 
   /** 意图是否「什么都没抽到」（这时该追问，而不是乱推） */
   static isEmpty(it: Intent): boolean {
     return it.category === null && it.difficulty === null && !it.short && !it.long
-      && !it.pausable && !it.untimed && !it.multiplayer;
+      && !it.pausable && !it.untimed && !it.multiplayer && !it.board;
   }
 
   /** 按意图给一款游戏打分（越高越合适） */
@@ -127,6 +136,7 @@ export class ChatFinder {
     if (it.pausable && g.tags.indexOf('pausable') >= 0) { sc += 12; }
     if (it.untimed && g.tags.indexOf('untimed') >= 0) { sc += 12; }
     if (it.multiplayer && (g.tags.indexOf('multiplayer') >= 0 || g.tags.indexOf('board') >= 0)) { sc += 10; }
+    if (it.board && (g.tags.indexOf('board') >= 0 || g.tags.indexOf('card') >= 0)) { sc += 30; }
     // 毫无倾向时给「轻松」一点偏好（新手友好）
     if (ChatFinder.isEmpty(it) && g.difficulty === Difficulty.EASY) { sc += 3; }
     return sc;
