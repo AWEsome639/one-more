@@ -306,7 +306,7 @@ export struct GDistractorMatrix {
       })
       Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", (this.q + 1), TOTAL)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
-        Text(TG('答对 ') + this.hits).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
+        Text(TG2('答对 {0}', String(this.hits))).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
         Text(TG2('剩 {0}s', Math.max(0, this.left))).fontSize(FontSize.md).fontColor(Palette.orange).layoutWeight(1)
       }.width('100%')
 

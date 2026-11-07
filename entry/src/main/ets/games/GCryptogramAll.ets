@@ -289,7 +289,7 @@ export struct GCryptogramAll {
         Text(TG2("第 {0}/{1}", (this.qi + 1), this.diffTotal)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
 .scale({ x: this.bump, y: this.bump })
 .animation({ duration: Motion.fast, curve: Motion.spring() })
-        Text(TG('答对 ') + this.right).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
+        Text(TG2('答对 {0}', String(this.right))).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
         Text(TG2('得分 {0}', String(this.score))).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
       }.width('100%')
 

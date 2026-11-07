@@ -315,7 +315,7 @@ export struct GAffixFactory {
       }.width('100%')
       Column({ space: Space.xs }) {
         Text(this.qIndex >= this.diffTotal ? TG('本局结束') : this.cur().root).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(this.qIndex >= this.diffTotal ? TG('答对 ') + this.right + ' / ' + this.diffTotal : '＋ ？ ＝ ' + this.cur().meaning).fontSize(FontSize.md).fontColor(this.theme.inkSoft)
+        Text(this.qIndex >= this.diffTotal ? TG2('答对 {0} / {1}', String(this.right), String(this.diffTotal)) : '＋ ？ ＝ ' + this.cur().meaning).fontSize(FontSize.md).fontColor(this.theme.inkSoft)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
         ForEach(this.opts, (o: string) => { Button((o))
