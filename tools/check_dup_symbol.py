@@ -186,7 +186,7 @@ WHITELIST = [
 #   ⇒ 这条豁免一次都没命中过，已修的 C-1 会被永远报成「疑似双符号」。
 #   ⇒ 后顾只排「标识符字符」，不再排 `.`；`stripArrowX(` 这类仍不会误命中（名字后必须紧跟 `(`）。
 SANITIZE_RE = re.compile(
-    r"(?<![\w$])(?:stripArrow|stripArrows|trimArrow|stripMark|stripLeadingMark|stripSymbols?|stripEmoji)\s*\("
+    r"(?<![\w$])(?:stripArrow|stripArrows|trimArrow|stripMark|stripMarks|stripLeadingMark|stripEdgeMark|stripSymbols?|stripEmoji)\s*\("
     r"|\.replace\s*\(\s*'[^']*[" + SYMBOLS + r"][^']*'"
 )
 
