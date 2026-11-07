@@ -510,17 +510,20 @@ build() {
         TabContent() {
           if (this.uiRev % 2 === 0) { GamesTab() } else { GamesTab() }
         }
-        .tabBar(this.barItem(0, '🎮', TG('游戏'), 'Games'))
+        .tabBar(this.barItem(0, '🎮', '游戏', 'Games'))   // ★ 2026-11-08：**不能再套 TG()** ——
+        //   barItem 内部会用 this.t(zh, en) 取词；外面套 TG() 会先把 '游戏' 翻成当前语言，
+        //   再当 zh 传进去 ⇒ 拿阿语/俄语去查字典 ⇒ 查不到 ⇒ **退英文**。
+        //   真机证据：阿语下底部三标签显示 Games / Stats / Settings。（判据 1801：三层取词）
 
         TabContent() {
           if (this.uiRev % 2 === 0) { StatsTab() } else { StatsTab() }
         }
-        .tabBar(this.barItem(1, '📊', TG('统计'), 'Stats'))
+        .tabBar(this.barItem(1, '📊', '统计', 'Stats'))
 
         TabContent() {
           if (this.uiRev % 2 === 0) { SettingsTab() } else { SettingsTab() }
         }
-        .tabBar(this.barItem(2, '⚙️', TG('设置'), 'Settings'))
+        .tabBar(this.barItem(2, '⚙️', '设置', 'Settings'))
       }
       // ★ 2026-10-29（六设备·手表实测）：233×233 vp 上 60vp 的页签占掉 1/4 屏
       //   ⇒ 手表缩到 36，给列表让出空间
