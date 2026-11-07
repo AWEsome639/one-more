@@ -356,6 +356,10 @@ export struct GMentalCalendar {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((w)); }); })
           .onClick(() => { Haptics.tick(); this.pick((w)); }) }, (w: number) => 'cw1' + w)
         }.width('100%')
+        // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
+        Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
+          .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+          .width('100%').textAlign(TextAlign.Center)
         Row({ space: Space.sm }) {
           ForEach(W2, (w: number) => { Text(TG(WEEK[(w)]))
           .fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
@@ -376,10 +380,6 @@ export struct GMentalCalendar {
 
       Text(this.msg).fontSize(FontSize.sm).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
-      Text(this.lastFb.length > 0 ? this.lastFb : '　')
-        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
-        .width('100%').textAlign(TextAlign.Center)
 
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       HintBar({

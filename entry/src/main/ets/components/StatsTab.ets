@@ -26,7 +26,7 @@ import { ProgressStore } from '../core/ProgressStore';
 import { GameLog, PlayRecord } from '../core/GameLog';   // ★ 2026-11-07：近期板块的数据源（每局日志）
 import { LevelHeader, iconOf } from './Common';
 import { Haptics } from '../core/Haptics';
-import { L, TN } from '../core/I18n';
+import { I18n, L, TN } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 /** 最近玩过显示几张 */
@@ -87,6 +87,17 @@ interface WeekStat {
 @Component
 export struct StatsTab {
   @StorageProp('lang') langCode: string = 'zh';
+
+  /**
+   * ★ 2026-11-08 RTL 判据 —— `const observed` 是**渲染依赖声明，别删**。
+   *   为什么不用裸 `I18n.isRTL()`：`I18n.current()` 返回 `I18n.cached` 静态字段，
+   *   ArkUI 看不到依赖 ⇒ 切语言后箭头/方向不会重算。摸一下 @StorageProp 才有依赖。
+   *   （同类坑见 Common.ets 的 taglineText()/gameTitle()）
+   */
+  private rtl(): boolean {
+    const observed: string = this.langCode;   // ← 依赖声明，别删
+    return I18n.isRTL();
+  }
   /** ★ 2026-10-13（P5）：主题色观察源 —— 设置页改色，本页立刻跟 */
   @StorageProp('accent') accentId: string = Palette.primary;
   @State achvExpanded: boolean = false;
@@ -531,7 +542,7 @@ build() {
   statsChips() {
     Column({ space: Space.sm }) {
       Row() {
-        Text(this.tn(TG('一共攒了 {n} 点经验'), '{n} XP earned', this.xp))
+        Text(this.tn('一共攒了 {n} 点经验', '{n} XP earned', this.xp))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme().inkFaint)
           .maxLines(1)
@@ -672,7 +683,7 @@ build() {
           Blank()
           // 窗口内的局数（0 就不显示，免得空状态里还挂一个「0 局」）
           Text(this.weekStat().total > 0
-            ? this.tn(TG('{n} 局'), '{n} rounds', this.weekStat().total) : '')
+            ? this.tn('{n} 局', '{n} rounds', this.weekStat().total) : '')
             .fontSize(FontSize.xxs)
             .fontColor(this.theme().inkFaint)
         }
@@ -859,11 +870,11 @@ build() {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
         Row({ space: Space.xs }) {
-          Text(this.tn(TG('玩过 {n} 次'), 'Played {n} times', it.plays))
+          Text(this.tn('玩过 {n} 次', 'Played {n} times', it.plays))
             .fontSize(FontSize.xxs)
             .fontColor(this.theme().inkFaint)
           if (it.best > 0) {
-            Text(this.tn(TG('最高 {n}'), 'Best {n}', it.best))
+            Text(this.tn('最高 {n}', 'Best {n}', it.best))
               .fontSize(FontSize.xxs)
               .fontColor(Palette.sky)
           }
@@ -981,7 +992,7 @@ build() {
         //   而下一行又画一个 `▲`/`▼` ⇒ 11 种语言显示「閉じる ▲ ▲」。
         //   ⇒ 剥掉字典里自带的尾部箭头，只留组件画的那一个（方向随展开态）。
         Text(this.stripArrow(this.achvExpanded ? this.t('收起', 'Less')
-            : this.tn(TG('看全部 {n} 个'), 'See all {n}', ProgressStore.achievementList().length)))
+            : this.tn('看全部 {n} 个', 'See all {n}', ProgressStore.achievementList().length)))
           .fontSize(FontSize.xxs).fontColor(this.accentColor()).fontWeight(FontWeight.Bold)
         Text(this.achvExpanded ? '▲' : '▼').fontSize(FontSize.micro).fontColor(this.accentColor())
       }
@@ -1001,7 +1012,7 @@ build() {
       }); })
       .accessibilityGroup(true)
       .accessibilityText(this.stripArrow(this.achvExpanded ? this.t('收起', 'Less')
-            : this.tn(TG('看全部 {n} 个'), 'See all {n}', ProgressStore.achievementList().length)))
+            : this.tn('看全部 {n} 个', 'See all {n}', ProgressStore.achievementList().length)))
       .accessibilityLevel('yes')
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
@@ -1219,7 +1230,7 @@ build() {
           }
           .alignItems(HorizontalAlign.Start)
           .layoutWeight(1)
-          Text('›').fontSize(FontSize.lg).fontColor(this.theme().inkFaint)
+          Text(this.rtl() ? '‹' : '›').fontSize(FontSize.lg).fontColor(this.theme().inkFaint)
             .accessibilityLevel('no')
         }
         .width('100%')

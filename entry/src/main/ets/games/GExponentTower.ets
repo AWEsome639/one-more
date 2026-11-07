@@ -325,6 +325,10 @@ export struct GExponentTower {
           .accessibilityLevel('no')
           .fontSize(FontSize.xl).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
+      Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
+        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+        .width('100%').textAlign(TextAlign.Center)
       Column({ space: Space.sm }) {
         ForEach(this.slots, (i: number) => {
           Row({ space: Space.sm }) {
@@ -343,10 +347,6 @@ export struct GExponentTower {
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
-      Text(this.lastFb.length > 0 ? this.lastFb : '　')
-        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
-        .width('100%').textAlign(TextAlign.Center)
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.cyan)

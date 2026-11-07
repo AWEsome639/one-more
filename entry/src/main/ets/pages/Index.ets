@@ -21,7 +21,7 @@ import { ProgressStore } from '../core/ProgressStore';
 import { About } from '../core/About';
 import { common, Want } from '@kit.AbilityKit';
 import { Haptics } from '../core/Haptics';
-import { L } from '../core/I18n';
+import { L, I18n } from '../core/I18n';
 import { GamesTab } from '../components/GamesTab';
 import { StatsTab } from '../components/StatsTab';
 import { SettingsTab } from '../components/SettingsTab';
@@ -544,6 +544,7 @@ build() {
       .layoutWeight(1)
     }
     .width('100%')
+    .direction(this.rtl() ? Direction.Rtl : Direction.Ltr)
     .height('100%')
     .backgroundColor(this.theme().bg)
     .opacity(this.entered ? 1 : 0)
@@ -570,7 +571,25 @@ build() {
       }
       .width('100%').height('100%')
     }
+    // ★★★ 2026-11-08（RTL 缺口）：**阿语布局从未镜像过** —— 真机验收确认
+    //   （标题在左、搜索图标在左、卡片顺序从左到右、底部栏未镜像）。
+    //   根因：全项目 `.direction(` 只有 GameHost 一处，主界面这一层完全没有。
+    //   加在这里（build 的根 Stack）就够：`direction` 会**继承给整棵子树**，
+    //   三个 Tab（GamesTab/StatsTab/SettingsTab）都在这里面，不必在子组件重复加。
+    //   ⚠️ 用 this.rtl() 而不是直接 I18n.isRTL()：后者读的是模块级静态缓存，
+    //      ArkUI 看不到依赖 ⇒ 切语言不会重算。见 rtl() 里的"依赖声明"。
     }
+  }
+
+  /**
+   * ★ 2026-11-08 RTL 判据（**别改成直接写 I18n.isRTL()**）
+   *   `I18n.current()` 返回的是 `I18n.cached` 静态字段，ArkUI 不会为它建立渲染依赖
+   *   ⇒ 切语言后 direction 不会重算。摸一下 `this.langCode`（@StorageProp）才有依赖。
+   *   这个写法照抄 Common.ets 的 `taglineText()/gameTitle()`（同类坑踩过）。
+   */
+  private rtl(): boolean {
+    const observed: string = this.langCode;   // ← 依赖声明，别删
+    return I18n.isRTL();
   }
 
   @Builder

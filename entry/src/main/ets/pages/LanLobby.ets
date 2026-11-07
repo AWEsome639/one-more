@@ -17,7 +17,7 @@ import { LanMatch } from '../core/LanMatch';
 import { GAMES, GameMeta, findGame, displayName } from '../core/GameRegistry';
 import { Haptics } from '../core/Haptics';
 import { Back } from '../core/Back';
-import { L } from '../core/I18n';
+import { I18n, L } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 /** 可联机的游戏（回合制对战型） */
@@ -103,7 +103,7 @@ struct LanLobby {
     Column({ space: Space.md }) {
       // 顶栏
       Row() {
-        Text('‹').fontSize(FontSize.xl).fontColor(this.theme().ink)
+        Text(this.rtl() ? '›' : '‹').fontSize(FontSize.xl).fontColor(this.theme().ink)
           .accessibilityText(this.t('返回', 'Back'))
           .width(Layout.touchMin).height(Layout.touchMin).textAlign(TextAlign.Center)
           // ★ 2026-10-19 奥森：「整个游戏必要的地方都要有细腻的按压反馈（合适的振动）」
@@ -327,6 +327,15 @@ struct LanLobby {
     .width('100%').height('100%')
     .edgeEffect(EdgeEffect.Spring)
     .backgroundColor(this.theme().bg)
+    // ★★★ 2026-11-08 RTL：独立路由（不在 Index 子树里），方向要自己声明。
+    //   用 this.rtl()，不能用裸 I18n.isRTL()（静态缓存 → 无渲染依赖）。
+    .direction(this.rtl() ? Direction.Rtl : Direction.Ltr)
+  }
+
+  /** ★ 2026-11-08 RTL 判据 —— `const observed` 是渲染依赖声明，别删 */
+  private rtl(): boolean {
+    const observed: string = this.langCode;   // ← 依赖声明，别删
+    return I18n.isRTL();
   }
 
   /**

@@ -151,12 +151,14 @@ export struct GSokoban {
       c.push(false);
     }
     this.cleared = c;
+    // ★★★ 2026-11-08 真机 BUG 修复（设备验收发现）：
+    //   `load()` 里会 `saveLastWhere` ⇒ **必须先读记录再 load(0)**，否则"第 1 关"会把
+    //   上次记录的关卡冲掉（与 GHanoi 同一个错，只是这里是 load 不是 reset）。
+    const lastLv: number = ProgressStore.shouldRestoreNow('sokoban') ? ProgressStore.lastLevel('sokoban') : 0;
     this.load(0);
-    // ★★★ 2026-11-08（退出恢复最小版）：**从上次玩到的那一关接着玩**
+    // ★ 2026-11-08（退出恢复最小版）：从上次玩到的那一关接着玩
     //   只记"第几关"（不序列化棋局）—— 退出再进不用从第 1 关点起。
     //   ★ 只在本局**首次进入**时恢复：`onRestart`（重来/换一局）不走这里，语义不变。
-    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
-    const lastLv: number = ProgressStore.shouldRestoreNow('sokoban') ? ProgressStore.lastLevel('sokoban') : 0;
     if (lastLv > 1 && lastLv <= LEVELS.length) {
       this.load(lastLv - 1);
     }

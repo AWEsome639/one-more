@@ -50,11 +50,14 @@ export struct GHanoi {
 
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
-    this.reset(this.level);
-    // ★★★ 2026-11-08（退出恢复最小版）：**从上次玩到的那一盘数接着玩**
-    //   本款"关卡"= 盘数（2~7）。只在本局首次进入时恢复：`onRestart` 仍是重来本关。
-    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    // ★★★ 2026-11-08 真机 BUG 修复（设备验收发现）：
+    //   `reset()` 里会 `saveLastWhere` ⇒ **必须先读记录再 reset**，否则本轮的随机盘数
+    //   会把上次的记录冲掉（实测：记录 5 盘 → 打开一次变成 3 盘，恢复永久失效）。
     const lastLv: number = ProgressStore.shouldRestoreNow('hanoi') ? ProgressStore.lastLevel('hanoi') : 0;
+    this.reset(this.level);
+    // ★ 2026-11-08（退出恢复最小版）：从上次玩到的那一盘数接着玩
+    //   本款"关卡"= 盘数（2~7）。只在首次进入时恢复：`onRestart` 仍是重来本关。
+    //   ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
     if (lastLv >= 2 && lastLv <= 7) {
       this.level = lastLv;
       this.reset(lastLv);

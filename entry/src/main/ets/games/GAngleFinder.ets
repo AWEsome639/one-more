@@ -294,6 +294,10 @@ export struct GAngleFinder {
         .width('100%')
       }
       .width('100%').padding(Space.sm).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
+      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
+      Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
+        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+        .width('100%').textAlign(TextAlign.Center)
       Column({ space: Space.sm }) {
         ForEach(this.rows, (r: number) => {
           Row({ space: Space.sm }) {
@@ -324,10 +328,6 @@ export struct GAngleFinder {
       .width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
-      Text(this.lastFb.length > 0 ? this.lastFb : '　')
-        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
-        .width('100%').textAlign(TextAlign.Center)
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       HintBar({
         showHint: true,

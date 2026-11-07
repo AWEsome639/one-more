@@ -94,6 +94,17 @@ export struct GamesTab {
   @State toast: string = '';
   @State renderRev: number = 0;
   @StorageProp('lang') langCode: string = 'zh';
+
+  /**
+   * ★ 2026-11-08 RTL 判据 —— `const observed` 是**渲染依赖声明，别删**。
+   *   为什么不用裸 `I18n.isRTL()`：`I18n.current()` 返回 `I18n.cached` 静态字段，
+   *   ArkUI 看不到依赖 ⇒ 切语言后箭头/方向不会重算。摸一下 @StorageProp 才有依赖。
+   *   （同类坑见 Common.ets 的 taglineText()/gameTitle()）
+   */
+  private rtl(): boolean {
+    const observed: string = this.langCode;   // ← 依赖声明，别删
+    return I18n.isRTL();
+  }
   /**
    * ★ 2026-10-13（P5）：主题色观察源 —— 有它，设置页改色这一页**立刻**重绘；
    *   没有它就只在页面重建时才跟色（ArkUI 的 TabContent 建好即缓存）。
@@ -1414,7 +1425,7 @@ build() {
         //   ⚠️ 也不用 Ellipsis —— 奥森明确不要「…」。
         //   版本号是"确认装的是哪一版"的水印，**设置页底部也有一份**（SettingsTab:478）
         //   ⇒ 首页窄屏不显示不丢信息。
-        Text(Digits(this.tn(TG('{n} 款小游戏，不用联网也能玩'), '{n} games. No Wi-Fi needed.', GAMES.length), this.langCode)
+        Text(Digits(this.tn('{n} 款小游戏，不用联网也能玩', '{n} games. No Wi-Fi needed.', GAMES.length), this.langCode)
           + (Bp.width > 0 && Bp.width < 420 ? '' : '  ·  ' + 'v' + About.VERSION))
           .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
       }
@@ -2609,7 +2620,7 @@ build() {
               .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
           }
           .alignItems(HorizontalAlign.Start).layoutWeight(1)
-          Text('›').fontSize(FontSize.lg).fontColor(this.theme().inkFaint)
+          Text(this.rtl() ? '‹' : '›').fontSize(FontSize.lg).fontColor(this.theme().inkFaint)
         }
         .width('100%').padding(Space.sm)
         .backgroundColor(this.theme().surface).borderRadius(Radius.md)

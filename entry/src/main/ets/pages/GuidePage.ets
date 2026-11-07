@@ -23,7 +23,7 @@ import { ProgressStore } from '../core/ProgressStore';
 import { Tv } from '../core/Tv';
 // ★★★ 2026-10-16 BUG #28：档位进度/次数数字要走 Digits ⇒ 必须导入
 //   （★ 铁律 #43 第二次咬我：加了 Digits 用法就必须补 Digits 导入）
-import { L, Digits } from '../core/I18n';
+import { I18n, L, Digits } from '../core/I18n';
 
 /** 模块级取词（不依赖 this）—— 给 categoryTips 这类独立函数用
  *  ★★★ 2026-10-16 实拍阿语指南页抓到 BUG #26：
@@ -55,7 +55,7 @@ function L2(zh: string, en: string, useEN: boolean): string {
  */
 function colorVisionNote(id: string, en: boolean): string {
   if (id === 'color_word_match_up' || id === 'double_trouble') {
-    return L2(TG('这一款需要正常的颜色辨识能力（它考的就是颜色）'),
+    return L2('这一款需要正常的颜色辨识能力（它考的就是颜色）',
               'This one needs normal colour vision — the colour IS the task.', en);
   }
   return '';
@@ -65,43 +65,43 @@ function colorVisionNote(id: string, en: boolean): string {
 function categoryTips(c: GameCategory, en: boolean): string[] {
   if (c === GameCategory.CLASSIC) {
     return [
-      L2(TG('点/滑操作，规则简单，玩起来就懂'), 'Tap or swipe. Simple rules, obvious once you start.', en),
-      L2(TG('有明确胜负判定；通关才有经验'), 'Clear win or lose — you earn XP only when you clear.', en),
-      L2(TG('右上角 ↻ 可以随时重开这一局'), 'Tap ↻ top-right to restart any time.', en)
+      L2('点/滑操作，规则简单，玩起来就懂', 'Tap or swipe. Simple rules, obvious once you start.', en),
+      L2('有明确胜负判定；通关才有经验', 'Clear win or lose — you earn XP only when you clear.', en),
+      L2('右上角 ↻ 可以随时重开这一局', 'Tap ↻ top-right to restart any time.', en)
     ];
   }
   if (c === GameCategory.LOGIC) {
     return [
-      L2(TG('点格子填/涂，满足题目给出的数字条件'), 'Tap cells to fill or shade until the number clues are satisfied.', en),
-      L2(TG('「违规」计数表示当前有几处违反规则，归零即通关'), 'The "conflicts" counter shows how many rules are broken. Get it to zero and you win.', en),
-      L2(TG('卡住了可以点「换一题」换一个新局面'), 'Stuck? Tap "New puzzle" for a fresh board.', en)
+      L2('点格子填/涂，满足题目给出的数字条件', 'Tap cells to fill or shade until the number clues are satisfied.', en),
+      L2('「违规」计数表示当前有几处违反规则，归零即通关', 'The "conflicts" counter shows how many rules are broken. Get it to zero and you win.', en),
+      L2('卡住了可以点「换一题」换一个新局面', 'Stuck? Tap "New puzzle" for a fresh board.', en)
     ];
   }
   if (c === GameCategory.MATH) {
     return [
-      L2(TG('算就完了 —— 结果对就得分，错会扣时间'), 'Just do the maths. Right answers score, wrong ones cost you time.', en),
-      L2(TG('多数款有倒计时或步数限制，快比慢强'), 'Most have a countdown or a move limit. Fast beats slow.', en),
-      L2(TG('心算不稳的话，先在纸上列一下也行'), 'Not confident in your head? Scribble it on paper first.', en)
+      L2('算就完了 —— 结果对就得分，错会扣时间', 'Just do the maths. Right answers score, wrong ones cost you time.', en),
+      L2('多数款有倒计时或步数限制，快比慢强', 'Most have a countdown or a move limit. Fast beats slow.', en),
+      L2('心算不稳的话，先在纸上列一下也行', 'Not confident in your head? Scribble it on paper first.', en)
     ];
   }
   if (c === GameCategory.MEMORY) {
     return [
-      L2(TG('先「看」后「答」：记住闪现的内容，再按提示回忆'), 'Look first, answer after. Remember what flashed up, then recall it.', en),
-      L2(TG('答对连续越多，得分越高'), 'The longer your streak, the higher the score.', en),
-      L2(TG('错了不要紧，重开一局成本很低'), 'Getting it wrong is cheap. Just start again.', en)
+      L2('先「看」后「答」：记住闪现的内容，再按提示回忆', 'Look first, answer after. Remember what flashed up, then recall it.', en),
+      L2('答对连续越多，得分越高', 'The longer your streak, the higher the score.', en),
+      L2('错了不要紧，重开一局成本很低', 'Getting it wrong is cheap. Just start again.', en)
     ];
   }
   if (c === GameCategory.WORD) {
     return [
-      L2(TG('拼词/找词/猜词，考验词汇量与语感'), 'Build, find and guess words. Tests vocabulary and feel for language.', en),
-      L2(TG('多数款支持逐字母输入，输错可退格'), 'Most accept letter-by-letter input, and you can backspace.', en),
-      L2(TG('不会的可以跳过，不影响其他题'), 'Skip anything you do not know. It will not affect the rest.', en)
+      L2('拼词/找词/猜词，考验词汇量与语感', 'Build, find and guess words. Tests vocabulary and feel for language.', en),
+      L2('多数款支持逐字母输入，输错可退格', 'Most accept letter-by-letter input, and you can backspace.', en),
+      L2('不会的可以跳过，不影响其他题', 'Skip anything you do not know. It will not affect the rest.', en)
     ];
   }
   return [
-    L2(TG('观察图形/空间关系，找出规律或路径'), 'Study the shapes and space, then find the pattern or the path.', en),
-    L2(TG('方向键或点选操作，走到目标即通关'), 'Arrow keys or taps. Reach the goal to win.', en),
-    L2(TG('步数越少得分越高'), 'Fewer moves, higher score.', en)
+    L2('观察图形/空间关系，找出规律或路径', 'Study the shapes and space, then find the pattern or the path.', en),
+    L2('方向键或点选操作，走到目标即通关', 'Arrow keys or taps. Reach the goal to win.', en),
+    L2('步数越少得分越高', 'Fewer moves, higher score.', en)
   ];
 }
 
@@ -173,7 +173,7 @@ struct GuidePage {
     Column() {
       // 顶栏
       Row({ space: Space.md }) {
-        Text('‹')
+        Text(this.rtl() ? '›' : '‹')
           .accessibilityText(this.t('返回', 'Back'))
           .fontSize(30).fontColor(this.theme().ink)
           .width(44).height(44).textAlign(TextAlign.Center)
@@ -243,6 +243,15 @@ struct GuidePage {
     .opacity(this.entered ? 1 : 0)
     .translate({ y: this.entered ? 0 : 12 })
     .animation({ duration: Motion.slow, curve: Motion.spring() })
+    // ★★★ 2026-11-08 RTL：这是独立路由（不在 Index 子树里），方向要自己声明。
+    //   用 this.rtl() 而不是直接 I18n.isRTL()：后者是静态缓存，ArkUI 看不到依赖。
+    .direction(this.rtl() ? Direction.Rtl : Direction.Ltr)
+  }
+
+  /** ★ 2026-11-08 RTL 判据 —— `const observed` 是渲染依赖声明，别删 */
+  private rtl(): boolean {
+    const observed: string = this.langCode;   // ← 依赖声明，别删
+    return I18n.isRTL();
   }
 
   // ───────────── 玩法说明 ─────────────

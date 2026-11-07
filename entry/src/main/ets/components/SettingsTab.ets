@@ -143,6 +143,17 @@ export struct SettingsTab {
   @State private starHint: string = '';
   @StorageProp('themeMode') mode: string = 'system';
   @StorageProp('lang') lang: string = 'zh';
+
+  /**
+   * ★ 2026-11-08 RTL 判据 —— `const observed` 是**渲染依赖声明，别删**。
+   *   为什么不用裸 `I18n.isRTL()`：`I18n.current()` 返回 `I18n.cached` 静态字段，
+   *   ArkUI 看不到依赖 ⇒ 切语言后箭头/方向不会重算。摸一下 @StorageProp 才有依赖。
+   *   （同类坑见 Common.ets 的 taglineText()/gameTitle()）
+   */
+  private rtl(): boolean {
+    const observed: string = this.lang;   // ← 依赖声明，别删
+    return I18n.isRTL();
+  }
   @StorageProp('soundOn') soundOn: boolean = true;
   @StorageProp('hapticsOn') hapticsOn: boolean = true;
   @StorageProp('keepAwake') keepAwake: boolean = true;
@@ -405,7 +416,7 @@ build() {
               .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
           }
           .alignItems(HorizontalAlign.Start).layoutWeight(1)
-          Text('›').fontSize(FontSize.lg).fontColor(this.theme().inkFaint)
+          Text(this.rtl() ? '‹' : '›').fontSize(FontSize.lg).fontColor(this.theme().inkFaint)
             .accessibilityLevel('no')
         }
         .width('100%').height(64).padding(Space.md)   // ★ 判据 1757 试修：显式高度，防嵌套 Column 塌陷
@@ -502,7 +513,7 @@ build() {
         // ★ 2026-11-08：反馈卡（原来被误插在 `themeModePicker()` 里，见 feedbackCard 的注释）
         this.feedbackCard()
 
-        Text('One More · ' + this.tn(TG('{n} 款小游戏，不用联网也能玩'), '{n} mini games, playable offline', GAMES.length))
+        Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme().inkFaint)
           .width('100%')
@@ -832,7 +843,7 @@ build() {
             .accessibilityLevel('no')
           Text(this.t(About.PRIVACY_TITLE_CN, About.PRIVACY_TITLE_EN))
             .fontSize(FontSize.sm).fontColor(this.theme().ink).layoutWeight(1)
-          Text('›').fontSize(FontSize.md).fontColor(this.theme().inkFaint)
+          Text(this.rtl() ? '‹' : '›').fontSize(FontSize.md).fontColor(this.theme().inkFaint)
             .accessibilityLevel('no')
         }
         .width('100%')
@@ -1332,7 +1343,7 @@ build() {
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
 
-      Text('›')
+      Text(this.rtl() ? '‹' : '›')
         .accessibilityLevel('no')
         .fontSize(FontSize.xl)
         .fontColor(this.theme().inkFaint)

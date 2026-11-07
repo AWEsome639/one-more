@@ -439,6 +439,17 @@ struct GameHost {
     return L(zh, en);
   }
   @StorageProp('lang') langCode: string = 'zh';
+
+  /**
+   * ★ 2026-11-08 RTL 判据 —— `const observed` 是**渲染依赖声明，别删**。
+   *   为什么不用裸 `I18n.isRTL()`：`I18n.current()` 返回 `I18n.cached` 静态字段，
+   *   ArkUI 看不到依赖 ⇒ 切语言后箭头/方向不会重算。摸一下 @StorageProp 才有依赖。
+   *   （同类坑见 Common.ets 的 taglineText()/gameTitle()）
+   */
+  private rtl(): boolean {
+    const observed: string = this.langCode;   // ← 依赖声明，别删
+    return I18n.isRTL();
+  }
   /** ★ 2026-10-13（P5）：主题色观察源 —— 设置页改色，本页立刻跟 */
   @StorageProp('accent') accentId: string = Palette.primary;
   /** 当前主题色（id 可能是 'system'，一律走 Accent 解析） */
@@ -1001,7 +1012,7 @@ struct GameHost {
         //        用 sm：4×30 + 3×10 = 150（+32 = 182）⇒ 195 上余量仅 13，偏紧
         //        **改用 xs**：4×30 + 3×6 = 138（+32 = 170）⇒ 余量 25 ✅
         Row({ space: this.tinyScreen() ? Space.xs : Space.sm }) {
-          Text('‹')
+          Text(this.rtl() ? '›' : '‹')
             .accessibilityText(this.t('返回', 'Back'))
             .fontSize(this.iconSize() < 44 ? 22 : 30)
             .fontColor(this.theme().ink)

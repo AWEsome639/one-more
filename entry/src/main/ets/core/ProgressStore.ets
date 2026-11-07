@@ -245,6 +245,13 @@ export class ProgressStore {
       AppStorage.setOrCreate(Keys.perGameClears, clearsRaw);
       const diffRaw: string = p.getSync(Keys.perGameDiff, '{}') as string;
       AppStorage.setOrCreate(Keys.perGameDiff, diffRaw);
+      // ★★★ 2026-11-08 真机 BUG 修复（ai-fixer-b 设备验收发现）：
+      //   原来没把 `lastWhere` 从盘里装回 AppStorage ⇒ 两个后果：
+      //     ① 重启后 `lastWhere()` 永远读不到 ⇒ **退出恢复完全不生效**；
+      //     ② 更糟：`saveLastWhere()` 从空 map 开始写 ⇒ **一存档就把其他游戏的记录全冲掉**（实测 4 条 → 1 条）。
+      //   ★ 判据：凡是"读 AppStorage 再整体写回 JSON"的 key，**必须**在 init 里装回来。
+      const lastWhereRaw: string = p.getSync(Keys.lastWhere, '{}') as string;
+      AppStorage.setOrCreate(Keys.lastWhere, lastWhereRaw);
       const playsRaw: string = p.getSync(Keys.perGamePlays, '{}') as string;
       AppStorage.setOrCreate(Keys.perGamePlays, playsRaw);
       const totalMsRaw: number = p.getSync(Keys.totalMs, 0) as number;
