@@ -328,13 +328,13 @@ export struct GBlinkDetector {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.tickN + '/' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('抓到'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('抓到'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.hits + '/' + BLINKS)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
@@ -346,7 +346,7 @@ export struct GBlinkDetector {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)

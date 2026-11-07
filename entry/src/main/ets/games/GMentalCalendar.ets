@@ -17,7 +17,7 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const GOAL: number = 6; const LIMIT: number = 90; const TICK_MS: number = 1000;
-const PENALTY: number = 4; const NEXT_MS: number = 480;
+const PENALTY: number = 4; const NEXT_MS: number = 900;
 const WEEK: string[] = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 const W1: number[] = [0, 1, 2, 3];
 const W2: number[] = [4, 5, 6];

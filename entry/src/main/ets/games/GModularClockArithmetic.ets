@@ -17,7 +17,7 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const GOAL: number = 10; const LIMIT: number = 60; const TICK_MS: number = 1000;
-const PENALTY: number = 3; const NEXT_MS: number = 420;
+const PENALTY: number = 3; const NEXT_MS: number = 900;
 const HOURS: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const OPT_IDX: number[] = [0, 1, 2, 3];
 
@@ -307,13 +307,13 @@ export struct GModularClockArithmetic {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.left) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.right) + '/' + String(GOAL))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)

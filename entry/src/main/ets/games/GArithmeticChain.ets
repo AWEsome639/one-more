@@ -383,11 +383,11 @@ export struct GArithmeticChain {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(Math.min(this.level + 1, this.diffTotal)) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG(TG('已过')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG(TG('已过')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(this.clears), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
@@ -398,17 +398,17 @@ export struct GArithmeticChain {
 
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG(TG('起点')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG(TG('起点')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.stage.start))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor((this.theme.surface))
         }.layoutWeight(1).padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         Column({ space: 2 }) {
-        Text((TG(TG('现在')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG(TG('现在')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(this.value), this.langCode)).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }.layoutWeight(1).padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         Column({ space: 2 }) {
-        Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.stage.target))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })

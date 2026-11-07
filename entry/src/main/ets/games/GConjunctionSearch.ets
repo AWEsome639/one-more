@@ -278,12 +278,12 @@ export struct GConjunctionSearch {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.round + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primaryDeep))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('错误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('错误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.wrong + ' / ' + MAX_WRONG)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)

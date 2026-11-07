@@ -31,6 +31,9 @@ export struct GSpatialConflict {
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
    *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
   @State private tvFocus: string = '';
+  // ★ 2026-11-08 常驻结果行：反应时/实验类不拉长试次节奏，「上一次对错」单独存一份。
+  @State private lastFb: string = '';
+  @State private lastOk: boolean = true;
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -63,6 +66,7 @@ export struct GSpatialConflict {
   private reset(): void {
     this.clearAll(); this.trial = 1; this.hits = 0; this.score = 0; this.flash = -1;
     this.over = false; this.won = false; this.done = false; this.startAt = Date.now();
+    this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     this.newTrial();
   }
 
@@ -208,9 +212,9 @@ export struct GSpatialConflict {
     if (this.over || this.flash >= 0) { return; }
     const name: string = this.dir === 0 ? TG('左') : TG('右');
     if (pickDir === this.dir) {
-      this.hits = this.hits + 1; this.score = this.score + 10; this.flash = 1; this.msg = TG2('✅ 箭头指向{0}', name);
+      this.hits = this.hits + 1; this.score = this.score + 10; this.flash = 1; this.msg = TG2('✅ 箭头指向{0}', name); this.lastFb = this.msg; this.lastOk = true;
     } else {
-      this.flash = 0; this.msg = TG2('❌ 箭头指向{0}，别被字和位置骗', name);
+      this.flash = 0; this.msg = TG2('❌ 箭头指向{0}，别被字和位置骗', name); this.lastFb = this.msg; this.lastOk = false;
     }
     this.timer = setTimeout(() => { this.timer = -1; this.next(); }, FEED_MS);
   }
@@ -250,7 +254,7 @@ export struct GSpatialConflict {
         Text((this.trial + ' / ' + this.diffTotal)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.primaryDeep)).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.hits + ' / ' + PASS)).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor((Palette.emerald)).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
@@ -313,8 +317,11 @@ export struct GSpatialConflict {
         .onBlur(() => { if (this.tvFocus === 'L305') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L305'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('规矩只有一条：跟箭头走，字和位置都在骗你')).fontSize(FontSize.xxs)
-        .fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+      // ★ 常驻结果行：答过之后这一行固定显示上一次对错（不再被下一题冲掉）
+      Text(this.lastFb.length > 0 ? this.lastFb : TG('规矩只有一条：跟箭头走，字和位置都在骗你'))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.lastFb.length > 0 ? (this.lastOk ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
+        .width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

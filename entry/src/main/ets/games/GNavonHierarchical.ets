@@ -394,7 +394,7 @@ export struct GNavonHierarchical {
           .borderRadius(Radius.md)
           .shadow(Shadow.card)
           Column({ space: Space.xs }) {
-          Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
           Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
           }
           .layoutWeight(1)
@@ -403,7 +403,7 @@ export struct GNavonHierarchical {
           .borderRadius(Radius.md)
           .shadow(Shadow.card)
           Column({ space: Space.xs }) {
-          Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
           Text((String(this.left) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
           }
           .layoutWeight(1)

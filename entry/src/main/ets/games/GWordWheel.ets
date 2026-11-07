@@ -281,7 +281,7 @@ export struct GWordWheel {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('找到'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('找到'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.found.length + '/' + this.goal())).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.cyan))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
@@ -293,7 +293,7 @@ export struct GWordWheel {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('机会'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('机会'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.life + '/' + LIVES)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)

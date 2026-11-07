@@ -290,12 +290,12 @@ export struct GVectorGridAlignment {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('回合'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('回合'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.round) + '/' + String(ROUNDS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('剩余步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((TG('剩余步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(this.movesLeft), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)

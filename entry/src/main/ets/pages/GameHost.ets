@@ -1107,6 +1107,10 @@ struct GameHost {
             .borderRadius(Radius.full)
             .shadow(Shadow.card)
             .animation({ duration: Motion.fast, curve: Motion.spring() })
+            // ★ 2026-11-08 读屏：纯图标按钮，必须说清按下去做什么（含状态）
+            .accessibilityText(this.t(this.fav ? '取消收藏这个游戏' : '收藏这个游戏',
+              this.fav ? 'Remove this game from favourites' : 'Add this game to favourites'))
+            .accessibilityLevel('yes')
             .onClick(() => {
               const now: boolean = ProgressStore.toggleFavorite(this.gameId);
               animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
@@ -1174,6 +1178,9 @@ struct GameHost {
             .padding({ left: 12, right: 12 })
             .backgroundColor(this.theme().surfaceAlt)
             .borderRadius(Radius.full)
+            .accessibilityGroup(true)
+            .accessibilityText(this.diffLabel())
+            .accessibilityLevel('yes')
             .onClick(() => {
               Haptics.tap();
               // ★★★ 2026-11-01 判据 56 的**第 4 个出口**：切难度。
@@ -3608,6 +3615,12 @@ struct GameHost {
           //     ⇒ 主按钮位给「下一款」（全宽），原来两个降级成**并排一行**的次级按钮
           //     ⇒ 竖向总高**不变**（普通 46+46，极小屏 40+40），那笔账继续成立。
           Button(this.t(TG('下一款'), 'Next game'))
+            // ★★★ 2026-11-08 读屏缺口修复（审计 P0-5 第 2 条）：三个出口并列，
+            //   读屏只能按 DOM 顺序念三个孤立的词，**分不出谁是主操作、谁是退出**。
+            //   ⇒ 给每个按钮一句「动作 + 后果」，让盲人用户不用试错。
+            .accessibilityText(this.t('下一款：直接开始下一个游戏',
+              'Next game: start another game right away'))
+            .accessibilityLevel('yes')
             .fontSize(this.tinyScreen() ? FontSize.sm : FontSize.md)
             .fontColor(Color.White)
             .backgroundColor(this.accentColor())
@@ -3635,6 +3648,10 @@ struct GameHost {
             //      ⇒ 可用 152−12 = 140vp ≥ 131vp（fr 17 字符 @14）✅，中文 4 字更不可能溢出。
             //      实测口径见 `_巡检记录/长词溢出-20261107.md` P0-2。
             Button(this.t(TG('再来一局'), 'Play again'))
+              // ★ 2026-11-08 读屏：说明「重玩这一个」，与「下一款」区分开
+              .accessibilityText(this.t('再来一局：重玩这一个游戏',
+                'Play again: restart this game'))
+              .accessibilityLevel('yes')
               .fontSize(this.tinyScreen() ? FontSize.xxs : FontSize.sm)
               .padding(this.tinyScreen() ? { left: 2, right: 2 } : { left: Space.xs, right: Space.xs })
               // 降级为次级：主按钮位已经给了「下一款」，两个 accent 按钮会互相抢
@@ -3662,6 +3679,10 @@ struct GameHost {
                 });
               })
             Button(this.t(TG('返回列表'), 'Back to list'))
+              // ★ 2026-11-08 读屏：说明「回列表」，与「再来一局」区分开
+              .accessibilityText(this.t('返回列表：回到游戏列表',
+                'Back to list: return to the game list'))
+              .accessibilityLevel('yes')
               .fontSize(this.tinyScreen() ? FontSize.xxs : FontSize.sm)
               .padding(this.tinyScreen() ? { left: 2, right: 2 } : { left: Space.xs, right: Space.xs })
               .fontColor(this.theme().inkSoft)

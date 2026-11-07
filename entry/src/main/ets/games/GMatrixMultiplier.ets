@@ -17,7 +17,7 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const SIZE: number = 2; const CELLS: number = 4; const GOAL: number = 8;
-const LIMIT: number = 60; const TICK_MS: number = 1000; const PENALTY: number = 3; const NEXT_MS: number = 420;
+const LIMIT: number = 60; const TICK_MS: number = 1000; const PENALTY: number = 3; const NEXT_MS: number = 900;
 const HOT: string = '#33F43F5E';
 const ROWS: number[] = [0, 1];
 const OPT_IDX: number[] = [0, 1, 2, 3];

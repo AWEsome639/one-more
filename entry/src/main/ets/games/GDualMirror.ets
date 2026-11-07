@@ -382,7 +382,7 @@ export struct GDualMirror {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.moves + ' / ' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
         }
         .layoutWeight(1)
@@ -400,7 +400,7 @@ export struct GDualMirror {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('状态'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('状态'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.over ? (this.won ? TG('通关') : TG('结束')) : TG('进行中'))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((this.over ? (this.won ? Palette.emerald : Palette.rose) : Palette.sky))
         }
         .layoutWeight(1)

@@ -58,7 +58,9 @@ export struct GHanoi {
 
   /** 宿主点了「换一局」 */
   onRestart(): void {
-    this.level = GameDiff.pick(2, 3, 5);
+    // ★ 2026-11-08 **重开语义 bug**（ai-fixer-b 扫描）：顶栏 ↻ 原来随机换一层
+    //   （`GameDiff.pick(2,3,5)`）⇒ 想重试本关，点了从 4 层变成 3/5 层。
+    //   改成重来本关（与游戏内「重开」的 `reset(this.level)` 一致）。
     this.reset(this.level);
   }
 

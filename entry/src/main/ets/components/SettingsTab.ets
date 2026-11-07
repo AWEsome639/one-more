@@ -322,6 +322,9 @@ export struct SettingsTab {
       Haptics.tap();
       this.openStar();
      }); })
+    .accessibilityGroup(true)
+    .accessibilityText(this.t('在 GitHub 上标星', 'Star it on GitHub'))
+    .accessibilityLevel('yes')
     .onClick(() => {
       Haptics.tap();
       this.openStar();
@@ -416,6 +419,9 @@ build() {
           Haptics.tap();
           router.pushUrl({ url: 'pages/LanLobby' });
          }); })
+        .accessibilityGroup(true)
+        .accessibilityText(this.t('局域网对战', 'LAN Play'))
+        .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();
           router.pushUrl({ url: 'pages/LanLobby' });
@@ -683,6 +689,9 @@ build() {
         ProgressStore.saveLang(code);   // ★ 落盘（preferences 通道，实测跨重启可靠）
         this.renderRev = this.renderRev + 1;
        }); })
+      .accessibilityGroup(true)
+      .accessibilityText(label)
+      .accessibilityLevel('yes')
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         // ★ 语言切换不能包在 animateTo 里 —— 它不是动画属性，
@@ -771,6 +780,9 @@ build() {
               Haptics.tap();
               this.copyEmail(About.SHAJIA_EMAIL);
              }); })
+            .accessibilityGroup(true)
+            .accessibilityText(this.t('复制', 'Copy'))
+            .accessibilityLevel('yes')
             .onClick(() => {
               Haptics.tap();
               this.copyEmail(About.SHAJIA_EMAIL);
@@ -799,6 +811,9 @@ build() {
               Haptics.tap();
               this.copyEmail(About.FEEDBACK_EMAIL);
              }); })
+            .accessibilityGroup(true)
+            .accessibilityText(this.t('复制', 'Copy'))
+            .accessibilityLevel('yes')
             .onClick(() => {
               Haptics.tap();
               this.copyEmail(About.FEEDBACK_EMAIL);
@@ -831,6 +846,9 @@ build() {
           Haptics.tap();
           this.openPrivacyUrl();
          }); })
+        .accessibilityGroup(true)
+        .accessibilityText(this.t(About.PRIVACY_TITLE_CN, About.PRIVACY_TITLE_EN))
+        .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();
           this.openPrivacyUrl();
@@ -874,6 +892,10 @@ build() {
         ProgressStore.setThemeMode(m);
       });
      }); })
+    .accessibilityGroup(true)
+    // ★ 2026-11-08：这里要念**文字**，不能念 icon（它是 emoji 装饰）
+    .accessibilityText(this.t(zh, en))
+    .accessibilityLevel('yes')
     .onClick(() => {
       Haptics.tap();   // ★ 2026-10-19 按压反馈
       animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
@@ -1093,6 +1115,9 @@ build() {
               UiModeMgr.save(m);
               this.uiMode = m;
              }); })
+            .accessibilityGroup(true)
+            .accessibilityText(this.t(UiModeMgr.labelOf(m), UiModeMgr.labelEnOf(m)))
+            .accessibilityLevel('yes')
             .onClick(() => {
               Haptics.tap();
               UiModeMgr.save(m);
@@ -1198,6 +1223,15 @@ build() {
     }
     .width('23%')
     .padding({ top: Space.xs, bottom: Space.xs })
+    // ★★★ 2026-11-08 读屏缺口修复（审计 P0-5 第 1 条）：
+    //   色块的**颜色本身就是信息** —— 视力用户扫一眼就知道是哪个色、有没有选中；
+    //   而原来这里只有子 Text 的「颜色名」会被零散念出来，
+    //   **听不出"这是主题色选择"、更听不出"当前选中了哪个"**。
+    //   ⇒ 合并成一个可访问对象，并把手势动作（选择）与状态（当前选中）一起说出来。
+    .accessibilityGroup(true)
+    .accessibilityText(this.t('主题色：', 'Theme colour: ') + this.t(o.zh, o.en)
+      + (this.isAccent(o.id) ? this.t('，当前选中', ', currently selected') : ''))
+    .accessibilityLevel('yes')
     .focusable(Tv.on())
     .onFocus(() => { this.tvFocus = 'S1084'; })
     .onBlur(() => { if (this.tvFocus === 'S1084') { this.tvFocus = ''; } })
@@ -1324,6 +1358,10 @@ build() {
       Haptics.tap();
       cfg.tap();
      }); })
+    .accessibilityGroup(true)
+    // ★ 2026-11-08：navRow 念标题，不能念 cfg.icon（emoji）
+    .accessibilityText(this.t(cfg.zh, cfg.en))
+    .accessibilityLevel('yes')
     .onClick(() => {
       Haptics.tap();
       cfg.tap();
@@ -1366,6 +1404,9 @@ build() {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
             this.confirming = false;
            }); })
+          .accessibilityGroup(true)
+          .accessibilityText(this.t('再想想', 'Not now'))
+          .accessibilityLevel('yes')
           .onClick(() => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
             this.confirming = false;
@@ -1387,6 +1428,9 @@ build() {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
             this.doReset();
            }); })
+          .accessibilityGroup(true)
+          .accessibilityText(this.t('确定重置', 'Yes, reset'))
+          .accessibilityLevel('yes')
           .onClick(() => {
             this.doReset();
           })

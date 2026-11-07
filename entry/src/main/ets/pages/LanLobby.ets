@@ -216,6 +216,9 @@ struct LanLobby {
                 this.picked = gid;
               
               }); })
+              .accessibilityGroup(true)
+              .accessibilityText(this.gameName(gid))
+              .accessibilityLevel('yes')
               .onClick(() => {
                 Haptics.tap();
                 this.picked = gid;
@@ -270,6 +273,11 @@ struct LanLobby {
         // ★ 2026-10-19 自查 A3：开房按钮写死 48vp，大字模式会裁
         .width('100%').constraintSize({ minHeight: Cell.of(48) })
         .backgroundColor(this.accentColor())
+        .accessibilityGroup(true)
+        .accessibilityText(Bp.tinyScreen() || Bp.isWatch()
+          ? this.t(TG('开个房间'), 'Host')
+          : this.t(TG('开个房间（我来当房主）'), 'Host a room'))
+        .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();   // ★ 2026-10-19 按压反馈
           this.hostRoom();
@@ -304,6 +312,9 @@ struct LanLobby {
           this.joinRoom(r);
         
         }); })
+        .accessibilityGroup(true)
+        .accessibilityText(this.t(TG('{s} 的房间'), "{s}'s room").replace('{s}', r.host))
+        .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：加入房间是重要动作
           this.joinRoom(r);

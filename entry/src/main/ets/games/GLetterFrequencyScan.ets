@@ -13,7 +13,7 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const QN: number = 8; const PASS: number = 5; const OPT_N: number = 4;
-const LIMIT_MS: number = 6000; const TICK_MS: number = 100; const FEED_MS: number = 700;
+const LIMIT_MS: number = 6000; const TICK_MS: number = 100; const FEED_MS: number = 900;
 const ALPHA: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
   'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 const WORDS: string[] = ['PINEAPPLE', 'BANANA', 'STRAWBERRY', 'CHOCOLATE', 'BUTTERFLY', 'MOUNTAIN',

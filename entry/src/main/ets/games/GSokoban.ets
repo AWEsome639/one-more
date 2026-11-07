@@ -159,9 +159,11 @@ export struct GSokoban {
 
   /** 宿主点了「换一局」 */
   onRestart(): void {
+    // ★ 2026-11-08 **重开语义 bug**（ai-fixer-b 扫描）：顶栏 ↻ 原来会
+    //   `cleared` 全部清零 + `load(0)` ⇒ **8 关进度全没了**，而游戏内「重开」是 `load(this.level)`
+    //   ⇒ 用户点顶栏 ↻ 以为重来本局，结果从头开始。改成只重来当前关（与游戏内按钮一致）。
     this.diffTotal = GameDiff.sizeNow(300);
-    this.cleared = this.cleared.map(() => false);
-    this.load(0);
+    this.load(this.level);
   }
 
   /** 载入第 idx 关 */

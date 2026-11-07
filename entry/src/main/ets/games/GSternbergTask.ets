@@ -32,6 +32,9 @@ export struct GSternbergTask {
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
    *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
   @State private tvFocus: string = '';
+  // ★ 2026-11-08 常驻结果行：反应时/实验类不拉长试次节奏，「上一次对错」单独存一份。
+  @State private lastFb: string = '';
+  @State private lastOk: boolean = true;
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -65,6 +68,7 @@ export struct GSternbergTask {
   private reset(): void {
     this.clearAll(); this.trial = 1; this.hits = 0; this.score = 0;
     this.over = false; this.won = false; this.done = false; this.startAt = Date.now();
+    this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     this.newTrial();
   }
 
@@ -222,9 +226,9 @@ export struct GSternbergTask {
     this.phase = 2;
     if (yes === this.inSet) {
       this.hits = this.hits + 1; this.score = this.score + Math.max(20, 100 - Math.floor(rt / 30));
-      this.msg = '✅ ' + rt + ' ms';
+      this.msg = '✅ ' + rt + ' ms'; this.lastFb = this.msg; this.lastOk = true;
     } else {
-      this.msg = TG2("❌ 它{0}刚才的集合里", (this.inSet ? '在' : TG('不在')));
+      this.msg = TG2("❌ 它{0}刚才的集合里", (this.inSet ? '在' : TG('不在'))); this.lastFb = this.msg; this.lastOk = false;
     }
     this.timer = setTimeout(() => { this.timer = -1; this.next(); }, FEED_MS);
   }
@@ -260,11 +264,11 @@ export struct GSternbergTask {
       })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
-        Text((TG('试次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('试次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.trial + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primaryDeep))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.hits + ' / ' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
@@ -325,6 +329,10 @@ export struct GSternbergTask {
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免首次答题后布局跳一下）
+      Text(this.lastFb.length > 0 ? this.lastFb : '　')
+        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+        .width('100%').textAlign(TextAlign.Center)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })

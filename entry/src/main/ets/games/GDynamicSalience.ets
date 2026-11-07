@@ -258,7 +258,7 @@ export struct GDynamicSalience {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.left > 0 ? this.left : 0) + 's')).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
@@ -276,7 +276,7 @@ export struct GDynamicSalience {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(NEED), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')

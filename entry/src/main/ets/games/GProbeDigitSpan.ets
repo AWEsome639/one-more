@@ -266,9 +266,9 @@ export struct GProbeDigitSpan {
         autoOn: this.autoId >= 0
       })
             Row({ space: Space.sm }) { Column({ space: Space.xs }) {
-      Text((TG('位数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(Digits(String(this.len), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
+      Text((TG('位数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs); Text(Digits(String(this.len), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: Space.xs }) {
-      Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+      Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs); Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: Space.xs }) {
       Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis }); Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card) }.width('100%')
@@ -277,7 +277,7 @@ export struct GProbeDigitSpan {
           Text(this.at < this.digits.length ? String(this.digits[this.at]) : '').fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         } else {
           Column({ space: Space.xs }) {
-            Text(TG('你的答案')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+            Text(TG('你的答案')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
             Text(this.typed.length > 0 ? this.typed : '?').fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.phase === 1 ? this.theme.inkFaint : Palette.emerald)
           }
         }

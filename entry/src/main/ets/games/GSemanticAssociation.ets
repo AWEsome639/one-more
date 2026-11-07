@@ -12,7 +12,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
-const ROUNDS: number = 10; const PASS: number = 7; const GAP_MS: number = 700;
+const ROUNDS: number = 10; const PASS: number = 7; const GAP_MS: number = 900;
 
 /** 强关联词对：[线索, 搭档] */
 const PAIRS: string[][] = [
@@ -268,7 +268,7 @@ export struct GSemanticAssociation {
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.right + '/' + PASS)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)

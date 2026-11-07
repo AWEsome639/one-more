@@ -1728,6 +1728,10 @@ export struct CategoryBar {
               this.onPick(it.cat);
             
             }); })
+            // ★ 2026-11-08 读屏：合并整行为一个可访问对象并念出内容
+            .accessibilityGroup(true)
+            .accessibilityText(this.catLabel(it.cat) + ' ' + Digits(String(it.count), this.langCode))
+            .accessibilityLevel('yes')
             .onClick(() => {
               Haptics.tap();   // ★ 2026-10-19 按压反馈
               this.onPick(it.cat);

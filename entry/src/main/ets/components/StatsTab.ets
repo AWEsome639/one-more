@@ -809,6 +809,9 @@ build() {
       this.openGame(g.id);
     
     }); })
+    .accessibilityGroup(true)
+    .accessibilityText(g.icon)
+    .accessibilityLevel('yes')
     .onClick(() => {
       Haptics.tap();
       this.openGame(g.id);
@@ -888,6 +891,9 @@ build() {
       this.openGame(it.meta.id);
     
     }); })
+    .accessibilityGroup(true)
+    .accessibilityText(Digits(String(rank + 1), this.langCode))
+    .accessibilityLevel('yes')
     .onClick(() => {
       Haptics.tap();   // ★ 2026-10-19 按压反馈
       this.openGame(it.meta.id);
@@ -993,6 +999,10 @@ build() {
         });
       
       }); })
+      .accessibilityGroup(true)
+      .accessibilityText(this.stripArrow(this.achvExpanded ? this.t('收起', 'Less')
+            : this.tn(TG('看全部 {n} 个'), 'See all {n}', ProgressStore.achievementList().length)))
+      .accessibilityLevel('yes')
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
@@ -1226,6 +1236,9 @@ build() {
           router.pushUrl({ url: 'pages/GameHost', params: { id: g.id } });
         
         }); })
+        .accessibilityGroup(true)
+        .accessibilityText(g.icon)
+        .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();
           router.pushUrl({ url: 'pages/GameHost', params: { id: g.id } });

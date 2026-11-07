@@ -16,7 +16,7 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const PAIRS_N: number = 6; const PASS: number = 5; const OPT_N: number = 4;
-const STUDY_S: number = 8; const TICK_MS: number = 1000; const FEED_MS: number = 750;
+const STUDY_S: number = 8; const TICK_MS: number = 1000; const FEED_MS: number = 900;
 
 interface WordPair { a: string; b: string }
 

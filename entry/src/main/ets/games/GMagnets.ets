@@ -602,7 +602,7 @@ export struct GMagnets {
       }
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.moves) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)
@@ -611,7 +611,7 @@ export struct GMagnets {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('成对磁铁'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((TG('成对磁铁'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.goodDominoes()) + '/8')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)
@@ -620,7 +620,7 @@ export struct GMagnets {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('已定格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已定格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.placed()) + '/' + String(CELLS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)

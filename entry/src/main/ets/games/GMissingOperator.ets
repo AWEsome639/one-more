@@ -18,7 +18,7 @@ import { Tv } from '../core/Tv';
 import { Bp } from '../core/Bp';
 
 const GOAL: number = 10; const LIMIT: number = 60; const TICK_MS: number = 1000;
-const PENALTY: number = 3; const NEXT_MS: number = 400;
+const PENALTY: number = 3; const NEXT_MS: number = 900;
 const OPS: string[] = ['＋', '−', '×', '÷'];
 const OPT_IDX: number[] = [0, 1, 2, 3];
 

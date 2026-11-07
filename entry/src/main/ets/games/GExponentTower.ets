@@ -12,7 +12,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
-const TOTAL: number = 8; const PASS: number = 6; const NEXT_MS: number = 760; const LETTERS: string[] = ['A', 'B', 'C', 'D'];
+const TOTAL: number = 8; const PASS: number = 6; const NEXT_MS: number = 900; const LETTERS: string[] = ['A', 'B', 'C', 'D'];
 /** 整数幂（指数很小，直接连乘） */
 function ipow(base: number, exp: number): number {
   let out: number = 1;
@@ -294,7 +294,7 @@ export struct GExponentTower {
         Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.right + '/' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {

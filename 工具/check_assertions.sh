@@ -85,13 +85,13 @@ printf "     %-42s %6s / %d\n" "check_focusable.py（焦点）" "-" "${FOCUS_N}"
 #  ★ 纯闸门：只 FAIL += 新增数，不动 TOT（理由同上：不产生通过计数）。
 #  ★ rc=2（解析/自检失败）也算失败 —— 检查器坏了不能显示成绿
 #    （check_dup_symbol 曾因写死阈值长期"死绿"，教训）。
-#  ★ 基线 102：入库时**存量**就有 102 处（历史遗留，不是这条尺子抓出来的新问题）。
-#    闸门只罚「比基线多出来的」；存量数每次都打印，持续可见、可分批还债。
+#  ★ 基线 0：2026-11-08 凌晨把 102 处存量全部清完（15 批 · 约 130 处标签），现已锁死为 0。
+#    从现在起任何新增分歧都会当场变红。
 #    想一次清完：`python3 tools/check_hud_consistency.py` 列出全部，按 7 款一批修。
 HUD_OUT=$(python3 "$(dirname "$0")/../tools/check_hud_consistency.py" 2>&1)
 HUD_RC=$?
 HUD_N=$(printf '%s' "${HUD_OUT}" | grep -oE "HUD不一致：[0-9]+ 处" | grep -oE "[0-9]+" | tail -1)
-HUD_BASE=102
+HUD_BASE=0
 if [ "${HUD_RC}" -eq 2 ] || [ -z "${HUD_N}" ]; then
   HUD_NEW=1
   echo "     ⚠️ check_hud_consistency.py 无法给出结论（rc=${HUD_RC}）⇒ 按 1 处失败计，别当绿"
@@ -116,6 +116,20 @@ if [ "${JUDGE_RC}" -eq 2 ] || [ -z "${JUDGE_N}" ]; then
 fi
 FAIL=$((FAIL + JUDGE_N))
 printf "     %-42s %6s / %d\n" "check_state_from_text.py（内容当状态）" "-" "${JUDGE_N}"
+
+# ── 判据 1782 家族（2026-11-08 新增）：跨局状态残留（复位遗漏）──
+#   2-hop 守卫链：字段在 reset 面没赋值 + 显示点没有「reset 面会清零的守卫」⇒ 报。
+#   自检：上一轮 4 个 A 类候选 0 命中（全被守卫消掉）；GWordLadderStep 精准命中 1 处。
+#   ★ 纯闸门：只 FAIL += N、不动 TOT（基线 200359 不用改）；rc=2 也算失败。
+LEAK_OUT=$(python3 "$(dirname "$0")/../tools/check_reset_leak.py" 2>&1)
+LEAK_RC=$?
+LEAK_N=$(printf '%s' "${LEAK_OUT}" | grep -oE "复位遗漏：[0-9]+ 处" | grep -oE "[0-9]+" | tail -1)
+if [ "${LEAK_RC}" -eq 2 ] || [ -z "${LEAK_N}" ]; then
+  LEAK_N=1
+  echo "     ⚠️ check_reset_leak.py 无法给出结论（rc=${LEAK_RC}）⇒ 按 1 处失败计，别当绿"
+fi
+FAIL=$((FAIL + LEAK_N))
+printf "     %-42s %6s / %d\n" "check_reset_leak.py（复位遗漏）" "-" "${LEAK_N}"
 
 echo "     ────────────────────────────────────────────────"
 printf "     %-42s %6d / %d\n" "合计" "${TOT}" "${FAIL}"

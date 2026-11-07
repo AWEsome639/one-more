@@ -18,7 +18,7 @@ import { Tv } from '../core/Tv';
 const N: number = 6; const CELLS: number = N * N; const IDX: number[] = [0, 1, 2, 3, 4, 5];
 const ROUNDS: number = 8; const PASS: number = 6;
 const LIMIT_MS: number = 8000; const TICK_MS: number = 100;
-const PENALTY_MS: number = 1200; const GAP_MS: number = 550;
+const PENALTY_MS: number = 1200; const GAP_MS: number = 900;
 /** 形近 emoji 对：[目标, 干扰] */
 const PAIRS: string[][] = [
   ['🍎', '🍒'], ['🐶', '🐺'], ['⭐', '🌟'], ['🔵', '🟣'],
@@ -267,11 +267,11 @@ export struct GVisualSearch {
       })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
-        Text((TG('局'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('局'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('找出'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('找出'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(this.found), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {

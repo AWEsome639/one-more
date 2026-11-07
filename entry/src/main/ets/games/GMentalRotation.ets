@@ -332,7 +332,7 @@ export struct GMentalRotation {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)
@@ -341,7 +341,7 @@ export struct GMentalRotation {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('转过'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('转过'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.sumDeg) + '°')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)

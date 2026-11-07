@@ -15,7 +15,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 const LIMIT_MS: number = 60000; const TICK_MS: number = 100;
-const TARGET: number = 12; const PENALTY_MS: number = 3000; const FEED_MS: number = 480;
+const TARGET: number = 12; const PENALTY_MS: number = 3000; const FEED_MS: number = 900;
 interface Quiz { w: string; hint: string }
 const BANK: Quiz[] = [
   { w: 'APPLE', hint: TG('苹果') }, { w: 'BRIDGE', hint: TG('桥') }, { w: 'CANDLE', hint: '蜡烛' },

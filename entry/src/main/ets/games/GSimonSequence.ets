@@ -17,7 +17,7 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const PADS: number = 6; const WIN_LEN: number = 8;
-const SHOW_TICK: number = 420; const FLASH_MS: number = 170; const GAP_MS: number = 620;
+const SHOW_TICK: number = 420; const FLASH_MS: number = 170; const GAP_MS: number = 900;
 const PAD_COLORS: string[] = [Palette.primary, Palette.berry, Palette.emerald, Palette.amber, Palette.sky, Palette.violet];
 const PAD_NUM: string[] = ['1', '2', '3', '4', '5', '6'];
 const ROW_A: number[] = [0, 1, 2]; const ROW_B: number[] = [3, 4, 5];
@@ -282,7 +282,7 @@ export struct GSimonSequence {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('长度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('长度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.len + '/' + WIN_LEN)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
@@ -292,7 +292,7 @@ export struct GSimonSequence {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('已点'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已点'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.phaseText())).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)

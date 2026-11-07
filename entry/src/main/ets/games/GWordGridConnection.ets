@@ -333,11 +333,11 @@ export struct GWordGridConnection {
       })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
-        Text((TG('已连'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已连'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.linked() + ' / ' + PAIR_N)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('失误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('失误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.miss + ' / ' + MAX_MISS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {

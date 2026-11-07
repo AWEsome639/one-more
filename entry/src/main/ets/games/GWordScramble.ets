@@ -15,7 +15,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 const ROUNDS: number = 8; const LIMIT_MS: number = 150000;
-const TICK_MS: number = 100; const FEED_MS: number = 620;
+const TICK_MS: number = 100; const FEED_MS: number = 900;
 interface Entry { w: string; hint: string }
 const BANK: Entry[] = [
   { w: 'APPLE', hint: TG('苹果') }, { w: 'BANANA', hint: TG('香蕉') }, { w: 'ORANGE', hint: '橙子' },
@@ -305,7 +305,7 @@ export struct GWordScramble {
       })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
-        Text((TG('第几个'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('第几个'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(((this.idx + 1) + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
@@ -313,7 +313,7 @@ export struct GWordScramble {
         Text(Digits(String(this.solved), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(((this.leftMs / 1000).toFixed(1) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')

@@ -338,6 +338,9 @@ struct GuidePage {
       .fontSize(FontSize.md).fontColor(Color.White)
       .backgroundColor(this.accentColor()).borderRadius(Radius.md)
       .width('100%').height(46)
+      .accessibilityGroup(true)
+      .accessibilityText(this.t('开始玩', 'Start playing'))
+      .accessibilityLevel('yes')
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         Back.go();

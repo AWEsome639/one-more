@@ -586,7 +586,7 @@ export struct GLighthouses {
       }
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.moves) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)
@@ -604,7 +604,7 @@ export struct GLighthouses {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('灯塔'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('灯塔'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.lampCount()))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)

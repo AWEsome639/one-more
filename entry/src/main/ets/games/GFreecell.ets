@@ -764,7 +764,7 @@ export struct GFreecell {
       })
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
-        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(this.moves), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1).padding(Space.sm)
@@ -776,7 +776,7 @@ export struct GFreecell {
         .layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('自由格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('自由格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.freeUsed()) + '/4')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1).padding(Space.sm)

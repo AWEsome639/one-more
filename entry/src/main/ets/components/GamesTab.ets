@@ -1268,6 +1268,11 @@ build() {
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
        Haptics.tap(); act(); 
     }); })
+    // ★★★ 2026-11-08 读屏缺口修复：整行是按钮，但图标被 accessibilityLevel('no') 摘掉后
+    //   只剩零散文字，读屏听不出「这是一行可点的」。合并成一个可访问对象并念出整行。
+    .accessibilityGroup(true)
+    .accessibilityText(text)
+    .accessibilityLevel('yes')
     .onClick(() => { Haptics.tap(); act(); })
   }
 
@@ -1338,6 +1343,9 @@ build() {
       });
     
     }); })
+    .accessibilityGroup(true)
+    .accessibilityText(this.collapseLabel())
+    .accessibilityLevel('yes')
     .onClick(() => {
       Haptics.tap();   // ★ 2026-10-19 按压反馈
       const now: number = Date.now();
@@ -1433,6 +1441,10 @@ build() {
           ProgressStore.setThemeDark(!this.dark);
         
         }); })
+        // ★ 2026-11-08 读屏：这是纯图标/组合文案，补一句可读的说明
+        .accessibilityGroup(true)
+        .accessibilityText(this.t('切换深色模式', 'Toggle dark mode'))
+        .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();   // ★ 2026-10-19 按压反馈
           ProgressStore.setThemeDark(!this.dark);
@@ -1474,6 +1486,9 @@ build() {
           this.renderRev = this.renderRev + 1;
         
         }); })
+        .accessibilityGroup(true)
+        .accessibilityText(this.langBadge())
+        .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();
           const cur: string = this.langCode;
@@ -1731,6 +1746,11 @@ build() {
       .onKeyEvent((e: KeyEvent) => {
         Tv.handleKey(e, () => { this.openGame(this.dailyId); });
       })
+      // ★★★ 2026-11-08 读屏缺口修复：整行是按钮，但图标被 accessibilityLevel('no') 摘掉后
+      //   只剩零散文字，读屏听不出「这是一行可点的」。合并成一个可访问对象并念出整行。
+      .accessibilityGroup(true)
+      .accessibilityText(this.t('打开今日挑战：', 'Open today\u2019s challenge: ') + this.dailyName())
+      .accessibilityLevel('yes')
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         this.openGame(this.dailyId);
@@ -1769,6 +1789,11 @@ build() {
         }
       });
     })
+    // ★★★ 2026-11-08 读屏缺口修复：整行是按钮，但图标被 accessibilityLevel('no') 摘掉后
+    //   只剩零散文字，读屏听不出「这是一行可点的」。合并成一个可访问对象并念出整行。
+    .accessibilityGroup(true)
+    .accessibilityText(this.t('随机来一局：交给运气挑一款', 'Surprise me: let luck pick a game'))
+    .accessibilityLevel('yes')
     .onClick(() => {
       const pool: GameMeta[] = this.list();
       if (pool.length === 0) {
@@ -1807,6 +1832,9 @@ build() {
             this.resetGridScroll();
           
           }); })
+          .accessibilityGroup(true)
+          .accessibilityText(this.t('清空', 'Clear'))
+          .accessibilityLevel('yes')
           .onClick(() => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
             this.picked = [];
@@ -1832,6 +1860,13 @@ build() {
       });
     
     }); })
+    // ★★★ 2026-11-08 读屏缺口修复：整行是按钮，但图标被 accessibilityLevel('no') 摘掉后
+    //   只剩零散文字，读屏听不出「这是一行可点的」。合并成一个可访问对象并念出整行。
+    .accessibilityGroup(true)
+    .accessibilityText(this.picked.length === 0
+        ? this.t('按喜好挑游戏', 'Pick by taste')
+        : this.t('已选 {n} 个条件', '{n} filters on').replace('{n}', String(this.picked.length)))
+    .accessibilityLevel('yes')
     .onClick(() => {
       animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
         this.showFilter = !this.showFilter;
@@ -1898,6 +1933,10 @@ build() {
       .onFocus(() => { this.tvFocus = 'GT1897'; })
       .onBlur(() => { if (this.tvFocus === 'GT1897') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'GT1897'))
+      // ★ 2026-11-08 读屏：这是纯图标/组合文案，补一句可读的说明
+      .accessibilityGroup(true)
+      .accessibilityText(L(t.label, t.enLabel))
+      .accessibilityLevel('yes')
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                 Haptics.tap();   // ★ 2026-10-19 按压反馈
         animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
@@ -1952,6 +1991,9 @@ build() {
         });
       
       }); })
+      .accessibilityGroup(true)
+      .accessibilityText(TG(zh))
+      .accessibilityLevel('yes')
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         this.pulseGrid();   // ★ 拉满：内容刷新脉冲
@@ -2139,6 +2181,10 @@ build() {
         }
       
       }); })
+      // ★ 2026-11-08 读屏：合并整行为一个可访问对象并念出内容
+      .accessibilityGroup(true)
+      .accessibilityText(this.t(zh, en))
+      .accessibilityLevel('yes')
       .onClick(() => {
         Haptics.tap();
         // ★ 每次切到 A-Z 都重放一次首屏错峰（先归零再置起，否则第二次进来不动）
@@ -2304,6 +2350,9 @@ build() {
             this.azScrollTo(letter);
           
           }); })
+          .accessibilityGroup(true)
+          .accessibilityText(letter)
+          .accessibilityLevel('yes')
           .onClick(() => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
             if (this.azCounts()[i] === 0) {
@@ -2339,6 +2388,9 @@ build() {
             this.azScrollTo(letter);
           
           }); })
+          .accessibilityGroup(true)
+          .accessibilityText(letter)
+          .accessibilityLevel('yes')
           .onClick(() => {
             if (this.azCounts()[i0 + 14] === 0) {
               return;
@@ -2440,6 +2492,11 @@ build() {
       this.openGame(m.id);
     
     }); })
+    // ★★★ 2026-11-08 读屏缺口修复：整行是按钮，但图标被 accessibilityLevel('no') 摘掉后
+    //   只剩零散文字，读屏听不出「这是一行可点的」。合并成一个可访问对象并念出整行。
+    .accessibilityGroup(true)
+    .accessibilityText(this.t('打开 ', 'Open ') + displayName(m))
+    .accessibilityLevel('yes')
     .onClick(() => {
       Haptics.tap();   // ★ 2026-10-19 按压反馈
       this.openGame(m.id);
@@ -2480,6 +2537,9 @@ build() {
               this.searchText = '';
             
             }); })
+            // ★ 2026-11-08 读屏：纯图标按钮，必须说清按下去做什么（含状态）
+            .accessibilityText(this.t('清空搜索框', 'Clear the search box'))
+            .accessibilityLevel('yes')
             .onClick(() => {
               Haptics.tap();
               this.searchText = '';
@@ -2523,6 +2583,9 @@ build() {
           .backgroundColor(this.accentColor())
           .borderRadius(Radius.md)
           .height(Cell.of(40))
+          .accessibilityGroup(true)
+          .accessibilityText(this.t('找', 'Go'))
+          .accessibilityLevel('yes')
           .onClick(() => {
             this.askChat();
           })
@@ -2560,6 +2623,11 @@ build() {
           router.pushUrl({ url: 'pages/GameHost', params: { id: p.game.id } });
         
         }); })
+        // ★★★ 2026-11-08 读屏缺口修复：整行是按钮，但图标被 accessibilityLevel('no') 摘掉后
+        //   只剩零散文字，读屏听不出「这是一行可点的」。合并成一个可访问对象并念出整行。
+        .accessibilityGroup(true)
+        .accessibilityText(this.t('打开 ', 'Open ') + displayName(p.game))
+        .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();
           this.chatOpen = false;

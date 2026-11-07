@@ -481,7 +481,7 @@ export struct GCompoundConnect {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.path.length + ' / ' + this.maxSteps)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((this.path.length <= this.maxSteps ? Palette.sky : Palette.rose))
         }
         .layoutWeight(1)
@@ -490,7 +490,7 @@ export struct GCompoundConnect {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('失败'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('失败'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.fails + ' / ' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1)

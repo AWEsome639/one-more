@@ -277,11 +277,11 @@ export struct GTrailMaking {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('已连'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已连'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.step) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('错误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('错误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.mistakes) + '/' + String(ALLOWED + 1))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {

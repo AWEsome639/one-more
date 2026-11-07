@@ -36,6 +36,10 @@ export struct GPosnerSpatialCueing {
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
    *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
   @State private tvFocus: string = '';
+  // ★ 2026-11-08 常驻结果行：反应时类不能拉长试次节奏，「上一次对错」单独存一份、
+  //   新试次提问只改 msg，不会把它覆盖 ⇒ 玩家随时能读上一次的结果。
+  @State private lastFb: string = '';
+  @State private lastOk: boolean = true;
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -73,6 +77,7 @@ export struct GPosnerSpatialCueing {
     this.trial = 1; this.right = 0; this.score = 0; this.pickSide = -1; this.startAt = Date.now();
     this.rtSum = 0; this.answered = 0;
     this.over = false; this.won = false; this.done = false;
+    this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     this.newTrial();
   }
 
@@ -232,9 +237,9 @@ export struct GPosnerSpatialCueing {
     if (side === this.targetSide) {
       this.right = this.right + 1;
       this.score = this.score + Math.max(20, MAX_BONUS - Math.floor(rt / 20));
-      this.msg = '✅ ' + rt + ' ms';
+      this.msg = '✅ ' + rt + ' ms'; this.lastFb = this.msg; this.lastOk = true;
     } else {
-      this.msg = TG2("❌ 目标在{0}边", (this.targetSide === 0 ? TG('左') : TG('右')));
+      this.msg = TG2("❌ 目标在{0}边", (this.targetSide === 0 ? TG('左') : TG('右'))); this.lastFb = this.msg; this.lastOk = false;
     }
     this.timer = setTimeout(() => { this.timer = -1; this.next(); }, FEED_MS);
   }
@@ -332,7 +337,10 @@ export struct GPosnerSpatialCueing {
       .onBlur(() => { if (this.tvFocus === 'L324') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L324'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+      // ★ 常驻结果行：答过之后这一行就固定显示上一次对错（不再被下一试次冲掉）
+      Text(this.lastFb.length > 0 ? this.lastFb : TG('提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点'))
+        .fontSize(FontSize.xxs).fontColor(this.lastFb.length > 0 ? (this.lastOk ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
+        .width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

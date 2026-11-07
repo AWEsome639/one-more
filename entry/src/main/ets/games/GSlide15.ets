@@ -151,6 +151,9 @@ export struct GSlide15 {
     this.tiles = t;
     this.blank = b;
     this.moves = 0;
+    // ★ 2026-11-08 第四把尺子（check_reset_leak）抓到：`reset()` 不复位 `bestMoves`
+    //   ⇒ 通关后「再来一局」HUD 的「最好 N 步」显示**上一局的数字**（应该回到「—」）。
+    this.bestMoves = 0;
     this.won = false;
     this.seconds = 0;
     this.pressed = -1;

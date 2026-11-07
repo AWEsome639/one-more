@@ -12,7 +12,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
-const LIVES: number = 3; const GAP_MS: number = 700;
+const LIVES: number = 3; const GAP_MS: number = 900;
 
 /** 每条链内部逐环语义递进 */
 const CHAINS: string[][] = [
@@ -276,12 +276,12 @@ export struct GSemanticLink {
       })
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
-        Text((TG('已连'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已连'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(((this.at + 1) + '/' + this.chain.length)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.berry))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('生命'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('生命'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.lives + '/' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)

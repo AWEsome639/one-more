@@ -20,7 +20,7 @@ const DICT: string =
   ' GULF HAIR HALF HALL HAND HANG HARD HARM HARP HATE HAVE HAWK HAZE HEAD HEAL HEAP HEAR HEAT HEEL HELL HELP HERB HERD HERE HERO HIDE HIGH HIKE HILL HINT HIRE HOLD HOLE HOLY HOME HOOK HOPE HORN HOSE HOST HOUR HUGE HUNT HURT HYMN ICON IDEA IDLE INCH INTO IRON ITEM JADE JAIL JAZZ JOIN JOKE JUMP JURY JUST KEEN KEEP KEPT KICK KIND KING KISS KNEE KNEW KNIT KNOB KNOT KNOW LACK LADY LAID LAKE LAMP LAND LANE LAST LATE LAZY LEAD LEAF LEAN LEAP LEFT LEND LENS LESS LIAR LICK LIFE LIFT LIKE LIMB LIME LINE LINK LION LIST LIVE LOAD LOAF LOAN LOCK LOFT LOGO LONE LONG LOOK LOOP LORD LOSE LOSS LOST LOUD LOVE LUCK';
 const WORDS: string[] = DICT.split(' '); const LETTERS: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const ROUNDS: number = 10; const LIVES: number = 3; const LEN: number = 4;
-const FEED_MS: number = 620; const CONSONANTS: string = 'XQZJKVWY';
+const FEED_MS: number = 900; const CONSONANTS: string = 'XQZJKVWY';
 interface Option { text: string; ok: boolean }
 function isWord(w: string): boolean { return (' ' + DICT + ' ').indexOf(' ' + w + ' ') >= 0; }
 function differs(a: string, b: string): number {
@@ -118,6 +118,10 @@ export struct GWordLadderStep {
     this.opts = mixOptions([{ text: good[Math.floor(Math.random() * good.length)], ok: true },
       { text: bad[0], ok: false }, { text: bad[1], ok: false }, { text: bad[2], ok: false }]);
     this.picked = -1;
+    // ★ 2026-11-08 跨局残留修复：reset() 直接调 buildRound()，原来没人写提示语 ⇒
+    //   「再来一局」后上一局的结算语（❌ 生命耗尽 / 🎉 通关）会停在新局开头。
+    //   用与 next() 相同的措辞，保证两条入口（首局/下一题）显示一致。
+    this.msg = TG2("第 {0} 题：挑只差一个字母的真实单词", this.round);
   }
   /** 提示：哪个选项是对的（代打就是找 opts[i].ok） */
   private computeHint(): HintResult {
@@ -318,7 +322,7 @@ export struct GWordLadderStep {
         Text((this.round + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('生命'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('生命'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.lives + ' ❤')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {

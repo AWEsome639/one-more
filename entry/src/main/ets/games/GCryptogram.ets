@@ -284,7 +284,7 @@ export struct GCryptogram {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('关卡'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((Math.min(this.qi + 1, this.diffTotal) + '/' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
 // ★ 动效：进度一变就弹一下
 .scale({ x: this.bump, y: this.bump })
@@ -293,19 +293,19 @@ export struct GCryptogram {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('已解'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已解'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.solved + '/' + PASS)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('生命'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('生命'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.life + '/' + LIVES)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
@@ -313,7 +313,7 @@ export struct GCryptogram {
       }
       .width('100%')
       Column({ space: Space.sm }) {
-        Text(TG('密文')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(TG('密文')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(this.cipher.split('').join(' ')).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
         Text(TG2('线索：{0}', this.cur().hint)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
         Text(TG2('已知映射：{0}', this.mapText())).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center).fontColor(Palette.emerald)

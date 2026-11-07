@@ -392,11 +392,11 @@ export struct GModuloPath {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(((this.step) + '/' + (PATH_LEN - 1))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('失误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('失误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.err + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         // ★ 错误抖动
         .translate({ x: this.shakeX })
