@@ -494,6 +494,8 @@ build() {
           }
         })
         this.starCard()
+        // ★ 2026-11-08：反馈卡（原来被误插在 `themeModePicker()` 里，见 feedbackCard 的注释）
+        this.feedbackCard()
 
         Text('One More · ' + this.tn(TG('{n} 款小游戏，不用联网也能玩'), '{n} mini games, playable offline', GAMES.length))
           .fontSize(FontSize.xxs)
@@ -714,10 +716,23 @@ build() {
         this.modeChip('system', '🔄', '跟随系统', 'System')
       }
       .width('100%')
+    }
+    .width('100%')
+    .padding(Space.md)
+    .backgroundColor(this.theme().surface)
+    .borderRadius(Radius.md)
+    .shadow(Shadow.card)
+  }
 
-      // ★★★ 2026-10-17 BUG #32 修复：这段原来被【误插】在标签行 Row 里面
-      //   ⇒ 🎨 孤零零 + 「外观模式」标题被挤没 + 反馈卡错位 ⇒ 已移到这里
-        // ★ 2026-10-13 奥森：「游戏里可以放"反馈邮箱"什么的，以及制作者的一些合适的信息」
+  /**
+   * ★★★ 2026-11-08 **真机抓到**（判据 1786）：整块「反馈与关于 + 隐私政策」原来被**误插在
+   *   `themeModePicker()` 的 Column 里** ⇒ 设置页「外观」之后直接接反馈卡，
+   *   语言 / 局域网 / 主题色 / 界面模式 全被挤到很下面（真机滚动确认内容都在，只是顺序乱了）。
+   *   ⇒ 抽成独立 builder，在 `build()` 里紧接 `themeModePicker()`（保持原分区顺序）。
+   */
+  @Builder
+  feedbackCard() {
+      // ★ 2026-10-13 奥森：「游戏里可以放"反馈邮箱"什么的，以及制作者的一些合适的信息」
       //   设计：① 只放必要信息（不放真名/学号）② 邮箱可复制（不裸链）③ 署名用英文名
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
@@ -832,12 +847,6 @@ build() {
       .backgroundColor(this.theme().surface)
       .borderRadius(Radius.lg)
       .margin({ bottom: Space.md })
-    }
-    .width('100%')
-    .padding(Space.md)
-    .backgroundColor(this.theme().surface)
-    .borderRadius(Radius.md)
-    .shadow(Shadow.card)
   }
 
   @Builder
