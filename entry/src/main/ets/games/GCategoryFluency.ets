@@ -310,7 +310,7 @@ export struct GCategoryFluency {
       Column({ space: Space.xs }) {
         Text(this.over ? TG('本轮结束') : this.cat().name).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
           .fontColor(this.theme.ink)
-        Text(TG('严格属于这一类的词，打出来按回车')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(TG('严格属于这一类的词，打出来按回车')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.sm }) {
         TextInput({ text: this.input, placeholder: TG2('输入「{0}」类的一个词', this.cat().name)})

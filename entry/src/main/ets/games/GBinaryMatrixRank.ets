@@ -441,7 +441,7 @@ export struct GBinaryMatrixRank {
               .fontSize(FontSize.sm)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.theme.inkFaint)
-            Text(TG2('秩 = {0}', String(this.opts[i])))
+            Text(TG2('秩 = {0}', String(this.opts[i]))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
               .fontSize(FontSize.lg)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.optInk(i))

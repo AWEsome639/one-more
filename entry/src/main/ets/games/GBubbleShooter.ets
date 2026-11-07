@@ -540,7 +540,7 @@ export struct GBubbleShooter {
 
       // 待发射的泡泡
       Row({ space: Space.sm }) {
-        Text(TG('待发射')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(TG('待发射')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Row()
           .width(34)
           .height(Cell.of(34))

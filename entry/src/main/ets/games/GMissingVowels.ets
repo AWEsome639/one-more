@@ -317,7 +317,7 @@ export struct GMissingVowels {
           .fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         Text(this.fill(true)).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
           .textAlign(TextAlign.Center).width('100%')
-        Text(TG2('缺 {0} 个元音', String(this.blanks()))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(TG2('缺 {0} 个元音', String(this.blanks()))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.sm }) {

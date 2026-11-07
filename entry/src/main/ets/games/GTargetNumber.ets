@@ -316,7 +316,7 @@ export struct GTargetNumber {
         .shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.sm }) {
-        Text(TG2('🎯 目标 = {0}', String(this.target))).fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold)
+        Text(TG2('🎯 目标 = {0}', String(this.target))).fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontColor(Palette.cyan)
         Row({ space: Space.sm }) {
           ForEach(this.nums, (v: number, i: number) => {

@@ -301,7 +301,7 @@ export struct GPrimeGapHunt {
       }.width('100%')
       Column({ space: Space.xs }) {
         Text(Digits(String(this.p), this.langCode)).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(TG('下一个素数 − 它 = ?')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+        Text(TG('下一个素数 − 它 = ?')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
       Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)

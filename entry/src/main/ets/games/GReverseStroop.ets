@@ -278,7 +278,7 @@ export struct GReverseStroop {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
-        Text(TG('点「字义」· 别看墨色')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(TG('点「字义」· 别看墨色')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(WORDS[this.wIdx]).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(INKS[this.kIdx])
       }.width('100%').height(150).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)

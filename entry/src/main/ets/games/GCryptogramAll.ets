@@ -308,7 +308,7 @@ export struct GCryptogramAll {
       Text(TG2('🔑 已知：{0}', this.shown))
         .fontSize(FontSize.sm).fontColor(Palette.violet).width('100%').textAlign(TextAlign.Center)
 
-      Text(this.hint.length > 0 ? this.hint : TG('提示：同一位移的凯撒密码，密钥里的字母差就是位移量'))
+      Text(this.hint.length > 0 ? this.hint : TG('提示：同一位移的凯撒密码，密钥里的字母差就是位移量')).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
       Row({ space: Space.sm }) {

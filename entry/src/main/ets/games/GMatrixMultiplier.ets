@@ -368,8 +368,8 @@ export struct GMatrixMultiplier {
           }.width('100%')
           }, (rr: number) => 'gr' + rr)
           }.layoutWeight(1)
-          Text('=').accessibilityText(TG('等于')).fontSize(FontSize.xl).fontColor(this.theme.inkSoft)
-          Text('?').accessibilityText(TG('待求')).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(Palette.rose)
+          Text('=').accessibilityText(TG('等于')).fontSize(FontSize.xl).fontColor(this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+          Text('?').accessibilityText(TG('待求')).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(Palette.rose).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
             .textAlign(TextAlign.Center).width(48).height(Cell.of(48)).backgroundColor(HOT).borderRadius(Radius.xs)
         }.width('100%').alignItems(VerticalAlign.Center)
 

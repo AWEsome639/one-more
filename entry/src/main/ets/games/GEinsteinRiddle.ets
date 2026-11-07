@@ -428,7 +428,7 @@ export struct GEinsteinRiddle {
         }, (i: number) => 'na' + i)
       }.width('100%')
 
-      Text(this.hintOn ? TG2('宠物代号 🔑 {0}', PETNAME) : this.note)
+      Text(this.hintOn ? TG2('宠物代号 🔑 {0}', PETNAME) : this.note).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
       Row({ space: Space.sm }) {

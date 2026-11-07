@@ -297,7 +297,7 @@ export struct GContextClues {
       .width('100%')
       Column({ space: Space.sm }) {
         Text(this.cur().s).fontSize(FontSize.md).fontColor(this.theme.ink).width('100%')
-        Text(TG2('生词：{0}', this.cur().w)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+        Text(TG2('生词：{0}', this.cur().w)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontColor(Palette.berry)
       }
       .width('100%').padding(Space.md).backgroundColor(this.theme.surface)

@@ -302,7 +302,7 @@ export struct GSymbolicFlanker {
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
       Row({ space: Space.sm }) {
-        Text((TG('◀ 向左'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+        Text((TG('◀ 向左'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(this.pick === (0) ? '#FFFFFF' : this.theme.ink)
         .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
         .backgroundColor(this.pick === (0) ? Palette.orange : this.theme.surfaceAlt)
@@ -315,7 +315,7 @@ export struct GSymbolicFlanker {
         .onBlur(() => { if (this.tvFocus === 'L311') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L311'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); })
-        Text((TG('向右 ▶'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+        Text((TG('向右 ▶'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
         .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
         .backgroundColor(this.pick === (1) ? Palette.orange : this.theme.surfaceAlt)

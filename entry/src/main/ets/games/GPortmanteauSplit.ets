@@ -306,7 +306,7 @@ export struct GPortmanteauSplit {
       Column({ space: Space.xs }) {
         Text(this.q.word).fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
         Text(this.q.def).fontSize(FontSize.md).fontColor(this.theme.inkSoft)
-        Text(TG2('已选 {0}/2', String(this.sel.length))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(TG2('已选 {0}/2', String(this.sel.length))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.sm }) {

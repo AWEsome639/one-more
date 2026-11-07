@@ -302,8 +302,8 @@ export struct GAnagramDefinition {
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Column({ space: Space.xs }) {
-        Text(this.qIndex >= QN ? TG('本局结束') : this.cur().def).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(TG2("共 {0} 个字母　点字母拼词", this.curWord().length)).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(this.qIndex >= QN ? TG('本局结束') : this.cur().def).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text(TG2("共 {0} 个字母　点字母拼词", this.curWord().length)).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg)
       Text(this.answerText()).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.rose)
         .width('100%').textAlign(TextAlign.Center).height(Cell.of(44))

@@ -323,7 +323,7 @@ export struct GWordSurge {
       }.width('100%')
       Column({ space: Space.xs }) {
         Text('「' + this.hint + '」').fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(TG('选出对应的英文单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(TG('选出对应的英文单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => { Text(this.opts.length > (i) ? this.opts[(i)] : '').fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkAt((i))).width('100%').height(Cell.of(52)).backgroundColor(this.toneAt((i))).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((i)); })

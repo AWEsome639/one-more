@@ -278,7 +278,7 @@ export struct GRelationalMemory {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.phase === 'study' ? TG('记忆 5 秒') : String(this.qIdx + 1) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.phase === 'study' ? TG('记忆 5 秒') : String(this.qIdx + 1) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       if (this.phase === 'study') {
@@ -287,7 +287,7 @@ export struct GRelationalMemory {
             Row({ space: Space.sm }) {
             Text(this.sideA[(i)]).fontSize(FontSize.lg).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(42))
             .backgroundColor(this.theme.surface).borderRadius(Radius.sm)
-            Text('↔').accessibilityText(TG('对应')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+            Text('↔').accessibilityText(TG('对应')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
             Text(this.sideB[(i)]).fontSize(FontSize.lg).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(42))
             .backgroundColor(this.theme.surface).borderRadius(Radius.sm)
             }.width('100%')

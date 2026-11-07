@@ -300,12 +300,12 @@ export struct GComplexFoldingNets {
         Text(TG2('得分 {0}', String(this.score))).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
       }.width('100%')
 
-      Text(TG('📄 纸条按下列折痕依次对折，📍 处最终叠了几层？'))
+      Text(TG('📄 纸条按下列折痕依次对折，📍 处最终叠了几层？')).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
 
       Row({ space: Space.xs }) {
         ForEach(this.folds, (f: number, i: number) => {
-          Text(TG2('折{0} {1}%', ((i) + 1), ((f) * 100).toFixed(0)))
+          Text(TG2('折{0} {1}%', ((i) + 1), ((f) * 100).toFixed(0))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(FontSize.sm).fontColor('#FFFFFF').textAlign(TextAlign.Center)
           .layoutWeight(1).height(Cell.of(34)).backgroundColor(Palette.emerald).borderRadius(Radius.sm)
         }, (f: number, i: number) => 'f' + i)
@@ -327,7 +327,7 @@ export struct GComplexFoldingNets {
       .borderRadius(Radius.md)
       .shadow(Shadow.card)
 
-      Text(TG(TG('箭头从左往右 = 展开后的纸条；实心块就是 📍 落点'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+      Text(TG(TG('箭头从左往右 = 展开后的纸条；实心块就是 📍 落点'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.sm }) {
         Button(TG2('{0} 层', this.opts[0]))

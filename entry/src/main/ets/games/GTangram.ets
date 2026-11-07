@@ -366,7 +366,7 @@ export struct GTangram {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
-      Text(TG2('铺对 {0} / {1}　次数 {2}', String(this.scan()[0]), String(this.scan()[1]),Digits(String(this.moves), this.langCode)))
+      Text(TG2('铺对 {0} / {1}　次数 {2}', String(this.scan()[0]), String(this.scan()[1]),Digits(String(this.moves), this.langCode))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
       Row({ space: Space.sm }) {
         ForEach(this.rowIdx(), (p: number) => {

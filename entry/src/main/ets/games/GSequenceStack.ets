@@ -304,7 +304,7 @@ export struct GSequenceStack {
         .shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.sm }) {
-        Text(TG('🏗️ 数列堆叠')).fontSize(FontSize.md).fontColor(this.theme.inkSoft)
+        Text(TG('🏗️ 数列堆叠')).fontSize(FontSize.md).fontColor(this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Row({ space: Space.xs }) {
           ForEach(this.shownTerms(), (v: number, i: number) => {
             Text((String(v))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((this.theme.ink)).textAlign(TextAlign.Center)

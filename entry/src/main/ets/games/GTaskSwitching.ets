@@ -325,7 +325,7 @@ export struct GTaskSwitching {
 
       Text(TG2('重复 {0}ms · 切换 {1}ms · 代价 ', String(this.avgRep()), String(this.avgSw()))
         + String(this.cost()) + 'ms')
-        .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.cyan).width('100%').textAlign(TextAlign.Center).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.cyan).width('100%').textAlign(TextAlign.Center).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')

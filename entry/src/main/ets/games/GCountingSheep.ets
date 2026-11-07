@@ -335,7 +335,7 @@ export struct GCountingSheep {
         }, (r: number) => 'r' + r)
       }.width('100%')
 
-      Text(this.hint.length > 0 ? this.hint : TG('🐺 是干扰项：按格数时它算 2 格，按只数时它不算羊'))
+      Text(this.hint.length > 0 ? this.hint : TG('🐺 是干扰项：按格数时它算 2 格，按只数时它不算羊')).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
       Row({ space: Space.sm }) {

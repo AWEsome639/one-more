@@ -312,7 +312,7 @@ export struct GDigitSpanReverse {
           }.width('100%')
         }, (r: number) => 'kr' + r)
       }.width('100%')
-      Text(TG2("已输入：{0}", (this.typed.length === 0 ? '—' : this.typed.join(' ')))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+      Text(TG2("已输入：{0}", (this.typed.length === 0 ? '—' : this.typed.join(' ')))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky).borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })

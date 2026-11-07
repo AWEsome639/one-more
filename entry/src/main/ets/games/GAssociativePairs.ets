@@ -325,7 +325,7 @@ export struct GAssociativePairs {
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.inkFaint); Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card) }.width('100%')
       Column({ space: Space.xs }) {
-        Text(TG('与它最相配的是？')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(TG('与它最相配的是？')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(this.stem.a).fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) { Text(this.opts[(0)].w).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)

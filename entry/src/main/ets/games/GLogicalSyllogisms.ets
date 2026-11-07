@@ -321,7 +321,7 @@ export struct GLogicalSyllogisms {
         Text(this.qIndex >= QN ? '' : this.cur().p2)
           .fontSize(FontSize.md).fontColor(this.theme.ink).width('100%')
         Divider().color(this.theme.line)
-        Text(this.qIndex >= QN ? '' : TG2('结论：{0}', this.cur().concl))
+        Text(this.qIndex >= QN ? '' : TG2('结论：{0}', this.cur().concl)).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(Palette.cyan).width('100%')
       }
       .width('100%').padding(Space.md).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg)
@@ -339,11 +339,11 @@ export struct GLogicalSyllogisms {
           .onBlur(() => { if (this.tvFocus === 'L331') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L331')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.judge(false, ''); }); }).onClick(() => { Haptics.tap(); this.judge(false, ''); })
       }.width('100%')
-      Text(this.feedback.length > 0 ? this.feedback : TG('结论能从两个前提必然推出吗？'))
+      Text(this.feedback.length > 0 ? this.feedback : TG('结论能从两个前提必然推出吗？')).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         .padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       Row({ space: Space.md }) {
-        Text(TG2('分 {0}',Digits(String(this.score), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
+        Text(TG2('分 {0}',Digits(String(this.score), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on())

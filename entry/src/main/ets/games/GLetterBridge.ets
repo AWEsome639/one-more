@@ -301,7 +301,7 @@ export struct GLetterBridge {
           Text(TG('桥')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.primary)
           Text((this.cur().right)).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).textAlign(TextAlign.Center).padding(Space.sm).backgroundColor((this.theme.surfaceAlt)).borderRadius(Radius.sm)
         }.justifyContent(FlexAlign.Center).width('100%')
-        Text(TG2('释义：{0}', this.cur().cn)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+        Text(TG2('释义：{0}', this.cur().cn)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
 
       Row({ space: Space.sm }) {

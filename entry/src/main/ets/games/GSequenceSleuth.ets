@@ -346,7 +346,7 @@ export struct GSequenceSleuth {
       Column({ space: Space.xs }) {
         Text(this.terms.join(' , ') + ' , ?').fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
           .fontColor(this.theme.ink).textAlign(TextAlign.Center).width('100%')
-        Text(TG('第六项是哪一个？')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+        Text(TG('第六项是哪一个？')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
       Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)

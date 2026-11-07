@@ -581,7 +581,7 @@ export struct GMancala {
       Row({ space: Space.sm }) {
         // 对手的库（在左）
         Column({ space: Space.xs }) {
-          Text(LanMatch.isActive() ? TG('对手') : 'AI').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(LanMatch.isActive() ? TG('对手') : 'AI').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           Text(String(this.pits.length > 0 ? this.pits[A_STORE] : 0))
             .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
         }
@@ -663,7 +663,7 @@ export struct GMancala {
 
         // 我方的库（在右）
         Column({ space: Space.xs }) {
-          Text(TG('我')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(TG('我')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           Text(String(this.pits.length > 0 ? this.pits[P_STORE] : 0))
             .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
         }

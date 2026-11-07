@@ -324,7 +324,7 @@ export struct GWordWheel {
       }
       .width('100%')
 
-      Text(this.found.length === 0 ? TG('已找到：（空）') : TG2('已找到：{0}', this.found.join(' · ')))
+      Text(this.found.length === 0 ? TG('已找到：（空）') : TG2('已找到：{0}', this.found.join(' · '))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.xs).fontColor(this.theme.inkFaint).width('100%')
 
       Row({ space: Space.sm }) {

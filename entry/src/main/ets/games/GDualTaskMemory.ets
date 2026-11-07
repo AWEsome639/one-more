@@ -340,7 +340,7 @@ export struct GDualTaskMemory {
         } else if (this.phase === 1) {
           Column({ space: Space.xs }) {
             Text(this.qs.length > 0 ? this.qs[this.qIdx].text : '').fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-            Text(TG2("第 {0}/{1}", String(this.qIdx + 1), String(QS))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+            Text(TG2("第 {0}/{1}", String(this.qIdx + 1), String(QS))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           }
         } else {
           Row({ space: Space.xs }) {

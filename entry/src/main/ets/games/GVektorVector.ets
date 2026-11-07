@@ -315,7 +315,7 @@ export struct GVektorVector {
         .scale({ x: this.scorePulse, y: this.scorePulse })
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.inkFaint); Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: 2 }) {
-      Text((TG('用时'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.clock + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+      Text((TG('用时'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.clock + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card) }.width('100%')
       Column({ space: Space.sm }) {
         Text(this.plus ? 'a + b = ?' : 'a − b = ?').fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
@@ -380,7 +380,7 @@ export struct GVektorVector {
       .onBlur(() => { if (this.tvFocus === 'L370') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L370'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((3)); }); }) }.width('100%')
-      Text(this.msg.length > 0 ? this.msg : TG('选一个正确答案')).fontSize(FontSize.sm)
+      Text(this.msg.length > 0 ? this.msg : TG('选一个正确答案')).fontSize(FontSize.sm).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')

@@ -301,7 +301,7 @@ export struct GCrossSectionSlice {
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
 
-      Text(TG('⬛ = 这一层有方块　▫️ = 这一层是空的（下层再高也不算）'))
+      Text(TG('⬛ = 这一层有方块　▫️ = 这一层是空的（下层再高也不算）')).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
 
       Row({ space: Space.sm }) {

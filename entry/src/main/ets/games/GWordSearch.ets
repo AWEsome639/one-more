@@ -375,7 +375,7 @@ export struct GWordSearch {
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('100%')
-      Text(TG2('藏词：{0}', this.words.join(' · '))).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%')
+      Text(TG2('藏词：{0}', this.words.join(' · '))).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })

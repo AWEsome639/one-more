@@ -316,7 +316,7 @@ export struct GRoomInspector {
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
-      Text(TG('🔍 原样')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+      Text(TG('🔍 原样')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Column({ space: Space.xs }) {
       ForEach(IDXR, (r: number) => {
       Row({ space: Space.xs }) {
@@ -340,7 +340,7 @@ export struct GRoomInspector {
       }.width('100%').padding(Space.xs).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).borderWidth(2)
       .borderColor(false ? Palette.violet : this.theme.line)
-      Text(TG('❗ 找不同 · 点下面这间')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+      Text(TG('❗ 找不同 · 点下面这间')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Column({ space: Space.xs }) {
       ForEach(IDXR, (r: number) => {
       Row({ space: Space.xs }) {

@@ -290,8 +290,8 @@ export struct GOxymoronHunt {
         .borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
-        Text(TG('矛盾修辞')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.sky)
-        Text(TG('两个词互相打架，才叫矛盾修辞')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(TG('矛盾修辞')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.sky).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text(TG('两个词互相打架，才叫矛盾修辞')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.sm }) {

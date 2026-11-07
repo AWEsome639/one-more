@@ -293,7 +293,7 @@ export struct GGrammarSort {
       }.width('100%')
 
       Column({ space: Space.xs }) {
-        Text(this.over ? TG('本局结束') : TG('它是哪种词性？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(this.over ? TG('本局结束') : TG('它是哪种词性？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(this.cur().w).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
 

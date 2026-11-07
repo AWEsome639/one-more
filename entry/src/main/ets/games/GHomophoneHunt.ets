@@ -295,7 +295,7 @@ export struct GHomophoneHunt {
 
       Column({ space: Space.xs }) {
         Text(this.cur().ipa).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.primaryDeep)
-        Text(TG2('释义提示：{0}', this.cur().hint)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+        Text(TG2('释义提示：{0}', this.cur().hint)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
       Column({ space: Space.sm }) {

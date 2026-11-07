@@ -301,7 +301,7 @@ export struct GChalkAndTalk {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
-        Text(TG2('说：「{0}」属于「{1}」吗？', this.word, this.cat)).fontSize(FontSize.lg)
+        Text(TG2('说：「{0}」属于「{1}」吗？', this.word, this.cat)).fontSize(FontSize.lg).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontWeight(FontWeight.Bold).fontColor(this.theme.ink).width('100%').textAlign(TextAlign.Center)
         Row({ space: Space.sm }) {
           Button((TG('是')))
@@ -322,7 +322,7 @@ export struct GChalkAndTalk {
           .outline(Tv.focusOutline(this.tvFocus === 'L313')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.say((false)); }); }).onClick(() => { Haptics.tap(); this.say((false)); })
         }.width('100%')
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-      Text(TG2("写：光标踩中 ✦ 时落笔　得分 ≥{0} 且落笔 ≥{1} 通关",Digits(String(this.diffTotal), this.langCode), WRITE_MIN)).fontSize(FontSize.xs)
+      Text(TG2("写：光标踩中 ✦ 时落笔　得分 ≥{0} 且落笔 ≥{1} 通关",Digits(String(this.diffTotal), this.langCode), WRITE_MIN)).fontSize(FontSize.xs).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
       Row({ space: Space.xs }) {
         ForEach(SLOT_IDX, (i: number) => { Text((i) === this.cursor ? '✍️' : ((i) === this.goal ? '✦' : '·'))

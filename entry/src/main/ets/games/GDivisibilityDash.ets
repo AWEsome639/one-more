@@ -334,7 +334,7 @@ export struct GDivisibilityDash {
         Text(TG('🔢 整除吗？')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
         Text(String(this.num) + ' ÷ ' + String(this.div))
           .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(TG2("连击 {0}", String(this.streak))).fontSize(FontSize.xs).fontColor(this.streak >= 5 ? Palette.orange : this.theme.inkFaint)
+        Text(TG2("连击 {0}", String(this.streak))).fontSize(FontSize.xs).fontColor(this.streak >= 5 ? Palette.orange : this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
 

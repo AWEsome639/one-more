@@ -307,7 +307,7 @@ export struct GFractionalPizza {
           .accessibilityLevel('no')
         Text(TG2('切出 {0} / {1}', String(this.n), String(this.d)))
           .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.amber)
-        Text(TG2('点亮 {0} 片（共 {1} 片）', String(this.n), String(this.d))).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+        Text(TG2('点亮 {0} 片（共 {1} 片）', String(this.n), String(this.d))).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.xs }) {
         ForEach(this.slots, (i: number) => {

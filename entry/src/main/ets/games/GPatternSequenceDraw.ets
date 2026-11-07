@@ -326,7 +326,7 @@ export struct GPatternSequenceDraw {
         }, (r: number) => 'r' + r)
       }.width('100%').layoutWeight(1)
 
-      Text(this.over ? this.msg : TG2('下一笔该点 {0} —— {1}', this.want(), this.msg)).fontSize(FontSize.sm)
+      Text(this.over ? this.msg : TG2('下一笔该点 {0} —— {1}', this.want(), this.msg)).fontSize(FontSize.sm).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%')

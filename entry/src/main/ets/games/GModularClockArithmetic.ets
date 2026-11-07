@@ -329,7 +329,7 @@ export struct GModularClockArithmetic {
       Column({ space: Space.sm }) {
         Text('🕐 ' + TG2(this.forward ? TG2('顺时针再走 {0} 小时', this.delta) : TG2('往回倒拨 {0} 小时', this.delta), '', ''))
           .fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
-        Text(TG2('现在指着 {0} 点 —— 之后是几点？', String(this.start)))
+        Text(TG2('现在指着 {0} 点 —— 之后是几点？', String(this.start))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.berry)
         Row({ space: Space.xs }) {
           ForEach(HOURS, (h: number) => {

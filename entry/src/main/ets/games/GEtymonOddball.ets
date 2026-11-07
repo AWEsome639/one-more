@@ -300,7 +300,7 @@ export struct GEtymonOddball {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
 
-      Text(TG('找出词根异类')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).width('100%')
+      Text(TG('找出词根异类')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Column({ space: Space.sm }) {
         Button((0) < this.shown.length ? this.shown[(0)] : '')

@@ -322,7 +322,7 @@ export struct GTemporalOrder {
           .backgroundColor(this.badge((i)) === '·' ? this.theme.lineSoft : Palette.primary).borderRadius(Radius.full)
           Text(this.opts[(i)].e).fontSize(FontSize.xxl)
           Text(this.opts[(i)].t).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
-          Text(this.picked.indexOf((i)) >= 0 ? TG('第 ') + this.badge((i)) + TG(' 步') : '')
+          Text(this.picked.indexOf((i)) >= 0 ? TG('第 ') + this.badge((i)) + TG(' 步') : '').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           }.width('100%').height(Cell.of(62)).padding(Space.sm)
           .backgroundColor(this.picked.indexOf((i)) >= 0 ? '#336366F1' : this.theme.surface)

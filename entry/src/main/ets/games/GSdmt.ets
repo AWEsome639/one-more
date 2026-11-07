@@ -282,7 +282,7 @@ export struct GSdmt {
       }.width('100%').padding(Space.xs).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
       Column({ space: Space.xs }) {
         Text(SYMS[this.cur]).fontSize(FontSize.hero).fontColor(Palette.lime)
-        Text(TG('这个符号对应哪个数字？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(TG('这个符号对应哪个数字？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').height(120).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {

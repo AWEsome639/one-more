@@ -326,7 +326,7 @@ export struct GDefinitionDash {
       Column({ space: Space.sm }) {
         Text(this.cur().w).fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold)
           .fontColor(Palette.violet)
-        Text(TG('它的意思是？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        Text(TG('它的意思是？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card)

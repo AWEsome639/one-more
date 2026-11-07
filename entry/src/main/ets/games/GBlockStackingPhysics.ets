@@ -293,7 +293,7 @@ export struct GBlockStackingPhysics {
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2], (k: number) => {
           Column({ space: 2 }) {
-            Text(TG2('内宽 {0}', this.at(LEVELS[this.level].inner, k)))
+            Text(TG2('内宽 {0}', this.at(LEVELS[this.level].inner, k))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
             ForEach([4, 3, 2, 1, 0], (row: number) => {
               Text(this.at(this.slots, k * this.diffTotal + row) === 0 ? ''

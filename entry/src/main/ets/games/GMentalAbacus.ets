@@ -323,7 +323,7 @@ export struct GMentalAbacus {
       }.width('100%')
 
       Column({ space: Space.sm }) {
-        Text(TG('🧮 算珠')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(TG('🧮 算珠')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Row({ space: Space.xs }) {
           ForEach(this.chips, (c: string, i: number) => {
             Text(c)

@@ -304,7 +304,7 @@ export struct GFibonacciMerge {
       Column({ space: Space.xs }) {
         Text('🌀').fontSize(FontSize.xxl)
           .accessibilityLevel('no')
-        Text(TG('把相邻两数合成斐波那契数')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.primary)
+        Text(TG('把相邻两数合成斐波那契数')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.primary).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.xs }) {
         ForEach(this.slots, (i: number) => {

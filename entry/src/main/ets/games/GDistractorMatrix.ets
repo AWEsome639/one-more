@@ -333,7 +333,7 @@ export struct GDistractorMatrix {
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
 
-      Text(this.hint.length > 0 ? this.hint : TG2('⏱ 每题 {0} 秒，答得越快加分越多', LIMIT))
+      Text(this.hint.length > 0 ? this.hint : TG2('⏱ 每题 {0} 秒，答得越快加分越多', LIMIT)).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
       Row({ space: Space.sm }) {

@@ -363,7 +363,7 @@ export struct GCubeNetFold {
 
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2], (i: number) => {
-          Text(TG2('可填 {0}', PICK[i])).fontSize(FontSize.sm).fontColor(this.theme.ink).textAlign(TextAlign.Center)
+          Text(TG2('可填 {0}', PICK[i])).fontSize(FontSize.sm).fontColor(this.theme.ink).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
             .layoutWeight(1).height(Cell.of(34)).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm)
         }, (i: number) => 'k' + i)
       }.width('100%')

@@ -328,7 +328,7 @@ export struct GWordLadderStep {
       }.width('100%')
       Column({ space: Space.xs }) {
         Text(this.cur).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(TG2('连击 {0}', this.streak)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(TG2('连击 {0}', this.streak)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => { Text(this.opts.length > (i) ? this.opts[(i)].text : '').fontSize(FontSize.xl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.opts.length > (i) && this.picked >= 0 && ((i) === this.picked || this.opts[(i)].ok) ? '#FFFFFF' : this.theme.ink).width('100%').height(Cell.of(52)).backgroundColor(this.toneOf((i))).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((i)); })

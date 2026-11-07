@@ -443,7 +443,7 @@ export struct GNavonHierarchical {
           .width('100%')
           .textAlign(TextAlign.Center)
         Row({ space: Space.sm }) {
-        Text((TG('大图形（整体轮廓）')))
+        Text((TG('大图形（整体轮廓）'))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         .width(88)
@@ -475,7 +475,7 @@ export struct GNavonHierarchical {
         }
         .width('100%')
         Row({ space: Space.sm }) {
-        Text((TG('小图形（组成小块）')))
+        Text((TG('小图形（组成小块）'))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         .width(88)

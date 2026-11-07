@@ -349,7 +349,7 @@ export struct GWordLadder {
         Text((String(this.left()))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.to)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
