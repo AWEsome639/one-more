@@ -70,7 +70,9 @@ export class Sound {
       // ③ 预加载三个音效
       //   ★ 正确的签名是 load(fd, offset, length) —— 不是 load(RawFileDescriptor)
       //     getRawFd 返回 { fd, offset, length }，要把三个字段拆开传
-      const mgr: resourceManager.ResourceManager = await ctx.resourceManager;
+      // ★ 2026-11-07 lint 抓到的真 Error：`ctx.resourceManager` 是**同步 getter**，不是 Promise
+      //   `await` 一个非 Promise 虽然能跑（TS 会包装），但 ArkTS 严格模式报 await-thenable
+      const mgr: resourceManager.ResourceManager = ctx.resourceManager;
       const t: resourceManager.RawFileDescriptor = await mgr.getRawFd('sfx/tap.wav');
       Sound.idTap = await Sound.pool.load(t.fd, t.offset, t.length);
       const w: resourceManager.RawFileDescriptor = await mgr.getRawFd('sfx/win.wav');
