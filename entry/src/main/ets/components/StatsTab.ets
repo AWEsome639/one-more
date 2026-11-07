@@ -434,7 +434,21 @@ export struct StatsTab {
 
   // ───────────── 页面 ─────────────
 
-  build() {
+    /** 剥掉字典译文自带的尾部箭头（判据 1782：字典有符号时组件不得再画同一个） */
+  private stripArrow(s: string): string {
+    let t: string = s;
+    while (t.length > 0) {
+      const last: string = t.charAt(t.length - 1);
+      if (last === '▲' || last === '▼' || last === '△' || last === '▽' || last === ' ') {
+        t = t.substring(0, t.length - 1);
+      } else {
+        break;
+      }
+    }
+    return t;
+  }
+
+build() {
     Scroll() {
       Column({ space: Space.lg }) {
         // ★ 2026-10-13 巡检发现：统计页缺等级展示（首页有 LV/经验/火焰，这里直接跳到成就）
@@ -935,8 +949,12 @@ export struct StatsTab {
 
       // 展开/收起（53 个全铺开会把徽章墙顶到很下面）
       Row({ space: 4 }) {
-        Text(this.achvExpanded ? this.t('收起', 'Less')
-            : this.tn(TG('看全部 {n} 个'), 'See all {n}', ProgressStore.achievementList().length))
+        // ★★★ 2026-11-07 判据 1782（verifier-dev 扫出的「双符号」）：
+        //   `收起` 的 10 语言译文**全都自带 ▲**（ja「閉じる ▲」/ de「Weniger ▲」…），
+        //   而下一行又画一个 `▲`/`▼` ⇒ 11 种语言显示「閉じる ▲ ▲」。
+        //   ⇒ 剥掉字典里自带的尾部箭头，只留组件画的那一个（方向随展开态）。
+        Text(this.stripArrow(this.achvExpanded ? this.t('收起', 'Less')
+            : this.tn(TG('看全部 {n} 个'), 'See all {n}', ProgressStore.achievementList().length)))
           .fontSize(FontSize.xxs).fontColor(this.accentColor()).fontWeight(FontWeight.Bold)
         Text(this.achvExpanded ? '▲' : '▼').fontSize(FontSize.micro).fontColor(this.accentColor())
       }

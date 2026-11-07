@@ -763,8 +763,13 @@ export struct LevelHeader {
 
       // 今日打卡状态
       Row({ space: Space.xs }) {
-        Text(this.solvedToday ? '✅' : '⭕')
-          .fontSize(FontSize.md)
+        // ★★★ 2026-11-07 判据 1782：`今日已打卡` 的 10 语言译文**全都自带 ✅**
+        //   （I18n.ets:1618 `"de": "✅ Heute erledigt"`…），而这里又画一个独立的 ✅/⭕
+        //   ⇒ 11 种语言显示「✅ ✅ Heute erledigt」。
+        //   ⇒ **删掉独立 emoji，只用译文自带的**；未打卡那支译文不带符号，保留 ⭕ 作视觉锚。
+        if (!this.solvedToday) {
+          Text('⭕').fontSize(FontSize.md)
+        }
         Text(this.solvedToday ? this.t(TG('今日已打卡'), 'Checked in today')
                               : this.t(TG('还没玩 · 来一局就打卡'), 'Not yet — play one round'))
           .fontSize(FontSize.xs)
