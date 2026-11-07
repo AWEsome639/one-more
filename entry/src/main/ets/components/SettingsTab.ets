@@ -32,6 +32,7 @@
  *      最后把「深色模式」这个外观偏好写回 —— 重置的是进度，不该顺手改外观。
  */
 
+import { LengthMetrics } from '@kit.ArkUI';
 import { TG } from '../core/GameI18n';
 import { Sound } from '../core/Sound';
 import { Bp } from '../core/Bp';
@@ -687,7 +688,7 @@ build() {
       .fontColor(this.lang === code ? Color.White : this.theme().inkSoft)
       .textAlign(TextAlign.Center)
       .padding({ left: Space.md, right: Space.md, top: 8, bottom: 8 })
-      .margin({ right: 6, bottom: 6 })
+      .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: 6 })
       .backgroundColor(this.lang === code ? this.accentColor() : this.theme().surfaceAlt)
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
@@ -1123,7 +1124,7 @@ build() {
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
             .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
-            .margin({ right: Space.sm, bottom: Space.xs })   // ★ Flex wrap 靠 margin 拉开间距
+            .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(Space.sm), bottom: Space.xs })   // ★ Flex wrap 靠 margin 拉开间距
             .backgroundColor(this.uiMode === m ? this.accentColor() : this.theme().surfaceAlt)
             .border({ width: 1, color: this.uiMode === m ? this.accentColor() : this.theme().line })
             .borderRadius(Radius.md)

@@ -14,6 +14,7 @@
  * 拾海 2026-10-10
  */
 
+import { LengthMetrics } from '@kit.ArkUI';
 import { TG } from '../core/GameI18n';
 import { router } from '@kit.ArkUI';
 import { Digits } from '../core/I18n';   // ★ 2026-10-16 数字本地化
@@ -584,7 +585,7 @@ build() {
         .fontColor(this.theme().inkSoft)
     }
     .padding({ left: Space.sm, right: Space.sm, top: Space.xs, bottom: Space.xs })
-    .margin({ right: Space.xs, top: Space.xs })
+    .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(Space.xs), top: Space.xs })
     .backgroundColor(this.tint(accent))
     .borderRadius(Radius.full)
   }
@@ -774,7 +775,7 @@ build() {
             this.recentCard(g)
           }, (g: GameMeta) => 'rc-' + g.id + '-' + this.rev())
         }
-        .padding({ right: Space.lg })
+        .padding({ end: LengthMetrics.vp(Space.lg) })
       }
       .scrollable(ScrollDirection.Horizontal)
       .scrollBar(BarState.Off)
@@ -1133,7 +1134,7 @@ build() {
               Text(displayName(g)).fontSize(FontSize.xxs).fontColor(this.theme().ink)
             }
             .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-            .margin({ right: 6, bottom: 6 })
+            .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: 6 })
             .backgroundColor(this.theme().surfaceAlt)
             .borderRadius(Radius.full)
           }, (g: GameMeta) => g.id)

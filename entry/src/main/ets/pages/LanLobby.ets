@@ -7,6 +7,7 @@
  * 拾海 2026-10-11
  */
 
+import { LengthMetrics } from '@kit.ArkUI';
 import { TG } from '../core/GameI18n';
 import { Bp } from '../core/Bp';
 import { router } from '@kit.ArkUI';
@@ -203,7 +204,7 @@ struct LanLobby {
               .fontWeight(this.picked === gid ? FontWeight.Bold : FontWeight.Normal)
               .fontColor(this.picked === gid ? Color.White : this.theme().inkSoft)
               .padding({ left: Space.md, right: Space.md, top: 7, bottom: 7 })
-              .margin({ right: 6, bottom: 6 })
+              .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: 6 })
               .backgroundColor(this.picked === gid ? this.accentColor() : this.theme().surfaceAlt)
               .borderRadius(Radius.full)
               .focusable(Tv.on())

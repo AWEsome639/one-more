@@ -5,6 +5,7 @@
  * 动效一律走 Motion 的时长，按下必有 0.96 缩放反馈。
  */
 
+import { LengthMetrics } from '@kit.ArkUI';
 import { TG } from '../core/GameI18n';
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
@@ -625,7 +626,7 @@ export struct LevelHeader {
             }
             .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
-            .margin({ left: Space.xs })
+            .margin({ start: LengthMetrics.vp(Space.xs) })
           }
           .width('100%')
 
@@ -674,7 +675,7 @@ export struct LevelHeader {
             }
             .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
-            .margin({ left: Space.md })
+            .margin({ start: LengthMetrics.vp(Space.md) })
           }
           .width('100%')
 
@@ -721,7 +722,7 @@ export struct LevelHeader {
             }
             .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
-            .margin({ left: Space.md })
+            .margin({ start: LengthMetrics.vp(Space.md) })
 
             // ★★★ 2026-11-07 布局审计（S-05）：窄屏大字模式下「火焰」换到下一行。
             //   实测 elder + 360vp：卡内 240 − 徽章 74 − 间距 24 − 火焰 ≈101.5 ⇒ 文字列只剩 **≈40.5vp**，
@@ -1323,7 +1324,7 @@ build() {
           //   ⇒ 有连胜时让出 48vp，没连胜时保持 6vp（不能无条件留空）。
           // ★ 2026-11-07：右内边距按**实际角标**算（🏆/分数/🔥 都算进去），
           //   不再写死"有连胜就 48" —— 否则新角标会压住副标题（判据 268 同类问题）。
-          .padding({ right: this.badgePadRight() })
+          .padding({ end: LengthMetrics.vp(this.badgePadRight()) })
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
@@ -1403,7 +1404,7 @@ build() {
           }
         }
         .padding({ left: 7, right: 7, top: 2, bottom: 2 })
-        .margin({ right: Space.xs, bottom: Space.xs })
+        .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(Space.xs), bottom: Space.xs })
         .backgroundColor(Overlay.chip)
         .borderRadius(Radius.full)
       }

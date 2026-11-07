@@ -9,6 +9,7 @@
  *   「一搜索整个列表区就不渲染」——根因是补丁残留，不是逻辑）
  */
 
+import { LengthMetrics } from '@kit.ArkUI';
 import { ChatFinder, Intent, Suggestion } from '../core/ChatFinder';
 import { TG } from '../core/GameI18n';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -1475,7 +1476,7 @@ build() {
         .width(Layout.touchMin).height(Layout.touchMin).textAlign(TextAlign.Center)
         .backgroundColor(this.theme().surface).borderRadius(Radius.full)
         .shadow(Shadow.card)
-        .margin({ left: Space.xs })
+        .margin({ start: LengthMetrics.vp(Space.xs) })
         .scale({ x: this.langPressed ? IconPress.scale : 1, y: this.langPressed ? IconPress.scale : 1 })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onTouch((e: TouchEvent) => {
@@ -1940,7 +1941,7 @@ build() {
       .fontWeight(this.picked.indexOf(t.id) >= 0 ? FontWeight.Bold : FontWeight.Normal)
       .fontColor(this.picked.indexOf(t.id) >= 0 ? Color.White : this.theme().inkSoft)
       .padding({ left: 10, right: 10, top: 5, bottom: 5 })
-      .margin({ right: 6, bottom: 6 })
+      .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: 6 })
       .backgroundColor(this.picked.indexOf(t.id) >= 0 ? this.accentColor() : this.theme().surfaceAlt)
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
@@ -2424,7 +2425,7 @@ build() {
     .height('100%')
     .justifyContent(FlexAlign.Center)
     .width(40)                    // ★★ 两列各 18vp ⇒ 容器必须 ≥36vp（原来是 22 ⇒ 右列被水平裁掉！）
-    .margin({ right: Space.xs })
+    .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(Space.xs) })
   }
 
   /** 组头：一枚字母 + 该字母下的款数（不是 @Builder 传值 —— 直接读参数对象） */

@@ -11,6 +11,7 @@
  *   onFinish: (r: GameResult) => void
  */
 
+import { LengthMetrics } from '@kit.ArkUI';
 import { TG } from '../core/GameI18n';
 import { Hint } from '../ai/Hint';
 import { Demo } from '../core/Demo';
@@ -1078,7 +1079,7 @@ struct GameHost {
             }
             .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
-            .margin({ left: Space.md })
+            .margin({ start: LengthMetrics.vp(Space.md) })
           } else {
             Row() {}.layoutWeight(1)
           }
