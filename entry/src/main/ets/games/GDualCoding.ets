@@ -276,7 +276,7 @@ export struct GDualCoding {
     if (this.done) { return; }
     this.done = true; this.over = true; this.won = this.right >= NEED;
     this.msg = (this.won ? TG('🎉 通关！') : TG('💤 本局结束：'))
-      + TG('答对 ') + String(this.right) + '/' + String(KEEP);
+      + TG2('答对 {0}', String(this.right)) + '/' + String(KEEP);
     const r: GameResult = {
       gameId: 'dual_coding', solved: this.won,
       score: this.right * 150, durationMs: Date.now() - this.startAt,

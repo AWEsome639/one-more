@@ -258,7 +258,7 @@ export struct GStroopTest {
       })
       Row() {
         Text(TG2("题号 {0}/{1}", String(this.round), String(this.diffTotal))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
-        Text(TG('答对 ') + String(this.right)).fontSize(FontSize.sm).fontColor(Palette.teal)
+        Text(TG2('答对 {0}', String(this.right))).fontSize(FontSize.sm).fontColor(Palette.teal)
         Text(TG('通关线 10')).fontSize(FontSize.sm).fontColor(this.theme.ink)
       }
       .width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
