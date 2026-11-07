@@ -570,6 +570,9 @@ export struct GKlotski {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
+      // ★ 2026-11-08 RTL：棋子/出口都用 `position({ x: …% })` **绝对坐标**（列号 × 100/COLS），
+      //   `direction` 不镜像 position ⇒ 只把**棋盘**钉成 Ltr（文字 chrome 在父级仍走 RTL）。
+      .direction(Direction.Ltr)
 
       // ★ 2026-10-31：演示文案改由 HintBar 那一行承载（demoMsg），
       //   不再另开一行 Text —— 单独那行在横屏布局里**不渲染**（真机 dump 抓不到）。

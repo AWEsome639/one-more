@@ -584,6 +584,12 @@ export struct GPong {
       .borderRadius(Radius.md)
       .shadow(Shadow.card)
       .clip(true)
+      // ★ 2026-11-08 RTL（判据：「按位置摆的不能镜像，按顺序排的必须镜像」）：
+      //   球场里的球拍/球/中线都用 `position({ x: …% })` **绝对坐标**，而 `direction`
+      //   只会镜像流式布局、**不会**镜像 position ⇒ 页面切 RTL 后 HUD 镜像到右边、
+      //   球台还留在左边（球拍与手指位置对不上）。
+      //   ⇒ 只把**球场**钉成 Ltr（文字 chrome 在父级 Column 里，仍然正常镜像）。
+      .direction(Direction.Ltr)
       .onAreaChange((oldArea: Area, newArea: Area) => {
         const h: number = newArea.height as number;
         if (h > 0) {

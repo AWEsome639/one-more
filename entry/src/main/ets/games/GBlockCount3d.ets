@@ -307,6 +307,8 @@ export struct GBlockCount3d {
         }, (r: number) => 'br' + r)
       }
       .width('100%').padding(Space.sm).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg)
+      Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
       Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
         .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
@@ -329,8 +331,6 @@ export struct GBlockCount3d {
         }, (i: number) => 'o' + i)
       }
       .width('100%')
-      Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

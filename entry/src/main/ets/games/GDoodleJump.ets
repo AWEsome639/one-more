@@ -531,6 +531,9 @@ export struct GDoodleJump {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
       .clip(true)
+      // ★ 2026-11-08 RTL：平台/青蛙全是 `position({ x: …% })` 绝对坐标，
+      //   `direction` 不镜像 position ⇒ 只把**跳跃区**钉成 Ltr（文字 chrome 仍走 RTL）。
+      .direction(Direction.Ltr)
       .shadow(Shadow.card)
       // ★ P9 同类：手指在场地里左右拖 = 青蛙左右走（不用去够下面两个按钮）
       .gesture(

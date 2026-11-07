@@ -289,6 +289,9 @@ export struct GOrbitTap {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((i)); }); }) }, (i: number) => 'slot' + i)
       }.width(ARENA).height(ARENA).backgroundColor(this.theme.surface)
       .borderRadius(Radius.xl).shadow(Shadow.card)
+      // ★ 2026-11-08 RTL：小圆点用 `position({ x: pctOf(slotX(i)) })` **绝对坐标**，
+      //   `direction` 不镜像 position ⇒ 只把**靶场**钉成 Ltr（文字 chrome 在父级仍走 RTL）。
+      .direction(Direction.Ltr)
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })

@@ -50,7 +50,12 @@ ABS_WHITELIST = [
 ]
 # ③ 白名单：确实要单边的（例如紧贴屏幕左缘的抽屉）；每条必须写理由
 EDGE_WHITELIST = [
-    # 例：('entry/src/main/ets/pages/Splash.ets', 'left: 24', '品牌 logo 贴左缘是设计稿硬约束'),
+    # ★ 2026-11-08（lead 确认）：游戏内布局不参与镜像 —— 这些间距是**题目坐标系**的一部分
+    #   （棋盘/选项网格按行列摆放），不随界面方向翻转，所以单边是刻意的。
+    ('entry/src/main/ets/games/GGrammarPolice.ets', 'right: Space.xs',
+     '游戏内选项网格：按题目坐标摆放，不随语言镜像（lead 2026-11-08 确认）'),
+    ('entry/src/main/ets/games/GVisualSearchConjunction.ets', 'right: Space.xs',
+     '游戏内选项网格：按题目坐标摆放，不随语言镜像（lead 2026-11-08 确认）'),
 ]
 
 

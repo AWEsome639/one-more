@@ -342,7 +342,7 @@ export struct GTypoglycemiaDecoder {
 
   @Builder
   option(text: string, i: number) {
-    Text(text).fontSize(FontSize.sm).textAlign(I18n.isRTL() ? TextAlign.End : TextAlign.Start).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
+    Text(text).fontSize(FontSize.sm).textAlign(TextAlign.Start).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
       .fontColor(this.locked && (this.picked === i || this.opts[i] === this.cur().text) ? '#FFFFFF' : this.theme.ink)
       .width('100%').padding(Space.sm).borderRadius(Radius.md).shadow(Shadow.card)
       .backgroundColor(this.locked && this.opts[i] === this.cur().text

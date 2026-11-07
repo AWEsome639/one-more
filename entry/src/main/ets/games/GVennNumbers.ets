@@ -338,6 +338,10 @@ export struct GVennNumbers {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapZone((2)); }); }) }
           .width('100%').height(150).justifyContent(FlexAlign.Center)
       }.width('100%').height(150)
+      // ★ 2026-11-08 RTL：背后两个 `Circle` 用 `position({ x: 8 / 78 })` **绝对坐标**，
+      //   而 A/B 选项是 Row 流式排列（RTL 会整体镜像）⇒ 不钉住的话圆会跑到另一个选项底下。
+      //   ⇒ 只把**这个图形区**钉成 Ltr（文字 chrome 在父级仍走 RTL）。
+      .direction(Direction.Ltr)
       Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Center }) {
         ForEach(this.slotIdx(), (i: number) => { Text(this.live((i)) ? String(this.items[(i)].v) : '·')
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold)

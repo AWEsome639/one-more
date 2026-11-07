@@ -147,6 +147,21 @@ fi
 FAIL=$((FAIL + KEY_N))
 printf "     %-42s %6s / %d\n" "check_key_coverage.py（key 覆盖）" "-" "${KEY_N}"
 
+# ── RTL 静态陷阱（2026-11-08 新增）：方向符号 / 绝对对齐 / 单边边距 ──
+#   来历：RTL（阿拉伯语）下 `Text('›')`、`TextAlign.Left`、`margin({ left })` 一定坏，
+#     且只有阿语用户能看到；运行时很难回归，所以做成静态闸门。
+#   白名单：games/ 玩法方向符号 2 处 + 游戏内网格单边边距 2 处（题目坐标不参与镜像，lead 确认）。
+#   ★ 纯闸门：只 FAIL += N、不动 TOT（基线 200359 不用改）；rc=2 也算失败。
+RTL_OUT=$(python3 "$(dirname "$0")/../tools/check_rtl.py" 2>&1)
+RTL_RC=$?
+RTL_N=$(printf '%s' "${RTL_OUT}" | grep -oE "RTL陷阱：[0-9]+ 处" | grep -oE "[0-9]+" | tail -1)
+if [ "${RTL_RC}" -eq 2 ] || [ -z "${RTL_N}" ]; then
+  RTL_N=1
+  echo "     ⚠️ check_rtl.py 无法给出结论（rc=${RTL_RC}）⇒ 按 1 处失败计，别当绿"
+fi
+FAIL=$((FAIL + RTL_N))
+printf "     %-42s %6s / %d\n" "check_rtl.py（RTL 陷阱）" "-" "${RTL_N}"
+
 echo "     ────────────────────────────────────────────────"
 printf "     %-42s %6d / %d\n" "合计" "${TOT}" "${FAIL}"
 

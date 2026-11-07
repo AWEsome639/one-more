@@ -634,6 +634,9 @@ export struct GFlappy {
       .backgroundColor(this.theme.isDark ? '#0B1220' : '#E0F2FE')
       .borderRadius(Radius.lg)
       .clip(true)
+      // ★ 2026-11-08 RTL：管道/小鸟/地面全是 `position({ x: …% })` 绝对坐标，
+      //   `direction` 不镜像 position ⇒ 只把**飞行区**钉成 Ltr（文字 chrome 仍走 RTL）。
+      .direction(Direction.Ltr)
       .shadow(Shadow.card)
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L636'; })

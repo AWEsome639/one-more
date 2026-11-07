@@ -544,7 +544,6 @@ build() {
       .layoutWeight(1)
     }
     .width('100%')
-    .direction(this.rtl() ? Direction.Rtl : Direction.Ltr)
     .height('100%')
     .backgroundColor(this.theme().bg)
     .opacity(this.entered ? 1 : 0)
@@ -571,14 +570,13 @@ build() {
       }
       .width('100%').height('100%')
     }
-    // ★★★ 2026-11-08（RTL 缺口）：**阿语布局从未镜像过** —— 真机验收确认
-    //   （标题在左、搜索图标在左、卡片顺序从左到右、底部栏未镜像）。
-    //   根因：全项目 `.direction(` 只有 GameHost 一处，主界面这一层完全没有。
-    //   加在这里（build 的根 Stack）就够：`direction` 会**继承给整棵子树**，
-    //   三个 Tab（GamesTab/StatsTab/SettingsTab）都在这里面，不必在子组件重复加。
-    //   ⚠️ 用 this.rtl() 而不是直接 I18n.isRTL()：后者读的是模块级静态缓存，
-    //      ArkUI 看不到依赖 ⇒ 切语言不会重算。见 rtl() 里的"依赖声明"。
+    // ★★★ 2026-11-08 RTL：挂在**根 Stack** 上，覆盖整页（含隐私/引导遮罩）。
+    //   ⚠️ 真机实测：这一层**不会**穿透进 `Tabs/TabContent` 里的自定义组件 ——
+    //      阿语下箭头镜像了（说明 rtl() 正常），但标题仍在左、模式胶囊仍是 LTR 顺序。
+    //   ⇒ 三个 Tab 各自在自己的根上又声明了一份（GamesTab/StatsTab/SettingsTab）。
+    //   ⚠️ 用 this.rtl() 而不是裸 I18n.isRTL()：后者读静态缓存，ArkUI 看不到依赖。
     }
+    .direction(this.rtl() ? Direction.Rtl : Direction.Ltr)
   }
 
   /**

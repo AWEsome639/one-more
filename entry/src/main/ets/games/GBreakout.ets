@@ -612,6 +612,9 @@ export struct GBreakout {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         .clip(true)
+        // ★ 2026-11-08 RTL：球场里的板/球全是 `position({ x: …% })` 绝对坐标，
+        //   `direction` 不镜像 position ⇒ 只把**球场**钉成 Ltr（文字 chrome 在父级仍走 RTL）。
+        .direction(Direction.Ltr)
         .onAreaChange((oldArea: Area, newArea: Area) => {
           const w: number = newArea.width as number;
           if (w > 0) {

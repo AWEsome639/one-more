@@ -3401,6 +3401,15 @@ struct GameHost {
         }
         .layoutWeight(1)
         .width('100%')
+        // ★★★ 2026-11-08 **一处止血 165 款**（ai-fixer-b 全量扫描 + 真机实测）：
+        //   **165 款游戏**用 `width('100%') + aspectRatio(1)` 求棋盘 —— 假设「宽 ≤ 高」。
+        //   横屏 853×533 时棋盘变成 **813vp 高**（可用高只有 ≈352vp，是它的 2.3 倍）
+        //   ⇒ 底部按钮被顶出屏幕：`G2048` 重开 +113vp / `GSokoban` 整行 +324vp /
+        //     `GCountdownMath` +143vp / `GPythagoreanTripleBuilder` 键盘 +37vp / `GLaserLink` 半裁。
+        //   ⇒ 给游戏区**加高度上限**：棋盘按上限反推宽度缩小（可玩 > 溢出），**不用逐款改**。
+        //   可用高实测：533 − 状态栏 66 − 顶栏 45 − padding 20 − HintBar 38 ≈ **352vp**
+        //   ⇒ 上限取 `Bp.height - 190`（533 → 343，留 9vp 余量）。
+        .constraintSize({ maxHeight: Bp.height - 190 })
         .padding({ left: Space.lg, right: Space.lg, bottom: Space.lg })
         // ═══ 棋盘键盘接收层：**第 10 次尝试，已回滚（第 683 轮）** ═══
         //   做法：在游戏区坐标叠一个 `.position({0,0})` 的可聚焦 Column `boardkey`，

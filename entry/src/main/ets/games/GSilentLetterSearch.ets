@@ -309,6 +309,8 @@ export struct GSilentLetterSearch {
 
       Column({ space: Space.sm }) {
         Text(TG('🔠 哪个字母不发音？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+      Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
         Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
           .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
@@ -333,8 +335,6 @@ export struct GSilentLetterSearch {
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
 
-      Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })

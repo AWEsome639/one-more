@@ -577,7 +577,7 @@ export struct GKenken {
               .fontSize(FontSize.xxs)
               .fontColor(this.theme.inkFaint)
               .width('100%')
-              .textAlign(I18n.isRTL() ? TextAlign.End : TextAlign.Start)
+              .textAlign(TextAlign.Start)
               Text(this.vals[(r * N + c)] === 0 ? '' : String(this.vals[(r * N + c)]))
               .fontSize(FontSize.xl)
               .fontWeight(FontWeight.Bold)

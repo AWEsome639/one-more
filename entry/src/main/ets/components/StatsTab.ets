@@ -521,6 +521,10 @@ build() {
     .backgroundColor(this.theme().bg)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
+    // ★★★ 2026-11-08 RTL：**必须在每个 Tab 的根上加** —— 实测 `direction` 不会从
+    //   Index 那一层继承进 `Tabs/TabContent`（真机验证：阿语下箭头镜像了、
+    //   但标题仍在左、模式胶囊仍是 LTR 顺序 ⇒ 继承没穿透到自定义组件）。
+    .direction(this.rtl() ? Direction.Rtl : Direction.Ltr)
   }
 
   /**
