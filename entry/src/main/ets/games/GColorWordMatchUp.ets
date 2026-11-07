@@ -239,7 +239,7 @@ export struct GColorWordMatchUp {
     this.over = true;
     this.won = solved;
     this.msg = solved ? TG("🎉 通关：答对 ") + this.correct + ' / ' + this.diffTotal
-      : TG('答对 ') + this.correct + ' 题，再来一局';
+      : TG2('答对 {0} 题，再来一局', String(this.correct));
     if (this.finished) { return; }
     this.finished = true;
     const r: GameResult = {

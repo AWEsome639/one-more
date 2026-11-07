@@ -322,7 +322,7 @@ export struct GNarrativeRecall {
             Row() {
         Text(TG2('篇数 {0}', (String(this.round) + '/' + String(ROUNDS)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2("题号 {0}", (this.phase === 1 ? String(this.qIdx + 1) + '/' + String(this.story.qs.length) : TG('阅读')))).fontSize(FontSize.xs).fontColor(this.theme.ink)
-        Text(TG('答对 ') + (String(this.right) + '/' + String(this.asked))).fontSize(FontSize.xs).fontColor(this.theme.ink)
+        Text(TG2('答对 {0}/{1}', String(this.right), String(this.asked))).fontSize(FontSize.xs).fontColor(this.theme.ink)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       .shadow(Shadow.card).justifyContent(FlexAlign.SpaceBetween)
 

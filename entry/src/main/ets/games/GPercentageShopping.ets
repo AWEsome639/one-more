@@ -304,7 +304,7 @@ export struct GPercentageShopping {
     if (this.round >= this.diffTotal) {
       const ok: boolean = this.right >= PASS;
       this.msg = ok ? TG('🎉 答对 ') + this.right + '/' + this.diffTotal + ' 件，通关！'
-        : TG('答对 ') + this.right + '/' + this.diffTotal + ' 件，还差一点';
+        : TG2('答对 {0}/{1} 件，还差一点', String(this.right), String(this.diffTotal));
       this.finish(ok);
       return;
     }
