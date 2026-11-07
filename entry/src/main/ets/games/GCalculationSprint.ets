@@ -139,7 +139,7 @@ export struct GCalculationSprint {
     this.left = this.left - 1;
     if (this.left <= 0) {
       this.left = 0;
-      this.lose(TG('⏰ 时间到，答对 ') + String(this.right) + ' 题，没到 ' + String(GOAL) + TG(' 题'));
+      this.lose(TG2('⏰ 时间到，答对 {0} 题', String(this.right)) + ' 题，没到 ' + String(GOAL) + TG(' 题'));
     }
   }
 
@@ -358,7 +358,7 @@ export struct GCalculationSprint {
       return;
     }
     if (this.left <= 0) {
-      this.lose(TG('⏰ 时间到，答对 ') + String(this.right) + TG(' 题'));
+      this.lose(TG2('⏰ 时间到，答对 {0} 题', String(this.right)) + TG(' 题'));
       return;
     }
     this.ask();

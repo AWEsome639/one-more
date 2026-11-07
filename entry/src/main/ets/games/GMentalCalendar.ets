@@ -115,7 +115,7 @@ export struct GMentalCalendar {
   private tick(): void {
     if (this.over) { return; }
     this.left = this.left - 1;
-    if (this.left <= 0) { this.left = 0; this.end(false, TG('⏰ 时间到，答对 ') + String(this.right) + TG(' 题')); }
+    if (this.left <= 0) { this.left = 0; this.end(false, TG2('⏰ 时间到，答对 {0} 题', String(this.right)) + TG(' 题')); }
   }
 
   private ask(): void {
@@ -278,7 +278,7 @@ export struct GMentalCalendar {
   private advance(): void {
     if (this.over) { return; }
     if (this.right >= GOAL) { this.end(true, TG('🎉 答对 ') + String(GOAL) + ' 个日期，通关！剩 ' + String(this.left) + TG(' 秒')); return; }
-    if (this.left <= 0) { this.end(false, TG('⏰ 时间到，答对 ') + String(this.right) + TG(' 题')); return; }
+    if (this.left <= 0) { this.end(false, TG2('⏰ 时间到，答对 {0} 题', String(this.right)) + TG(' 题')); return; }
     this.ask();
   }
 

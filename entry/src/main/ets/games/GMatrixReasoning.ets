@@ -103,7 +103,7 @@ export struct GMatrixReasoning {
   private tick(): void {
     if (this.over) { return; }
     this.left = this.left - 1;
-    if (this.left <= 0) { this.left = 0; this.end(false, TG('⏰ 时间到，答对 ') + String(this.right) + TG(' 题')); }
+    if (this.left <= 0) { this.left = 0; this.end(false, TG2('⏰ 时间到，答对 {0} 题', String(this.right)) + TG(' 题')); }
   }
 
   private ask(): void {
@@ -287,7 +287,7 @@ export struct GMatrixReasoning {
   private advance(): void {
     if (this.over) { return; }
     if (this.right >= GOAL) { this.end(true, TG2('🎉 答对 {0} 题，通关！剩 {1} 秒', String(GOAL), String(this.left))); return; }
-    if (this.left <= 0) { this.end(false, TG('⏰ 时间到，答对 ') + String(this.right) + TG(' 题')); return; }
+    if (this.left <= 0) { this.end(false, TG2('⏰ 时间到，答对 {0} 题', String(this.right)) + TG(' 题')); return; }
     this.ask();
   }
 
