@@ -369,7 +369,7 @@ export struct GGo9 {
     this.thinking = false;
     this.koStr = '';
     this.finished = false;
-    this.msg = LanMatch.isActive() ? '联机：黑先（房主执黑）' : TG('点交叉点落子，黑先');
+    this.msg = LanMatch.isActive() ? TG('联机：黑先（房主执黑）') : TG('点交叉点落子，黑先');
     if (LanMatch.isActive()) {
       // ★ 联机：本地 turn 必须跟"轮到谁"对齐（加入方执白，开局等房主落子）
       this.turn = LanMatch.myTurn() ? BLACK : WHITE;
@@ -420,7 +420,7 @@ export struct GGo9 {
     this.turn = this.turn === BLACK ? WHITE : BLACK;
     if (LanMatch.isActive()) {
       this.turn = LanMatch.myTurn() ? BLACK : WHITE;
-      this.msg = this.turn === BLACK ? '联机：轮到你' : TG('联机：等对手落子…');
+      this.msg = this.turn === BLACK ? TG('联机：轮到你') : TG('联机：等对手落子…');
       return;
     }
     this.msg = TG('双方各停一手就数子');
@@ -698,7 +698,7 @@ export struct GGo9 {
       }
       LanMatch.record(String(i));               // ★ 先广播（对方靠这一步算同样的局面）
       this.turn = LanMatch.myTurn() ? BLACK : WHITE;
-      this.msg = this.turn === BLACK ? '联机：轮到你' : TG('联机：等对手落子…');
+      this.msg = this.turn === BLACK ? TG('联机：轮到你') : TG('联机：等对手落子…');
       return;
     }
     if (!this.play(i, BLACK)) {
@@ -733,7 +733,7 @@ export struct GGo9 {
         return;
       }
       this.turn = LanMatch.myTurn() ? BLACK : WHITE;
-      this.msg = this.turn === BLACK ? '联机：轮到你' : TG('联机：等对手落子…');
+      this.msg = this.turn === BLACK ? TG('联机：轮到你') : TG('联机：等对手落子…');
       return;
     }
     this.pass();
@@ -915,7 +915,7 @@ export struct GGo9 {
         return;
       }
       this.turn = LanMatch.myTurn() ? BLACK : WHITE;
-      this.msg = this.turn === BLACK ? '联机：轮到你' : TG('联机：等对手落子…');
+      this.msg = this.turn === BLACK ? TG('联机：轮到你') : TG('联机：等对手落子…');
       return;
     }
     const i: number = Number.parseInt(d, 10);
@@ -930,7 +930,7 @@ export struct GGo9 {
       return;
     }
     this.turn = LanMatch.myTurn() ? BLACK : WHITE;
-    this.msg = this.turn === BLACK ? '联机：轮到你' : TG('联机：等对手落子…');
+    this.msg = this.turn === BLACK ? TG('联机：轮到你') : TG('联机：等对手落子…');
   }
 
   /** 重开：联机要通知对方一起重置，并把回合翻回房主（先手执黑） */

@@ -243,7 +243,7 @@ export struct GChoiceReactionTime {
     } else {
       this.total = this.total + LIMIT_MS * 2;
       this.wrong = this.wrong + 1;
-      this.msg = TG2("❌ {0} 是{1}，这题按 {2} ms 计", String(this.val), (isEven ? '偶数' : TG('奇数')), String(LIMIT_MS * 2));
+      this.msg = TG2("❌ {0} 是{1}，这题按 {2} ms 计", String(this.val), (isEven ? TG('偶数') : TG('奇数')), String(LIMIT_MS * 2));
     }
     this.nextTo = setTimeout(() => {
       this.nextTo = -1;
