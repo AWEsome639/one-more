@@ -494,9 +494,25 @@ def _open_search():
     sb = _search_btn(ns)
     if not sb:
         return None
-    tap(sb, 2.0)
-    d = dump()
-    return _text_input(nodes(d)) if d else None
+    # ★ 判据 1763（2026-11-07）：点一次 + dump 一次不够 —— 面板有时要 3~5 秒才出来
+    #   （跨游戏返回后首页还在动画/搜索按钮刚重绘）⇒ 连点最多 3 次、每次等 1.5s 再 dump。
+    for attempt in range(3):
+        tap(sb, 1.5)
+        d = dump()
+        ti = _text_input(nodes(d)) if d else None
+        if ti:
+            return ti
+        # 再拿一次按钮（可能位置变了）
+        ns = nodes(d) if d else []
+        sb = _search_btn(ns)
+        if not sb:
+            time.sleep(1.0)
+            d = dump()
+            ns = nodes(d) if d else []
+            sb = _search_btn(ns)
+            if not sb:
+                return None
+    return None
 
 
 def _clear_input(name):
@@ -590,12 +606,43 @@ def canonical_name(name):
     return name, gid_for(name)
 
 
+def _ensure_home():
+    """★ 判据 1763（2026-11-07）：进游戏前**先确保在首页**。
+    \n    原来 `open_game` 假设"每次都在首页"，可上一款可能停在结算页/隐私页/设置页
+    \n    （真机实测：验证器在「One More — Privacy Policy」页上点搜索键 ⇒ 必然 FAIL）。
+    \n    做法：按 `‹` 最多 5 次，直到页面出现「One More」且没有 `‹`（首页没有返回键）。
+    """
+    for _ in range(5):
+        d = dump()
+        ns = nodes(d) if d else []
+        txt = [x['text'] for x in ns if x['text']]
+        joined = '|'.join(txt)
+        # ★ 判据 1764：隐私政策是**用系统浏览器打开的网页**（`awesome639.github.io`）
+        #   ⇒ 检测到浏览器地址栏就直接 `aa start` 把 app 拉回来（网页里没有 `‹` 可点）
+        if 'awesome639.github.io' in joined or ('Privacy Policy' in joined and 'Developer' in joined):
+            sh("aa force-stop com.andrewoscar.onemore; sleep 1; aa start -a EntryAbility -b com.andrewoscar.onemore")
+            time.sleep(6)
+            continue
+        on_home = ('One More' in joined) and ('355' in joined) and not any(t == '‹' for t in txt)
+        if on_home:
+            return True
+        back = next((x for x in ns if x.get('text') == '‹'), None)
+        if back is None:
+            # 没有返回键又不在首页 ⇒ 可能是游戏内（关掉）或未知页
+            time.sleep(1.0)
+            continue
+        tap(back, 1.2)
+    return False
+
+
 def open_game(name):
     """搜索并进入游戏；返回 (ok, why)。
 
     ★ 判据 1678：第一次搜不到 ⇒ **清空搜索框重搜一次**（第 ④ 级兜底），仍无才 FAIL。
       实测「进不去游戏」多数是搜索词没吃进去 / 卡片匹配过严，不是游戏打不开。
+    ★ 判据 1763：**先回首页**（否则在隐私页/结算页上点什么都没用）。
     """
+    _ensure_home()
     name, gid = canonical_name(name)
     for attempt in (1, 2):
         _BUDGET.check()
