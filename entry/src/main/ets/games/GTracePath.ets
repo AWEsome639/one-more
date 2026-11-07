@@ -250,7 +250,8 @@ export struct GTracePath {
       this.traced = t;
       if (t.length < this.path.length) { this.note = TG2('继续 · {0}/{1}', String(t.length), String(LEN)); return; }
       if (this.round + 1 >= this.diffTotal) { this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return; }
- TG2("✅ 第 {0} 条描完",Digits(String(this.round), this.langCode)); this.note = TG2('✅ 第 {0} 条描完',Digits(String(this.round), this.langCode));
+      // ★ 2026-11-07 清掉一行裸 TG2 表达式（无赋值、无副作用，lint 没报但看着像 bug）
+      this.note = TG2('✅ 第 {0} 条描完', Digits(String(this.round), this.langCode));
       this.newPath();
       return;
     }
