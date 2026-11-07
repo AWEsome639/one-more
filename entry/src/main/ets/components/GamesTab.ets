@@ -1311,6 +1311,16 @@ build() {
       const now: number = Date.now();
       animateTo({ duration: 520, curve: Curve.ExtremeDeceleration }, () => {
         this.topCollapsed = !this.topCollapsed;
+        // ★★★ 2026-11-07 **功能性 bug**（code-hunter 交互死角扫描 P0-1）：
+        //   `elderExpanded` 这个 @State **全文件从来没有被赋值过**，而 `effCollapsed()` 在
+        //   大字模式下一律 `return true`（只用 `topCollapsed` 没用）
+        //   ⇒ **大字模式下点「展开」→ 震一下、界面纹丝不动**。
+        //   注释里写着「手点展开后就不再强制收起」——那套逻辑从来没接上。
+        //   ⇒ 大字模式下手点「展开」时置 true，让 effCollapsed 尊重用户。
+        if (this.uiMode === 'elder') {
+          this.elderExpanded = true;
+          this.topCollapsed = false;
+        }
         // ★ 手动操作后 2 秒内不被自动收起逻辑抢回（体验）
         this.manualUntil = now + 2000;
         this.lastToggle = now;

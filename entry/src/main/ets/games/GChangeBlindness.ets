@@ -304,7 +304,7 @@ export struct GChangeBlindness {
       Text((TG('得分'))).fontSize(FontSize.xxs)
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
-        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.inkFaint); Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis }); Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card) }.width('100%')
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.phase === 2 ? Palette.lime : this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)

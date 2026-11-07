@@ -112,16 +112,27 @@ struct Index {
     this.showPrivacy = true;
   }
 
-  /** 打开隐私政策全文（系统浏览器） */
+  /**
+   * 打开隐私政策全文（系统浏览器）。
+   *
+   * ★★★ 2026-11-07 **交互死角**（code-hunter 扫描 P0-2）：
+   *   原来只有同步 `try/catch`，而 `startAbility()` 返回 **Promise** ——
+   *   同步 try 根本抓不到异步失败，catch 块里也只有一句注释（**什么也没做**）
+   *   ⇒ 用户点「查看全文」打不开时**零反馈**，只会觉得按钮坏了。
+   *   而**同一个 app 的同一个链接**，设置页那块是对的（挂了 `.catch()` 显示地址）
+   *   ⇒ 照抄那 6 行。
+   */
   private openPrivacy(): void {
     const url: string = this.langCode === 'en' ? About.PRIVACY_URL_EN : About.PRIVACY_URL;
-    try {
-      const ctx = getContext(this) as common.UIAbilityContext;
-      const want: Want = { action: 'ohos.want.action.viewData', uri: url };
-      ctx.startAbility(want);
-    } catch (e) {
+    const ctx = getContext(this) as common.UIAbilityContext;
+    ctx.startAbility({
+      action: 'ohos.want.action.viewData',
+      uri: url
+    }).catch(() => {
       // 打不开就把地址显示出来，不让人卡住
-    }
+      this.privacyFallback = this.t('打不开链接，请手动访问：', 'Cannot open link. Please visit: ') + url;
+      setTimeout(() => { this.privacyFallback = ''; }, 5000);
+    });
   }
 
   onUiModeChange(): void {
@@ -145,6 +156,8 @@ struct Index {
    *     完全可控、可重试、不依赖系统时序。
    */
   @State private showPrivacy: boolean = false;
+  /** ★ 2026-11-07 判据 1781：隐私链接打不开时的兜底提示（按钮点了必须有反馈） */
+  @State private privacyFallback: string = '';
 
   aboutToAppear(): void {
     UiModeMgr.apply(UiModeMgr.current());
@@ -480,8 +493,17 @@ pageTransition() {
         .borderRadius(Radius.md)
         .accessibilityText(this.t('同意并继续', 'Agree and continue'))
         .onClick(() => { this.agreePrivacy(); })
-    }
-    .width('100%')
+      }
+      .width('100%')
+      // ★★★ 2026-11-07 判据 1781：**「查看全文」点了必须有反馈** ——
+      //   打不开系统浏览器时把地址显示出来（设置页那块早有这个处理，首启弹窗漏了）。
+      if (this.privacyFallback.length > 0) {
+        Text(this.privacyFallback)
+          .fontSize(FontSize.xxs).fontColor(Palette.warning)
+          .width('100%').textAlign(TextAlign.Center)
+          .maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
+          .padding({ top: Space.sm })
+      }
   }
 
 build() {

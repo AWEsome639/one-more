@@ -391,7 +391,7 @@ export struct GSimonSays {
         Text((TG('得分'))).fontSize(FontSize.xxs)
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
-        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.inkFaint)
+        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.score), this.langCode))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)

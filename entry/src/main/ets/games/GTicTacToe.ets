@@ -618,7 +618,7 @@ export struct GTicTacToe {
         Column({ space: 2 }) {
         Text(true ? TG('得分') : (false ? TG('步数') : TG('用时')))
         .fontSize(FontSize.xxs)
-        .fontColor(this.theme.inkFaint)
+        .fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(true ? String(this.score0)
         : (false ? String(this.steps) : (this.seconds + 's')))
         .fontSize(FontSize.lg)
@@ -633,7 +633,7 @@ export struct GTicTacToe {
         Column({ space: 2 }) {
         Text(false ? TG('得分') : (true ? TG('步数') : TG('用时')))
         .fontSize(FontSize.xxs)
-        .fontColor(this.theme.inkFaint)
+        .fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(false ? String(this.score0)
         : (true ? String(this.steps) : (this.seconds + 's')))
         .fontSize(FontSize.lg)
@@ -648,7 +648,7 @@ export struct GTicTacToe {
         Column({ space: 2 }) {
         Text(false ? TG('得分') : (false ? TG('步数') : TG('用时')))
         .fontSize(FontSize.xxs)
-        .fontColor(this.theme.inkFaint)
+        .fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(false ? String(this.score0)
         : (false ? String(this.steps) : (this.seconds + 's')))
         .fontSize(FontSize.lg)
