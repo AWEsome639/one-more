@@ -684,11 +684,16 @@ export struct GSokoban {
       //   `maxHeight` 压不住（子项固定），`.clip` 切了画面也不救按钮 ⇒ **限宽**：
       //   每格边长 = min(可用高 / 行数)，棋盘宽 = 列数 × 边长。手机上（≥600）不限制、零回归。
       //   ★ 数值依据（真机预算）：游戏区上限 = Bp.height − 190 = 343vp；
-      //     游戏内部固定项（HUD 60 + 状态 20 + 按钮行 48 + 间距 ~64）≈ 192vp
-      //     ⇒ 棋盘可用高 ≈ Bp.height − 390（533 → 143vp；8 行 ⇒ 每格 17vp，棋盘 170×136）。
+      //     游戏内部固定项（HUD 60 + 状态 20 + **方向键区 ~96** + 间距 ~64）≈ 240vp
+      //     ⇒ 棋盘可用高 ≈ Bp.height − 480（533 → 53vp；8 行 ⇒ 每格 10vp（下限），棋盘 80×80）。
+      //   ★★★ 2026-11-08 真机回归（verifier-eng2）**第一次算少了 50vp**：
+      //     原来写 `− 390`（棋盘 136vp），实测方向键容器 `y=489~533`、`▲` 底边 = 屏高 533.3
+      //     ⇒ **零余量，`↓/←/→` 三个方向键全被裁掉**（dump 里根本没有这三个节点）。
+      //     对照 `G2048`（正确做法）：D-pad 收在 `y=481~519`（**余 14vp**）⇒ 4 键全在屏内。
+      //     ⇒ 改成 `− 440`，棋盘 88vp ⇒ 方向键区上方多出 ~48vp 余量。
       .constraintSize({
         maxWidth: Bp.height < 600
-          ? Math.min(Bp.width - 40, this.w * Math.max(12, Math.floor((Bp.height - 390) / Math.max(1, this.h))))
+          ? Math.min(Bp.width - 40, this.w * Math.max(10, Math.floor((Bp.height - 480) / Math.max(1, this.h))))
           : 9999
       })
       .padding(Space.xs)
