@@ -630,7 +630,9 @@ def _restart_app():
     \n    ⇒ 17 个 FAIL 全是「回不到列表」（假警报，不是功能坏了）。
     """
     sh("aa force-stop com.andrewoscar.onemore; sleep 1; aa start -a EntryAbility -b com.andrewoscar.onemore")
-    time.sleep(8)
+    # ★ 判据 1777（2026-11-07 18:35）：**8 秒不够** —— 开屏 2.27s + 加载 + 首页首帧，
+    #   实测 8 秒时还在开屏/首页未就绪 ⇒ `open_game` 点搜索点不到 ⇒ 一串「进错游戏」。
+    time.sleep(15)
 
 
 def _ensure_home():
