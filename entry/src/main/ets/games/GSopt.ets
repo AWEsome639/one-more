@@ -228,7 +228,7 @@ export struct GSopt {
     this.filled = [];
     this.next = 1;
     this.roundAt = Date.now();
-    this.msg = TG('第 ') + String(this.round) + '/' + String(this.diffTotal) + ' 轮：按 1 → 9 依次点';
+    this.msg = TG2('第 {0}/{1} 轮：按 1 → 9 依次点', String(this.round), String(this.diffTotal));
   }
 
   private tap(i: number): void {

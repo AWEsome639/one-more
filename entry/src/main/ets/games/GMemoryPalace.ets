@@ -252,7 +252,7 @@ export struct GMemoryPalace {
       }
       if (this.round >= this.diffTotal) {
         this.phase = 2; this.over = true; this.won = this.right >= PASS;
-        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + String(this.right) + '/' + String(this.asked);
+        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + TG2('答对 {0}/{1}', String(this.right), String(this.asked));
         this.finish(this.won);
         return;
       }

@@ -130,7 +130,7 @@ export struct GNarrativeRecall {
     this.used = picked;
     this.story = STORIES[k];
     this.qIdx = 0; this.pick = -1; this.phase = 0;
-    this.msg = TG('第 ') + String(this.round) + ' 篇：读一遍，记住细节';
+    this.msg = TG2('第 {0} 篇：读一遍，记住细节', String(this.round));
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
@@ -290,7 +290,7 @@ export struct GNarrativeRecall {
       }
       if (this.round >= ROUNDS) {
         this.phase = 2; this.over = true; this.won = this.right >= this.diffTotal;
-        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + String(this.right) + '/' + String(this.asked);
+        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + TG2('答对 {0}/{1}', String(this.right), String(this.asked));
         this.finish(this.won);
         return;
       }

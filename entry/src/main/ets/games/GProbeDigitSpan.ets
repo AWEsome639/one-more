@@ -228,7 +228,7 @@ export struct GProbeDigitSpan {
     this.typed = String(d);
     const want: number = this.digits[this.probe];
     if (d !== want) {
-      this.end(false, TG('❌ 第 ') + (this.probe + 1) + ' 位是 ' + want + '，你答了 ' + d);
+      this.end(false, '❌ ' + TG2('第 {0} 位是 {1}', String(this.probe + 1), want) + TG('，你答了 ') + d);
       return;
     }
     this.right = this.right + 1;

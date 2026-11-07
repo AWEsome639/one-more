@@ -111,7 +111,7 @@ export struct GNegativeSpaceDetection {
     this.opts = mixFig(group);
     this.pick = -1;
     this.phase = 0;
-    this.msg = TG('第 ') + String(this.round) + ' 关：空白处拼出了什么形状？';
+    this.msg = TG2('第 {0} 关：空白处拼出了什么形状？', String(this.round));
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
@@ -264,7 +264,7 @@ export struct GNegativeSpaceDetection {
       this.nextTo = -1;
       if (this.round >= this.diffTotal) {
         this.phase = 2; this.over = true; this.won = this.right >= this.passNeed();
-        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + String(this.right) + '/' + String(this.asked);
+        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + TG2('答对 {0}/{1}', String(this.right), String(this.asked));
         this.finish(this.won);
         return;
       }
@@ -303,7 +303,7 @@ export struct GNegativeSpaceDetection {
       Row() {
         Text(TG2('关卡 {0}', (String(this.round) + '/' + String(this.diffTotal)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2("答对 {0}", (String(this.right) + '/' + String(this.asked)))).fontSize(FontSize.xs).fontColor(this.theme.ink)
-        Text(TG('得分 ') + String(this.right * 100)).fontSize(FontSize.xs).fontColor(this.theme.ink)
+        Text(TG2('得分 {0}', String(this.right * 100))).fontSize(FontSize.xs).fontColor(this.theme.ink)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       .shadow(Shadow.card).justifyContent(FlexAlign.SpaceBetween)
 

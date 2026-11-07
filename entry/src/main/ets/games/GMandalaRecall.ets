@@ -264,7 +264,7 @@ export struct GMandalaRecall {
       this.score = this.score + 100; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110); this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
       if (this.level >= this.diffTotal) {
         this.phase = 2; this.over = true; this.won = true;
-        this.msg = TG('🎉 通关！') + String(this.diffTotal) + ' 关全过';
+        this.msg = TG2('🎉 通关！{0} 关全过', String(this.diffTotal));
         this.finish(true);
         return;
       }

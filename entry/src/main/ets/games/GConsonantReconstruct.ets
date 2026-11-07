@@ -227,7 +227,7 @@ export struct GConsonantReconstruct {
       this.nextQ();
     } else {
       this.life = this.life - 1;
-      this.msg = '❌ 「' + guess + '」不对，还剩 ' + this.life + TG(' 条命');
+      this.msg = TG2('❌ 「{0}」不对，还剩 {1} 条命', guess, String(this.life));
       if (this.life <= 0) { this.end(); }
     }
   }
@@ -249,7 +249,7 @@ export struct GConsonantReconstruct {
     if (this.qi + 1 >= this.diffTotal) { this.end(); return; }
     this.qi = this.qi + 1;
     this.doBump();   // ★ 弹一下
-    this.msg = this.msg + '　｜　下一词：' + this.cur().w.length + TG(' 个字母');
+    this.msg = TG2('{0}　｜　下一词：{1} 个字母', this.msg, String(this.cur().w.length));
   }
   private end(): void {
     this.over = true; this.won = this.solved >= this.diffTotal;

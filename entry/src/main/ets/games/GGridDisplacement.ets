@@ -234,7 +234,7 @@ export struct GGridDisplacement {
       this.right = this.right + 1; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110); this.score = this.score + gain;
       this.msg = TG2('✅ 落点正确 +{0}', gain);
     } else {
-      this.msg = '❌ 应落在第 ' + (Math.floor(this.curPos / N) + 1) + ' 行第 ' + (this.curPos % N + 1) + TG(' 列');
+      this.msg = TG2('❌ 应落在第 {0} 行第 {1} 列', String(Math.floor(this.curPos / N) + 1), String(this.curPos % N + 1));
     }
     this.qIndex = this.qIndex + 1;
     if (this.qIndex >= QN) {

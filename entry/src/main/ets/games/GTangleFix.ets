@@ -151,7 +151,7 @@ export struct GTangleFix {
           this.edges[j * 2], this.edges[j * 2 + 1]);
         if (c1) {
           return LABELS[this.edges[i * 2]] + LABELS[this.edges[i * 2 + 1]]
-            + TG(' 与 ') + LABELS[this.edges[j * 2]] + LABELS[this.edges[j * 2 + 1]] + ' 交叉';
+            + TG(' 与 ') + LABELS[this.edges[j * 2]] + LABELS[this.edges[j * 2 + 1]] + TG(' 交叉');
         }
       }
     }

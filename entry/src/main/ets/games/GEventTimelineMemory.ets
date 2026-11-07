@@ -291,7 +291,7 @@ export struct GEventTimelineMemory {
     if (this.done) { return; }
     this.done = true; this.over = true; this.won = this.right >= NEED;
     this.msg = (this.won ? TG('🎉 通关！') : TG('💤 本局结束：'))
-      + '全对 ' + String(this.right) + '/' + String(this.diffTotal) + TG(' 轮');
+      + TG2('全对 {0}/{1} 轮', String(this.right), String(this.diffTotal));
     const r: GameResult = {
       gameId: 'event_timeline_memory', solved: this.won,
       score: this.totalHit * 60, durationMs: Date.now() - this.startAt,

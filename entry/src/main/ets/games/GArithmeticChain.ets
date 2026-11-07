@@ -360,12 +360,12 @@ export struct GArithmeticChain {
     this.level++;
     if (this.level >= this.diffTotal) {
       this.over = true;
-      this.tip = msg + '｜共过 ' + String(this.clears) + '/' + String(this.diffTotal) + TG(' 关');
+      this.tip = TG2('{0}｜共过 {1}/{2} 关', msg, String(this.clears), String(this.diffTotal));
       this.finish(this.clears >= PASS);
       return;
     }
     this.load(this.level);
-    this.tip = msg + '，继续第 ' + String(this.level + 1) + TG(' 关');
+    this.tip = TG2('{0}，继续第 {1} 关', msg, String(this.level + 1));
   }
 
   private finish(solved: boolean): void {

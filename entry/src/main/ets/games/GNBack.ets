@@ -256,7 +256,7 @@ export struct GNBack {
     }
     this.over = true;
     this.won = this.right >= PASS;
-    this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + String(this.right) + '/' + String(this.diffTotal);
+    this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + TG2('答对 {0}/{1}', String(this.right), String(this.diffTotal));
     this.finish(this.won);
   }
 

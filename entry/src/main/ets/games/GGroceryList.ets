@@ -104,7 +104,7 @@ export struct GGroceryList {
       ps[j] = t;
     }
     this.list = onList; this.probes = ps; this.pIdx = 0; this.pick = -1; this.phase = 0;
-    this.msg = TG('记住这 ') + String(n) + ' 样东西';
+    this.msg = TG2('记住这 {0} 样东西', String(n));
     this.memTo = setTimeout(() => {
       this.memTo = -1; this.phase = 1; this.pick = -1; this.msg = TG(TG(TG('刚才的东西，在清单里吗？')));
     }, MEM_MS);
@@ -255,7 +255,7 @@ export struct GGroceryList {
       }
       if (this.round >= this.diffTotal) {
         this.over = true; this.phase = 2; this.won = this.right * 4 >= this.asked * 3;
-        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + String(this.right) + '/' + String(this.asked);
+        this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + TG2('答对 {0}/{1}', String(this.right), String(this.asked));
         this.finish(this.won);
         return;
       }

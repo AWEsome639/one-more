@@ -152,7 +152,7 @@ export struct GBaseConversionRun {
     this.left = this.left - 1;
     if (this.left <= 0) {
       this.left = 0;
-      this.lose(TG2('⏰ 时间到，答对 {0} 题', String(this.right)) + ' 题，没到 ' + String(GOAL) + TG(' 题'));
+      this.lose(TG2('⏰ 时间到，答对 {0} 题，没到 {1} 题', String(this.right), String(GOAL)));
     }
   }
 

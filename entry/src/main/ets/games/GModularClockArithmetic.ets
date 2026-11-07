@@ -264,7 +264,7 @@ export struct GModularClockArithmetic {
     } else {
       this.combo = 0; this.score = Math.max(0, this.score - 15);
       this.left = Math.max(0, this.left - PENALTY);
-      this.msg = TG('❌ 错了，扣 ') + String(PENALTY) + ' 秒 —— 答案是 ' + String(this.opts[this.ans]) + TG(' 点');
+      this.msg = TG2('❌ 错了，扣 {0} 秒 —— 答案是 {1} 点', String(PENALTY), String(this.opts[this.ans]));
     }
     if (this.nextTo >= 0) { clearTimeout(this.nextTo); }
     this.nextTo = setTimeout(() => { this.nextTo = -1; this.advance(); }, NEXT_MS);

@@ -283,7 +283,7 @@ export struct GMemoryMatrix {
       this.score = this.score + 120; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
       if (this.level >= PASS_LEVEL) {
         this.phase = 2; this.over = true; this.won = true;
-        this.msg = TG('🎉 通关！') + String(PASS_LEVEL) + ' 关全过';
+        this.msg = TG2('🎉 通关！{0} 关全过', String(PASS_LEVEL));
         this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true);
         return;
       }

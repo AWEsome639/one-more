@@ -246,7 +246,7 @@ export struct GStaircaseMemory {
     }
     this.cur = this.cur + 1;
     if (this.cur < this.order.length) {
-      this.msg = TG('还差 ') + String(this.order.length - this.cur) + ' 级';
+      this.msg = TG2('还差 {0} 级', String(this.order.length - this.cur));
       return;
     }
     this.score = this.score + this.order.length * 60;

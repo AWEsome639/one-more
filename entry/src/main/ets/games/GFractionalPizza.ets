@@ -254,7 +254,7 @@ export struct GFractionalPizza {
       this.over = true; this.won = this.right >= this.passNeed();
       this.msg = this.won
         ? TG('🎉 答对 ') + String(this.right) + '/' + this.diffTotal + TG('，通关！')
-        : TG('😵 只答对 ') + String(this.right) + '/' + this.diffTotal + TG('，差 ') + String(this.passNeed() - this.right) + TG(' 题');
+        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(this.passNeed() - this.right));
       this.finish(this.won); return;
     }
     this.round = this.round + 1; this.ask(); this.msg = TG2('点亮 {0}/{1} 片，再点确认', String(this.n), String(this.d));

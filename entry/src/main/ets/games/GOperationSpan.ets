@@ -283,7 +283,7 @@ export struct GOperationSpan {
     if (this.phase !== 1 || this.pool[i] === '✔') { return; }
     const want: number = this.stored[this.got];
     if (this.pool[i] !== String(want)) {
-      this.end(false, TG('❌ 第 ') + (this.got + 1) + ' 个结果应该是 ' + want);
+      this.end(false, '❌ ' + TG2('第 {0} 个结果应该是 {1}', String(this.got + 1), want));
       return;
     }
     const next: string[] = this.pool.slice();
