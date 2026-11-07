@@ -57,9 +57,8 @@ export struct DemoBar {
         //     而不是"把提示读完"（提示在顶栏下方，棋盘上有描边指路）。
         Text(this.tiny() ? TG('演示中') : (TG('演示中') + ' ｜ '
           + (this.msg.length > 0 ? this.msg : TG('碰一下就停'))
-          // ★ 不计分提示：335 款共用这一条，省得每款各写一遍。
-          //   已经写明「不计分」的（3 款手工版）就不重复。
-          + (this.msg.indexOf(DEMO_NO_SCORE_TAG) >= 0 ? '' : TG('（演示不计分）'))))
+          // ★ 2026-11-07 奥森：删掉「（演示不计分）」这行提示
+          ))
           .fontSize(FontSize.sm)
           .fontColor(Palette.amber)
           .textAlign(TextAlign.Center)
@@ -75,7 +74,7 @@ export struct DemoBar {
           //     所以这里用同一表达式再写一遍；改文案时**两处必须同步**。
           .accessibilityText(this.tiny() ? TG('演示中') : (TG('演示中') + ' ｜ '
             + (this.msg.length > 0 ? this.msg : TG('碰一下就停'))
-            + (this.msg.indexOf(DEMO_NO_SCORE_TAG) >= 0 ? '' : TG('（演示不计分）'))))
+            ))
           .accessibilityLevel('yes')
           .accessibilityGroup(true)
           .width('100%')

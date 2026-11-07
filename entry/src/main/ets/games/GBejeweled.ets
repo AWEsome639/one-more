@@ -359,7 +359,7 @@ export struct GBejeweled {
     this.demoScored = this.score - this.demoSnapScore;
     this.msg = this.demoRound >= 2
       ? TG('就这样连。这就是全部玩法 —— 碰一下屏幕，换你来')
-      : TG2('消掉了！这一下能拿 +{0} 分（演示不计分）', String(this.demoScored));
+      : TG2('消掉了！这一下能拿 +{0} 分', String(this.demoScored));
     this.demoPhase = 0;
     if (this.demoRound >= 2) {
       this.demoFinish();

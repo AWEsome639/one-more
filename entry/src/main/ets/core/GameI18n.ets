@@ -1344,14 +1344,14 @@ const DICT: Record<string, Record<string, string>> = {
   "就是这样跳。碰一下屏幕，换你来": { "en": "That's how you jump. Tap the screen — your turn", "ja": "こうやって跳びます。画面をタップして、あなたの番です", "ko": "이렇게 뜁니다. 화면을 탭하면 당신 차례입니다", "es": "Así se salta. Toca la pantalla, es tu turno", "fr": "Voilà comment on saute. Touche l'écran, à toi", "de": "So wird gesprungen. Tippe auf den Bildschirm — du bist dran", "pt": "É assim que se salta. Toca no ecrã — é a tua vez", "ru": "Вот как прыгают. Коснись экрана — твой ход", "it": "Così si salta. Tocca lo schermo — tocca a te", "ar": "هكذا تقفز. انقر على الشاشة — دورك" },
   "推过去了。已走 {0} 步，最多 {1} 步": { "en": "Pushed through. {0} moves used, {1} allowed", "ja": "{0} 手使いました（上限 {1} 手）", "ko": "{0}수를 썼습니다 (최대 {1}수)", "es": "Empujado. {0} movimientos usados de {1}", "fr": "Poussé. {0} coups utilisés sur {1}", "de": "Geschoben. {0} Züge verbraucht, {1} erlaubt", "pt": "Empurrado. {0} jogadas usadas de {1}", "ru": "Сдвинуто. Использовано {0} ходов из {1}", "it": "Spinto. {0} mosse usate su {1}", "ar": "تم الدفع. استُخدمت {0} حركة من {1}" },
   "看这块「{0}」：往{1}推一格": { "en": "Look at “{0}”: push it one step {1}", "ja": "この「{0}」を見て：{1}へ一つ押します", "ko": "이 「{0}」을 보세요: {1}으로 한 칸 밉니다", "es": "Mira «{0}»: empújalo un paso hacia {1}", "fr": "Regarde « {0} » : pousse-le d'un pas vers {1}", "de": "Schau «{0}» an: schiebe es einen Schritt nach {1}", "pt": "Olha «{0}»: empurra-o um passo para {1}", "ru": "Посмотри на «{0}»: толкни на шаг {1}", "it": "Guarda «{0}»: spingilo di un passo verso {1}", "ar": "انظر إلى «{0}»: ادفعه خطوة {1}" },
-  "消掉了！这一下能拿 +{0} 分（演示不计分）": { "en": "Cleared! That move is worth +{0} points (demo doesn't score)", "ja": "消えました！この一手で +{0} 点（デモは加点されません）", "ko": "지웠습니다! 이 수로 +{0}점 (데모는 점수에 포함되지 않습니다)", "es": "¡Eliminado! Esa jugada vale +{0} puntos (la demo no puntúa)", "fr": "Éliminé ! Ce coup vaut +{0} points (la démo ne compte pas)", "de": "Weg! Dieser Zug bringt +{0} Punkte (Demo zählt nicht)", "pt": "Eliminado! Essa jogada vale +{0} pontos (a demo não conta)", "ru": "Убрано! Этот ход даёт +{0} очков (демо не считается)", "it": "Eliminato! Questa mossa vale +{0} punti (la demo non conta)", "ar": "تم الإزالة! هذه الحركة تساوي +{0} نقطة (العرض لا يُحتسب)" },
-  "滑过去了，这一下能拿 +{0} 分（演示不计分）": { "en": "Slid — that move is worth +{0} points (demo doesn't score)", "ja": "スライドしました — この一手で +{0} 点（デモは加点されません）", "ko": "밀었습니다 — 이 수로 +{0}점 (데모는 점수에 포함되지 않습니다)", "es": "Deslizado: esa jugada vale +{0} puntos (la demo no puntúa)", "fr": "Glissé — ce coup vaut +{0} points (la démo ne compte pas)", "de": "Verschoben — dieser Zug bringt +{0} Punkte (Demo zählt nicht)", "pt": "Deslizado — essa jogada vale +{0} pontos (a demo não conta)", "ru": "Сдвинуто — этот ход даёт +{0} очков (демо не считается)", "it": "Scivolato — questa mossa vale +{0} punti (la demo non conta)", "ar": "تم السحب — هذه الحركة تساوي +{0} نقطة (العرض لا يُحتسب)" },
-  // ★★★ 2026-11-03（第 1078 轮）**真机发现：英文界面里漏出中文「（演示不计分）」**
-  //   根因：`DemoBar.ets:52` 用 `TG('（演示不计分）')` 单独翻译这个片段，
-  //         而 DICT 里只有**完整句**的条目（"消掉了！…（演示不计分）"），
+  "消掉了！这一下能拿 +{0} 分": { "en": "Cleared! That move is worth +{0} points (demo doesn't score)", "ja": "消えました！この一手で +{0} 点（デモは加点されません）", "ko": "지웠습니다! 이 수로 +{0}점 (데모는 점수에 포함되지 않습니다)", "es": "¡Eliminado! Esa jugada vale +{0} puntos (la demo no puntúa)", "fr": "Éliminé ! Ce coup vaut +{0} points (la démo ne compte pas)", "de": "Weg! Dieser Zug bringt +{0} Punkte (Demo zählt nicht)", "pt": "Eliminado! Essa jogada vale +{0} pontos (a demo não conta)", "ru": "Убрано! Этот ход даёт +{0} очков (демо не считается)", "it": "Eliminato! Questa mossa vale +{0} punti (la demo non conta)", "ar": "تم الإزالة! هذه الحركة تساوي +{0} نقطة (العرض لا يُحتسب)" },
+  "滑过去了，这一下能拿 +{0} 分": { "en": "Slid — that move is worth +{0} points (demo doesn't score)", "ja": "スライドしました — この一手で +{0} 点（デモは加点されません）", "ko": "밀었습니다 — 이 수로 +{0}점 (데모는 점수에 포함되지 않습니다)", "es": "Deslizado: esa jugada vale +{0} puntos (la demo no puntúa)", "fr": "Glissé — ce coup vaut +{0} points (la démo ne compte pas)", "de": "Verschoben — dieser Zug bringt +{0} Punkte (Demo zählt nicht)", "pt": "Deslizado — essa jogada vale +{0} pontos (a demo não conta)", "ru": "Сдвинуто — этот ход даёт +{0} очков (демо не считается)", "it": "Scivolato — questa mossa vale +{0} punti (la demo non conta)", "ar": "تم السحب — هذه الحركة تساوي +{0} نقطة (العرض لا يُحتسب)" },
+  // ★★★ 2026-11-03（第 1078 轮）**真机发现：英文界面里漏出中文「」**
+  //   根因：`DemoBar.ets:52` 用 `TG('')` 单独翻译这个片段，
+  //         而 DICT 里只有**完整句**的条目（"消掉了！…"），
   //         没有这个**独立片段** ⇒ `TG` 走了 `return zh` ⇒ 直接吐中文。
   //   ⇒ 补上独立条目。括号保留（它是追加在句子尾部的）。
-  "（演示不计分）": {
+  "": {
     "en": "(demo doesn't score)",
     "ja": "（デモは採点されません）",
     "ko": "(데모는 점수에 포함되지 않습니다)",
@@ -1367,7 +1367,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★★ 2026-11-03（第 1079 轮）**DemoBar 里另一个漏译的片段**
   //   `DemoBar.ets:49` 用 `TG('碰一下就停')`，而 DICT 里没有这一条
   //   ⇒ `TG` 走 `return zh` ⇒ 英文界面里会显示中文
-  //   （和「（演示不计分）」是同一类 bug，判据 355）
+  //   （和「」是同一类 bug，判据 355）
   "碰一下就停": {
     "en": "tap to stop",
     "ja": "タップで停止",
@@ -2291,7 +2291,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "接入 ✅": {
     "en": "Connected ✅",
-    "zhtw": "接入 ✅",
+    "zh-Hant": "接入 ✅",
     "ja": "接続 ✅",
     "ko": "연결 ✅",
     "fr": "Connecté ✅",
@@ -2305,7 +2305,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "断开 ❌": {
     "en": "Broken ❌",
-    "zhtw": "斷開 ❌",
+    "zh-Hant": "斷開 ❌",
     "ja": "断線 ❌",
     "ko": "끊김 ❌",
     "fr": "Coupé ❌",
@@ -2319,7 +2319,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "　终点 {0}": {
     "en": "　Goal {0}",
-    "zhtw": "　終點 {0}",
+    "zh-Hant": "　終點 {0}",
     "ja": "　ゴール {0}",
     "ko": "　목표 {0}",
     "fr": "　But {0}",
@@ -2333,7 +2333,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "通电 💡": {
     "en": "Powered 💡",
-    "zhtw": "通電 💡",
+    "zh-Hant": "通電 💡",
     "ja": "通電 💡",
     "ko": "통전 💡",
     "fr": "Sous tension 💡",
@@ -2347,7 +2347,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "未通": {
     "en": "No power",
-    "zhtw": "未通",
+    "zh-Hant": "未通",
     "ja": "未通電",
     "ko": "미통전",
     "fr": "Hors tension",
@@ -2361,7 +2361,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "✅ 答对了 —— {0}": {
     "en": "✅ Correct — {0}",
-    "zhtw": "✅ 答對了 —— {0}",
+    "zh-Hant": "✅ 答對了 —— {0}",
     "ja": "✅ 正解 —— {0}",
     "ko": "✅ 정답 —— {0}",
     "fr": "✅ Correct — {0}",
@@ -2375,7 +2375,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "❌ 答错了 —— {0}": {
     "en": "❌ Wrong — {0}",
-    "zhtw": "❌ 答錯了 —— {0}",
+    "zh-Hant": "❌ 答錯了 —— {0}",
     "ja": "❌ 不正解 —— {0}",
     "ko": "❌ 오답 —— {0}",
     "fr": "❌ Faux — {0}",
@@ -2389,7 +2389,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "步数超了": {
     "en": "Out of moves",
-    "zhtw": "步數超了",
+    "zh-Hant": "步數超了",
     "ja": "手数オーバー",
     "ko": "이동 초과",
     "fr": "Plus de coups",
@@ -2403,7 +2403,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "和是 {0}，不是 {1}": {
     "en": "Sum is {0}, not {1}",
-    "zhtw": "和是 {0}，不是 {1}",
+    "zh-Hant": "和是 {0}，不是 {1}",
     "ja": "合計は {0}、{1} ではない",
     "ko": "합은 {0}, {1}이 아님",
     "fr": "La somme est {0}, pas {1}",
@@ -2417,7 +2417,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "🎉 通关：最长倒背 {0} 个": {
     "en": "🎉 Cleared: longest backward span {0}",
-    "zhtw": "🎉 通關：最長倒背 {0} 個",
+    "zh-Hant": "🎉 通關：最長倒背 {0} 個",
     "ja": "🎉 クリア：最長逆唱 {0} 個",
     "ko": "🎉 클리어: 최장 역순 {0}개",
     "fr": "🎉 Réussi : plus long revers {0}",
@@ -2431,7 +2431,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "最长倒背 {0} 个": {
     "en": "Longest backward span {0}",
-    "zhtw": "最長倒背 {0} 個",
+    "zh-Hant": "最長倒背 {0} 個",
     "ja": "最長逆唱 {0} 個",
     "ko": "최장 역순 {0}개",
     "fr": "Plus long revers {0}",
@@ -2445,7 +2445,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "🎉 通关：最长记住 {0} 个": {
     "en": "🎉 Cleared: longest span {0}",
-    "zhtw": "🎉 通關：最長記住 {0} 個",
+    "zh-Hant": "🎉 通關：最長記住 {0} 個",
     "ja": "🎉 クリア：最長記憶 {0} 個",
     "ko": "🎉 클리어: 최장 기억 {0}개",
     "fr": "🎉 Réussi : plus long rappel {0}",
@@ -2459,7 +2459,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "最长记住 {0} 个": {
     "en": "Longest span {0}",
-    "zhtw": "最長記住 {0} 個",
+    "zh-Hant": "最長記住 {0} 個",
     "ja": "最長記憶 {0} 個",
     "ko": "최장 기억 {0}개",
     "fr": "Plus long rappel {0}",
@@ -2473,7 +2473,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "偏快": {
     "en": "too fast",
-    "zhtw": "偏快",
+    "zh-Hant": "偏快",
     "ja": "速すぎ",
     "ko": "너무 빠름",
     "fr": "trop rapide",
@@ -2487,7 +2487,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "偏慢": {
     "en": "too slow",
-    "zhtw": "偏慢",
+    "zh-Hant": "偏慢",
     "ja": "遅すぎ",
     "ko": "너무 느림",
     "fr": "trop lent",
@@ -2501,7 +2501,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "🎉 节奏稳！命中 {0}/{1} 拍": {
     "en": "🎉 Steady! {0}/{1} beats",
-    "zhtw": "🎉 節奏穩！命中 {0}/{1} 拍",
+    "zh-Hant": "🎉 節奏穩！命中 {0}/{1} 拍",
     "ja": "🎉 リズム安定！{0}/{1} 拍",
     "ko": "🎉 리듬 안정! {0}/{1}박",
     "fr": "🎉 Rythme stable ! {0}/{1} temps",
@@ -2515,7 +2515,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "💤 结束，命中 {0}/{1} 拍": {
     "en": "💤 Over, {0}/{1} beats",
-    "zhtw": "💤 結束，命中 {0}/{1} 拍",
+    "zh-Hant": "💤 結束，命中 {0}/{1} 拍",
     "ja": "💤 終了、{0}/{1} 拍",
     "ko": "💤 종료, {0}/{1}박",
     "fr": "💤 Fini, {0}/{1} temps",
@@ -2529,7 +2529,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "🎉 通关！正确 {0}/{1}": {
     "en": "🎉 Cleared! Correct {0}/{1}",
-    "zhtw": "🎉 通關！正確 {0}/{1}",
+    "zh-Hant": "🎉 通關！正確 {0}/{1}",
     "ja": "🎉 クリア！正解 {0}/{1}",
     "ko": "🎉 클리어! 정답 {0}/{1}",
     "fr": "🎉 Réussi ! Correct {0}/{1}",
@@ -2543,7 +2543,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "💤 结束，正确 {0}/{1}": {
     "en": "💤 Over, correct {0}/{1}",
-    "zhtw": "💤 結束，正確 {0}/{1}",
+    "zh-Hant": "💤 結束，正確 {0}/{1}",
     "ja": "💤 終了、正解 {0}/{1}",
     "ko": "💤 종료, 정답 {0}/{1}",
     "fr": "💤 Fini, correct {0}/{1}",
@@ -2557,7 +2557,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   " · 误点 {0} 次": {
     "en": " · {0} false alarms",
-    "zhtw": " · 誤點 {0} 次",
+    "zh-Hant": " · 誤點 {0} 次",
     "ja": " · 誤反応 {0} 回",
     "ko": " · 오반응 {0}회",
     "fr": " · {0} fausses alertes",
@@ -2571,7 +2571,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "❌ 判断错了　": {
     "en": "❌ Wrong call　",
-    "zhtw": "❌ 判斷錯了　",
+    "zh-Hant": "❌ 判斷錯了　",
     "ja": "❌ 判断ミス　",
     "ko": "❌ 판단 오류　",
     "fr": "❌ Mauvaise réponse　",
@@ -2585,7 +2585,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "🎉 通关 · ": {
     "en": "🎉 Cleared · ",
-    "zhtw": "🎉 通關 · ",
+    "zh-Hant": "🎉 通關 · ",
     "ja": "🎉 クリア · ",
     "ko": "🎉 클리어 · ",
     "fr": "🎉 Réussi · ",
@@ -2599,7 +2599,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "💤 结束 · ": {
     "en": "💤 Over · ",
-    "zhtw": "💤 結束 · ",
+    "zh-Hant": "💤 結束 · ",
     "ja": "💤 終了 · ",
     "ko": "💤 종료 · ",
     "fr": "💤 Fini · ",
@@ -2613,7 +2613,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "🎉 通关 · 对 ": {
     "en": "🎉 Cleared · right ",
-    "zhtw": "🎉 通關 · 對 ",
+    "zh-Hant": "🎉 通關 · 對 ",
     "ja": "🎉 クリア · 正解 ",
     "ko": "🎉 클리어 · 정답 ",
     "fr": "🎉 Réussi · justes ",
@@ -2627,7 +2627,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "💤 结束 · 对 ": {
     "en": "💤 Over · right ",
-    "zhtw": "💤 結束 · 對 ",
+    "zh-Hant": "💤 結束 · 對 ",
     "ja": "💤 終了 · 正解 ",
     "ko": "💤 종료 · 정답 ",
     "fr": "💤 Fini · justes ",
@@ -2641,7 +2641,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "🎉 通关 · 答对 ": {
     "en": "🎉 Cleared · hit ",
-    "zhtw": "🎉 通關 · 答對 ",
+    "zh-Hant": "🎉 通關 · 答對 ",
     "ja": "🎉 クリア · 的中 ",
     "ko": "🎉 클리어 · 정답 ",
     "fr": "🎉 Réussi · trouvés ",
@@ -2655,7 +2655,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "💤 时间到 · 答对 ": {
     "en": "💤 Time up · hit ",
-    "zhtw": "💤 時間到 · 答對 ",
+    "zh-Hant": "💤 時間到 · 答對 ",
     "ja": "💤 時間切れ · 的中 ",
     "ko": "💤 시간 종료 · 정답 ",
     "fr": "💤 Temps écoulé · trouvés ",
@@ -2669,7 +2669,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   "💤 失败 ": {
     "en": "💤 Failed ",
-    "zhtw": "💤 失敗 ",
+    "zh-Hant": "💤 失敗 ",
     "ja": "💤 失敗 ",
     "ko": "💤 실패 ",
     "fr": "💤 Échec ",
@@ -2683,7 +2683,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   " 轮 · 点错 {0} 次": {
     "en": " rounds · {0} misclicks",
-    "zhtw": " 輪 · 點錯 {0} 次",
+    "zh-Hant": " 輪 · 點錯 {0} 次",
     "ja": " ラウンド · 誤クリック {0} 回",
     "ko": " 라운드 · 오클릭 {0}회",
     "fr": " tours · {0} erreurs",
@@ -2697,7 +2697,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   " 大": {
     "en": " bigger",
-    "zhtw": " 大",
+    "zh-Hant": " 大",
     "ja": " 大",
     "ko": " 큼",
     "fr": " plus grand",
@@ -2711,7 +2711,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 ① 括号三元+拼接 收尾
   " 小": {
     "en": " smaller",
-    "zhtw": " 小",
+    "zh-Hant": " 小",
     "ja": " 小",
     "ko": " 작음",
     "fr": " plus petit",
@@ -2725,7 +2725,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 实拍日语发现（GBreakout HUD）
   "已破": {
     "en": "Broken",
-    "zhtw": "已破",
+    "zh-Hant": "已破",
     "ja": "破壊",
     "ko": "파괴",
     "fr": "Cassés",
@@ -2739,7 +2739,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 HUD（拆成 ≤3 占位符）
   "目标 {0}/{1}　余命 {2}": {
     "en": "Target {0}/{1}　Lives {2}",
-    "zhtw": "目標 {0}/{1}　餘命 {2}",
+    "zh-Hant": "目標 {0}/{1}　餘命 {2}",
     "ja": "目標 {0}/{1}　残り {2}",
     "ko": "목표 {0}/{1}　남은 목숨 {2}",
     "fr": "Cible {0}/{1}　Vies {2}",
@@ -2753,7 +2753,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 HUD（拆成 ≤3 占位符）
   "/{0}　隧道 {1}": {
     "en": "/{0}　Tunnel {1}",
-    "zhtw": "/{0}　隧道 {1}",
+    "zh-Hant": "/{0}　隧道 {1}",
     "ja": "/{0}　トンネル {1}",
     "ko": "/{0}　터널 {1}",
     "fr": "/{0}　Tunnel {1}",
@@ -2767,7 +2767,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 HUD（拆成 ≤3 占位符）
   "段 {0}/{1}　已接 {2}": {
     "en": "Part {0}/{1}　Placed {2}",
-    "zhtw": "段 {0}/{1}　已接 {2}",
+    "zh-Hant": "段 {0}/{1}　已接 {2}",
     "ja": "パート {0}/{1}　接続 {2}",
     "ko": "단락 {0}/{1}　연결 {2}",
     "fr": "Partie {0}/{1}　Placé {2}",
@@ -2781,7 +2781,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 HUD（拆成 ≤3 占位符）
   "/{0}　生命 {1}": {
     "en": "/{0}　Lives {1}",
-    "zhtw": "/{0}　生命 {1}",
+    "zh-Hant": "/{0}　生命 {1}",
     "ja": "/{0}　ライフ {1}",
     "ko": "/{0}　목숨 {1}",
     "fr": "/{0}　Vies {1}",
@@ -2795,7 +2795,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 HUD（拆成 ≤3 占位符）
   "已用 {0}/{1}　范围 {2}": {
     "en": "Used {0}/{1}　Range {2}",
-    "zhtw": "已用 {0}/{1}　範圍 {2}",
+    "zh-Hant": "已用 {0}/{1}　範圍 {2}",
     "ja": "使用 {0}/{1}　範囲 {2}",
     "ko": "사용 {0}/{1}　범위 {2}",
     "fr": "Utilisé {0}/{1}　Plage {2}",
@@ -2809,7 +2809,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 HUD（拆成 ≤3 占位符）
   "~{0}　分 {1}": {
     "en": "~{0}　Score {1}",
-    "zhtw": "~{0}　分 {1}",
+    "zh-Hant": "~{0}　分 {1}",
     "ja": "~{0}　スコア {1}",
     "ko": "~{0}　점수 {1}",
     "fr": "~{0}　Score {1}",
@@ -2823,7 +2823,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 HUD 合并式
   "目标 {0}/{1}　余命 {2}/{3}　隧道 {4}": {
     "en": "Target {0}/{1}　Lives {2}/{3}　Tunnel {4}",
-    "zhtw": "目標 {0}/{1}　餘命 {2}/{3}　隧道 {4}",
+    "zh-Hant": "目標 {0}/{1}　餘命 {2}/{3}　隧道 {4}",
     "ja": "目標 {0}/{1}　残り {2}/{3}　トンネル {4}",
     "ko": "목표 {0}/{1}　남은 목숨 {2}/{3}　터널 {4}",
     "fr": "Cible {0}/{1}　Vies {2}/{3}　Tunnel {4}",
@@ -2837,7 +2837,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 HUD 合并式
   "段 {0}/{1}　已接 {2}/{3}　生命 {4}": {
     "en": "Part {0}/{1}　Placed {2}/{3}　Lives {4}",
-    "zhtw": "段 {0}/{1}　已接 {2}/{3}　生命 {4}",
+    "zh-Hant": "段 {0}/{1}　已接 {2}/{3}　生命 {4}",
     "ja": "パート {0}/{1}　接続 {2}/{3}　ライフ {4}",
     "ko": "단락 {0}/{1}　연결 {2}/{3}　목숨 {4}",
     "fr": "Partie {0}/{1}　Placé {2}/{3}　Vies {4}",
@@ -2851,7 +2851,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 游戏 HUD（GMathGuess）
   "已用 {0}/{1}　范围 {2}~{3}　分 {4}": {
     "en": "Used {0}/{1}　Range {2}~{3}　Score {4}",
-    "zhtw": "已用 {0}/{1}　範圍 {2}~{3}　分 {4}",
+    "zh-Hant": "已用 {0}/{1}　範圍 {2}~{3}　分 {4}",
     "ja": "使用 {0}/{1}　範囲 {2}~{3}　スコア {4}",
     "ko": "사용 {0}/{1}　범위 {2}~{3}　점수 {4}",
     "fr": "Utilisé {0}/{1}　Plage {2}~{3}　Score {4}",
@@ -2865,7 +2865,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 游戏 HUD 标签（原来中文直显）
   "目标 {0}/{1}　余命 {2}/{3}": {
     "en": "Target {0}/{1}　Lives {2}/{3}",
-    "zhtw": "目標 {0}/{1}　餘命 {2}/{3}",
+    "zh-Hant": "目標 {0}/{1}　餘命 {2}/{3}",
     "ja": "目標 {0}/{1}　残り {2}/{3}",
     "ko": "목표 {0}/{1}　남은 목숨 {2}/{3}",
     "fr": "Cible {0}/{1}　Vies {2}/{3}",
@@ -2879,7 +2879,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 游戏 HUD 标签（原来中文直显）
   "已用 {0}/{1}　范围 {2}~{3}": {
     "en": "Used {0}/{1}　Range {2}~{3}",
-    "zhtw": "已用 {0}/{1}　範圍 {2}~{3}",
+    "zh-Hant": "已用 {0}/{1}　範圍 {2}~{3}",
     "ja": "使用 {0}/{1}　範囲 {2}~{3}",
     "ko": "사용 {0}/{1}　범위 {2}~{3}",
     "fr": "Utilisé {0}/{1}　Plage {2}~{3}",
@@ -2893,7 +2893,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 游戏 HUD 标签（原来中文直显）
   "段 {0}/{1}　已接 {2}/{3}": {
     "en": "Part {0}/{1}　Placed {2}/{3}",
-    "zhtw": "段 {0}/{1}　已接 {2}/{3}",
+    "zh-Hant": "段 {0}/{1}　已接 {2}/{3}",
     "ja": "パート {0}/{1}　接続 {2}/{3}",
     "ko": "단락 {0}/{1}　연결 {2}/{3}",
     "fr": "Partie {0}/{1}　Placé {2}/{3}",
@@ -2907,7 +2907,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 游戏 HUD 标签（原来中文直显）
   "铺对 {0} / {1}　次数 {2}": {
     "en": "Filled {0} / {1}　Moves {2}",
-    "zhtw": "鋪對 {0} / {1}　次數 {2}",
+    "zh-Hant": "鋪對 {0} / {1}　次數 {2}",
     "ja": "配置 {0} / {1}　手数 {2}",
     "ko": "배치 {0} / {1}　횟수 {2}",
     "fr": "Placé {0} / {1}　Coups {2}",
@@ -2921,7 +2921,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "运算符 {0}，再点一个数字": {
     "en": "Operator {0} — now tap a number",
-    "zhtw": "運算子 {0}，再點一個數字",
+    "zh-Hant": "運算子 {0}，再點一個數字",
     "ja": "演算子 {0}、次に数字をタップ",
     "ko": "연산자 {0}, 이제 숫자를 누르세요",
     "fr": "Opérateur {0}, puis touchez un nombre",
@@ -2935,7 +2935,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "本轮记住 {0}/{1}（正确答案 {2}）": {
     "en": "Remembered {0}/{1} this round (correct: {2})",
-    "zhtw": "本輪記住 {0}/{1}（正確答案 {2}）",
+    "zh-Hant": "本輪記住 {0}/{1}（正確答案 {2}）",
     "ja": "今回 {0}/{1} 記憶（正解 {2}）",
     "ko": "이번 라운드 {0}/{1} 기억 (정답 {2})",
     "fr": "Retenu {0}/{1} cette manche (réponse : {2})",
@@ -2949,7 +2949,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "停一手": {
     "en": "Pass",
-    "zhtw": "停一手",
+    "zh-Hant": "停一手",
     "ja": "パス",
     "ko": "한 수 쉼",
     "fr": "Passer",
@@ -2963,7 +2963,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "我提子": {
     "en": "I capture",
-    "zhtw": "我提子",
+    "zh-Hant": "我提子",
     "ja": "取りました",
     "ko": "내가 따냄",
     "fr": "Je capture",
@@ -2977,7 +2977,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "清单 {0}": {
     "en": "List {0}",
-    "zhtw": "清單 {0}",
+    "zh-Hant": "清單 {0}",
     "ja": "リスト {0}",
     "ko": "목록 {0}",
     "fr": "Liste {0}",
@@ -2991,7 +2991,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "⌛ 超时：其实是 {0} 次": {
     "en": "⌛ Time up: it was {0}",
-    "zhtw": "⌛ 逾時：其實是 {0} 次",
+    "zh-Hant": "⌛ 逾時：其實是 {0} 次",
     "ja": "⌛ 時間切れ：実際は {0} 回",
     "ko": "⌛ 시간 초과: 실제로 {0}회",
     "fr": "⌛ Temps écoulé : c’était {0}",
@@ -3005,7 +3005,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "关卡 {0}": {
     "en": "Level {0}",
-    "zhtw": "關卡 {0}",
+    "zh-Hant": "關卡 {0}",
     "ja": "レベル {0}",
     "ko": "레벨 {0}",
     "fr": "Niveau {0}",
@@ -3019,7 +3019,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "试次 {0}": {
     "en": "Trial {0}",
-    "zhtw": "試次 {0}",
+    "zh-Hant": "試次 {0}",
     "ja": "試行 {0}",
     "ko": "시행 {0}",
     "fr": "Essai {0}",
@@ -3033,7 +3033,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "篇数 {0}": {
     "en": "Stories {0}",
-    "zhtw": "篇數 {0}",
+    "zh-Hant": "篇數 {0}",
     "ja": "話数 {0}",
     "ko": "편수 {0}",
     "fr": "Récits {0}",
@@ -3047,7 +3047,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "⌛ 超时：少了 {0}": {
     "en": "⌛ Time up: missing {0}",
-    "zhtw": "⌛ 逾時：少了 {0}",
+    "zh-Hant": "⌛ 逾時：少了 {0}",
     "ja": "⌛ 時間切れ：{0} 足りない",
     "ko": "⌛ 시간 초과: {0}개 부족",
     "fr": "⌛ Temps écoulé : il manquait {0}",
@@ -3061,7 +3061,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "✅ 缺的正是 {0}　+{1}": {
     "en": "✅ Missing exactly {0}　+{1}",
-    "zhtw": "✅ 缺的正是 {0}　+{1}",
+    "zh-Hant": "✅ 缺的正是 {0}　+{1}",
     "ja": "✅ まさに {0} が不足　+{1}",
     "ko": "✅ 정확히 {0} 부족　+{1}",
     "fr": "✅ Il manquait exactement {0}　+{1}",
@@ -3075,7 +3075,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "❌ 缺的是 {0}": {
     "en": "❌ Missing {0}",
-    "zhtw": "❌ 缺的是 {0}",
+    "zh-Hant": "❌ 缺的是 {0}",
     "ja": "❌ 不足は {0}",
     "ko": "❌ 부족한 것: {0}",
     "fr": "❌ Il manquait {0}",
@@ -3089,7 +3089,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "🎉 通关：链已接通 —— {0}": {
     "en": "🎉 Cleared: chain connected — {0}",
-    "zhtw": "🎉 通關：鏈已接通 —— {0}",
+    "zh-Hant": "🎉 通關：鏈已接通 —— {0}",
     "ja": "🎉 クリア：チェーン完成 —— {0}",
     "ko": "🎉 클리어: 사슬 연결 —— {0}",
     "fr": "🎉 Réussi : chaîne connectée — {0}",
@@ -3103,7 +3103,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "断线 {0} 次": {
     "en": "{0} breaks",
-    "zhtw": "斷線 {0} 次",
+    "zh-Hant": "斷線 {0} 次",
     "ja": "切断 {0} 回",
     "ko": "{0}회 끊김",
     "fr": "{0} ruptures",
@@ -3117,7 +3117,7 @@ const DICT: Record<string, Record<string, string>> = {
   // ★★ 2026-10-16 TG/TG2 键不在字典（原来非中文显示中文）
   "藏词：{0}": {
     "en": "Hidden: {0}",
-    "zhtw": "藏詞：{0}",
+    "zh-Hant": "藏詞：{0}",
     "ja": "隠し語：{0}",
     "ko": "숨은 단어: {0}",
     "fr": "Mot caché : {0}",
@@ -3132,7 +3132,7 @@ const DICT: Record<string, Record<string, string>> = {
   "看": {
     "zh": "看",
     "en": "Watch",
-    "zhtw": "看",
+    "zh-Hant": "看",
     "ja": "見る",
     "ko": "보기",
     "fr": "Regarder",
@@ -3147,7 +3147,7 @@ const DICT: Record<string, Record<string, string>> = {
   "拍手": {
     "zh": "拍手",
     "en": "Clap",
-    "zhtw": "拍手",
+    "zh-Hant": "拍手",
     "ja": "拍手",
     "ko": "박수",
     "fr": "Taper",
@@ -3162,7 +3162,7 @@ const DICT: Record<string, Record<string, string>> = {
   "跺脚": {
     "zh": "跺脚",
     "en": "Stomp",
-    "zhtw": "跺腳",
+    "zh-Hant": "跺腳",
     "ja": "足踏み",
     "ko": "발 구르기",
     "fr": "Taper du pied",
@@ -3177,7 +3177,7 @@ const DICT: Record<string, Record<string, string>> = {
   "举手": {
     "zh": "举手",
     "en": "Raise hand",
-    "zhtw": "舉手",
+    "zh-Hant": "舉手",
     "ja": "手を挙げる",
     "ko": "손 들기",
     "fr": "Lever la main",
@@ -3192,7 +3192,7 @@ const DICT: Record<string, Record<string, string>> = {
   "握拳": {
     "zh": "握拳",
     "en": "Fist",
-    "zhtw": "握拳",
+    "zh-Hant": "握拳",
     "ja": "拳を握る",
     "ko": "주먹 쥐기",
     "fr": "Poing",
@@ -3207,7 +3207,7 @@ const DICT: Record<string, Record<string, string>> = {
   "A 更大": {
     "zh": "A 更大",
     "en": "A is bigger",
-    "zhtw": "A 更大",
+    "zh-Hant": "A 更大",
     "ja": "A が大きい",
     "ko": "A가 더 큼",
     "fr": "A est plus grand",
@@ -3222,7 +3222,7 @@ const DICT: Record<string, Record<string, string>> = {
   "B 更大": {
     "zh": "B 更大",
     "en": "B is bigger",
-    "zhtw": "B 更大",
+    "zh-Hant": "B 更大",
     "ja": "B が大きい",
     "ko": "B가 더 큼",
     "fr": "B est plus grand",
@@ -3237,7 +3237,7 @@ const DICT: Record<string, Record<string, string>> = {
   "一样大": {
     "zh": "一样大",
     "en": "Same size",
-    "zhtw": "一樣大",
+    "zh-Hant": "一樣大",
     "ja": "同じ大きさ",
     "ko": "같은 크기",
     "fr": "Même taille",
@@ -3252,7 +3252,7 @@ const DICT: Record<string, Record<string, string>> = {
   "黄": {
     "zh": "黄",
     "en": "Yellow",
-    "zhtw": "黃",
+    "zh-Hant": "黃",
     "ja": "黄",
     "ko": "노랑",
     "fr": "Jaune",
@@ -3267,7 +3267,7 @@ const DICT: Record<string, Record<string, string>> = {
   "北 ⬆️": {
     "zh": "北 ⬆️",
     "en": "North ⬆️",
-    "zhtw": "北 ⬆️",
+    "zh-Hant": "北 ⬆️",
     "ja": "北 ⬆️",
     "ko": "북 ⬆️",
     "fr": "Nord ⬆️",
@@ -3282,7 +3282,7 @@ const DICT: Record<string, Record<string, string>> = {
   "东 ➡️": {
     "zh": "东 ➡️",
     "en": "East ➡️",
-    "zhtw": "東 ➡️",
+    "zh-Hant": "東 ➡️",
     "ja": "東 ➡️",
     "ko": "동 ➡️",
     "fr": "Est ➡️",
@@ -3297,7 +3297,7 @@ const DICT: Record<string, Record<string, string>> = {
   "南 ⬇️": {
     "zh": "南 ⬇️",
     "en": "South ⬇️",
-    "zhtw": "南 ⬇️",
+    "zh-Hant": "南 ⬇️",
     "ja": "南 ⬇️",
     "ko": "남 ⬇️",
     "fr": "Sud ⬇️",
@@ -3312,7 +3312,7 @@ const DICT: Record<string, Record<string, string>> = {
   "西 ⬅️": {
     "zh": "西 ⬅️",
     "en": "West ⬅️",
-    "zhtw": "西 ⬅️",
+    "zh-Hant": "西 ⬅️",
     "ja": "西 ⬅️",
     "ko": "서 ⬅️",
     "fr": "Ouest ⬅️",
@@ -3327,7 +3327,7 @@ const DICT: Record<string, Record<string, string>> = {
   "左手边": {
     "zh": "左手边",
     "en": "On the left",
-    "zhtw": "左手邊",
+    "zh-Hant": "左手邊",
     "ja": "左手側",
     "ko": "왼쪽",
     "fr": "À gauche",
@@ -3342,7 +3342,7 @@ const DICT: Record<string, Record<string, string>> = {
   "右手边": {
     "zh": "右手边",
     "en": "On the right",
-    "zhtw": "右手邊",
+    "zh-Hant": "右手邊",
     "ja": "右手側",
     "ko": "오른쪽",
     "fr": "À droite",
@@ -3357,7 +3357,7 @@ const DICT: Record<string, Record<string, string>> = {
   "正前方": {
     "zh": "正前方",
     "en": "Straight ahead",
-    "zhtw": "正前方",
+    "zh-Hant": "正前方",
     "ja": "真正面",
     "ko": "정면",
     "fr": "Droit devant",
@@ -3372,7 +3372,7 @@ const DICT: Record<string, Record<string, string>> = {
   "身后": {
     "zh": "身后",
     "en": "Behind",
-    "zhtw": "身後",
+    "zh-Hant": "身後",
     "ja": "背後",
     "ko": "뒤",
     "fr": "Derrière",
@@ -3387,7 +3387,7 @@ const DICT: Record<string, Record<string, string>> = {
   "1层 底": {
     "zh": "1层 底",
     "en": "Layer 1 · bottom",
-    "zhtw": "1層 底",
+    "zh-Hant": "1層 底",
     "ja": "1 層 底",
     "ko": "1층 바닥",
     "fr": "Couche 1 · bas",
@@ -3402,7 +3402,7 @@ const DICT: Record<string, Record<string, string>> = {
   "2层": {
     "zh": "2层",
     "en": "Layer 2",
-    "zhtw": "2層",
+    "zh-Hant": "2層",
     "ja": "2 層",
     "ko": "2층",
     "fr": "Couche 2",
@@ -3417,7 +3417,7 @@ const DICT: Record<string, Record<string, string>> = {
   "3层 顶": {
     "zh": "3层 顶",
     "en": "Layer 3 · top",
-    "zhtw": "3層 頂",
+    "zh-Hant": "3層 頂",
     "ja": "3 層 頂",
     "ko": "3층 꼭대기",
     "fr": "Couche 3 · haut",
@@ -3432,7 +3432,7 @@ const DICT: Record<string, Record<string, string>> = {
   "下层": {
     "zh": "下层",
     "en": "Lower",
-    "zhtw": "下層",
+    "zh-Hant": "下層",
     "ja": "下層",
     "ko": "아래층",
     "fr": "Inférieur",
@@ -3447,7 +3447,7 @@ const DICT: Record<string, Record<string, string>> = {
   "中层": {
     "zh": "中层",
     "en": "Middle",
-    "zhtw": "中層",
+    "zh-Hant": "中層",
     "ja": "中層",
     "ko": "중간층",
     "fr": "Milieu",
@@ -3462,7 +3462,7 @@ const DICT: Record<string, Record<string, string>> = {
   "上层": {
     "zh": "上层",
     "en": "Upper",
-    "zhtw": "上層",
+    "zh-Hant": "上層",
     "ja": "上層",
     "ko": "위층",
     "fr": "Supérieur",
@@ -3477,7 +3477,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⬆ 升层": {
     "zh": "⬆ 升层",
     "en": "⬆ Up a layer",
-    "zhtw": "⬆ 升層",
+    "zh-Hant": "⬆ 升層",
     "ja": "⬆ 層を上げる",
     "ko": "⬆ 층 올리기",
     "fr": "⬆ Monter d’un niveau",
@@ -3492,7 +3492,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⬇ 降层": {
     "zh": "⬇ 降层",
     "en": "⬇ Down a layer",
-    "zhtw": "⬇ 降層",
+    "zh-Hant": "⬇ 降層",
     "ja": "⬇ 層を下げる",
     "ko": "⬇ 층 내리기",
     "fr": "⬇ Descendre d’un niveau",
@@ -3507,7 +3507,7 @@ const DICT: Record<string, Record<string, string>> = {
   "冒泡": {
     "zh": "冒泡",
     "en": "Bubble",
-    "zhtw": "冒泡",
+    "zh-Hant": "冒泡",
     "ja": "バブル",
     "ko": "버블",
     "fr": "Bulles",
@@ -3522,7 +3522,7 @@ const DICT: Record<string, Record<string, string>> = {
   "插入": {
     "zh": "插入",
     "en": "Insertion",
-    "zhtw": "插入",
+    "zh-Hant": "插入",
     "ja": "挿入",
     "ko": "삽입",
     "fr": "Insertion",
@@ -3537,7 +3537,7 @@ const DICT: Record<string, Record<string, string>> = {
   "选择": {
     "zh": "选择",
     "en": "Selection",
-    "zhtw": "選擇",
+    "zh-Hant": "選擇",
     "ja": "選択",
     "ko": "선택",
     "fr": "Sélection",
@@ -3552,7 +3552,7 @@ const DICT: Record<string, Record<string, string>> = {
   "快速": {
     "zh": "快速",
     "en": "Quick",
-    "zhtw": "快速",
+    "zh-Hant": "快速",
     "ja": "クイック",
     "ko": "퀵",
     "fr": "Rapide",
@@ -3567,7 +3567,7 @@ const DICT: Record<string, Record<string, string>> = {
   "本周三有雷阵雨": {
     "zh": "本周三有雷阵雨",
     "en": "Thunderstorms this Wednesday",
-    "zhtw": "本週三有雷陣雨",
+    "zh-Hant": "本週三有雷陣雨",
     "ja": "今週水曜は雷雨",
     "ko": "이번 주 수요일 뇌우",
     "fr": "Orages mercredi",
@@ -3582,7 +3582,7 @@ const DICT: Record<string, Record<string, string>> = {
   "图书馆周六闭馆": {
     "zh": "图书馆周六闭馆",
     "en": "Library closed Saturday",
-    "zhtw": "圖書館週六閉館",
+    "zh-Hant": "圖書館週六閉館",
     "ja": "図書館は土曜休館",
     "ko": "도서관 토요일 휴관",
     "fr": "Bibliothèque fermée samedi",
@@ -3597,7 +3597,7 @@ const DICT: Record<string, Record<string, string>> = {
   "新食堂下月开张": {
     "zh": "新食堂下月开张",
     "en": "New canteen opens next month",
-    "zhtw": "新食堂下月開張",
+    "zh-Hant": "新食堂下月開張",
     "ja": "新しい食堂は来月開店",
     "ko": "새 식당 다음 달 개장",
     "fr": "Nouvelle cantine le mois prochain",
@@ -3612,7 +3612,7 @@ const DICT: Record<string, Record<string, string>> = {
   "地铁 15 号线年底通车": {
     "zh": "地铁 15 号线年底通车",
     "en": "Metro line 15 opens this year",
-    "zhtw": "地鐵 15 號線年底通車",
+    "zh-Hant": "地鐵 15 號線年底通車",
     "ja": "地下鉄 15 号線が年内開通",
     "ko": "지하철 15호선 연내 개통",
     "fr": "Ligne 15 du métro cette année",
@@ -3627,7 +3627,7 @@ const DICT: Record<string, Record<string, string>> = {
   "期末考提前一周": {
     "zh": "期末考提前一周",
     "en": "Finals moved up a week",
-    "zhtw": "期末考提前一週",
+    "zh-Hant": "期末考提前一週",
     "ja": "期末試験が一週前倒し",
     "ko": "기말고사 일주일 앞당김",
     "fr": "Examens avancés d’une semaine",
@@ -3642,7 +3642,7 @@ const DICT: Record<string, Record<string, string>> = {
   "学校要办机器人赛": {
     "zh": "学校要办机器人赛",
     "en": "School robotics contest",
-    "zhtw": "學校要辦機器人賽",
+    "zh-Hant": "學校要辦機器人賽",
     "ja": "学校でロボット大会",
     "ko": "학교 로봇 대회",
     "fr": "Concours de robots",
@@ -3657,7 +3657,7 @@ const DICT: Record<string, Record<string, string>> = {
   "游泳馆水温调到 28 度": {
     "zh": "游泳馆水温调到 28 度",
     "en": "Pool heated to 28°C",
-    "zhtw": "游泳館水溫調到 28 度",
+    "zh-Hant": "游泳館水溫調到 28 度",
     "ja": "プール水温 28 度",
     "ko": "수영장 수온 28도",
     "fr": "Piscine à 28 °C",
@@ -3672,7 +3672,7 @@ const DICT: Record<string, Record<string, string>> = {
   "校车改到南门发车": {
     "zh": "校车改到南门发车",
     "en": "Shuttle now leaves from South Gate",
-    "zhtw": "校車改到南門發車",
+    "zh-Hant": "校車改到南門發車",
     "ja": "スクールバスは南門発",
     "ko": "통학버스 남문 출발",
     "fr": "Navette départ porte sud",
@@ -3687,7 +3687,7 @@ const DICT: Record<string, Record<string, string>> = {
   "下学期加开 Python 选修": {
     "zh": "下学期加开 Python 选修",
     "en": "Python elective added next term",
-    "zhtw": "下學期加開 Python 選修",
+    "zh-Hant": "下學期加開 Python 選修",
     "ja": "来学期 Python 選択追加",
     "ko": "다음 학기 Python 선택 추가",
     "fr": "Option Python au prochain semestre",
@@ -3702,7 +3702,7 @@ const DICT: Record<string, Record<string, string>> = {
   "操场跑道正在翻修": {
     "zh": "操场跑道正在翻修",
     "en": "Track under renovation",
-    "zhtw": "操場跑道正在翻修",
+    "zh-Hant": "操場跑道正在翻修",
     "ja": "グラウンド改修中",
     "ko": "운동장 트랙 공사 중",
     "fr": "Piste en rénovation",
@@ -3717,7 +3717,7 @@ const DICT: Record<string, Record<string, string>> = {
   "👩‍🏫 任课老师": {
     "zh": "👩‍🏫 任课老师",
     "en": "👩‍🏫 Course teacher",
-    "zhtw": "👩‍🏫 任課老師",
+    "zh-Hant": "👩‍🏫 任課老師",
     "ja": "👩‍🏫 担当教員",
     "ko": "👩‍🏫 담당 교사",
     "fr": "👩‍🏫 Enseignant",
@@ -3732,7 +3732,7 @@ const DICT: Record<string, Record<string, string>> = {
   "📰 校报": {
     "zh": "📰 校报",
     "en": "📰 School paper",
-    "zhtw": "📰 校報",
+    "zh-Hant": "📰 校報",
     "ja": "📰 学園新聞",
     "ko": "📰 학교 신문",
     "fr": "📰 Journal de l’école",
@@ -3747,7 +3747,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🧑‍🔬 实验室学长": {
     "zh": "🧑‍🔬 实验室学长",
     "en": "🧑‍🔬 Lab senior",
-    "zhtw": "🧑‍🔬 實驗室學長",
+    "zh-Hant": "🧑‍🔬 實驗室學長",
     "ja": "🧑‍🔬 研究室の先輩",
     "ko": "🧑‍🔬 연구실 선배",
     "fr": "🧑‍🔬 Ancien du labo",
@@ -3762,7 +3762,7 @@ const DICT: Record<string, Record<string, string>> = {
   "👬 室友": {
     "zh": "👬 室友",
     "en": "👬 Roommate",
-    "zhtw": "👬 室友",
+    "zh-Hant": "👬 室友",
     "ja": "👬 ルームメイト",
     "ko": "👬 룸메이트",
     "fr": "👬 Colocataire",
@@ -3777,7 +3777,7 @@ const DICT: Record<string, Record<string, string>> = {
   "周一": {
     "zh": "周一",
     "en": "Monday",
-    "zhtw": "週一",
+    "zh-Hant": "週一",
     "ja": "月曜",
     "ko": "월요일",
     "fr": "lundi",
@@ -3792,7 +3792,7 @@ const DICT: Record<string, Record<string, string>> = {
   "周二": {
     "zh": "周二",
     "en": "Tuesday",
-    "zhtw": "週二",
+    "zh-Hant": "週二",
     "ja": "火曜",
     "ko": "화요일",
     "fr": "mardi",
@@ -3807,7 +3807,7 @@ const DICT: Record<string, Record<string, string>> = {
   "周三": {
     "zh": "周三",
     "en": "Wednesday",
-    "zhtw": "週三",
+    "zh-Hant": "週三",
     "ja": "水曜",
     "ko": "수요일",
     "fr": "mercredi",
@@ -3822,7 +3822,7 @@ const DICT: Record<string, Record<string, string>> = {
   "周四": {
     "zh": "周四",
     "en": "Thursday",
-    "zhtw": "週四",
+    "zh-Hant": "週四",
     "ja": "木曜",
     "ko": "목요일",
     "fr": "jeudi",
@@ -3837,7 +3837,7 @@ const DICT: Record<string, Record<string, string>> = {
   "周五": {
     "zh": "周五",
     "en": "Friday",
-    "zhtw": "週五",
+    "zh-Hant": "週五",
     "ja": "金曜",
     "ko": "금요일",
     "fr": "vendredi",
@@ -3852,7 +3852,7 @@ const DICT: Record<string, Record<string, string>> = {
   "周六": {
     "zh": "周六",
     "en": "Saturday",
-    "zhtw": "週六",
+    "zh-Hant": "週六",
     "ja": "土曜",
     "ko": "토요일",
     "fr": "samedi",
@@ -3867,7 +3867,7 @@ const DICT: Record<string, Record<string, string>> = {
   "周日": {
     "zh": "周日",
     "en": "Sunday",
-    "zhtw": "週日",
+    "zh-Hant": "週日",
     "ja": "日曜",
     "ko": "일요일",
     "fr": "dimanche",
@@ -3882,7 +3882,7 @@ const DICT: Record<string, Record<string, string>> = {
   "架了 {0} 座桥": {
     "zh": "架了 {0} 座桥",
     "en": "Built {0} bridges",
-    "zhtw": "架了 {0} 座橋",
+    "zh-Hant": "架了 {0} 座橋",
     "ja": "{0} 本の橋を架けた",
     "ko": "다리 {0}개 건설",
     "fr": "{0} ponts construits",
@@ -3897,7 +3897,7 @@ const DICT: Record<string, Record<string, string>> = {
   "💤 错了 {0} 格": {
     "zh": "💤 错了 {0} 格",
     "en": "💤 {0} wrong",
-    "zhtw": "💤 錯了 {0} 格",
+    "zh-Hant": "💤 錯了 {0} 格",
     "ja": "💤 {0} マス誤り",
     "ko": "💤 {0}칸 틀림",
     "fr": "💤 {0} erreurs",
@@ -3912,7 +3912,7 @@ const DICT: Record<string, Record<string, string>> = {
   "💤 只对了 {0}/{1} 格": {
     "zh": "💤 只对了 {0}/{1} 格",
     "en": "💤 Only {0}/{1} right",
-    "zhtw": "💤 只對了 {0}/{1} 格",
+    "zh-Hant": "💤 只對了 {0}/{1} 格",
     "ja": "💤 {0}/{1} マス正解",
     "ko": "💤 {0}/{1}칸 정답",
     "fr": "💤 Seulement {0}/{1}",
@@ -3927,7 +3927,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 这一格是 {0}，要的是 {1}": {
     "zh": "❌ 这一格是 {0}，要的是 {1}",
     "en": "❌ This cell is {0}, needed {1}",
-    "zhtw": "❌ 這一格是 {0}，要的是 {1}",
+    "zh-Hant": "❌ 這一格是 {0}，要的是 {1}",
     "ja": "❌ このマスは {0}、必要なのは {1}",
     "ko": "❌ 이 칸은 {0}, 필요한 건 {1}",
     "fr": "❌ Cette case est {0}, il faut {1}",
@@ -3942,7 +3942,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 规律是「{0}」，绿框才对": {
     "zh": "❌ 规律是「{0}」，绿框才对",
     "en": "❌ The rule is “{0}” — the green box is right",
-    "zhtw": "❌ 規律是「{0}」，綠框才對",
+    "zh-Hant": "❌ 規律是「{0}」，綠框才對",
     "ja": "❌ 規則は「{0}」、緑枠が正解",
     "ko": "❌ 규칙은 “{0}”, 초록 상자가 정답",
     "fr": "❌ La règle est « {0} » — la case verte",
@@ -3957,7 +3957,7 @@ const DICT: Record<string, Record<string, string>> = {
   "消掉 {0} 行！": {
     "zh": "消掉 {0} 行！",
     "en": "Cleared {0} rows!",
-    "zhtw": "消掉 {0} 行！",
+    "zh-Hant": "消掉 {0} 行！",
     "ja": "{0} 行消去！",
     "ko": "{0}줄 제거!",
     "fr": "{0} lignes effacées !",
@@ -3972,7 +3972,7 @@ const DICT: Record<string, Record<string, string>> = {
   "😵 只答对 {0}/{1}，差 {2} 题": {
     "zh": "😵 只答对 {0}/{1}，差 {2} 题",
     "en": "😵 Only {0}/{1} correct — {2} short",
-    "zhtw": "😵 只答對 {0}/{1}，差 {2} 題",
+    "zh-Hant": "😵 只答對 {0}/{1}，差 {2} 題",
     "ja": "😵 {0}/{1} 正解、あと {2} 問",
     "ko": "😵 {0}/{1} 정답, {2}개 부족",
     "fr": "😵 Seulement {0}/{1} — il manque {2}",
@@ -3987,7 +3987,7 @@ const DICT: Record<string, Record<string, string>> = {
   "走到第 {0} 关 · 得分 {1}": {
     "zh": "走到第 {0} 关 · 得分 {1}",
     "en": "Reached level {0} · score {1}",
-    "zhtw": "走到第 {0} 關 · 得分 {1}",
+    "zh-Hant": "走到第 {0} 關 · 得分 {1}",
     "ja": "第 {0} 面 · スコア {1}",
     "ko": "{0}단계 도달 · 점수 {1}",
     "fr": "Niveau {0} · score {1}",
@@ -4002,7 +4002,7 @@ const DICT: Record<string, Record<string, string>> = {
   "正确 {0}/{1}": {
     "zh": "正确 {0}/{1}",
     "en": "{0}/{1} correct",
-    "zhtw": "正確 {0}/{1}",
+    "zh-Hant": "正確 {0}/{1}",
     "ja": "正解 {0}/{1}",
     "ko": "정답 {0}/{1}",
     "fr": "{0}/{1} corrects",
@@ -4017,7 +4017,7 @@ const DICT: Record<string, Record<string, string>> = {
   "叠对 {0}/{1}": {
     "zh": "叠对 {0}/{1}",
     "en": "{0}/{1} stacked right",
-    "zhtw": "疊對 {0}/{1}",
+    "zh-Hant": "疊對 {0}/{1}",
     "ja": "{0}/{1} 正しく積み上げ",
     "ko": "{0}/{1}개 정확히 쌓음",
     "fr": "{0}/{1} empilés juste",
@@ -4032,7 +4032,7 @@ const DICT: Record<string, Record<string, string>> = {
   "复原 {0} / {1}": {
     "zh": "复原 {0} / {1}",
     "en": "{0} / {1} restored",
-    "zhtw": "復原 {0} / {1}",
+    "zh-Hant": "復原 {0} / {1}",
     "ja": "{0} / {1} 復元",
     "ko": "{0} / {1} 복원",
     "fr": "{0} / {1} restaurés",
@@ -4047,7 +4047,7 @@ const DICT: Record<string, Record<string, string>> = {
   "读对 {0}/{1}": {
     "zh": "读对 {0}/{1}",
     "en": "{0}/{1} read right",
-    "zhtw": "讀對 {0}/{1}",
+    "zh-Hant": "讀對 {0}/{1}",
     "ja": "{0}/{1} 正しく読めた",
     "ko": "{0}/{1}개 정확히 읽음",
     "fr": "{0}/{1} lus juste",
@@ -4062,7 +4062,7 @@ const DICT: Record<string, Record<string, string>> = {
   "命中 {0}": {
     "zh": "命中 {0}",
     "en": "{0} hits",
-    "zhtw": "命中 {0}",
+    "zh-Hant": "命中 {0}",
     "ja": "{0} 命中",
     "ko": "{0}회 명중",
     "fr": "{0} touches",
@@ -4077,7 +4077,7 @@ const DICT: Record<string, Record<string, string>> = {
   "找出 {0} / {1}": {
     "zh": "找出 {0} / {1}",
     "en": "{0} / {1} found",
-    "zhtw": "找出 {0} / {1}",
+    "zh-Hant": "找出 {0} / {1}",
     "ja": "{0} / {1} 発見",
     "ko": "{0} / {1} 발견",
     "fr": "{0} / {1} trouvés",
@@ -4092,7 +4092,7 @@ const DICT: Record<string, Record<string, string>> = {
   "找对 {0} / {1}": {
     "zh": "找对 {0} / {1}",
     "en": "{0} / {1} right",
-    "zhtw": "找對 {0} / {1}",
+    "zh-Hant": "找對 {0} / {1}",
     "ja": "{0} / {1} 正解",
     "ko": "{0} / {1} 정답",
     "fr": "{0} / {1} justes",
@@ -4107,7 +4107,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还原 {0}/{1}": {
     "zh": "还原 {0}/{1}",
     "en": "{0}/{1} restored",
-    "zhtw": "還原 {0}/{1}",
+    "zh-Hant": "還原 {0}/{1}",
     "ja": "{0}/{1} 復元",
     "ko": "{0}/{1} 복원",
     "fr": "{0}/{1} restaurés",
@@ -4122,7 +4122,7 @@ const DICT: Record<string, Record<string, string>> = {
   "回忆对 {0}/{1}": {
     "zh": "回忆对 {0}/{1}",
     "en": "{0}/{1} recalled",
-    "zhtw": "回憶對 {0}/{1}",
+    "zh-Hant": "回憶對 {0}/{1}",
     "ja": "{0}/{1} 記憶正解",
     "ko": "{0}/{1} 기억 정답",
     "fr": "{0}/{1} rappelés",
@@ -4137,7 +4137,7 @@ const DICT: Record<string, Record<string, string>> = {
   "答对 {0} / {1}": {
     "zh": "答对 {0} / {1}",
     "en": "{0} / {1} correct",
-    "zhtw": "答對 {0} / {1}",
+    "zh-Hant": "答對 {0} / {1}",
     "ja": "{0} / {1} 正解",
     "ko": "{0} / {1} 정답",
     "fr": "{0} / {1} bonnes",
@@ -4152,7 +4152,7 @@ const DICT: Record<string, Record<string, string>> = {
   "共 {0}/{1} 分": {
     "zh": "共 {0}/{1} 分",
     "en": "{0}/{1} points",
-    "zhtw": "共 {0}/{1} 分",
+    "zh-Hant": "共 {0}/{1} 分",
     "ja": "計 {0}/{1} 点",
     "ko": "총 {0}/{1}점",
     "fr": "{0}/{1} points",
@@ -4167,7 +4167,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还原 {0} / {1}": {
     "zh": "还原 {0} / {1}",
     "en": "{0} / {1} restored",
-    "zhtw": "還原 {0} / {1}",
+    "zh-Hant": "還原 {0} / {1}",
     "ja": "{0} / {1} 復元",
     "ko": "{0} / {1} 복원",
     "fr": "{0} / {1} restaurés",
@@ -4182,7 +4182,7 @@ const DICT: Record<string, Record<string, string>> = {
   "猜中 {0} / {1}": {
     "zh": "猜中 {0} / {1}",
     "en": "{0} / {1} guessed",
-    "zhtw": "猜中 {0} / {1}",
+    "zh-Hant": "猜中 {0} / {1}",
     "ja": "{0} / {1} 正解",
     "ko": "{0} / {1} 정답",
     "fr": "{0} / {1} trouvés",
@@ -4197,7 +4197,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 个": {
     "zh": "{0} 个",
     "en": "{0}",
-    "zhtw": "{0} 個",
+    "zh-Hant": "{0} 個",
     "ja": "{0} 個",
     "ko": "{0}개",
     "fr": "{0}",
@@ -4212,7 +4212,7 @@ const DICT: Record<string, Record<string, string>> = {
   "破译 {0} / {1}": {
     "zh": "破译 {0} / {1}",
     "en": "{0} / {1} decoded",
-    "zhtw": "破譯 {0} / {1}",
+    "zh-Hant": "破譯 {0} / {1}",
     "ja": "{0} / {1} 解読",
     "ko": "{0} / {1} 해독",
     "fr": "{0} / {1} déchiffrés",
@@ -4227,7 +4227,7 @@ const DICT: Record<string, Record<string, string>> = {
   "真实 {0}，你报 {1} · 总分 {2}": {
     "zh": "真实 {0}，你报 {1} · 总分 {2}",
     "en": "Actual {0}, you said {1} · score {2}",
-    "zhtw": "真實 {0}，你報 {1} · 總分 {2}",
+    "zh-Hant": "真實 {0}，你報 {1} · 總分 {2}",
     "ja": "実際 {0}、回答 {1} · スコア {2}",
     "ko": "실제 {0}, 응답 {1} · 점수 {2}",
     "fr": "Réel {0}, vous dites {1} · score {2}",
@@ -4242,7 +4242,7 @@ const DICT: Record<string, Record<string, string>> = {
   "全对 {0}/{1} 轮": {
     "zh": "全对 {0}/{1} 轮",
     "en": "All correct {0}/{1} rounds",
-    "zhtw": "全對 {0}/{1} 輪",
+    "zh-Hant": "全對 {0}/{1} 輪",
     "ja": "全問正解 {0}/{1} 回",
     "ko": "전부 정답 {0}/{1}라운드",
     "fr": "Tout juste {0}/{1} manches",
@@ -4257,7 +4257,7 @@ const DICT: Record<string, Record<string, string>> = {
   "解出 {0}/{1}": {
     "zh": "解出 {0}/{1}",
     "en": "{0}/{1} solved",
-    "zhtw": "解出 {0}/{1}",
+    "zh-Hant": "解出 {0}/{1}",
     "ja": "{0}/{1} 解答",
     "ko": "{0}/{1} 해결",
     "fr": "{0}/{1} résolus",
@@ -4272,7 +4272,7 @@ const DICT: Record<string, Record<string, string>> = {
   "答对 {0} / {1}，平均 {2} ms": {
     "zh": "答对 {0} / {1}，平均 {2} ms",
     "en": "{0} / {1} correct, {2} ms average",
-    "zhtw": "答對 {0} / {1}，平均 {2} ms",
+    "zh-Hant": "答對 {0} / {1}，平均 {2} ms",
     "ja": "{0} / {1} 正解、平均 {2} ms",
     "ko": "{0} / {1} 정답, 평균 {2} ms",
     "fr": "{0} / {1} bonnes, {2} ms en moyenne",
@@ -4287,7 +4287,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}/{1} · 平均 {2} ms": {
     "zh": "{0}/{1} · 平均 {2} ms",
     "en": "{0}/{1} · {2} ms average",
-    "zhtw": "{0}/{1} · 平均 {2} ms",
+    "zh-Hant": "{0}/{1} · 平均 {2} ms",
     "ja": "{0}/{1} · 平均 {2} ms",
     "ko": "{0}/{1} · 평균 {2} ms",
     "fr": "{0}/{1} · {2} ms en moyenne",
@@ -4302,7 +4302,7 @@ const DICT: Record<string, Record<string, string>> = {
   "完成 {0}/{1}": {
     "zh": "完成 {0}/{1}",
     "en": "{0}/{1} done",
-    "zhtw": "完成 {0}/{1}",
+    "zh-Hant": "完成 {0}/{1}",
     "ja": "{0}/{1} 完了",
     "ko": "{0}/{1} 완료",
     "fr": "{0}/{1} faits",
@@ -4317,7 +4317,7 @@ const DICT: Record<string, Record<string, string>> = {
   "答对 {0}/{1} 轮": {
     "zh": "答对 {0}/{1} 轮",
     "en": "{0}/{1} rounds correct",
-    "zhtw": "答對 {0}/{1} 輪",
+    "zh-Hant": "答對 {0}/{1} 輪",
     "ja": "{0}/{1} 回正解",
     "ko": "{0}/{1}라운드 정답",
     "fr": "{0}/{1} manches justes",
@@ -4332,7 +4332,7 @@ const DICT: Record<string, Record<string, string>> = {
   "配对 {0}/{1}": {
     "zh": "配对 {0}/{1}",
     "en": "{0}/{1} paired",
-    "zhtw": "配對 {0}/{1}",
+    "zh-Hant": "配對 {0}/{1}",
     "ja": "{0}/{1} ペア",
     "ko": "{0}/{1} 짝",
     "fr": "{0}/{1} appariés",
@@ -4347,7 +4347,7 @@ const DICT: Record<string, Record<string, string>> = {
   "点亮 {0}/{1}": {
     "zh": "点亮 {0}/{1}",
     "en": "{0}/{1} lit",
-    "zhtw": "點亮 {0}/{1}",
+    "zh-Hant": "點亮 {0}/{1}",
     "ja": "{0}/{1} 点灯",
     "ko": "{0}/{1} 점등",
     "fr": "{0}/{1} allumés",
@@ -4362,7 +4362,7 @@ const DICT: Record<string, Record<string, string>> = {
   "连线 {0}/{1}": {
     "zh": "连线 {0}/{1}",
     "en": "{0}/{1} linked",
-    "zhtw": "連線 {0}/{1}",
+    "zh-Hant": "連線 {0}/{1}",
     "ja": "{0}/{1} 接続",
     "ko": "{0}/{1} 연결",
     "fr": "{0}/{1} reliés",
@@ -4377,7 +4377,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已找 {0}/{1}": {
     "zh": "已找 {0}/{1}",
     "en": "{0}/{1} found",
-    "zhtw": "已找 {0}/{1}",
+    "zh-Hant": "已找 {0}/{1}",
     "ja": "{0}/{1} 発見",
     "ko": "{0}/{1} 발견",
     "fr": "{0}/{1} trouvés",
@@ -4392,7 +4392,7 @@ const DICT: Record<string, Record<string, string>> = {
   "拼对 {0}/{1}": {
     "zh": "拼对 {0}/{1}",
     "en": "{0}/{1} spelled",
-    "zhtw": "拼對 {0}/{1}",
+    "zh-Hant": "拼對 {0}/{1}",
     "ja": "{0}/{1} 正解",
     "ko": "{0}/{1} 완성",
     "fr": "{0}/{1} épelés",
@@ -4407,7 +4407,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已连 {0}/{1}": {
     "zh": "已连 {0}/{1}",
     "en": "{0}/{1} connected",
-    "zhtw": "已連 {0}/{1}",
+    "zh-Hant": "已連 {0}/{1}",
     "ja": "{0}/{1} 接続",
     "ko": "{0}/{1} 연결",
     "fr": "{0}/{1} connectés",
@@ -4422,7 +4422,7 @@ const DICT: Record<string, Record<string, string>> = {
   "消掉 {0}/{1}": {
     "zh": "消掉 {0}/{1}",
     "en": "{0}/{1} cleared",
-    "zhtw": "消掉 {0}/{1}",
+    "zh-Hant": "消掉 {0}/{1}",
     "ja": "{0}/{1} 消去",
     "ko": "{0}/{1} 제거",
     "fr": "{0}/{1} éliminés",
@@ -4437,7 +4437,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已解 {0}/{1}": {
     "zh": "已解 {0}/{1}",
     "en": "{0}/{1} solved",
-    "zhtw": "已解 {0}/{1}",
+    "zh-Hant": "已解 {0}/{1}",
     "ja": "{0}/{1} 解決",
     "ko": "{0}/{1} 해결",
     "fr": "{0}/{1} résolus",
@@ -4452,7 +4452,7 @@ const DICT: Record<string, Record<string, string>> = {
   "过关 {0}/{1}": {
     "zh": "过关 {0}/{1}",
     "en": "{0}/{1} cleared",
-    "zhtw": "過關 {0}/{1}",
+    "zh-Hant": "過關 {0}/{1}",
     "ja": "{0}/{1} クリア",
     "ko": "{0}/{1} 통과",
     "fr": "{0}/{1} réussis",
@@ -4467,7 +4467,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已翻 {0}/{1}": {
     "zh": "已翻 {0}/{1}",
     "en": "{0}/{1} flipped",
-    "zhtw": "已翻 {0}/{1}",
+    "zh-Hant": "已翻 {0}/{1}",
     "ja": "{0}/{1} めくり",
     "ko": "{0}/{1} 뒤집음",
     "fr": "{0}/{1} retournés",
@@ -4482,7 +4482,7 @@ const DICT: Record<string, Record<string, string>> = {
   "收集 {0}/{1}": {
     "zh": "收集 {0}/{1}",
     "en": "{0}/{1} collected",
-    "zhtw": "收集 {0}/{1}",
+    "zh-Hant": "收集 {0}/{1}",
     "ja": "{0}/{1} 収集",
     "ko": "{0}/{1} 수집",
     "fr": "{0}/{1} collectés",
@@ -4497,7 +4497,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0}/{1}": {
     "zh": "步数 {0}/{1}",
     "en": "Steps {0}/{1}",
-    "zhtw": "步數 {0}/{1}",
+    "zh-Hant": "步數 {0}/{1}",
     "ja": "手数 {0}/{1}",
     "ko": "걸음 {0}/{1}",
     "fr": "Pas {0}/{1}",
@@ -4512,7 +4512,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}　终点 {1}": {
     "zh": "{0}　终点 {1}",
     "en": "{0} · goal {1}",
-    "zhtw": "{0}　終點 {1}",
+    "zh-Hant": "{0}　終點 {1}",
     "ja": "{0}　終点 {1}",
     "ko": "{0} · 도착 {1}",
     "fr": "{0} · arrivée {1}",
@@ -4527,7 +4527,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1}": {
     "zh": "第 {0}/{1}",
     "en": "{0}/{1}",
-    "zhtw": "第 {0}/{1}",
+    "zh-Hant": "第 {0}/{1}",
     "ja": "{0}/{1}",
     "ko": "{0}/{1}",
     "fr": "{0}/{1}",
@@ -4542,7 +4542,7 @@ const DICT: Record<string, Record<string, string>> = {
   "共 {0}": {
     "zh": "共 {0}",
     "en": "{0} in all",
-    "zhtw": "共 {0}",
+    "zh-Hant": "共 {0}",
     "ja": "全 {0}",
     "ko": "총 {0}",
     "fr": "{0} en tout",
@@ -4557,7 +4557,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0}": {
     "zh": "步数 {0}",
     "en": "Steps {0}",
-    "zhtw": "步數 {0}",
+    "zh-Hant": "步數 {0}",
     "ja": "手数 {0}",
     "ko": "걸음 {0}",
     "fr": "Pas {0}",
@@ -4572,7 +4572,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已绑定 {0}/{1}": {
     "zh": "已绑定 {0}/{1}",
     "en": "{0}/{1} bound",
-    "zhtw": "已綁定 {0}/{1}",
+    "zh-Hant": "已綁定 {0}/{1}",
     "ja": "{0}/{1} 結合",
     "ko": "{0}/{1} 결합",
     "fr": "{0}/{1} liés",
@@ -4587,7 +4587,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}{1} 拍即通关": {
     "zh": "{0}{1} 拍即通关",
     "en": "{0}{1} beats to clear",
-    "zhtw": "{0}{1} 拍即通關",
+    "zh-Hant": "{0}{1} 拍即通關",
     "ja": "{0}{1} 拍でクリア",
     "ko": "{0}{1}박자면 클리어",
     "fr": "{0}{1} temps pour réussir",
@@ -4602,7 +4602,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}　失误 {1}/{2}": {
     "zh": "{0}　失误 {1}/{2}",
     "en": "{0} · misses {1}/{2}",
-    "zhtw": "{0}　失誤 {1}/{2}",
+    "zh-Hant": "{0}　失誤 {1}/{2}",
     "ja": "{0}　ミス {1}/{2}",
     "ko": "{0} · 실수 {1}/{2}",
     "fr": "{0} · erreurs {1}/{2}",
@@ -4617,7 +4617,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已绘 {0}/{1}": {
     "zh": "已绘 {0}/{1}",
     "en": "{0}/{1} drawn",
-    "zhtw": "已繪 {0}/{1}",
+    "zh-Hant": "已繪 {0}/{1}",
     "ja": "{0}/{1} 描画",
     "ko": "{0}/{1} 그려짐",
     "fr": "{0}/{1} tracés",
@@ -4632,7 +4632,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已消 {0}/{1}": {
     "zh": "已消 {0}/{1}",
     "en": "{0}/{1} cleared",
-    "zhtw": "已消 {0}/{1}",
+    "zh-Hant": "已消 {0}/{1}",
     "ja": "{0}/{1} 消去",
     "ko": "{0}/{1} 제거",
     "fr": "{0}/{1} éliminés",
@@ -4647,7 +4647,7 @@ const DICT: Record<string, Record<string, string>> = {
   "题 {0}/{1}": {
     "zh": "题 {0}/{1}",
     "en": "Q{0}/{1}",
-    "zhtw": "題 {0}/{1}",
+    "zh-Hant": "題 {0}/{1}",
     "ja": "問 {0}/{1}",
     "ko": "{0}/{1}문제",
     "fr": "Q{0}/{1}",
@@ -4662,7 +4662,7 @@ const DICT: Record<string, Record<string, string>> = {
   "轮次 {0}": {
     "zh": "轮次 {0}",
     "en": "Round {0}",
-    "zhtw": "輪次 {0}",
+    "zh-Hant": "輪次 {0}",
     "ja": "回 {0}",
     "ko": "{0}라운드",
     "fr": "Manche {0}",
@@ -4677,7 +4677,7 @@ const DICT: Record<string, Record<string, string>> = {
   "归位 {0}/{1}": {
     "zh": "归位 {0}/{1}",
     "en": "{0}/{1} in place",
-    "zhtw": "歸位 {0}/{1}",
+    "zh-Hant": "歸位 {0}/{1}",
     "ja": "{0}/{1} 配置",
     "ko": "{0}/{1} 제자리",
     "fr": "{0}/{1} en place",
@@ -4692,7 +4692,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已拆 {0}/{1}": {
     "zh": "已拆 {0}/{1}",
     "en": "{0}/{1} dismantled",
-    "zhtw": "已拆 {0}/{1}",
+    "zh-Hant": "已拆 {0}/{1}",
     "ja": "{0}/{1} 分解",
     "ko": "{0}/{1} 분해",
     "fr": "{0}/{1} démontés",
@@ -4707,7 +4707,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已亮 {0}/{1}": {
     "zh": "已亮 {0}/{1}",
     "en": "{0}/{1} lit",
-    "zhtw": "已亮 {0}/{1}",
+    "zh-Hant": "已亮 {0}/{1}",
     "ja": "{0}/{1} 点灯",
     "ko": "{0}/{1} 점등",
     "fr": "{0}/{1} allumés",
@@ -4722,7 +4722,7 @@ const DICT: Record<string, Record<string, string>> = {
   "得分 {0}": {
     "zh": "得分 {0}",
     "en": "Score {0}",
-    "zhtw": "得分 {0}",
+    "zh-Hant": "得分 {0}",
     "ja": "スコア {0}",
     "ko": "점수 {0}",
     "fr": "Score {0}",
@@ -4737,7 +4737,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0}/{1} · 从左上角走到右下角 🏁，和要刚好等于目标": {
     "zh": "步数 {0}/{1} · 从左上角走到右下角 🏁，和要刚好等于目标",
     "en": "Steps {0}/{1} · go from top-left to bottom-right 🏁; the sum must hit the target exactly",
-    "zhtw": "步數 {0}/{1} · 從左上角走到右下角 🏁，和要剛好等於目標",
+    "zh-Hant": "步數 {0}/{1} · 從左上角走到右下角 🏁，和要剛好等於目標",
     "ja": "手数 {0}/{1} · 左上から右下へ 🏁、合計を目標ちょうどに",
     "ko": "걸음 {0}/{1} · 왼쪽 위에서 오른쪽 아래로 🏁, 합이 목표와 정확히",
     "fr": "Pas {0}/{1} · du coin haut-gauche au bas-droit 🏁, somme exacte",
@@ -4752,7 +4752,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0}/{1} · 相邻成路、数字与运算符交替、从左往右算（不区分优先级）": {
     "zh": "步数 {0}/{1} · 相邻成路、数字与运算符交替、从左往右算（不区分优先级）",
     "en": "Steps {0}/{1} · adjacent cells form a path, digits and operators alternate, evaluate left to right (no precedence)",
-    "zhtw": "步數 {0}/{1} · 相鄰成路、數字與運算子交替、從左往右算（不分優先級）",
+    "zh-Hant": "步數 {0}/{1} · 相鄰成路、數字與運算子交替、從左往右算（不分優先級）",
     "ja": "手数 {0}/{1} · 隣接で道、数字と演算子が交互、左から右へ（優先順位なし）",
     "ko": "걸음 {0}/{1} · 인접 연결, 숫자와 연산자 교대, 왼쪽부터 계산 (우선순위 없음)",
     "fr": "Pas {0}/{1} · cases adjacentes, chiffres et opérateurs alternés, de gauche à droite (sans priorité)",
@@ -4767,7 +4767,7 @@ const DICT: Record<string, Record<string, string>> = {
   "答对 {0}": {
     "zh": "答对 {0}",
     "en": "{0} correct",
-    "zhtw": "答對 {0}",
+    "zh-Hant": "答對 {0}",
     "ja": "{0} 問正解",
     "ko": "{0}개 정답",
     "fr": "{0} bonnes",
@@ -4782,7 +4782,7 @@ const DICT: Record<string, Record<string, string>> = {
   "题号 {0}": {
     "zh": "题号 {0}",
     "en": "No. {0}",
-    "zhtw": "題號 {0}",
+    "zh-Hant": "題號 {0}",
     "ja": "問 {0}",
     "ko": "{0}번",
     "fr": "N° {0}",
@@ -4797,7 +4797,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} · 需要 {1}": {
     "zh": "{0} · 需要 {1}",
     "en": "{0} · need {1}",
-    "zhtw": "{0} · 需要 {1}",
+    "zh-Hant": "{0} · 需要 {1}",
     "ja": "{0} · 必要 {1}",
     "ko": "{0} · 필요 {1}",
     "fr": "{0} · il faut {1}",
@@ -4812,7 +4812,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 题，答对 ≥{1} 通关": {
     "zh": "{0} 题，答对 ≥{1} 通关",
     "en": "{0} questions; pass with ≥{1}",
-    "zhtw": "{0} 題，答對 ≥{1} 通關",
+    "zh-Hant": "{0} 題，答對 ≥{1} 通關",
     "ja": "{0} 問、{1} 問以上でクリア",
     "ko": "{0}문제, {1}개 이상 정답 시 클리어",
     "fr": "{0} questions ; ≥{1} pour réussir",
@@ -4827,7 +4827,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 题，答对 ≥{1} 通关：词义越近越好": {
     "zh": "{0} 题，答对 ≥{1} 通关：词义越近越好",
     "en": "{0} questions; pass with ≥{1}: closer in meaning scores better",
-    "zhtw": "{0} 題，答對 ≥{1} 通關：詞義越近越好",
+    "zh-Hant": "{0} 題，答對 ≥{1} 通關：詞義越近越好",
     "ja": "{0} 問、{1} 問以上でクリア：意味が近いほど高得点",
     "ko": "{0}문제, {1}개 이상 정답: 뜻이 가까울수록 좋아요",
     "fr": "{0} questions ; ≥{1} pour réussir : plus le sens est proche, mieux c’est",
@@ -4842,7 +4842,7 @@ const DICT: Record<string, Record<string, string>> = {
   "题号 {0}/{1}": {
     "zh": "题号 {0}/{1}",
     "en": "No. {0}/{1}",
-    "zhtw": "題號 {0}/{1}",
+    "zh-Hant": "題號 {0}/{1}",
     "ja": "問 {0}/{1}",
     "ko": "{0}/{1}번",
     "fr": "N° {0}/{1}",
@@ -4857,7 +4857,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 题，答对 ≥{1} 通关：点错扣一条命": {
     "zh": "{0} 题，答对 ≥{1} 通关：点错扣一条命",
     "en": "{0} questions; pass with ≥{1}: a wrong tap costs a life",
-    "zhtw": "{0} 題，答對 ≥{1} 通關：點錯扣一條命",
+    "zh-Hant": "{0} 題，答對 ≥{1} 通關：點錯扣一條命",
     "ja": "{0} 問、{1} 問以上でクリア：誤タップでライフ −1",
     "ko": "{0}문제, {1}개 이상 정답: 오답은 목숨 −1",
     "fr": "{0} questions ; ≥{1} pour réussir : erreur = une vie en moins",
@@ -4872,7 +4872,7 @@ const DICT: Record<string, Record<string, string>> = {
   "答对 {0}/{1}": {
     "zh": "答对 {0}/{1}",
     "en": "{0}/{1} correct",
-    "zhtw": "答對 {0}/{1}",
+    "zh-Hant": "答對 {0}/{1}",
     "ja": "{0}/{1} 正解",
     "ko": "{0}/{1} 정답",
     "fr": "{0}/{1} bonnes",
@@ -4887,7 +4887,7 @@ const DICT: Record<string, Record<string, string>> = {
   "轮次 {0}/{1}": {
     "zh": "轮次 {0}/{1}",
     "en": "Round {0}/{1}",
-    "zhtw": "輪次 {0}/{1}",
+    "zh-Hant": "輪次 {0}/{1}",
     "ja": "回 {0}/{1}",
     "ko": "{0}/{1}라운드",
     "fr": "Manche {0}/{1}",
@@ -4902,7 +4902,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 题，答对 ≥{1} 通关：首音对调后仍是真词": {
     "zh": "{0} 题，答对 ≥{1} 通关：首音对调后仍是真词",
     "en": "{0} questions; pass with ≥{1}: swapping the first sounds still yields real words",
-    "zhtw": "{0} 題，答對 ≥{1} 通關：首音對調後仍是真詞",
+    "zh-Hant": "{0} 題，答對 ≥{1} 通關：首音對調後仍是真詞",
     "ja": "{0} 問、{1} 問以上でクリア：頭音を入れ替えても実在語",
     "ko": "{0}문제, {1}개 이상 정답: 첫소리를 바꿔도 실제 단어",
     "fr": "{0} questions ; ≥{1} pour réussir : après échange des initiales, ce sont encore de vrais mots",
@@ -4917,7 +4917,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}　回忆对 {1}": {
     "zh": "{0}　回忆对 {1}",
     "en": "{0} · recalled {1}",
-    "zhtw": "{0}　回憶對 {1}",
+    "zh-Hant": "{0}　回憶對 {1}",
     "ja": "{0}　記憶正解 {1}",
     "ko": "{0} · 기억 정답 {1}",
     "fr": "{0} · rappelés {1}",
@@ -4932,7 +4932,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}接好 {1}/{2} 段故事": {
     "zh": "{0}接好 {1}/{2} 段故事",
     "en": "{0}connected {1}/{2} story parts",
-    "zhtw": "{0}接好 {1}/{2} 段故事",
+    "zh-Hant": "{0}接好 {1}/{2} 段故事",
     "ja": "{0} {1}/{2} 段落を接続",
     "ko": "{0} {1}/{2}개 이야기 연결",
     "fr": "{0} : {1}/{2} segments reliés",
@@ -4947,7 +4947,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ {0} 确实比 {1}{2}": {
     "zh": "✅ {0} 确实比 {1}{2}",
     "en": "✅ {0} really is {2} than {1}",
-    "zhtw": "✅ {0} 確實比 {1}{2}",
+    "zh-Hant": "✅ {0} 確實比 {1}{2}",
     "ja": "✅ {0} は確かに {1} より{2}",
     "ko": "✅ {0}는 정말 {1}보다 {2}",
     "fr": "✅ {0} est bien plus {2} que {1}",
@@ -4962,7 +4962,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ {0} 比 {1}{2}，字形在骗你": {
     "zh": "❌ {0} 比 {1}{2}，字形在骗你",
     "en": "❌ {0} is {2} than {1} — the glyphs fool you",
-    "zhtw": "❌ {0} 比 {1}{2}，字形在騙你",
+    "zh-Hant": "❌ {0} 比 {1}{2}，字形在騙你",
     "ja": "❌ {0} は {1} より{2} — 字形に騙される",
     "ko": "❌ {0}가 {1}보다 {2} — 글자가 속여요",
     "fr": "❌ {0} est plus {2} que {1} — le glyphe trompe",
@@ -4977,7 +4977,7 @@ const DICT: Record<string, Record<string, string>> = {
   "最佳 {0}": {
     "zh": "最佳 {0}",
     "en": "Best {0}",
-    "zhtw": "最佳 {0}",
+    "zh-Hant": "最佳 {0}",
     "ja": "ベスト {0}",
     "ko": "최고 {0}",
     "fr": "Meilleur {0}",
@@ -4992,7 +4992,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 完成！失误 {0} 次 · 用时 {1} 秒": {
     "zh": "🎉 完成！失误 {0} 次 · 用时 {1} 秒",
     "en": "🎉 Done! {0} mistakes · {1} seconds",
-    "zhtw": "🎉 完成！失誤 {0} 次 · 用時 {1} 秒",
+    "zh-Hant": "🎉 完成！失誤 {0} 次 · 用時 {1} 秒",
     "ja": "🎉 完了！ミス {0} 回 · {1} 秒",
     "ko": "🎉 완료! 실수 {0}회 · {1}초",
     "fr": "🎉 Terminé ! {0} erreurs · {1} s",
@@ -5007,7 +5007,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已选中第 {0} 行第 {1} 列": {
     "zh": "已选中第 {0} 行第 {1} 列",
     "en": "Row {0}, column {1} selected",
-    "zhtw": "已選中第 {0} 行第 {1} 列",
+    "zh-Hant": "已選中第 {0} 行第 {1} 列",
     "ja": "{0} 行 {1} 列を選択",
     "ko": "{0}행 {1}열 선택",
     "fr": "Ligne {0}, colonne {1} sélectionnée",
@@ -5022,7 +5022,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 「{0}」不该在这，还剩 {1} 条命": {
     "zh": "❌ 「{0}」不该在这，还剩 {1} 条命",
     "en": "❌ “{0}” does not belong here — {1} lives left",
-    "zhtw": "❌ 「{0}」不該在這，還剩 {1} 條命",
+    "zh-Hant": "❌ 「{0}」不該在這，還剩 {1} 條命",
     "ja": "❌ 「{0}」はここに無い — 残り {1} ライフ",
     "ko": "❌ “{0}”는 여기가 아니에요 — 목숨 {1}",
     "fr": "❌ « {0} » n’est pas ici — {1} vies",
@@ -5037,7 +5037,7 @@ const DICT: Record<string, Record<string, string>> = {
   "共 {0} 个音节": {
     "zh": "共 {0} 个音节",
     "en": "{0} syllables",
-    "zhtw": "共 {0} 個音節",
+    "zh-Hant": "共 {0} 個音節",
     "ja": "全 {0} 音節",
     "ko": "총 {0}음절",
     "fr": "{0} syllabes",
@@ -5052,7 +5052,7 @@ const DICT: Record<string, Record<string, string>> = {
   "题型：{0}": {
     "zh": "题型：{0}",
     "en": "Type: {0}",
-    "zhtw": "題型：{0}",
+    "zh-Hant": "題型：{0}",
     "ja": "形式：{0}",
     "ko": "유형: {0}",
     "fr": "Type : {0}",
@@ -5067,7 +5067,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 已取回": {
     "zh": "{0} 已取回",
     "en": "{0} retrieved",
-    "zhtw": "{0} 已取回",
+    "zh-Hant": "{0} 已取回",
     "ja": "{0} を回収",
     "ko": "{0} 회수됨",
     "fr": "{0} récupéré",
@@ -5082,7 +5082,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 严丝合缝！用了 {0} 次": {
     "zh": "🎉 严丝合缝！用了 {0} 次",
     "en": "🎉 Perfect fit! In {0} moves",
-    "zhtw": "🎉 嚴絲合縫！用了 {0} 次",
+    "zh-Hant": "🎉 嚴絲合縫！用了 {0} 次",
     "ja": "🎉 ぴったり！{0} 回で",
     "ko": "🎉 완벽해요! {0}번 만에",
     "fr": "🎉 Ajusté parfaitement ! En {0} coups",
@@ -5097,7 +5097,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⏰ 时间到，还剩 {0} 块": {
     "zh": "⏰ 时间到，还剩 {0} 块",
     "en": "⏰ Time's up — {0} blocks left",
-    "zhtw": "⏰ 時間到，還剩 {0} 塊",
+    "zh-Hant": "⏰ 時間到，還剩 {0} 塊",
     "ja": "⏰ 時間切れ — 残り {0} 個",
     "ko": "⏰ 시간 종료 — {0}개 남음",
     "fr": "⏰ Temps écoulé — {0} blocs",
@@ -5112,7 +5112,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 全消！用时 {0} 秒": {
     "zh": "🎉 全消！用时 {0} 秒",
     "en": "🎉 All cleared! In {0} seconds",
-    "zhtw": "🎉 全消！用時 {0} 秒",
+    "zh-Hant": "🎉 全消！用時 {0} 秒",
     "ja": "🎉 全部消去！{0} 秒",
     "ko": "🎉 전부 제거! {0}초",
     "fr": "🎉 Tout éliminé ! En {0} s",
@@ -5127,7 +5127,7 @@ const DICT: Record<string, Record<string, string>> = {
   "本轮规则：{0}{1}": {
     "zh": "本轮规则：{0}{1}",
     "en": "This round's rule: {0}{1}",
-    "zhtw": "本輪規則：{0}{1}",
+    "zh-Hant": "本輪規則：{0}{1}",
     "ja": "今回の規則：{0}{1}",
     "ko": "이번 규칙: {0}{1}",
     "fr": "Règle de la manche : {0}{1}",
@@ -5142,7 +5142,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0} · 最少 {1} · 上限 {2}": {
     "zh": "步数 {0} · 最少 {1} · 上限 {2}",
     "en": "Steps {0} · min {1} · cap {2}",
-    "zhtw": "步數 {0} · 最少 {1} · 上限 {2}",
+    "zh-Hant": "步數 {0} · 最少 {1} · 上限 {2}",
     "ja": "手数 {0} · 最少 {1} · 上限 {2}",
     "ko": "걸음 {0} · 최소 {1} · 상한 {2}",
     "fr": "Pas {0} · min {1} · max {2}",
@@ -5157,7 +5157,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 拍 · 命中 {2}": {
     "zh": "第 {0}/{1} 拍 · 命中 {2}",
     "en": "Beat {0}/{1} · {2} hits",
-    "zhtw": "第 {0}/{1} 拍 · 命中 {2}",
+    "zh-Hant": "第 {0}/{1} 拍 · 命中 {2}",
     "ja": "{0}/{1} 拍 · {2} 命中",
     "ko": "{0}/{1}박자 · {2}회 명중",
     "fr": "Temps {0}/{1} · {2} touches",
@@ -5172,7 +5172,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}{1} WPM ｜ 正确率 {2}%": {
     "zh": "{0}{1} WPM ｜ 正确率 {2}%",
     "en": "{0}{1} WPM | accuracy {2}%",
-    "zhtw": "{0}{1} WPM ｜ 正確率 {2}%",
+    "zh-Hant": "{0}{1} WPM ｜ 正確率 {2}%",
     "ja": "{0}{1} WPM ｜ 正確率 {2}%",
     "ko": "{0}{1} WPM | 정확도 {2}%",
     "fr": "{0}{1} WPM | précision {2} %",
@@ -5187,7 +5187,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 轮 · 找到 {2}": {
     "zh": "第 {0}/{1} 轮 · 找到 {2}",
     "en": "Round {0}/{1} · {2} found",
-    "zhtw": "第 {0}/{1} 輪 · 找到 {2}",
+    "zh-Hant": "第 {0}/{1} 輪 · 找到 {2}",
     "ja": "第 {0}/{1} 回 · {2} 個発見",
     "ko": "{0}/{1}라운드 · {2}개 발견",
     "fr": "Manche {0}/{1} · {2} trouvés",
@@ -5202,7 +5202,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 轮 · 答对 {2}": {
     "zh": "第 {0}/{1} 轮 · 答对 {2}",
     "en": "Round {0}/{1} · {2} correct",
-    "zhtw": "第 {0}/{1} 輪 · 答對 {2}",
+    "zh-Hant": "第 {0}/{1} 輪 · 答對 {2}",
     "ja": "第 {0}/{1} 回 · {2} 問正解",
     "ko": "{0}/{1}라운드 · {2}개 정답",
     "fr": "Manche {0}/{1} · {2} bonnes",
@@ -5217,7 +5217,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}　回忆对 ": {
     "zh": "{0}　回忆对 ",
     "en": "{0} · recalled ",
-    "zhtw": "{0}　回憶對 ",
+    "zh-Hant": "{0}　回憶對 ",
     "ja": "{0}　記憶正解 ",
     "ko": "{0} · 기억 정답 ",
     "fr": "{0} · rappelés ",
@@ -5232,7 +5232,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 生命耗尽，撑到第 {0} 题": {
     "zh": "❌ 生命耗尽，撑到第 {0} 题",
     "en": "❌ Out of lives at question {0}",
-    "zhtw": "❌ 生命耗盡，撐到第 {0} 題",
+    "zh-Hant": "❌ 生命耗盡，撐到第 {0} 題",
     "ja": "❌ ライフ切れ、第 {0} 問まで",
     "ko": "❌ 목숨 소진, {0}번 문제까지",
     "fr": "❌ Plus de vies à la question {0}",
@@ -5247,7 +5247,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}　答对 {1}　得分 {2}": {
     "zh": "{0}　答对 {1}　得分 {2}",
     "en": "{0} · correct {1} · score {2}",
-    "zhtw": "{0}　答對 {1}　得分 {2}",
+    "zh-Hant": "{0}　答對 {1}　得分 {2}",
     "ja": "{0}　正解 {1}　スコア {2}",
     "ko": "{0} · 정답 {1} · 점수 {2}",
     "fr": "{0} · bonnes {1} · score {2}",
@@ -5262,7 +5262,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⌛ 时间到 —— 拼对 {0} 个词": {
     "zh": "⌛ 时间到 —— 拼对 {0} 个词",
     "en": "⌛ Time's up — {0} words spelled",
-    "zhtw": "⌛ 時間到 —— 拼對 {0} 個詞",
+    "zh-Hant": "⌛ 時間到 —— 拼對 {0} 個詞",
     "ja": "⌛ 時間切れ —— {0} 語正解",
     "ko": "⌛ 시간 종료 — {0}개 단어",
     "fr": "⌛ Temps écoulé — {0} mots",
@@ -5277,7 +5277,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⌛ 时间到 —— 答对 {0} 个": {
     "zh": "⌛ 时间到 —— 答对 {0} 个",
     "en": "⌛ Time's up — {0} correct",
-    "zhtw": "⌛ 時間到 —— 答對 {0} 個",
+    "zh-Hant": "⌛ 時間到 —— 答對 {0} 個",
     "ja": "⌛ 時間切れ —— {0} 問正解",
     "ko": "⌛ 시간 종료 — {0}개 정답",
     "fr": "⌛ Temps écoulé — {0} bonnes",
@@ -5292,7 +5292,7 @@ const DICT: Record<string, Record<string, string>> = {
   "得分 {0}｜最好连击 {1}｜答错扣 3 秒": {
     "zh": "得分 {0}｜最好连击 {1}｜答错扣 3 秒",
     "en": "Score {0} | best combo {1} | a miss costs 3s",
-    "zhtw": "得分 {0}｜最好連擊 {1}｜答錯扣 3 秒",
+    "zh-Hant": "得分 {0}｜最好連擊 {1}｜答錯扣 3 秒",
     "ja": "スコア {0}｜最高コンボ {1}｜誤答は 3 秒減点",
     "ko": "점수 {0} | 최고 콤보 {1} | 오답은 3초 차감",
     "fr": "Score {0} | meilleur combo {1} | erreur −3 s",
@@ -5307,7 +5307,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 的 {1}% = ?": {
     "zh": "{0} 的 {1}% = ?",
     "en": "{1}% of {0} = ?",
-    "zhtw": "{0} 的 {1}% = ?",
+    "zh-Hant": "{0} 的 {1}% = ?",
     "ja": "{0} の {1}% = ?",
     "ko": "{0}의 {1}% = ?",
     "fr": "{1} % de {0} = ?",
@@ -5322,7 +5322,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 是 {1} 的 ?%": {
     "zh": "{0} 是 {1} 的 ?%",
     "en": "{0} is what % of {1}?",
-    "zhtw": "{0} 是 {1} 的 ?%",
+    "zh-Hant": "{0} 是 {1} 的 ?%",
     "ja": "{0} は {1} の ?%",
     "ko": "{0}는 {1}의 ?%",
     "fr": "{0} représente quel % de {1} ?",
@@ -5337,7 +5337,7 @@ const DICT: Record<string, Record<string, string>> = {
   "连击 ×{0} · 已答 {1} 题": {
     "zh": "连击 ×{0} · 已答 {1} 题",
     "en": "Combo ×{0} · {1} answered",
-    "zhtw": "連擊 ×{0} · 已答 {1} 題",
+    "zh-Hant": "連擊 ×{0} · 已答 {1} 題",
     "ja": "コンボ ×{0} · {1} 問解答",
     "ko": "콤보 ×{0} · {1}문제 응답",
     "fr": "Combo ×{0} · {1} répondues",
@@ -5352,7 +5352,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 题 · 答对 {2}": {
     "zh": "第 {0}/{1} 题 · 答对 {2}",
     "en": "Q{0}/{1} · {2} correct",
-    "zhtw": "第 {0}/{1} 題 · 答對 {2}",
+    "zh-Hant": "第 {0}/{1} 題 · 答對 {2}",
     "ja": "第 {0}/{1} 問 · {2} 問正解",
     "ko": "{0}/{1}번 문제 · {2}개 정답",
     "fr": "Q{0}/{1} · {2} bonnes",
@@ -5367,7 +5367,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}的是哪一件？": {
     "zh": "{0}的是哪一件？",
     "en": "Which one is {0}?",
-    "zhtw": "{0}的是哪一件？",
+    "zh-Hant": "{0}的是哪一件？",
     "ja": "{0} はどれ？",
     "ko": "{0}인 것은?",
     "fr": "Lequel est {0} ?",
@@ -5382,7 +5382,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}格": {
     "zh": "{0}格",
     "en": "{0} cells",
-    "zhtw": "{0}格",
+    "zh-Hant": "{0}格",
     "ja": "{0} マス",
     "ko": "{0}칸",
     "fr": "{0} cases",
@@ -5397,7 +5397,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}（提示不一定准）": {
     "zh": "{0}（提示不一定准）",
     "en": "{0} (hint may be off)",
-    "zhtw": "{0}（提示不一定準）",
+    "zh-Hant": "{0}（提示不一定準）",
     "ja": "{0}（ヒントは不確か）",
     "ko": "{0} (힌트는 부정확할 수 있어요)",
     "fr": "{0} (indice approximatif)",
@@ -5412,7 +5412,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 目标在{0}边": {
     "zh": "❌ 目标在{0}边",
     "en": "❌ The target is on the {0}",
-    "zhtw": "❌ 目標在{0}邊",
+    "zh-Hant": "❌ 目標在{0}邊",
     "ja": "❌ 目標は{0}にある",
     "ko": "❌ 목표는 {0}에 있어요",
     "fr": "❌ La cible est en {0}",
@@ -5427,7 +5427,7 @@ const DICT: Record<string, Record<string, string>> = {
   "两条直角边 {0} 与 {1}，斜边 = ?": {
     "zh": "两条直角边 {0} 与 {1}，斜边 = ?",
     "en": "Legs {0} and {1} — hypotenuse = ?",
-    "zhtw": "兩條直角邊 {0} 與 {1}，斜邊 = ?",
+    "zh-Hant": "兩條直角邊 {0} 與 {1}，斜邊 = ?",
     "ja": "直角をはさむ 2 辺 {0} と {1}、斜辺 = ?",
     "ko": "직각변 {0}과 {1}, 빗변 = ?",
     "fr": "Côtés {0} et {1} — hypoténuse = ?",
@@ -5442,7 +5442,7 @@ const DICT: Record<string, Record<string, string>> = {
   "斜边 {0}，一条直角边 {1}，另一边 = ?": {
     "zh": "斜边 {0}，一条直角边 {1}，另一边 = ?",
     "en": "Hypotenuse {0}, one leg {1} — other leg = ?",
-    "zhtw": "斜邊 {0}，一條直角邊 {1}，另一邊 = ?",
+    "zh-Hant": "斜邊 {0}，一條直角邊 {1}，另一邊 = ?",
     "ja": "斜辺 {0}、一方の直角辺 {1}、他方 = ?",
     "ko": "빗변 {0}, 한 직각변 {1}, 다른 변 = ?",
     "fr": "Hypoténuse {0}, un côté {1} — l’autre = ?",
@@ -5457,7 +5457,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}{1} ms · 点偏 {2}": {
     "zh": "{0}{1} ms · 点偏 {2}",
     "en": "{0}{1} ms · {2} mis-taps",
-    "zhtw": "{0}{1} ms · 點偏 {2}",
+    "zh-Hant": "{0}{1} ms · 點偏 {2}",
     "ja": "{0}{1} ms · ミス {2}",
     "ko": "{0}{1} ms · 오클릭 {2}",
     "fr": "{0}{1} ms · {2} à côté",
@@ -5472,7 +5472,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🌀 迷宫转了！已走 {0} 步": {
     "zh": "🌀 迷宫转了！已走 {0} 步",
     "en": "🌀 The maze spun! {0} steps taken",
-    "zhtw": "🌀 迷宮轉了！已走 {0} 步",
+    "zh-Hant": "🌀 迷宮轉了！已走 {0} 步",
     "ja": "🌀 迷路が回転！{0} 歩",
     "ko": "🌀 미로가 돌았어요! {0}걸음",
     "fr": "🌀 Le labyrinthe a tourné ! {0} pas",
@@ -5487,7 +5487,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 句，答对 ≥{1} 通关": {
     "zh": "{0} 句，答对 ≥{1} 通关",
     "en": "{0} sentences; pass with ≥{1}",
-    "zhtw": "{0} 句，答對 ≥{1} 通關",
+    "zh-Hant": "{0} 句，答對 ≥{1} 通關",
     "ja": "{0} 文、{1} 問以上でクリア",
     "ko": "{0}문장, {1}개 이상 정답 시 클리어",
     "fr": "{0} phrases ; ≥{1} pour réussir",
@@ -5502,7 +5502,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0} · 绿字 = 素数，灰底 = 被划掉的合数": {
     "zh": "步数 {0} · 绿字 = 素数，灰底 = 被划掉的合数",
     "en": "Steps {0} · green = prime, grey = crossed-out composite",
-    "zhtw": "步數 {0} · 綠字 = 質數，灰底 = 被劃掉的合數",
+    "zh-Hant": "步數 {0} · 綠字 = 質數，灰底 = 被劃掉的合數",
     "ja": "手数 {0} · 緑 = 素数、灰 = 消した合成数",
     "ko": "걸음 {0} · 초록 = 소수, 회색 = 지운 합성수",
     "fr": "Pas {0} · vert = premier, gris = composé barré",
@@ -5517,7 +5517,7 @@ const DICT: Record<string, Record<string, string>> = {
   "看好了… 长度 {0}": {
     "zh": "看好了… 长度 {0}",
     "en": "Watch closely… length {0}",
-    "zhtw": "看好了… 長度 {0}",
+    "zh-Hant": "看好了… 長度 {0}",
     "ja": "よく見て… 長さ {0}",
     "ko": "잘 보세요… 길이 {0}",
     "fr": "Regardez bien… longueur {0}",
@@ -5532,7 +5532,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 长度 {0} 过关": {
     "zh": "✅ 长度 {0} 过关",
     "en": "✅ Length {0} cleared",
-    "zhtw": "✅ 長度 {0} 過關",
+    "zh-Hant": "✅ 長度 {0} 過關",
     "ja": "✅ 長さ {0} でクリア",
     "ko": "✅ 길이 {0} 통과",
     "fr": "✅ Longueur {0} réussie",
@@ -5547,7 +5547,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已过 {0} / {1} 关": {
     "zh": "已过 {0} / {1} 关",
     "en": "{0} / {1} levels cleared",
-    "zhtw": "已過 {0} / {1} 關",
+    "zh-Hant": "已過 {0} / {1} 關",
     "ja": "{0} / {1} 面クリア",
     "ko": "{0} / {1}단계 통과",
     "fr": "{0} / {1} niveaux réussis",
@@ -5562,7 +5562,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}完成 {1}/{2}": {
     "zh": "{0}完成 {1}/{2}",
     "en": "{0}done {1}/{2}",
-    "zhtw": "{0}完成 {1}/{2}",
+    "zh-Hant": "{0}完成 {1}/{2}",
     "ja": "{0}完了 {1}/{2}",
     "ko": "{0} 완료 {1}/{2}",
     "fr": "{0}terminé {1}/{2}",
@@ -5577,7 +5577,7 @@ const DICT: Record<string, Record<string, string>> = {
   "首字母 {0} · 共 {1} 个字母": {
     "zh": "首字母 {0} · 共 {1} 个字母",
     "en": "First letter {0} · {1} letters total",
-    "zhtw": "首字母 {0} · 共 {1} 個字母",
+    "zh-Hant": "首字母 {0} · 共 {1} 個字母",
     "ja": "頭文字 {0} · 全 {1} 文字",
     "ko": "첫 글자 {0} · 총 {1}글자",
     "fr": "Première lettre {0} · {1} lettres",
@@ -5592,7 +5592,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 秒内答对 ≥{1} 通关": {
     "zh": "{0} 秒内答对 ≥{1} 通关",
     "en": "Get ≥{1} right within {0}s",
-    "zhtw": "{0} 秒內答對 ≥{1} 通關",
+    "zh-Hant": "{0} 秒內答對 ≥{1} 通關",
     "ja": "{0} 秒以内に {1} 問以上でクリア",
     "ko": "{0}초 안에 {1}개 이상 정답",
     "fr": "≥{1} en {0} s pour réussir",
@@ -5607,7 +5607,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}走到第 {1} 关 · 得分 {2}": {
     "zh": "{0}走到第 {1} 关 · 得分 {2}",
     "en": "{0} reached level {1} · score {2}",
-    "zhtw": "{0}走到第 {1} 關 · 得分 {2}",
+    "zh-Hant": "{0}走到第 {1} 關 · 得分 {2}",
     "ja": "{0} は第 {1} 面 · スコア {2}",
     "ko": "{0}는 {1}단계 도달 · 점수 {2}",
     "fr": "{0} au niveau {1} · score {2}",
@@ -5622,7 +5622,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 它{0}刚才的集合里": {
     "zh": "❌ 它{0}刚才的集合里",
     "en": "❌ It {0} the previous set",
-    "zhtw": "❌ 它{0}剛才的集合裡",
+    "zh-Hant": "❌ 它{0}剛才的集合裡",
     "ja": "❌ それは{0}前の集合",
     "ko": "❌ 그것은 {0} 이전 집합",
     "fr": "❌ Il {0} l’ensemble précédent",
@@ -5637,7 +5637,7 @@ const DICT: Record<string, Record<string, string>> = {
   "探针 {0}{1}": {
     "zh": "探针 {0}{1}",
     "en": "Probe {0}{1}",
-    "zhtw": "探針 {0}{1}",
+    "zh-Hant": "探針 {0}{1}",
     "ja": "プローブ {0}{1}",
     "ko": "프로브 {0}{1}",
     "fr": "Sonde {0}{1}",
@@ -5652,7 +5652,7 @@ const DICT: Record<string, Record<string, string>> = {
   "冲均值 {0}": {
     "zh": "冲均值 {0}",
     "en": "Toward mean {0}",
-    "zhtw": "衝均值 {0}",
+    "zh-Hant": "衝均值 {0}",
     "ja": "平均へ {0}",
     "ko": "평균으로 {0}",
     "fr": "Vers la moyenne {0}",
@@ -5667,7 +5667,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 不对 —— 错在「{0}」": {
     "zh": "❌ 不对 —— 错在「{0}」",
     "en": "❌ Wrong — the mistake was “{0}”",
-    "zhtw": "❌ 不對 —— 錯在「{0}」",
+    "zh-Hant": "❌ 不對 —— 錯在「{0}」",
     "ja": "❌ 違います —— 「{0}」でミス",
     "ko": "❌ 틀렸어요 — “{0}”에서 실수",
     "fr": "❌ Faux — erreur sur « {0} »",
@@ -5682,7 +5682,7 @@ const DICT: Record<string, Record<string, string>> = {
   "每题 {0} 秒，点错罚 3 秒；答对 ≥{1} 通关": {
     "zh": "每题 {0} 秒，点错罚 3 秒；答对 ≥{1} 通关",
     "en": "{0}s per item, a wrong tap costs 3s; pass with ≥{1}",
-    "zhtw": "每題 {0} 秒，點錯罰 3 秒；答對 ≥{1} 通關",
+    "zh-Hant": "每題 {0} 秒，點錯罰 3 秒；答對 ≥{1} 通關",
     "ja": "1 問 {0} 秒、誤タップは 3 秒罰；{1} 問以上でクリア",
     "ko": "문제당 {0}초, 오답은 3초; {1}개 이상 정답 시 클리어",
     "fr": "{0} s par item, erreur −3 s ; ≥{1} pour réussir",
@@ -5697,7 +5697,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 个词，{1} 秒内答对 ≥{2} 通关": {
     "zh": "{0} 个词，{1} 秒内答对 ≥{2} 通关",
     "en": "{0} words; get ≥{2} right within {1}s",
-    "zhtw": "{0} 個詞，{1} 秒內答對 ≥{2} 通關",
+    "zh-Hant": "{0} 個詞，{1} 秒內答對 ≥{2} 通關",
     "ja": "{0} 語、{1} 秒以内に {2} 問以上でクリア",
     "ko": "{0}개 단어, {1}초 안에 {2}개 이상 정답",
     "fr": "{0} mots ; ≥{2} en {1} s pour réussir",
@@ -5712,7 +5712,7 @@ const DICT: Record<string, Record<string, string>> = {
   "吸走 {0} 块同色{1}": {
     "zh": "吸走 {0} 块同色{1}",
     "en": "Absorbed {0} same-colour{1}",
-    "zhtw": "吸走 {0} 塊同色{1}",
+    "zh-Hant": "吸走 {0} 塊同色{1}",
     "ja": "同色 {0} 個を吸収{1}",
     "ko": "같은 색 {0}개 흡수{1}",
     "fr": "{0} blocs de même couleur absorbés{1}",
@@ -5727,7 +5727,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 题，每题 {1} 秒；答对 ≥{2} 通关": {
     "zh": "{0} 题，每题 {1} 秒；答对 ≥{2} 通关",
     "en": "{0} items, {1}s each; pass with ≥{2}",
-    "zhtw": "{0} 題，每題 {1} 秒；答對 ≥{2} 通關",
+    "zh-Hant": "{0} 題，每題 {1} 秒；答對 ≥{2} 通關",
     "ja": "{0} 問、1 問 {1} 秒；{2} 問以上でクリア",
     "ko": "{0}문제, 문제당 {1}초; {2}개 이상 정답 시 클리어",
     "fr": "{0} items, {1} s chacun ; ≥{2} pour réussir",
@@ -5742,7 +5742,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ {0} 与 {1} 应是 {2}": {
     "zh": "❌ {0} 与 {1} 应是 {2}",
     "en": "❌ {0} and {1} should be {2}",
-    "zhtw": "❌ {0} 與 {1} 應是 {2}",
+    "zh-Hant": "❌ {0} 與 {1} 應是 {2}",
     "ja": "❌ {0} と {1} は {2} のはず",
     "ko": "❌ {0}와 {1}는 {2}여야 해요",
     "fr": "❌ {0} et {1} devraient être {2}",
@@ -5757,7 +5757,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}　🔦发射器 🎯探头": {
     "zh": "{0}　🔦发射器 🎯探头",
     "en": "{0} · 🔦 emitter 🎯 sensor",
-    "zhtw": "{0}　🔦發射器 🎯探頭",
+    "zh-Hant": "{0}　🔦發射器 🎯探頭",
     "ja": "{0}　🔦発射器 🎯センサー",
     "ko": "{0} · 🔦 발사기 🎯 센서",
     "fr": "{0} · 🔦 émetteur 🎯 capteur",
@@ -5772,7 +5772,7 @@ const DICT: Record<string, Record<string, string>> = {
   "盘里共 {0} 个": {
     "zh": "盘里共 {0} 个",
     "en": "{0} on the board",
-    "zhtw": "盤裡共 {0} 個",
+    "zh-Hant": "盤裡共 {0} 個",
     "ja": "盤上に {0} 個",
     "ko": "판에 {0}개",
     "fr": "{0} sur le plateau",
@@ -5787,7 +5787,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还差点 {0}": {
     "zh": "还差点 {0}",
     "en": "Off by {0}",
-    "zhtw": "還差點 {0}",
+    "zh-Hant": "還差點 {0}",
     "ja": "あと少し {0}",
     "ko": "{0} 차이",
     "fr": "Écart de {0}",
@@ -5802,7 +5802,7 @@ const DICT: Record<string, Record<string, string>> = {
   "求 C 的第 {0} 行第 {1} 列": {
     "zh": "求 C 的第 {0} 行第 {1} 列",
     "en": "Find C row {0}, column {1}",
-    "zhtw": "求 C 的第 {0} 行第 {1} 列",
+    "zh-Hant": "求 C 的第 {0} 行第 {1} 列",
     "ja": "C の {0} 行 {1} 列を求めよ",
     "ko": "C의 {0}행 {1}열을 구하세요",
     "fr": "Trouvez C ligne {0}, colonne {1}",
@@ -5817,7 +5817,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还需 {0}": {
     "zh": "还需 {0}",
     "en": "Need {0}",
-    "zhtw": "還需 {0}",
+    "zh-Hant": "還需 {0}",
     "ja": "あと {0}",
     "ko": "{0} 더 필요",
     "fr": "Encore {0}",
@@ -5832,7 +5832,7 @@ const DICT: Record<string, Record<string, string>> = {
   "进度 {0}": {
     "zh": "进度 {0}",
     "en": "Progress {0}",
-    "zhtw": "進度 {0}",
+    "zh-Hant": "進度 {0}",
     "ja": "進捗 {0}",
     "ko": "진행 {0}",
     "fr": "Progression {0}",
@@ -5847,7 +5847,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 它是{0}{1}°）": {
     "zh": "❌ 它是{0}{1}°）",
     "en": "❌ It is {0}{1}°)",
-    "zhtw": "❌ 它是{0}{1}°）",
+    "zh-Hant": "❌ 它是{0}{1}°）",
     "ja": "❌ それは{0}{1}°）",
     "ko": "❌ {0}{1}°예요)",
     "fr": "❌ C’est {0}{1}°)",
@@ -5862,7 +5862,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 全部扫清！用时 {0} 秒": {
     "zh": "🎉 全部扫清！用时 {0} 秒",
     "en": "🎉 All swept! In {0} seconds",
-    "zhtw": "🎉 全部掃清！用時 {0} 秒",
+    "zh-Hant": "🎉 全部掃清！用時 {0} 秒",
     "ja": "🎉 全部制圧！{0} 秒",
     "ko": "🎉 전부 해치웠어요! {0}초",
     "fr": "🎉 Tout balayé ! En {0} s",
@@ -5877,7 +5877,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 题 · 连击 ×{1}": {
     "zh": "第 {0} 题 · 连击 ×{1}",
     "en": "Q{0} · combo ×{1}",
-    "zhtw": "第 {0} 題 · 連擊 ×{1}",
+    "zh-Hant": "第 {0} 題 · 連擊 ×{1}",
     "ja": "第 {0} 問 · コンボ ×{1}",
     "ko": "{0}번 문제 · 콤보 ×{1}",
     "fr": "Q{0} · combo ×{1}",
@@ -5892,7 +5892,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🕐 {0}{1} 小时": {
     "zh": "🕐 {0}{1} 小时",
     "en": "🕐 {0}{1} hours",
-    "zhtw": "🕐 {0}{1} 小時",
+    "zh-Hant": "🕐 {0}{1} 小時",
     "ja": "🕐 {0}{1} 時間",
     "ko": "🕐 {0}{1}시간",
     "fr": "🕐 {0}{1} heures",
@@ -5907,7 +5907,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 堆": {
     "zh": "第 {0} 堆",
     "en": "Pile {0}",
-    "zhtw": "第 {0} 堆",
+    "zh-Hant": "第 {0} 堆",
     "ja": "{0} 番目の山",
     "ko": "{0}번째 더미",
     "fr": "Pile {0}",
@@ -5922,7 +5922,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 的 {1}% ≈ ?": {
     "zh": "{0} 的 {1}% ≈ ?",
     "en": "{1}% of {0} ≈ ?",
-    "zhtw": "{0} 的 {1}% ≈ ?",
+    "zh-Hant": "{0} 的 {1}% ≈ ?",
     "ja": "{0} の {1}% ≈ ?",
     "ko": "{0}의 {1}% ≈ ?",
     "fr": "{1} % de {0} ≈ ?",
@@ -5937,7 +5937,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 个结果是几？": {
     "zh": "第 {0} 个结果是几？",
     "en": "What is result {0}?",
-    "zhtw": "第 {0} 個結果是幾？",
+    "zh-Hant": "第 {0} 個結果是幾？",
     "ja": "{0} 番目の結果は？",
     "ko": "{0}번째 결과는?",
     "fr": "Quel est le résultat {0} ?",
@@ -5952,7 +5952,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 命中 {0} 次": {
     "zh": "✅ 命中 {0} 次",
     "en": "✅ {0} hits",
-    "zhtw": "✅ 命中 {0} 次",
+    "zh-Hant": "✅ 命中 {0} 次",
     "ja": "✅ {0} 回命中",
     "ko": "✅ {0}회 명중",
     "fr": "✅ {0} touches",
@@ -5967,7 +5967,7 @@ const DICT: Record<string, Record<string, string>> = {
   "共 {0} 个字母，已用 {1}": {
     "zh": "共 {0} 个字母，已用 {1}",
     "en": "{0} letters, {1} used",
-    "zhtw": "共 {0} 個字母，已用 {1}",
+    "zh-Hant": "共 {0} 個字母，已用 {1}",
     "ja": "全 {0} 文字、使用済み {1}",
     "ko": "총 {0}글자, {1} 사용",
     "fr": "{0} lettres, {1} utilisées",
@@ -5982,7 +5982,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已选 {0}/{1} 个": {
     "zh": "已选 {0}/{1} 个",
     "en": "{0}/{1} selected",
-    "zhtw": "已選 {0}/{1} 個",
+    "zh-Hant": "已選 {0}/{1} 個",
     "ja": "{0}/{1} 個選択",
     "ko": "{0}/{1}개 선택",
     "fr": "{0}/{1} sélectionnés",
@@ -5997,7 +5997,7 @@ const DICT: Record<string, Record<string, string>> = {
   "记住这 {0} 组": {
     "zh": "记住这 {0} 组",
     "en": "Remember these {0} sets",
-    "zhtw": "記住這 {0} 組",
+    "zh-Hant": "記住這 {0} 組",
     "ja": "この {0} 組を覚えて",
     "ko": "이 {0}세트를 기억",
     "fr": "Retenez ces {0} séries",
@@ -6012,7 +6012,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⏭ 放弃：谜底是 {0}": {
     "zh": "⏭ 放弃：谜底是 {0}",
     "en": "⏭ Gave up: the answer is {0}",
-    "zhtw": "⏭ 放棄：謎底是 {0}",
+    "zh-Hant": "⏭ 放棄：謎底是 {0}",
     "ja": "⏭ 諦め：答えは {0}",
     "ko": "⏭ 포기: 정답은 {0}",
     "fr": "⏭ Abandon : la réponse est {0}",
@@ -6027,7 +6027,7 @@ const DICT: Record<string, Record<string, string>> = {
   "谜底 {0} 个字母": {
     "zh": "谜底 {0} 个字母",
     "en": "Answer: {0} letters",
-    "zhtw": "謎底 {0} 個字母",
+    "zh-Hant": "謎底 {0} 個字母",
     "ja": "答えは {0} 文字",
     "ko": "정답 {0}글자",
     "fr": "Réponse : {0} lettres",
@@ -6042,7 +6042,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}{1} 张": {
     "zh": "{0}{1} 张",
     "en": "{0}{1} cards",
-    "zhtw": "{0}{1} 張",
+    "zh-Hant": "{0}{1} 張",
     "ja": "{0}{1} 枚",
     "ko": "{0}{1}장",
     "fr": "{0}{1} cartes",
@@ -6057,7 +6057,7 @@ const DICT: Record<string, Record<string, string>> = {
   "目标＝字母 d 且上下小撇共 2 个；{0} 秒内找齐 {1} 个": {
     "zh": "目标＝字母 d 且上下小撇共 2 个；{0} 秒内找齐 {1} 个",
     "en": "Target: the letter d with exactly 2 apostrophes; find {1} within {0}s",
-    "zhtw": "目標＝字母 d 且上下小撇共 2 個；{0} 秒內找齊 {1} 個",
+    "zh-Hant": "目標＝字母 d 且上下小撇共 2 個；{0} 秒內找齊 {1} 個",
     "ja": "目標＝文字 d で上下の点が計 2 個；{0} 秒で {1} 個",
     "ko": "목표: 위아래 점이 2개인 d; {0}초 안에 {1}개",
     "fr": "Cible : le d avec 2 apostrophes ; {1} en {0} s",
@@ -6072,7 +6072,7 @@ const DICT: Record<string, Record<string, string>> = {
   "样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 {0} / {1} 通关": {
     "zh": "样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 {0} / {1} 通关",
     "en": "Sample lights 1.4s ⇒ hidden 1.8s ⇒ answer; pass with {0} / {1}",
-    "zhtw": "範例亮 1.4 秒 ⇒ 遮擋 1.8 秒 ⇒ 作答；答對 {0} / {1} 通關",
+    "zh-Hant": "範例亮 1.4 秒 ⇒ 遮擋 1.8 秒 ⇒ 作答；答對 {0} / {1} 通關",
     "ja": "見本 1.4 秒 ⇒ 隠す 1.8 秒 ⇒ 解答；{0} / {1} でクリア",
     "ko": "예시 1.4초 ⇒ 가림 1.8초 ⇒ 응답; {0} / {1}이면 클리어",
     "fr": "Exemple 1,4 s ⇒ caché 1,8 s ⇒ répondez ; {0} / {1} pour réussir",
@@ -6087,7 +6087,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 第 {0} 位错了，应为 {1}": {
     "zh": "❌ 第 {0} 位错了，应为 {1}",
     "en": "❌ Position {0} is wrong — should be {1}",
-    "zhtw": "❌ 第 {0} 位錯了，應為 {1}",
+    "zh-Hant": "❌ 第 {0} 位錯了，應為 {1}",
     "ja": "❌ {0} 桁目が違います — {1} のはず",
     "ko": "❌ {0}번째 자리가 틀렸어요 — {1}이어야 해요",
     "fr": "❌ Le {0}ᵉ chiffre est faux — {1}",
@@ -6102,7 +6102,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已输入：{0}": {
     "zh": "已输入：{0}",
     "en": "Entered: {0}",
-    "zhtw": "已輸入：{0}",
+    "zh-Hant": "已輸入：{0}",
     "ja": "入力済み：{0}",
     "ko": "입력됨: {0}",
     "fr": "Saisi : {0}",
@@ -6117,7 +6117,7 @@ const DICT: Record<string, Record<string, string>> = {
   "长度 {0}": {
     "zh": "长度 {0}",
     "en": "Length {0}",
-    "zhtw": "長度 {0}",
+    "zh-Hant": "長度 {0}",
     "ja": "長さ {0}",
     "ko": "길이 {0}",
     "fr": "Longueur {0}",
@@ -6132,7 +6132,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮 · 记住这 {1} 个": {
     "zh": "第 {0} 轮 · 记住这 {1} 个",
     "en": "Round {0} · remember these {1}",
-    "zhtw": "第 {0} 輪 · 記住這 {1} 個",
+    "zh-Hant": "第 {0} 輪 · 記住這 {1} 個",
     "ja": "第 {0} 回 · この {1} 個を覚えて",
     "ko": "{0}번째 · 이 {1}개를 기억",
     "fr": "Manche {0} · retenez ces {1}",
@@ -6147,7 +6147,7 @@ const DICT: Record<string, Record<string, string>> = {
   "任务① 算术{0}": {
     "zh": "任务① 算术{0}",
     "en": "Task ① arithmetic {0}",
-    "zhtw": "任務① 算術{0}",
+    "zh-Hant": "任務① 算術{0}",
     "ja": "課題① 計算{0}",
     "ko": "과제① 산술 {0}",
     "fr": "Tâche ① calcul {0}",
@@ -6162,7 +6162,7 @@ const DICT: Record<string, Record<string, string>> = {
   "任务② 认颜色{0}（点「墨水」的颜色）": {
     "zh": "任务② 认颜色{0}（点「墨水」的颜色）",
     "en": "Task ② colour naming {0} (tap the INK colour)",
-    "zhtw": "任務② 認顏色{0}（點「墨水」的顏色）",
+    "zh-Hant": "任務② 認顏色{0}（點「墨水」的顏色）",
     "ja": "課題② 色名{0}（「インク」の色をタップ）",
     "ko": "과제② 색 이름 {0} (잉크 색을 탭)",
     "fr": "Tâche ② couleurs {0} (touchez la couleur de l’ENCRE)",
@@ -6177,7 +6177,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 题：这个词配哪张图？": {
     "zh": "第 {0} 题：这个词配哪张图？",
     "en": "Q{0}: which picture matches this word?",
-    "zhtw": "第 {0} 題：這個詞配哪張圖？",
+    "zh-Hant": "第 {0} 題：這個詞配哪張圖？",
     "ja": "第 {0} 問：この語に合う絵は？",
     "ko": "{0}번 문제: 이 단어에 맞는 그림은?",
     "fr": "Q{0} : quelle image va avec ce mot ?",
@@ -6192,7 +6192,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⌛ 时间到 —— 共答对 {0} 个": {
     "zh": "⌛ 时间到 —— 共答对 {0} 个",
     "en": "⌛ Time's up — {0} correct",
-    "zhtw": "⌛ 時間到 —— 共答對 {0} 個",
+    "zh-Hant": "⌛ 時間到 —— 共答對 {0} 個",
     "ja": "⌛ 時間切れ —— {0} 問正解",
     "ko": "⌛ 시간 종료 — {0}개 정답",
     "fr": "⌛ Temps écoulé — {0} bonnes",
@@ -6207,7 +6207,7 @@ const DICT: Record<string, Record<string, string>> = {
   "答对 {0} 个通关；答错扣 3 秒，错满 {1} 次结束": {
     "zh": "答对 {0} 个通关；答错扣 3 秒，错满 {1} 次结束",
     "en": "Get {0} right to clear; a miss costs 3s, {1} misses end it",
-    "zhtw": "答對 {0} 個通關；答錯扣 3 秒，錯滿 {1} 次結束",
+    "zh-Hant": "答對 {0} 個通關；答錯扣 3 秒，錯滿 {1} 次結束",
     "ja": "{0} 問正解でクリア。誤答は 3 秒減点、{1} 回で終了",
     "ko": "{0}개 정답 시 클리어; 오답은 3초 차감, {1}회면 종료",
     "fr": "{0} bonnes pour réussir ; erreur −3 s, {1} erreurs = fin",
@@ -6222,7 +6222,7 @@ const DICT: Record<string, Record<string, string>> = {
   "共 {0} 轮，答对 ≥{1} 通关；每题 {2} 秒": {
     "zh": "共 {0} 轮，答对 ≥{1} 通关；每题 {2} 秒",
     "en": "{0} rounds; pass with ≥{1} correct; {2}s per item",
-    "zhtw": "共 {0} 輪，答對 ≥{1} 通關；每題 {2} 秒",
+    "zh-Hant": "共 {0} 輪，答對 ≥{1} 通關；每題 {2} 秒",
     "ja": "全 {0} 回、{1} 問以上でクリア；1 問 {2} 秒",
     "ko": "총 {0}라운드, {1}개 이상 정답 시 클리어; 문제당 {2}초",
     "fr": "{0} manches ; ≥{1} bonnes pour réussir ; {2} s par item",
@@ -6237,7 +6237,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 过关！接着找 {0} 的全部因数（共 {1} 个）": {
     "zh": "✅ 过关！接着找 {0} 的全部因数（共 {1} 个）",
     "en": "✅ Cleared! Now find all factors of {0} ({1} in all)",
-    "zhtw": "✅ 過關！接著找 {0} 的全部因數（共 {1} 個）",
+    "zh-Hant": "✅ 過關！接著找 {0} 的全部因數（共 {1} 個）",
     "ja": "✅ クリア！次は {0} の約数を全部（計 {1} 個）",
     "ko": "✅ 통과! 이제 {0}의 약수를 모두 (총 {1}개)",
     "fr": "✅ Réussi ! Trouvez tous les diviseurs de {0} ({1})",
@@ -6252,7 +6252,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 中间是 {0}（按 {1} ms 计）": {
     "zh": "❌ 中间是 {0}（按 {1} ms 计）",
     "en": "❌ The middle was {0} (counts as {1} ms)",
-    "zhtw": "❌ 中間是 {0}（按 {1} ms 計）",
+    "zh-Hant": "❌ 中間是 {0}（按 {1} ms 計）",
     "ja": "❌ 中央は {0}（{1} ms 扱い）",
     "ko": "❌ 가운데는 {0} ({1} ms)",
     "fr": "❌ Le milieu était {0} ({1} ms)",
@@ -6267,7 +6267,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 4 对全配齐，共翻 {0} 次": {
     "zh": "🎉 4 对全配齐，共翻 {0} 次",
     "en": "🎉 All 4 pairs matched in {0} flips",
-    "zhtw": "🎉 4 對全配齊，共翻 {0} 次",
+    "zh-Hant": "🎉 4 對全配齊，共翻 {0} 次",
     "ja": "🎉 4 組すべて完成、{0} 回で",
     "ko": "🎉 4쌍 모두 완성, {0}번 만에",
     "fr": "🎉 Les 4 paires en {0} retours",
@@ -6282,7 +6282,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 误差 {0}{1} ms": {
     "zh": "✅ 误差 {0}{1} ms",
     "en": "✅ Error {0}{1} ms",
-    "zhtw": "✅ 誤差 {0}{1} ms",
+    "zh-Hant": "✅ 誤差 {0}{1} ms",
     "ja": "✅ 誤差 {0}{1} ms",
     "ko": "✅ 오차 {0}{1} ms",
     "fr": "✅ Erreur {0}{1} ms",
@@ -6297,7 +6297,7 @@ const DICT: Record<string, Record<string, string>> = {
   "😐 偏差 {0} ms（{1}）": {
     "zh": "😐 偏差 {0} ms（{1}）",
     "en": "😐 Deviation {0} ms ({1})",
-    "zhtw": "😐 偏差 {0} ms（{1}）",
+    "zh-Hant": "😐 偏差 {0} ms（{1}）",
     "ja": "😐 ずれ {0} ms（{1}）",
     "ko": "😐 편차 {0} ms ({1})",
     "fr": "😐 Écart {0} ms ({1})",
@@ -6312,7 +6312,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 题　得分 {2}": {
     "zh": "第 {0}/{1} 题　得分 {2}",
     "en": "Q{0}/{1} · score {2}",
-    "zhtw": "第 {0}/{1} 題　得分 {2}",
+    "zh-Hant": "第 {0}/{1} 題　得分 {2}",
     "ja": "第 {0}/{1} 問　スコア {2}",
     "ko": "{0}/{1}번 문제 · 점수 {2}",
     "fr": "Q{0}/{1} · score {2}",
@@ -6327,7 +6327,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⌛ 超时 —— 错在「{0}」": {
     "zh": "⌛ 超时 —— 错在「{0}」",
     "en": "⌛ Time out — missed “{0}”",
-    "zhtw": "⌛ 超時 —— 錯在「{0}」",
+    "zh-Hant": "⌛ 超時 —— 錯在「{0}」",
     "ja": "⌛ 時間切れ —— 「{0}」でミス",
     "ko": "⌛ 시간 초과 — “{0}”에서 실수",
     "fr": "⌛ Temps écoulé — raté sur « {0} »",
@@ -6342,7 +6342,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}{1} 次、误报 {2} 次，通关！": {
     "zh": "{0}{1} 次、误报 {2} 次，通关！",
     "en": "{0}{1} hits, {2} false alarms — cleared!",
-    "zhtw": "{0}{1} 次、誤報 {2} 次，通關！",
+    "zh-Hant": "{0}{1} 次、誤報 {2} 次，通關！",
     "ja": "{0}{1} 回命中、誤報 {2} 回でクリア！",
     "ko": "{0}{1}회 명중, 오경보 {2}회 — 클리어!",
     "fr": "{0}{1} touches, {2} fausses alertes — réussi !",
@@ -6357,7 +6357,7 @@ const DICT: Record<string, Record<string, string>> = {
   "共 {0} 个字母　点字母拼词": {
     "zh": "共 {0} 个字母　点字母拼词",
     "en": "{0} letters — tap letters to spell",
-    "zhtw": "共 {0} 個字母　點字母拼詞",
+    "zh-Hant": "共 {0} 個字母　點字母拼詞",
     "ja": "全 {0} 文字　タップして綴って",
     "ko": "총 {0}글자 — 탭해서 단어 완성",
     "fr": "{0} lettres — touchez pour épeler",
@@ -6372,7 +6372,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}{1} · 周长 {2}": {
     "zh": "{0}{1} · 周长 {2}",
     "en": "{0}{1} · perimeter {2}",
-    "zhtw": "{0}{1} · 周長 {2}",
+    "zh-Hant": "{0}{1} · 周長 {2}",
     "ja": "{0}{1} · 周囲 {2}",
     "ko": "{0}{1} · 둘레 {2}",
     "fr": "{0}{1} · périmètre {2}",
@@ -6387,7 +6387,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 枚砝码": {
     "zh": "{0} 枚砝码",
     "en": "{0} weights",
-    "zhtw": "{0} 枚砝碼",
+    "zh-Hant": "{0} 枚砝碼",
     "ja": "分銅 {0} 個",
     "ko": "추 {0}개",
     "fr": "{0} poids",
@@ -6402,7 +6402,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 题 · 目标答对 {1} 题": {
     "zh": "第 {0} 题 · 目标答对 {1} 题",
     "en": "Q{0} · target {1} correct",
-    "zhtw": "第 {0} 題 · 目標答對 {1} 題",
+    "zh-Hant": "第 {0} 題 · 目標答對 {1} 題",
     "ja": "第 {0} 問 · 目標 {1} 問正解",
     "ko": "{0}번 문제 · 목표 {1}문제 정답",
     "fr": "Q{0} · objectif {1} bonnes",
@@ -6417,7 +6417,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 里 {1} 末尾添 {2} 个 0 = ?": {
     "zh": "{0} 里 {1} 末尾添 {2} 个 0 = ?",
     "en": "{1} in base {0}, append {2} zeros = ?",
-    "zhtw": "{0} 裡 {1} 末尾添 {2} 個 0 = ?",
+    "zh-Hant": "{0} 裡 {1} 末尾添 {2} 個 0 = ?",
     "ja": "{0} 進法の {1} に 0 を {2} 個 = ?",
     "ko": "{0}진법 {1}에 0을 {2}개 = ?",
     "fr": "{1} en base {0}, ajoutez {2} zéros = ?",
@@ -6432,7 +6432,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 题 · 生命 {2}": {
     "zh": "第 {0}/{1} 题 · 生命 {2}",
     "en": "Q{0}/{1} · lives {2}",
-    "zhtw": "第 {0}/{1} 題 · 生命 {2}",
+    "zh-Hant": "第 {0}/{1} 題 · 生命 {2}",
     "ja": "第 {0}/{1} 問 · ライフ {2}",
     "ko": "{0}/{1}번 문제 · 목숨 {2}",
     "fr": "Q{0}/{1} · vies {2}",
@@ -6447,7 +6447,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 关　已放 {2}/": {
     "zh": "第 {0}/{1} 关　已放 {2}/",
     "en": "Level {0}/{1} · placed {2}/",
-    "zhtw": "第 {0}/{1} 關　已放 {2}/",
+    "zh-Hant": "第 {0}/{1} 關　已放 {2}/",
     "ja": "第 {0}/{1} 面　設置 {2}/",
     "ko": "{0}/{1}단계 · 배치 {2}/",
     "fr": "Niveau {0}/{1} · placé {2}/",
@@ -6462,7 +6462,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 宽 {1}": {
     "zh": "{0} 宽 {1}",
     "en": "{0} × {1} wide",
-    "zhtw": "{0} 寬 {1}",
+    "zh-Hant": "{0} 寬 {1}",
     "ja": "{0} 幅 {1}",
     "ko": "{0} 너비 {1}",
     "fr": "{0} large {1}",
@@ -6477,7 +6477,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已破 {0}/{1} 块": {
     "zh": "已破 {0}/{1} 块",
     "en": "{0}/{1} blocks broken",
-    "zhtw": "已破 {0}/{1} 塊",
+    "zh-Hant": "已破 {0}/{1} 塊",
     "ja": "{0}/{1} 個破壊",
     "ko": "{0}/{1}개 파괴",
     "fr": "{0}/{1} blocs brisés",
@@ -6492,7 +6492,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}共列出 {1} 个有效词": {
     "zh": "{0}共列出 {1} 个有效词",
     "en": "{0} — {1} valid words listed",
-    "zhtw": "{0}共列出 {1} 個有效詞",
+    "zh-Hant": "{0}共列出 {1} 個有效詞",
     "ja": "{0}：有効語 {1} 個",
     "ko": "{0} — 유효 단어 {1}개",
     "fr": "{0} — {1} mots valides",
@@ -6507,7 +6507,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0}/{1}　剩光点 {2}": {
     "zh": "步数 {0}/{1}　剩光点 {2}",
     "en": "Steps {0}/{1} · dots left {2}",
-    "zhtw": "步數 {0}/{1}　剩光點 {2}",
+    "zh-Hant": "步數 {0}/{1}　剩光點 {2}",
     "ja": "手数 {0}/{1}　残り光点 {2}",
     "ko": "걸음 {0}/{1} · 남은 점 {2}",
     "fr": "Pas {0}/{1} · points {2}",
@@ -6522,7 +6522,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}得分 {1}　落笔 {2}": {
     "zh": "{0}得分 {1}　落笔 {2}",
     "en": "{0} score {1} · strokes {2}",
-    "zhtw": "{0}得分 {1}　落筆 {2}",
+    "zh-Hant": "{0}得分 {1}　落筆 {2}",
     "ja": "{0} スコア {1}　筆 {2}",
     "ko": "{0} 점수 {1} · 획 {2}",
     "fr": "{0} score {1} · traits {2}",
@@ -6537,7 +6537,7 @@ const DICT: Record<string, Record<string, string>> = {
   "写：光标踩中 ✦ 时落笔　得分 ≥{0} 且落笔 ≥{1} 通关": {
     "zh": "写：光标踩中 ✦ 时落笔　得分 ≥{0} 且落笔 ≥{1} 通关",
     "en": "Write: tap when the cursor hits ✦ · pass with score ≥{0} and strokes ≥{1}",
-    "zhtw": "寫：游標踩中 ✦ 時落筆　得分 ≥{0} 且落筆 ≥{1} 通關",
+    "zh-Hant": "寫：游標踩中 ✦ 時落筆　得分 ≥{0} 且落筆 ≥{1} 通關",
     "ja": "書く：カーソルが ✦ に来たらタップ　スコア ≥{0} かつ筆 ≥{1} でクリア",
     "ko": "쓰기: 커서가 ✦에 오면 탭 · 점수 ≥{0} 그리고 획 ≥{1}이면 클리어",
     "fr": "Écrire : touchez quand le curseur est sur ✦ · réussir avec score ≥{0} et traits ≥{1}",
@@ -6552,7 +6552,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ {0} 是{1}，这题按 {2} ms 计": {
     "zh": "❌ {0} 是{1}，这题按 {2} ms 计",
     "en": "❌ {0} is {1} — this item counts as {2} ms",
-    "zhtw": "❌ {0} 是{1}，這題按 {2} ms 計",
+    "zh-Hant": "❌ {0} 是{1}，這題按 {2} ms 計",
     "ja": "❌ {0} は{1} — この問題は {2} ms 扱い",
     "ko": "❌ {0}는 {1} — 이 문제는 {2} ms",
     "fr": "❌ {0} est {1} — compté {2} ms",
@@ -6567,7 +6567,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}平均 {1} ms · 错 {2} 次": {
     "zh": "{0}平均 {1} ms · 错 {2} 次",
     "en": "{0} average {1} ms · {2} errors",
-    "zhtw": "{0}平均 {1} ms · 錯 {2} 次",
+    "zh-Hant": "{0}平均 {1} ms · 錯 {2} 次",
     "ja": "{0} 平均 {1} ms · ミス {2} 回",
     "ko": "{0} 평균 {1} ms · 오답 {2}회",
     "fr": "{0} moyenne {1} ms · {2} erreurs",
@@ -6582,7 +6582,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0}/{1}　电源 {2}": {
     "zh": "步数 {0}/{1}　电源 {2}",
     "en": "Steps {0}/{1} · power {2}",
-    "zhtw": "步數 {0}/{1}　電源 {2}",
+    "zh-Hant": "步數 {0}/{1}　電源 {2}",
     "ja": "手数 {0}/{1}　電源 {2}",
     "ko": "걸음 {0}/{1} · 전원 {2}",
     "fr": "Pas {0}/{1} · courant {2}",
@@ -6597,7 +6597,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0}/{1}　位置 {2}排": {
     "zh": "步数 {0}/{1}　位置 {2}排",
     "en": "Steps {0}/{1} · row {2}",
-    "zhtw": "步數 {0}/{1}　位置 {2}排",
+    "zh-Hant": "步數 {0}/{1}　位置 {2}排",
     "ja": "手数 {0}/{1}　{2} 列目",
     "ko": "걸음 {0}/{1} · {2}행",
     "fr": "Pas {0}/{1} · rang {2}",
@@ -6612,7 +6612,7 @@ const DICT: Record<string, Record<string, string>> = {
   "步数 {0}/{1}　脚下 {2}": {
     "zh": "步数 {0}/{1}　脚下 {2}",
     "en": "Steps {0}/{1} · underfoot {2}",
-    "zhtw": "步數 {0}/{1}　腳下 {2}",
+    "zh-Hant": "步數 {0}/{1}　腳下 {2}",
     "ja": "手数 {0}/{1}　足元 {2}",
     "ko": "걸음 {0}/{1} · 발밑 {2}",
     "fr": "Pas {0}/{1} · sol {2}",
@@ -6627,7 +6627,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 其实是{0}": {
     "zh": "❌ 其实是{0}",
     "en": "❌ Actually {0}",
-    "zhtw": "❌ 其實是{0}",
+    "zh-Hant": "❌ 其實是{0}",
     "ja": "❌ 実は{0}",
     "ko": "❌ 사실 {0}",
     "fr": "❌ En fait {0}",
@@ -6642,7 +6642,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 那是{0}": {
     "zh": "❌ 那是{0}",
     "en": "❌ That was {0}",
-    "zhtw": "❌ 那是{0}",
+    "zh-Hant": "❌ 那是{0}",
     "ja": "❌ それは{0}",
     "ko": "❌ 그건 {0}",
     "fr": "❌ C’était {0}",
@@ -6657,7 +6657,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 答对 {0}/{1}，通关！": {
     "zh": "🎉 答对 {0}/{1}，通关！",
     "en": "🎉 {0}/{1} correct — cleared!",
-    "zhtw": "🎉 答對 {0}/{1}，通關！",
+    "zh-Hant": "🎉 答對 {0}/{1}，通關！",
     "ja": "🎉 {0}/{1} 正解でクリア！",
     "ko": "🎉 {0}/{1} 정답! 클리어",
     "fr": "🎉 {0}/{1} — réussi !",
@@ -6672,7 +6672,7 @@ const DICT: Record<string, Record<string, string>> = {
   "💤 命用完了 —— 撑到第 {0} 关": {
     "zh": "💤 命用完了 —— 撑到第 {0} 关",
     "en": "💤 Out of lives — reached level {0}",
-    "zhtw": "💤 命用完了 —— 撐到第 {0} 關",
+    "zh-Hant": "💤 命用完了 —— 撐到第 {0} 關",
     "ja": "💤 ライフ切れ — 第 {0} 面まで",
     "ko": "💤 목숨 소진 — {0}단계까지",
     "fr": "💤 Plus de vies — niveau {0}",
@@ -6687,7 +6687,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 答对 {0}/{1}{2}": {
     "zh": "🎉 答对 {0}/{1}{2}",
     "en": "🎉 {0}/{1}{2}",
-    "zhtw": "🎉 答對 {0}/{1}{2}",
+    "zh-Hant": "🎉 答對 {0}/{1}{2}",
     "ja": "🎉 {0}/{1}{2}",
     "ko": "🎉 {0}/{1}{2}",
     "fr": "🎉 {0}/{1}{2}",
@@ -6702,7 +6702,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🔁 {0} 已经找过啦": {
     "zh": "🔁 {0} 已经找过啦",
     "en": "🔁 {0} was already found",
-    "zhtw": "🔁 {0} 已經找過啦",
+    "zh-Hant": "🔁 {0} 已經找過啦",
     "ja": "🔁 {0} はもう見つけた",
     "ko": "🔁 {0}는 이미 찾았어요",
     "fr": "🔁 {0} déjà trouvé",
@@ -6717,7 +6717,7 @@ const DICT: Record<string, Record<string, string>> = {
   "撞了，穿过 {0} 根": {
     "zh": "撞了，穿过 {0} 根",
     "en": "Crash — passed through {0}",
-    "zhtw": "撞了，穿過 {0} 根",
+    "zh-Hant": "撞了，穿過 {0} 根",
     "ja": "衝突 — {0} 本通過",
     "ko": "충돌 — {0}개 통과",
     "fr": "Collision — {0} traversés",
@@ -6732,7 +6732,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 就是「{0}」用错了": {
     "zh": "✅ 就是「{0}」用错了",
     "en": "✅ It was “{0}” misused",
-    "zhtw": "✅ 就是「{0}」用錯了",
+    "zh-Hant": "✅ 就是「{0}」用錯了",
     "ja": "✅ 「{0}」の使い方が違う",
     "ko": "✅ “{0}”를 잘못 썼어요",
     "fr": "✅ C’est « {0} » mal employé",
@@ -6747,7 +6747,7 @@ const DICT: Record<string, Record<string, string>> = {
   "当前：{0}": {
     "zh": "当前：{0}",
     "en": "Current: {0}",
-    "zhtw": "當前：{0}",
+    "zh-Hant": "當前：{0}",
     "ja": "現在：{0}",
     "ko": "현재: {0}",
     "fr": "Actuel : {0}",
@@ -6762,7 +6762,7 @@ const DICT: Record<string, Record<string, string>> = {
   "差了 {0} 个": {
     "zh": "差了 {0} 个",
     "en": "{0} off",
-    "zhtw": "差了 {0} 個",
+    "zh-Hant": "差了 {0} 個",
     "ja": "{0} 個ずれ",
     "ko": "{0}개 차이",
     "fr": "{0} d’écart",
@@ -6777,7 +6777,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⏰ 时间到，命中 {0} 次": {
     "zh": "⏰ 时间到，命中 {0} 次",
     "en": "⏰ Time's up — {0} hits",
-    "zhtw": "⏰ 時間到，命中 {0} 次",
+    "zh-Hant": "⏰ 時間到，命中 {0} 次",
     "ja": "⏰ 時間切れ — {0} 回命中",
     "ko": "⏰ 시간 종료 — {0}회 명중",
     "fr": "⏰ Temps écoulé — {0} touches",
@@ -6792,7 +6792,7 @@ const DICT: Record<string, Record<string, string>> = {
   "本局答对 {0}/{1} 题": {
     "zh": "本局答对 {0}/{1} 题",
     "en": "This round: {0}/{1} correct",
-    "zhtw": "本局答對 {0}/{1} 題",
+    "zh-Hant": "本局答對 {0}/{1} 題",
     "ja": "今回 {0}/{1} 問正解",
     "ko": "이번 판 {0}/{1}문제 정답",
     "fr": "Cette manche : {0}/{1}",
@@ -6807,7 +6807,7 @@ const DICT: Record<string, Record<string, string>> = {
   "😵 步数用尽，还剩 {0} 格": {
     "zh": "😵 步数用尽，还剩 {0} 格",
     "en": "😵 Out of moves — {0} cells left",
-    "zhtw": "😵 步數用盡，還剩 {0} 格",
+    "zh-Hant": "😵 步數用盡，還剩 {0} 格",
     "ja": "😵 手数切れ — 残り {0} マス",
     "ko": "😵 이동 소진 — {0}칸 남음",
     "fr": "😵 Plus de coups — {0} cases",
@@ -6822,7 +6822,7 @@ const DICT: Record<string, Record<string, string>> = {
   "😵 本局结束 · 找到 {0} 处": {
     "zh": "😵 本局结束 · 找到 {0} 处",
     "en": "😵 Round over · {0} found",
-    "zhtw": "😵 本局結束 · 找到 {0} 處",
+    "zh-Hant": "😵 本局結束 · 找到 {0} 處",
     "ja": "😵 終了 · {0} 箇所発見",
     "ko": "😵 판 종료 · {0}곳 발견",
     "fr": "😵 Manche finie · {0} trouvés",
@@ -6837,7 +6837,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 对！规律是「{0}」": {
     "zh": "✅ 对！规律是「{0}」",
     "en": "✅ Right! The rule is “{0}”",
-    "zhtw": "✅ 對！規律是「{0}」",
+    "zh-Hant": "✅ 對！規律是「{0}」",
     "ja": "✅ 正解！規則は「{0}」",
     "ko": "✅ 맞아요! 규칙은 “{0}”",
     "fr": "✅ Oui ! La règle est « {0} »",
@@ -6852,7 +6852,7 @@ const DICT: Record<string, Record<string, string>> = {
   "正好等于目标 🎉 得分 {0}": {
     "zh": "正好等于目标 🎉 得分 {0}",
     "en": "Exactly on target 🎉 score {0}",
-    "zhtw": "正好等於目標 🎉 得分 {0}",
+    "zh-Hant": "正好等於目標 🎉 得分 {0}",
     "ja": "ちょうど目標 🎉 スコア {0}",
     "ko": "정확히 목표 🎉 점수 {0}",
     "fr": "Pile la cible 🎉 score {0}",
@@ -6867,7 +6867,7 @@ const DICT: Record<string, Record<string, string>> = {
   "全部解开了 🎉 得分 {0}": {
     "zh": "全部解开了 🎉 得分 {0}",
     "en": "All untangled 🎉 score {0}",
-    "zhtw": "全部解開了 🎉 得分 {0}",
+    "zh-Hant": "全部解開了 🎉 得分 {0}",
     "ja": "全部解けた 🎉 スコア {0}",
     "ko": "전부 풀었어요 🎉 점수 {0}",
     "fr": "Tout dénoué 🎉 score {0}",
@@ -6882,7 +6882,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已选中 {0}，点谁与它换？": {
     "zh": "已选中 {0}，点谁与它换？",
     "en": "Selected {0} — tap one to swap",
-    "zhtw": "已選中 {0}，點誰與它換？",
+    "zh-Hant": "已選中 {0}，點誰與它換？",
     "ja": "{0} を選択 — 交換相手をタップ",
     "ko": "{0} 선택 — 바꿀 상대를 탭",
     "fr": "{0} sélectionné — qui échanger ?",
@@ -6897,7 +6897,7 @@ const DICT: Record<string, Record<string, string>> = {
   "全部满足 🎉 得分 {0}": {
     "zh": "全部满足 🎉 得分 {0}",
     "en": "All satisfied 🎉 score {0}",
-    "zhtw": "全部滿足 🎉 得分 {0}",
+    "zh-Hant": "全部滿足 🎉 得分 {0}",
     "ja": "すべて満たした 🎉 スコア {0}",
     "ko": "모두 충족 🎉 점수 {0}",
     "fr": "Tout satisfait 🎉 score {0}",
@@ -6912,7 +6912,7 @@ const DICT: Record<string, Record<string, string>> = {
   "整盘排好 🎉 得分 {0}": {
     "zh": "整盘排好 🎉 得分 {0}",
     "en": "Whole board sorted 🎉 score {0}",
-    "zhtw": "整盤排好 🎉 得分 {0}",
+    "zh-Hant": "整盤排好 🎉 得分 {0}",
     "ja": "盤面完成 🎉 スコア {0}",
     "ko": "판 전체 정렬 🎉 점수 {0}",
     "fr": "Plateau entier trié 🎉 score {0}",
@@ -6927,7 +6927,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已选中第 {0} 行": {
     "zh": "已选中第 {0} 行",
     "en": "Row {0} selected",
-    "zhtw": "已選中第 {0} 行",
+    "zh-Hant": "已選中第 {0} 行",
     "ja": "第 {0} 行を選択",
     "ko": "{0}행 선택",
     "fr": "Ligne {0} sélectionnée",
@@ -6942,7 +6942,7 @@ const DICT: Record<string, Record<string, string>> = {
   "全部配对 🎉 得分 {0}": {
     "zh": "全部配对 🎉 得分 {0}",
     "en": "All paired 🎉 score {0}",
-    "zhtw": "全部配對 🎉 得分 {0}",
+    "zh-Hant": "全部配對 🎉 得分 {0}",
     "ja": "全部ペア完成 🎉 スコア {0}",
     "ko": "전부 짝지음 🎉 점수 {0}",
     "fr": "Tout apparié 🎉 score {0}",
@@ -6957,7 +6957,7 @@ const DICT: Record<string, Record<string, string>> = {
   "全部单色 🎉 得分 {0}": {
     "zh": "全部单色 🎉 得分 {0}",
     "en": "All one colour 🎉 score {0}",
-    "zhtw": "全部單色 🎉 得分 {0}",
+    "zh-Hant": "全部單色 🎉 得分 {0}",
     "ja": "全部同色 🎉 スコア {0}",
     "ko": "전부 단색 🎉 점수 {0}",
     "fr": "Tout uni 🎉 score {0}",
@@ -6972,7 +6972,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已选中第 {0} 管": {
     "zh": "已选中第 {0} 管",
     "en": "Tube {0} selected",
-    "zhtw": "已選中第 {0} 管",
+    "zh-Hant": "已選中第 {0} 管",
     "ja": "第 {0} 管を選択",
     "ko": "{0}번 시험관 선택",
     "fr": "Tube {0} sélectionné",
@@ -6987,7 +6987,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 次：盯住中心 ➕，别移开视线": {
     "zh": "第 {0} 次：盯住中心 ➕，别移开视线",
     "en": "Trial {0}: keep your eyes on the central ➕",
-    "zhtw": "第 {0} 次：盯住中心 ➕，別移開視線",
+    "zh-Hant": "第 {0} 次：盯住中心 ➕，別移開視線",
     "ja": "{0} 回目：中央の ➕ から目を離さないで",
     "ko": "{0}번째: 가운데 ➕에서 눈을 떼지 마세요",
     "fr": "Essai {0} : gardez les yeux sur le ➕",
@@ -7002,7 +7002,7 @@ const DICT: Record<string, Record<string, string>> = {
   "对上 {0}/{1} 格": {
     "zh": "对上 {0}/{1} 格",
     "en": "{0}/{1} matched",
-    "zhtw": "對上 {0}/{1} 格",
+    "zh-Hant": "對上 {0}/{1} 格",
     "ja": "{0}/{1} マス一致",
     "ko": "{0}/{1}칸 일치",
     "fr": "{0}/{1} alignées",
@@ -7017,7 +7017,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 序列长度到 {0}，通关！": {
     "zh": "🎉 序列长度到 {0}，通关！",
     "en": "🎉 Sequence reached {0} — cleared!",
-    "zhtw": "🎉 序列長度到 {0}，通關！",
+    "zh-Hant": "🎉 序列長度到 {0}，通關！",
     "ja": "🎉 シーケンス {0} 到達でクリア！",
     "ko": "🎉 시퀀스 {0} 도달! 클리어",
     "fr": "🎉 Séquence de {0} — réussi !",
@@ -7032,7 +7032,7 @@ const DICT: Record<string, Record<string, string>> = {
   "选中 {0}，点目标列或基础堆": {
     "zh": "选中 {0}，点目标列或基础堆",
     "en": "Selected {0} — tap a target column or the base pile",
-    "zhtw": "選中 {0}，點目標欄或基礎堆",
+    "zh-Hant": "選中 {0}，點目標欄或基礎堆",
     "ja": "{0} を選択 — 目標列か基礎山をタップ",
     "ko": "{0} 선택 — 목표 열이나 기본 더미를 탭",
     "fr": "{0} sélectionné — touchez une colonne cible",
@@ -7047,7 +7047,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 轮：按 1 → 9 依次点": {
     "zh": "第 {0}/{1} 轮：按 1 → 9 依次点",
     "en": "Round {0}/{1}: tap 1 → 9 in order",
-    "zhtw": "第 {0}/{1} 輪：按 1 → 9 依次點",
+    "zh-Hant": "第 {0}/{1} 輪：按 1 → 9 依次點",
     "ja": "{0}/{1} 回：1 → 9 の順にタップ",
     "ko": "{0}/{1}번째: 1 → 9 순서대로",
     "fr": "Manche {0}/{1} : tapez 1 → 9 dans l’ordre",
@@ -7062,7 +7062,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 刚才在哪一格？点它": {
     "zh": "{0} 刚才在哪一格？点它",
     "en": "Where was {0}? Tap it",
-    "zhtw": "{0} 剛才在哪一格？點它",
+    "zh-Hant": "{0} 剛才在哪一格？點它",
     "ja": "{0} はどこだった？タップして",
     "ko": "{0}가 어디 있었나요? 탭하세요",
     "fr": "Où était {0} ? Touchez-le",
@@ -7077,7 +7077,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 它在第 {0} 格": {
     "zh": "❌ 它在第 {0} 格",
     "en": "❌ It was in cell {0}",
-    "zhtw": "❌ 它在第 {0} 格",
+    "zh-Hant": "❌ 它在第 {0} 格",
     "ja": "❌ それは {0} マス目",
     "ko": "❌ {0}칸이었어요",
     "fr": "❌ C’était la case {0}",
@@ -7092,7 +7092,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} / {1} 题：照箭头指的方向点": {
     "zh": "第 {0} / {1} 题：照箭头指的方向点",
     "en": "Question {0} / {1}: tap the way the arrow points",
-    "zhtw": "第 {0} / {1} 題：照箭頭指的方向點",
+    "zh-Hant": "第 {0} / {1} 題：照箭頭指的方向點",
     "ja": "{0} / {1} 問：矢印の向きにタップ",
     "ko": "{0} / {1}번 문제: 화살표 방향으로 탭",
     "fr": "Question {0} / {1} : suivez la flèche",
@@ -7107,7 +7107,7 @@ const DICT: Record<string, Record<string, string>> = {
   "盯住亮斑，它会走 {0} 步": {
     "zh": "盯住亮斑，它会走 {0} 步",
     "en": "Watch the bright spot — it moves {0} steps",
-    "zhtw": "盯住亮斑，它會走 {0} 步",
+    "zh-Hant": "盯住亮斑，它會走 {0} 步",
     "ja": "光る点を見て — {0} 歩動く",
     "ko": "빛나는 점을 보세요 — {0}걸음 움직여요",
     "fr": "Suivez le point lumineux — {0} pas",
@@ -7122,7 +7122,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 它停在第 {0} 格": {
     "zh": "❌ 它停在第 {0} 格",
     "en": "❌ It stopped at cell {0}",
-    "zhtw": "❌ 它停在第 {0} 格",
+    "zh-Hant": "❌ 它停在第 {0} 格",
     "ja": "❌ {0} マス目で止まった",
     "ko": "❌ {0}칸에서 멈췄어요",
     "fr": "❌ Il s’est arrêté case {0}",
@@ -7137,7 +7137,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 关 · 看它亮 {2} 级": {
     "zh": "第 {0}/{1} 关 · 看它亮 {2} 级",
     "en": "Level {0}/{1} · watch {2} brightness levels",
-    "zhtw": "第 {0}/{1} 關 · 看它亮 {2} 級",
+    "zh-Hant": "第 {0}/{1} 關 · 看它亮 {2} 級",
     "ja": "{0}/{1} 面 · 明るさ {2} 段階を見て",
     "ko": "{0}/{1}단계 · 밝기 {2}단계 보기",
     "fr": "Niveau {0}/{1} · {2} niveaux de luminosité",
@@ -7152,7 +7152,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还差 {0} 级": {
     "zh": "还差 {0} 级",
     "en": "{0} levels to go",
-    "zhtw": "還差 {0} 級",
+    "zh-Hant": "還差 {0} 級",
     "ja": "あと {0} 段階",
     "ko": "{0}단계 남음",
     "fr": "Encore {0} niveaux",
@@ -7167,7 +7167,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 第 {0} 关走通，下一关更陡": {
     "zh": "✅ 第 {0} 关走通，下一关更陡",
     "en": "✅ Level {0} done — the next is steeper",
-    "zhtw": "✅ 第 {0} 關走通，下一關更陡",
+    "zh-Hant": "✅ 第 {0} 關走通，下一關更陡",
     "ja": "✅ 第 {0} 面クリア — 次はもっと急",
     "ko": "✅ {0}단계 통과 — 다음은 더 가파릅니다",
     "fr": "✅ Niveau {0} fini — le suivant est plus raide",
@@ -7182,7 +7182,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} / {1} 次：记住这 {2} 个": {
     "zh": "第 {0} / {1} 次：记住这 {2} 个",
     "en": "Trial {0} / {1}: remember these {2}",
-    "zhtw": "第 {0} / {1} 次：記住這 {2} 個",
+    "zh-Hant": "第 {0} / {1} 次：記住這 {2} 個",
     "ja": "{0} / {1} 回目：この {2} 個を覚えて",
     "ko": "{0} / {1}번째: 이 {2}개를 기억",
     "fr": "Essai {0} / {1} : retenez ces {2}",
@@ -7197,7 +7197,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}/{1} 回合 · 预备": {
     "zh": "第 {0}/{1} 回合 · 预备",
     "en": "Round {0}/{1} · get ready",
-    "zhtw": "第 {0}/{1} 回合 · 預備",
+    "zh-Hant": "第 {0}/{1} 回合 · 預備",
     "ja": "{0}/{1} ターン · 用意",
     "ko": "{0}/{1}回合 · 준비",
     "fr": "Tour {0}/{1} · prêt",
@@ -7212,7 +7212,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 第 {0} 句归位": {
     "zh": "✅ 第 {0} 句归位",
     "en": "✅ Sentence {0} in place",
-    "zhtw": "✅ 第 {0} 句歸位",
+    "zh-Hant": "✅ 第 {0} 句歸位",
     "ja": "✅ {0} 文目が定位置に",
     "ko": "✅ {0}번째 문장 제자리",
     "fr": "✅ Phrase {0} en place",
@@ -7227,7 +7227,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 这句还不到时候，还剩 {0} 条命": {
     "zh": "❌ 这句还不到时候，还剩 {0} 条命",
     "en": "❌ Not this sentence yet — {0} lives left",
-    "zhtw": "❌ 這句還不到時候，還剩 {0} 條命",
+    "zh-Hant": "❌ 這句還不到時候，還剩 {0} 條命",
     "ja": "❌ この文はまだ — 残りライフ {0}",
     "ko": "❌ 이 문장은 아직이에요 — 목숨 {0}개",
     "fr": "❌ Pas encore cette phrase — {0} vies",
@@ -7242,7 +7242,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 就是 {0} 个": {
     "zh": "✅ 就是 {0} 个",
     "en": "✅ It is {0}",
-    "zhtw": "✅ 就是 {0} 個",
+    "zh-Hant": "✅ 就是 {0} 個",
     "ja": "✅ まさに {0} 個",
     "ko": "✅ 바로 {0}개",
     "fr": "✅ C’est bien {0}",
@@ -7257,7 +7257,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 其实是 {0} 个": {
     "zh": "❌ 其实是 {0} 个",
     "en": "❌ Actually {0}",
-    "zhtw": "❌ 其實是 {0} 個",
+    "zh-Hant": "❌ 其實是 {0} 個",
     "ja": "❌ 実は {0} 個",
     "ko": "❌ 사실 {0}개",
     "fr": "❌ En fait {0}",
@@ -7272,7 +7272,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 已填 {0}/{1} 格": {
     "zh": "✅ 已填 {0}/{1} 格",
     "en": "✅ {0}/{1} filled",
-    "zhtw": "✅ 已填 {0}/{1} 格",
+    "zh-Hant": "✅ 已填 {0}/{1} 格",
     "ja": "✅ {0}/{1} マス記入",
     "ko": "✅ {0}/{1}칸 채움",
     "fr": "✅ {0}/{1} remplies",
@@ -7287,7 +7287,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} / {1} 题：它关于哪条轴对称？": {
     "zh": "第 {0} / {1} 题：它关于哪条轴对称？",
     "en": "Question {0} / {1}: which axis is it symmetric about?",
-    "zhtw": "第 {0} / {1} 題：它關於哪條軸對稱？",
+    "zh-Hant": "第 {0} / {1} 題：它關於哪條軸對稱？",
     "ja": "{0} / {1} 問：どの軸に対称？",
     "ko": "{0} / {1}번 문제: 어느 축 대칭인가요?",
     "fr": "Question {0} / {1} : quel axe de symétrie ?",
@@ -7302,7 +7302,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} / {1} 题：记住这 {2} 格（左右对称）": {
     "zh": "第 {0} / {1} 题：记住这 {2} 格（左右对称）",
     "en": "Question {0} / {1}: remember these {2} cells (mirrored)",
-    "zhtw": "第 {0} / {1} 題：記住這 {2} 格（左右對稱）",
+    "zh-Hant": "第 {0} / {1} 題：記住這 {2} 格（左右對稱）",
     "ja": "{0} / {1} 問：この {2} マスを覚えて（左右対称）",
     "ko": "{0} / {1}번 문제: 이 {2}칸을 기억 (좌우 대칭)",
     "fr": "Question {0} / {1} : retenez ces {2} cases (symétriques)",
@@ -7317,7 +7317,7 @@ const DICT: Record<string, Record<string, string>> = {
   "💤 次数用尽，只铺对 {0} / {1} 格": {
     "zh": "💤 次数用尽，只铺对 {0} / {1} 格",
     "en": "💤 Out of tries — only {0} / {1} placed",
-    "zhtw": "💤 次數用盡，只鋪對 {0} / {1} 格",
+    "zh-Hant": "💤 次數用盡，只鋪對 {0} / {1} 格",
     "ja": "💤 回数切れ — {0} / {1} マスだけ",
     "ko": "💤 횟수 소진 — {0} / {1}칸만",
     "fr": "💤 Plus d’essais — {0} / {1}",
@@ -7332,7 +7332,7 @@ const DICT: Record<string, Record<string, string>> = {
   "铺对 {0} / {1} 格　剩 {2} 次": {
     "zh": "铺对 {0} / {1} 格　剩 {2} 次",
     "en": "{0} / {1} placed · {2} left",
-    "zhtw": "鋪對 {0} / {1} 格　剩 {2} 次",
+    "zh-Hant": "鋪對 {0} / {1} 格　剩 {2} 次",
     "ja": "{0} / {1} マス · 残り {2} 回",
     "ko": "{0} / {1}칸 · {2}번 남음",
     "fr": "{0} / {1} placées · {2} restants",
@@ -7347,7 +7347,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} / {1} 题：按发生先后依次点": {
     "zh": "第 {0} / {1} 题：按发生先后依次点",
     "en": "Question {0} / {1}: tap in the order they happened",
-    "zhtw": "第 {0} / {1} 題：按發生先後依次點",
+    "zh-Hant": "第 {0} / {1} 題：按發生先後依次點",
     "ja": "{0} / {1} 問：起きた順にタップ",
     "ko": "{0} / {1}번 문제: 일어난 순서대로 탭",
     "fr": "Question {0} / {1} : dans l’ordre chronologique",
@@ -7362,7 +7362,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} / {1} 次：看清先后": {
     "zh": "第 {0} / {1} 次：看清先后",
     "en": "Trial {0} / {1}: note the order",
-    "zhtw": "第 {0} / {1} 次：看清先後",
+    "zh-Hant": "第 {0} / {1} 次：看清先後",
     "ja": "{0} / {1} 回目：順番を見て",
     "ko": "{0} / {1}번째: 순서를 보세요",
     "fr": "Essai {0} / {1} : repérez l’ordre",
@@ -7377,7 +7377,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} / {1} 题：它俩拓扑等价吗？": {
     "zh": "第 {0} / {1} 题：它俩拓扑等价吗？",
     "en": "Question {0} / {1}: are they topologically equivalent?",
-    "zhtw": "第 {0} / {1} 題：它倆拓撲等價嗎？",
+    "zh-Hant": "第 {0} / {1} 題：它倆拓撲等價嗎？",
     "ja": "{0} / {1} 問：この 2 つは同相？",
     "ko": "{0} / {1}번 문제: 위상적으로 같은가요?",
     "fr": "Question {0} / {1} : équivalents topologiquement ?",
@@ -7392,7 +7392,7 @@ const DICT: Record<string, Record<string, string>> = {
   "看清路线 · 共 {0} 格": {
     "zh": "看清路线 · 共 {0} 格",
     "en": "Trace the route · {0} cells",
-    "zhtw": "看清路線 · 共 {0} 格",
+    "zh-Hant": "看清路線 · 共 {0} 格",
     "ja": "経路を見て · 全 {0} マス",
     "ko": "경로를 보세요 · 총 {0}칸",
     "fr": "Suivez le tracé · {0} cases",
@@ -7407,7 +7407,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 第 {0} 条描完": {
     "zh": "✅ 第 {0} 条描完",
     "en": "✅ Line {0} traced",
-    "zhtw": "✅ 第 {0} 條描完",
+    "zh-Hant": "✅ 第 {0} 條描完",
     "ja": "✅ {0} 本目をなぞった",
     "ko": "✅ {0}번째 완료",
     "fr": "✅ Tracé {0} fini",
@@ -7422,7 +7422,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 通关！25 个全连上，错 {0} 次": {
     "zh": "🎉 通关！25 个全连上，错 {0} 次",
     "en": "🎉 Cleared! All 25 connected, {0} mistakes",
-    "zhtw": "🎉 通關！25 個全連上，錯 {0} 次",
+    "zh-Hant": "🎉 通關！25 個全連上，錯 {0} 次",
     "ja": "🎉 クリア！25 個すべて接続、ミス {0} 回",
     "ko": "🎉 클리어! 25개 모두 연결, 실수 {0}회",
     "fr": "🎉 Réussi ! Les 25 connectés, {0} erreurs",
@@ -7437,7 +7437,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还差 {0} 列、{1} 行": {
     "zh": "还差 {0} 列、{1} 行",
     "en": "{0} columns and {1} rows to go",
-    "zhtw": "還差 {0} 列、{1} 行",
+    "zh-Hant": "還差 {0} 列、{1} 行",
     "ja": "あと {0} 列・{1} 行",
     "ko": "{0}열, {1}행 남음",
     "fr": "Encore {0} colonnes, {1} lignes",
@@ -7452,7 +7452,7 @@ const DICT: Record<string, Record<string, string>> = {
   "选中 {0}，它属于哪一块？": {
     "zh": "选中 {0}，它属于哪一块？",
     "en": "Selected {0} — which block does it belong to?",
-    "zhtw": "選中 {0}，它屬於哪一塊？",
+    "zh-Hant": "選中 {0}，它屬於哪一塊？",
     "ja": "{0} を選択 — どのブロック？",
     "ko": "{0} 선택 — 어느 블록인가요?",
     "fr": "{0} sélectionné — quel bloc ?",
@@ -7467,7 +7467,7 @@ const DICT: Record<string, Record<string, string>> = {
   "太短了，回路至少要 {0} 格": {
     "zh": "太短了，回路至少要 {0} 格",
     "en": "Too short — a loop needs at least {0} cells",
-    "zhtw": "太短了，迴路至少要 {0} 格",
+    "zh-Hant": "太短了，迴路至少要 {0} 格",
     "ja": "短すぎます — ループは最低 {0} マス",
     "ko": "너무 짧아요 — 최소 {0}칸 필요",
     "fr": "Trop court — au moins {0} cases",
@@ -7482,7 +7482,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 猜：{1}": {
     "zh": "第 {0} 猜：{1}",
     "en": "Guess {0}: {1}",
-    "zhtw": "第 {0} 猜：{1}",
+    "zh-Hant": "第 {0} 猜：{1}",
     "ja": "{0} 回目の推測：{1}",
     "ko": "{0}번째 추측: {1}",
     "fr": "Essai {0} : {1}",
@@ -7497,7 +7497,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 刚好 {0}，通关！": {
     "zh": "🎉 刚好 {0}，通关！",
     "en": "🎉 Exactly {0} — cleared!",
-    "zhtw": "🎉 剛好 {0}，通關！",
+    "zh-Hant": "🎉 剛好 {0}，通關！",
     "ja": "🎉 ちょうど {0} でクリア！",
     "ko": "🎉 딱 {0}! 클리어",
     "fr": "🎉 Exactement {0} — réussi !",
@@ -7512,7 +7512,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 {0} = {1}，通关！": {
     "zh": "🎉 {0} = {1}，通关！",
     "en": "🎉 {0} = {1} — cleared!",
-    "zhtw": "🎉 {0} = {1}，通關！",
+    "zh-Hant": "🎉 {0} = {1}，通關！",
     "ja": "🎉 {0} = {1} でクリア！",
     "ko": "🎉 {0} = {1}! 클리어",
     "fr": "🎉 {0} = {1} — réussi !",
@@ -7527,7 +7527,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 配错了，扣 {0} 秒": {
     "zh": "❌ 配错了，扣 {0} 秒",
     "en": "❌ Mismatch — −{0}s",
-    "zhtw": "❌ 配錯了，扣 {0} 秒",
+    "zh-Hant": "❌ 配錯了，扣 {0} 秒",
     "ja": "❌ 組み合わせミス — {0} 秒減点",
     "ko": "❌ 짝이 틀렸어요 — {0}초 차감",
     "fr": "❌ Mauvaise paire — −{0} s",
@@ -7542,7 +7542,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 错了，扣 {0} 秒（规律：{1}）": {
     "zh": "❌ 错了，扣 {0} 秒（规律：{1}）",
     "en": "❌ Wrong — −{0}s (rule: {1})",
-    "zhtw": "❌ 錯了，扣 {0} 秒（規律：{1}）",
+    "zh-Hant": "❌ 錯了，扣 {0} 秒（規律：{1}）",
     "ja": "❌ 不正解 — {0} 秒減点（規則：{1}）",
     "ko": "❌ 틀렸어요 — {0}초 차감 (규칙: {1})",
     "fr": "❌ Faux — −{0} s (règle : {1})",
@@ -7557,7 +7557,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 关：记住 {1} 个亮格": {
     "zh": "第 {0} 关：记住 {1} 个亮格",
     "en": "Level {0}: remember {1} lit cells",
-    "zhtw": "第 {0} 關：記住 {1} 個亮格",
+    "zh-Hant": "第 {0} 關：記住 {1} 個亮格",
     "ja": "第 {0} 面：光る {1} マスを覚えて",
     "ko": "{0}단계: 빛난 {1}칸을 기억",
     "fr": "Niveau {0} : retenez {1} cases",
@@ -7572,7 +7572,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 生命耗尽，止步第 {0} 关": {
     "zh": "❌ 生命耗尽，止步第 {0} 关",
     "en": "❌ Out of lives — stopped at level {0}",
-    "zhtw": "❌ 生命耗盡，止步第 {0} 關",
+    "zh-Hant": "❌ 生命耗盡，止步第 {0} 關",
     "ja": "❌ ライフ切れ — 第 {0} 面で終了",
     "ko": "❌ 목숨 소진 — {0}단계에서 종료",
     "fr": "❌ Plus de vies — niveau {0}",
@@ -7587,7 +7587,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 这格没亮过，还剩 {0} 条命": {
     "zh": "❌ 这格没亮过，还剩 {0} 条命",
     "en": "❌ That cell never lit — {0} lives left",
-    "zhtw": "❌ 這格沒亮過，還剩 {0} 條命",
+    "zh-Hant": "❌ 這格沒亮過，還剩 {0} 條命",
     "ja": "❌ そのマスは光っていない — 残り {0}",
     "ko": "❌ 그 칸은 빛난 적 없어요 — 목숨 {0}개",
     "fr": "❌ Cette case n’a jamais brillé — {0} vies",
@@ -7602,7 +7602,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮：记住 {1} 件东西的位置": {
     "zh": "第 {0} 轮：记住 {1} 件东西的位置",
     "en": "Round {0}: remember where {1} objects are",
-    "zhtw": "第 {0} 輪：記住 {1} 件東西的位置",
+    "zh-Hant": "第 {0} 輪：記住 {1} 件東西的位置",
     "ja": "第 {0} 回：{1} 個の位置を覚えて",
     "ko": "{0}번째: {1}개 물건의 위치를 기억",
     "fr": "Manche {0} : retenez {1} objets",
@@ -7617,7 +7617,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 错了，扣 {0} 秒 —— 正确答案是{1}": {
     "zh": "❌ 错了，扣 {0} 秒 —— 正确答案是{1}",
     "en": "❌ Wrong — −{0}s; the answer is {1}",
-    "zhtw": "❌ 錯了，扣 {0} 秒 —— 正確答案是{1}",
+    "zh-Hant": "❌ 錯了，扣 {0} 秒 —— 正確答案是{1}",
     "ja": "❌ 不正解 — {0} 秒減点、正解は {1}",
     "ko": "❌ 틀렸어요 — {0}초 차감, 정답은 {1}",
     "fr": "❌ Faux — −{0} s ; réponse : {1}",
@@ -7632,7 +7632,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已走 {0} 步 · 还能走 {1} 步": {
     "zh": "已走 {0} 步 · 还能走 {1} 步",
     "en": "{0} steps taken · {1} left",
-    "zhtw": "已走 {0} 步 · 還能走 {1} 步",
+    "zh-Hant": "已走 {0} 步 · 還能走 {1} 步",
     "ja": "{0} 歩 · あと {1} 歩",
     "ko": "{0}걸음 · {1}걸음 남음",
     "fr": "{0} pas · {1} restants",
@@ -7647,7 +7647,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✏️ 对齐了 {0}/{1} 格": {
     "zh": "✏️ 对齐了 {0}/{1} 格",
     "en": "✏️ {0}/{1} cells aligned",
-    "zhtw": "✏️ 對齊了 {0}/{1} 格",
+    "zh-Hant": "✏️ 對齊了 {0}/{1} 格",
     "ja": "✏️ {0}/{1} マス揃えた",
     "ko": "✏️ {0}/{1}칸 정렬",
     "fr": "✏️ {0}/{1} cases alignées",
@@ -7662,7 +7662,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 错了，扣 {0} 秒 —— 应该是 {1}": {
     "zh": "❌ 错了，扣 {0} 秒 —— 应该是 {1}",
     "en": "❌ Wrong — −{0}s; it should be {1}",
-    "zhtw": "❌ 錯了，扣 {0} 秒 —— 應該是 {1}",
+    "zh-Hant": "❌ 錯了，扣 {0} 秒 —— 應該是 {1}",
     "ja": "❌ 不正解 — {0} 秒減点、{1} のはず",
     "ko": "❌ 틀렸어요 — {0}초 차감, {1}이어야 해요",
     "fr": "❌ Faux — −{0} s ; devrait être {1}",
@@ -7677,7 +7677,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 错了，扣 {0} 秒 —— 答案是 {1} 点": {
     "zh": "❌ 错了，扣 {0} 秒 —— 答案是 {1} 点",
     "en": "❌ Wrong — −{0}s; the answer is {1} pips",
-    "zhtw": "❌ 錯了，扣 {0} 秒 —— 答案是 {1} 點",
+    "zh-Hant": "❌ 錯了，扣 {0} 秒 —— 答案是 {1} 點",
     "ja": "❌ 不正解 — {0} 秒減点、答えは {1} 点",
     "ko": "❌ 틀렸어요 — {0}초 차감, 답은 {1}점",
     "fr": "❌ Faux — −{0} s ; réponse : {1} points",
@@ -7692,7 +7692,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 应该是 {0} 点": {
     "zh": "❌ 应该是 {0} 点",
     "en": "❌ Should be {0} pips",
-    "zhtw": "❌ 應該是 {0} 點",
+    "zh-Hant": "❌ 應該是 {0} 點",
     "ja": "❌ {0} 点のはず",
     "ko": "❌ {0}점이어야 해요",
     "fr": "❌ Devrait être {0} points",
@@ -7707,7 +7707,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还差 {0} 个": {
     "zh": "还差 {0} 个",
     "en": "{0} to go",
-    "zhtw": "還差 {0} 個",
+    "zh-Hant": "還差 {0} 個",
     "ja": "あと {0} 個",
     "ko": "{0}개 남음",
     "fr": "Encore {0}",
@@ -7722,7 +7722,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 篇：读一遍，记住细节": {
     "zh": "第 {0} 篇：读一遍，记住细节",
     "en": "Passage {0}: read it and note the details",
-    "zhtw": "第 {0} 篇：讀一遍，記住細節",
+    "zh-Hant": "第 {0} 篇：讀一遍，記住細節",
     "ja": "第 {0} 編：読んで細部を覚えて",
     "ko": "{0}번째 글: 읽고 세부를 기억하세요",
     "fr": "Texte {0} : lisez et retenez les détails",
@@ -7737,7 +7737,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 关：空白处拼出了什么形状？": {
     "zh": "第 {0} 关：空白处拼出了什么形状？",
     "en": "Level {0}: what shape do the gaps form?",
-    "zhtw": "第 {0} 關：空白處拼出了什麼形狀？",
+    "zh-Hant": "第 {0} 關：空白處拼出了什麼形狀？",
     "ja": "第 {0} 面：空白はどんな形？",
     "ko": "{0}단계: 빈칸이 어떤 모양인가요?",
     "fr": "Niveau {0} : quelle forme forment les vides ?",
@@ -7752,7 +7752,7 @@ const DICT: Record<string, Record<string, string>> = {
   "选中 {0}，再点一块凑 {1}": {
     "zh": "选中 {0}，再点一块凑 {1}",
     "en": "Selected {0} — tap another to make {1}",
-    "zhtw": "選中 {0}，再點一塊湊 {1}",
+    "zh-Hant": "選中 {0}，再點一塊湊 {1}",
     "ja": "{0} を選択 — もう 1 枚で {1}",
     "ko": "{0} 선택 — 하나 더 눌러 {1}",
     "fr": "{0} sélectionné — une autre pour {1}",
@@ -7767,7 +7767,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮：记住每个物件在哪一格": {
     "zh": "第 {0} 轮：记住每个物件在哪一格",
     "en": "Round {0}: remember which cell each object is in",
-    "zhtw": "第 {0} 輪：記住每個物件在哪一格",
+    "zh-Hant": "第 {0} 輪：記住每個物件在哪一格",
     "ja": "第 {0} 回：各物件のマスを覚えて",
     "ko": "{0}번째: 각 물건의 칸을 기억",
     "fr": "Manche {0} : retenez la case de chaque objet",
@@ -7782,7 +7782,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮：看清 💎 在哪只盒子下": {
     "zh": "第 {0} 轮：看清 💎 在哪只盒子下",
     "en": "Round {0}: spot which box hides the 💎",
-    "zhtw": "第 {0} 輪：看清 💎 在哪隻盒子下",
+    "zh-Hant": "第 {0} 輪：看清 💎 在哪隻盒子下",
     "ja": "第 {0} 回：💎 がどの箱かを見て",
     "ko": "{0}번째: 💎가 어느 상자 아래인지 보세요",
     "fr": "Manche {0} : sous quelle boîte est le 💎 ?",
@@ -7797,7 +7797,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 题：看清这个数（{1} ms）": {
     "zh": "第 {0} 题：看清这个数（{1} ms）",
     "en": "Question {0}: read this number ({1} ms)",
-    "zhtw": "第 {0} 題：看清這個數（{1} ms）",
+    "zh-Hant": "第 {0} 題：看清這個數（{1} ms）",
     "ja": "第 {0} 問：この数字を見て（{1} ms）",
     "ko": "{0}번 문제: 이 숫자를 보세요 ({1} ms)",
     "fr": "Question {0} : lisez ce nombre ({1} ms)",
@@ -7812,7 +7812,7 @@ const DICT: Record<string, Record<string, string>> = {
   "对，继续点第 {0} 个": {
     "zh": "对，继续点第 {0} 个",
     "en": "Right — tap number {0}",
-    "zhtw": "對，繼續點第 {0} 個",
+    "zh-Hant": "對，繼續點第 {0} 個",
     "ja": "正解 — {0} 個目を続けて",
     "ko": "맞아요 — {0}번째를 계속",
     "fr": "Oui — continuez avec le {0}ᵉ",
@@ -7827,7 +7827,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已打 {0} 孔（展开后 {1} 个）": {
     "zh": "已打 {0} 孔（展开后 {1} 个）",
     "en": "{0} holes punched ({1} when unfolded)",
-    "zhtw": "已打 {0} 孔（展開後 {1} 個）",
+    "zh-Hant": "已打 {0} 孔（展開後 {1} 個）",
     "ja": "{0} 個穴（展開すると {1} 個）",
     "ko": "{0}개 구멍 (펼치면 {1}개)",
     "fr": "{0} trous percés ({1} dépliés)",
@@ -7842,7 +7842,7 @@ const DICT: Record<string, Record<string, string>> = {
   "按顺序点出这 {0} 格": {
     "zh": "按顺序点出这 {0} 格",
     "en": "Tap these {0} cells in order",
-    "zhtw": "按順序點出這 {0} 格",
+    "zh-Hant": "按順序點出這 {0} 格",
     "ja": "この {0} マスを順番に",
     "ko": "이 {0}칸을 순서대로",
     "fr": "Touchez ces {0} cases dans l’ordre",
@@ -7857,7 +7857,7 @@ const DICT: Record<string, Record<string, string>> = {
   "答对 {0} 题通关；答错不扣时间，但断连击": {
     "zh": "答对 {0} 题通关；答错不扣时间，但断连击",
     "en": "Answer {0} correctly to clear; misses cost no time but break the combo",
-    "zhtw": "答對 {0} 題通關；答錯不扣時間，但斷連擊",
+    "zh-Hant": "答對 {0} 題通關；答錯不扣時間，但斷連擊",
     "ja": "{0} 問正解でクリア。誤答は時間減点なし、ただしコンボ途切れ",
     "ko": "{0}문제 정답 시 클리어; 오답은 시간 차감 없음, 콤보만 끊김",
     "fr": "{0} bonnes réponses pour réussir ; une erreur casse le combo",
@@ -7872,7 +7872,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⏰ 时间到，答对 {0}/{1} 题": {
     "zh": "⏰ 时间到，答对 {0}/{1} 题",
     "en": "⏰ Time's up — {0}/{1} correct",
-    "zhtw": "⏰ 時間到，答對 {0}/{1} 題",
+    "zh-Hant": "⏰ 時間到，答對 {0}/{1} 題",
     "ja": "⏰ 時間切れ — {0}/{1} 問正解",
     "ko": "⏰ 시간 종료 — {0}/{1}문제 정답",
     "fr": "⏰ Temps écoulé — {0}/{1} bonnes",
@@ -7887,7 +7887,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 局：找出 {1}": {
     "zh": "第 {0} 局：找出 {1}",
     "en": "Game {0}: find {1}",
-    "zhtw": "第 {0} 局：找出 {1}",
+    "zh-Hant": "第 {0} 局：找出 {1}",
     "ja": "第 {0} 局：{1} を探せ",
     "ko": "{0}번째 판: {1} 찾기",
     "fr": "Partie {0} : trouvez {1}",
@@ -7902,7 +7902,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 局：形状和颜色都要对上": {
     "zh": "第 {0} 局：形状和颜色都要对上",
     "en": "Game {0}: match both shape and colour",
-    "zhtw": "第 {0} 局：形狀和顏色都要對上",
+    "zh-Hant": "第 {0} 局：形狀和顏色都要對上",
     "ja": "第 {0} 局：形と色の両方を合わせて",
     "ko": "{0}번째 판: 모양과 색 모두 맞추기",
     "fr": "Partie {0} : forme et couleur",
@@ -7917,7 +7917,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还剩 {0} 步": {
     "zh": "还剩 {0} 步",
     "en": "{0} steps left",
-    "zhtw": "還剩 {0} 步",
+    "zh-Hant": "還剩 {0} 步",
     "ja": "残り {0} 歩",
     "ko": "{0}걸음 남음",
     "fr": "{0} pas restants",
@@ -7932,7 +7932,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ {0} 与 {1} 意思不相近": {
     "zh": "❌ {0} 与 {1} 意思不相近",
     "en": "❌ {0} and {1} aren't close in meaning",
-    "zhtw": "❌ {0} 與 {1} 意思不相近",
+    "zh-Hant": "❌ {0} 與 {1} 意思不相近",
     "ja": "❌ {0} と {1} は意味が近くない",
     "ko": "❌ {0}와 {1}는 뜻이 가깝지 않아요",
     "fr": "❌ {0} et {1} ne sont pas proches",
@@ -7947,7 +7947,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 到 {0} 了，用了 {1} 步": {
     "zh": "🎉 到 {0} 了，用了 {1} 步",
     "en": "🎉 Reached {0} in {1} steps",
-    "zhtw": "🎉 到 {0} 了，用了 {1} 步",
+    "zh-Hant": "🎉 到 {0} 了，用了 {1} 步",
     "ja": "🎉 {0} に到達、{1} 歩",
     "ko": "🎉 {0} 도달, {1}걸음",
     "fr": "🎉 {0} atteint en {1} pas",
@@ -7962,7 +7962,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ {0}，还剩 {1} 步": {
     "zh": "✅ {0}，还剩 {1} 步",
     "en": "✅ {0} — {1} steps left",
-    "zhtw": "✅ {0}，還剩 {1} 步",
+    "zh-Hant": "✅ {0}，還剩 {1} 步",
     "ja": "✅ {0} — 残り {1} 歩",
     "ko": "✅ {0} — {1}걸음 남음",
     "fr": "✅ {0} — {1} pas",
@@ -7977,7 +7977,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 题：挑只差一个字母的真实单词": {
     "zh": "第 {0} 题：挑只差一个字母的真实单词",
     "en": "Question {0}: pick a real word one letter away",
-    "zhtw": "第 {0} 題：挑只差一個字母的真實單詞",
+    "zh-Hant": "第 {0} 題：挑只差一個字母的真實單詞",
     "ja": "第 {0} 問：1 文字違いの実在語を選んで",
     "ko": "{0}번 문제: 한 글자만 다른 실제 단어 고르기",
     "fr": "Question {0} : un vrai mot à une lettre près",
@@ -7992,7 +7992,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 次反馈：🟩 位置对｜🟨 字母在｜⬜ 没有": {
     "zh": "第 {0} 次反馈：🟩 位置对｜🟨 字母在｜⬜ 没有",
     "en": "Feedback {0}: 🟩 right spot | 🟨 letter present | ⬜ absent",
-    "zhtw": "第 {0} 次回饋：🟩 位置對｜🟨 字母在｜⬜ 沒有",
+    "zh-Hant": "第 {0} 次回饋：🟩 位置對｜🟨 字母在｜⬜ 沒有",
     "ja": "{0} 回目のフィードバック：🟩 位置一致｜🟨 文字あり｜⬜ なし",
     "ko": "{0}번째 피드백: 🟩 위치 정확 | 🟨 글자 있음 | ⬜ 없음",
     "fr": "Retour {0} : 🟩 bien placé | 🟨 présent | ⬜ absent",
@@ -8007,7 +8007,7 @@ const DICT: Record<string, Record<string, string>> = {
   "记住这 {0} 组词对": {
     "zh": "记住这 {0} 组词对",
     "en": "Remember these {0} word pairs",
-    "zhtw": "記住這 {0} 組詞對",
+    "zh-Hant": "記住這 {0} 組詞對",
     "ja": "この {0} 組の単語ペアを覚えて",
     "ko": "이 {0}쌍의 단어를 기억하세요",
     "fr": "Retenez ces {0} paires de mots",
@@ -8022,7 +8022,7 @@ const DICT: Record<string, Record<string, string>> = {
   "💥 {0}，还剩 {1} 条命": {
     "zh": "💥 {0}，还剩 {1} 条命",
     "en": "💥 {0} — {1} lives left",
-    "zhtw": "💥 {0}，還剩 {1} 條命",
+    "zh-Hant": "💥 {0}，還剩 {1} 條命",
     "ja": "💥 {0} — 残りライフ {1}",
     "ko": "💥 {0} — 목숨 {1}개",
     "fr": "💥 {0} — {1} vies",
@@ -8037,7 +8037,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 「{0}」+ {1} 分": {
     "zh": "✅ 「{0}」+ {1} 分",
     "en": "✅ “{0}” +{1}",
-    "zhtw": "✅ 「{0}」+ {1} 分",
+    "zh-Hant": "✅ 「{0}」+ {1} 分",
     "ja": "✅ 「{0}」+{1} 点",
     "ko": "✅ “{0}” +{1}점",
     "fr": "✅ « {0} » +{1}",
@@ -8052,7 +8052,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 猜中了！用了 {0} 次": {
     "zh": "🎉 猜中了！用了 {0} 次",
     "en": "🎉 Got it! Took {0} guesses",
-    "zhtw": "🎉 猜中了！用了 {0} 次",
+    "zh-Hant": "🎉 猜中了！用了 {0} 次",
     "ja": "🎉 当たり！{0} 回で",
     "ko": "🎉 정답! {0}번 만에",
     "fr": "🎉 Trouvé ! En {0} essais",
@@ -8067,7 +8067,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还差 {0} 次机会": {
     "zh": "还差 {0} 次机会",
     "en": "{0} tries left",
-    "zhtw": "還差 {0} 次機會",
+    "zh-Hant": "還差 {0} 次機會",
     "ja": "あと {0} 回",
     "ko": "{0}번 남음",
     "fr": "Encore {0} essais",
@@ -8082,7 +8082,7 @@ const DICT: Record<string, Record<string, string>> = {
   "拿起一块 · 还剩 {0} 步": {
     "zh": "拿起一块 · 还剩 {0} 步",
     "en": "Pick a piece · {0} steps left",
-    "zhtw": "拿起一塊 · 還剩 {0} 步",
+    "zh-Hant": "拿起一塊 · 還剩 {0} 步",
     "ja": "1 枚取って · 残り {0} 歩",
     "ko": "조각 들기 · {0}걸음 남음",
     "fr": "Prenez une pièce · {0} pas",
@@ -8097,7 +8097,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已铺 {0}/{1} 格": {
     "zh": "已铺 {0}/{1} 格",
     "en": "{0}/{1} laid",
-    "zhtw": "已鋪 {0}/{1} 格",
+    "zh-Hant": "已鋪 {0}/{1} 格",
     "ja": "{0}/{1} マス敷いた",
     "ko": "{0}/{1}칸 깔음",
     "fr": "{0}/{1} posées",
@@ -8112,7 +8112,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 次：盯住中间的 ➕": {
     "zh": "第 {0} 次：盯住中间的 ➕",
     "en": "Trial {0}: fix your gaze on the ➕",
-    "zhtw": "第 {0} 次：盯住中間的 ➕",
+    "zh-Hant": "第 {0} 次：盯住中間的 ➕",
     "ja": "{0} 回目：中央の ➕ を見つめて",
     "ko": "{0}번째: 가운데 ➕를 응시하세요",
     "fr": "Essai {0} : fixez le ➕ central",
@@ -8127,7 +8127,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}，接着下一棵": {
     "zh": "{0}，接着下一棵",
     "en": "{0} — on to the next tree",
-    "zhtw": "{0}，接著下一棵",
+    "zh-Hant": "{0}，接著下一棵",
     "ja": "{0}、次の木へ",
     "ko": "{0}, 다음 나무로",
     "fr": "{0} — arbre suivant",
@@ -8142,7 +8142,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 是素数，还剩 {1} 个": {
     "zh": "{0} 是素数，还剩 {1} 个",
     "en": "{0} is prime — {1} to go",
-    "zhtw": "{0} 是質數，還剩 {1} 個",
+    "zh-Hant": "{0} 是質數，還剩 {1} 個",
     "ja": "{0} は素数 — あと {1} 個",
     "ko": "{0}는 소수 — {1}개 남음",
     "fr": "{0} est premier — {1} restants",
@@ -8157,7 +8157,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 不是素数": {
     "zh": "{0} 不是素数",
     "en": "{0} is not prime",
-    "zhtw": "{0} 不是質數",
+    "zh-Hant": "{0} 不是質數",
     "ja": "{0} は素数ではありません",
     "ko": "{0}는 소수가 아니에요",
     "fr": "{0} n’est pas premier",
@@ -8172,7 +8172,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}｜共猎到 {1}/{2} 关": {
     "zh": "{0}｜共猎到 {1}/{2} 关",
     "en": "{0} | {1}/{2} levels hunted",
-    "zhtw": "{0}｜共獵到 {1}/{2} 關",
+    "zh-Hant": "{0}｜共獵到 {1}/{2} 關",
     "ja": "{0}｜{1}/{2} 面クリア",
     "ko": "{0} | {1}/{2}단계",
     "fr": "{0} | {1}/{2} niveaux",
@@ -8187,7 +8187,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}，进入第 {1} 关": {
     "zh": "{0}，进入第 {1} 关",
     "en": "{0} — entering level {1}",
-    "zhtw": "{0}，進入第 {1} 關",
+    "zh-Hant": "{0}，進入第 {1} 關",
     "ja": "{0}、第 {1} 面へ",
     "ko": "{0}, {1}단계 진입",
     "fr": "{0} — niveau {1}",
@@ -8202,7 +8202,7 @@ const DICT: Record<string, Record<string, string>> = {
   "记住这 {0} 位数字，逐位闪现": {
     "zh": "记住这 {0} 位数字，逐位闪现",
     "en": "Remember these {0} digits — shown one by one",
-    "zhtw": "記住這 {0} 位數字，逐位閃現",
+    "zh-Hant": "記住這 {0} 位數字，逐位閃現",
     "ja": "この {0} 桁を覚えて（1 桁ずつ表示）",
     "ko": "이 {0}자리를 기억하세요 (한 자리씩)",
     "fr": "Retenez ces {0} chiffres — un par un",
@@ -8217,7 +8217,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 位是几？（从左数）": {
     "zh": "第 {0} 位是几？（从左数）",
     "en": "What is digit {0}? (from the left)",
-    "zhtw": "第 {0} 位是幾？（從左數）",
+    "zh-Hant": "第 {0} 位是幾？（從左數）",
     "ja": "{0} 桁目は？（左から）",
     "ko": "{0}번째 자리는? (왼쪽부터)",
     "fr": "Quel est le chiffre {0} ? (depuis la gauche)",
@@ -8232,7 +8232,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 第 {0} 位正是 {1}": {
     "zh": "✅ 第 {0} 位正是 {1}",
     "en": "✅ Digit {0} is indeed {1}",
-    "zhtw": "✅ 第 {0} 位正是 {1}",
+    "zh-Hant": "✅ 第 {0} 位正是 {1}",
     "ja": "✅ {0} 桁目はまさに {1}",
     "ko": "✅ {0}번째 자리는 바로 {1}",
     "fr": "✅ Le chiffre {0} est bien {1}",
@@ -8247,7 +8247,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 不对，再算一次（a² + b² = c²）": {
     "zh": "{0} 不对，再算一次（a² + b² = c²）",
     "en": "{0} is wrong — try again (a² + b² = c²)",
-    "zhtw": "{0} 不對，再算一次（a² + b² = c²）",
+    "zh-Hant": "{0} 不對，再算一次（a² + b² = c²）",
     "ja": "{0} は違う — もう一度（a² + b² = c²）",
     "ko": "{0} 틀렸어요 — 다시 (a² + b² = c²)",
     "fr": "{0} est faux — réessayez (a² + b² = c²)",
@@ -8262,7 +8262,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}｜共解出 {1}/{2} 关": {
     "zh": "{0}｜共解出 {1}/{2} 关",
     "en": "{0} | {1}/{2} levels solved",
-    "zhtw": "{0}｜共解出 {1}/{2} 關",
+    "zh-Hant": "{0}｜共解出 {1}/{2} 關",
     "ja": "{0}｜{1}/{2} 面解いた",
     "ko": "{0} | {1}/{2}단계 해결",
     "fr": "{0} | {1}/{2} niveaux résolus",
@@ -8277,7 +8277,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}，第 {1} 关": {
     "zh": "{0}，第 {1} 关",
     "en": "{0} — level {1}",
-    "zhtw": "{0}，第 {1} 關",
+    "zh-Hant": "{0}，第 {1} 關",
     "ja": "{0}、第 {1} 面",
     "ko": "{0}, {1}단계",
     "fr": "{0} — niveau {1}",
@@ -8292,7 +8292,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 化成 a√b": {
     "zh": "{0} 化成 a√b",
     "en": "Simplify {0} to a√b",
-    "zhtw": "{0} 化成 a√b",
+    "zh-Hant": "{0} 化成 a√b",
     "ja": "{0} を a√b に",
     "ko": "{0}를 a√b로",
     "fr": "Simplifiez {0} en a√b",
@@ -8307,7 +8307,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} / {1} 句：这句话通顺吗？": {
     "zh": "第 {0} / {1} 句：这句话通顺吗？",
     "en": "Sentence {0} / {1}: does it read well?",
-    "zhtw": "第 {0} / {1} 句：這句話通順嗎？",
+    "zh-Hant": "第 {0} / {1} 句：這句話通順嗎？",
     "ja": "{0} / {1} 文：この文は自然？",
     "ko": "{0} / {1}문장: 자연스러운가요?",
     "fr": "Phrase {0} / {1} : est-elle correcte ?",
@@ -8322,7 +8322,7 @@ const DICT: Record<string, Record<string, string>> = {
   "记住这 {0} 组配对": {
     "zh": "记住这 {0} 组配对",
     "en": "Remember these {0} pairs",
-    "zhtw": "記住這 {0} 組配對",
+    "zh-Hant": "記住這 {0} 組配對",
     "ja": "この {0} 組のペアを覚えて",
     "ko": "이 {0}쌍을 기억하세요",
     "fr": "Retenez ces {0} paires",
@@ -8337,7 +8337,7 @@ const DICT: Record<string, Record<string, string>> = {
   "轮到你了：照刚才的间隔敲 {0} 下": {
     "zh": "轮到你了：照刚才的间隔敲 {0} 下",
     "en": "Your turn: tap {0} times at the same pace",
-    "zhtw": "輪到你了：照剛才的間隔敲 {0} 下",
+    "zh-Hant": "輪到你了：照剛才的間隔敲 {0} 下",
     "ja": "あなたの番：同じ間隔で {0} 回叩いて",
     "ko": "당신 차례: 같은 간격으로 {0}번 두드리세요",
     "fr": "À vous : tapez {0} fois au même rythme",
@@ -8352,7 +8352,7 @@ const DICT: Record<string, Record<string, string>> = {
   "💤 超时，没敲满 {0} 下": {
     "zh": "💤 超时，没敲满 {0} 下",
     "en": "💤 Time out — fewer than {0} taps",
-    "zhtw": "💤 超時，沒敲滿 {0} 下",
+    "zh-Hant": "💤 超時，沒敲滿 {0} 下",
     "ja": "💤 時間切れ — {0} 回に満たず",
     "ko": "💤 시간 초과 — {0}번 미만",
     "fr": "💤 Temps écoulé — moins de {0} frappes",
@@ -8367,7 +8367,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 下 · 别停": {
     "zh": "第 {0} 下 · 别停",
     "en": "Tap {0} · keep going",
-    "zhtw": "第 {0} 下 · 別停",
+    "zh-Hant": "第 {0} 下 · 別停",
     "ja": "{0} 回目 · 止まらないで",
     "ko": "{0}번째 · 멈추지 마세요",
     "fr": "Frappe {0} · continuez",
@@ -8382,7 +8382,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 这里一样 · 还能错 {0} 次": {
     "zh": "❌ 这里一样 · 还能错 {0} 次",
     "en": "❌ Same here · {0} mistakes left",
-    "zhtw": "❌ 這裡一樣 · 還能錯 {0} 次",
+    "zh-Hant": "❌ 這裡一樣 · 還能錯 {0} 次",
     "ja": "❌ ここも同じ · あと {0} 回ミスできる",
     "ko": "❌ 여기도 같아요 · {0}번 더 가능",
     "fr": "❌ Identiques · encore {0} erreurs",
@@ -8397,7 +8397,7 @@ const DICT: Record<string, Record<string, string>> = {
   "按顺序点出最后 {0} 个": {
     "zh": "按顺序点出最后 {0} 个",
     "en": "Tap the last {0} in order",
-    "zhtw": "按順序點出最後 {0} 個",
+    "zh-Hant": "按順序點出最後 {0} 個",
     "ja": "最後の {0} 個を順番に",
     "ko": "마지막 {0}개를 순서대로",
     "fr": "Touchez les {0} derniers dans l’ordre",
@@ -8412,7 +8412,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 第 {0} 层落定": {
     "zh": "✅ 第 {0} 层落定",
     "en": "✅ Layer {0} settled",
-    "zhtw": "✅ 第 {0} 層落定",
+    "zh-Hant": "✅ 第 {0} 層落定",
     "ja": "✅ 第 {0} 層が確定",
     "ko": "✅ {0}층 완료",
     "fr": "✅ Couche {0} posée",
@@ -8427,7 +8427,7 @@ const DICT: Record<string, Record<string, string>> = {
   "看好球 → 第 {0} 关，洗 {1} 次": {
     "zh": "看好球 → 第 {0} 关，洗 {1} 次",
     "en": "Watch the ball → level {0}, {1} shuffles",
-    "zhtw": "看好球 → 第 {0} 關，洗 {1} 次",
+    "zh-Hant": "看好球 → 第 {0} 關，洗 {1} 次",
     "ja": "球を追って → 第 {0} 面、シャッフル {1} 回",
     "ko": "공을 보세요 → {0}단계, 섞기 {1}회",
     "fr": "Suivez la balle → niveau {0}, {1} mélanges",
@@ -8442,7 +8442,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 通关 · 连中 {0} 关": {
     "zh": "🎉 通关 · 连中 {0} 关",
     "en": "🎉 Cleared · {0} in a row",
-    "zhtw": "🎉 通關 · 連中 {0} 關",
+    "zh-Hant": "🎉 通關 · 連中 {0} 關",
     "ja": "🎉 クリア · {0} 面連続",
     "ko": "🎉 클리어 · {0}단계 연속",
     "fr": "🎉 Réussi · {0} d’affilée",
@@ -8457,7 +8457,7 @@ const DICT: Record<string, Record<string, string>> = {
   "看好了… 第 {0} 关": {
     "zh": "看好了… 第 {0} 关",
     "en": "Watch closely… level {0}",
-    "zhtw": "看好了… 第 {0} 關",
+    "zh-Hant": "看好了… 第 {0} 關",
     "ja": "よく見て… 第 {0} 面",
     "ko": "잘 보세요… {0}단계",
     "fr": "Regardez bien… niveau {0}",
@@ -8472,7 +8472,7 @@ const DICT: Record<string, Record<string, string>> = {
   "轮到你了，按顺序点 {0} 下": {
     "zh": "轮到你了，按顺序点 {0} 下",
     "en": "Your turn — tap {0} in order",
-    "zhtw": "輪到你了，按順序點 {0} 下",
+    "zh-Hant": "輪到你了，按順序點 {0} 下",
     "ja": "あなたの番 — 順番に {0} 回",
     "ko": "당신 차례 — 순서대로 {0}번",
     "fr": "À vous — {0} dans l’ordre",
@@ -8487,7 +8487,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 第 {0} 关通过": {
     "zh": "✅ 第 {0} 关通过",
     "en": "✅ Level {0} cleared",
-    "zhtw": "✅ 第 {0} 關通過",
+    "zh-Hant": "✅ 第 {0} 關通過",
     "ja": "✅ 第 {0} 面クリア",
     "ko": "✅ {0}단계 통과",
     "fr": "✅ Niveau {0} réussi",
@@ -8502,7 +8502,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 按错了，最长撑到 {0} 关": {
     "zh": "❌ 按错了，最长撑到 {0} 关",
     "en": "❌ Missed — reached level {0}",
-    "zhtw": "❌ 按錯了，最長撐到 {0} 關",
+    "zh-Hant": "❌ 按錯了，最長撐到 {0} 關",
     "ja": "❌ ミス — 最長 {0} 面",
     "ko": "❌ 잘못 눌렀어요 — 최고 {0}단계",
     "fr": "❌ Erreur — jusqu’au niveau {0}",
@@ -8517,7 +8517,7 @@ const DICT: Record<string, Record<string, string>> = {
   "轮到你了：按顺序点 {0} 下": {
     "zh": "轮到你了：按顺序点 {0} 下",
     "en": "Your turn: tap {0} in order",
-    "zhtw": "輪到你了：按順序點 {0} 下",
+    "zh-Hant": "輪到你了：按順序點 {0} 下",
     "ja": "あなたの番：順番に {0} 回",
     "ko": "당신 차례: 순서대로 {0}번",
     "fr": "À vous : {0} dans l’ordre",
@@ -8532,7 +8532,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮 · 记住 {1} 个数字": {
     "zh": "第 {0} 轮 · 记住 {1} 个数字",
     "en": "Round {0} · remember {1} digits",
-    "zhtw": "第 {0} 輪 · 記住 {1} 個數字",
+    "zh-Hant": "第 {0} 輪 · 記住 {1} 個數字",
     "ja": "第 {0} 回 · {1} 個の数字を覚えて",
     "ko": "{0}번째 · 숫자 {1}개 기억",
     "fr": "Manche {0} · retenez {1} chiffres",
@@ -8547,7 +8547,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 步点错了 ❌": {
     "zh": "第 {0} 步点错了 ❌",
     "en": "Wrong tap on step {0} ❌",
-    "zhtw": "第 {0} 步點錯了 ❌",
+    "zh-Hant": "第 {0} 步點錯了 ❌",
     "ja": "{0} 手目でミス ❌",
     "ko": "{0}번째에서 잘못 탭 ❌",
     "fr": "Erreur au pas {0} ❌",
@@ -8562,7 +8562,7 @@ const DICT: Record<string, Record<string, string>> = {
   "时间到｜答对 {0} 题": {
     "zh": "时间到｜答对 {0} 题",
     "en": "Time's up | {0} correct",
-    "zhtw": "時間到｜答對 {0} 題",
+    "zh-Hant": "時間到｜答對 {0} 題",
     "ja": "時間切れ｜{0} 問正解",
     "ko": "시간 종료 | {0}문제 정답",
     "fr": "Temps écoulé | {0} bonnes",
@@ -8577,7 +8577,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ {0}，还剩 {1} 条命": {
     "zh": "❌ {0}，还剩 {1} 条命",
     "en": "❌ {0} — {1} lives left",
-    "zhtw": "❌ {0}，還剩 {1} 條命",
+    "zh-Hant": "❌ {0}，還剩 {1} 條命",
     "ja": "❌ {0} — 残りライフ {1}",
     "ko": "❌ {0} — 목숨 {1}개",
     "fr": "❌ {0} — {1} vies",
@@ -8592,7 +8592,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮开始，两个任务都做完": {
     "zh": "第 {0} 轮开始，两个任务都做完",
     "en": "Round {0} — finish both tasks",
-    "zhtw": "第 {0} 輪開始，兩個任務都做完",
+    "zh-Hant": "第 {0} 輪開始，兩個任務都做完",
     "ja": "第 {0} 回：2 つの課題を両方こなして",
     "ko": "{0}번째 시작 — 두 과제 모두 완료",
     "fr": "Manche {0} — faites les deux tâches",
@@ -8607,7 +8607,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 两块板全灭了，用了 {0} 步": {
     "zh": "🎉 两块板全灭了，用了 {0} 步",
     "en": "🎉 Both boards cleared in {0} steps",
-    "zhtw": "🎉 兩塊板全滅了，用了 {0} 步",
+    "zh-Hant": "🎉 兩塊板全滅了，用了 {0} 步",
     "ja": "🎉 2 枚とも制圧、{0} 歩",
     "ko": "🎉 두 판 모두 클리어, {0}걸음",
     "fr": "🎉 Les deux plateaux ! En {0} pas",
@@ -8622,7 +8622,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已走 {0} 步 · 还剩 {1} 盏灯": {
     "zh": "已走 {0} 步 · 还剩 {1} 盏灯",
     "en": "{0} steps · {1} lamps left",
-    "zhtw": "已走 {0} 步 · 還剩 {1} 盞燈",
+    "zh-Hant": "已走 {0} 步 · 還剩 {1} 盞燈",
     "ja": "{0} 歩 · 残り {1} 灯",
     "ko": "{0}걸음 · 램프 {1}개",
     "fr": "{0} pas · {1} lampes",
@@ -8637,7 +8637,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮：记住这 4 个数字": {
     "zh": "第 {0} 轮：记住这 4 个数字",
     "en": "Round {0}: remember these 4 digits",
-    "zhtw": "第 {0} 輪：記住這 4 個數字",
+    "zh-Hant": "第 {0} 輪：記住這 4 個數字",
     "ja": "第 {0} 回：この 4 桁を覚えて",
     "ko": "{0}번째: 이 4개 숫자를 기억",
     "fr": "Manche {0} : retenez ces 4 chiffres",
@@ -8652,7 +8652,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 通关：答对 {0} 个": {
     "zh": "🎉 通关：答对 {0} 个",
     "en": "🎉 Cleared: {0} correct",
-    "zhtw": "🎉 通關：答對 {0} 個",
+    "zh-Hant": "🎉 通關：答對 {0} 個",
     "ja": "🎉 クリア：{0} 問正解",
     "ko": "🎉 클리어: {0}개 정답",
     "fr": "🎉 Réussi : {0} bonnes",
@@ -8667,7 +8667,7 @@ const DICT: Record<string, Record<string, string>> = {
   "点亮 {0} 的全部因数（共 {1} 个）": {
     "zh": "点亮 {0} 的全部因数（共 {1} 个）",
     "en": "Light all factors of {0} ({1} in all)",
-    "zhtw": "點亮 {0} 的全部因數（共 {1} 個）",
+    "zh-Hant": "點亮 {0} 的全部因數（共 {1} 個）",
     "ja": "{0} の約数を全部点灯（計 {1} 個）",
     "ko": "{0}의 약수를 모두 점등 (총 {1}개)",
     "fr": "Allumez tous les diviseurs de {0} ({1})",
@@ -8682,7 +8682,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ {0} 不是 {1} 的因数，还剩 {2} 条命": {
     "zh": "❌ {0} 不是 {1} 的因数，还剩 {2} 条命",
     "en": "❌ {0} is not a factor of {1} — {2} lives left",
-    "zhtw": "❌ {0} 不是 {1} 的因數，還剩 {2} 條命",
+    "zh-Hant": "❌ {0} 不是 {1} 的因數，還剩 {2} 條命",
     "ja": "❌ {0} は {1} の約数ではありません — 残り {2}",
     "ko": "❌ {0}은 {1}의 약수가 아니에요 — 목숨 {2}개",
     "fr": "❌ {0} n’est pas un diviseur de {1} — {2} vies",
@@ -8697,7 +8697,7 @@ const DICT: Record<string, Record<string, string>> = {
   "⌛ 时间到 —— 共找到 {0} 个词": {
     "zh": "⌛ 时间到 —— 共找到 {0} 个词",
     "en": "⌛ Time's up — {0} words found",
-    "zhtw": "⌛ 時間到 —— 共找到 {0} 個詞",
+    "zh-Hant": "⌛ 時間到 —— 共找到 {0} 個詞",
     "ja": "⌛ 時間切れ —— {0} 語見つけた",
     "ko": "⌛ 시간 종료 — 단어 {0}개",
     "fr": "⌛ Temps écoulé — {0} mots",
@@ -8712,7 +8712,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 通关：找到 {0} 个词": {
     "zh": "🎉 通关：找到 {0} 个词",
     "en": "🎉 Cleared: {0} words found",
-    "zhtw": "🎉 通關：找到 {0} 個詞",
+    "zh-Hant": "🎉 通關：找到 {0} 個詞",
     "ja": "🎉 クリア：{0} 語発見",
     "ko": "🎉 클리어: 단어 {0}개",
     "fr": "🎉 Réussi : {0} mots",
@@ -8727,7 +8727,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 凑出 24！用了 {0} 步": {
     "zh": "🎉 凑出 24！用了 {0} 步",
     "en": "🎉 Made 24! Took {0} steps",
-    "zhtw": "🎉 湊出 24！用了 {0} 步",
+    "zh-Hant": "🎉 湊出 24！用了 {0} 步",
     "ja": "🎉 24 完成！{0} 歩",
     "ko": "🎉 24 완성! {0}걸음",
     "fr": "🎉 24 trouvé ! En {0} pas",
@@ -8742,7 +8742,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 全部归位！用了 {0} 步": {
     "zh": "🎉 全部归位！用了 {0} 步",
     "en": "🎉 All in place! Took {0} steps",
-    "zhtw": "🎉 全部歸位！用了 {0} 步",
+    "zh-Hant": "🎉 全部歸位！用了 {0} 步",
     "ja": "🎉 全部整列！{0} 歩",
     "ko": "🎉 전부 제자리! {0}걸음",
     "fr": "🎉 Tout en place ! En {0} pas",
@@ -8757,7 +8757,7 @@ const DICT: Record<string, Record<string, string>> = {
   "💤 步数用尽，还剩 {0} 块": {
     "zh": "💤 步数用尽，还剩 {0} 块",
     "en": "💤 Out of steps — {0} blocks left",
-    "zhtw": "💤 步數用盡，還剩 {0} 塊",
+    "zh-Hant": "💤 步數用盡，還剩 {0} 塊",
     "ja": "💤 手数切れ — 残り {0} 個",
     "ko": "💤 이동 소진 — {0}개 남음",
     "fr": "💤 Plus de pas — {0} blocs",
@@ -8772,7 +8772,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 应落在第 {0} 行第 {1} 列": {
     "zh": "❌ 应落在第 {0} 行第 {1} 列",
     "en": "❌ Should land on row {0}, column {1}",
-    "zhtw": "❌ 應落在第 {0} 行第 {1} 列",
+    "zh-Hant": "❌ 應落在第 {0} 行第 {1} 列",
     "ja": "❌ {0} 行 {1} 列のはず",
     "ko": "❌ {0}행 {1}열이어야 해요",
     "fr": "❌ Devait aller en ligne {0}, colonne {1}",
@@ -8787,7 +8787,7 @@ const DICT: Record<string, Record<string, string>> = {
   "记住这 {0} 样东西": {
     "zh": "记住这 {0} 样东西",
     "en": "Remember these {0} items",
-    "zhtw": "記住這 {0} 樣東西",
+    "zh-Hant": "記住這 {0} 樣東西",
     "ja": "この {0} 個を覚えて",
     "ko": "이 {0}개를 기억하세요",
     "fr": "Retenez ces {0} objets",
@@ -8802,7 +8802,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ {0} 与 {1} 同音": {
     "zh": "✅ {0} 与 {1} 同音",
     "en": "✅ {0} and {1} sound alike",
-    "zhtw": "✅ {0} 與 {1} 同音",
+    "zh-Hant": "✅ {0} 與 {1} 同音",
     "ja": "✅ {0} と {1} は同音",
     "ko": "✅ {0}와 {1}는 동음",
     "fr": "✅ {0} et {1} sont homophones",
@@ -8817,7 +8817,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 答对 {0} 题，用了 {1} 秒": {
     "zh": "🎉 答对 {0} 题，用了 {1} 秒",
     "en": "🎉 {0} correct in {1} seconds",
-    "zhtw": "🎉 答對 {0} 題，用了 {1} 秒",
+    "zh-Hant": "🎉 答對 {0} 題，用了 {1} 秒",
     "ja": "🎉 {0} 問正解、{1} 秒",
     "ko": "🎉 {0}문제 정답, {1}초",
     "fr": "🎉 {0} bonnes en {1} s",
@@ -8832,7 +8832,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 全部拆开！用了 {0} 步": {
     "zh": "🎉 全部拆开！用了 {0} 步",
     "en": "🎉 All dismantled! Took {0} steps",
-    "zhtw": "🎉 全部拆開！用了 {0} 步",
+    "zh-Hant": "🎉 全部拆開！用了 {0} 步",
     "ja": "🎉 全部分解！{0} 歩",
     "ko": "🎉 전부 분해! {0}걸음",
     "fr": "🎉 Tout démonté ! En {0} pas",
@@ -8847,7 +8847,7 @@ const DICT: Record<string, Record<string, string>> = {
   "曹操距出口还差 {0} 格": {
     "zh": "曹操距出口还差 {0} 格",
     "en": "Cao Cao is {0} cells from the exit",
-    "zhtw": "曹操距出口還差 {0} 格",
+    "zh-Hant": "曹操距出口還差 {0} 格",
     "ja": "曹操は出口まであと {0} マス",
     "ko": "조조는 출구까지 {0}칸",
     "fr": "Cao Cao est à {0} cases de la sortie",
@@ -8862,7 +8862,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0} 已选中，点方向键移动": {
     "zh": "{0} 已选中，点方向键移动",
     "en": "{0} selected — use the arrows to move",
-    "zhtw": "{0} 已選中，點方向鍵移動",
+    "zh-Hant": "{0} 已選中，點方向鍵移動",
     "ja": "{0} を選択 — 矢印で移動",
     "ko": "{0} 선택됨 — 방향키로 이동",
     "fr": "{0} sélectionné — flèches pour bouger",
@@ -8877,7 +8877,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 第 {0} 盘清空，下一盘！": {
     "zh": "✅ 第 {0} 盘清空，下一盘！",
     "en": "✅ Board {0} cleared — next!",
-    "zhtw": "✅ 第 {0} 盤清空，下一盤！",
+    "zh-Hant": "✅ 第 {0} 盤清空，下一盤！",
     "ja": "✅ {0} 盤目クリア — 次へ！",
     "ko": "✅ {0}번째 판 클리어 — 다음!",
     "fr": "✅ Plateau {0} fini — suivant !",
@@ -8892,7 +8892,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}{1} 次": {
     "zh": "{0}{1} 次",
     "en": "{0}{1} times",
-    "zhtw": "{0}{1} 次",
+    "zh-Hant": "{0}{1} 次",
     "ja": "{0}{1} 回",
     "ko": "{0}{1}회",
     "fr": "{0}{1} fois",
@@ -8907,7 +8907,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 其实是 {0} 次": {
     "zh": "❌ 其实是 {0} 次",
     "en": "❌ It was actually {0}",
-    "zhtw": "❌ 其實是 {0} 次",
+    "zh-Hant": "❌ 其實是 {0} 次",
     "ja": "❌ 実は {0} 回",
     "ko": "❌ 사실 {0}회",
     "fr": "❌ C’était en fait {0}",
@@ -8922,7 +8922,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 排好了，用了 {0} 步": {
     "zh": "🎉 排好了，用了 {0} 步",
     "en": "🎉 Sorted! Took {0} steps",
-    "zhtw": "🎉 排好了，用了 {0} 步",
+    "zh-Hant": "🎉 排好了，用了 {0} 步",
     "ja": "🎉 並べ終えた！{0} 歩",
     "ko": "🎉 정렬 완료! {0}걸음",
     "fr": "🎉 Trié ! En {0} pas",
@@ -8937,7 +8937,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 幻方成立！进入第 {0} 关": {
     "zh": "✅ 幻方成立！进入第 {0} 关",
     "en": "✅ Magic square holds! Level {0}",
-    "zhtw": "✅ 幻方成立！進入第 {0} 關",
+    "zh-Hant": "✅ 幻方成立！進入第 {0} 關",
     "ja": "✅ 魔方陣成立！第 {0} 面へ",
     "ko": "✅ 마방진 성립! {0}단계",
     "fr": "✅ Carré magique ! Niveau {0}",
@@ -8952,7 +8952,7 @@ const DICT: Record<string, Record<string, string>> = {
   "记住亮格（{0} 个）": {
     "zh": "记住亮格（{0} 个）",
     "en": "Remember the lit cells ({0})",
-    "zhtw": "記住亮格（{0} 個）",
+    "zh-Hant": "記住亮格（{0} 個）",
     "ja": "光るマスを覚えて（{0} 個）",
     "ko": "빛난 칸을 기억 ({0}개)",
     "fr": "Retenez les cases allumées ({0})",
@@ -8967,7 +8967,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 记错了，止步第 {0} 关": {
     "zh": "❌ 记错了，止步第 {0} 关",
     "en": "❌ Missed — stopped at level {0}",
-    "zhtw": "❌ 記錯了，止步第 {0} 關",
+    "zh-Hant": "❌ 記錯了，止步第 {0} 關",
     "ja": "❌ 覚え違い — 第 {0} 面で終了",
     "ko": "❌ 잘못 기억 — {0}단계에서 종료",
     "fr": "❌ Erreur — arrêté au niveau {0}",
@@ -8982,7 +8982,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}｜共过 {1}/{2} 关": {
     "zh": "{0}｜共过 {1}/{2} 关",
     "en": "{0} | {1}/{2} levels",
-    "zhtw": "{0}｜共過 {1}/{2} 關",
+    "zh-Hant": "{0}｜共過 {1}/{2} 關",
     "ja": "{0}｜{1}/{2} 面クリア",
     "ko": "{0} | {1}/{2}단계",
     "fr": "{0} | {1}/{2} niveaux",
@@ -8997,7 +8997,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}，继续第 {1} 关": {
     "zh": "{0}，继续第 {1} 关",
     "en": "{0} — on to level {1}",
-    "zhtw": "{0}，繼續第 {1} 關",
+    "zh-Hant": "{0}，繼續第 {1} 關",
     "ja": "{0}、第 {1} 面へ",
     "ko": "{0}, {1}단계로",
     "fr": "{0} — niveau {1}",
@@ -9012,7 +9012,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮：数字混在字母里，记住它是几": {
     "zh": "第 {0} 轮：数字混在字母里，记住它是几",
     "en": "Round {0}: a digit hides among letters — remember it",
-    "zhtw": "第 {0} 輪：數字混在字母裡，記住它是幾",
+    "zh-Hant": "第 {0} 輪：數字混在字母裡，記住它是幾",
     "ja": "第 {0} 回：文字に紛れた数字を覚えて",
     "ko": "{0}번째: 글자 사이 숫자를 기억하세요",
     "fr": "Manche {0} : un chiffre se cache parmi les lettres",
@@ -9027,7 +9027,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮：记住数字，并留意它之后有没有 ✦": {
     "zh": "第 {0} 轮：记住数字，并留意它之后有没有 ✦",
     "en": "Round {0}: remember the digit, then watch for ✦",
-    "zhtw": "第 {0} 輪：記住數字，並留意它之後有沒有 ✦",
+    "zh-Hant": "第 {0} 輪：記住數字，並留意它之後有沒有 ✦",
     "ja": "第 {0} 回：数字を覚え、その後の ✦ に注意",
     "ko": "{0}번째: 숫자를 기억하고 ✦를 확인하세요",
     "fr": "Manche {0} : retenez le chiffre, guettez le ✦",
@@ -9042,7 +9042,7 @@ const DICT: Record<string, Record<string, string>> = {
   "把进制换算对，答错扣 {0} 秒": {
     "zh": "把进制换算对，答错扣 {0} 秒",
     "en": "Convert the base correctly — a miss costs {0}s",
-    "zhtw": "把進位換算對，答錯扣 {0} 秒",
+    "zh-Hant": "把進位換算對，答錯扣 {0} 秒",
     "ja": "基数変換を正しく — 誤答は {0} 秒減点",
     "ko": "진법 변환을 맞히세요 — 오답은 {0}초 차감",
     "fr": "Convertissez bien la base — erreur : −{0} s",
@@ -9057,7 +9057,7 @@ const DICT: Record<string, Record<string, string>> = {
   "💔 错满 {0} 次，答对 {1} 题": {
     "zh": "💔 错满 {0} 次，答对 {1} 题",
     "en": "💔 {0} mistakes — {1} correct",
-    "zhtw": "💔 錯滿 {0} 次，答對 {1} 題",
+    "zh-Hant": "💔 錯滿 {0} 次，答對 {1} 題",
     "ja": "💔 {0} 回ミス、{1} 問正解",
     "ko": "💔 실수 {0}회, {1}문제 정답",
     "fr": "💔 {0} erreurs — {1} bonnes réponses",
@@ -9072,7 +9072,7 @@ const DICT: Record<string, Record<string, string>> = {
   "消除 +{0} 分": {
     "zh": "消除 +{0} 分",
     "en": "Cleared +{0}",
-    "zhtw": "消除 +{0} 分",
+    "zh-Hant": "消除 +{0} 分",
     "ja": "消去 +{0} 点",
     "ko": "제거 +{0}점",
     "fr": "Éliminé +{0}",
@@ -9087,7 +9087,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 行 ← 第 {1} 行 ⊕ 第 {2} 行（秩不变）": {
     "zh": "第 {0} 行 ← 第 {1} 行 ⊕ 第 {2} 行（秩不变）",
     "en": "Row {0} ← row {1} ⊕ row {2} (rank unchanged)",
-    "zhtw": "第 {0} 行 ← 第 {1} 行 ⊕ 第 {2} 行（秩不變）",
+    "zh-Hant": "第 {0} 行 ← 第 {1} 行 ⊕ 第 {2} 行（秩不變）",
     "ja": "第 {0} 行 ← 第 {1} 行 ⊕ 第 {2} 行（階数不変）",
     "ko": "{0}행 ← {1}행 ⊕ {2}행 (계수 불변)",
     "fr": "Ligne {0} ← ligne {1} ⊕ ligne {2} (rang inchangé)",
@@ -9102,7 +9102,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 开出去了！用了 {0} 步": {
     "zh": "🎉 开出去了！用了 {0} 步",
     "en": "🎉 Out! Took {0} steps",
-    "zhtw": "🎉 開出去了！用了 {0} 步",
+    "zh-Hant": "🎉 開出去了！用了 {0} 步",
     "ja": "🎉 脱出！{0} 歩",
     "ko": "🎉 탈출! {0}걸음",
     "fr": "🎉 Sorti ! En {0} pas",
@@ -9117,7 +9117,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已走 {0} 步": {
     "zh": "已走 {0} 步",
     "en": "{0} steps taken",
-    "zhtw": "已走 {0} 步",
+    "zh-Hant": "已走 {0} 步",
     "ja": "{0} 歩進んだ",
     "ko": "{0}걸음 이동",
     "fr": "{0} pas faits",
@@ -9132,7 +9132,7 @@ const DICT: Record<string, Record<string, string>> = {
   "炸掉 {0} 颗，+{1} 分": {
     "zh": "炸掉 {0} 颗，+{1} 分",
     "en": "Blasted {0}, +{1}",
-    "zhtw": "炸掉 {0} 顆，+{1} 分",
+    "zh-Hant": "炸掉 {0} 顆，+{1} 分",
     "ja": "{0} 個破壊、+{1} 点",
     "ko": "{0}개 폭파, +{1}점",
     "fr": "{0} détruits, +{1}",
@@ -9147,7 +9147,7 @@ const DICT: Record<string, Record<string, string>> = {
   "算得越快，连击越高；答错扣 {0} 秒": {
     "zh": "算得越快，连击越高；答错扣 {0} 秒",
     "en": "The faster you solve, the higher the combo — a miss costs {0}s",
-    "zhtw": "算得越快，連擊越高；答錯扣 {0} 秒",
+    "zh-Hant": "算得越快，連擊越高；答錯扣 {0} 秒",
     "ja": "速いほどコンボ増 — 誤答は {0} 秒減点",
     "ko": "빠를수록 콤보 상승 — 오답은 {0}초 차감",
     "fr": "Plus vite, plus de combo — erreur : −{0} s",
@@ -9162,7 +9162,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮：盯住闪过的牌，有一张会出现两次": {
     "zh": "第 {0} 轮：盯住闪过的牌，有一张会出现两次",
     "en": "Round {0}: watch the flashing cards — one appears twice",
-    "zhtw": "第 {0} 輪：盯住閃過的牌，有一張會出現兩次",
+    "zh-Hant": "第 {0} 輪：盯住閃過的牌，有一張會出現兩次",
     "ja": "第 {0} 回：光る札を見て、2 回出る札が 1 枚",
     "ko": "{0}번째: 번쩍이는 카드를 보세요 — 하나가 두 번 나와요",
     "fr": "Manche {0} : une carte apparaît deux fois",
@@ -9177,7 +9177,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ {0} —— 本类已列 {1} 个": {
     "zh": "✅ {0} —— 本类已列 {1} 个",
     "en": "✅ {0} — {1} in this group",
-    "zhtw": "✅ {0} —— 本類已列 {1} 個",
+    "zh-Hant": "✅ {0} —— 本類已列 {1} 個",
     "ja": "✅ {0} —— この分類は {1} 個",
     "ko": "✅ {0} — 이 분류 {1}개",
     "fr": "✅ {0} — {1} dans cette catégorie",
@@ -9192,7 +9192,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 轮：记住这 9 个符号": {
     "zh": "第 {0} 轮：记住这 9 个符号",
     "en": "Round {0}: remember these 9 symbols",
-    "zhtw": "第 {0} 輪：記住這 9 個符號",
+    "zh-Hant": "第 {0} 輪：記住這 9 個符號",
     "ja": "第 {0} 回：この 9 記号を覚えて",
     "ko": "{0}번째: 이 9개 기호를 기억하세요",
     "fr": "Manche {0} : retenez ces 9 symboles",
@@ -9207,7 +9207,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 找到了！就是第 {0} 格": {
     "zh": "✅ 找到了！就是第 {0} 格",
     "en": "✅ Found it! It's cell {0}",
-    "zhtw": "✅ 找到了！就是第 {0} 格",
+    "zh-Hant": "✅ 找到了！就是第 {0} 格",
     "ja": "✅ 見つけた！{0} マス目",
     "ko": "✅ 찾았어요! {0}칸",
     "fr": "✅ Trouvé ! Case {0}",
@@ -9222,7 +9222,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 变的是第 {0} 格": {
     "zh": "❌ 变的是第 {0} 格",
     "en": "❌ Cell {0} changed",
-    "zhtw": "❌ 變的是第 {0} 格",
+    "zh-Hant": "❌ 變的是第 {0} 格",
     "ja": "❌ 変わったのは {0} マス目",
     "ko": "❌ 바뀐 건 {0}칸",
     "fr": "❌ C'est la case {0}",
@@ -9237,7 +9237,7 @@ const DICT: Record<string, Record<string, string>> = {
   "可走 {0} 步": {
     "zh": "可走 {0} 步",
     "en": "{0} moves available",
-    "zhtw": "可走 {0} 步",
+    "zh-Hant": "可走 {0} 步",
     "ja": "あと {0} 手",
     "ko": "{0}수 이동 가능",
     "fr": "{0} coups possibles",
@@ -9252,7 +9252,7 @@ const DICT: Record<string, Record<string, string>> = {
   "记住这 {0} 个数字的位置": {
     "zh": "记住这 {0} 个数字的位置",
     "en": "Remember where these {0} digits are",
-    "zhtw": "記住這 {0} 個數字的位置",
+    "zh-Hant": "記住這 {0} 個數字的位置",
     "ja": "この {0} 個の数字の位置を覚えて",
     "ko": "이 {0}개 숫자의 위치를 기억하세요",
     "fr": "Retenez ces {0} chiffres",
@@ -9267,7 +9267,7 @@ const DICT: Record<string, Record<string, string>> = {
   "消了 {0} 格，+{1} 分": {
     "zh": "消了 {0} 格，+{1} 分",
     "en": "Cleared {0} cells, +{1}",
-    "zhtw": "消了 {0} 格，+{1} 分",
+    "zh-Hant": "消了 {0} 格，+{1} 分",
     "ja": "{0} マス消去、+{1} 点",
     "ko": "{0}칸 제거, +{1}점",
     "fr": "{0} cases effacées, +{1}",
@@ -9282,7 +9282,7 @@ const DICT: Record<string, Record<string, string>> = {
   "和 {0} · 已走 {1} 格": {
     "zh": "和 {0} · 已走 {1} 格",
     "en": "Sum {0} · {1} cells",
-    "zhtw": "和 {0} · 已走 {1} 格",
+    "zh-Hant": "和 {0} · 已走 {1} 格",
     "ja": "合計 {0} · {1} マス",
     "ko": "합 {0} · {1}칸",
     "fr": "Somme {0} · {1} cases",
@@ -9297,7 +9297,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 找到！进入第 {0} / {1} 关": {
     "zh": "✅ 找到！进入第 {0} / {1} 关",
     "en": "✅ Found! Level {0} / {1}",
-    "zhtw": "✅ 找到！進入第 {0} / {1} 關",
+    "zh-Hant": "✅ 找到！進入第 {0} / {1} 關",
     "ja": "✅ 発見！第 {0} / {1} 面",
     "ko": "✅ 찾음! {0} / {1}단계",
     "fr": "✅ Trouvé ! Niveau {0} / {1}",
@@ -9312,7 +9312,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 「{0}」不对，还剩 {1} 条命": {
     "zh": "❌ 「{0}」不对，还剩 {1} 条命",
     "en": "❌ “{0}” is wrong — {1} lives left",
-    "zhtw": "❌ 「{0}」不對，還剩 {1} 條命",
+    "zh-Hant": "❌ 「{0}」不對，還剩 {1} 條命",
     "ja": "❌ 「{0}」は違います — 残りライフ {1}",
     "ko": "❌ “{0}” 틀렸어요 — 목숨 {1}개",
     "fr": "❌ « {0} » est faux — {1} vies",
@@ -9327,7 +9327,7 @@ const DICT: Record<string, Record<string, string>> = {
   "{0}　｜　下一词：{1} 个字母": {
     "zh": "{0}　｜　下一词：{1} 个字母",
     "en": "{0} | next word: {1} letters",
-    "zhtw": "{0}　｜　下一詞：{1} 個字母",
+    "zh-Hant": "{0}　｜　下一詞：{1} 個字母",
     "ja": "{0}｜次の語：{1} 文字",
     "ko": "{0} | 다음 단어: {1}글자",
     "fr": "{0} | mot suivant : {1} lettres",
@@ -9342,7 +9342,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 不对，正解是「{0}」，还剩 {1} 条命": {
     "zh": "❌ 不对，正解是「{0}」，还剩 {1} 条命",
     "en": "❌ Wrong — the answer is “{0}”, {1} lives left",
-    "zhtw": "❌ 不對，正解是「{0}」，還剩 {1} 條命",
+    "zh-Hant": "❌ 不對，正解是「{0}」，還剩 {1} 條命",
     "ja": "❌ 不正解、正解は「{0}」— 残りライフ {1}",
     "ko": "❌ 틀렸어요, 정답은 “{0}” — 목숨 {1}개",
     "fr": "❌ Faux — la réponse est « {0} », {1} vies",
@@ -9357,7 +9357,7 @@ const DICT: Record<string, Record<string, string>> = {
   "看顺序，共 {0} 个": {
     "zh": "看顺序，共 {0} 个",
     "en": "Watch the order — {0} in all",
-    "zhtw": "看順序，共 {0} 個",
+    "zh-Hant": "看順序，共 {0} 個",
     "ja": "順番を見て、全部で {0} 個",
     "ko": "순서를 보세요 — 총 {0}개",
     "fr": "Regardez l’ordre — {0} au total",
@@ -9372,7 +9372,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 第 {0} / {1} 张有几个黄点？": {
     "zh": "✅ 第 {0} / {1} 张有几个黄点？",
     "en": "✅ Card {0} / {1}: how many yellow dots?",
-    "zhtw": "✅ 第 {0} / {1} 張有幾個黃點？",
+    "zh-Hant": "✅ 第 {0} / {1} 張有幾個黃點？",
     "ja": "✅ {0} / {1} 枚目：黄点はいくつ？",
     "ko": "✅ {0} / {1}번째: 노란 점 몇 개?",
     "fr": "✅ Carte {0} / {1} : combien de points jaunes ?",
@@ -9387,7 +9387,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 那一张是 {0} 个，还剩 {1} 条命": {
     "zh": "❌ 那一张是 {0} 个，还剩 {1} 条命",
     "en": "❌ That one had {0} — {1} lives left",
-    "zhtw": "❌ 那一張是 {0} 個，還剩 {1} 條命",
+    "zh-Hant": "❌ 那一張是 {0} 個，還剩 {1} 條命",
     "ja": "❌ それは {0} 個 — 残りライフ {1}",
     "ko": "❌ 그건 {0}개였어요 — 목숨 {1}개",
     "fr": "❌ C’était {0} — {1} vies",
@@ -9402,7 +9402,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 第 {0} 行填好了，接着下一行": {
     "zh": "✅ 第 {0} 行填好了，接着下一行",
     "en": "✅ Row {0} done — next row",
-    "zhtw": "✅ 第 {0} 行填好了，接著下一行",
+    "zh-Hant": "✅ 第 {0} 行填好了，接著下一行",
     "ja": "✅ {0} 行目完了 — 次の行へ",
     "ko": "✅ {0}행 완료 — 다음 행",
     "fr": "✅ Ligne {0} remplie — suivante",
@@ -9417,7 +9417,7 @@ const DICT: Record<string, Record<string, string>> = {
   "共解出 {0}/{1} 题": {
     "zh": "共解出 {0}/{1} 题",
     "en": "{0}/{1} solved",
-    "zhtw": "共解出 {0}/{1} 題",
+    "zh-Hant": "共解出 {0}/{1} 題",
     "ja": "合計 {0}/{1} 問解いた",
     "ko": "총 {0}/{1}문제 해결",
     "fr": "{0}/{1} résolus",
@@ -9432,7 +9432,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 「{0}」不是明文，还剩 {1} 条命": {
     "zh": "❌ 「{0}」不是明文，还剩 {1} 条命",
     "en": "❌ “{0}” isn’t the plaintext — {1} lives left",
-    "zhtw": "❌ 「{0}」不是明文，還剩 {1} 條命",
+    "zh-Hant": "❌ 「{0}」不是明文，還剩 {1} 條命",
     "ja": "❌ 「{0}」は平文ではありません — 残り {1}",
     "ko": "❌ “{0}”는 평문이 아니에요 — 목숨 {1}개",
     "fr": "❌ « {0} » n’est pas le clair — {1} vies",
@@ -9447,7 +9447,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 应该是 {0}": {
     "zh": "❌ 应该是 {0}",
     "en": "❌ Should be {0}",
-    "zhtw": "❌ 應該是 {0}",
+    "zh-Hant": "❌ 應該是 {0}",
     "ja": "❌ {0} のはず",
     "ko": "❌ {0}이어야 해요",
     "fr": "❌ Devrait être {0}",
@@ -9462,7 +9462,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 错了，扣 {0} 秒（正确答案已标绿）": {
     "zh": "❌ 错了，扣 {0} 秒（正确答案已标绿）",
     "en": "❌ Wrong, −{0}s (the answer is marked green)",
-    "zhtw": "❌ 錯了，扣 {0} 秒（正確答案已標綠）",
+    "zh-Hant": "❌ 錯了，扣 {0} 秒（正確答案已標綠）",
     "ja": "❌ 不正解、{0} 秒減点（正解は緑）",
     "ko": "❌ 틀렸어요, {0}초 차감 (정답은 초록색)",
     "fr": "❌ Faux, −{0} s (la bonne réponse est en vert)",
@@ -9477,7 +9477,7 @@ const DICT: Record<string, Record<string, string>> = {
   "✅ 答对 {0} 题": {
     "zh": "✅ 答对 {0} 题",
     "en": "✅ {0} correct",
-    "zhtw": "✅ 答對 {0} 題",
+    "zh-Hant": "✅ 答對 {0} 題",
     "ja": "✅ {0} 問正解",
     "ko": "✅ {0}문제 정답",
     "fr": "✅ {0} bonnes réponses",
@@ -9492,7 +9492,7 @@ const DICT: Record<string, Record<string, string>> = {
   "答对 {0}/{1} 题": {
     "zh": "答对 {0}/{1} 题",
     "en": "{0}/{1} correct",
-    "zhtw": "答對 {0}/{1} 題",
+    "zh-Hant": "答對 {0}/{1} 題",
     "ja": "{0}/{1} 問正解",
     "ko": "{0}/{1}문제 정답",
     "fr": "{0}/{1} bonnes réponses",
@@ -9507,7 +9507,7 @@ const DICT: Record<string, Record<string, string>> = {
   "违规满 {0} 次，这一局没通关": {
     "zh": "违规满 {0} 次，这一局没通关",
     "en": "{0} violations — this round is over",
-    "zhtw": "違規滿 {0} 次，這一局沒通關",
+    "zh-Hant": "違規滿 {0} 次，這一局沒通關",
     "ja": "違反 {0} 回で今回はクリアならず",
     "ko": "위반 {0}회 — 이번 판 실패",
     "fr": "{0} infractions — manche perdue",
@@ -9522,7 +9522,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 答对 {0} 题，通关！剩 {1} 秒": {
     "zh": "🎉 答对 {0} 题，通关！剩 {1} 秒",
     "en": "🎉 {0} correct — cleared! {1}s left",
-    "zhtw": "🎉 答對 {0} 題，通關！剩 {1} 秒",
+    "zh-Hant": "🎉 答對 {0} 題，通關！剩 {1} 秒",
     "ja": "🎉 {0} 問正解でクリア！残り {1} 秒",
     "ko": "🎉 {0}문제 정답, 클리어! {1}초 남음",
     "fr": "🎉 {0} bonnes réponses — réussi ! {1} s restantes",
@@ -9537,7 +9537,7 @@ const DICT: Record<string, Record<string, string>> = {
   "共答对 {0}/{1} 题": {
     "zh": "共答对 {0}/{1} 题",
     "en": "{0}/{1} correct in total",
-    "zhtw": "共答對 {0}/{1} 題",
+    "zh-Hant": "共答對 {0}/{1} 題",
     "ja": "合計 {0}/{1} 問正解",
     "ko": "총 {0}/{1}문제 정답",
     "fr": "{0}/{1} bonnes réponses au total",
@@ -9552,7 +9552,7 @@ const DICT: Record<string, Record<string, string>> = {
   "失误满 {0} 次，这一局没通关": {
     "zh": "失误满 {0} 次，这一局没通关",
     "en": "{0} mistakes — this round is over",
-    "zhtw": "失誤滿 {0} 次，這一局沒通關",
+    "zh-Hant": "失誤滿 {0} 次，這一局沒通關",
     "ja": "ミス {0} 回で今回はクリアならず",
     "ko": "실수 {0}회 — 이번 판 실패",
     "fr": "{0} erreurs — manche perdue",
@@ -9567,7 +9567,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0}{1}": {
     "zh": "第 {0}{1}",
     "en": "Round {0}{1}",
-    "zhtw": "第 {0}{1}",
+    "zh-Hant": "第 {0}{1}",
     "ja": "{0} 回目{1}",
     "ko": "{0}번째{1}",
     "fr": "N° {0}{1}",
@@ -9582,7 +9582,7 @@ const DICT: Record<string, Record<string, string>> = {
   "已走 {0} 步，还剩 {1} 步": {
     "zh": "已走 {0} 步，还剩 {1} 步",
     "en": "{0} steps taken, {1} left",
-    "zhtw": "已走 {0} 步，還剩 {1} 步",
+    "zh-Hant": "已走 {0} 步，還剩 {1} 步",
     "ja": "{0} 歩進み、残り {1} 歩",
     "ko": "{0}걸음 이동, {1}걸음 남음",
     "fr": "{0} pas faits, {1} restants",
@@ -9597,7 +9597,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 顺序错了，还剩 {0} 条命": {
     "zh": "❌ 顺序错了，还剩 {0} 条命",
     "en": "❌ Wrong order — {0} lives left",
-    "zhtw": "❌ 順序錯了，還剩 {0} 條命",
+    "zh-Hant": "❌ 順序錯了，還剩 {0} 條命",
     "ja": "❌ 順番が違います — 残りライフ {0}",
     "ko": "❌ 순서가 틀렸어요 — 목숨 {0}개",
     "fr": "❌ Mauvais ordre — {0} vies",
@@ -9612,7 +9612,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 全部点亮！用了 {0}{1}": {
     "zh": "🎉 全部点亮！用了 {0}{1}",
     "en": "🎉 All lit! Took {0}{1}",
-    "zhtw": "🎉 全部點亮！用了 {0}{1}",
+    "zh-Hant": "🎉 全部點亮！用了 {0}{1}",
     "ja": "🎉 全部点灯！{0}{1} かかった",
     "ko": "🎉 모두 점등! {0}{1} 걸렸어요",
     "fr": "🎉 Tout allumé ! En {0}{1}",
@@ -9627,7 +9627,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还差 {0} 格": {
     "zh": "还差 {0} 格",
     "en": "{0} squares to go",
-    "zhtw": "還差 {0} 格",
+    "zh-Hant": "還差 {0} 格",
     "ja": "あと {0} マス",
     "ko": "{0}칸 남음",
     "fr": "Encore {0} cases",
@@ -9642,7 +9642,7 @@ const DICT: Record<string, Record<string, string>> = {
   "🎉 通关！{0} 关全过": {
     "zh": "🎉 通关！{0} 关全过",
     "en": "🎉 Cleared! All {0} levels done",
-    "zhtw": "🎉 通關！{0} 關全過",
+    "zh-Hant": "🎉 通關！{0} 關全過",
     "ja": "🎉 クリア！{0} 面すべて制覇",
     "ko": "🎉 클리어! {0}단계 전부 완료",
     "fr": "🎉 Réussi ! Les {0} niveaux terminés",
@@ -9657,7 +9657,7 @@ const DICT: Record<string, Record<string, string>> = {
   "继续：第 {0} 题": {
     "zh": "继续：第 {0} 题",
     "en": "Next: question {0}",
-    "zhtw": "繼續：第 {0} 題",
+    "zh-Hant": "繼續：第 {0} 題",
     "ja": "続けて：第 {0} 問",
     "ko": "계속: {0}번 문제",
     "fr": "Suite : question {0}",
@@ -9672,7 +9672,7 @@ const DICT: Record<string, Record<string, string>> = {
   "第 {0} 层 · 长度 {1}/{2}": {
     "zh": "第 {0} 层 · 长度 {1}/{2}",
     "en": "Layer {0} · length {1}/{2}",
-    "zhtw": "第 {0} 層 · 長度 {1}/{2}",
+    "zh-Hant": "第 {0} 層 · 長度 {1}/{2}",
     "ja": "第 {0} 層 · 長さ {1}/{2}",
     "ko": "{0}층 · 길이 {1}/{2}",
     "fr": "Couche {0} · longueur {1}/{2}",
@@ -9687,7 +9687,7 @@ const DICT: Record<string, Record<string, string>> = {
   "选中 {0}（{1} 张），点目标列或基础堆": {
     "zh": "选中 {0}（{1} 张），点目标列或基础堆",
     "en": "Selected {0} ({1} cards) — tap a column or the base pile",
-    "zhtw": "選中 {0}（{1} 張），點目標欄或基礎堆",
+    "zh-Hant": "選中 {0}（{1} 張），點目標欄或基礎堆",
     "ja": "{0}（{1} 枚）を選択 — 列か基礎山をタップ",
     "ko": "{0}({1}장) 선택 — 열이나 기본 더미를 탭",
     "fr": "{0} sélectionné ({1} cartes) — touchez une colonne",
@@ -9702,7 +9702,7 @@ const DICT: Record<string, Record<string, string>> = {
   "搬到第 {0} 列": {
     "zh": "搬到第 {0} 列",
     "en": "Move to column {0}",
-    "zhtw": "搬到第 {0} 欄",
+    "zh-Hant": "搬到第 {0} 欄",
     "ja": "第 {0} 列へ移動",
     "ko": "{0}번 열로 이동",
     "fr": "Vers la colonne {0}",
@@ -9717,7 +9717,7 @@ const DICT: Record<string, Record<string, string>> = {
   "选中 {0} 起 {1} 张": {
     "zh": "选中 {0} 起 {1} 张",
     "en": "Selected {1} cards from {0}",
-    "zhtw": "選中 {0} 起 {1} 張",
+    "zh-Hant": "選中 {0} 起 {1} 張",
     "ja": "{0} から {1} 枚選択",
     "ko": "{0}부터 {1}장 선택",
     "fr": "{1} cartes depuis {0}",
@@ -9732,7 +9732,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 应该是 {0}，还剩 {1} 条命": {
     "zh": "❌ 应该是 {0}，还剩 {1} 条命",
     "en": "❌ Should be {0} — {1} lives left",
-    "zhtw": "❌ 應該是 {0}，還剩 {1} 條命",
+    "zh-Hant": "❌ 應該是 {0}，還剩 {1} 條命",
     "ja": "❌ {0} のはず — 残りライフ {1}",
     "ko": "❌ {0}이어야 해요 — 목숨 {1}개",
     "fr": "❌ Devrait être {0} — {1} vies",
@@ -9747,7 +9747,7 @@ const DICT: Record<string, Record<string, string>> = {
   "还差 {0} 个字母": {
     "zh": "还差 {0} 个字母",
     "en": "{0} letters to go",
-    "zhtw": "還差 {0} 個字母",
+    "zh-Hant": "還差 {0} 個字母",
     "ja": "あと {0} 文字",
     "ko": "{0}글자 남음",
     "fr": "Encore {0} lettres",
@@ -9762,7 +9762,7 @@ const DICT: Record<string, Record<string, string>> = {
   "❌ 第 {0} 步错了 —— 只剩 {1} 条命，重放一次": {
     "zh": "❌ 第 {0} 步错了 —— 只剩 {1} 条命，重放一次",
     "en": "❌ Step {0} was wrong — only {1} lives left, replaying",
-    "zhtw": "❌ 第 {0} 步錯了 —— 只剩 {1} 條命，重放一次",
+    "zh-Hant": "❌ 第 {0} 步錯了 —— 只剩 {1} 條命，重放一次",
     "ja": "❌ {0} 歩目が違います —— 残りライフ {1}、もう一度",
     "ko": "❌ {0}번째 단계가 틀렸어요 —— 목숨 {1}개 남음, 다시",
     "fr": "❌ Erreur à l’étape {0} — {1} vies restantes, on rejoue",

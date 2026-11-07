@@ -584,7 +584,7 @@ export struct G2048 {
     this.demoRound = this.demoRound + 1;
     this.demoMsg = this.demoRound >= 3
       ? TG('就是这样合。碰一下屏幕，换你来')
-      : TG2('滑过去了，这一下能拿 +{0} 分（演示不计分）',
+      : TG2('滑过去了，这一下能拿 +{0} 分',
           String(this.score - this.demoSnapScore));
     this.hintText = this.demoMsg;
     this.demoPhase = 0;
