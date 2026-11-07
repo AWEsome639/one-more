@@ -606,6 +606,15 @@ def canonical_name(name):
     return name, gid_for(name)
 
 
+def _restart_app():
+    """★ 判据 1770（2026-11-07）：**跑验证前重启 app，清掉上一轮留下的浮层**。
+    \n    血教训：对话面板 `chatOpen=true` 留着，`.zIndex(10)` 盖住所有点击
+    \n    ⇒ 17 个 FAIL 全是「回不到列表」（假警报，不是功能坏了）。
+    """
+    sh("aa force-stop com.andrewoscar.onemore; sleep 1; aa start -a EntryAbility -b com.andrewoscar.onemore")
+    time.sleep(8)
+
+
 def _ensure_home():
     """★ 判据 1763（2026-11-07）：进游戏前**先确保在首页**。
     \n    原来 `open_game` 假设"每次都在首页"，可上一款可能停在结算页/隐私页/设置页
@@ -642,6 +651,7 @@ def open_game(name):
       实测「进不去游戏」多数是搜索词没吃进去 / 卡片匹配过严，不是游戏打不开。
     ★ 判据 1763：**先回首页**（否则在隐私页/结算页上点什么都没用）。
     """
+    _restart_app()          # ★ 判据 1770：每次进游戏前重启，清掉浮层状态
     _ensure_home()
     name, gid = canonical_name(name)
     for attempt in (1, 2):
