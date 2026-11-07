@@ -860,7 +860,14 @@ build() {
     Stack({ alignContent: Alignment.Top }) {
     // ★ 判据 1766：`chatPanel()` 从嵌套 else 分支**提到 Stack 直接子级**（试修）
     if (this.chatOpen) {
-      this.chatPanel()
+      // ★ 判据 1768 的第二层根因：面板渲染了，但 **`Column` 在 Stack 里后渲染、盖住了它**
+      //   ⇒ 点击全被 Column 吃掉（`Button` 和 `Text` 的 onClick 都不触发、连日志都没有）。
+      //   修法：`.zIndex(10)` 把它提到最上层。
+      Column() {
+        this.chatPanel()
+      }
+      .width('100%')
+      .zIndex(10)
     }
     Column() {
       // ★★★ 2026-10-14 奥森：「我看到了你的自动收起，图标还是会闪现，并且收起动画有点不太好」
@@ -2269,12 +2276,17 @@ build() {
           .borderRadius(Radius.md)
           .onChange((v: string) => { this.chatText = v; })
           .onSubmit(() => { this.askChat(); })
-        Text(this.t('找', 'Go'))
-          .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
-          .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
+        // ★ 判据 1768 实锤：`Text('找')` 的 onClick **完全没触发**（连日志都没有）
+        //   ⇒ 改用 `Button`（点击区域/命中测试更可靠），文字用 label
+        Button(this.t('找', 'Go'))
+          .fontSize(FontSize.sm)
+          .fontColor('#FFFFFF')
           .backgroundColor(this.accentColor())
           .borderRadius(Radius.md)
-          .onClick(() => { this.askChat(); })
+          .height(Cell.of(40))
+          .onClick(() => {
+            this.askChat();
+          })
       }
       .width('100%')
 
