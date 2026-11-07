@@ -21,7 +21,7 @@ import { router } from '@kit.ArkUI';
 import { window } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Layout, Accent, Cell } from '../core/Design';
 import { IconPress, RollingNumber } from '../core/MotionKit';
-import { findGame, GameMeta, GameResult, difficultyFactor, displayTagline, displayName } from '../core/GameRegistry';
+import { GAMES, findGame, GameMeta, GameResult, difficultyFactor, displayTagline, displayName } from '../core/GameRegistry';
 import { ProgressStore } from '../core/ProgressStore';
 // ★★★ 2026-10-23 路线 E：每局结束记一条游玩记录
 import { GameLog } from '../core/GameLog';
@@ -32,6 +32,7 @@ import { SparkBurst } from '../components/SparkBurst';
 import { GameDiff } from '../core/GameDiff';
 import { AppClock } from '../core/AppClock';
 import { I18n, L, Digits } from '../core/I18n';
+import { WatchGames } from '../core/WatchGames';
 // ── 游戏实现（自动生成，勿手改）──
 import { G2048 } from '../games/G2048';
 import { GAbReversalOddball } from '../games/GAbReversalOddball';
@@ -741,6 +742,113 @@ struct GameHost {
     setTimeout(() => {
       this.pop = true;
     }, Motion.base + 40);   // 260 + 40 = 300ms
+  }
+
+  /**
+   * ★★★ 2026-11-07（体验升级点 Top 2）：结算「下一款」该挑哪一款
+   *
+   * 为什么需要：355 款的合集，玩完一局最常见的下一步是"接着玩"；
+   *   原来只有「再来一局」和「返回列表 → 重新搜索 → 再点开」⇒ **每局都多一次流失点**。
+   *
+   * 挑选规则（成本从低到高的三级兜底，**永远返回一款**，除非全库只有当前这一款）：
+   *   ① 同分类 且 没通关      —— 最贴"刚才玩这一类玩上瘾"的心理
+   *   ② 任意 没通关            —— 还没有"进度包袱"，先扩大覆盖面
+   *   ③ 任意一款（全通关时）   —— 合集类 App 的默认行为就是"再来一局别的"
+   * 另外两条硬约束：
+   *   · **排除当前这款**（否则「下一款」= 同一款，白按）
+   *   · 手表/极小屏只从精选 24 款里挑（与 `GamesTab.watchFilter` 同一口径）——
+   *     否则会把玩家送到 `placeholder()`「这一款还在路上」，等于送进死胡同
+   */
+  private nextGameId(): string {
+    const restrict: boolean = Bp.isWatch() || Bp.tinyScreen();
+    const pool: GameMeta[] = [];
+    for (let i = 0; i < GAMES.length; i++) {
+      const g: GameMeta = GAMES[i];
+      if (g.id === this.gameId) {
+        continue;
+      }
+      if (restrict && !WatchGames.has(g.id)) {
+        continue;
+      }
+      pool.push(g);
+    }
+    if (pool.length === 0) {
+      return '';
+    }
+    // ① 同分类 + 没通关
+    const cur: GameMeta | undefined = this.meta;
+    if (cur !== undefined) {
+      const same: GameMeta[] = [];
+      for (let i = 0; i < pool.length; i++) {
+        if (pool[i].category === cur.category && !ProgressStore.hasCleared(pool[i].id)) {
+          same.push(pool[i]);
+        }
+      }
+      if (same.length > 0) {
+        return same[Math.floor(Math.random() * same.length)].id;
+      }
+    }
+    // ② 任意没通关
+    const fresh: GameMeta[] = [];
+    for (let i = 0; i < pool.length; i++) {
+      if (!ProgressStore.hasCleared(pool[i].id)) {
+        fresh.push(pool[i]);
+      }
+    }
+    if (fresh.length > 0) {
+      return fresh[Math.floor(Math.random() * fresh.length)].id;
+    }
+    // ③ 全通关了：随便来一款 —— 永远有下一款
+    return pool[Math.floor(Math.random() * pool.length)].id;
+  }
+
+  /**
+   * ★★★ 2026-11-07：结算 → 原地换到下一款
+   *
+   * **不用 `router.pushUrl`**：本页已是路由栈顶，再 push 一层会越玩越深，返回键要按 N 次；
+   *   而分发链是 `if (this.gameId === 'xxx')` 的一串分支（`@State gameId`）⇒
+   *   **改 gameId 就等于换游戏**，页面/路由/返回栈一动不动。
+   *
+   * 重置三件事（缺一个都会留残留）：
+   *   ① 结算状态（否则新游戏一进来就顶着上一局的「这一局拿下！」—— 判据 1762 同一个坑）
+   *   ② 代打/演示（它们都是全局 setInterval，不随组件重建而停 —— 判据 54）
+   *   ③ `nonce + 1` + `diffTick + 1` 奇偶翻转 ⇒ 子组件**销毁重建**、`autoId` 归零
+   *      （与「再来一局」完全同一套，见那边 onClick 的注释）
+   */
+  private gotoNext(): void {
+    const next: string = this.nextGameId();
+    if (next.length === 0) {
+      return;                       // 理论到不了（355 款里总有别的）；真到了就当没这个按钮
+    }
+    Hint.stopAllAuto();
+    Demo.stopAll();
+    this.roll.stop();               // 上一局的得分/经验滚动动画：别让它继续往 @State 里写
+    // ★ 顺序要紧：子组件的 `@State diffTotal = GameDiff.sizeNow(...)` 是**字段初始化时**读的，
+    //   所以难度必须在下一次 build（子组件构造）之前登记好。
+    GameDiff.enter(next);
+    this.meta = findGame(next);
+    this.fav = ProgressStore.isFavorite(next);
+    animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
+      this.showResult = false;
+      this.lastSolved = false;
+      this.lastScore = 0;
+      this.lastMs = 0;
+      this.lastGain = 0;
+      this.lastHintsUsed = 0;
+      this.levelUpTo = 0;
+      this.newAch = [];
+      this.scoreShown = 0;
+      this.gainShown = 0;
+      this.finished = false;        // 新的一局：中途退出该补记就补记
+      this.startedAt = Date.now();  // 时长/放弃记录从这一刻重新算
+      this.pop = false;             // 进场动画重播
+      this.gameId = next;
+      this.nonce = this.nonce + 1;
+      this.diffTick = this.diffTick + 1;
+    });
+    setTimeout(() => {
+      this.pop = true;
+    }, Motion.base + 40);
   }
 
 /** 未实现的游戏：给个友好的占位，而不是白屏 */
@@ -3293,6 +3401,10 @@ struct GameHost {
         //        ① `space` 16 → **4**（省 36vp；卡片本来就是圆角块，4vp 也够分开）
         //        ② 两个按钮 46 → **40**（省 12vp；40 仍是可用触控高度）
         //        ── 276 − 48 = **228 < 233** ✅
+        // ★ 2026-11-07：加了第三个按钮「下一款」之后这笔账**没变** ——
+        //   新布局是「主按钮（全宽）＋ 次级两个（并排一行）」= 仍然是**两行**
+        //   （普通 46+46、极小屏 40+40），所以 228/233 继续成立；
+        //   ⛔ 不要改成三个全宽竖着叠：那会 +40vp ⇒ 272 > 233，按钮又被切回屏幕外。
         // ★★★ 2026-11-07 奥森截图：结算框**明显偏上**。
         //   根因：根容器是 `Stack({ alignContent: Alignment.Top })`（为了让内容溢出时不被裁顶），
         //   结算弹窗也在里面 ⇒ **被 Top 对齐** ⇒ 卡在垂直 1/3。
@@ -3461,44 +3573,70 @@ struct GameHost {
             .translate({ y: this.pop ? 0 : 8 })
             .animation({ duration: Motion.base, curve: Motion.spring(), delay: 200 })
           }
-          Button(this.t('再来一局', 'Play again'))
-            .fontSize(FontSize.md)
+          // ★★★ 2026-11-07（体验升级点 Top 2）：**结算的第三个出口「下一款」**
+          //   355 款合集里，玩完一局最常见的下一步是"接着玩"；原来只有「再来一局」
+          //   和「返回列表 → 重新搜索 → 再点开」⇒ 每局结束都多一次流失点。
+          //   ★ 布局为什么这样排（不是三个全宽竖着叠）：
+          //     上面那段 233×233 的账已经算到 228/233（见本块开头的注释），
+          //     再叠一行 40vp 就会**重新溢出**（272 > 233）⇒ 上一轮修好的「按钮被切」会复发。
+          //     ⇒ 主按钮位给「下一款」（全宽），原来两个降级成**并排一行**的次级按钮
+          //     ⇒ 竖向总高**不变**（普通 46+46，极小屏 40+40），那笔账继续成立。
+          Button(this.t(TG('下一款'), 'Next game'))
+            .fontSize(this.tinyScreen() ? FontSize.sm : FontSize.md)
             .fontColor(Color.White)
             .backgroundColor(this.accentColor())
             .borderRadius(Radius.md)
-            // ★ 2026-10-19 自查 A3：结算页主按钮写死 46vp，大字模式字会顶出去
-            // ★ 2026-11-03（第 892 轮）：极小屏 46 → 40（省 6vp，仍够点）
             .width('100%').constraintSize({ minHeight: this.tinyScreen() ? 40 : Cell.of(46) })
             .onClick(() => {
-              Haptics.tap();   // ★ 2026-10-19 按压反馈
-              // ★★★ 2026-11-01 真机抓到：**点「再来一局」后 AI 代打还在跑**。
-              //   因为 `Hint.autoRun` 是全局 setInterval，不随组件重建而停；
-              //   而这里只 `nonce + 1`（触发 @Watch，组件不重建）⇒ 旧计时器继续跑，
-              //   新的一局 AI 又自己玩起来（按钮还显示"停代打"）。
-              //   ⇒ 开新局前先把所有代打停掉（一处覆盖 355 款）。
-              Hint.stopAllAuto();
-              animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
-                this.showResult = false;
-                this.nonce = this.nonce + 1;
-                // ★★★ 2026-11-01 **关键：切 diffTick 的奇偶 ⇒ 游戏组件「重建」**。
-                //   只 `nonce + 1` 走的是 `@Watch('onRestart')` ⇒ 组件**不重建** ⇒
-                //   游戏自己的 `autoId` 仍是原值 ⇒ 按钮继续显示"停代打"（虽然计时器已停）。
-                //   切奇偶让 `if (diffTick % 2 === 0)` 的另一支生效 ⇒ 全新实例 ⇒ autoId = -1。
-                //   ⇒ 功能（AI 已停）+ 显示（按钮回到"AI 代打"）两边都对。
-                this.diffTick = this.diffTick + 1;
-              });
+              Haptics.tap();
+              // 换游戏的全部逻辑（挑款 / 停代打 / 清结算 / 强制重建）都在 gotoNext 里，
+              // 与「再来一局」同一套重建机制，只是多换了一个 gameId。
+              this.gotoNext();
             })
-          Button(this.t(TG('返回列表'), 'Back to list'))
-            .fontSize(FontSize.md)
-            .fontColor(this.theme().inkSoft)
-            .backgroundColor(this.theme().surfaceAlt)
-            .borderRadius(Radius.md)
-            // ★ 2026-11-03（第 892 轮）：极小屏 46 → 40（省 6vp，与上面对称）
-            .width('100%').height(this.tinyScreen() ? 40 : 46)
-            .onClick(() => {
-              Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：这一处原来**没有按压反馈**
-              Back.go();
-            })
+          Row({ space: this.tinyScreen() ? Space.xs : Space.md }) {
+            // ★ 2026-11-07：这两个**沿用原来的文案**（「再来一局」/「返回列表」在 EXTRA 字典里
+            //   都有 10 语言译文）—— 千万别说短成「再来」「返回」：那会变成新 key ⇒
+            //   10 语言退回英文，反而比现在差。为了在极小屏的半宽里放得下：字号 xxs + padding 2。
+            Button(this.t(TG('再来一局'), 'Play again'))
+              .fontSize(this.tinyScreen() ? FontSize.xxs : FontSize.md)
+              .padding(this.tinyScreen() ? { left: 2, right: 2 } : { left: Space.md, right: Space.md })
+              // 降级为次级：主按钮位已经给了「下一款」，两个 accent 按钮会互相抢
+              .fontColor(this.theme().ink)
+              .backgroundColor(this.theme().surfaceAlt)
+              .borderRadius(Radius.md)
+              .layoutWeight(1).height(this.tinyScreen() ? 40 : 46)
+              .onClick(() => {
+                Haptics.tap();   // ★ 2026-10-19 按压反馈
+                // ★★★ 2026-11-01 真机抓到：**点「再来一局」后 AI 代打还在跑**。
+                //   因为 `Hint.autoRun` 是全局 setInterval，不随组件重建而停；
+                //   而这里只 `nonce + 1`（触发 @Watch，组件不重建）⇒ 旧计时器继续跑，
+                //   新的一局 AI 又自己玩起来（按钮还显示"停代打"）。
+                //   ⇒ 开新局前先把所有代打停掉（一处覆盖 355 款）。
+                Hint.stopAllAuto();
+                animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
+                  this.showResult = false;
+                  this.nonce = this.nonce + 1;
+                  // ★★★ 2026-11-01 **关键：切 diffTick 的奇偶 ⇒ 游戏组件「重建」**。
+                  //   只 `nonce + 1` 走的是 `@Watch('onRestart')` ⇒ 组件**不重建** ⇒
+                  //   游戏自己的 `autoId` 仍是原值 ⇒ 按钮继续显示"停代打"（虽然计时器已停）。
+                  //   切奇偶让 `if (diffTick % 2 === 0)` 的另一支生效 ⇒ 全新实例 ⇒ autoId = -1。
+                  //   ⇒ 功能（AI 已停）+ 显示（按钮回到"AI 代打"）两边都对。
+                  this.diffTick = this.diffTick + 1;
+                });
+              })
+            Button(this.t(TG('返回列表'), 'Back to list'))
+              .fontSize(this.tinyScreen() ? FontSize.xxs : FontSize.md)
+              .padding(this.tinyScreen() ? { left: 2, right: 2 } : { left: Space.md, right: Space.md })
+              .fontColor(this.theme().inkSoft)
+              .backgroundColor(this.theme().surfaceAlt)
+              .borderRadius(Radius.md)
+              .layoutWeight(1).height(this.tinyScreen() ? 40 : 46)
+              .onClick(() => {
+                Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：这一处原来**没有按压反馈**
+                Back.go();
+              })
+          }
+          .width('100%')
         }
         .width('100%')
         // ★★★ 2026-10-29 平板横屏真机抓到：结算弹窗是 `.width('100%')`，

@@ -742,6 +742,98 @@ export struct LevelHeader {
   }
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+//  卡片角标（已通关 🏆 / 最高分）的数据源与性能 —— 2026-11-07
+//
+//  ★ 数据在哪：ProgressStore 把「每款最高分」「已通关列表」存在 AppStorage 的
+//    **两个字符串**里（keys：`perGameBest` / `clearedGames`）。
+//  ★ 为什么不能每张卡都调 ProgressStore.bestOf(id) / hasCleared(id)：
+//      bestOf()    每次调用都 **JSON.parse 整个最高分字典**
+//      hasCleared() 每次调用都 **split(',') 整个已通关串**
+//    而列表要渲染 **355 张卡** ⇒ 每轮重建最多 355 次全量解析（平方级浪费）。
+//  ★ 做法：按「原始串」做一层**静态缓存** —— 同一份串只解析一次，之后每张卡 O(1) 查表；
+//    串变了（又玩了一局 / 新通关一款）才重解析一次，所有卡共享同一份。
+//  ★ 全程**内存级**：AppStorage 本身就是内存 KV，这里不碰磁盘（落盘在 ProgressStore 里）。
+//  ★ 不改成「父组件算好 Map 传进来」的原因：那要动 GamesTab（本轮写域只有本文件），
+//    而且 @Prop Map 的比较/传递比字符串更绕；现在的方案是"只改一个文件就生效"。
+//    代价：角标数据一变，355 张卡的 @StorageProp 都会被标记脏（Grid 虚拟化下实际只重建可见的几张）。
+// ════════════════════════════════════════════════════════════════════════════
+class CardBadgeCache {
+  /** 上次解析用的原始串（哨兵值：保证首帧一定解析一次） */
+  private static bestRaw: string = '@@init@@';
+  private static bestMap: Map<string, number> = new Map<string, number>();
+  private static clearedRaw: string = '@@init@@';
+  private static clearedSet: Set<string> = new Set<string>();
+
+  /** 最高分；0 = 没玩过 / 没有分 */
+  static best(raw: string, id: string): number {
+    if (raw !== CardBadgeCache.bestRaw) {
+      CardBadgeCache.bestRaw = raw;
+      CardBadgeCache.bestMap = new Map<string, number>();
+      try {
+        const m: Record<string, number> = JSON.parse(raw.length > 0 ? raw : '{}') as Record<string, number>;
+        const keys: string[] = Object.keys(m);
+        for (let i = 0; i < keys.length; i++) {
+          CardBadgeCache.bestMap.set(keys[i], m[keys[i]]);
+        }
+      } catch (e) {
+        // 坏数据 ⇒ 当空表：少一个角标，界面绝不崩（写成空 catch 有的 linter 会报"空块"）
+        CardBadgeCache.bestMap = new Map<string, number>();
+      }
+    }
+    const v: number | undefined = CardBadgeCache.bestMap.get(id);
+    return v === undefined ? 0 : v;
+  }
+
+  /** 这款通关过吗 */
+  static cleared(raw: string, id: string): boolean {
+    if (raw !== CardBadgeCache.clearedRaw) {
+      CardBadgeCache.clearedRaw = raw;
+      CardBadgeCache.clearedSet = new Set<string>();
+      if (raw.length > 0) {
+        const parts: string[] = raw.split(',');
+        for (let i = 0; i < parts.length; i++) {
+          if (parts[i].length > 0) {
+            CardBadgeCache.clearedSet.add(parts[i]);
+          }
+        }
+      }
+    }
+    return CardBadgeCache.clearedSet.has(id);
+  }
+}
+
+/**
+ * 最高分怎么显示（卡片上横向空间有限）
+ *   1240 → `1,240` ｜ 1234567 → `1.2M`
+ *   compact（窄卡片）→ `1.2k` ｜ `980`
+ * ★ 只做"给人看"的千分位/缩写；数字本地化（阿拉伯-印度数字等）交给 Digits()，与全项目一致。
+ */
+function fmtBest(n: number, compact: boolean): string {
+  const v: number = Math.floor(n);
+  if (compact) {
+    // ★ 窄卡片：省 2~3 个字符（角标区还要放 🏆 和 🔥，标题不能被挤没）
+    if (v >= 1000) {
+      return String(Math.round(v / 100) / 10) + 'k';
+    }
+    return String(v);
+  }
+  if (v >= 1000000) {
+    return String(Math.round(v / 100000) / 10) + 'M';
+  }
+  const s: string = String(v);
+  let out: string = '';
+  let cnt: number = 0;
+  for (let i = s.length - 1; i >= 0; i--) {
+    out = s.charAt(i) + out;
+    cnt++;
+    if (cnt % 3 === 0 && i > 0) {
+      out = ',' + out;
+    }
+  }
+  return out;
+}
+
 /** ───────────── 游戏卡 ───────────── */
 @Component
 export struct GameCard {
@@ -768,6 +860,19 @@ export struct GameCard {
   @Prop theme: Theme = Theme.light();
   @Prop streak: number = 0;
   @Prop playedToday: boolean = false;
+  /**
+   * ★★★ 2026-11-07：**卡片角标（已通关 🏆 / 最高分）的数据源**。
+   *
+   * 为什么用 @StorageProp 而不是在 build() 里直接问 ProgressStore：
+   *   · 值就在 AppStorage（**内存 KV**），读它不碰磁盘；
+   *   · 值一变，这张卡**自动重建**（角标立刻刷新），不需要父组件逐个传参
+   *     —— 本轮写域只有本文件，这样改一个文件就能生效；
+   *   · 解析开销由上面的 CardBadgeCache 兜住（同一份串只 JSON.parse 一次，355 张卡共享）。
+   * ⚠️ key 必须与 `ProgressStore.Keys.cleared` / `Keys.perGameBest` 的**字面量**一致；
+   *    @StorageProp 的 key 只能写字面量，不能传常量。
+   */
+  @StorageProp('clearedGames') clearedRaw: string = '';
+  @StorageProp('perGameBest') bestRaw: string = '{}';
   /**
    * 共享元素转场 id（动画 ①）—— 非空时这张卡参与 `geometryTransition` 补间。
    * 默认空串 = 不参与；GamesTab 只在"正在点开的那一张"上传入。
@@ -881,6 +986,70 @@ export struct GameCard {
     return iconOf(this.meta.id);
   }
 
+  // ───────── 角标（已通关 🏆 / 最高分）· 2026-11-07 ─────────
+
+  /** 这款通关过吗（读 @StorageProp 建立 ArkUI 依赖；解析走 CardBadgeCache） */
+  private isCleared(): boolean {
+    if (!this.meta) {
+      return false;
+    }
+    const observed: string = this.clearedRaw;   // ← 依赖声明，别删
+    return CardBadgeCache.cleared(observed, this.meta.id);
+  }
+
+  /** 最高分（0 = 没玩过 / 没有分） */
+  private bestScore(): number {
+    if (!this.meta) {
+      return 0;
+    }
+    const observed: string = this.bestRaw;      // ← 依赖声明，别删
+    return CardBadgeCache.best(observed, this.meta.id);
+  }
+
+  /**
+   * 最高分角标文字；'' = 不显示。
+   * ★ 极小屏（tinyWatch 58vp 卡高 / tinyScreen）**不显示数字**：
+   *   195vp 屏上卡片只有约 80vp 宽，底部角标区还要放 🔥 ⇒ 5 位数字塞不下。
+   *   那时只留 🏆 —— "通关过"这个信息在极小屏上比"多少分"更重要（屏幕就这么大）。
+   */
+  private bestText(): string {
+    if (Bp.tinyWatch() || Bp.tinyScreen()) {
+      return '';
+    }
+    const n: number = this.bestScore();
+    if (n <= 0) {
+      return '';
+    }
+    // ★ 窄卡片（< 420vp）用缩写，否则 5 位数字会把标题挤掉
+    return Digits(fmtBest(n, Bp.width < 420), this.langCode);
+  }
+
+  /** 🏆 显示条件（没通关就不画，省得 355 张卡里 340 张都有个空位） */
+  private showCrown(): boolean {
+    return this.isCleared();
+  }
+
+  /**
+   * 底部角标占用的总宽度（vp）—— 文字的右内边距按它让位，
+   * 否则副标题会被角标压住（判据 268 的老毛病；这次把新角标也一起算进去）。
+   * ★ 无连胜时仍保留原来的 Space.xs（不无条件留空）。
+   */
+  private badgePadRight(): number {
+    let p: number = this.streak > 0 ? 48 : Space.xs;
+    if (this.showCrown()) {
+      p += 18;
+    }
+    if (this.bestText().length > 0) {
+      p += Bp.width < 420 ? 28 : 42;      // 窄卡片用缩写，占位也小
+    }
+    return p;
+  }
+
+  /** 有没有任何底部角标要画 */
+  private hasBadge(): boolean {
+    return this.showCrown() || this.bestText().length > 0 || this.streak > 0;
+  }
+
 build() {
     // ★ P1「图标挤到一起」的根因（2026-10-13）：
     //   改前图标是 **Text(emoji)**，大小/基线/行高全由**系统 emoji 字体**决定 ——
@@ -981,7 +1150,7 @@ build() {
           //      ⇒ 徽章「1 d」被压成 **3vp**（dump 实测）
           //   ⇒ 合并成一个条件：**任一情况成立就隐藏**。
           .visibility(
-            (Bp.tinyWatch() || (this.streak > 0 && Bp.width < 420))
+            (Bp.tinyWatch() || (this.hasBadge() && Bp.width < 420))
               ? Visibility.None : Visibility.Visible)
           // ★★★ 2026-11-03（第 932 轮）**英文 tagline 被截成「Bounce the ball, ...」**
           //   中文「一板一球，清空全场」9 字；英文 enTagline 是
@@ -1000,7 +1169,9 @@ build() {
           //   `.width('100%')` 一直延伸到卡片右缘 ⇒ 与徽章重叠。
           //   改前只留 `Space.xs`(6vp)，而徽章实测宽约 **48vp**。
           //   ⇒ 有连胜时让出 48vp，没连胜时保持 6vp（不能无条件留空）。
-          .padding({ right: this.streak > 0 ? 48 : Space.xs })
+          // ★ 2026-11-07：右内边距按**实际角标**算（🏆/分数/🔥 都算进去），
+          //   不再写死"有连胜就 48" —— 否则新角标会压住副标题（判据 268 同类问题）。
+          .padding({ right: this.badgePadRight() })
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
@@ -1047,12 +1218,29 @@ build() {
       // ★ 连胜角标：叠在卡片右下角 —— 改前它占一行、把卡片撑高，
       //   同一行里"有连胜的卡"比"没连胜的卡"高出一截，网格参差不齐。
       //   叠上去之后卡片高度恒定，信息一点没少（奥森 2026-10-11 加的功能，不能丢）。
-      if (this.streak > 0) {
+      // ★★★ 2026-11-07：底部角标**合并成一条**（🏆 已通关 → 最高分 → 🔥 连胜）。
+      //   为什么合成一条而不各占一角：
+      //     · 卡片只有四个角，右上角已被 ✓（今日已玩）用了 —— 再塞 🏆 会两个圆章叠一起；
+      //     · 三样说的都是"这款的历史成绩"，放同一块底上读起来是一组信息；
+      //     · 共用一个胶囊底 ⇒ 只有一行圆角、不会出现三个小胶囊互相挤。
+      //   ⚠️ 顺序固定 🏆 → 分数 → 🔥：🔥 在最右，保持它原来"贴右下角"的位置不变。
+      if (this.hasBadge()) {
         Row({ space: 3 }) {
-          Text('🔥').fontSize(FontSize.micro)
-            .accessibilityLevel('no')
-          Text(this.tn('{n} 天', '{n} d', this.streak, '{n} день', '{n} дня', '{n} дней'))
-            .fontSize(FontSize.micro).fontColor(Color.White).fontWeight(FontWeight.Bold)
+          if (this.showCrown()) {
+            Text('🏆').fontSize(FontSize.micro)
+              .accessibilityLevel('no')
+          }
+          if (this.bestText().length > 0) {
+            Text(this.bestText())
+              .fontSize(FontSize.micro).fontColor(Color.White).fontWeight(FontWeight.Bold)
+              .accessibilityLevel('no')
+          }
+          if (this.streak > 0) {
+            Text('🔥').fontSize(FontSize.micro)
+              .accessibilityLevel('no')
+            Text(this.tn('{n} 天', '{n} d', this.streak, '{n} день', '{n} дня', '{n} дней'))
+              .fontSize(FontSize.micro).fontColor(Color.White).fontWeight(FontWeight.Bold)
+          }
         }
         .padding({ left: 7, right: 7, top: 2, bottom: 2 })
         .margin({ right: Space.xs, bottom: Space.xs })
@@ -1203,7 +1391,13 @@ build() {
     //   修：两处都走 L(zh, en)
     .accessibilityText(
       this.meta ? (displayName(this.meta) + L('，', ', ') + displayTagline(this.meta)
-        + (this.playedToday ? L('，今日已玩', ', played today') : '')) : '')
+        + (this.playedToday ? L('，今日已玩', ', played today') : '')
+        // ★ 2026-11-07：角标也要"读得出来" —— 读屏用户看不见 🏆 和数字。
+        //   这里用 bestScore() 而不是 bestText()：极小屏上数字**不显示**，
+        //   但读屏仍然该听到（信息不该因为屏幕小而消失）。
+        + (this.showCrown() ? L('，已通关', ', cleared') : '')
+        + (this.bestScore() > 0
+          ? L('，最高分 ', ', best ') + Digits(fmtBest(this.bestScore(), false), this.langCode) : '')) : '')
     .onFocus(() => { this.focused = true; })
     .onBlur(() => { this.focused = false; })
     .onClick(() => {

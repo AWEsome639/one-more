@@ -1134,6 +1134,8 @@ export function gameName(id: string, zh: string, en: string): string {
 }
 
 const EXTRA: Record<string, Record<string, string>> = {
+  "下一款": { "ja": "次のゲーム", "ko": "다음 게임", "es": "Siguiente juego", "fr": "Jeu suivant", "de": "Naechstes Spiel", "pt": "Proximo jogo", "ru": "Следующая игра", "it": "Gioco successivo", "ar": "اللعبة التالية", "zh-Hant": "下一款" },
+
   /** ★★ 2026-10-16 实拍日语发现：界面模式三档的名字/说明没本地化 */
   "默认": {
     "en": "Default",
