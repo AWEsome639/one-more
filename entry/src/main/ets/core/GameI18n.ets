@@ -23,6 +23,7 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  "🎉 答对 {0} 题，通关！": {"en": "🎉 {0} correct — cleared!", "ja": "🎉 {0} 問正解・クリア！", "ko": "🎉 {0}문제 정답 — 클리어!", "es": "🎉 {0} correctas: ¡superado!", "fr": "🎉 {0} bonnes — réussi !", "de": "🎉 {0} richtig — geschafft!", "pt": "🎉 {0} certas — concluído!", "ru": "🎉 {0} верных — пройдено!", "it": "🎉 {0} corrette — superato!", "ar": "🎉 {0} صحيحة — تم الإنجاز!"},
   "答对 {0}/{1} 题，还差一点": {"en": "{0}/{1} correct — almost there", "ja": "{0}/{1} 正解・あと少し", "ko": "{0}/{1} 정답 — 거의 다 왔어요", "es": "{0}/{1} correctas: casi", "fr": "{0}/{1} bonnes — presque !", "de": "{0}/{1} richtig — fast!", "pt": "{0}/{1} certas — quase!", "ru": "{0}/{1} верных — почти!", "it": "{0}/{1} corrette — quasi!", "ar": "{0}/{1} صحيحة — تقريباً"},
   "答对 {0}/{1} 件，还差一点": {"en": "{0}/{1} correct — almost there", "ja": "{0}/{1} 個正解・あと少し", "ko": "{0}/{1}개 정답 — 거의 다 왔어요", "es": "{0}/{1} correctas: casi", "fr": "{0}/{1} bonnes — presque !", "de": "{0}/{1} richtig — fast!", "pt": "{0}/{1} certas — quase!", "ru": "{0}/{1} верных — почти!", "it": "{0}/{1} corrette — quasi!", "ar": "{0}/{1} صحيحة — تقريباً"},
   "答对 {0} 题，再来一局": {"en": "{0} correct — one more?", "ja": "{0} 問正解・もう一回？", "ko": "{0}문제 정답 — 한 판 더?", "es": "{0} correctas: ¿otra?", "fr": "{0} bonnes — encore ?", "de": "{0} richtig — nochmal?", "pt": "{0} certas — outra?", "ru": "{0} верных — ещё?", "it": "{0} corrette — ancora?", "ar": "{0} صحيحة — مرة أخرى؟"},

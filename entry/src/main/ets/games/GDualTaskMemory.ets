@@ -91,7 +91,7 @@ export struct GDualTaskMemory {
       made.push(this.makeQ());
     }
     this.digits = list; this.qs = made; this.qIdx = 0; this.typed = []; this.pick = -1; this.phase = 0;
-    this.msg = TG('第 ') + String(this.roundNo) + ' 轮：记住这 4 个数字';
+    this.msg = TG2('第 {0} 轮：记住这 4 个数字', String(this.roundNo));
     this.to1 = setTimeout(() => { this.to1 = -1; this.toMath(); }, 2400);
   }
   private makeQ(): MathQ {

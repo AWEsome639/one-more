@@ -302,7 +302,7 @@ export struct GModuloClock {
     }
     if (this.round >= this.diffTotal) {
       const ok: boolean = this.right >= PASS;
-      this.msg = ok ? TG('🎉 答对 ') + this.right + '/' + this.diffTotal + ' 题，通关！'
+      this.msg = ok ? TG2('🎉 答对 {0}/{1} 题，通关！', String(this.right), String(this.diffTotal))
         : TG2('答对 {0}/{1} 题，还差一点', String(this.right), String(this.diffTotal));
       this.finish(ok);
       return;

@@ -303,7 +303,7 @@ export struct GSopt {
         Text(TG2("轮次 {0}/{1}",Digits(String(this.round), this.langCode),Digits(String(this.diffTotal), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2('下一个 {0}', String(this.next))).fontSize(FontSize.sm).fontColor(Palette.cyan)
         Text(TG2('点错 {0}/3', String(this.wrong))).fontSize(FontSize.sm).fontColor(this.theme.ink)
-        Text(TG('得分 ') + String(this.score)).fontSize(FontSize.sm)
+        Text(TG2('得分 {0}', String(this.score))).fontSize(FontSize.sm)
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.ink)

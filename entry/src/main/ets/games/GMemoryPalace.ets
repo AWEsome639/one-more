@@ -100,7 +100,7 @@ export struct GMemoryPalace {
     this.slots = room;
     this.order = mix(spot);
     this.qIdx = 0; this.target = this.order[0]; this.pickCell = -1; this.phase = 0;
-    this.msg = TG('第 ') + String(this.round) + ' 轮：记住 ' + String(PER) + ' 件东西的位置';
+    this.msg = TG2('第 {0} 轮：记住 {1} 件东西的位置', String(this.round), String(PER));
     this.memTo = setTimeout(() => {
       this.memTo = -1; this.phase = 1; this.pickCell = -1; this.msg = TG(TG(TG('它放在哪一格？')));
     }, MEM_MS);

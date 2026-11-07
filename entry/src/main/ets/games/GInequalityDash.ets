@@ -80,7 +80,7 @@ export struct GInequalityDash {
       if (this.tick >= 0) { clearInterval(this.tick); this.tick = -1; }
       if (this.over) { return; }
       this.over = true; this.won = this.hits >= TARGET;
-      this.msg = this.won ? TG('🎉 答对 ') + String(this.hits) + ' 题，通关！'
+      this.msg = this.won ? TG2('🎉 答对 {0} 题，通关！', String(this.hits))
         : '⏰ 时间到，只答对 ' + String(this.hits) + '/' + String(TARGET) + TG(' 题');
       this.finish(this.won);
     }, 1000);

@@ -311,7 +311,7 @@ export struct GMandalaRecall {
       Row() {
         Text(TG2('关卡 {0}', (String(this.level) + '/' + String(this.diffTotal)))).fontSize(FontSize.xs).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2('还差点 {0}', this.phase === 0 ? TG('看') : String(Math.max(this.lit.length - this.picks.length, 0)))).fontSize(FontSize.xs).fontColor(this.theme.ink)
-        Text(TG('得分 ') + String(this.score)).fontSize(FontSize.xs)
+        Text(TG2('得分 {0}', String(this.score))).fontSize(FontSize.xs)
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontColor(this.theme.ink)

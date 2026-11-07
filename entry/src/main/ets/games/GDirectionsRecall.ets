@@ -232,7 +232,7 @@ export struct GDirectionsRecall {
     const seq: number[] = this.seq;
     const at: number = this.input.length;
     if (seq[at] !== d) {
-      this.note = TG('第 ') + (at + 1) + ' 步点错了 ❌';
+      this.note = TG2('第 {0} 步点错了 ❌', String(at + 1));
       this.nextRound();
       return;
     }

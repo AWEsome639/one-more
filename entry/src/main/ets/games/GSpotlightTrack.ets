@@ -305,7 +305,7 @@ export struct GSpotlightTrack {
         Text(TG2("轮次 {0}/{1}",Digits(String(this.round), this.langCode),Digits(String(this.diffTotal), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2('答对 {0}', String(this.hit))).fontSize(FontSize.sm).fontColor(Palette.primary)
         Text(TG2('连对 {0}', String(this.streak))).fontSize(FontSize.sm).fontColor(this.theme.ink)
-        Text(TG('得分 ') + String(this.score)).fontSize(FontSize.sm).fontColor(this.theme.ink)
+        Text(TG2('得分 {0}', String(this.score))).fontSize(FontSize.sm).fontColor(this.theme.ink)
       }
       .width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
       .borderRadius(Radius.md).shadow(Shadow.card).justifyContent(FlexAlign.SpaceBetween)
