@@ -1426,6 +1426,7 @@ build() {
           .onClick(() => {
             Haptics.tap();
             this.chatOpen = !this.chatOpen;
+            this.renderRev = this.renderRev + 1;   // ★ 强制重渲染（@State private 有时不触发 build）
             if (!this.chatOpen) { this.chatText = ''; this.chatPicks = []; this.chatAnswer = ''; }
           })
 
