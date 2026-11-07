@@ -10,7 +10,7 @@ import { TG } from '../core/GameI18n';
 import { Bp } from '../core/Bp';
 import { Tv } from '../core/Tv';
 import { Haptics } from '../core/Haptics';
-import { Digits } from '../core/I18n';   // ★ 2026-10-16 数字本地化
+import { Digits, I18n } from '../core/I18n';   // ★ 2026-10-16 数字本地化
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Accent, Cell } from '../core/Design';
 import { GameMeta, GameCategory, CatCount, colorOf, enterDelay, catLabelEn, ACCENT_TAG, ACCENT_DEEP_TAG, displayName, displayTagline } from '../core/GameRegistry';
 import { L, TN } from '../core/I18n';
@@ -748,7 +748,8 @@ export struct LevelHeader {
       // XP 进度条
       Column({ space: Space.xs }) {
         Row() {
-          Text(this.tn('再攒 {n} 点经验就升级', '{n} XP to next level', this.toNext()))
+          Text(this.tn('再攒 {n} 点经验就升级', '{n} XP to next level', this.toNext(),
+                 'Ещё {n} опыт до уровня', 'Ещё {n} опыта до уровня', 'Ещё {n} опыта до уровня'))
             .fontSize(FontSize.xxs)
             .fontColor(this.theme.inkFaint)
           Blank()
@@ -905,13 +906,20 @@ function fmtBest(n: number, compact: boolean): string {
     return String(Math.round(v / 100000) / 10) + 'M';
   }
   const s: string = String(v);
+  // ★★★ 2026-11-08：千分位分隔符要跟语言走。
+  //   阿语的千分位是 `٬`（U+066C，ARABIC THOUSANDS SEPARATOR），不是拉丁逗号 ——
+  //   原来写死 `','`，`Digits()` 只映射 0-9（标点原样透传）⇒ 阿语显示「١,٥١٠」
+  //   混着拉丁逗号，和周围的阿拉伯数字不是一套。
+  //   ⚠️ 为什么不用 toLocaleString：本项目的数字格式化全程自己控制（Digits/fmtBest），
+  //      混入 Intl 会引入第二套规则；这里只换一个分隔符，最小改动。
+  const sep: string = I18n.current() === 'ar' ? '٬' : ',';
   let out: string = '';
   let cnt: number = 0;
   for (let i = s.length - 1; i >= 0; i--) {
     out = s.charAt(i) + out;
     cnt++;
     if (cnt % 3 === 0 && i > 0) {
-      out = ',' + out;
+      out = sep + out;
     }
   }
   return out;

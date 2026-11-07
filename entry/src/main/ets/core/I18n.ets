@@ -1154,6 +1154,8 @@ export function gameName(id: string, zh: string, en: string): string {
 }
 
 const EXTRA: Record<string, Record<string, string>> = {
+  "新纪录！上次 {n}": { "ja": "新記録！前回 {n}", "ko": "신기록! 이전 {n}", "es": "Nuevo record! Antes {n}", "fr": "Nouveau record ! Avant {n}", "de": "Neuer Rekord! Vorher {n}", "pt": "Novo recorde! Antes {n}", "ru": "Новый рекорд! Было {n}", "it": "Nuovo record! Prima {n}", "ar": "رقم قياسي جديد! سابقاً {n}", "zh-Hant": "新紀錄！上次 {n}" },
+  "本局用了 {n} 次提示，不计满分": { "ja": "ヒントを {n} 回使いました（満点なし）", "ko": "힌트 {n}회 사용 — 만점 아님", "es": "Usaste {n} pista(s) — sin puntuacion perfecta", "fr": "{n} indice(s) utilise(s) — pas de score parfait", "de": "{n} Hinweis(e) benutzt — kein perfekter Lauf", "pt": "Usou {n} dica(s) — sem pontuacao perfeita", "ru": "Использовано подсказок: {n} — не идеальный забег", "it": "Usati {n} suggerimento/i — non perfetto", "ar": "استخدمت {n} تلميح — ليس كاملاً", "zh-Hant": "本局用了 {n} 次提示，不計滿分" },
   "找": { "ja": "探す", "ko": "찾기", "es": "Buscar", "fr": "Trouver", "de": "Finden", "pt": "Achar", "ru": "Найти", "it": "Trova", "ar": "ابحث", "zh-Hant": "找" },
   "打开 ": { "ja": "開く ", "ko": "열기 ", "es": "Abrir ", "fr": "Ouvrir ", "de": "Offnen ", "pt": "Abrir ", "ru": "Открыть ", "it": "Apri ", "ar": "افتح ", "zh-Hant": "打開 " },
   "主题色：": { "ja": "テーマ色：", "ko": "테마 색: ", "es": "Color de acento: ", "fr": "Couleur d accent : ", "de": "Akzentfarbe: ", "pt": "Cor de destaque: ", "ru": "Цвет акцента: ", "it": "Colore accento: ", "ar": "لون التمييز: ", "zh-Hant": "主題色：" },

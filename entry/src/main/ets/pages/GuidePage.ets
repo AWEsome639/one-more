@@ -307,7 +307,7 @@ struct GuidePage {
         : TG('通用玩法')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
       ForEach(this.tips(), (t: string, i: number) => {
         Row({ space: Space.sm }) {
-          Text(String(i + 1))
+          Text(Digits(String(i + 1), this.langCode))
             .fontSize(FontSize.xs).fontColor(Color.White)
             .width(20).height(20).textAlign(TextAlign.Center)
             .backgroundColor(this.accentColor())

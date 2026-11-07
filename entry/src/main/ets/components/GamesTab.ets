@@ -1015,7 +1015,8 @@ build() {
               .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
               .fontColor(this.theme().ink)
               .layoutWeight(1)
-            Text(String(this.list().length) + this.t(' 款', ' games'))
+            // ★ 2026-11-08：裸 String() ⇒ 阿语下是西文数字（同屏另有 ٣٥٥），过 Digits 统一
+       Text(Digits(String(this.list().length), this.langCode) + this.t(' 款', ' games'))
               .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
           }
           .width('100%')
@@ -1430,7 +1431,8 @@ build() {
         //   ⚠️ 也不用 Ellipsis —— 奥森明确不要「…」。
         //   版本号是"确认装的是哪一版"的水印，**设置页底部也有一份**（SettingsTab:478）
         //   ⇒ 首页窄屏不显示不丢信息。
-        Text(Digits(this.tn('{n} 款小游戏，不用联网也能玩', '{n} games. No Wi-Fi needed.', GAMES.length), this.langCode)
+        Text(Digits(this.tn('{n} 款小游戏，不用联网也能玩', '{n} games. No Wi-Fi needed.', GAMES.length,
+                '{n} мини-игра без интернета', '{n} мини-игры без интернета', '{n} мини-игр без интернета'), this.langCode)
           + (Bp.width > 0 && Bp.width < 420 ? '' : '  ·  ' + 'v' + About.VERSION))
           .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
       }
@@ -1601,7 +1603,8 @@ build() {
 
       Column({ space: 4 }) {
         Row() {
-          Text(Digits(this.tn('再攒 {n} 点经验就升级', '{n} XP to next level', this.xpToNext()), this.langCode))
+          Text(Digits(this.tn('再攒 {n} 点经验就升级', '{n} XP to next level', this.xpToNext(),
+                 'Ещё {n} опыт до уровня', 'Ещё {n} опыта до уровня', 'Ещё {n} опыта до уровня'), this.langCode))
             .fontSize(FontSize.xxs).fontColor(this.theme().inkSoft)
           Blank()
           Text(Digits(this.levelPct() + '%', this.langCode))
@@ -1647,7 +1650,8 @@ build() {
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
         .fontColor(this.theme().ink)
         .layoutWeight(1)
-      Text(String(this.list().length) + this.t(' 款', ' games'))
+      // ★ 2026-11-08：裸 String() ⇒ 阿语下是西文数字（同屏另有 ٣٥٥），过 Digits 统一
+       Text(Digits(String(this.list().length), this.langCode) + this.t(' 款', ' games'))
         .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
     }
     .width('100%')

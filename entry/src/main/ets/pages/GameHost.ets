@@ -12,7 +12,8 @@
  */
 
 import { LengthMetrics } from '@kit.ArkUI';
-import { TG } from '../core/GameI18n';
+import { TG } from '../core/GameI18n'
+import { TN } from '../core/I18n';
 import { Hint } from '../ai/Hint';
 import { Demo } from '../core/Demo';
 import { Tv } from '../core/Tv';
@@ -981,6 +982,14 @@ struct GameHost {
 
   private iconSize(): number {
     return Bp.narrowHeight() ? 30 : 44;
+  }
+
+  /** ★ 2026-11-08 复数透传（与 StatsTab/Common 同一口径）：
+   *   `tn(zh, en, n, f1?, f2?, f5?)` —— 俄语/阿语等有 2~6 种复数形式的语言靠 f1/f2/f5 选。
+   *   ⚠️ 必须摸一下 `this.langCode` 建立 ArkUI 依赖，否则切语言后不重渲染。 */
+  private tn(zh: string, en: string, n: number, f1?: string, f2?: string, f5?: string): string {
+    const observed: string = this.langCode;
+    return TN(zh, en, n, f1, f2, f5);
   }
 
   build() {
@@ -3514,7 +3523,8 @@ struct GameHost {
           if (this.levelUpTo > 0) {
             Row({ space: Space.sm }) {
               Text('🎊').accessibilityLevel('no').fontSize(FontSize.lg)
-              Text(TG('升到 LV ') + this.levelUpTo + ' · ' + ProgressStore.titleOf(this.levelUpTo))
+              Text(TG('升到 LV ') + Digits(String(this.levelUpTo), this.langCode) + ' · '
+                 + ProgressStore.titleOf(this.levelUpTo))
                 .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
                 .fontColor(Palette.amber)
             }
@@ -3542,8 +3552,12 @@ struct GameHost {
           if (this.lastHintsUsed > 0) {
             Row({ space: 6 }) {
               Text('💡').accessibilityLevel('no').fontSize(FontSize.sm)
-              Text(this.t(TG('本局用了 ') + this.lastHintsUsed + TG(' 次提示，不计满分'),
-                          'Used ' + this.lastHintsUsed + ' hint(s) — not a perfect run'))
+              // ★★★ 2026-11-08（判据 1801 漏网）：原来是**三层取词** ——
+              //   `TG()` 先翻成阿语，拼上数字后又整句当 `zh` 传给 `t()` ⇒ EXTRA 查不到
+              //   ⇒ **整句退英文**（阿语玩家在结算页看到 "Used 3 hint(s)..."）。
+              //   改成 tn 模板：取词只负责「显示」，数字交给 TN 自动过 Digits()。
+              Text(this.tn('本局用了 {n} 次提示，不计满分',
+                           'Used {n} hint(s) — not a perfect run', this.lastHintsUsed))
                 .fontSize(FontSize.xxs).fontColor(this.theme().inkSoft)
                 .layoutWeight(1).maxLines(2)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -3569,7 +3583,8 @@ struct GameHost {
           //     信息不丢（数字全在），高度从 41vp 降到约 17vp，省 **24vp**。
           if (Bp.tinyWatch()) {
             Text(Digits(String(this.scoreShown), this.langCode) + ' · '
-                 + (this.lastMs / 1000).toFixed(1) + 's · +' + String(this.gainShown))
+                 + Digits((this.lastMs / 1000).toFixed(1), this.langCode) + 's · +'
+                 + Digits(String(this.gainShown), this.langCode))
               .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
               .fontColor(this.theme().ink)
               .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -3591,7 +3606,7 @@ struct GameHost {
             .opacity(this.pop ? 1 : 0).translate({ y: this.pop ? 0 : 10 })
             .animation({ duration: Motion.base, curve: Motion.spring() })
             Column({ space: 2 }) {
-              Text((this.lastMs / 1000).toFixed(1) + 's')
+              Text(Digits((this.lastMs / 1000).toFixed(1), this.langCode) + 's')
                 .fontSize(this.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold)
                 .fontColor(this.theme().ink)
               Text(this.t('用时', 'Time')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
@@ -3599,7 +3614,7 @@ struct GameHost {
             .opacity(this.pop ? 1 : 0).translate({ y: this.pop ? 0 : 10 })
             .animation({ duration: Motion.base, curve: Motion.spring(), delay: 80 })
             Column({ space: 2 }) {
-              Text('+' + String(this.gainShown))
+              Text('+' + Digits(String(this.gainShown), this.langCode))
                 .fontSize(this.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold)
                 .fontColor(Palette.emerald)
               Text(TG('经验')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
@@ -3623,8 +3638,8 @@ struct GameHost {
               // ★ 2026-11-03（第 1119 轮）奖杯是装饰，语义由旁边「新纪录！」承担
               Text('🏆').accessibilityLevel('no').fontSize(FontSize.md)
               Text(ProgressStore.prevBest > 0
-                ? this.t(TG('新纪录！上次 ') + String(ProgressStore.prevBest),
-                         'New best! Previous ' + String(ProgressStore.prevBest))
+                // ★ 2026-11-08（同款三层取词）：GT 拼数字后再进 t() ⇒ 整句退英文
+                ? this.tn('新纪录！上次 {n}', 'New best! Previous {n}', ProgressStore.prevBest)
                 : TG('新纪录！'))
                 .fontSize(FontSize.sm)
                 .fontWeight(FontWeight.Medium)

@@ -679,6 +679,18 @@ export struct GSokoban {
         }, (y: number) => 'skr' + y)
       }
       .width('100%')
+      // ★★★ 2026-11-08 真机（853×533）：棋盘是「正方形格子 + 宽驱动」⇒ 高度被宽度锁死
+      //   （853 宽 ⇒ 棋盘 813vp 高，而游戏区只有 ≈343vp ⇒ 底部四个按钮全被顶出屏幕）。
+      //   `maxHeight` 压不住（子项固定），`.clip` 切了画面也不救按钮 ⇒ **限宽**：
+      //   每格边长 = min(可用高 / 行数)，棋盘宽 = 列数 × 边长。手机上（≥600）不限制、零回归。
+      //   ★ 数值依据（真机预算）：游戏区上限 = Bp.height − 190 = 343vp；
+      //     游戏内部固定项（HUD 60 + 状态 20 + 按钮行 48 + 间距 ~64）≈ 192vp
+      //     ⇒ 棋盘可用高 ≈ Bp.height − 390（533 → 143vp；8 行 ⇒ 每格 17vp，棋盘 170×136）。
+      .constraintSize({
+        maxWidth: Bp.height < 600
+          ? Math.min(Bp.width - 40, this.w * Math.max(12, Math.floor((Bp.height - 390) / Math.max(1, this.h))))
+          : 9999
+      })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
@@ -917,11 +929,10 @@ export struct GSokoban {
     }
     .layoutWeight(1)
     .aspectRatio(1)
-    // ★ 2026-11-08 **横屏防裁**（真机实测）：853×533 时棋盘按宽度铺满 = 813vp 高，
-    //   而游戏区只有 ≈343vp ⇒ 底部「上一关/重开/下一关/撤销」四个按钮全被顶出屏幕。
-    //   `constraintSize({ maxHeight })` 只压容器不压子项；`.clip(true)` 只切画面不救按钮。
-    //   ⇒ **直接给棋盘设高度上限**：横屏按可用高反推，aspectRatio(1) 会让宽度同步缩小。
-    .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 280 : 9999 })
+    // ★★★ 2026-11-08 修正（真机复验发现）：这里的 `.constraintSize({ maxHeight: Bp.height - 280 })`
+    //   加在了**每一个格子**上（253vp ≫ 格子边长 40vp）⇒ 等于没加，棋盘照样铺满。
+    //   真正要限的是**棋盘整体**（它由「正方形格子 × 宽度」驱动）⇒ 见下方棋盘 Column 的 maxWidth。
+    //   ⚠️ 判据：约束要加在「被宽度锁死高度」的那个容器上，不是它的每个小子项上。
     .backgroundColor(this.theme.surface)
     .border({ width: 1, color: this.theme.line })
   }

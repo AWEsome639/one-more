@@ -6,6 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { TG, TG2, TG4 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
@@ -483,7 +484,9 @@ export struct GCountdownMath {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    // ★ 2026-11-08 横屏（853×533）：cap 已把容器压到 343vp，但 `Space.md(16)` 不受 Cell.of 缩放影响
+    //   ⇒ 5 个间距就吃掉 80vp，把「重开」挤出屏。横屏降成 sm(10)（手机上仍用 md，零回归）。
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({

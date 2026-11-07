@@ -514,7 +514,8 @@ build() {
         // ★ 2026-11-08：反馈卡（原来被误插在 `themeModePicker()` 里，见 feedbackCard 的注释）
         this.feedbackCard()
 
-        Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length))
+        Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length,
+          '{n} мини-игра без интернета', '{n} мини-игры без интернета', '{n} мини-игр без интернета'))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme().inkFaint)
           .width('100%')

@@ -377,7 +377,7 @@ export struct StatsTab {
     }
     const m: GameMeta | undefined = findGame(st.topId);
     const name: string = m !== undefined ? displayName(m) : st.topId;
-    return name + ' · ' + this.tn('{n} 局', '{n} rounds', st.topCount);
+    return name + ' · ' + this.tn('{n} 局', '{n} rounds', st.topCount, '{n} игра', '{n} игры', '{n} игр');
   }
 
   /** 极小屏 / 手表的一行版：「今日 3 分 24 秒 · 62%」（塞不下三行，见 recentStats 的注释） */
@@ -547,7 +547,8 @@ build() {
   statsChips() {
     Column({ space: Space.sm }) {
       Row() {
-        Text(this.tn('一共攒了 {n} 点经验', '{n} XP earned', this.xp))
+        Text(this.tn('一共攒了 {n} 点经验', '{n} XP earned', this.xp,
+          '{n} очко опыта заработано', '{n} очка опыта заработано', '{n} очков опыта заработано'))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme().inkFaint)
           .maxLines(1)
@@ -561,10 +562,13 @@ build() {
       .width('100%')
 
       Flex({ wrap: FlexWrap.Wrap }) {
-        this.chip('🔥', TG('连胜 {n} 天'), 'Streak {n} days', this.superStreak, Palette.orange)
-        this.chip('🏅', TG('最长连了 {n} 天'), 'Longest {n} days', this.bestStreak, Palette.amber)
-        this.chip('📅', TG('今天玩了 {n} 局'), 'Today {n} rounds', this.dailyCount, Palette.sky)
-        this.chip('⭐', TG('收藏 {n} 款'), 'Saved {n}', ProgressStore.favorites().length, Palette.berry)
+        this.chip('🔥', '连胜 {n} 天', 'Streak {n} days', this.superStreak, Palette.orange,
+          'Серия {n} день', 'Серия {n} дня', 'Серия {n} дней')
+        this.chip('🏅', '最长连了 {n} 天', 'Longest {n} days', this.bestStreak, Palette.amber,
+          'Наибольшая серия {n} день', 'Наибольшая серия {n} дня', 'Наибольшая серия {n} дней')
+        this.chip('📅', '今天玩了 {n} 局', 'Today {n} rounds', this.dailyCount, Palette.sky,
+          'Играл сегодня {n} раунд', 'Играл сегодня {n} раунда', 'Играл сегодня {n} раундов')
+        this.chip('⭐', '收藏 {n} 款', 'Saved {n}', ProgressStore.favorites().length, Palette.berry)
       }
       .width('100%')
     }
@@ -575,12 +579,20 @@ build() {
     .shadow(Shadow.card)
   }
 
+  /**
+   * ★★★ 2026-11-08（判据 1801）：`zh` 必须是**中文字面量**，不能传 `TG(...)` 的结果。
+   *   原来 4 个调用点写的是 `chip('🔥', TG('连胜 {n} 天'), ...)`：
+   *   `TG()` 先翻成当前语言，`chip` 内部再 `tn(zh,…)` 拿**译文**当 key 查 EXTRA
+   *   ⇒ 查不到 ⇒ **退英文**（阿语/俄语下「Streak 5 days」）。
+   *   ⇒ 取词函数的返回值只能「显示」，不能再当入参（判据 1801）。
+   */
   @Builder
-  chip(icon: string, zh: string, en: string, n: number, accent: string) {
+  chip(icon: string, zh: string, en: string, n: number, accent: string,
+       f1?: string, f2?: string, f5?: string) {
     Row({ space: Space.xs }) {
       Text(icon)
         .fontSize(FontSize.xs)
-      Text(this.tn(zh, en, n))
+      Text(this.tn(zh, en, n, f1, f2, f5))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme().inkSoft)
     }
@@ -688,7 +700,7 @@ build() {
           Blank()
           // 窗口内的局数（0 就不显示，免得空状态里还挂一个「0 局」）
           Text(this.weekStat().total > 0
-            ? this.tn('{n} 局', '{n} rounds', this.weekStat().total) : '')
+            ? this.tn('{n} 局', '{n} rounds', this.weekStat().total, '{n} игра', '{n} игры', '{n} игр') : '')
             .fontSize(FontSize.xxs)
             .fontColor(this.theme().inkFaint)
         }
@@ -805,7 +817,7 @@ build() {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .width(RECENT_BOX)
 
-      Text(this.tn('{n} 局', '{n} rounds', ProgressStore.playsOf(g.id)))
+      Text(this.tn('{n} 局', '{n} rounds', ProgressStore.playsOf(g.id), '{n} игра', '{n} игры', '{n} игр'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme().inkFaint)
     }
@@ -875,7 +887,8 @@ build() {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
         Row({ space: Space.xs }) {
-          Text(this.tn('玩过 {n} 次', 'Played {n} times', it.plays))
+          Text(this.tn('玩过 {n} 次', 'Played {n} times', it.plays,
+            'Играл {n} раз', 'Играл {n} раза', 'Играл {n} раз'))
             .fontSize(FontSize.xxs)
             .fontColor(this.theme().inkFaint)
           if (it.best > 0) {

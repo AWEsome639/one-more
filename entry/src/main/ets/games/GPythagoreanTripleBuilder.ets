@@ -6,6 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -307,7 +308,9 @@ export struct GPythagoreanTripleBuilder {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    // ★ 2026-11-08 横屏（853×533）：cap 343vp + 键帽×0.85 之后，7/8/9 刚好贴到 533
+    //   「0」与「确认」还在屏外 ⇒ 横屏再收一档：间距 md→sm（省 30）、键帽 48→46（省 7）。
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -345,7 +348,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('1')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('1')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('1')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('1'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L332'; })
@@ -356,7 +359,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('2')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('2')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('2')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('2'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L341'; })
@@ -367,7 +370,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('3')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('3')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('3')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('3'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L350'; })
@@ -380,7 +383,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('4')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('4')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('4')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('4'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L361'; })
@@ -391,7 +394,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('5')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('5')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('5')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('5'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L370'; })
@@ -402,7 +405,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('6')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('6')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('6')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('6'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L379'; })
@@ -415,7 +418,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('7')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('7')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('7')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('7'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L390'; })
@@ -426,7 +429,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('8')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('8')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('8')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('8'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L399'; })
@@ -437,7 +440,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('9')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('9')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('9')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('9'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L408'; })
@@ -450,7 +453,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('⌫')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('⌫')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('⌫')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('⌫'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L419'; })
@@ -461,7 +464,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize((('0')) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor((('0')) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor((('0')) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey((('0'))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L428'; })
@@ -472,7 +475,7 @@ export struct GPythagoreanTripleBuilder {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(((TG('确认'))) === TG('确认') ? FontSize.md : FontSize.xl)
         .fontColor(((TG('确认'))) === TG('确认') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(((TG('确认'))) === TG('确认') ? Palette.berry : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
         .onClick(() => { Haptics.tap(); this.pickKey(((TG('确认')))); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L437'; })

@@ -18,7 +18,7 @@ import { LanMatch } from '../core/LanMatch';
 import { GAMES, GameMeta, findGame, displayName } from '../core/GameRegistry';
 import { Haptics } from '../core/Haptics';
 import { Back } from '../core/Back';
-import { I18n, L } from '../core/I18n';
+import { I18n, L, Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 /** 可联机的游戏（回合制对战型） */
@@ -180,11 +180,11 @@ struct LanLobby {
           }
           ForEach(LanRace.ranked(), (sc: RaceScore, i: number) => {
             Row({ space: Space.sm }) {
-              Text(i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : String(i + 1))))
+              Text(i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : Digits(String(i + 1), this.langCode))))
                 .fontSize(FontSize.sm).width(28).textAlign(TextAlign.Center)
               Text(sc.nick + (sc.me ? TG('（我）') : ''))
                 .fontSize(FontSize.sm).fontColor(this.theme().ink).layoutWeight(1)
-              Text((sc.ms / 1000).toFixed(1) + 's')
+              Text(Digits((sc.ms / 1000).toFixed(1), this.langCode) + 's')
                 .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.accentColor())
             }
             .width('100%')
