@@ -290,7 +290,7 @@ export struct GCryptogramAll {
 .scale({ x: this.bump, y: this.bump })
 .animation({ duration: Motion.fast, curve: Motion.spring() })
         Text(TG('答对 ') + this.right).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
-        Text(TG('得分 ') + this.score).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
+        Text(TG2('得分 {0}', String(this.score))).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
       }.width('100%')
 
       Text(TG('🔐 每个字母都被移位加密了；密钥只露出一部分，推出原词'))

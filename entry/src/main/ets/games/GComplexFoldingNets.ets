@@ -297,7 +297,7 @@ export struct GComplexFoldingNets {
       Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", (this.qi + 1), this.diffTotal)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG('答对 ') + this.right).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
-        Text(TG('得分 ') + this.score).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
+        Text(TG2('得分 {0}', String(this.score))).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
       }.width('100%')
 
       Text(TG('📄 纸条按下列折痕依次对折，📍 处最终叠了几层？'))

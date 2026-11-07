@@ -272,7 +272,7 @@ export struct GCrossSectionSlice {
       Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", (this.qi + 1), this.diffTotal)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG('答对 ') + this.right).fontSize(FontSize.md).fontColor(Palette.emerald).layoutWeight(1)
-        Text(TG('得分 ') + this.score).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
+        Text(TG2('得分 {0}', String(this.score))).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
       }.width('100%')
 
       Text(TG2('🧊 一堆方块（每列 1~5 层）。这是第 {0} 层的俯视切片 —— 这一层有几个方块？', (this.h + 1)))

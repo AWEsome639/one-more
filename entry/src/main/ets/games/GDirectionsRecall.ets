@@ -306,7 +306,7 @@ export struct GDirectionsRecall {
             Row({ space: Space.md }) {
         Text(TG2("第 {0}/{1}", Math.min(this.round + 1, ROUNDS.length), ROUNDS.length)).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1)
         Text(TG2('长度 {0}', String(this.seq.length > 0 ? this.seq.length : ROUNDS[0]))).fontSize(FontSize.md).fontColor(Palette.sky).layoutWeight(1)
-        Text(TG('得分 ') + this.score).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
+        Text(TG2('得分 {0}', String(this.score))).fontSize(FontSize.md).fontColor(this.theme.inkSoft).layoutWeight(1)
       }.width('100%')
 
       Text('📐 ' + this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
