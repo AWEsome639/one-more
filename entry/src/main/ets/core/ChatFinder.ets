@@ -36,6 +36,8 @@ export interface Intent {
   multiplayer: boolean;
   /** 想「棋牌类」（tags 里有 board/card） */
   board: boolean;
+  /** ★ 2026-11-08：「像 XX 那样的」—— 用户提到的那款游戏的 id（找不到就空串） */
+  similar: string;
   /** 命中意图的词（给用户看「我是根据这几个词找的」） */
   hits: string[];
 }
@@ -62,7 +64,17 @@ const CATS: GameCategory[] = [GameCategory.LOGIC, GameCategory.MATH, GameCategor
   GameCategory.WORD, GameCategory.SPATIAL, GameCategory.CLASSIC];
 
 /** 难度关键词 */
-const EASY_WORDS: string[] = ['简单', '轻松', '不太难', '随便', '休闲', '摸鱼', 'easy', 'casual', 'relax', 'leicht', 'facile', 'fácil', 'легк', 'سهل'];
+// ★★★ 2026-11-08 **否定式修复**（code-hunter 实测）：
+//   `parse()` 是**子串包含**匹配，而 HARD 词表里英/德/俄用的是**词干**（hard/schwer/сложн）
+//   ⇒ `not hard` / `nicht schwer` / `несложная` 全部命中 HARD ⇒ **用户说「不难」却给最难的**。
+//   中文靠枚举整句 `'不太难'` 绕过了，其它语言全中招。
+//   ⇒ 把否定短语放进 EASY（代码里 EASY 先于 HARD 判 ⇒ 必然优先命中）。
+const EASY_WORDS: string[] = [
+  '简单', '轻松', '不太难', '随便', '休闲', '摸鱼',
+  'not hard', 'not difficult', 'no hard', 'nicht schwer', 'nicht schwierig',
+  'pas difficile', 'no difícil', 'несложн', 'не сложн', 'ليس صعب',
+  'easy', 'casual', 'relax', 'leicht', 'facile', 'fácil', 'легк', 'سهل'
+];
 const HARD_WORDS: string[] = ['难', '挑战', '烧脑', '硬核', 'hard', 'challenge', 'schwer', 'difficile', 'difícil', 'сложн', 'صعب'];
 
 /** 时长关键词 */
@@ -78,7 +90,7 @@ export class ChatFinder {
     const s: string = text.toLowerCase();
     const it: Intent = {
       category: null, difficulty: null, short: false, long: false,
-      pausable: false, untimed: false, multiplayer: false, board: false, hits: []
+      pausable: false, untimed: false, multiplayer: false, board: false, similar: '', hits: []
     };
     // 类别
     for (let i = 0; i < CAT_WORDS.length; i++) {
@@ -108,14 +120,27 @@ export class ChatFinder {
       if (s.indexOf(LONG_WORDS[k].toLowerCase()) >= 0) { it.long = true; it.hits.push(LONG_WORDS[k]); break; }
     }
     // 可暂停 / 不限时 / 联机
-    if (s.indexOf('暂停') >= 0 || s.indexOf('电话') >= 0 || s.indexOf('pause') >= 0 || s.indexOf('unterbr') >= 0) { it.pausable = true; it.hits.push('可暂停'); }
-    if (s.indexOf('不限时') >= 0 || s.indexOf('慢慢') >= 0 || s.indexOf('untimed') >= 0 || s.indexOf('ohne zeit') >= 0) { it.untimed = true; it.hits.push('不限时'); }
-    if (s.indexOf('联机') >= 0 || s.indexOf('对打') >= 0 || s.indexOf('朋友') >= 0 || s.indexOf('multi') >= 0 || s.indexOf('freund') >= 0) { it.multiplayer = true; it.hits.push('联机'); }
+    if (s.indexOf('暂停') >= 0 || s.indexOf('电话') >= 0 || s.indexOf('pause') >= 0 || s.indexOf('unterbr') >= 0) { it.pausable = true; it.hits.push(TG('可暂停')); }
+    if (s.indexOf('不限时') >= 0 || s.indexOf('慢慢') >= 0 || s.indexOf('untimed') >= 0 || s.indexOf('ohne zeit') >= 0) { it.untimed = true; it.hits.push(TG('不限时')); }
+    if (s.indexOf('联机') >= 0 || s.indexOf('对打') >= 0 || s.indexOf('朋友') >= 0 || s.indexOf('multi') >= 0 || s.indexOf('freund') >= 0) { it.multiplayer = true; it.hits.push(TG('联机')); }
     // ★ 2026-11-07 模拟验证抓到：「棋/牌」原来被映射到 CLASSIC 类别 ⇒ 推荐出「宝石迷阵／打砖块」
     //   因为 CLASSIC 是「经典」不是「棋牌」。改成 **tag 意图**（tags 里有 board/card 的才是棋牌）。
     if (s.indexOf('棋') >= 0 || s.indexOf('牌') >= 0 || s.indexOf('board') >= 0 || s.indexOf('card') >= 0
         || s.indexOf('brett') >= 0 || s.indexOf('carte') >= 0 || s.indexOf('juego de mesa') >= 0) {
-      it.board = true; it.hits.push('棋牌');
+      it.board = true; it.hits.push(TG('棋牌'));
+    }
+    // ★★★ 2026-11-08 **「像 XX 那样的」**（v2 第一个新维度）——
+    //   这是用户最常问的一类（「有没有像 2048 的」「跟扫雷差不多的」），v1 完全没接住。
+    //   识别法：句子里**直接出现某款游戏的名字**（去掉空格/标点后包含即可）。
+    //   ⚠️ 只在**没有更明确的意图**时启用（用户说「想玩不太难的解谜，像 2048 那样」时以解谜为主）。
+    const nmClean: string = s.replace(/\s/g, '');
+    for (let i = 0; i < GAMES.length; i++) {
+      const gn: string = GAMES[i].name.replace(/\s/g, '').toLowerCase();
+      if (gn.length >= 2 && nmClean.indexOf(gn) >= 0) {
+        it.similar = GAMES[i].id;
+        it.hits.push(GAMES[i].name);
+        break;
+      }
     }
     return it;
   }
@@ -123,7 +148,7 @@ export class ChatFinder {
   /** 意图是否「什么都没抽到」（这时该追问，而不是乱推） */
   static isEmpty(it: Intent): boolean {
     return it.category === null && it.difficulty === null && !it.short && !it.long
-      && !it.pausable && !it.untimed && !it.multiplayer && !it.board;
+      && !it.pausable && !it.untimed && !it.multiplayer && !it.board && it.similar.length === 0;
   }
 
   /** 按意图给一款游戏打分（越高越合适） */
@@ -131,7 +156,9 @@ export class ChatFinder {
     let sc: number = 0;
     if (it.category !== null && g.category === it.category) { sc += 40; }
     if (it.difficulty !== null && g.difficulty === it.difficulty) { sc += 25; }
-    if (it.short && (g.tags.indexOf('quick') >= 0 || g.tags.indexOf('timed') >= 0 || g.tags.indexOf('endless') >= 0)) { sc += 15; }
+    // ★ 2026-11-08 **死判据修复**（verifier-eng2 实测）：数据里 **`quick` 是 0 款**，
+    //   真实存在的是 **`short`(166)** 与 `timed`(32) ⇒ 「十分钟/短一局」原来**永远匹配不到**。
+    if (it.short && (g.tags.indexOf('short') >= 0 || g.tags.indexOf('timed') >= 0 || g.tags.indexOf('quick') >= 0)) { sc += 15; }
     if (it.long && (g.tags.indexOf('endless') >= 0 || g.tags.indexOf('untimed') >= 0)) { sc += 15; }
     if (it.pausable && g.tags.indexOf('pausable') >= 0) { sc += 12; }
     if (it.untimed && g.tags.indexOf('untimed') >= 0) { sc += 12; }
@@ -141,6 +168,23 @@ export class ChatFinder {
     if (it.board) {
       const nm: string = g.name;
       if (nm.indexOf('棋') >= 0 || nm.indexOf('牌') >= 0 || nm.indexOf('麻将') >= 0) { sc += 30; }
+    }
+    // ★ 2026-11-08「像 XX 那样」：同类别 +18、同难度 +8、共享 tags 每个 +4（最多 +16）
+    //   ⚠️ **不推荐它自己**（用户说「像 2048」意思是要「别的」，不是「再玩一次 2048」）
+    if (it.similar.length > 0 && g.id !== it.similar) {
+      let ref: GameMeta | undefined = undefined;
+      for (let i = 0; i < GAMES.length; i++) {
+        if (GAMES[i].id === it.similar) { ref = GAMES[i]; break; }
+      }
+      if (ref !== undefined) {
+        if (g.category === ref.category) { sc += 18; }
+        if (g.difficulty === ref.difficulty) { sc += 8; }
+        let shared: number = 0;
+        for (let t = 0; t < g.tags.length; t++) {
+          if (ref.tags.indexOf(g.tags[t]) >= 0) { shared = shared + 1; }
+        }
+        sc += Math.min(16, shared * 4);
+      }
     }
     // 毫无倾向时给「轻松」一点偏好（新手友好）
     if (ChatFinder.isEmpty(it) && g.difficulty === Difficulty.EASY) { sc += 3; }
@@ -162,6 +206,7 @@ export class ChatFinder {
       if (it.category !== null && g.category === it.category) { why = TG('是「' + it.category + '」类'); }
       else if (it.difficulty !== null && g.difficulty === it.difficulty) { why = TG('难度正好是「' + it.difficulty + '」'); }
       else if (it.pausable && g.tags.indexOf('pausable') >= 0) { why = TG('可以随时暂停'); }
+      else if (it.similar.length > 0 && g.id !== it.similar) { why = TG('和你说的那款相近'); }
       else { why = TG('符合你的口味'); }
       scored.push({ game: g, score: sc, why: why });
     }
@@ -180,6 +225,9 @@ export class ChatFinder {
   /** 把抽到的意图回给用户看（让他知道我是按什么找的） */
   static echo(it: Intent): string {
     if (it.hits.length === 0) { return ''; }
-    return TG('按「' + it.hits.join('、') + '」找：');
+    // ★★★ 2026-11-08 **恒中文 bug**（code-hunter 抓到）：原来 `TG('按「' + hits.join('、') + '」找：')`
+    //   是**动态 key** —— 永远不可能命中字典 ⇒ `TG` 走最后一行 `return zh` ⇒ **恒中文**。
+    //   ⇒ 拆成「模板（静态，可翻译）+ 命中词（来自用户原话，不译）」两段。
+    return TG('按「{0}」找：').replace('{0}', it.hits.join('、'));
   }
 }
