@@ -265,7 +265,7 @@ export struct GUnitConverterPro {
     if (this.round >= this.diffTotal) {
       this.over = true; this.won = this.right >= PASS;
       this.msg = this.won
-        ? TG('🎉 答对 ') + String(this.right) + '/' + String(this.diffTotal) + TG('，通关！')
+        ? TG2('🎉 答对 {0}/{1}，通关！', String(this.right), String(this.diffTotal))
         : TG('😵 只答对 ') + String(this.right) + '/' + String(this.diffTotal) + TG('，差 ') + String(PASS - this.right) + TG(' 题');
       this.finish(this.won); return;
     }
