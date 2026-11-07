@@ -217,8 +217,23 @@ export class Hint {
    * onStop 保证**只调一次**；用户手动 `autoStop(id)` 不触发（那条路游戏自己清）。
    */
   static autoRun(tick: () => boolean, onStop?: () => void): number {
+    return Hint.autoRunMs(tick, Hint.AUTO_MS, onStop);
+  }
+
+  /**
+   * ★★★ 2026-11-07（判据 1731 的落地）：**实时游戏专用的快速代打**。
+   *
+   * 背景：`autoRun` 固定 320ms 一拍，对回合制/解谜游戏刚好（人能看清）；
+   * 但**实时游戏**里球/线每 16ms 动一次，AI 每 320ms 才追一次 ⇒ 永远追不上。
+   * 实测：乒乓、描路径在 320ms 下一直是 TIMEOUT。
+   *
+   * ⇒ 给实时游戏一个 `ms` 参数（建议 16~50），让 AI 按帧追。
+   * ⚠️ 只给**物理/实时**类游戏用；回合制游戏用 `autoRun`，否则按钮像抽风。
+   */
+  static autoRunMs(tick: () => boolean, ms: number, onStop?: () => void): number {
     let id: number = -1;
     let fired: boolean = false;
+    const step: number = ms > 0 ? ms : Hint.AUTO_MS;
     id = setInterval(() => {
       let more: boolean = false;
       try {
@@ -236,7 +251,7 @@ export class Hint {
           onStop();
         }
       }
-    }, Hint.AUTO_MS);
+    }, step);
     Hint.autos.add(id);
     return id;
   }

@@ -449,7 +449,8 @@ export struct GPong {
       return;
     }
     Hint.toast(TG('AI 开始代打…'));
-    this.autoId = Hint.autoRun(() => this.autoStep(), () => { this.autoId = -1; });
+    // ★ 2026-11-07：实时游戏必须按帧追（球每 16ms 动一次，320ms 一拍追不上 —— 判据 1731）
+    this.autoId = Hint.autoRunMs(() => this.autoStep(), TICK_MS, () => { this.autoId = -1; });
   }
 
   private stopAuto(): void {
