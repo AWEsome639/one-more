@@ -23,6 +23,9 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  "第 {0} 关：称出 {1}": {"en": "Level {0}: weigh out {1}", "ja": "ステージ {0}：{1} を量り出せ", "ko": "{0}단계: {1}을(를) 달아라", "es": "Nivel {0}: pesa {1}", "fr": "Niveau {0} : pèse {1}", "de": "Level {0}: {1} abwiegen", "pt": "Nível {0}: pese {1}", "ru": "Уровень {0}: отвесь {1}", "it": "Livello {0}: pesa {1}", "ar": "المستوى {0}: زن {1}"},
+  "第 {0} 关：凑出 {1}": {"en": "Level {0}: make {1}", "ja": "ステージ {0}：{1} を作れ", "ko": "{0}단계: {1} 만들기", "es": "Nivel {0}: forma {1}", "fr": "Niveau {0} : forme {1}", "de": "Level {0}: {1} bilden", "pt": "Nível {0}: forme {1}", "ru": "Уровень {0}: составь {1}", "it": "Livello {0}: forma {1}", "ar": "المستوى {0}: كوّن {1}"},
+  "第 {0} 关：凑到 {1}": {"en": "Level {0}: reach {1}", "ja": "ステージ {0}：{1} に届け", "ko": "{0}단계: {1}에 도달", "es": "Nivel {0}: llega a {1}", "fr": "Niveau {0} : atteins {1}", "de": "Level {0}: {1} erreichen", "pt": "Nível {0}: chegue a {1}", "ru": "Уровень {0}: достигни {1}", "it": "Livello {0}: raggiungi {1}", "ar": "المستوى {0}: اصل إلى {1}"},
   "答对 {0} 题": {"en": "{0} correct", "ja": "{0} 問正解", "ko": "{0}문제 정답", "es": "{0} correctas", "fr": "{0} bonnes réponses", "de": "{0} richtig", "pt": "{0} certas", "ru": "{0} верных", "it": "{0} corrette", "ar": "{0} صحيحة"},
   "⏰ 时间到，答对 {0} 题": {"en": "⏰ Time's up — {0} correct", "ja": "⏰ 時間切れ・{0} 問正解", "ko": "⏰ 시간 종료 — {0}문제 정답", "es": "⏰ Tiempo: {0} correctas", "fr": "⏰ Temps écoulé — {0} bonnes réponses", "de": "⏰ Zeit um — {0} richtig", "pt": "⏰ Tempo esgotado — {0} certas", "ru": "⏰ Время вышло — {0} верных", "it": "⏰ Tempo scaduto — {0} corrette", "ar": "⏰ انتهى الوقت — {0} صحيحة"},
   "🎮 全部": {"en": "🎮 All", "ja": "🎮 すべて", "ko": "🎮 전체", "es": "🎮 Todos", "fr": "🎮 Tous", "de": "🎮 Alle", "pt": "🎮 Todos", "ru": "🎮 Все", "it": "🎮 Tutti", "ar": "🎮 الكل"},

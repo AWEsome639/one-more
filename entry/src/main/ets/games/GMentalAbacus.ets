@@ -277,7 +277,7 @@ export struct GMentalAbacus {
 
   private advance(): void {
     if (this.over) { return; }
-    if (this.right >= GOAL) { this.end(true, TG('🎉 答对 ') + String(GOAL) + TG(' 题，通关！剩 ') + String(this.left) + TG(' 秒')); return; }
+    if (this.right >= GOAL) { this.end(true, TG2('🎉 答对 {0} 题，通关！剩 {1} 秒', String(GOAL), String(this.left))); return; }
     if (this.left <= 0) { this.end(false, TG2('⏰ 时间到，答对 {0} 题', String(this.right))); return; }
     this.ask();
   }

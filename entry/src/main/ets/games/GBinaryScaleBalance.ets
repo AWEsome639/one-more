@@ -127,7 +127,7 @@ export struct GBinaryScaleBalance {
     this.on = new Array<boolean>(COUNT).fill(false);
     this.msg = first
       ? TG2('拨开关，把右盘凑到 {0}', t)
-      : TG('第 ') + String(this.level) + ' 关：凑到 ' + String(t);
+      : TG2('第 {0} 关：凑到 {1}', String(this.level), String(t));
   }
 
   private sum(): number {

@@ -138,7 +138,7 @@ export struct GBalanceScale {
     this.target = t;
     this.msg = first
       ? TG2('点砝码放上右盘，凑到刚好 {0}', t)
-      : TG('第 ') + String(this.level) + ' 关：称出 ' + String(t);
+      : TG2('第 {0} 关：称出 {1}', String(this.level), String(t));
   }
 
   private sum(): number {
