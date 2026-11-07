@@ -58,6 +58,9 @@ export struct GExponentTower {
   @State private over: boolean = false;
   @State private won: boolean = false;
   @State private msg: string = '';
+  // ★ 2026-11-08 常驻结果行：反馈不再依赖显示的几秒，随时能回看上一题的对错
+  @State private lastFb: string = '';
+  @State private lastOk: boolean = true;
   private startAt: number = 0; private nextTo: number = -1; private finished: boolean = false;
   private slots: number[] = [0, 1, 2, 3];
   aboutToAppear(): void {
@@ -74,6 +77,7 @@ export struct GExponentTower {
     if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
   }
   private reset(): void {
+    this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     if (this.nextTo >= 0) { clearTimeout(this.nextTo); this.nextTo = -1; }
     this.round = 1; this.right = 0; this.score = 0; this.over = false; this.won = false; this.finished = false;
     this.startAt = Date.now(); this.ask(); this.msg = TG('先算塔顶 (b^c)，拿它当指数');
@@ -244,6 +248,11 @@ export struct GExponentTower {
     this.nextTo = setTimeout(() => { this.nextTo = -1; this.next(); }, NEXT_MS);
   }
   private next(): void {
+    // ★ 2026-11-08 常驻结果行：在加载下一题之前，把上一题的反馈存下来（窗口再短也能回看）
+      const fbV: string = this.msg;
+      if (fbV.indexOf('✅') >= 0 || fbV.indexOf('🎉') >= 0) { this.lastFb = fbV; this.lastOk = true; }
+      else if (fbV.indexOf('❌') >= 0 || fbV.indexOf('💤') >= 0 || fbV.indexOf('😵') >= 0 || fbV.indexOf('⏰') >= 0 || fbV.indexOf('⌛') >= 0) { this.lastFb = fbV; this.lastOk = false; }
+
     if (this.over) { return; }
     if (this.round >= this.diffTotal) {
       this.over = true; this.won = this.right >= PASS;
@@ -333,7 +342,11 @@ export struct GExponentTower {
         }, (i: number) => 'et' + i + '_' + String(this.opts[i]))
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%')
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
+      Text(this.lastFb.length > 0 ? this.lastFb : '　')
+        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+        .width('100%').textAlign(TextAlign.Center)
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.cyan)

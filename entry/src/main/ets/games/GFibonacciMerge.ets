@@ -259,7 +259,7 @@ export struct GFibonacciMerge {
     }
     this.lives = this.lives - 1; this.score = Math.max(0, this.score - 20); this.shakeX = 8; setTimeout(() => { this.shakeX = -8; }, 60); setTimeout(() => { this.shakeX = 0; }, 120);
     if (this.lives <= 0) {
-      this.over = true; this.won = false; this.msg = TG2('💔 只能合相邻两格、且和要是斐波那契数（这次和是 {0}）', String(sum)); this.finish(false); return;
+      this.over = true; this.won = false; this.msg = TG2('💔 {0} 不是斐波那契数', String(sum)); this.finish(false); return;
     }
     this.msg = TG2('❌ 要相邻两格、和还要是斐波那契数（这次和是 {0}），还剩 {1} 次', String(sum),Digits(String(this.lives), this.langCode));
   }
@@ -328,7 +328,7 @@ export struct GFibonacciMerge {
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).width('100%')
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)

@@ -456,7 +456,7 @@ export struct GMagicSquares {
       .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg).shadow(Shadow.card)
 
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.sm }) {
         ForEach(this.pool, (v: number, i: number) => { Text(String((v)))

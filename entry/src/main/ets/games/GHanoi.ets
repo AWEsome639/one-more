@@ -11,6 +11,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -50,6 +51,14 @@ export struct GHanoi {
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
     this.reset(this.level);
+    // ★★★ 2026-11-08（退出恢复最小版）：**从上次玩到的那一盘数接着玩**
+    //   本款"关卡"= 盘数（2~7）。只在本局首次进入时恢复：`onRestart` 仍是重来本关。
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('hanoi') ? ProgressStore.lastLevel('hanoi') : 0;
+    if (lastLv >= 2 && lastLv <= 7) {
+      this.level = lastLv;
+      this.reset(lastLv);
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GHanoi')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -65,6 +74,8 @@ export struct GHanoi {
   }
 
   private reset(n: number): void {
+    // ★ 2026-11-08（退出恢复最小版）：记下当前盘数（唯一"关卡"概念）
+    ProgressStore.saveLastWhere('hanoi', n, String(GameDiff.of('hanoi')));
     const a: number[] = [];
     for (let i = n; i >= 1; i--) {
       a.push(i);   // 大的在底

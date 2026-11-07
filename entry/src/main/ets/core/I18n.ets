@@ -1990,6 +1990,13 @@ const EXTRA: Record<string, Record<string, string>> = {
     "pt": "Auto",
     "it": "Auto",
   },
+  "，已通关": { "ja": "、クリア済み", "ko": ", 클리어", "es": ", superado", "fr": ", terminé", "de": ", geschafft", "pt": ", concluído", "ru": ", пройдено", "it": ", completato", "ar": "، مكتمل", "zh-Hant": "，已通關" },
+  "，最高分 ": { "ja": "、最高 ", "ko": ", 최고 ", "es": ", récord ", "fr": ", record ", "de": ", Best ", "pt": ", melhor ", "ru": ", рекорд ", "it": ", record ", "ar": "، الأفضل ", "zh-Hant": "，最高分 " },
+  "这个组合没找到，换个说法试试？": { "ja": "見つかりません。別の言い方は？", "ko": "이 조합은 못 찾았어요. 다른 말로 해볼까요?", "es": "No encontré nada. ¿Pruebas otras palabras?", "fr": "Rien trouvé. Essaie d'autres mots ?", "de": "Nichts gefunden — andere Worte?", "pt": "Nada encontrado — tente outras palavras?", "ru": "Ничего не найдено — попробуйте иначе?", "it": "Niente trovato — prova altre parole?", "ar": "لم أجد شيئًا — جرّب كلمات أخرى؟", "zh-Hant": "這個組合沒找到，換個說法試試？" },
+  "想玩点什么样的？": { "ja": "どんな気分？", "ko": "어떤 걸 하고 싶으세요?", "es": "¿Qué te apetece?", "fr": "Tu as envie de quoi ?", "de": "Worauf hast du Lust?", "pt": "Do que você gosta?", "ru": "Что хочется?", "it": "Cosa ti va?", "ar": "ماذا تحب أن تلعب؟", "zh-Hant": "想玩點什麼樣的？" },
+  "已开启": { "ja": "オン", "ko": "켬", "es": "Activado", "fr": "Activé", "de": "An", "pt": "Ativado", "ru": "Вкл.", "it": "Attivo", "ar": "مفعّل", "zh-Hant": "已開啟" },
+  "已关闭": { "ja": "オフ", "ko": "끔", "es": "Desactivado", "fr": "Désactivé", "de": "Aus", "pt": "Desativado", "ru": "Выкл.", "it": "Disattivato", "ar": "متوقف", "zh-Hant": "已關閉" },
+  "，当前选中": { "ja": "、選択中", "ko": ", 선택됨", "es": ", seleccionado", "fr": ", sélectionné", "de": ", gewählt", "pt": ", selecionado", "ru": ", выбран", "it": ", selezionato", "ar": "، محدد", "zh-Hant": "，目前選取" },
 };
 
 /**

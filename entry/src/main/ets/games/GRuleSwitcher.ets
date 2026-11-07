@@ -325,7 +325,7 @@ export struct GRuleSwitcher {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((1)); }); })
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm).textAlign(TextAlign.Center).width('100%')
-        .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft)
+        .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.sky)

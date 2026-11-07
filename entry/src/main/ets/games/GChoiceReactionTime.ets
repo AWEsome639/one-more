@@ -296,7 +296,7 @@ export struct GChoiceReactionTime {
       Column({ space: Space.xs }) {
         Text(this.live ? String(this.val) : '👀').fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
           .fontColor(this.live ? Palette.orange : this.theme.inkFaint)
-        Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center)
+        Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').height(170).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.md }) {

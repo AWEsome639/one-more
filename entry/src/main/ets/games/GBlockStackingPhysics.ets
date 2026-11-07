@@ -10,6 +10,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Cell } from '../core/D
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -68,6 +69,17 @@ export struct GBlockStackingPhysics {
 
   aboutToAppear(): void {
     LanRace.noteStart(); this.reset();
+    // ★★★ 2026-11-08（退出恢复最小版）：**从上次玩到的那一关接着玩**
+    //   本款关卡只由底部「换一关」按钮切换 ⇒ 记住那个 n 就够了。
+    //   ★ 只在本局首次进入时恢复：`onRestart` 仍走 reset()，语义不变。
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('block_stacking_physics') ? ProgressStore.lastLevel('block_stacking_physics') : 0;
+    if (lastLv > 0 && lastLv <= LEVELS.length) {
+      const lv: number = lastLv - 1;
+      this.reset();
+      this.level = lv;
+      this.queue = LEVELS[lv].queue.slice();
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GBlockStackingPhysics')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -346,10 +358,14 @@ export struct GBlockStackingPhysics {
 .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on())
 .onFocus(() => { this.tvFocus = 'L331'; })
 .onBlur(() => { if (this.tvFocus === 'L331') { this.tvFocus = ''; } })
-.outline(Tv.focusOutline(this.tvFocus === 'L331')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); const n: number = (this.level + 1) % LEVELS.length; this.reset(); this.level = n; this.queue = LEVELS[n].queue.slice(); }); }).onClick(() => {
+.outline(Tv.focusOutline(this.tvFocus === 'L331')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); const n: number = (this.level + 1) % LEVELS.length; this.reset(); this.level = n; this.queue = LEVELS[n].queue.slice();
+            // ★ 2026-11-08（退出恢复最小版）：记下当前关卡（1 基）
+            ProgressStore.saveLastWhere('block_stacking_physics', n + 1, String(GameDiff.of('block_stacking_physics'))); }); }).onClick(() => {
             Haptics.tap();
             const n: number = (this.level + 1) % LEVELS.length; this.reset();
             this.level = n; this.queue = LEVELS[n].queue.slice();
+            // ★ 2026-11-08（退出恢复最小版）：记下当前关卡（1 基）
+            ProgressStore.saveLastWhere('block_stacking_physics', n + 1, String(GameDiff.of('block_stacking_physics')));
           })
       }.width('100%')
     }

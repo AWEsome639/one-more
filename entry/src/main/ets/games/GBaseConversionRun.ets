@@ -531,7 +531,7 @@ export struct GBaseConversionRun {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() })
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
-        .width('100%')
+        .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Button(TG('提示'))
         .fontSize(FontSize.sm)

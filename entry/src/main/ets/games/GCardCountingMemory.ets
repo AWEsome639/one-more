@@ -323,7 +323,7 @@ export struct GCardCountingMemory {
         }
       }.width('100%').height(110).backgroundColor(Palette.surface).borderRadius(Radius.md)
         .border({ width: 3, color: Palette.rose }).shadow(Shadow.card)
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Grid() {
         ForEach(SLOTS, (i: number) => { GridItem() {
         Text(cardFace(this.stream[(i)])).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)

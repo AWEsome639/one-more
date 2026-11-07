@@ -349,7 +349,7 @@ export struct GAbReversalOddball {
       .width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       // ★★★ 2026-11-05（第 1386 轮）**修「提示文案误导」（判据 1268）**
       //   原文：「漏掉的反转 {0} 次 —— 只在连续两次同一个时点才抓对了」
       //   问题：

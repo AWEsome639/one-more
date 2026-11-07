@@ -322,7 +322,7 @@ export struct GSpotlightTrack {
       .backgroundColor(this.theme.isDark ? '#141414' : '#E2E8F0').borderRadius(Radius.lg)
       Text(this.msg)
         .fontSize(FontSize.md).fontColor(this.chasing ? this.theme.inkSoft : Palette.primary)
-        .width('100%').textAlign(TextAlign.Center)
+        .width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF')

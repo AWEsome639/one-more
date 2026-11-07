@@ -473,7 +473,7 @@ export struct GMirrorMaze {
         .animation({ duration: Motion.slow, curve: Motion.spring() })
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         .width('100%')
-        .textAlign(TextAlign.Center)
+        .textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.sm }) {
         Text(('◀'))
         .fontSize(FontSize.lg)

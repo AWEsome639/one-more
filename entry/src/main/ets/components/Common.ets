@@ -783,8 +783,8 @@ export struct LevelHeader {
         //   **zh 返回原词、en 返回入参** —— 两者都不带符号 ⇒ 只有切到那 10 种语言才冒出来。
         //   ⇒ 正确做法：**组件两种状态都自己画符号**，并**剥掉译文首尾符号** ⇒ 11 语言一致。
         Text(this.solvedToday ? '✅' : '⭕').fontSize(FontSize.md)
-        Text(this.stripEdgeMark(this.solvedToday ? this.t(TG('今日已打卡'), 'Checked in today')
-                              : this.t(TG('还没玩 · 来一局就打卡'), 'Not yet — play one round')))
+        Text(this.stripEdgeMark(this.solvedToday ? TG('今日已打卡')
+                              : TG('还没玩 · 来一局就打卡')))
           .fontSize(FontSize.xs)
           .fontColor(this.solvedToday ? Palette.emerald : this.theme.inkSoft)
       }
@@ -1246,6 +1246,16 @@ build() {
           //     （而 802-803 行的注释明确说"允许两行"，设计意图是相反的）。
           //   ⇒ 合并成一个条件：**任一条件成立就给两行**。
           .maxLines((Bp.tinyWatch() || this.uiMode === 'elder') ? 2 : 1)
+          // ★★★ 2026-11-08（真机验收抓到的）：**俄语卡片标题被省略号截断**
+          //   实测：「Составная …」「Непрерывн…」（4 列布局，每卡 ~500px 仍不够）
+          //   修法选择：**先缩字号再省略**（与下一条副标题同一套机制），
+          //     而不是"给俄语起个短名字" —— 理由：
+          //       ① 语言中立：一次修好 ru/de/pt/it/fr 所有长名，不是只修眼前两个
+          //       ② 游戏名是**专有名词**，缩写会失真（"Составная линия" ≠ "Составная"）
+          //       ③ 隔壁副标题 20 行前就是这么做的（minFontSize(8)），概念一致、无新机制
+          //       ④ 一行、可逆；真要再挤不下，下一步才是"宽屏改 3 列"（布局改动，另议）
+          .minFontSize(11)
+          .maxFontSize(Bp.tinyWatch() ? FontSize.sm : FontSize.md)
           .fontWeight(FontWeight.Bold)
           .fontColor(Color.White)
           .textOverflow({ overflow: TextOverflow.Ellipsis })

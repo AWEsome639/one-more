@@ -352,7 +352,7 @@ export struct GDualCoding {
           }, (r: number) => 'qr' + r)
         }.width('100%')
       }
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.sm }) {
         if (this.phase === 0) {
           Button(TG('我记住了 ▶'))

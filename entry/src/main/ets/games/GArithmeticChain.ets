@@ -7,6 +7,7 @@ import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
@@ -100,6 +101,14 @@ export struct GArithmeticChain {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
     this.startAt = Date.now();
     this.reset();
+    // ★★★ 2026-11-08（退出恢复最小版）：从上次玩到的那一关接着玩
+    //   ★ 本款 level 是 **0 基**，记录里存 1 基 ⇒ 恢复时 -1。只在本局首次进入时恢复。
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('arithmetic_chain') ? ProgressStore.lastLevel('arithmetic_chain') : 0;
+    if (lastLv >= 1 && lastLv <= this.diffTotal) {
+      this.level = lastLv - 1;
+      this.load(this.level);
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GArithmeticChain')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -358,6 +367,9 @@ export struct GArithmeticChain {
 
   private next(msg: string): void {
     this.level++;
+    // ★ 2026-11-08（退出恢复最小版）：记下当前关卡（1 基；打完最后一关就清零，下次从头）
+    ProgressStore.saveLastWhere('arithmetic_chain', this.level < this.diffTotal ? this.level + 1 : 0,
+      String(GameDiff.of('arithmetic_chain')));
     if (this.level >= this.diffTotal) {
       this.over = true;
       this.tip = TG2('{0}｜共过 {1}/{2} 关', msg, String(this.clears), String(this.diffTotal));
@@ -417,7 +429,7 @@ export struct GArithmeticChain {
       Text(this.chain.length > 0 ? this.chain.join('  →  ') : TG('还没有任何运算'))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
 
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {

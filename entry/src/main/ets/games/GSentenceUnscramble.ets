@@ -60,6 +60,9 @@ export struct GSentenceUnscramble {
   @State plan: string[] = []; @State tiles: string[] = []; @State pickedIdx: number[] = [];
   @State qi: number = 0; @State right: number = 0; @State lives: number = LIVES;
   @State score: number = 0; @State msg: string = ''; @State over: boolean = false;
+  // ★ 2026-11-08 常驻结果行：反馈不再依赖显示的几秒，随时能回看上一题的对错
+  @State private lastFb: string = '';
+  @State private lastOk: boolean = true;
   @State won: boolean = false;
   /**
    * ★★★ 2026-11-07（判据 1782 家族 · 渲染路径）：**用状态字段记「上一步错了」**，
@@ -85,6 +88,7 @@ export struct GSentenceUnscramble {
   private stop(): void { if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; } }
 
   private reset(): void {
+    this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     this.stop();
     this.plan = shufStr(SENTS).slice(0, this.diffTotal);
     this.qi = 0; this.right = 0; this.lives = LIVES; this.score = 0;
@@ -92,6 +96,11 @@ export struct GSentenceUnscramble {
   }
 
   private next(): void {
+    // ★ 2026-11-08 常驻结果行：在加载下一题之前，把上一题的反馈存下来（窗口再短也能回看）
+      const fbV: string = this.msg;
+      if (fbV.indexOf('✅') >= 0 || fbV.indexOf('🎉') >= 0) { this.lastFb = fbV; this.lastOk = true; }
+      else if (fbV.indexOf('❌') >= 0 || fbV.indexOf('💤') >= 0 || fbV.indexOf('😵') >= 0 || fbV.indexOf('⏰') >= 0 || fbV.indexOf('⌛') >= 0) { this.lastFb = fbV; this.lastOk = false; }
+
     this.lastWrong = false;                     // 新一句 ⇒ 解锁输入（不再靠 msg 首字符）
     const sent: string = this.plan[this.qi];
     const words: string[] = sent.split(' ');
@@ -395,7 +404,11 @@ export struct GSentenceUnscramble {
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
+      Text(this.lastFb.length > 0 ? this.lastFb : '　')
+        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+        .width('100%').textAlign(TextAlign.Center)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })

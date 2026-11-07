@@ -669,7 +669,7 @@ export struct GGame24 {
           .padding(Space.sm)
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.sm)
-          .shadow(Shadow.card)
+          .shadow(Shadow.card).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }
 
       Row({ space: Space.md }) {

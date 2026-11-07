@@ -6,6 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -62,6 +63,13 @@ export struct GPythagoreanTripleBuilder {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
     this.startAt = Date.now();
     this.reset();
+    // ★★★ 2026-11-08（退出恢复最小版）：从上次答到的那一题接着做（level 是 **0 基**）
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('pythagorean_triple_builder') ? ProgressStore.lastLevel('pythagorean_triple_builder') : 0;
+    if (lastLv >= 1 && lastLv <= this.diffTotal) {
+      this.level = lastLv - 1;
+      this.load();
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GPythagoreanTripleBuilder')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -280,6 +288,9 @@ export struct GPythagoreanTripleBuilder {
 
   private next(msg: string): void {
     this.level++;
+    // ★ 2026-11-08（退出恢复最小版）：记下当前题号（1 基；做完最后一题就清零）
+    ProgressStore.saveLastWhere('pythagorean_triple_builder', this.level < this.diffTotal ? this.level + 1 : 0,
+      String(GameDiff.of('pythagorean_triple_builder')));
     if (this.level >= this.diffTotal) {
       this.over = true;
       this.tip = TG2("{0}｜共解出 {1}/{2} 关", msg,Digits(String(this.clears), this.langCode),Digits(String(this.diffTotal), this.langCode));
@@ -327,7 +338,7 @@ export struct GPythagoreanTripleBuilder {
           .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.berry)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Column({ space: Space.xs }) {
         Row({ space: Space.xs }) {
         Button((('1')))

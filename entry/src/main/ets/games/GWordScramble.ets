@@ -68,6 +68,9 @@ export struct GWordScramble {
   onFinish: (r: GameResult) => void = () => {};
   @State queue: Entry[] = []; @State idx: number = 0; @State tiles: string[] = [];
   @State used: boolean[] = []; @State typed: string[] = []; @State msg: string = '';
+  // ★ 2026-11-08 常驻结果行：反馈不再依赖显示的几秒，随时能回看上一题的对错
+  @State private lastFb: string = '';
+  @State private lastOk: boolean = true;
   @State score: number = 0; @State solved: number = 0; @State leftMs: number = LIMIT_MS;
   @State over: boolean = false; @State won: boolean = false;
   private startAt: number = 0; private timer: number = -1; private feed: number = -1;
@@ -220,6 +223,7 @@ export struct GWordScramble {
   }
 
   private reset(): void {
+    this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     this.stopAll();
     this.queue = mixEntries(BANK).slice(0, this.diffTotal);
     this.idx = 0; this.score = 0; this.solved = 0; this.leftMs = LIMIT_MS;
@@ -228,6 +232,11 @@ export struct GWordScramble {
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private load(): void {
+    // ★ 2026-11-08 常驻结果行：在加载下一题之前，把上一题的反馈存下来（窗口再短也能回看）
+      const fbV: string = this.msg;
+      if (fbV.indexOf('✅') >= 0 || fbV.indexOf('🎉') >= 0) { this.lastFb = fbV; this.lastOk = true; }
+      else if (fbV.indexOf('❌') >= 0 || fbV.indexOf('💤') >= 0 || fbV.indexOf('😵') >= 0 || fbV.indexOf('⏰') >= 0 || fbV.indexOf('⌛') >= 0) { this.lastFb = fbV; this.lastOk = false; }
+
     const w: string = this.word();
     let t: string[] = mixLetters(w);
     for (let guard = 0; guard < 20 && t.join('') === w; guard++) { t = mixLetters(w); }
@@ -332,7 +341,11 @@ export struct GWordScramble {
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
-        .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
+      Text(this.lastFb.length > 0 ? this.lastFb : '　')
+        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+        .width('100%').textAlign(TextAlign.Center)
       Row({ space: Space.sm }) {
         Button(TG('撤销'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).onClick(() => { Haptics.tap(); this.undo(); })

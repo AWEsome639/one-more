@@ -529,7 +529,7 @@ export struct GSumSnake {
           .fontColor(this.over
             ? (this.won ? Palette.emerald : Palette.rose)
             : this.theme.inkSoft)
-          .layoutWeight(1)
+          .layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Button(TG('提示'))
           .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

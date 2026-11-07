@@ -324,7 +324,7 @@ export struct GMemoryPalace {
       .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
       .backgroundColor(this.theme.isDark ? '#141414' : '#E2E8F0').borderRadius(Radius.lg)
 
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
 
       Button(this.over ? TG('再来一局') : TG('重开'))

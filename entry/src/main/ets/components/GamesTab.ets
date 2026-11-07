@@ -1262,9 +1262,9 @@ build() {
     .padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm })
     .borderRadius(Radius.sm)
     .focusable(Tv.on())
-    .onFocus(() => { this.tvFocus = 'GT1264'; })
-    .onBlur(() => { if (this.tvFocus === 'GT1264') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'GT1264'))
+    .onFocus(() => { this.tvFocus = 'GT1264-' + text; })
+    .onBlur(() => { if (this.tvFocus === 'GT1264-' + text) { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'GT1264-' + text))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
        Haptics.tap(); act(); 
     }); })
@@ -1930,9 +1930,9 @@ build() {
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
       .focusable(Tv.on())
-      .onFocus(() => { this.tvFocus = 'GT1897'; })
-      .onBlur(() => { if (this.tvFocus === 'GT1897') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'GT1897'))
+      .onFocus(() => { this.tvFocus = 'GT1897-' + t.id; })
+      .onBlur(() => { if (this.tvFocus === 'GT1897-' + t.id) { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'GT1897-' + t.id))
       // ★ 2026-11-08 读屏：这是纯图标/组合文案，补一句可读的说明
       .accessibilityGroup(true)
       .accessibilityText(L(t.label, t.enLabel))
@@ -1979,9 +1979,9 @@ build() {
       .shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
       .focusable(Tv.on())
-      .onFocus(() => { this.tvFocus = 'GT1931'; })
-      .onBlur(() => { if (this.tvFocus === 'GT1931') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'GT1931'))
+      .onFocus(() => { this.tvFocus = 'GT1931-' + s; })
+      .onBlur(() => { if (this.tvFocus === 'GT1931-' + s) { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'GT1931-' + s))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                 Haptics.tap();   // ★ 2026-10-19 按压反馈
         this.pulseGrid();   // ★ 拉满：内容刷新脉冲
@@ -2162,9 +2162,9 @@ build() {
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
       .focusable(Tv.on())
-      .onFocus(() => { this.tvFocus = 'GT2098'; })
-      .onBlur(() => { if (this.tvFocus === 'GT2098') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'GT2098'))
+      .onFocus(() => { this.tvFocus = 'GT2098-' + mode; })
+      .onBlur(() => { if (this.tvFocus === 'GT2098-' + mode) { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'GT2098-' + mode))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                 Haptics.tap();
         // ★ 每次切到 A-Z 都重放一次首屏错峰（先归零再置起，否则第二次进来不动）
@@ -2378,9 +2378,9 @@ build() {
           .backgroundColor((i0 + 14) === this.azCurrent ? this.theme().surfaceAlt : Color.Transparent)
           .animation({ duration: Motion.fast, curve: Motion.spring() })
           .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'GT2275'; })
-          .onBlur(() => { if (this.tvFocus === 'GT2275') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'GT2275'))
+          .onFocus(() => { this.tvFocus = 'GT2275-' + letter; })
+          .onBlur(() => { if (this.tvFocus === 'GT2275-' + letter) { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'GT2275-' + letter))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                         if (this.azCounts()[i0 + 14] === 0) {
               return;
@@ -2484,9 +2484,9 @@ build() {
       delay: enterIdx >= 0 ? Motion.stagger(enterIdx) : 0
     })
     .focusable(Tv.on())
-    .onFocus(() => { this.tvFocus = 'GT2367'; })
-    .onBlur(() => { if (this.tvFocus === 'GT2367') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'GT2367'))
+    .onFocus(() => { this.tvFocus = 'GT2367-' + m.id; })
+    .onBlur(() => { if (this.tvFocus === 'GT2367-' + m.id) { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'GT2367-' + m.id))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
       this.openGame(m.id);

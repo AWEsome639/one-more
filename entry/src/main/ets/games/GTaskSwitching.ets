@@ -298,7 +298,7 @@ export struct GTaskSwitching {
         Text(this.shape === 0 ? '●' : '■').fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.hue === 0 ? Palette.rose : Palette.sky)
       }.width('100%').height(136).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
 
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.sm }) {
         Text(this.optName((0))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.pick === (0) ? '#FFFFFF' : this.theme.ink)

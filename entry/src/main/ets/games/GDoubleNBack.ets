@@ -306,7 +306,7 @@ export struct GDoubleNBack {
           .fontWeight(FontWeight.Bold).fontColor(Palette.orange).textAlign(TextAlign.Center).layoutWeight(1)
           .height(120).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       }.width('100%')
-      Text(this.msg).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.sm }) {
         Text((true ? this.selPos : this.selLetter) ? '✔ ' + (TG('位置 = 2-back')) : (TG('位置 = 2-back'))).fontSize(FontSize.sm).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor((true ? this.selPos : this.selLetter) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(44))

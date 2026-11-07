@@ -384,7 +384,7 @@ export struct GLightsOut {
       return;
     }
     this.hintIdx = -1;
-    this.tip = TG('这一步算不出来（盘面可能已经无解），重开一局吧');
+    this.tip = TG('这一步算不出来，重开吧');
   }
 
   private tap(i: number): void {
@@ -500,7 +500,7 @@ export struct GLightsOut {
         })
       Text(this.tip)
         .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Text(TG('目标：全部熄灭。点一格会连带翻转上下左右四格'))
         .fontSize(FontSize.xxs)

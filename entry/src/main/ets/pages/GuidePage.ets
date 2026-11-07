@@ -197,7 +197,7 @@ struct GuidePage {
             Haptics.tap();
             Back.go();
           })
-        Text(this.isPrivacy ? this.t('隐私政策', 'Privacy policy') : this.t(TG('怎么玩'), 'How to play'))
+        Text(this.isPrivacy ? this.t('隐私政策', 'Privacy policy') : TG('怎么玩'))
           .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink)
           .layoutWeight(1)
@@ -294,8 +294,8 @@ struct GuidePage {
     Column({ space: Space.md }) {
       // ★ 2026-11-02：有具体玩法要点时标题叫「玩法要点」，否则诚实叫「通用玩法」
       Text(this.meta !== undefined && howToOf(this.meta.id) !== null
-        ? this.t(TG('玩法要点'), 'How to play')
-        : this.t(TG('通用玩法'), 'General rules')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+        ? TG('玩法要点')
+        : TG('通用玩法')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
       ForEach(this.tips(), (t: string, i: number) => {
         Row({ space: Space.sm }) {
           Text(String(i + 1))
@@ -321,7 +321,7 @@ struct GuidePage {
     // 通用操作
     Column({ space: Space.sm }) {
       this.tierRow(this.meta !== undefined ? this.meta.id : "")
-      Text(this.t(TG('通用操作'), 'Controls')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+      Text(TG('通用操作')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
       this.kv(TG('↻ 右上角'), '↻ top right', TG('重开这一局'), 'Restart this round')
       this.kv(TG('‹ 左上角'), '‹ top left', TG('返回游戏列表'), 'Back to the game list')
       this.kv('⭐', '⭐', TG('收藏这一款（在游戏页右上角）'), 'Save this game (top right of a game page)')
@@ -350,7 +350,7 @@ struct GuidePage {
   private tips(): string[] {
     const m: GameMeta | undefined = this.meta;
     if (m === undefined) {
-      return [this.t(TG('选一款游戏开始吧'), 'Pick a game to get started')];
+      return [TG('选一款游戏开始吧')];
     }
     const out: string[] = [];
     // ★★★ 2026-11-02（第 833 轮）：**有具体玩法要点就用它**，没有再退回通用提示。
@@ -398,7 +398,7 @@ struct GuidePage {
   tierRow(gid: string) {
     Column({ space: 6 }) {
       Row() {
-        Text(this.t(TG('这款的成就'), 'Badges for this game'))
+        Text(TG('这款的成就'))
           .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
         Blank()
         // ★ BUG #25 同源：档位进度数字没走 Digits ⇒ 阿语下是西文
@@ -481,7 +481,7 @@ struct GuidePage {
 
     this.sec('七、合规声明', '7. Compliance', '本应用为个人开发者独立开发的休闲益智游戏合集：\n· 全部代码为原创编写（ArkTS / ArkUI 原生开发）\n· 玩法均为公有领域的经典益智玩法\n· 未复制、未改编任何第三方项目的代码、美术资源或名称\n· 未使用任何第三方依赖库\n· 图标与界面视觉均为原创设计', 'This is a casual puzzle collection independently developed by a solo developer:\n· All code is originally written (native ArkTS / ArkUI)\n· All gameplay comes from classic puzzles in the public domain\n· No code, artwork or name from any third-party project has been copied or adapted\n· No third-party dependency libraries are used\n· The icon and all interface visuals are original designs')
 
-    Text(this.t(TG('最后更新：2026 年 10 月 10 日'), 'Last updated: 10 October 2026'))
+    Text(TG('最后更新：2026 年 10 月 10 日'))
       .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
       .width('100%').textAlign(TextAlign.Center)
       .margin({ top: Space.md })

@@ -355,7 +355,7 @@ export struct GFrequencyTap {
       .onClick(() => { Haptics.tick(); this.tap(); })
 
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
-        .width('100%').textAlign(TextAlign.Center)
+        .width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Button(this.phase === 0 ? TG('开始') : (this.phase === 2 ? TG('再来一局') : TG('重开')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

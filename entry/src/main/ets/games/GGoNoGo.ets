@@ -335,7 +335,7 @@ export struct GGoNoGo {
           .fontSize(FontSize.hero)
           .scale({ x: this.live ? 1.1 : 1, y: this.live ? 1.1 : 1 })
           .animation({ duration: Motion.fast, curve: Motion.snap() })
-        Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center)
+        Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').height(Space.xxxl * 2).justifyContent(FlexAlign.Center)
       .backgroundColor(this.fbMark === 1 ? '#1A10B981' : (this.fbMark === 2 ? '#1AEF4444' : this.theme.surface))
       .borderRadius(Radius.lg).shadow(Shadow.card)

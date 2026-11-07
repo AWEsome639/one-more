@@ -11,6 +11,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -47,6 +48,13 @@ export struct GChimpTest {
   private startAt: number = 0; private done: boolean = false;
   aboutToAppear(): void {
     LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★★★ 2026-11-08（退出恢复最小版）：从上次玩到的那一关接着玩（level 1 基，1 = 默认）
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('chimp_test') ? ProgressStore.lastLevel('chimp_test') : 0;
+    if (lastLv > 1 && lastLv < this.diffTotal) {
+      this.level = lastLv;
+      this.deal();
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GChimpTest')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -227,6 +235,8 @@ export struct GChimpTest {
     this.score = this.score + 100;
     if (this.level >= this.diffTotal) { this.end(true); return; }
     this.level = this.level + 1; this.deal();
+    // ★ 2026-11-08（退出恢复最小版）：记下当前关卡（1 基）
+    ProgressStore.saveLastWhere('chimp_test', this.level, String(GameDiff.of('chimp_test')));
     this.msg = TG2('✅ 过关！第 {0} 关：{1} 个数字',Digits(String(this.level), this.langCode), this.count());
   }
   private end(solved: boolean): void {
@@ -308,7 +318,7 @@ export struct GChimpTest {
       .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg)
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%')
         .textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.md }) {
         Button(this.hidden ? TG('数字已藏起') : (Bp.tinyScreen() || Bp.isWatch() ? TG('记住再点 1') : TG('看好位置，再点 1')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm)

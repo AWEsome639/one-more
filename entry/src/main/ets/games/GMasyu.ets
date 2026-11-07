@@ -543,7 +543,7 @@ export struct GMasyu {
     }
     this.over = true;
     this.won = true;
-    this.tip = TG('🎉 回路闭合、黑圈拐弯白圈直行，通关！');
+    this.tip = TG('🎉 回路闭合，通关！');
     this.finish(true);
   }
 
@@ -647,7 +647,7 @@ export struct GMasyu {
 
       Text(this.tip)
         .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.md }) {
         Button(TG('退一步'))

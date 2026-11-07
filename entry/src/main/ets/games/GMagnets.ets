@@ -706,7 +706,7 @@ export struct GMagnets {
 
       Text(this.tip)
         .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Text(TG('每块磁铁（横向两格）必须一正一负；右侧/下方数字是该行该列 ＋ 的个数'))
         .fontSize(FontSize.xxs)

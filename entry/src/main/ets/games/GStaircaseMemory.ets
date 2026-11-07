@@ -9,6 +9,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -61,6 +62,13 @@ export struct GStaircaseMemory {
 
   aboutToAppear(): void {
     LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★★★ 2026-11-08（退出恢复最小版）：从上次玩到的那一关接着玩（level 1 基）
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('staircase_memory') ? ProgressStore.lastLevel('staircase_memory') : 0;
+    if (lastLv > 1 && lastLv < this.diffTotal) {
+      this.level = lastLv;
+      this.newLevel();
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GStaircaseMemory')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -256,6 +264,9 @@ export struct GStaircaseMemory {
     this.stepTo = setTimeout(() => {
       this.stepTo = -1;
       this.level = this.level + 1; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110);
+      // ★ 2026-11-08（退出恢复最小版）：记下当前关卡（1 基；打满就清零）
+      ProgressStore.saveLastWhere('staircase_memory', this.level < this.diffTotal ? this.level : 0,
+        String(GameDiff.of('staircase_memory')));
       this.newLevel();
     }, 800);
   }
@@ -312,7 +323,7 @@ export struct GStaircaseMemory {
       .backgroundColor(this.theme.isDark ? '#141414' : '#E2E8F0').borderRadius(Radius.lg)
       Text(this.msg)
         .fontSize(FontSize.sm).fontColor(this.phase === 2 ? Palette.rose : this.theme.inkSoft)
-        .width('100%').textAlign(TextAlign.Center)
+        .width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF')

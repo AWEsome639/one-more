@@ -352,7 +352,7 @@ export struct GDefinitionDash {
 
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%')
         .textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
 
       Button(TG('重开'))

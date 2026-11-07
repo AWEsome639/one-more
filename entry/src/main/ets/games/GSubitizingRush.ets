@@ -315,7 +315,7 @@ export struct GSubitizingRush {
       .backgroundColor(this.theme.isDark ? '#141414' : '#E2E8F0').borderRadius(Radius.lg)
       Text(this.msg)
         .fontSize(FontSize.md).fontColor(this.pick >= 0 ? Palette.violet : this.theme.inkSoft)
-        .width('100%').textAlign(TextAlign.Center)
+        .width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.sm }) {
         this.optBtn(0)
         this.optBtn(1)

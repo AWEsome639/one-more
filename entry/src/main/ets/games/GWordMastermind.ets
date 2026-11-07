@@ -245,7 +245,7 @@ export struct GWordMastermind {
       this.over = true; this.won = false; this.score = 0; this.msg = TG2('❌ 机会用完，答案是 {0}', this.answer);
       this.finish(false); return;
     }
-    this.msg = TG2("第 {0} 次反馈：🟩 位置对｜🟨 字母在｜⬜ 没有", this.rows.length);
+    this.msg = TG2("第 {0} 次：🟩 对位 🟨 在位 ⬜ 无", this.rows.length);
   }
   private finish(solved: boolean): void {
     if (this.settled) { return; }
@@ -307,7 +307,7 @@ export struct GWordMastermind {
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
-        .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Column({ space: Space.xs }) {
         ForEach([0, 1, 2, 3], (r: number) => {
           Row({ space: Space.xs }) {

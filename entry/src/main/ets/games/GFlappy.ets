@@ -647,7 +647,7 @@ export struct GFlappy {
 
       Text(this.msg)
         .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.md }) {
         Button(TG('扇翅膀'))

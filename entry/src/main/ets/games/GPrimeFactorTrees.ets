@@ -307,7 +307,7 @@ export struct GPrimeFactorTrees {
           .fontSize(FontSize.lg).fontColor(Palette.cyan)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.xs }) {
         ForEach(PRIMES, (p: number) => { Button(String((p)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)

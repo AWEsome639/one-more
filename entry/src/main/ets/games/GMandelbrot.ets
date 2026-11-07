@@ -397,7 +397,7 @@ export struct GMandelbrot {
       Text(this.msg())
         .fontSize(FontSize.sm)
         .fontColor(this.phase === 1 ? (this.lastRight ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
-        .textAlign(TextAlign.Center)
+        .textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       if (this.phase === 0) {
         Row({ space: Space.md }) {

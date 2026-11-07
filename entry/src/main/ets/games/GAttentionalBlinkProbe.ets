@@ -351,7 +351,7 @@ export struct GAttentionalBlinkProbe {
           .fontColor(this.idx >= 0 && this.idx < this.seq.length && this.seq[this.idx] === '✦' ? Palette.sky : Palette.violet)
       }.width('100%').height(120).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm)
-        .fontColor(this.phase === 0 ? this.theme.inkFaint : this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+        .fontColor(this.phase === 0 ? this.theme.inkFaint : this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       if (this.phase === 2) {
         Row({ space: Space.sm }) {
           Button(TG('有 ✦'))

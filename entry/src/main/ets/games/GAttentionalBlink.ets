@@ -319,7 +319,7 @@ export struct GAttentionalBlink {
         Text(this.showing && this.idx >= 0 ? this.seq[this.idx] : '·')
           .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.violet)
       }.width('100%').height(120).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.sm }) { Text(this.opts[(0)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
       .fontColor(this.pick === (0) ? '#FFFFFF' : (this.answered() ? this.theme.inkFaint : this.theme.ink))
       .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))

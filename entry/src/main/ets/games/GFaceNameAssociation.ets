@@ -417,13 +417,13 @@ export struct GFaceNameAssociation {
       } else {
         Column({ space: Space.xs }) {
           Text(this.won ? '🎉' : '💤').fontSize(FontSize.hero)
-          Text(this.msg).fontSize(FontSize.md).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center)
+          Text(this.msg).fontSize(FontSize.md).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.width('100%').padding(Space.lg)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       }
 
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
-        .width('100%').textAlign(TextAlign.Center)
+        .width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
 
       Button(this.over ? TG('再来一局') : TG('重开'))

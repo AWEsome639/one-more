@@ -319,7 +319,7 @@ export struct GFlankerTest {
           Text('👀').fontSize(FontSize.hero)
             .accessibilityLevel('no')
         }
-        Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center)
+        Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').height(Space.xxxl * 2).justifyContent(FlexAlign.Center)
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 

@@ -310,7 +310,7 @@ export struct GCognateCatch {
       .width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.answered ? (this.lastOk ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.answered ? (this.lastOk ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       if (this.answered) {
         Button(this.over ? TG('看结果') : TG('下一题 →'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')

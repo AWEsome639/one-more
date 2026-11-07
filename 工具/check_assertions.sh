@@ -131,6 +131,22 @@ fi
 FAIL=$((FAIL + LEAK_N))
 printf "     %-42s %6s / %d\n" "check_reset_leak.py（复位遗漏）" "-" "${LEAK_N}"
 
+# ── 判据 1790（2026-11-08 新增）：代码里的 key 在不在字典 ──
+#   来历：a11y 批量补的 `this.t('中文','English')` 只写了 zh/en ⇒ 10 语言退英文；
+#     而 check_i18n.py 只查字典条目完不完整，查不到「代码引用了字典里没有的 key」。
+#   实测：用 c388365d^ 的旧字典跑 ⇒ 28 处（11 个 a11y key 的 13 个调用点 + 15 处存量缺口）；
+#         现网 ⇒ 15 处（a11y 已全补，存量缺口仍在）。
+#   ★ 纯闸门：只 FAIL += N、不动 TOT（基线 200359 不用改）；rc=2 也算失败。
+KEY_OUT=$(python3 "$(dirname "$0")/../tools/check_key_coverage.py" 2>&1)
+KEY_RC=$?
+KEY_N=$(printf '%s' "${KEY_OUT}" | grep -oE "缺字典：[0-9]+ 处" | grep -oE "[0-9]+" | tail -1)
+if [ "${KEY_RC}" -eq 2 ] || [ -z "${KEY_N}" ]; then
+  KEY_N=1
+  echo "     ⚠️ check_key_coverage.py 无法给出结论（rc=${KEY_RC}）⇒ 按 1 处失败计，别当绿"
+fi
+FAIL=$((FAIL + KEY_N))
+printf "     %-42s %6s / %d\n" "check_key_coverage.py（key 覆盖）" "-" "${KEY_N}"
+
 echo "     ────────────────────────────────────────────────"
 printf "     %-42s %6d / %d\n" "合计" "${TOT}" "${FAIL}"
 

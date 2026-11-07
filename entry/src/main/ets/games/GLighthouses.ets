@@ -655,7 +655,7 @@ export struct GLighthouses {
 
       Text(this.tip)
         .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Text(TG('💡 放在空格；光沿直线走，遇 🪨 被挡；两盏灯不能互相照到'))
         .fontSize(FontSize.xxs)

@@ -8,6 +8,7 @@ import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -58,6 +59,13 @@ export struct GMirrorTracing {
   @State private won: boolean = false; private startAt: number = 0; private done: boolean = false;
   aboutToAppear(): void {
     LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★★★ 2026-11-08（退出恢复最小版）：从上次玩到的那一关接着玩（本款固定 3 关，level 1 基）
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('mirror_tracing') ? ProgressStore.lastLevel('mirror_tracing') : 0;
+    if (lastLv > 1 && lastLv <= 3) {
+      this.level = lastLv;
+      this.makeLevel();
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GMirrorTracing')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -263,6 +271,8 @@ export struct GMirrorTracing {
         this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true);
       } else {
         this.level = this.level + 1;
+        // ★ 2026-11-08（退出恢复最小版）：记下当前第几关（1..3）
+        ProgressStore.saveLastWhere('mirror_tracing', this.level, String(GameDiff.of('mirror_tracing')));
         this.msg = TG('✅ 这一关成了，下一关 👉');
         this.makeLevel();
       }
@@ -489,7 +499,7 @@ export struct GMirrorTracing {
           .animation({ duration: Motion.slow, curve: Motion.spring() })
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
           .width('100%')
-          .textAlign(TextAlign.Center)
+          .textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Button(this.over ? TG('再来一局') : TG('重开'))
         .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)

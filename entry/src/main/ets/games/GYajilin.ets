@@ -445,7 +445,7 @@ export struct GYajilin {
       .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
       .borderRadius(Radius.lg).shadow(Shadow.card)
 
-      Text(this.tip).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+      Text(this.tip).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.sm }) {
         Button(TG('提示 (-5)'))

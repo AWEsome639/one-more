@@ -320,7 +320,7 @@ export struct GNegativeSpaceDetection {
       .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
       .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg).shadow(Shadow.card)
 
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.sm }) { this.optBtn(0); this.optBtn(1) }.width('100%')
       Row({ space: Space.sm }) { this.optBtn(2); this.optBtn(3) }.width('100%')

@@ -288,7 +288,7 @@ export struct GSymbolDigitAssoc {
       Text(SYMS[this.idx]).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.rose)
         .textAlign(TextAlign.Center).width('100%').height(120).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
 
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Column({ space: Space.sm }) {
         ForEach(ROWS, (r: number) => {

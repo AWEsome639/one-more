@@ -344,7 +344,7 @@ export struct GAlgebraicInequalitySolver {
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       .animation({ duration: Motion.base, curve: Motion.snap() })
 
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.lastRight ? Palette.emerald : this.theme.inkSoft)
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.lastRight ? Palette.emerald : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {

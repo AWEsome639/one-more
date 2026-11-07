@@ -749,7 +749,7 @@ export struct GWaterSort {
         .fontColor(this.over
           ? (this.won ? Palette.emerald : Palette.rose)
           : this.theme.inkSoft)
-        .width('100%')
+        .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

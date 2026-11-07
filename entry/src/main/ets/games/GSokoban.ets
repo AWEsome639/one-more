@@ -13,6 +13,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -151,6 +152,14 @@ export struct GSokoban {
     }
     this.cleared = c;
     this.load(0);
+    // ★★★ 2026-11-08（退出恢复最小版）：**从上次玩到的那一关接着玩**
+    //   只记"第几关"（不序列化棋局）—— 退出再进不用从第 1 关点起。
+    //   ★ 只在本局**首次进入**时恢复：`onRestart`（重来/换一局）不走这里，语义不变。
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('sokoban') ? ProgressStore.lastLevel('sokoban') : 0;
+    if (lastLv > 1 && lastLv <= LEVELS.length) {
+      this.load(lastLv - 1);
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GSokoban')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -202,6 +211,8 @@ export struct GSokoban {
       }
     }
     this.level = idx;
+    // ★ 2026-11-08（退出恢复最小版）：每次载入关卡就记一笔（1 基，0 = 没进度）
+    ProgressStore.saveLastWhere('sokoban', idx + 1, String(GameDiff.of('sokoban')));
     this.w = w;
     this.h = h;
     const rs: number[] = [];

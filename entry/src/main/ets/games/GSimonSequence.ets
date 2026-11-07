@@ -50,6 +50,9 @@ export struct GSimonSequence {
   @State lit: number = -1; @State len: number = 0; @State pos: number = 0; @State score: number = 0;
   @State phase: string = 'show'; @State over: boolean = false; @State won: boolean = false;
   @State msg: string = '';
+  // ★ 2026-11-08 常驻结果行：反馈不再依赖显示的几秒，随时能回看上一题的对错
+  @State private lastFb: string = '';
+  @State private lastOk: boolean = true;
   private seq: number[] = []; private showIdx: number = -1;
   private showTimer: number = -1; private flashTimer: number = -1; private gapTimer: number = -1;
   private startAt: number = 0; private done: boolean = false;
@@ -204,6 +207,7 @@ export struct GSimonSequence {
   }
 
   private reset(): void {
+    this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     this.clearTimers(); this.seq = []; this.len = 0; this.pos = 0; this.score = 0;
     this.lit = -1; this.over = false; this.won = false; this.done = false;
     this.startAt = Date.now();
@@ -211,6 +215,11 @@ export struct GSimonSequence {
   }
   /** 序列加长一位，然后演示一遍 */
   private nextRound(): void {
+    // ★ 2026-11-08 常驻结果行：在加载下一题之前，把上一题的反馈存下来（窗口再短也能回看）
+      const fbV: string = this.msg;
+      if (fbV.indexOf('✅') >= 0 || fbV.indexOf('🎉') >= 0) { this.lastFb = fbV; this.lastOk = true; }
+      else if (fbV.indexOf('❌') >= 0 || fbV.indexOf('💤') >= 0 || fbV.indexOf('😵') >= 0 || fbV.indexOf('⏰') >= 0 || fbV.indexOf('⌛') >= 0) { this.lastFb = fbV; this.lastOk = false; }
+
     this.seq.push(Math.floor(Math.random() * PADS));
     this.len = this.seq.length; this.showIdx = -1; this.pos = 0; this.lit = -1;
     this.phase = 'show'; this.msg = TG2("看好了… 长度 {0}", this.len);
@@ -331,7 +340,11 @@ export struct GSimonSequence {
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
+      Text(this.lastFb.length > 0 ? this.lastFb : '　')
+        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+        .width('100%').textAlign(TextAlign.Center)
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)

@@ -401,7 +401,7 @@ export struct GMirrorImage {
         .fontSize(FontSize.sm)
         .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft)
         .width('100%')
-        .textAlign(TextAlign.Center)
+        .textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.md }) {
         Button((TG('是镜像')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

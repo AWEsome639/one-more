@@ -441,7 +441,7 @@ export struct GNavonHierarchical {
           .fontSize(FontSize.sm)
           .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
           .width('100%')
-          .textAlign(TextAlign.Center)
+          .textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Row({ space: Space.sm }) {
         Text((TG('大图形（整体轮廓）'))).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontSize(FontSize.xxs)

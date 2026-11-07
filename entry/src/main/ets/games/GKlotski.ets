@@ -576,7 +576,7 @@ export struct GKlotski {
       if (this.demoId < 0 && Bp.width <= Bp.height) {
       Text(this.tip)
         .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }
 
       // ★ 2026-10-31 真机（横屏 853×533）：原来是「↑ 一行 + ←↓→ 一行」两行，

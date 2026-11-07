@@ -87,12 +87,12 @@ struct LanLobby {
 
   private async doScan(): Promise<void> {
     this.scanning = true;
-    this.status = this.t(TG('正在找同一 Wi-Fi 下的房间…'), 'Looking for rooms on your Wi-Fi…');
+    this.status = TG('正在找同一 Wi-Fi 下的房间…');
     const found: LanRoom[] = await Lan.scan();
     this.rooms = found;
     this.scanning = false;
     this.status = found.length === 0
-      ? this.t(TG('没找到房间 —— 让对手点「开个房间」'), 'No rooms found — ask your opponent to host')
+      ? TG('没找到房间 —— 让对手点「开个房间」')
       : '';
   }
 
@@ -126,11 +126,11 @@ struct LanLobby {
           })
         Text(this.t('局域网对战', 'LAN Play')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink).layoutWeight(1)
-        Text(this.t(TG('重扫'), 'Rescan')).fontSize(FontSize.xs).fontColor(this.accentColor())
+        Text(TG('重扫')).fontSize(FontSize.xs).fontColor(this.accentColor())
           .padding(Space.sm)
           // ★★★ 2026-11-07 交互死角：Text + onClick 默认不可聚焦 ⇒ TV/键盘选不中。
           //   补焦点三件套（同 GamesTab:1674-1688）+ 读屏文案。
-          .accessibilityText(this.t(TG('重新扫描局域网内的房间'), 'Rescan rooms on this Wi-Fi'))
+          .accessibilityText(TG('重新扫描局域网内的房间'))
           .accessibilityLevel('yes')
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L110'; })
@@ -143,8 +143,7 @@ struct LanLobby {
       }
       .width('100%').padding({ left: Space.sm, right: Space.md, top: Space.xl })
 
-      Text(this.t(TG('同一 Wi-Fi 下的两台设备直接对局 —— 没有服务器，不上传任何数据'),
-                  'Two devices on the same Wi-Fi play directly. No server, nothing uploaded.'))
+      Text(TG('同一 Wi-Fi 下的两台设备直接对局 —— 没有服务器，不上传任何数据'))
         .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
         .padding({ left: Space.lg, right: Space.lg })
 
@@ -153,11 +152,11 @@ struct LanLobby {
       Row({ space: Space.sm }) {
         Text(this.raceMode ? '🏁' : '♟️').fontSize(FontSize.lg)
         Column({ space: 1 }) {
-          Text(this.raceMode ? this.t(TG('竞速模式'), 'Race mode') : this.t(TG('回合制对战'), 'Turn-based'))
+          Text(this.raceMode ? TG('竞速模式') : TG('回合制对战'))
             .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
           Text(this.raceMode
-            ? this.t(TG('同一款游戏一起开，谁先完成谁赢；355 款全都能比'), 'Same game, first to finish wins — all 355 games')
-            : this.t(TG('井字棋 / 五子棋 / 围棋 等 8 款轮流下'), '8 games, take turns'))
+            ? TG('同一款游戏一起开，谁先完成谁赢；355 款全都能比')
+            : TG('井字棋 / 五子棋 / 围棋 等 8 款轮流下'))
             .fontSize(FontSize.micro).fontColor(this.theme().inkFaint)
         }
         .alignItems(HorizontalAlign.Start).layoutWeight(1)
@@ -173,16 +172,16 @@ struct LanLobby {
       // ★ 排名榜（竞速模式才有）
       if (this.raceMode) {
         Column({ space: 6 }) {
-          Text(this.t(TG('实时排名'), 'Live ranking')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+          Text(TG('实时排名')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
           if (LanRace.scoresOf().length === 0) {
-            Text(this.t(TG('还没有人完成 —— 开一局吧'), 'Nobody finished yet — start a round'))
+            Text(TG('还没有人完成 —— 开一局吧'))
               .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
           }
           ForEach(LanRace.ranked(), (sc: RaceScore, i: number) => {
             Row({ space: Space.sm }) {
               Text(i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : String(i + 1))))
                 .fontSize(FontSize.sm).width(28).textAlign(TextAlign.Center)
-              Text(sc.nick + (sc.me ? this.t(TG('（我）'), ' (me)') : ''))
+              Text(sc.nick + (sc.me ? TG('（我）') : ''))
                 .fontSize(FontSize.sm).fontColor(this.theme().ink).layoutWeight(1)
               Text((sc.ms / 1000).toFixed(1) + 's')
                 .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.accentColor())
@@ -195,7 +194,7 @@ struct LanLobby {
       }
 
       Column({ space: Space.sm }) {
-        Text(this.t(TG('玩哪一款'), 'Pick a game')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+        Text(TG('玩哪一款')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
           .width('100%')
         Flex({ wrap: FlexWrap.Wrap }) {
           ForEach(this.pickList(), (gid: string) => {
@@ -208,9 +207,9 @@ struct LanLobby {
               .backgroundColor(this.picked === gid ? this.accentColor() : this.theme().surfaceAlt)
               .borderRadius(Radius.full)
               .focusable(Tv.on())
-              .onFocus(() => { this.tvFocus = 'LL201'; })
-              .onBlur(() => { if (this.tvFocus === 'LL201') { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'LL201'))
+              .onFocus(() => { this.tvFocus = 'LL201-' + gid; })
+              .onBlur(() => { if (this.tvFocus === 'LL201-' + gid) { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'LL201-' + gid))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                                 Haptics.tap();
                 this.picked = gid;
@@ -233,7 +232,7 @@ struct LanLobby {
 
       // 手动连接（扫不到房间时用；同一 Wi-Fi 但广播被路由器拦掉的情况很常见）
       Column({ space: 6 }) {
-        Text(this.t(TG('扫不到？直接输房主 IP'), 'Nothing found? Type the host IP'))
+        Text(TG('扫不到？直接输房主 IP'))
           .fontSize(FontSize.xs).fontColor(this.theme().inkFaint).width('100%')
         Row({ space: Space.sm }) {
           TextInput({ text: this.manualIp, placeholder: '192.168.1.5' })
@@ -244,12 +243,12 @@ struct LanLobby {
             .fontSize(FontSize.sm).layoutWeight(1).height(40)
             .backgroundColor(this.theme().surfaceAlt).borderRadius(Radius.sm)
             .onChange((v: string) => { this.manualPort = v; })
-          Text(this.t(TG('连接'), 'Join'))
+          Text(TG('连接'))
             .fontSize(FontSize.xs).fontColor(Color.White)
             .padding({ left: Space.md, right: Space.md, top: 10, bottom: 10 })
             .backgroundColor(Palette.emerald).borderRadius(Radius.full)
             // ★★★ 2026-11-07 交互死角：同上 —— TV 上「连不上房间」有一半原因是根本选不中这个按钮。
-            .accessibilityText(this.t(TG('连接这个房间'), 'Join this room'))
+            .accessibilityText(TG('连接这个房间'))
             .accessibilityLevel('yes')
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L207'; })
@@ -268,15 +267,15 @@ struct LanLobby {
 
       // 开房
       Button(Bp.tinyScreen() || Bp.isWatch()
-          ? this.t(TG('开个房间'), 'Host')
-          : this.t(TG('开个房间（我来当房主）'), 'Host a room'))
+          ? TG('开个房间')
+          : TG('开个房间（我来当房主）'))
         // ★ 2026-10-19 自查 A3：开房按钮写死 48vp，大字模式会裁
         .width('100%').constraintSize({ minHeight: Cell.of(48) })
         .backgroundColor(this.accentColor())
         .accessibilityGroup(true)
         .accessibilityText(Bp.tinyScreen() || Bp.isWatch()
-          ? this.t(TG('开个房间'), 'Host')
-          : this.t(TG('开个房间（我来当房主）'), 'Host a room'))
+          ? TG('开个房间')
+          : TG('开个房间（我来当房主）'))
         .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();   // ★ 2026-10-19 按压反馈
@@ -290,13 +289,13 @@ struct LanLobby {
           Text('📶').fontSize(FontSize.lg)
             .accessibilityLevel('no')
           Column({ space: 2 }) {
-            Text(this.t(TG('{s} 的房间'), "{s}'s room").replace('{s}', r.host)).fontSize(FontSize.sm)
+            Text(TG('{s} 的房间').replace('{s}', r.host)).fontSize(FontSize.sm)
               .fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
             Text(this.gameName(r.gameId) + ' · ' + r.ip).fontSize(FontSize.micro)
               .fontColor(this.theme().inkFaint)
           }
           .alignItems(HorizontalAlign.Start).layoutWeight(1)
-          Text(this.t(TG('加入'), 'Join')).fontSize(FontSize.xs).fontColor(Color.White)
+          Text(TG('加入')).fontSize(FontSize.xs).fontColor(Color.White)
             .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
             .backgroundColor(Palette.emerald).borderRadius(Radius.full)
         }
@@ -304,16 +303,16 @@ struct LanLobby {
         .margin({ left: Space.lg, right: Space.lg })
         .backgroundColor(this.theme().surface).borderRadius(Radius.md).shadow(Shadow.card)
         .focusable(Tv.on())
-        .onFocus(() => { this.tvFocus = 'LL280'; })
-        .onBlur(() => { if (this.tvFocus === 'LL280') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'LL280'))
+        .onFocus(() => { this.tvFocus = 'LL280-' + r.ip + ':' + r.port; })
+        .onBlur(() => { if (this.tvFocus === 'LL280-' + r.ip + ':' + r.port) { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'LL280-' + r.ip + ':' + r.port))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                     Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：加入房间是重要动作
           this.joinRoom(r);
         
         }); })
         .accessibilityGroup(true)
-        .accessibilityText(this.t(TG('{s} 的房间'), "{s}'s room").replace('{s}', r.host))
+        .accessibilityText(TG('{s} 的房间').replace('{s}', r.host))
         .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：加入房间是重要动作
@@ -358,19 +357,19 @@ struct LanLobby {
   /** ★ 竞速模式：房主开一局（广播 race_go，各端同时开始） */
   private async raceHost(): Promise<void> {
     Haptics.press();
-    this.status = this.t(TG('正在开房…'), 'Opening room…');
+    this.status = TG('正在开房…');
     const port: number = await Lan.host(this.picked, (m: LanMsg) => {
       LanRace.receive(m);
       if (m.t === 'hello') {
-        this.status = this.t(TG('有人来了！'), 'Someone joined!');
+        this.status = TG('有人来了！');
       }
     });
     if (port <= 0) {
-      this.status = this.t(TG('开房失败'), 'Failed to open room');
+      this.status = TG('开房失败');
       return;
     }
     await LanRace.hostStart(this.picked);
-    this.status = this.t(TG('竞速开始！谁先完成谁赢'), 'Race on! First to finish wins');
+    this.status = TG('竞速开始！谁先完成谁赢');
     Haptics.success();
     router.pushUrl({ url: 'pages/GameHost', params: { id: this.picked } });
   }
@@ -382,11 +381,11 @@ struct LanLobby {
       LanRace.receive(m);
     });
     if (!ok) {
-      this.status = this.t(TG('连不上，检查同一 Wi-Fi'), 'Cannot connect — check same Wi-Fi');
+      this.status = TG('连不上，检查同一 Wi-Fi');
       return;
     }
     await LanRace.ask();
-    this.status = this.t(TG('已加入，等房主开始'), 'Joined — waiting for host');
+    this.status = TG('已加入，等房主开始');
     Haptics.success();
     router.pushUrl({ url: 'pages/GameHost', params: { id: room.gameId } });
   }
@@ -405,14 +404,14 @@ struct LanLobby {
       if (m.t === 'hello') {
         // ★ 对手来了 ⇒ 先把我的难度告诉他，保证两边棋盘一致
         LanMatch.broadcastDiff(this.picked);
-        this.status = this.t(TG('对手已连上！开局…'), 'Opponent connected! Starting…');
+        this.status = TG('对手已连上！开局…');
         // ★ 对手来了 ⇒ 直接进游戏（房主先手）
         router.pushUrl({ url: 'pages/GameHost', params: { id: this.picked } });
       }
     });
     this.status = port > 0
-      ? this.t(TG('房间已开（端口 {n}）—— 等对手加入'), 'Room open on port {n} — waiting').replace('{n}', String(port))
-      : this.t(TG('开房失败，检查 Wi-Fi'), 'Could not host — check your Wi-Fi');
+      ? TG('房间已开（端口 {n}）—— 等对手加入').replace('{n}', String(port))
+      : TG('开房失败，检查 Wi-Fi');
   }
 
   /** 手动输 IP 直连（绕开 UDP 发现） */
@@ -420,12 +419,12 @@ struct LanLobby {
     Haptics.tap();
     const ip: string = this.manualIp.trim();
     if (ip.length === 0) {
-      this.status = this.t(TG('先填房主 IP'), 'Enter the host IP first');
+      this.status = TG('先填房主 IP');
       return;
     }
     const pt: number = Number.parseInt(this.manualPort.trim(), 10);
     const room: LanRoom = { ip: ip, port: isNaN(pt) ? 41235 : pt, host: 'Host', gameId: this.picked };
-    this.status = this.t(TG('正在连接 {s}…'), 'Connecting to {s}…').replace('{s}', ip);
+    this.status = TG('正在连接 {s}…').replace('{s}', ip);
     LanMatch.begin(false, (d: string) => {
       this.status = this.t('对手落子：', 'Opponent moved: ') + d;
     }, this.picked);          // ★ P12：传 gameId，难度广播才生效
@@ -439,8 +438,8 @@ struct LanLobby {
       }
     });
     this.status = ok
-      ? this.t(TG('连上了！等对手开局'), 'Connected! Waiting for the host')
-      : this.t(TG('连不上 —— 检查 IP 和 Wi-Fi'), 'Could not connect — check IP and Wi-Fi');
+      ? TG('连上了！等对手开局')
+      : TG('连不上 —— 检查 IP 和 Wi-Fi');
   }
 
   private async joinRoom(r: LanRoom): Promise<void> {
@@ -457,6 +456,6 @@ struct LanLobby {
         router.pushUrl({ url: 'pages/GameHost', params: { id: this.picked } });
       }
     });
-    this.status = ok ? this.t(TG('连上了！'), 'Connected!') : this.t(TG('连不上，可能房主退出了'), 'Could not connect');
+    this.status = ok ? TG('连上了！') : TG('连不上，可能房主退出了');
   }
 }

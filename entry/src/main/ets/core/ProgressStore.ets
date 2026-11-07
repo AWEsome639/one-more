@@ -55,6 +55,8 @@ export class Keys {
   static readonly perfect: string = 'perfectGames';        // 满分/零失误通关的 gameId
   static readonly perGameClears: string = 'perGameClears'; // 每款通关次数 JSON
   static readonly perGameDiff: string = 'perGameDiff';     // 每款选的难度 JSON
+  /** ★ 2026-11-08（退出恢复最小版）：上次玩到哪 —— gameId → { level, diff, at } 的 JSON */
+  static readonly lastWhere: string = 'lastWhere';
 }
 
 /** 单个游戏的连胜记录 */
@@ -62,6 +64,13 @@ interface GameStreak {
   current: number;
   lastDay: string;   // YYYY-MM-DD
   solvedToday: boolean;
+}
+
+/** ★ 2026-11-08（退出恢复最小版）：「上次玩到哪」的一条记录 */
+export interface LastWhere {
+  level: number;   // 0 基或 1 基由各游戏自定，只要求">0 = 有进度可续"
+  diff: string;    // 难度标识（多数款用 String(GameDiff.of(id))，用不上就 ''）
+  at: number;      // 写入时间戳（排查"为什么续到这一关"时看）
 }
 
 export class ProgressStore {
@@ -103,6 +112,8 @@ export class ProgressStore {
   private static pref: preferences.Preferences | null = null;
   private static streaks: Map<string, GameStreak> = new Map<string, GameStreak>();
   private static ready: boolean = false;
+  /** ★ 2026-11-08：本进程已经"恢复过一次"的游戏（见 shouldRestoreNow） */
+  private static restored: string[] = [];
 
   /** ★ 一次性迁移：旧库 yiju_progress → 新库 onemore_progress（搬完删旧库） */
   private static async migrateLegacy(ctx: common.UIAbilityContext,
@@ -500,35 +511,23 @@ export class ProgressStore {
 
   /** 每款游戏的开局数 */
   static playsOf(gameId: string): number {
-    try {
-      const raw: string = AppStorage.get<string>(Keys.perGamePlays) ?? '{}';
-      const m: Record<string, number> = JSON.parse(raw) as Record<string, number>;
-      return m[gameId] ?? 0;
-    } catch (e) {
-      return 0;
-    }
+    const raw: string = AppStorage.get<string>(Keys.perGamePlays) ?? '{}';
+    const m: Record<string, number> = ProgressStore.parseNumMap(raw);
+    return m[gameId] ?? 0;
   }
 
   /** 每款游戏的最高分 */
   static bestOf(gameId: string): number {
-    try {
-      const raw: string = AppStorage.get<string>(Keys.perGameBest) ?? '{}';
-      const m: Record<string, number> = JSON.parse(raw) as Record<string, number>;
-      return m[gameId] ?? 0;
-    } catch (e) {
-      return 0;
-    }
+    const raw: string = AppStorage.get<string>(Keys.perGameBest) ?? '{}';
+    const m: Record<string, number> = ProgressStore.parseNumMap(raw);
+    return m[gameId] ?? 0;
   }
 
   /** 玩过的不同游戏款数 */
   static playedKinds(): number {
-    try {
-      const raw: string = AppStorage.get<string>(Keys.perGamePlays) ?? '{}';
-      const m: Record<string, number> = JSON.parse(raw) as Record<string, number>;
-      return Object.keys(m).length;
-    } catch (e) {
-      return 0;
-    }
+    const raw: string = AppStorage.get<string>(Keys.perGamePlays) ?? '{}';
+    const m: Record<string, number> = ProgressStore.parseNumMap(raw);
+    return Object.keys(m).length;
   }
 
   // ───────── 成就 ─────────
@@ -891,6 +890,34 @@ export class ProgressStore {
   // ───────── 每游戏徽章 ─────────
 
   /** 通关过的游戏 id 列表 */
+  /**
+   * ★★★ 2026-11-08 **性能**（verifier-eng2 的 faultlog 分析）：
+   *   返回列表要重建 **355 张卡**，每张都读 `bestOf()` / `playsOf()` / `diffOf()` ——
+   *   每个都是 `JSON.parse(整个 perGameBest 串)` ⇒ **一次返回 ≈ 1000+ 次 JSON.parse**。
+   *   20:31 那条 `APP_INPUT_BLOCK`（8 秒没处理完一个输入事件）正卡在 `GameHost → Index` 返回瞬间。
+   *   （桌面 sceneboard 早 5 秒先冻 ⇒ **根因是模拟器在卡，app 只是放大器**；
+   *     但这个放大器是可以拆掉的，成本很低。）
+   *   ⇒ 按**原始字符串**做缓存：串没变就直接复用已解析的对象。
+   */
+  private static mapCacheRaw: string = '';
+  private static mapCacheVal: Record<string, number> | undefined = undefined;
+
+  /** 解析 `Record<string, number>` 型的 JSON 串（带缓存 —— 同一个串只 parse 一次） */
+  private static parseNumMap(raw: string): Record<string, number> {
+    if (raw === ProgressStore.mapCacheRaw && ProgressStore.mapCacheVal !== undefined) {
+      return ProgressStore.mapCacheVal;
+    }
+    let val: Record<string, number> = {};
+    try {
+      val = JSON.parse(raw) as Record<string, number>;
+    } catch (e) {
+      val = {};
+    }
+    ProgressStore.mapCacheRaw = raw;
+    ProgressStore.mapCacheVal = val;
+    return val;
+  }
+
   static clearedGames(): string[] {
     const raw: string = AppStorage.get<string>(Keys.cleared) ?? '';
     return raw.length === 0 ? [] : raw.split(',');
@@ -966,6 +993,101 @@ export class ProgressStore {
     const j: string = JSON.stringify(m);
     AppStorage.setOrCreate(Keys.perGameDiff, j);
     ProgressStore.putString(Keys.perGameDiff, j);
+  }
+
+  // ───────── 上次玩到哪（2026-11-08 · 退出恢复最小版）─────────
+  /**
+   * 读「上次玩到哪」。**没有记录 / 记录损坏 ⇒ undefined**（调用方按"从第 1 关开始"处理）。
+   *
+   * ★ 为什么只记 level+diff 而不是完整棋局：
+   *   全量序列化要改 355 款的内部状态（成本极高、易漏）；而"上次玩到第几关"是**用户感知最强、
+   *   成本最低**的那一项 —— 退出再进直接续关，就已经解决了"每次都要从头点"的痛点。
+   */
+  static lastWhere(gameId: string): LastWhere | undefined {
+    if (!gameId) {
+      return undefined;
+    }
+    const raw: string = AppStorage.get<string>(Keys.lastWhere) ?? '{}';
+    try {
+      const m: Record<string, LastWhere> = JSON.parse(raw) as Record<string, LastWhere>;
+      const row: LastWhere | undefined = m[gameId];
+      if (row === undefined || row === null) {
+        return undefined;
+      }
+      // 记录损坏（NaN / 负数）一律当没有：宁可从头开始，也不要续到一个非法关卡
+      if (typeof row.level !== 'number' || !(row.level >= 0)) {
+        return undefined;
+      }
+      const d: string = typeof row.diff === 'string' ? row.diff : '';
+      return { level: row.level, diff: d, at: typeof row.at === 'number' ? row.at : 0 };
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  /**
+   * ★★★ 2026-11-08（退出恢复最小版）**恢复闸门**：每个游戏**每个进程只允许恢复一次**。
+   *
+   * ★ 为什么必须有它：`再来一局 / 顶栏 ↻` 会切 `diffTick` 奇偶 ⇒ 游戏组件**重建**
+   *   ⇒ `aboutToAppear` 又跑一遍。如果在那里无条件恢复，玩家点「再来一局」会被莫名
+   *   续回上次那一关 —— 直接破坏「再来一局 = 从头」的语义。
+   * ⇒ 用"本进程第一次打开这款游戏才恢复"来区分：
+   *   · 杀进程后重进（真正想要的功能）⇒ 静态集合为空 ⇒ 恢复 ✓
+   *   · 再来一局 / 换一局 / 返回列表再点进来 ⇒ 已经恢复过 ⇒ 从第 1 关开始 ✓
+   */
+  static shouldRestoreNow(gameId: string): boolean {
+    if (!gameId) {
+      return false;
+    }
+    if (ProgressStore.restored.indexOf(gameId) >= 0) {
+      return false;
+    }
+    ProgressStore.restored.push(gameId);
+    return true;
+  }
+
+  /** 便捷：只取上次的关卡号（无记录 = 0，正好等于"从第 1 关开始"的入参） */
+  static lastLevel(gameId: string): number {
+    const w: LastWhere | undefined = ProgressStore.lastWhere(gameId);
+    return w === undefined ? 0 : w.level;
+  }
+
+  /**
+   * 写「上次玩到哪」。
+   * ★ `level <= 0` 视为**清除记录** —— 通关最后一关后调 `saveLastWhere(id, 0, diff)`，
+   *   下次进来就从头，不会续到"已经不存在的下一关"。
+   */
+  static saveLastWhere(gameId: string, level: number, diff: string): void {
+    if (!gameId) {
+      return;
+    }
+    const raw: string = AppStorage.get<string>(Keys.lastWhere) ?? '{}';
+    let m: Record<string, LastWhere> = {};
+    try {
+      m = JSON.parse(raw) as Record<string, LastWhere>;
+    } catch (e) {
+      m = {};
+    }
+    // ★ 2026-11-08 ArkTS **不支持 `delete` 运算符**（`arkts-no-delete`）⇒ 改成重建对象。
+    //   （ai-fixer-b 的退出恢复接口原来写的是 `delete m[gameId]`，编译挂在这。）
+    let out: Record<string, LastWhere> = {};
+    const keys: string[] = Object.keys(m);
+    for (let i = 0; i < keys.length; i++) {
+      const k: string = keys[i];
+      if (k !== gameId) {
+        const v: LastWhere = m[k];
+        if (v !== undefined) {
+          out[k] = v;
+        }
+      }
+    }
+    if (level > 0) {
+      out[gameId] = { level: Math.floor(level), diff: diff ?? '', at: Date.now() };
+    }
+    m = out;
+    const j: string = JSON.stringify(m);
+    AppStorage.setOrCreate(Keys.lastWhere, j);
+    ProgressStore.putString(Keys.lastWhere, j);
   }
 
   // ───────── 每游戏分级成就（奥森 2026-10-11 要求）─────────

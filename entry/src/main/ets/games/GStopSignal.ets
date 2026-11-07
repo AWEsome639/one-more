@@ -327,7 +327,7 @@ export struct GStopSignal {
         Text(this.icon()).fontSize(FontSize.hero)
         Text(this.msg)
           .fontSize(FontSize.md).textAlign(TextAlign.Center)
-          .fontColor(this.kind === 1 || this.kind === 2 ? '#FFFFFF' : this.theme.inkSoft)
+          .fontColor(this.kind === 1 || this.kind === 2 ? '#FFFFFF' : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .width('100%').height(170).justifyContent(FlexAlign.Center)
       .backgroundColor(this.panel()).borderRadius(Radius.lg).shadow(Shadow.card)

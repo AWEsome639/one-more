@@ -353,7 +353,7 @@ export struct GDualTaskMemory {
         }
       }.width('100%').height(104).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       if (this.phase === 1) {
         Row({ space: Space.sm }) {
           ForEach([0, 1, 2], (i: number) => {

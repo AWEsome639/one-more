@@ -297,7 +297,7 @@ export struct GDigitSpanReverse {
           .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.sky)
       }.width('100%').height(110).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Column({ space: Space.xs }) {
         ForEach([0, 1, 2], (r: number) => {
           Row({ space: Space.xs }) {

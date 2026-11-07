@@ -408,7 +408,7 @@ export struct GPercentageShopping {
         }, (i: number) => 'ps' + i)
       }.width('100%')
 
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').animation({ duration: Motion.fast, curve: Motion.snap() })
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
 

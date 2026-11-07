@@ -81,9 +81,7 @@ struct Index {
           // ★ 2026-10-29（运动手表 195vp 实测）：18 字的文案仍会撑到 3 行、
           //   把两个按钮顶出屏幕 ⇒ 极小屏压到 8 个字（合规信息靠「查看全文」兜）
           TG('不收集信息 · 只存本地'),
-          'No data · Local only') : Bp.isWatch() ? this.t(
-          TG('不收集你的信息，记录只存在手表里。'),
-          'No data collected. All records stay on this watch.') : this.t(
+          'No data · Local only') : Bp.isWatch() ? TG('不收集你的信息，记录只存在手表里。') : this.t(
           // ★ 2026-10-19 真机首启实拍后修正：原来写「不连公网」是假的
           //   （GameKit 的账号校验会连华为服务器，这是应用市场对游戏类目的合规要求）
           '「One More」不收集你的个人信息，也不上传你的游戏记录。\n' +
@@ -311,8 +309,7 @@ pageTransition() {
           Text(this.t('隐私说明', 'Privacy'))
             .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
             .width('100%')
-          Text(this.t(TG('「One More」不收集你的个人信息，也不上传你的游戏记录。所有记录只存在你自己的手机里。需联网的只有两项：局域网对战、华为游戏服务的账号校验。'),
-                  'One More collects nothing and uploads nothing. All records stay on your phone. Only two things use the network: LAN matches and Huawei Game Service sign-in.'))
+          Text(TG('「One More」不收集你的个人信息，也不上传你的游戏记录。所有记录只存在你自己的手机里。需联网的只有两项：局域网对战、华为游戏服务的账号校验。'))
         .fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
         // ★★★ 2026-11-02（第 844 轮）**手表 233×233 真机截图抓到**：
         //   这段摘要没有行数上限，在 233vp 上排了 12 行、把卡片撑破，
@@ -351,7 +348,7 @@ pageTransition() {
         // ★ 2026-11-02（第 845 轮）**手表 233×233**：两个按钮并排时宽度不够，
         //   文字被省略成「查看…」「同意…」⇒ 极小屏改用短标签（语义不变）。
         Button(Bp.isWatch() || Bp.tinyScreen()
-          ? this.t(TG('全文'), 'All')
+          ? TG('全文')
           : this.t('查看全文', 'Read policy'))
           .layoutWeight(1).height(this.privacyCompact() ? 36 : 42)
           .fontSize(FontSize.sm)
@@ -361,7 +358,7 @@ pageTransition() {
           .accessibilityText(this.t('查看全文', 'Read policy'))
           .onClick(() => { Haptics.tap(); this.openPrivacy(); })
         Button(Bp.isWatch() || Bp.tinyScreen()
-          ? this.t(TG('同意'), 'Agree')
+          ? TG('同意')
           : this.t('同意并继续', 'Agree and continue'))
           .layoutWeight(1).height(this.privacyCompact() ? 36 : 42)
           .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
@@ -406,18 +403,18 @@ pageTransition() {
   welcomeCard() {
     Column({ space: 12 }) {
       Text('👋').fontSize(38)
-      Text(this.t(TG('欢迎来到 One More'), 'Welcome to One More'))
+      Text(TG('欢迎来到 One More'))
         .fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
-      Text(this.t(TG('355 款小游戏，每一款都能：'), '355 mini-games. Every one can:'))
+      Text(TG('355 款小游戏，每一款都能：'))
         .fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
       Column({ space: 7 }) {
-        Text(this.t(TG('💡 提示 — 卡住时给下一步'), '💡 Hint — the next step when stuck'))
+        Text(TG('💡 提示 — 卡住时给下一步'))
           .fontSize(FontSize.sm).fontColor(this.theme().ink)
-        Text(this.t(TG('🤖 AI 代打 — 看它一步一步走完'), '🤖 Auto-play — watch it finish'))
+        Text(TG('🤖 AI 代打 — 看它一步一步走完'))
           .fontSize(FontSize.sm).fontColor(this.theme().ink)
-        Text(this.t(TG('▶️ 演示 — 进游戏 3 秒自动演一遍'), '▶️ Demo — 3s after you enter'))
+        Text(TG('▶️ 演示 — 进游戏 3 秒自动演一遍'))
           .fontSize(FontSize.sm).fontColor(this.theme().ink)
-        Text(this.t(TG('🔍 搜索 / 分类 / 收藏'), '🔍 Search, filter, favourites'))
+        Text(TG('🔍 搜索 / 分类 / 收藏'))
           .fontSize(FontSize.sm).fontColor(this.theme().ink)
       }
       .alignItems(HorizontalAlign.Start).width('100%')
@@ -619,9 +616,9 @@ build() {
     //   `this.current = idx` 就是 Tabs 的受控索引，和点击 tabBar 的效果一致
     //   ⚠️ 不在电视上时这几行完全不起作用（Tv.on() 恒 false）
     .focusable(Tv.on())
-    .onFocus(() => { this.tvFocus = 'L475'; })
-    .onBlur(() => { if (this.tvFocus === 'L475') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'L475', Radius.sm))
+    .onFocus(() => { this.tvFocus = 'L475-' + idx; })
+    .onBlur(() => { if (this.tvFocus === 'L475-' + idx) { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L475-' + idx, Radius.sm))
     .onKeyEvent((e: KeyEvent) => {
       Tv.handleKey(e, () => {
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {

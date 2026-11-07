@@ -357,7 +357,7 @@ export struct GWordWheel {
       .width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Text(TG('提示：词都是 3~6 个字母的常见英文词，先凑短的再拼长的'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

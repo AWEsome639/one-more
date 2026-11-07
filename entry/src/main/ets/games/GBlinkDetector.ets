@@ -380,7 +380,7 @@ export struct GBlinkDetector {
         .onClick(() => { Haptics.tap(); this.reset(); })
 
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Text(TG2('提示：一共会眨 {0} 次；乱点会扣分，误报超过 {1} 次就输了', BLINKS, MAX_FA))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }

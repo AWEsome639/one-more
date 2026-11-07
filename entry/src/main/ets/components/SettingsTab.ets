@@ -243,8 +243,7 @@ export struct SettingsTab {
     hilog.info(0x0000, 'GameLog', 'doExport count=%{public}d ready-check', n);
     if (n === 0) {
       this.noteOk = false;
-      this.note = this.t(TG('还没有游玩记录 —— 先玩几局再来导出'),
-        'No play records yet — play a few games first');
+      this.note = TG('还没有游玩记录 —— 先玩几局再来导出');
       return;
     }
     hilog.info(0x0000, 'GameLog', 'doExport: calling writeExport');
@@ -678,9 +677,9 @@ build() {
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
       .focusable(Tv.on())
-      .onFocus(() => { this.tvFocus = 'S653'; })
-      .onBlur(() => { if (this.tvFocus === 'S653') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'S653'))
+      .onFocus(() => { this.tvFocus = 'S653-' + code; })
+      .onBlur(() => { if (this.tvFocus === 'S653-' + code) { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'S653-' + code))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         // ★ 语言切换不能包在 animateTo 里 —— 它不是动画属性，
@@ -1233,9 +1232,9 @@ build() {
       + (this.isAccent(o.id) ? this.t('，当前选中', ', currently selected') : ''))
     .accessibilityLevel('yes')
     .focusable(Tv.on())
-    .onFocus(() => { this.tvFocus = 'S1084'; })
-    .onBlur(() => { if (this.tvFocus === 'S1084') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'S1084'))
+    .onFocus(() => { this.tvFocus = 'S1084-' + o.id; })
+    .onBlur(() => { if (this.tvFocus === 'S1084-' + o.id) { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'S1084-' + o.id))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
       Haptics.tap();
       // ★ 一条路走完：AppStorage ＋ Palette.primary/primaryDeep ＋ 落盘
@@ -1351,9 +1350,9 @@ build() {
       normal: { .scale({ x: 1, y: 1 }).opacity(1) }
     })
     .focusable(Tv.on())
-    .onFocus(() => { this.tvFocus = 'S1192'; })
-    .onBlur(() => { if (this.tvFocus === 'S1192') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'S1192'))
+    .onFocus(() => { this.tvFocus = 'S1192-' + cfg.en; })
+    .onBlur(() => { if (this.tvFocus === 'S1192-' + cfg.en) { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'S1192-' + cfg.en))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
       Haptics.tap();
       cfg.tap();

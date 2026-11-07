@@ -60,6 +60,9 @@ export struct GSemanticLink {
   @State chain: string[] = []; @State at: number = 0; @State opts: string[] = [];
   @State ans: number = 0; @State picked: number = -1; @State lives: number = this.diffTotal;
   @State score: number = 0; @State msg: string = ''; @State over: boolean = false;
+  // ★ 2026-11-08 常驻结果行：反馈不再依赖显示的几秒，随时能回看上一题的对错
+  @State private lastFb: string = '';
+  @State private lastOk: boolean = true;
   @State won: boolean = false;
   private startAt: number = 0; private feed: number = -1; private done: boolean = false;
 
@@ -77,6 +80,7 @@ export struct GSemanticLink {
   private stop(): void { if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; } }
 
   private reset(): void {
+    this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     this.stop();
     this.chain = CHAINS[Math.floor(Math.random() * CHAINS.length)].slice();
     this.at = 0; this.lives = this.diffTotal; this.score = 0;
@@ -85,6 +89,11 @@ export struct GSemanticLink {
   }
 
   private next(): void {
+    // ★ 2026-11-08 常驻结果行：在加载下一题之前，把上一题的反馈存下来（窗口再短也能回看）
+      const fbV: string = this.msg;
+      if (fbV.indexOf('✅') >= 0 || fbV.indexOf('🎉') >= 0) { this.lastFb = fbV; this.lastOk = true; }
+      else if (fbV.indexOf('❌') >= 0 || fbV.indexOf('💤') >= 0 || fbV.indexOf('😵') >= 0 || fbV.indexOf('⏰') >= 0 || fbV.indexOf('⌛') >= 0) { this.lastFb = fbV; this.lastOk = false; }
+
     const correct: string = this.chain[this.at + 1];
     const sameWrong: string[] = [];
     for (let i = 0; i < this.chain.length; i++) {
@@ -358,7 +367,11 @@ export struct GSemanticLink {
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
+      Text(this.lastFb.length > 0 ? this.lastFb : '　')
+        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+        .width('100%').textAlign(TextAlign.Center)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })

@@ -9,6 +9,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -61,6 +62,15 @@ export struct GShellGame {
   private done: boolean = false;
   aboutToAppear(): void {
     LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★★★ 2026-11-08（退出恢复最小版）：从上次玩到的那一关接着玩
+    //   ★ 本款的"关卡数"是 wins（连中几关），level 只是难度斜坡 ⇒ 两个都要还原。
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('shell_game') ? ProgressStore.lastLevel('shell_game') : 0;
+    if (lastLv > 1 && lastLv <= this.diffTotal) {
+      this.wins = lastLv - 1;
+      this.level = lastLv - 1;
+      this.newRound();
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GShellGame')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -254,6 +264,8 @@ export struct GShellGame {
         return;
       }
       this.level = this.level + 1;
+      // ★ 2026-11-08（退出恢复最小版）：记下"下一关"的序号（1 基 = 已过关数 + 1）
+      ProgressStore.saveLastWhere('shell_game', this.wins + 1, String(GameDiff.of('shell_game')));
       this.toId = setTimeout(() => { this.toId = -1; this.newRound(); }, 850);
       return;
     }
@@ -317,7 +329,7 @@ export struct GShellGame {
         }, (slot: number) => 's' + slot)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%')
-        .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft)
+        .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.orange)

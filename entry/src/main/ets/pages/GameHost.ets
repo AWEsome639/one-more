@@ -403,7 +403,7 @@ struct GameHost {
     //   只显示"自动"的话，玩家不知道里面在做什么 ⇒ 显示「自动·困难」
     if (raw === 3) {
       const real: number = GameDiff.of(this.gameId);
-      const autoCn: string = this.t(TG('自动'), 'Auto');
+      const autoCn: string = TG('自动');
       const realCn: string = this.t(ProgressStore.DIFF_NAME[real][0], ProgressStore.DIFF_NAME[real][1]);
       return autoCn + '·' + realCn;
     }
@@ -882,14 +882,14 @@ struct GameHost {
     placeholder() {
     Column({ space: Space.md }) {
       Text(this.meta ? this.meta.icon : '🎮').fontSize(56)
-      Text(this.t(TG('这一款还在路上'), 'This one is still on the way')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
+      Text(TG('这一款还在路上')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
         .fontColor(this.theme().ink)
       Text(this.meta ? displayName(this.meta) : '')   // ★ 繁體/其它语言都要走 displayName（2026-10-13 模拟器抓到）
         .fontSize(FontSize.sm).fontColor(this.theme().inkSoft)
-      Text(this.t(TG('玩法：'), 'How to play: ') + (this.meta ? displayTagline(this.meta) : ''))
+      Text(TG('玩法：') + (this.meta ? displayTagline(this.meta) : ''))
         .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
         .textAlign(TextAlign.Center)
-      Text(this.t(TG('换一款玩玩？'), 'Try another?')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+      Text(TG('换一款玩玩？')).fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
         .margin({ top: Space.lg })
     }
     .width('100%').height('100%')
@@ -1127,7 +1127,7 @@ struct GameHost {
             .border(Tv.focusBorder(this.focusIdx === 2))
             .onFocus(() => { this.focusIdx = 2; })
             .onBlur(() => { if (this.focusIdx === 2) { this.focusIdx = -1; } })
-            .accessibilityText(this.t(TG('玩法说明'), 'How to play'))
+            .accessibilityText(TG('玩法说明'))
             .fontSize(FontSize.lg)
             .fontColor(this.theme().inkSoft)
             .width(this.iconSize()).height(this.iconSize()).textAlign(TextAlign.Center)
@@ -3455,7 +3455,7 @@ struct GameHost {
             .rotate({ angle: this.pop ? 0 : -18 })
             .animation({ duration: 480, curve: Motion.snap() })
             .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
-          Text(this.lastSolved ? this.t(TG('这一局拿下！'), 'You cleared it!') : this.t(TG('再来一局？'), 'One more?'))
+          Text(this.lastSolved ? TG('这一局拿下！') : TG('再来一局？'))
             // ★ 2026-11-03（第 894 轮）：195 上 xl(20) → md(16)，再省约 6vp
             .fontSize(Bp.tinyWatch() ? FontSize.md : FontSize.xl).fontWeight(FontWeight.Bold)
             .fontColor(this.theme().ink)
@@ -3463,7 +3463,7 @@ struct GameHost {
           if (this.newAch.length > 0) {
             Column({ space: 4 }) {
               ForEach(this.newAch, (a: string) => {
-                Text(this.t(TG('🏆 解锁成就 '), '🏆 Unlocked ') + a)
+                Text(TG('🏆 解锁成就 ') + a)
                   .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
                   .fontColor(Palette.amber)
               }, (a: string) => a)
@@ -3486,7 +3486,7 @@ struct GameHost {
           if (this.levelUpTo > 0) {
             Row({ space: Space.sm }) {
               Text('🎊').accessibilityLevel('no').fontSize(FontSize.lg)
-              Text(this.t(TG('升到 LV '), 'Reached LV ') + this.levelUpTo + ' · ' + ProgressStore.titleOf(this.levelUpTo))
+              Text(TG('升到 LV ') + this.levelUpTo + ' · ' + ProgressStore.titleOf(this.levelUpTo))
                 .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
                 .fontColor(Palette.amber)
             }
@@ -3574,7 +3574,7 @@ struct GameHost {
               Text('+' + String(this.gainShown))
                 .fontSize(this.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold)
                 .fontColor(Palette.emerald)
-              Text(this.t(TG('经验'), 'XP')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
+              Text(TG('经验')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
             }.layoutWeight(1)
             .opacity(this.pop ? 1 : 0).translate({ y: this.pop ? 0 : 10 })
             .animation({ duration: Motion.base, curve: Motion.spring(), delay: 160 })
@@ -3597,7 +3597,7 @@ struct GameHost {
               Text(ProgressStore.prevBest > 0
                 ? this.t(TG('新纪录！上次 ') + String(ProgressStore.prevBest),
                          'New best! Previous ' + String(ProgressStore.prevBest))
-                : this.t(TG('新纪录！'), 'New best!'))
+                : TG('新纪录！'))
                 .fontSize(FontSize.sm)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(Palette.emerald)
@@ -3614,7 +3614,7 @@ struct GameHost {
           //     再叠一行 40vp 就会**重新溢出**（272 > 233）⇒ 上一轮修好的「按钮被切」会复发。
           //     ⇒ 主按钮位给「下一款」（全宽），原来两个降级成**并排一行**的次级按钮
           //     ⇒ 竖向总高**不变**（普通 46+46，极小屏 40+40），那笔账继续成立。
-          Button(this.t(TG('下一款'), 'Next game'))
+          Button(TG('下一款'))
             // ★★★ 2026-11-08 读屏缺口修复（审计 P0-5 第 2 条）：三个出口并列，
             //   读屏只能按 DOM 顺序念三个孤立的词，**分不出谁是主操作、谁是退出**。
             //   ⇒ 给每个按钮一句「动作 + 后果」，让盲人用户不用试错。
@@ -3647,7 +3647,7 @@ struct GameHost {
             //   ⇒ 真的让它放得下：**字号降一档 md→sm(14) + padding 16→6**（Space.xs）
             //      ⇒ 可用 152−12 = 140vp ≥ 131vp（fr 17 字符 @14）✅，中文 4 字更不可能溢出。
             //      实测口径见 `_巡检记录/长词溢出-20261107.md` P0-2。
-            Button(this.t(TG('再来一局'), 'Play again'))
+            Button(TG('再来一局'))
               // ★ 2026-11-08 读屏：说明「重玩这一个」，与「下一款」区分开
               .accessibilityText(this.t('再来一局：重玩这一个游戏',
                 'Play again: restart this game'))
@@ -3678,7 +3678,7 @@ struct GameHost {
                   this.diffTick = this.diffTick + 1;
                 });
               })
-            Button(this.t(TG('返回列表'), 'Back to list'))
+            Button(TG('返回列表'))
               // ★ 2026-11-08 读屏：说明「回列表」，与「再来一局」区分开
               .accessibilityText(this.t('返回列表：回到游戏列表',
                 'Back to list: return to the game list'))

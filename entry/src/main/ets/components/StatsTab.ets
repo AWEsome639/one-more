@@ -248,7 +248,7 @@ export struct StatsTab {
   }
   private nextLevelText(): string {
     if (this.level >= MAX_LEVEL) {
-      return 'LV ' + MAX_LEVEL + ' · ' + this.t(TG('满级'), 'Max');
+      return 'LV ' + MAX_LEVEL + ' · ' + TG('满级');
     }
     return 'LV ' + this.level + ' → LV ' + (this.level + 1);
   }
@@ -477,7 +477,7 @@ build() {
           this.recentSection()
           this.topSection()
         }
-        Text(this.t(TG('记录只存在你手机里，不上传、不联网也能看'), 'Everything stays on your phone — no uploads, works offline'))
+        Text(TG('记录只存在你手机里，不上传、不联网也能看'))
           .fontSize(FontSize.xxs)
           .fontColor(this.theme().inkFaint)
           .width('100%')
@@ -665,7 +665,7 @@ build() {
     if (GameLog.count() > 0 || this.plays > 0) {
       Column({ space: Space.sm }) {
         Row() {
-          Text('📊 ' + this.t(TG('近 7 天'), 'Last 7 days'))
+          Text('📊 ' + TG('近 7 天'))
             .fontSize(FontSize.md)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.theme().ink)
@@ -691,7 +691,7 @@ build() {
         } else {
           Column({ space: Space.sm }) {
             if (this.weekStat().total === 0) {
-              Text(this.t(TG('还没有记录 —— 玩一局就有了'), 'No records yet — play a round'))
+              Text(TG('还没有记录 —— 玩一局就有了'))
                 .fontSize(FontSize.xs)
                 .fontColor(this.theme().inkFaint)
                 .width('100%')
@@ -801,9 +801,9 @@ build() {
       normal: { .scale({ x: 1, y: 1 }).opacity(1) }
     })
     .focusable(Tv.on())
-    .onFocus(() => { this.tvFocus = 'ST803'; })
-    .onBlur(() => { if (this.tvFocus === 'ST803') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'ST803'))
+    .onFocus(() => { this.tvFocus = 'ST803-' + g.id; })
+    .onBlur(() => { if (this.tvFocus === 'ST803-' + g.id) { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'ST803-' + g.id))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
             Haptics.tap();
       this.openGame(g.id);
@@ -883,9 +883,9 @@ build() {
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
     .focusable(Tv.on())
-    .onFocus(() => { this.tvFocus = 'ST873'; })
-    .onBlur(() => { if (this.tvFocus === 'ST873') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'ST873'))
+    .onFocus(() => { this.tvFocus = 'ST873-' + rank; })
+    .onBlur(() => { if (this.tvFocus === 'ST873-' + rank) { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'ST873-' + rank))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
       this.openGame(it.meta.id);
@@ -956,7 +956,7 @@ build() {
   achvWall() {
     Column({ space: Space.md }) {
       Row() {
-        Text(this.t(TG('🏅 成就'), '🏅 Achievements')).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
+        Text(TG('🏅 成就')).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink)
         Blank()
         Text(Digits(String(this.unlockedIds().length), this.langCode) + ' / ' +
@@ -1089,7 +1089,7 @@ build() {
   badgeWall() {
     Column({ space: Space.md }) {
       Row() {
-        Text(this.t(TG('🎖️ 游戏徽章'), '🎖️ Game Badges')).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
+        Text(TG('🎖️ 游戏徽章')).fontSize(FontSize.md).fontWeight(FontWeight.Bold)
           .fontColor(this.theme().ink)
         Blank()
         Text(Digits(String(ProgressStore.tierTotal()), this.langCode) + ' / ' +
@@ -1098,7 +1098,7 @@ build() {
       }
       .width('100%')
 
-      Text(this.t(TG('每款游戏 4 档：首通 · 熟练 10 次 · 精通 50 次 · 大师 100 次'), 'Each game has 4 tiers: first clear, 10, 50, 100'))
+      Text(TG('每款游戏 4 档：首通 · 熟练 10 次 · 精通 50 次 · 大师 100 次'))
         .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
 
       Stack({ alignContent: Alignment.Start }) {
@@ -1125,7 +1125,7 @@ build() {
         }
         .width('100%')
       } else {
-        Text(this.t(TG('还没有徽章——通关任意一局就点亮'), 'No badges yet — clear any game to start'))
+        Text(TG('还没有徽章——通关任意一局就点亮'))
           .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
           .padding({ top: Space.sm, bottom: Space.sm })
       }
@@ -1254,7 +1254,7 @@ build() {
       Text('🌱')
         .accessibilityLevel('no')
         .fontSize(FontSize.hero)
-      Text(this.t(TG('这里还空着'), 'Nothing here yet'))
+      Text(TG('这里还空着'))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme().ink)

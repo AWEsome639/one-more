@@ -704,7 +704,7 @@ export struct GKurodoko {
 
       Text(this.tip)
         .fontSize(FontSize.sm)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Text(TG('数字 = 从这格朝四个方向能看见的黑格数；黑格不能相邻；白格要连成一片'))
         .fontSize(FontSize.xxs)

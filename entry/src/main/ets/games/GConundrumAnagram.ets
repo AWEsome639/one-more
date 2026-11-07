@@ -338,7 +338,7 @@ export struct GConundrumAnagram {
       .width('100%')
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%')
         .textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.sm }) {
         Button(Bp.tinyScreen() || Bp.isWatch()
           ? TG('乱序 -40')

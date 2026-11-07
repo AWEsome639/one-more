@@ -604,7 +604,7 @@ export struct GTangleFix {
         .fontColor(this.over
           ? (this.won ? Palette.emerald : Palette.rose)
           : this.theme.inkSoft)
-        .width('100%')
+        .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Text(this.over || this.crossCount() === 0 ? '' : '🔴 ' + this.crossText())
         .fontSize(FontSize.xs)

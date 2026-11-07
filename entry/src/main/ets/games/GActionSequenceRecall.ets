@@ -6,6 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -49,6 +50,13 @@ export struct GActionSequenceRecall {
 
   aboutToAppear(): void {
     LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    // ★★★ 2026-11-08（退出恢复最小版）：从上次玩到的那一关接着玩（level 1 基）
+    // ★ 每进程只恢复一次：`再来一局` 会重建组件、`aboutToAppear` 会再跑 —— 不设闸门就会破坏「再来一局 = 从头」
+    const lastLv: number = ProgressStore.shouldRestoreNow('action_sequence_recall') ? ProgressStore.lastLevel('action_sequence_recall') : 0;
+    if (lastLv > 1 && lastLv < this.diffTotal) {
+      this.level = lastLv;
+      this.deal();
+    }
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GActionSequenceRecall')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -241,6 +249,8 @@ export struct GActionSequenceRecall {
     if (this.cursor >= this.seq.length) {
       if (this.level >= this.diffTotal) { this.end(true); return; }
       this.level = this.level + 1; this.deal();
+      // ★ 2026-11-08（退出恢复最小版）：记下当前关卡（1 基）
+      ProgressStore.saveLastWhere('action_sequence_recall', this.level, String(GameDiff.of('action_sequence_recall')));
       // ★★★ 2026-11-07 同 A1：裸 `TG2(...)` ⇒ 过关正反馈丢失（verifier-dev 扫描 A2）
       this.msg = TG2('✅ 过关！第 {0} 关：{1} 个动作',Digits(String(this.level), this.langCode), this.len());
     }
@@ -325,7 +335,7 @@ export struct GActionSequenceRecall {
       }
       .width('100%')
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

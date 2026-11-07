@@ -298,7 +298,7 @@ export struct GSwitchTask {
       }.width('100%').height(146).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card)
 
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
+      Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.sm }) {
         Text(this.optName((0))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
