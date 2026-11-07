@@ -307,6 +307,7 @@ export struct GGravitySort {
       // ★ 2026-11-07（剩余提示缺口 C 类）：步数上限原来完全不可见 —— 玩家看不到还剩几步，突然「步数用尽」
       Text(TG2('步数 {0}/{1}', this.moves, this.diffTotal)).fontSize(FontSize.sm)
         .fontColor(this.moves >= this.diffTotal - 3 ? Palette.rose : this.theme.inkSoft)
+        .visibility(Bp.tinyScreen() || Bp.isWatch() ? Visibility.None : Visibility.Visible)
       Text(TG2("已消 {0}/{1}", (ROWS * COLS - this.remain()), (ROWS * COLS)))
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
         .width('100%').textAlign(TextAlign.Center).padding(Space.sm)

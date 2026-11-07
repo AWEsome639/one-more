@@ -447,6 +447,8 @@ export struct StreakFlame {
       Text('🔥')
         .accessibilityLevel('no')
         .fontSize(FontSize.lg)
+        // ★ 2026-11-07 emoji 固定盒子：lg=18 ⇒ 24×24（1.33em，≥ 1.30em 行盒；advance 实测 1.00em）
+        .width(24).height(24).textAlign(TextAlign.Center)
         .scale({ x: this.pulse, y: this.pulse })
       Text(this.tn('{n} 天', '{n} days', this.streak, '{n} день', '{n} дня', '{n} дней'))
         .fontSize(FontSize.sm)
@@ -462,6 +464,19 @@ export struct StreakFlame {
 /** ───────────── 等级头卡 ───────────── */
 @Component
 export struct LevelHeader {
+  /** ★ 2026-11-07 判据 1782：剥掉译文**首尾**装饰符号（✅⭕❌▲▼△▽）。配套见下方同名版本。 */
+  private stripEdgeMark(s: string): string {
+    const marks: string = '✅⭕❌▲▼△▽ ';
+    let t: string = s;
+    while (t.length > 0 && marks.indexOf(t.charAt(0)) >= 0) {
+      t = t.substring(1);
+    }
+    while (t.length > 0 && marks.indexOf(t.charAt(t.length - 1)) >= 0) {
+      t = t.substring(0, t.length - 1);
+    }
+    return t;
+  }
+
   @StorageProp('xp') xp: number = 0;
   @StorageProp('level') level: number = 1;
   @StorageProp('superStreak') streak: number = 0;
@@ -763,15 +778,13 @@ export struct LevelHeader {
 
       // 今日打卡状态
       Row({ space: Space.xs }) {
-        // ★★★ 2026-11-07 判据 1782：`今日已打卡` 的 10 语言译文**全都自带 ✅**
-        //   （I18n.ets:1618 `"de": "✅ Heute erledigt"`…），而这里又画一个独立的 ✅/⭕
-        //   ⇒ 11 种语言显示「✅ ✅ Heute erledigt」。
-        //   ⇒ **删掉独立 emoji，只用译文自带的**；未打卡那支译文不带符号，保留 ⭕ 作视觉锚。
-        if (!this.solvedToday) {
-          Text('⭕').fontSize(FontSize.md)
-        }
-        Text(this.solvedToday ? this.t(TG('今日已打卡'), 'Checked in today')
-                              : this.t(TG('还没玩 · 来一局就打卡'), 'Not yet — play one round'))
+        // ★★★ 2026-11-07 **判据 1782 + 渲染路径一致性**：
+        //   `今日已打卡`/`还没玩` 的 10 语言**字典译文自带 ✅/⭕**，但 `this.t(zh, en)` 的三条路径里
+        //   **zh 返回原词、en 返回入参** —— 两者都不带符号 ⇒ 只有切到那 10 种语言才冒出来。
+        //   ⇒ 正确做法：**组件两种状态都自己画符号**，并**剥掉译文首尾符号** ⇒ 11 语言一致。
+        Text(this.solvedToday ? '✅' : '⭕').fontSize(FontSize.md)
+        Text(this.stripEdgeMark(this.solvedToday ? this.t(TG('今日已打卡'), 'Checked in today')
+                              : this.t(TG('还没玩 · 来一局就打卡'), 'Not yet — play one round')))
           .fontSize(FontSize.xs)
           .fontColor(this.solvedToday ? Palette.emerald : this.theme.inkSoft)
       }
@@ -1143,7 +1156,25 @@ export struct GameCard {
     return this.showCrown() && this.streak > 0 && this.bestText().length > 0;
   }
 
-  /** 有没有任何底部角标要画 */
+  /**
+   * ★ 2026-11-07 判据 1782 的**公共净化函数**：剥掉译文**首尾**的装饰符号。
+   *   为什么首尾都剥：`收起` 的箭头在尾部、`今日已打卡` 的 ✅ 在开头 —— 只剥一边救不了另一边。
+   *   为什么集中在这一处：`StatsTab.stripArrow()` 和 `GamesTab.collapseLabel()` 是两份私有实现，
+   *   都只剥 2~4 种字符、都不剥首字符 ⇒ 三处需求、三套代码、三倍漏改。
+   */
+  private stripEdgeMark(s: string): string {
+    const marks: string = '✅⭕❌▲▼△▽ ';
+    let t: string = s;
+    while (t.length > 0 && marks.indexOf(t.charAt(0)) >= 0) {
+      t = t.substring(1);
+    }
+    while (t.length > 0 && marks.indexOf(t.charAt(t.length - 1)) >= 0) {
+      t = t.substring(0, t.length - 1);
+    }
+    return t;
+  }
+
+  /** 有没有任何底部角标要画 */  /** 有没有任何底部角标要画 */
   private hasBadge(): boolean {
     return this.showCrown() || this.bestText().length > 0 || this.streak > 0;
   }
@@ -1339,6 +1370,9 @@ build() {
         Row({ space: 3 }) {
           if (this.showCrown()) {
             Text('🏆').fontSize(FontSize.micro)
+              // ★ 2026-11-07 emoji 固定盒子：横向 1.2em（字形 advance 实测 1.00em，留 20% 余量）、
+              //   纵向 1.4em（≥ 1.30em 行盒，防竖切）。角标胶囊刚收窄到 ~64vp，所以宽度只给 +2vp。
+              .width(12).height(14).textAlign(TextAlign.Center)
               .accessibilityLevel('no')
           }
           // ★★★ 2026-11-07 **真机实测**（verifier-eng2 853×533）：三样全亮时胶囊 **94.3vp**，
@@ -1352,6 +1386,7 @@ build() {
           }
           if (this.streak > 0) {
             Text('🔥').fontSize(FontSize.micro)
+              .width(12).height(14).textAlign(TextAlign.Center)
               .accessibilityLevel('no')
             Text(this.tn('{n} 天', '{n} d', this.streak, '{n} день', '{n} дня', '{n} дней'))
               .fontSize(FontSize.micro).fontColor(Color.White).fontWeight(FontWeight.Bold)

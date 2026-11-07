@@ -318,7 +318,7 @@ export struct GWordPairAssociateMemory {
   pairRow(p: WordPair) {
     Row({ space: Space.sm }) {
       Text(p.a).fontSize(FontSize.md).fontColor(this.theme.ink).layoutWeight(1).textAlign(TextAlign.End)
-      Text('↔').accessibilityText(TG('对应')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+      Text('↔').accessibilityText(TG('对应')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).width(19).height(19).textAlign(TextAlign.Center)
         .accessibilityLevel('no')
       Text(p.b).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(Palette.violet).layoutWeight(1)
     }.width('100%').padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm)

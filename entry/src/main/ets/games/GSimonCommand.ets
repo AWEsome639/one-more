@@ -6,6 +6,7 @@
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -267,6 +268,7 @@ export struct GSimonCommand {
       //   复用字典里已有的 `剩 {0}s`（10 语言齐），红字提醒最后 0.6s。
       Text(TG2('剩 {0}s', (Math.max(0, this.left) / 1000).toFixed(1))).fontSize(FontSize.sm)
         .fontColor(this.left <= 600 ? Palette.rose : this.theme.inkSoft).width('100%')
+        .visibility(Bp.tinyScreen() || Bp.isWatch() ? Visibility.None : Visibility.Visible)
       Text(TG2("答对 {0}/{1}", this.correct, this.diffTotal))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       Stack({ alignContent: Alignment.Start }) {

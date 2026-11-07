@@ -1505,6 +1505,7 @@ build() {
 
       Row({ space: 3 }) {
         Text('🔥').fontSize(FontSize.sm)
+          .width(19).height(19).textAlign(TextAlign.Center)
           .accessibilityLevel('no')
         Text(Digits(this.tn('{n} 天', '{n} d', this.streak, '{n} день', '{n} дня', '{n} дней'), this.langCode)).fontSize(FontSize.xs).fontWeight(FontWeight.Bold)
           .fontColor(this.streak > 0 ? Palette.amber : this.theme().inkFaint)
@@ -1658,7 +1659,7 @@ build() {
   @Builder
   randomCard() {
     Row({ space: Space.sm }) {
-      Text('🎲').fontSize(FontSize.md)
+      Text('🎲').fontSize(FontSize.md).width(22).height(22).textAlign(TextAlign.Center)
         .accessibilityLevel('no')
       Text(this.t('随机来一局', 'Surprise me')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
         .fontColor(this.theme().ink)
@@ -1700,7 +1701,7 @@ build() {
   @Builder
   tagEntry() {
     Row({ space: Space.sm }) {
-      Text('🎛️').fontSize(FontSize.md)
+      Text('🎛️').fontSize(FontSize.md).width(22).height(22).textAlign(TextAlign.Center)
         .accessibilityLevel('no')
       Text(this.picked.length === 0
         ? this.t('按喜好挑游戏', 'Pick by taste')
@@ -2245,6 +2246,7 @@ build() {
       if (ProgressStore.streakOf(m.id) > 0) {
         Row({ space: 2 }) {
           Text('🔥').fontSize(FontSize.micro)
+            .width(12).height(14).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           Text(Digits(String(ProgressStore.streakOf(m.id)), this.langCode)).fontSize(FontSize.micro).fontColor(this.theme().inkSoft)
         }
@@ -2277,7 +2279,7 @@ build() {
   searchBar() {
     Column() {
       Row({ space: Space.xs }) {
-        Text('🔍').fontSize(FontSize.sm).fontColor(this.theme().inkFaint)
+        Text('🔍').fontSize(FontSize.sm).fontColor(this.theme().inkFaint).width(19).height(19).textAlign(TextAlign.Center)
         TextInput({ text: this.searchText, placeholder: this.t('搜游戏名或玩法', 'Search games') })
           .layoutWeight(1)
           .height(Cell.of(38))

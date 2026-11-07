@@ -20,6 +20,7 @@ import { Back } from '../core/Back';
 import { findGame, GameMeta, GameCategory, displayName, displayTagline, catLabelEn } from '../core/GameRegistry';
 import { HOW_TO, HowTo, howToOf } from '../core/GameHowTo';
 import { ProgressStore } from '../core/ProgressStore';
+import { Tv } from '../core/Tv';
 // ★★★ 2026-10-16 BUG #28：档位进度/次数数字要走 Digits ⇒ 必须导入
 //   （★ 铁律 #43 第二次咬我：加了 Digits 用法就必须补 Digits 导入）
 import { L, Digits } from '../core/I18n';
@@ -125,6 +126,8 @@ struct GuidePage {
   }
 
   @State private meta: GameMeta | undefined = undefined;
+  /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环 */
+  @State private tvFocus: string = '';
 
   /** ★ BUG #26：游戏名（★ 先读 langCode 建立 ArkUI 依赖，否则换语言不重算） */
   private gName(): string {
@@ -182,6 +185,14 @@ struct GuidePage {
             pressed: { .scale({ x: 0.9, y: 0.9 }).opacity(0.85) },
             normal: { .scale({ x: 1, y: 1 }).opacity(1) }
           })
+          // ★★★ 2026-11-07 交互死角：Text 上的 onClick 默认不可聚焦 ⇒ 电视/键盘选不中返回键
+          .accessibilityText(this.t('返回', 'Back'))
+          .accessibilityLevel('yes')
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'G185'; })
+          .onBlur(() => { if (this.tvFocus === 'G185') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'G185', Radius.full))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); Back.go(); }); })
           .onClick(() => {
             Haptics.tap();
             Back.go();

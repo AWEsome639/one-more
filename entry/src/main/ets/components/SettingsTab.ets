@@ -50,6 +50,7 @@ import { UiModeMgr } from '../core/UiMode';
 import { About } from '../core/About';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
+import { Tv } from '../core/Tv';
 
 /** 进度库名 —— 与 ProgressStore 的 STORE_NAME、StatsCardAbility 的 STORE 同一个库 */
 const STORE_NAME: string = 'onemore_progress';
@@ -135,6 +136,8 @@ export struct SettingsTab {
   //   @StorageProp 是【单向】（AppStorage → 组件），本地赋值不回写、下次同步还会被覆盖
   //   ⇒ 改成 @StorageLink（双向）—— 这才是"既读又写"的正确装饰器
   @StorageLink('uiMode') uiMode: string = 'normal';   // 界面模式（大字/紧凑），双向
+  /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环（判据：可点组件必须有 focusable） */
+  @State private tvFocus: string = '';
   @State private copyHint: string = '';   // 「已复制 ✓」提示
   /** 标星卡片的提示（打开 GitHub 失败时显示可复制的地址） */
   @State private starHint: string = '';
@@ -311,6 +314,14 @@ export struct SettingsTab {
     .backgroundColor(this.theme().surfaceAlt)
     .borderRadius(Radius.lg)
     .margin({ top: Space.sm })
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'S314'; })
+    .onBlur(() => { if (this.tvFocus === 'S314') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'S314'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+      Haptics.tap();
+      this.openStar();
+     }); })
     .onClick(() => {
       Haptics.tap();
       this.openStar();
@@ -397,6 +408,14 @@ build() {
         }
         .width('100%').height(64).padding(Space.md)   // ★ 判据 1757 试修：显式高度，防嵌套 Column 塌陷
         .backgroundColor(this.theme().surface).borderRadius(Radius.md).shadow(Shadow.card)
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'S400'; })
+        .onBlur(() => { if (this.tvFocus === 'S400') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'S400'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+          Haptics.tap();
+          router.pushUrl({ url: 'pages/LanLobby' });
+         }); })
         .onClick(() => {
           Haptics.tap();
           router.pushUrl({ url: 'pages/LanLobby' });
@@ -650,6 +669,18 @@ build() {
       .backgroundColor(this.lang === code ? this.accentColor() : this.theme().surfaceAlt)
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
+      .focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'S653'; })
+      .onBlur(() => { if (this.tvFocus === 'S653') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'S653'))
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+        Haptics.tap();   // ★ 2026-10-19 按压反馈
+        // ★ 语言切换不能包在 animateTo 里 —— 它不是动画属性，
+        //   而且换语言要重建大量文案，包进动画闭包反而可能不执行
+        I18n.set(code);
+        ProgressStore.saveLang(code);   // ★ 落盘（preferences 通道，实测跨重启可靠）
+        this.renderRev = this.renderRev + 1;
+       }); })
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         // ★ 语言切换不能包在 animateTo 里 —— 它不是动画属性，
@@ -717,19 +748,17 @@ build() {
             .fontSize(FontSize.xs).fontColor(Color.White)
             .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
             .backgroundColor(this.theme().inkFaint).borderRadius(Radius.full)
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'S720'; })
+            .onBlur(() => { if (this.tvFocus === 'S720') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'S720'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+              Haptics.tap();
+              this.copyEmail(About.SHAJIA_EMAIL);
+             }); })
             .onClick(() => {
               Haptics.tap();
-              const data2: pasteboard.PasteData =
-                pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, About.SHAJIA_EMAIL);
-              pasteboard.getSystemPasteboard().setData(data2)
-                .then(() => {
-                  this.copyHint = this.t('已复制 ✓', 'Copied ✓');
-                  setTimeout(() => { this.copyHint = ''; }, 1600);
-                })
-                .catch(() => {
-                  this.copyHint = this.t('复制失败，请手动输入', 'Copy failed — type it manually');
-                  setTimeout(() => { this.copyHint = ''; }, 2200);
-                });
+              this.copyEmail(About.SHAJIA_EMAIL);
             })
         }
         .width('100%')
@@ -747,19 +776,17 @@ build() {
             .fontSize(FontSize.xs).fontColor(Color.White)
             .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
             .backgroundColor(this.accentColor()).borderRadius(Radius.full)
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'S740'; })
+            .onBlur(() => { if (this.tvFocus === 'S740') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'S740'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+              Haptics.tap();
+              this.copyEmail(About.FEEDBACK_EMAIL);
+             }); })
             .onClick(() => {
               Haptics.tap();
-              const data: pasteboard.PasteData =
-                pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, About.FEEDBACK_EMAIL);
-              pasteboard.getSystemPasteboard().setData(data)
-                .then(() => {
-                  this.copyHint = this.t('已复制 ✓', 'Copied ✓');
-                  setTimeout(() => { this.copyHint = ''; }, 1600);
-                })
-                .catch(() => {
-                  this.copyHint = this.t('复制失败，请手动输入', 'Copy failed — type it manually');
-                  setTimeout(() => { this.copyHint = ''; }, 2200);
-                });
+              this.copyEmail(About.FEEDBACK_EMAIL);
             })
         }
         .width('100%')
@@ -781,18 +808,17 @@ build() {
         }
         .width('100%')
         .padding({ top: 6, bottom: 6 })
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'S764'; })
+        .onBlur(() => { if (this.tvFocus === 'S764') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'S764'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+          Haptics.tap();
+          this.openPrivacyUrl();
+         }); })
         .onClick(() => {
           Haptics.tap();
-          const url: string = this.lang === 'en' ? About.PRIVACY_URL_EN : About.PRIVACY_URL;
-          // 用系统浏览器打开 —— 应用内不做 WebView（少一个组件、少一份风险）
-          const ctx = getContext(this) as common.UIAbilityContext;
-          ctx.startAbility({
-            action: 'ohos.want.action.viewData',
-            uri: url
-          }).catch(() => {
-            this.copyHint = this.t('打不开链接，请手动访问：', 'Cannot open link. Please visit: ') + url;
-            setTimeout(() => { this.copyHint = ''; }, 4000);
-          });
+          this.openPrivacyUrl();
         })
 
         Text(this.t('不收集任何信息 · 记录只在你手机里', 'No data collected · Everything stays on your device'))
@@ -829,12 +855,56 @@ build() {
     .backgroundColor(this.mode === m ? this.accentColor() : this.theme().surfaceAlt)
     .borderRadius(Radius.full)
     .animation({ duration: Motion.fast, curve: Motion.spring() })
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'S803'; })
+    .onBlur(() => { if (this.tvFocus === 'S803') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'S803'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+      Haptics.tap();   // ★ 2026-10-19 按压反馈
+      animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
+        ProgressStore.setThemeMode(m);
+      });
+     }); })
     .onClick(() => {
       Haptics.tap();   // ★ 2026-10-19 按压反馈
       animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
         ProgressStore.setThemeMode(m);
       });
     })
+  }
+
+
+  /**
+   * ★★★ 2026-11-07 交互死角修复：复制邮箱（原来两处各抄一遍 pasteboard 流程，
+   *   补 TV 焦点后会变成 4 份副本 ⇒ 收成一个方法，点击/遥控器 OK 共用）。
+   */
+  private copyEmail(addr: string): void {
+    const data: pasteboard.PasteData =
+      pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, addr);
+    pasteboard.getSystemPasteboard().setData(data)
+      .then(() => {
+        this.copyHint = this.t('已复制 ✓', 'Copied ✓');
+        setTimeout(() => { this.copyHint = ''; }, 1600);
+      })
+      .catch(() => {
+        this.copyHint = this.t('复制失败，请手动输入', 'Copy failed — type it manually');
+        setTimeout(() => { this.copyHint = ''; }, 2200);
+      });
+  }
+
+  /** ★ 2026-11-07：隐私政策外链（与 openStar 同一套兜底；点击/遥控器 OK 共用） */
+  private openPrivacyUrl(): void {
+    const url: string = this.lang === 'en' ? About.PRIVACY_URL_EN : About.PRIVACY_URL;
+    try {
+      const ctx = getContext(this) as common.UIAbilityContext;
+      ctx.startAbility({ action: 'ohos.want.action.viewData', uri: url }).catch(() => {
+        this.copyHint = this.t('打不开链接，请手动访问：', 'Cannot open link. Please visit: ') + url;
+        setTimeout(() => { this.copyHint = ''; }, 6000);
+      });
+    } catch (e) {
+      this.copyHint = this.t('打不开链接，请手动访问：', 'Cannot open link. Please visit: ') + url;
+      setTimeout(() => { this.copyHint = ''; }, 6000);
+    }
   }
 
   private modeSub(): string {
@@ -1005,6 +1075,15 @@ build() {
             .backgroundColor(this.uiMode === m ? this.accentColor() : this.theme().surfaceAlt)
             .border({ width: 1, color: this.uiMode === m ? this.accentColor() : this.theme().line })
             .borderRadius(Radius.md)
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'S979'; })
+            .onBlur(() => { if (this.tvFocus === 'S979') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'S979'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+              Haptics.tap();
+              UiModeMgr.save(m);
+              this.uiMode = m;
+             }); })
             .onClick(() => {
               Haptics.tap();
               UiModeMgr.save(m);
@@ -1110,6 +1189,16 @@ build() {
     }
     .width('23%')
     .padding({ top: Space.xs, bottom: Space.xs })
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'S1084'; })
+    .onBlur(() => { if (this.tvFocus === 'S1084') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'S1084'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+      Haptics.tap();
+      // ★ 一条路走完：AppStorage ＋ Palette.primary/primaryDeep ＋ 落盘
+      Accent.set(o.id);
+      ProgressStore.saveAccent(o.id);
+     }); })
     .onClick(() => {
       Haptics.tap();
       // ★ 一条路走完：AppStorage ＋ Palette.primary/primaryDeep ＋ 落盘
@@ -1218,6 +1307,14 @@ build() {
       pressed: { .scale({ x: 0.975, y: 0.975 }).opacity(0.9) },
       normal: { .scale({ x: 1, y: 1 }).opacity(1) }
     })
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'S1192'; })
+    .onBlur(() => { if (this.tvFocus === 'S1192') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'S1192'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+      Haptics.tap();
+      cfg.tap();
+     }); })
     .onClick(() => {
       Haptics.tap();
       cfg.tap();
@@ -1252,6 +1349,14 @@ build() {
           .padding({ top: Space.sm, bottom: Space.sm })
           .backgroundColor(this.theme().surface)
           .borderRadius(Radius.sm)
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'S1226'; })
+          .onBlur(() => { if (this.tvFocus === 'S1226') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'S1226'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+            Haptics.tap();   // ★ 2026-10-19 按压反馈
+            this.confirming = false;
+           }); })
           .onClick(() => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
             this.confirming = false;
@@ -1266,6 +1371,13 @@ build() {
           .padding({ top: Space.sm, bottom: Space.sm })
           .backgroundColor(Palette.danger)
           .borderRadius(Radius.sm)
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'S1240'; })
+          .onBlur(() => { if (this.tvFocus === 'S1240') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'S1240'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+            this.doReset();
+           }); })
           .onClick(() => {
             this.doReset();
           })

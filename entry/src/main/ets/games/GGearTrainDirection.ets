@@ -330,7 +330,7 @@ export struct GGearTrainDirection {
   gearRow(i: number) {
     Row({ space: Space.sm }) {
       Text(TG2('齿轮 {0}', (i + 1))).fontSize(FontSize.sm).fontColor(this.theme.ink).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      Text('⚙️').accessibilityLevel('no').fontSize(FontSize.lg)
+      Text('⚙️').accessibilityLevel('no').fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center)
       Text(this.dirLabel(i)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
         .width(80).textAlign(TextAlign.End)
     }

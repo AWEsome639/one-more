@@ -333,7 +333,7 @@ export struct GWordAssociationRecall {
   pairRow(p: number) {
     Row({ space: Space.sm }) {
       Text(PAIRS[p].cue).fontSize(FontSize.md).layoutWeight(1).fontColor(this.theme.ink)
-      Text('→').accessibilityText(TG('指向')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+      Text('→').accessibilityText(TG('指向')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).width(19).height(19).textAlign(TextAlign.Center)
         .accessibilityLevel('no')
       Text(PAIRS[p].mate).fontSize(FontSize.md).layoutWeight(1).textAlign(TextAlign.End).fontColor(Palette.berry)
     }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)

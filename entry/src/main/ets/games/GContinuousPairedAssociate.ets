@@ -394,7 +394,7 @@ export struct GContinuousPairedAssociate {
           ForEach(this.pairs, (p: Pair) => {
             Row({ space: Space.md }) {
               Text(p.a).fontSize(FontSize.xxl)
-              Text('→').accessibilityText(TG('指向')).fontSize(FontSize.lg).fontColor(this.theme.inkFaint)
+              Text('→').accessibilityText(TG('指向')).fontSize(FontSize.lg).fontColor(this.theme.inkFaint).width(24).height(24).textAlign(TextAlign.Center)
               Text(p.b).fontSize(FontSize.xxl)
             }
             .width('100%')

@@ -111,6 +111,15 @@ struct LanLobby {
             pressed: { .scale({ x: 0.9, y: 0.9 }).opacity(0.85) },
             normal: { .scale({ x: 1, y: 1 }).opacity(1) }
           })
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'LL114'; })
+          .onBlur(() => { if (this.tvFocus === 'LL114') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'LL114'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                        Haptics.tap();
+            Back.go();
+          
+          }); })
           .onClick(() => {
             Haptics.tap();
             Back.go();
@@ -198,6 +207,15 @@ struct LanLobby {
               .margin({ right: 6, bottom: 6 })
               .backgroundColor(this.picked === gid ? this.accentColor() : this.theme().surfaceAlt)
               .borderRadius(Radius.full)
+              .focusable(Tv.on())
+              .onFocus(() => { this.tvFocus = 'LL201'; })
+              .onBlur(() => { if (this.tvFocus === 'LL201') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'LL201'))
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                                Haptics.tap();
+                this.picked = gid;
+              
+              }); })
               .onClick(() => {
                 Haptics.tap();
                 this.picked = gid;
@@ -277,6 +295,15 @@ struct LanLobby {
         .width('100%').padding(Space.md)
         .margin({ left: Space.lg, right: Space.lg })
         .backgroundColor(this.theme().surface).borderRadius(Radius.md).shadow(Shadow.card)
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'LL280'; })
+        .onBlur(() => { if (this.tvFocus === 'LL280') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'LL280'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                    Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：加入房间是重要动作
+          this.joinRoom(r);
+        
+        }); })
         .onClick(() => {
           Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：加入房间是重要动作
           this.joinRoom(r);

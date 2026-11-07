@@ -412,7 +412,7 @@ export struct GBalanceScale {
       // 天平：左盘物体 / 右盘砝码
       Row({ space: Space.sm }) {
         this.pan(0)
-        Text('⚖️').accessibilityLevel('no').fontSize(FontSize.xxl)
+        Text('⚖️').accessibilityLevel('no').fontSize(FontSize.xxl).width(32).height(32).textAlign(TextAlign.Center)
         this.pan(1)
       }
       .width('100%')

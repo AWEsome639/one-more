@@ -37,6 +37,23 @@ TOT=$((TOT + 17))
 FAIL=$((FAIL + GUARD_N))
 printf "     %-42s %6d / %d\n" "check_layout_guard.py" "17" "${GUARD_N}"
 
+# ── 判据 1782（2026-11-07 新增）：双符号 —— 字典译文自带符号 + 组件又画一个 ──
+#   来历：一晚两处 —— 成就墙「閉じる ▲ ▲」、等级头卡「✅ ✅ Heute erledigt」。
+#   ⇒ 能写成脚本的规矩，就不要写成文字。
+#   ★ 为什么是**纯闸门**（只 FAIL += N，不动 TOT）：
+#     加 TOT 就要改基线数字（200359 → +1），而基线变化必须能说清「多了哪把尺子」；
+#     这条只判「有没有违规」，不产生通过计数，所以不进 TOT 最干净。
+#   ★ rc=2（解析器坏/自检失败）也算失败 —— 否则"检查器坏了"会显示成绿。
+DUP_OUT=$(python3 "$(dirname "$0")/../tools/check_dup_symbol.py" 2>&1)
+DUP_RC=$?
+DUP_N=$(printf '%s' "${DUP_OUT}" | grep -oE "双符号：[0-9]+ 处" | grep -oE "[0-9]+" | tail -1)
+if [ "${DUP_RC}" -eq 2 ] || [ -z "${DUP_N}" ]; then
+  DUP_N=1
+  echo "     ⚠️ check_dup_symbol.py 无法给出结论（rc=${DUP_RC}）⇒ 按 1 处失败计，别当绿"
+fi
+FAIL=$((FAIL + DUP_N))
+printf "     %-42s %6s / %d\n" "check_dup_symbol.py（双符号）" "-" "${DUP_N}"
+
 echo "     ────────────────────────────────────────────────"
 printf "     %-42s %6d / %d\n" "合计" "${TOT}" "${FAIL}"
 
