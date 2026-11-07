@@ -257,7 +257,7 @@ export struct GMandalaRecall {
     next.push(i);
     this.picks = next;
     if (next.length < this.lit.length) {
-      this.msg = TG('还差 ') + String(this.lit.length - next.length) + TG(' 格');
+      this.msg = TG2('还差 {0} 格', String(this.lit.length - next.length));
       return;
     }
     if (sameSet(next, this.lit)) {

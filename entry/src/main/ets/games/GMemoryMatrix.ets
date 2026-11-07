@@ -277,7 +277,7 @@ export struct GMemoryMatrix {
       next.push(i);
       this.picks = next;
       if (next.length < this.need) {
-        this.msg = TG('还差 ') + String(this.need - next.length) + TG(' 格');
+        this.msg = TG2('还差 {0} 格', String(this.need - next.length));
         return;
       }
       this.score = this.score + 120; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);

@@ -23,6 +23,8 @@ import { I18n, Lang, toTrad } from './I18n';
 
 /** 中文原文 → 英文 */
 const DICT: Record<string, Record<string, string>> = {
+  "答对 {0} 题": {"en": "{0} correct", "ja": "{0} 問正解", "ko": "{0}문제 정답", "es": "{0} correctas", "fr": "{0} bonnes réponses", "de": "{0} richtig", "pt": "{0} certas", "ru": "{0} верных", "it": "{0} corrette", "ar": "{0} صحيحة"},
+  "⏰ 时间到，答对 {0} 题": {"en": "⏰ Time's up — {0} correct", "ja": "⏰ 時間切れ・{0} 問正解", "ko": "⏰ 시간 종료 — {0}문제 정답", "es": "⏰ Tiempo: {0} correctas", "fr": "⏰ Temps écoulé — {0} bonnes réponses", "de": "⏰ Zeit um — {0} richtig", "pt": "⏰ Tempo esgotado — {0} certas", "ru": "⏰ Время вышло — {0} верных", "it": "⏰ Tempo scaduto — {0} corrette", "ar": "⏰ انتهى الوقت — {0} صحيحة"},
   "🎮 全部": {"en": "🎮 All", "ja": "🎮 すべて", "ko": "🎮 전체", "es": "🎮 Todos", "fr": "🎮 Tous", "de": "🎮 Alle", "pt": "🎮 Todos", "ru": "🎮 Все", "it": "🎮 Tutti", "ar": "🎮 الكل"},
   "⭐ 我收藏的 ": {"en": "⭐ Saved ", "ja": "⭐ お気に入り ", "ko": "⭐ 즐겨찾기 ", "es": "⭐ Guardados ", "fr": "⭐ Favoris ", "de": "⭐ Favoriten ", "pt": "⭐ Guardados ", "ru": "⭐ Избранное ", "it": "⭐ Salvati ", "ar": "⭐ المفضلة "},
   "🕐 玩过的": {"en": "🕐 Played", "ja": "🕐 プレイ済み", "ko": "🕐 플레이함", "es": "🕐 Jugados", "fr": "🕐 Joués", "de": "🕐 Gespielt", "pt": "🕐 Jogados", "ru": "🕐 Игранные", "it": "🕐 Giocati", "ar": "🕐 لعبتها"},
