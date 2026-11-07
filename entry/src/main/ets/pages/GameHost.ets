@@ -3286,6 +3286,12 @@ struct GameHost {
         //        ① `space` 16 → **4**（省 36vp；卡片本来就是圆角块，4vp 也够分开）
         //        ② 两个按钮 46 → **40**（省 12vp；40 仍是可用触控高度）
         //        ── 276 − 48 = **228 < 233** ✅
+        // ★★★ 2026-11-07 奥森截图：结算框**明显偏上**。
+        //   根因：根容器是 `Stack({ alignContent: Alignment.Top })`（为了让内容溢出时不被裁顶），
+        //   结算弹窗也在里面 ⇒ **被 Top 对齐** ⇒ 卡在垂直 1/3。
+        //   修法：给弹窗单独包一层 `Stack({ alignContent: Alignment.Center })`，
+        //   根 Stack 保持 Top（不动那 355 款的溢出行为），弹窗自己居中。
+        Stack({ alignContent: Alignment.Center }) {
         Column({ space: this.tinyScreen() ? Space.xs : Space.md }) {
           // ★★★ 2026-11-02（第 842 轮 · 第二轮）**手表 233×233**：
           //   隐藏成就列表后三数据出来了，但**两个按钮仍在屏幕外**。
@@ -3511,6 +3517,8 @@ struct GameHost {
         .shadow(Shadow.card)
         .transition(TransitionEffect.OPACITY.animation({ duration: Motion.sheet })
           .combine(TransitionEffect.translate({ y: 300 })))
+        }
+        .width('100%').height('100%')
       }
 
       // ★★★「动画拉满」胜利粒子层

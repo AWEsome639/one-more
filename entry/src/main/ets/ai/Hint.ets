@@ -1,3 +1,4 @@
+import { TG } from '../core/GameI18n';
 import { promptAction } from '@kit.ArkUI';
 
 /**
@@ -109,9 +110,37 @@ export class Hint {
     }
   }
 
-  /** 结果给不出时，用一句兜底话走 toast */
+  /**
+   * 结果给不出时，用一句兜底话走 toast。
+   *
+   * ★★★ 2026-11-07（ai-fixer-b 审计发现的真缺口）：原来**只判 `r.ok`，完全不看 `r.reason`**。
+   *   `reason` 是设计好的四态字段（ok/none/timeout/error），而且有些游戏**把「人话」当 reason 传**
+   *   （`GFreecell.ets:524` `Hint.none(TG('这局已经走不通了，换一局吧'))`）——
+   *   这些话**一个字都没显示过**（全项目 `grep "\.reason" games/` = 0 命中）。
+   *   ⇒ 335 款的提示失败一律只弹「这一步看不出答案」，玩家分不清「这局死了」还是「算法不行」。
+   *
+   *   现在：timeout 说「想得有点久」/ error 说「出错了」/ 游戏传的人话直接念 / 其余才用兜底。
+   */
   static toastResult(r: HintResult, zhFail: string): void {
-    Hint.toast(r.ok ? r.zh : zhFail);
+    if (r.ok) {
+      Hint.toast(r.zh);
+      return;
+    }
+    const reason: string = r.reason === undefined || r.reason === null ? '' : r.reason;
+    if (reason === 'timeout') {
+      Hint.toast(TG('想得有点久，再点一次'));
+      return;
+    }
+    if (reason === 'error') {
+      Hint.toast(TG('出错了，再点一次'));
+      return;
+    }
+    // 游戏自己传的「人话」（已由 TG 翻好）—— 直接念，别丢
+    if (reason.length > 0 && reason !== 'none' && reason !== 'unsupported') {
+      Hint.toast(reason);
+      return;
+    }
+    Hint.toast(zhFail);
   }
 
   // ═══════════ 第二期·AI 代打（2026-10-24 奥森提的想法）═══════════
