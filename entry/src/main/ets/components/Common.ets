@@ -1135,6 +1135,14 @@ export struct GameCard {
     return p > 84 ? 84 : p;
   }
 
+  /**
+   * ★ 2026-11-07 真机实测：**三样全亮时胶囊 94.3vp**，把副标题压到 25.3vp（「交换消宝石」只剩 8vp 字号）。
+   *   ⇒ 三样全亮时不画分数（只留 🏆 + 🔥 N 天）⇒ 胶囊 → ~64vp。判据：可读文字 > 装饰数字。
+   */
+  private hasThreeBadges(): boolean {
+    return this.showCrown() && this.streak > 0 && this.bestText().length > 0;
+  }
+
   /** 有没有任何底部角标要画 */
   private hasBadge(): boolean {
     return this.showCrown() || this.bestText().length > 0 || this.streak > 0;
@@ -1333,7 +1341,11 @@ build() {
             Text('🏆').fontSize(FontSize.micro)
               .accessibilityLevel('no')
           }
-          if (this.bestText().length > 0) {
+          // ★★★ 2026-11-07 **真机实测**（verifier-eng2 853×533）：三样全亮时胶囊 **94.3vp**，
+          //   把副标题压到 **25.3vp** ⇒「交换消宝石」被压到 **8vp 字号**（行盒 9.65 vs 正常 14.0）。
+          //   ⇒ **三样全亮时不画分数**（只留 🏆 + 🔥 N 天）⇒ 胶囊 → ~64vp ⇒ 副标题可用宽 → 44.9。
+          //   判据：**可读文字 > 装饰数字**。只有 🏆+分数、或只有分数+🔥 的组合不受影响。
+          if (this.bestText().length > 0 && !this.hasThreeBadges()) {
             Text(this.bestText())
               .fontSize(FontSize.micro).fontColor(Color.White).fontWeight(FontWeight.Bold)
               .accessibilityLevel('no')
