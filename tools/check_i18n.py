@@ -28,6 +28,11 @@ I18N = os.path.join(ETS, 'core/I18n.ets')
 DESIGN = os.path.join(ETS, 'core/Design.ets')
 SETTINGS = os.path.join(ETS, 'components/SettingsTab.ets')
 LANGS = ['ja', 'ko', 'es', 'fr', 'de', 'pt', 'ru', 'it', 'ar', 'zh-Hant']
+# ★ 判据 1741：**zh-Hant 允许缺** —— I18n.ets 的 L() 里明写
+#   `if (cur === Lang.ZHTW) { return Digits(toTrad(zh), cur); // 繁体缺项：转换`，
+#   所以「没写 zh-Hant 列」是设计，不是洞（48 条这样，旧版当缺项 ⇒ 假红）。
+#   缺这 9 种才是真洞。
+LANGS_REQ = ['ja', 'ko', 'es', 'fr', 'de', 'pt', 'ru', 'it', 'ar']
 # 受本专项管辖（改了要自检）的三个文件
 MANAGED = [I18N, DESIGN, SETTINGS]
 # 2026-10-13 i18n-theme 专项扩围后经手的文件（都做括号配平自检）
@@ -84,57 +89,224 @@ def strip_code(txt):
     return ''.join(out)
 
 
-def parse_extra(s):
-    """
-    把 EXTRA 字典整块解析出来（**不是正则**）
+# ════════════════════════════════════════════════════════════════════════════
+#  判据 1741：字典必须**按结构**解析（括号栈 + 跳过字符串），不能按行、不能 json.loads
+#
+#  ⚠️ 2026-11-07 修三处误报 —— 根因是同一把坏尺子（**按行 / 按 JSON 解析 TS 对象字面量**）：
+#    ① 「重复键 ['"ar"', '"de"', '"en"', …]」：旧版用 `^\s*"…"\s*:` 抓**所有**行首键，
+#       把嵌套的**语言列名**也算成顶层键 ⇒ 语言列名当然每条都重复。语言列不是键。
+#    ② 「GameI18n 字典解析失败：Expecting property name」：DICT 里夹着 // 注释
+#       （GameI18n.ets 第 1325 行起就是），json.loads 读到注释当场崩。
+#    ③ 附带修掉的第三个误报：「完整性 398 条有缺」—— EXTRA 是**混排**的
+#       （31 条多行 + 389 条单行：单行条目的语言列和键挤在同一行），
+#       旧版只认行首的 `"键": {`，单行条目整片漏掉 ⇒ 全被记成「缺 10 语言」。
+#  ⇒ 现在：先按字符扫（字符串 / 注释分开），再用**括号栈**切出每个顶层条目，
+#     最后在条目体内正则取语言列。多行、单行、带注释、带尾逗号、含 `{n}` 模板都能吃。
+# ════════════════════════════════════════════════════════════════════════════
+QUOTES = ('"', "'", '`')
+_KEY_OBJ = re.compile(r'\s*("(?:[^"\\]|\\.)*")\s*:\s*\{')
+# 非对象型条目（`"k": "v"`）也整条吃掉，免得它的值里出现 `": {"` 把后面搅乱
+_KEY_STR = re.compile(r'\s*("(?:[^"\\]|\\.)*")\s*:\s*"(?:[^"\\]|\\.)*"')
+_PAIR = re.compile(r'"([A-Za-z][A-Za-z-]{0,9})"\s*:\s*"((?:[^"\\]|\\.)*)"')
 
-    ⚠️ 2026-10-13 修过一把"坏尺子"：原来用 `^\\s*"k":\\s*\\{([^}]*)\\}` 逐行匹配，
-       而译文里带 `{n}` 的条目（如 `"{n} 局": {"ja": "{n}局"}`）会在 `{n}` 的 `}` 处断掉
-       ⇒ 这类条目**被静默跳过**，旧脚本报 248 条、真实是 281 条，10 条从没被校验过。
+
+def _skip_string(txt, i):
+    """i 指向引号；返回**配对引号之后**的下标（认反斜杠转义）"""
+    q = txt[i]
+    i += 1
+    n = len(txt)
+    while i < n:
+        if txt[i] == '\\':
+            i += 2
+            continue
+        if txt[i] == q:
+            return i + 1
+        i += 1
+    return n
+
+
+def _object_end(txt, i):
+    """i 指向 '{'；返回配对 '}' **之后**的下标。
+
+    ★ 必须跳过字符串：译文里的 `{n}` / `{s}` 模板就是花括号，
+      不认识字符串的话层数会被模板搅乱（判据 1740 踩过同一个坑）。
     """
-    i = s.index('const EXTRA:')
-    j = s.index('{', i)
     depth = 0
-    k = j
-    while k < len(s):
-        if s[k] == '{':
+    n = len(txt)
+    while i < n:
+        c = txt[i]
+        if c in QUOTES:
+            i = _skip_string(txt, i)
+            continue
+        if c == '{':
             depth += 1
-        elif s[k] == '}':
+        elif c == '}':
             depth -= 1
             if depth == 0:
-                break
-        k += 1
-    block = s[j:k + 1]
-    # ★ 判据 1740：EXTRA 里允许注释 + 尾逗号 + 未转义反斜杠 —— JSON 太严格，
-    #   改用**正则提取**（key -> 语言列），绕开所有 JSON 语法问题
-    clean = re.sub(r'/\*.*?\*/', '', block, flags=re.S)
-    clean = re.sub(r'//[^\n]*', '', clean)
-    data = {}
-    cur_key = None
-    for line in clean.split('\n'):
-        mk = re.match(r'^\s*("(?:[^"\\]|\\.)*")\s*:\s*\{', line)
-        if mk:
-            try:
-                cur_key = json.loads(mk.group(1))
-            except Exception:
-                cur_key = mk.group(1)
-            data.setdefault(cur_key, {})
+                return i + 1
+        i += 1
+    return n
+
+
+def blank_comments(txt):
+    """注释 ⇒ 等长空白（**字符串里的内容一个字符都不动**，换行保留 ⇒ 行号不变）。
+
+    ★ 为什么不能 `re.sub(r'//[^\n]*')`：译文里一出现 `https://…`，
+      整个行尾都会被当成注释删掉（值被截断），随后括号配平也会跟着错位。
+    """
+    out = list(txt)
+    i = 0
+    n = len(txt)
+    while i < n:
+        c = txt[i]
+        if c in QUOTES:
+            i = _skip_string(txt, i)
             continue
-        ml = re.match(r'^\s*"([^"]+)"\s*:\s*"(.*)",?\s*$', line)
-        if ml and cur_key is not None:
-            data[cur_key][ml.group(1)] = ml.group(2)
-    raw = re.findall(r'^\s*("(?:[^"\\]|\\.)*")\s*:', clean, re.M)
-    keys = [x for x in raw]
-    dup = sorted({x for x in keys if keys.count(x) > 1})
-    return data, dup, len(keys)
+        if c == '/' and i + 1 < n and txt[i + 1] == '/':
+            j = txt.find('\n', i)
+            j = n if j < 0 else j
+            for k in range(i, j):
+                out[k] = ' '
+            i = j
+            continue
+        if c == '/' and i + 1 < n and txt[i + 1] == '*':
+            j = txt.find('*/', i + 2)
+            j = n if j < 0 else j + 2
+            for k in range(i, min(j, n)):
+                if out[k] != '\n':
+                    out[k] = ' '
+            i = j
+            continue
+        i += 1
+    return ''.join(out)
+
+
+def _key_text(raw):
+    """源码里的键字面量（自带引号）⇒ 真实字符串（`\\n` 之类的转义要还原）"""
+    try:
+        return json.loads(raw)
+    except Exception:
+        return raw[1:-1] if len(raw) >= 2 else raw
+
+
+def parse_dict_literal(src, marker):
+    """解析 `const XXX: Record<…> = { … }` ⇒ (entries, stray)。
+
+    entries = [(键字面量, {语言: 译文}), …]，**保持出现顺序、重复键各自保留**
+              （判重交给调用方，合并会掩盖重复）
+    stray   = 值不是对象的条目数（这个字典的类型不该有 ⇒ 出现就是类型错误）
+    找不到 marker 时返回 (None, 0)，让调用方报「解析失败」而不是抛异常。
+    """
+    try:
+        i = src.index(marker)
+        b = src.index('{', i)
+    except ValueError:
+        return None, 0
+    end = _object_end(src, b)
+    inner = blank_comments(src[b + 1:end - 1])
+    entries = []
+    stray = 0
+    k = 0
+    n = len(inner)
+    while k < n:
+        m = _KEY_OBJ.match(inner, k)
+        if m:
+            j = m.end() - 1                      # 指向条目对象的 '{'
+            e = _object_end(inner, j)
+            row = {}
+            for pm in _PAIR.finditer(inner[j + 1:e - 1]):
+                row[pm.group(1)] = pm.group(2)
+            entries.append((m.group(1), row))
+            k = e
+            continue
+        if inner[k] in ' \t\r\n,':
+            k += 1
+            continue
+        m2 = _KEY_STR.match(inner, k)
+        if m2:
+            stray += 1
+            k = m2.end()
+            continue
+        k += 1
+    return entries, stray
+
+
+def parse_extra(s):
+    """I18n.ets 的 EXTRA ⇒ (data, dup, nkeys, stray)（判据 1741）。
+
+    dup 只算**顶层键**（中文原文）；语言列名在条目体里，从头到尾不当键。
+    """
+    entries, stray = parse_dict_literal(s, 'const EXTRA:')
+    if entries is None:
+        return {}, [], 0, 0
+    data = {}
+    keys = []
+    for raw, row in entries:
+        key = _key_text(raw)
+        keys.append(key)
+        data.setdefault(key, {}).update(row)
+    cnt = {}
+    for key in keys:
+        cnt[key] = cnt.get(key, 0) + 1
+    dup = sorted([key for key, c in cnt.items() if c > 1])
+    return data, dup, len(keys), stray
+
+
+# ── 反证尺子（判据 1741）：这几种排版和坑，解析器必须扛住 ──
+SELF_TEST_SRC = '''const EXTRA: Record<string, Record<string, string>> = {
+  /** 注释里带 "引号" 和 { 花括号 } 都不算数 */
+  "多行条目": {
+    "en": "Multi line",
+    "ja": "複数行",   // 行尾注释
+    "zh-Hant": "多行條目",
+  },
+  "单行条目": { "en": "One line", "ja": "一行", "zh-Hant": "單行條目" },
+  "{n} 局": { "en": "{n} rounds", "ja": "{n}局", "zh-Hant": "{n} 局" },
+  "网址": { "en": "see https://example.com/a{b}", "ja": "https://example.com", "zh-Hant": "網址" },
+  "带撇号": { "en": "it's the host's room", "ja": "ホストの部屋", "zh-Hant": "房主的房間" },
+  "重复的键": { "en": "dup A", "ja": "重複", "zh-Hant": "重複的鍵" },
+  "重复的键": { "en": "dup B", "ja": "重複2", "zh-Hant": "重複的鍵2" },
+};
+'''
+
+
+def self_test():
+    """反证尺子：解析器自己先过一遍坑，再拿它量真实字典。
+
+    断言的都是**这轮修掉的误报**：
+      · 顶层键 7 条 / 去重 6 条 / 重复只报「重复的键」（**不许报语言列名**）
+      · 单行条目要有 3 个语言列（旧版这里是空 dict ⇒ 假「缺项」）
+      · `{n} 局`、注释、尾逗号、`https://`、`it's` 全部不许把解析搅坏
+    """
+    entries, stray = parse_dict_literal(SELF_TEST_SRC, 'const EXTRA:')
+    data, dup, nkeys, stray2 = parse_extra(SELF_TEST_SRC)
+    checks = [
+        ('条目数 = 7', nkeys == 7),
+        ('去重后 = 6', len(data) == 6),
+        ('重复键只报顶层「重复的键」', dup == ['重复的键']),
+        ('语言列名不算重复键', not (set(dup) & set(['en', 'ja', 'zh-Hant']))),
+        ('单行条目解析出 3 列', len(data.get('单行条目', {})) == 3),
+        ('多行条目解析出 3 列', len(data.get('多行条目', {})) == 3),
+        ('{n} 模板键解析', data.get('{n} 局', {}).get('en') == '{n} rounds'),
+        ('https:// 没被当注释吃掉',
+         data.get('网址', {}).get('en') == 'see https://example.com/a{b}'),
+        ('撇号没截断', data.get('带撇号', {}).get('en') == "it's the host's room"),
+        ('重复键内容合并（后值覆盖）', data.get('重复的键', {}).get('en') == 'dup B'),
+        ('stray = 0', stray == 0 and stray2 == 0),
+    ]
+    bad = [name for name, ok in checks if not ok]
+    for name, ok in checks:
+        if not ok:
+            print('     ⚠️ 自检失败：%s' % name)
+    return len(bad) == 0, len(checks)
 
 
 def check_dict():
     s = read(I18N)
-    data, dup, nkeys = parse_extra(s)
+    data, dup, nkeys, stray = parse_extra(s)      # ★ 判据 1741：dup 只算顶层键
     bad = []
     for key, got in data.items():
-        miss = [l for l in LANGS if l not in got]
+        miss = [l for l in LANGS_REQ if l not in got]      # ★ zh-Hant 不在硬要求里（见 LANGS_REQ）
         empty = [l for l, v in got.items() if not v.strip()]
         if miss or empty:
             bad.append((key, miss, empty))
@@ -147,20 +319,31 @@ def check_dict():
             for m in re.finditer(pat, txt):
                 pairs.add(m.group(1).replace('\\n', '\n'))   # 源码 \n 转义 ⇒ 归一化比较
     covered = len(pairs & set(data.keys()))
+    hant_missing = [k for k, got in data.items() if 'zh-Hant' not in got]
     print('  ═══ ① 字典 ═══')
-    print('  条数          %d 条中文原文 × %d 语言 = %d 条译文' % (nkeys, len(LANGS), nkeys * len(LANGS)))
+    print('  条数          %d 条中文原文 × %d 语言 = %d 条译文'
+          % (nkeys, len(LANGS_REQ), nkeys * len(LANGS_REQ)))
     if bad:
         fatal.append('字典有缺项 %d 条' % len(bad))
         print('  完整性        ⚠️ %d 条有缺' % len(bad))
         for k, m, e in bad[:10]:
             print('                  %-30s 缺 %s 空 %s' % (k[:30], m, e))
     else:
-        print('  完整性        ✅ %d/%d 条 %d 语言齐全（含 {n} 模板条）' % (nkeys, nkeys, len(LANGS)))
+        print('  完整性        ✅ %d/%d 条 %d 语言齐全（含 {n} 模板条）'
+              % (nkeys, nkeys, len(LANGS_REQ)))
+    if hant_missing:
+        print('  zh-Hant 未写   %d 条 —— 不算缺：L() 里明写「繁体缺项走 toTrad 转换，'
+              '不退英文/简体」，判据 ④ 就在保这条路径' % len(hant_missing))
+    else:
+        print('  zh-Hant 未写   ✅ 0 条')
+    if stray:
+        fatal.append('EXTRA 有 %d 条值不是对象（类型错误）' % stray)
+        print('  非对象条目    ⚠️ %d 条（Record<string, Record<string,string>> 不该有）' % stray)
     if dup:
         fatal.append('字典重复键 %s' % dup)
         print('  重复键        ⚠️ %s' % dup)
     else:
-        print('  重复键        ✅ 无')
+        print('  重复键        ✅ 无（只查顶层中文原文，语言列名不算键）')
     print('  代码覆盖率    %d/%d = %d%%  ← 未覆盖的 %d 条在 10 语言下退英文'
           % (covered, len(pairs), covered * 100 // max(1, len(pairs)), len(pairs) - covered))
     return data
@@ -389,31 +572,31 @@ def check_ingame_dict():
     print('\n  ═══ ⑩ 游戏内字典（GameI18n）═══')
     p = os.path.join(ETS, 'core/GameI18n.ets')
     src = read(p)
-    i = src.index('{', src.index('const DICT:'))
-    d = 0
-    j = i
-    while j < len(src):
-        if src[j] == '{':
-            d += 1
-        elif src[j] == '}':
-            d -= 1
-            if d == 0:
-                break
-        j += 1
-    try:
-        data = json.loads(re.sub(r',(\s*})$', r'\1', src[i:j + 1]))
-    except Exception as e:
-        fatal.append('GameI18n 字典解析失败: %s' % e)
-        print('  ⚠️ 解析失败: %s' % e)
+    # ★ 判据 1741：DICT 不是严格 JSON（夹着 // 注释、尾逗号）⇒ 不再 json.loads，
+    #   改用与 EXTRA 同一把**结构化**解析器（括号栈 + 跳字符串），
+    #   否则永远停在「Expecting property name enclosed in double quotes: line 1325」。
+    entries, stray = parse_dict_literal(src, 'const DICT:')
+    if entries is None:
+        fatal.append('GameI18n 字典解析失败（找不到 const DICT: 的对象体）')
+        print('  ⚠️ 解析失败：找不到 const DICT: 的对象体')
         return
+    data = {}
+    nkeys = 0
+    for raw, row in entries:
+        key = _key_text(raw)
+        nkeys += 1
+        data.setdefault(key, {}).update(row)
     LANGS10 = ['en', 'ja', 'ko', 'es', 'fr', 'de', 'pt', 'ru', 'it', 'ar']
     miss = [k for k, row in data.items() if [l for l in LANGS10 if l not in row]]
-    print('  条数            %d 条 × %d 语言' % (len(data), len(LANGS10)))
+    print('  条数            %d 条 × %d 语言' % (nkeys, len(LANGS10)))
     if miss:
         fatal.append('GameI18n 缺列 %d 条' % len(miss))
         print('  缺列            ⚠️ %d 条：%s' % (len(miss), miss[:5]))
     else:
-        print('  十语言列齐全    ✅ %d/%d' % (len(data), len(data)))
+        print('  十语言列齐全    ✅ %d/%d（解析器自检过的排版：单行 + 注释 + 尾逗号）'
+              % (nkeys, nkeys))
+    if stray:
+        print('  非对象条目      ⚠️ %d 条' % stray)
     if 'toTrad(zh)' in src:
         print('  繁体走转换      ✅')
     else:
@@ -497,6 +680,13 @@ def check_balance():
 
 
 def main():
+    # ★ 判据 1741：先修尺子再量东西 —— 解析器先过反证自检，失败就别信后面的数字
+    ok, n = self_test()
+    print('  ═══ ⓪ 解析器自检（%d 条反证）═══' % n)
+    print('  %s' % ('✅ 通过（多行/单行/注释/尾逗号/{n}模板/https:// 都能吃）' if ok else '⚠️ 失败'))
+    if not ok:
+        print('\n  ❌ 解析器自检没过，后面的字典数字不可信 ⇒ 先修解析器')
+        return 1
     entries = check_dict()
     check_hant_path()
     naked = check_naked_chinese()
