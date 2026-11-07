@@ -100,8 +100,13 @@ export struct GTowerOfLondon {
     this.note = TG('每次搬一个球 · 大球不能压小球 · 摆成目标'); this.startAt = Date.now();
   }
   private ballAt(s: number, b: number): number { return Math.floor(s / W[b - 1]) % this.diffTotal; }
-  /** 球 b 能不能落到柱 c：柱 c 上不能有比它更小的球 */
+  /** 球 b 能不能落到柱 c：① b 必须是它所在柱的**顶部球** ② 柱 c 上不能有比它更小的球 */
   private canPut(s: number, b: number, c: number): boolean {
+    // ★★★ 2026-11-07 真机 bug（判据 1761 的根因）：原来**只检查 ②**，没检查「b 是顶部」。
+    //   `bfs()` 和 `bestMove()` 都调 canPut ⇒ **BFS 会规划「搬中间的球」这种非法步**
+    //   ⇒ AI 按非法路径走，`tap()` 一执行就被游戏规则拒 ⇒ 卡在 8 步上限、对位 0/3。
+    //   修法：b 所在柱的顶部球必须就是 b，否则它搬不动。
+    if (this.topBall(s, this.ballAt(s, b)) !== b) { return false; }
     for (let o = 1; o < b; o++) { if (this.ballAt(s, o) === c) { return false; } }
     return true;
   }
