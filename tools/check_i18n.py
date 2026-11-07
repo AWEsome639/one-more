@@ -15,7 +15,7 @@
   ⑤ 裸中文  components/pages 里没走 t()/L()/TZ() 的中文字面量（警告 + 清单）
   ⑥ Builder 陷阱  @Builder 收算好的字符串（语言变了不重建）（警告）
   ⑦ 主题色  `this.accent` 被当颜色用（它是 id，可能是 'system'）（硬失败）
-  ⑧ 结构    受管文件的括号/花括号/引号是否配平（硬失败）
+  ⑧ 结构    受管文件的括号/花括号/引号是否配平（硬失败）\n  ⑫ enum 成员持 TG()（硬失败，判据 1745）\n  ⑥ 已按判据 1776 收窄：实参里直接 this.t(...) 不算陷阱
 
 用法: python3 tools/check_i18n.py [--scan]
 退出码 0 = 全过；1 = 有硬失败
@@ -460,13 +460,35 @@ def check_naked_chinese():
 
 
 def check_builder_trap():
-    """⑥ @Builder 参数里出现 this.t(...)：语言变了 Builder 不重建"""
-    print('\n  ═══ ⑥ @Builder 记忆化陷阱 ═══')
+    """
+    ⑥ @Builder 记忆化陷阱（判据 1776 收窄版）
+
+    ★ 旧版把**所有** `this.xxx( … this.t( … ) … )` 都报成"传算好的值"，
+      结果是 3 条**误报**（`GamesTab.menuItem(...)` 那批）。
+    ★ 判据 1776（2026-11-07 定案）：`@Builder` 每次渲染都会重新求值调用点，
+      直接把 `this.t('中文','en')` 写在实参里**不是**陷阱 —— 闭包是新的。
+    ★ 真正的陷阱只剩一种：**文案先在别处被算成变量/字段，再作为参数传进去**
+      （那时 Builder 拿到的是一个已经定型的字符串，语言变了也不会变）。
+      ⇒ 本检查只报这一种：
+        · 实参是裸标识符/`this.xxx`（不是调用表达式），且
+        · 该名字在本文件里被 `this.t(` / `this.tn(` / `TG(` 赋过值
+      并且在**同一文件里真的声明为 `@Builder`** 的宿主上才检查（不再乱抓 this.xxx）。
+    """
+    print('\n  ═══ ⑥ @Builder 记忆化陷阱（判据 1776）═══')
     hits = []
     for p in sorted(glob.glob(os.path.join(ETS, '**/*.ets'), recursive=True)):
         txt = read(p)
-        # 调用点 this.xxx( ... )：按括号配平取实参文本，再看里面有没有先算好的文案
-        for m in re.finditer(r"this\.([A-Za-z]+)\(", txt):
+        # 本文件里的 @Builder 名字
+        builders = set(re.findall(r'@Builder\s*\n\s*([A-Za-z_]\w*)\s*\(', txt))
+        if not builders:
+            continue
+        # 被"先算好"的变量名：const x = this.t(...) / this.x = this.t(...)
+        pre = set(re.findall(r'(?:const|let|var)\s+([A-Za-z_]\w*)\s*[:=][^;\n]*?(?:this\.t[n]?\(|TG\(|L\()', txt))
+        pre |= set(re.findall(r'this\.([A-Za-z_]\w*)\s*=[^;\n]*?(?:this\.t[n]?\(|TG\(|L\()', txt))
+        for m in re.finditer(r'this\.([A-Za-z_]\w*)\(', txt):
+            name = m.group(1)
+            if name not in builders:
+                continue
             i = m.end() - 1
             depth = 0
             j = i
@@ -481,14 +503,58 @@ def check_builder_trap():
             args = txt[i + 1:j]
             if len(args) > 600:
                 continue
-            if re.search(r"this\.t\(|this\.tn\(", args):
-                ln = txt[:m.start()].count('\n') + 1
-                hits.append((os.path.relpath(p, ROOT), ln, m.group(1)))
+            # 直接内联 this.t(...) ⇒ 判据 1776 明确不算，跳过
+            if re.search(r'this\.t[n]?\(|TG\(|L\(', args):
+                continue
+            for ident in re.findall(r'^\s*(?:this\.)?([A-Za-z_]\w*)\s*$', args, re.M):
+                if ident in pre:
+                    ln = txt[:m.start()].count('\n') + 1
+                    hits.append((os.path.relpath(p, ROOT), ln, name, ident))
     if hits:
-        warn.append('Builder 传算好的值 %d 处' % len(hits))
-        print('  ⚠️ %d 处把算好的文案传进 @Builder（换语言可能不重建）：' % len(hits))
-        for f, ln, name in hits[:20]:
-            print('     %s:%d  this.%s(...)' % (f, ln, name))
+        warn.append('@Builder 传"已算好的变量" %d 处' % len(hits))
+        print('  ⚠️ %d 处：文案先算成变量再传进 @Builder（换语言不会重建）：' % len(hits))
+        for f, ln, name, ident in hits[:20]:
+            print('     %s:%d  this.%s(%s)' % (f, ln, name, ident))
+    else:
+        print('  ✅ 没有')
+        print('     （判据 1776：实参里直接写 this.t(...) 不算陷阱 —— 闭包每次新，已排除）')
+
+
+def check_enum_tg():
+    """
+    ⑫ enum 成员不能持 `TG()`（判据 1745）
+
+    ★ 为什么：`enum` 是**模块加载时**求值的，那时 `I18n.current()` 还没初始化
+      （语言要等 ProgressStore.init 从盘里读回来）⇒ 枚举值会被永久钉在首启语言上，
+      切语言也不变。合法例外是**中文字面量**（`Seg.ALL = '全部'`），它不是 TG 调用。
+    """
+    print('\n  ═══ ⑫ enum 持 TG()（判据 1745）═══')
+    bad = []
+    for p in sorted(glob.glob(os.path.join(ETS, '**/*.ets'), recursive=True)):
+        txt = read(p)
+        for m in re.finditer(r'enum\s+([A-Za-z_]\w*)\s*\{', txt):
+            # 取枚举体
+            i = m.end() - 1
+            depth = 0
+            j = i
+            while j < len(txt):
+                if txt[j] == '{':
+                    depth += 1
+                elif txt[j] == '}':
+                    depth -= 1
+                    if depth == 0:
+                        break
+                j += 1
+            body = txt[i + 1:j]
+            if re.search(r'=\s*(?:TG[24]?|L|this\.t)\s*\(', body):
+                ln = txt[:m.start()].count('\n') + 1
+                bad.append('%s:%d enum %s' % (os.path.relpath(p, ROOT), ln, m.group(1)))
+    if bad:
+        fatal.append('enum 成员持 TG() %d 处' % len(bad))
+        print('  ❌ %d 处（模块加载时求值 ⇒ 永远钉在首启语言）：' % len(bad))
+        for b in bad[:15]:
+            print('     ' + b)
+        print('     修法：枚举存**中文原文**，在用的时候再 TG(枚举值)')
     else:
         print('  ✅ 没有')
 
@@ -693,6 +759,7 @@ def main():
     check_builder_trap()
     check_accent_id_as_color()
     check_binary_t()
+    check_enum_tg()
     check_ingame_dict()
     check_core_imports()
     check_balance()

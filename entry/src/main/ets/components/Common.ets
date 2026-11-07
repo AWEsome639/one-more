@@ -1107,9 +1107,18 @@ export struct GameCard {
     // ★ 2026-11-07 verifier-eng2 核算的配套条件①：**2 列手机卡（宽 <240）角标只留一个**
     //   ⇒ 否则 440 手机上三样全亮时副标题区只剩 26vp（真机截图：竖排 + 省略号）。
     //   窄卡上限 48（够放 🏆 + 一个分数或 🔥 N 天），宽卡仍按实际累加。
+    // ★★★ 2026-11-07 **真机实测**（verifier-eng2 853×533，ratio 3.0）：
+    //   三样全亮时胶囊实测 **94.3vp**，而上限 84 ⇒ 副标题可用宽只剩 25.3vp，
+    //   「交换消宝石」被压到 **8vp 字号**（行盒 9.65 vs 正常 14.0 —— 这是铁证）。
+    //   ⇒ **三样全亮时放弃分数**（只留 🏆 + 🔥 N 天）⇒ 胶囊 → ~64vp ⇒ 可用宽 25.3 → 44.9
+    //      （另两样：只分数 26.0 / 只有🔥 41.0 都正常，所以只压缩三样全亮这一种）。
     const narrowCard: boolean = Bp.width < 480;
     if (narrowCard) {
       return 48;
+    }
+    if (this.showCrown() && this.bestText().length > 0 && this.streak > 0) {
+      // 三样全亮：角标只画 🏆 + 🔥（分数让位给副标题 —— 判据：可读文字 > 装饰数字）
+      return 64;
     }
     let p: number = this.streak > 0 ? 48 : Space.xs;
     if (this.showCrown()) {
