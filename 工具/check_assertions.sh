@@ -162,6 +162,30 @@ fi
 FAIL=$((FAIL + RTL_N))
 printf "     %-42s %6s / %d\n" "check_rtl.py（RTL 陷阱）" "-" "${RTL_N}"
 
+# ── 复数形式（2026-11-08 新增）：tn() 必须给俄语/阿语复数形式 ──
+#   来历：36 个 tn() 里 22 个没传 f1/f2/f5 ⇒ 俄语 n=1 显示「1 игр」（新玩家高频）。
+#   ★ 基线机制：PLURAL_BASE = 已确认「不需要修」的存量数（当前 0）。
+#     只罚**新增**（N > BASE），修完把 BASE 改成 0；这样挂上去不会因为存量变红，
+#     但也不会把新写出来的 `tn('{n} …')` 放过去。
+#   ★ 白名单（写在 tools/check_plural_forms.py 里，不是在脚本里）：
+#     俄语译文证明「{n} 后面没有需要变格的名词」——名词前置+冒号（Пройдено игр: {n}）、
+#     数词结尾（Лучший {n}）、不变格缩写（{n} мин）——当前放行 12 处。
+PLURAL_BASE=0
+PLURAL_OUT=$(python3 "$(dirname "$0")/../tools/check_plural_forms.py" 2>&1)
+PLURAL_RC=$?
+PLURAL_N=$(printf '%s' "${PLURAL_OUT}" | grep -oE "复数缺失：[0-9]+ 处" | grep -oE "[0-9]+" | tail -1)
+if [ "${PLURAL_RC}" -eq 2 ] || [ -z "${PLURAL_N}" ]; then
+  PLURAL_N=$((PLURAL_BASE + 1))
+  echo "     ⚠️ check_plural_forms.py 无法给出结论（rc=${PLURAL_RC}）⇒ 按 1 处新增失败计，别当绿"
+fi
+if [ "${PLURAL_N}" -gt "${PLURAL_BASE}" ]; then
+  PLURAL_NEW=$((PLURAL_N - PLURAL_BASE))
+else
+  PLURAL_NEW=0
+fi
+FAIL=$((FAIL + PLURAL_NEW))
+printf "     %-42s %6s / %d\n" "check_plural_forms.py（复数）" "${PLURAL_N}/${PLURAL_BASE}" "${PLURAL_NEW}"
+
 echo "     ────────────────────────────────────────────────"
 printf "     %-42s %6d / %d\n" "合计" "${TOT}" "${FAIL}"
 

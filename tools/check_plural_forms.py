@@ -50,6 +50,32 @@ TN_SIG = re.compile(r'export\s+function\s+TN\s*\(([^)]*)\)')
 CALL = re.compile(r'(?<![\w$.])(?:this\.tn|TN)\s*\(')
 LIT = re.compile(r"^\s*'([^'\\]*(?:\\.[^'\\]*)*)'\s*$")
 NUM1 = re.compile(r'^\s*1\s*$')
+# 俄语里不需要随数词变格的缩写（"5 мин" 的 мин 就是不变格）
+INVARIANT = {'мин', 'ч', 'с', 'сек', 'шт', 'км', 'м', 'см', 'кг', 'г', 'мл', 'л', 'руб', 'xp', 'xp.'}
+
+
+def ru_needs_forms(ru):
+    """看俄语译文：`{n}` 后面还有没有**需要变格的名词**。
+
+    · `Пройдено игр: {n}`（名词前置+冒号）⇒ 不需要（False）
+    · `Лучший {n}` / `Было {n}`（数词在结尾）⇒ 不需要
+    · `{n} мин`（不变格缩写）⇒ 不需要
+    · `{n} игра`（数词后跟可变化名词）⇒ 需要（True）
+    · 没有 ru 译文 ⇒ 保守判 True（不能证明安全就别放行）
+    """
+    if not ru:
+        return True
+    if '{n}' not in ru:
+        return False            # 译文里没 {n}，没有复数问题
+    tail = ru[ru.find('{n}') + 3:].strip()
+    if tail == '':
+        return False            # 数词在结尾
+    if tail[0] in '—-,.;:!?)]':  # 数词后直接标点/破折号
+        return False
+    m = re.match(r'[A-Za-zА-Яа-яЁё]+', tail)
+    if m and m.group(0).lower() in INVARIANT:
+        return False
+    return True
 
 
 def match_paren(masked, open_idx):
@@ -119,12 +145,12 @@ def parse_tn_signature(src):
 def scan_file(path, extra, verbose=False):
     rel = os.path.relpath(path, ROOT)
     if os.path.basename(path) == 'I18n.ets' and os.path.dirname(path) == os.path.join(ETS, 'core'):
-        return {'hard': [], 'warn': [], 'skip': {'n1': [], 'nofn': [], 'passthrough': []}}
+        return {'hard': [], 'warn': [], 'skip': {'n1': [], 'nofn': [], 'passthrough': [], 'ru_safe': []}}
     src = io.open(path, encoding='utf-8').read()
     mk = mask_comments(src)
     lines = mk.split('\n')
     raw_lines = src.split('\n')
-    found = {'hard': [], 'warn': [], 'skip': {'n1': [], 'nofn': [], 'passthrough': []}}
+    found = {'hard': [], 'warn': [], 'skip': {'n1': [], 'nofn': [], 'passthrough': [], 'ru_safe': []}}
     for m in CALL.finditer(mk):
         op = m.end() - 1
         cl = match_paren(mk, op)
@@ -155,8 +181,16 @@ def scan_file(path, extra, verbose=False):
             continue
         has_forms = len(args) >= 6
         if not has_forms:
-            found['hard'].append({'file': rel, 'line': ln, 'kind': 'missing-f',
-                                  'tpl': tpl, 'n': narg, 'code': code})
+            row = extra.get(tpl, {})
+            ru = row.get('ru', '') if isinstance(row, dict) else ''
+            if not ru_needs_forms(ru):
+                # ★ 白名单（复核过的 12 处都属这类）：俄语译文里 {n} 后面没有需要变格的名词
+                #   （名词前置+冒号 / 数词在结尾 / мин 这类不变格缩写）⇒ 传 f1/f2/f5 反而多余。
+                found['skip'].setdefault('ru_safe', []).append(
+                    {'file': rel, 'line': ln, 'tpl': tpl, 'ru': ru})
+            else:
+                found['hard'].append({'file': rel, 'line': ln, 'kind': 'missing-f',
+                                      'tpl': tpl, 'n': narg, 'code': code, 'ru': ru})
         # ② 字典（TN 真正读的 EXTRA）里有没有这个中文模板
         if tpl not in extra:
             found['warn'].append({'file': rel, 'line': ln, 'tpl': tpl,
@@ -173,11 +207,12 @@ struct Demo {
     Text(this.tn(zh, en, n))                     // 包装器只转 3 参 ⇒ 硬失败
   }
   build() {
-    Text(this.tn('{n} 天', '{n} days', n))       // ① 硬失败（没传 f）
-    Text(this.tn('{n} 天', '{n} days', n, '1 день', '2 дня', '5 дней'))  // 安全（传了 f 且在字典）
+    Text(this.tn('{n} 天', '{n} days', n))       // ru=「Дней: {n}」⇒ 白名单（不需要变格）
+    Text(this.tn('{n} 周', '{n} weeks', n))      // ① 硬失败（ru=「{n} недель」需要变格）
+    Text(this.tn('{n} 天', '{n} days', n, '1 день', '2 дня', '5 дней'))  // 安全（传了 f）
     Text(this.tn('{n} 天', '{n} days', 1))       // 白名单：n 固定 1
     Text(this.tn('天数', 'days', n))              // 白名单：模板不含 {n}
-    Text(this.tn('{n} 周', '{n} weeks', n, '1 нед', '2 нед', '5 нед'))   // ② 警告（字典缺）
+    Text(this.tn('{n} 张', '{n} cards', n, '1 карта', '2 карты', '5 карт'))  // ② 警告（模板缺字典）
   }
 }
 '''
@@ -189,15 +224,19 @@ def self_test():
     try:
         p = os.path.join(d, 'demo.ets')
         io.open(p, 'w', encoding='utf-8').write(SELF_SRC)
-        extra = {'{n} 天': {'ja': 'x'}}          # 只有这个模板在字典里
+        # {n} 天 ⇒ ru 是「名词前置+冒号」= 不需要变格；{n} 周 ⇒ ru 数词后跟名词 = 需要变格
+        # {n} 张 ⇒ 故意不放字典，用来测 ② 警告
+        extra = {'{n} 天': {'ja': 'x', 'ru': 'Дней: {n}'},
+                 '{n} 周': {'ru': '{n} недель'}}
         f = scan_file(p, extra)
         ok = [
-            ('① 硬失败：应 2 处（1 直调 + 1 包装器）', len(f['hard']) == 2,
+            ('① 硬失败：应 2 处（{n} 天 被 ru 白名单、{n} 周 仍报 + 包装器）', len(f['hard']) == 2,
              '%d 处 %s' % (len(f['hard']), [x['kind'] for x in f['hard']])),
-            ('② 警告：应 1 处（{n} 周 缺字典）', len(f['warn']) == 1,
+            ('② 警告：应 1 处（{n} 张 缺字典）', len(f['warn']) == 1,
              '%d 处 %s' % (len(f['warn']), [x['tpl'] for x in f['warn']])),
-            ('白名单：n=1 与不含 {n} 各 1 处', len(f['skip']['n1']) == 1 and len(f['skip']['nofn']) == 1,
-             'n1=%d nofn=%d' % (len(f['skip']['n1']), len(f['skip']['nofn']))),
+            ('白名单：n=1 / 不含 {n} / ru 不变格 各 1 处',
+             len(f['skip']['n1']) == 1 and len(f['skip']['nofn']) == 1 and len(f['skip']['ru_safe']) == 1,
+             'n1=%d nofn=%d ru_safe=%d' % (len(f['skip']['n1']), len(f['skip']['nofn']), len(f['skip']['ru_safe']))),
         ]
     finally:
         try:
@@ -240,7 +279,7 @@ def main():
     for d in SCAN_DIRS:
         files += sorted(glob.glob(os.path.join(ETS, d, '*.ets')))
 
-    hard, warn, skip = [], [], {'n1': [], 'nofn': [], 'passthrough': []}
+    hard, warn, skip = [], [], {'n1': [], 'nofn': [], 'passthrough': [], 'ru_safe': []}
     for p in files:
         f = scan_file(p, extra, verbose)
         hard += f['hard']
@@ -267,8 +306,12 @@ def main():
     if len(warn) > 10 and not verbose:
         print('     …（共 %d 处，--verbose 看全部）' % len(warn))
 
-    print('\n  白名单：n 固定为 1 的 %d 处 ｜ 模板不含 {n} 的 %d 处 ｜ 透传包装器（6 参）%d 处'
-          % (len(skip['n1']), len(skip['nofn']), len(skip['passthrough'])))
+    print('\n  白名单：俄语不需要变格的 %d 处 ｜ n 固定为 1 的 %d 处 ｜ 模板不含 {n} 的 %d 处 ｜ 透传包装器（6 参）%d 处'
+          % (len(skip['ru_safe']), len(skip['n1']), len(skip['nofn']), len(skip['passthrough'])))
+    if verbose:
+        for it in skip['ru_safe']:
+            print('     ✓ 俄语不变格：%s:%d 「%s」 ru=%r'
+                  % (it['file'], it['line'], it['tpl'], it['ru']))
     print('\n  复数缺失：%d 处' % len(hard))
     print('  复数警告：%d 处' % len(warn))
     if hard:
