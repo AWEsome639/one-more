@@ -427,7 +427,8 @@ export struct GCryptoArithmetic {
         }
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).height(20)
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+        .constraintSize({ minHeight: 20 }).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Column({ space: Space.sm }) {
         Row({ space: Space.xs }) {

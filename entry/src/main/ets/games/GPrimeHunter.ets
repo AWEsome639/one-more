@@ -310,7 +310,7 @@ export struct GPrimeHunter {
         Text((String(Math.min(this.level + 1, this.diffTotal)) + '/' + String(this.diffTotal))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('剩余素数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('剩余素数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.remain), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
         Column({ space: 2 }) {

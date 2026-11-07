@@ -284,7 +284,7 @@ export struct GConsonantReconstruct {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG(TG('还原')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG(TG('还原')))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.solved), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
@@ -296,7 +296,7 @@ export struct GConsonantReconstruct {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)

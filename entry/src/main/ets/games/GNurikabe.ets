@@ -640,7 +640,7 @@ export struct GNurikabe {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('已满足提示'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已满足提示'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.solvedClues()) + '/' + String(this.clueTotal)))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)

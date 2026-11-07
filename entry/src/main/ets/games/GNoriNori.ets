@@ -585,7 +585,7 @@ export struct GNoriNori {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('已满足区域'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已满足区域'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.doneRegions()) + '/' + String(REG_CNT)))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)

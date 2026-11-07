@@ -739,7 +739,7 @@ export struct G2048 {
 
     this.spawn();
     if (this.isDead()) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
     }
   }

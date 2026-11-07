@@ -228,6 +228,10 @@ export struct GWordMastermind {
     this.submit();
   }
   private submit(): void {
+    // ★★ 2026-11-07（死亡判定巡检 ③）：**收尾防重入**
+    //   finish() 本身已有 `if (this.settled) return;`（所以不会重复结算），
+    //   但这条入口不判 over ⇒ 结算后还能继续记行/改状态。守卫补在这条入口上。
+    if (this.over) { return; }
     if (this.typed.length < this.diffTotal) { this.msg = TG2('还差 {0} 个字母', this.diffTotal - this.typed.length); return; }
     const g: string = this.typed;
     this.rows = this.rows.concat([g]);
@@ -238,7 +242,7 @@ export struct GWordMastermind {
       this.msg = TG2('🎉 猜中了：{0}', this.answer); this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
     }
     if (this.rows.length >= TRIES) {
-      this.over = true; this.score = 0; this.msg = TG2('❌ 机会用完，答案是 {0}', this.answer);
+      this.over = true; this.won = false; this.score = 0; this.msg = TG2('❌ 机会用完，答案是 {0}', this.answer);
       this.finish(false); return;
     }
     this.msg = TG2("第 {0} 次反馈：🟩 位置对｜🟨 字母在｜⬜ 没有", this.rows.length);

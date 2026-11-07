@@ -239,7 +239,7 @@ export struct GWordScramble {
     const gap: number = Date.now() - this.startAt;
     this.leftMs = gap >= LIMIT_MS ? 0 : LIMIT_MS - gap;
     if (gap >= LIMIT_MS) {
-      this.over = true; this.msg = TG2("⌛ 时间到 —— 拼对 {0} 个词", this.solved); this.finish(false);
+      this.over = true; this.won = false; this.msg = TG2("⌛ 时间到 —— 拼对 {0} 个词", this.solved); this.finish(false);
     }
   }
   private tap(i: number): void {

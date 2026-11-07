@@ -288,7 +288,7 @@ export struct GPatternSequenceDraw {
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('规律'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((TG2('每次 +{0}',Digits(String(this.step), this.langCode)))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((TG2('每次 +{0}',Digits(String(this.step), this.langCode)))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).minFontSize(10).maxFontSize(FontSize.lg).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

@@ -270,7 +270,7 @@ export struct GDoubleNBack {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.idx + 1) + '/' + String(this.diffTotal))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {

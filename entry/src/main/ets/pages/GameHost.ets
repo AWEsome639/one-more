@@ -3597,9 +3597,20 @@ struct GameHost {
             // ★ 2026-11-07：这两个**沿用原来的文案**（「再来一局」/「返回列表」在 EXTRA 字典里
             //   都有 10 语言译文）—— 千万别说短成「再来」「返回」：那会变成新 key ⇒
             //   10 语言退回英文，反而比现在差。为了在极小屏的半宽里放得下：字号 xxs + padding 2。
+            //
+            // ★★★ 2026-11-07 溢出审计（同一轮）：**普通手机也放不下** ——
+            //   半宽 ≈152vp，减 padding 32 只剩 120vp；而 fs=md(16) 时
+            //   `Retour à la liste` / `Volver a la lista`(fr/es) = 17 字符 ≈**150vp**（超 25%）、
+            //   `Zurück zur Liste`(de) = 16 字符 ≈141vp、`Nochmal spielen`(de) ≈132vp。
+            //   ⚠️ 不能用 `textOverflow` 修：`Button(label)` 的 `LabelStyle.maxLines` 默认 1、
+            //      `overflow` 默认就是 **TextOverflow.Ellipsis** ⇒ 它本来就省略号截断，
+            //      再写一遍是空操作，用户看到的仍是「Retour à la li…」。
+            //   ⇒ 真的让它放得下：**字号降一档 md→sm(14) + padding 16→6**（Space.xs）
+            //      ⇒ 可用 152−12 = 140vp ≥ 131vp（fr 17 字符 @14）✅，中文 4 字更不可能溢出。
+            //      实测口径见 `_巡检记录/长词溢出-20261107.md` P0-2。
             Button(this.t(TG('再来一局'), 'Play again'))
-              .fontSize(this.tinyScreen() ? FontSize.xxs : FontSize.md)
-              .padding(this.tinyScreen() ? { left: 2, right: 2 } : { left: Space.md, right: Space.md })
+              .fontSize(this.tinyScreen() ? FontSize.xxs : FontSize.sm)
+              .padding(this.tinyScreen() ? { left: 2, right: 2 } : { left: Space.xs, right: Space.xs })
               // 降级为次级：主按钮位已经给了「下一款」，两个 accent 按钮会互相抢
               .fontColor(this.theme().ink)
               .backgroundColor(this.theme().surfaceAlt)
@@ -3625,8 +3636,8 @@ struct GameHost {
                 });
               })
             Button(this.t(TG('返回列表'), 'Back to list'))
-              .fontSize(this.tinyScreen() ? FontSize.xxs : FontSize.md)
-              .padding(this.tinyScreen() ? { left: 2, right: 2 } : { left: Space.md, right: Space.md })
+              .fontSize(this.tinyScreen() ? FontSize.xxs : FontSize.sm)
+              .padding(this.tinyScreen() ? { left: 2, right: 2 } : { left: Space.xs, right: Space.xs })
               .fontColor(this.theme().inkSoft)
               .backgroundColor(this.theme().surfaceAlt)
               .borderRadius(Radius.md)

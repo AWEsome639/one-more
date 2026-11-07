@@ -181,7 +181,7 @@ export struct GLightsOut {
       return;
     }
     if (this.moves >= this.diffTotal) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.tip = TG2('步数用尽，还剩 {0} 盏亮着', String(this.litCount()));
       this.finish(false);
       return;

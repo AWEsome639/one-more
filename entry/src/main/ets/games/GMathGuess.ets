@@ -232,7 +232,7 @@ export struct GMathGuess {
     }
     this.history = this.history.concat([line + (v < this.secret ? ' ↑' : ' ↓')]);
     if (left <= 0) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.hint = TG2('💤 机会用完，答案是 {0}', this.secret);
       this.finish(false);
       return;

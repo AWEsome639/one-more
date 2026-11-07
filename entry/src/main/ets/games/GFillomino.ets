@@ -444,7 +444,7 @@ export struct GFillomino {
       return;
     }
     if (this.moves >= this.diffTotal) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
       return;
     }

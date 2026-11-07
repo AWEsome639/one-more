@@ -103,7 +103,7 @@ export struct GWordSearch {
     if (this.over) { return; }
     const gap: number = Date.now() - this.startAt;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
-    if (gap >= this.diffTotal) { this.over = true; this.msg = '⌛ 时间到 —— 找到 ' + this.hits() + ' / ' + COUNT + TG(' 个词'); this.finish(false); }
+    if (gap >= this.diffTotal) { this.over = true; this.won = false; this.msg = '⌛ 时间到 —— 找到 ' + this.hits() + ' / ' + COUNT + TG(' 个词'); this.finish(false); }
   }
   private hits(): number {
     let n: number = 0;

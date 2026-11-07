@@ -487,7 +487,7 @@ export struct GGokigenNaname {
       return;
     }
     if (this.moves >= this.diffTotal) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
     }
   }
@@ -556,7 +556,7 @@ export struct GGokigenNaname {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('数字吻合'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('数字吻合'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.numOk()) + '/25'))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)

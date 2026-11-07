@@ -323,7 +323,7 @@ export struct GFaceNameAssociation {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.phase === 0 ? TG('记脸') : (this.over ? TG('结束') : TG('作答')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.phase === 0 ? TG('记脸') : (this.over ? TG('结束') : TG('作答')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).minFontSize(10).maxFontSize(FontSize.lg).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {

@@ -285,7 +285,7 @@ export struct GRunningMemorySpan {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('阶段'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.phase === 'show' ? TG('闪数字') : (this.phase === 'input' ? TG('回忆') : TG('结束')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.phase === 'show' ? TG('闪数字') : (this.phase === 'input' ? TG('回忆') : TG('结束')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).minFontSize(10).maxFontSize(FontSize.lg).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {

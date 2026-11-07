@@ -9,7 +9,6 @@
  * 胜负：四条全满足 = 通关；步数用尽 = 失败。
  */
 
-import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -527,7 +526,7 @@ export struct GHeyawake {
       return;
     }
     if (this.moves >= this.diffTotal) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
     }
   }
@@ -655,9 +654,16 @@ export struct GHeyawake {
       .borderRadius(Radius.md)
 
       Row({ space: Space.md }) {
-        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : (Bp.tinyScreen() || Bp.isWatch() ? TG('涂黑 / 擦白') : TG('点格子涂黑 / 擦白')))
+        // ★★ 2026-11-07 溢出审计：统一用**短标签**（原来只有极小屏走短支）。
+        //   长标签「点格子涂黑 / 擦白」德语 36 / 俄语 37 字符 ≈315vp，而这里只有半宽 ~156vp
+        //   ⇒ 只能显示成「Antippen zum Schw…」。短标签俄语 19 字符 ≈165vp，
+        //   再配 `labelStyle(2)` 就把最后 9vp 也兜住。
+        //   ⚠️ Button 没有 `.maxLines()`/`.textOverflow()`（那是 TextAttribute 的），
+        //      必须用 `.labelStyle({ maxLines, overflow })` —— API 10+，项目 compatibleSdk=12。
+        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : TG('涂黑 / 擦白'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.sm)
+          .fontSize(FontSize.xs)
+          .labelStyle({ maxLines: 2, overflow: TextOverflow.Ellipsis, font: { size: FontSize.xs } })
           .fontColor(this.theme.inkSoft)
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)

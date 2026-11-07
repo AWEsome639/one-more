@@ -275,7 +275,7 @@ export struct GAreaPerimeterMatch {
         Text(true ? 'A' : 'B').fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         Text(this.picked < 0 ? TG('面积 ?  周长 ?')
           : TG2('面积 {0} · 周长 {1}', this.area((this.w1), (this.h1)), this.peri((this.w1), (this.h1))))
-        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         Column({ space: Space.xs }) {
@@ -290,7 +290,7 @@ export struct GAreaPerimeterMatch {
         Text(false ? 'A' : 'B').fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         Text(this.picked < 0 ? TG('面积 ?  周长 ?')
           : TG2('面积 {0} · 周长 {1}', this.area((this.w2), (this.h2)), this.peri((this.w2), (this.h2))))
-        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
       }

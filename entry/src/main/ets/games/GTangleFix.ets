@@ -516,7 +516,7 @@ export struct GTangleFix {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('剩余交换'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('剩余交换'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.diffTotal - this.swaps)))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)

@@ -283,9 +283,13 @@ export struct GPolyominoTiling {
     const cur: number = this.board[i];
     if (cur === 2) {
       const b: number[] = this.board.slice();
-      b[i] = 0; this.board = b; this.moves = this.moves + 1;
+      b[i] = 0; this.board = b;
+      // ★★ 2026-11-07（死亡判定巡检 ①）：**拿起 = 撤销，不扣步数**
+      //   原来这里是 `this.moves = this.moves + 1` 再判 `>= LIMIT` ⇒
+      //   "放一块看看效果、再拿起来"这种拼图里的**免费动作**会吃掉命：
+      //   连点同一块 26 次就判负（一次都没铺），正常试错几次也逼近上限。
+      //   放置仍然算一步（下面那条），语义变成「步数 = 实际铺了多少次」。
       this.msg = TG2("拿起一块 · 还剩 {0} 步", String(LIMIT - this.moves));
-      if (this.moves >= LIMIT) { this.finish(false); }
       return;
     }
     if (cur === 1) { this.msg = TG('这是墙，放不了'); return; }

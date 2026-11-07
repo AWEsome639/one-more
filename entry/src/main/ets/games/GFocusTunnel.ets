@@ -254,6 +254,10 @@ export struct GFocusTunnel {
   }
 
   private finish(solved: boolean): void {
+    // ★★ 2026-11-07（死亡判定巡检 ③）：**收尾防重入**
+    //   原来没有守卫，而 place() 也不判 over ⇒ 结算弹窗出现后
+    //   AI 代打/键盘/连点还能再进一次 ⇒ onFinish 被调两次（经验翻倍、日志双写）。
+    if (this.over) { return; }
     this.over = true;
     this.won = solved;
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）

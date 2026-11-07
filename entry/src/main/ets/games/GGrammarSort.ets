@@ -279,7 +279,7 @@ export struct GGrammarSort {
         Text((Math.min(this.step + 1, this.diffTotal) + ' / ' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.cyan))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.right + ' / ' + PASS)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {

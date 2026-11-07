@@ -482,7 +482,7 @@ export struct GMathMaze {
     if (this.finished) {
       return;
     }
-    this.over = true;
+    this.over = true; this.won = false;
     this.tip = why;
     this.finish(false);
   }

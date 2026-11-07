@@ -305,7 +305,7 @@ export struct GGearRotation {
         }.layoutWeight(1)
         Column({ space: Space.xs }) {
           Text(this.meshed ? '⛓' : '🪢').fontSize(FontSize.xl)
-          Text(this.meshed ? TG('啮合') : TG('皮带')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+          Text(this.meshed ? TG('啮合') : TG('皮带')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.width(64)
         Column({ space: Space.xs }) {
           Text(TG('B 从动轮')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)

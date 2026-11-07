@@ -296,13 +296,13 @@ export struct GDefinitionDash {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((Math.min(this.qi + 1, this.diffTotal) + '/' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.correct + '/' + PASS)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         .scale({ x: this.k, y: this.k })
         }
@@ -315,7 +315,7 @@ export struct GDefinitionDash {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('倒计时'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('倒计时'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(((this.over ? 0 : this.leftS) + 's')).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
@@ -331,19 +331,19 @@ export struct GDefinitionDash {
       .width('100%').padding(Space.lg).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card)
 
-      Text((this.opts.length > 0 ? this.opts[0] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
+      Text((this.opts.length > 0 ? this.opts[0] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').constraintSize({ minHeight: Cell.of(46) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       .shadow(Shadow.card).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L333'; })
       .onBlur(() => { if (this.tvFocus === 'L333') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L333')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((0)); }); }).onClick(() => { Haptics.tick(); this.answer((0)); })
-      Text((this.opts.length > 1 ? this.opts[1] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
+      Text((this.opts.length > 1 ? this.opts[1] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').constraintSize({ minHeight: Cell.of(46) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       .shadow(Shadow.card).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L336'; })
       .onBlur(() => { if (this.tvFocus === 'L336') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L336')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((1)); }); }).onClick(() => { Haptics.tick(); this.answer((1)); })
-      Text((this.opts.length > 2 ? this.opts[2] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(46))
+      Text((this.opts.length > 2 ? this.opts[2] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').constraintSize({ minHeight: Cell.of(46) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       .fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       .shadow(Shadow.card).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L339'; })

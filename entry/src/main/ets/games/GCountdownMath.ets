@@ -596,7 +596,8 @@ export struct GCountdownMath {
         })
       }.width('100%')
 
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).height(20)
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+        .constraintSize({ minHeight: 20 }).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.sm }) {
         Button(TG('提示'))

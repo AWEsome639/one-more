@@ -329,7 +329,7 @@ export struct GDelayedMatchSample {
         .animation({ duration: Motion.fast, curve: Motion.snap() })
 
       Row({ space: Space.sm }) {
-        Text((this.options.length > 0 ? this.options[0] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
+        Text((this.options.length > 0 ? this.options[0] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).constraintSize({ minHeight: Cell.of(64) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
@@ -338,7 +338,7 @@ export struct GDelayedMatchSample {
         .outline(Tv.focusOutline(this.tvFocus === 'L333'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((this.options.length > 0 ? this.options[0] : '')); }); })
         .onClick(() => { Haptics.tick(); this.answer((this.options.length > 0 ? this.options[0] : '')); })
-        Text((this.options.length > 1 ? this.options[1] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
+        Text((this.options.length > 1 ? this.options[1] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).constraintSize({ minHeight: Cell.of(64) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
@@ -350,7 +350,7 @@ export struct GDelayedMatchSample {
       }.width('100%')
 
       Row({ space: Space.sm }) {
-        Text((this.options.length > 2 ? this.options[2] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
+        Text((this.options.length > 2 ? this.options[2] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).constraintSize({ minHeight: Cell.of(64) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())
@@ -359,7 +359,7 @@ export struct GDelayedMatchSample {
         .outline(Tv.focusOutline(this.tvFocus === 'L350'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.answer((this.options.length > 2 ? this.options[2] : '')); }); })
         .onClick(() => { Haptics.tick(); this.answer((this.options.length > 2 ? this.options[2] : '')); })
-        Text((this.options.length > 3 ? this.options[3] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(64))
+        Text((this.options.length > 3 ? this.options[3] : '')).fontSize(FontSize.xxl).textAlign(TextAlign.Center).layoutWeight(1).constraintSize({ minHeight: Cell.of(64) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .focusable(Tv.on())

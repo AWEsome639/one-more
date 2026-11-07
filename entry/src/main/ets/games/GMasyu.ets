@@ -331,7 +331,7 @@ export struct GMasyu {
     if (this.finished) {
       return;
     }
-    this.over = true;
+    this.over = true; this.won = false;
     this.tip = TG('步数用尽，重开一题吧');
     this.finish(false);
   }

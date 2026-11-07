@@ -702,6 +702,38 @@ build() {
         }
         .width('100%')
 
+        // ★★★ 2026-11-07 奥森：「把你的邮箱也写到反馈那里吧！」
+        //   ⇒ 作者邮箱下面多一行「拾海（AI）」的邮箱，给用户第二条直达通道。
+        Row({ space: Space.sm }) {
+          Text('🤖')
+            .fontSize(FontSize.sm)
+            .accessibilityLevel('no')
+          Text(About.SHAJIA_EMAIL)
+            .minFontSize(9)
+            .maxFontSize(FontSize.sm)
+            .fontSize(FontSize.sm).fontColor(this.theme().inkSoft).layoutWeight(1)
+            .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+          Text(this.t('复制', 'Copy'))
+            .fontSize(FontSize.xs).fontColor(Color.White)
+            .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
+            .backgroundColor(this.theme().inkFaint).borderRadius(Radius.full)
+            .onClick(() => {
+              Haptics.tap();
+              const data2: pasteboard.PasteData =
+                pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, About.SHAJIA_EMAIL);
+              pasteboard.getSystemPasteboard().setData(data2)
+                .then(() => {
+                  this.copyHint = this.t('已复制 ✓', 'Copied ✓');
+                  setTimeout(() => { this.copyHint = ''; }, 1600);
+                })
+                .catch(() => {
+                  this.copyHint = this.t('复制失败，请手动输入', 'Copy failed — type it manually');
+                  setTimeout(() => { this.copyHint = ''; }, 2200);
+                });
+            })
+        }
+        .width('100%')
+
         Row({ space: Space.sm }) {
           Text(About.FEEDBACK_EMAIL)
           // ★ 2026-10-19 真机大字模式实拍后修：原来只有 fontSize(sm) + maxLines(1) + Ellipsis

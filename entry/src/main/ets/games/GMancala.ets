@@ -564,7 +564,7 @@ export struct GMancala {
         .layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('对手库'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('对手库'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.pits.length > 0 ? this.pits[A_STORE] : 0))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1).padding(Space.sm)
@@ -581,7 +581,7 @@ export struct GMancala {
       Row({ space: Space.sm }) {
         // 对手的库（在左）
         Column({ space: Space.xs }) {
-          Text(LanMatch.isActive() ? TG('对手') : 'AI').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+          Text(LanMatch.isActive() ? TG('对手') : 'AI').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
           Text(String(this.pits.length > 0 ? this.pits[A_STORE] : 0))
             .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
         }

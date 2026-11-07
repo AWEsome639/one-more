@@ -106,7 +106,9 @@ export struct GCompassMaze {
    *   ⇒ 步数上限随棋盘放大（每格 3 步，困难档 27）。
    */
   private dmax(): number {
-    const need: number = this.diffTotal * 3;
+    // ★ 2026-11-07 二次校准（ai-fixer-b 复跑模拟）：3n 仍不够 ——
+    //   简单 94% / 普通 63% / **困难 57%**（43% 死局）；扫倍数后 **5n = 99/98/98** ⇒ 采用 5n。
+    const need: number = this.diffTotal * 5;
     return need > 20 ? need : 20;
   }
   /** ★ 2026-10-16 通关庆祝 */

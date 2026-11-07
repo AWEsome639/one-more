@@ -114,7 +114,7 @@ export struct GWordSurge {
     const gap: number = Date.now() - this.startAt + this.penalty;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) {
-      this.over = true; this.msg = TG2("⌛ 时间到 —— 答对 {0} 个", this.hits); this.finish(false);
+      this.over = true; this.won = false; this.msg = TG2("⌛ 时间到 —— 答对 {0} 个", this.hits); this.finish(false);
     }
   }
   /** 提示：和代打同一个循环，只把"点"换成"说" */
@@ -326,7 +326,7 @@ export struct GWordSurge {
         Text(TG('选出对应的英文单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
-        ForEach([0, 1, 2, 3], (i: number) => { Text(this.opts.length > (i) ? this.opts[(i)] : '').fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkAt((i))).width('100%').height(Cell.of(52)).backgroundColor(this.toneAt((i))).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((i)); })
+        ForEach([0, 1, 2, 3], (i: number) => { Text(this.opts.length > (i) ? this.opts[(i)] : '').fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkAt((i))).width('100%').constraintSize({ minHeight: Cell.of(52) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis }).backgroundColor(this.toneAt((i))).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((i)); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L328'; })
         .onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })

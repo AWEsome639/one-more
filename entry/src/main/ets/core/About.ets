@@ -25,6 +25,12 @@ export class About {
    *   **他明确说「就用这个」⇒ 就这么定，不再改、不再提。**
    */
   static readonly FEEDBACK_EMAIL: string = 'andrew680701@outlook.com';
+  /**
+   * ★★★ 2026-11-07 奥森：「把你的邮箱也写到反馈那里吧！」
+   *   —— 我的邮箱（拾海的），给用户多一个直达 AI 的通道。
+   *   ⚠️ 也记进 ~/.dsh 的记忆：QQMAIL_ADDRESS = shihai0912@qq.com。
+   */
+  static readonly SHAJIA_EMAIL: string = 'shihai0912@qq.com';
 
   /** 署名（英文界面） */
   static readonly AUTHOR_EN: string = 'Andrew Oscar';

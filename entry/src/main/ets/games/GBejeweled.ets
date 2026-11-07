@@ -618,7 +618,7 @@ export struct GBejeweled {
           .borderRadius(Radius.md)
           .shadow(Shadow.card)
           Column({ space: 2 }) {
-          Text((TG('剩余步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((TG('剩余步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
           Text((this.demoId >= 0 ? '—' : Digits(String(this.left), this.langCode))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
           }
           .layoutWeight(1)

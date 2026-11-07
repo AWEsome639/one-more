@@ -513,7 +513,7 @@ export struct GNonogram {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('错涂'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('错涂'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.errors) + '/' + String(this.errMax)))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)

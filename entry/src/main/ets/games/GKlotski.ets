@@ -509,7 +509,7 @@ export struct GKlotski {
       return;
     }
     if (this.moves >= this.diffTotal) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.tip = TG('步数用尽，曹操没能出关');
       this.finish(false);
       return;

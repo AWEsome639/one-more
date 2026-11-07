@@ -314,7 +314,7 @@ export struct GMastermind {
       return;
     }
     if (this.tries >= MAX_TRIES) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
     }
   }

@@ -243,18 +243,6 @@ export struct StatsTab {
     return this.plays + '-' + this.totalMsRaw + '-' + this.perGameRaw.length
       + '-' + this.favRaw + '-' + this.recentRaw.length;
   }
-
-  private levelPct(): number {
-    return Math.round(ProgressStore.levelProgress(this.xp) * PCT);
-  }
-
-  private xpLeftText(): string {
-    if (this.level >= MAX_LEVEL) {
-      return this.t(TG('已达最高等级'), 'Max level reached');
-    }
-    return this.tn('再攒 {n} 点经验就升级', '{n} XP to next level', ProgressStore.xpToNext(this.xp));
-  }
-
   private nextLevelText(): string {
     if (this.level >= MAX_LEVEL) {
       return 'LV ' + MAX_LEVEL + ' · ' + this.t(TG('满级'), 'Max');
@@ -387,30 +375,6 @@ export struct StatsTab {
     const pct: string = Digits(String(Math.round(st.solved * PCT / st.total)), this.langCode) + '%';
     return this.t('今日', 'Today') + ' ' + today + ' · ' + pct;
   }
-
-  private titleForLevel(): string {
-    const l: number = this.level;
-    if (l >= 60) {
-      return this.t('游戏宗师', 'Grandmaster');
-    }
-    if (l >= 40) {
-      return this.t('解谜高手', 'Puzzle Master');
-    }
-    if (l >= 25) {
-      return this.t('益智达人', 'Puzzle Pro');
-    }
-    if (l >= 15) {
-      return this.t('小有所成', 'Getting Somewhere');
-    }
-    if (l >= 8) {
-      return this.t('渐入佳境', 'In the Groove');
-    }
-    if (l >= 3) {
-      return this.t('初窥门径', 'First Steps');
-    }
-    return this.t('新手上路', 'Newcomer');
-  }
-
   /** 最近玩过的游戏（最多 6 款） */
   private recentMetas(): GameMeta[] {
     const out: GameMeta[] = [];
@@ -478,13 +442,16 @@ export struct StatsTab {
         LevelHeader()
         this.achvWall()
         this.badgeWall()
-        this.heroCard()
+        // ★★★ 2026-11-07（S-09）：这里原来是 `this.heroCard()` —— 与顶部 `LevelHeader()` 是同一张
+        //   等级卡的第二次渲染（LV 圆章/称号/XP 进度条/今日打卡 四项逐字重复，且两者都只服务本页）。
+        //   ⇒ 删 heroCard、留顶部 LevelHeader；只把它独有的「累计经验 + 下一等级 + 4 枚 chip」提出来。
+        this.statsChips()
         this.statGrid()
         // ★★★ 2026-11-07（体验升级点 Top 4）：近期 = 今日时长 / 近 7 天通关率 / 近 7 天最常玩
         //   位置：等级头卡（LV/XP/连胜/今日打卡）+ 四宫格（累计）之后，最近玩过/最常玩榜之前。
-        //   ⚠️ 现有 DOM 顺序是「LevelHeader → 成就墙 → 徽章墙 → 等级头卡 → 四宫格」，
-        //     成就墙在等级头卡**上面**，所以"成就之前"与"等级/连胜/打卡之后"不能同时满足；
-        //     按 lead 的原意取后者（信息层级：身份 → 累计 → 近期）。
+        //   ⚠️ 2026-11-07（S-09）后的 DOM 顺序：「LevelHeader → 成就墙 → 徽章墙 → statsChips → 四宫格 → 近期」，
+        //     「等级/连胜/打卡」由顶部 LevelHeader 承担，近期板块仍在它们之后 —— 信息层级：身份 → 累计 → 近期 ✓。
+        //     （删 heroCard 之前这里写的是「…→ 等级头卡 → 四宫格」，那张"等级头卡"就是被删掉的重复卡。）
         this.recentStats()
         if (ProgressStore.totalPlays() === 0) {
           this.emptyState()
@@ -528,94 +495,35 @@ export struct StatsTab {
     .edgeEffect(EdgeEffect.Spring)
   }
 
-  /** ── ① 等级头卡：徽章 + 称号 + XP 进度条 + 连胜/收藏 ── */
+  /**
+   * ── ① 统计 chip 条（原 `heroCard()` 的**独有信息**）──
+   *
+   * ★★★ 2026-11-07（S-09）：`heroCard()` 与顶部 `LevelHeader()` 是同一张等级卡的两次渲染 ——
+   *   LV 圆章、称号、XP 进度条、今日打卡这四项逐字重复，而两张卡**都只服务统计页**
+   *   （`grep -rn LevelHeader` / `heroCard` 全仓各只有一个使用点，都在本文件）。
+   *   ⇒ 删 `heroCard`、留顶部 `LevelHeader`（位置决定谁是重复：身份卡应在页面最顶，
+   *     而不是在「成就墙 + 徽章墙」之后再出现一次）。
+   *   ⇒ 这里只搬 **heroCard 独有的三项**，不再重复画等级：
+   *     · 累计经验「一共攒了 {n} 点经验」（LevelHeader 只有"还差多少"，没有累计）
+   *     · 下一等级「LV 9 → LV 10」（LevelHeader 没有）
+   *     · 4 枚 chip：连胜 / 最长连 / 今天玩几局 / 收藏
+   *   ⚠️ 原来那两行里「再攒 {n} 点经验就升级」与 LevelHeader 的进度行**逐字相同**，
+   *     为了不再制造重复，这里换成「LV 9 → LV 10」。
+   */
   @Builder
-  heroCard() {
-    Column({ space: Space.md }) {
-      Row({ space: Space.md }) {
-        Stack() {
-          Circle({ width: BADGE_SIZE, height: BADGE_SIZE })
-            .fill(this.accentColor())
-            .shadow(Shadow.card)
-          Column() {
-            Text('LV')
-              .fontSize(FontSize.xxs)
-              .fontColor(ON_PRIMARY_SOFT)
-            Text(Digits(String(this.level), this.langCode))
-              .fontSize(FontSize.xxl)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(Color.White)
-          }
-        }
-        .width(BADGE_SIZE)
-        .height(BADGE_SIZE)
-
-        Column({ space: Space.xs }) {
-          // ★★★ 2026-11-04（第 1255 轮）**真 bug：233×233 上标题逐字竖排**
-          //   实测（真机 dump）：`Text(新手上路)` 的 bounds = [336,261][354,507]
-          //     ⇒ 宽度只有 **18 px = 6 vp**，而 `FontSize.xl = 20 vp`（一个字要 60 px）
-          //     ⇒ 每行只放得下半边 ⇒ **逐字竖排**
-          //   根因：`Column().alignItems(HorizontalAlign.Start)` ⇒ 子元素**只占内容宽度**，
-          //         不拉伸到列宽；而 Text 的「最窄可行宽度」= 一个字符宽
-          //         （被下面那行 FontSize.xxs 的副标题拉到 ~18 px）
-          //   修法：① 标题 `.width('100%')` 取满列宽 ② `.maxLines(1)` 绝不折行
-          //         ③ 极小屏字号降一档（xl=20 → lg=18），保证 4 个汉字放得下
-          Text(this.titleForLevel())
-            .fontSize(Bp.isWatch() || Bp.tinyScreen() ? FontSize.lg : FontSize.xl)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(this.theme().ink)
-            .width('100%')
-            .maxLines(1)
-          Text(this.solvedToday ? this.t(TG('✅ 今日已打卡'), '✅ Checked in today') : this.t(TG('⭕ 还没玩 · 来一局就打卡'), '⭕ Nothing yet — play one to check in'))
-            .fontSize(FontSize.xxs)
-            .fontColor(this.solvedToday ? Palette.emerald : this.theme().inkFaint)
-            .width('100%')
-            .maxLines(2)
-        }
-        .alignItems(HorizontalAlign.Start)
-        .layoutWeight(1)
-      }
-      .width('100%')
-
-      Column({ space: Space.xs }) {
-        Row() {
-          Text(this.nextLevelText())
-            .fontSize(FontSize.xxs)
-            .fontColor(this.theme().inkSoft)
-          Blank()
-          Text(Digits(String(this.levelPct()), this.langCode) + '%')
-            .fontSize(FontSize.xxs)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(this.accentColor())
-        }
-        .width('100%')
-
-        Stack({ alignContent: Alignment.Start }) {
-          Row()
-            .width('100%')
-            .height(BAR_H)
-            .backgroundColor(this.theme().line)
-            .borderRadius(Radius.full)
-          Row()
-            .width(this.levelPct() + '%')
-            .height(BAR_H)
-            .backgroundColor(this.accentColor())
-            .borderRadius(Radius.full)
-            .animation({ duration: Motion.slow, curve: Motion.spring() })
-        }
-        .width('100%')
-        .height(BAR_H)
-
-        Row() {
-          Text(this.tn(TG('一共攒了 {n} 点经验'), '{n} XP earned', this.xp))
-            .fontSize(FontSize.xxs)
-            .fontColor(this.theme().inkFaint)
-          Blank()
-          Text(this.xpLeftText())
-            .fontSize(FontSize.xxs)
-            .fontColor(this.theme().inkFaint)
-        }
-        .width('100%')
+  statsChips() {
+    Column({ space: Space.sm }) {
+      Row() {
+        Text(this.tn(TG('一共攒了 {n} 点经验'), '{n} XP earned', this.xp))
+          .fontSize(FontSize.xxs)
+          .fontColor(this.theme().inkFaint)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+        Blank()
+        Text(this.nextLevelText())
+          .fontSize(FontSize.xxs)
+          .fontColor(this.theme().inkFaint)
+          .maxLines(1)
       }
       .width('100%')
 
@@ -628,7 +536,7 @@ export struct StatsTab {
       .width('100%')
     }
     .width('100%')
-    .padding(Space.lg)
+    .padding(Space.md)
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.lg)
     .shadow(Shadow.card)
@@ -802,6 +710,13 @@ export struct StatsTab {
       Text(this.t(labelZh, labelEn))
         .fontSize(FontSize.xs)
         .fontColor(this.theme().inkSoft)
+        // ★★★ 2026-11-07 溢出审计（S-08）：这里原来只有 layoutWeight(1)，没有 maxLines/截断
+        //   ⇒ 德语「Am meisten gespielt」≈122vp、法语「Le plus joué」≈72vp、西语「Más jugado」≈70vp，
+        //     而标签可用宽 = 卡内 288 − 图标 22 − 两个间距 20 − 值（≤58%≈167）= **≥79vp**
+        //   ⇒ 德语必然折成两行 ⇒ 这一行比「今日/通关率」两行高 ⇒ 三行参差（奥森能看见的"错位"）。
+        //   值那一端早就有 maxLines+Ellipsis，这里补齐同一套：单行 + 省略号，三行永远等高。
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
         .layoutWeight(1)
       Text(value)
         .fontSize(FontSize.xs)

@@ -346,7 +346,7 @@ export struct GFeatureMatrixRecall {
         }.layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
-        Text((TG('要点的颜色'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('要点的颜色'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.colorName(this.askColor))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)

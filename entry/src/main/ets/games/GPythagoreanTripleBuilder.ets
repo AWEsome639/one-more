@@ -247,6 +247,11 @@ export struct GPythagoreanTripleBuilder {
   }
 
   private submit(): void {
+    // ★★ 2026-11-07（死亡判定巡检 ③）：**收尾防重入**
+    //   这款没有独立的 finish()，收尾是内联在 next() 里直接 onFinish 的，
+    //   而 next() 只在 level >= diffTotal 时结算 ⇒ 结算后 submit 再进一次
+    //   就会再调一次 next() ⇒ onFinish 被调两次。守卫加在这条入口上。
+    if (this.over) { return; }
     if (this.typed.length === 0) { this.tip = TG('先输入一个数'); return; }
     const v: number = this.typedValue();
     if (v === this.ans) {

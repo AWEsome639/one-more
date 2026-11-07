@@ -285,7 +285,7 @@ export struct GTrailMaking {
         Text((String(this.mistakes) + '/' + String(ALLOWED + 1))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('下一类'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('下一类'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.step >= this.diffTotal ? '—' : (this.step % 2 === 0 ? TG('数字') : TG('字母')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')

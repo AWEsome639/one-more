@@ -490,7 +490,7 @@ export struct GFutoshiki {
       return;
     }
     if (this.moves >= this.diffTotal) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
     }
   }

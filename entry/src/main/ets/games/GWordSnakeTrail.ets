@@ -286,7 +286,7 @@ export struct GWordSnakeTrail {
   }
   private crash(why: string): void {
     this.lives = this.lives - 1;
-    if (this.lives <= 0) { this.over = true; this.msg = TG2('❌ {0}，生命耗尽', why); this.finish(false); return; }
+    if (this.lives <= 0) { this.over = true; this.won = false; this.msg = TG2('❌ {0}，生命耗尽', why); this.finish(false); return; }
     this.body = [27, 28, 29]; this.dir = 0;
     this.msg = TG2("💥 {0}，还剩 {1} 条命", why,Digits(String(this.lives), this.langCode));
   }

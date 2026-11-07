@@ -557,7 +557,7 @@ export struct GDominosa {
       return;
     }
     if (this.moves >= this.moveCap) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
     }
   }

@@ -463,7 +463,7 @@ export struct GDualMirror {
         .layoutWeight(1)
 
         Column({ space: Space.xs }) {
-          Text(TG('右板（镜像）')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text(TG('右板（镜像）')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
           Column({ space: 2 }) {
             ForEach(this.rows, (r: number) => {
               Row({ space: 2 }) {

@@ -407,7 +407,7 @@ export struct GSimonSays {
         Text((this.phase === 'input' ? TG('你来') : (this.phase === 'show' ? TG('演示') : TG('结束'))))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
-        .fontColor(this.theme.ink)
+        .fontColor(this.theme.ink).maxLines(1).minFontSize(10).maxFontSize(FontSize.lg).textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         .layoutWeight(1)
         .padding(Space.sm)

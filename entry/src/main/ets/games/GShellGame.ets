@@ -294,7 +294,7 @@ export struct GShellGame {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('状态'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text((this.phase === 'shuffle' ? TG('洗牌') : (this.phase === 'pick' ? TG('快选') : TG('看球')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((this.phase === 'shuffle' ? TG('洗牌') : (this.phase === 'pick' ? TG('快选') : TG('看球')))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).minFontSize(10).maxFontSize(FontSize.lg).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Row({ space: Space.md }) {

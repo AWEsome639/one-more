@@ -467,6 +467,13 @@ export struct LevelHeader {
   @StorageProp('superStreak') streak: number = 0;
   @StorageProp('solvedToday') solvedToday: boolean = false;
   @StorageProp('totalSolved') totalSolved: number = 0;
+  /**
+   * 界面模式（normal / elder / simple）。
+   * ★★★ 2026-11-07 布局审计（S-05）：`flamesBelow()` 要按「大字模式 + 窄屏」决定火焰是否换行。
+   *   本组件此前**没有 uiMode 观察源**，只按宽度判断的话，正常档 360vp 也会被换行（它其实够用：
+   *   文字列 137vp）。有了这个观察源才能只在 elder 下换，正常档保持"火焰贴右"的紧凑观感。
+   */
+  @StorageProp('uiMode') uiMode: string = 'normal';
   // ★ 2026-10-13（P4/P5）：等级称号、进度文案、打卡文案都要跟语言；徽章/进度条要跟主题色
   @StorageProp('lang') langCode: string = 'zh';
   @StorageProp('accent') accentId: string = Palette.primary;
@@ -504,6 +511,27 @@ export struct LevelHeader {
   private toNext(): number {
     const hi: number = Math.floor(100 * Math.pow(this.level, 2.04));
     return Math.max(0, hi - this.xp);
+  }
+
+  /**
+   * 火焰（连胜徽章）是否要**单独占一行**。
+   *
+   * ★★★ 2026-11-07 布局审计（S-05）：大字模式 + 窄屏时，徽章(74) + 间距(24) + 火焰(≈101.5)
+   *   会把文字列挤到 ≈40.5vp（360vp：卡内 240 − 74 − 24 − 101.5）。
+   *   标题是 4 个汉字（`FontSize.lg=24` ⇒ 96vp）、通关数「通关 571 局」（`xs=18` ⇒ ≈85vp）
+   *   ⇒ 即使补了 Ellipsis 也只能显示「新…」「通…」，信息等于没有 —— 截断体面 ≠ 信息还在。
+   *   ⇒ 把火焰挪到下一行：文字列回到 `240 − 74 − 24 = 142vp`，两者都放得下，且**不需要缩字号**
+   *     （缩到能塞进 40.5vp 需 ≤10vp/字，与大字模式「字放大 25~42%」的目的直接矛盾）。
+   *   ⚠️ 阈值 440：elder 下 440vp 时文字列 ≈120.5vp（标题 96 / 通关数 85 / 5 位数 107 都够），
+   *     所以只在 **< 440** 换行；宽屏保持原样（火焰贴右更紧凑）。
+   *   ⚠️ 手表/极小屏本来就走「火焰另起一行」那一支（`isWatch() || tinyScreen()`），这里一并返回 true，
+   *     保证「常规分支」不会在那些设备上误把火焰塞回同一行。
+   */
+  private flamesBelow(): boolean {
+    if (Bp.isWatch() || Bp.tinyScreen()) {
+      return true;
+    }
+    return this.uiMode === 'elder' && Bp.width < 440;
   }
 
   build() {
@@ -566,6 +594,10 @@ export struct LevelHeader {
                 .fontColor(this.theme.ink)
                 .width('100%')
                 .maxLines(1)
+                // ★★★ 2026-11-07 溢出审计：段位名 `maxLines(1)` 必须配 textOverflow ——
+                //   俄语「Мастер головоломок」18 字符 @fs18 ≈200vp，而 233 上这列只有 ~81vp
+                //   （`Common.ets:510-520` 实测），不配就硬切。
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
               Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
                 .fontSize(FontSize.xxs)
                 .fontColor(this.theme.inkFaint)
@@ -613,6 +645,9 @@ export struct LevelHeader {
                 .fontColor(this.theme.ink)
                 .width('100%')
                 .maxLines(1)
+                // ★★★ 2026-11-07 溢出审计：段位名必须配 textOverflow，
+                //   否则俄语 18 字符在西里尔下会被硬切（无省略号）。
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
               Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
                 .fontSize(FontSize.xs)
                 .fontColor(this.theme.inkFaint)
@@ -657,6 +692,9 @@ export struct LevelHeader {
                 .fontColor(this.theme.ink)
                 .width('100%')
                 .maxLines(1)
+                // ★★★ 2026-11-07 溢出审计：段位名必须配 textOverflow，
+                //   否则俄语 18 字符在西里尔下会被硬切（无省略号）。
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
               Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
                 .fontSize(FontSize.xs)
                 .fontColor(this.theme.inkFaint)
@@ -670,9 +708,25 @@ export struct LevelHeader {
             .layoutWeight(1)
             .margin({ left: Space.md })
 
-            StreakFlame({ streak: this.streak, theme: this.theme })
+            // ★★★ 2026-11-07 布局审计（S-05）：窄屏大字模式下「火焰」换到下一行。
+            //   实测 elder + 360vp：卡内 240 − 徽章 74 − 间距 24 − 火焰 ≈101.5 ⇒ 文字列只剩 **≈40.5vp**，
+            //   而标题是 4 个汉字（lg=24 ⇒ 96vp）、通关数是「通关 571 局」（xs=18 ⇒ ≈85vp）
+            //   ⇒ 配了 Ellipsis 也只显示「新…」「通…」，信息等于没有。
+            //   ⇒ 火焰本行不画、挪到下一行（照抄 1257 轮在 233×233 上的做法），
+            //     文字列回到 240 − 74 − 24 = **142vp**，标题/通关数/5 位数全部放得下（零缩字号）。
+            if (!this.flamesBelow()) {
+              StreakFlame({ streak: this.streak, theme: this.theme })
+            }
           }
           .width('100%')
+
+          if (this.flamesBelow()) {
+            Row() {
+              Blank()
+              StreakFlame({ streak: this.streak, theme: this.theme })
+            }
+            .width('100%')
+          }
         }
 
       // XP 进度条
@@ -1045,6 +1099,13 @@ export struct GameCard {
    * ★ 无连胜时仍保留原来的 Space.xs（不无条件留空）。
    */
   private badgePadRight(): number {
+    // ★ 2026-11-07 verifier-eng2 核算的配套条件①：**2 列手机卡（宽 <240）角标只留一个**
+    //   ⇒ 否则 440 手机上三样全亮时副标题区只剩 26vp（真机截图：竖排 + 省略号）。
+    //   窄卡上限 48（够放 🏆 + 一个分数或 🔥 N 天），宽卡仍按实际累加。
+    const narrowCard: boolean = Bp.width < 480;
+    if (narrowCard) {
+      return 48;
+    }
     let p: number = this.streak > 0 ? 48 : Space.xs;
     if (this.showCrown()) {
       p += 18;

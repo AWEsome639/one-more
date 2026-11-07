@@ -449,7 +449,7 @@ export struct GMatch3 {
       return;
     }
     if (this.movesLeft <= 0) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
     }
   }
@@ -489,7 +489,7 @@ export struct GMatch3 {
         .layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('剩余步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('剩余步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.movesLeft), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1).padding(Space.sm)

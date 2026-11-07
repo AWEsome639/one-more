@@ -524,7 +524,7 @@ export struct GKenken {
       return;
     }
     if (this.moves >= this.diffTotal) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.tip = TG('步数用尽，重开一题吧');
       this.finish(false);
       return;

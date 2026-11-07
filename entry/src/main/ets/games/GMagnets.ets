@@ -230,7 +230,7 @@ export struct GMagnets {
       return;
     }
     if (this.moves >= this.diffTotal) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.tip = TG('步数用尽，重开一题吧');
       this.finish(false);
       return;
@@ -611,7 +611,7 @@ export struct GMagnets {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('成对磁铁'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('成对磁铁'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.goodDominoes()) + '/8')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)

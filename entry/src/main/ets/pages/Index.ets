@@ -328,6 +328,12 @@ pageTransition() {
       .width('100%')
 
       // ★ 按钮在 Scroll **之外** ⇒ 永远可见（判据 519）
+      // ★★★ 2026-11-07 溢出审计：**非极小屏改竖排、每个按钮整行**。
+      //   并排时每个按钮只有 ~132vp，而俄语「Согласиться и продолжить」24 字符 ≈208vp
+      //   ⇒ 只能在「同意并继续」上显示成「Согласиться и пр…」。
+      //   ⚠️ `textOverflow` 修不了：`Button` 的 `LabelStyle.overflow` 默认就是 Ellipsis。
+      //   极小屏这一支**保持不变**（那里已用短标签，且高度极紧，判据 519）。
+      if (Bp.isWatch() || Bp.tinyScreen()) {
       Row({ space: 10 }) {
         // ★ 2026-11-02（第 845 轮）**手表 233×233**：两个按钮并排时宽度不够，
         //   文字被省略成「查看…」「同意…」⇒ 极小屏改用短标签（语义不变）。
@@ -350,19 +356,12 @@ pageTransition() {
           .backgroundColor(this.accentColor())
           .borderRadius(Radius.md)
           .accessibilityText(this.t('同意并继续', 'Agree and continue'))
-          .onClick(() => {
-            Haptics.tap();
-            ProgressStore.savePrivacyAgreed();
-            this.showPrivacy = false;
-            // ★ 2026-10-29：同意的那一刻**直接接上欢迎卡**。
-            //   理由：kick 那 8 次重试（1.6s~7.2s）在用户同意之前就耗完了，
-            //   同意之后没有任何东西再触发 ⇒ 欢迎卡永远不出现。
-            if (!ProgressStore.onboarded()) {
-              this.showWelcome = true;
-            }
-          })
+          .onClick(() => { this.agreePrivacy(); })
       }
       .width('100%')
+      } else {
+        this.privacyFootStack()
+      }
     }
     .width('88%')
     // ★★★ 2026-11-04（第 1173 轮）**上限给"够用"而不是"满屏"**
@@ -428,6 +427,61 @@ pageTransition() {
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.lg)
     .shadow(Shadow.card)
+  }
+
+
+  /** ★ 2026-11-07 溢出审计：同意隐私协议的**统一入口**（并排 / 竖排两支都调它，别写两遍） */
+  private agreePrivacy(): void {
+    Haptics.tap();
+    ProgressStore.savePrivacyAgreed();
+    this.showPrivacy = false;
+    // ★ 2026-10-29：同意的那一刻**直接接上欢迎卡**。
+    //   理由：kick 那 8 次重试（1.6s~7.2s）在用户同意之前就耗完了，
+    //   同意之后没有任何东西再触发 ⇒ 欢迎卡永远不出现。
+    if (!ProgressStore.onboarded()) {
+      this.showWelcome = true;
+    }
+  }
+
+  /**
+   * ★★★ 2026-11-07 溢出审计：隐私页两按钮的**竖排整行**版本（非极小屏用）。
+   *
+   * 为什么必须竖排：并排时每个按钮只有 ~132vp（卡片内宽 288 − 间距 10，再减按钮 padding），
+   *   而最长语言放不下 —— 俄 `Согласиться и продолжить` 24 字符 ≈208vp、
+   *   德 `Zustimmen und weiter` 20 字符 ≈180vp ⇒ 只能显示成「Согласиться и пр…」。
+   *   竖排后每个按钮拿到卡片整宽 288vp ⇒ 12 种语言全部完整显示。
+   *
+   * ⚠️ 为什么不能用 `textOverflow` 修（很容易踩的坑）：
+   *   `Button(label)` 的 `LabelStyle.maxLines` **默认就是 1**、`overflow` **默认就是
+   *   TextOverflow.Ellipsis** ⇒ 它本来就在省略号截断，再写一遍是空操作，用户看到的还是半句。
+   *   要真放得下只能给宽度（本函数）或缩字号（缩到 9vp 才够，不可接受）。
+   *
+   * ⚠️ 为什么抽成 @Builder 而不是直接改原来那个 `Row`：
+   *   极小屏（233/195）必须继续**并排** —— 那里已经用短标签「全文」「同意」，
+   *   且高度极紧（判据 519 那笔账：多 46vp 按钮就会被顶出卡片）。所以按设备分两支，
+   *   高度不变、只是换了方向。
+   */
+  @Builder
+  privacyFootStack() {
+    Column({ space: 10 }) {
+      Button(this.t('查看全文', 'Read policy'))
+        .width('100%').height(this.privacyCompact() ? 36 : 42)
+        .fontSize(FontSize.sm)
+        .fontColor(this.theme().ink)
+        .backgroundColor(this.theme().surfaceAlt)
+        .borderRadius(Radius.md)
+        .accessibilityText(this.t('查看全文', 'Read policy'))
+        .onClick(() => { Haptics.tap(); this.openPrivacy(); })
+      Button(this.t('同意并继续', 'Agree and continue'))
+        .width('100%').height(this.privacyCompact() ? 36 : 42)
+        .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
+        .fontColor(Color.White)
+        .backgroundColor(this.accentColor())
+        .borderRadius(Radius.md)
+        .accessibilityText(this.t('同意并继续', 'Agree and continue'))
+        .onClick(() => { this.agreePrivacy(); })
+    }
+    .width('100%')
   }
 
 build() {

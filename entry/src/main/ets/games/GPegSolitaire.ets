@@ -361,7 +361,7 @@ export struct GPegSolitaire {
       this.over = true;
       this.finish(true);
     } else if (!this.anyMove()) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
     }
     return true;
@@ -507,7 +507,7 @@ export struct GPegSolitaire {
         Text((this.sel >= 0 ? TG2('{0} 处', this.dests.length) : '—'))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
-        .fontColor(this.theme.ink)
+        .fontColor(this.theme.ink).maxLines(1).minFontSize(10).maxFontSize(FontSize.lg).textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         .layoutWeight(1)
         .padding(Space.sm)

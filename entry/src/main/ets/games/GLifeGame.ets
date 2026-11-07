@@ -345,7 +345,7 @@ export struct GLifeGame {
     if (alive === 0) {
       this.stop();
       this.running = false;
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
       return;
     }

@@ -1264,12 +1264,32 @@ build() {
     .onClick(() => { Haptics.tap(); act(); })
   }
 
+  /**
+   * 「收起 / 展开」的**可见**文案。
+   *
+   * ★★★ 2026-11-07 布局审计（S-06 附带发现）：12 语言字典里的「收起/展开」**自带 ▲/▼**
+   *   （de「Weniger ▲」、ja「閉じる ▲」、ru「Свернуть ▲」、ko「접기 ▲」…），
+   *   而本组件旁边又画了一个**会旋转**的 `⌄` ⇒ 德语/日语下变成「Weniger ▲ ⌄」：
+   *   · 多占约 12vp（这一行本来就已经超预算 28vp）；
+   *   · 两个箭头指向还可能是反的（收起态 ⌄ 朝下、字典 ▲ 朝上）⇒ 看起来像坏了。
+   *   ⇒ 剥掉字典自带的尾部箭头，只保留代码画的那个（只有它会随状态旋转）。
+   */
+  private collapseLabel(): string {
+    const raw: string = this.topCollapsed
+      ? this.t('展开', 'Expand')
+      : this.t('收起', 'Collapse');
+    let s: string = raw.trim();
+    const last: string = s.length > 0 ? s.substring(s.length - 1) : '';
+    if (last === '▲' || last === '▼') {
+      s = s.substring(0, s.length - 1).trim();
+    }
+    return s;
+  }
+
   @Builder
   collapseToggle() {
     Row({ space: 4 }) {
-      Text(this.topCollapsed
-        ? this.t('展开', 'Expand')
-        : this.t('收起', 'Collapse'))
+      Text(this.collapseLabel())
         .fontSize(FontSize.xxs)
         .fontColor(this.theme().inkFaint)
         .maxLines(1)
@@ -1543,6 +1563,10 @@ build() {
           .width(22).height(22).textAlign(TextAlign.Center)
         Text(this.t('今天这一局', 'Today'))
           .fontSize(FontSize.xxs).fontColor(Overlay.onColorSoft).maxLines(1)
+          // ★★★ 2026-11-07 溢出审计：这里原来只写 `.maxLines(1)`、没配 textOverflow，
+          //   而紧挨着的下一行（`dailyName()`）是配了的 ⇒ 明显漏写。
+          //   德语「Die Runde heute」15 字符 @fs12 ≈99vp，窄卡里会被硬切。
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(this.dailyName())
           .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).fontColor(Overlay.onColor)
           .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1907,15 +1931,31 @@ build() {
   @Builder
   countRow() {
     Row({ space: Space.sm }) {
+      // ★★★ 2026-11-07 布局审计（S-06）：本行原来全是定宽项（计数 + 两个胶囊 + 通关数 + 收起），
+      //   360vp 上预算 **348 > 可用 320**；欧洲语言更糟（de「571 Runden geschafft」≈132vp、
+      //   es/fr ≈139、「Weniger ▲」≈108）⇒ 最坏超过 500vp。
+      //   ⇒ 让「计数」成为**唯一可伸缩项**（layoutWeight + 单行省略），其余按钮永不被挤出屏幕。
+      //   判据：可点区域优先于文案完整 —— 按钮少一个像素都点不准，计数截断只是少几个字。
       Text(this.countLabel())
         .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
-      Blank()
+        .layoutWeight(1)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
       // ★ 视图切换：网格 ⇄ 字母表（奥森 2026-10-13「再加一个游戏列表，按字母排序」）
       //   放在这一行是因为它字最少；两个小胶囊，选中态跟随主题色
       this.viewPill(ViewMode.GRID, '▦', TG('网格'), 'Grid')
       this.viewPill(ViewMode.AZ, '🔤', 'A-Z', 'A-Z')
-      Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
-        .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
+      // ★★★ 2026-11-07 布局审计（S-06）：通关数只在**宽屏**显示：
+      //   ① 它和统计页四宫格的「通关 N 局」重复；
+      //   ② 它是本行最长的可选项（de/ru/es ≈132~139vp），窄屏留它必然把按钮挤出去。
+      //   显示阈值取 `Bp.SM`(600) —— 600vp 上 de 的预算才算宽松（计数还剩 ~158vp，够「Klassiker · 355 Spiele」）。
+      //   ⚠️ Bp.width 首帧可能是 0（EntryAbility 还没 update）⇒ 按「未知时显示」处理，避免先消失再出现的闪烁。
+      if (Bp.width === 0 || Bp.width >= Bp.SM) {
+        Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))
+          .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
       // ★★★ 2026-10-14 奥森截图「这怎么间隔这么大啊？」⇒ 真问题是【顶部太长，网格只剩 1 行】
       //   我上一版把 collapsedBar 常驻 ⇒ 展开态白占一行（46vp ≈ 170px）
       //   ⇒ 把「收起」按钮【并入计数行右侧】—— 与收起态的「展开」按钮同一视觉位置

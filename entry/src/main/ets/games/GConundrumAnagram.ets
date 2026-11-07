@@ -280,7 +280,7 @@ export struct GConundrumAnagram {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((Math.min(this.qi + 1, this.diffTotal) + '/' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
 // ★ 动效：进度一变就弹一下
 .scale({ x: this.bump, y: this.bump })
@@ -301,7 +301,7 @@ export struct GConundrumAnagram {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)

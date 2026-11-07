@@ -300,7 +300,7 @@ export struct GWordGridConnection {
     this.sel = []; this.miss = this.miss + 1;
     this.score = this.score > 20 ? this.score - 20 : 0;
     if (this.miss >= MAX_MISS) {
-      this.over = true; this.msg = TG2('❌ 连错 {0} 次，本局结束', MAX_MISS); this.finish(false);
+      this.over = true; this.won = false; this.msg = TG2('❌ 连错 {0} 次，本局结束', MAX_MISS); this.finish(false);
     } else { this.msg = TG2("❌ {0} 与 {1} 意思不相近", w1, w2); }
   }
   private finish(solved: boolean): void {

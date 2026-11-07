@@ -315,7 +315,7 @@ export struct GWordLadder {
       this.msg = TG2("✅ {0}，还剩 {1} 步", next, this.left());
     }
     if (!this.over && this.steps >= this.limit) {
-      this.over = true; this.msg = TG2('❌ 步数用尽，没能走到 {0}', this.to); this.finish(false);
+      this.over = true; this.won = false; this.msg = TG2('❌ 步数用尽，没能走到 {0}', this.to); this.finish(false);
     }
   }
   private finish(solved: boolean): void {

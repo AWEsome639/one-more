@@ -590,7 +590,7 @@ export struct GReversi {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('电脑（白）'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('电脑（白）'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.wCount), this.langCode))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)

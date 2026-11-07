@@ -421,7 +421,7 @@ export struct GMahjongSolitaire {
         return;
       }
     }
-    this.over = true;
+    this.over = true; this.won = false;
     this.finish(false);
   }
 

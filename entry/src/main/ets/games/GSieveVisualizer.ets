@@ -381,7 +381,7 @@ export struct GSieveVisualizer {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('已找到素数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已找到素数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).minFontSize(8).maxFontSize(FontSize.xxs).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.found + ' / ' + PRIMES))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)

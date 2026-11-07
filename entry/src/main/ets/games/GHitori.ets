@@ -8,7 +8,6 @@
  * 胜负：三条全满足 = 通关；步数用尽 = 失败。
  */
 
-import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
@@ -665,7 +664,7 @@ export struct GHitori {
       return;
     }
     if (this.moves >= this.diffTotal) {
-      this.over = true;
+      this.over = true; this.won = false;
       this.finish(false);
     }
   }
@@ -687,9 +686,13 @@ export struct GHitori {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.md }) {
-        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : (Bp.tinyScreen() || Bp.isWatch() ? TG('涂黑 / 取消') : TG('点格子涂黑 / 取消')))
+        // ★★ 2026-11-07 溢出审计：统一用**短标签**（原来只有极小屏走短支）。
+        //   长标签德语 35 / 俄语 37 字符 ≈315vp > 半宽 ~156vp ⇒ 被省略成半句。
+        //   ⚠️ Button 没有 `.maxLines()`/`.textOverflow()`，必须用 `.labelStyle({...})`。
+        Button(this.over ? (this.won ? TG('🎉 已通关') : TG('已结束')) : TG('涂黑 / 取消'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.sm)
+          .fontSize(FontSize.xs)
+          .labelStyle({ maxLines: 2, overflow: TextOverflow.Ellipsis, font: { size: FontSize.xs } })
           .fontColor(this.theme.inkSoft)
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)

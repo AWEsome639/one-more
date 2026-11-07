@@ -605,7 +605,7 @@ export struct GSlide15 {
         Text((this.bestMoves > 0 ? this.bestMoves + TG(' 步') : '—'))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
-        .fontColor(this.theme.ink)
+        .fontColor(this.theme.ink).maxLines(1).minFontSize(10).maxFontSize(FontSize.lg).textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         .layoutWeight(1)
         .padding(Space.sm)

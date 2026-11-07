@@ -270,13 +270,13 @@ export struct GContextClues {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((Math.min(this.qi + 1, this.diffTotal) + '/' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.correct + '/' + PASS)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
@@ -288,7 +288,7 @@ export struct GContextClues {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
@@ -302,7 +302,7 @@ export struct GContextClues {
       }
       .width('100%').padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card)
-      Text((this.opts.length > 0 ? this.opts[0] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
+      Text((this.opts.length > 0 ? this.opts[0] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').constraintSize({ minHeight: Cell.of(44) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       .fontColor(this.picked >= 0 && ((0) === this.ans || (0) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((0))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -312,7 +312,7 @@ export struct GContextClues {
       .outline(Tv.focusOutline(this.tvFocus === 'L307'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.choose((0)); }); })
       .onClick(() => { Haptics.tick(); this.choose((0)); })
-      Text((this.opts.length > 1 ? this.opts[1] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
+      Text((this.opts.length > 1 ? this.opts[1] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').constraintSize({ minHeight: Cell.of(44) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       .fontColor(this.picked >= 0 && ((1) === this.ans || (1) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((1))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -322,7 +322,7 @@ export struct GContextClues {
       .outline(Tv.focusOutline(this.tvFocus === 'L315'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.choose((1)); }); })
       .onClick(() => { Haptics.tick(); this.choose((1)); })
-      Text((this.opts.length > 2 ? this.opts[2] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
+      Text((this.opts.length > 2 ? this.opts[2] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').constraintSize({ minHeight: Cell.of(44) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       .fontColor(this.picked >= 0 && ((2) === this.ans || (2) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((2))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -332,7 +332,7 @@ export struct GContextClues {
       .outline(Tv.focusOutline(this.tvFocus === 'L323'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.choose((2)); }); })
       .onClick(() => { Haptics.tick(); this.choose((2)); })
-      Text((this.opts.length > 3 ? this.opts[3] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').height(Cell.of(44))
+      Text((this.opts.length > 3 ? this.opts[3] : '')).fontSize(FontSize.md).textAlign(TextAlign.Center).width('100%').constraintSize({ minHeight: Cell.of(44) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       .fontColor(this.picked >= 0 && ((3) === this.ans || (3) === this.picked) ? '#FFFFFF' : this.theme.ink)
       .backgroundColor(this.bg((3))).borderRadius(Radius.md).shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
