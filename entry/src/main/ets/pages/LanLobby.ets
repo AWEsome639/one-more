@@ -18,6 +18,7 @@ import { GAMES, GameMeta, findGame, displayName } from '../core/GameRegistry';
 import { Haptics } from '../core/Haptics';
 import { Back } from '../core/Back';
 import { L } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 /** 可联机的游戏（回合制对战型） */
 // ★ P12（2026-10-13）：奥森要求「合适的都能加上」。
@@ -46,6 +47,17 @@ struct LanLobby {
   // ★ 竞速模式（奥森 2026-10-13：「所有游戏都可以比速度」）
   @State private raceMode: boolean = false;   // 是否在竞速模式
   @State private raceTick: number = 0;        // 排名变化时 +1 ⇒ 驱动重绘（拱 LanRace 的静态状态）
+  /**
+   * ★★★ 2026-11-07 交互死角修复：智慧屏/键盘焦点环的「当前焦点是谁」。
+   *
+   * 为什么本页需要它：本页有两个**玩家必用**的操作挂在 `Text` 上而不是 `Button` 上
+   *   —— 顶部「重扫」、手动连房间的「连接」。`Text` + `onClick` 在 ArkUI 里
+   *   **默认不可聚焦** ⇒ TV 遥控器/键盘根本选不到 ⇒ 电视上等于开不了房、进不去别人的房间。
+   * 照抄 `components/GamesTab.ets:1674-1688`「随机来一局」卡的三件套：
+   *   `.focusable(Tv.on())` + `.onFocus/.onBlur` + `.outline(focusOutline)` + `.onKeyEvent(Tv.handleKey)`。
+   * 文案里的 L14xx 只是焦点标识串（同一页内唯一即可），不参与业务。
+   */
+  @State private tvFocus: string = '';
 
   /** 当前主题色（id 可能是 'system'，一律走 Accent 解析） */
   private accentColor(): string {
@@ -107,6 +119,17 @@ struct LanLobby {
           .fontColor(this.theme().ink).layoutWeight(1)
         Text(this.t(TG('重扫'), 'Rescan')).fontSize(FontSize.xs).fontColor(this.accentColor())
           .padding(Space.sm)
+          // ★★★ 2026-11-07 交互死角：Text + onClick 默认不可聚焦 ⇒ TV/键盘选不中。
+          //   补焦点三件套（同 GamesTab:1674-1688）+ 读屏文案。
+          .accessibilityText(this.t(TG('重新扫描局域网内的房间'), 'Rescan rooms on this Wi-Fi'))
+          .accessibilityLevel('yes')
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L110'; })
+          .onBlur(() => { if (this.tvFocus === 'L110') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L110'))
+          .onKeyEvent((e: KeyEvent) => {
+            Tv.handleKey(e, () => { this.doScan(); });
+          })
           .onClick(() => this.doScan())
       }
       .width('100%').padding({ left: Space.sm, right: Space.md, top: Space.xl })
@@ -204,6 +227,16 @@ struct LanLobby {
             .fontSize(FontSize.xs).fontColor(Color.White)
             .padding({ left: Space.md, right: Space.md, top: 10, bottom: 10 })
             .backgroundColor(Palette.emerald).borderRadius(Radius.full)
+            // ★★★ 2026-11-07 交互死角：同上 —— TV 上「连不上房间」有一半原因是根本选不中这个按钮。
+            .accessibilityText(this.t(TG('连接这个房间'), 'Join this room'))
+            .accessibilityLevel('yes')
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L207'; })
+            .onBlur(() => { if (this.tvFocus === 'L207') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L207', Radius.full))
+            .onKeyEvent((e: KeyEvent) => {
+              Tv.handleKey(e, () => { this.manualJoin(); });
+            })
             .onClick(() => this.manualJoin())
         }
         .width('100%')

@@ -569,7 +569,7 @@ export struct GGokigenNaname {
         .shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(Digits(String(this.moves), this.langCode))
+        Text(TG2('步数 {0}/{1}', Digits(String(this.moves), this.langCode), Digits(String(this.diffTotal), this.langCode)))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

@@ -269,6 +269,9 @@ export struct GGeometricVision {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
+      // ★ 2026-11-07（剩余提示缺口 C 类）：错误上限原来完全不可见 —— 玩家不知道还能错几次
+      Text(TG2('　违规 {0}/{1}', this.wrong, LIVES)).fontSize(FontSize.sm)
+        .fontColor(this.wrong >= LIVES - 1 ? Palette.rose : this.theme.inkSoft)
       Text(TG2("第 {0}/{1} 题　得分 {2}", Math.min(this.idx + 1, this.diffTotal),Digits(String(this.diffTotal), this.langCode),Digits(String(this.score), this.langCode)))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         // ★ 错误抖动

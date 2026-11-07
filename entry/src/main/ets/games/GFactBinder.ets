@@ -297,6 +297,9 @@ export struct GFactBinder {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
+      // ★ 2026-11-07（剩余提示缺口 C 类）：错误上限原来完全不可见 —— 玩家不知道还能错几次
+      Text(TG2('　违规 {0}/{1}', this.wrong, this.diffTotal)).fontSize(FontSize.sm)
+        .fontColor(this.wrong >= this.diffTotal - 1 ? Palette.rose : this.theme.inkSoft)
       Text(TG2("已绑定 {0}/{1}", this.bound(), IDX.length))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       Row({ space: Space.sm }) {

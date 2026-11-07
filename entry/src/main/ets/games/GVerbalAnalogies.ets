@@ -299,6 +299,10 @@ export struct GVerbalAnalogies {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
+        // ★ 2026-11-07（剩余提示缺口 B 类）：生命原来**完全不可见**（只在答错后的 msg 里闪一句）
+        //   ⇒ 玩家不知道还剩几条命就被「生命耗尽」结束。这里做成常驻的 ❤×n（纯符号，无需翻译 key）。
+        Text('❤×' + Digits(String(this.life), this.langCode)).fontSize(FontSize.xs)
+          .fontColor(this.life <= 1 ? Palette.rose : this.theme.inkSoft).layoutWeight(1)
         Text(TG2("题 {0}/{1}", Math.min(this.qi + 1, ROUNDS), ROUNDS)).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(Palette.amber)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface)

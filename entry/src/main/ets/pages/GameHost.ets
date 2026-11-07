@@ -26,6 +26,7 @@ import { ProgressStore } from '../core/ProgressStore';
 // ★★★ 2026-10-23 路线 E：每局结束记一条游玩记录
 import { GameLog } from '../core/GameLog';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { Haptics } from '../core/Haptics';
 import { Back } from '../core/Back';
 import { SparkBurst } from '../components/SparkBurst';
@@ -540,9 +541,16 @@ struct GameHost {
     try {
       window.getLastWindow(getContext(this)).then((w: window.Window) => {
         w.setWindowKeepScreenOn(true);
+      }).catch(() => {
+        // ★★★ 2026-11-07 交互死角修复：`.then()` 里的失败**不会**被外面那个同步 try/catch 接到
+        //   （Promise 的异常是 rejection，不走同步 throw）⇒ 原来常亮静默失效，
+        //   玩家玩到一半屏幕黑掉，只会觉得「这游戏自己黑屏」。必须挂 .catch 留痕。
+        hilog.warn(0x0000, 'GameHost', 'keepScreenOn(true) rejected');
       });
     } catch (e) {
-      // 拿不到窗口就算了，不影响游戏
+      // 同步失败（连窗口都拿不到）—— 同样留痕，别静默
+      const err = e as BusinessError;
+      hilog.warn(0x0000, 'GameHost', 'getLastWindow failed: %{public}s', err.message);
     }
   }
 
@@ -577,13 +585,24 @@ struct GameHost {
         const sp: number = Date.now() - this.startedAt;
         GameLog.recordResult(this.gameId, false, this.lastScore, sp, GameDiff.now(), -1);
       } catch (e) {
+        // ★ 2026-11-07 交互死角修复（原为空 catch）：这里是「中途退出补记一局」的入口，
+        //   写失败同样要留痕 —— 否则「放弃的那一局」凭空消失，7 天曲线对不上。
+        const err = e as BusinessError;
+        hilog.error(0x0000, 'GameLog', 'recordResult(abandon) failed gid=%{public}s err=%{public}s',
+          this.gameId, err.message);
       }
     }
     try {
       window.getLastWindow(getContext(this)).then((w: window.Window) => {
         w.setWindowKeepScreenOn(false);
+      }).catch(() => {
+        // ★ 2026-11-07 交互死角修复：同上一处 —— 关常亮失败也要留痕，
+        //   否则退出游戏后屏幕可能还被钉着常亮（耗电、烧屏）。
+        hilog.warn(0x0000, 'GameHost', 'keepScreenOn(false) rejected');
       });
     } catch (e) {
+      const err = e as BusinessError;
+      hilog.warn(0x0000, 'GameHost', 'getLastWindow failed: %{public}s', err.message);
     }
   }
 
@@ -655,6 +674,13 @@ struct GameHost {
       GameLog.recordResult(r.gameId, r.solved, r.score, r.durationMs,
         GameDiff.now(), r.levelReached ?? -1);
     } catch (e) {
+      // ★★★ 2026-11-07 交互死角修复（原为空 catch）：
+      //   ✗ 不能弹窗：结算弹窗正开着，再弹一个会打断玩家；
+      //   ✓ 但**必须留痕** —— 写失败 = 这一局不进统计/不进 7 天曲线，事后无法追查。
+      //   查法：`hdc shell hilog | grep GameLog`，能看到是哪一款（gid）哪一次丢的。
+      const err = e as BusinessError;
+      hilog.error(0x0000, 'GameLog', 'recordResult failed gid=%{public}s err=%{public}s',
+        r.gameId, err.message);
     }
     this.finished = true;      // ★ 路线 E：已结算，退出时不再补记
     // ★★★ 2026-10-29（项目 D ④）：**结算的瞬间必须听得出来成败**

@@ -262,6 +262,11 @@ export struct GSimonCommand {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
+      // ★ 2026-11-07（剩余提示缺口 A 类）：每轮只有 LIMIT_MS=2.2s，超时直接判失误 ——
+      //   原来时间**完全不可见**（玩家只看到进度条，不知道还剩多久）。
+      //   复用字典里已有的 `剩 {0}s`（10 语言齐），红字提醒最后 0.6s。
+      Text(TG2('剩 {0}s', (Math.max(0, this.left) / 1000).toFixed(1))).fontSize(FontSize.sm)
+        .fontColor(this.left <= 600 ? Palette.rose : this.theme.inkSoft).width('100%')
       Text(TG2("答对 {0}/{1}", this.correct, this.diffTotal))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       Stack({ alignContent: Alignment.Start }) {
