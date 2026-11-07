@@ -97,6 +97,18 @@ export struct GCompassMaze {
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private diffTotal: number = GameDiff.sizeNow(7);
+  /**
+   * ★★★ 2026-11-07 **真机 bug**（ai-fixer-b 静态扫描 + 400 局/档蒙特卡洛模拟）：
+   *   `DMAX = 20` 写死，而棋盘按难度放大（简单 5 / 普通 7 / **困难 9**）；
+   *   从左上到右下的曼哈顿就 8/12/**16** 步 ⇒ 困难档只剩 4 步容错，
+   *   而指令带来自 `genMaze` 的**随机游走**（中位 64/146/**330** 步）。
+   *   模拟结果：**简单 92% 可解 / 普通 62% / 困难只有 23%** ⇒ 困难档 **77% 的对局开局即死局**。
+   *   ⇒ 步数上限随棋盘放大（每格 3 步，困难档 27）。
+   */
+  private dmax(): number {
+    const need: number = this.diffTotal * 3;
+    return need > 20 ? need : 20;
+  }
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
 
@@ -157,7 +169,7 @@ export struct GCompassMaze {
     const cells: number = n * n;
     const goal: number = this.goalIdx();
     const L: number = this.cmds.length;
-    const budget: number = DMAX - this.steps;
+    const budget: number = this.dmax() - this.steps;
     if (L <= 0 || this.walls.length < cells || budget <= 0) {
       return [0, -1];                  // 盘面还没初始化 / 没有剩余步数
     }
@@ -322,7 +334,7 @@ export struct GCompassMaze {
     if (this.pos === this.goalIdx()) {
       return Hint.none('none');
     }
-    if (this.steps >= DMAX) {
+    if (this.steps >= this.dmax()) {
       return Hint.none('none');
     }
     const info: number[] = this.planInfo();
@@ -376,7 +388,7 @@ export struct GCompassMaze {
  if (this.pos === this.goalIdx()) {
  this.note = TG('指令走完，出关 🎉'); this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
  }
- if (this.steps >= DMAX) {
+ if (this.steps >= this.dmax()) {
  this.note = TG('步数用尽，还在半路 😵'); this.finish(false); return;
  }
  this.note = TG2('下一步指令：{0}', ARROW[this.cmds[this.idx]]);
@@ -393,7 +405,7 @@ export struct GCompassMaze {
  LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
  this.onFinish({
  gameId: 'compass_maze', solved: solved,
- score: solved ? 70 + Math.max(0, (DMAX - this.steps) * 5) : this.steps * 4,
+ score: solved ? 70 + Math.max(0, (this.dmax() - this.steps) * 5) : this.steps * 4,
  durationMs: Date.now() - this.startAt, levelReached: solved ? 2 : 1
  });
  }
@@ -409,7 +421,7 @@ export struct GCompassMaze {
      demoOn: false,
      disabled: this.demoId >= 0,
    })
- Text(TG4('步数 {0}/{1}　指令 {2}/{3}', this.steps, DMAX, this.idx + 1, this.cmds.length)
+ Text(TG4('步数 {0}/{1}　指令 {2}/{3}', this.steps, this.dmax(), this.idx + 1, this.cmds.length)
  + TG2('　出口 {0}排{1}列', this.diffTotal, this.diffTotal)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: 0 }) {
  ForEach(this.rowIdx(), (r: number) => {

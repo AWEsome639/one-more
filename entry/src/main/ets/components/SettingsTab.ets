@@ -910,6 +910,18 @@ build() {
           .fontSize(FontSize.xl)
           .width(Space.xxl)
           .textAlign(TextAlign.Center)
+        // ★★★ 2026-11-07 真机 bug（verifier-dev 三页面扫描 S-01）：**「主题色」这一卡只剩一枚 🎨**，
+        //   本该在它右边的标题块**整块丢了** —— 而且下面还紧跟着「界面模式」整块卡，
+        //   视觉上成了「🎨 孤零零 → 界面模式 → 色块」。中文下必现。
+        //   ⇒ 按同页「界面模式」的行结构补回标题块。
+        Column({ space: 2 }) {
+          Text(this.t('主题色', 'Accent colour'))
+            .fontSize(FontSize.md).fontWeight(FontWeight.Medium).fontColor(this.theme().ink)
+          Text(this.t('按钮和高亮都跟着换成这个颜色', 'Buttons and highlights follow this colour'))
+            .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+            .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        }
+        .alignItems(HorizontalAlign.Start).layoutWeight(1)
       }
       .width('100%')
         // ★ 2026-10-13 奥森：「可以加"长辈模式""简约模式"什么的」⇒ 定名【大字模式 / 紧凑模式】

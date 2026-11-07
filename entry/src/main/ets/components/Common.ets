@@ -571,6 +571,10 @@ export struct LevelHeader {
                 .fontColor(this.theme.inkFaint)
                 .width('100%')
                 .maxLines(1)
+                // ★★★ 2026-11-07 溢出审计：`maxLines(1)` **必须**配 textOverflow，
+                //   否则多出来的部分被硬切、连省略号都没有（奥森报的「文字错位」）。
+                //   德语 `{n} Runden geschafft` 20 字符 ≈143vp，而三标签全亮时这里只剩 ~30vp。
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
             .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
@@ -614,6 +618,9 @@ export struct LevelHeader {
                 .fontColor(this.theme.inkFaint)
                 .width('100%')
                 .maxLines(1)
+                // ★★★ 2026-11-07 溢出审计：同上，maxLines 必须有 textOverflow
+                //   （德语 20 字符 ≈143vp；俄语 ≈161vp）
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
             .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
@@ -655,6 +662,9 @@ export struct LevelHeader {
                 .fontColor(this.theme.inkFaint)
                 .width('100%')
                 .maxLines(1)
+                // ★★★ 2026-11-07 溢出审计：同上，maxLines 必须有 textOverflow
+                //   （德语 20 字符 ≈143vp；俄语 ≈161vp）
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
             .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
@@ -1045,8 +1055,9 @@ export struct GameCard {
     // ★★★ 2026-11-07 奥森报「首页图标文字错位」——真机截图：「交换消宝石」被挤成竖排
     //   「交换」、「跳过吃子」→「跳过」。根因：三个角标全亮时 p 最大 = 48+18+42 = **108vp**，
     //   卡片副标题区只剩 ~30vp ⇒ 逐字换行成竖排。
-    //   ⇒ 上限 72vp（够放「🏆 + 4 位分数 + 🔥 3 天」的胶囊），超出部分让角标自己压缩。
-    return p > 72 ? 72 : p;
+    //   ⇒ 上限 **84vp**（verifier-eng2 按 FontSize.micro=10 逐项估：🏆11 + 分数24.5 + 🔥11 + 天数18
+    //     + 间距9 + 内边距14 ≈ **87.5**，加右边距 6 ⇒ 至少要 84；72 会差 12–16vp）。
+    return p > 84 ? 84 : p;
   }
 
   /** 有没有任何底部角标要画 */
@@ -1061,7 +1072,7 @@ build() {
     //   同一个码位在两端量出来的行盒不一样 ⇒ 图标会顶到 52vp 盒子的边缘、
     //   视觉上就"贴着标题"。现在换成**固定尺寸的位图**，盒子与图像都由我们定死。
     Stack({ alignContent: Alignment.BottomEnd }) {
-    Row({ space: 8 }) {
+    Row({ space: 6 }) {
       // ── 左：图标（固定 48vp；今日已玩时右上角一枚 ✓）──
       // ★ 2026-10-29（六设备·运动手表 195vp 实测）：48vp 图标 + 标题在 139vp 宽的
       //   卡片里放不下 ⇒ 标题被截成「宝...」⇒ **极小屏（高 < 210vp）直接不画图标**，
@@ -1070,8 +1081,11 @@ build() {
       if (!Bp.tinyWatch()) {
         Stack({ alignContent: Alignment.TopEnd }) {
           if (this.iconRes() !== undefined) {
+            // ★★★ 2026-11-07 奥森：「这些图标为什么间距这么大！图标可以都放到很大呀，
+            //   直接有一些缝隙不就行了？」⇒ 图标 **40 → 56**（卡高 84 − 内 padding 10×2 = 64 可用），
+            //   与文字间距 8 → 6。视觉上图标成了卡片的主角，缝隙只剩「挨着」。
             Image(this.iconRes())
-              .width(40).height(40)
+              .width(56).height(56)
               .objectFit(ImageFit.Contain)
               .draggable(false)
               // ★★★ 2026-11-03（第 1023 轮）**图标与卡片"同色系"时边界像一条多余的线**
@@ -1085,7 +1099,7 @@ build() {
               .shadow({ radius: 4, color: '#26000000', offsetX: 0, offsetY: 1 })
           } else {
             // 兜底：资源表里没有这一款（理论上不会发生）⇒ 仍然画 emoji，别开天窗
-            Text(this.meta.icon).fontSize(FontSize.xl).width(40).height(40)
+            Text(this.meta.icon).fontSize(FontSize.xxl).width(56).height(56)
               .textAlign(TextAlign.Center)
           }
           if (this.playedToday) {
@@ -1099,7 +1113,7 @@ build() {
               .textAlign(TextAlign.Center)
           }
         }
-        .width(40).height(40)
+        .width(56).height(56)
       }
 
       // ── 右：名称 + 副标题（与图标之间固定 Space.sm 间距，永不重叠）──
@@ -1153,8 +1167,11 @@ build() {
           //      ⇒ 233 上 `tinyWatch()=false` ⇒ 返回 Visible ⇒ **副标题没隐藏**
           //      ⇒ 徽章「1 d」被压成 **3vp**（dump 实测）
           //   ⇒ 合并成一个条件：**任一情况成立就隐藏**。
+          // ★★★ 2026-11-07 verifier-eng2 回归抓到：原条件 `hasBadge() && width<420`
+          //   把「玩过就有最高分」也算进去 ⇒ **360–419vp 手机上几乎所有玩过的卡都没副标题**。
+          //   ⇒ 只在「角标真的挤占超过 48vp」时才藏（判据 268 的本意）。
           .visibility(
-            (Bp.tinyWatch() || (this.hasBadge() && Bp.width < 420))
+            (Bp.tinyWatch() || (this.badgePadRight() > 48 && Bp.width < 420))
               ? Visibility.None : Visibility.Visible)
           // ★★★ 2026-11-03（第 932 轮）**英文 tagline 被截成「Bounce the ball, ...」**
           //   中文「一板一球，清空全场」9 字；英文 enTagline 是
@@ -1166,7 +1183,10 @@ build() {
           //   ⇒ 副标题区被角标压到 ~30vp 时，**每个字占一行 ⇒ 竖排**（截图：「交换」「跳过」）。
           //   判据 932 的原话就是「允许 **2** 行」——3 行是我后来为英文长 tagline 加的，
           //   但代价是中文在窄区变竖排。**改回 2 行** + 省略号。
-          .maxLines(2)
+          // ★★★ 2026-11-07 verifier-eng2 量化：355 款 enTagline 中位 28 字符、>24 字符 **226 款**
+          //   ⇒ 2 行时（三标签全亮只剩 ~58vp）226 款吃省略号；3 行时约 36 字符、只有 ~100 款。
+          //   ⇒ **长 tagline 给 3 行，短的给 2 行**（中文 9 字仍 2 行，竖排不复发）。
+          .maxLines(this.taglineText().length > 24 ? 3 : 2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
           // ★ 真机实测（2026-10-13 模拟器 1320px）：长副标题（「一板一球，清空全场」）
