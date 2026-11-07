@@ -136,7 +136,12 @@ export class ChatFinder {
     if (it.pausable && g.tags.indexOf('pausable') >= 0) { sc += 12; }
     if (it.untimed && g.tags.indexOf('untimed') >= 0) { sc += 12; }
     if (it.multiplayer && (g.tags.indexOf('multiplayer') >= 0 || g.tags.indexOf('board') >= 0)) { sc += 10; }
-    if (it.board && (g.tags.indexOf('board') >= 0 || g.tags.indexOf('card') >= 0)) { sc += 30; }
+    // ★ 2026-11-07 模拟验证：355 款的 tags 里**根本没有 board/card** ⇒ 改用「名称含棋/牌」判断
+    //   （`9 路围棋`/`跳棋`/`五子棋`/`四子棋`/`黑白棋` 全命中，而 `宝石迷阵` 不会）
+    if (it.board) {
+      const nm: string = g.name;
+      if (nm.indexOf('棋') >= 0 || nm.indexOf('牌') >= 0 || nm.indexOf('麻将') >= 0) { sc += 30; }
+    }
     // 毫无倾向时给「轻松」一点偏好（新手友好）
     if (ChatFinder.isEmpty(it) && g.difficulty === Difficulty.EASY) { sc += 3; }
     return sc;
