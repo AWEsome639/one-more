@@ -739,7 +739,18 @@ def stop_demo():
       ⇒ 点屏幕中心 + 顶部各一次，再给 1.5s 让 demoId 归零
     """
     _BUDGET.check()
-    time.sleep(3.5)
+    # ★ 判据 1778/1780（2026-11-07 20:00）：**固定 sleep 不可靠** ——
+    #   演示最长 3+6.5≈9.5 秒，但打砖块的演示**会反复播**（实测 12 秒后 dump 仍只有 12 个节点、
+    #   AI 按钮完全不渲染 = 判据 1689 的演示期）。手动等到 13 秒就正常。
+    #   ⇒ 改成**轮询等「AI 代打」出现**（最多 25 秒），出现即返回，不出现再走点击流程。
+    deadline = time.time() + 25
+    while time.time() < deadline:
+        d0 = dump()
+        ns0 = nodes(d0) if d0 else []
+        if find(ns0, 'AI 代打'):
+            return
+        time.sleep(2.0)
+    return
     # ★ 判据 1697：坐标必须按**实际屏幕尺寸**算 —— 2560×1600 上写死的
     #   (1280,800)/(1280,220) 在 440×744(1320×2232) 上会点到屏幕边缘/误触
     # ★ 判据 1697：不依赖屏幕尺寸 —— 在几个「安全空白点」各点一次（屏幕外点击会被忽略）
@@ -1030,7 +1041,9 @@ def verify(name):
         if ai2 and attempt < 3:
             tries = attempt
             print('   ⚠️ AI 代打点了没启动（第 %d 次），重新取 bounds 再点…' % attempt, flush=True)
-            tap(ai2, 0.5)
+            # ★ 判据 1779（2026-11-07 20:05）：**0.5 秒太短** —— 打砖块/穿云/西蒙说
+            #   手动点（等 2 秒）都正常启动，验证器 0.5 秒就判「没启动」⇒ 误报。
+            tap(ai2, 2.0)
     verdict, detail = watch(120)
     if (not started) and idle_end and verdict == 'TIMEOUT':
         return 'FAIL', ('代打按钮点了 %d 次都没启动（页面始终写着「AI 代打」，'
