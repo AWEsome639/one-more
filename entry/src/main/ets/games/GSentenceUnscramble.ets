@@ -61,6 +61,14 @@ export struct GSentenceUnscramble {
   @State qi: number = 0; @State right: number = 0; @State lives: number = LIVES;
   @State score: number = 0; @State msg: string = ''; @State over: boolean = false;
   @State won: boolean = false;
+  /**
+   * ★★★ 2026-11-07（判据 1782 家族 · 渲染路径）：**用状态字段记「上一步错了」**，
+   *   不要用 `this.msg.indexOf('❌') === 0` 去嗅译文。
+   *   原来那样写是赌「❌ 一定在译文开头」：zh 原词带、英文入参带，但 10 语言字典里
+   *   任何一处去掉 emoji（或改成别的叉号），该语言下**答错后不会锁输入**（可连点）——
+   *   行为差异且没有任何测试会报。
+   */
+  @State private lastWrong: boolean = false;
   private startAt: number = 0; private feed: number = -1; private done: boolean = false;
 
   aboutToAppear(): void {
@@ -84,6 +92,7 @@ export struct GSentenceUnscramble {
   }
 
   private next(): void {
+    this.lastWrong = false;                     // 新一句 ⇒ 解锁输入（不再靠 msg 首字符）
     const sent: string = this.plan[this.qi];
     const words: string[] = sent.split(' ');
     let mixed: string[] = shufStr(words);
@@ -231,13 +240,15 @@ export struct GSentenceUnscramble {
   }
 
   private pick(i: number): void {
-    if (this.over || this.usedAt(i) || this.msg.indexOf('❌') === 0) { return; }
+    if (this.over || this.usedAt(i) || this.lastWrong) { return; }
     const sel: number[] = this.pickedIdx.slice();
     sel.push(i); this.pickedIdx = sel;
     if (sel.length < this.tiles.length) { return; }
     if (this.placed() === this.plan[this.qi]) {
+      this.lastWrong = false;
       this.right = this.right + 1; this.score = this.score + 120; this.msg = TG('✅ 语序正确！');
     } else {
+      this.lastWrong = true;
       this.lives = this.lives - 1; this.msg = TG2('❌ 正确语序：{0}', this.plan[this.qi]);
     }
     if (this.qi + 1 >= this.diffTotal) {

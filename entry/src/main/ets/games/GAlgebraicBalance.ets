@@ -90,6 +90,13 @@ export struct GAlgebraicBalance {
   @State private score: number = 0;
   @State private over: boolean = false;
   @State private tip: string = TG('点一个候选值');
+  /**
+   * ★★★ 2026-11-07（判据 1782 家族 · 渲染路径）：对错状态用**状态字段**，不用译文首字符。
+   *   原来颜色判断是 `this.tip.startsWith('✓')` —— 赌「✓ 一定在译文里」：
+   *   zh 原词带 ✓、英文入参带 ✓，但 10 语言字典任一处删了 emoji（或加空格）就静默失效。
+   *   ⇒ 显式记住「最后一次答得对不对」，颜色只读它，与语言彻底解耦。
+   */
+  @State private lastRight: boolean = false;
   @State private lockTap: boolean = false;
 
   private startAt: number = 0;
@@ -120,6 +127,7 @@ export struct GAlgebraicBalance {
     this.score = 0;
     this.over = false;
     this.lockTap = false;
+    this.lastRight = false;
     this.tip = TG('点一个候选值');
     this.eq = makeEq();
   }
@@ -240,6 +248,7 @@ export struct GAlgebraicBalance {
   private answer(v: number): void {
     if (this.over || this.lockTap) { return; }
     const good: boolean = v === this.eq.answer;
+    this.lastRight = good;                      // ★ 颜色只读它（不再看 tip 首字符）
     if (good) {
       this.right++;
       this.score += 10;
@@ -262,6 +271,7 @@ export struct GAlgebraicBalance {
       }
       this.eq = makeEq();
       this.lockTap = false;
+      this.lastRight = false;
       this.tip = TG('点一个候选值');
     }, 650);
   }
@@ -348,7 +358,7 @@ export struct GAlgebraicBalance {
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card).animation({ duration: Motion.base, curve: Motion.snap() })
 
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.tip.startsWith('✓') ? Palette.emerald : this.theme.inkSoft)
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.lastRight ? Palette.emerald : this.theme.inkSoft)
 
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {

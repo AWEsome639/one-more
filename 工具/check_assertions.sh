@@ -9,6 +9,7 @@
 
 TOT=0
 FAIL=0
+WARN=0   # 只提示、不影响退出码与基线（当前用于读屏缺口趋势）
 for f in ~/.dsh/storages/games-input-20261013/verify_*.mjs \
          ~/.dsh/storages/race-lead-20261013/verify_*.mjs; do
   [ -f "${f}" ] || continue
@@ -73,8 +74,69 @@ fi
 FAIL=$((FAIL + FOCUS_N))
 printf "     %-42s %6s / %d\n" "check_focusable.py（焦点）" "-" "${FOCUS_N}"
 
+# ══════════════════════════════════════════════════════════════════════════
+#  tools/check_hud_consistency.py —— 同一个 HUD 容器内，标签 maxLines 必须一致
+#
+#  来历（2026-11-08）：三块统计 HUD（Row { Column{ 标签 + 数值 } × N }）是**逐文件
+#        复制粘贴**的（games/ 里 295 份副本，没有任何共享 @Builder）。其中 24 款手写时
+#        把某一块标签改成 maxLines(2)、邻块留 1 行或干脆不写 ⇒ 长语言标签一换行，
+#        那一块的数值就比邻块**低一整行（xxs 行盒 14vp）**⇒ 三块数值不在一条水平线上
+#        （中文 2~4 字看不出来，德语/俄语很容易）。
+#  ★ 纯闸门：只 FAIL += 新增数，不动 TOT（理由同上：不产生通过计数）。
+#  ★ rc=2（解析/自检失败）也算失败 —— 检查器坏了不能显示成绿
+#    （check_dup_symbol 曾因写死阈值长期"死绿"，教训）。
+#  ★ 基线 102：入库时**存量**就有 102 处（历史遗留，不是这条尺子抓出来的新问题）。
+#    闸门只罚「比基线多出来的」；存量数每次都打印，持续可见、可分批还债。
+#    想一次清完：`python3 tools/check_hud_consistency.py` 列出全部，按 7 款一批修。
+HUD_OUT=$(python3 "$(dirname "$0")/../tools/check_hud_consistency.py" 2>&1)
+HUD_RC=$?
+HUD_N=$(printf '%s' "${HUD_OUT}" | grep -oE "HUD不一致：[0-9]+ 处" | grep -oE "[0-9]+" | tail -1)
+HUD_BASE=102
+if [ "${HUD_RC}" -eq 2 ] || [ -z "${HUD_N}" ]; then
+  HUD_NEW=1
+  echo "     ⚠️ check_hud_consistency.py 无法给出结论（rc=${HUD_RC}）⇒ 按 1 处失败计，别当绿"
+else
+  HUD_NEW=$((HUD_N - HUD_BASE))
+  [ "${HUD_NEW}" -lt 0 ] && HUD_NEW=0
+fi
+FAIL=$((FAIL + HUD_NEW))
+printf "     %-42s %6s / %d\n" "check_hud_consistency.py（HUD 一致）" "${HUD_N:-?}/${HUD_BASE}" "${HUD_NEW}"
+
+# ── 判据 1782 家族（2026-11-08 新增）：译文内容被当状态用 ──
+#   来历：`this.tip.startsWith('✓')` 决定颜色、`this.msg.indexOf('❌') === 0` 决定锁输入 ——
+#     只要某个语言的译文删掉 emoji，判断就静默失效（比颜色更隐蔽的是行为差异）。
+#   试点：改前精准 4 处、改后 0 处、367 个 .ets 零误报。
+#   ★ 同样**纯闸门**：只 FAIL += N、不动 TOT（基线 200359 不用改）；rc=2 也算失败。
+JUDGE_OUT=$(python3 "$(dirname "$0")/../tools/check_state_from_text.py" 2>&1)
+JUDGE_RC=$?
+JUDGE_N=$(printf '%s' "${JUDGE_OUT}" | grep -oE "内容当状态：[0-9]+ 处" | grep -oE "[0-9]+" | tail -1)
+if [ "${JUDGE_RC}" -eq 2 ] || [ -z "${JUDGE_N}" ]; then
+  JUDGE_N=1
+  echo "     ⚠️ check_state_from_text.py 无法给出结论（rc=${JUDGE_RC}）⇒ 按 1 处失败计，别当绿"
+fi
+FAIL=$((FAIL + JUDGE_N))
+printf "     %-42s %6s / %d\n" "check_state_from_text.py（内容当状态）" "-" "${JUDGE_N}"
+
 echo "     ────────────────────────────────────────────────"
 printf "     %-42s %6d / %d\n" "合计" "${TOT}" "${FAIL}"
+
+# ══════════════════════════════════════════════════════════════════════════
+#  读屏缺口（accessibilityText）—— **只算 warning，不进 FAIL**
+#
+#  为什么不当闸门：读屏不是「必须 0」，而是「应该越来越少」。
+#    纯图标按钮没有 a11y ⇒ 盲人听到「按钮」却不知道功能（该修）；
+#    带文字标签的按钮子 Text 往往能被念出来（语义/顺序不一定对）。
+#  ⇒ 每次跑都打印这两档数字，趋势往下是好事、往上要解释。
+A11Y_OUT=$(python3 "$(dirname "$0")/../tools/check_focusable.py" --a11y 2>&1)
+A11Y_RED=$(printf '%s' "${A11Y_OUT}" | grep -oE "🔴 [0-9]+" | grep -oE "[0-9]+" | head -1)
+A11Y_YEL=$(printf '%s' "${A11Y_OUT}" | grep -oE "🟡 [0-9]+" | grep -oE "[0-9]+" | head -1)
+# ★ 数字与显示分开：显示可以是 "?"，但算术必须拿到数字 ——
+#   否则检查器一坏，`$(( ))` 会直接让脚本报错退出（比"静默变绿"更糟的是"整条断言挂掉"）。
+A11Y_RED_S="${A11Y_RED}"; A11Y_YEL_S="${A11Y_YEL}"
+case "${A11Y_RED}" in ''|*[!0-9]*) A11Y_RED=1; A11Y_RED_S="?" ;; esac
+case "${A11Y_YEL}" in ''|*[!0-9]*) A11Y_YEL=1; A11Y_YEL_S="?" ;; esac
+WARN=$((WARN + A11Y_RED + A11Y_YEL))
+printf "     %-42s %6s / %s\n" "读屏缺口（🔴纯图标 / 🟡有文字）" "${A11Y_RED_S}" "${A11Y_YEL_S}"
 
 # ★ 2026-10-31 基线变更：200342 → 200359（+17）
 #   原因：新增 `check_layout_guard.py`（17 处宽驱动 aspectRatio 的静态守卫）。
@@ -82,7 +144,7 @@ printf "     %-42s %6d / %d\n" "合计" "${TOT}" "${FAIL}"
 #      基线数字变化必须能指出"多了哪一把尺子"。
 BASE=200359
 if [ "${TOT}" -eq "${BASE}" ] && [ "${FAIL}" -eq 0 ]; then
-  echo "     ✅ 与基线一致（${BASE} / 0）"
+  echo "     ✅ 与基线一致（${BASE} / 0）　｜ 读屏缺口合计 ${WARN} 处（warning，不影响基线）"
   exit 0
 fi
 echo "     🔴 与基线不一致：期望 ${BASE} / 0，实际 ${TOT} / ${FAIL}"

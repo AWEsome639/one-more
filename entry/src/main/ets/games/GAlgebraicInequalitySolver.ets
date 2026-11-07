@@ -93,6 +93,13 @@ export struct GAlgebraicInequalitySolver {
   @State private scorePulse: number = 1;
   @State private over: boolean = false;
   @State private tip: string = TG('点出正确的解集');
+  /**
+   * ★★★ 2026-11-07（判据 1782 家族 · 渲染路径）：对错状态用**状态字段**，不用译文首字符。
+   *   原来颜色判断是 `this.tip.startsWith('✓')` —— 赌「✓ 一定在译文里」：
+   *   zh 原词带 ✓、英文入参带 ✓，但 10 语言字典任一处删了 emoji（或加空格）就静默失效。
+   *   ⇒ 显式记住「最后一次答得对不对」，颜色只读它，与语言彻底解耦。
+   */
+  @State private lastRight: boolean = false;
   @State private lockTap: boolean = false;
 
   private startAt: number = 0;
@@ -123,6 +130,7 @@ export struct GAlgebraicInequalitySolver {
     this.score = 0;
     this.over = false;
     this.lockTap = false;
+    this.lastRight = false;
     this.tip = TG('点出正确的解集');
     this.quiz = makeIneq();
   }
@@ -263,7 +271,9 @@ export struct GAlgebraicInequalitySolver {
 
   private answer(s: string): void {
     if (this.over || this.lockTap) { return; }
-    if (s === this.quiz.answer) {
+    const good: boolean = s === this.quiz.answer;
+    this.lastRight = good;                      // ★ 颜色只读它（不再看 tip 首字符）
+    if (good) {
       this.right++;
       this.score += 10; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
       this.tip = TG2('✓ 解集就是 {0}', this.quiz.answer);
@@ -282,6 +292,7 @@ export struct GAlgebraicInequalitySolver {
       }
       this.quiz = makeIneq();
       this.lockTap = false;
+      this.lastRight = false;
       this.tip = TG('点出正确的解集');
     }, 650);
   }
@@ -333,7 +344,7 @@ export struct GAlgebraicInequalitySolver {
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       .animation({ duration: Motion.base, curve: Motion.snap() })
 
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.tip.startsWith('✓') ? Palette.emerald : this.theme.inkSoft)
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.lastRight ? Palette.emerald : this.theme.inkSoft)
 
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {

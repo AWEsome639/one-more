@@ -22,6 +22,7 @@
 
 用法：
   python3 tools/check_focusable.py            # 全仓扫，有命中退出码 1
+  python3 tools/check_focusable.py --a11y     # 读屏缺口（三档，仅供参考，恒返回 0）
   python3 tools/check_focusable.py --verbose  # 同时打印白名单放行明细
   python3 tools/check_focusable.py --self-test  # 先验尺子（反证用例）
 退出码：0 = 无命中 ｜ 1 = 有命中 ｜ 2 = 解析失败/自检失败
@@ -280,6 +281,8 @@ def self_test():
 
 
 def main():
+    if '--a11y' in sys.argv:
+        return a11y_main()
     verbose = '--verbose' in sys.argv
     if '--self-test' in sys.argv:
         print('  ═══ 自检（反证尺子）═══')
@@ -327,6 +330,112 @@ def main():
     # ★ 机读收尾行（供 工具/check_assertions.sh 当闸门用，照 check_dup_symbol 的写法）
     print('  焦点缺口：%d 处' % len(all_hits))
     return 1 if all_hits else 0
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  --a11y 模式：读屏（accessibilityText）缺口 —— 分三档
+#
+#  ★ 为什么不进 FAIL：读屏不是「必须 0」，而是「应该越来越少」。
+#    纯图标按钮没有 a11y = 盲人用户听到「按钮」却不知道是什么（🔴 必须修）；
+#    带文字标签的按钮，子 Text 往往能被读屏念出来（🟡 顺序/语义不一定对）。
+# ════════════════════════════════════════════════════════════════════════════
+TEXT_CHARS = re.compile(r'[A-Za-z\u4e00-\u9fff]')
+
+
+def _strings_in(text):
+    """取出一段源码里的所有字符串字面量（含被结构视图抹掉的原始内容）"""
+    return re.findall(r"'((?:[^'\\]|\\.)*)'", text) +            re.findall(r'"((?:[^"\\]|\\.)*)"', text)
+
+
+def _icon_only(raw_component_text):
+    """组件（含子节点）里有没有"文字"：没有字母/汉字 ⇒ 视为纯图标"""
+    for lit in _strings_in(raw_component_text):
+        if TEXT_CHARS.search(lit):
+            return False
+    return True
+
+
+def a11y_scan_file(path):
+    rel = os.path.relpath(path, ROOT)
+    src = read(path)
+    S = struct_view(src)
+    red, yellow, green, skipped = [], [], [], []
+    for m in re.finditer(r'\.onClick\s*\(', S):
+        ln = S.count('\n', 0, m.start()) + 1
+        name, st, en = owner_of(S, m.start())
+        # ★ 与 ③ 焦点检查不同：**这里连 Button/Toggle 也要查**
+        #   （`Button('返回')` 没 a11y 属 🟡：子 Text 能代读，但语义/顺序不一定对）。
+        #   只跳过"认不出宿主"的（解析失败）。
+        if name is None:
+            continue
+        op = S.find('(', m.start())
+        d = 0
+        k = op
+        while k < len(S):
+            if S[k] == '(':
+                d += 1
+            elif S[k] == ')':
+                d -= 1
+                if d == 0:
+                    break
+            k += 1
+        body = S[op + 1:k]
+        chain = S[en:m.start()] if en is not None else ''
+        chain_raw = src[en:m.start()] if en is not None else ''
+        why = is_global_mask(S, st, en, chain_raw, body, name, rel)
+        if why:
+            skipped.append({'file': rel, 'line': ln, 'comp': name, 'why': why})
+            continue
+        # 组件本体（从宿主起点到 onClick）用于判断"有没有文字"
+        comp_raw = src[st:m.start()] if st is not None else ''
+        item = {'file': rel, 'line': ln, 'comp': name}
+        if 'accessibilityText' in chain:
+            green.append(item)
+        elif _icon_only(comp_raw):
+            item['snippet'] = ' '.join(comp_raw.split())[:60]
+            red.append(item)
+        else:
+            item['snippet'] = ' '.join(comp_raw.split())[:60]
+            yellow.append(item)
+    return red, yellow, green, skipped
+
+
+def a11y_main():
+    files = []
+    for d in SCAN_DIRS:
+        p = os.path.join(ETS, d)
+        if not os.path.isdir(p):
+            print('  🔴 目录不存在：%s' % p)
+            return 2
+        files += sorted(glob_ets(p))
+    if not files:
+        print('  🔴 没找到 .ets 文件')
+        return 2
+    RED, YEL, GRN, SKP = [], [], [], []
+    for p in files:
+        r, y, g, s = a11y_scan_file(p)
+        RED += r
+        YEL += y
+        GRN += g
+        SKP += s
+    print('  ═══ 读屏缺口（accessibilityText）═══')
+    print('  扫描 .ets：%d 个（components + pages），可点组件 %d 个'
+          % (len(files), len(RED) + len(YEL) + len(GRN)))
+    print('\n  🔴 纯图标 + 无 a11y：%d 处（读屏只会念「按钮」，不知道是什么）' % len(RED))
+    for h in RED[:200]:
+        print('     %s:%d  <%s>  %s' % (h['file'], h['line'], h['comp'], h.get('snippet', '')))
+    if len(RED) > 200:
+        print('     …还有 %d 处' % (len(RED) - 200))
+    print('\n  🟡 有文字但无 a11y：%d 处（子 Text 可能能代读，顺序/语义不一定对）' % len(YEL))
+    for h in YEL[:200]:
+        print('     %s:%d  <%s>' % (h['file'], h['line'], h['comp']))
+    if len(YEL) > 200:
+        print('     …还有 %d 处' % (len(YEL) - 200))
+    print('\n  ✅ 已声明 a11y：%d 处' % len(GRN))
+    if SKP:
+        print('     白名单跳过 %d 处（遮罩/整屏可点）' % len(SKP))
+    print('\n  读屏缺口：🔴 %d / 🟡 %d / ✅ %d' % (len(RED), len(YEL), len(GRN)))
+    return 0
 
 
 def glob_ets(d):

@@ -54,6 +54,13 @@ export struct GDivisibilityDash {
   @State private left: number = 0;
   @State private over: boolean = false;
   @State private tip: string = TG('整除吗？');
+  /**
+   * ★★★ 2026-11-07（判据 1782 家族 · 渲染路径）：对错状态用**状态字段**，不用译文首字符。
+   *   原来颜色判断是 `this.tip.startsWith('✓')` —— 赌「✓ 一定在译文里」：
+   *   zh 原词带 ✓、英文入参带 ✓，但 10 语言字典任一处删了 emoji（或加空格）就静默失效。
+   *   ⇒ 显式记住「最后一次答得对不对」，颜色只读它，与语言彻底解耦。
+   */
+  @State private lastRight: boolean = false;
 
   private startAt: number = 0;
   private tick: number = -1;
@@ -94,6 +101,7 @@ export struct GDivisibilityDash {
     this.score = 0;
     this.streak = 0;
     this.over = false;
+    this.lastRight = false;
     this.tip = TG('整除吗？');
     this.roll();
   }
@@ -271,7 +279,9 @@ export struct GDivisibilityDash {
 
   private answer(said: boolean): void {
     if (this.over) { return; }
-    if (said === this.yes) {
+    const good: boolean = said === this.yes;
+    this.lastRight = good;                      // ★ 颜色只读它（不再看 tip 首字符）
+    if (good) {
       this.right++;
       this.streak++;
       this.score += 10 + (this.streak >= 5 ? 5 : 0); this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
@@ -359,7 +369,7 @@ export struct GDivisibilityDash {
           .onClick(() => { Haptics.tap(); this.answer(false); })
       }.width('100%')
 
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.tip.startsWith('✓') ? Palette.emerald : this.theme.inkSoft)
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.lastRight ? Palette.emerald : this.theme.inkSoft)
         .constraintSize({ minHeight: 20 }).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.sm }) {
