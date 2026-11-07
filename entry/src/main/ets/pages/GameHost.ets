@@ -504,6 +504,16 @@ struct GameHost {
     // ★ 路线 E：记下进游戏页的时刻（中途退出时用它算时长）
     this.startedAt = Date.now();
     this.finished = false;
+    // ★★★ 2026-11-07 真机 bug（判据 1762 的根因）：**结算弹窗会跨游戏残留**。
+    //   `router.pushUrl` 到同一个 GameHost 页时组件被**复用**（@State 不重建），
+    //   而 `aboutToAppear` 原来没重置 `showResult`/`lastSolved`/`lastScore`/`lastMs`
+    //   ⇒ 上一局赢过的话，新游戏一进来就顶着「🎉 这一局拿下！」+ 上一局的分数
+    //   （伦敦塔实测：步数 0 · 对位 1/3 却显示「这一局拿下！」）。
+    //   修法：进页就清干净这四项 —— 结算弹窗必须由**本局**的 finish 才能打开。
+    this.showResult = false;
+    this.lastSolved = false;
+    this.lastScore = 0;
+    this.lastMs = 0;
     const p: Record<string, Object> = router.getParams() as Record<string, Object>;
     if (p && p.id !== undefined) {
       this.gameId = p.id as string;
