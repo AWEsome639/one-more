@@ -858,6 +858,10 @@ build() {
     //   修法：主内容 Column 用 **Top** 对齐；底部弹层（右键菜单/长按提示）
     //     各自有 `.position()` / 显式定位，不依赖 Stack 的 Bottom。
     Stack({ alignContent: Alignment.Top }) {
+    // ★ 判据 1766：`chatPanel()` 从嵌套 else 分支**提到 Stack 直接子级**（试修）
+    if (this.chatOpen) {
+      this.chatPanel()
+    }
     Column() {
       // ★★★ 2026-10-14 奥森：「我看到了你的自动收起，图标还是会闪现，并且收起动画有点不太好」
       //   ⇒ 根因：上一版用 if/else 切换 ⇒ 展开态组件被【销毁再重建】
@@ -879,9 +883,6 @@ build() {
         // ★ 搜索栏：紧跟在顶栏之后（"想找东西"的第一反应位置）
         if (this.searchOpen) {
           this.searchBar()
-        }
-        if (this.chatOpen) {
-          this.chatPanel()
         }
         // ★ 极小屏（含手机「显示大小」调到最小）只留标题 + 列表
         // ★★★ 2026-11-01（第 824 轮）**真机 853×533 抓到**：
@@ -2261,7 +2262,7 @@ build() {
   chatPanel() {
     Column({ space: Space.sm }) {
       Row({ space: Space.sm }) {
-        TextInput({ text: this.chatText, placeholder: this.t('想玩点什么样的？', 'What are you in the mood for?') })
+        TextInput({ text: $$this.chatText, placeholder: this.t('想玩点什么样的？', 'What are you in the mood for?') })
           .layoutWeight(1)
           .fontSize(FontSize.sm)
           .backgroundColor(this.theme().surface)
