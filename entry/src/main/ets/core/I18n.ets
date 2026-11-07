@@ -1134,6 +1134,12 @@ export function gameName(id: string, zh: string, en: string): string {
 }
 
 const EXTRA: Record<string, Record<string, string>> = {
+  "秒": { "ja": "秒", "ko": "초", "es": "s", "fr": "s", "de": "s", "pt": "s", "ru": "с", "it": "s", "ar": "ثانية", "zh-Hant": "秒" },
+  "还没有记录 —— 玩一局就有了": { "ja": "記録なし —— 1回遊ぶと出ます", "ko": "기록 없음 —— 한 판 하면 생겨요", "es": "Sin registros —— juega una ronda", "fr": "Aucun enregistrement —— jouez une manche", "de": "Noch keine Eintraege —— spiel eine Runde", "pt": "Sem registros —— jogue uma rodada", "ru": "Пока нет записей —— сыграйте раунд", "it": "Nessuna partita —— giocane una", "ar": "لا سجلات بعد —— العب جولة", "zh-Hant": "還沒有記錄 —— 玩一局就有了" },
+  "最常玩": { "ja": "よく遊ぶ", "ko": "자주 하는", "es": "Más jugado", "fr": "Le plus joué", "de": "Am meisten gespielt", "pt": "Mais jogado", "ru": "Чаще всего", "it": "Più giocato", "ar": "الأكثر لعبا", "zh-Hant": "最常玩" },
+  "通关率": { "ja": "クリア率", "ko": "클리어율", "es": "Tasa de superación", "fr": "Taux de réussite", "de": "Klarquote", "pt": "Taxa de conclusao", "ru": "Доля пройденных", "it": "Tasso di completamento", "ar": "نسبة الإنجاز", "zh-Hant": "通關率" },
+  "今日": { "ja": "今日", "ko": "오늘", "es": "Hoy", "fr": "Aujourd hui", "de": "Heute", "pt": "Hoje", "ru": "Сегодня", "it": "Oggi", "ar": "اليوم", "zh-Hant": "今日" },
+  "近 7 天": { "ja": "直近7日", "ko": "최근 7일", "es": "Últimos 7 días", "fr": "7 derniers jours", "de": "Letzte 7 Tage", "pt": "Ultimos 7 dias", "ru": "Последние 7 дней", "it": "Ultimi 7 giorni", "ar": "آخر 7 أيام", "zh-Hant": "近 7 天" },
   "下一款": { "ja": "次のゲーム", "ko": "다음 게임", "es": "Siguiente juego", "fr": "Jeu suivant", "de": "Naechstes Spiel", "pt": "Proximo jogo", "ru": "Следующая игра", "it": "Gioco successivo", "ar": "اللعبة التالية", "zh-Hant": "下一款" },
 
   /** ★★ 2026-10-16 实拍日语发现：界面模式三档的名字/说明没本地化 */

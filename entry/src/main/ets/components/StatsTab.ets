@@ -23,6 +23,7 @@ import { RollingNumber } from '../core/MotionKit';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Layout, Accent, Cell } from '../core/Design';
 import { GAMES, GameMeta, GameCategory, CatCount, categoryList, findGame, colorOf, displayName, displayTagline, gamesByCategory } from '../core/GameRegistry';
 import { ProgressStore } from '../core/ProgressStore';
+import { GameLog, PlayRecord } from '../core/GameLog';   // ★ 2026-11-07：近期板块的数据源（每局日志）
 import { LevelHeader, iconOf } from './Common';
 import { Haptics } from '../core/Haptics';
 import { L, TN } from '../core/I18n';
@@ -40,6 +41,10 @@ const PCT: number = 100;
 /** 毫秒 → 分钟；分钟 → 小时 */
 const MS_PER_MIN: number = 60000;
 const MIN_PER_HOUR: number = 60;
+/** ★ 2026-11-07：一天的毫秒数（近期板块按「自然日」切窗口） */
+const MS_PER_DAY: number = 86400000;
+/** ★ 2026-11-07：取多少条日志算「近期」—— GameLog 内存里最多留 800 条（core/GameLog.ets KEEP_IN_MEM） */
+const LOG_WINDOW: number = 800;
 /** 12% 透明度（ARGB 前缀），配 tint() 用 */
 const TINT_ALPHA: string = '#1A';
 /** 徽章上的次级文字（Palette 无此 token，集中放这里） */
@@ -61,6 +66,21 @@ interface RankItem {
   plays: number;
   best: number;
   streak: number;
+}
+
+/**
+ * ★ 2026-11-07（体验升级点 Top 4）：「近期」板块要用的一次聚合结果
+ *   一次遍历 `GameLog.recent()` 同时算出三件事：
+ *     · total / solved ⇒ 近 7 天通关率
+ *     · todayMs        ⇒ 今日玩了多久
+ *     · topId/topCount ⇒ 近 7 天最常玩的那一款
+ */
+interface WeekStat {
+  total: number;
+  solved: number;
+  todayMs: number;
+  topId: string;
+  topCount: number;
 }
 
 @Component
@@ -253,6 +273,121 @@ export struct StatsTab {
     return h + this.t('小时', 'h') + m + this.t('分', 'min');
   }
 
+  // ═══════ ★★★ 2026-11-07（体验升级点 Top 4）：近期 = 今日时长 / 近 7 天通关率 / 近 7 天最常玩 ═══════
+  //
+  // 为什么要有：本页原来**一个字节都没读过 `GameLog`**（core/GameLog.ets 的每局日志：
+  //   结束时间 / 时长 / 成败 / 难度 / 得分）⇒ 只有「累计玩了多久」这一个时间维度，
+  //   看不出"今天玩了多久 / 最近一周怎么样"。数据早就在盘上，缺的只是这一屏。
+  //
+  // ⚠️ 依赖陷阱（必须读一下 @StorageProp）：`GameLog` 是静态类，记录变了**不会通知 ArkUI**；
+  //   而本页 `@StorageProp('totalPlays') plays` 每结算一局都会变 ⇒ 在那几个取数方法里读它，
+  //   build 才会在每局结束后重算这块（同 `this.t()` 开头 `const observed = this.langCode` 的写法）。
+  //   ⛔ 别删那行"依赖声明"，否则打完一局统计页的"近期"永远停在旧数字（判据 897/898 同族）。
+
+  /** 今天 0 点的时间戳（本地时区） */
+  private dayStart(): number {
+    const d: Date = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }
+
+  /** 近 7 天的下界：含今天在内共 7 个自然日 */
+  private weekStart(): number {
+    return this.dayStart() - 6 * MS_PER_DAY;
+  }
+
+  /** 一次遍历算出「近期」要的三个数（7 天窗口内的局 / 通关数 / 今日时长 / 最常玩那款） */
+  private weekStat(): WeekStat {
+    const observed: number = this.plays;      // ← 依赖声明，别删（读一下才会重算；同 t() 的 langCode）
+    const st: WeekStat = { total: 0, solved: 0, todayMs: 0, topId: '', topCount: 0 };
+    const recs: PlayRecord[] = GameLog.recent(LOG_WINDOW);
+    const wk: number = this.weekStart();
+    const td: number = this.dayStart();
+    const cnt: Map<string, number> = new Map<string, number>();
+    for (let i = 0; i < recs.length; i++) {
+      const r: PlayRecord = recs[i];
+      if (r.t < wk) {
+        continue;                             // 7 天以前的不算
+      }
+      st.total++;
+      if (r.ok) {
+        st.solved++;
+      }
+      if (r.t >= td) {
+        st.todayMs += r.ms;                   // 「今日玩了多久」= 今天这些局的时长之和
+      }
+      cnt.set(r.g, (cnt.get(r.g) ?? 0) + 1);
+    }
+    cnt.forEach((n: number, gid: string) => {
+      if (n > st.topCount) {
+        st.topCount = n;                      // 并列时保留先出现的那款（Map 是插入序）
+        st.topId = gid;
+      }
+    });
+    return st;
+  }
+
+  /** 毫秒 → 「3 分 24 秒」/「45 秒」/「3 分」（单位走字典：「分」已有、「秒」是本次新增 key） */
+  private fmtPlaytime(ms: number): string {
+    const sec: number = Math.floor(ms / 1000);
+    const m: number = Math.floor(sec / 60);
+    const s: number = sec % 60;
+    const minU: string = this.t('分', 'min');
+    const secU: string = this.t('秒', 'sec');
+    if (m <= 0) {
+      return Digits(String(s), this.langCode) + ' ' + secU;
+    }
+    if (s <= 0) {
+      return Digits(String(m), this.langCode) + ' ' + minU;
+    }
+    return Digits(String(m), this.langCode) + ' ' + minU + ' '
+      + Digits(String(s), this.langCode) + ' ' + secU;
+  }
+
+  /** 今日时长：今天一局都没玩 ⇒ 「—」（绝不显示 0 秒） */
+  private todayPlaytimeText(): string {
+    const st: WeekStat = this.weekStat();
+    if (st.todayMs <= 0) {
+      return '—';
+    }
+    return this.fmtPlaytime(st.todayMs);
+  }
+
+  /** 近 7 天通关率：「62%（8/13）」；窗口内没有记录 ⇒ 「—」（绝不出现 0/0 / NaN） */
+  private weekRateText(): string {
+    const st: WeekStat = this.weekStat();
+    if (st.total <= 0) {
+      return '—';
+    }
+    const pct: number = Math.round(st.solved * PCT / st.total);
+    return this.t('{p}%（{a}/{b}）', '{p}% ({a}/{b})')
+      .replace('{p}', Digits(String(pct), this.langCode))
+      .replace('{a}', Digits(String(st.solved), this.langCode))
+      .replace('{b}', Digits(String(st.total), this.langCode));
+  }
+
+  /** 近 7 天最常玩的那一款：「数独 · 5 局」；没有记录 ⇒ 「—」 */
+  private weekTopText(): string {
+    const st: WeekStat = this.weekStat();
+    if (st.topId.length === 0) {
+      return '—';
+    }
+    const m: GameMeta | undefined = findGame(st.topId);
+    const name: string = m !== undefined ? displayName(m) : st.topId;
+    return name + ' · ' + this.tn('{n} 局', '{n} rounds', st.topCount);
+  }
+
+  /** 极小屏 / 手表的一行版：「今日 3 分 24 秒 · 62%」（塞不下三行，见 recentStats 的注释） */
+  private weekLineText(): string {
+    const st: WeekStat = this.weekStat();
+    if (st.total <= 0) {
+      return this.t('还没有记录 —— 玩一局就有了', 'No records yet — play a round');
+    }
+    const today: string = st.todayMs > 0 ? this.fmtPlaytime(st.todayMs) : '—';
+    const pct: string = Digits(String(Math.round(st.solved * PCT / st.total)), this.langCode) + '%';
+    return this.t('今日', 'Today') + ' ' + today + ' · ' + pct;
+  }
+
   private titleForLevel(): string {
     const l: number = this.level;
     if (l >= 60) {
@@ -345,6 +480,12 @@ export struct StatsTab {
         this.badgeWall()
         this.heroCard()
         this.statGrid()
+        // ★★★ 2026-11-07（体验升级点 Top 4）：近期 = 今日时长 / 近 7 天通关率 / 近 7 天最常玩
+        //   位置：等级头卡（LV/XP/连胜/今日打卡）+ 四宫格（累计）之后，最近玩过/最常玩榜之前。
+        //   ⚠️ 现有 DOM 顺序是「LevelHeader → 成就墙 → 徽章墙 → 等级头卡 → 四宫格」，
+        //     成就墙在等级头卡**上面**，所以"成就之前"与"等级/连胜/打卡之后"不能同时满足；
+        //     按 lead 的原意取后者（信息层级：身份 → 累计 → 近期）。
+        this.recentStats()
         if (ProgressStore.totalPlays() === 0) {
           this.emptyState()
           this.suggestSection()      // ★ item ③：把底部的空白填上
@@ -578,6 +719,100 @@ export struct StatsTab {
     .borderRadius(Radius.lg)
     .shadow(Shadow.card)
     .layoutWeight(1)
+  }
+
+  /**
+   * ── ★★★ 2026-11-07（体验升级点 Top 4）：近期 ──
+   *
+   * 三行：今日玩了多久 / 近 7 天通关率 / 近 7 天最常玩。数据源是 `core/GameLog.ets` 的每局日志
+   * （本页原来一个字节都没读过它 ⇒ 只有"累计时长"，没有时间维度）。
+   *
+   * 空状态（按严重程度分两档，**绝不出现 0/0 或 NaN**）：
+   *   · 全库一条记录都没有 ⇒ **整块不渲染**（本页自己的 emptyState 已经在说"这里还空着"，别叠两张空卡）
+   *   · 有记录但近 7 天没有 ⇒ 卡里只有一句「还没有记录 —— 玩一局就有了」
+   *   · 窗口内有记录、但今天没玩 ⇒ 「今日 —」（其他两行照常显示）
+   *
+   * 极小屏 / 手表（233×233 塞不下三行）⇒ 压成**一行**：「今日 3 分 24 秒 · 62%」
+   *   （最常玩那款不显示：一行里再塞游戏名会换行/截断，收益不如保住前两个数）
+   */
+  @Builder
+  recentStats() {
+    if (GameLog.count() > 0 || this.plays > 0) {
+      Column({ space: Space.sm }) {
+        Row() {
+          Text('📊 ' + this.t(TG('近 7 天'), 'Last 7 days'))
+            .fontSize(FontSize.md)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.theme().ink)
+          Blank()
+          // 窗口内的局数（0 就不显示，免得空状态里还挂一个「0 局」）
+          Text(this.weekStat().total > 0
+            ? this.tn(TG('{n} 局'), '{n} rounds', this.weekStat().total) : '')
+            .fontSize(FontSize.xxs)
+            .fontColor(this.theme().inkFaint)
+        }
+        .width('100%')
+
+        if (Bp.tinyScreen() || Bp.isWatch()) {
+          Text(this.weekLineText())
+            .fontSize(FontSize.xxs)
+            .fontColor(this.theme().inkSoft)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .width('100%')
+            .padding(Space.sm)
+            .backgroundColor(this.theme().surface)
+            .borderRadius(Radius.md)
+        } else {
+          Column({ space: Space.sm }) {
+            if (this.weekStat().total === 0) {
+              Text(this.t(TG('还没有记录 —— 玩一局就有了'), 'No records yet — play a round'))
+                .fontSize(FontSize.xs)
+                .fontColor(this.theme().inkFaint)
+                .width('100%')
+            } else {
+              this.recentRow('⏱️', TG('今日'), 'Today', this.todayPlaytimeText(), Palette.emerald)
+              this.recentRow('🎯', TG('通关率'), 'Clear rate', this.weekRateText(), Palette.amber)
+              this.recentRow('🎮', TG('最常玩'), 'Most played', this.weekTopText(), Palette.violet)
+            }
+          }
+          .width('100%')
+          .padding(Space.md)
+          .backgroundColor(this.theme().surface)
+          .borderRadius(Radius.lg)
+          .shadow(Shadow.card)
+        }
+      }
+      .width('100%')
+    }
+  }
+
+  /** 「近期」的一行：图标 + 标签（左）+ 值（右）；值最多占 58%，长游戏名不会把标签挤没 */
+  @Builder
+  recentRow(icon: string, labelZh: string, labelEn: string, value: string, accent: string) {
+    Row({ space: Space.sm }) {
+      Stack() {
+        Text(icon)
+          .fontSize(FontSize.sm)
+      }
+      .width(ICON_SM)
+      .height(ICON_SM)
+      .backgroundColor(this.tint(accent))
+      .borderRadius(Radius.xs)
+      Text(this.t(labelZh, labelEn))
+        .fontSize(FontSize.xs)
+        .fontColor(this.theme().inkSoft)
+        .layoutWeight(1)
+      Text(value)
+        .fontSize(FontSize.xs)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme().ink)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .constraintSize({ maxWidth: '58%' })
+        .textAlign(TextAlign.End)
+    }
+    .width('100%')
   }
 
   /** ── ③ 最近玩过：横向滑动小卡 ── */
