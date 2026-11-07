@@ -3410,6 +3410,13 @@ struct GameHost {
         //   可用高实测：533 − 状态栏 66 − 顶栏 45 − padding 20 − HintBar 38 ≈ **352vp**
         //   ⇒ 上限取 `Bp.height - 190`（533 → 343，留 9vp 余量）。
         .constraintSize({ maxHeight: Bp.height - 190 })
+        // ★★★ 2026-11-08 **回滚 `.clip(true)`**（真机截图证实它更糟）：
+        //   clip 只是把棋盘**切成两半**（上半可见、下半被切掉），
+        //   底部按钮**并没有因此回到屏内** —— 它们本来就在容器外的流式布局里。
+        //   ⇒ **判据 1798：`clip` 不能救「被顶出屏幕」的控件，它只切画面**。
+        //     要救只有两条路：① 给每个棋盘设 maxHeight（逐款，`aspectRatio` 会同步缩宽）
+        //                     ② 游戏区包 `Scroll`（一处覆盖全部，但 355 个 if 分支要重构）
+        //   本轮的 `constraintSize` 保留（对 `layoutWeight` 驱动的棋盘有效：2048/LaserLink 已验证）。
         .padding({ left: Space.lg, right: Space.lg, bottom: Space.lg })
         // ═══ 棋盘键盘接收层：**第 10 次尝试，已回滚（第 683 轮）** ═══
         //   做法：在游戏区坐标叠一个 `.position({0,0})` 的可聚焦 Column `boardkey`，

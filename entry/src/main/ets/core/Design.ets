@@ -66,7 +66,21 @@ export class Cell {
    *    · 平板 1.06 / PC 1.12 / 电视 1.45 ⇒ 一处改动，355 款自动跟着放大
    *  ⚠️ 只对"装内容的格子"生效（和原设计一致），纯装饰尺寸不受影响 */
   static of(base: number): number {
-    return Math.round(base * Cell.k * Bp.scale());
+    // ★★★ 2026-11-08 **矮屏压缩**（ai-fixer-b 全量扫描 + 真机实测）：
+    //   `GameHost` 游戏区的 `.constraintSize({ maxHeight: Bp.height - 190 })` 只能压**容器**，
+    //   **不会让容器里固定尺寸的子项缩小**（Column 默认不裁剪）⇒
+    //     · `layoutWeight`/`aspectRatio` 驱动的棋盘会跟着缩（2048 / LaserLink ✓）
+    //     · `Cell.of(48)` 写的按钮网格照样画到容器外（Sokoban / CountdownMath / 勾股数 ✗）
+    //   实测：853×533 时 Sokoban 的固定项 = HUD 60 + 状态 20 + 4 行按钮 192 + 间距 80 ≈ **352vp**
+    //        而可用只有 343vp —— **棋盘还没算就已经超了**。
+    //   ⇒ 在**这里**统一压：`Bp.height < 600`（横屏平板 / 电视横屏）时 ×0.85。
+    //     533 × 0.85 ≈ 453 ⇒ 按压 192→163、间距 80→68，省下 41vp，够放回底部一行。
+    //   ⚠️ 手机上 `Bp.height` ≥ 600 ⇒ 系数 1.0，**与改造前逐像素一致**（零回归）。
+    let shrink: number = 1;
+    if (Bp.height > 0 && Bp.height < 600) {
+      shrink = 0.85;
+    }
+    return Math.round(base * Cell.k * Bp.scale() * shrink);
   }
 }
 

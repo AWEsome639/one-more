@@ -9,6 +9,7 @@
  * 通关：所有箱子都在目标点上 ⇒ 本关过关，可继续下一关
  */
 
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -916,6 +917,11 @@ export struct GSokoban {
     }
     .layoutWeight(1)
     .aspectRatio(1)
+    // ★ 2026-11-08 **横屏防裁**（真机实测）：853×533 时棋盘按宽度铺满 = 813vp 高，
+    //   而游戏区只有 ≈343vp ⇒ 底部「上一关/重开/下一关/撤销」四个按钮全被顶出屏幕。
+    //   `constraintSize({ maxHeight })` 只压容器不压子项；`.clip(true)` 只切画面不救按钮。
+    //   ⇒ **直接给棋盘设高度上限**：横屏按可用高反推，aspectRatio(1) 会让宽度同步缩小。
+    .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 280 : 9999 })
     .backgroundColor(this.theme.surface)
     .border({ width: 1, color: this.theme.line })
   }
