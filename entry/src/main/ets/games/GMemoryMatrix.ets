@@ -106,7 +106,8 @@ export struct GMemoryMatrix {
     const flags: boolean[] = new Array<boolean>(CELLS).fill(false);
     for (let i = 0; i < k; i++) { flags[slots[i]] = true; }
     this.lit = flags; this.need = k; this.picks = []; this.wrong = []; this.phase = 0;
-    this.msg = TG('第 ') + String(this.level) + ' 关：记住 ' + String(k) + ' 个亮格';
+    // ★ 2026-11-07（code-hunter P0-1）：原来 TG 只包住「第 」，后面全是裸中文 ⇒ 半译
+    this.msg = TG2('第 {0} 关：记住 {1} 个亮格', String(this.level), String(k));
     this.showTo = setTimeout(() => {
       this.showTo = -1; this.phase = 1; this.msg = TG(TG(TG('把亮过的格子点出来')));
     }, SHOW_MS);

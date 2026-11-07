@@ -94,7 +94,7 @@ export struct GStaircaseMemory {
     this.cur = 0;
     this.cursor = 0;
     this.phase = 0;
-    this.msg = TG('第 ') + String(this.level) + '/' + String(this.diffTotal) + ' 关 · 看它亮 ' + String(n) + ' 级';
+    this.msg = TG2('第 {0}/{1} 关 · 看它亮 {2} 级', String(this.level), String(this.diffTotal), String(n));
     this.flashId = setInterval(() => {
       if (this.cursor >= this.order.length - 1) {
         if (this.flashId >= 0) { clearInterval(this.flashId); this.flashId = -1; }
@@ -252,7 +252,7 @@ export struct GStaircaseMemory {
     this.score = this.score + this.order.length * 60;
     if (this.level >= this.diffTotal) { this.stop(true); return; }
     this.phase = 3;
-    this.msg = TG('✅ 第 ') + String(this.level) + ' 关走通，下一关更陡';
+    this.msg = TG2('✅ 第 {0} 关走通，下一关更陡', String(this.level));
     this.stepTo = setTimeout(() => {
       this.stepTo = -1;
       this.level = this.level + 1; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110);
