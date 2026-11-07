@@ -482,8 +482,26 @@ def _text_input(ns):
     return None
 
 
+def _close_chat_panel():
+    """★ 判据 1772（2026-11-07）：`💬` 和 `🔍` 相邻，验证器点搜索时偶尔会点到 `💬`
+    \n    ⇒ 对话面板 `.zIndex(10)` 打开，挡住所有点击（表现为一串「回不到列表」）。
+    \n    做法：dump 里如果看到「找」按钮 + 「想玩点什么样的」占位，就点一次 💬 把它关掉。
+    """
+    d = dump()
+    if not d:
+        return
+    ns = nodes(d)
+    txt = '|'.join([x['text'] for x in ns if x['text']])
+    if '想玩点什么样的' in txt or ('按「' in txt and '找：' in txt):
+        chat = next((x for x in ns if x.get('text') == '💬'), None)
+        if chat:
+            tap(chat, 1.2)
+            time.sleep(0.8)
+
+
 def _open_search():
     """确保搜索面板打开；返回 TextInput 节点或 None"""
+    _close_chat_panel()   # ★ 判据 1772：先关对话面板（它和搜索按钮相邻，容易被误点开）
     d = dump()
     if not d:
         return None
