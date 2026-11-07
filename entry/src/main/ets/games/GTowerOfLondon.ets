@@ -125,7 +125,11 @@ export struct GTowerOfLondon {
         }
       }
     }
-    return BALLS * 2;
+    // ★★★ 2026-11-07 真机 bug（判据 1761）：原来这里返回 `BALLS * 2`（=8）当「找不到」。
+    //   `bestMove()` 里 `d >= 0 && d < bestD` 会把它当成「8 步可达」的最优解选走
+    //   ⇒ **AI 挑了一条其实到不了目标的路** ⇒ 8 步走完只对位 2/3（真机实测数据）。
+    //   返回 -1 才会被 bestMove 正确过滤掉。
+    return -1;
   }
   private rightCount(s: number): number {
     let n: number = 0;
