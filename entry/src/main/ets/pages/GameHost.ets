@@ -31,7 +31,7 @@ import { Back } from '../core/Back';
 import { SparkBurst } from '../components/SparkBurst';
 import { GameDiff } from '../core/GameDiff';
 import { AppClock } from '../core/AppClock';
-import { L, Digits } from '../core/I18n';
+import { I18n, L, Digits } from '../core/I18n';
 // ── 游戏实现（自动生成，勿手改）──
 import { G2048 } from '../games/G2048';
 import { GAbReversalOddball } from '../games/GAbReversalOddball';
@@ -3271,6 +3271,13 @@ struct GameHost {
       }
       .width('100%')
       .height('100%')
+      // ★★★ 2026-11-07（判据 1759 的落地）：**阿拉伯语布局方向**。
+      //   `direction` 是 `CommonMethod`（所有组件都有、且**会继承给子组件**）
+      //   ⇒ 在根容器一处改，355 款的 Row/Column/内边距全部镜像。
+      //   之前全项目 `.direction(` = **0 处**、`isRTL()` 只用在 2 处 textAlign ——
+      //   阿拉伯语只是「文字从右往左读」，卡片按钮还是左到右。
+      //   ⚠️ 系统 locale 是阿语时 ArkUI 会自动镜像；这一行补的是「**系统非阿语、app 内切阿语**」。
+      .direction(I18n.isRTL() ? Direction.Rtl : Direction.Ltr)
 
       // ── 结算弹窗 ──
       if (this.showResult) {
