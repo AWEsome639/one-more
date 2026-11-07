@@ -1550,6 +1550,15 @@ build() {
           ? L('，最高分 ', ', best ') + Digits(fmtBest(this.bestScore(), false), this.langCode) : '')) : '')
     .onFocus(() => { this.focused = true; })
     .onBlur(() => { this.focused = false; })
+    // ★★★ 2026-11-07 交互死角：**有 onFocus/onBlur 却没有 focusable** ⇒ 那两个回调
+    //   一次都不会触发（死代码），而且电视/键盘**根本选不中这张卡**。
+    //   它是主列表卡片，是全场最显眼的可点组件 —— 补上 focusable 让焦点真的进来，
+    //   再补 onKeyEvent 让遥控器 OK 键等于点一下（与下面 onClick 同一动作）。
+    .focusable(Tv.on())
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+      Haptics.tap();
+      this.onOpen(this.meta.id);
+    }); })
     .onClick(() => {
       Haptics.tap();
       this.onOpen(this.meta.id);
@@ -1625,6 +1634,8 @@ build() {
 /** ───────────── 分类筛选条 ───────────── */
 @Component
 export struct CategoryBar {
+  /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环（分类 chip 需要） */
+  @State private tvFocus: string = '';
   @StorageProp('lang') langCode: string = 'zh';
   /** ★ 2026-10-13（P5）：主题色观察源 —— 没它选中态不跟色 */
   @StorageProp('accent') accentId: string = Palette.primary;
@@ -1708,6 +1719,15 @@ export struct CategoryBar {
             })
             .borderRadius(Radius.full)
             .animation({ duration: Motion.fast, curve: Motion.spring() })
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'CT1722'; })
+            .onBlur(() => { if (this.tvFocus === 'CT1722') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'CT1722'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                            Haptics.tap();   // ★ 2026-10-19 按压反馈
+              this.onPick(it.cat);
+            
+            }); })
             .onClick(() => {
               Haptics.tap();   // ★ 2026-10-19 按压反馈
               this.onPick(it.cat);

@@ -241,7 +241,8 @@ export struct GActionSequenceRecall {
     if (this.cursor >= this.seq.length) {
       if (this.level >= this.diffTotal) { this.end(true); return; }
       this.level = this.level + 1; this.deal();
-      TG2('✅ 过关！第 {0} 关：{1} 个动作',Digits(String(this.level), this.langCode), this.len())
+      // ★★★ 2026-11-07 同 A1：裸 `TG2(...)` ⇒ 过关正反馈丢失（verifier-dev 扫描 A2）
+      this.msg = TG2('✅ 过关！第 {0} 关：{1} 个动作',Digits(String(this.level), this.langCode), this.len());
     }
   }
 

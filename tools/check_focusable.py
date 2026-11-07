@@ -324,6 +324,8 @@ def main():
             print('     %s:%d <%s> — %s' % (a['file'], a['line'], a['comp'], a['why']))
     elif all_allowed:
         print('     白名单放行 %d 处（--verbose 看明细）' % len(all_allowed))
+    # ★ 机读收尾行（供 工具/check_assertions.sh 当闸门用，照 check_dup_symbol 的写法）
+    print('  焦点缺口：%d 处' % len(all_hits))
     return 1 if all_hits else 0
 
 

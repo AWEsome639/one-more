@@ -27,6 +27,7 @@ import { GameLog, PlayRecord } from '../core/GameLog';   // ★ 2026-11-07：近
 import { LevelHeader, iconOf } from './Common';
 import { Haptics } from '../core/Haptics';
 import { L, TN } from '../core/I18n';
+import { Tv } from '../core/Tv';
 
 /** 最近玩过显示几张 */
 const RECENT_LIMIT: number = 6;
@@ -89,6 +90,8 @@ export struct StatsTab {
   /** ★ 2026-10-13（P5）：主题色观察源 —— 设置页改色，本页立刻跟 */
   @StorageProp('accent') accentId: string = Palette.primary;
   @State achvExpanded: boolean = false;
+  /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环 */
+  @State private tvFocus: string = '';
   @State renderRev: number = 0;
   // ★★★ 2026-11-05（第 1345 轮）**修「显示停住」bug（判据 897/898）**：
   //   现象：结算后统计页「🎯 一共玩了 **0** 局」，而成就墙已解锁「初次开局」（2/53）
@@ -797,6 +800,15 @@ build() {
       pressed: { .scale({ x: 0.94, y: 0.94 }).opacity(0.85) },
       normal: { .scale({ x: 1, y: 1 }).opacity(1) }
     })
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'ST803'; })
+    .onBlur(() => { if (this.tvFocus === 'ST803') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'ST803'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+            Haptics.tap();
+      this.openGame(g.id);
+    
+    }); })
     .onClick(() => {
       Haptics.tap();
       this.openGame(g.id);
@@ -867,6 +879,15 @@ build() {
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'ST873'; })
+    .onBlur(() => { if (this.tvFocus === 'ST873') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'ST873'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+            Haptics.tap();   // ★ 2026-10-19 按压反馈
+      this.openGame(it.meta.id);
+    
+    }); })
     .onClick(() => {
       Haptics.tap();   // ★ 2026-10-19 按压反馈
       this.openGame(it.meta.id);
@@ -961,6 +982,17 @@ build() {
       .width('100%')
       .justifyContent(FlexAlign.Center)
       .padding({ top: 6, bottom: 2 })
+      .focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'ST967'; })
+      .onBlur(() => { if (this.tvFocus === 'ST967') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'ST967'))
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                Haptics.tap();   // ★ 2026-10-19 按压反馈
+        animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
+          this.achvExpanded = !this.achvExpanded;
+        });
+      
+      }); })
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
@@ -1185,6 +1217,15 @@ build() {
         .backgroundColor(this.theme().surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'ST1191'; })
+        .onBlur(() => { if (this.tvFocus === 'ST1191') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'ST1191'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                    Haptics.tap();
+          router.pushUrl({ url: 'pages/GameHost', params: { id: g.id } });
+        
+        }); })
         .onClick(() => {
           Haptics.tap();
           router.pushUrl({ url: 'pages/GameHost', params: { id: g.id } });

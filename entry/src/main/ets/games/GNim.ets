@@ -435,7 +435,11 @@ export struct GNim {
       ForEach([0, 1, 2], (i: number) => {
         Column({ space: Space.xs }) {
         Row() {
+        // ★ 2026-11-07（参考 StatsTab:621-640 的「数值 + 单位」写法）：13vp 标签 + 16vp 数值同行，
+        //   默认 VerticalAlign.Center 会让数字上下各溢出 ~1.5vp（再叠加 CJK vs 数字的行盒差异）
+        //   ⇒ 加 .margin({bottom}) 把标签提到底边，靠 Row 的 Bottom 对齐
         Text(TG2("第 {0} 堆", String((i) + 1))).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+          .margin({ bottom: 2 })
         Text(this.stones(this.piles[(i)]))
         .fontSize(FontSize.md)
         .fontColor(this.piles[(i)] > 0 ? Palette.emerald : this.theme.lineSoft)
@@ -446,6 +450,7 @@ export struct GNim {
         .scale({ x: this.piles[(i)] > 0 ? 1 : 0.92, y: this.piles[(i)] > 0 ? 1 : 0.92 })
         .animation({ duration: Motion.fast, curve: Motion.spring() })
         }
+        .alignItems(VerticalAlign.Bottom)
         .width('100%')
 
         Row({ space: Space.xs }) {

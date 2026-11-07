@@ -1261,6 +1261,13 @@ build() {
     .width(168)
     .padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm })
     .borderRadius(Radius.sm)
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'GT1264'; })
+    .onBlur(() => { if (this.tvFocus === 'GT1264') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'GT1264'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+       Haptics.tap(); act(); 
+    }); })
     .onClick(() => { Haptics.tap(); act(); })
   }
 
@@ -1306,6 +1313,31 @@ build() {
     .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
     .backgroundColor(this.theme().surfaceAlt)
     .borderRadius(Radius.full)
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'GT1309'; })
+    .onBlur(() => { if (this.tvFocus === 'GT1309') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'GT1309'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+            Haptics.tap();   // ★ 2026-10-19 按压反馈
+      const now: number = Date.now();
+      animateTo({ duration: 520, curve: Curve.ExtremeDeceleration }, () => {
+        this.topCollapsed = !this.topCollapsed;
+        // ★★★ 2026-11-07 **功能性 bug**（code-hunter 交互死角扫描 P0-1）：
+        //   `elderExpanded` 这个 @State **全文件从来没有被赋值过**，而 `effCollapsed()` 在
+        //   大字模式下一律 `return true`（只用 `topCollapsed` 没用）
+        //   ⇒ **大字模式下点「展开」→ 震一下、界面纹丝不动**。
+        //   注释里写着「手点展开后就不再强制收起」——那套逻辑从来没接上。
+        //   ⇒ 大字模式下手点「展开」时置 true，让 effCollapsed 尊重用户。
+        if (this.uiMode === 'elder') {
+          this.elderExpanded = true;
+          this.topCollapsed = false;
+        }
+        // ★ 手动操作后 2 秒内不被自动收起逻辑抢回（体验）
+        this.manualUntil = now + 2000;
+        this.lastToggle = now;
+      });
+    
+    }); })
     .onClick(() => {
       Haptics.tap();   // ★ 2026-10-19 按压反馈
       const now: number = Date.now();
@@ -1392,6 +1424,15 @@ build() {
         .onTouch((e: TouchEvent) => {
           this.darkPressed = IconPress.onTouch(this.darkPressed, e);
         })
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'GT1395'; })
+        .onBlur(() => { if (this.tvFocus === 'GT1395') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'GT1395'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                    Haptics.tap();   // ★ 2026-10-19 按压反馈
+          ProgressStore.setThemeDark(!this.dark);
+        
+        }); })
         .onClick(() => {
           Haptics.tap();   // ★ 2026-10-19 按压反馈
           ProgressStore.setThemeDark(!this.dark);
@@ -1413,6 +1454,26 @@ build() {
         .onTouch((e: TouchEvent) => {
           this.langPressed = IconPress.onTouch(this.langPressed, e);
         })
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'GT1416'; })
+        .onBlur(() => { if (this.tvFocus === 'GT1416') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'GT1416'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                    Haptics.tap();
+          const cur: string = this.langCode;
+          let next: string = 'en';
+          if (cur === 'en') {
+            // 回程：恢复切到英文之前的那门语言（默认简体）
+            next = AppStorage.get<string>('langPrevNonEn') ?? 'zh';
+          } else {
+            // 记住"非英文"的那门语言，回程才不会把繁体/日语打回简体
+            AppStorage.setOrCreate('langPrevNonEn', cur);
+          }
+          I18n.set(next);          // I18n.set 内部已经写 AppStorage，别重复写
+          ProgressStore.saveLang(next);   // ★ 落盘
+          this.renderRev = this.renderRev + 1;
+        
+        }); })
         .onClick(() => {
           Haptics.tap();
           const cur: string = this.langCode;
@@ -1446,6 +1507,16 @@ build() {
           .backgroundColor(this.searchOpen ? Palette.primary : this.theme().surface)
           .borderRadius(Radius.full)
           .shadow(Shadow.card)
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'GT1449'; })
+          .onBlur(() => { if (this.tvFocus === 'GT1449') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'GT1449'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                        Haptics.tap();
+            this.searchOpen = !this.searchOpen;
+            if (!this.searchOpen) { this.searchText = ''; }
+          
+          }); })
           .onClick(() => {
             Haptics.tap();
             this.searchOpen = !this.searchOpen;
@@ -1461,6 +1532,17 @@ build() {
           .backgroundColor(this.chatOpen ? Palette.primary : this.theme().surface)
           .borderRadius(Radius.full)
           .shadow(Shadow.card)
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'GT1464'; })
+          .onBlur(() => { if (this.tvFocus === 'GT1464') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'GT1464'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                        Haptics.tap();
+            this.chatOpen = !this.chatOpen;
+            this.renderRev = this.renderRev + 1;   // ★ 强制重渲染（@State private 有时不触发 build）
+            if (!this.chatOpen) { this.chatText = ''; this.chatPicks = []; this.chatAnswer = ''; }
+          
+          }); })
           .onClick(() => {
             Haptics.tap();
             this.chatOpen = !this.chatOpen;
@@ -1715,6 +1797,16 @@ build() {
           .padding({ left: 8, right: 8, top: 3, bottom: 3 })
           .backgroundColor(this.theme().surfaceAlt)
           .borderRadius(Radius.full)
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'GT1718'; })
+          .onBlur(() => { if (this.tvFocus === 'GT1718') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'GT1718'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                        Haptics.tap();   // ★ 2026-10-19 按压反馈
+            this.picked = [];
+            this.resetGridScroll();
+          
+          }); })
           .onClick(() => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
             this.picked = [];
@@ -1730,6 +1822,16 @@ build() {
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'GT1733'; })
+    .onBlur(() => { if (this.tvFocus === 'GT1733') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'GT1733'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+            animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
+        this.showFilter = !this.showFilter;
+      });
+    
+    }); })
     .onClick(() => {
       animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
         this.showFilter = !this.showFilter;
@@ -1792,6 +1894,17 @@ build() {
       .backgroundColor(this.picked.indexOf(t.id) >= 0 ? this.accentColor() : this.theme().surfaceAlt)
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
+      .focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'GT1897'; })
+      .onBlur(() => { if (this.tvFocus === 'GT1897') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'GT1897'))
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                Haptics.tap();   // ★ 2026-10-19 按压反馈
+        animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
+          this.toggleTag(t.id);
+        });
+      
+      }); })
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
@@ -1826,6 +1939,19 @@ build() {
       .borderRadius(Radius.full)
       .shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
+      .focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'GT1931'; })
+      .onBlur(() => { if (this.tvFocus === 'GT1931') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'GT1931'))
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                Haptics.tap();   // ★ 2026-10-19 按压反馈
+        this.pulseGrid();   // ★ 拉满：内容刷新脉冲
+        this.resetGridScroll();
+        animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
+          this.seg = s;
+        });
+      
+      }); })
       .onClick(() => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         this.pulseGrid();   // ★ 拉满：内容刷新脉冲
@@ -1993,6 +2119,26 @@ build() {
       .border({ width: 1, color: this.viewMode === mode ? this.accentColor() : this.theme().line })
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
+      .focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'GT2098'; })
+      .onBlur(() => { if (this.tvFocus === 'GT2098') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'GT2098'))
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                Haptics.tap();
+        // ★ 每次切到 A-Z 都重放一次首屏错峰（先归零再置起，否则第二次进来不动）
+        this.azShown = (mode !== ViewMode.AZ);
+        this.pulseGrid();   // ★ 拉满：内容刷新脉冲（网格 ⇄ 字母表）
+        this.resetGridScroll();
+        animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
+          this.viewMode = mode;
+        });
+        if (mode === ViewMode.AZ) {
+          setTimeout(() => {
+            this.azShown = true;
+          }, 30);
+        }
+      
+      }); })
       .onClick(() => {
         Haptics.tap();
         // ★ 每次切到 A-Z 都重放一次首屏错峰（先归零再置起，否则第二次进来不动）
@@ -2146,6 +2292,18 @@ build() {
           .borderRadius(Radius.xs)
           .backgroundColor(i === this.azCurrent ? this.theme().surfaceAlt : Color.Transparent)
           .animation({ duration: Motion.fast, curve: Motion.spring() })
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'GT2251'; })
+          .onBlur(() => { if (this.tvFocus === 'GT2251') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'GT2251'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                        Haptics.tap();   // ★ 2026-10-19 按压反馈
+            if (this.azCounts()[i] === 0) {
+              return;
+            }
+            this.azScrollTo(letter);
+          
+          }); })
           .onClick(() => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
             if (this.azCounts()[i] === 0) {
@@ -2170,6 +2328,17 @@ build() {
           .borderRadius(Radius.xs)
           .backgroundColor((i0 + 14) === this.azCurrent ? this.theme().surfaceAlt : Color.Transparent)
           .animation({ duration: Motion.fast, curve: Motion.spring() })
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'GT2275'; })
+          .onBlur(() => { if (this.tvFocus === 'GT2275') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'GT2275'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                        if (this.azCounts()[i0 + 14] === 0) {
+              return;
+            }
+            this.azScrollTo(letter);
+          
+          }); })
           .onClick(() => {
             if (this.azCounts()[i0 + 14] === 0) {
               return;
@@ -2262,6 +2431,15 @@ build() {
       curve: Motion.enter(),
       delay: enterIdx >= 0 ? Motion.stagger(enterIdx) : 0
     })
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'GT2367'; })
+    .onBlur(() => { if (this.tvFocus === 'GT2367') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'GT2367'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+            Haptics.tap();   // ★ 2026-10-19 按压反馈
+      this.openGame(m.id);
+    
+    }); })
     .onClick(() => {
       Haptics.tap();   // ★ 2026-10-19 按压反馈
       this.openGame(m.id);
@@ -2293,6 +2471,15 @@ build() {
           Text('✕')
             .fontSize(FontSize.sm).fontColor(this.theme().inkFaint)
             .width(Cell.of(32)).height(Cell.of(32)).textAlign(TextAlign.Center)
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'GT2398'; })
+            .onBlur(() => { if (this.tvFocus === 'GT2398') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'GT2398'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                            Haptics.tap();
+              this.searchText = '';
+            
+            }); })
             .onClick(() => {
               Haptics.tap();
               this.searchText = '';
@@ -2363,6 +2550,16 @@ build() {
         }
         .width('100%').padding(Space.sm)
         .backgroundColor(this.theme().surface).borderRadius(Radius.md)
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'GT2468'; })
+        .onBlur(() => { if (this.tvFocus === 'GT2468') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'GT2468'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+                    Haptics.tap();
+          this.chatOpen = false;
+          router.pushUrl({ url: 'pages/GameHost', params: { id: p.game.id } });
+        
+        }); })
         .onClick(() => {
           Haptics.tap();
           this.chatOpen = false;

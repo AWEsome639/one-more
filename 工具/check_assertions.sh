@@ -54,6 +54,25 @@ fi
 FAIL=$((FAIL + DUP_N))
 printf "     %-42s %6s / %d\n" "check_dup_symbol.py（双符号）" "-" "${DUP_N}"
 
+# ══════════════════════════════════════════════════════════════════════════
+#  check_focusable.py —— 可点组件必须有 focusable（2026-11-07 交互死角审计）
+#
+#  来历：电视/PC 靠方向键，而 ArkUI 里 Text/Row/Column/Stack 上的 .onClick
+#        **默认不可聚焦** ⇒ 触屏能点、遥控器选不中。实测主界面/设置页/联机页
+#        共 41 处（GameCard 甚至"有 onFocus/onBlur 却没有 focusable"= 死回调）。
+#  ★ 同样是**纯闸门**：只 FAIL += N，不动 TOT（理由同上：不产生通过计数）。
+#  ★ rc=2（解析/自检失败）也算失败 —— 检查器坏了不能显示成绿
+#    （今晚 check_dup_symbol 就因为写死阈值 `n_extra<500` 而长期"死绿"，教训）。
+FOCUS_OUT=$(python3 "$(dirname "$0")/../tools/check_focusable.py" 2>&1)
+FOCUS_RC=$?
+FOCUS_N=$(printf '%s' "${FOCUS_OUT}" | grep -oE "焦点缺口：[0-9]+ 处" | grep -oE "[0-9]+" | tail -1)
+if [ "${FOCUS_RC}" -eq 2 ] || [ -z "${FOCUS_N}" ]; then
+  FOCUS_N=1
+  echo "     ⚠️ check_focusable.py 无法给出结论（rc=${FOCUS_RC}）⇒ 按 1 处失败计，别当绿"
+fi
+FAIL=$((FAIL + FOCUS_N))
+printf "     %-42s %6s / %d\n" "check_focusable.py（焦点）" "-" "${FOCUS_N}"
+
 echo "     ────────────────────────────────────────────────"
 printf "     %-42s %6d / %d\n" "合计" "${TOT}" "${FAIL}"
 

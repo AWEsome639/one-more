@@ -243,9 +243,12 @@ export struct GAlgebraicBalance {
     if (good) {
       this.right++;
       this.score += 10;
-      TG2('✓ 平衡了，x = {0}', String(this.eq.answer))
+      // ★★★ 2026-11-07 **真 bug**（verifier-dev 渲染路径扫描 A1）：原来这行是裸 `TG2(...)`
+      //   —— 返回值**没赋给 `this.tip`** ⇒ 348 行的 `this.tip.startsWith('✓')` **永远为假**
+      //   ⇒ 答对/答错**都没有任何反馈文字**，颜色永远是中性灰。100% 每次答题都走这条路。
+      this.tip = TG2('✓ 平衡了，x = {0}', String(this.eq.answer));
     } else {
-      TG2('✗ 正确答案 x = {0}', String(this.eq.answer))
+      this.tip = TG2('✗ 正确答案 x = {0}', String(this.eq.answer));
     }
     this.lockTap = true;
     this.wait = setTimeout(() => {
