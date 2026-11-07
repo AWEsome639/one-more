@@ -241,7 +241,7 @@ export struct GInequalityBalanceOps {
       this.over = true; this.won = this.hits >= PASS;
       this.msg = this.won
         ? TG('🎉 答对 ') + String(this.hits) + '/' + String(this.diffTotal) + TG('，通关！')
-        : TG('😵 只答对 ') + String(this.hits) + '/' + String(this.diffTotal) + TG('，差 ') + String(PASS - this.hits) + TG(' 题');
+        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.hits), String(this.diffTotal), String(PASS - this.hits));
       this.finish(this.won); return;
     }
     this.round = this.round + 1; this.ask();
