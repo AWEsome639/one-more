@@ -309,7 +309,7 @@ export struct GDualCoding {
         Text((this.phase === 0 ? TG('记忆') : TG('答题'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((this.phase === 0 ? TG('倒计时') : TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((this.phase === 0 ? TG('倒计时') : TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.phase === 0 ? String(this.left) + 's' : String(this.qNo + 1) + '/' + String(KEEP))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {

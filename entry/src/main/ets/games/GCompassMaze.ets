@@ -407,7 +407,11 @@ export struct GCompassMaze {
  LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
  this.onFinish({
  gameId: 'compass_maze', solved: solved,
- score: solved ? 70 + Math.max(0, (this.dmax() - this.steps) * 5) : this.steps * 4,
+ // ★ 2026-11-07 三次校准（lead 决定）：dmax 20 → 5n（简单 25 / 普通 35 / 困难 45）之后，
+ //   「剩余步数 × 5」会把通关分天花板顶到 170→295 ⇒ 系数压到 **2**：
+ //   理论上限 70 + dmax×2 = **120 / 140 / 160**（困难档正好回到你算的 160）；
+ //   按「最快通关」（曼哈顿最少步 8/12/16）算实际能拿 **104 / 116 / 128**，与旧量级一致。
+ score: solved ? 70 + Math.max(0, (this.dmax() - this.steps) * 2) : this.steps * 4,
  durationMs: Date.now() - this.startAt, levelReached: solved ? 2 : 1
  });
  }

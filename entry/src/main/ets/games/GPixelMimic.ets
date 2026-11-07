@@ -284,7 +284,7 @@ export struct GPixelMimic {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('目标格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('目标格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(countOf(this.goal)))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)

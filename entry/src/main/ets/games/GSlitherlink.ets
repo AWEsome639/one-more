@@ -559,7 +559,7 @@ export struct GSlitherlink {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('已画边'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已画边'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.edgeCount())))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)
@@ -571,7 +571,7 @@ export struct GSlitherlink {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('已用步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已用步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.steps) + '/' + String(this.diffTotal)))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)

@@ -424,7 +424,7 @@ export struct GPathFinder {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('已用步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已用步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.steps) + '/' + String(this.budget)))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)
@@ -436,7 +436,7 @@ export struct GPathFinder {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('最短路'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('最短路'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.par), this.langCode))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)

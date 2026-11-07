@@ -597,7 +597,7 @@ export struct GNoriNori {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('已放黑格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('已放黑格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.placed) + '/' + String(REG_CNT * 2)))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)

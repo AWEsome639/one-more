@@ -595,7 +595,7 @@ export struct GLighthouses {
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('照亮船'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('照亮船'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.shipsLit(this.lamp, this.rock, this.ship)) + '/' + String(this.shipTotal()))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)

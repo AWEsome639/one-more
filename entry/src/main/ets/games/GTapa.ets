@@ -639,7 +639,7 @@ export struct GTapa {
         .borderRadius(Radius.sm)
         .shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('剩余秒'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('剩余秒'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.left), this.langCode))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)

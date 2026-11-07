@@ -653,7 +653,7 @@ export struct GWaterSort {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('归位'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('归位'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.done) + '/' + String(this.diffTotal)))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)

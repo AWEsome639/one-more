@@ -472,7 +472,7 @@ export struct GCompoundConnect {
       })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
-        Text((TG('数字和'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('数字和'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.pathSum() + ' / ' + this.target)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((this.pathSum() === this.target ? Palette.emerald : Palette.primary)).animation({ duration: Motion.fast, curve: Motion.snap() })
         }
         .layoutWeight(1)

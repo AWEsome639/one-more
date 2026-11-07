@@ -305,7 +305,7 @@ export struct GAbReversalOddball {
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
-        Text((TG('误报'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text((TG('误报'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.fa), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
