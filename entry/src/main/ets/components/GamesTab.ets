@@ -9,6 +9,7 @@
  *   「一搜索整个列表区就不渲染」——根因是补丁残留，不是逻辑）
  */
 
+import { ChatFinder, Intent, Suggestion } from '../core/ChatFinder';
 import { TG } from '../core/GameI18n';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Diag } from '../core/Diag';
@@ -131,6 +132,12 @@ export struct GamesTab {
    */
   @State private searchText: string = '';
   @State private searchOpen: boolean = false;
+  // ★★★ 2026-11-07（奥森的第八个想法）**对话找游戏**
+  //   v1 = 规则 + 标签检索（零模型、零网络）；v2 再挂端侧 LLM（`ChatFinder` 里有说明）
+  @State private chatOpen: boolean = false;
+  @State private chatText: string = '';
+  @State private chatAnswer: string = '';
+  @State private chatPicks: Suggestion[] = [];
   @State private darkPressed: boolean = false;
   @State private langPressed: boolean = false;
   /** A-Z 索引条当前高亮（跟着列表滚动走） */
@@ -269,6 +276,24 @@ export struct GamesTab {
    *   （2026-10-11 真踩过：切英文后按钮变 ENe、标题却还是中文）
    *   ⇒ 组件内一律用 `this.t(...)`：它先读 `this.langCode`，把依赖显式建立起来。
    */
+  /** 对话找游戏：解析 → 检索 → 回填 */
+  private askChat(): void {
+    const text: string = this.chatText.trim();
+    if (text.length === 0) { return; }
+    const it: Intent = ChatFinder.parse(text);
+    if (ChatFinder.isEmpty(it)) {
+      this.chatAnswer = ChatFinder.ask();
+      this.chatPicks = [];
+      return;
+    }
+    this.chatAnswer = ChatFinder.echo(it);
+    this.chatPicks = ChatFinder.suggest(text, 3);
+    if (this.chatPicks.length === 0) {
+      this.chatAnswer = this.t('这个组合没找到，换个说法试试？', 'Nothing matched — try different words?');
+    }
+    this.renderRev = this.renderRev + 1;
+  }
+
   private t(zh: string, en: string): string {
     const observed: string = this.langCode;   // ← 这一行就是"依赖声明"，别删
     // ★ 走 L() 而不是三元 —— L() 会查 EXTRA 字典支持 12 种语言，
@@ -855,6 +880,9 @@ build() {
         if (this.searchOpen) {
           this.searchBar()
         }
+        if (this.chatOpen) {
+          this.chatPanel()
+        }
         // ★ 极小屏（含手机「显示大小」调到最小）只留标题 + 列表
         // ★★★ 2026-11-01（第 824 轮）**真机 853×533 抓到**：
         //   搜索栏展开后，顶栏 + 搜索栏 + LV条 + 按喜好 + 分类 + 排序行 把 533vp 吃光，
@@ -1384,6 +1412,21 @@ build() {
             Haptics.tap();
             this.searchOpen = !this.searchOpen;
             if (!this.searchOpen) { this.searchText = ''; }
+          })
+
+        // ★ 对话找游戏入口（奥森第八个想法）
+        Text('💬')
+          .accessibilityText(this.t('对话找游戏', 'Ask for a game'))
+          .accessibilityLevel('yes')
+          .offset({ y: -1 })
+          .fontSize(FontSize.lg).width(Layout.touchMin).height(Layout.touchMin).textAlign(TextAlign.Center)
+          .backgroundColor(this.chatOpen ? Palette.primary : this.theme().surface)
+          .borderRadius(Radius.full)
+          .shadow(Shadow.card)
+          .onClick(() => {
+            Haptics.tap();
+            this.chatOpen = !this.chatOpen;
+            if (!this.chatOpen) { this.chatText = ''; this.chatPicks = []; this.chatAnswer = ''; }
           })
 
       }
@@ -2203,6 +2246,66 @@ build() {
     }
     .width('100%')
     .padding({ left: Space.lg, right: Space.lg, top: Space.xs })
+  }
+
+  /**
+   * ★★★ 2026-11-07（奥森第八个想法）**对话找游戏** v1 —— 规则 + 标签检索。
+   *
+   * 为什么不是 LLM：奥森明令「不能需要网络」；端侧 LLM（MindSpore Lite + 0.5B 量化）
+   * 技术上可行且包可以大，但模型转换/首测要几天，而 355 款的元数据
+   * （category/difficulty/tags）本身就是结构化标签 —— 「找游戏」这个主诉求规则就能覆盖。
+   * LLM 留 v2（`ChatFinder` 文件头有完整路线判定，别重走）。
+   */
+  @Builder
+  chatPanel() {
+    Column({ space: Space.sm }) {
+      Row({ space: Space.sm }) {
+        TextInput({ text: this.chatText, placeholder: this.t('想玩点什么样的？', 'What are you in the mood for?') })
+          .layoutWeight(1)
+          .fontSize(FontSize.sm)
+          .backgroundColor(this.theme().surface)
+          .borderRadius(Radius.md)
+          .onChange((v: string) => { this.chatText = v; })
+          .onSubmit(() => { this.askChat(); })
+        Text(this.t('找', 'Go'))
+          .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
+          .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
+          .backgroundColor(this.accentColor())
+          .borderRadius(Radius.md)
+          .onClick(() => { this.askChat(); })
+      }
+      .width('100%')
+
+      if (this.chatAnswer.length > 0) {
+        Text(this.chatAnswer)
+          .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+          .width('100%').textAlign(TextAlign.Start).maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      ForEach(this.chatPicks, (p: Suggestion) => {
+        Row({ space: Space.sm }) {
+          Text(p.game.icon).fontSize(FontSize.lg)
+          Column({ space: 1 }) {
+            Text(this.t(p.game.name, p.game.enName))
+              .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
+              .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+            Text(p.why).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
+              .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+          }
+          .alignItems(HorizontalAlign.Start).layoutWeight(1)
+          Text('›').fontSize(FontSize.lg).fontColor(this.theme().inkFaint)
+        }
+        .width('100%').padding(Space.sm)
+        .backgroundColor(this.theme().surface).borderRadius(Radius.md)
+        .onClick(() => {
+          Haptics.tap();
+          this.chatOpen = false;
+          router.pushUrl({ url: 'pages/GameHost', params: { id: p.game.id } });
+        })
+      }, (p: Suggestion) => p.game.id)
+    }
+    .width('100%')
+    .padding({ left: Space.lg, right: Space.lg, bottom: Space.sm })
   }
 
   @Builder
