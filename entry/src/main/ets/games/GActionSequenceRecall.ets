@@ -72,7 +72,9 @@ export struct GActionSequenceRecall {
     const s: number[] = [];
     for (let i = 0; i < this.len(); i++) { s.push(Math.floor(Math.random() * ACTS.length)); }
     this.seq = s; this.cursor = 0; this.showIdx = -1; this.playing = true; this.tickN = 0;
-    TG2('看好机器人做 {0} 个动作…', this.len())
+    // ★ 2026-11-07 真机 bug（verifier-dev 扫描 S-01）：原来这行是**裸表达式**（值被丢弃），
+    //   本该赋值给 this.msg ⇒ 新局没有引导语、HUD 还挂着上一局的「命用完了」。
+    this.msg = TG2('看好机器人做 {0} 个动作…', this.len());
   }
 
   /** 每 STEP_MS 走半拍：偶数拍亮、奇数拍灭 */

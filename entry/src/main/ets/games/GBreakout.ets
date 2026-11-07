@@ -178,6 +178,9 @@ export struct GBreakout {
     this.won = false;
     this.paused = false;
     this.launched = false;
+    // ★ 2026-11-07 真机 bug（verifier-dev 扫描 S-02）：endlessWave 不归零 ⇒ 重开后
+    //   HUD 还写着上一局的「♾️ 无尽模式 第 N 波」。
+    this.endlessWave = 0;
     this.vx = 0;
     this.vy = 0;
     this.paddleX = (100 - PADDLE_W) / 2;
