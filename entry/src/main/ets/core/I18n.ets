@@ -100,6 +100,26 @@ export class I18n {
   static set(lang: string): void {
     I18n.cached = lang;
     AppStorage.setOrCreate('lang', lang);
+    // ★★★ 2026-11-08（RTL 根因）：**必须同时告诉系统**，否则阿语布局永远不会镜像。
+    //
+    //   为什么：`direction` 的 SDK 原文是「along the **main axis** of the container」，
+    //   且明写「does not take effect in the **Column** component」——它只作用于
+    //   单个 Row 的主轴，**不能**指望根容器一挂就整页镜像。
+    //   官方 FAQ「如何实现镜像语言功能」的四步里，第 2 步就是 setAppPreferredLanguage：
+    //     ① 加语言资源 ② **setAppPreferredLanguage** ③ direction(Direction.Auto)
+    //     ④ matchTextDirection（图片镜像）
+    //
+    //   本项目此前**只有①②之外的半个**：语言只存在自己的状态里（cached/AppStorage/
+    //   preferences），系统侧一直是 zh-CN ⇒ `Direction.Auto` 永远解析成 LTR。
+    //
+    //   ⚠️ 副作用（这是**对的行为**）：系统侧语言也会变 —— 系统弹窗、输入法候选、
+    //      日期格式都会跟着切。用户选了阿语，整个 app 就该是阿语。
+    //   ⚠️ 可能抛（无权限 / 语言包未安装）：静默吞掉，绝不因为镜像失败而让换语言失败。
+    try {
+      i18n.System.setAppPreferredLanguage(lang);
+    } catch (e) {
+      // 静默：布局镜像失败是降级，换语言本身不能失败
+    }
   }
 
   static refresh(): void {

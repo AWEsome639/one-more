@@ -533,16 +533,16 @@ build() {
       .opacity(this.entered ? 1 : 0)
       .translate({ y: this.entered ? 0 : 10 })
       .animation({ duration: Motion.slow, curve: Motion.spring() })
+      // ★ 2026-11-08 实验 A（方案①）：把 direction 从 Scroll 挪到**里面的 Column**。
+      //   ⚠️ SDK `common.d.ts:20248` 原文：The setting does not take effect in the **Column**
+      //   component ⇒ 文档预期这条**无效**，保留它只为验证文档是否说谎。
+      .direction(this.rtl() ? Direction.Rtl : Direction.Ltr)
     }
     .width('100%')
     .height('100%')
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
     .backgroundColor(this.theme().bg)
-    // ★★★ 2026-11-08 RTL：**必须在每个 Tab 的根上加** —— 实测 `direction` 不会从
-    //   Index 那一层继承进 `Tabs/TabContent`（真机验证：阿语下箭头镜像了、
-    //   但标题仍在左、模式胶囊仍是 LTR 顺序 ⇒ 继承没穿透到自定义组件）。
-    .direction(this.rtl() ? Direction.Rtl : Direction.Ltr)
   }
 
   /** 页头 */
@@ -739,6 +739,13 @@ build() {
         this.modeChip('system', '🔄', '跟随系统', 'System')
       }
       .width('100%')
+      // ★★★ 2026-11-08 实验 B（文档指出的正解）：SDK 原文 direction 是
+      //   「how elements are laid out along the **main axis** of the container」
+      //   ⇒ 只对**主轴容器（Row）**有意义；官方 FAQ「如何实现镜像语言功能」的示例也挂在 Row 上。
+      //   ★ 这里用 **Direction.Auto**（不是写死 Rtl）：配合 I18n.set() 里新加的
+      //     `setAppPreferredLanguage`，让平台自己解析方向 —— 这才是 FAQ 的第 3 步。
+      //   判据：阿语下三个胶囊若变成「跟随系统 → 深色 → 浅色」，说明 ①+③ 整条链路通了。
+      .direction(Direction.Auto)
     }
     .width('100%')
     .padding(Space.md)
