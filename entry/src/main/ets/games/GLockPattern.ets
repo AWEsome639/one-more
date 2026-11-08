@@ -317,6 +317,9 @@ export struct GLockPattern {
   }
 
   private finish(solved: boolean): void {
+    if (this.over) {
+      return;
+    }
     this.over = true;
     const r: GameResult = {
       gameId: 'lock_pattern',
@@ -422,7 +425,7 @@ export struct GLockPattern {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(44))
+          .layoutWeight(1).height(Cell.tap(44))
           .enabled(this.phase === 1)
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L423'; })
@@ -437,7 +440,7 @@ export struct GLockPattern {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.sky).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(44))
+          .layoutWeight(1).height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L435'; })
           .onBlur(() => { if (this.tvFocus === 'L435') { this.tvFocus = ''; } })

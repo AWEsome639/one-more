@@ -46,6 +46,18 @@ export class Space {
   static xxxl: number = 48;
 }
 
+/**
+ * 无障碍与尺寸下限
+ * ★ 2026-11-08：**从文件末尾挪到 `Cell` 之前** —— `Cell.tap()` 要用 `touchMin`，
+ *   放后面虽然运行时没问题，但按本文件"自上而下声明"的惯例会读得别扭。
+ */
+export class Layout {
+  /** 可点区域最小边长（vp）—— 小于这个值手指点不准 */
+  static readonly touchMin: number = 44;
+  /** 进度条这类细线的高度 */
+  static readonly hairline: number = 3;
+}
+
 /** 圆角 */
 /**
  * ★★★ 2026-10-14 新增：可缩放的【格子尺寸】
@@ -82,6 +94,28 @@ export class Cell {
     }
     return Math.round(base * Cell.k * Bp.scale() * shrink);
   }
+
+  /**
+   * ★★★ 2026-11-08（UI 一致性审计 · ① 触控底线）**可点格子的尺寸**
+   *
+   *   问题：`Cell.of(44)` 在 853×533（`1.12 × 0.85`）下 = **42vp**，
+   *   比 `Layout.touchMin`（44）小 2vp ⇒ 手指按边缘会落空。
+   *   全库有 **165 个可点格子**卡在这条线上（都是 `.width/.height(Cell.of(44))`）。
+   *
+   *   ⇒ 用法：**可点**的格子用 `Cell.tap(44)`，纯装饰仍用 `Cell.of()`。
+   *     - `tap()` 在 `of()` **之后**取 max ⇒ 只把"被压到线下"的抬回 44，**不会抵消 0.85 压缩**
+   *       （533 下 `tap(46)` = `of(46)` = 44，一点没变；只有 `tap(44)` 从 42 抬到 44，+2vp）。
+   *     - 手机上 `of()` 本来就 ≥44 ⇒ `tap()` 与原值**逐像素一致**（零回归）。
+   *
+   *   ⚠️ **不要给基线本身就 <44 的格子套**（`Cell.of(40)→38`）：
+   *      `tap(40)` 会 +6vp，而那些款正是**为了塞进 533 才故意选小基线**的棋盘，
+   *      一改就把棋盘顶出屏幕（比差点按更糟）。已知 71 处属于这一类，**2026-11-08 决定接受现状**。
+   *      ⚠️ 同一条也适用于 `.responseRegion()` 扩热区：网格相邻格子会重叠 ⇒ 点 A 触发 B，别走这条路。
+   */
+  static tap(base: number): number {
+    const v: number = Cell.of(base);
+    return v < Layout.touchMin ? Layout.touchMin : v;
+  }
 }
 
 export class Radius {
@@ -104,6 +138,31 @@ export class Palette {
   static primary: string = '#6366F1';
   /** 主题色的深色版（按下态、强调边），随 primary 一起派生 */
   static primaryDeep: string = '#4F46E5';
+
+  /**
+   * ★★★ 2026-11-08（UI 一致性审计 · ② 颜色收口）**主题色 + 透明度**
+   *
+   *   项目里有一批 `'#1A6366F1'` / `'#226366F1'` / `'#33F43F5E'` 这样**写死颜色+alpha** 的
+   *   选中底色/选中描边。它们绕过了可跟随的 `Palette.primary` ⇒
+   *   **用户换主题色之后，这些地方仍然是靛蓝**（与 2026-10-13 的 P5 事故"主题色好像也不会变"同源）。
+   *
+   *   ⇒ 统一出口：`Palette.tint('1A')` ⇒ `'#1A' + 当前 primary`（8 位 ARGB）
+   *      也支持 6 位不带 alpha 的写法：`Palette.alpha(Palette.primary, '33')`
+   *
+   *   ⚠️ **必须在渲染时调用**，别写进模块级 `const` —— const 在 import 时只求值一次，
+   *      那一刻 `Accent.sync()` 可能还没跑完，会把默认靛蓝"冻"在常量里（P5 的另一种复发方式）。
+   */
+  static tint(alpha: string): string {
+    const a: string = alpha.length === 1 ? ('0' + alpha) : alpha;
+    return ('#' + a + Palette.primary.substring(1)).toUpperCase();
+  }
+
+  /** 给任意 6 位颜色加透明度前缀（`Palette.wall` 这类固定色也用得上） */
+  static alpha(hex: string, alpha: string): string {
+    const a: string = alpha.length === 1 ? ('0' + alpha) : alpha;
+    const body: string = hex.length === 9 ? hex.substring(3) : hex;
+    return ('#' + a + body.substring(1)).toUpperCase();
+  }
   static readonly berry: string = '#EC4899';
   /**
    * ★ 2026-10-19（对比度审计后整体下调一档）：
@@ -393,14 +452,6 @@ export class Overlay {
   static readonly chipSoft: string = '#1AFFFFFF';
   /** 浮层遮罩（底部提示条） */
   static readonly scrim: string = '#E6000000';
-}
-
-/** 无障碍与尺寸下限 */
-export class Layout {
-  /** 可点区域最小边长（vp）—— 小于这个值手指点不准 */
-  static readonly touchMin: number = 44;
-  /** 进度条这类细线的高度 */
-  static readonly hairline: number = 3;
 }
 
 export class Theme {

@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const POOL: string[] = ['🍎', '🍊', '🍇', '🍓', '🍒', '🥝', '🌵', '🌻', '🍄', '🐟', '🐤', '🦋', '⭐', '🌙'];
 const ROUNDS: number = 6;
@@ -84,6 +85,7 @@ export struct GChangeBlindness {
     this.done = false; this.startAt = Date.now();
     this.newRound();
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.over && this.phase === 2) { this.score = Math.max(0, this.score - 5); }
     }, 1000);
   }

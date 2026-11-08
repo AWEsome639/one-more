@@ -652,7 +652,7 @@ export struct GGokigenNaname {
           //   Row 里用 width('100%') 会抢占整行宽度 ⇒ 把「重开」挤到屏幕外（真机实测：dump 里没有它）
           //   ⇒ Row 里应该用 layoutWeight 按比例分，和左边那个保持一致
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L651'; })
           .onBlur(() => { if (this.tvFocus === 'L651') { this.tvFocus = ''; } })
@@ -668,7 +668,7 @@ export struct GGokigenNaname {
           .backgroundColor(Palette.primary)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L665'; })
           .onBlur(() => { if (this.tvFocus === 'L665') { this.tvFocus = ''; } })

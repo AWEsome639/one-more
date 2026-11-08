@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 interface WordPair { a: string; b: string; }
 interface WordChoice { w: string; ok: boolean; }
@@ -93,7 +94,10 @@ export struct GAssociativePairs {
     this.msg = TG('看上面的词，选它最自然的搭档');
     this.startAt = Date.now();
     this.nextRound();
-    this.timer = setInterval(() => { if (!this.over) { this.clock = this.clock + 1; } }, 1000);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      if (!this.over) { this.clock = this.clock + 1; }
+    }, 1000);
   }
   /** 取一个没用过的词对，再配 3 个干扰项 */
   private nextRound(): void {

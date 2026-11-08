@@ -22,6 +22,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 6;
 const CELLS: number = N * N;
@@ -287,6 +288,7 @@ export struct GBinaryPuzzle {
     this.finished = false;
     this.startAt = Date.now();
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.done && !this.finished) {
         this.seconds = this.seconds + 1;
       }

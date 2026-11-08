@@ -18,6 +18,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const LEN: number = 5;
 const TRIES: number = 5;
@@ -71,6 +72,8 @@ export struct GWordle {
   @State private guesses: string[] = [];
   @State private marks: number[] = [];      // 摊平：行 × 5；0 未定 1 无 2 位置错 3 位置对
   @State private cur: string = '';
+  /** ★ 2026-11-08（ai-fixer-a）代打当前要打的候选词（每猜一次重算；空 = 候选耗尽） */
+  private autoWord: string = '';
   @State private status: string = '';
   @State private seconds: number = 0;
   @State private over: boolean = false;
@@ -109,6 +112,7 @@ export struct GWordle {
     this.finished = false;
     this.startAt = Date.now();
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.over && !this.finished) {
         this.seconds = this.seconds + 1;
       }
@@ -209,12 +213,75 @@ export struct GWordle {
     if (this.over) {
       return false;
     }
+    // ★ 2026-11-08（ai-fixer-a）**不再读 answer**：用历史反馈筛候选词，逐字母输入。
     if (this.cur.length < LEN) {
-      this.tapKey(this.answer.charAt(this.cur.length));
+      if (this.autoWord.length !== LEN) {
+        this.autoWord = this.autoPick();
+      }
+      if (this.autoWord.length !== LEN) {
+        return false;
+      }
+      this.tapKey(this.autoWord.charAt(this.cur.length));
       return true;
     }
+    this.autoWord = '';
     this.tapKey('⏎');
     return !this.over;
+  }
+
+  /**
+   * ★ 2026-11-08（ai-fixer-a）代打选词：**只依赖历史上的猜词与反馈**，不读 answer。
+   *   对词库里每个候选 w，用与 judge() 同规则的 scoreOf 重放每一行历史；
+   *   与 marks 全部一致才算候选。第一条候选就是下一步要打的词。
+   */
+  private autoPick(): string {
+    const rows: number = this.guesses.length;
+    for (let k = 0; k < WORDS.length; k++) {
+      const w: string = WORDS[k];
+      if (w.length !== LEN) {
+        continue;
+      }
+      let ok: boolean = true;
+      for (let r = 0; r < rows && ok; r++) {
+        const sc: number[] = this.scoreOf(this.guesses[r], w);
+        for (let i = 0; i < LEN; i++) {
+          if (sc[i] !== this.marks[r * LEN + i]) {
+            ok = false;
+            break;
+          }
+        }
+      }
+      if (ok) {
+        return w;
+      }
+    }
+    return '';
+  }
+
+  /** 与 judge() 完全同规则，但目标是任意词（不碰 answer） */
+  private scoreOf(guess: string, target: string): number[] {
+    const res: number[] = new Array<number>(LEN).fill(1);
+    const used: boolean[] = new Array<boolean>(LEN).fill(false);
+    for (let i = 0; i < LEN; i++) {
+      if (guess.charAt(i) === target.charAt(i)) {
+        res[i] = 3;
+        used[i] = true;
+      }
+    }
+    for (let i = 0; i < LEN; i++) {
+      if (res[i] === 3) {
+        continue;
+      }
+      const ch: string = guess.charAt(i);
+      for (let j = 0; j < LEN; j++) {
+        if (!used[j] && target.charAt(j) === ch) {
+          res[i] = 2;
+          used[j] = true;
+          break;
+        }
+      }
+    }
+    return res;
   }
 
   /** 提示：答案就存在 this.answer 里 —— 直接报单词 */

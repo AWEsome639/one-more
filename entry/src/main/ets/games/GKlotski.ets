@@ -94,7 +94,11 @@ export struct GKlotski {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
-  @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
+  // ★★★ 2026-11-08 **困难档 0% 可通关**（game-balancer 离线算过）：
+  //   `MAX_MOVES=160`，困难档 `livesNow(160)` → `floor(160×0.6)=96`，
+  //   而本款的**最短解是 116 步**（`KLO_STEPS`）⇒ **96 < 116 ⇒ 困难档数学上不可能通关**。
+  //   ⇒ 保底 `KLO_STEPS + 20 = 136`（比最短解多 20 步容错）。
+  @State private diffTotal: number = Math.max(KLO_STEPS + 20, GameDiff.livesNow(MAX_MOVES));
   onFinish: (r: GameResult) => void = () => {};
 
   @State private blocks: Blk[] = [];
@@ -146,7 +150,7 @@ export struct GKlotski {
   }
 
   onRestart(): void {
-    this.diffTotal = GameDiff.livesNow(MAX_MOVES);
+    this.diffTotal = Math.max(KLO_STEPS + 20, GameDiff.livesNow(MAX_MOVES));
     this.reset();
   }
 
@@ -597,7 +601,7 @@ export struct GKlotski {
             .fontColor(Color.White)
             .backgroundColor(Palette.amber)
             .borderRadius(Radius.md)
-            .height(Cell.of(44))
+            .height(Cell.tap(44))
             .layoutWeight(1)
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L597'; })
@@ -629,7 +633,7 @@ export struct GKlotski {
         .backgroundColor(Palette.amber)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(44))
+        .height(Cell.tap(44))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L626'; })
         .onBlur(() => { if (this.tvFocus === 'L626') { this.tvFocus = ''; } })

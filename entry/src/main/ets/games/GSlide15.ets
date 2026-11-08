@@ -21,6 +21,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 4;
 const CELLS: number = N * N;
@@ -163,6 +164,7 @@ export struct GSlide15 {
       clearInterval(this.timer);
     }
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.won) {
         this.seconds = Math.floor((Date.now() - this.startAt) / 1000);
       }

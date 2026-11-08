@@ -373,7 +373,7 @@ export struct GTangram {
           Text((this.pieceAt.indexOf((p)) >= 0 ? '· ' : PIECES[(p)].icon + ' ') + PIECES[(p)].name)
           .fontSize(FontSize.xs).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(50))
           .fontColor(this.pieceAt.indexOf((p)) >= 0 ? this.theme.inkFaint : this.theme.inkSoft)
-          .backgroundColor(this.sel === (p) ? '#336366F1' : this.theme.surfaceAlt).borderRadius(Radius.md)
+          .backgroundColor(this.sel === (p) ? Palette.tint('33') : this.theme.surfaceAlt).borderRadius(Radius.md)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => {
           Haptics.tick();

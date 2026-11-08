@@ -487,7 +487,7 @@ export struct GPythagoreanTripleBuilder {
       Row({ space: Space.md }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.berry)
-          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(120).height(Cell.tap(44)).onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L446'; })
           .onBlur(() => { if (this.tvFocus === 'L446') { this.tvFocus = ''; } })

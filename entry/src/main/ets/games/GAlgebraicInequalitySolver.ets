@@ -6,6 +6,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -307,7 +308,7 @@ export struct GAlgebraicInequalitySolver {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -350,14 +351,14 @@ export struct GAlgebraicInequalitySolver {
         Row({ space: Space.sm }) {
           Button(this.quiz.choices[(0)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
           .enabled(!this.lockTap && !this.over).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L340'; })
           .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L340')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(0)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(0)] ?? '?'); })
           Button(this.quiz.choices[(1)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
           .enabled(!this.lockTap && !this.over).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L344'; })
           .onBlur(() => { if (this.tvFocus === 'L344') { this.tvFocus = ''; } })
@@ -366,14 +367,14 @@ export struct GAlgebraicInequalitySolver {
         Row({ space: Space.sm }) {
           Button(this.quiz.choices[(2)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
           .enabled(!this.lockTap && !this.over).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L350'; })
           .onBlur(() => { if (this.tvFocus === 'L350') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L350')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer(this.quiz.choices[(2)] ?? '?'); }); }).onClick(() => { Haptics.tap(); this.answer(this.quiz.choices[(2)] ?? '?'); })
           Button(this.quiz.choices[(3)] ?? '?')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
           .enabled(!this.lockTap && !this.over).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L354'; })
           .onBlur(() => { if (this.tvFocus === 'L354') { this.tvFocus = ''; } })
@@ -384,7 +385,7 @@ export struct GAlgebraicInequalitySolver {
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.sky).borderRadius(Radius.md)
-          .width(120).height(Cell.of(44)).focusable(Tv.on())
+          .width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L361'; })
           .onBlur(() => { if (this.tvFocus === 'L361') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L361')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

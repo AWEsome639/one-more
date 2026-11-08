@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const QN: number = 8; const PASS: number = 5;
 const LIMIT_S: number = 15; const TICK_MS: number = 1000;
@@ -97,7 +98,10 @@ export struct GLetterBridge {
     this.over = false; this.won = false; this.done = false;
     this.msg = TG('缺的是哪个字母？');
     this.startAt = Date.now();
-    this.timer = setInterval(() => { this.leftS--; this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.leftS--; this.tick();
+    }, TICK_MS);
   }
   private cur(): LB { return BANK[this.queue[this.qIdx < QN ? this.qIdx : QN - 1]]; }
   private tick(): void {

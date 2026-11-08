@@ -1154,6 +1154,7 @@ export function gameName(id: string, zh: string, en: string): string {
 }
 
 const EXTRA: Record<string, Record<string, string>> = {
+  "是「{0}」类": { "ja": "「{0}」系", "ko": "「{0}」류", "es": "Del tipo «{0}»", "fr": "Type « {0} »", "de": "Typ „{0}“", "pt": "Do tipo «{0}»", "ru": "Тип «{0}»", "it": "Del tipo «{0}»", "ar": "من نوع «{0}»", "zh-Hant": "是「{0}」類" },
   "难度对得上": { "ja": "難易度が合ってる", "ko": "난이도가 맞음", "es": "Dificultad adecuada", "fr": "Difficulte adaptee", "de": "Passender Schwierigkeitsgrad", "pt": "Dificuldade certa", "ru": "Подходящая сложность", "it": "Difficolta giusta", "ar": "صعوبة مناسبة", "zh-Hant": "難度對得上" },
   "和你说的那款相近": { "ja": "言ったあの作品に似てる", "ko": "말한 그 게임과 비슷", "es": "Similar al que dijiste", "fr": "Similaire a celui cite", "de": "Ahnlich wie das genannte", "pt": "Parecido com o que citou", "ru": "Похоже на названное", "it": "Simile a quello citato", "ar": "مشابه لما ذكرته", "zh-Hant": "和你說的那款相近" },
   "棋牌": { "ja": "ボード・カード", "ko": "보드/카드", "es": "Tablero y cartas", "fr": "Plateau et cartes", "de": "Brett und Karten", "pt": "Tabuleiro e cartas", "ru": "Доска и карты", "it": "Tavolo e carte", "ar": "لوح وورق", "zh-Hant": "棋牌" },

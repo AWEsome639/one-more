@@ -16,6 +16,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const LIMIT: number = 90;
 const NEED: number = 3;
@@ -96,6 +97,7 @@ export struct GCountdownMath {
     this.startAt = Date.now();
     this.reset();
     this.tick = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (this.over) { return; }
       this.left--;
       if (this.left <= 0) {
@@ -620,7 +622,7 @@ export struct GCountdownMath {
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.sky).borderRadius(Radius.md)
-          .width(120).height(Cell.of(44)).focusable(Tv.on())
+          .width(120).height(Cell.tap(44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L600'; })
           .onBlur(() => { if (this.tvFocus === 'L600') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L600')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

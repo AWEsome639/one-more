@@ -508,7 +508,11 @@ export struct GChainReaction {
     this.onFinish({
       gameId: 'chain_reaction', solved: solved,
       // ★ 2026-10-28：上限从 20 变成按档算（10/26/50）⇒ 分数按比例给，三档可比
-      score: solved ? 60 + Math.round(160 * (this.limit - this.steps) / this.limit) : this.steps * 5,
+      // ★★★ 2026-11-08（game-balancer）**输局封顶 50**：原来输局 = `steps*5`，
+      //   而 limit 按档涨到 26/50 ⇒ 走满步数能拿 130/250，**比赢局下限 60 还高**
+      //   （困难档输一局 = 赢四局）⇒ 故意耗光步数刷最高分。赢局下限恒为 60，故封 50。
+      score: solved ? 60 + Math.round(160 * (this.limit - this.steps) / this.limit)
+        : Math.min(Math.round(this.steps * 5), 50),
       durationMs: Date.now() - this.startAt, levelReached: solved ? 2 : 1
     });
   }

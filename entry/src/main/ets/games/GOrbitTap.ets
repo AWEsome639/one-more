@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const ARENA: number = 280; const RING: number = 100; const SLOTS: number = 12;
 const DOT: number = 42; const NEED: number = 10; const LIMIT: number = 25; const HOP: number = 1100;
@@ -75,7 +76,10 @@ export struct GOrbitTap {
     this.stop(); this.target = Math.floor(Math.random() * SLOTS); this.hits = 0; this.miss = 0;
     this.left = this.total; this.over = false; this.won = false; this.done = false;
     this.msg = TG('点中亮起的 🛰️，它会一直跳'); this.startAt = Date.now();
-    this.clock = setInterval(() => { this.tick(); }, 1000);
+    this.clock = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, 1000);
     this.hop = setInterval(() => { this.move(); }, HOP);
   }
   private move(): void {

@@ -537,7 +537,7 @@ export struct GSumSnake {
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             this.askHint();
           })
@@ -554,7 +554,7 @@ export struct GSumSnake {
           .backgroundColor(Palette.violet !== undefined ? Palette.violet : Palette.cyan)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             this.askAuto();
           })
@@ -573,7 +573,7 @@ export struct GSumSnake {
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             Haptics.tap();
             this.reset();

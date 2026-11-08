@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const GOAL: number = 10; const LIMIT: number = 60; const TICK_MS: number = 1000;
 const PENALTY: number = 3; const NEXT_MS: number = 900;
@@ -97,7 +98,10 @@ export struct GModularClockArithmetic {
     this.over = false; this.won = false; this.finished = false; this.startAt = Date.now();
     this.ask();
     this.msg = TG(TG(TG('钟面只有 12 个点：走过头就绕回来（mod 12）')));
-    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK_MS);
   }
 
   private tick(): void {

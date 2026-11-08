@@ -744,7 +744,7 @@ export struct GKurodoko {
         .backgroundColor(Palette.teal)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(44))
+        .height(Cell.tap(44))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L742'; })
         .onBlur(() => { if (this.tvFocus === 'L742') { this.tvFocus = ''; } })

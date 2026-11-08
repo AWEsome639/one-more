@@ -19,6 +19,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 5;
 const CELLS: number = N * N;
@@ -327,6 +328,7 @@ export struct GTapa {
       clearInterval(this.timer);
     }
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (this.over) {
         return;
       }
@@ -735,7 +737,7 @@ export struct GTapa {
         .backgroundColor(Palette.primary)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(44))
+        .height(Cell.tap(44))
         .onClick(() => {
           Haptics.tap();
           this.reset();

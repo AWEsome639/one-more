@@ -28,6 +28,18 @@ export struct GMathGuess {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：原 MAX_TRIES=7，按难度换算
+  /**
+   * ★★★ 2026-11-08（game-balancer）**困难档给不出 7 次 = 数学上不可能赢**：
+   *   本款是纯二分猜数（1~100，只回"大了/小了"）⇒ 理论下限 `ceil(log2 100) = 7` 次。
+   *   而 `GameDiff.lives()` 困难档 = `floor(7 × 0.6) = 4` ⇒ 4 次最多区分 2⁴ = 16 种
+   *   ⇒ 100 个数里 **84% 猜不中**（实测只能靠 4% 随机运气）。
+   *   ⇒ 用 MAX_TRIES 兜底：**任何档都不少于信息论下限**（简单 11 / 普通 7 / 困难 7）。
+   *   ⚠️ 别改成「困难档给更多次」——那只是把难度抹平；这一款的难度本应做在**数的范围**上（见 lowBound/highBound）。
+   */
+  private static triesOf(): number {
+    const v: number = GameDiff.livesNow(MAX_TRIES);
+    return v < MAX_TRIES ? MAX_TRIES : v;
+  }
   /** 代打计时器（-1 = 未运行）。必须 @State */
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
    *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
@@ -41,7 +53,7 @@ export struct GMathGuess {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.livesNow(7);
+  @State private diffTotal: number = GMathGuess.triesOf();
   onFinish: (r: GameResult) => void = () => {};
 
   @State secret: number = 0; @State guess: number = 50; @State tries: number = 0;
@@ -60,7 +72,7 @@ export struct GMathGuess {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.livesNow(7);
+    this.diffTotal = GMathGuess.triesOf();
      this.reset(); }
 
   /** ★ 弹一下：先放大再回弹（140ms 一个来回） */
@@ -165,7 +177,10 @@ export struct GMathGuess {
     if (this.over) {
       return false;
     }
-    this.guess = this.secret;
+    // ★ 2026-11-08（ai-fixer-a）**不再直接读答案**：按游戏自己的规则做二分——
+    //   nudge(0) 把 guess 跳到 [lowBound, highBound] 的中位（这正是玩家能做的操作），
+    //   再 submit。1~100 至多 7 步收敛，而游戏正好给 7 次。
+    this.nudge(0);
     this.submit();
     return !this.over;
   }
@@ -294,19 +309,19 @@ export struct GMathGuess {
       Row({ space: Space.sm }) {
         Button('−1')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).focusable(Tv.on())
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.tap(44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L294'; })
           .onBlur(() => { if (this.tvFocus === 'L294') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L294')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nudge(-1); }); }).onClick(() => { Haptics.tap(); this.nudge(-1); })
         Button(TG('中位'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.violet)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).focusable(Tv.on())
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.tap(44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L297'; })
           .onBlur(() => { if (this.tvFocus === 'L297') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L297')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nudge(0); }); }).onClick(() => { Haptics.tap(); this.nudge(0); })
         Button('+1')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).focusable(Tv.on())
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.tap(44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L300'; })
           .onBlur(() => { if (this.tvFocus === 'L300') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L300')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.nudge(1); }); }).onClick(() => { Haptics.tap(); this.nudge(1); })
@@ -327,7 +342,7 @@ export struct GMathGuess {
           .fontSize(FontSize.xs).fontColor(this.theme.inkFaint).layoutWeight(1)
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on())
+          .borderRadius(Radius.md).width(96).height(Cell.tap(44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L315'; })
           .onBlur(() => { if (this.tvFocus === 'L315') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L315')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const LIMIT: number = 60;
 const NEED: number = 5;
@@ -152,6 +153,7 @@ export struct GDigitSwapEq {
     this.startAt = Date.now();
     this.reset();
     this.tick = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (this.over) { return; }
       this.left--;
       if (this.left <= 0) {
@@ -455,7 +457,7 @@ export struct GDigitSwapEq {
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.lime).borderRadius(Radius.md).width(120).height(Cell.of(44)).focusable(Tv.on())
+          .backgroundColor(Palette.lime).borderRadius(Radius.md).width(120).height(Cell.tap(44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L449'; })
           .onBlur(() => { if (this.tvFocus === 'L449') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L449')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

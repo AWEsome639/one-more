@@ -506,7 +506,7 @@ export struct GNim {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(Palette.emerald).borderRadius(Radius.md)
-        .width('100%').height(Cell.of(44))
+        .width('100%').height(Cell.tap(44))
         .onClick(() => {
           Haptics.tap();
           this.reset();

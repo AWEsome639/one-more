@@ -452,7 +452,7 @@ export struct GMahjongSolitaire {
 
   private tileBg(i: number): string {
     if (this.sel === i) {
-      return '#226366F1';
+      return Palette.tint('22');
     }
     if (this.hintA === i || this.hintB === i) {
       return '#33F59E0B';
@@ -542,7 +542,7 @@ export struct GMahjongSolitaire {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(44))
+          .layoutWeight(1).height(Cell.tap(44))
           .enabled(!this.over)
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L543'; })
@@ -557,7 +557,7 @@ export struct GMahjongSolitaire {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor(Color.White)
           .backgroundColor(Palette.rose).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(44))
+          .layoutWeight(1).height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L555'; })
           .onBlur(() => { if (this.tvFocus === 'L555') { this.tvFocus = ''; } })

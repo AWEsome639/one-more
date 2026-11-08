@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 7;
 const GAP: number = 2;
@@ -138,6 +139,7 @@ export struct GNavonHierarchical {
     this.msg = TG('大图形是什么字母？小图形又是什么字母？');
     if (this.timer < 0) {
       this.timer = setInterval(() => {
+        if (AppClock.isPaused()) { return; }
         if (this.done || this.over) { return; }
         const used: number = Math.floor((Date.now() - this.startAt) / 1000);
         this.left = Math.max(0, LIMIT - used);

@@ -761,7 +761,7 @@ export struct GSkyscrapers {
             .fontColor(this.pick === v ? '#FFFFFF' : this.theme.ink)
             .textAlign(TextAlign.Center)
             .layoutWeight(1)
-            .height(Cell.of(44))
+            .height(Cell.tap(44))
             .backgroundColor(this.pick === v ? Palette.sky : this.theme.surface)
             .borderRadius(Radius.sm)
             .shadow(Shadow.card)
@@ -791,7 +791,7 @@ export struct GSkyscrapers {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .width(64)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             this.askHint();
           })
@@ -807,7 +807,7 @@ export struct GSkyscrapers {
           .backgroundColor(Palette.sky)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             Haptics.tap();
             this.reset();

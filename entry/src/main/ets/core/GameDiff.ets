@@ -193,7 +193,11 @@ export class GameDiff {
     if (d === 0) {
       v = Math.ceil(base * 1.5);
     } else if (d === 2) {
-      v = Math.max(1, Math.floor(base * 0.6));
+      // ★★★ 2026-11-08 **困难档保底 2 条命**（game-balancer 全量扫描）：
+      //   原来 `Math.max(1, ...)`，而 `base=3` 的款（数字金字塔/语义连接/词汇构建/
+      //   词语类比/双重麻烦/找因数…**共 20 款**）困难档只剩 **1 条命** ⇒ 错一次直接结束。
+      //   ⇒ 保底 2，20 款一起好（收益/成本最高的一处）。
+      v = Math.max(2, Math.floor(base * 0.6));
     }
     return v < 1 ? 1 : v;
   }

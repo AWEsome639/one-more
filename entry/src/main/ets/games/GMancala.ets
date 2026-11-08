@@ -686,7 +686,7 @@ export struct GMancala {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(Palette.lime).borderRadius(Radius.md)
-        .width('100%').height(Cell.of(44))
+        .width('100%').height(Cell.tap(44))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L684'; })
         .onBlur(() => { if (this.tvFocus === 'L684') { this.tvFocus = ''; } })

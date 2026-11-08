@@ -276,6 +276,9 @@ export struct GFactBinder {
   }
 
   private finish(solved: boolean): void {
+    if (this.over) {
+      return;
+    }
     this.over = true; this.won = solved;
     this.note = solved ? TG("五组全部绑定，通关 🎉") : TG("失误太多，这局没绑完 😵");
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
@@ -319,7 +322,7 @@ export struct GFactBinder {
         .width('100%').textAlign(TextAlign.Center)
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(44))
+        .borderRadius(Radius.md).width('100%').height(Cell.tap(44))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L316'; })
         .onBlur(() => { if (this.tvFocus === 'L316') { this.tvFocus = ''; } })

@@ -325,7 +325,7 @@ export struct GTemporalOrder {
           Text(this.picked.indexOf((i)) >= 0 ? TG('第 ') + this.badge((i)) + TG(' 步') : '').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           }.width('100%').height(Cell.of(62)).padding(Space.sm)
-          .backgroundColor(this.picked.indexOf((i)) >= 0 ? '#336366F1' : this.theme.surface)
+          .backgroundColor(this.picked.indexOf((i)) >= 0 ? Palette.tint('33') : this.theme.surface)
           .borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
           // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
           .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })

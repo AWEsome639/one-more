@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const ROUNDS: number = 8;
 const NEED: number = 600;
@@ -83,7 +84,10 @@ export struct GVektorVector {
     this.round = 1; this.score = 0; this.over = false; this.won = false;
     this.done = false; this.msg = ''; this.clock = 0; this.startAt = Date.now();
     this.nextRound();
-    this.timer = setInterval(() => { if (!this.over) { this.clock = this.clock + 1; } }, 1000);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      if (!this.over) { this.clock = this.clock + 1; }
+    }, 1000);
   }
   private trueAns(): VecChoice {
     return {

@@ -184,7 +184,7 @@ struct LanLobby {
                 .fontSize(FontSize.sm).width(28).textAlign(TextAlign.Center)
               Text(sc.nick + (sc.me ? TG('（我）') : ''))
                 .fontSize(FontSize.sm).fontColor(this.theme().ink).layoutWeight(1)
-              Text(Digits((sc.ms / 1000).toFixed(1), this.langCode) + 's')
+              Text(Digits((sc.ms / 1000).toFixed(1), this.langCode) + ' ' + this.t('秒', 's'))
                 .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.accentColor())
             }
             .width('100%')

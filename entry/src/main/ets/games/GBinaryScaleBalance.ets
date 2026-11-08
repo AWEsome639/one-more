@@ -19,6 +19,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const WEIGHTS: number[] = [1, 2, 4, 8, 16, 32, 64];
 const COUNT: number = 7;
@@ -104,6 +105,7 @@ export struct GBinaryScaleBalance {
     this.startAt = Date.now();
     this.newLevel(true);
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.over) {
         this.seconds = this.seconds + 1;
       }

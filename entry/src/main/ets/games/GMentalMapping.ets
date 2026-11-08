@@ -12,6 +12,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -311,7 +312,7 @@ export struct GMentalMapping {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
 
     // ★ 演示条（共用组件；未演示时高度为 0，不占位）
     DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
@@ -399,7 +400,7 @@ export struct GMentalMapping {
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(false ? this.theme.surfaceAlt : this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -417,7 +418,7 @@ export struct GMentalMapping {
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(false ? this.theme.surfaceAlt : this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -435,7 +436,7 @@ export struct GMentalMapping {
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(false ? this.theme.surfaceAlt : this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -455,7 +456,7 @@ export struct GMentalMapping {
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(false ? this.theme.surfaceAlt : this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -473,7 +474,7 @@ export struct GMentalMapping {
           .fontColor(true ? this.theme.inkFaint : this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(true ? this.theme.surfaceAlt : this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -491,7 +492,7 @@ export struct GMentalMapping {
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(false ? this.theme.surfaceAlt : this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -511,7 +512,7 @@ export struct GMentalMapping {
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(false ? this.theme.surfaceAlt : this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -529,7 +530,7 @@ export struct GMentalMapping {
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(false ? this.theme.surfaceAlt : this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -547,7 +548,7 @@ export struct GMentalMapping {
           .fontColor(false ? this.theme.inkFaint : this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(false ? this.theme.surfaceAlt : this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -575,7 +576,7 @@ export struct GMentalMapping {
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
-        .width('100%').height(Cell.of(44))
+        .width('100%').height(Cell.of(Bp.height < 600 ? 36 : 44))
         .onClick(() => {
           Haptics.tap();
           this.reset();

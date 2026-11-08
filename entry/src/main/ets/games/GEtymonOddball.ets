@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const ROUNDS: number = 8; const PASS: number = 5;
 const LIMIT_S: number = 20; const TICK_MS: number = 1000;
@@ -98,7 +99,10 @@ export struct GEtymonOddball {
     this.over = false; this.won = false; this.done = false;
     this.msg = TG('哪个词的词根不属于同一族？'); this.startAt = Date.now();
     this.load();
-    this.timer = setInterval(() => { this.leftS--; this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.leftS--; this.tick();
+    }, TICK_MS);
   }
   private load(): void {
     const g: string[] = GROUPS[this.queue[this.round]];

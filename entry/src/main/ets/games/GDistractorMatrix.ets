@@ -14,6 +14,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 4;
 const CELLS: number = N * N;
@@ -121,6 +122,7 @@ export struct GDistractorMatrix {
     if (this.ticker >= 0) { clearInterval(this.ticker); }
     if (this.timer >= 0) { clearTimeout(this.timer); }
     this.ticker = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (this.locked || this.over) { return; }
       this.left--;
       if (this.left <= 0) { this.judge(-1); }
@@ -383,7 +385,7 @@ export struct GDistractorMatrix {
 
       Button(this.over ? (this.hits >= PASS ? TG('通关 🎉') : TG('结束')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .height(Cell.tap(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L378'; })

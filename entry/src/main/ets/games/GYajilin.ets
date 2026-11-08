@@ -450,7 +450,7 @@ export struct GYajilin {
       Row({ space: Space.sm }) {
         Button(TG('提示 (-5)'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44))
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.tap(44))
           .enabled(!this.over).onClick(() => { Haptics.tap(); this.hint(); })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L451'; })
@@ -459,7 +459,7 @@ export struct GYajilin {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hint(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.teal).borderRadius(Radius.md).width(96).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .backgroundColor(Palette.teal).borderRadius(Radius.md).width(96).height(Cell.tap(44)).onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L457'; })
           .onBlur(() => { if (this.tvFocus === 'L457') { this.tvFocus = ''; } })

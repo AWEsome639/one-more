@@ -633,7 +633,7 @@ export struct GTennerGrid {
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             this.askAuto();
           })
@@ -652,7 +652,7 @@ export struct GTennerGrid {
           .backgroundColor(Palette.berry)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             Haptics.tap();
             this.reset();

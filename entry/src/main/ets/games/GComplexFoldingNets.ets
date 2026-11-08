@@ -10,6 +10,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -332,7 +333,7 @@ export struct GComplexFoldingNets {
       Row({ space: Space.sm }) {
         Button(TG2('{0} 层', this.opts[0]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+        .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -344,7 +345,7 @@ export struct GComplexFoldingNets {
         .onClick(() => { Haptics.tap(); this.pick((this.opts[0])); })
         Button(TG2('{0} 层', this.opts[1]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+        .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -358,7 +359,7 @@ export struct GComplexFoldingNets {
       Row({ space: Space.sm }) {
         Button(TG2('{0} 层', this.opts[2]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+        .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -370,7 +371,7 @@ export struct GComplexFoldingNets {
         .onClick(() => { Haptics.tap(); this.pick((this.opts[2])); })
         Button(TG2('{0} 层', this.opts[3]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .layoutWeight(1).height(Cell.of(52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+        .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -384,7 +385,7 @@ export struct GComplexFoldingNets {
 
       Button(this.over ? (this.right >= PASS ? TG('通关 🎉') : TG('结束')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .height(Cell.of(Bp.height < 600 ? 36 : 44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L379'; })

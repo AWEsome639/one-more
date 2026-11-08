@@ -514,7 +514,7 @@ export struct GLightsOut {
         .backgroundColor(Palette.sky)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(44))
+        .height(Cell.tap(44))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L512'; })
         .onBlur(() => { if (this.tvFocus === 'L512') { this.tvFocus = ''; } })

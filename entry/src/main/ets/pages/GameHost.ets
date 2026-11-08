@@ -657,6 +657,15 @@ struct GameHost {
   }
 
   private handleFinish(r: GameResult): void {
+    // ★★★ 2026-11-08 **重入守卫**（verifier-dev 的 P0）：
+    //   355 个结算函数里 269 个自带守卫，但 `handleFinish` 这个**总入口不查 `finished`**
+    //   （`this.finished` 原来只用于「退出补记」），而 `ProgressStore.finishGame` **无幂等**
+    //   ⇒ **任何双 `onFinish` = 双倍 XP + 双写日志**。
+    //   触发场景：结算瞬间连点 / AI 代打还在跑 / 某款自己的定时器又调一次。
+    //   ⇒ 这一行覆盖 355 款，比逐款补守卫划算。
+    if (this.finished) {
+      return;
+    }
     // ★★★ 2026-11-01（奥森「演示就是一段动画，不计分」的第三时刻）：
     //   **演示期间绝不结算。**
     //   原来这里毫无保护 ⇒ 演示过程中若某款游戏达成胜利条件，
@@ -3583,7 +3592,8 @@ struct GameHost {
           //     信息不丢（数字全在），高度从 41vp 降到约 17vp，省 **24vp**。
           if (Bp.tinyWatch()) {
             Text(Digits(String(this.scoreShown), this.langCode) + ' · '
-                 + Digits((this.lastMs / 1000).toFixed(1), this.langCode) + 's · +'
+                 + Digits((this.lastMs / 1000).toFixed(1), this.langCode) + ' '
+                 + this.t('秒', 's') + ' · +'
                  + Digits(String(this.gainShown), this.langCode))
               .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
               .fontColor(this.theme().ink)
@@ -3606,7 +3616,7 @@ struct GameHost {
             .opacity(this.pop ? 1 : 0).translate({ y: this.pop ? 0 : 10 })
             .animation({ duration: Motion.base, curve: Motion.spring() })
             Column({ space: 2 }) {
-              Text(Digits((this.lastMs / 1000).toFixed(1), this.langCode) + 's')
+              Text(Digits((this.lastMs / 1000).toFixed(1), this.langCode) + ' ' + this.t('秒', 's'))
                 .fontSize(this.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold)
                 .fontColor(this.theme().ink)
               Text(this.t('用时', 'Time')).fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)

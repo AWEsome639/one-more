@@ -18,6 +18,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const LEVELS: number = 5;      // 通关关数
 const POOL: number = 6;        // 每关砝码个数
@@ -106,6 +107,7 @@ export struct GBalanceScale {
     this.startAt = Date.now();
     this.newLevel(true);
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.over) {
         this.seconds = this.seconds + 1;
       }

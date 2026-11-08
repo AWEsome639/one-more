@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const KIND: string[] = [TG('名词'), TG('动词'), TG('形容词'), TG('副词')];
 const KIND_COLOR: string[] = [Palette.sky, Palette.orange, Palette.violet, Palette.emerald];
@@ -92,7 +93,10 @@ export struct GGrammarSort {
     this.over = false; this.won = false; this.done = false;
     this.msg = TG('这个词是哪种词性？');
     this.startAt = Date.now();
-    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK_MS);
   }
   private cur(): GW { return BANK[this.queue[this.step < this.diffTotal ? this.step : this.diffTotal - 1]]; }
   private tick(): void {

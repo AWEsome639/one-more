@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const PAIRS_N: number = 6; const PASS: number = 5; const OPT_N: number = 4;
 const STUDY_S: number = 8; const TICK_MS: number = 1000; const FEED_MS: number = 900;
@@ -88,7 +89,10 @@ export struct GWordPairAssociateMemory {
     this.phase = 0; this.leftS = STUDY_S; this.qIndex = 0; this.right = 0; this.score = 0;
     this.pickedOk = -1; this.lastPick = ''; this.over = false; this.won = false; this.done = false;
     this.msg = TG2("记住这 {0} 组词对", this.diffTotal); this.startAt = Date.now();
-    this.timer = setInterval(() => { this.countdown(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.countdown();
+    }, TICK_MS);
   }
   private countdown(): void {
     this.leftS = this.leftS - 1;

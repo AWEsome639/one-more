@@ -27,7 +27,10 @@ const CELLS: number = N * N;
 //   而数组原来按 CELLS = 25 开 ⇒【困难档必越界】✗）
 const MAX_N: number = 7;
 const MAX_CELLS: number = MAX_N * MAX_N;
-const GOAL: number = CELLS - 1;
+// ★★★ 2026-11-08 **简单档 100% 赢不了**（game-balancer）：
+//   `GOAL = CELLS - 1 = 24` 写死，而棋盘按难度放大（`sizeNow(5)` = 4/5/7）
+//   ⇒ 简单档 4×4 只有 **16 格**，24 越界 ⇒ **永远不会触发胜利**。
+//   ⇒ 删掉常量，改成按当前棋盘算 `this.diffTotal * this.diffTotal - 1`（`GPathFinder` 已有正确范式）。
 const MAX_PATH: number = 13;
 const MAX_STEPS: number = 20;
 const NODE_CAP: number = 20000;
@@ -74,6 +77,12 @@ export struct GMathMaze {
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private diffTotal: number = GameDiff.sizeNow(5);
+
+  /** 终点格号（按当前棋盘算 —— 简单 4×4=15 / 普通 5×5=24 / 困难 7×7=48） */
+  private goal(): number {
+    const n: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    return n * n - 1;
+  }
 
   /** 0..diffTotal-1（读 @State 建依赖） */
   private rowIdx(): number[] {
@@ -145,7 +154,7 @@ export struct GMathMaze {
       return false;
     }
     const cur: number = path[path.length - 1];
-    if (cur === GOAL) {
+    if (cur === this.goal()) {
       return true;
     }
     if (path.length >= MAX_PATH) {
@@ -251,7 +260,7 @@ export struct GMathMaze {
    * ⇒ 提示**只报下一步走哪一格**（报整条路径玩家也用不上，因为格子会变）。
    */
   private dfsSum(cur: number, sum: number, visited: boolean[], out: number): boolean {
-    if (cur === GOAL) {
+    if (cur === this.goal()) {
       return sum === this.target;
     }
     const ns: number[] = this.nbrs(cur);
@@ -279,7 +288,7 @@ export struct GMathMaze {
 
   private findNext(): number {
     const start: number = this.trail[this.trail.length - 1];
-    if (start === GOAL) {
+    if (start === this.goal()) {
       return -1;
     }
     const visited: boolean[] = new Array<boolean>(MAX_CELLS).fill(false);
@@ -500,7 +509,7 @@ export struct GMathMaze {
     nt.push(to);
     this.trail = nt;
     const s: number = this.sumNow();
-    if (to === GOAL) {
+    if (to === this.goal()) {
       if (s === this.target) {
         this.over = true;
         this.won = true;
@@ -588,7 +597,7 @@ export struct GMathMaze {
               .fontSize(FontSize.xl)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.theme.ink)
-              Text((r * this.diffTotal + c) === GOAL ? '🏁' : (this.trail.length > 0 && (r * this.diffTotal + c) === this.trail[0] ? TG('起') : ''))
+              Text((r * this.diffTotal + c) === this.goal() ? '🏁' : (this.trail.length > 0 && (r * this.diffTotal + c) === this.trail[0] ? TG('起') : ''))
               .fontSize(FontSize.xxs)
               .fontColor(this.theme.inkFaint)
               }
@@ -596,7 +605,7 @@ export struct GMathMaze {
               .layoutWeight(1)
               .aspectRatio(1)
               .backgroundColor(this.trail.length > 0 && (r * this.diffTotal + c) === this.trail[this.trail.length - 1]
-              ? '#336366F1'
+              ? Palette.tint('33')
               : (this.trail.indexOf((r * this.diffTotal + c)) >= 0 ? '#2210B981' : this.theme.surface))
               .borderRadius(Radius.sm)
               .border({ width: 1, color: this.theme.line })
@@ -647,7 +656,7 @@ export struct GMathMaze {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L645'; })
           .onBlur(() => { if (this.tvFocus === 'L645') { this.tvFocus = ''; } })
@@ -664,7 +673,7 @@ export struct GMathMaze {
           .backgroundColor(Palette.orange)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L660'; })
           .onBlur(() => { if (this.tvFocus === 'L660') { this.tvFocus = ''; } })

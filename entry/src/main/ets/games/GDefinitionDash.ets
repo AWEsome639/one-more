@@ -13,6 +13,7 @@ import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const ROUNDS: number = 10; const PASS: number = 8; const MISS_MAX: number = 3;
 const LIMIT_S: number = 60; const TICK_MS: number = 1000;
@@ -96,7 +97,10 @@ export struct GDefinitionDash {
       out.push(idx[p]); idx.splice(p, 1);
     }
     this.order = out; this.deal();
-    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK_MS);
   }
 
   private deal(): void {

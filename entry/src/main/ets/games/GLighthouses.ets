@@ -539,7 +539,7 @@ export struct GLighthouses {
           .backgroundColor(Palette.violet)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L615'; })
           .onBlur(() => { if (this.tvFocus === 'L615') { this.tvFocus = ''; } })

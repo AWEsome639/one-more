@@ -21,6 +21,7 @@ import { Digits } from '../core/I18n';
 // ★ 2026-10-24 第三期：通用提示层 + AI 代打
 import { Hint, HintResult } from '../ai/Hint';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 6;              // 6×6
 const BOX_R: number = 2;          // 宫高
@@ -266,6 +267,7 @@ export struct GSudokuHex {
     this.finished = false;
     this.startAt = Date.now();
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.done && !this.finished) {
         this.seconds = this.seconds + 1;
       }
@@ -656,7 +658,7 @@ export struct GSudokuHex {
       .height(this.boardPx(340))
       .alignSelf(ItemAlign.Center)
       .padding(Space.xs)
-      .backgroundColor('#1A6366F1')
+      .backgroundColor(Palette.tint('1A'))
       .borderRadius(Radius.lg)
 
       Row({ space: Space.xs }) {

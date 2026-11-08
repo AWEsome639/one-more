@@ -51,6 +51,8 @@ export struct GWordMastermind {
   onFinish: (r: GameResult) => void = () => {};
   @State answer: string = ''; @State rows: string[] = []; @State marks: string[] = [];
   @State typed: string = ''; @State score: number = 0; @State msg: string = '';
+  /** ★ 2026-11-08（ai-fixer-a）代打当前这一猜的词（每轮重算；空 = 未算） */
+  private autoGuess: string = '';
   @State over: boolean = false; @State won: boolean = false;
   private startAt: number = 0; private settled: boolean = false;
   aboutToAppear(): void {
@@ -174,8 +176,71 @@ export struct GWordMastermind {
     if (this.over) {
       return true;
     }
-    this.press(this.typed.length < this.diffTotal ? LETTERS.indexOf(this.answer.charAt(this.typed.length)) : 27);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 answer**：按历史反馈逐位排除，逐字母按键输入。
+    if (this.typed.length < LEN) {
+      if (this.autoGuess.length !== LEN) {
+        this.autoGuess = this.autoNext();
+      }
+      this.press(LETTERS.indexOf(this.autoGuess.charAt(this.typed.length)));
+      return !this.over;
+    }
+    this.autoGuess = '';
+    this.press(27);            // ⏎ 提交
     return !this.over;
+  }
+
+  /**
+   * ★ 2026-11-08（ai-fixer-a）代打推理：**只看历史行与反馈标记**（'2' 对位 / '1' 在位 / '0' 无）。
+   *   规则：某位出现过 '2' ⇒ 该位定死；出现过 '0' ⇒ 该位排除这个字母；
+   *   未知位优先用「还没试过的字母」填（信息增益最大）。全程不碰 answer。
+   */
+  private autoNext(): string {
+    const banned: boolean[][] = [];
+    for (let c = 0; c < LEN; c++) {
+      banned.push(new Array<boolean>(26).fill(false));
+    }
+    const fixed: number[] = new Array<number>(LEN).fill(-1);
+    const tried: boolean[] = new Array<boolean>(26).fill(false);
+    for (let r = 0; r < this.rows.length; r++) {
+      const g: string = this.rows[r];
+      const mk: string = this.marks[r];
+      for (let c = 0; c < LEN; c++) {
+        const li: number = LETTERS.indexOf(g.charAt(c));
+        if (li < 0) {
+          continue;
+        }
+        tried[li] = true;
+        if (mk.charAt(c) === '2') {
+          fixed[c] = li;
+        } else if (mk.charAt(c) === '0') {
+          banned[c][li] = true;
+        }
+      }
+    }
+    let out: string = '';
+    for (let c = 0; c < LEN; c++) {
+      if (fixed[c] >= 0) {
+        out = out + LETTERS.charAt(fixed[c]);
+        continue;
+      }
+      let pick: number = -1;
+      for (let li = 0; li < 26; li++) {
+        if (!banned[c][li] && !tried[li]) {
+          pick = li;
+          break;
+        }
+      }
+      if (pick < 0) {
+        for (let li = 0; li < 26; li++) {
+          if (!banned[c][li]) {
+            pick = li;
+            break;
+          }
+        }
+      }
+      out = out + (pick >= 0 ? LETTERS.charAt(pick) : 'A');
+    }
+    return out;
   }
 
   // ═══════════ AI 代打（2026-10-28 第七批）═══════════
@@ -326,14 +391,14 @@ export struct GWordMastermind {
       }.width('100%')
       Row({ space: Space.sm }) {
         Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.tap(44)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L322'; })
       .onBlur(() => { if (this.tvFocus === 'L322') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L322'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         Button(TG('删一个'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.press(26); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.tap(44)).onClick(() => { Haptics.tap(); this.press(26); })
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L327'; })
       .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })

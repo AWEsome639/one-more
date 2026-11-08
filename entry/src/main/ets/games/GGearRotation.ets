@@ -352,7 +352,7 @@ export struct GGearRotation {
       }.width('100%')
       Button(TG('重开'))
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(44))
+        .borderRadius(Radius.md).width('100%').height(Cell.tap(44))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L350'; })
         .onBlur(() => { if (this.tvFocus === 'L350') { this.tvFocus = ''; } })

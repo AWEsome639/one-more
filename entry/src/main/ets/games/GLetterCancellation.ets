@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 6; const CELLS: number = N * N;
 const TARGETS: number = 8; const PLATES: number = 3;
@@ -71,7 +72,10 @@ export struct GLetterCancellation {
     this.msg = TG('划掉盘里所有的目标字母');
     this.startAt = Date.now();
     this.load();
-    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK_MS);
   }
   private load(): void {
     this.target = ALL[Math.floor(Math.random() * ALL.length)];

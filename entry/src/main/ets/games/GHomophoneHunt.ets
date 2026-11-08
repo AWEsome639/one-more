@@ -15,6 +15,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { Bp } from '../core/Bp';
+import { AppClock } from '../core/AppClock';
 
 const QN: number = 10; const PASS: number = 6;
 const LIMIT_S: number = 15; const TICK_MS: number = 1000;
@@ -97,7 +98,10 @@ export struct GHomophoneHunt {
     this.over = false; this.won = false; this.done = false;
     this.msg = TG('哪个词是这个读音？');
     this.startAt = Date.now();
-    this.timer = setInterval(() => { this.leftS--; this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.leftS--; this.tick();
+    }, TICK_MS);
   }
   private cur(): HP { return BANK[this.queue[this.qIdx < QN ? this.qIdx : QN - 1]]; }
   private tick(): void {

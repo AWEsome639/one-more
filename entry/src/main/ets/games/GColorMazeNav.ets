@@ -60,6 +60,37 @@ function genMap(n: number): ColorMap {
  // 终点保持与通路同色：通路本身就是"这条路"，改写终点颜色会让它变成走不到的孤岛
  return { color: color, start: start, goal: goal };
 }
+/**
+ * 同色最短路长度（BFS：只能踩与起点同色的砖）—— 结算时当「本局的下限」用。
+ * 返回 -1 = 走不到（生成器保证有解，这里只是兜底）。
+ * 成本：≤ MAX_CELLS(64) 格，一次结算只调一次，不进帧循环。
+ */
+function bestPath(color: number[], n: number, from: number, to: number): number {
+ if (from === to) { return 0; }
+ const dist: number[] = new Array<number>(n * n).fill(-1);
+ const q: number[] = [from];
+ dist[from] = 0;
+ let head: number = 0;
+ while (head < q.length) {
+ const cur: number = q[head];
+ head = head + 1;
+ const r: number = Math.floor(cur / n);
+ const c: number = cur % n;
+ const nb: number[] = [];
+ if (r > 0) { nb.push(cur - n); }
+ if (r < n - 1) { nb.push(cur + n); }
+ if (c > 0) { nb.push(cur - 1); }
+ if (c < n - 1) { nb.push(cur + 1); }
+ for (let k = 0; k < nb.length; k++) {
+ const t: number = nb[k];
+ if (dist[t] >= 0 || color[t] !== color[from]) { continue; }
+ dist[t] = dist[cur] + 1;
+ if (t === to) { return dist[t]; }
+ q.push(t);
+ }
+ }
+ return dist[to];
+}
   @Component
 export struct GColorMazeNav {
   /** ★★★ 2026-10-16 BUG #24：数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
@@ -101,6 +132,8 @@ export struct GColorMazeNav {
   @State private note: string = '';
 
  private startAt: number = 0;
+ /** 本局起点（结算算 par 用；不参与渲染，不用 @State） */
+ private startPos: number = 0;
 
  aboutToAppear(): void {
    LanRace.noteStart(); this.reset();
@@ -246,7 +279,7 @@ export struct GColorMazeNav {
   }
 
  private reset(): void {
- const m: ColorMap = genMap(this.diffTotal); this.color = m.color; this.pos = m.start; this.goal = m.goal;
+ const m: ColorMap = genMap(this.diffTotal); this.color = m.color; this.pos = m.start; this.goal = m.goal; this.startPos = m.start;
  this.steps = 0; this.over = false; this.won = false; this.note = TG('只能走同色砖，踩到 🏁 通关');
  this.startAt = Date.now();
  }
@@ -272,9 +305,24 @@ export struct GColorMazeNav {
  private finish(solved: boolean): void {
  this.over = true; this.won = solved;
  LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+ // ★★★ 2026-11-08（game-balancer）修「越难分越少 + 慢赢不如快输」：
+ //   ① 原式 `70 + (DMAX - steps) * 3` 拿写死的 DMAX=26 当分母，与棋盘大小无关
+ //      ⇒ 三档打得再漂亮也是同一档分数（难度给不了任何奖励）；
+ //   ② 输局 `steps*3` 上限 78 > 慢赢（走满 26 步）的 70 ⇒ **耗光步数比通关分还高**。
+ //   ⇒ 效率按「本局真实最短同色路 par」归一（0~1，与棋盘无关），乘档位权重 0.7+0.1n
+ //      （4→1.1 / 6→1.3 / 8→1.5）⇒ 难度越高分越高；输局封顶 30×权重 < 赢局下限 70×权重。
+ const parRaw: number = bestPath(this.color, this.diffTotal, this.startPos, this.goal);
+ const par: number = parRaw > 0 ? parRaw : 1;
+ const span: number = DMAX - par > 4 ? DMAX - par : 4;
+ let eff: number = (DMAX - this.steps) / span;
+ if (eff < 0) { eff = 0; }
+ if (eff > 1) { eff = 1; }
+ const mul: number = 0.7 + 0.1 * this.diffTotal;
+ let prog: number = this.steps / par;
+ if (prog > 1) { prog = 1; }
  this.onFinish({
  gameId: 'color_maze_nav', solved: solved,
- score: solved ? 70 + Math.max(0, (DMAX - this.steps) * 3) : this.steps * 3,
+ score: solved ? Math.round((70 + 70 * eff) * mul) : Math.round(30 * mul * prog),
  durationMs: Date.now() - this.startAt, levelReached: solved ? 2 : 1
  });
  }
@@ -351,7 +399,7 @@ export struct GColorMazeNav {
    .textShadow(A11y.glyphShadow())
  Text(this.pos === r * this.diffTotal + c ? '🔵' : (r * this.diffTotal + c === this.goal ? '🏁' : '')).fontSize(FontSize.md)
  }
- }.layoutWeight(1).height(Cell.of(44)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+ }.layoutWeight(1).height(Cell.tap(44)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
  .onFocus(() => { this.tvFocus = 'L351'; })
  .onBlur(() => { if (this.tvFocus === 'L351') { this.tvFocus = ''; } })
  .outline(Tv.focusOutline(this.tvFocus === 'L351', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); }); }).onClick(() => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); })

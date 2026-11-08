@@ -24,6 +24,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const TARGET: number = 24;        // 目标值
 const COUNT: number = 4;          // 4 个数
@@ -272,6 +273,7 @@ export struct GGame24 {
     this.tip = '';
     this.startAt = Date.now();
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.done && !this.finished) {
         this.seconds = this.seconds + 1;
       }
@@ -680,7 +682,7 @@ export struct GGame24 {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .opacity(this.undoDepth > 0 && !this.done ? 1 : 0.45)
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L681'; })
@@ -698,7 +700,7 @@ export struct GGame24 {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L696'; })
           .onBlur(() => { if (this.tvFocus === 'L696') { this.tvFocus = ''; } })
@@ -715,7 +717,7 @@ export struct GGame24 {
           .backgroundColor(Palette.primary)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L711'; })
           .onBlur(() => { if (this.tvFocus === 'L711') { this.tvFocus = ''; } })

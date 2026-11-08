@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const COLS: number = 8;
 const CELLS: number = 32;
@@ -117,7 +118,10 @@ export struct GD2Attention {
     this.over = false; this.won = false; this.finished = false;
     this.msg = TG('点出「d + 正好两个小撇」');
     this.startAt = Date.now();
-    this.timer = setInterval(() => { this.tick(); }, 1000);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, 1000);
   }
 
   private tick(): void {

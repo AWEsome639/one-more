@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const SYMS: string[] = ['●', '▲', '■', '★', '◆', '✚'];
 const IDX6: number[] = [0, 1, 2, 3, 4, 5];
@@ -62,7 +63,10 @@ export struct GSymbolDigitAssoc {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
     this.startAt = Date.now();
     this.reset();
-    this.tick = setInterval(() => { this.secs = Math.floor((Date.now() - this.startAt) / 1000); }, 1000);
+    this.tick = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.secs = Math.floor((Date.now() - this.startAt) / 1000);
+    }, 1000);
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GSymbolDigitAssoc')) {
       setTimeout(() => { this.demoStart(); }, 3000);

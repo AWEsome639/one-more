@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 interface VennItem { v: number; zone: number; }   // zone: 0=只在A 1=只在B 2=交集 -1=已归位
 const BANK: number[][] = [
@@ -224,7 +225,10 @@ export struct GVennNumbers {
     this.sel = -1; this.placed = 0; this.wrong = 0; this.fb = -1;
     this.over = false; this.won = false; this.clock = 0; this.startAt = Date.now();
     this.msg = TG('A 是 3 的倍数，B 是偶数 —— 先选数字，再点区域');
-    this.timer = setInterval(() => { if (!this.over) { this.clock = this.clock + 1; } }, 1000);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      if (!this.over) { this.clock = this.clock + 1; }
+    }, 1000);
   }
   private live(i: number): boolean { return this.items[i].zone >= 0; }
   private zoneName(z: number): string { return z === 0 ? TG('只在 A') : (z === 1 ? TG('只在 B') : 'A ∩ B'); }
@@ -309,7 +313,7 @@ export struct GVennNumbers {
         Circle({ width: 118, height: 118 }).fill(this.theme.isDark ? '#221D4ED8' : '#332563EB')
           .stroke(Palette.primary).strokeWidth(3).position({ x: 78, y: 12 })
         Row() { Text(('A')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        .textAlign(TextAlign.Center).width((96)).height(Cell.of(44)).backgroundColor(this.theme.surfaceAlt)
+        .textAlign(TextAlign.Center).width((96)).height(Cell.tap(44)).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).border({ width: 2, color: this.fb === 1 ? Palette.rose : this.theme.line })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.tapZone((0)); })
@@ -318,7 +322,7 @@ export struct GVennNumbers {
         .onBlur(() => { if (this.tvFocus === 'L314') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L314'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapZone((0)); }); }); Text(('B')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        .textAlign(TextAlign.Center).width((96)).height(Cell.of(44)).backgroundColor(this.theme.surfaceAlt)
+        .textAlign(TextAlign.Center).width((96)).height(Cell.tap(44)).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).border({ width: 2, color: this.fb === 1 ? Palette.rose : this.theme.line })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.tapZone((1)); })
@@ -327,7 +331,7 @@ export struct GVennNumbers {
         .onBlur(() => { if (this.tvFocus === 'L321') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L321'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapZone((1)); }); }); Text(('A∩B')).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        .textAlign(TextAlign.Center).width((74)).height(Cell.of(44)).backgroundColor(this.theme.surfaceAlt)
+        .textAlign(TextAlign.Center).width((74)).height(Cell.tap(44)).backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md).border({ width: 2, color: this.fb === 1 ? Palette.rose : this.theme.line })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => { Haptics.tick(); this.tapZone((2)); })

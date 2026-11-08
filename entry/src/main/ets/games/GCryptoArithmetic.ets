@@ -9,6 +9,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -333,7 +334,7 @@ export struct GCryptoArithmetic {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -434,7 +435,7 @@ export struct GCryptoArithmetic {
         Row({ space: Space.xs }) {
           ForEach([0, 1, 2, 3, 4], (d: number) => { Button(String((d)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.usedDigit((d)) ? this.theme.inkFaint : this.theme.ink)
-          .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(48))
+          .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 40 : 48))
           .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L424'; })
           .onBlur(() => { if (this.tvFocus === 'L424') { this.tvFocus = ''; } })
@@ -443,7 +444,7 @@ export struct GCryptoArithmetic {
         Row({ space: Space.xs }) {
           ForEach([5, 6, 7, 8, 9], (d: number) => { Button(String((d)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.usedDigit((d)) ? this.theme.inkFaint : this.theme.ink)
-          .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(48))
+          .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 40 : 48))
           .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L430'; })
           .onBlur(() => { if (this.tvFocus === 'L430') { this.tvFocus = ''; } })
@@ -454,7 +455,7 @@ export struct GCryptoArithmetic {
       Row({ space: Space.sm }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(44)).focusable(Tv.on())
+          .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L437'; })
           .onBlur(() => { if (this.tvFocus === 'L437') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L437')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

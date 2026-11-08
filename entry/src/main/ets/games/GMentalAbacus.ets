@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const TERMS: number = 5; const GOAL: number = 8;
 const LIMIT: number = 60; const TICK_MS: number = 1000; const PENALTY: number = 3; const NEXT_MS: number = 900;
@@ -91,7 +92,10 @@ export struct GMentalAbacus {
     this.over = false; this.won = false; this.finished = false; this.startAt = Date.now();
     this.ask();
     this.msg = TG('从左往右一路算下去，得出最后的结果');
-    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK_MS);
   }
 
   private tick(): void {

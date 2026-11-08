@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const LIMIT: number = 45;
 const NEED: number = 12;
@@ -70,6 +71,7 @@ export struct GDivisibilityDash {
     this.startAt = Date.now();
     this.reset();
     this.tick = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (this.over) { return; }
       this.left--;
       if (this.left <= 0) {
@@ -390,7 +392,7 @@ export struct GDivisibilityDash {
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.orange).borderRadius(Radius.md).width(120).height(Cell.of(44)).focusable(Tv.on())
+          .backgroundColor(Palette.orange).borderRadius(Radius.md).width(120).height(Cell.tap(44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L373'; })
           .onBlur(() => { if (this.tvFocus === 'L373') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L373')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

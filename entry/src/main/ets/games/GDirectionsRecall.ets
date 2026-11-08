@@ -247,6 +247,9 @@ export struct GDirectionsRecall {
   }
 
   private nextRound(): void {
+    if (this.over) {
+      return;
+    }
     this.phase = 'done';
     if (this.round + 1 >= ROUNDS.length) {
       this.over = true;
@@ -334,7 +337,7 @@ export struct GDirectionsRecall {
       
       Button(this.phase === 'done' ? TG('下一关…') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .height(Cell.tap(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L332'; })

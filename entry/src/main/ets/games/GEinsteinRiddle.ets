@@ -433,7 +433,7 @@ export struct GEinsteinRiddle {
 
       Row({ space: Space.sm }) {
         Button(this.hintOn ? TG('已看提示') : TG('提示 −100'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.tap(44))
           .fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .focusable(Tv.on())
@@ -443,7 +443,7 @@ export struct GEinsteinRiddle {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.hintOn = true; }); })
           .onClick(() => { Haptics.tap(); this.hintOn = true; })
         Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.tap(44))
           .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
           .borderRadius(Radius.md)
           .focusable(Tv.on())

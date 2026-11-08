@@ -15,6 +15,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const PADS: number[] = [0, 1, 2, 3];
 const PAD_COLORS: string[] = [Palette.rose, Palette.sky, Palette.emerald, Palette.amber];
@@ -76,7 +77,10 @@ export struct GSimonCommand {
     this.color = Math.floor(Math.random() * PADS.length);
     this.left = LIMIT_MS; this.phase = 'play';
     if (this.tickTimer >= 0) { clearInterval(this.tickTimer); }
-    this.tickTimer = setInterval(() => { this.tick(); }, TICK);
+    this.tickTimer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK);
   }
   private tick(): void {
     if (this.phase !== 'play' || this.over) { return; }

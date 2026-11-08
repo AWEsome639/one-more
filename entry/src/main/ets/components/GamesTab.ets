@@ -144,6 +144,18 @@ export struct GamesTab {
    */
   @State private searchText: string = '';
   @State private searchOpen: boolean = false;
+  /**
+   * ★★★ 2026-11-08 perf-hunter **搜索防抖**（性能）
+   *   每敲 1 个字都会改 `searchText` ⇒ `list()` 的缓存键变 ⇒ `computeList()` 重扫 355 款
+   *   （**355 × 3 = 1065 次 `toLowerCase` + `indexOf`**）**＋ 命中卡的全量重建**（后者才是大头）。
+   *   ⇒ 用 150ms 防抖：连续输入只算最后一次。
+   *   ⚠️ **必须保留「立刻生效」的三个出口**（不然用户会觉得点不动）：
+   *     ① 清空 ✕（含遥控器/键盘那条）② 回车（`onSubmit`）③ 关掉搜索（🔍 再点一次）
+   *   ⚠️ 关搜索那条最容易漏：防抖回调会在面板关掉后才落地 ⇒ 列表被留在一个看不见的筛选里。
+   */
+  private searchTimer: number = -1;
+  /** 还没落地的最新输入（防抖窗口内的值） */
+  private searchPending: string = '';
   // ★★★ 2026-11-07（奥森的第八个想法）**对话找游戏**
   //   v1 = 规则 + 标签检索（零模型、零网络）；v2 再挂端侧 LLM（`ChatFinder` 里有说明）
   @State private chatOpen: boolean = false;
@@ -241,6 +253,17 @@ export struct GamesTab {
     this.flyingId = '';
   }
 
+  /**
+   * ★ 2026-11-08 perf-hunter：搜索防抖的计时器必须随组件一起停。
+   *   判据 54：组件销毁后不许再改 @State —— 150ms 的窗口足够让「退出页面」正好落在里面。
+   */
+  aboutToDisappear(): void {
+    if (this.searchTimer >= 0) {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = -1;
+    }
+  }
+
   // ★ 性能：theme() 在一次渲染里被调 28+ 次，每次都 new Theme 对象 ⇒ 按 dark 记忆化
   private themeCache: Theme | null = null;
   private themeCacheDark: boolean = false;
@@ -292,7 +315,21 @@ export struct GamesTab {
   private askChat(): void {
     const text: string = this.chatText.trim();
     if (text.length === 0) { return; }
-    const it: Intent = ChatFinder.parse(text);
+    // ★★★ 2026-11-08 **端侧 LLM 优先，规则保底**（verifier-eng2 的 `LocalLLM`）：
+    //   `parseWithLLM()` 内部已 fallback —— 系统模型不可用/超时/JSON 不合法 ⇒ **原样返回 `parse()` 的结果**
+    //   ⇒ 断网、没模型、权限拒绝**都不影响**（判据：LLM 是锦上添花，规则是保底）。
+    //   ⚠️ 异步：先同步走规则（用户立刻看到结果），LLM 回来后再覆盖（不阻塞 UI）。
+    const base: Intent = ChatFinder.parse(text);
+    this.applyChatIntent(base, text);
+    ChatFinder.parseWithLLM(text).then((it: Intent) => {
+      this.applyChatIntent(it, text);
+    }).catch(() => {
+      // 静默：base 已经显示过了
+    });
+  }
+
+  /** 把意图应用到 UI（同步/异步两条路共用） */
+  private applyChatIntent(it: Intent, text: string): void {
     if (ChatFinder.isEmpty(it)) {
       this.chatAnswer = ChatFinder.ask();
       this.chatPicks = [];
@@ -377,6 +414,36 @@ export struct GamesTab {
   @State private menuId: string = '';
   @State private menuX: number = 0;
   @State private menuY: number = 0;
+
+  /**
+   * ★ 2026-11-08 perf-hunter：搜索输入的统一入口（防抖 / 立刻）。
+   *   immediate = true ⇒ 取消未落地的防抖并**立刻**赋值（清空 ✕ / 回车 / 关搜索走这条）。
+   */
+  private setSearch(v: string, immediate: boolean): void {
+    this.searchPending = v;
+    if (this.searchTimer >= 0) {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = -1;
+    }
+    if (immediate) {
+      this.searchText = v;
+      return;
+    }
+    this.searchTimer = setTimeout(() => {
+      this.searchTimer = -1;
+      this.searchText = this.searchPending;
+    }, 150);
+  }
+
+  /** 把防抖窗口里还没落地的搜索词立刻生效（回车用；没有待生效值时什么也不做） */
+  private flushSearch(): void {
+    if (this.searchTimer < 0) {
+      return;
+    }
+    clearTimeout(this.searchTimer);
+    this.searchTimer = -1;
+    this.searchText = this.searchPending;
+  }
 
   /**
    * ★ 2026-10-30：切换任何"会改变列表长度"的条件后，把 Grid 滚动位置归零。
@@ -1133,7 +1200,7 @@ build() {
             //   ⇒ 修法：高度【跟着模式算】
             //      normal 84 ｜ elder 112（×1.33）｜ simple 76（×0.9）
             .height(this.cardH())
-          }, (g: GameMeta) => g.id + this.tick)
+          }, (g: GameMeta) => g.id)   // ★ 2026-11-08 perf-hunter：去掉 `+ this.tick`（收藏不再重建 355 卡）
         }
         // ★★★ 2026-10-19 真机大字模式实拍后改：大字模式改【单列】
         //   实拍：副标题「一板一球，清空全场」在大字模式下被截成「一板一球，清…」
@@ -1547,13 +1614,13 @@ build() {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                         Haptics.tap();
             this.searchOpen = !this.searchOpen;
-            if (!this.searchOpen) { this.searchText = ''; }
+            if (!this.searchOpen) { this.setSearch('', true); }
           
           }); })
           .onClick(() => {
             Haptics.tap();
             this.searchOpen = !this.searchOpen;
-            if (!this.searchOpen) { this.searchText = ''; }
+            if (!this.searchOpen) { this.setSearch('', true); }
           })
 
         // ★ 对话找游戏入口（奥森第八个想法）
@@ -2276,7 +2343,7 @@ build() {
                 //   但也因此不会因为内部状态变化而重算 —— 正合我意：进场只做一次）。
                 this.azRow(g, (secIndex === 0 && gi < 10) ? gi : -1)
               }
-            }, (g: GameMeta) => g.id + this.tick)
+            }, (g: GameMeta) => g.id)   // ★ 同上：去掉 `+ this.tick`
           }
         }, (sec: AzSection) => sec.letter)
       }
@@ -2542,7 +2609,12 @@ build() {
           .backgroundColor(Color.Transparent)
           .placeholderColor(this.theme().inkFaint)
           .onChange((v: string) => {
-            this.searchText = v;
+            this.setSearch(v, false);
+          })
+          // ★ 2026-11-08 perf-hunter：键盘回车要把防抖里的词立刻落地
+          //   （否则「按了回车没反应」，等 150ms 才变）
+          .onSubmit(() => {
+            this.flushSearch();
           })
         if (this.searchText.length > 0) {
           Text('✕')
@@ -2554,7 +2626,7 @@ build() {
             .outline(Tv.focusOutline(this.tvFocus === 'GT2398'))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                             Haptics.tap();
-              this.searchText = '';
+              this.setSearch('', true);
             
             }); })
             // ★ 2026-11-08 读屏：纯图标按钮，必须说清按下去做什么（含状态）
@@ -2562,7 +2634,7 @@ build() {
             .accessibilityLevel('yes')
             .onClick(() => {
               Haptics.tap();
-              this.searchText = '';
+              this.setSearch('', true);
             })
         }
       }

@@ -621,7 +621,7 @@ export struct GNonogram {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .width(64)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             this.askHint();
           })
@@ -637,7 +637,7 @@ export struct GNonogram {
           .backgroundColor(Palette.primaryDeep)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             Haptics.tap();
             this.reset();

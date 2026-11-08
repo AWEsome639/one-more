@@ -1052,7 +1052,7 @@ build() {
               Text(ProgressStore.isUnlocked(a[0]) ? a[1] : '🔒')
                 .fontSize(FontSize.xl)
                 .width(30).height(30).textAlign(TextAlign.Center)
-                .backgroundColor(ProgressStore.isUnlocked(a[0]) ? '#1A6366F1' : this.theme().surfaceAlt)
+                .backgroundColor(ProgressStore.isUnlocked(a[0]) ? Palette.tint('1A') : this.theme().surfaceAlt)
                 .borderRadius(Radius.sm)
               Column({ space: 1 }) {
                 Text(this.t(a[2], a.length >= 6 ? a[4] : a[2]))
@@ -1189,7 +1189,7 @@ build() {
       Text(ProgressStore.isUnlocked(a[0]) ? a[1] : '🔒')
         .fontSize(FontSize.xl)
         .width(36).height(36).textAlign(TextAlign.Center)
-        .backgroundColor(ProgressStore.isUnlocked(a[0]) ? '#1A6366F1' : this.theme().surfaceAlt)
+        .backgroundColor(ProgressStore.isUnlocked(a[0]) ? Palette.tint('1A') : this.theme().surfaceAlt)
         .borderRadius(Radius.sm)
       Column({ space: 1 }) {
         Text(this.t(a[2], a.length >= 6 ? a[4] : a[2]))

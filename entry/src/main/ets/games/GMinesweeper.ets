@@ -25,6 +25,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const SIDE: number = 9;                        // 9×9
 const MINES: number = 10;                      // 10 颗雷
@@ -168,6 +169,7 @@ export struct GMinesweeper {
     this.swallowClick = false;
     this.startAt = Date.now();
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.over && !this.finished) {
         this.seconds = this.seconds + 1;
       }
@@ -701,7 +703,7 @@ export struct GMinesweeper {
             .backgroundColor(this.flagMode ? Palette.berry : this.theme.surfaceAlt)
             .borderRadius(Radius.md)
             .layoutWeight(1)
-            .height(Cell.of(44))
+            .height(Cell.tap(44))
             .onClick(() => {
               Haptics.tap();
               this.flagMode = !this.flagMode;
@@ -717,7 +719,7 @@ export struct GMinesweeper {
             .backgroundColor(this.theme.surfaceAlt)
             .borderRadius(Radius.md)
             .width(64)
-            .height(Cell.of(44))
+            .height(Cell.tap(44))
             .onClick(() => {
               this.askHint();
             })
@@ -733,7 +735,7 @@ export struct GMinesweeper {
             .backgroundColor(Palette.primary)
             .borderRadius(Radius.md)
             .width(96)
-            .height(Cell.of(44))
+            .height(Cell.tap(44))
             .onClick(() => {
               Haptics.tap();
               this.reset();

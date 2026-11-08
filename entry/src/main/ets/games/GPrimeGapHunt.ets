@@ -3,6 +3,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -257,6 +258,9 @@ export struct GPrimeGapHunt {
   }
 
   private next(): void {
+    if (this.over) {
+      return;
+    }
     this.wait = -1;
     this.idx++;
     if (this.idx >= this.diffTotal) {
@@ -274,7 +278,7 @@ export struct GPrimeGapHunt {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -308,7 +312,7 @@ export struct GPrimeGapHunt {
       Row({ space: Space.sm }) {
         ForEach([0, 1], (i: number) => { Button(String(this.opts[(i)]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.picked < 0 && !this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked < 0 && !this.over)
         .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L311'; })
@@ -319,7 +323,7 @@ export struct GPrimeGapHunt {
       Row({ space: Space.sm }) {
         ForEach([2, 3], (i: number) => { Button(String(this.opts[(i)]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.picked < 0 && !this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked < 0 && !this.over)
         .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L320'; })
@@ -330,7 +334,7 @@ export struct GPrimeGapHunt {
       Row({ space: Space.md }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primaryDeep)
-          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L328'; })
           .onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })

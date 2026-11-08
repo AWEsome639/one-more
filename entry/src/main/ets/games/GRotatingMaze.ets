@@ -274,7 +274,26 @@ export struct GRotatingMaze {
   private finish(solved: boolean): void {
     if (this.done) { return; }
     this.done = true; this.over = true; this.won = solved;
-    const raw: number = solved ? 80 + (DMAX - this.steps) * 2 : this.steps * 2 + this.turns * 3;
+    // ★★★ 2026-11-08（game-balancer）修「越难分越少 + 输比赢多」两个反直觉：
+    //   ① 原式 `80 + (DMAX - steps) * 2` 拿**写死的 DMAX=64** 当分母，而棋盘随难度 5/7/9
+    //      ⇒ 最短解是 8/12/16（4000 局 BFS 实测），同样"打得最漂亮"却是
+    //        简单 192 / 普通 184 / 困难 **176** —— **越难分越少**（与"烧脑该多给"相反）。
+    //   ② 原输局 `steps*2 + turns*3`：困难档走满 63 步 + 30 转 ≈ 216 > 赢局 176
+    //      ⇒ **故意把步数走光，分数比通关还高**（最高分会记住这个数）。
+    //   ⇒ 效率按「本档 par」归一（par = 2(n-1)，与随机迷宫实测最短解一致，且与棋盘无关地落在 0~1），
+    //     再乘档位权重 `0.7 + 0.1n`（5→1.2 / 7→1.4 / 9→1.6）⇒ 难度越高分越高；
+    //     输局封顶 40×权重，恒低于赢局下限 80×权重 ⇒ 再也不会「输 > 赢」。
+    const par: number = Math.max(4, 2 * (this.diffTotal - 1));
+    const span: number = DMAX - par > 4 ? DMAX - par : 4;
+    let eff: number = (DMAX - this.steps) / span;
+    if (eff < 0) { eff = 0; }
+    if (eff > 1) { eff = 1; }
+    const mul: number = 0.7 + 0.1 * this.diffTotal;
+    let prog: number = this.steps / par;
+    if (prog > 1) { prog = 1; }
+    const raw: number = solved
+      ? Math.round((80 + 80 * eff) * mul)
+      : Math.round(40 * mul * prog);
     const res: GameResult = { gameId: 'rotating_maze', solved: solved, score: raw, durationMs: Date.now() - this.startAt, levelReached: this.turns };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(res);

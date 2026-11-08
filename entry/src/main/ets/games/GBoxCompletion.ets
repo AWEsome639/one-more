@@ -377,7 +377,7 @@ export struct GBoxCompletion {
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
  Row({ space: Space.sm }) {
  Button(TG('清空点亮'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.tap(44)).fontSize(FontSize.sm).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L352'; })
       .onBlur(() => { if (this.tvFocus === 'L352') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L352')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (!this.over) { this.lit = new Array<boolean>(MAX_CELLS).fill(false); } }); }).onClick(() => {
@@ -385,7 +385,7 @@ export struct GBoxCompletion {
  if (!this.over) { this.lit = new Array<boolean>(MAX_CELLS).fill(false); }
  })
  Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.tap(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L357'; })
       .onBlur(() => { if (this.tvFocus === 'L357') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L357')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

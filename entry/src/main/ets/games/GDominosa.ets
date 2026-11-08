@@ -714,7 +714,7 @@ export struct GDominosa {
           .backgroundColor(Palette.primary)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L711'; })
           .onBlur(() => { if (this.tvFocus === 'L711') { this.tvFocus = ''; } })

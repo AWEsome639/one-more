@@ -49,6 +49,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const GRID: number = 6;
 const CELLS: number = GRID * GRID;
@@ -226,6 +227,7 @@ export struct GBlockEscape {
     this.hintBlock = -1;
     this.startAt = Date.now();
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.done && !this.finished) {
         this.seconds = this.seconds + 1;
       }
@@ -709,7 +711,7 @@ export struct GBlockEscape {
         .height(this.boardPx(394))
         .alignSelf(ItemAlign.Center)
         .padding(Space.xs)
-        .backgroundColor('#1A6366F1')
+        .backgroundColor(Palette.tint('1A'))
         .borderRadius(Radius.lg)
 
         Row({ space: Space.sm }) {

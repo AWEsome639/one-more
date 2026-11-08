@@ -9,6 +9,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -244,7 +245,7 @@ export struct GSdmt {
     this.onFinish(r);
   }
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -289,7 +290,7 @@ export struct GSdmt {
         Row({ space: Space.sm }) {
           ForEach([1, 2, 3], (d: number) => {
             Text(String((d))).fontSize(FontSize.xl).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-            .layoutWeight(1).height(Cell.of(54)).borderRadius(Radius.md)
+            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 54)).borderRadius(Radius.md)
             .backgroundColor(this.tapped === (d) ? (this.ok ? Palette.emerald : Palette.rose) : Palette.primary)
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -304,7 +305,7 @@ export struct GSdmt {
         Row({ space: Space.sm }) {
           ForEach([4, 5, 6], (d: number) => {
             Text(String((d))).fontSize(FontSize.xl).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-            .layoutWeight(1).height(Cell.of(54)).borderRadius(Radius.md)
+            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 54)).borderRadius(Radius.md)
             .backgroundColor(this.tapped === (d) ? (this.ok ? Palette.emerald : Palette.rose) : Palette.primary)
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -319,7 +320,7 @@ export struct GSdmt {
         Row({ space: Space.sm }) {
           ForEach([7, 8, 9], (d: number) => {
             Text(String((d))).fontSize(FontSize.xl).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-            .layoutWeight(1).height(Cell.of(54)).borderRadius(Radius.md)
+            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 54)).borderRadius(Radius.md)
             .backgroundColor(this.tapped === (d) ? (this.ok ? Palette.emerald : Palette.rose) : Palette.primary)
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -337,7 +338,7 @@ export struct GSdmt {
       Button(this.over ? TG('再来一局') : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(Bp.height < 600 ? 38 : 46)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L333'; })
         .onBlur(() => { if (this.tvFocus === 'L333') { this.tvFocus = ''; } })

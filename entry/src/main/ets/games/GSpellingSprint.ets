@@ -11,6 +11,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const TOTAL: number = 12; const PASS: number = 8; const LIVES: number = 3;
 const LIMIT_S: number = 60; const TICK_MS: number = 1000; const GAP_MS: number = 600;
@@ -92,7 +93,10 @@ export struct GSpellingSprint {
     this.over = false; this.won = false; this.done = false;
     this.startAt = Date.now();
     this.msg = TG2('拼出「{0}」', this.cur().zh);
-    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK_MS);
   }
   private tick(): void {
     if (this.over) { return; }

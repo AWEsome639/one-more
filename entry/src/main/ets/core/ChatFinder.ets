@@ -17,8 +17,10 @@
  *   输入 → parse() 抽意图（类别/难度/时长/tag/是否限时）→ search() 打分排序 → 回 3 条
  *   意图抽不出来 ⇒ 回一句追问（不是「找不到」）
  */
-import { GAMES, GameMeta, GameCategory, Difficulty } from './GameRegistry';
+import { GAMES, GameMeta, GameCategory, Difficulty, catLabelEn } from './GameRegistry';
 import { TG } from './GameI18n';
+import { L } from './I18n';
+import { LocalLLM } from './LocalLLM';
 
 /** 一次对话解析出来的意图 */
 export interface Intent {
@@ -53,12 +55,19 @@ export interface Suggestion {
 /** 类别关键词表（中英都收，因为用户可能用任意语言） */
 const CAT_WORDS: string[][] = [
   // ★ 2026-11-07 模拟验证抓到：「解谜」是中文里**最常见**的说法，原来没在表里 ⇒ 「不太难的解谜」抽不出类别
-  ['逻辑', '推理', '动脑', '解谜', '谜题', '拼图', '脑筋', 'logic', 'puzzle', 'riddle', 'denken', 'logique', 'lógica', 'логик', 'منطق'],
-  ['数字', '数学', '算', 'math', 'number', 'zahlen', 'nombre', 'числ', 'أرقام'],
-  ['记忆', '记', 'memory', 'memor', 'gedächtnis', 'mémoire', 'memória', 'памят', 'ذاكرة'],
-  ['文字', '词', 'word', 'letter', 'wort', 'mot', 'palabra', 'слов', 'كلمات'],
-  ['空间', '旋转', '图形', 'spatial', 'shape', 'rotation', 'raum', 'espace', 'espacio', 'простран', 'مكان'],
-  ['经典', 'classic', 'klassisch', 'classique', 'clásico', 'классик', 'كلاسيك'],
+  ['逻辑', '推理', '动脑', '解谜', '谜题', '拼图', '脑筋', 'logic', 'puzzle', 'riddle', 'denken', 'logique', 'lógica', 'логик', 'منطق',
+   // ★ 2026-11-08 补：德 Rätsel/Denkspiel、俄 головоломка 是各自语言里最自然的说法（原来只有 denken/логик）
+   'rätsel', 'denkspiel', 'головолом', 'パズル', '論理', '퍼즐', '논리'],
+  ['数字', '数学', '算', 'math', 'number', 'zahlen', 'nombre', 'числ', 'أرقام',
+   'rechnen', 'матем', '数字', '計算', '숫자', '계산'],
+  ['记忆', '记', 'memory', 'memor', 'gedächtnis', 'mémoire', 'memória', 'памят', 'ذاكرة',
+   'merken', 'память', '記憶', '기억'],
+  ['文字', '词', 'word', 'letter', 'wort', 'mot', 'palabra', 'слов', 'كلمات',
+   'buchstab', 'wörter', 'букв', '言葉', '단어', '글자'],
+  ['空间', '旋转', '图形', 'spatial', 'shape', 'rotation', 'raum', 'espace', 'espacio', 'простран', 'مكان',
+   'räumlich', 'drehen', 'фигур', '空間', '回転', '공간', '회전'],
+  ['经典', 'classic', 'klassisch', 'classique', 'clásico', 'классик', 'كلاسيك',
+   'klassiker', 'クラシック', '클래식'],
 ];
 const CATS: GameCategory[] = [GameCategory.LOGIC, GameCategory.MATH, GameCategory.MEMORY,
   GameCategory.WORD, GameCategory.SPATIAL, GameCategory.CLASSIC];
@@ -217,10 +226,10 @@ export class ChatFinder {
       const sc: number = ChatFinder.scoreOf(g, it);
       if (sc <= 0) { continue; }
       let why: string = '';
-      if (it.category !== null && g.category === it.category) { why = TG('是「' + it.category + '」类'); }
-      else if (it.difficulty !== null && (g.difficulty === it.difficulty || g.tags.indexOf(it.difficulty === Difficulty.EASY ? 'easy' : (it.difficulty === Difficulty.HARD ? 'hard' : 'medium')) >= 0)) { why = TG('难度对得上'); }
+      if (it.category !== null && g.category === it.category) { why = L('是「{0}」类', 'Category: {0}').replace('{0}', ChatFinder.catLabel(it.category)); }
+      else if (it.difficulty !== null && (g.difficulty === it.difficulty || g.tags.indexOf(it.difficulty === Difficulty.EASY ? 'easy' : (it.difficulty === Difficulty.HARD ? 'hard' : 'medium')) >= 0)) { why = L('难度对得上', 'Difficulty matches'); }
       else if (it.pausable && g.tags.indexOf('pausable') >= 0) { why = TG('可以随时暂停'); }
-      else if (it.similar.length > 0 && g.id !== it.similar) { why = TG('和你说的那款相近'); }
+      else if (it.similar.length > 0 && g.id !== it.similar) { why = L('和你说的那款相近', 'Similar to the one you named'); }
       else { why = TG('符合你的口味'); }
       scored.push({ game: g, score: sc, why: why });
     }
@@ -237,11 +246,133 @@ export class ChatFinder {
   }
 
   /** 把抽到的意图回给用户看（让他知道我是按什么找的） */
+  /**
+   * ★★★ 2026-11-08：类别标签。
+   *   `GameCategory` 的枚举值是**中文**（`LOGIC = '逻辑'`），直接拼进文案会变成
+   *   「是「逻辑」类」—— 非中文用户看到的永远是中文。
+   *   ⇒ 6 个类别中文值**都在 EXTRA 字典里**，走 `L()` 查表即可；
+   *     英文用 `catLabelEn()`（GameRegistry 已有），因为 `L()` 对英文直接用第二个参数。
+   */
+  private static catLabel(c: GameCategory): string {
+    return L(c, catLabelEn(c));
+  }
+
   static echo(it: Intent): string {
     if (it.hits.length === 0) { return ''; }
     // ★★★ 2026-11-08 **恒中文 bug**（code-hunter 抓到）：原来 `TG('按「' + hits.join('、') + '」找：')`
     //   是**动态 key** —— 永远不可能命中字典 ⇒ `TG` 走最后一行 `return zh` ⇒ **恒中文**。
     //   ⇒ 拆成「模板（静态，可翻译）+ 命中词（来自用户原话，不译）」两段。
-    return TG('按「{0}」找：').replace('{0}', it.hits.join('、'));
+    // ⚠️ 用 L() 而不是 TG()：这条 key 在 **EXTRA**（core/I18n.ets），不在 DICT。
+    //   `TG()` 只读 DICT ⇒ 查不到就 `return zh` ⇒ 恒中文（我上一版就是这么失效的）。
+    return L('按「{0}」找：', 'Found for "{0}":').replace('{0}', it.hits.join('、'));
   }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  端侧 LLM 抽意图（2026-11-08）—— **可选路径，规则版永远是保底**
+  //
+  //  ★ 为什么不改 parse()：`parse()` 是**断网/无模型/无权限**时唯一能用的路径，
+  //    它的行为必须冻结（有 20 句模拟基线：见 _巡检记录/ChatFinder覆盖-20261108.md）。
+  //  ★ 只换「理解」，不换「检索」：LLM 只吐 `{category, difficulty, short}`，
+  //    排序仍走现有 scoreOf()（355 款数据、可测、稳定）。
+  //  ★ prompt <1KB：**不塞 355 款目录**（中文名就要 ~3.5KB，会贴 4500 字节上限），
+  //    只放 6 类别 + 3 难度 + 时长词表。
+  // ══════════════════════════════════════════════════════════════════════
+
+  /** 给端侧 LLM 的抽取 prompt（静态模板 + 用户原话；<1KB） */
+  private static llmPrompt(text: string): string {
+    return '你是游戏筛选助手。只输出一行 JSON，不要解释，不要 markdown。\n'
+      + '字段：\n'
+      + '- category：LOGIC(逻辑解谜) / MATH(数字数学) / MEMORY(记忆) / WORD(文字词) / SPATIAL(空间旋转) / CLASSIC(经典)，或 null\n'
+      + '- difficulty：EASY(简单轻松) / NORMAL(普通) / HARD(烧脑挑战)，或 null\n'
+      + '- short：布尔，想玩几分钟的短局为 true\n'
+      + '示例：{"category":"LOGIC","difficulty":"EASY","short":true}\n'
+      + '用户说：' + text;
+  }
+
+  /**
+   * 用端侧 LLM 抽意图；**任何失败都回落 `parse()`**（规则保底，绝不抛）。
+   * 调用方：`const it: Intent = await ChatFinder.parseWithLLM(userText);`
+   */
+  static async parseWithLLM(text: string): Promise<Intent> {
+    const base: Intent = ChatFinder.parse(text);
+    try {
+      const ready: boolean = await LocalLLM.init();
+      if (!ready) {
+        return base;
+      }
+      let acc: string = '';
+      const ok: boolean = await LocalLLM.chat(ChatFinder.llmPrompt(text), (piece: string) => {
+        acc += piece;
+      });
+      if (!ok) {
+        return base;
+      }
+      return ChatFinder.mergeLLM(base, acc);
+    } catch (e) {
+      // 兜底中的兜底：连 LocalLLM 都抛了（不该发生），仍然用规则版
+      return base;
+    }
+  }
+
+  /** 把 LLM 吐的 JSON 合进意图；解析/校验任何一环失败就原样返回 base */
+  private static mergeLLM(base: Intent, raw: string): Intent {
+    const i: number = raw.indexOf('{');
+    const j: number = raw.lastIndexOf('}');
+    if (i < 0 || j <= i) {
+      return base;
+    }
+    let out: LlmOut;
+    try {
+      // ★ 用显式接口而不是 Record 索引：ArkTS 严格模式下更稳，也自带字段校验
+      out = JSON.parse(raw.substring(i, j + 1)) as LlmOut;
+    } catch (e) {
+      return base;
+    }
+    if (out === undefined || out === null) {
+      return base;
+    }
+    // 显式拷贝（ArkTS 不用对象展开）
+    // ⚠️ 字段必须与 `interface Intent` 完全一致：加字段时这里也要加（漏了就是编译错）
+    const it: Intent = {
+      category: base.category, difficulty: base.difficulty,
+      short: base.short, long: base.long,
+      pausable: base.pausable, untimed: base.untimed,
+      multiplayer: base.multiplayer, board: base.board,
+      similar: base.similar,
+      hits: base.hits.slice()
+    };
+    if (out.category === 'LOGIC') {
+      it.category = GameCategory.LOGIC;
+    } else if (out.category === 'MATH') {
+      it.category = GameCategory.MATH;
+    } else if (out.category === 'MEMORY') {
+      it.category = GameCategory.MEMORY;
+    } else if (out.category === 'WORD') {
+      it.category = GameCategory.WORD;
+    } else if (out.category === 'SPATIAL') {
+      it.category = GameCategory.SPATIAL;
+    } else if (out.category === 'CLASSIC') {
+      it.category = GameCategory.CLASSIC;
+    }
+    if (out.difficulty === 'EASY') {
+      it.difficulty = Difficulty.EASY;
+    } else if (out.difficulty === 'NORMAL') {
+      it.difficulty = Difficulty.NORMAL;
+    } else if (out.difficulty === 'HARD') {
+      it.difficulty = Difficulty.HARD;
+    }
+    if (out.short === true) {
+      it.short = true;
+    } else if (out.short === false) {
+      it.short = false;
+    }
+    return it;
+  }
+}
+
+/** LLM 期望吐出的 JSON（解析后用它校验字段类型） */
+interface LlmOut {
+  category?: string;
+  difficulty?: string;
+  short?: boolean;
 }

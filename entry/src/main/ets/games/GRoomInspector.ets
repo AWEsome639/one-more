@@ -14,6 +14,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const COLS: number = 4; const ROWS: number = 3; const CELLS: number = COLS * ROWS;
 const DIFFS: number = 3; const MISS: number = 3; const LIMIT: number = 60;
@@ -85,7 +86,10 @@ export struct GRoomInspector {
     this.over = false; this.won = false; this.done = false;
     this.msg = TG2('下面那间有 {0} 处不同，点它', String(DIFFS));
     this.startAt = Date.now();
-    this.clock = setInterval(() => { this.tick(); }, 1000);
+    this.clock = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, 1000);
   }
   private tick(): void {
     if (this.over) { return; }

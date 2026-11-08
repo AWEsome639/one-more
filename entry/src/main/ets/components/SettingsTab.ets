@@ -47,6 +47,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { GameDiff } from '../core/GameDiff';
 import { findGame, displayName } from '../core/GameRegistry';
 import { I18n, L, LANGS, LangInfo, TN } from '../core/I18n';
+import { IconSize } from './Common';
 import { UiModeMgr } from '../core/UiMode';
 import { About } from '../core/About';
 import { pasteboard } from '@kit.BasicServicesKit';
@@ -295,7 +296,7 @@ export struct SettingsTab {
   starCard() {
     Column({ space: Space.xs }) {
       Row({ space: Space.sm }) {
-        Text('⭐').fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center)
+        Text('⭐').fontSize(FontSize.lg).width(IconSize.of(FontSize.lg)).height(IconSize.of(FontSize.lg)).textAlign(TextAlign.Center)
           .accessibilityLevel('no')
         Column({ space: 2 }) {
           Text(this.t('在 GitHub 上标星', 'Star it on GitHub'))
@@ -768,7 +769,7 @@ build() {
       //   设计：① 只放必要信息（不放真名/学号）② 邮箱可复制（不裸链）③ 署名用英文名
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
-          Text('✉️').fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center)
+          Text('✉️').fontSize(FontSize.lg).width(IconSize.of(FontSize.lg)).height(IconSize.of(FontSize.lg)).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           Column({ space: 2 }) {
             Text(this.t('反馈与关于', 'Feedback & about'))
@@ -784,7 +785,7 @@ build() {
         //   ⇒ 作者邮箱下面多一行「拾海（AI）」的邮箱，给用户第二条直达通道。
         Row({ space: Space.sm }) {
           Text('🤖')
-            .fontSize(FontSize.sm).width(19).height(19).textAlign(TextAlign.Center)
+            .fontSize(FontSize.sm).width(IconSize.of(FontSize.sm)).height(IconSize.of(FontSize.sm)).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           Text(About.SHAJIA_EMAIL)
             .minFontSize(9)
@@ -852,7 +853,7 @@ build() {
         Divider().color(this.theme().line).margin({ top: Space.xs, bottom: Space.xs })
 
         Row({ space: Space.sm }) {
-          Text('🔒').fontSize(FontSize.md).width(22).height(22).textAlign(TextAlign.Center)
+          Text('🔒').fontSize(FontSize.md).width(IconSize.of(FontSize.md)).height(IconSize.of(FontSize.md)).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           Text(this.t(About.PRIVACY_TITLE_CN, About.PRIVACY_TITLE_EN))
             .fontSize(FontSize.sm).fontColor(this.theme().ink).layoutWeight(1)
@@ -1083,7 +1084,7 @@ build() {
         // ★ 2026-10-13 奥森：「可以加"长辈模式""简约模式"什么的」⇒ 定名【大字模式 / 紧凑模式】
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
-          Text('🔠').fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center)
+          Text('🔠').fontSize(FontSize.lg).width(IconSize.of(FontSize.lg)).height(IconSize.of(FontSize.lg)).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           Column({ space: 2 }) {
             Text(this.t('界面模式', 'Layout scale'))
@@ -1396,7 +1397,7 @@ build() {
   confirmPanel() {
     Column({ space: Space.sm }) {
       Row({ space: Space.xs }) {
-        Text('⚠️').fontSize(FontSize.md).width(22).height(22).textAlign(TextAlign.Center)
+        Text('⚠️').fontSize(FontSize.md).width(IconSize.of(FontSize.md)).height(IconSize.of(FontSize.md)).textAlign(TextAlign.Center)
           .accessibilityLevel('no')
         Text(this.t('真的要清空吗？', 'Really clear everything?'))
           .fontSize(FontSize.sm)

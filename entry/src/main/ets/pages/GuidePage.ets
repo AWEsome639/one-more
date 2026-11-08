@@ -273,7 +273,7 @@ struct GuidePage {
         Text(this.meta ? L(this.catOf(), catLabelEn(this.catOf())) : '')
           .fontSize(FontSize.xs).fontColor(this.accentColor())
           .padding({ left: 8, right: 8, top: 2, bottom: 2 })
-          .backgroundColor('#1A6366F1')
+          .backgroundColor(Palette.tint('1A'))
           .borderRadius(Radius.full)
       }
       .alignItems(HorizontalAlign.Start)

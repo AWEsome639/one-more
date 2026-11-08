@@ -511,7 +511,7 @@ export struct GSlidePuzzle {
           .backgroundColor(Palette.rose)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             Haptics.tap();
             this.reset();

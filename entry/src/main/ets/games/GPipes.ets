@@ -570,7 +570,7 @@ export struct GPipes {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .width(64)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             this.askHint();
           })
@@ -586,7 +586,7 @@ export struct GPipes {
           .backgroundColor(Palette.teal)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             Haptics.tap();
             this.reset();

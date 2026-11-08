@@ -340,7 +340,7 @@ export class ProgressStore {
     const today: string = ProgressStore.today();
 
     // ⓪ 统计记账（每局都记，不论输赢）
-    ProgressStore.recordPlay(gameId, score, durationMs);
+    ProgressStore.recordPlay(gameId, score, durationMs, solved);
 
     // ⓪' 今日挑战：完成了给额外经验
     let dailyBonus: number = 0;
@@ -906,8 +906,12 @@ export class ProgressStore {
    *     但这个放大器是可以拆掉的，成本很低。）
    *   ⇒ 按**原始字符串**做缓存：串没变就直接复用已解析的对象。
    */
-  private static mapCacheRaw: string = '';
-  private static mapCacheVal: Record<string, number> | undefined = undefined;
+  // ★★★ 2026-11-08 **单槽 → 按原始串分槽**（perf-hunter 实测）：
+  //   原来只有 1 个槽 —— 而 `playsOf` 读 `perGamePlays`、`bestOf` 读 `perGameBest`，
+  //   统计页的 `topPlayed()` 恰好**交替调用** ⇒ **100% 未命中**，每次 StatsTab 构建
+  //   = 1 + 2N 次全量 JSON.parse（N=200 → 401 次 ≈ 15~40ms）⇒ 昨晚那刀在统计页上等于白修。
+  //   ⇒ 按 raw 分槽（最多 8 个，防无界）。
+  private static mapCache: Map<string, Record<string, number>> = new Map<string, Record<string, number>>();
 
   /**
    * 解析 `Record<string, number>` 型的 JSON 串（带缓存 —— 同一个串只 parse 一次）。
@@ -925,8 +929,9 @@ export class ProgressStore {
    *     ⇒ 用「注释约束 + 写路径重建」换取零成本，比拷贝更合适。
    */
   private static parseNumMap(raw: string): Record<string, number> {
-    if (raw === ProgressStore.mapCacheRaw && ProgressStore.mapCacheVal !== undefined) {
-      return ProgressStore.mapCacheVal;
+    const hit: Record<string, number> | undefined = ProgressStore.mapCache.get(raw);
+    if (hit !== undefined) {
+      return hit;
     }
     let val: Record<string, number> = {};
     try {
@@ -934,8 +939,10 @@ export class ProgressStore {
     } catch (e) {
       val = {};
     }
-    ProgressStore.mapCacheRaw = raw;
-    ProgressStore.mapCacheVal = val;
+    if (ProgressStore.mapCache.size >= 8) {
+      ProgressStore.mapCache.clear();      // 简单防无界：满了就清空（真实场景只有 5 个 key）
+    }
+    ProgressStore.mapCache.set(raw, val);
     return val;
   }
 
@@ -1331,7 +1338,7 @@ export class ProgressStore {
   }
 
   /** 每局都调：记开局数、时长、最高分、最近玩过 */
-  private static recordPlay(gameId: string, score: number, durationMs: number): void {
+  private static recordPlay(gameId: string, score: number, durationMs: number, solved: boolean): void {
     const plays: number = ProgressStore.totalPlays() + 1;
     AppStorage.setOrCreate(Keys.totalPlays, plays);
     ProgressStore.putNumber(Keys.totalPlays, plays);
@@ -1362,7 +1369,15 @@ export class ProgressStore {
       const mb: Record<string, number> = JSON.parse(rawB) as Record<string, number>;
       const prevBest: number = mb[gameId] ?? 0;
       ProgressStore.prevBest = prevBest;
-      ProgressStore.lastWasBest = score > prevBest;
+      // ★★★ 2026-11-08（game-balancer）**输局不再弹「🏆 新纪录」**：
+      //   原来只看分数高低，而 recordPlay 对**每一局**都调用（含输局），
+      //   且很多款的输局也给分（`this.steps*3`、`this.bound()*12`…）
+      //   ⇒ 输一局拿 60 分、上一把赢局只拿 40 分 ⇒ 结算页庆祝一场失败。
+      //   ⇒ 新纪录必须同时满足「这局赢了」。
+      //   ⚠️ 已知残留：下面的 `mb[gameId] = score` 仍会记输局的分数——
+      //     若某款「输比赢分多」（如未修的 classic_maze）会把最高分刷成失败分。
+      //     那属于各款分数公式的问题，不在这里做二次裁决。
+      ProgressStore.lastWasBest = solved && score > prevBest;
       if (score > prevBest) {
         mb[gameId] = score;
         const jb: string = JSON.stringify(mb);

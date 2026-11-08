@@ -654,7 +654,7 @@ export struct GHitoriAll {
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L732'; })
           .onBlur(() => { if (this.tvFocus === 'L732') { this.tvFocus = ''; } })

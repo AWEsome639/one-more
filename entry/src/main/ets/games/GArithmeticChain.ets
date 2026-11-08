@@ -7,6 +7,7 @@ import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { ProgressStore } from '../core/ProgressStore';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
@@ -390,7 +391,7 @@ export struct GArithmeticChain {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
@@ -436,14 +437,14 @@ export struct GArithmeticChain {
           Button((0) < this.stage.palette.length ? this.stage.palette[(0)].label : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl)
           .fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (0) < this.stage.palette.length).focusable(Tv.on())
+          .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(!this.over && (0) < this.stage.palette.length).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L424'; })
           .onBlur(() => { if (this.tvFocus === 'L424') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L424')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tap((0)); }); }).onClick(() => { Haptics.tap(); this.tap((0)); })
           Button((1) < this.stage.palette.length ? this.stage.palette[(1)].label : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl)
           .fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (1) < this.stage.palette.length).focusable(Tv.on())
+          .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(!this.over && (1) < this.stage.palette.length).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L428'; })
           .onBlur(() => { if (this.tvFocus === 'L428') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L428')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tap((1)); }); }).onClick(() => { Haptics.tap(); this.tap((1)); })
@@ -452,14 +453,14 @@ export struct GArithmeticChain {
           Button((2) < this.stage.palette.length ? this.stage.palette[(2)].label : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl)
           .fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (2) < this.stage.palette.length).focusable(Tv.on())
+          .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(!this.over && (2) < this.stage.palette.length).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L434'; })
           .onBlur(() => { if (this.tvFocus === 'L434') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L434')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tap((2)); }); }).onClick(() => { Haptics.tap(); this.tap((2)); })
           Button((3) < this.stage.palette.length ? this.stage.palette[(3)].label : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl)
           .fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(56)).enabled(!this.over && (3) < this.stage.palette.length).focusable(Tv.on())
+          .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(!this.over && (3) < this.stage.palette.length).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L438'; })
           .onBlur(() => { if (this.tvFocus === 'L438') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L438')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.tap((3)); }); }).onClick(() => { Haptics.tap(); this.tap((3)); })
@@ -490,7 +491,7 @@ export struct GArithmeticChain {
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.of(Bp.height < 600 ? 36 : 44))
                     // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
@@ -504,7 +505,7 @@ export struct GArithmeticChain {
           })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(44)).focusable(Tv.on())
+          .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L476'; })
           .onBlur(() => { if (this.tvFocus === 'L476') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L476')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

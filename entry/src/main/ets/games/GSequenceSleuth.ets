@@ -3,6 +3,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { TG, TG2 } from '../core/GameI18n';
 // ★ 2026-10-23 第二期：通用提示层
 import { Hint, HintResult } from '../ai/Hint';
@@ -302,6 +303,9 @@ export struct GSequenceSleuth {
   }
 
   private next(): void {
+    if (this.over) {
+      return;
+    }
     this.wait = -1;
     this.idx++;
     if (this.idx >= this.diffTotal) {
@@ -319,7 +323,7 @@ export struct GSequenceSleuth {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -353,7 +357,7 @@ export struct GSequenceSleuth {
       Row({ space: Space.sm }) {
         ForEach([0, 1], (i: number) => { Button(String(this.opts[(i)]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.picked < 0 && !this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked < 0 && !this.over)
         .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L356'; })
@@ -364,7 +368,7 @@ export struct GSequenceSleuth {
       Row({ space: Space.sm }) {
         ForEach([2, 3], (i: number) => { Button(String(this.opts[(i)]))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56)).enabled(this.picked < 0 && !this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked < 0 && !this.over)
         .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L365'; })
@@ -390,7 +394,7 @@ export struct GSequenceSleuth {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.violet)
-          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L386'; })
           .onBlur(() => { if (this.tvFocus === 'L386') { this.tvFocus = ''; } })

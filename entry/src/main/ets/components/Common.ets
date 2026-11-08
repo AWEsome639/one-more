@@ -389,6 +389,21 @@ export function iconOf(id: string): Resource | undefined {
 }
 
 /**
+ * ★ 2026-11-08（ai-fixer-a）**图标固定盒尺寸**
+ *   背景：emoji 的行盒由系统字体决定（Apple Color Emoji = 1.30em，Noto 略不同），
+ *   放在「和文字/数字同一行」的 Row 里时，视觉重心会差 1~2vp（判据 305 的 offset 补偿就是为此）。
+ *   ⇒ 统一盒 = `字号 × 1.35`（≥1.30em 行盒 ⇒ 不竖切；advance 实测 1.00em ⇒ 不会挤字）。
+ *   ⚠️ 只给「和文字同排」的图标用；Column 里的插画 emoji 不需要（也不会因此变好看）。
+ *   ⚠️ games/ 下的文件历史上不 import 本文件（避免循环依赖），那边沿用字面量。
+ */
+export class IconSize {
+  /** 由字号算图标盒边长（vp） */
+  static of(fontSize: number): number {
+    return Math.round(fontSize * 1.35);
+  }
+}
+
+/**
  * ★ 按 id 记忆化卡片底色
  *
  * ⚠️ 本块依赖 `ACCENT_TAG` / `ACCENT_DEEP_TAG`（来自 GameRegistry）—— 别删那两个 import。
@@ -447,7 +462,7 @@ export struct StreakFlame {
     Row({ space: Space.xs }) {
       Text('🔥')
         .accessibilityLevel('no')
-        .fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center)
+        .fontSize(FontSize.lg).width(IconSize.of(FontSize.lg)).height(IconSize.of(FontSize.lg)).textAlign(TextAlign.Center)
         // ★ 2026-11-07 emoji 固定盒子：lg=18 ⇒ 24×24（1.33em，≥ 1.30em 行盒；advance 实测 1.00em）
         .width(24).height(24).textAlign(TextAlign.Center)
         .scale({ x: this.pulse, y: this.pulse })

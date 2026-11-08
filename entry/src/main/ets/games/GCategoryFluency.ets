@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const CAT_N: number = 4; const PASS: number = 8;
 const LIMIT_S: number = 25; const TICK_MS: number = 1000;
@@ -222,7 +223,10 @@ export struct GCategoryFluency {
     this.leftS = this.diffTotal; this.over = false; this.won = false; this.done = false;
     this.msg = TG2('第一类：{0} —— 越快越多越好', CATS[0].name);
     this.startAt = Date.now();
-    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK_MS);
   }
   private cat(): Cat { return CATS[this.catIdx < CAT_N ? this.catIdx : CAT_N - 1]; }
   private tick(): void {

@@ -26,6 +26,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const SIDE: number = 9;
 const BOX: number = 3;
@@ -42,7 +43,6 @@ const DIGITS: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 /** 棋盘配色（棋盘专属，浅/深两套） */
 const PEER_LIGHT: string = '#EAF0F8';
 const PEER_DARK: string = '#141A22';
-const SEL_TINT: string = '#406366F1';
 const SAME_TINT: string = '#2E0EA5E9';
 const BAD_TINT: string = '#40F43F5E';
 const BOARD_LIGHT: string = '#C9D4E8';
@@ -527,6 +527,7 @@ export struct GSudoku {
     this.recount();
     this.startAt = Date.now();
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.done && !this.finished) {
         this.seconds = this.seconds + 1;
       }
@@ -795,7 +796,7 @@ export struct GSudoku {
 
   private cellBg(i: number): string {
     if (i === this.sel) {
-      return SEL_TINT;
+      return Palette.tint('40');   // ★ 主题色跟随（原写死 '#406366F1'）
     }
     if (this.isConflict(i)) {
       return BAD_TINT;
@@ -878,7 +879,7 @@ export struct GSudoku {
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             this.askHint();
           })
@@ -913,7 +914,7 @@ export struct GSudoku {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             Haptics.tap();
             this.erase();
@@ -934,7 +935,7 @@ export struct GSudoku {
           .backgroundColor(Palette.primary)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           // 兜底：任何语言下都不硬切
           .labelStyle({ maxLines: 1, overflow: TextOverflow.Ellipsis })
           .onClick(() => {
@@ -1008,7 +1009,7 @@ export struct GSudoku {
             //    ⇒ 只用「浅底 + 深字」就够低调，边框反而带来布局问题。
             .borderRadius(Radius.sm)
             .layoutWeight(1)
-            .height(Cell.of(44))
+            .height(Cell.tap(44))
             .onClick(() => {
               Haptics.tap();
               this.fill(d);

@@ -619,7 +619,7 @@ export struct GTangleFix {
           .backgroundColor(Palette.primaryDeep)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .onClick(() => {
             Haptics.tap();
             this.reset();

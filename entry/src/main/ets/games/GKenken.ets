@@ -68,6 +68,8 @@ export struct GKenken {
   /** 出题时的完整解 */
 
   private solCells: number[] = [];
+  /** ★ 2026-11-08 代打算出来的解（不依赖出题解）；空 = 未算 */
+  private autoSol: number[] = [];
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
@@ -234,6 +236,7 @@ export struct GKenken {
     this.anchor = anchor;
     // ★ 出题时的完整解留着（提示兜底 + 代打）
     this.solCells = sol.slice();
+    this.autoSol = [];   // ★ 新题：代打解作废，下次 autoStep 重算
     this.vals = new Array<number>(CELLS).fill(0);
     this.sel = 0;
     this.moves = 0;
@@ -447,17 +450,100 @@ export struct GKenken {
     if (this.over) {
       return false;
     }
-    if (this.solCells.length < CELLS) {
+    // ★ 2026-11-08（ai-fixer-a）**不再抄出题解 solCells**：用 4×4 的行/列不重复 + 笼子约束
+    //   现场回溯求解，再走一步（玩家看到的是"它一格一格推"）。
+    if (this.autoSol.length !== CELLS) {
+      this.autoSol = this.solveKenken();
+    }
+    if (this.autoSol.length !== CELLS) {
       return false;
     }
     for (let i = 0; i < CELLS; i++) {
-      if (this.vals[i] !== this.solCells[i]) {
+      if (this.vals[i] !== this.autoSol[i]) {
         this.sel = i;
-        this.put(this.solCells[i]);
+        this.put(this.autoSol[i]);
         return !this.over;
       }
     }
     return false;
+  }
+
+  /** ★ 2026-11-08 代打求解：只用棋盘自己的规则（不读 solCells） */
+  private solveKenken(): number[] {
+    if (this.cages.length === 0) {
+      return [];
+    }
+    const board: number[] = new Array<number>(CELLS).fill(0);
+    const ok: boolean = this.kkFill(board, 0);
+    return ok ? board : [];
+  }
+
+  /** 回溯：按格子顺序填 1..N，行/列不重复 + 每个笼子「部分可行」 */
+  private kkFill(board: number[], idx: number): boolean {
+    if (idx >= CELLS) {
+      return true;
+    }
+    if (board[idx] !== 0) {
+      return this.kkFill(board, idx + 1);
+    }
+    const r: number = Math.floor(idx / N);
+    const c: number = idx % N;
+    for (let v = 1; v <= N; v++) {
+      let dup: boolean = false;
+      for (let k = 0; k < N; k++) {
+        if (board[r * N + k] === v || board[k * N + c] === v) {
+          dup = true;
+          break;
+        }
+      }
+      if (dup) {
+        continue;
+      }
+      board[idx] = v;
+      if (this.kkCageOk(this.cageOf[idx], board) && this.kkFill(board, idx + 1)) {
+        return true;
+      }
+      board[idx] = 0;
+    }
+    return false;
+  }
+
+  /** 笼子「部分可行」判断（全填满时必须等于目标） */
+  private kkCageOk(ci: number, board: number[]): boolean {
+    if (ci < 0 || ci >= this.cages.length) {
+      return true;
+    }
+    const cage: Cage = this.cages[ci];
+    const n: number = cage.cells.length;
+    let filled: number = 0;
+    let sum: number = 0;
+    let prod: number = 1;
+    let hi: number = 0;
+    let lo: number = 99;
+    for (let k = 0; k < n; k++) {
+      const v: number = board[cage.cells[k]];
+      if (v > 0) {
+        filled = filled + 1;
+        sum = sum + v;
+        prod = prod * v;
+        if (v > hi) { hi = v; }
+        if (v < lo) { lo = v; }
+      }
+    }
+    if (filled === 0) {
+      return true;
+    }
+    if (filled === n) {
+      if (cage.op === '+') { return sum === cage.target; }
+      if (cage.op === '×') { return prod === cage.target; }
+      if (cage.op === '-') { return hi - lo === cage.target; }
+      if (cage.op === '÷') { return lo > 0 && hi === lo * cage.target; }
+      return sum === cage.target;   // 单格
+    }
+    // 部分填：只对 +/× 做上界剪枝，其余不剪
+    if (cage.op === '+') { return sum < cage.target; }
+    if (cage.op === '×') { return prod < cage.target; }
+    return true;
   }
 
   private askAuto(): void {
@@ -662,7 +748,7 @@ export struct GKenken {
           .fontColor('#FFFFFF')
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -683,7 +769,7 @@ export struct GKenken {
           .fontColor(this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -708,7 +794,7 @@ export struct GKenken {
         .backgroundColor(Palette.emerald)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(44))
+        .height(Cell.tap(44))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L699'; })
         .onBlur(() => { if (this.tvFocus === 'L699') { this.tvFocus = ''; } })
@@ -762,7 +848,7 @@ export struct GKenken {
       .fontColor(Palette.rose)
       .textAlign(TextAlign.Center)
       .layoutWeight(1)
-      .height(Cell.of(44))
+      .height(Cell.tap(44))
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.sm)
       .focusable(Tv.on())

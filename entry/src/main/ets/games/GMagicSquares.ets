@@ -16,6 +16,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const SIDE: number = 3; const CELLS: number = 9; const BLANKS: number = 4; const MAGIC: number = 15;
 const ROUNDS: number = 3; const MAX_ERR: number = 4; const LIMIT: number = 120; const TICK_MS: number = 1000;
@@ -112,7 +113,10 @@ export struct GMagicSquares {
     this.over = false; this.won = false; this.finished = false; this.startAt = Date.now();
     this.newRound();
     this.msg = TG2('让每行、每列、两条对角线的和都等于 {0}', String(MAGIC));
-    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK_MS);
   }
 
   private tick(): void {

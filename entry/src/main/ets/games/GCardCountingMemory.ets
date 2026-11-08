@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const ROUNDS: number = 8;
 const NEED: number = 6;
@@ -85,7 +86,10 @@ export struct GCardCountingMemory {
     this.round = 1; this.right = 0; this.over = false; this.won = false; this.done = false; this.clock = 0;
     this.startAt = Date.now();
     this.newRound();
-    this.timer = setInterval(() => { if (!this.over) { this.clock = this.clock + 1; } }, 1000);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      if (!this.over) { this.clock = this.clock + 1; }
+    }, 1000);
   }
   /** 造 8 张牌：5 张不同 + 其中一张的重份 + 1 张新的 ⇒ 恰好一张出现两次 */
   private newRound(): void {

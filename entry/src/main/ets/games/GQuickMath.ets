@@ -3,6 +3,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '.
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { Bp } from '../core/Bp';
 import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -11,6 +12,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const LIMIT: number = 60;
 const PASS: number = 100;
@@ -96,7 +98,10 @@ export struct GQuickMath {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
     this.startAt = Date.now();
     this.reset();
-    this.tick = setInterval(() => { this.beat(); }, 1000);
+    this.tick = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.beat();
+    }, 1000);
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GQuickMath')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -320,7 +325,7 @@ export struct GQuickMath {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -357,7 +362,7 @@ export struct GQuickMath {
       Row({ space: Space.sm }) {
         ForEach([0, 1], (i: number) => { Button(this.opts.length > (i) ? String(this.opts[(i)]) : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink)
-        .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
+        .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
         .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L343'; })
@@ -368,7 +373,7 @@ export struct GQuickMath {
       Row({ space: Space.sm }) {
         ForEach([2, 3], (i: number) => { Button(this.opts.length > (i) ? String(this.opts[(i)]) : '—')
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink)
-        .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
+        .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
         .enabled(!this.over && this.opts.length > (i)).onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L352'; })
@@ -379,7 +384,7 @@ export struct GQuickMath {
       Row({ space: Space.md }) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.emerald)
-          .borderRadius(Radius.md).width(120).height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+          .borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L360'; })
           .onBlur(() => { if (this.tvFocus === 'L360') { this.tvFocus = ''; } })

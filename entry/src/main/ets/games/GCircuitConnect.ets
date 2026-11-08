@@ -47,6 +47,14 @@ export struct GCircuitConnect {
  @State private demoLeft: number = 0;
   @State private diffTotal: number = GameDiff.sizeNow(4);
 
+  /** ★ 2026-11-08 终点格号**按当前棋盘算**（game-balancer：`LAST` 写死 15，
+   *   而 `sizeNow(4)` = 3/4/5 ⇒ 简单档 3×3 只有 **9 格**，`lit[15]=undefined` ⇒
+   *   **`solved` 恒 false，简单档 100% 赢不了**；困难档 5×5 又判早到第 15 格。） */
+  private last(): number {
+    const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    return n2 * n2 - 1;
+  }
+
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
   private rowIdx(): number[] {
     const n2: number = this.diffTotal > 1 ? this.diffTotal : 2;
@@ -328,7 +336,7 @@ export struct GCircuitConnect {
  const rt: number[] = this.rot.slice(); rt[i] = (rt[i] + 1) % 4; this.rot = rt; this.moves++;
  const lit: boolean[] = this.powered(); this.on = lit; let cnt: number = 0;
  for (let t = 0; t < lit.length; t++) { if (lit[t]) { cnt++; } }
- const solved: boolean = lit[LAST] && has(this.maskAt(LAST), 1);
+ const solved: boolean = lit[this.last()] && has(this.maskAt(this.last()), 1);
  if (solved || this.moves >= TURNS) {
  this.note = solved ? TG("接通了，灯亮 🎉") : TG("步数用尽，还没接通 😵"); this.finish(solved, cnt); return;
  }
@@ -355,14 +363,14 @@ export struct GCircuitConnect {
      disabled: this.demoId >= 0,
    })
  Text(TG2('步数 {0}/{1}　电源 {2}',Digits(String(this.moves), this.langCode), String(TURNS), this.on[0] ? TG('接入 ✅') : TG('断开 ❌'))
- + TG2('　终点 {0}', this.on[LAST] ? TG('通电 💡') : TG('未通'))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
+ + TG2('　终点 {0}', this.on[this.last()] ? TG('通电 💡') : TG('未通'))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: Space.xs }) {
  ForEach(this.rowIdx(), (r: number) => {
  Row({ space: Space.xs }) {
  ForEach(this.rowIdx(), (c: number) => {
  Stack() {
  Text(GLYPH[this.maskAt(r * this.diffTotal + c)]).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.on[r * this.diffTotal + c] ? Palette.amber : this.theme.inkFaint)
- Text(r * this.diffTotal + c === 0 ? '⚡' : (r * this.diffTotal + c === LAST ? '💡' : '')).fontSize(FontSize.xs).offset({ x: 0, y: 20 })
+ Text(r * this.diffTotal + c === 0 ? '⚡' : (r * this.diffTotal + c === this.last() ? '💡' : '')).fontSize(FontSize.xs).offset({ x: 0, y: 20 })
  }.layoutWeight(1).height(Cell.of(62)).backgroundColor(this.on[r * this.diffTotal + c] ? this.theme.surfaceAlt : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.on[r * this.diffTotal + c] ? Palette.amber : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
  .onFocus(() => { this.tvFocus = 'L363'; })
  .onBlur(() => { if (this.tvFocus === 'L363') { this.tvFocus = ''; } })
@@ -371,7 +379,7 @@ export struct GCircuitConnect {
  }, (r: number) => 'r' + r) }.width('100%')
  Text(this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
  Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).width('100%').height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).width('100%').height(Cell.tap(44)).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L368'; })
       .onBlur(() => { if (this.tvFocus === 'L368') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L368')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

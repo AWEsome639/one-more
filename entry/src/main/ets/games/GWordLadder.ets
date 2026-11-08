@@ -383,7 +383,7 @@ export struct GWordLadder {
         }, (r: number) => 'r' + r)
       }.width('100%')
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(44)).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.tap(44)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L381'; })
       .onBlur(() => { if (this.tvFocus === 'L381') { this.tvFocus = ''; } })

@@ -12258,17 +12258,48 @@ export function TG(zh: string): string {
 //   String.replace('{0}', x) 只替换第一个 ⇒ 模板里重复的占位符会漏掉，
 //   界面上会露出 {1} 这种原始文本（真机上就出现过
 //   「试试 1 —— 它能整除 18（{1} ÷ {0} = 18）」）。
-//   ⇒ 改用 split/join，语义是"全部替换"。
+//   ⇒ 改用「全部替换」。
+//
+// ★★★ 2026-11-08 perf-hunter **性能**：原来是 `out.split('{0}').join(v)`
+//   —— 每替换一个占位符要**分配 1 个数组 + 1 个结果串**（N 个占位符 = N 次 split + N 次 join）。
+//   `TG2/TG4` 全仓 **2,760 处**调用，其中一部分在 `build()` / `ForEach` 里
+//   （例：`GEventTimelineMemory.ets:348` 的格子 ForEach 里每格都调）⇒ 每帧几百次白分配。
+//   ⇒ 换 `fillToken()`：**单次扫描 + 纯拼接**，只产出一个结果串；
+//     语义与 `split(t).join(v)` **完全等价**（含「替换进去的值不再被二次扫描」这一点 ——
+//     所以仍按原来的顺序 0→1→2→3 逐个替换，行为逐字节一致）。
+/**
+ * 把 `s` 里所有 `token` 换成 `val`（全部替换，语义等价于 `s.split(token).join(val)`）。
+ *
+ * ⚠️ 不要换成 `String.replaceAll` —— 本项目**零处**使用（ArkTS 编译目标未验证过），
+ *    宁可自己写 12 行单次扫描。
+ * ⚠️ `token` 必须是非空字面量（这里只会传 `'{0}'`~`'{3}'`）：空串会让 indexOf 死循环。
+ */
+function fillToken(s: string, token: string, val: string): string {
+  let at: number = s.indexOf(token);
+  if (at < 0) {
+    return s;                     // 没有占位符 ⇒ 原样返回（零分配，这是最常见的情况）
+  }
+  const tl: number = token.length;
+  let out: string = '';
+  let from: number = 0;
+  while (at >= 0) {
+    out = out + s.substring(from, at) + val;
+    from = at + tl;
+    at = s.indexOf(token, from);
+  }
+  return out + s.substring(from);
+}
+
 export function TG2(tpl: string, p0?: number | string, p1?: number | string, p2?: number | string): string {
   let out: string = TG(tpl);
   if (p0 !== undefined) {
-    out = out.split('{0}').join(`${p0}`);
+    out = fillToken(out, '{0}', `${p0}`);
   }
   if (p1 !== undefined) {
-    out = out.split('{1}').join(`${p1}`);
+    out = fillToken(out, '{1}', `${p1}`);
   }
   if (p2 !== undefined) {
-    out = out.split('{2}').join(`${p2}`);
+    out = fillToken(out, '{2}', `${p2}`);
   }
   return out;
 }
@@ -12282,16 +12313,16 @@ export function TG4(tpl: string, p0?: number | string, p1?: number | string,
                     p2?: number | string, p3?: number | string): string {
   let out: string = TG(tpl);
   if (p0 !== undefined) {
-    out = out.split('{0}').join(`${p0}`);
+    out = fillToken(out, '{0}', `${p0}`);
   }
   if (p1 !== undefined) {
-    out = out.split('{1}').join(`${p1}`);
+    out = fillToken(out, '{1}', `${p1}`);
   }
   if (p2 !== undefined) {
-    out = out.split('{2}').join(`${p2}`);
+    out = fillToken(out, '{2}', `${p2}`);
   }
   if (p3 !== undefined) {
-    out = out.split('{3}').join(`${p3}`);
+    out = fillToken(out, '{3}', `${p3}`);
   }
   return out;
 }

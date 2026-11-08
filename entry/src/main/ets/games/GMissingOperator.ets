@@ -16,6 +16,7 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { Bp } from '../core/Bp';
+import { AppClock } from '../core/AppClock';
 
 const GOAL: number = 10; const LIMIT: number = 60; const TICK_MS: number = 1000;
 const PENALTY: number = 3; const NEXT_MS: number = 900;
@@ -94,7 +95,10 @@ export struct GMissingOperator {
     this.over = false; this.won = false; this.finished = false; this.startAt = Date.now();
     this.ask();
     this.msg = TG('把问号换成一个运算符，让等式成立');
-    this.timer = setInterval(() => { this.tick(); }, TICK_MS);
+    this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, TICK_MS);
   }
 
   private tick(): void {

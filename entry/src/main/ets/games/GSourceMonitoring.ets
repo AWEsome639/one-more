@@ -14,6 +14,7 @@ import { TG, TG2, TG4 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const CLAIMS: string[] = [
   TG('本周三有雷阵雨'), TG('图书馆周六闭馆'), TG('新食堂下月开张'), TG('地铁 15 号线年底通车'),
@@ -87,7 +88,10 @@ export struct GSourceMonitoring {
     this.claims = cs; this.srcs = ss; this.phase = 'study'; this.left = STUDY_SEC;
     this.q = 0; this.score = 0; this.picked = -1; this.over = false; this.won = false;
     this.done = false; this.note = TG('记住每条消息的出处'); this.startAt = Date.now();
-    this.clock = setInterval(() => { this.tick(); }, 1000);
+    this.clock = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, 1000);
   }
   private tick(): void {
     if (this.phase !== 'study') { return; }

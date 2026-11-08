@@ -289,6 +289,9 @@ export struct GCubeNetFold {
   }
 
   private finish(solved: boolean): void {
+    if (this.over) {
+      return;
+    }
     this.over = true;
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish({
@@ -370,7 +373,7 @@ export struct GCubeNetFold {
 
       Button(this.over ? (this.wins >= PASS ? TG('通关 🎉') : TG('结束')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .height(Cell.tap(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L341'; })

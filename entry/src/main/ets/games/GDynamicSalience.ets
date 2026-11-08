@@ -17,6 +17,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 const SIDE: number = 4; const CELLS: number = SIDE * SIDE; const LIMIT: number = 20;      // 秒
 const HOP: number = 1500;      // 目标自动换位间隔
 const NEED: number = 10;
@@ -76,7 +77,10 @@ export struct GDynamicSalience {
   private reset(): void {
     this.stop(); this.hot = Math.floor(Math.random() * CELLS); this.hits = 0; this.miss = 0;
     this.left = this.total; this.over = false; this.won = false; this.done = false; this.msg = TG('点亮着的方块，它会一直换位');
-    this.startAt = Date.now(); this.clock = setInterval(() => { this.tick(); }, 1000);
+    this.startAt = Date.now(); this.clock = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
+      this.tick();
+    }, 1000);
     this.hopper = setInterval(() => { this.jump(); }, HOP);
   }
   private tick(): void {

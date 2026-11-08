@@ -509,7 +509,7 @@ export struct GFillomino {
     //   代价是整页会超高 ⇒ **必须同时套 Scroll**，否则底部按钮又被挤出屏。
     //   这两件事必须一起做 —— 只做一件就是把旧 bug 请回来。
     Scroll() {
-      Column({ space: Space.md }) {
+      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         Row({ space: Space.md }) {
           Button(TG('清除本格'))
@@ -519,7 +519,7 @@ export struct GFillomino {
             .backgroundColor(this.theme.surfaceAlt)
             .borderRadius(Radius.md)
             .layoutWeight(1)
-            .height(Cell.of(44))
+            .height(Cell.of(Bp.height < 600 ? 36 : 44))
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L660'; })
             .onBlur(() => { if (this.tvFocus === 'L660') { this.tvFocus = ''; } })
@@ -570,7 +570,7 @@ export struct GFillomino {
             .backgroundColor(Palette.cyan)
             .borderRadius(Radius.md)
             .width(96)
-            .height(Cell.of(44))
+            .height(Cell.of(Bp.height < 600 ? 36 : 44))
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L705'; })
             .onBlur(() => { if (this.tvFocus === 'L705') { this.tvFocus = ''; } })
@@ -685,7 +685,7 @@ export struct GFillomino {
             .fontColor(this.theme.ink)
             .textAlign(TextAlign.Center)
             .layoutWeight(1)
-            .height(Cell.of(44))
+            .height(Cell.of(Bp.height < 600 ? 36 : 44))
             .backgroundColor(this.theme.surface)
             .borderRadius(Radius.sm)
             .shadow(Shadow.card)
@@ -710,7 +710,7 @@ export struct GFillomino {
             .fontColor(this.theme.ink)
             .textAlign(TextAlign.Center)
             .layoutWeight(1)
-            .height(Cell.of(44))
+            .height(Cell.of(Bp.height < 600 ? 36 : 44))
             .backgroundColor(this.theme.surface)
             .borderRadius(Radius.sm)
             .shadow(Shadow.card)

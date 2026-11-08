@@ -350,7 +350,7 @@ export struct GHueSort {
         Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).layoutWeight(1).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.of(44)).focusable(Tv.on())
+          .borderRadius(Radius.md).width(96).height(Cell.tap(44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L350'; })
           .onBlur(() => { if (this.tvFocus === 'L350') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L350')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

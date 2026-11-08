@@ -59,6 +59,8 @@ export struct GKakuro {
   /** 出题时的完整解 */
 
   private solCells: number[] = [];
+  /** ★ 2026-11-08 代打算出来的解（不依赖出题解）；空 = 未算 */
+  private autoSol: number[] = [];
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
@@ -221,6 +223,7 @@ export struct GKakuro {
     this.colClue = cc;
     // ★ 出题时的完整解留着（提示兜底 + 代打）
     this.solCells = sol.slice();
+    this.autoSol = [];   // ★ 新题：代打解作废
     this.vals = new Array<number>(CELLS).fill(0);
     this.sel = WHITE[0];
     this.moves = 0;
@@ -354,17 +357,100 @@ export struct GKakuro {
     if (this.over) {
       return false;
     }
-    if (this.solCells.length < CELLS) {
+    // ★ 2026-11-08（ai-fixer-a）**不再抄出题解 solCells**：用「每段数字不重复 + 和等于提示」
+    //   现场回溯求解，再走一步。
+    if (this.autoSol.length !== CELLS) {
+      this.autoSol = this.solveKakuro();
+    }
+    if (this.autoSol.length !== CELLS) {
       return false;
     }
     for (let i = 0; i < CELLS; i++) {
-      if (this.vals[i] !== this.solCells[i]) {
+      if (this.vals[i] !== this.autoSol[i]) {
         this.sel = i;
-        this.put(this.solCells[i]);
+        this.put(this.autoSol[i]);
         return !this.over;
       }
     }
     return false;
+  }
+
+  /** ★ 2026-11-08 代打求解：只用盘面线索（不读 solCells） */
+  private solveKakuro(): number[] {
+    const board: number[] = new Array<number>(CELLS).fill(0);
+    const ok: boolean = this.krFill(board, 0);
+    return ok ? board : [];
+  }
+
+  private krFill(board: number[], w: number): boolean {
+    if (w >= WHITE.length) {
+      return this.krAllOk(board);
+    }
+    const idx: number = WHITE[w];
+    for (let v = 1; v <= 9; v++) {
+      board[idx] = v;
+      if (this.krPartialOk(board) && this.krFill(board, w + 1)) {
+        return true;
+      }
+      board[idx] = 0;
+    }
+    return false;
+  }
+
+  /** 部分可行：每段已填的数不重复、和 ≤ 线索；填满的段必须正好等于线索 */
+  private krPartialOk(board: number[]): boolean {
+    for (let i = 0; i < H_RUNS.length; i++) {
+      if (!this.krRunOk(board, H_RUNS[i], this.rowClue[H_CLUE_AT[i]])) {
+        return false;
+      }
+    }
+    for (let i = 0; i < V_RUNS.length; i++) {
+      if (!this.krRunOk(board, V_RUNS[i], this.colClue[V_CLUE_AT[i]])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private krRunOk(board: number[], run: number[], clue: number): boolean {
+    let sum: number = 0;
+    let filled: number = 0;
+    for (let k = 0; k < run.length; k++) {
+      const v: number = board[run[k]];
+      if (v > 0) {
+        sum = sum + v;
+        filled = filled + 1;
+      }
+    }
+    if (sum > clue) {
+      return false;
+    }
+    for (let a = 0; a < run.length; a++) {
+      const va: number = board[run[a]];
+      if (va === 0) {
+        continue;
+      }
+      for (let b = a + 1; b < run.length; b++) {
+        if (board[run[b]] === va) {
+          return false;
+        }
+      }
+    }
+    return filled < run.length || sum === clue;
+  }
+
+  private krAllOk(board: number[]): boolean {
+    for (let i = 0; i < H_RUNS.length; i++) {
+      if (!this.runDistinct(board, H_RUNS[i]) || this.runSum(board, H_RUNS[i]) !== this.rowClue[H_CLUE_AT[i]]) {
+        return false;
+      }
+    }
+    for (let i = 0; i < V_RUNS.length; i++) {
+      if (!this.runDistinct(board, V_RUNS[i]) || this.runSum(board, V_RUNS[i]) !== this.colClue[V_CLUE_AT[i]]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private askAuto(): void {
@@ -494,7 +580,7 @@ export struct GKakuro {
               }
               .layoutWeight(1)
               .aspectRatio(1)
-              .backgroundColor(this.sel === ((r * N + c)) ? '#226366F1' : this.theme.surface)
+              .backgroundColor(this.sel === ((r * N + c)) ? Palette.tint('22') : this.theme.surface)
               .borderRadius(Radius.xs)
               .border({ width: this.sel === ((r * N + c)) ? 2 : 1, color: this.sel === ((r * N + c)) ? Palette.primary : this.theme.line })
               .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -634,7 +720,7 @@ export struct GKakuro {
           .backgroundColor(Palette.berry)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(44))
+          .height(Cell.tap(44))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L625'; })
           .onBlur(() => { if (this.tvFocus === 'L625') { this.tvFocus = ''; } })

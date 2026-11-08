@@ -86,6 +86,8 @@ export struct GClassicMaze {
   @State private walls: number[] = []; @State private pos: number = 0;
   @State private steps: number = 0; @State private over: boolean = false;
   @State private won: boolean = false; @State private note: string = '';
+  /** ★ 2026-11-08（game-balancer 4000 局）：本局迷宫的**最短解**，用来定步数上限 */
+  @State private best: number = 0;
 
  private startAt: number = 0;
 
@@ -99,12 +101,69 @@ export struct GClassicMaze {
  onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(9);
      this.reset(); }
- /** ★ 本局步数上限（随棋盘边长走：4 倍格子边） */
- private dmax(): number { return this.diffTotal * 4; }
+ /**
+  * ★★★ 2026-11-08（game-balancer 4000 局蒙特卡洛）**步数上限必须按"实际最短解"给**：
+  *   原来是 `diffTotal * 4`（6×6→24 / 9×9→36 / 12×12→48），而 DFS 生成的是**完美迷宫**
+  *   （任意两点唯一路径，最短路可以很长）。实测最短路中位数：18 / 36 / 62，
+  *   旧上限造成的死局率：简单 **17.2%** / 普通 **49.9%** / 困难 **72.7%**
+  *   （game-balancer 报的 51% / 71.5% 与模拟一致）。
+  *   ⇒ 改成 `max(ceil(2.2 × 最短路), 3n)`：模拟 6000 局 **死局 0%**，且保留 2.2 倍容错给人类试错。
+  */
+ private dmax(): number {
+   const need: number = Math.ceil(this.best * 2.2);
+   const floor: number = this.diffTotal * 3;
+   // best 还没算出来（reset 之前）/ 算不出（理论不会）⇒ 退回旧的宽松值
+   return this.best > 0 ? Math.max(need, floor) : this.diffTotal * 4;
+ }
  /** ★ 出口格子下标（随棋盘边长走） */
  private goalIdx(): number { return this.diffTotal * this.diffTotal - 1; }
+
+ /**
+  * ★ 2026-11-08：BFS 求「起点→出口」的最短步数（-1 = 走不到）。
+  *   `genWalls` 是 DFS 生成的无环迷宫 ⇒ 一定连通，这里只算长度。
+  *   ⚠️ 和 AI 代打用的 `nextMove()` 是**两套**：那个每步算一次方向，这个只在换局时算一次。
+  */
+ private bestPath(): number {
+   const n: number = this.diffTotal > 1 ? this.diffTotal : 2;
+   const goal: number = this.goalIdx();
+   if (goal <= 0 || goal >= n * n) {
+     return -1;
+   }
+   const dist: number[] = new Array<number>(n * n).fill(-1);
+   const q: number[] = [0];
+   dist[0] = 0;
+   let head: number = 0;
+   while (head < q.length) {
+     const cur: number = q[head];
+     head++;
+     if (cur === goal) {
+       return dist[cur];
+     }
+     const r: number = Math.floor(cur / n);
+     const c: number = cur - r * n;
+     for (let d = 0; d < 4; d++) {
+       if ((this.walls[cur] & WALL[d]) !== 0) {
+         continue;
+       }
+       const nr: number = r + DR[d];
+       const nc: number = c + DC[d];
+       if (nr < 0 || nr >= n || nc < 0 || nc >= n) {
+         continue;
+       }
+       const nb: number = nr * n + nc;
+       if (dist[nb] >= 0) {
+         continue;
+       }
+       dist[nb] = dist[cur] + 1;
+       q.push(nb);
+     }
+   }
+   return -1;
+ }
  private reset(): void {
  this.walls = genWalls(this.diffTotal); this.pos = 0; this.steps = 0; this.over = false;
+ // ★ 2026-11-08：本局最短解算一次，`dmax()` 用它定上限（见 dmax 注释）
+ this.best = this.bestPath();
  this.won = false; this.note = TG('滑动或按方向键，找出口 🌀'); this.startAt = Date.now();
  }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════

@@ -20,6 +20,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 3;
 const CELLS: number = N * N;
@@ -241,6 +242,7 @@ export struct GTicTacToe {
     this.status = TG('你先手，点一格落 ✕');
     this.startAt = Date.now();
     this.timer = setInterval(() => {
+      if (AppClock.isPaused()) { return; }
       if (!this.over && !this.finished) {
         this.seconds = this.seconds + 1;
       }

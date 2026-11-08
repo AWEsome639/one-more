@@ -385,7 +385,7 @@ export struct GCountingSheep {
 
       Button(this.over ? (this.right >= PASS ? TG('通关 🎉') : TG('结束')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .height(Cell.of(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
+        .height(Cell.tap(44)).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%')
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L380'; })

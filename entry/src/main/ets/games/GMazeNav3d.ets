@@ -77,9 +77,15 @@ export struct GMazeNav3d {
     return z * W * H + y * W + x;
   }
 
-  /** 用「随机挖通道」生成一个保证连通的迷宫 */
+  /**
+   * ★★★ 2026-11-08（game-balancer 4000 局蒙特卡洛）**生成器不保证可解**：
+   *   原注释写「保证连通」，但层间通道开在「该层随机游走的终点 `(cx,cy)`」，
+   *   而下一层的游走又从 (0,0) 开始 ⇒ 从下层入口到出口不一定有路。
+   *   实测不可达率：简单 **36.8%** / 普通 **22.9%** / 困难 **12.8%**
+   *   （这也是"3D 迷宫 AI 代打 FAIL"的真因 —— 不是 AI 弱，是地图无解）。
+   *   ⇒ 生成后跑一次 6 连通 BFS 校验（5×5×3 = 125 格，<1ms），不可达就重生成。
+   */
   private reset(): void {
-    this.walls = new Array<number>(CELLS).fill(1);
     this.px = 0;
     this.py = 0;
     this.pz = 0;
@@ -87,8 +93,18 @@ export struct GMazeNav3d {
     this.done = false;
     this.startAt = Date.now();
 
-    // 每层挖一条随机游走的通路
-    const w = this.walls.slice();
+    let w: number[] = this.genWalls3d();
+    let tries: number = 0;
+    while (!this.reachable(w) && tries < 40) {
+      w = this.genWalls3d();
+      tries++;
+    }
+    this.walls = w;
+  }
+
+  /** 生成一份候选地图（层内随机游走 + 终点必通 + 层间通道） */
+  private genWalls3d(): number[] {
+    const w = new Array<number>(CELLS).fill(1);
     for (let z = 0; z < this.diffTotal; z++) {
       let cx = 0;
       let cy = 0;
@@ -116,7 +132,52 @@ export struct GMazeNav3d {
         w[this.idx(cx, cy, z + 1)] = 0;
       }
     }
-    this.walls = w;
+    return w;
+  }
+
+  /**
+   * 6 连通 BFS：起点 (0,0,0) 能否走到出口 (W-1, H-1, diffTotal-1)。
+   * ★ 只做连通性判断（不存路径），125 格量级，<1ms。
+   */
+  private reachable(w: number[]): boolean {
+    const l: number = this.diffTotal;
+    const total: number = W * H * l;
+    if (total <= 0 || w.length < total) {
+      return false;
+    }
+    const seen: boolean[] = new Array<boolean>(total).fill(false);
+    const goal: number = (l - 1) * W * H + (H - 1) * W + (W - 1);
+    const q: number[] = [0];
+    seen[0] = true;
+    let head: number = 0;
+    while (head < q.length) {
+      const cur: number = q[head];
+      head++;
+      if (cur === goal) {
+        return true;
+      }
+      const x: number = cur % W;
+      const y: number = Math.floor(cur / W) % H;
+      const z: number = Math.floor(cur / (W * H));
+      const dx: number[] = [1, -1, 0, 0, 0, 0];
+      const dy: number[] = [0, 0, 1, -1, 0, 0];
+      const dz: number[] = [0, 0, 0, 0, 1, -1];
+      for (let k = 0; k < 6; k++) {
+        const nx: number = x + dx[k];
+        const ny: number = y + dy[k];
+        const nz: number = z + dz[k];
+        if (nx < 0 || nx >= W || ny < 0 || ny >= H || nz < 0 || nz >= l) {
+          continue;
+        }
+        const i: number = nz * W * H + ny * W + nx;
+        if (seen[i] || w[i] === 1) {
+          continue;
+        }
+        seen[i] = true;
+        q.push(i);
+      }
+    }
+    return false;
   }
 
   private at(x: number, y: number, z: number): number {
@@ -553,7 +614,7 @@ export struct GMazeNav3d {
       Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
-        .width('100%').height(Cell.of(44))
+        .width('100%').height(Cell.tap(44))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L543'; })
         .onBlur(() => { if (this.tvFocus === 'L543') { this.tvFocus = ''; } })
