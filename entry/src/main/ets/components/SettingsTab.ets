@@ -752,7 +752,14 @@ build() {
 
   /** 把 `LocalLLM.stat` 的当前值抄进四个 @State 快照（页面打开 + 点卡片时各调一次） */
   private refreshDiag(): void {
-    this.diagReasonV = LocalLLM.stat.reason.length === 0 ? 'idle' : LocalLLM.stat.reason;
+    const reason: string = LocalLLM.stat.reason.length === 0 ? 'idle' : LocalLLM.stat.reason;
+    // ★★★ 2026-11-09 临时诊断日志（lead 批准，定「诊断卡不更新」到底是数据侧还是渲染侧）：
+    //   · 打印的是**即将写进 @State 的值**；
+    //   · 点击后若这里打 `initMs=1040`（新值）而卡面仍是 `1050` ⇒ **渲染问题**（@State 手动赋值没触发重建）；
+    //   · 若这里打的就是 `1050`（旧值）⇒ **数据侧**（`LocalLLM.stat.initMs` 没写进去）。
+    hilog.info(0x0001, 'diag', 'refresh reason=%{public}s initMs=%{public}d calls=%{public}d ready=%{public}s',
+      reason, LocalLLM.stat.initMs, LocalLLM.stat.calls, String(LocalLLM.stat.ready));
+    this.diagReasonV = reason;
     this.diagInitV = LocalLLM.stat.initMs;
     this.diagFirstV = LocalLLM.stat.firstTokenMs;
     this.diagCallsV = LocalLLM.stat.calls;
