@@ -39,6 +39,22 @@ struct StatsCard {
   //   也永远是 NORMAL 档的值。有了这个字段，卡片才能真正跟随「大字模式」。
   //   ⚠️ 老版本卡片（桌面已添加的实例）拿不到这个键 ⇒ 默认 'normal'，不会崩。
   @LocalStorageProp('uiMode') @Watch('onUiModeChange') uiMode: string = 'normal';
+  /**
+   * ★★★ 2026-11-08（StatsCard 巡检 ③）：**卡片尺寸规格**（'2*2' / '2*4' / '2*3' / '3*3'）
+   * 由 `StatsCardAbility.onAddForm` 从 `want.parameters[DIMENSION_KEY]` 读出后注入。
+   * ⚠️ 卡片跑在 Form 渲染进程，**拿不到 Bp**（Bp 只由 App 主进程 WindowStage 初始化，
+   *   在这里永远是默认 360×780）⇒ `Bp.tinyWatch()` 在卡片里**恒 false**，
+   *   "是不是手表卡"只能看这个字段。
+   */
+  @LocalStorageProp('dim') dim: string = '2*2';
+
+  /**
+   * 是不是手表卡：`2*3` / `3*3` 是官方**仅手表支持**的两档（桌面/平板不支持）
+   * ⇒ 用"尺寸"反推设备，比猜 `Bp` 可靠。
+   */
+  private isWatchCard(): boolean {
+    return this.dim === '2*3' || this.dim === '3*3';
+  }
 
   /** 首帧之前就把字号/间距/圆角改成正确的档位（否则会先按 NORMAL 画一帧再跳） */
   aboutToAppear(): void {
@@ -89,9 +105,12 @@ struct StatsCard {
     //     · `EntryAbility` 负责落盘（onBackground/onDestroy）与冷启动恢复（onCreate）
     //     ⚠️ 前提是「界面模式」真的被写进盘 —— 原来它**从来没落过盘**（`UiModeMgr.save()`
     //       只写内存），所以这一轮同时补了落盘，否则卡片永远拿到 'normal'。
-    Column({ space: 8 }) {
-      // 顶行：名字 + 连胜
-      Row() {
+    Column({ space: this.isWatchCard() ? 6 : 8 }) {
+      // 顶行：名字 + 连胜 —— ★ 手表卡（2*3/3*3）上**整行删掉**：
+      //   ① 品牌名在"就是本 App 的卡"上没有信息量；② 🔥 连胜在手表上意义低（同 `Common.ets:654` 的先例）
+      //   省下的 ~18vp 正好给等级和进度条。
+      if (!this.isWatchCard()) {
+        Row() {
         Text('One More')
           .fontSize(FontSize.xs)
           .fontWeight(FontWeight.Bold)
@@ -102,24 +121,33 @@ struct StatsCard {
             Text('🔥').accessibilityLevel('no').fontSize(11)
             Text(this.streak).fontSize(11).fontColor(Palette.warning).fontWeight(FontWeight.Bold)
           }
-        }
-      }
-      .width('100%')
-
-      // 主行：等级
-      Row({ space: 8 }) {
-        Stack() {
-          Circle({ width: 40, height: 40 }).fill(Palette.primary)
-          Column() {
-            Text('LV').fontSize(FontSize.badge).fontColor(Overlay.onColorSoft)
-            Text(this.level).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(Overlay.onColor)
           }
         }
-        .width(40).height(40)
+        .width('100%')
+      }
+
+      // 主行：等级 —— ★ 手表上环 40→28、等级字 16→13（宽度是大问题：28 只占 2*3 的 ~28%）
+      Row({ space: 8 }) {
+        Stack() {
+          Circle({
+            width: this.isWatchCard() ? 28 : 40,
+            height: this.isWatchCard() ? 28 : 40
+          }).fill(Palette.primary)
+          Column() {
+            Text('LV').fontSize(FontSize.badge).fontColor(Overlay.onColorSoft)
+            Text(this.level)
+              .fontSize(this.isWatchCard() ? FontSize.xs : FontSize.md)
+              .fontWeight(FontWeight.Bold).fontColor(Overlay.onColor)
+          }
+        }
+        .width(this.isWatchCard() ? 28 : 40)
+        .height(this.isWatchCard() ? 28 : 40)
 
         Column({ space: 2 }) {
           Text(this.title)
-            .fontSize(FontSize.xs)
+            // ★ 手表上 13→12（阶梯最小档），且**保持 maxLines(1)+省略号** —— 宁缺勿换行：
+            //   标题一换行就会把进度条挤出 2*3 的高度预算（见巡检报告 §3.3）。
+            .fontSize(this.isWatchCard() ? FontSize.xxs : FontSize.xs)
             .fontWeight(FontWeight.Bold)
             .fontColor(Palette.dInk)
             .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -141,14 +169,48 @@ struct StatsCard {
       .width('100%').height(5)
 
       // ★ 2026-10-19 自查 A2：底部文案由 FormExtensionAbility 本地化后注入
-      Text(this.footer)
-        .fontSize(9)
-        .fontColor(Palette.dInkSoft)
+      // ★ 2026-11-08（③）：**手表卡不画** —— "累计 N 局 · 点我开一局" 的后半句对手表无意义
+      //   （现在卡片真的能点了，但手表上点开是首页、不是"开一局"），省 ~13vp。
+      if (!this.isWatchCard()) {
+        Text(this.footer)
+          .fontSize(9)
+          .fontColor(Palette.dInkSoft)
+      }
     }
     .width('100%')
     .height('100%')
-    .padding(Space.snug)
+    // ★ 手表卡：行距 8→6、内边距 12→8（2*3 的可用高只有 ~190vp，省一档是一档）
+    .padding(this.isWatchCard() ? Space.tiny : Space.snug)
+    // ★★★ 2026-11-08（③）：**手表卡用 SpaceBetween** —— 2*3 是竖长卡，内容只占上半屏，
+    //   底部会留一大片空黑。SpaceBetween 把进度条压到底边 ⇒ 既有"进度感"又不空。
+    //   桌面卡保持默认（Start）：桌面 2*2/2*4 本来就填满，不需要拉伸。
+    .justifyContent(this.isWatchCard() ? FlexAlign.SpaceBetween : FlexAlign.Start)
     .backgroundColor('#1E1B4B')
     .borderRadius(Radius.md)
+    // ★★★ 2026-11-08（StatsCard 巡检 ①）**点卡片真的能开 App 了**
+    //
+    //   问题：底部文案写着「点我开一局」，但卡片里 `onClick` / `FormLink` / `postCardAction`
+    //   一个都没有 ⇒ **点卡片什么都不发生**（文案比实现走得远，与 `super_10`、`marathon` 同源）。
+    //
+    //   ⚠️ 修法**不是** `formConfigAbility`：官方文档写的是
+    //      「formConfigAbility：表示桌面**点击编辑后**，需要拉起的 ability 路径」
+    //      —— 那是卡片**编辑**入口，不是普通点击。
+    //   ✅ 动态卡片的正路是 `postCardAction(router)`（官方《卡片跳转到应用页面（router事件）》）：
+    //      `postCardAction` 是 `component/common.d.ts` 里的**全局函数**，卡片内可直接调，不用 import；
+    //      `router` 动作**只允许在点击事件里触发**（正好符合这里）。
+    //
+    //   ℹ️ 当前**只能打开 App 首页**：带 `params` 才能指定页面，而要在指定页落地还得让
+    //      `EntryAbility.onCreate/onNewWant` 读 `want.parameters.params` 再决定 `loadContent` 哪个页
+    //      —— 本工程没做那层路由。首页也算"能用"（Lead 已确认），真要直达再来一批。
+    .onClick(() => {
+      try {
+        postCardAction(this, {
+          action: 'router',
+          abilityName: 'EntryAbility'
+        });
+      } catch (e) {
+        // 卡片环境异常时绝不让点击把卡片搞崩（点了没反应 = 回到改造前的行为）
+      }
+    })
   }
 }

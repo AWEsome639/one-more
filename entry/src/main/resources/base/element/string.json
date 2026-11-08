@@ -31,6 +31,14 @@
     {
       "name": "wifi_reason",
       "value": "用来确认你和对手在同一个 Wi-Fi 下，方便互相找到"
+    },
+    {
+      "name": "card_watch_display_name",
+      "value": "一局 · 手表"
+    },
+    {
+      "name": "card_watch_desc",
+      "value": "等级、称号与今日打卡（手表版）"
     }
   ]
 }

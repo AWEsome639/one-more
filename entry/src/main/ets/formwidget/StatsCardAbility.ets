@@ -5,7 +5,7 @@
  * 点卡片直达主页，随手来一局。
  */
 
-import { formBindingData, FormExtensionAbility, formProvider } from '@kit.FormKit';
+import { formBindingData, FormExtensionAbility, formProvider, formInfo } from '@kit.FormKit';
 import { Want, common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { preferences } from '@kit.ArkData';
@@ -32,6 +32,10 @@ interface CardStats {
   //   卡片在自己的 Form 渲染进程里跑，**看不到主进程的 AppStorage** ⇒ 必须由 Ability
   //   从 preferences 读出来、随 formBindingData 一起注入，卡片再 `UiModeMgr.apply()`。
   uiMode: string;
+  // ★★★ 2026-11-08（StatsCard 巡检 ③）：**卡片的尺寸规格**（'2*2' / '2*4' / '2*3' / '3*3' …）
+  //   卡片在 Form 渲染进程里**拿不到 Bp**（Bp 只由 App 主进程的 WindowStage 初始化）⇒
+  //   判断"是不是手表卡"只能靠这个字段（官方做法：onAddForm 读 DIMENSION_KEY 再注入）。
+  dim: string;
 }
 
 
@@ -129,12 +133,59 @@ function readUiModeSync(ctx: common.Context): string {
   }
 }
 
+/**
+ * ★★★ 2026-11-08（③ 手表适配）：`formInfo.FormDimension` 枚举 → `'2*3'` 这种可读规格。
+ * 数值取自 SDK `@ohos.app.form.formInfo.d.ts`：1_2=1 / 2_2=2 / 2_4=3 / 4_4=4 / 1_1=6 / 6_4=7 / 2_3=8 / 3_3=9
+ */
+function dimName(d: number): string {
+  if (d === formInfo.FormDimension.Dimension_1_2) { return '1*2'; }
+  if (d === formInfo.FormDimension.Dimension_2_2) { return '2*2'; }
+  if (d === formInfo.FormDimension.Dimension_2_4) { return '2*4'; }
+  if (d === formInfo.FormDimension.Dimension_4_4) { return '4*4'; }
+  if (d === formInfo.FormDimension.DIMENSION_1_1) { return '1*1'; }
+  if (d === formInfo.FormDimension.DIMENSION_6_4) { return '6*4'; }
+  if (d === formInfo.FormDimension.DIMENSION_2_3) { return '2*3'; }
+  if (d === formInfo.FormDimension.DIMENSION_3_3) { return '3*3'; }
+  return '2*2';
+}
+
+/**
+ * 从 `want` 里取卡片尺寸（官方《如何根据不同尺寸的卡片适配不同的UI / faqs-form-19》的做法）。
+ * ⚠️ `want.parameters` 的值类型不稳定（number / string 都可能）⇒ 先 JSON.stringify 再 Number，
+ *    这是官方示例里的写法，最稳。
+ */
+function readDim(want: Want): string {
+  try {
+    if (!want.parameters) {
+      return '2*2';
+    }
+    const raw: string = JSON.stringify(want.parameters[formInfo.FormParam.DIMENSION_KEY]);
+    const n: number = Number(raw);
+    return isNaN(n) ? '2*2' : dimName(n);
+  } catch (e) {
+    return '2*2';
+  }
+}
+
+/** 从 `want` 里取 formId（更新卡片时要按 id 找回尺寸） */
+function readFormId(want: Want): string {
+  try {
+    if (!want.parameters) {
+      return '';
+    }
+    const raw: string = JSON.stringify(want.parameters[formInfo.FormParam.IDENTITY_KEY]);
+    return raw === undefined || raw === 'undefined' ? '' : raw;
+  } catch (e) {
+    return '';
+  }
+}
+
 function defaults(): CardStats {
   const d: CardStats = {
     level: '1', title: '新手上路', streak: '0',
     today: '今天还没玩', solved: '0', xp: '0', pct: '0',
     footer: '累计 0 局 · 点我开一局', done: '0',
-    uiMode: 'normal'
+    uiMode: 'normal', dim: '2*2'
   };
   return d;
 }
@@ -184,8 +235,9 @@ function levelTitle(l: number): string {
   return '新手上路';
 }
 
-async function readStats(ctx: common.Context): Promise<CardStats> {
+async function readStats(ctx: common.Context, dim: string): Promise<CardStats> {
   const out: CardStats = defaults();
+  out.dim = dim;
   try {
     const p: preferences.Preferences = await preferences.getPreferences(ctx, STORE);
     const xp: number = p.getSync('xp', 0) as number;
@@ -226,12 +278,28 @@ async function readStats(ctx: common.Context): Promise<CardStats> {
 }
 
 export default class StatsCardAbility extends FormExtensionAbility {
+  /**
+   * ★★★ 2026-11-08（③）：**formId → 尺寸规格** 的记忆。
+   *
+   *   `onUpdateForm(formId)` / `onFormVisible(formId)` 这两个回调**只给 formId，不给 want**
+   *   ⇒ 刷新时没法再问系统"这张卡多大"。所以在 `onAddForm` 时记下来，刷新时按 id 取回。
+   *   取不到就退回 `'2*2'`（桌面默认卡），最坏是"手表卡按桌面样式画"，不会崩。
+   */
+  private dims: Map<string, string> = new Map<string, string>();
+
   /** 卡片被加到桌面：先给默认值，保证立刻出画面 */
   onAddForm(want: Want): formBindingData.FormBindingData {
     hilog.info(DOMAIN, TAG, '%{public}s', 'onAddForm');
     const d: CardStats = defaults();
     // ★ 首帧就按用户的界面模式出画面，避免"先小字再跳大字"
     d.uiMode = readUiModeSync(this.context);
+    // ★ ③：首帧就带上尺寸，卡片据此选「桌面版 / 手表版」布局
+    d.dim = readDim(want);
+    const fid: string = readFormId(want);
+    if (fid.length > 0) {
+      this.dims.set(fid, d.dim);
+    }
+    hilog.info(DOMAIN, TAG, 'onAddForm dim=%{public}s id=%{public}s', d.dim, fid);
     return formBindingData.createFormBindingData(d);
   }
 
@@ -251,7 +319,9 @@ export default class StatsCardAbility extends FormExtensionAbility {
 
   /** 读真实进度 → 推给指定卡片 */
   private push(formId: string): void {
-    readStats(this.context).then((data: CardStats) => {
+    // ★ ③：按 id 取回这张卡的尺寸（取不到退回桌面默认）
+    const dim: string = this.dims.get(formId) ?? '2*2';
+    readStats(this.context, dim).then((data: CardStats) => {
       try {
         const bind: formBindingData.FormBindingData = formBindingData.createFormBindingData(data);
         formProvider.updateForm(formId, bind).catch((e: BusinessError) => {

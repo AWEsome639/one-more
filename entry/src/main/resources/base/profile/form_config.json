@@ -19,6 +19,29 @@
       "supportDimensions": [
         "2*2",
         "2*4"
+      ],
+      "previewImages": [
+        "$media:card_preview_2x2",
+        "$media:card_preview_2x4"
+      ]
+    },
+    {
+      "name": "StatsCardWatch",
+      "displayName": "$string:card_watch_display_name",
+      "description": "$string:card_watch_desc",
+      "src": "./ets/formwidget/pages/StatsCard.ets",
+      "uiSyntax": "arkts",
+      "isDefault": false,
+      "updateEnabled": true,
+      "updateDuration": 2,
+      "defaultDimension": "2*3",
+      "supportDimensions": [
+        "2*3",
+        "3*3"
+      ],
+      "previewImages": [
+        "$media:card_preview_2x3",
+        "$media:card_preview_3x3"
       ]
     }
   ]
