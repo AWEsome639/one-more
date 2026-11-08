@@ -213,7 +213,15 @@ export struct GTargetNumber {
     if (this.answered) {
       return true;
     }
-    this.submit(this.ansIdx);
+    // ★ 2026-11-09（ai-fixer-a）**不再读 ansIdx（答案下标）**：
+    //   屏幕上是 4 个算式 + 一个目标数 ⇒ 自己把每个式子算出来，等于目标的那个就是答案。
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.aiEvalExpr(this.opts[i]) === this.target) {
+        this.submit(i);
+        return !this.over;
+      }
+    }
+    return false;
     return !this.over;
   }
 
@@ -250,6 +258,60 @@ export struct GTargetNumber {
     Haptics.tap();
     const r: HintResult = this.computeHint();
     Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
+  /** ★ 2026-11-09 自己解算式（支持括号、× 优先、− 号） */
+  private aiEvalExpr(expr: string): number {
+    const s: string = expr.split('×').join('*').split('−').join('-').split(' ').join('');
+    const at: number[] = [0];
+    return this.aiSum(s, at);
+  }
+
+  private aiSum(s: string, at: number[]): number {
+    let v: number = this.aiProd(s, at);
+    while (at[0] < s.length) {
+      const c: string = s.charAt(at[0]);
+      if (c === '+') {
+        at[0] = at[0] + 1;
+        v = v + this.aiProd(s, at);
+      } else if (c === '-') {
+        at[0] = at[0] + 1;
+        v = v - this.aiProd(s, at);
+      } else {
+        break;
+      }
+    }
+    return v;
+  }
+
+  private aiProd(s: string, at: number[]): number {
+    let v: number = this.aiAtom(s, at);
+    while (at[0] < s.length && s.charAt(at[0]) === '*') {
+      at[0] = at[0] + 1;
+      v = v * this.aiAtom(s, at);
+    }
+    return v;
+  }
+
+  private aiAtom(s: string, at: number[]): number {
+    if (s.charAt(at[0]) === '(') {
+      at[0] = at[0] + 1;
+      const v: number = this.aiSum(s, at);
+      if (s.charAt(at[0]) === ')') {
+        at[0] = at[0] + 1;
+      }
+      return v;
+    }
+    let num: string = '';
+    while (at[0] < s.length) {
+      const c: string = s.charAt(at[0]);
+      if (c < '0' || c > '9') {
+        break;
+      }
+      num = num + c;
+      at[0] = at[0] + 1;
+    }
+    return num.length > 0 ? Number(num) : 0;
   }
 
   private submit(k: number): void {

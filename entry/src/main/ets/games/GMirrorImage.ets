@@ -264,7 +264,9 @@ export struct GMirrorImage {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.answer(this.truth);
+    // ★ 2026-11-09（ai-fixer-a）**不再读 this.truth（答案）**：
+    //   屏幕上是左右两幅方块图 ⇒ 自己把左边水平翻一下，跟右边逐格比，就知道是不是镜像。
+    this.answer(same(this.right, flipX(this.left)));
     return !this.over;
   }
 

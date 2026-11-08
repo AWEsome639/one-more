@@ -208,7 +208,20 @@ export struct GUnitConverterPro {
     if (this.answered || this.over) {
       return true;
     }
-    this.submit(this.ansIdx);
+    // ★ 2026-11-09（ai-fixer-a）**不再读 ansIdx（答案下标）**：
+    //   屏幕上是「12 km = ? m」⇒ 从单位表里取两个换算系数，自己算 v×fFrom/fTo，
+    //   再和选项里的数字比（用同一个 fmt 格式化）。
+    const want: string = this.aiConvert();
+    if (want.length === 0) {
+      return false;
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.submit(i);
+        return !this.over;
+      }
+    }
+    return false;
     return !this.over;
   }
 
@@ -245,6 +258,37 @@ export struct GUnitConverterPro {
     Haptics.tap();
     const r: HintResult = this.computeHint();
     Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
+  /** ★ 2026-11-09 按单位表自己换算（不读 ansIdx） */
+  private aiConvert(): string {
+    const parts: string[] = this.q.split(' ');
+    if (parts.length < 5) {
+      return '';
+    }
+    const v: number = Number(parts[0]);
+    const from: string = parts[1];
+    const to: string = parts[4];
+    if (v !== v) {
+      return '';
+    }
+    let ff: number = -1;
+    let ft: number = -1;
+    for (let i = 0; i < SCALES.length; i++) {
+      const us: Unit[] = SCALES[i].us;
+      for (let k = 0; k < us.length; k++) {
+        if (us[k].n === from) {
+          ff = us[k].f;
+        }
+        if (us[k].n === to) {
+          ft = us[k].f;
+        }
+      }
+    }
+    if (ff <= 0 || ft <= 0) {
+      return '';
+    }
+    return fmt(v * ff / ft);
   }
 
   private submit(k: number): void {

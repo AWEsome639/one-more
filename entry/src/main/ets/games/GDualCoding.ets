@@ -51,6 +51,18 @@ export struct GDualCoding {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
+  /** ★ 2026-11-09 代打的记忆：记忆阶段看过的「词↔图」 */
+  private aiPairs: Pair[] = [];
+
+  /** ★ 2026-11-09 从自己的记忆里查这个词对应的图 */
+  private aiIconOf(word: string): string {
+    for (let i = 0; i < this.aiPairs.length; i++) {
+      if (this.aiPairs[i].word === word) {
+        return this.aiPairs[i].icon;
+      }
+    }
+    return '';
+  }
   @State private pairs: Pair[] = [];
   @State private quiz: Pair[] = [];
   @State private phase: number = 0;        // 0 记忆 1 答题
@@ -174,7 +186,18 @@ export struct GDualCoding {
     if (this.phase !== 1 || this.pick >= 0) {
       return true;
     }
-    this.answer(this.aiOpt());
+    // ★ 2026-11-09（ai-fixer-a）**不再读 quiz[qNo].icon（答案的图）**：
+    //   记忆阶段把「词↔图」抄进 aiPairs，作答时拿屏幕上的那个词去自己记忆里查图，
+    //   再在选项里找这张图。
+    const want: string = this.aiIconOf(this.quiz[this.qNo].word);
+    if (want.length === 0) {
+      return false;
+    }
+    const k: number = this.opts.indexOf(want);
+    if (k < 0) {
+      return false;
+    }
+    this.answer(k);
     return !this.over;
   }
 
@@ -238,6 +261,8 @@ export struct GDualCoding {
     }, 1000);
   }
   private startQuiz(): void {
+    // ★ 2026-11-09（ai-fixer-a）代打「记住」刚才那一屏「词↔图」
+    this.aiPairs = this.pairs.slice();
     this.stop(); this.phase = 1; this.qNo = 0; this.pick = -1; this.buildOpts();
   }
   private buildOpts(): void {

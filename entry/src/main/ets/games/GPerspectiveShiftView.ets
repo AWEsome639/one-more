@@ -247,7 +247,22 @@ export struct GPerspectiveShiftView {
     if (this.chosen >= 0) {
       return true;
     }
-    this.choose(this.answer);
+    // ★ 2026-11-09（ai-fixer-a）**不再读 this.answer（答案下标）**：
+    //   屏幕上给了俯视图 base 和要转的方向 dir ⇒ 自己 spin 出「转对之后的样子」，
+    //   再和 3 个候选逐个比，一样的那条就是答案。
+    const n: number = this.diffTotal;
+    const want: string[] = spin(this.base, ROTS[this.dir], n);
+    let k: number = -1;
+    for (let i = 0; i < this.opts.length; i++) {
+      if (sameMap(this.opts[i], want)) {
+        k = i;
+        break;
+      }
+    }
+    if (k < 0) {
+      return false;
+    }
+    this.choose(k);
     return !this.over;
   }
 
