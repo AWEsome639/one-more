@@ -242,11 +242,12 @@ export struct GPong {
   private bounceAngle(relIn: number): number {
     const rel: number = relIn > 1 ? 1 : (relIn < -1 ? -1 : relIn);
     const MIN_ANG: number = 0.14;
-    // ★ 放大「击球点偏移 → 出射角」的映射（×1.8，上限仍 MAX_TILT）：真机对拉时 rel 只有 ±0.2 左右，
-    //   原映射只出 10° 左右的平球；放大后同样偏移能出 17°~39°，对拉才有来回拉锯的样子。
-    let a: number = rel * MAX_TILT * 1.8;
+    // ★ 放大「击球点偏移 → 出射角」的映射（**×1.2**，上限仍 MAX_TILT）：
+    //   ×1.8 时真机中位 50.9°（太斜）；按线性缩放反推「中位 rel ≈ 0.52」，
+    //   ×1.2 ⇒ 0.493rad×1.2 = 0.592rad ≈ **34°**（落在旧版 27.5° 与 1.8 版 50.9° 中间）。
+    const raw: number = rel * MAX_TILT * 1.2;
     // ★ 再叠一点随机抖动（±0.05rad ≈ ±3°），避免"同一落点永远同一角度"的机械感
-    a = a + (Math.random() - 0.5) * 0.10;
+    let a: number = raw + (Math.random() - 0.5) * 0.10;
     if (a > MAX_TILT) {
       a = MAX_TILT;
     } else if (a < -MAX_TILT) {
@@ -256,6 +257,11 @@ export struct GPong {
       const sign: number = rel === 0 ? (Math.random() < 0.5 ? -1 : 1) : (rel > 0 ? 1 : -1);
       a = sign * MIN_ANG;
     }
+    // ★ 2026-11-08 定位用（每次撞拍一条，不改变行为）：
+    //   rel = 击球点偏移（-1..1，0=正中心）／raw = 放大映射后／out = 最终出射角（含抖动与 8° 保底）
+    hilog.info(0x0000, 'GPong',
+      'bounce rel=' + rel.toFixed(3) + ' raw=' + raw.toFixed(3) + ' out=' + a.toFixed(3)
+        + ' deg=' + (a * 180 / Math.PI).toFixed(1));
     return a;
   }
 
