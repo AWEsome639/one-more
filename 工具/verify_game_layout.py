@@ -100,6 +100,23 @@ def close_search():
         sh('uitest uiInput click 2276 264')
         time.sleep(0.7)
 
+def save_shot(safe_name):
+    """⚠️ v11：非 OK 的结果「自动存一张截图」——判据 1854「max_bottom 只有配截图才算数」
+    返回本地路径（失败返回空串）。"""
+    ts = time.strftime('%H%M%S')
+    remote = f'/data/local/tmp/shot_{safe_name}.jpeg'
+    out = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                       '_巡检记录', f'截图-{safe_name}-{ts}.jpeg')
+    sh(f'snapshot_display -f {remote}')
+    try:
+        r = subprocess.run([HC, '-t', DEV, 'file', 'recv', remote, out],
+                           capture_output=True, text=True, timeout=90)
+        if os.path.exists(out) and os.path.getsize(out) > 1000:
+            return out
+    except Exception:
+        pass
+    return ''
+
 def is_home():
     """首页判据：有「355 款」或「🔍/💬」顶栏 + 有分类标签「全部」"""
     d = dump('/data/local/tmp/home.json')
@@ -154,10 +171,14 @@ def verify_one(en_name):
     # ⚠️ v9：两次采样。真机实测「2048 一次量 1600、另一次 1557」——
     #   游戏内容会随状态变化（msg 行/演示条/棋盘缩放），单次采样会误报。
     #   ⇒ 取「两次里的最小值」当 best-case：最小值都贴底才算真出屏。
-    time.sleep(1.0)
+    # ⚠️ v10：三次采样（实测两次还不够 —— `Compound Connect` 两次都给 1600、单独再测 1351）
+    #   原因：进游戏瞬间「演示条 / 进场动画」还没收敛，会把 max_bottom 顶到屏底。
+    time.sleep(1.2)
     d2 = dump(f'/data/local/tmp/game_{safe}.json')
     time.sleep(1.4)
     d2b = dump(f'/data/local/tmp/game_{safe}_b.json')
+    time.sleep(1.4)
+    d2c = dump(f'/data/local/tmp/game_{safe}_c.json')
     if not d2:
         sh('uitest uiInput keyEvent Back'); close_search()
         return ('GAME_DUMP_FAIL', {})
@@ -176,9 +197,13 @@ def verify_one(en_name):
             if y2 == mb:
                 lo = t[:30]; break
         return mb, lo
-    mb_a, lo_a = bottom_of(d2)
-    mb_b, lo_b = bottom_of(d2b) if d2b else (mb_a, lo_a)
-    max_bottom, lowest = (mb_a, lo_a) if mb_a <= mb_b else (mb_b, lo_b)   # 取 best-case
+    cands = []
+    for tree in (d2, d2b, d2c):
+        if tree:
+            cands.append(bottom_of(tree))
+    if not cands:
+        cands = [(0, '')]
+    max_bottom, lowest = min(cands, key=lambda x: x[0])   # 取 best-case（三次里的最小值）
 
     if max_bottom <= CONTENT_BOTTOM:
         status = 'OK'
@@ -186,10 +211,13 @@ def verify_one(en_name):
         status = 'TIGHT'
     else:
         status = 'PUSHED_OUT'
+    shot = ''
+    if status != 'OK':
+        shot = save_shot(safe)          # ⚠️ v11：非 OK 自动存截图
     sh('uitest uiInput keyEvent Back')
     time.sleep(0.8)
     close_search()
-    return (status, {'max_bottom': max_bottom, 'lowest': lowest, 'count': cnt})
+    return (status, {'max_bottom': max_bottom, 'lowest': lowest, 'count': cnt, 'shot': shot})
 
 def main():
     if len(sys.argv) < 2:

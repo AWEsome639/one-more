@@ -300,13 +300,13 @@ export struct GVectorDotProduct {
         Row({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.round) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .justifyContent(FlexAlign.SpaceBetween)
         Row({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.right) + '/' + String(PASS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .justifyContent(FlexAlign.SpaceBetween)
         Row({ space: Space.xs }) {
@@ -315,7 +315,7 @@ export struct GVectorDotProduct {
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
         .justifyContent(FlexAlign.SpaceBetween)
       }.width('100%')
@@ -325,7 +325,7 @@ export struct GVectorDotProduct {
         Text(vecText('v', this.v)).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         Text(this.u.length === 2 ? 'u · v = u₁v₁ + u₂v₂' : 'u · v = u₁v₁ + u₂v₂ + u₃v₃').fontSize(FontSize.xs)
           .fontColor(this.theme.inkFaint)
-      }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card)
         .justifyContent(FlexAlign.SpaceBetween)
       Text(this.msg).fontSize(FontSize.sm)
@@ -336,7 +336,7 @@ export struct GVectorDotProduct {
         .fontColor(this.pick === (0) ? '#FFFFFF' : this.theme.ink).backgroundColor(this.pick === (0)
         ? ((0) < this.opts.length && this.opts[(0)] === this.answer ? Palette.emerald : Palette.rose)
         : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
         Haptics.tap();
         this.submit((0));
@@ -351,7 +351,7 @@ export struct GVectorDotProduct {
         .fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink).backgroundColor(this.pick === (1)
         ? ((1) < this.opts.length && this.opts[(1)] === this.answer ? Palette.emerald : Palette.rose)
         : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
         Haptics.tap();
         this.submit((1));
@@ -368,7 +368,7 @@ export struct GVectorDotProduct {
         .fontColor(this.pick === (2) ? '#FFFFFF' : this.theme.ink).backgroundColor(this.pick === (2)
         ? ((2) < this.opts.length && this.opts[(2)] === this.answer ? Palette.emerald : Palette.rose)
         : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
         Haptics.tap();
         this.submit((2));
@@ -383,7 +383,7 @@ export struct GVectorDotProduct {
         .fontColor(this.pick === (3) ? '#FFFFFF' : this.theme.ink).backgroundColor(this.pick === (3)
         ? ((3) < this.opts.length && this.opts[(3)] === this.answer ? Palette.emerald : Palette.rose)
         : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(54)).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
         Haptics.tap();
         this.submit((3));
