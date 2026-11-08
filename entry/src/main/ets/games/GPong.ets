@@ -96,7 +96,11 @@ export struct GPong {
   private tickN: number = 0;
   private startAt: number = 0;
   private finished: boolean = false;
-  private fieldH: number = 0;
+  @State private fieldH: number = 0;
+  /** ★ 2026-11-08 判据级发现：`position({ x: '50%' })` 的**百分比字符串不生效**
+   *  （`Length` 在 position 里不认 `%`，只认数值/资源）⇒ 必须用 onAreaChange 量到的
+   *  球场宽高把百分比**换算成 vp 数值**再摆。`fieldH` 早就有（拖拽用），这里补 `fieldW`。 */
+  @State private fieldW: number = 0;
   private dragPrev: number = 0;
 
   aboutToAppear(): void {
@@ -634,7 +638,8 @@ export struct GPong {
             .height('4%')
             .backgroundColor(this.theme.line)
             .borderRadius(Radius.full)
-            .position({ x: '49.5%', y: (2 + i * 10) + '%' })
+            // ★ 百分比 → vp（position 不认 '…%'，见 fieldW 注释）
+            .position({ x: 0.495 * this.fieldW, y: (2 + i * 10) / 100 * this.fieldH })
         }, (i: number) => 'n' + i)
 
         // 左拍
@@ -644,7 +649,7 @@ export struct GPong {
           .backgroundColor(Palette.violet)
           .borderRadius(Radius.full)
           .shadow(Shadow.card)
-          .position({ x: PADDLE_X + '%', y: this.px + '%' })
+          .position({ x: PADDLE_X / 100 * this.fieldW, y: this.px / 100 * this.fieldH })
 
         // 右拍
         Row()
@@ -653,7 +658,7 @@ export struct GPong {
           .backgroundColor(Palette.sky)
           .borderRadius(Radius.full)
           .shadow(Shadow.card)
-          .position({ x: AI_X + '%', y: this.ay + '%' })
+          .position({ x: AI_X / 100 * this.fieldW, y: this.ay / 100 * this.fieldH })
 
         // 球
         Row()
@@ -662,7 +667,7 @@ export struct GPong {
           .backgroundColor(Palette.amber)
           .borderRadius(Radius.full)
           .shadow(Shadow.lifted)
-          .position({ x: (this.bx - BALL_R) + '%', y: (this.by - BALL_R) + '%' })
+          .position({ x: (this.bx - BALL_R) / 100 * this.fieldW, y: (this.by - BALL_R) / 100 * this.fieldH })
       }
       .width('100%')
       .layoutWeight(1)
@@ -679,8 +684,12 @@ export struct GPong {
       .direction(Direction.Ltr)
       .onAreaChange((oldArea: Area, newArea: Area) => {
         const h: number = newArea.height as number;
+        const w: number = newArea.width as number;
         if (h > 0) {
           this.fieldH = h;
+        }
+        if (w > 0) {
+          this.fieldW = w;
         }
         // ★ 2026-11-08 自愈：球场已上屏但循环没建起来（timer<0 且没结算）⇒ 补一次启动
         if (this.timer < 0 && !this.over && this.running) {
