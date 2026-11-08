@@ -26,6 +26,10 @@ interface CardStats {
   pct: string;
   footer: string;      // ★ 卡片底部文案（Ability 已本地化）
   done: string;        // ★ '1' 今日已打卡 / '0' 还没玩 —— 卡片不再靠中文「已」字判断
+  // ★★★ 2026-11-08（UI 一致性审计 ③ 续）：**界面模式**（normal / elder / simple）
+  //   卡片在自己的 Form 渲染进程里跑，**看不到主进程的 AppStorage** ⇒ 必须由 Ability
+  //   从 preferences 读出来、随 formBindingData 一起注入，卡片再 `UiModeMgr.apply()`。
+  uiMode: string;
 }
 
 
@@ -107,11 +111,28 @@ function pickTier(level: number, lang: string): string {
   return levelTitle(level);
 }
 
+/**
+ * 同步读「界面模式」—— 卡片首帧就要用，等不了异步。
+ * 与 `lang` 同一个库（`onemore_progress`）、同一套写法；读不到就 'normal'（绝不阻塞出画面）。
+ */
+function readUiModeSync(ctx: common.Context): string {
+  try {
+    const opt: preferences.Options = { name: STORE };
+    const pr: preferences.Preferences = preferences.getPreferencesSync(ctx, opt);
+    const m: string = pr.getSync('uiMode', '') as string;
+    return (m === 'elder' || m === 'simple') ? m : 'normal';
+  } catch (e) {
+    hilog.warn(DOMAIN, TAG, 'readUiMode failed: %{public}s', JSON.stringify(e));
+    return 'normal';
+  }
+}
+
 function defaults(): CardStats {
   const d: CardStats = {
     level: '1', title: '新手上路', streak: '0',
     today: '今天还没玩', solved: '0', xp: '0', pct: '0',
-    footer: '累计 0 局 · 点我开一局', done: '0'
+    footer: '累计 0 局 · 点我开一局', done: '0',
+    uiMode: 'normal'
   };
   return d;
 }
@@ -188,6 +209,10 @@ async function readStats(ctx: common.Context): Promise<CardStats> {
     out.solved = String(total);
     out.xp = String(xp);
     out.pct = String(pct);
+    // ★ 2026-11-08：界面模式（大字/简约）—— 卡片据此调 UiModeMgr.apply
+    //   这里**复用已有的 `p` 句柄**（不另开一个，避免同一库两个实例各自缓存）
+    const modeRaw: string = p.getSync('uiMode', '') as string;
+    out.uiMode = (modeRaw === 'elder' || modeRaw === 'simple') ? modeRaw : 'normal';
   } catch (e) {
     hilog.error(DOMAIN, TAG, 'readStats failed: %{public}s', JSON.stringify(e));
   }
@@ -198,7 +223,10 @@ export default class StatsCardAbility extends FormExtensionAbility {
   /** 卡片被加到桌面：先给默认值，保证立刻出画面 */
   onAddForm(want: Want): formBindingData.FormBindingData {
     hilog.info(DOMAIN, TAG, '%{public}s', 'onAddForm');
-    return formBindingData.createFormBindingData(defaults());
+    const d: CardStats = defaults();
+    // ★ 首帧就按用户的界面模式出画面，避免"先小字再跳大字"
+    d.uiMode = readUiModeSync(this.context);
+    return formBindingData.createFormBindingData(d);
   }
 
   /** 卡片出现在桌面时刷新 */

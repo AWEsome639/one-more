@@ -222,6 +222,8 @@ export struct GAlphabetSudoku {
 
   @State private cells: number[] = [];
   @State private fixed: boolean[] = [];
+  /** ★ 2026-11-08 代打现场解出来的盘面（不读 solCells）；空 = 未算 */
+  private autoSol: number[] = [];
   @State private sel: number = -1;
   @State private mistakes: number = 0;
   @State private seconds: number = 0;
@@ -289,6 +291,17 @@ export struct GAlphabetSudoku {
 
   private valAt(i: number): number {
     return i >= 0 && i < this.cells.length ? this.cells[i] : 0;
+  }
+
+  /** ★ 2026-11-08 代打求解：只用题面给定 + 行/列/宫约束（fits），不碰 solCells */
+  private solveByRules(n: number): number[] {
+    const board: number[] = new Array<number>(n * n).fill(0);
+    for (let i = 0; i < n * n; i++) {
+      if (this.fixed[i]) {
+        board[i] = this.cells[i];
+      }
+    }
+    return fill(board, 0, n) ? board : [];
   }
 
   private isFixed(i: number): boolean {
@@ -422,13 +435,18 @@ export struct GAlphabetSudoku {
       return false;
     }
     const n: number = this.diffTotal;
-    if (this.solCells.length < n * n) {
+    // ★ 2026-11-08（ai-fixer-a）**不再抄出题解 solCells**：用统一的回溯骨架 fill()
+    //   （行/列/宫约束，见 fits()）从当前盘面现场求解，再一格一格填。
+    if (this.autoSol.length !== n * n) {
+      this.autoSol = this.solveByRules(n);
+    }
+    if (this.autoSol.length !== n * n) {
       return false;
     }
     for (let i = 0; i < n * n; i++) {
-      if (this.cells[i] !== this.solCells[i] && !this.fixed[i]) {
+      if (this.cells[i] !== this.autoSol[i] && !this.fixed[i]) {
         this.sel = i;
-        this.put(this.solCells[i]);
+        this.put(this.autoSol[i]);
         return true;
       }
     }

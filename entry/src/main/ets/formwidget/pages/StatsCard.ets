@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Palette, Overlay, Radius } from '../../core/Design';
+import { UiModeMgr } from '../../core/UiMode';
 
 interface CardData {
   level: string;
@@ -33,6 +34,31 @@ struct StatsCard {
   @LocalStorageProp('footer') footer: string = '累计 0 局 · 点我开一局';
   // ★ '1' = 今日已打卡。原来靠 today.indexOf('已') 判断 ⇒ 一旦本地化就永远判成"没玩"
   @LocalStorageProp('done') done: string = '0';
+  // ★★★ 2026-11-08（UI 一致性审计 ③ 续）：**界面模式**由 Ability 注入（normal/elder/simple）。
+  //   卡片跑在 Form 自己的渲染进程，**没人调 `UiModeMgr.apply()`** ⇒ 就算用了 `FontSize.*`
+  //   也永远是 NORMAL 档的值。有了这个字段，卡片才能真正跟随「大字模式」。
+  //   ⚠️ 老版本卡片（桌面已添加的实例）拿不到这个键 ⇒ 默认 'normal'，不会崩。
+  @LocalStorageProp('uiMode') @Watch('onUiModeChange') uiMode: string = 'normal';
+
+  /** 首帧之前就把字号/间距/圆角改成正确的档位（否则会先按 NORMAL 画一帧再跳） */
+  aboutToAppear(): void {
+    this.applyUiMode();
+  }
+
+  /** Ability 推来新模式（onUpdateForm）时跟着换 */
+  onUiModeChange(): void {
+    this.applyUiMode();
+  }
+
+  private applyUiMode(): void {
+    try {
+      // 只在三档之内才应用 —— 防止脏数据改坏 FontSize 阶梯
+      const m: string = (this.uiMode === 'elder' || this.uiMode === 'simple') ? this.uiMode : 'normal';
+      UiModeMgr.apply(m);
+    } catch (e) {
+      // 卡片环境特殊（Form 渲染进程）—— 应用失败就保持默认档，绝不因此不渲染
+    }
+  }
 
   private played(): boolean {
     // ★ 2026-10-19 修：原来是 today.indexOf('已') ≥ 0 —— 只对中文成立；
@@ -55,10 +81,13 @@ struct StatsCard {
     //   ⇒ 要收干净需**给阶梯补档**（`FontSize.nano=9`、`Space.base=12`…），那要同步改
     //     `core/UiMode.ets` 的 Spec/elder/simple 三张表，属于另一批活，本批不动。
     //
-    //   ⚠️ 另一件事**还没做**：卡片运行在 Form 自己的渲染环境里，**没人调 `UiModeMgr.apply()`**
-    //     ⇒ 就算用了 `FontSize.*`，在大字模式下仍是 NORMAL 档的值。要真跟随，得在
-    //     `StatsCardAbility.onAddForm` 里把当前 uiMode 写进 `formBindingData`，卡片
-    //     `aboutToAppear` 里再 `UiModeMgr.apply(...)`。**没做**（要改 Ability 的数据管道）。
+    //   ✅ 跟随「大字模式」：**已接好**（2026-11-08 同日第二批）
+    //     · `StatsCardAbility` 从 preferences 读 'uiMode' → 随 `formBindingData` 注入
+    //     · 本组件 `aboutToAppear` 里 `UiModeMgr.apply(uiMode)` ⇒ 首帧之前就把
+    //       FontSize/Space/Radius 换成该档的值
+    //     · `EntryAbility` 负责落盘（onBackground/onDestroy）与冷启动恢复（onCreate）
+    //     ⚠️ 前提是「界面模式」真的被写进盘 —— 原来它**从来没落过盘**（`UiModeMgr.save()`
+    //       只写内存），所以这一轮同时补了落盘，否则卡片永远拿到 'normal'。
     Column({ space: 8 }) {
       // 顶行：名字 + 连胜
       Row() {

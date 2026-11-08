@@ -22,6 +22,8 @@ import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { window } from '@kit.ArkUI';
 import { Configuration } from '@ohos.app.ability.Configuration';
 import { ProgressStore } from '../core/ProgressStore';
+import { preferences } from '@kit.ArkData';
+import { UiMode, UiModeMgr } from '../core/UiMode';
 // ★★★ 2026-10-23 路线 E：游玩记录（路线 B/C/F 的数据地基）
 import { GameLog } from '../core/GameLog';
 // ★★★ 2026-10-23 路线 D：端侧 AI 引擎（探针失败是正常状态，不影响任何玩法）
@@ -33,6 +35,8 @@ import { G2048Value } from '../ai/G2048Value';
 import { gamePlayer } from '@kit.GameServiceKit';
 
 const DOMAIN = 0x0000;
+/** 与 ProgressStore / StatsCardAbility 同一个 preferences 库 */
+const STORE_NAME: string = 'onemore_progress';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -45,6 +49,14 @@ export default class EntryAbility extends UIAbility {
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
+    // ★★★ 2026-11-08（UI 一致性审计 ③ 续）：**把界面模式接回来**
+    //   原来它从来没落盘：`UiModeMgr.save()` 只写了内存里的 `AppStorage 'uiModePersist'`，
+    //   而 `UiModeMgr.current()` 冷启动永远是 'normal' ⇒ **重启就丢大字模式**；
+    //   桌面卡片跑在 Form 进程、看不到 AppStorage ⇒ 更拿不到。
+    //   ⇒ 落到 `onemore_progress` 库的 'uiMode' 键（与 `lang` 同一个库、同一套写法）。
+    //   ⚠️ 必须在第一帧（onWindowStageCreate→loadContent）之前跑完，否则会先按 NORMAL 画一帧。
+    this.loadUiMode();
+
     // 进度系统：读 XP/等级/连胜/打卡（失败也不阻塞启动，ProgressStore 内部有兜底）
     ProgressStore.init(this.context).then(() => {
       hilog.info(DOMAIN, 'testTag', '%{public}s', 'ProgressStore ready');
@@ -66,6 +78,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onDestroy(): void {
+    this.saveUiMode();   // ★ 2026-11-08：与 onBackground 双保险
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
@@ -202,6 +215,43 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
   }
 
+  /**
+   * ★★★ 2026-11-08：从 preferences 恢复「界面模式」并立刻应用到设计系统常量。
+   * 读不到/读坏了 ⇒ 'normal'（绝不因此不启动）。
+   * ⚠️ 应用这一步是**全局**的：它改写 `FontSize/Space/Radius` 的静态值，
+   *    而 `Index.aboutToAppear` 随后会再 `apply(UiModeMgr.current())` —— 因为这里
+   *    已经 `apply` 过，`current()` 就是正确档位，不会被打回 normal。
+   */
+  private loadUiMode(): void {
+    try {
+      const opt: preferences.Options = { name: STORE_NAME };
+      const pr: preferences.Preferences = preferences.getPreferencesSync(this.context, opt);
+      const m: string = pr.getSync('uiMode', '') as string;
+      const mode: string = (m === UiMode.ELDER || m === UiMode.SIMPLE) ? m : UiMode.NORMAL;
+      UiModeMgr.apply(mode);
+      hilog.info(DOMAIN, 'testTag', 'uiMode = %{public}s', mode);
+    } catch (e) {
+      hilog.error(DOMAIN, 'testTag', 'loadUiMode failed: %{public}s', JSON.stringify(e));
+    }
+  }
+
+  /** 把当前模式写盘（唯一真相源是 `AppStorage 'uiMode'`，由 UiModeMgr.apply 维护） */
+  private saveUiMode(): void {
+    try {
+      const m: string | undefined = AppStorage.get<string>('uiMode');
+      if (m === undefined || m.length === 0) {
+        return;
+      }
+      const opt: preferences.Options = { name: STORE_NAME };
+      const pr: preferences.Preferences = preferences.getPreferencesSync(this.context, opt);
+      // 存储满时 putSync/flush 会抛 ⇒ 静默失败（同 ProgressStore.putString 的做法）
+      pr.putSync('uiMode', m);
+      pr.flush();
+    } catch (e) {
+      // 写不进去只影响"下次启动的记忆"，不动声色
+    }
+  }
+
   onForeground(): void {
     // Ability has brought to foreground
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
@@ -209,6 +259,8 @@ export default class EntryAbility extends UIAbility {
 
   onBackground(): void {
     // Ability has back to background
+    // ★ 2026-11-08：切后台时把当前界面模式落盘（用户刚在大字/简约之间切过就靠这一下）
+    this.saveUiMode();
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
   }
 }

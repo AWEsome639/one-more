@@ -83,6 +83,8 @@ export struct GFutoshiki {
 
   @State private vals: number[] = [];
   @State private given: boolean[] = [];
+  /** ★ 2026-11-08 代打现场解出来的盘面（不读 solVals）；空 = 未算 */
+  private autoSol: number[] = [];
   @State private hSign: number[] = [];   // 水平：(r,c)-(r,c+1)，1 = <，2 = >
   @State private vSign: number[] = [];   // 垂直：(r,c)-(r+1,c)，1 = <，2 = >
   @State private sel: number = -1;
@@ -353,13 +355,18 @@ export struct GFutoshiki {
     if (this.over) {
       return false;
     }
-    if (this.solVals.length !== N * N) {
+    // ★ 2026-11-08（ai-fixer-a）**不再抄出题解 solVals**：用回溯骨架（行/列不重复 + 不等号约束）
+    //   从题面现场求解，再一格一格填。
+    if (this.autoSol.length !== N * N) {
+      this.autoSol = this.solveByRules();
+    }
+    if (this.autoSol.length !== N * N) {
       return false;
     }
     for (let i = 0; i < N * N; i++) {
-      if (this.vals[i] !== this.solVals[i] && !this.given[i]) {
+      if (this.vals[i] !== this.autoSol[i] && !this.given[i]) {
         this.sel = i;
-        this.put(this.solVals[i]);
+        this.put(this.autoSol[i]);
         return !this.over;
       }
     }
@@ -409,6 +416,79 @@ export struct GFutoshiki {
     this.hintIdx = -1;
     this.hintMsg = TG('这一步从不等号推不出来，得先试一个数');
     setTimeout(() => { this.hintMsg = ''; }, 4500);
+  }
+
+  /** ★ 2026-11-08 代打求解：题面给定 + 行/列不重复 + 不等号（不碰 solVals） */
+  private solveByRules(): number[] {
+    const board: number[] = new Array<number>(N * N).fill(0);
+    const fx: boolean[] = new Array<boolean>(N * N).fill(false);
+    for (let i = 0; i < N * N; i++) {
+      if (this.given[i]) {
+        board[i] = this.vals[i];
+        fx[i] = true;
+      }
+    }
+    return this.fsFill(board, fx, 0) ? board : [];
+  }
+
+  private fsFill(board: number[], fx: boolean[], pos: number): boolean {
+    if (pos >= N * N) {
+      return true;
+    }
+    if (fx[pos]) {
+      return this.fsFill(board, fx, pos + 1);
+    }
+    for (let v = 1; v <= N; v++) {
+      if (!this.fsOk(board, pos, v)) {
+        continue;
+      }
+      board[pos] = v;
+      if (this.fsFill(board, fx, pos + 1)) {
+        return true;
+      }
+      board[pos] = 0;
+    }
+    return false;
+  }
+
+  /** 行/列不重复 + 与上下左右的不等号（只比较已填的邻居） */
+  private fsOk(board: number[], idx: number, v: number): boolean {
+    const r: number = Math.floor(idx / N);
+    const c: number = idx % N;
+    for (let i = 0; i < N; i++) {
+      if (board[r * N + i] === v || board[i * N + c] === v) {
+        return false;
+      }
+    }
+    if (c > 0) {
+      const sg: number = this.hSign[r * (N - 1) + c - 1];
+      const a: number = board[r * N + c - 1];
+      if (sg > 0 && a > 0 && !((sg === 1 && a < v) || (sg === 2 && a > v))) {
+        return false;
+      }
+    }
+    if (c < N - 1) {
+      const sg: number = this.hSign[r * (N - 1) + c];
+      const b: number = board[r * N + c + 1];
+      if (sg > 0 && b > 0 && !((sg === 1 && v < b) || (sg === 2 && v > b))) {
+        return false;
+      }
+    }
+    if (r > 0) {
+      const sg: number = this.vSign[(r - 1) * N + c];
+      const a: number = board[(r - 1) * N + c];
+      if (sg > 0 && a > 0 && !((sg === 1 && a < v) || (sg === 2 && a > v))) {
+        return false;
+      }
+    }
+    if (r < N - 1) {
+      const sg: number = this.vSign[r * N + c];
+      const b: number = board[(r + 1) * N + c];
+      if (sg > 0 && b > 0 && !((sg === 1 && v < b) || (sg === 2 && v > b))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private signTotal(): number {

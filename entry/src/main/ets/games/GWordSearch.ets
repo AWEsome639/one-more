@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 const N: number = 8; const CELLS: number = N * N; const COUNT: number = 4;
 const LIMIT_MS: number = 90000; const TICK_MS: number = 100;
 const LETTERS: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -58,7 +59,7 @@ export struct GWordSearch {
   @State over: boolean = false; @State won: boolean = false;
   private startAt: number = 0; private timer: number = -1; private settled: boolean = false;
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GWordSearch')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -79,7 +80,7 @@ export struct GWordSearch {
     }
     this.grid = grid; this.words = pick; this.found = new Array<boolean>(COUNT).fill(false);
     this.mark = []; this.sel = []; this.score = 0; this.leftMs = this.diffTotal;
-    this.over = false; this.won = false; this.settled = false; this.startAt = Date.now();
+    this.over = false; this.won = false; this.settled = false; this.startAt = AppClock.netNow();
     this.msg = TG('点一个词的首尾两格，把它圈出来');
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
@@ -101,7 +102,10 @@ export struct GWordSearch {
   }
   private tick(): void {
     if (this.over) { return; }
-    const gap: number = Date.now() - this.startAt;
+    // ★ 2026-11-08 perf-hunter：后台期间先跳过 —— 否则「切后台 30 秒」会在后台就跑超时判负。
+    //   （与下面的 netNow() 是两件事：守卫挡「后台期间」，netNow 挡「回到前台后的跳变」）
+    if (AppClock.isPaused()) { return; }
+    const gap: number = AppClock.netNow() - this.startAt;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.over = true; this.won = false; this.msg = '⌛ 时间到 —— 找到 ' + this.hits() + ' / ' + COUNT + TG(' 个词'); this.finish(false); }
   }
@@ -329,7 +333,7 @@ export struct GWordSearch {
     if (this.settled) { return; }
     this.settled = true; this.stopTimer();
     const r: GameResult = { gameId: 'word_search', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.hits() };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.hits() };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

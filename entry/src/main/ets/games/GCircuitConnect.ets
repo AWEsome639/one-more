@@ -16,7 +16,8 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
-const N: number = 4; const LAST: number = N * N - 1; const TURNS: number = 26;
+/** ★ 2026-11-08：删掉死代码 `N=4 / LAST=N*N-1`（终点号已改为 `last()` 按棋盘算，全文件无引用）；
+ *   `TURNS=26` 这个常量也一并去掉 —— 它不随棋盘走（见 `turns()`）。 */
 /** 位序 0上 1右 2下 3左；GLYPH[mask] = 画出来的样子 */
 const BASE: number[] = [3, 5, 6, 9, 10, 12, 15];
 const GLYPH: string[] = ['·', '╹', '╺', '╚', '╻', '║', '╔', '╠', '╸', '╝', '═', '╩', '╗', '╣', '╦', '╬'];
@@ -81,14 +82,89 @@ export struct GCircuitConnect {
  onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(4);
      this.reset(); }
+ /**
+  * ★★★ 2026-11-08（ai-fixer-b 蒙特卡洛）**两个真问题**：
+  *   ① **生成本身大多无解**：原来每个格随机取 `BASE` 掩码 + 随机朝向。而通关要求
+  *      「源点格有 bit3（左侧馈入）」+「终点格有 bit1（右侧灯）」+ 沿途每对相邻格**双向**匹配。
+  *      实测随机盘的可解率只有 **约 7~13%**（500 局/档贪心求解：简单 65/500、普通 36/500、困难 34/500）。
+  *   ② `TURNS=26` 写死不随棋盘走（3×3 也是 26、5×5 还是 26）。
+  *   ⇒ 改成**「先造答案再打乱」**：随机生成一条 0→last 的简单路径，给路径格配上「正好通向
+  *     前后两格」的掩码（源点补 bit3、终点补 bit1），其余格随便给；最后把每格随机转 k 圈（k 取 0/1/2/3）。
+  *     这样**一定存在解**（把每格转回去即可），步数上限按棋盘给（见 `turns()`）。
+  */
  private reset(): void {
- const g: number[] = []; const rt: number[] = [];
- for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
- g.push(BASE[Math.floor(Math.random() * BASE.length)]); rt.push(Math.floor(Math.random() * 4));
+ const n: number = this.diffTotal > 1 ? this.diffTotal : 2;
+ const g: number[] = this.genSolved(n);
+ const rt: number[] = [];
+ for (let i = 0; i < n * n; i++) {
+ rt.push(Math.floor(Math.random() * 4));
  }
- this.grid = g; this.rot = rt; this.moves = 0; this.over = false;
+ this.moves = 0; this.over = false;
  this.won = false; this.note = TG(TG(TG('转动元件，把电送到右下角 🔋')));
- this.startAt = Date.now(); this.on = this.powered();
+ this.startAt = Date.now();
+ this.rot = rt; this.grid = g; this.on = this.powered();
+ }
+
+ /**
+  * 步数上限：**按棋盘算**（原来三档都写死 26）。
+  * 依据（500 局/档模拟）：打乱后「朴素还原」（把每格转回原朝向）所需步数
+  *   3×3 中位 14 / 最长 22；4×4 中位 24 / 最长 36；5×5 中位 38 / 最长 **55**。
+  * ⇒ 取 `2.5 n²`：23 / 40 / 63，**覆盖朴素还原的最长值**（保证"照答案转回去"一定能完成），
+  *   同时比 26 更合理（5×5 原来 26 步连朴素还原的 38 都不够）。
+  */
+ private turns(): number {
+ const n: number = this.diffTotal > 1 ? this.diffTotal : 2;
+ return Math.ceil(n * n * 2.5);
+ }
+
+ /** 方向位：from → to 是哪个方向（0上 1右 2下 3左） */
+ private dirBit(from: number, to: number): number {
+ const n: number = this.diffTotal > 1 ? this.diffTotal : 2;
+ const fr: number = Math.floor(from / n); const fc: number = from % n;
+ const tr: number = Math.floor(to / n); const tc: number = to % n;
+ if (tr < fr) { return 1; }
+ if (tc > fc) { return 2; }
+ if (tr > fr) { return 4; }
+ return 8;
+ }
+
+ /** 随机一条 0 → last 的简单路径（DFS + 回溯；棋盘 ≤ 25 格，瞬间完成） */
+ private buildPath(n: number): number[] {
+ const last: number = n * n - 1;
+ const seen: boolean[] = new Array<boolean>(n * n).fill(false);
+ const path: number[] = [0];
+ seen[0] = true;
+ // 迭代 DFS（不用递归箭头函数：ArkTS 里 const 自引用会「使用前声明」报错）
+ while (path.length > 0 && path[path.length - 1] !== last) {
+   const cur: number = path[path.length - 1];
+   const r: number = Math.floor(cur / n); const c: number = cur % n;
+   const opts: number[] = [];
+   if (r > 0 && !seen[cur - n]) { opts.push(cur - n); }
+   if (c < n - 1 && !seen[cur + 1]) { opts.push(cur + 1); }
+   if (r < n - 1 && !seen[cur + n]) { opts.push(cur + n); }
+   if (c > 0 && !seen[cur - 1]) { opts.push(cur - 1); }
+   if (opts.length === 0) { path.pop(); continue; }
+   const pick: number = opts[Math.floor(Math.random() * opts.length)];
+   seen[pick] = true;
+   path.push(pick);
+ }
+ return path;
+ }
+
+ /** 造一个「已解开」的盘面（每格掩码正好通向路径前后两格；源点 bit3、终点 bit1） */
+ private genSolved(n: number): number[] {
+ const g: number[] = new Array<number>(n * n).fill(15);
+ const path: number[] = this.buildPath(n);
+ for (let k = 0; k < path.length; k++) {
+   const i: number = path[k];
+   let m: number = 0;
+   if (k === 0) { m |= 8; }                       // 源点：左侧馈入（bit3）
+   if (k === path.length - 1) { m |= 2; }          // 终点：右侧灯（bit1）
+   if (k > 0) { m |= this.dirBit(i, path[k - 1]); }
+   if (k < path.length - 1) { m |= this.dirBit(i, path[k + 1]); }
+   g[i] = m;
+ }
+ return g;
  }
  /** 当前朝向的导通掩码 */
  private maskAt(i: number): number {
@@ -337,7 +413,7 @@ export struct GCircuitConnect {
  const lit: boolean[] = this.powered(); this.on = lit; let cnt: number = 0;
  for (let t = 0; t < lit.length; t++) { if (lit[t]) { cnt++; } }
  const solved: boolean = lit[this.last()] && has(this.maskAt(this.last()), 1);
- if (solved || this.moves >= TURNS) {
+ if (solved || this.moves >= this.turns()) {
  this.note = solved ? TG("接通了，灯亮 🎉") : TG("步数用尽，还没接通 😵"); this.finish(solved, cnt); return;
  }
  this.note = TG2('当前带电 {0}/{1} 格 ⚡', cnt, (this.diffTotal * this.diffTotal));
@@ -347,7 +423,7 @@ export struct GCircuitConnect {
  LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
  this.onFinish({
  gameId: 'circuit_connect', solved: solved,
- score: solved ? 60 + Math.max(0, (TURNS - this.moves) * 4) : lit * 3,
+ score: solved ? 60 + Math.max(0, (this.turns() - this.moves) * 4) : lit * 3,
  durationMs: Date.now() - this.startAt, levelReached: solved ? 2 : 1
  });
  }
@@ -362,7 +438,7 @@ export struct GCircuitConnect {
      demoOn: false,
      disabled: this.demoId >= 0,
    })
- Text(TG2('步数 {0}/{1}　电源 {2}',Digits(String(this.moves), this.langCode), String(TURNS), this.on[0] ? TG('接入 ✅') : TG('断开 ❌'))
+ Text(TG2('步数 {0}/{1}　电源 {2}',Digits(String(this.moves), this.langCode), String(this.turns()), this.on[0] ? TG('接入 ✅') : TG('断开 ❌'))
  + TG2('　终点 {0}', this.on[this.last()] ? TG('通电 💡') : TG('未通'))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: Space.xs }) {
  ForEach(this.rowIdx(), (r: number) => {
