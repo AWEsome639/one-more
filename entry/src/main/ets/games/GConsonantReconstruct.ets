@@ -57,6 +57,12 @@ export struct GConsonantReconstruct {
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」**顺带把题面变成显式字段**：
+   *   原来 UI 直接渲染 `skeleton(this.cur().w)`（题面 = 答案算出来的），AI 只能读答案。
+   *   ⇒ 把"屏幕上那串辅音骨架"存成 `skelText`（题面），UI 与 AI 都读它。
+   */
+  @State private skelText: string = '';
   onFinish: (r: GameResult) => void = () => {};
   @State order: number[] = []; @State qi: number = 0; @State solved: number = 0;
   @State life: number = LIVES; @State score: number = 0; @State input: string = '';
@@ -84,6 +90,7 @@ export struct GConsonantReconstruct {
       out.push(idx[p]); idx.splice(p, 1);
     }
     this.order = out;
+    this.skelText = out.length > 0 ? skeleton(POOL[out[0]].w) : '';
   }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // ═══════════ 演示动画（项目 C）═══════════
@@ -168,11 +175,30 @@ export struct GConsonantReconstruct {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /** 用「屏幕上的辅音骨架」在 POOL 里找唯一匹配的词（不读 cur().w） */
+  private aiWord(): string {
+    if (this.skelText.length === 0) {
+      return '';
+    }
+    for (let i = 0; i < POOL.length; i++) {
+      if (skeleton(POOL[i].w) === this.skelText) {
+        return POOL[i].w;
+      }
+    }
+    return '';
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
     }
-    this.autoSubmit(this.cur().w);
+    // ★ 2026-11-08 代打「不抄答案」（判据 1824）：题面是**辅音骨架**（元音换成 `_`）
+    //   ⇒ 拿屏幕上的骨架去 `POOL` 里匹配（12 个词的骨架**互不重复**，模拟已验证）⇒ 唯一解
+    const want: string = this.aiWord();
+    if (want.length === 0) {
+      return false;              // 匹配不到 ⇒ 停手（不读 cur().w）
+    }
+    this.autoSubmit(want);
     return !this.over;
   }
 
@@ -248,6 +274,7 @@ export struct GConsonantReconstruct {
   private nextQ(): void {
     if (this.qi + 1 >= this.diffTotal) { this.end(); return; }
     this.qi = this.qi + 1;
+    this.skelText = this.qi < this.order.length ? skeleton(POOL[this.order[this.qi]].w) : '';
     this.doBump();   // ★ 弹一下
     this.msg = TG2('{0}　｜　下一词：{1} 个字母', this.msg, String(this.cur().w.length));
   }
@@ -305,7 +332,7 @@ export struct GConsonantReconstruct {
       .width('100%')
       Column({ space: Space.sm }) {
         Text(this.cur().hint).fontSize(FontSize.md).fontColor(this.theme.inkSoft)
-        Text(skeleton(this.cur().w)).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
+        Text(this.skelText).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
           .fontColor(Palette.primary)
         Text(TG2("共 {0}", this.cur().w.length)).fontSize(FontSize.xxs)
           .fontColor(this.theme.inkFaint)
