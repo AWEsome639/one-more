@@ -158,23 +158,12 @@ export struct SettingsTab {
    *   ⚠️ 真正的实时刷新要把 stat 写进 AppStorage 再 `@StorageProp` 订阅 ——
    *      那要动 `core/LocalLLM.ets` 的 4 个写入点，本轮**没做**（记在报告「后续」里）。
    */
-  @State private diagReasonV: string = '';
-  @State private diagInitV: number = 0;
-  @State private diagFirstV: number = 0;
-  @State private diagCallsV: number = 0;
+  @StorageProp('llmReason') diagReasonV: string = 'idle';
+  @StorageProp('llmInitMs') diagInitV: number = 0;
+  @StorageProp('llmFirstMs') diagFirstV: number = 0;
+  @StorageProp('llmCalls') diagCallsV: number = 0;
   /** 模型是否 ready（失败态要显示「装好系统模型后，点这里重试」那行） */
-  @State private diagReadyV: boolean = false;
-  /**
-   * ★★★ 2026-11-09 perf-hunter（修法 A：版本号强制重建）**这是必须的，不是保险**。
-   *
-   * 实测（判据「@Builder 内部读 @State 不会可靠重建」）：
-   *   `refreshDiag()` 里 `diagReasonV` 从 `init-false` → `idle`（**值确实变了**），`diag` 日志也打了，
-   *   但**点击后 +0.24 / +0.37 / +0.51s 三张截图，卡片区域像素差 = 0** ⇒ **整个 `@Builder` 子树没重建**。
-   *   根因：`diag*` 这些 `@State` **只在 `aiDiagCard()` 内部被读**，父 `build()` 的依赖集里没有它们。
-   * ⇒ 用版本号：`refreshDiag()` 每次 +1，并把 `diagRev` 作为参数传给 `@Builder`、在 `.id()` 里用上
-   *   ⇒ 父 build 依赖它、`@Builder` 的参数也变了 ⇒ **参数记忆化挡不住，子树必然重建**。
-   */
-  @State private diagRev: number = 0;
+  @StorageProp('llmReady') diagReadyV: boolean = false;
   /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环（判据：可点组件必须有 focusable） */
   @State private tvFocus: string = '';
   @State private copyHint: string = '';   // 「已复制 ✓」提示
@@ -212,8 +201,7 @@ export struct SettingsTab {
   @State private entered: boolean = false;
 
   aboutToAppear(): void {
-    // ★ 2026-11-09：打开设置页先抄一份 AI 诊断快照（`LocalLLM.stat` 没有观察源，见 refreshDiag）
-    this.refreshDiag();
+    // ★ 2026-11-09（AppStorage 终解）：不再"打开设置页抄快照" —— `@StorageProp` 自动响应
     setTimeout(() => {
       animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
         this.entered = true;
@@ -556,7 +544,7 @@ build() {
         this.feedbackCard()
         // ★★★ 2026-11-09（code-hunter 建议 #2）**AI 诊断卡**（放在「关于」区最后一张）
         this.sectionTitle('AI 诊断', 'AI diagnostics')
-        this.aiDiagCard(this.diagRev)
+        this.aiDiagCard()
 
         Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length,
           '{n} мини-игра без интернета', '{n} мини-игры без интернета', '{n} мини-игр без интернета'))
@@ -645,10 +633,11 @@ build() {
    *   ⚠️ 判据 1829：每行都是「固定宽度标签 + 值」；标签 `.flexShrink(0)`，值 `layoutWeight(1)`，
    *      行本身 `.width('100%')` ⇒ 长 reason 只会省略号，不会把行压扁。
    *   ⚠️ 刷新：`LocalLLM.stat` 没有观察源（判据 1824：看实现，`LocalLLM.ets:46` 是 static 对象）
-   *      ⇒ 点卡片任意位置 `diagRev += 1` 强制重算；卡片上写了「点一下刷新」。
+   *      ⇒ 2026-11-09 终解：数据走 `AppStorage`（`LocalLLM.sync()` 写、这里 `@StorageProp` 读），
+   *        点卡片只**主动重试一次 `init()`**（`retryDiag()`），不再手动抄值。
    */
   @Builder
-  aiDiagCard(rev: number) {
+  aiDiagCard() {
     Column({ space: Space.xs }) {
       // 标题行：emoji + 标题 + 「点一下刷新」
       Row({ space: Space.md }) {
@@ -707,9 +696,6 @@ build() {
     //   （「模型状态」「ok」「初始化」「—」…），听不出它们属于同一张诊断卡。
     .accessibilityGroup(true)
     .accessibilityText(this.diagA11yText())
-    // ★ 版本号挂在 `id` 上：`:id` 变化会让这颗节点重建（配合上面的 `diagRev` 参数）
-    //   `rev` 只用于"变一下"，不参与任何显示逻辑 ⇒ 不影响读屏、不影响布局
-    .id('aiDiag-' + rev)
     // ★ 2026-11-09：**可点就必须能"被选中"**（check_focusable 抓到过一次）
     //   电视/键盘用户用方向键在这里停不住的话，这张卡对他们等于不存在。
     //   照 `GamesTab:1674-1688` 的写法补全五件套。
@@ -727,20 +713,11 @@ build() {
     })
   }
 
-  /**
-   * ★★★ 2026-11-09 perf-hunter：诊断卡「点一下刷新」= **真重试**，不再只是重读快照。
-   *
-   * 为什么改：`LocalLLM` 的 `init()` 以前一旦失败就把 `inited` 永久置真
-   *   ⇒ 用户把系统模型装好也不会自愈、必须重启 app（产品缺陷）。
-   *   现在 `init()` 失败会把 `inited` 放回 false，并用 60s 冷却防重试风暴；
-   *   这里 `reset()` 先清冷却，再**主动 init 一次** ⇒ 用户点一下就能看到新的 `模型状态`。
-   *   ⚠️ 不 `await`：不阻塞 UI；结果回来后 `refreshDiag()` 再抄一次快照。
-   */
   private retryDiag(): void {
-    LocalLLM.retry();          // 清 inited + 冷却，**保留 calls 统计**（判据：失败不能永久缓存）
-    this.refreshDiag();        // 先把 idle 抄进来，用户立刻看到"在重试"
+    // 只负责"主动重试一次 init"：值的变化由 `LocalLLM.sync()` 写进 AppStorage 自动反映到界面
+    LocalLLM.retry();          // 清 inited + 冷却（保留 calls）；内部会 sync 一次 reason=idle
     LocalLLM.init().then(() => {
-      this.refreshDiag();      // 结果回来后再抄一次（ok / init-false / no-syscap）
+      // init 内部（fail()/成功路径）已 sync ⇒ 这里不需要再抄任何值
     });
   }
 
@@ -765,25 +742,6 @@ build() {
   }
 
   /** 把 `LocalLLM.stat` 的当前值抄进四个 @State 快照（页面打开 + 点卡片时各调一次） */
-  private refreshDiag(): void {
-    const reason: string = LocalLLM.stat.reason.length === 0 ? 'idle' : LocalLLM.stat.reason;
-    // ★★★ 2026-11-09 临时诊断日志（lead 批准，定「诊断卡不更新」到底是数据侧还是渲染侧）：
-    //   · 打印的是**即将写进 @State 的值**；
-    //   · 点击后若这里打 `initMs=1040`（新值）而卡面仍是 `1050` ⇒ **渲染问题**（@State 手动赋值没触发重建）；
-    //   · 若这里打的就是 `1050`（旧值）⇒ **数据侧**（`LocalLLM.stat.initMs` 没写进去）。
-    hilog.info(0x0001, 'diag', 'refresh reason=%{public}s initMs=%{public}d calls=%{public}d ready=%{public}s',
-      reason, LocalLLM.stat.initMs, LocalLLM.stat.calls, String(LocalLLM.stat.ready));
-    this.diagReasonV = reason;
-    this.diagInitV = LocalLLM.stat.initMs;
-    this.diagFirstV = LocalLLM.stat.firstTokenMs;
-    this.diagCallsV = LocalLLM.stat.calls;
-    this.diagReadyV = LocalLLM.stat.ready;
-    // ★ 版本号 +1 ⇒ 父 build 依赖它、@Builder 参数也变 ⇒ 强制重建（否则 @Builder 内部读 @State 不重建）
-    this.diagRev = this.diagRev + 1;
-    // 2026-11-09 定案结论（临时日志已删，见 `_巡检记录/诊断卡定案-20261109.md`）：
-    //   `rev` 确实从 1 涨到 2，但**页面标题仍显示 1**、像素差 0 ⇒ **组件根本没重建**
-    //   ⇒ 这不是 @Builder 的问题，是「事件 → 重建调度」这一层断了。
-  }
 
   /**
    * 诊断卡的**整句读屏文本**：把 5 行拼成一句话。

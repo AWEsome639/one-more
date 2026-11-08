@@ -64,12 +64,29 @@ export class LocalLLM {
   /** 上次失败时刻（0 = 没失败过）；冷却判据用它 */
   private static lastFailMs: number = 0;
 
+  /**
+   * ★★★ 2026-11-09 perf-hunter（AppStorage 终解）：把 `stat` 镜像进 **AppStorage**。
+   *
+   * 为什么：`stat` 是普通静态对象，**没有观察源** ⇒ 设置页只能手动抄进 `@State`，
+   *   而实测「点击 → 手动赋值 → 组件不重建」（`rev` 涨了、标题没变、像素差 0）。
+   * ⇒ 改成写 `AppStorage`，界面用 `@StorageProp` 读 ⇒ **框架保证通知**，不依赖手动重建调度。
+   * ⚠️ 所有会改 `stat` 的地方都必须调它（`fail` / `init` 成功 / `chat` 结束 / `retry` / `reset`）。
+   */
+  private static sync(): void {
+    AppStorage.setOrCreate('llmReason', LocalLLM.stat.reason);
+    AppStorage.setOrCreate('llmInitMs', LocalLLM.stat.initMs);
+    AppStorage.setOrCreate('llmFirstMs', LocalLLM.stat.firstTokenMs);
+    AppStorage.setOrCreate('llmCalls', LocalLLM.stat.calls);
+    AppStorage.setOrCreate('llmReady', LocalLLM.stat.ready);
+  }
+
   /** 失败收尾：**把 inited 放回 false**，并记下失败时刻（判据：失败不能永久缓存） */
   private static fail(reason: string): void {
     LocalLLM.inited = false;
     LocalLLM.lastFailMs = Date.now();
     LocalLLM.stat.ready = false;
     LocalLLM.stat.reason = reason;
+    LocalLLM.sync();
   }
 
   /** 设备是否具备该系统能力（canIUse 自身不抛，仍包一层） */
@@ -108,6 +125,7 @@ export class LocalLLM {
       LocalLLM.stat.ready = true;
       LocalLLM.stat.reason = 'ok';
       LocalLLM.lastFailMs = 0;
+      LocalLLM.sync();
       return true;
     } catch (e) {
       const err = e as BusinessError;
@@ -141,6 +159,7 @@ export class LocalLLM {
         settled = true;
         LocalLLM.stat.calls += 1;
         LocalLLM.stat.totalMs = Date.now() - t0;
+        LocalLLM.sync();
         if (!ok) {
           LocalLLM.stat.reason = LocalLLM.stat.reason === 'timeout' ? 'timeout' : 'chat-failed';
         }
@@ -195,6 +214,7 @@ export class LocalLLM {
     LocalLLM.inited = false;
     LocalLLM.lastFailMs = 0;
     LocalLLM.stat.reason = 'idle';
+    LocalLLM.sync();
   }
 
   /** 重置状态（诊断/测试用；正式流程不需要） */
@@ -205,5 +225,6 @@ export class LocalLLM {
     LocalLLM.stat = {
       ready: false, reason: 'idle', initMs: 0, firstTokenMs: 0, totalMs: 0, calls: 0
     };
+    LocalLLM.sync();
   }
 }
