@@ -36,6 +36,8 @@ import { LengthMetrics } from '@kit.ArkUI';
 import { TG } from '../core/GameI18n';
 import { Sound } from '../core/Sound';
 import { Bp } from '../core/Bp';
+// ★★★ 2026-11-09：**AI 诊断卡**读 `LocalLLM.stat`（纯静态、零副作用；读它不会触发模型加载）
+import { LocalLLM } from '../core/LocalLLM';
 import { router } from '@kit.ArkUI';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Accent, AccentOption } from '../core/Design';
 import { BUILD_TAG, GAMES } from '../core/GameRegistry';
@@ -46,7 +48,7 @@ import { Haptics } from '../core/Haptics';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { GameDiff } from '../core/GameDiff';
 import { findGame, displayName } from '../core/GameRegistry';
-import { I18n, L, LANGS, LangInfo, TN } from '../core/I18n';
+import { I18n, L, LANGS, LangInfo, TN, Digits } from '../core/I18n';
 import { IconSize } from './Common';
 import { UiModeMgr } from '../core/UiMode';
 import { About } from '../core/About';
@@ -56,6 +58,14 @@ import { Tv } from '../core/Tv';
 
 /** 进度库名 —— 与 ProgressStore 的 STORE_NAME、StatsCardAbility 的 STORE 同一个库 */
 const STORE_NAME: string = 'onemore_progress';
+/**
+ * ★ 2026-11-09（AI 诊断卡）**标签列固定宽**（vp）。
+ *   判据 1829：诊断卡的每一行都是「固定宽标签 + 值」——
+ *   标签给死宽度并 `.flexShrink(0)`，值用 `layoutWeight(1)` 吃掉剩余，
+ *   这样长 `reason`（`chat-failed` / `no-syscap`）只会走省略号，不会把标签挤成两行或把行压扁。
+ *   100vp 是按最长的中文标签「规则版已启用」（6 字 × FontSize.xs 13）估的，留了余量。
+ */
+const DIAG_LABEL_W: number = 100;
 /** 版本号 —— 与 AppScope/app.json5 的 versionName 保持一致 */
 // ★ 2026-10-13：版本号**单一真相源**在 `core/About.ets` 的 `About.VERSION`
 //   原来这里又硬编码了一份 ⇒ 改一处忘另一处就会不同步（我今天正好发现两处都是 1.0.0）
@@ -138,6 +148,20 @@ export struct SettingsTab {
   //   @StorageProp 是【单向】（AppStorage → 组件），本地赋值不回写、下次同步还会被覆盖
   //   ⇒ 改成 @StorageLink（双向）—— 这才是"既读又写"的正确装饰器
   @StorageLink('uiMode') uiMode: string = 'normal';   // 界面模式（大字/紧凑），双向
+
+  /**
+   * ★★★ 2026-11-09（AI 诊断卡）**诊断快照**。
+   *
+   *   `LocalLLM.stat` 是**普通静态对象**（不是 `@State` / AppStorage）⇒ 它变了界面**不会自己重建**
+   *   （判据 1824：看实现 —— `LocalLLM.ets:46` 就是个 static 字段，全项目没有任何观察源）。
+   *   ⇒ 这里存一份 `@State` 快照：**页面打开时**（`aboutToAppear`）刷一次、**点卡片**再刷一次。
+   *   ⚠️ 真正的实时刷新要把 stat 写进 AppStorage 再 `@StorageProp` 订阅 ——
+   *      那要动 `core/LocalLLM.ets` 的 4 个写入点，本轮**没做**（记在报告「后续」里）。
+   */
+  @State private diagReasonV: string = '';
+  @State private diagInitV: number = 0;
+  @State private diagFirstV: number = 0;
+  @State private diagCallsV: number = 0;
   /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环（判据：可点组件必须有 focusable） */
   @State private tvFocus: string = '';
   @State private copyHint: string = '';   // 「已复制 ✓」提示
@@ -175,6 +199,8 @@ export struct SettingsTab {
   @State private entered: boolean = false;
 
   aboutToAppear(): void {
+    // ★ 2026-11-09：打开设置页先抄一份 AI 诊断快照（`LocalLLM.stat` 没有观察源，见 refreshDiag）
+    this.refreshDiag();
     setTimeout(() => {
       animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
         this.entered = true;
@@ -515,6 +541,9 @@ build() {
         this.starCard()
         // ★ 2026-11-08：反馈卡（原来被误插在 `themeModePicker()` 里，见 feedbackCard 的注释）
         this.feedbackCard()
+        // ★★★ 2026-11-09（code-hunter 建议 #2）**AI 诊断卡**（放在「关于」区最后一张）
+        this.sectionTitle('AI 诊断', 'AI diagnostics')
+        this.aiDiagCard()
 
         Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length,
           '{n} мини-игра без интернета', '{n} мини-игры без интернета', '{n} мини-игр без интернета'))
@@ -589,6 +618,143 @@ build() {
     }
     .width('100%')
     .padding({ left: Space.lg, right: Space.lg, top: Space.md })
+  }
+
+  /**
+   * ★★★ 2026-11-09（code-hunter 建议 #2）**AI 诊断卡**
+   *
+   *   为什么加：用户报「AI 不工作」时，原来只能让他跑 `hdc` 看日志；
+   *   现在设置页直接显示 `LocalLLM.stat` 的 `reason` / `initMs` / `firstTokenMs` / `calls`，
+   *   一句话就能定位是「没系统能力」还是「初始化失败」还是「问过一次但超时」。
+   *
+   *   ⚠️ 判据 1805：文案走 `this.t()`（`I18n.EXTRA`），**不用 `TG()`** —— 设置页统一 `t()`
+   *      （`TG()` 是 GameI18n 的，进了设置页会缺 10 语言）。
+   *   ⚠️ 判据 1829：每行都是「固定宽度标签 + 值」；标签 `.flexShrink(0)`，值 `layoutWeight(1)`，
+   *      行本身 `.width('100%')` ⇒ 长 reason 只会省略号，不会把行压扁。
+   *   ⚠️ 刷新：`LocalLLM.stat` 没有观察源（判据 1824：看实现，`LocalLLM.ets:46` 是 static 对象）
+   *      ⇒ 点卡片任意位置 `diagRev += 1` 强制重算；卡片上写了「点一下刷新」。
+   */
+  @Builder
+  aiDiagCard() {
+    Column({ space: Space.xs }) {
+      // 标题行：emoji + 标题 + 「点一下刷新」
+      Row({ space: Space.md }) {
+        Text('🤖')
+          .accessibilityLevel('no')
+          .fontSize(FontSize.xl)
+          .width(Space.xxl)
+          .textAlign(TextAlign.Center)
+          .flexShrink(0)
+        Column({ space: 2 }) {
+          Text(this.t('AI 诊断', 'AI diagnostics'))
+            .fontSize(FontSize.md).fontWeight(FontWeight.Medium).fontColor(this.theme().ink)
+          Text(this.t('点一下刷新', 'Tap to refresh'))
+            .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+        }
+        .alignItems(HorizontalAlign.Start).layoutWeight(1)
+      }
+      .width('100%')
+      .flexShrink(0)
+
+      // 行 1：模型状态（`ok` / `init-false` / `no-syscap` / `init-failed` / `chat-failed` / `timeout` / `idle`）
+      this.diagRow('模型状态', 'Model status', this.diagReasonV)
+      // 行 2：初始化耗时
+      this.diagRow('初始化', 'Init', this.diagMs(this.diagInitV))
+      // 行 3：首 token 延迟
+      this.diagRow('首字延迟', 'First token', this.diagMs(this.diagFirstV))
+      // 行 4：问答次数（0 = 从来没真问过 ⇒ 上面 reason 是 idle 就说明"还没试过"，不是"坏了"）
+      this.diagRow('问答次数', 'Calls', Digits(String(this.diagCallsV), this.lang))
+      // 行 5：规则版兜底（永远 true —— 四层兜底保证 AI 挂了也能玩）
+      Row({ space: Space.sm }) {
+        Text(this.t('规则版已启用', 'Rule-based fallback on'))
+          .fontSize(FontSize.xs).fontColor(Palette.success)
+          .layoutWeight(1).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text('✓')
+          .accessibilityLevel('no')
+          .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).fontColor(Palette.success)
+          .flexShrink(0)
+      }
+      .width('100%')
+      .flexShrink(0)
+    }
+    .alignItems(HorizontalAlign.Start)
+    .width('100%')
+    .padding(Space.md)
+    .margin({ left: Space.lg, right: Space.lg })
+    .backgroundColor(this.theme().surface)
+    .borderRadius(Radius.md)
+    .shadow(Shadow.card)
+    // ★ 2026-11-09（读屏）：可点的卡**必须一口念完**，否则读屏用户只会听到 5 个断开的碎片
+    //   （「模型状态」「ok」「初始化」「—」…），听不出它们属于同一张诊断卡。
+    .accessibilityGroup(true)
+    .accessibilityText(this.diagA11yText())
+    // ★ 2026-11-09：**可点就必须能"被选中"**（check_focusable 抓到过一次）
+    //   电视/键盘用户用方向键在这里停不住的话，这张卡对他们等于不存在。
+    //   照 `GamesTab:1674-1688` 的写法补全五件套。
+    .focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'S-AIDIAG'; })
+    .onBlur(() => { if (this.tvFocus === 'S-AIDIAG') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'S-AIDIAG'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+      Haptics.tap();
+      this.refreshDiag();
+     }); })
+    .onClick(() => {
+      Haptics.tap();
+      // ★ 判据 1824 的落地：`LocalLLM.stat` 没有观察源 ⇒ 点一下把它的当前值抄进 @State
+      this.refreshDiag();
+    })
+  }
+
+  /** 诊断卡的一行：固定宽标签 + 值（判据 1829：都不许被压） */
+  @Builder
+  diagRow(zh: string, en: string, value: string) {
+    Row({ space: Space.sm }) {
+      Text(this.t(zh, en))
+        .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+        .width(DIAG_LABEL_W)
+        .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        .flexShrink(0)
+      Text(value)
+        .fontSize(FontSize.xs).fontColor(this.theme().ink)
+        .fontWeight(FontWeight.Medium)
+        .layoutWeight(1)
+        .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        .textAlign(TextAlign.End)
+    }
+    .width('100%')
+    .flexShrink(0)
+  }
+
+  /** 把 `LocalLLM.stat` 的当前值抄进四个 @State 快照（页面打开 + 点卡片时各调一次） */
+  private refreshDiag(): void {
+    this.diagReasonV = LocalLLM.stat.reason.length === 0 ? 'idle' : LocalLLM.stat.reason;
+    this.diagInitV = LocalLLM.stat.initMs;
+    this.diagFirstV = LocalLLM.stat.firstTokenMs;
+    this.diagCallsV = LocalLLM.stat.calls;
+  }
+
+  /**
+   * 诊断卡的**整句读屏文本**：把 5 行拼成一句话。
+   * 为什么不用默认的子节点拼接：默认顺序是「标签→值→标签→值」，
+   * 念出来是碎的（"模型状态 ok 初始化 — 首字延迟 —"），听不出层级。
+   */
+  private diagA11yText(): string {
+    return this.t('AI 诊断', 'AI diagnostics') + '。'
+      + this.t('模型状态', 'Model status') + ' ' + this.diagReasonV + '，'
+      + this.t('初始化', 'Init') + ' ' + this.diagMs(this.diagInitV) + '，'
+      + this.t('首字延迟', 'First token') + ' ' + this.diagMs(this.diagFirstV) + '，'
+      + this.t('问答次数', 'Calls') + ' ' + Digits(String(this.diagCallsV), this.lang) + '，'
+      + this.t('规则版已启用', 'Rule-based fallback on') + '。'
+      + this.t('点一下刷新', 'Tap to refresh');
+  }
+
+  /** 毫秒显示：0 ⇒ 「—」（0 表示"还没发生过"，与"很快"要分开看） */
+  private diagMs(ms: number): string {
+    if (ms <= 0) {
+      return '—';
+    }
+    return Digits(String(ms), this.lang) + ' ms';
   }
 
   /** 卡片行：emoji + 标题 + 副标题 + 开关 */
