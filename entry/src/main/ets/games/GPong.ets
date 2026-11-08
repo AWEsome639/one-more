@@ -101,6 +101,19 @@ export struct GPong {
    *  （`Length` 在 position 里不认 `%`，只认数值/资源）⇒ 必须用 onAreaChange 量到的
    *  球场宽高把百分比**换算成 vp 数值**再摆。`fieldH` 早就有（拖拽用），这里补 `fieldW`。 */
   @State private fieldW: number = 0;
+  /**
+   * ★★★ 2026-11-08（判据 1819，产品缺陷）**改用 Canvas 画球场**：
+   *   真机复验：`position({ x: 数值 })` 也**没落到布局上** —— 两根球拍始终贴在球场中线
+   *   （`cx≈1279`）、球连节点都没有；而 `bx` 在 10.7→90.4 往返、屏幕比分 0:0→0:2→0:4 实时变
+   *   ⇒ 逻辑与 @State 重绘都正常，**是 `Stack` 内的绝对定位不生效**。
+   *   ⇒ 球场是纯几何（中线/两拍/一个圆），**直接上 Canvas**，不依赖布局引擎。
+   *   坐标一律用 `ctx.width/height`（vp）换算，与物理层共用同一套百分比。
+   */
+  private settings: RenderingContextSettings = new RenderingContextSettings(true);
+  private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
+  private drawN: number = 0;
+  /** Canvas 未 attach 前调 ctx 可能报错 ⇒ onReady 后才允许画 */
+  private canvasReady: boolean = false;
   private dragPrev: number = 0;
 
   aboutToAppear(): void {
@@ -178,6 +191,7 @@ export struct GPong {
     this.wait = WAIT_TICKS;
     this.startAt = Date.now();
     this.startLoop();
+    this.drawField();        // ★ 先画一帧（Canvas 不随 @State 自动重绘）
   }
 
   /** 从中间发球，方向随机 */
@@ -186,6 +200,51 @@ export struct GPong {
     const tilt: number = (Math.random() - 0.5) * 1.2;
     this.vx = SPEED * dir * Math.cos(tilt);
     this.vy = SPEED * Math.sin(tilt);
+  }
+
+  /** 把整个球场画一遍（中线 / 左拍 / 右拍 / 球） */
+  private drawField(): void {
+    if (!this.canvasReady) {
+      return;                  // onReady 之前不碰 ctx
+    }
+    const w: number = this.ctx.width > 0 ? this.ctx.width : this.fieldW;
+    const h: number = this.ctx.height > 0 ? this.ctx.height : this.fieldH;
+    if (!(w > 0) || !(h > 0)) {
+      return;
+    }
+    const c: CanvasRenderingContext2D = this.ctx;
+    const lx: number = PADDLE_X / 100 * w;
+    const rx: number = AI_X / 100 * w;
+    const cx: number = this.bx / 100 * w;      // bx 是球心百分比
+    const cy: number = this.by / 100 * h;
+    this.drawN = this.drawN + 1;
+    // ★ 定位用日志（限频：每 120 次画一条）
+    if (this.drawN % 120 === 1) {
+      hilog.info(0x0000, 'GPong',
+        'draw#' + String(this.drawN) + ' canvas=' + String(w) + 'x' + String(h)
+          + ' field=' + String(this.fieldW) + 'x' + String(this.fieldH)
+          + ' 左拍x=' + String(lx) + ' 右拍x=' + String(rx) + ' 球=' + String(cx) + ',' + String(cy));
+    }
+    c.clearRect(0, 0, w, h);
+    c.fillStyle = this.theme.isDark ? '#0B0B0B' : '#0F172A';
+    c.fillRect(0, 0, w, h);
+    // 中线（10 段）
+    c.fillStyle = this.theme.line;
+    const netW: number = Math.max(1, 0.01 * w);
+    for (let i = 0; i < NET.length; i++) {
+      c.fillRect(0.495 * w, (2 + i * 10) / 100 * h, netW, 0.04 * h);
+    }
+    // 左拍（你）
+    c.fillStyle = Palette.violet;
+    c.fillRect(lx, this.px / 100 * h, PADDLE_W / 100 * w, PADDLE_H / 100 * h);
+    // 右拍（电脑）
+    c.fillStyle = Palette.sky;
+    c.fillRect(rx, this.ay / 100 * h, PADDLE_W / 100 * w, PADDLE_H / 100 * h);
+    // 球
+    c.fillStyle = Palette.amber;
+    c.beginPath();
+    c.arc(cx, cy, Math.max(2, BALL_R / 100 * w), 0, Math.PI * 2);
+    c.fill();
   }
 
   private tick(): void {
@@ -261,6 +320,7 @@ export struct GPong {
       this.ps++;
       this.serveAgain();
     }
+    this.drawField();          // ★ 每帧重画（Canvas 是命令式，不随 @State 自动重绘）
   }
 
   /** 电脑跟球：球朝它来时追球，否则回中间 */
@@ -329,7 +389,8 @@ export struct GPong {
       return;
     }
     this.running = !this.running;
-  }
+    this.drawField();
+   }
 
   /** 拖动左拍：按上一帧位移走，触边不粘手 */
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
@@ -518,6 +579,7 @@ export struct GPong {
     const max: number = 100 - PADDLE_H;
     const next: number = this.px + delta;
     this.px = next < 0 ? 0 : (next > max ? max : next);
+    this.drawField();          // ★ 拖拽是手势回调，@State 变了也要自己重画
   }
 
   private status(): string {
@@ -630,46 +692,16 @@ export struct GPong {
       Text(this.status())
         .fontSize(FontSize.xxs)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
-      Stack({ alignContent: Alignment.TopStart }) {
-        // 中线
-        ForEach(NET, (i: number) => {
-          Row()
-            .width('1%')
-            .height('4%')
-            .backgroundColor(this.theme.line)
-            .borderRadius(Radius.full)
-            // ★ 百分比 → vp（position 不认 '…%'，见 fieldW 注释）
-            .position({ x: 0.495 * this.fieldW, y: (2 + i * 10) / 100 * this.fieldH })
-        }, (i: number) => 'n' + i)
-
-        // 左拍
-        Row()
-          .width(PADDLE_W + '%')
-          .height(PADDLE_H + '%')
-          .backgroundColor(Palette.violet)
-          .borderRadius(Radius.full)
-          .shadow(Shadow.card)
-          .position({ x: PADDLE_X / 100 * this.fieldW, y: this.px / 100 * this.fieldH })
-
-        // 右拍
-        Row()
-          .width(PADDLE_W + '%')
-          .height(PADDLE_H + '%')
-          .backgroundColor(Palette.sky)
-          .borderRadius(Radius.full)
-          .shadow(Shadow.card)
-          .position({ x: AI_X / 100 * this.fieldW, y: this.ay / 100 * this.fieldH })
-
-        // 球
-        Row()
-          .width(BALL_D + '%')
-          .aspectRatio(1)
-          .backgroundColor(Palette.amber)
-          .borderRadius(Radius.full)
-          .shadow(Shadow.lifted)
-          .position({ x: (this.bx - BALL_R) / 100 * this.fieldW, y: (this.by - BALL_R) / 100 * this.fieldH })
-      }
-      .width('100%')
+      // ★★★ 2026-11-08（判据 1819）**Stack + position 整体换成 Canvas**：
+      //   真机复验证明 `position`（连数值 vp 都不行）在这个 Stack 里没落到布局上
+      //   —— 两拍永远贴中线、球无节点；而逻辑与 @State 重绘正常（比分实时 0:0→0:2→0:4）。
+      //   球场只有「中线 / 两个矩形 / 一个圆」⇒ Canvas 最稳，且完全不依赖布局引擎。
+      Canvas(this.ctx)
+        .onReady(() => {
+          this.canvasReady = true;
+          this.drawField();      // 首帧
+        })
+        .width('100%')
       .layoutWeight(1)
       .aspectRatio(0.7)
       .backgroundColor(this.theme.isDark ? '#0B0B0B' : '#0F172A')
@@ -677,9 +709,8 @@ export struct GPong {
       .shadow(Shadow.card)
       .clip(true)
       // ★ 2026-11-08 RTL（判据：「按位置摆的不能镜像，按顺序排的必须镜像」）：
-      //   球场里的球拍/球/中线都用 `position({ x: …% })` **绝对坐标**，而 `direction`
-      //   只会镜像流式布局、**不会**镜像 position ⇒ 页面切 RTL 后 HUD 镜像到右边、
-      //   球台还留在左边（球拍与手指位置对不上）。
+      //   球场由 Canvas 用**绝对坐标**绘制（不再经过布局引擎的 position），而 `direction`
+      //   只会镜像流式布局 ⇒ 页面切 RTL 后 HUD 会镜像到右边、球台仍该留在左边。
       //   ⇒ 只把**球场**钉成 Ltr（文字 chrome 在父级 Column 里，仍然正常镜像）。
       .direction(Direction.Ltr)
       .onAreaChange((oldArea: Area, newArea: Area) => {
@@ -691,6 +722,8 @@ export struct GPong {
         if (w > 0) {
           this.fieldW = w;
         }
+        // ★ 尺寸变了（旋转/分屏）立刻按新尺寸重画
+        this.drawField();
         // ★ 2026-11-08 自愈：球场已上屏但循环没建起来（timer<0 且没结算）⇒ 补一次启动
         if (this.timer < 0 && !this.over && this.running) {
           hilog.info(0x0000, 'GPong', 'onAreaChange 发现循环丢失 ⇒ 补启动');
