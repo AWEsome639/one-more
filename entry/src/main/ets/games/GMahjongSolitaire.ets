@@ -69,6 +69,8 @@ export struct GMahjongSolitaire {
   @State private hintA: number = -1;
   @State private hintB: number = -1;
   @State private over: boolean = false;
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   @State private won: boolean = false;
 
   private startAt: number = 0;
@@ -248,6 +250,7 @@ export struct GMahjongSolitaire {
     this.hintA = -1;
     this.hintB = -1;
     this.over = false;
+    this.settled = false;
     this.won = false;
     this.startAt = Date.now();
     // 开局就无解（极罕见）时自动重排
@@ -439,6 +442,9 @@ export struct GMahjongSolitaire {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const r: GameResult = {
       gameId: 'mahjong_solitaire',
       solved: solved,
@@ -447,6 +453,7 @@ export struct GMahjongSolitaire {
       levelReached: this.removedPairs()
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 

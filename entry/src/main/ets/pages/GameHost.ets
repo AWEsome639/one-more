@@ -1205,7 +1205,7 @@ struct GameHost {
             .fontColor(this.diffColor())
             .height(Layout.touchMin)
             .textAlign(TextAlign.Center)
-            .padding({ left: 12, right: 12 })
+            .padding({ left: Space.snug, right: Space.snug })
             .backgroundColor(this.theme().surfaceAlt)
             .borderRadius(Radius.full)
             .accessibilityGroup(true)
@@ -3515,7 +3515,7 @@ struct GameHost {
               }, (a: string) => a)
             }
             .width('100%')
-            .padding({ left: Space.md, right: Space.md, top: 8, bottom: 8 })
+            .padding({ left: Space.md, right: Space.md, top: Space.tiny, bottom: Space.tiny })
             .backgroundColor('#1AF59E0B')
             // ★★★ 2026-11-02（第 842 轮）**手表 233×233 真机抓到**：
             //   结算弹窗内容比屏幕高，**「再来一局」与「返回列表」两个按钮被挤到屏幕外**
@@ -3537,7 +3537,7 @@ struct GameHost {
                 .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
                 .fontColor(Palette.amber)
             }
-            .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
+            .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
             .backgroundColor('#1AF59E0B')
             .borderRadius(Radius.full)
             .scale({ x: this.pop ? 1 : 0.7, y: this.pop ? 1 : 0.7 })

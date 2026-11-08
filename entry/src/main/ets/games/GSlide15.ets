@@ -88,6 +88,8 @@ export struct GSlide15 {
   private initial: number[] = [];
   private initialBlank: number = CELLS - 1;
   private startAt: number = 0;
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   private timer: number = -1;
 
   aboutToAppear(): void {
@@ -113,6 +115,7 @@ export struct GSlide15 {
   }
 
   private reset(): void {
+    this.settled = false;
     // ① 从已解状态出发
     let t: number[] = new Array<number>(MAX_CELLS).fill(0);
     for (let i = 0; i < CELLS - 1; i++) {
@@ -526,6 +529,9 @@ export struct GSlide15 {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const sec: number = Math.floor((Date.now() - this.startAt) / 1000);
     const r: GameResult = {
       gameId: 'slide15',
@@ -534,6 +540,7 @@ export struct GSlide15 {
       durationMs: Date.now() - this.startAt
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 

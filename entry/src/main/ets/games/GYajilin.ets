@@ -64,6 +64,8 @@ export struct GYajilin {
   /** ★ 2026-10-15 得分跳动 */
   @State private scorePulse: number = 1;
   @State private over: boolean = false;
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   @State private tip: string = TG('点白格涂黑，凑出单回路');
 
   private startAt: number = 0;
@@ -88,6 +90,7 @@ export struct GYajilin {
     this.score = 0;
     this.level = 0;
     this.over = false;
+    this.settled = false;
     this.tip = TG('点白格涂黑，凑出单回路');
     this.load(0);
   }
@@ -378,11 +381,15 @@ export struct GYajilin {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const res: GameResult = {
       gameId: 'yajilin', solved: solved, score: this.score,
       durationMs: Date.now() - this.startAt, levelReached: this.level
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(res);
   }
 

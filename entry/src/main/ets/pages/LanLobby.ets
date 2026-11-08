@@ -204,7 +204,7 @@ struct LanLobby {
               .fontWeight(this.picked === gid ? FontWeight.Bold : FontWeight.Normal)
               .fontColor(this.picked === gid ? Color.White : this.theme().inkSoft)
               .padding({ left: Space.md, right: Space.md, top: 7, bottom: 7 })
-              .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: 6 })
+              .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: Space.xs })
               .backgroundColor(this.picked === gid ? this.accentColor() : this.theme().surfaceAlt)
               .borderRadius(Radius.full)
               .focusable(Tv.on())
@@ -246,7 +246,7 @@ struct LanLobby {
             .onChange((v: string) => { this.manualPort = v; })
           Text(TG('连接'))
             .fontSize(FontSize.xs).fontColor(Color.White)
-            .padding({ left: Space.md, right: Space.md, top: 10, bottom: 10 })
+            .padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm })
             .backgroundColor(Palette.emerald).borderRadius(Radius.full)
             // ★★★ 2026-11-07 交互死角：同上 —— TV 上「连不上房间」有一半原因是根本选不中这个按钮。
             .accessibilityText(TG('连接这个房间'))
@@ -297,7 +297,7 @@ struct LanLobby {
           }
           .alignItems(HorizontalAlign.Start).layoutWeight(1)
           Text(TG('加入')).fontSize(FontSize.xs).fontColor(Color.White)
-            .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
+            .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
             .backgroundColor(Palette.emerald).borderRadius(Radius.full)
         }
         .width('100%').padding(Space.md)

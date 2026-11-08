@@ -48,6 +48,8 @@ export struct GKakuroMini {
   @State private sel: number = -1;
   @State private moves: number = 0;
   @State private over: boolean = false;
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   @State private won: boolean = false;
   /** ★ P18：给"和都对上了但没通关"一个明确原因（否则玩家只会觉得"完成了没算通关"） */
   @State private hint: string = '';
@@ -124,6 +126,7 @@ export struct GKakuroMini {
     this.sel = 0;
     this.moves = 0;
     this.over = false;
+    this.settled = false;
     this.won = false;
     this.hint = '';
     this.startAt = Date.now();
@@ -197,6 +200,9 @@ export struct GKakuroMini {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const r: GameResult = {
       gameId: 'kakuro_mini',
       solved: solved,
@@ -205,6 +211,7 @@ export struct GKakuroMini {
       levelReached: this.linesDone()
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 

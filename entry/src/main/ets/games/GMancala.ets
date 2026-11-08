@@ -77,6 +77,8 @@ export struct GMancala {
   @State private turn: number = 0;     // 0 = 我方，1 = 对手
   @State private moves: number = 0;
   @State private over: boolean = false;
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   @State private won: boolean = false;
 
   private aiTimer: number = -1;
@@ -141,6 +143,7 @@ export struct GMancala {
     }
     this.moves = 0;
     this.over = false;
+    this.settled = false;
     this.won = false;
     this.startAt = Date.now();
   }
@@ -533,6 +536,9 @@ export struct GMancala {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const r: GameResult = {
       gameId: 'mancala',
       solved: solved,
@@ -541,6 +547,7 @@ export struct GMancala {
       levelReached: this.pits[P_STORE]
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 

@@ -57,6 +57,8 @@ export struct GMemory {
 
   private startAt: number = 0;
 
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
     this.reset();
@@ -73,6 +75,7 @@ export struct GMemory {
   }
 
   private reset(): void {
+    this.settled = false;
     const deck: string[] = FACES.slice(0, this.pairCount).concat(FACES.slice(0, this.pairCount));   // 8 对 = 16 张
     for (let i = deck.length - 1; i > 0; i--) {
       const j: number = Math.floor(Math.random() * (i + 1));
@@ -230,6 +233,9 @@ export struct GMemory {
   }
 
   private tap(i: number): void {
+    if (this.settled) {
+      return;
+    }
     if (this.lock || this.done) {
       return;
     }
@@ -270,6 +276,7 @@ export struct GMemory {
             levelReached: this.tries
           };
           LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+          this.settled = true;
           this.onFinish(r);
         }
       } else {

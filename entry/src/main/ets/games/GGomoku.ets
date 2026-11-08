@@ -430,6 +430,8 @@ export struct GGomoku {
   private startAt: number = 0;
   /** ★ 2026-10-23：α-β 搜索器（路线 A）。置换表随实例复用，跨局不清 */
   private searcher: GomokuSearch = new GomokuSearch();
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   /**
    * ★★★ 2026-10-23 路线 D 下半：搜索挪到工作线程后，它是**异步**的。
    *   异步期间玩家可能：重开 / 悔棋 / 退回列表 ⇒ 算出来的那一手已经过期。
@@ -491,6 +493,7 @@ export struct GGomoku {
     }
     this.thinking = false;
     this.over = false;
+    this.settled = false;
     this.winner = EMPTY;
     this.lastMove = -1;
     // ★ 落子弹跳：0.6 → 1（150ms）
@@ -895,6 +898,9 @@ export struct GGomoku {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const sec: number = Math.max(1, Math.floor((Date.now() - this.startAt) / 1000));
     const r: GameResult = {
       gameId: 'gomoku',
@@ -903,6 +909,7 @@ export struct GGomoku {
       durationMs: Date.now() - this.startAt
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 

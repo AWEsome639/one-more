@@ -41,6 +41,8 @@ export struct GMirrorTracing {
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
    *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
   @State private tvFocus: string = '';
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -78,6 +80,7 @@ export struct GMirrorTracing {
     this.level = 1;
     this.taps = 0;
     this.over = false;
+    this.settled = false;
     this.won = false;
     this.done = false;
     this.startAt = Date.now();
@@ -324,12 +327,16 @@ export struct GMirrorTracing {
     this.finish(false);
   }
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const r: GameResult = {
       gameId: 'mirror_tracing', solved: solved,
       score: solved ? Math.max(150, 300 * this.diffTotal - (BUDGET * this.diffTotal - this.taps) * 10) : (this.level - 1) * 120,
       durationMs: Date.now() - this.startAt, levelReached: this.level
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 

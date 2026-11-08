@@ -332,6 +332,49 @@ export class ProgressStore {
   // ---------- 结算 ----------
 
   /**
+   * ★★★ 2026-11-08（game-balancer）「完美主义 💎」的**逐款门槛**。
+   *
+   * 为什么需要：判定原来是 `score >= baseXp * 10`，而 `baseXp` 355 款**全是 12**
+   *   ⇒ 等价于「**绝对 120 分**」。可各款分值口径天差地别（静态 40~1600、实测 400~10440），
+   *   有 4 款**最高分到不了 120** ⇒ 那些款**永远拿不到 💎**
+   *   （推导见 `_巡检记录/分数与XP-20261108.md` §5.3）。
+   *   ⇒ 这 5 款各给一个「本款**普通档**可达」的门槛，其余仍 `baseXp × 10`。
+   *
+   * ⚠️ 门槛必须 ≤ 该款**普通档**的可达上限，否则等于没修（可达上限已逐款核过）：
+   *   · `classic_maze`         `70 + max(0, dmax − steps×0.6)`，dmax=max(2.2×最短路, 3n)
+   *                            2000 局/档实测「每局最高分」区间：简单 86~125 / **普通 96~186** / 困难 106~256
+   *                            ⇒ 取 **90**：普通、困难**任何迷宫**都够；简单档多数够（短迷宫天花板 86~89，那几张拿不到）
+   *   · `graph_coordinate_plot` `40 + step×6 − wrong×10`，step ≤ NEED=8 ⇒ 上限 88 ⇒ 取 80
+   *   · `focus_tunnel`         `50 + lives×10`，lives = 5/3/2 ⇒ 上限 100 / 80 / 70 ⇒ 取 70（三档都够）
+   *   · `fact_binder`          `60 + (5 − wrong)×10` ⇒ 上限 110 ⇒ 取 100
+   *   · `box_completion`       `80 + max(0, 40 − moves×4)`，而生成器强制 `holes ∈ [3,6]`（GBoxCompletion.ets:104）
+   *                            ⇒ 最少 moves = 洞数 ⇒ 按洞数分档上限：3洞 108 / 4洞 104 / 5洞 100 / 6洞 **96**
+   *                            ⇒ 取 **95**（**任何盘面**都够；取 110 的话 6 洞盘面永远拿不到——那正是要修的 bug）
+   *
+   * ⚠️ 为什么用 if 链而不是 Map 常量：ArkTS 的静态 Map 只能先 `new Map()` 再 `.set()`
+   *   （见 `GameLog.autoCache`），而**字段初始化器里放不了语句**；`new Map([[...]])` 的
+   *   元组字面量在严格模式下不稳。if 链零分配、没有初始化顺序问题，5 行也够读。
+   */
+  private static perfectAt(gameId: string, baseXp: number): number {
+    if (gameId === 'classic_maze') {
+      return 90;
+    }
+    if (gameId === 'graph_coordinate_plot') {
+      return 80;
+    }
+    if (gameId === 'focus_tunnel') {
+      return 70;
+    }
+    if (gameId === 'fact_binder') {
+      return 100;
+    }
+    if (gameId === 'box_completion') {
+      return 95;
+    }
+    return baseXp * 10;
+  }
+
+  /**
    * 一局结束。**只有 solved 才加 XP、才算打卡**。
    * @returns 本次获得的 XP（用于结算弹窗展示）
    */
@@ -350,9 +393,12 @@ export class ProgressStore {
     }
 
     // ① 每个游戏自己的连胜
-    let gs: GameStreak | undefined = ProgressStore.streaks.get(gameId);
-    if (!gs) {
-      gs = { current: 0, lastDay: '', solvedToday: false };
+    // ★ 2026-11-08 ArkTS 严格模式：`if (!gs)` 之后仍可能被判 undefined
+    //   ⇒ 显式 `=== undefined` + 重新赋值（编译器才认窄化）
+    let gs: GameStreak = { current: 0, lastDay: '', solvedToday: false };
+    const found: GameStreak | undefined = ProgressStore.streaks.get(gameId);
+    if (found !== undefined) {
+      gs = found;
     }
     const gap: number = ProgressStore.dayGap(gs.lastDay, today);
     if (solved && !gs.solvedToday) {
@@ -422,9 +468,12 @@ export class ProgressStore {
     //   ⚠️ 计数是**局内**的：`take()` 读走并清零，不会串到下一局。
     const hintsUsed: number = HintCost.take();
     AppStorage.setOrCreate('lastHintsUsed', hintsUsed);
-    // 满分通关：得分达到该局基准的 10 倍以上（各游戏分值口径不同，用相对值判定）
+    // 满分通关：得分达到**本款的门槛**（各游戏分值口径不同 ⇒ 走 perfectAt() 查表）
     //   ★ 且这一局**一次提示都没用过**
-    if (solved && score > 0 && score >= baseXp * 10 && hintsUsed === 0) {
+    //   ★★★ 2026-11-08（game-balancer）：原来写死 `baseXp * 10`，而 baseXp 全 12
+    //      ⇒ 绝对 120 分；4 款最高分到不了 120 ⇒ 永远拿不到 💎（详见 perfectAt 的注释）
+    const perfectGate: number = ProgressStore.perfectAt(gameId, baseXp);
+    if (solved && score > 0 && score >= perfectGate && hintsUsed === 0) {
       const pc: number = (AppStorage.get<number>('perfectCount') ?? 0) + 1;
       AppStorage.setOrCreate('perfectCount', pc);
       ProgressStore.putNumber('perfectCount', pc);

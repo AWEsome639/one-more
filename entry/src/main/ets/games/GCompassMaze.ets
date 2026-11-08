@@ -411,7 +411,10 @@ export struct GCompassMaze {
  //   「剩余步数 × 5」会把通关分天花板顶到 170→295 ⇒ 系数压到 **2**：
  //   理论上限 70 + dmax×2 = **120 / 140 / 160**（困难档正好回到你算的 160）；
  //   按「最快通关」（曼哈顿最少步 8/12/16）算实际能拿 **104 / 116 / 128**，与旧量级一致。
- score: solved ? 70 + Math.max(0, (this.dmax() - this.steps) * 2) : this.steps * 4,
+ // ★★★ 2026-11-08（game-balancer）**输局封顶 60**：原来输局 = `steps×4`，
+ //   困难档走满 45 步 = **180**，而赢局下限只有 70（慢赢）⇒ 「走满步数」比「勉强通关」得分还高（1.4~2.6 倍）。
+ //   赢局下限恒 ≥70，故输局封在 60（比 70 低一档，任何档位都不会倒挂）。
+ score: solved ? 70 + Math.max(0, (this.dmax() - this.steps) * 2) : Math.min(this.steps * 4, 60),
  durationMs: Date.now() - this.startAt, levelReached: solved ? 2 : 1
  });
  }

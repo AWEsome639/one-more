@@ -91,6 +91,19 @@ export class Diag {
   static readonly forceTv: boolean = false;
 
   /**
+   * ★ 2026-11-08：**启动时探一次端侧 LLM**（`LocalLLM.init()` 只打一行 hilog，不阻塞 UI）
+   *
+   * ★ 为什么需要
+   *   「对话找游戏」的提交入口在 853×533 上被挤出屏幕（`找` 按钮只剩 12vp，Enter 也不触发
+   *   `onSubmit`），⇒ **验 `init()` 时没法从 UI 触发**。
+   *   而 `LocalLLM.init()` 本身只做一件事（拉起系统模型管理应用）并打一行 hilog，
+   *   放在启动里探一次**不影响任何用户可见行为**（失败也只是多一行 warn）。
+   *
+   * ⚠️ 验完就改回 `false`（它会在每次冷启动调一次系统模型接口）。
+   */
+  static readonly llmProbe: boolean = true;
+
+  /**
    * ★★★ 2026-11-05（第 1277 轮）：**调试期强制默认页签**（-1 = 不强制）
    *
    * ★ 为什么需要

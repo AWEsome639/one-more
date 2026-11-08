@@ -26,6 +26,7 @@ import { GamesTab } from '../components/GamesTab';
 import { StatsTab } from '../components/StatsTab';
 import { SettingsTab } from '../components/SettingsTab';
 import { Diag } from '../core/Diag';
+import { LocalLLM } from '../core/LocalLLM';
 
 @Entry
 @Component
@@ -159,6 +160,18 @@ struct Index {
 
   aboutToAppear(): void {
     UiModeMgr.apply(UiModeMgr.current());
+    // ★ 2026-11-08：端侧 LLM 启动探针（`Diag.llmProbe`，验完置 false）
+    //   为什么要在这里：对话入口的「找」按钮在 853×533 上被挤出屏幕、Enter 也不触发
+    //   `onSubmit` ⇒ 没法从 UI 触发 `LocalLLM.init()`。这里探一次只多一行 hilog，
+    //   失败也只是 `reason='init-false'/'init-failed'`，**不影响任何用户可见行为**。
+    if (Diag.llmProbe) {
+      LocalLLM.init().then((ok: boolean) => {
+        hilog.info(0x0000, 'LocalLLM', 'probe ready=%{public}s initMs=%{public}d reason=%{public}s',
+          String(ok), LocalLLM.stat.initMs, LocalLLM.stat.reason);
+      }).catch(() => {
+        // 静默：探针失败绝不影响启动
+      });
+    }
     // ★ 2026-10-13 实测修正：两件事必须等 ——
     //   ① ProgressStore.init() 是异步的（要等它把 pref 句柄拿到）
     //   ② AlertDialog.show() 不能在 aboutToAppear 里立刻调（页面还没建好 ⇒ 静默失败）

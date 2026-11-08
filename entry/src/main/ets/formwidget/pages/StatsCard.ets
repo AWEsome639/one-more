@@ -5,7 +5,7 @@
  *   level / title / streak / today / solved / pct
  */
 
-import { FontSize, Palette, Overlay, Radius } from '../../core/Design';
+import { FontSize, Palette, Overlay, Radius, Space } from '../../core/Design';
 import { UiModeMgr } from '../../core/UiMode';
 
 interface CardData {
@@ -72,13 +72,14 @@ struct StatsCard {
     //   视觉阶梯脱钩，且永远不会跟随"大字模式"。现在字号/颜色/圆角一律走 `FontSize.*` /
     //   `Palette.*` / `Overlay.*` / `Radius.*`（**值完全等价，零视觉变化**）。
     //
-    //   ⚠️ 仍有 5 处**故意保留裸数字**——因为阶梯里没有精确对应档，硬套会改视觉：
+    //   ✅ 间距也已收口（2026-11-08 第五批）：`.padding(12)` → `Space.snug`（等值，零视觉变化）
+    //
+    //   ⚠️ 仍有 4 处**故意保留裸数字**——因为阶梯里没有精确对应档，硬套会改视觉：
     //     · `.fontSize(11)` ×2（🔥 连胜数）—— 阶梯是 10(micro)/12(xxs)，11 无档
     //     · `.fontSize(9)`（底部文案）—— 阶梯是 8(badge)/10(micro)，9 无档
     //     · `borderRadius(3)` ×2（进度条圆角）—— 阶梯最小是 8(xs)
-    //     · `.padding(12)` —— 阶梯是 10(sm)/16(md)
     //     · `#1E1B4B`（卡片深底）—— 色板里没有这个深靛蓝
-    //   ⇒ 要收干净需**给阶梯补档**（`FontSize.nano=9`、`Space.base=12`…），那要同步改
+    //   ⇒ 要收干净需**给阶梯补档**（`FontSize.nano=9`、`Radius.hair=3`…），那要同步改
     //     `core/UiMode.ets` 的 Spec/elder/simple 三张表，属于另一批活，本批不动。
     //
     //   ✅ 跟随「大字模式」：**已接好**（2026-11-08 同日第二批）
@@ -146,7 +147,7 @@ struct StatsCard {
     }
     .width('100%')
     .height('100%')
-    .padding(12)
+    .padding(Space.snug)
     .backgroundColor('#1E1B4B')
     .borderRadius(Radius.md)
   }

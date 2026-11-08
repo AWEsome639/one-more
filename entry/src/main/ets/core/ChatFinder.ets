@@ -82,13 +82,21 @@ const EASY_WORDS: string[] = [
   '简单', '轻松', '不太难', '随便', '休闲', '摸鱼',
   'not hard', 'not difficult', 'no hard', 'nicht schwer', 'nicht schwierig',
   'pas difficile', 'no difícil', 'несложн', 'не сложн', 'ليس صعب',
+  // ★ 2026-11-08：日语/韩语的「简单」（原来一个都没有 ⇒ 「簡単なパズル」抽不到难度）
+  '簡単', 'かんたん', '優しい', '쉬운', '간단',
   'easy', 'casual', 'relax', 'leicht', 'facile', 'fácil', 'легк', 'سهل'
 ];
-const HARD_WORDS: string[] = ['难', '挑战', '烧脑', '硬核', 'hard', 'challenge', 'schwer', 'difficile', 'difícil', 'сложн', 'صعب'];
+const HARD_WORDS: string[] = ['难', '挑战', '烧脑', '硬核', 'hard', 'challenge', 'schwer', 'difficile', 'difícil', 'сложн', 'صعب',
+  // ★ 2026-11-08 补：日语/韩语（「難しい」「어려운」原来一个都没有 ⇒ 整句空）
+  '難しい', 'むずかしい', '어려운', '어렵'];
 
 /** 时长关键词 */
-const SHORT_WORDS: string[] = ['三五分钟', '几分钟', '短', '快', '一会儿', '碎片', 'short', 'quick', 'brief', 'kurz', 'court', 'corto', 'коротк', 'قصير'];
-const LONG_WORDS: string[] = ['长', '久', '一直玩', '耐玩', 'long', 'endless', 'lange', 'longtemps', 'долг', 'طويل'];
+const SHORT_WORDS: string[] = ['三五分钟', '几分钟', '短', '快', '一会儿', '碎片', 'short', 'quick', 'brief', 'kurz', 'court', 'corto', 'коротк', 'قصير',
+  // ★ 2026-11-08 补：日语/韩语（「短い」「짧은」原来都没有 ⇒「短いゲーム」「짧은 게임」整句空）
+  '短い', '짧은', 'すぐ'];
+const LONG_WORDS: string[] = ['长', '久', '一直玩', '耐玩', 'long', 'endless', 'lange', 'longtemps', 'долг', 'طويل',
+  // ★ 2026-11-08 补：日语/韩语的「长」（与 SHORT 对称）
+  '長い', '긴'];
 
 export class ChatFinder {
   /**
@@ -129,7 +137,9 @@ export class ChatFinder {
       if (s.indexOf(LONG_WORDS[k].toLowerCase()) >= 0) { it.long = true; it.hits.push(LONG_WORDS[k]); break; }
     }
     // 可暂停 / 不限时 / 联机
-    if (s.indexOf('暂停') >= 0 || s.indexOf('电话') >= 0 || s.indexOf('pause') >= 0 || s.indexOf('unterbr') >= 0) { it.pausable = true; it.hits.push(TG('可暂停')); }
+    // ★ 2026-11-08 补：日/韩/俄的「暂停」（原来只认 中文/英/德）
+    if (s.indexOf('暂停') >= 0 || s.indexOf('电话') >= 0 || s.indexOf('pause') >= 0 || s.indexOf('unterbr') >= 0
+        || s.indexOf('一時停止') >= 0 || s.indexOf('일시정지') >= 0 || s.indexOf('паузу') >= 0 || s.indexOf('пауза') >= 0) { it.pausable = true; it.hits.push(TG('可暂停')); }
     if (s.indexOf('不限时') >= 0 || s.indexOf('慢慢') >= 0 || s.indexOf('untimed') >= 0 || s.indexOf('ohne zeit') >= 0) { it.untimed = true; it.hits.push(TG('不限时')); }
     if (s.indexOf('联机') >= 0 || s.indexOf('对打') >= 0 || s.indexOf('朋友') >= 0 || s.indexOf('multi') >= 0 || s.indexOf('freund') >= 0) { it.multiplayer = true; it.hits.push(TG('联机')); }
     // ★ 2026-11-07 模拟验证抓到：「棋/牌」原来被映射到 CLASSIC 类别 ⇒ 推荐出「宝石迷阵／打砖块」
@@ -142,12 +152,31 @@ export class ChatFinder {
     //   这是用户最常问的一类（「有没有像 2048 的」「跟扫雷差不多的」），v1 完全没接住。
     //   识别法：句子里**直接出现某款游戏的名字**（去掉空格/标点后包含即可）。
     //   ⚠️ 只在**没有更明确的意图**时启用（用户说「想玩不太难的解谜，像 2048 那样」时以解谜为主）。
+    // ★★★ 2026-11-08（模拟验证抓到的**真 bug**）：
+    //   上面的注释写着「⚠️ 只在**没有更明确的意图**时启用（用户说『想玩不太难的解谜，像 2048 那样』时以解谜为主）」，
+    //   但**实现里根本没有这个判断** ⇒ 只要句子里出现某个游戏的英文名，similar 就会覆盖掉主意图。
+    //   实例：`memory training` 里的 `memory` 命中了游戏英文名 `Memory` ⇒ similar 生效
+    //        ⇒ 353 款全被拉进来（原本「找记忆类」只要 74 款，且排序也乱了）。
+    //   ⇒ 按注释的本意补上：只有「别的意图一个都没抽到」时才做 similar 匹配。
+    const hasIntent: boolean =
+      it.category !== null || it.difficulty !== null || it.short || it.long
+      || it.pausable || it.untimed || it.multiplayer || it.board;
     const nmClean: string = s.replace(/\s/g, '');
-    for (let i = 0; i < GAMES.length; i++) {
+    for (let i = 0; hasIntent === false && i < GAMES.length; i++) {
       const gn: string = GAMES[i].name.replace(/\s/g, '').toLowerCase();
       if (gn.length >= 2 && nmClean.indexOf(gn) >= 0) {
         it.similar = GAMES[i].id;
         it.hits.push(GAMES[i].name);
+        break;
+      }
+      // ★★★ 2026-11-08：**英文名也参与匹配** —— 原来只收中文名，
+      //   所以 `like minesweeper` / `как сапёр` 完全匹配不到「扫雷」（必空）。
+      //   ⚠️ 拉丁名**必须词边界匹配**：`Nim`（尼姆博弈）不加边界会命中 `animal`，
+      //      `Pong` 会命中 `pingpong`（这个反而是想要的，见 wordIn 的注释）。
+      const en: string = GAMES[i].enName.toLowerCase();
+      if (en.length >= 3 && ChatFinder.wordIn(s, en)) {
+        it.similar = GAMES[i].id;
+        it.hits.push(GAMES[i].enName);   // ★ 用户用英文问，就把英文名回显给他
         break;
       }
     }
@@ -253,6 +282,26 @@ export class ChatFinder {
    *   ⇒ 6 个类别中文值**都在 EXTRA 字典里**，走 `L()` 查表即可；
    *     英文用 `catLabelEn()`（GameRegistry 已有），因为 `L()` 对英文直接用第二个参数。
    */
+  /**
+   * ★★★ 2026-11-08 拉丁词边界匹配（`parse` 的英文名识别用）。
+   *   为什么必需：英文名里有 `Nim`（3 字符）这种，纯子串匹配会命中 `animal` 的 'nim'
+   *   ⇒ 用户说 "animal games" 被当成「想玩尼姆博弈」。
+   *   判据：前后字符都不是 a-z 才算命中；`ping pong` 里的 `pong` 前后是空格 ⇒ 通过 ✓
+   */
+  private static wordIn(s: string, w: string): boolean {
+    const latin: RegExp = /[a-z]/;
+    let from: number = 0;
+    while (from + w.length <= s.length) {
+      const i: number = s.indexOf(w, from);
+      if (i < 0) { return false; }
+      const before: string = i > 0 ? s.charAt(i - 1) : ' ';
+      const after: string = i + w.length < s.length ? s.charAt(i + w.length) : ' ';
+      if (!latin.test(before) && !latin.test(after)) { return true; }
+      from = i + 1;
+    }
+    return false;
+  }
+
   private static catLabel(c: GameCategory): string {
     return L(c, catLabelEn(c));
   }

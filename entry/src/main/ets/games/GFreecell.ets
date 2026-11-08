@@ -82,6 +82,8 @@ export struct GFreecell {
   @State private sel: number = -1;    // -1 无；0..3 自由格；10..13 列
   @State private over: boolean = false;
 
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   private startAt: number = 0;
 
   aboutToAppear(): void {
@@ -132,6 +134,7 @@ export struct GFreecell {
     this.moves = 0;
     this.sel = -1;
     this.over = false;
+    this.settled = false;
     this.startAt = Date.now();
   }
 
@@ -738,6 +741,9 @@ export struct GFreecell {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const placed: number = this.found[0] + this.found[1];
     const r: GameResult = {
       gameId: 'freecell',
@@ -747,6 +753,7 @@ export struct GFreecell {
       levelReached: placed
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 

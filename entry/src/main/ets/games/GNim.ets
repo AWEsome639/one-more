@@ -56,6 +56,8 @@ export struct GNim {
   @State private turn: number = 0;      // 0 = 你，1 = AI
   @State private moves: number = 0;
   @State private over: boolean = false;
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   @State private won: boolean = false;
   @State private msg: string = TG('点某堆的第 k 颗石子 = 从这堆拿走 k 颗');
 
@@ -118,6 +120,7 @@ export struct GNim {
     this.turn = 0;
     this.moves = 0;
     this.over = false;
+    this.settled = false;
     this.won = false;
     this.msg = TG('点某堆的第 k 颗石子 = 从这堆拿走 k 颗');
     this.startAt = Date.now();
@@ -387,6 +390,9 @@ export struct GNim {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const r: GameResult = {
       gameId: 'nim',
       solved: solved,
@@ -395,6 +401,7 @@ export struct GNim {
       levelReached: this.moves
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 

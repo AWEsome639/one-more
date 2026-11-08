@@ -272,7 +272,7 @@ struct GuidePage {
         // ★ BUG #26：分类原来显示【中文原文】⇒ 走 L() + catLabelEn()
         Text(this.meta ? L(this.catOf(), catLabelEn(this.catOf())) : '')
           .fontSize(FontSize.xs).fontColor(this.accentColor())
-          .padding({ left: 8, right: 8, top: 2, bottom: 2 })
+          .padding({ left: Space.tiny, right: Space.tiny, top: Space.xxs, bottom: Space.xxs })
           .backgroundColor(Palette.tint('1A'))
           .borderRadius(Radius.full)
       }

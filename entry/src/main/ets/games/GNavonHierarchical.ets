@@ -83,6 +83,8 @@ export struct GNavonHierarchical {
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
    *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
   @State private tvFocus: string = '';
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -124,6 +126,7 @@ export struct GNavonHierarchical {
     this.right = 0;
     this.left = this.total;
     this.over = false;
+    this.settled = false;
     this.won = false;
     this.done = false;
     this.startAt = Date.now();
@@ -331,12 +334,16 @@ export struct GNavonHierarchical {
     }, 900);
   }
   private finish(): void {
+    if (this.settled) {
+      return;
+    }
     const r: GameResult = {
       gameId: 'navon_hierarchical', solved: this.won,
       score: this.right * 110 + (this.won ? 220 : 0),
       durationMs: Date.now() - this.startAt, levelReached: this.right
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 

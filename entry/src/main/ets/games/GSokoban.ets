@@ -144,6 +144,8 @@ export struct GSokoban {
   /** ★ 滑动起点（vp）：每认一次方向就重置，一次滑动能连着推两格 */
   private dragX: number = 0;
   private dragY: number = 0;
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能当守卫） */
+  private settled: boolean = false;
 
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
@@ -182,6 +184,7 @@ export struct GSokoban {
   /** ★ 2026-10-29：演示动画需要「演完重来」⇒ 包一个无参 reset()
    *  这款没有"当前关卡"字段（一直是 load(0)），所以重来就是重新载入第 0 关 */
   private reset(): void {
+    this.settled = false;
     this.load(0);
   }
 
@@ -580,6 +583,9 @@ export struct GSokoban {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const base: number = 300 + (this.level + 1) * 80;
     const r: GameResult = {
       gameId: 'sokoban',
@@ -589,6 +595,7 @@ export struct GSokoban {
       levelReached: this.level + 1
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(r);
   }
 
