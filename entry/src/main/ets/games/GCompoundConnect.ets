@@ -532,7 +532,7 @@ export struct GCompoundConnect {
   }
 
   build() {
-    Column({ space: Space.sm }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -544,33 +544,36 @@ export struct GCompoundConnect {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('数字和'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.pathSum() + ' / ' + this.target)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((this.pathSum() === this.target ? Palette.emerald : Palette.primary)).animation({ duration: Motion.fast, curve: Motion.snap() })
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.path.length + ' / ' + this.maxSteps)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((this.path.length <= this.maxSteps ? Palette.sky : Palette.rose))
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('失败'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.fails + ' / ' + this.diffTotal)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
+        .justifyContent(FlexAlign.SpaceBetween)
       }
       .width('100%')
 
@@ -688,9 +691,14 @@ export struct GCompoundConnect {
       }
       .width('100%')
 
-      Text(TG2('两条硬条件：路径数字和 = {0}，且步数 ≤ {1}（0 是障碍）',Digits(String(this.target), this.langCode),Digits(String(this.maxSteps), this.langCode)))
-        .fontSize(FontSize.xxs)
-        .fontColor(this.theme.inkFaint)
+      // ★ 2026-11-09：矮屏（横屏 533vp）里这行「两条硬条件」底边会被屏底裁掉 ——
+      //   与其「露半行」，不如「矮屏不显示」（目标值在「数字和 x/57」里已经可见）。
+      if (!Bp.isShort()) {
+        Text(TG2('两条硬条件：路径数字和 = {0}，且步数 ≤ {1}（0 是障碍）',Digits(String(this.target), this.langCode),Digits(String(this.maxSteps), this.langCode)))
+          .fontSize(FontSize.xxs)
+          .fontColor(this.theme.inkFaint)
+          .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
