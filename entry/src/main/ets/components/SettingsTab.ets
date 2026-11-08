@@ -65,7 +65,6 @@ const STORE_NAME: string = 'onemore_progress';
  *   这样长 `reason`（`chat-failed` / `no-syscap`）只会走省略号，不会把标签挤成两行或把行压扁。
  *   100vp 是按最长的中文标签「规则版已启用」（6 字 × FontSize.xs 13）估的，留了余量。
  */
-const DIAG_LABEL_W: number = 100;
 /** 版本号 —— 与 AppScope/app.json5 的 versionName 保持一致 */
 // ★ 2026-10-13：版本号**单一真相源**在 `core/About.ets` 的 `About.VERSION`
 //   原来这里又硬编码了一份 ⇒ 改一处忘另一处就会不同步（我今天正好发现两处都是 1.0.0）
@@ -158,12 +157,7 @@ export struct SettingsTab {
    *   ⚠️ 真正的实时刷新要把 stat 写进 AppStorage 再 `@StorageProp` 订阅 ——
    *      那要动 `core/LocalLLM.ets` 的 4 个写入点，本轮**没做**（记在报告「后续」里）。
    */
-  @StorageProp('llmReason') diagReasonV: string = 'idle';
-  @StorageProp('llmInitMs') diagInitV: number = 0;
-  @StorageProp('llmFirstMs') diagFirstV: number = 0;
-  @StorageProp('llmCalls') diagCallsV: number = 0;
   /** 模型是否 ready（失败态要显示「装好系统模型后，点这里重试」那行） */
-  @StorageProp('llmReady') diagReadyV: boolean = false;
   /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环（判据：可点组件必须有 focusable） */
   @State private tvFocus: string = '';
   @State private copyHint: string = '';   // 「已复制 ✓」提示
@@ -544,7 +538,7 @@ build() {
         this.feedbackCard()
         // ★★★ 2026-11-09（code-hunter 建议 #2）**AI 诊断卡**（放在「关于」区最后一张）
         this.sectionTitle('AI 诊断', 'AI diagnostics')
-        this.aiDiagCard()
+        AiDiagCard()
 
         Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length,
           '{n} мини-игра без интернета', '{n} мини-игры без интернета', '{n} мини-игр без интернета'))
@@ -621,150 +615,6 @@ build() {
     .padding({ left: Space.lg, right: Space.lg, top: Space.md })
   }
 
-  /**
-   * ★★★ 2026-11-09（code-hunter 建议 #2）**AI 诊断卡**
-   *
-   *   为什么加：用户报「AI 不工作」时，原来只能让他跑 `hdc` 看日志；
-   *   现在设置页直接显示 `LocalLLM.stat` 的 `reason` / `initMs` / `firstTokenMs` / `calls`，
-   *   一句话就能定位是「没系统能力」还是「初始化失败」还是「问过一次但超时」。
-   *
-   *   ⚠️ 判据 1805：文案走 `this.t()`（`I18n.EXTRA`），**不用 `TG()`** —— 设置页统一 `t()`
-   *      （`TG()` 是 GameI18n 的，进了设置页会缺 10 语言）。
-   *   ⚠️ 判据 1829：每行都是「固定宽度标签 + 值」；标签 `.flexShrink(0)`，值 `layoutWeight(1)`，
-   *      行本身 `.width('100%')` ⇒ 长 reason 只会省略号，不会把行压扁。
-   *   ⚠️ 刷新：`LocalLLM.stat` 没有观察源（判据 1824：看实现，`LocalLLM.ets:46` 是 static 对象）
-   *      ⇒ 2026-11-09 终解：数据走 `AppStorage`（`LocalLLM.sync()` 写、这里 `@StorageProp` 读），
-   *        点卡片只**主动重试一次 `init()`**（`retryDiag()`），不再手动抄值。
-   */
-  @Builder
-  aiDiagCard() {
-    Column({ space: Space.xs }) {
-      // 标题行：emoji + 标题 + 「点一下刷新」
-      Row({ space: Space.md }) {
-        Text('🤖')
-          .accessibilityLevel('no')
-          .fontSize(FontSize.xl)
-          .width(Space.xxl)
-          .textAlign(TextAlign.Center)
-          .flexShrink(0)
-        Column({ space: 2 }) {
-          Text(this.t('AI 诊断', 'AI diagnostics'))
-            .fontSize(FontSize.md).fontWeight(FontWeight.Medium).fontColor(this.theme().ink)
-          Text(this.t('点一下刷新', 'Tap to refresh'))
-            .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
-        }
-        .alignItems(HorizontalAlign.Start).layoutWeight(1)
-      }
-      .width('100%')
-      .flexShrink(0)
-
-      // 行 1：模型状态（`ok` / `init-false` / `no-syscap` / `init-failed` / `chat-failed` / `timeout` / `idle`）
-      this.diagRow('模型状态', 'Model status', this.diagReasonV)
-      // 行 2：初始化耗时
-      this.diagRow('初始化', 'Init', this.diagMs(this.diagInitV))
-      // 行 3：首 token 延迟
-      this.diagRow('首字延迟', 'First token', this.diagMs(this.diagFirstV))
-      // 行 4：问答次数（0 = 从来没真问过 ⇒ 上面 reason 是 idle 就说明"还没试过"，不是"坏了"）
-      this.diagRow('问答次数', 'Calls', Digits(String(this.diagCallsV), this.lang))
-      // 行 5：失败态的"自愈提示"（只有没 ready 时才显示）
-      if (!this.diagReadyV) {
-        Text(this.t('装好系统模型后，点这里重试', 'After installing the system model, tap here to retry'))
-          .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
-          .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      }
-      // 行 6：规则版兜底（永远 true —— 四层兜底保证 AI 挂了也能玩）
-      Row({ space: Space.sm }) {
-        Text(this.t('规则版已启用', 'Rule-based fallback on'))
-          .fontSize(FontSize.xs).fontColor(Palette.success)
-          .layoutWeight(1).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text('✓')
-          .accessibilityLevel('no')
-          .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).fontColor(Palette.success)
-          .flexShrink(0)
-      }
-      .width('100%')
-      .flexShrink(0)
-    }
-    .alignItems(HorizontalAlign.Start)
-    .width('100%')
-    .padding(Space.md)
-    .margin({ left: Space.lg, right: Space.lg })
-    .backgroundColor(this.theme().surface)
-    .borderRadius(Radius.md)
-    .shadow(Shadow.card)
-    // ★ 2026-11-09（读屏）：可点的卡**必须一口念完**，否则读屏用户只会听到 5 个断开的碎片
-    //   （「模型状态」「ok」「初始化」「—」…），听不出它们属于同一张诊断卡。
-    .accessibilityGroup(true)
-    .accessibilityText(this.diagA11yText())
-    // ★ 2026-11-09：**可点就必须能"被选中"**（check_focusable 抓到过一次）
-    //   电视/键盘用户用方向键在这里停不住的话，这张卡对他们等于不存在。
-    //   照 `GamesTab:1674-1688` 的写法补全五件套。
-    .focusable(Tv.on())
-    .onFocus(() => { this.tvFocus = 'S-AIDIAG'; })
-    .onBlur(() => { if (this.tvFocus === 'S-AIDIAG') { this.tvFocus = ''; } })
-    .outline(Tv.focusOutline(this.tvFocus === 'S-AIDIAG'))
-    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
-      Haptics.tap();
-      this.retryDiag();
-     }); })
-    .onClick(() => {
-      Haptics.tap();
-      this.retryDiag();
-    })
-  }
-
-  private retryDiag(): void {
-    // 只负责"主动重试一次 init"：值的变化由 `LocalLLM.sync()` 写进 AppStorage 自动反映到界面
-    LocalLLM.retry();          // 清 inited + 冷却（保留 calls）；内部会 sync 一次 reason=idle
-    LocalLLM.init().then(() => {
-      // init 内部（fail()/成功路径）已 sync ⇒ 这里不需要再抄任何值
-    });
-  }
-
-  /** 诊断卡的一行：固定宽标签 + 值（判据 1829：都不许被压） */
-  @Builder
-  diagRow(zh: string, en: string, value: string) {
-    Row({ space: Space.sm }) {
-      Text(this.t(zh, en))
-        .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
-        .width(DIAG_LABEL_W)
-        .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
-        .flexShrink(0)
-      Text(value)
-        .fontSize(FontSize.xs).fontColor(this.theme().ink)
-        .fontWeight(FontWeight.Medium)
-        .layoutWeight(1)
-        .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
-        .textAlign(TextAlign.End)
-    }
-    .width('100%')
-    .flexShrink(0)
-  }
-
-  /** 把 `LocalLLM.stat` 的当前值抄进四个 @State 快照（页面打开 + 点卡片时各调一次） */
-
-  /**
-   * 诊断卡的**整句读屏文本**：把 5 行拼成一句话。
-   * 为什么不用默认的子节点拼接：默认顺序是「标签→值→标签→值」，
-   * 念出来是碎的（"模型状态 ok 初始化 — 首字延迟 —"），听不出层级。
-   */
-  private diagA11yText(): string {
-    return this.t('AI 诊断', 'AI diagnostics') + '。'
-      + this.t('模型状态', 'Model status') + ' ' + this.diagReasonV + '，'
-      + this.t('初始化', 'Init') + ' ' + this.diagMs(this.diagInitV) + '，'
-      + this.t('首字延迟', 'First token') + ' ' + this.diagMs(this.diagFirstV) + '，'
-      + this.t('问答次数', 'Calls') + ' ' + Digits(String(this.diagCallsV), this.lang) + '，'
-      + this.t('规则版已启用', 'Rule-based fallback on') + '。'
-      + this.t('点一下刷新', 'Tap to refresh');
-  }
-
-  /** 毫秒显示：0 ⇒ 「—」（0 表示"还没发生过"，与"很快"要分开看） */
-  private diagMs(ms: number): string {
-    if (ms <= 0) {
-      return '—';
-    }
-    return Digits(String(ms), this.lang) + ' ms';
-  }
 
   /** 卡片行：emoji + 标题 + 副标题 + 开关 */
   @Builder
@@ -1755,5 +1605,155 @@ build() {
       .layoutWeight(1)
     }
     .width('100%')
+  }
+}
+
+/**
+ * ★★★ 2026-11-09 perf-hunter：**AI 诊断卡 · 独立 `@Component`**（从 `SettingsTab` 的 `@Builder` 拆出来）
+ *
+ * 为什么拆：同一张卡，`@State` 和 `@StorageProp` 两条路都试过 —— **都能"读到真值"、但运行时改值不重绘**
+ *   （实测：点击后 `+0.19/0.33/0.46s` 三张截图像素差全 0；而"退出再进设置页"能显示新值）。
+ *   ⇒ 判断病根不在状态装饰器，而在"这个 `@Builder` 子树在页面构建完成后不再响应"。
+ *   ⇒ 拆成独立组件 = 给它**自己的重建边界**，绕开父级的"不重建"。
+ *
+ * 数据源：`LocalLLM.sync()` 写 AppStorage（`llmReason/llmInitMs/llmFirstMs/llmCalls/llmReady`），
+ *   本组件用 `@StorageProp` 读 —— 组件级订阅，不再依赖父级刷新。
+ * 交互：点卡片 = `LocalLLM.retry()`（清缓存+冷却）+ 主动 `init()`（结果由 `sync()` 自动写回）。
+ */
+@Component
+export struct AiDiagCard {
+  /** 数据源（与 `core/LocalLLM.ets` 的 `sync()` 键名一一对应） */
+  @StorageProp('llmReason') reasonV: string = 'idle';
+  @StorageProp('llmInitMs') initMsV: number = 0;
+  @StorageProp('llmFirstMs') firstMsV: number = 0;
+  @StorageProp('llmCalls') callsV: number = 0;
+  @StorageProp('llmReady') readyV: boolean = false;
+  /** 主题 / 语言（组件自己的订阅） */
+  @StorageProp('themeDark') dark: boolean = false;
+  @StorageProp('lang') lang: string = 'zh';
+  /** 组件自己的焦点环状态（原来借用 SettingsTab 的 tvFocus） */
+  @State private focused: boolean = false;
+
+  /** 标签列固定宽（判据 1829：固定宽标签 + 值，谁都别被压） */
+  private static readonly LABEL_W: number = 100;
+
+  private theme(): Theme {
+    return this.dark ? Theme.dark() : Theme.light();
+  }
+
+  private t(zh: string, en: string): string {
+    const observed: string = this.lang;   // ← 渲染依赖声明，别删
+    return L(zh, en);
+  }
+
+  /** 毫秒显示：0 ⇒ 「—」（0 = 还没发生过，与"很快"要分开看） */
+  private diagMs(ms: number): string {
+    if (ms <= 0) {
+      return '—';
+    }
+    return Digits(String(ms), this.lang) + ' ms';
+  }
+
+  private a11yText(): string {
+    return this.t('AI 诊断', 'AI diagnostics') + '。'
+      + this.t('模型状态', 'Model status') + ' ' + this.reasonV + '，'
+      + this.t('初始化', 'Init') + ' ' + this.diagMs(this.initMsV) + '，'
+      + this.t('首字延迟', 'First token') + ' ' + this.diagMs(this.firstMsV) + '，'
+      + this.t('问答次数', 'Calls') + ' ' + Digits(String(this.callsV), this.lang) + '，'
+      + this.t('规则版已启用', 'Rule-based fallback on') + '。'
+      + this.t('点一下刷新', 'Tap to refresh');
+  }
+
+  /** 点一下 = 清缓存+冷却，再主动 init 一次（值的变化由 LocalLLM.sync() 写回 AppStorage） */
+  private retry(): void {
+    LocalLLM.retry();
+    LocalLLM.init().then(() => {
+      // init 内部（fail()/成功路径）已 sync ⇒ 这里不需要再抄值
+    });
+  }
+
+  @Builder
+  row(zh: string, en: string, value: string) {
+    Row({ space: Space.sm }) {
+      Text(this.t(zh, en))
+        .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+        .width(AiDiagCard.LABEL_W)
+        .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        .flexShrink(0)
+      Text(value)
+        .fontSize(FontSize.xs).fontColor(this.theme().ink)
+        .fontWeight(FontWeight.Medium)
+        .layoutWeight(1)
+        .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        .textAlign(TextAlign.End)
+    }
+    .width('100%')
+    .flexShrink(0)
+  }
+
+  build() {
+    Column({ space: Space.xs }) {
+      // 标题行：emoji + 标题 + 「点一下刷新」
+      Row({ space: Space.md }) {
+        Text('🤖')
+          .accessibilityLevel('no')
+          .fontSize(FontSize.xl)
+          .width(Space.xxl)
+          .textAlign(TextAlign.Center)
+          .flexShrink(0)
+        Column({ space: 2 }) {
+          Text(this.t('AI 诊断', 'AI diagnostics'))
+            .fontSize(FontSize.md).fontWeight(FontWeight.Medium).fontColor(this.theme().ink)
+          Text(this.t('点一下刷新', 'Tap to refresh'))
+            .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+        }
+        .alignItems(HorizontalAlign.Start).layoutWeight(1)
+      }
+      .width('100%')
+      .flexShrink(0)
+
+      this.row('模型状态', 'Model status', this.reasonV)
+      this.row('初始化', 'Init', this.diagMs(this.initMsV))
+      this.row('首字延迟', 'First token', this.diagMs(this.firstMsV))
+      this.row('问答次数', 'Calls', Digits(String(this.callsV), this.lang))
+      // 失败态才显示的自愈提示
+      if (!this.readyV) {
+        Text(this.t('装好系统模型后，点这里重试', 'After installing the system model, tap here to retry'))
+          .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+          .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      Row({ space: Space.sm }) {
+        Text(this.t('规则版已启用', 'Rule-based fallback on'))
+          .fontSize(FontSize.xs).fontColor(Palette.success)
+          .layoutWeight(1).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text('✓')
+          .accessibilityLevel('no')
+          .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).fontColor(Palette.success)
+          .flexShrink(0)
+      }
+      .width('100%')
+      .flexShrink(0)
+    }
+    .alignItems(HorizontalAlign.Start)
+    .width('100%')
+    .padding(Space.md)
+    .margin({ left: Space.lg, right: Space.lg })
+    .backgroundColor(this.theme().surface)
+    .borderRadius(Radius.md)
+    .shadow(Shadow.card)
+    .accessibilityGroup(true)
+    .accessibilityText(this.a11yText())
+    .focusable(Tv.on())
+    .onFocus(() => { this.focused = true; })
+    .onBlur(() => { this.focused = false; })
+    .outline(Tv.focusOutline(this.focused))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
+      Haptics.tap();
+      this.retry();
+     }); })
+    .onClick(() => {
+      Haptics.tap();
+      this.retry();
+    })
   }
 }

@@ -60,3 +60,45 @@ AI 诊断, …, 初始化, 1028 ms, …                            ← 仍是旧
 
 ## 5. 设备已复位
 首页（聊天面板关）｜简体中文｜8 张卡｜主题色靛蓝
+
+---
+
+## 6. 重构：`aiDiagCard` → 独立 `@Component`（2026-11-09 03:1x，**未编译**）
+
+### 6.1 改了什么
+| 文件 | 改动 |
+|---|---|
+| `components/SettingsTab.ets` | **+151 / −151**（净 0，是"搬"不是"加"）：<br>· 新增 **`@Component export struct AiDiagCard`**（文件末尾，独立重建边界）<br>· `build()` 里 `this.aiDiagCard()` → **`AiDiagCard()`**（一行调用）<br>· 删掉 `SettingsTab` 里的 `aiDiagCard()` / `diagRow()` / `diagMs()` / `diagA11yText()` / `retryDiag()` 与 5 个 `@StorageProp('llm…')`<br>· 顺手删掉已无引用的 `DIAG_LABEL_W` 常量 |
+
+**新组件的自包含结构**（判据 1828：依赖面已全搜，只有 `build()` 里一处调用）：
+```ts
+@Component
+export struct AiDiagCard {
+  @StorageProp('llmReason')  reasonV: string = 'idle';
+  @StorageProp('llmInitMs')  initMsV: number = 0;
+  @StorageProp('llmFirstMs') firstMsV: number = 0;
+  @StorageProp('llmCalls')   callsV: number = 0;
+  @StorageProp('llmReady')   readyV: boolean = false;
+  @StorageProp('themeDark')  dark: boolean = false;   // 组件自己的主题订阅
+  @StorageProp('lang')       lang: string = 'zh';     // 组件自己的语言订阅
+  @State private focused: boolean = false;            // 自己的焦点环（原来借父组件的 tvFocus）
+  private retry(): void { LocalLLM.retry(); LocalLLM.init().then(...); }   // 回调不需要从父传入
+  build() { … }   // 卡片内容整体搬进来
+}
+```
+
+### 6.2 为什么这次可能成
+- 之前两条路（`@State` / `@StorageProp`）都是**父组件持有状态**，改值能读、**不触发子树重绘**；
+- 现在状态**归组件自己所有**（`@StorageProp` 在组件内），组件有**独立重建边界** ⇒ 值变化直接作用于组件自身；
+- 回调也内聚（不需要 `@Prop` 传函数）——避开了 ArkUI 对 `@Prop` 函数类型的限制。
+
+### 6.3 验收（下一版包，仍是那三步 + 像素差分）
+1. **进设置页**：`模型状态` = `idle` 或上次结果（构建时读，必须过）
+2. **点卡片**（`hilog -r` → 点 → +0.2/0.4/0.6s 连拍）：**卡片区域像素差 > 0**（修前 0）
+3. **点后 ~2s**：`初始化` == 本次 `initMs`（与 `LocalLLM: init=` 日志一致）、`reason` 回 `init-false`
+
+### 6.4 如果这次仍是 0 差异 —— 那就是更深的框架问题
+按 lead 的判断：**「可能这个页面有更上层的重建阻塞」** ⇒
+- 记成**已知项**（不再在状态/组件结构上打转）
+- 下一步只能查 `SettingsTab` 的**上层容器**（`Tabs`/`TabContent`/`Scroll`）或整个设置页的构建方式，
+  或者干脆给诊断信息做**一次性快照 + 手动"重新读取"文案**（承认它不实时，但不骗人）。
