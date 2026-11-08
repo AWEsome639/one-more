@@ -167,10 +167,23 @@ export struct GamesTab {
   @State private langPressed: boolean = false;
   /** A-Z 索引条当前高亮（跟着列表滚动走） */
   @State azCurrent: number = 0;
+  /**
+   * ★ 2026-11-08 首帧闸门：`false` 时用 `ForEach(this.list())` 直出（LazyForEach 首帧拿不到数据），
+   *   挂载后置 `true` ⇒ 切到 `LazyForEach`（只建可视区 + cachedCount 范围）。
+   *   代价：首帧仍建 355 卡（收益打折），换来「绝不空白」。
+   */
+  @State private gridReady: boolean = false;
   /** 列表滚动控制器（字母条要能跳） */
   private azScroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
+    // ★ 2026-11-08 首帧闸门：先让 ForEach 把第一帧画出来，再切 LazyForEach。
+    //   ⚠️ 切换时**必须先把数据源灌好**（`list()` 此时已记忆化，是幂等的），
+    //      否则 LazyForEach 挂上来的第一帧又是空表（这正是上一版失败的形态）。
+    setTimeout(() => {
+      this.source.reset(this.list());
+      this.gridReady = true;
+    }, 0);
     // ★ 大字模式默认收起顶部（否则网格被挤出屏幕 —— 实测）
     if (this.uiMode === 'elder') {
       this.topCollapsed = true;
@@ -1148,77 +1161,161 @@ build() {
           //   `LazyForEach` 挂载时拿不到 `aboutToAppear` 预填的数据，补一次挂载后 notify 也不稳定）。
           //   要再试必须先解决首帧，评估见 `_巡检记录/LazyForEach可行性-20261108.md`。
           //   ⇒ 现在仍是 `ForEach`：355 卡 × 19 节点 ≈ **6,745 个节点首帧全建**（这是已知代价）。
-          ForEach(this.list(), (g: GameMeta, i: number) => {
-            GridItem() {
-              GameCard({
-                meta: g,
-                // ★ 2026-11-01（智慧屏）：首屏第一张卡拿默认焦点，让遥控器/键盘方向键有起点
-                first: i === 0,
-                // ★ item ①：只有正在点开的那张卡参与共享元素补间
-                sharedId: this.flyingId === ('card-' + g.id) ? this.flyingId : '',
-                // ★ 2026-10-13「动画拉满」item ③：**只给首屏可见的前几款**排错峰。
-                //   全量传 i 的后果：Grid 虚拟化 ⇒ 滚到第 100 款时它"刚创建"，
-                //   enterDelay(100) 会再让它延迟进场 = 一边滚一边动，又乱又掉帧。
-                // ★★★ 2026-10-14 奥森反馈「主界面滑动时下面的游戏总是闪现出来」⇒ 修：
-                //   原来是 `i < 8 ? i : 8` —— 第 9 张之后【全部是 index=8】⇒ GameCard 的
-                //   aboutToAppear 里 `enterDelay(8)` = 320ms 延迟 ⇒ 配合 Grid 的 cachedCount(6)
-                //   一边滚一边新建卡片 ⇒ ★ 每张新卡都 opacity 0 起步、320ms 后才淡入 = "闪现"！
-                //   ⇒ 改成 -1：★ 首屏之外【不做入场动画，直接显示】
-                index: i < 8 ? i : -1,
-                theme: this.theme(),
-                // ★ 2026-11-08 perf-hunter：**这两个参数删了** —— 卡片改成自己 `@StorageProp('streaks')` 订阅。
-                //   原因：原来靠父传 `@Prop`，而 ForEach **同 key 不重跑 itemGenerator** ⇒ 玩完一局回首页
-                //   🔥「N 天」/「今日已玩」不刷新（连切语言都不行）。现在由 `ProgressStore.persistStreaks()`
-                //   每次连胜变化时写 AppStorage，卡片自订阅 —— 与角标（`clearedGames`/`perGameBest`）同构。
-                onOpen: (id: string) => {
-                  this.openGame(id);
-                },
-                // 右键菜单（只在桌面类启用；手机/平板零影响）
-                // ★ 第 1203 轮：`Diag.forceMenu` 用于在模拟器上验菜单 UI
-                //   （模拟器 deviceType 报 phone ⇒ `Tv.on()` false ⇒ 菜单永不弹）
-                allowMenu: Tv.on() || Diag.forceMenu,
-                onMenu: (id: string, x: number, y: number) => {
-                  this.menuId = id;
-                  this.menuX = x;
-                  this.menuY = y;
-                },
-                // 方向键导航（PC / 2in1 键盘 · 电视遥控器）
-                gridCols: this.colCount(),
-                onArrow: (id: string, delta: number) => {
-                  this.moveFocus(id, delta);
-                },
-                onLongPress: (id: string) => {
-                  // 长按 = 收藏 / 取消收藏，顺手给个提示
-                  ProgressStore.toggleFavorite(id);
-                  this.toast = ProgressStore.isFavorite(id)
-                    ? this.t('⭐ 已收藏', '⭐ Saved') : this.t('已取消收藏', 'Removed');
-                  this.tick = this.tick + 1;
-                  setTimeout(() => {
-                    this.toast = '';
-                  }, 1400);
-                }
-              })
-            }
-            // ★★★★★ 2026-10-14 闪现【第 9 层 · 跳着走的真因】
-            //   奥森原话：「突然出现一大块，而不是从下面连贯的滑上来（好比手表的指针，
-            //             有些是跳着走的，有些走的比较连贯）」
-            //   实测：卡片自然高度【不一致】= 212 / 240 / 288
-            //     ⇒ 因为不同游戏的副标题行数不同 ⇒ Grid 每行都要【重新测量】
-            //     ⇒ 无法预知行位置 ⇒ 滚动只能"整块跳" ⇒ ★ 他看到的"跳着走"
-            //   ⇒ 修法：给 GridItem 一个【统一的确定高度】
-            //   ★★★★★ 2026-10-14 奥森截图指出「这怎么间隔这么大啊？」⇒ 我犯了【单位错误】：
-            //     dumpLayout 给的是【px】，而 .height() 收的是【vp】！
-            //     屏幕 1320px ÷ 360vp ⇒ 1vp ≈ 3.67px
-            //     卡片真实高度 212~288px ⇒ ÷3.67 ≈ 58~78vp
-            //     我写了 232（当成 px 用了）⇒ 232vp × 3.67 = 851px ⇒ ★ 行距变 3 倍
-            //   ⇒ 正确值：84vp（略高于最高的 78vp，留一点余量）
-            // ★★★★★ 2026-10-14 奥森：「你也要注意语言切换和模式（大字和紧凑）后的界面噢」
-            //   查出真问题：UiMode 的【elder 档把字号放大 30~42%】（md 16→21、xxs 12→17）
-            //     而我这里写死 84 ⇒ ★ 大字模式下卡片文字会被裁掉！
-            //   ⇒ 修法：高度【跟着模式算】
-            //      normal 84 ｜ elder 112（×1.33）｜ simple 76（×0.9）
-            .height(this.cardH())
-          }, (g: GameMeta) => g.id)   // ★ 2026-11-08 perf-hunter：去掉 `+ this.tick`（收藏不再重建 355 卡）
+          // ⚠️⚠️ 2026-11-08 首帧闸门（判据 1813/1814）：
+          //   实测 `LazyForEach` 在**首帧拿不到** `aboutToAppear` 预填的数据 ⇒ 首屏空白（无 Grid 节点）。
+          //   ⇒ 第一帧用 `ForEach(this.list())` 直出，挂载后再切 `LazyForEach`（只建视区 + cachedCount）。
+          //   代价：**首帧仍建 355 卡，收益打折**，但换来"绝不空白"。
+          //   ★★★ 下面两个分支的卡片块【除 `index` 一行外逐字相同，必须同步改】——改一处就改两处。
+          //      唯一有意差异：`gridReady` 分支的 `index: -1`（切换后不再播入场，防「闪一下再淡入」）。
+          if (this.gridReady) {
+            LazyForEach(this.source, (g: GameMeta, i: number) => {
+              GridItem() {
+                GameCard({
+                  meta: g,
+                  // ★ 2026-11-01（智慧屏）：首屏第一张卡拿默认焦点，让遥控器/键盘方向键有起点
+                  first: i === 0,
+                  // ★ item ①：只有正在点开的那张卡参与共享元素补间
+                  sharedId: this.flyingId === ('card-' + g.id) ? this.flyingId : '',
+                  // ★ 2026-10-13「动画拉满」item ③：**只给首屏可见的前几款**排错峰。
+                  //   全量传 i 的后果：Grid 虚拟化 ⇒ 滚到第 100 款时它"刚创建"，
+                  //   enterDelay(100) 会再让它延迟进场 = 一边滚一边动，又乱又掉帧。
+                  // ★★★ 2026-10-14 奥森反馈「主界面滑动时下面的游戏总是闪现出来」⇒ 修：
+                  //   原来是 `i < 8 ? i : 8` —— 第 9 张之后【全部是 index=8】⇒ GameCard 的
+                  //   aboutToAppear 里 `enterDelay(8)` = 320ms 延迟 ⇒ 配合 Grid 的 cachedCount(6)
+                  //   一边滚一边新建卡片 ⇒ ★ 每张新卡都 opacity 0 起步、320ms 后才淡入 = "闪现"！
+                  //   ⇒ 改成 -1：★ 首屏之外【不做入场动画，直接显示】
+                  // ★ 2026-11-08：**闸门切换之后一律不播入场**（`-1`）。
+                  //   否则 ForEach→LazyForEach 那一瞬，前 8 张会重播 0~320ms 错峰淡入 ⇒
+                  //   用户看到「先出现 → 闪一下 → 再淡入」三态，会以为卡住了（奥森判据：一次平滑的"已有"胜过"再演一遍"）。
+                  //   注意：这正是本分支与下面 ForEach 分支**唯一**的有意差异，别"顺手对齐"回去。
+                  index: -1,
+                  theme: this.theme(),
+                  // ★ 2026-11-08 perf-hunter：**这两个参数删了** —— 卡片改成自己 `@StorageProp('streaks')` 订阅。
+                  //   原因：原来靠父传 `@Prop`，而 ForEach **同 key 不重跑 itemGenerator** ⇒ 玩完一局回首页
+                  //   🔥「N 天」/「今日已玩」不刷新（连切语言都不行）。现在由 `ProgressStore.persistStreaks()`
+                  //   每次连胜变化时写 AppStorage，卡片自订阅 —— 与角标（`clearedGames`/`perGameBest`）同构。
+                  onOpen: (id: string) => {
+                    this.openGame(id);
+                  },
+                  // 右键菜单（只在桌面类启用；手机/平板零影响）
+                  // ★ 第 1203 轮：`Diag.forceMenu` 用于在模拟器上验菜单 UI
+                  //   （模拟器 deviceType 报 phone ⇒ `Tv.on()` false ⇒ 菜单永不弹）
+                  allowMenu: Tv.on() || Diag.forceMenu,
+                  onMenu: (id: string, x: number, y: number) => {
+                    this.menuId = id;
+                    this.menuX = x;
+                    this.menuY = y;
+                  },
+                  // 方向键导航（PC / 2in1 键盘 · 电视遥控器）
+                  gridCols: this.colCount(),
+                  onArrow: (id: string, delta: number) => {
+                    this.moveFocus(id, delta);
+                  },
+                  onLongPress: (id: string) => {
+                    // 长按 = 收藏 / 取消收藏，顺手给个提示
+                    ProgressStore.toggleFavorite(id);
+                    this.toast = ProgressStore.isFavorite(id)
+                      ? this.t('⭐ 已收藏', '⭐ Saved') : this.t('已取消收藏', 'Removed');
+                    this.tick = this.tick + 1;
+                    setTimeout(() => {
+                      this.toast = '';
+                    }, 1400);
+                  }
+                })
+              }
+              // ★★★★★ 2026-10-14 闪现【第 9 层 · 跳着走的真因】
+              //   奥森原话：「突然出现一大块，而不是从下面连贯的滑上来（好比手表的指针，
+              //             有些是跳着走的，有些走的比较连贯）」
+              //   实测：卡片自然高度【不一致】= 212 / 240 / 288
+              //     ⇒ 因为不同游戏的副标题行数不同 ⇒ Grid 每行都要【重新测量】
+              //     ⇒ 无法预知行位置 ⇒ 滚动只能"整块跳" ⇒ ★ 他看到的"跳着走"
+              //   ⇒ 修法：给 GridItem 一个【统一的确定高度】
+              //   ★★★★★ 2026-10-14 奥森截图指出「这怎么间隔这么大啊？」⇒ 我犯了【单位错误】：
+              //     dumpLayout 给的是【px】，而 .height() 收的是【vp】！
+              //     屏幕 1320px ÷ 360vp ⇒ 1vp ≈ 3.67px
+              //     卡片真实高度 212~288px ⇒ ÷3.67 ≈ 58~78vp
+              //     我写了 232（当成 px 用了）⇒ 232vp × 3.67 = 851px ⇒ ★ 行距变 3 倍
+              //   ⇒ 正确值：84vp（略高于最高的 78vp，留一点余量）
+              // ★★★★★ 2026-10-14 奥森：「你也要注意语言切换和模式（大字和紧凑）后的界面噢」
+              //   查出真问题：UiMode 的【elder 档把字号放大 30~42%】（md 16→21、xxs 12→17）
+              //     而我这里写死 84 ⇒ ★ 大字模式下卡片文字会被裁掉！
+              //   ⇒ 修法：高度【跟着模式算】
+              //      normal 84 ｜ elder 112（×1.33）｜ simple 76（×0.9）
+              .height(this.cardH())
+            }, (g: GameMeta) => g.id)
+          } else {
+            ForEach(this.list(), (g: GameMeta, i: number) => {
+              GridItem() {
+                GameCard({
+                  meta: g,
+                  // ★ 2026-11-01（智慧屏）：首屏第一张卡拿默认焦点，让遥控器/键盘方向键有起点
+                  first: i === 0,
+                  // ★ item ①：只有正在点开的那张卡参与共享元素补间
+                  sharedId: this.flyingId === ('card-' + g.id) ? this.flyingId : '',
+                  // ★ 2026-10-13「动画拉满」item ③：**只给首屏可见的前几款**排错峰。
+                  //   全量传 i 的后果：Grid 虚拟化 ⇒ 滚到第 100 款时它"刚创建"，
+                  //   enterDelay(100) 会再让它延迟进场 = 一边滚一边动，又乱又掉帧。
+                  // ★★★ 2026-10-14 奥森反馈「主界面滑动时下面的游戏总是闪现出来」⇒ 修：
+                  //   原来是 `i < 8 ? i : 8` —— 第 9 张之后【全部是 index=8】⇒ GameCard 的
+                  //   aboutToAppear 里 `enterDelay(8)` = 320ms 延迟 ⇒ 配合 Grid 的 cachedCount(6)
+                  //   一边滚一边新建卡片 ⇒ ★ 每张新卡都 opacity 0 起步、320ms 后才淡入 = "闪现"！
+                  //   ⇒ 改成 -1：★ 首屏之外【不做入场动画，直接显示】
+                  index: i < 8 ? i : -1,
+                  theme: this.theme(),
+                  // ★ 2026-11-08 perf-hunter：**这两个参数删了** —— 卡片改成自己 `@StorageProp('streaks')` 订阅。
+                  //   原因：原来靠父传 `@Prop`，而 ForEach **同 key 不重跑 itemGenerator** ⇒ 玩完一局回首页
+                  //   🔥「N 天」/「今日已玩」不刷新（连切语言都不行）。现在由 `ProgressStore.persistStreaks()`
+                  //   每次连胜变化时写 AppStorage，卡片自订阅 —— 与角标（`clearedGames`/`perGameBest`）同构。
+                  onOpen: (id: string) => {
+                    this.openGame(id);
+                  },
+                  // 右键菜单（只在桌面类启用；手机/平板零影响）
+                  // ★ 第 1203 轮：`Diag.forceMenu` 用于在模拟器上验菜单 UI
+                  //   （模拟器 deviceType 报 phone ⇒ `Tv.on()` false ⇒ 菜单永不弹）
+                  allowMenu: Tv.on() || Diag.forceMenu,
+                  onMenu: (id: string, x: number, y: number) => {
+                    this.menuId = id;
+                    this.menuX = x;
+                    this.menuY = y;
+                  },
+                  // 方向键导航（PC / 2in1 键盘 · 电视遥控器）
+                  gridCols: this.colCount(),
+                  onArrow: (id: string, delta: number) => {
+                    this.moveFocus(id, delta);
+                  },
+                  onLongPress: (id: string) => {
+                    // 长按 = 收藏 / 取消收藏，顺手给个提示
+                    ProgressStore.toggleFavorite(id);
+                    this.toast = ProgressStore.isFavorite(id)
+                      ? this.t('⭐ 已收藏', '⭐ Saved') : this.t('已取消收藏', 'Removed');
+                    this.tick = this.tick + 1;
+                    setTimeout(() => {
+                      this.toast = '';
+                    }, 1400);
+                  }
+                })
+              }
+              // ★★★★★ 2026-10-14 闪现【第 9 层 · 跳着走的真因】
+              //   奥森原话：「突然出现一大块，而不是从下面连贯的滑上来（好比手表的指针，
+              //             有些是跳着走的，有些走的比较连贯）」
+              //   实测：卡片自然高度【不一致】= 212 / 240 / 288
+              //     ⇒ 因为不同游戏的副标题行数不同 ⇒ Grid 每行都要【重新测量】
+              //     ⇒ 无法预知行位置 ⇒ 滚动只能"整块跳" ⇒ ★ 他看到的"跳着走"
+              //   ⇒ 修法：给 GridItem 一个【统一的确定高度】
+              //   ★★★★★ 2026-10-14 奥森截图指出「这怎么间隔这么大啊？」⇒ 我犯了【单位错误】：
+              //     dumpLayout 给的是【px】，而 .height() 收的是【vp】！
+              //     屏幕 1320px ÷ 360vp ⇒ 1vp ≈ 3.67px
+              //     卡片真实高度 212~288px ⇒ ÷3.67 ≈ 58~78vp
+              //     我写了 232（当成 px 用了）⇒ 232vp × 3.67 = 851px ⇒ ★ 行距变 3 倍
+              //   ⇒ 正确值：84vp（略高于最高的 78vp，留一点余量）
+              // ★★★★★ 2026-10-14 奥森：「你也要注意语言切换和模式（大字和紧凑）后的界面噢」
+              //   查出真问题：UiMode 的【elder 档把字号放大 30~42%】（md 16→21、xxs 12→17）
+              //     而我这里写死 84 ⇒ ★ 大字模式下卡片文字会被裁掉！
+              //   ⇒ 修法：高度【跟着模式算】
+              //      normal 84 ｜ elder 112（×1.33）｜ simple 76（×0.9）
+              .height(this.cardH())
+            }, (g: GameMeta) => g.id)
+          }
         }
         // ★★★ 2026-10-19 真机大字模式实拍后改：大字模式改【单列】
         //   实拍：副标题「一板一球，清空全场」在大字模式下被截成「一板一球，清…」
