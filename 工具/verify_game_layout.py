@@ -100,8 +100,28 @@ def close_search():
         sh('uitest uiInput click 2276 264')
         time.sleep(0.7)
 
+def is_home():
+    """首页判据：有「355 款」或「🔍/💬」顶栏 + 有分类标签「全部」"""
+    d = dump('/data/local/tmp/home.json')
+    if not d:
+        return False
+    texts = [t for t, _ in collect(d, lambda t: True)]
+    joined = ''.join(texts)
+    return ('One More' in joined) and ('全部' in joined or '355 款' in joined)
+
+def ensure_home():
+    """⚠️ v9：工具必须从首页开始。在游戏内时先 Back（最多 3 次，且每次都先确认不是首页）"""
+    for _ in range(3):
+        if is_home():
+            return True
+        sh('uitest uiInput keyEvent Back')
+        time.sleep(1.2)
+    return is_home()
+
 def verify_one(en_name):
     """返回 (状态, 关键数据)"""
+    if not ensure_home():
+        return ('NOT_HOME', {})
     search_game(en_name)
     d = dump()
     if not d:
@@ -131,7 +151,13 @@ def verify_one(en_name):
     #   v7 日志实测：`-p /data/local/tmp/game_Snake 3D` 被切成「game_Snake」+「3D」
     #   ⇒ dumpLayout 写到「game_Snake」、cat 读「game_Snake 3D.json」⇒ 读不到 ⇒ None
     safe = re.sub(r'[^A-Za-z0-9_]', '_', en_name)
+    # ⚠️ v9：两次采样。真机实测「2048 一次量 1600、另一次 1557」——
+    #   游戏内容会随状态变化（msg 行/演示条/棋盘缩放），单次采样会误报。
+    #   ⇒ 取「两次里的最小值」当 best-case：最小值都贴底才算真出屏。
+    time.sleep(1.0)
     d2 = dump(f'/data/local/tmp/game_{safe}.json')
+    time.sleep(1.4)
+    d2b = dump(f'/data/local/tmp/game_{safe}_b.json')
     if not d2:
         sh('uitest uiInput keyEvent Back'); close_search()
         return ('GAME_DUMP_FAIL', {})
@@ -142,13 +168,18 @@ def verify_one(en_name):
         sh('uitest uiInput keyEvent Back'); close_search()
         return ('NOT_IN_GAME', {'texts': texts2[:5]})
     # ⚠️ v4：max_bottom 只看「有文本」的节点（排除根容器/装饰背景）
-    nodes = collect(d2, lambda t: len(t.strip()) > 0)
-    max_bottom = max((y2 for _, (_, _, _, y2) in nodes), default=0)
-    # 同时记「最底下那个元素是什么」（供人工核对）
-    lowest = ''
-    for t, (_, _, _, y2) in nodes:
-        if y2 == max_bottom:
-            lowest = t[:30]; break
+    def bottom_of(tree):
+        ns = collect(tree, lambda t: len(t.strip()) > 0)
+        mb = max((y2 for _, (_, _, _, y2) in ns), default=0)
+        lo = ''
+        for t, (_, _, _, y2) in ns:
+            if y2 == mb:
+                lo = t[:30]; break
+        return mb, lo
+    mb_a, lo_a = bottom_of(d2)
+    mb_b, lo_b = bottom_of(d2b) if d2b else (mb_a, lo_a)
+    max_bottom, lowest = (mb_a, lo_a) if mb_a <= mb_b else (mb_b, lo_b)   # 取 best-case
+
     if max_bottom <= CONTENT_BOTTOM:
         status = 'OK'
     elif max_bottom <= GESTURE_LIMIT:
