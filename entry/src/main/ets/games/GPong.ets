@@ -101,6 +101,9 @@ export struct GPong {
    *  （`Length` 在 position 里不认 `%`，只认数值/资源）⇒ 必须用 onAreaChange 量到的
    *  球场宽高把百分比**换算成 vp 数值**再摆。`fieldH` 早就有（拖拽用），这里补 `fieldW`。 */
   @State private fieldW: number = 0;
+  /** ★ 方案 C：球场实际尺寸（vp）—— 由外层可用区反推 `min(availW, availH/0.7)` */
+  @State private courtW: number = 0;
+  @State private courtH: number = 0;
   /**
    * ★★★ 2026-11-08（判据 1819，产品缺陷）**改用 Canvas 画球场**：
    *   真机复验：`position({ x: 数值 })` 也**没落到布局上** —— 两根球拍始终贴在球场中线
@@ -204,8 +207,9 @@ export struct GPong {
 
   /** 把整个球场画一遍（中线 / 左拍 / 右拍 / 球） */
   private drawField(): void {
-    if (!this.canvasReady) {
-      return;                  // onReady 之前不碰 ctx
+    // ★ `onReady` 在 Canvas 初始 0×0 时可能不触发 ⇒ 只要 ctx 已报出正尺寸就允许画
+    if (!this.canvasReady && !(this.ctx.width > 0 && this.ctx.height > 0)) {
+      return;                  // 还没 attach / 还没有尺寸
     }
     const w: number = this.ctx.width > 0 ? this.ctx.width : this.fieldW;
     const h: number = this.ctx.height > 0 ? this.ctx.height : this.fieldH;
@@ -696,35 +700,58 @@ export struct GPong {
       //   真机复验证明 `position`（连数值 vp 都不行）在这个 Stack 里没落到布局上
       //   —— 两拍永远贴中线、球无节点；而逻辑与 @State 重绘正常（比分实时 0:0→0:2→0:4）。
       //   球场只有「中线 / 两个矩形 / 一个圆」⇒ Canvas 最稳，且完全不依赖布局引擎。
-      Canvas(this.ctx)
-        .onReady(() => {
-          this.canvasReady = true;
-          this.drawField();      // 首帧
-        })
-        .width('100%')
+      // ★★★ 2026-11-08 **方案 C（lead）**：球场宽 = min(可用宽, 可用高 / 0.7)
+      //   A 方案（`height('100%') + aspectRatio(0.7)`）算出来只有 170×243 —— 仅占屏宽 21%，太小；
+      //   这里按可用区反推：`courtW = min(availW, availH / 0.7)`、`courtH = courtW * 0.7`
+      //   （真机可用区 813×243 ⇒ courtW = min(813, 347) = **347**，courtH = **243**）
+      //   ⇒ 竖场比例保住（物理量纲不变），面积比 A 大一倍；外层 Column 居中，不用 aspectRatio。
+      Column() {
+        Canvas(this.ctx)
+          .onReady(() => {
+            // ★ 首帧 `onAreaChange` 还没来 ⇒ 用 Canvas 自己的尺寸兜底
+            if (this.fieldW <= 0 && this.ctx.width > 0) {
+              this.fieldW = this.ctx.width;
+            }
+            if (this.fieldH <= 0 && this.ctx.height > 0) {
+              this.fieldH = this.ctx.height;
+            }
+            this.canvasReady = true;
+            this.drawField();      // 首帧
+          })
+          .width(this.courtW)
+          .height(this.courtH)
+          .backgroundColor(this.theme.isDark ? '#0B0B0B' : '#0F172A')
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          .clip(true)
+          // ★ RTL：Canvas 用绝对坐标绘制，钉 Ltr 保证球台方向不随语言翻转
+          .direction(Direction.Ltr)
+      }
+      .width('100%')
       .layoutWeight(1)
-      .aspectRatio(0.7)
-      .backgroundColor(this.theme.isDark ? '#0B0B0B' : '#0F172A')
-      .borderRadius(Radius.md)
-      .shadow(Shadow.card)
-      .clip(true)
-      // ★ 2026-11-08 RTL（判据：「按位置摆的不能镜像，按顺序排的必须镜像」）：
-      //   球场由 Canvas 用**绝对坐标**绘制（不再经过布局引擎的 position），而 `direction`
-      //   只会镜像流式布局 ⇒ 页面切 RTL 后 HUD 会镜像到右边、球台仍该留在左边。
-      //   ⇒ 只把**球场**钉成 Ltr（文字 chrome 在父级 Column 里，仍然正常镜像）。
-      .direction(Direction.Ltr)
+      .justifyContent(FlexAlign.Center)     // 竖向居中
+      .alignItems(HorizontalAlign.Center)   // 横向居中
       .onAreaChange((oldArea: Area, newArea: Area) => {
-        const h: number = newArea.height as number;
-        const w: number = newArea.width as number;
-        if (h > 0) {
-          this.fieldH = h;
+        const aw: number = newArea.width as number;
+        const ah: number = newArea.height as number;
+        if (!(aw > 0) || !(ah > 0)) {
+          return;
         }
-        if (w > 0) {
-          this.fieldW = w;
+        // ★ 方案 C 的核心：宽度吃满可用宽，但**高度不超过 可用高**（竖场 0.7:1）
+        const w1: number = Math.min(aw, ah / 0.7);
+        const h1: number = w1 * 0.7;
+        if (Math.abs(w1 - this.courtW) > 0.5 || Math.abs(h1 - this.courtH) > 0.5) {
+          this.courtW = w1;
+          this.courtH = h1;
+          hilog.info(0x0000, 'GPong',
+            'area avail=' + String(aw) + 'x' + String(ah) + ' ⇒ court=' + String(w1) + 'x' + String(h1));
         }
-        // ★ 尺寸变了（旋转/分屏）立刻按新尺寸重画
+        // 物理/拖拽都以**球场**尺寸为准（不是可用区）
+        this.fieldW = w1;
+        this.fieldH = h1;
+        this.canvasReady = true;      // 尺寸已确定 ⇒ 允许绘制（不再依赖 onReady 是否触发）
         this.drawField();
-        // ★ 2026-11-08 自愈：球场已上屏但循环没建起来（timer<0 且没结算）⇒ 补一次启动
+        // ★ 自愈：球场已上屏但循环没建起来 ⇒ 补一次启动
         if (this.timer < 0 && !this.over && this.running) {
           hilog.info(0x0000, 'GPong', 'onAreaChange 发现循环丢失 ⇒ 补启动');
           this.startLoop();
