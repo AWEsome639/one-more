@@ -171,14 +171,6 @@ export struct GamesTab {
   private azScroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
-    // ★ 2026-11-08 perf-hunter：先灌一次数据源，避免首帧 `LazyForEach` 拿到空表
-    //   （`list()` 本身带记忆化，这里调用是幂等的；`reset()` 内部还会再比一次 id）。
-    this.source.reset(this.list())
-    // ★ 2026-11-08 **首帧空白修复**：挂载后无条件再通知一次
-    //   （`aboutToAppear` 里 `reset` 时 LazyForEach 还没注册 listener）
-    setTimeout(() => {
-      this.source.reload();
-    }, 0);;
     // ★ 大字模式默认收起顶部（否则网格被挤出屏幕 —— 实测）
     if (this.uiMode === 'elder') {
       this.topCollapsed = true;
@@ -470,8 +462,10 @@ export struct GamesTab {
     }, 0);
   }
   /**
-   * ★ LazyForEach 的数据源（355 款不再全量创建，见 `core/GameSource.ets` 顶部说明）。
-   *   与 `listCache` 同步：`list()` 缓存未命中时 `reset()` 一次。
+   * **备用**：`LazyForEach` 的数据源（`core/GameSource.ets`）。
+   * ⚠️ 2026-11-08 实测首帧空白 ⇒ **当前未参与渲染**（网格仍走 `ForEach`）。
+   *   保留这里 + `list()` 里的 `reset()`，是为了将来重试时改一行就能接上；
+   *   现在它只是把同样的数组存一份（无监听者 ⇒ `reset` 里 notify 是空循环）。
    */
   private source: GameSource = new GameSource();
   private listCache: GameMeta[] = [];
@@ -1150,11 +1144,11 @@ build() {
         this.azList()
       } else {
         Grid(this.gridScroller) {
-          // ★ 2026-11-08 perf-hunter：`ForEach` → `LazyForEach`（只建可视区 + cachedCount 范围）。
-          //   官方 FAQ faqs-arkui-1291：「初始化渲染时 ForEach 会加载数据源的所有数据」⇒
-          //   原来 355 卡 × 19 节点 ≈ 6,745 个节点首帧全建。
-          //   ⚠️ keyGenerator 必须给（缺省会退化成 index+JSON.stringify，比 ForEach 还慢）。
-          LazyForEach(this.source, (g: GameMeta, i: number) => {
+          // ⚠️ 2026-11-08 perf-hunter：**这里试过 `LazyForEach`，已回滚**（真机首帧会空白：
+          //   `LazyForEach` 挂载时拿不到 `aboutToAppear` 预填的数据，补一次挂载后 notify 也不稳定）。
+          //   要再试必须先解决首帧，评估见 `_巡检记录/LazyForEach可行性-20261108.md`。
+          //   ⇒ 现在仍是 `ForEach`：355 卡 × 19 节点 ≈ **6,745 个节点首帧全建**（这是已知代价）。
+          ForEach(this.list(), (g: GameMeta, i: number) => {
             GridItem() {
               GameCard({
                 meta: g,

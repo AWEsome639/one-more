@@ -186,7 +186,7 @@ export struct GStroopTest {
       return Hint.none('none');
     }
     return Hint.make([this.ink], TG2('墨色是「{0}」', WORDS[this.ink]),
-      TG2('The ink color is {0}', WORDS[this.ink]), t0);
+      TG2('The ink colour is {0}', WORDS[this.ink]), t0);
   }
 
   private askAuto(): void {

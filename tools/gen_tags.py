@@ -29,7 +29,8 @@ EN = {
     'ps_match': 'Match', 'ps_merge': 'Merge', 'ps_push': 'Push', 'ps_maze': 'Maze',
     'ps_fill': 'Fill-in', 'ps_board': 'Board', 'ps_word': 'Words', 'ps_memory': 'Memory',
     'ps_reaction': 'Reaction', 'ps_quiz': 'Quiz', 'ps_search': 'Spotting',
-    'ps_spatial': 'Spatial', 'ps_attention': 'Attention', 'ps_run': 'Run', 'ps_other': 'Other',
+    'ps_spatial': 'Spatial', 'ps_attention': 'Attention', 'ps_run': 'Run',
+    'ps_card': 'Cards', 'ps_other': 'Other',
 }
 
 GRP_EN = {'时长': 'Length', '难度': 'Difficulty', '操作': 'Controls',
@@ -86,8 +87,15 @@ TAGS = [
     ('玩法', 'ps_spatial',  '📐', '折转空间'),
     ('玩法', 'ps_attention','🎯', '注意力任务'),
     ('玩法', 'ps_run',      '🏃', '跑分局'),
+    ('玩法', 'ps_card',     '🃏', '纸牌接龙'),
     ('玩法', 'ps_other',    '❓', '其它玩法'),
 ]
+
+# ★★★ 2026-11-08：**款数 <10、只服务于「像 XX」打分的细类** —— 筛选面板不显示（hidden: true）。
+#   规则：hidden = 款数 <10 **且** 不是兜底桶（ps_other）、**不是**高辨识度意图（ps_board「下棋」）。
+#   ⚠️ ps_other(7) / ps_board(8) 也在 10 以下，但**故意不隐藏**：
+#      ps_other 是兜底桶（藏了那 7 款就再也筛不出来）；ps_board 是用户会主动找的一类。
+HIDDEN_TAGS = {'ps_merge', 'ps_match', 'ps_run', 'ps_card'}   # 4 款，属「细类」
 
 # ── 打标规则 ──
 
@@ -106,15 +114,22 @@ CAT_ATTR = {
 #   实测：325/355 = 91.5% 自动命中，剩 30 款落 ps_other（纸牌接龙/算法可视化/序列记忆…）。
 PLAY_STYLE_RULES = [
     ('ps_board',     r'gomoku|checkers|connect_four|reversi|mancala|\bnim\b|tic_tac|go9|chess'),
-    ('ps_match',     r'match3|bejewel|bubble|mahjong|color_flood|water_sort|hue_sort|gravity_sort|chain_reaction|jewel|collaps'),
-    ('ps_merge',     r'2048|fibonacci|merge|number_bond|exponent_tower|sum_pyramid|collatz|sum_snake|target_number|prime_factor|magic_square'),
-    ('ps_push',      r'sokoban|klotski|slide1|block_escape|tangram|polyomino|hanoi|peg_solitaire|block_stacking|block_count|box_completion|tower_of_london'),
+    # 注：water_sort / hue_sort / gravity_sort 是**排序类**不是消除，2026-11-08 挪到 ps_push
+    # 纸牌接龙：单机清盘类。麻将连连看**排在 match 之前**（否则会被 mahjong 抢走）
+    ('ps_card',      r'freecell|solitaire|spider|mahjong'),
+    ('ps_match',     r'match3|bejewel|bubble|color_flood|chain_reaction|jewel|collaps'),
+    # ⚠️ 2026-11-08 收窄（code-hunter 抽检）：原来 11 款里只有 3 款是**真·合并**，
+    #   其余 8 款（考拉兹/指数塔/幻方/数字键/数字拆分/质因数树/金字塔/目标数字）是**数字计算**
+    #   ⇒ 全部让给 ps_quiz（见下方 quiz 正则 + PIN 表），否则「像 2048」会推出考拉兹。
+    ('ps_merge',     r'2048|fibonacci_merge|merge|sum_snake'),
+    ('ps_push',      r'sokoban|klotski|slide1|block_escape|tangram|polyomino|hanoi|peg_solitaire|block_stacking|block_count|box_completion|tower_of_london|water_sort|hue_sort|gravity_sort'),
     ('ps_maze',      r'maze|path_finder|trace_path|pipes|laser|circuit_connect|wire|vector_grid|path_intersect|path_recall|lock_pattern|grid_displacement'),
     ('ps_fill',      r'sudoku|kakuro|kenken|nonogram|hitori|heyawake|slitherlink|nurikabe|yajilin|tapa|akari|magnet|lighthouse|kurodoko|norinori|gokigen|kakurasu|dominosa|fillomino|futoshiki|crown|shikaku|bridges|masyu|tents|tenner|skyscraper|binary_puzzle|lights_out|minesweeper|dominosa'),
-    ('ps_word',      r'word|anagram|cryptogram|letter|vowel|rhyme|homophone|spelling|typing|scramble|palindrome|pangram|portmanteau|spoonerism|consonant|crossword|affix|etymolog|grammar|silent_letter|semantic|vocabulary|analog|definition|context_clues|oxymoron|cognate|typoglyc|syllable|category_fluency|story_builder|chalk'),
+    ('ps_word',      r'word|anagram|cryptogram|letter|vowel|rhyme|homophone|spelling|typing|scramble|palindrome|pangram|portmanteau|spoonerism|consonant|crossword|affix|etymolog|grammar|silent_letter|semantic|vocabulary|analog|definition|context_clues|oxymoron|cognate|typoglyc|syllable|category_fluency|story_builder|chalk|phonetic'),
     ('ps_memory',    r'memory|n_back|corsi|span|recall|chimp|simon|delayed_match|dnms|card_counting|spatial_cabinet|word_pair|paired_associate'),
     ('ps_reaction',  r'reflex|blink|flash|reaction|subitiz|go_no_go|stop_signal|vigilance|orbit|ghost_tap|whack|frequency|rhythm'),
-    ('ps_quiz',      r'estimat|guess|mental_calendar|mental_abacus|percentage|fraction|angle|numeric|currency|unit_converter|radical|roman|arithmetic|algebra|inequality|base_conversion|base_shift|binary_code|modular|modulo|divisibility|matrix|vector|dot_product|pythagor|prime|factor|gcd|common_denominator|venn|set_theory|balance_scale|digit_swap|missing_operator|calculation_sprint|countdown_math|quick_math|target_10|math_path|binomial'),
+    ('ps_quiz',      r'estimat|guess|mental_calendar|mental_abacus|percentage|fraction|angle|numeric|currency|unit_converter|radical|roman|arithmetic|algebra|inequality|base_conversion|base_shift|binary_code|modular|modulo|divisibility|matrix|vector|dot_product|pythagor|prime|factor|gcd|common_denominator|venn|set_theory|balance_scale|digit_swap|missing_operator|calculation_sprint|countdown_math|quick_math|target_10|math_path|binomial'
+                     r'|collatz|exponent_tower|magic_square|number_bond|sum_pyramid|target_number'),
     ('ps_search',    r'visual_search|schulte|odd_one_out|silhouette|shape_shifter|shadow_pivot|symmetry|topology|color_match|area_perimeter|geometric_vision|navon|negative_space|spotlight|multiple_object|visual_crowding|ab_reversal|cross_section|room_inspector|find_word'),
     ('ps_spatial',   r'fold|cube_net|paper_folding|rotation|perspective|gear_|mirror|pixel_mimic|graph_coordinate|triplets_logic|temporal_order'),
     ('ps_attention', r'stroop|flanker|d2_attention|sdmt|trail_making|task_switch|switch_task|posner|divided_attention|dual_coding|dual_task|change_blindness|conjunction_search|continuous_recognition|dynamic_salience|visual_statistical|source_monitoring|sopt|wisconsin|rule_switcher|sternberg|object_shuffle|object_displacement|shell_game|grocery_list|face_|associative_pairs'),
@@ -122,8 +137,56 @@ PLAY_STYLE_RULES = [
 ]
 
 
-def play_style_for(hay):
-    """玩法归类：顺序即优先级，首个命中即定；都不中就 ps_other。"""
+# ★★★ 2026-11-08（game-labancer → code-hunter 抽检 88%）**人工矫正表**：关键词打不准的一条条钉死。
+#   优先级最高（先查 PIN，再走正则）。加一行的成本 = 改一个分类，别再往正则里堆长词。
+PLAY_STYLE_PIN = {
+    # ★ 2026-11-08 二轮抽检（code-hunter 看源码判的，不看名字）：
+    #   判据 =「玩家实际在做什么操作」，不是「游戏名像什么」。
+    'dynamic_salience': 'ps_reaction',    # 20 秒内点掉会自己换位置的亮方块 = 追移动目标
+    'polyomino_tiling': 'ps_fill',        # 铺满网格（polyomino tiling）⇒ 与多米诺拼盘同源
+    # ⚠️ 'peg_solitaire'（孔明棋）**不是纸牌**，但它含 solitaire 会被 ps_card 正则抢走 ⇒ 钉回 ps_push
+    'peg_solitaire': 'ps_push',
+    # ① ps_other 里本可归类的 23 款（真·other 只留 7：4 款可视化 + 3 款纸牌）
+    'game24': 'ps_quiz',
+    'mastermind': 'ps_quiz',
+    'sequence_sleuth': 'ps_quiz',
+    'symbol_logic': 'ps_quiz',
+    'binary_scale_balance': 'ps_quiz',
+    'sequence_stack': 'ps_quiz',
+    'logical_syllogisms': 'ps_quiz',
+    'peripheral_focus': 'ps_attention',
+    'focus_tunnel': 'ps_attention',
+    'multi_track_counter': 'ps_attention',
+    'double_trouble': 'ps_attention',
+    'einstein_riddle': 'ps_fill',
+    'pattern_sequence_draw': 'ps_fill',
+    'slide_puzzle': 'ps_spatial',
+    'interlock_puzzle': 'ps_spatial',
+    'spatial_conflict': 'ps_attention',   # 2026-11-08 二轮：箭头方向/文字/位置互相捣乱 = Stroop 式干扰
+    'etymon_oddball': 'ps_word',
+    'compound_connect': 'ps_maze',
+    'counting_sheep': 'ps_attention',     # 2026-11-08 二轮：狼披羊皮混进羊圈，数羊/数格 = 计数+辨别
+    'symbol_digit_assoc': 'ps_memory',
+    'fact_binder': 'ps_memory',
+    'mental_mapping': 'ps_memory',
+    'triple_sequence': 'ps_memory',
+    # ⑤ MEMORY 类别里**其实是记忆**的 9 款（原来被 attention 正则吃掉）
+    'associative_pairs': 'ps_memory',
+    'continuous_recognition': 'ps_memory',
+    'face_name_association': 'ps_memory',
+    'face_trait_association': 'ps_memory',
+    'grocery_list': 'ps_memory',
+    'object_displacement': 'ps_memory',
+    'object_shuffle': 'ps_memory',
+    'shell_game': 'ps_memory',
+    'sopt': 'ps_memory',
+}
+
+def play_style_for(gid, hay):
+    """玩法归类：① 先查人工矫正表 ② 再按 PLAY_STYLE_RULES 顺序首命中 ③ 兜底 ps_other。"""
+    pin = PLAY_STYLE_PIN.get(gid)
+    if pin is not None:
+        return pin
     for pid, pat in PLAY_STYLE_RULES:
         if re.search(pat, hay):
             return pid
@@ -273,7 +336,7 @@ def tags_for(gid, name, tag, cat):
         t.add('untimed')
 
     # ── ⑧ 玩法（playStyle）：每款恰好 1 个（划分，兜底 ps_other）──
-    t.add(play_style_for(hay))
+    t.add(play_style_for(gid, hay))
 
     return sorted(t)
 
@@ -309,22 +372,25 @@ export interface GameTag {
   label: string;
   enLabel: string;
   enGroup: string;
+  /** ★ 2026-11-08：款数 <10 的细类只用于「像 XX」打分，筛选面板不显示（缺省不写 = 显示） */
+  hidden?: boolean;
 }
 
 /** 全部特征（按组排列） */
 export const TAGS: GameTag[] = [
 """)
     for grp, tid, icon, label in TAGS:
+        hid = ', hidden: true' if tid in HIDDEN_TAGS else ''
         out.append(f"  {{ group: '{grp}', id: '{tid}', icon: '{icon}', label: '{label}', "
-                   f"enLabel: '{EN.get(tid, label)}', enGroup: '{GRP_EN.get(grp, grp)}' }},\n")
+                   f"enLabel: '{EN.get(tid, label)}', enGroup: '{GRP_EN.get(grp, grp)}'{hid} }},\n")
     out.append("""];
 
-/** 分组清单（按出现顺序） */
+/** 分组清单（按出现顺序）—— 只收「至少有一个可见 tag」的组 */
 export function tagsByGroup(): string[] {
   const out: string[] = [];
   for (let i = 0; i < TAGS.length; i++) {
     const g: string = TAGS[i].group;
-    if (out.indexOf(g) < 0) {
+    if (out.indexOf(g) < 0 && TAGS[i].hidden !== true) {
       out.push(g);
     }
   }
@@ -335,7 +401,7 @@ export function tagsByGroup(): string[] {
 export function tagsIn(group: string): GameTag[] {
   const out: GameTag[] = [];
   for (let i = 0; i < TAGS.length; i++) {
-    if (TAGS[i].group === group) {
+    if (TAGS[i].group === group && TAGS[i].hidden !== true) {
       out.push(TAGS[i]);
     }
   }

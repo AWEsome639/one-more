@@ -13,6 +13,8 @@ export interface GameTag {
   label: string;
   enLabel: string;
   enGroup: string;
+  /** ★ 2026-11-08：款数 <10 的细类只用于「像 XX」打分，筛选面板不显示（缺省不写 = 显示） */
+  hidden?: boolean;
 }
 
 /** 全部特征（按组排列） */
@@ -42,8 +44,8 @@ export const TAGS: GameTag[] = [
   { group: '场景', id: 'zen', icon: '🌸', label: '解压放松', enLabel: 'Wind down', enGroup: 'Vibe' },
   { group: '场景', id: 'brainy', icon: '🎓', label: '烧脑挑战', enLabel: 'Challenge', enGroup: 'Vibe' },
   { group: '场景', id: 'cozy', icon: '🛋️', label: '躺着玩', enLabel: 'Cosy', enGroup: 'Vibe' },
-  { group: '玩法', id: 'ps_match', icon: '💥', label: '消除配对', enLabel: 'Match', enGroup: 'Playstyle' },
-  { group: '玩法', id: 'ps_merge', icon: '🔢', label: '合并滚雪球', enLabel: 'Merge', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_match', icon: '💥', label: '消除配对', enLabel: 'Match', enGroup: 'Playstyle', hidden: true },
+  { group: '玩法', id: 'ps_merge', icon: '🔢', label: '合并滚雪球', enLabel: 'Merge', enGroup: 'Playstyle', hidden: true },
   { group: '玩法', id: 'ps_push', icon: '📦', label: '挪块推箱', enLabel: 'Push', enGroup: 'Playstyle' },
   { group: '玩法', id: 'ps_maze', icon: '🌀', label: '走格寻路', enLabel: 'Maze', enGroup: 'Playstyle' },
   { group: '玩法', id: 'ps_fill', icon: '🧩', label: '填格谜题', enLabel: 'Fill-in', enGroup: 'Playstyle' },
@@ -55,16 +57,17 @@ export const TAGS: GameTag[] = [
   { group: '玩法', id: 'ps_search', icon: '🔍', label: '眼力搜寻', enLabel: 'Spotting', enGroup: 'Playstyle' },
   { group: '玩法', id: 'ps_spatial', icon: '📐', label: '折转空间', enLabel: 'Spatial', enGroup: 'Playstyle' },
   { group: '玩法', id: 'ps_attention', icon: '🎯', label: '注意力任务', enLabel: 'Attention', enGroup: 'Playstyle' },
-  { group: '玩法', id: 'ps_run', icon: '🏃', label: '跑分局', enLabel: 'Run', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_run', icon: '🏃', label: '跑分局', enLabel: 'Run', enGroup: 'Playstyle', hidden: true },
+  { group: '玩法', id: 'ps_card', icon: '🃏', label: '纸牌接龙', enLabel: 'Cards', enGroup: 'Playstyle', hidden: true },
   { group: '玩法', id: 'ps_other', icon: '❓', label: '其它玩法', enLabel: 'Other', enGroup: 'Playstyle' },
 ];
 
-/** 分组清单（按出现顺序） */
+/** 分组清单（按出现顺序）—— 只收「至少有一个可见 tag」的组 */
 export function tagsByGroup(): string[] {
   const out: string[] = [];
   for (let i = 0; i < TAGS.length; i++) {
     const g: string = TAGS[i].group;
-    if (out.indexOf(g) < 0) {
+    if (out.indexOf(g) < 0 && TAGS[i].hidden !== true) {
       out.push(g);
     }
   }
@@ -75,7 +78,7 @@ export function tagsByGroup(): string[] {
 export function tagsIn(group: string): GameTag[] {
   const out: GameTag[] = [];
   for (let i = 0; i < TAGS.length; i++) {
-    if (TAGS[i].group === group) {
+    if (TAGS[i].group === group && TAGS[i].hidden !== true) {
       out.push(TAGS[i]);
     }
   }
