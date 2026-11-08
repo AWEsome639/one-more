@@ -550,7 +550,11 @@ export struct GKakuroMini {
       //   ★ 模板取自同族的 `GKakuro`（那边用 -310，因为它按钮行**紧贴棋盘正下方**；
       //     本款按钮在上方 ⇒ 先用 -260，真机量了不够再压）。
       //   ★ 手机零回归：`Bp.height >= 600` 走 9999（等于不约束）。
-      .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 260 : 9999 })
+      // ★ 2026-11-08 **第二次校准**（verifier-dev 真机量）：`-260` 时格子底 1536px，
+      //   而安全区是 1516px ⇒ **还差 ~20px**（仍压在手势区边缘）。
+      //   对照 `GShikaku`（同批同一修法）：它格底 1385px、收进来 215px ⇒ **已安全**。
+      //   ⇒ 再收 20px。
+            .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 280 : 9999 })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
