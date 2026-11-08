@@ -873,13 +873,26 @@ export struct GSudoku {
     //   ★ 实测收益（屏高 533）：棋盘 234 → 193vp，让出 41vp ≈ 120px > 84px 缺口
     //     ⇒ 键盘行回到内容区，状态行底部 24vp 留白也真正露出（不再被顶到屏外）。
     const h: number = Bp.height < 600
-      ? Math.max(160, Bp.height - 340)
+      ? Math.max(160, Bp.height - 385)      // ★ 第二刀：340 → 385（棋盘 580 → 445px，再让 135px）
       : Math.max(160, Bp.height * 0.44);
     return Math.min(w, h);
   }
 
   build() {
-    Column({ space: Space.md }) {
+    // ★★★ 2026-11-09 **第二刀**（verifier-dev 真机 dump，判据 1819 第五类「先问数字怎么量的」）：
+    //   实测纵向预算（屏 2560×1600，内容根 Stack [0,117][2560,1516] 高 1399px）：
+    //     ┌ 顶偏移 48px
+    //     ├ 按钮行 [60,429][2500,561]  h=132px   ← 提示/AI代打/擦除/重开
+    //     ├ 间距 48px
+    //     ├ 信息行 [60,609][2500,780]  h=171px   ← 已填/失误/用时（**最大的 chrome**）
+    //     ├ 间距 48px
+    //     ├ 棋盘   [990,828][1570,1408] h=580px  = 193.3vp（与 Bp.height−340 吻合 ✓ 公式是对的）
+    //     ├ 间距 48px
+    //     └ 键盘行 [60,1456][2500,1588] h=132px  ← **下沿 1588 > 1516，越界 72px**
+    //   ★ 关键：**键盘行 132px 一点没被压**（不是 flexShrink 问题），状态行整个在屏外
+    //     ⇒ 是「棋盘 + 间距 + 其余 chrome」**总高仍超**，只能从**间距**和**棋盘常数**里让。
+    //   ⇒ 矮屏把 Column 间距 md(16) → xs(6)：3 个间距 × 10vp = **省 30vp ≈ 88px**
+    Column({ space: Bp.height < 600 ? Space.xs : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.md }) {
@@ -1045,7 +1058,8 @@ export struct GSudoku {
         .fontColor(this.done ? Palette.emerald : this.theme.inkFaint)
 
       // ★ 2026-10-29：用 margin 把这一行从底部推开（padding 会被 layoutWeight 棋盘吸收）
-      .margin({ bottom: 24 })
+      // ★ 第二刀：矮屏 24 → 8vp（原 24vp 是想把按钮行推离手势条，但状态行现在整体在屏外，等于白占）
+      .margin({ bottom: Bp.height < 600 ? 8 : 24 })
       // ★★★ 2026-10-29 真机抓到：这一行按钮**贴着屏幕底**（y=2178 / 屏高 2232），
       //   被系统手势区吃掉 ⇒ **点不动**。
       //   实测证据（同一个页面）：棋盘和数字键都能点（已填 41→42），
