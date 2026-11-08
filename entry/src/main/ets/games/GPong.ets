@@ -20,6 +20,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 /**
  * ★★★ 2026-10-15 提帧率：40ms → 16ms（25fps → 60fps）
@@ -87,6 +88,12 @@ export struct GPong {
   private vy: number = 0;
   private wait: number = 0;
   private timer: number = -1;
+  /** ★ 2026-11-08 看门狗：定时检查 tick 是否在推进（防"interval 建了但回调不执行"） */
+  private dog: number = -1;
+  private lastTickAt: number = 0;
+  private lastTickN: number = 0;
+  /** ★ 2026-11-08 定位用：tick 计数（日志限频） */
+  private tickN: number = 0;
   private startAt: number = 0;
   private finished: boolean = false;
   private fieldH: number = 0;
@@ -99,6 +106,22 @@ export struct GPong {
     if (Hint.demoOnce('GPong')) {
       setTimeout(() => { this.demoStart(); }, 3000);
     }
+    // ★ 2026-11-08 看门狗：每 700ms 看一次「tick 还在推进吗」。
+    //   真机现象：`reset()` 明明跑过（status 显示「准备发球…」而不是「已暂停」⇒ running=true、wait>0），
+    //   但 `wait` 永远不减 ⇒ **interval 回调根本没执行**。这里兜底：1.5s 没心跳就重建循环。
+    if (this.dog < 0) {
+      this.dog = setInterval(() => {
+        if (this.over || !this.running) {
+          return;
+        }
+        const gap: number = this.lastTickN === this.tickN ? Date.now() - this.lastTickAt : 0;
+        this.lastTickN = this.tickN;
+        if (gap > 1500) {
+          hilog.info(0x0000, 'GPong', '看门狗：1.5s 无心跳（timer=' + String(this.timer) + '）⇒ 重建循环');
+          this.startLoop();
+        }
+      }, 700);
+    }
   }
 
   /** 宿主点了「换一局」 */
@@ -109,6 +132,10 @@ export struct GPong {
 
   aboutToDisappear(): void {
     this.stopLoop();
+    if (this.dog >= 0) {
+      clearInterval(this.dog);
+      this.dog = -1;
+    }
   }
 
   private stopLoop(): void {
@@ -120,9 +147,14 @@ export struct GPong {
 
   private startLoop(): void {
     this.stopLoop();
+    // ★ 2026-11-08 定位用（verifier-dev：进 GPong 后 status 一直「准备发球…」、画面 0 变化）
+    const ms: number = (this.diffTotal >= 10 && this.diffTotal <= 500) ? this.diffTotal : TICK_MS;
+    hilog.info(0x0000, 'GPong',
+      'startLoop diffTotal=' + String(this.diffTotal) + ' ms=' + String(ms) + ' timer=' + String(this.timer) + ' running=' + String(this.running));
     this.timer = setInterval(() => {
       this.tick();
-    }, this.diffTotal);
+    }, ms);
+    hilog.info(0x0000, 'GPong', 'startLoop → timer=' + String(this.timer));
   }
 
   private reset(): void {
@@ -153,6 +185,13 @@ export struct GPong {
   }
 
   private tick(): void {
+    this.tickN = this.tickN + 1;
+    this.lastTickAt = Date.now();
+    if (this.tickN % 25 === 1) {
+      hilog.info(0x0000, 'GPong',
+        'tick#' + String(this.tickN) + ' wait=' + String(this.wait) + ' bx=' + String(this.bx) + ' by=' + String(this.by)
+          + ' over=' + String(this.over) + ' running=' + String(this.running) + ' vx=' + String(this.vx));
+    }
     if (this.over || !this.running) {
       return;
     }
@@ -642,6 +681,11 @@ export struct GPong {
         const h: number = newArea.height as number;
         if (h > 0) {
           this.fieldH = h;
+        }
+        // ★ 2026-11-08 自愈：球场已上屏但循环没建起来（timer<0 且没结算）⇒ 补一次启动
+        if (this.timer < 0 && !this.over && this.running) {
+          hilog.info(0x0000, 'GPong', 'onAreaChange 发现循环丢失 ⇒ 补启动');
+          this.startLoop();
         }
       })
       .gesture(
