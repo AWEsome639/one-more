@@ -34,15 +34,35 @@ const WIN_PTS: number = 5;
 const MARGIN: number = 3;      // ★ 无尽模式的领先分差
 
 const BALL_D: number = 3.2;
+/** ★ 2026-11-08 D 方案：球半径不再用「%宽」，改**按球场高取 vp**（见 ballRvp()），
+ *  这条常量只作旧公式的参考值保留（已无代码引用） */
 const BALL_R: number = BALL_D / 2;
-const SPEED: number = 1.9;          // 球速（%/帧）
+/**
+ * ★ 2026-11-08 D 方案（产品缺陷 1819 收尾）：球场从「竖场 259×181」改成**横场吃满宽**，
+ *   `bx`/`by` 仍是百分比坐标 ⇒ 1% 横向 = 宽/100 vp、1% 纵向 = 高/100 vp，
+ *   球在宽场上会「横着飞」（813×181 时横移比竖移快 4.5 倍）。
+ *   ⇒ 解法：**x 位移乘轴比 `K = 高/宽`**（见 axisK()），使两个方向的 vp 速度一致；
+ *     此时 `SPEED` 的含义变成「**%球场高/帧**」的天量，视觉速度 = SPEED% × 球场高。
+ *   `2.5% × 181 ≈ 4.5vp/帧`，与旧竖场（横 4.9 / 竖 3.4）的手感中枢一致。
+ */
+const SPEED: number = 6.5;          // 球速（%/帧 of 球场高，各向同性）—— 见下方算账注释
+/**
+ * ★★★ 2026-11-08 D 方案（横场 813×181）速度算账 —— **目标是"横穿时间"和旧竖场一致**：
+ *   · 旧竖场（169×118）：每 tick 位移 = 1.9% × 118 × DT(0.4) ≈ **0.9vp** ⇒ 横穿 169vp ≈ **7.5s**
+ *   · 新横场（813×181）：要同样的横穿时间 ⇒ 每 tick 需 813/188 ≈ 4.3vp
+ *     ⇒ SPEED = 4.3 / (181 × 0.4 / 100) ≈ **6.0**，取 **6.5**（≈4.7vp/tick，横穿 ≈6.9s ✓）
+ *   · 竖直方向：181 / 4.7 ≈ 38 tick 一次上下往返（≈1.5s）⇒ 一次横穿约 4~5 次上下弹，像乒乓
+ *   ⚠️ 上界：球拍高 = 18% × 181 ≈ **32.6vp**，球每 tick 4.7vp ⇒ **6.9 tick 过一个拍，绝不会穿拍**
+ *     （若以后调 SPEED > 12 ⇒ 每 tick >8.7vp 仍安全；>27 才会穿拍）
+ *   · AI 拍速同步重标：旧比例 AI/球 = 1.15/1.9 ≈ **0.61** ⇒ 新场取 **4.0**（0.62×）⇒ 手感不变
+ */
+const AI_SPEED: number = 4.0;       // 电脑每帧最大移动量（%/帧 of 球场高，与球速同比例）
 const MAX_TILT: number = 0.95;      // 打到拍边最大偏折角（弧度）
 
 const PADDLE_W: number = 2.6;
 const PADDLE_H: number = 18;
 const PADDLE_X: number = 4;         // 左拍左边（%）
 const AI_X: number = 93.4;          // 右拍左边（%）
-const AI_SPEED: number = 1.15;      // 电脑每帧最大移动量
 
 const WAIT_TICKS: number = 14;      // 得分后停顿几帧再发球
 const BTN_H: number = 46;
@@ -205,6 +225,23 @@ export struct GPong {
     this.vy = SPEED * Math.sin(tilt);
   }
 
+  /** 轴的横纵比 K = 球场高 / 球场宽（宽场 < 1）：x 位移乘它 ⇒ 两方向 vp 速度一致 */
+  private axisK(): number {
+    return this.fieldW > 0 ? this.fieldH / this.fieldW : 1;
+  }
+  /** 球半径（vp）：按**球场高**取 2.3%（旧设计 118~181 高时 = 4.2~4.2vp，视觉一致） */
+  private ballRvp(): number {
+    return Math.max(2, 0.023 * this.fieldH);
+  }
+  /** 球半径在 **x 轴百分比**下的值（宽场里很小） */
+  private rX(): number {
+    return this.fieldW > 0 ? this.ballRvp() / this.fieldW * 100 : BALL_R;
+  }
+  /** 球半径在 **y 轴百分比**下的值（≈2.3） */
+  private rY(): number {
+    return this.fieldH > 0 ? this.ballRvp() / this.fieldH * 100 : BALL_R;
+  }
+
   /** 把整个球场画一遍（中线 / 左拍 / 右拍 / 球） */
   private drawField(): void {
     // ★ `onReady` 在 Canvas 初始 0×0 时可能不触发 ⇒ 只要 ctx 已报出正尺寸就允许画
@@ -247,7 +284,7 @@ export struct GPong {
     // 球
     c.fillStyle = Palette.amber;
     c.beginPath();
-    c.arc(cx, cy, Math.max(2, BALL_R / 100 * w), 0, Math.PI * 2);
+    c.arc(cx, cy, this.ballRvp(), 0, Math.PI * 2);
     c.fill();
   }
 
@@ -281,22 +318,25 @@ export struct GPong {
     }
 
     // ★ 位置按 DT 缩放（vx/vy 是【基准帧】的速度 ⇒ 帧率变了也不会变快）
-    let x: number = this.bx + this.vx * DT;
+    // ★ D 方案：x 位移乘轴比 K ⇒ 横场里也不会「横着飞」（两方向 vp 速度一致）
+    let x: number = this.bx + this.vx * this.axisK() * DT;
     let y: number = this.by + this.vy * DT;
 
-    // 上下墙
-    if (y - BALL_R < 0) {
-      y = BALL_R;
+    // 上下墙（用 y 轴半径）
+    const ry: number = this.rY();
+    if (y - ry < 0) {
+      y = ry;
       this.vy = Math.abs(this.vy);
-    } else if (y + BALL_R > 100) {
-      y = 100 - BALL_R;
+    } else if (y + ry > 100) {
+      y = 100 - ry;
       this.vy = -Math.abs(this.vy);
     }
 
     // 左拍（你的）
-    if (this.vx < 0 && x - BALL_R <= PADDLE_X + PADDLE_W && x + BALL_R >= PADDLE_X
-      && y >= this.px - BALL_R && y <= this.px + PADDLE_H + BALL_R) {
-      x = PADDLE_X + PADDLE_W + BALL_R;
+    const rx: number = this.rX();
+    if (this.vx < 0 && x - rx <= PADDLE_X + PADDLE_W && x + rx >= PADDLE_X
+      && y >= this.px - ry && y <= this.px + PADDLE_H + ry) {
+      x = PADDLE_X + PADDLE_W + rx;
       const rel: number = (y - (this.px + PADDLE_H / 2)) / (PADDLE_H / 2);
       const ang: number = (rel > 1 ? 1 : (rel < -1 ? -1 : rel)) * MAX_TILT;
       this.vx = SPEED * Math.cos(ang);
@@ -304,9 +344,9 @@ export struct GPong {
     }
 
     // 右拍（电脑的）
-    if (this.vx > 0 && x + BALL_R >= AI_X && x - BALL_R <= AI_X + PADDLE_W
-      && y >= this.ay - BALL_R && y <= this.ay + PADDLE_H + BALL_R) {
-      x = AI_X - BALL_R;
+    if (this.vx > 0 && x + rx >= AI_X && x - rx <= AI_X + PADDLE_W
+      && y >= this.ay - ry && y <= this.ay + PADDLE_H + ry) {
+      x = AI_X - rx;
       const rel2: number = (y - (this.ay + PADDLE_H / 2)) / (PADDLE_H / 2);
       const ang2: number = (rel2 > 1 ? 1 : (rel2 < -1 ? -1 : rel2)) * MAX_TILT;
       this.vx = -SPEED * Math.cos(ang2);
@@ -317,10 +357,10 @@ export struct GPong {
     this.by = y;
     this.aiMove();
 
-    if (x + BALL_R < 0) {
+    if (x + rx < 0) {
       this.as++;
       this.serveAgain();
-    } else if (x - BALL_R > 100) {
+    } else if (x - rx > 100) {
       this.ps++;
       this.serveAgain();
     }
@@ -513,17 +553,19 @@ export struct GPong {
     if (vx >= 0) {
       return 50;
     }
-    const plane: number = PADDLE_X + PADDLE_W + BALL_R;
+    const k: number = this.axisK();
+    const ry: number = this.rY();
+    const plane: number = PADDLE_X + PADDLE_W + this.rX();
     let guard: number = 0;
     while (x > plane && guard < 400) {
       guard++;
-      x = x + vx * DT;
+      x = x + vx * k * DT;          // ★ 与 tick 一致：x 位移乘轴比
       y = y + vy * DT;
-      if (y - BALL_R < 0) {
-        y = BALL_R;
+      if (y - ry < 0) {
+        y = ry;
         vy = Math.abs(vy);
-      } else if (y + BALL_R > 100) {
-        y = 100 - BALL_R;
+      } else if (y + ry > 100) {
+        y = 100 - ry;
         vy = -Math.abs(vy);
       }
     }
@@ -740,9 +782,12 @@ export struct GPong {
         if (!(aw > 0) || !(ah > 0)) {
           return;
         }
-        // ★ 方案 C 的核心：宽度吃满可用宽，但**高度不超过 可用高**（竖场 0.7:1）
-        const w1: number = Math.min(aw, ah / 0.7);
-        const h1: number = w1 * 0.7;
+        // ★★★ 2026-11-08 **D 方案**：横场**吃满可用区**（不再按 0.7 竖场比例反推）。
+        //   真机实测：可用区 813.33×181.33 ⇒ 竖场只能 259×181（占宽 30%，太小）；
+        //   改成 813×181 ⇒ 面积 ×3.1。手感由 `axisK()`（x 位移乘 高/宽）+ `SPEED=%球场高`
+        //   保证两方向 vp 速度一致，`PADDLE_H`/`px`/`ay` 仍按**球场高百分比**。
+        const w1: number = aw;
+        const h1: number = ah;
         if (Math.abs(w1 - this.courtW) > 0.5 || Math.abs(h1 - this.courtH) > 0.5) {
           this.courtW = w1;
           this.courtH = h1;
