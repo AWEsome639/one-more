@@ -28,7 +28,8 @@ EN = {
     # 玩法（playStyle）
     'ps_match': 'Match', 'ps_merge': 'Merge', 'ps_push': 'Push', 'ps_maze': 'Maze',
     'ps_fill': 'Fill-in', 'ps_board': 'Board', 'ps_word': 'Words', 'ps_memory': 'Memory',
-    'ps_reaction': 'Reaction', 'ps_quiz': 'Quiz', 'ps_search': 'Spotting',
+    'ps_reaction': 'Reaction', 'ps_search': 'Spotting',
+    'ps_calc': 'Build', 'ps_eval': 'Evaluate', 'ps_judge': 'Judge', 'ps_deduce': 'Deduce',
     'ps_spatial': 'Spatial', 'ps_attention': 'Attention', 'ps_run': 'Run',
     'ps_card': 'Cards', 'ps_other': 'Other',
 }
@@ -82,7 +83,10 @@ TAGS = [
     ('玩法', 'ps_word',     '🔤', '拼词文字'),
     ('玩法', 'ps_memory',   '🧠', '记忆回忆'),
     ('玩法', 'ps_reaction', '⚡', '反应手速'),
-    ('玩法', 'ps_quiz',     '🧮', '答题估算'),
+    ('玩法', 'ps_calc',     '🧮', '构造算式'),
+    ('玩法', 'ps_eval',     '📏', '求值计算'),
+    ('玩法', 'ps_judge',    '⚖️', '判断对错'),
+    ('玩法', 'ps_deduce',   '🔎', '推理解谜'),
     ('玩法', 'ps_search',   '🔍', '眼力搜寻'),
     ('玩法', 'ps_spatial',  '📐', '折转空间'),
     ('玩法', 'ps_attention','🎯', '注意力任务'),
@@ -95,7 +99,9 @@ TAGS = [
 #   规则：hidden = 款数 <10 **且** 不是兜底桶（ps_other）、**不是**高辨识度意图（ps_board「下棋」）。
 #   ⚠️ ps_other(7) / ps_board(8) 也在 10 以下，但**故意不隐藏**：
 #      ps_other 是兜底桶（藏了那 7 款就再也筛不出来）；ps_board 是用户会主动找的一类。
-HIDDEN_TAGS = {'ps_merge', 'ps_match', 'ps_run', 'ps_card'}   # 4 款，属「细类」
+# 2026-11-08 第七轮：ps_quiz 拆成 4 类后重算（<10 的进 hidden）
+#   merge 3 / run 7 / card 3 / calc 8 / judge 8 / deduce 2；match 回到 10（>10 不再隐藏）
+HIDDEN_TAGS = {'ps_merge', 'ps_run', 'ps_card', 'ps_calc', 'ps_judge', 'ps_deduce'}
 
 # ── 打标规则 ──
 
@@ -128,8 +134,6 @@ PLAY_STYLE_RULES = [
     ('ps_word',      r'word|anagram|cryptogram|letter|vowel|rhyme|homophone|spelling|typing|scramble|palindrome|pangram|portmanteau|spoonerism|consonant|crossword|affix|etymolog|grammar|silent_letter|semantic|vocabulary|analog|definition|context_clues|oxymoron|cognate|typoglyc|syllable|category_fluency|story_builder|chalk|phonetic'),
     ('ps_memory',    r'memory|n_back|corsi|span|recall|chimp|simon|delayed_match|dnms|card_counting|spatial_cabinet|word_pair|paired_associate'),
     ('ps_reaction',  r'reflex|blink|flash|reaction|subitiz|go_no_go|stop_signal|vigilance|orbit|ghost_tap|whack|frequency|rhythm'),
-    ('ps_quiz',      r'estimat|guess|mental_calendar|mental_abacus|percentage|fraction|angle|numeric|currency|unit_converter|radical|roman|arithmetic|algebra|inequality|base_conversion|base_shift|binary_code|modular|modulo|divisibility|matrix|vector|dot_product|pythagor|prime|factor|gcd|common_denominator|venn|set_theory|balance_scale|digit_swap|missing_operator|calculation_sprint|countdown_math|quick_math|target_10|math_path|binomial'
-                     r'|collatz|exponent_tower|magic_square|number_bond|sum_pyramid|target_number'),
     ('ps_search',    r'visual_search|schulte|odd_one_out|silhouette|shape_shifter|shadow_pivot|symmetry|topology|color_match|area_perimeter|geometric_vision|navon|negative_space|spotlight|multiple_object|visual_crowding|ab_reversal|cross_section|room_inspector|find_word'),
     ('ps_spatial',   r'fold|cube_net|paper_folding|rotation|perspective|gear_|mirror|pixel_mimic|graph_coordinate|triplets_logic|temporal_order'),
     ('ps_attention', r'stroop|flanker|d2_attention|sdmt|trail_making|task_switch|switch_task|posner|divided_attention|dual_coding|dual_task|change_blindness|conjunction_search|continuous_recognition|dynamic_salience|visual_statistical|source_monitoring|sopt|wisconsin|rule_switcher|sternberg|object_shuffle|object_displacement|shell_game|grocery_list|face_|associative_pairs'),
@@ -153,9 +157,7 @@ PLAY_STYLE_PIN = {
     'silhouette_match': 'ps_spatial',         # 剪影匹配
     'silhouette_match_ortho': 'ps_spatial',   # 正投影剪影
     'shape_shifter': 'ps_spatial',            # 形状变换
-    'geometric_vision': 'ps_quiz',            # 几何直觉 = 比两块图形谁占的格子多 ⇒ 与「面积周长」同源（不是在脑内转形）
     'topology': 'ps_spatial',                 # 拓扑等价判断
-    'area_perimeter_match': 'ps_quiz',        # 两个矩形比面积/周长，10 题答对 ≥7 = 答题
     'color_match': 'ps_match',                # 点中同色连同整片消掉 = 三消
     'navon_hierarchical': 'ps_attention',     # 大图字母+小图字母 = Navon 整体/局部冲突
     'visual_crowding_acuity': 'ps_attention', # 拥挤视力 = 外周辨认（不是"找目标"）
@@ -198,15 +200,69 @@ PLAY_STYLE_PIN = {
     #   ps_match 抽 8 错 2（25%），补读满 12 款 = 2/12（16.7%）⇒ 不必全量，但这 2 条要挪。
     'chain_reaction': 'ps_other',          # 点格累积到爆炸、四邻 +1 连锁 ⇒ 连锁解谜，不是「配对消除」
     'color_flood': 'ps_other',             # Flood-It：把左上连通块染色吞并 ⇒ 染扩策略，不是「配对消除」
+    # ═══ 2026-11-08 第七轮：**ps_quiz(50) 拆成 4 类**（code-hunter 提议 + 我逐款读源码复核）═══
+    #   判据：calc=构造（凑数/赋值/分解）；eval=求值（算出一个数）；judge=判断（对错/大小/等价）；
+    #        deduce=猜解（假设+反馈）。
+    #   ⚠️ 与 code-hunter 的初版差 6 处，全部按源码改（见 §17）：
+    #      number_bonds/target_number 不在 calc（都是四选一选择题）；代数天平/解不等式/不等式冲刺/找角度/符号逻辑 → eval
+    'arithmetic_chain': 'ps_calc',        # 从起始数依次点运算符，≤4 步落到目标
+    'binary_code': 'ps_calc',             # 点亮 8 个位开关凑出目标数
+    'countdown_math': 'ps_calc',          # 点数字→运算符→数字，算出目标数
+    'crypto_arithmetic': 'ps_calc',       # 给五个字母指派数字让等式成立
+    'game24': 'ps_calc',                  # 4 个数用 +−×÷ 凑 24
+    'missing_operator': 'ps_calc',        # 等式缺一个运算符，选出能成立的那个
+    'prime_factor_trees': 'ps_calc',      # 把合数一路拆成质因数
+    'pythagorean_triple_builder': 'ps_calc',  # 构造勾股三元组
+    'area_perimeter_match': 'ps_judge',   # 比面积 / 比周长（比大小）
+    'divisibility_dash': 'ps_judge',      # 快速点「能整除 / 不能整除」
+    'fraction_matcher': 'ps_judge',       # 四选一挑出与它等值的分数（判等价）
+    'geometric_vision': 'ps_judge',       # 比两块图形谁占的格子多
+    'inequality_balance_ops': 'ps_judge', # 比较左右算式，选 < / = / >
+    'logical_syllogisms': 'ps_judge',     # 判断三段论推理是否有效
+    'set_theory_venn': 'ps_judge',        # 判断数字落在文氏图哪个区域
+    'target_number': 'ps_judge',          # 四选一挑出「结果等于目标」的那个式子
+    'mastermind': 'ps_deduce',            # 猜颜色组合，靠反馈排除
+    'math_guess': 'ps_deduce',            # 七次机会二分猜数
+    # —— eval（求值：算出一个数再选）32 款 ——
+    'algebraic_balance': 'ps_eval',
+    'algebraic_inequality_solver': 'ps_eval',  # 求一元一次不等式的解集
+    'angle_finder': 'ps_eval',                 # 多边形内角和减已知角，求最后一个角
+    'base_conversion_run': 'ps_eval',
+    'base_shift': 'ps_eval',
+    'binary_matrix_rank': 'ps_eval',
+    'binary_matrix_rank_all': 'ps_eval',
+    'calculation_sprint': 'ps_eval',
+    'collatz': 'ps_eval',                      # 每步算出 3n+1 的下一项
+    'common_denominator': 'ps_eval',
+    'exponent_tower': 'ps_eval',
+    'inequality_dash': 'ps_eval',              # 解成 x 的范围
+    'matrix_multiplier': 'ps_eval',
+    'matrix_reasoning': 'ps_eval',             # 3×3 数阵补被挖掉那格
+    'mental_abacus': 'ps_eval',
+    'mental_calendar': 'ps_eval',              # 推算星期几
+    'modular_clock_arithmetic': 'ps_eval',
+    'modulo_clock': 'ps_eval',
+    'number_bonds': 'ps_eval',                 # 四选一补另一部分（不是构造）
+    'numerical_estimation': 'ps_eval',
+    'percentage_peak': 'ps_eval',
+    'percentage_shopping': 'ps_eval',
+    'prime_gap_hunt': 'ps_eval',
+    'quick_math': 'ps_eval',
+    'radical_roots': 'ps_eval',
+    'roman_arithmetic': 'ps_eval',
+    'sequence_sleuth': 'ps_eval',
+    'sequence_stack': 'ps_eval',
+    'symbol_logic': 'ps_eval',                 # 由两条线索推出符号是几（解出数值）
+    'unit_converter_pro': 'ps_eval',
+    'vector_dot_product': 'ps_eval',
+    'vektor_vector': 'ps_eval',
+    # ═══ 2026-11-08 第八轮：verifier-eng2 独立复核发现（ps_spatial 抽 8 错 1）═══
+    #   源码：「把打乱的 4 件事按发生先后依次点出来」= **时序排序**，没有旋转/折纸/视角。
+    #   无更贴的类 ⇒ ps_other（将来细分可加 ps_sequence）。
+    'temporal_order': 'ps_other',
     # ⚠️ 'peg_solitaire'（孔明棋）**不是纸牌**，但它含 solitaire 会被 ps_card 正则抢走 ⇒ 钉回 ps_push
     'peg_solitaire': 'ps_push',
     # ① ps_other 里本可归类的 23 款（真·other 只留 7：4 款可视化 + 3 款纸牌）
-    'game24': 'ps_quiz',
-    'mastermind': 'ps_quiz',
-    'sequence_sleuth': 'ps_quiz',
-    'symbol_logic': 'ps_quiz',
-    'sequence_stack': 'ps_quiz',
-    'logical_syllogisms': 'ps_quiz',
     'peripheral_focus': 'ps_attention',
     'focus_tunnel': 'ps_attention',
     'multi_track_counter': 'ps_attention',
