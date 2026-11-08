@@ -13,6 +13,7 @@
 # 用法：
 #   bash 工具/check_ui_change.sh            # 只提示（默认，退出码恒 0）
 #   bash 工具/check_ui_change.sh --strict   # 有几何改动但没证据 ⇒ 退出码 1
+#   bash 工具/check_ui_change.sh --commit <hash>  # 回溯检查某一次提交（而不是工作区）
 #
 # 证据怎么给（--strict 才需要）：
 #   UI_VERIFIED=1 bash 工具/check_ui_change.sh --strict
@@ -20,12 +21,25 @@
 
 set -u
 STRICT=0
-[ "${1:-}" = "--strict" ] && STRICT=1
+STRICT=0
+COMMIT=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --strict) STRICT=1; shift ;;
+    --commit) COMMIT="${2:-}"; shift 2 ;;
+    *) shift ;;
+  esac
+done
 
 # ── 从 git diff 里取「新增的代码行」（去掉注释行）──
 # 只看工作区 + 暂存区的改动（**不是** git log：今天的紫色事故从未提交，
 #  所以任何「扫历史提交」的做法都抓不到它）
-DIFF=$(git diff HEAD --unified=0 -- '*.ets' 2>/dev/null)
+if [ -n "$COMMIT" ]; then
+  DIFF=$(git show "$COMMIT" --unified=0 --format= -- '*.ets' 2>/dev/null)
+  echo "── 检查提交 ${COMMIT}（git show）──"
+else
+  DIFF=$(git diff HEAD --unified=0 -- '*.ets' 2>/dev/null)
+fi
 [ -z "$DIFF" ] && { echo "✅ 工作区没有 .ets 改动，无需验"; exit 0; }
 
 ADDED=$(printf '%s\n' "$DIFF" | grep -E "^\+" | grep -vE "^\+\+\+" | sed 's/^+//' \
