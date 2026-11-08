@@ -51,18 +51,33 @@ def collect(d, pred):
     w(d)
     return out
 
+def in_search_mode():
+    """搜索态的标志：「搜索框内的小 🔍」([108,407][165,464] 附近)。
+    ⚠️ 这是 2026-11-09 04:48 修的 bug：初版「无条件点 🔍」，
+       如果「已经是搜索态」，再点会「关掉它」⇒ 后面 uinput 输到「无处的输入框」。
+    """
+    d = dump('/data/local/tmp/probe.json')
+    if not d:
+        return False
+    for t, (x1, y1, x2, y2) in collect(d, lambda t: True):
+        if t.strip() == '🔍' and 400 <= y1 <= 470 and x1 < 200:
+            return True
+    return False
+
 def search_game(en_name):
-    """uinput 搜索（判据 1846：只能 ASCII）"""
-    sh('uitest uiInput click 2276 264')   # 打开搜索
-    time.sleep(0.8)
-    sh('uitest uiInput click 1280 435')   # 聚焦搜索框
-    time.sleep(0.5)
+    """uinput 搜索（判据 1846：只能 ASCII）。① 先确认「是搜索态」 ② 再聚焦 ③ 再输入"""
+    if not in_search_mode():
+        sh('uitest uiInput click 2276 264')   # 打开搜索
+        time.sleep(0.9)
+    sh('uitest uiInput click 1280 435')       # 聚焦搜索框
+    time.sleep(0.6)
     sh(f"uinput -K -t '{en_name}'")
-    time.sleep(1.2)
+    time.sleep(1.4)
 
 def close_search():
-    sh('uitest uiInput click 2276 264')
-    time.sleep(0.6)
+    if in_search_mode():
+        sh('uitest uiInput click 2276 264')
+        time.sleep(0.7)
 
 def verify_one(en_name):
     """返回 (状态, 关键数据)"""
