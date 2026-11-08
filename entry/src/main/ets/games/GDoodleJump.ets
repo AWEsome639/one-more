@@ -176,7 +176,10 @@ export struct GDoodleJump {
     this.stopLoop();
     this.serial = 0;
     this.px = 50;
-    this.py = 70;
+    // ★★★ 2026-11-08 **判据 1828**：`P_H` 从 9% 改到 28% 时，这里原来写死的 `py = 70` 是
+    //   「隐式依赖」—— 起始底边 = 70 + 28 = 98% > 第一块平台的 85% ⇒ 下落判定
+    //   `prevBottom <= p.y && bottom >= p.y` **永不成立** ⇒ 直接穿到屏幕底部（真机 1.5s 内就"掉下去了"）。
+    //   ⇒ 不在顶部赋值，改成「创建完平台后用第一块平台的 y 反推」（见下方 `this.plats = list;` 之后）。
     this.vy = 0;
     this.climbed = 0;
     this.over = false;
@@ -194,6 +197,10 @@ export struct GDoodleJump {
       list.push(this.makePlat(Math.random() * 84, y));
     }
     this.plats = list;
+    // ★ 判据 1828：出生点由**第一块平台的实际 y**（85）反推，而不是写死的数字
+    //   （局部常量同理：以后平台起点若改成随机/难度相关，这一行自动跟着走）
+    const firstY: number = this.plats.length > 0 ? this.plats[0].y : 85;
+    this.py = firstY - P_H;      // 85 − 28 = 57%（视觉底边正好站在第一块平台上）
     // ★★ 2026-10-13 真机体验修复（和像素鸟/贪吃蛇同一个病）：
     //   原来 reset() 里【立刻】startLoop() ⇒ 角色马上开始跳，玩家还没看清平台。
     //   ⇒ 改成「待操作」：角色静止，等第一次左右滑动才开始。
