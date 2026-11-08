@@ -2251,6 +2251,18 @@ build() {
     if (this.uiMode === 'elder' && !this.elderExpanded) {
       return true;
     }
+    // ★★★ 2026-11-08 **矮屏必须常收起**（perf-hunter 真机实测，判据 1815）：
+    //   853×533 下顶部整块展开 = **404vp**，而 TabContent 只有 406vp
+    //   ⇒ **网格剩 8px ≈ 2.7vp ⇒ 一个 GridItem 都不建**（收起态是 697px = 232vp = 正好 2 行卡）。
+    //   更严重的是**功能性死锁**：`onScrollIndex` 的「收起」分支靠**网格滚动事件**触发，
+    //   而网格高度 ≈ 0 ⇒ 手势打不到 ⇒ **实测往下甩 2 次也出不来，只能重启 app**。
+    //   根因：`Bp.isShort()`（height<690）**只在 `aboutToAppear` 用它初始化 `topCollapsed=true`**，
+    //   而 `onScrollIndex`（`first ≤ 1` 时）把它**翻回 false 时没有任何地方再拦**。
+    //   ⇒ 这一行就是那道闸。**阈值不用改**（硬下限重算 = 顶部 404 + 2 行卡 180 + TabBar 60 = 644 < 690，
+    //     690 本身合理且有 46vp 余量；抬到 900+ 会误伤 700~900 的正常机型）。
+    if (Bp.isShort()) {
+      return true;
+    }
     return this.topCollapsed;
   }
 
