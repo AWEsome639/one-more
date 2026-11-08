@@ -597,7 +597,10 @@ export struct GPong {
   }
 
   build() {
-    Column({ space: Space.sm }) {
+    // ★ 2026-11-08：游戏区被 GameHost 统一限高 `Bp.height-190`=343vp（355 款共用），
+    //   而本款 chrome（HintBar 38 + HUD 46 + 按钮行 46 + 状态 16 + 5 个间隙 50）≈196vp
+    //   ⇒ 球场只能拿到 ~118vp。这里先压自身 chrome：间隙 10→6（省 20vp）、HUD 卡上下 padding 10→6（省 8vp）。
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -617,7 +620,7 @@ export struct GPong {
         .fontColor(this.theme.ink)
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding({ top: Space.xs, bottom: Space.xs, left: Space.sm, right: Space.sm })
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
@@ -629,7 +632,7 @@ export struct GPong {
         .fontColor(this.theme.ink)
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding({ top: Space.xs, bottom: Space.xs, left: Space.sm, right: Space.sm })
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
@@ -641,7 +644,7 @@ export struct GPong {
         .fontColor(this.theme.ink)
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding({ top: Space.xs, bottom: Space.xs, left: Space.sm, right: Space.sm })
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
