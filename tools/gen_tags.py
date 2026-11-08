@@ -165,6 +165,33 @@ PLAY_STYLE_PIN = {
     'dual_coding': 'ps_memory',               # 图文双通道 = 记忆编码
     # 麻将连连看：4×4 共 16 张、点两张相同的牌 = **配对**，不是纸牌接龙
     'mahjong_solitaire': 'ps_match',
+    # ═══ 2026-11-08 第五轮：**ps_quiz 全量看 68 款**（抽样 8 款错 4 = 50% > 25% ⇒ 按判据全量）═══
+    #   判据：`ps_quiz` = 玩家在「读题 → 判/算 → 选答案」，**不需要在棋盘上挪动/点选物件**。
+    #   下列 18 款实际是**操作棋盘**，不是在答题（其余 50 款保留）。
+    #   —— 摆放/拖拽/交换 ⇒ ps_push
+    'balance_scale': 'ps_push',
+    'binary_scale_balance': 'ps_push',
+    'digit_swap_eq': 'ps_push',
+    'tangle_fix': 'ps_push',
+    #   —— 填格/点亮 ⇒ ps_fill
+    'sum_pyramid': 'ps_fill',
+    'magic_squares': 'ps_fill',
+    'fractional_pizza': 'ps_fill',
+    'venn_numbers': 'ps_fill',
+    #   —— 走格 ⇒ ps_maze
+    'math_path': 'ps_maze',
+    'modulo_path': 'ps_maze',
+    #   —— 配对 ⇒ ps_match
+    'binomial_match': 'ps_match',
+    'matrix_multiplier_match': 'ps_match',
+    'fraction_match': 'ps_match',
+    'number_bonds_all': 'ps_match',
+    'target_10': 'ps_match',
+    #   —— 在阵里点选目标 ⇒ ps_search
+    'factor_finder': 'ps_search',
+    'prime_hunter': 'ps_search',
+    #   —— 计数+抑制干扰 ⇒ ps_attention
+    'distractor_matrix': 'ps_attention',
     # ⚠️ 'peg_solitaire'（孔明棋）**不是纸牌**，但它含 solitaire 会被 ps_card 正则抢走 ⇒ 钉回 ps_push
     'peg_solitaire': 'ps_push',
     # ① ps_other 里本可归类的 23 款（真·other 只留 7：4 款可视化 + 3 款纸牌）
@@ -172,7 +199,6 @@ PLAY_STYLE_PIN = {
     'mastermind': 'ps_quiz',
     'sequence_sleuth': 'ps_quiz',
     'symbol_logic': 'ps_quiz',
-    'binary_scale_balance': 'ps_quiz',
     'sequence_stack': 'ps_quiz',
     'logical_syllogisms': 'ps_quiz',
     'peripheral_focus': 'ps_attention',
@@ -202,6 +228,18 @@ PLAY_STYLE_PIN = {
     'shell_game': 'ps_memory',
     'sopt': 'ps_memory',
 }
+
+def _check_pin_dups():
+    """★ 2026-11-08：Python 字典字面量里重复的 key 会**静默覆盖**（后者赢）。
+    这张表已经 68 条，手工追加时踩过一次（binary_scale_balance 被旧条目盖掉，
+    ps_push 没生效、只在 17/18 行里体现）⇒ 生成前先查重，重复就报错。"""
+    from collections import Counter
+    src = open(__file__, encoding='utf-8').read()
+    keys = re.findall(r"^    '([a-z0-9_]+)': 'ps_[a-z]+',$", src, re.M)
+    dup = [k for k, c in Counter(keys).items() if c > 1]
+    if dup:
+        raise SystemExit('❌ PLAY_STYLE_PIN 有重复 key（后者会静默覆盖前者）：%s' % ', '.join(sorted(dup)))
+
 
 def play_style_for(gid, hay):
     """玩法归类：① 先查人工矫正表 ② 再按 PLAY_STYLE_RULES 顺序首命中 ③ 兜底 ps_other。"""
@@ -364,6 +402,7 @@ def tags_for(gid, name, tag, cat):
 
 def main():
     import json
+    _check_pin_dups()
     games = load_games()
     data = {}
     stat = {}
