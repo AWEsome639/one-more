@@ -27,7 +27,9 @@
      · 这是**候选**（很多 `aspectRatio(1)` 是小格子/图标，不是整块棋盘）——真机复核后收敛；
      · tinyWatch 分支放过。
 
-★ 输出：机读行 `布局溢出：N 处`；退出码 0 = 无 ｜ 1 = 有 ｜ 2 = 解析/自检失败。
+★ 输出：机读行 `布局溢出：N 处`（**闸门 = ①+③**）；`布局提示：M 处`（**②④ 只提示，不进闸门** ——
+  判据 1819 同族：静态估算与真机差异大，perf-hunter 真机 6/6 证明 ④ 候选全是误报）；
+  退出码 0 = 闸门无命中 ｜ 1 = 闸门有命中 ｜ 2 = 解析/自检失败。
 用法：
   python3 tools/check_layout_overflow.py [--verbose] [--self-test] [--ref-height 533]
 """
@@ -57,6 +59,9 @@ POSITION = re.compile(r'\.position\(\s*\{')
 CAP_RE = re.compile(r'constraintSize|maxHeight|maxWidth')
 # ④ 判据 1819：自绘「提示」按钮（HintBar 的按钮不是这个写法，不在此类）
 HINT_BTN_RE = re.compile(r"Button\(\s*TG\(\s*['\"]提示['\"]\s*\)\s*\)")
+# ④（判据 1819 同族）：祖先链上有这些容器 ⇒ 高度会被压缩/滚动吸收，**不可能是「按钮被挤出」**
+#   （perf-hunter 真机 6/6：皇冠/数织/数墙/灭灯/数字华容道/找因数 —— 按钮实际 y2=657）
+PROTECTIVE = ('Scroll', 'List', 'ListItem', 'Grid', 'GridItem', 'WaterFlow', 'Tabs', 'TabContent')
 
 
 def mask(src, strings_too=False):
@@ -170,6 +175,23 @@ def function_spans(ms):
         if e > 0:
             out.append((b, e, name))
     return out
+
+
+def ancestors(spans, pos):
+    return [s for s in spans if s[0] <= pos <= s[1]]
+
+
+def protective_ancestor(conts, mk, pos):
+    """祖先链上有 Scroll/List/... 或 layoutWeight ⇒ 高度被压缩/滚动吸收（判据 1819 同族）。
+
+    返回 (True, 原因) 表示被保护 —— 这类节点**不会**把按钮顶出屏幕（perf-hunter 真机 6/6 证实）。
+    """
+    for (cb, ce, kind) in sorted(ancestors(conts, pos), key=lambda x: x[0], reverse=True):
+        if kind in PROTECTIVE:
+            return True, 'ancestor:%s' % kind
+        if '.layoutWeight(' in mk[ce:ce + 300]:
+            return True, 'ancestor:%s+layoutWeight' % kind
+    return False, ''
 
 
 def innermost(spans, pos):
@@ -326,7 +348,24 @@ def scan_file(path, ref_h=REF_HEIGHT):
                 or ('boardPx' in mk) or bool(re.search(r'width\(Math\.min\(', mk)))
     has_scroll = ('Scroll()' in mk) or ('Scroll{' in mk)
     if not file_cap and not has_scroll:
-        asp_lines = [line_of(mk, m.start()) for m in ASPECT.finditer(mk)]
+        # ★ 只认「宽驱动整块棋盘」：修饰链上同时有 `width('100%')`（与 ① 同口径）；
+        #   格子级的 `layoutWeight(1)+aspectRatio(1)` **不算** —— perf-hunter 真机 6/6 的
+        #   皇冠/数织/数墙/灭灯/数字华容道/找因数，全是这种「小格子」被误当成棋盘。
+        board_asp = []
+        for am in ASPECT.finditer(mk):
+            ap = am.start()
+            aln = line_of(mk, ap)
+            lo = max(0, aln - 3)
+            chain = '\n'.join(mk.split('\n')[lo:aln])
+            cut = max(chain.rfind('{'), chain.rfind('}'), chain.rfind(';'))
+            chain = chain[cut + 1:] if cut >= 0 else chain
+            if "width('100%')" not in chain:
+                continue
+            host = innermost(conts, ap)
+            if host and host[2] in ('Grid', 'GridItem', 'Row', 'Flex'):
+                continue
+            board_asp.append((aln, ap))
+        asp_lines = [aln for aln, _ in board_asp]
         for bm in HINT_BTN_RE.finditer(mk):
             bl = line_of(mk, bm.start())
             before = [al for al in asp_lines if al < bl]
@@ -335,6 +374,21 @@ def scan_file(path, ref_h=REF_HEIGHT):
             item = {'file': rel, 'line': bl,
                     'code': raw_lines[bl - 1].strip()[:110],
                     'kind': 'hint-after-square-board'}
+            # ★ perf-hunter 真机 6/6：按钮/棋盘在 Scroll/List/layoutWeight 的祖先里 ⇒
+            #   高度会被压缩或滚动吸收，**不是「按钮被挤出」** ⇒ 放过（否则系统性假阳性）。
+            prot_btn, why_btn = protective_ancestor(conts, mk, bm.start())
+            aim = None
+            last_al = max(before)
+            for aln, ap in board_asp:
+                if aln == last_al:
+                    aim = ap
+                    break
+            prot_board, why_board = (False, '')
+            if aim is not None:
+                prot_board, why_board = protective_ancestor(conts, mk, aim)
+            if prot_btn or prot_board:
+                allowed['pushout'].append((item, why_btn or why_board))
+                continue
             if near_tiny(bm.start()):
                 allowed['pushout'].append((item, 'tinyWatch 分支'))
             else:
@@ -386,6 +440,19 @@ struct Demo4Bad {
   }
 }
 '''
+SELF4_CELL = '''
+@Component
+struct Demo4Cell {
+  build() {
+    Column() {
+      Row() {
+        Text('a').layoutWeight(1).aspectRatio(1)
+      }
+      Button(TG('提示')) { Text('hint') }
+    }
+  }
+}
+'''
 SELF4_OK = '''
 @Component
 struct Demo4Ok {
@@ -411,14 +478,18 @@ def self_test():
         p4o = os.path.join(d, 'demo4_ok.ets')
         io.open(p4b, 'w', encoding='utf-8').write(SELF4_BAD)
         io.open(p4o, 'w', encoding='utf-8').write(SELF4_OK)
+        p4c = os.path.join(d, 'demo4_cell.ets')
+        io.open(p4c, 'w', encoding='utf-8').write(SELF4_CELL)
         f4b, _ = scan_file(p4b)
         f4o, _ = scan_file(p4o)
+        f4c, _ = scan_file(p4c)
         ok = [
             ('① 宽驱动无上限：应命中 1 处', len(found['wide']) == 1, '%d 处' % len(found['wide'])),
             ('② 固定高堆叠：应命中 1 处', len(found['stack']) == 1, '%d 处' % len(found['stack'])),
             ('③ position y>500：应命中 1 处', len(found['pos']) == 1, '%d 处' % len(found['pos'])),
             ('④ 提示在棋盘后+无限高：应命中 1 处', len(f4b['pushout']) == 1, '%d 处' % len(f4b['pushout'])),
             ('④ 有 constraintSize 时：应 0 处', len(f4o['pushout']) == 0, '%d 处' % len(f4o['pushout'])),
+            ('④ 格子级 aspectRatio 不算棋盘：应 0 处', len(f4c['pushout']) == 0, '%d 处' % len(f4c['pushout'])),
         ]
     finally:
         try:
@@ -459,11 +530,13 @@ def main():
             allowed_all[k] += allowed[k]
 
     names = {'wide': "① 宽驱动棋盘无上限（width('100%') + aspectRatio，链上无 constraintSize）",
-             'stack': '② 固定高元素堆叠（Cell.of(40..59) ≥4 且竖排估算 > %d）' % (ref_h - CHROME_H),
+             'stack': '② 固定高元素堆叠（Cell.of(40..59) ≥4 且竖排估算 > %d）｜提示，不进闸门'
+                      % (ref_h - CHROME_H),
              'pos': '③ position y 字面量 > 500（可能超出屏高）',
-             'pushout': '④ 提示按钮在 aspectRatio 棋盘之后 + 文件无限高（按钮可能被挤出，候选）'}
+             'pushout': '④ 提示按钮在 width(100%) 的 aspectRatio 棋盘之后 + 文件无限高（提示，不进闸门）'}
     print('  ═══ 布局溢出静态检查 ═══')
     print('  扫描 .ets：%d 个（games/components/pages）｜ 参考高 %d，可用高 %d'
+          '（② 仅提示：竖屏/手表请用 --ref-height 另算）'
           % (len(files), ref_h, ref_h - CHROME_H))
     for k in ('wide', 'stack', 'pos', 'pushout'):
         print('\n  %s：%d 处' % (names[k], totals[k]))
@@ -474,9 +547,13 @@ def main():
         if verbose:
             for h, why in allowed_all[k]:
                 print('     ✓ 白名单：%s:%d（%s）' % (h['file'], h['line'], why))
-    n = sum(totals.values())
-    print('\n  布局溢出：%d 处' % n)
-    return 0 if n == 0 else 1
+    # ★ 判据 1819 同族（lead 2026-11-08 决定）：②④ 是**提示**，不进闸门 ——
+    #   静态估算与真机差异大（perf-hunter 真机 6/6 证明 ④ 候选全是误报）。
+    gate = totals['wide'] + totals['pos']
+    hint = totals['stack'] + totals['pushout']
+    print('\n  布局溢出：%d 处（闸门 = ①+③）' % gate)
+    print('  布局提示：%d 处（②④ 不进闸门，参考用）' % hint)
+    return 0 if gate == 0 else 1
 
 
 if __name__ == '__main__':
