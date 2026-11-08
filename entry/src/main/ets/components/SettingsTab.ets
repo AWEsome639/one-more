@@ -164,6 +164,17 @@ export struct SettingsTab {
   @State private diagCallsV: number = 0;
   /** 模型是否 ready（失败态要显示「装好系统模型后，点这里重试」那行） */
   @State private diagReadyV: boolean = false;
+  /**
+   * ★★★ 2026-11-09 perf-hunter（修法 A：版本号强制重建）**这是必须的，不是保险**。
+   *
+   * 实测（判据「@Builder 内部读 @State 不会可靠重建」）：
+   *   `refreshDiag()` 里 `diagReasonV` 从 `init-false` → `idle`（**值确实变了**），`diag` 日志也打了，
+   *   但**点击后 +0.24 / +0.37 / +0.51s 三张截图，卡片区域像素差 = 0** ⇒ **整个 `@Builder` 子树没重建**。
+   *   根因：`diag*` 这些 `@State` **只在 `aiDiagCard()` 内部被读**，父 `build()` 的依赖集里没有它们。
+   * ⇒ 用版本号：`refreshDiag()` 每次 +1，并把 `diagRev` 作为参数传给 `@Builder`、在 `.id()` 里用上
+   *   ⇒ 父 build 依赖它、`@Builder` 的参数也变了 ⇒ **参数记忆化挡不住，子树必然重建**。
+   */
+  @State private diagRev: number = 0;
   /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环（判据：可点组件必须有 focusable） */
   @State private tvFocus: string = '';
   @State private copyHint: string = '';   // 「已复制 ✓」提示
@@ -545,7 +556,7 @@ build() {
         this.feedbackCard()
         // ★★★ 2026-11-09（code-hunter 建议 #2）**AI 诊断卡**（放在「关于」区最后一张）
         this.sectionTitle('AI 诊断', 'AI diagnostics')
-        this.aiDiagCard()
+        this.aiDiagCard(this.diagRev)
 
         Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length,
           '{n} мини-игра без интернета', '{n} мини-игры без интернета', '{n} мини-игр без интернета'))
@@ -637,7 +648,7 @@ build() {
    *      ⇒ 点卡片任意位置 `diagRev += 1` 强制重算；卡片上写了「点一下刷新」。
    */
   @Builder
-  aiDiagCard() {
+  aiDiagCard(rev: number) {
     Column({ space: Space.xs }) {
       // 标题行：emoji + 标题 + 「点一下刷新」
       Row({ space: Space.md }) {
@@ -696,6 +707,9 @@ build() {
     //   （「模型状态」「ok」「初始化」「—」…），听不出它们属于同一张诊断卡。
     .accessibilityGroup(true)
     .accessibilityText(this.diagA11yText())
+    // ★ 版本号挂在 `id` 上：`:id` 变化会让这颗节点重建（配合上面的 `diagRev` 参数）
+    //   `rev` 只用于"变一下"，不参与任何显示逻辑 ⇒ 不影响读屏、不影响布局
+    .id('aiDiag-' + rev)
     // ★ 2026-11-09：**可点就必须能"被选中"**（check_focusable 抓到过一次）
     //   电视/键盘用户用方向键在这里停不住的话，这张卡对他们等于不存在。
     //   照 `GamesTab:1674-1688` 的写法补全五件套。
@@ -764,6 +778,8 @@ build() {
     this.diagFirstV = LocalLLM.stat.firstTokenMs;
     this.diagCallsV = LocalLLM.stat.calls;
     this.diagReadyV = LocalLLM.stat.ready;
+    // ★ 版本号 +1 ⇒ 父 build 依赖它、@Builder 参数也变 ⇒ 强制重建（否则 @Builder 内部读 @State 不重建）
+    this.diagRev = this.diagRev + 1;
   }
 
   /**
