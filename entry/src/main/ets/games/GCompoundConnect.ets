@@ -63,6 +63,8 @@ export struct GCompoundConnect {
   @State private path: number[] = [];
   /** ★ AI 代打/提示：出题时那条真实通路的格子序列（reset 里存下来） */
   private sol: number[] = [];
+  /** ★ 2026-11-08 代打自己搜出来的路径（不读 sol） */
+  private aiSol: number[] = [];
   @State private target: number = 0;
   @State private maxSteps: number = 0;
   @State private fails: number = 0;
@@ -132,6 +134,7 @@ export struct GCompoundConnect {
       sum += b[path[i]];
     }
     this.sol = path;
+    this.aiSol = [];   // ★ 新题：代打路径作废
     this.board = b;
     this.target = sum;
     this.maxSteps = path.length;
@@ -145,6 +148,61 @@ export struct GCompoundConnect {
   }
 
   /** 随机 DFS 找一条从 start 到 goal 的通路（绕开障碍） */
+  /** ★ 2026-11-08 代打现场搜索：DFS + 和的上界剪枝，找一条和为 target 的通路 */
+  private aiPath(): number[] {
+    if (this.board.length < N * N) {
+      return [];
+    }
+    const visited: boolean[] = new Array<boolean>(N * N).fill(false);
+    const path: number[] = [];
+    return this.aiDfs(visited, path, START, 0) ? path : [];
+  }
+
+  private aiDfs(visited: boolean[], path: number[], cur: number, sum: number): boolean {
+    const v: number = this.board[cur];
+    if (v <= 0) {
+      return false;
+    }
+    const total: number = sum + v;
+    if (total > this.target) {
+      return false;
+    }
+    visited[cur] = true;
+    path.push(cur);
+    if (cur === GOAL) {
+      if (total === this.target && path.length <= this.maxSteps) {
+        return true;
+      }
+      visited[cur] = false;
+      path.pop();
+      return false;
+    }
+    const r: number = Math.floor(cur / N);
+    const c: number = cur % N;
+    const nb: number[] = [];
+    if (r > 0) {
+      nb.push(cur - N);
+    }
+    if (r < N - 1) {
+      nb.push(cur + N);
+    }
+    if (c > 0) {
+      nb.push(cur - 1);
+    }
+    if (c < N - 1) {
+      nb.push(cur + 1);
+    }
+    for (let i = 0; i < nb.length; i++) {
+      const nx: number = nb[i];
+      if (!visited[nx] && this.aiDfs(visited, path, nx, total)) {
+        return true;
+      }
+    }
+    visited[cur] = false;
+    path.pop();
+    return false;
+  }
+
   private walk(b: number[], start: number, goal: number): number[] {
     const visited: boolean[] = new Array<boolean>(N * N).fill(false);
     const path: number[] = [];
@@ -315,10 +373,22 @@ export struct GCompoundConnect {
     if (this.over) {
       return false;
     }
-    if (this.over || this.sol.length === 0 || this.path.length >= this.sol.length) {
+    if (this.over) {
       return true;
     }
-    this.tap(this.sol[this.path.length]);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.sol（答案路径）**：
+    //   屏幕上有棋盘（0=障碍，1..5=分数）和目标「和」⇒ 自己 DFS 找一条从左上到右下、
+    //   和恰好等于 target 且步数不超限的路径。
+    if (this.aiSol.length === 0) {
+      this.aiSol = this.aiPath();
+    }
+    if (this.aiSol.length === 0) {
+      return true;
+    }
+    if (this.path.length >= this.aiSol.length) {
+      return true;
+    }
+    this.tap(this.aiSol[this.path.length]);
     return !this.over;
   }
 

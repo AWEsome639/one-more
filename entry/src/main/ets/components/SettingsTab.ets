@@ -439,6 +439,7 @@ build() {
           router.pushUrl({ url: 'pages/LanLobby' });
         })
         this.accentPicker()
+        this.uiModePicker()
         this.diffSelfCheck()
 
         // ───────── 游戏偏好 ─────────
@@ -1067,10 +1068,13 @@ build() {
           .fontSize(FontSize.xl)
           .width(Space.xxl)
           .textAlign(TextAlign.Center)
-        // ★★★ 2026-11-07 真机 bug（verifier-dev 三页面扫描 S-01）：**「主题色」这一卡只剩一枚 🎨**，
-        //   本该在它右边的标题块**整块丢了** —— 而且下面还紧跟着「界面模式」整块卡，
-        //   视觉上成了「🎨 孤零零 → 界面模式 → 色块」。中文下必现。
-        //   ⇒ 按同页「界面模式」的行结构补回标题块。
+        // ★★★ 2026-11-08（主题色色板修复）**根因找到了**：
+        //   2026-11-07 那次（verifier-dev S-01「这一卡只剩一枚 🎨」）只补回了**标题块**，
+        //   没动**根因** —— 「界面模式」整块当时是**嵌在 `accentPicker()` 里面的**，
+        //   于是顺序成了「🎨+标题 → 界面模式整卡 → 主题色标题(重复) → 色板」。
+        //   用户扫一眼只见"标题 → 界面模式"，就报了「没有色板」（色板其实在下面，被整张卡顶开）。
+        //   ⇒ 本轮把界面模式拆成独立的 `uiModePicker()`，并删掉重复的标题块；
+        //     色板 `ForEach(ACCENTS)` 一直都在（1173 行那次 grep 漏看），不是"丢失"。
         Column({ space: 2 }) {
           Text(this.t('主题色', 'Accent colour'))
             .fontSize(FontSize.md).fontWeight(FontWeight.Medium).fontColor(this.theme().ink)
@@ -1081,6 +1085,54 @@ build() {
         .alignItems(HorizontalAlign.Start).layoutWeight(1)
       }
       .width('100%')
+
+
+      Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween }) {
+        ForEach(ACCENTS, (o: AccentOption) => {
+          this.accentChip(o)
+        }, (o: AccentOption) => o.id)
+      }
+      .width('100%')
+
+      // 实时预览：这一枚就是"按钮长什么样"
+      Row({ space: Space.sm }) {
+        Text(this.accentName())
+          .fontSize(FontSize.xxs)
+          .fontColor(this.theme().inkFaint)
+        Blank()
+        Text(this.t('开始 ›', 'Start ›'))
+          .fontSize(FontSize.xs)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(Color.White)
+          .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
+          .backgroundColor(this.accentColor())
+          .borderRadius(Radius.full)
+          .animation({ duration: Motion.fast, curve: Motion.spring() })
+      }
+      .width('100%')
+    }
+    .alignItems(HorizontalAlign.Start)
+    .width('100%')
+    .padding(Space.md)
+    .margin({ left: Space.lg, right: Space.lg })
+    .backgroundColor(this.theme().surface)
+    .borderRadius(Radius.md)
+    .shadow(Shadow.card)
+  }
+
+  /**
+   * ★★★ 2026-11-08（主题色色板修复）**「界面模式」独立成卡**
+   *
+   *   原来这一整块是**嵌在 `accentPicker()` 里的**（缩进了两层，`.padding/.backgroundColor/.borderRadius`
+   *   都在 `Column({space: Space.sm})` 内部）⇒ 视觉上变成：
+   *     「🎨 主题色」标题 → **界面模式整卡** → 「主题色」标题（重复一次）→ 色板
+   *   于是用户看到「主题色描述完直接是界面模式」，**以为色板丢了**（verifier-dev S-01 报的就是这个）。
+   *
+   *   现在拆成两张并列的卡：`accentPicker()`（主题色）+ `uiModePicker()`（界面模式），
+   *   顺序保持用户预期（主题色在前、界面模式在后）。
+   */
+  @Builder
+  uiModePicker() {
         // ★ 2026-10-13 奥森：「可以加"长辈模式""简约模式"什么的」⇒ 定名【大字模式 / 紧凑模式】
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
@@ -1156,50 +1208,6 @@ build() {
       .backgroundColor(this.theme().surface)
       .borderRadius(Radius.lg)
       .margin({ bottom: Space.md })
-
-      Column({ space: Space.xs }) {
-          Text(this.t('主题色', 'Accent colour'))
-            .fontSize(FontSize.md)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(this.theme().ink)
-          Text(this.t('按钮和高亮都跟着换成这个颜色', 'Buttons and highlights follow this colour'))
-            .fontSize(FontSize.xxs)
-            .fontColor(this.theme().inkFaint)
-        }
-        .alignItems(HorizontalAlign.Start)
-        .layoutWeight(1)
-
-      Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween }) {
-        ForEach(ACCENTS, (o: AccentOption) => {
-          this.accentChip(o)
-        }, (o: AccentOption) => o.id)
-      }
-      .width('100%')
-
-      // 实时预览：这一枚就是"按钮长什么样"
-      Row({ space: Space.sm }) {
-        Text(this.accentName())
-          .fontSize(FontSize.xxs)
-          .fontColor(this.theme().inkFaint)
-        Blank()
-        Text(this.t('开始 ›', 'Start ›'))
-          .fontSize(FontSize.xs)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(Color.White)
-          .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
-          .backgroundColor(this.accentColor())
-          .borderRadius(Radius.full)
-          .animation({ duration: Motion.fast, curve: Motion.spring() })
-      }
-      .width('100%')
-    }
-    .alignItems(HorizontalAlign.Start)
-    .width('100%')
-    .padding(Space.md)
-    .margin({ left: Space.lg, right: Space.lg })
-    .backgroundColor(this.theme().surface)
-    .borderRadius(Radius.md)
-    .shadow(Shadow.card)
   }
 
   /** 当前主题色的名字（'system' 显示"跟随系统"） */
@@ -1221,6 +1229,8 @@ build() {
         Row()
           .width(Space.xxl)
           .height(Space.xxl)
+          // ★ 判据 1829：圆的尺寸是**视觉主角**，绝不能被 flex 压扁
+          .flexShrink(0)
           .backgroundColor(Accent.color(o.id))
           .borderRadius(Radius.full)
           .borderWidth(this.isAccent(o.id) ? 3 : 0)
@@ -1245,7 +1255,11 @@ build() {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(this.isAccent(o.id) ? this.theme().ink : this.theme().inkFaint)
     }
+    // ★★★ 判据 1829：**色块必须"固定尺寸 + 不参与压缩"**。
+    //   23% 是"四列一行"的宽度基准；`flexShrink(0)` 保证 Flex 换行时它不会被压成椭圆/细条
+    //   （1875 那次的教训就是 `SymbolGlyph` 在 Row 里被拉伸成一片紫）。
     .width('23%')
+    .flexShrink(0)
     .padding({ top: Space.xs, bottom: Space.xs })
     // ★★★ 2026-11-08 读屏缺口修复（审计 P0-5 第 1 条）：
     //   色块的**颜色本身就是信息** —— 视力用户扫一眼就知道是哪个色、有没有选中；

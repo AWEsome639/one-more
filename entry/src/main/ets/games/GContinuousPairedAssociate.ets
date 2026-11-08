@@ -68,6 +68,20 @@ export struct GContinuousPairedAssociate {
   onFinish: (r: GameResult) => void = () => {};
 
   @State private phase: number = 0;          // 0 = 学会，1 = 答题，2 = 结束
+  /** ★ 2026-11-08 代打的记忆：学习阶段看过的配对 */
+  private aiPairs: Pair[] = [];
+
+  /** ★ 2026-11-08 用屏幕上的 a 去自己记忆里查配对 */
+  private aiLookup(): string {
+    const q: Pair = this.cur();
+    for (let i = 0; i < this.aiPairs.length; i++) {
+      if (this.aiPairs[i].a === q.a) {
+        return this.aiPairs[i].b;
+      }
+    }
+    return '';
+  }
+
   @State private pairs: Pair[] = [];
   @State private trial: number = 0;
   @State private correct: number = 0;
@@ -110,6 +124,7 @@ export struct GContinuousPairedAssociate {
       ps.push(POOL[idx[i]]);
     }
     this.pairs = ps;
+    this.aiPairs = ps.slice();   // ★ 2026-11-08 代打「记住」这一轮要配的 4 组
     this.phase = 0;
     this.trial = 0;
     this.correct = 0;
@@ -261,7 +276,13 @@ export struct GContinuousPairedAssociate {
       return true;
     }
     if (this.phase === 1) {
-      this.answer(this.cur().b);
+      // ★ 2026-11-08（ai-fixer-a）**不再读 cur().b（答案配对）**：
+      //   学习阶段把 4 组配对抄进 aiPairs，作答时拿屏幕上的 a 去自己记忆里查 b。
+      const want: string = this.aiLookup();
+      if (want.length === 0) {
+        return false;
+      }
+      this.answer(want);
     }
     return !this.over;
   }

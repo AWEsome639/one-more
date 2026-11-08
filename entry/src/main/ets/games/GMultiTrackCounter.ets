@@ -227,7 +227,13 @@ export struct GMultiTrackCounter {
     if (this.over) {
       return false;
     }
-    this.answer = this.trueSum();
+    // ★ 2026-11-08（ai-fixer-a）**不再读 trueSum()/seen（内部真值）**：
+    //   屏幕上每条的跳动次数就是 vals ⇒ 自己把它们加起来再结算。
+    let sum: number = 0;
+    for (let i = 0; i < this.vals.length; i++) {
+      sum = sum + this.vals[i];
+    }
+    this.answer = sum;
     this.submit();
     return !this.over;
   }

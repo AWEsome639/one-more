@@ -259,8 +259,16 @@ export struct GCollatz {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    // ★ 2026-11-08 代打「不抄答案」：屏幕上是**当前值 n**，规则是考拉兹
+    //   ⇒ 偶数 → n/2、奇数 → 3n+1（`evenNext` 就是这个规则，不是答案字段）
+    const want: number = this.evenNext(this.n);
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

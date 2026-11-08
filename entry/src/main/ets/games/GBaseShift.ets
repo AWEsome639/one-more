@@ -273,8 +273,59 @@ export struct GBaseShift {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    // ★ 2026-11-08 代打「不抄答案」（判据 1824：先读题面生成）：
+    //   题面 = `"{0} 里 {1} 末尾添 {2} 个 0 = ?"`，{0}=SUBS[bi]（₂/₈/₁₆）、{1}=toBase(v,b)、{2}=k
+    //   ⇒ 解析出「进制 + 数字串 + 添 0 个数」，自己算 `v × b^k`（在 b 进制下末尾添 k 个 0 就是这个意思）
+    const toks: string[] = this.quiz.split(' ');
+    let base: number = -1;
+    let numeral: string = '';
+    let k: number = -1;
+    if (toks.length > 2) {
+      const label: string = toks[0];
+      base = label.indexOf('₁₆') >= 0 ? 16 : (label.indexOf('₈') >= 0 ? 8 : (label.indexOf('₂') >= 0 ? 2 : -1));
+      // ⚠️ 不能写死下标：题面是 "{0} 里 {1} 末尾添 {2} 个 0 = ?" ⇒ toks[1] 是「里」不是数字串
+      //   ⇒ 从 toks[1] 起扫「该进制下的合法数字串」当 num，再取它之后的第一个 1~9 单个数字当 k
+      let numIdx: number = -1;
+      for (let i = 1; i < toks.length && base > 0; i++) {
+        const tk: string = toks[i];
+        if (tk.length === 0) {
+          continue;
+        }
+        let ok: boolean = true;
+        for (let j = 0; j < tk.length; j++) {
+          const dv: number = DIGITS.indexOf(tk.charAt(j).toUpperCase());
+          if (dv < 0 || dv >= base) {
+            ok = false;
+            break;
+          }
+        }
+        if (ok) {
+          numeral = tk;
+          numIdx = i;
+          break;
+        }
+      }
+      for (let i = numIdx + 1; i < toks.length && numIdx >= 0; i++) {
+        const tk: string = toks[i];
+        if (tk.length === 1 && tk >= '1' && tk <= '9') {
+          k = Number.parseInt(tk, 10);
+          break;
+        }
+      }
+    }
+    if (base > 0 && numeral.length > 0 && k > 0) {
+      const v: number = Number.parseInt(numeral, base);
+      if (!isNaN(v)) {
+        const want: number = v * Math.pow(base, k);
+        for (let i = 0; i < this.opts.length; i++) {
+          if (this.opts[i] === want) {
+            this.pick(i);
+            return !this.over;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

@@ -279,8 +279,41 @@ export struct GNumericalEstimation {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    // ★ 2026-11-08 代打「不抄答案」：题面是 "a × b ≈ ?" / "a ÷ b ≈ ?" / "v 的 p% ≈ ?"
+    //   ⇒ 抽两个数、按算符算粗略值，再用**同一个 `niceRound`** 取整（就是本款要考的"估算"）
+    const ns: number[] = [];
+    let cur: string = '';
+    const q: string = this.quiz;
+    for (let i = 0; i < q.length; i++) {
+      const ch: string = q.charAt(i);
+      const isDigit: boolean = ch >= '0' && ch <= '9';
+      if (isDigit) {
+        cur = cur + ch;
+      } else if (cur.length > 0) {
+        ns.push(Number.parseInt(cur, 10));
+        cur = '';
+      }
+    }
+    if (cur.length > 0) {
+      ns.push(Number.parseInt(cur, 10));
+    }
+    let want: number = -1;
+    if (ns.length >= 2) {
+      if (q.indexOf('×') >= 0) {
+        want = niceRound(ns[0] * ns[1]);
+      } else if (q.indexOf('÷') >= 0) {
+        want = niceRound(ns[0] / ns[1]);
+      } else {
+        want = niceRound(ns[0] * ns[1] / 100);
+      }
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

@@ -231,6 +231,73 @@ export struct GRomanArithmetic {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /** 罗马数字单字符值 */
+  private romanVal(ch: string): number {
+    if (ch === 'I') {
+      return 1;
+    }
+    if (ch === 'V') {
+      return 5;
+    }
+    if (ch === 'X') {
+      return 10;
+    }
+    if (ch === 'L') {
+      return 50;
+    }
+    if (ch === 'C') {
+      return 100;
+    }
+    return 0;
+  }
+
+  /** 解析罗马数字（含减法记法 IV/IX/XL/XC） */
+  private fromRoman(s: string): number {
+    const up: string = s.toUpperCase();
+    let total: number = 0;
+    for (let i = 0; i < up.length; i++) {
+      const v: number = this.romanVal(up.charAt(i));
+      const nx: number = i + 1 < up.length ? this.romanVal(up.charAt(i + 1)) : 0;
+      total = total + (v < nx ? -v : v);
+    }
+    return total;
+  }
+
+  /** 从题面「ⅩⅣ  +  ⅩⅩ」算答案（字符串） */
+  private aiRomanAnswer(): string {
+    const q: string = this.q;
+    let opIdx: number = -1;
+    let plus: boolean = true;
+    for (let i = 0; i < q.length; i++) {
+      const ch: string = q.charAt(i);
+      if (ch === '+' || ch === '＋') {
+        opIdx = i;
+        plus = true;
+        break;
+      }
+      if (ch === '−' || ch === '-') {
+        opIdx = i;
+        plus = false;
+        break;
+      }
+    }
+    if (opIdx <= 0) {
+      return '';
+    }
+    const lhs: string = q.substring(0, opIdx).trim();
+    const rhs: string = q.substring(opIdx + 1).trim();
+    const a: number = this.fromRoman(lhs);
+    const b: number = this.fromRoman(rhs);
+    if (a <= 0 || b <= 0) {
+      return '';
+    }
+    const val: number = plus ? a + b : a - b;
+    if (val <= 0) {
+      return '';
+    }
+    return toRoman(val);
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -238,7 +305,13 @@ export struct GRomanArithmetic {
     if (this.picked.length > 0) {
       return true;              // 这题答过了，等下一题
     }
-    this.choose(this.ans);
+    // ★ 2026-11-08 代打「不抄答案」（判据 1824：题面 = `toRoman(a) + '  +  ' + toRoman(b)`）：
+    //   ⇒ 解析两个罗马数字、算出结果、再用 `toRoman` 转回去与选项比对
+    const want: string = this.aiRomanAnswer();
+    if (want.length === 0) {
+      return false;             // 解析不出来 ⇒ 停手（不读 ans）
+    }
+    this.choose(want);
     return !this.over;
   }
 

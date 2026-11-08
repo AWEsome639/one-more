@@ -51,6 +51,19 @@ export struct GFaceTraitAssociation {
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private faces: TraitFace[] = [];
+  /** ★ 2026-11-08 代打的记忆：记忆阶段看过的脸+特征 */
+  private aiFaces: TraitFace[] = [];
+
+  /** ★ 2026-11-08 从自己的记忆里查这张脸的特征 */
+  private aiTraitOf(icon: string): string {
+    for (let i = 0; i < this.aiFaces.length; i++) {
+      if (this.aiFaces[i].icon === icon) {
+        return this.aiFaces[i].trait;
+      }
+    }
+    return '';
+  }
+
   @State private opts: TraitChoice[] = [];
   @State private phase: number = 0;      // 0 记脸 1 作答 2 结束
   @State private askNo: number = 1;
@@ -108,6 +121,8 @@ export struct GFaceTraitAssociation {
   }
 
   private startQuiz(): void {
+    // ★ 2026-11-08（ai-fixer-a）代打「记住」刚看过的脸+特征
+    this.aiFaces = this.faces.slice();
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
     this.phase = 1;
     this.msg = TG('从下面选一条特质');
@@ -247,8 +262,15 @@ export struct GFaceTraitAssociation {
     if (this.phase !== 1 || this.pick >= 0) {
       return true;
     }
+    // ★ 2026-11-08（ai-fixer-a）**不再读 opts[i].ok**：
+    //   记忆阶段把「脸→特征」抄进 aiFaces，作答时拿屏幕上的脸去自己记忆里查，
+    //   再在选项里找同名的那一条。
+    const hint: string = this.aiTraitOf(this.faces[this.askNo - 1].icon);
+    if (hint.length === 0) {
+      return false;
+    }
     for (let i = 0; i < this.opts.length; i++) {
-      if (this.opts[i].ok) {
+      if (this.opts[i].label === hint) {
         this.answer(i);
         return true;
       }
