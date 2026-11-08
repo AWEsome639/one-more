@@ -22,10 +22,20 @@ CONTENT_BOTTOM = 1516      # 内容区底（dump 实测）
 GESTURE_LIMIT = 1584       # 屏底 - 16
 
 def sh(cmd, timeout=25):
+    """执行 hdc shell；加日志区分「超时」和「其它异常」（v7，2026-11-09）"""
     try:
         r = subprocess.run([HC, '-t', DEV, 'shell', cmd], capture_output=True, text=True, timeout=timeout)
-        return r.stdout or ''
-    except Exception:
+        out = r.stdout or ''
+        if len(out) < 200:
+            print(f'    [sh] {cmd[:50]} → len={len(out)} rc={r.returncode} out={out.strip()[:80]!r}')
+        else:
+            print(f'    [sh] {cmd[:50]} → len={len(out)} rc={r.returncode}')
+        return out
+    except subprocess.TimeoutExpired:
+        print(f'    [sh] {cmd[:50]} → ❌ TIMEOUT ({timeout}s)')
+        return ''
+    except Exception as e:
+        print(f'    [sh] {cmd[:50]} → ❌ ERR {type(e).__name__}: {e}')
         return ''
 
 def dump(path='/data/local/tmp/layout.json'):
@@ -117,7 +127,11 @@ def verify_one(en_name):
         return ('NO_CARD', {})
     sh(f'uitest uiInput click {target[0]} {target[1]}')
     time.sleep(3.0)   # ⚠️ v6：2.2 不够
-    d2 = dump(f'/data/local/tmp/game_{en_name}.json')   # ← v4：落盘，明早可查
+    # ⚠️ v8：路径不能有空格（hdc shell 会按空格切参数）
+    #   v7 日志实测：`-p /data/local/tmp/game_Snake 3D` 被切成「game_Snake」+「3D」
+    #   ⇒ dumpLayout 写到「game_Snake」、cat 读「game_Snake 3D.json」⇒ 读不到 ⇒ None
+    safe = re.sub(r'[^A-Za-z0-9_]', '_', en_name)
+    d2 = dump(f'/data/local/tmp/game_{safe}.json')
     if not d2:
         sh('uitest uiInput keyEvent Back'); close_search()
         return ('GAME_DUMP_FAIL', {})
