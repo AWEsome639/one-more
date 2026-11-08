@@ -295,22 +295,21 @@ export struct GFibonacciMerge {
         Column({ space: 2 }) {
         Text((TG('最大'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.best + '/' + GOAL)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('机会'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(('❤️×' + String(this.lives))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         // ★ 错误抖动
         .translate({ x: this.shakeX })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.moves), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
-        Text('🌀').fontSize(FontSize.xxl)
-          .accessibilityLevel('no')
+        // ★ 2026-11-09：删 '🌀'（24vp）—— 真机实测「重开」按钮到 1600（屏底），压上方元素（判据 1850 之外，属 1826）
         Text(TG('把相邻两数合成斐波那契数')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.primary).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.xs }) {
@@ -343,7 +342,7 @@ export struct GFibonacciMerge {
         .onFocus(() => { this.tvFocus = 'L316'; })
         .onBlur(() => { if (this.tvFocus === 'L316') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L316')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
-      Text(TG('提示：相邻两格之和要落在 1,2,3,5,8,13,21… 里；合到 21 即通关')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+      Text(TG('提示：相邻两格之和要落在 1,2,3,5,8,13,21… 里；合到 21 即通关')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
