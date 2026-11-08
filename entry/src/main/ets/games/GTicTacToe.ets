@@ -14,7 +14,7 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
-import { GameDiff } from '../core/GameDiff';
+// ★ 2026-11-08：棋盘锁死 3×3 后不再需要 GameDiff（原 sizeNow(3) 会放大棋盘）
 import { LanMatch } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -158,7 +158,21 @@ export struct GTicTacToe {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(3);
+  /**
+   * ★★★ 2026-11-08（TIMEOUT 排查）**棋盘锁死 3×3**：
+   *   原来 `diffTotal = GameDiff.sizeNow(3)` = round(3×0.7/1.0/1.3) = **2 / 3 / 4**，
+   *   但胜负判定 `LINES` / `winnerOf()` 是**写死的 8 条 3×3 线**（`:34-38`）⇒ 两边对不上：
+   *     · **简单 2×2（4 格）**：`winnerOf` 读 `cells[6..8]` = undefined，
+   *       而 `undefined !== 0` 为 true、`undefined === undefined` 为 true
+   *       ⇒ 返回 undefined ⇒ `checkEnd()` 走「电脑连线了」分支 ⇒ **首手就判负**（这档玩家永远赢不了）。
+   *     · **困难 4×4（16 格）**：只认左上 3×3 的 8 条线 ⇒ 第 2 行/列、右下角的三连**不判胜**，
+   *       只能等 16 格填满才知道是平局 ⇒ 看起来像"满盘不结算"。
+   *   ⇒ 决策：**锁 3×3**（与 `GCircuitConnect` / `GNurikabe` 的"棋盘锁死"先例一致），
+   *     不按尺寸生成 LINES（那要改 15 行、且 4×4 的三连语义还得重定）。
+   *   ⚠️ 因此**难度不再改变棋盘大小**（2/4 档与普通档棋盘相同）；难度当前只影响 AI 走子策略以外的部分，
+   *     若要保留难度差异，应改成"AI 强度 / 步数上限"，不要再动 diffTotal。
+   */
+  @State private diffTotal: number = 3;
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
   private rowIdx(): number[] {
@@ -207,7 +221,8 @@ export struct GTicTacToe {
   }
 
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(3);
+    // ★ 2026-11-08：棋盘锁死 3×3（见字段注释）—— 重开时也别再按难度放大
+    this.diffTotal = 3;
     this.reset();
   }
 

@@ -197,7 +197,20 @@ export struct GSpellingSprint {
     if (this.feed >= 0) {
       return true;               // 换题间隙
     }
-    this.input = this.cur().w;  // 直接把词填进输入框（submit 读的是 this.input）
+    // ★ 2026-11-08（ai-fixer-a）**不再读 cur().w（答案）**：
+    //   屏幕上是中文释义（cur().zh，题面）⇒ 拿释义去词库反查拼写，这才是"拼写"本人干的事。
+    const zh: string = this.cur().zh;
+    let w: string = '';
+    for (let i = 0; i < BANK.length; i++) {
+      if (BANK[i].zh === zh) {
+        w = BANK[i].w;
+        break;
+      }
+    }
+    if (w.length === 0) {
+      return false;
+    }
+    this.input = w;
     this.submit();
     return !this.over;
   }

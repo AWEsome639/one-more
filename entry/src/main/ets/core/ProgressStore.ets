@@ -1,9 +1,13 @@
 /**
  * 进度系统 —— XP / 等级 / 每日打卡 / 双层连胜
  *
- * 等级公式（对标体验）：level = clamp(floor((xp/100)^(1/2.04)) + 1, 1, 100)
- *   反解 XP 门槛：xpForLevel(l) = floor(100 * (l-1)^2.04)
+ * 等级公式：**已搬到 `core/LevelCurve.ets`（唯一真相源）**
+ *   level = clamp(floor((xp/100)^(1/EXP)) + 1, 1, 100)，EXP = **1.3**（2026-11-08 由 2.04 下调）
+ *   反解 XP 门槛：xpForLevel(l) = ceil(100 × (l−1)^1.3)
  *   ⇒ 早期升级快（正反馈），后期拉长（耐玩），100 级封顶
+ *   ⚠️ 为什么下调：指数 2.04（≈平方增长）下 100 级要 ≈98,000 局 ⇒
+ *      `level_80`/`level_100` 两个成就**数学上不可达**。1.3 下是 ≈3,274 局。
+ *   ⚠️ 桌面卡片也调同一份数学（`formwidget/StatsCardAbility` → `LevelCurve`），别再各写一遍。
  *
  * 双层连胜：
  *   ① 每个游戏自己的 streak（连续几天玩了这个游戏）
@@ -17,6 +21,8 @@ import { HintCost } from './HintCost';
 import { GAME_IDS_BY_CAT } from './GameRegistry';
 import { I18n, toTrad } from './I18n';
 import { Accent } from './Design';
+// ★★★ 2026-11-08（成就体系巡检 P0-1）：**等级曲线单一真相源**（桌面卡片也引它）
+import { LevelCurve } from './LevelCurve';
 import { preferences } from '@kit.ArkData';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { common } from '@kit.AbilityKit';
@@ -52,7 +58,13 @@ export class Keys {
   static readonly achievements: string = 'achievements';   // 已解锁的成就 id，逗号分隔
 
   static readonly cleared: string = 'clearedGames';        // 已通关过的 gameId，逗号分隔（每游戏徽章）
-  static readonly perfect: string = 'perfectGames';        // 满分/零失误通关的 gameId
+  // ★★★ 2026-11-08（成就体系巡检 P1）：**删掉死键 `perfectGames`**
+  //   它从声明那天起就是死的 —— 全库只有这一行声明，**没有任何地方读或写**。
+  //   后果：玩家/后来人都以为"每款都有 💎 徽章"，实际只有**全局**一个 `perfectCount`
+  //   （≥1 就解锁「完美主义 💎」，之后再无任何反馈）。
+  //   ⇒ 与其留一个骗人的键，不如删掉；真要做「每款独立 💎」，请**端到端**实现：
+  //     在 `finishGame` 的 perfect 分支里 append gameId（去重）+ 游戏卡上渲染 →
+  //     两处一起做，别只加键（那又会变成死键）。
   static readonly perGameClears: string = 'perGameClears'; // 每款通关次数 JSON
   static readonly perGameDiff: string = 'perGameDiff';     // 每款选的难度 JSON
   /** ★ 2026-11-08（退出恢复最小版）：上次玩到哪 —— gameId → { level, diff, at } 的 JSON */
@@ -293,34 +305,26 @@ export class ProgressStore {
 
   // ---------- 等级数学 ----------
 
+  /**
+   * XP → 等级（1~100）
+   * ★★★ 2026-11-08：**数学搬去 `core/LevelCurve.ets`** —— 这里只留转发。
+   *   为什么搬：原来这里 `xpForLevel(100)` 写死 `1000000`，而 `levelOf` 真到 100 要
+   *   `1,177,866` ⇒ **非单调**（99 级门槛 1,153,722 > 100 级的 1,000,000）
+   *   ⇒ `levelProgress()` 走进 `hi <= lo` ⇒ **99 级进度条永远满格**。
+   *   现在两个函数从同一条曲线派生（指数 `LevelCurve.EXP = 1.3`），
+   *   且 `levelOf(xpForLevel(L)) === L` 对 1~100 全部成立（我逐档验过）。
+   */
   static levelOf(xp: number): number {
-    if (xp <= 0) {
-      return 1;
-    }
-    const l: number = Math.floor(Math.pow(xp / 100, 1 / 2.04)) + 1;
-    return Math.min(100, Math.max(1, l));
+    return LevelCurve.levelOf(xp);
   }
 
   static xpForLevel(level: number): number {
-    if (level <= 1) {
-      return 0;
-    }
-    if (level >= 100) {
-      return 1000000;
-    }
-    return Math.floor(100 * Math.pow(level - 1, 2.04));
+    return LevelCurve.xpForLevel(level);
   }
 
   /** 当前等级内的进度 0~1（进度条用） */
   static levelProgress(xp: number): number {
-    const lv: number = ProgressStore.levelOf(xp);
-    const lo: number = ProgressStore.xpForLevel(lv);
-    const hi: number = ProgressStore.xpForLevel(lv + 1);
-    if (hi <= lo) {
-      return 1;
-    }
-    const p: number = (xp - lo) / (hi - lo);
-    return Math.min(1, Math.max(0, p));
+    return LevelCurve.progress(xp);
   }
 
   /** 距下一级还差多少 XP */
@@ -680,7 +684,9 @@ export class ProgressStore {
       // ── 单游戏连胜 ──
       ['streak_game_5', '🎯', '五连霸', '同一个游戏连赢 5 局', 'Five Straight', 'Win 5 in a row in one game'],
       ['streak_game_10', '💥', '十连霸', '同一个游戏连赢 10 局', 'Ten Straight', 'Win 10 in a row in one game'],
-      ['super_10', '🚀', '超级十连', '连着 10 天每天都通关', 'Ten-Day Run', 'Clear something 10 days running'],
+      // ★ 2026-11-08：文案原来写「连着 10 天**每天都通关**」，而判定只看 `streak >= 10`
+      //   （连续来玩 10 天，**不查有没有通关**）⇒ 文案撒谎。现在改成与判定一致的说法。
+      ['super_10', '🚀', '超级十连', '连着 10 天每天都来玩', 'Ten-Day Streak', 'Come back 10 days running'],
 
       // ── 挑战类 ──
       ['night_owl', '🦉', '夜猫子', '凌晨 0–5 点还在玩', 'Night Owl', 'Playing between midnight and 5am'],
@@ -821,6 +827,21 @@ export class ProgressStore {
       const joined: string = got.join(',');
       AppStorage.setOrCreate(Keys.achievements, joined);
       ProgressStore.putString(Keys.achievements, joined);
+    }
+    // ★★★ 2026-11-08（成就体系巡检 P1-3）**批量解锁只弹一条汇总**
+    //   背景：等级曲线从 EXP 2.04 下调到 1.3 后，**老玩家首次进游戏会一次性跨好几级**
+    //   （旧 L25 的 XP 在新曲线直接 L100）⇒ 结算弹窗一次堆 5 行「🏆 解锁成就 …」。
+    //   而判据 842 已经踩过：手表 233×233 上内容一高，「再来一局/返回列表」就被挤出屏幕。
+    //   ⇒ 超过 3 个就压成一行：`🌱 初次开局、🎉 首次通关、🕹️ 手熟 等 7 个`
+    //   数据层不受影响：`achievements` 里存的是**全量 id**，统计页照旧一个不少。
+    if (newly.length > 3) {
+      const isCn: boolean = I18n.isZH() || I18n.isHant();
+      const sep: string = isCn ? '、' : ', ';
+      const head: string = newly.slice(0, 3).join(sep);
+      const tail: string = isCn
+        ? (' 等 ' + String(newly.length) + ' 个')
+        : (' +' + String(newly.length - 3) + ' more');
+      return [head + tail];
     }
     return newly;
   }
@@ -1396,7 +1417,20 @@ export class ProgressStore {
     AppStorage.setOrCreate(Keys.totalMs, ms);
     ProgressStore.putNumber(Keys.totalMs, ms);
     // 单日累计（马拉松成就用）
-    const todayMs: number = (AppStorage.get<number>('todayMs') ?? 0) + durationMs;
+    // ★★★ 2026-11-08（成就体系巡检 P0-2）：**原来从不跨天清零** ——
+    //   `todayMs` 全库只有"判成就"和"这里累加"两处 ⇒ 它实际是「**累计**玩了多久」，
+    //   于是成就 `marathon`（文案「一天玩了 2 小时」）判的其实是「累计 2 小时」，
+    //   与 `hour_1`/`hour_10` 同义，且额外多给一个徽章。
+    //   ⇒ 现在用 `todayMsDay` 记住"这份累计属于哪一天"，跨天就归零。
+    //   ⚠️ 这个值只在 AppStorage 里（不落盘）—— 重启后从 0 起算，比"跨天还带着昨天的数"安全。
+    const msDay: string = AppStorage.get<string>('todayMsDay') ?? '';
+    const nowDay: string = ProgressStore.today();
+    let baseMs: number = AppStorage.get<number>('todayMs') ?? 0;
+    if (msDay !== nowDay) {
+      baseMs = 0;
+      AppStorage.setOrCreate('todayMsDay', nowDay);
+    }
+    const todayMs: number = baseMs + (durationMs > 0 ? durationMs : 0);
     AppStorage.setOrCreate('todayMs', todayMs);
 
     // 每款开局数

@@ -171,10 +171,17 @@ export struct GFibonacciMerge {
     }
     const lo: number = this.findPair();
     if (lo < 0) {
-      // ★ 2026-11-06：局面无解时 AI 不能干停（代打的意义是把一局打完）
-      //   ⇒ 自动重开一局（reset 已保证新开局至少有一组可合并，不会死循环）
-      this.reset();
-      return true;
+      // ★★★ 2026-11-08（TIMEOUT 排查，lead 批准）**这里不能 reset()**：
+      //   模拟 2000 局（按本文件的 findPair 贪心）：**83.7% 的对局会死锁**（中位第 5 步就没得合）。
+      //   原来死锁就 `reset(); return true;` ⇒ 每 5 步重开一次、`autoStep` **永远返回 true**、
+      //   `over` 一直是 false ⇒ **无限重开、永不结算**（验证器等 100s 报 TIMEOUT，
+      //   而且 reset 会清零 moves ⇒ 界面上"步数"永远涨不过 5，看起来就是"第 4 步后不动"）。
+      //   ⇒ 死锁 = 这一局到此为止：立刻结算，并返回 false 让代打/提示停手。
+      this.over = true;
+      this.won = false;
+      this.msg = TG('💤 没有可合并的相邻格了，这一局到此为止');
+      this.finish(false);
+      return false;
     }
     if (this.sel < 0) {
       this.tap(lo);

@@ -192,7 +192,26 @@ export struct GLetterFrequencyScan {
     if (this.over || this.feed >= 0) {
       return true;
     }
-    this.pick(this.q.ans);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 q.ans（答案）**：
+    //   题面就是屏幕上的 text + target ⇒ 自己数一遍，再去选项里找这个数。
+    const q: FreqQ = this.q;
+    let cnt: number = 0;
+    for (let i = 0; i < q.text.length; i++) {
+      if (q.text.charAt(i) === q.target) {
+        cnt = cnt + 1;
+      }
+    }
+    let idx: number = -1;
+    for (let i = 0; i < q.opts.length; i++) {
+      if (q.opts[i] === cnt) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx < 0) {
+      return false;
+    }
+    this.pick(idx);
     return !this.over;
   }
 

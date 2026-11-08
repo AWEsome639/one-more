@@ -1252,9 +1252,16 @@ build() {
             });
           }
         })
-        // ★★★ 2026-10-14 奥森反馈「应该先都加载好，往下快速滑动时也能连贯显示」：
-      //   6 ⇒ 20：多预加载 14 张卡 ⇒ 快速滑动时内容【已经建好】，不必边滚边建 ⇒ 连贯 ✓
-      //   （配合上面 index 的修改：预加载的卡片走 index<0 快速路径 ⇒ 一就位就是可见的）
+        // ⚠️⚠️ 2026-11-08 perf-hunter **纠正一处长期误解**：`cachedCount` 在 `ForEach` 下**没有任何作用**。
+      //   官方 SDK 原文（<SDK>/openharmony/ets/component/grid.d.ts:563–567）：
+      //     "It works only in `LazyForEach` and `Repeat` with the `virtualScroll` option enabled."
+      //   ⇒ 2026-10-14 那次「6 ⇒ 20，多预加载 14 张卡，快速滑动时内容已经建好」**从未生效**：
+      //     `ForEach` 本来就把这 355 张卡**全量创建**了（官方 FAQ faqs-arkui-1291：
+      //     「初始化渲染时，ForEach 会加载数据源的所有数据」）⇒ 根本不存在"预加载"这回事。
+      //   ⇒ **为什么还留着这行**：将来若把本网格迁到 `LazyForEach`（评估见
+      //     `_巡检记录/LazyForEach可行性-20261108.md`），它**才会真正生效**，届时直接可用。
+      //   ⚠️ 迁移时注意：缓存量 = **cachedCount × 列数**（4 列时 20 ⇒ 预建 80 张卡），
+      //      建议先降到 **8–12** 再观察首屏节点数与滚动连贯，别把省下来的节点又预建回去。
       .cachedCount(20)
       }
     }
@@ -2350,8 +2357,16 @@ build() {
       .layoutWeight(1)
       .width('100%')
       .scrollBar(BarState.Off)
-      // ★★★ 2026-10-14 同类全扫：与网格同步预加载量（6→20 那次）
-      //   4 → 20 ⇒ 字母表快速滚动时行已建好，不再边滚边建 ⇒ 连贯 ✓
+      // ⚠️ 2026-11-08 perf-hunter **纠正措辞（不是删功能）**：
+      //   官方 `list.d.ts:769–773` 的原话是 ——
+      //     "When the **List** component is used together with **ForEach** and **cachedCount** is set,
+      //      in addition to laying out child components within the visible area, child components
+      //      within the range of **cachedCount** outside the visible area are **pre-laid out** during idle time."
+      //   ⇒ 也就是说：**List + ForEach 下这行是有效的**，但它的效果是「**预布局**」而不是「预创建」。
+      //   ⇒ 原注释「4 → 20 ⇒ 字母表快速滚动时行已建好」**措辞不准**：`ForEach(this.azSections())`
+      //      本来就是全量创建（"建好"是恒真的），这行真正买到的是**滚动时的布局开销**。
+      //   ⚠️ 注意与主网格的区别：**Grid 的 `cachedCount` 才是"只在 LazyForEach 下生效"**
+      //      （`grid.d.ts:563`）—— 两处语义不同，别照着这里去推网格。
       .cachedCount(20)
       .sticky(StickyStyle.Header)
       // 滚动时把当前字母同步到右侧索引条

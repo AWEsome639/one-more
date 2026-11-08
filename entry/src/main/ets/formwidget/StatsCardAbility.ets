@@ -10,6 +10,8 @@ import { Want, common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { preferences } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
+// ★★★ 2026-11-08（成就体系巡检 P1）：等级曲线唯一真相源（纯数学、零依赖 ⇒ 可安全带进 Form 进程）
+import { LevelCurve } from '../core/LevelCurve';
 
 const DOMAIN = 0x0001;
 const TAG = 'StatsCard';
@@ -197,10 +199,14 @@ async function readStats(ctx: common.Context): Promise<CardStats> {
     const alive: boolean = playedToday || isYesterday(lastDay, today);
 
     const level: number = xp <= 0 ? 1
-      : Math.min(100, Math.max(1, Math.floor(Math.pow(xp / 100, 1 / 2.04)) + 1));
-    const lo: number = level <= 1 ? 0 : Math.floor(100 * Math.pow(level - 1, 2.04));
-    const hi: number = Math.floor(100 * Math.pow(level, 2.04));
-    const pct: number = hi <= lo ? 100 : Math.min(100, Math.max(0, Math.round(((xp - lo) / (hi - lo)) * 100)));
+      // ★★★ 2026-11-08：原来这里把公式**又抄了一遍**（1/2.04），一旦 ProgressStore 改曲线，
+      //   桌面卡片就会和 App 显示**不一样的等级**。现在两边都走 `LevelCurve`。
+      : LevelCurve.levelOf(xp);
+    // ★★★ 2026-11-08：进度条的两个端点原来**也各写了一遍 2.04** —— 同一个坑。
+    //   现在统一走 `LevelCurve`（它内部还处理了"99 级 hi<=lo 时进度条永远满格"那个 bug）。
+    const lo: number = LevelCurve.xpForLevel(level);
+    const hi: number = LevelCurve.xpForLevel(level + 1);
+    const pct: number = Math.round(LevelCurve.progress(xp) * 100);
 
     out.level = String(level);
     out.title = levelTitle(level);

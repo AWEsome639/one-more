@@ -74,6 +74,13 @@
             分类：进度类（步数/得分/接通/已描…）= AI 在推进；失误类（配错/错手/失误）= AI 在错。
             **只涨失误计数不算 ACTIVE** —— 那是「AI 在动但每次都错」，仍报 TIMEOUT，
             并在 detail 里写明「只有失误计数在动」（正好能一眼看出立方体展开那类的病）。
+  ★ 判据 1810（2026-11-08）**ACTIVE = 通过**（新增口径，默认关）：
+            `--active-pass` 打开时，**ACTIVE 视为「通过」**（实时/无尽/长局的正确判据）。
+            为什么：这 10 款**根本没有结算**，旧统计把它们算成「未通过」⇒ 覆盖率被低估。
+            「通过」的条件比 ACTIVE 更严：**只认进度类读数在动**（步数/得分/接通…），
+            **失误类的加不加分** —— 只涨失误的仍判 TIMEOUT（见 §判据 1712 分类）。
+            JSONL 里始终写 `active_ok`（与开关无关，便于复核）与 `pass`（受开关影响）。
+            退出码：开关打开时 ACTIVE 不再算失败；默认关闭 ⇒ 344 WIN 基线不变。
   判据 1713 ACTIVE 早退（**默认关**）：`--active-window N`（秒）>0 时，累计 ≥2 次进度类变化
             且已跑满 N 秒 ⇒ 直接判 ACTIVE 收工，不再干等 120s。
             默认 0 = 不早退：**结算该等的还照等**，免得把「40 秒才结算」的款
@@ -125,6 +132,7 @@ RESET_BUDGET = 150.0   # 每款之间「回列表」的复位预算（比单款�
 # ── 判据 1712/1713 的旋钮 ──
 ACTIVE_WINDOW = 0.0    # 判据 1713：>0 才启用「读数动够就收工」；默认 0 = 不早退（保住 WIN 基线）
 ACTIVE_MIN_MOVES = 2   # 判据 1713：早退要求的最少**进度类**变化次数
+ACTIVE_COUNTS_PASS = False  # 判据 1810：--active-pass 打开时 ACTIVE 计入通过
 DUMP_REMOTE = '/data/local/tmp/_vaw.json'
 DUMP_LOCAL = '/tmp/_vaw.json'
 
@@ -171,7 +179,9 @@ USAGE = """用法：
   --out <路径>              结果 jsonl（默认 验收截图-v1.0.1/ai_win_verified.jsonl）
   --device <host:port>      设备地址（默认 127.0.0.1:5555）
   --active-window <秒>      读数动够就判 ACTIVE 收工（默认 0 = 不早退，判据 1713）
-退出码：0 全 WIN ｜ 1 有失败/TIMEOUT/ACTIVE ｜ 2 脚本异常 ｜ 3 设备不可用
+  --active-pass             **ACTIVE 视为通过**（判据 1810：实时/无尽/长局没有结算可等）
+退出码：0 全通过 ｜ 1 有失败/TIMEOUT/（未开 --active-pass 时的）ACTIVE ｜ 2 脚本异常 ｜ 3 设备不可用
+        （开 --active-pass 时 ACTIVE 计入通过 ⇒ 全 ACTIVE 也返回 0）
 """
 
 
@@ -1064,7 +1074,12 @@ def save(name, verdict, detail):
     ★ 为什么逐条 flush：24 款要跑 1 小时＋，中途掉线/被杀时，
       已经验完的结论必须已经在盘上，否则整批白跑。
     """
+    # ★ 判据 1810：`active_ok` 与开关无关（ACTIVE 本身就是「有进度、无失败」）；
+    #   `pass` 受 `--active-pass` 影响，供统计与下游脚本直接读，不用再自己判 verdict。
+    active_ok = (verdict == 'ACTIVE')
+    passed = (verdict == 'WIN') or (active_ok and ACTIVE_COUNTS_PASS)
     rec = {'name': name, 'verdict': verdict, 'detail': detail,
+           'active_ok': active_ok, 'pass': passed,
            'ts': time.strftime('%Y-%m-%dT%H:%M:%S')}
     with io.open(OUT, 'a', encoding='utf-8') as f:
         f.write(json.dumps(rec, ensure_ascii=False) + '\n')
@@ -1073,8 +1088,14 @@ def save(name, verdict, detail):
 
 def _stats_line(stats):
     """判据 1679 + 1712：一行汇总（ACTIVE 单列，绝不并进 WIN）"""
-    return 'WIN %d · ACTIVE %d · FAIL %d · TIMEOUT %d · ERROR %d' % (
+    base = 'WIN %d · ACTIVE %d · FAIL %d · TIMEOUT %d · ERROR %d' % (
         stats['WIN'], stats['ACTIVE'], stats['FAIL'], stats['TIMEOUT'], stats['ERROR'])
+    if ACTIVE_COUNTS_PASS:
+        # 判据 1810：把「ACTIVE 计入通过」这件事显式打出来，避免看统计的人误以为 WIN 变多了
+        base += ' ｜ ACTIVE 计入通过 ⇒ 通过 %d/%d' % (
+            stats['WIN'] + stats['ACTIVE'], stats['WIN'] + stats['ACTIVE']
+            + stats['FAIL'] + stats['TIMEOUT'] + stats['ERROR'])
+    return base
 
 
 def _reset_home():
@@ -1094,13 +1115,17 @@ def _reset_home():
 # ════════════════════════════════════════════════════════════════════════════
 def parse_args(argv):
     opts = {'names': [], 'limit': 10, 'per_game': PER_GAME, 'out': OUT, 'device': DEV,
-            'active_window': ACTIVE_WINDOW}
+            'active_window': ACTIVE_WINDOW, 'active_pass': False}
     i = 0
     while i < len(argv):
         a = argv[i]
         if a in ('-h', '--help'):
             print(USAGE)
             raise SystemExit(0)
+        if a == '--active-pass':
+            opts['active_pass'] = True
+            i += 1
+            continue
         if a in ('--limit', '--per-game-timeout', '--names-file', '--out', '--device',
                  '--active-window'):
             if i + 1 >= len(argv):
@@ -1136,12 +1161,13 @@ def parse_args(argv):
 
 
 def main():
-    global OUT, DEV, PER_GAME, _BUDGET, ACTIVE_WINDOW
+    global OUT, DEV, PER_GAME, _BUDGET, ACTIVE_WINDOW, ACTIVE_COUNTS_PASS
     opts = parse_args(sys.argv[1:])
     OUT = os.path.abspath(opts['out'])
     DEV = opts['device']
     PER_GAME = float(opts['per_game'])
     ACTIVE_WINDOW = float(opts['active_window'])
+    ACTIVE_COUNTS_PASS = bool(opts.get('active_pass', False))
 
     if not os.path.exists(HC):
         print('🔴 找不到 hdc：%s' % HC, file=sys.stderr)
@@ -1226,7 +1252,9 @@ def main():
         print('  未通过：', flush=True)
         for nm, v, dd in bad:
             print('    %s => %s（%s）' % (nm, v, (dd or '')[:120]), flush=True)
-    return 0 if stats['WIN'] == total else 1
+    # ★ 判据 1810：开了 --active-pass ⇒ ACTIVE（有进度、无失败）也算通过
+    passed_n = stats['WIN'] + (stats['ACTIVE'] if ACTIVE_COUNTS_PASS else 0)
+    return 0 if passed_n == total else 1
 
 
 if __name__ == '__main__':

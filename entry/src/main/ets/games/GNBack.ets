@@ -44,6 +44,8 @@ export struct GNBack {
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
   @State private seq: string[] = [];
+  /** ★ 2026-11-08 代打滚动的记忆：每个 trial 看到的刺激 */
+  private aiSeen: string[] = [];
   @State private idx: number = 0;
   @State private marks: number[] = [];   // 1 对 / 0 错
   @State private right: number = 0;
@@ -193,7 +195,18 @@ export struct GNBack {
     if (this.warm() || this.pick >= 0) {
       return true;
     }
-    this.answer(this.seq[this.idx] === this.seq[this.idx - BACK]);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 seq[idx-BACK]（答案）**：
+    //   当前刺激是屏幕上的题面；往前 BACK 个是什么，用自己滚动记下的清单比。
+    const cur: string = this.seq[this.idx];
+    const back: number = this.idx - BACK;
+    let same: boolean = false;
+    if (back >= 0 && back < this.aiSeen.length) {
+      same = this.aiSeen[back] === cur;
+    }
+    if (this.aiSeen.length === this.idx) {
+      this.aiSeen = this.aiSeen.concat([cur]);
+    }
+    this.answer(same);
     return !this.over;
   }
 

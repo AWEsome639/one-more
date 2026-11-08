@@ -52,6 +52,8 @@ export struct GMemoryPalace {
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
   @State private slots: string[] = [];
+  /** ★ 2026-11-08 代打的记忆：记忆阶段看过的那间屋子 */
+  private aiMem: string[] = [];
   @State private order: number[] = [];
   @State private qIdx: number = 0;
   @State private target: number = -1;
@@ -103,6 +105,8 @@ export struct GMemoryPalace {
     this.msg = TG2('第 {0} 轮：记住 {1} 件东西的位置', String(this.round), String(PER));
     this.memTo = setTimeout(() => {
       this.memTo = -1; this.phase = 1; this.pickCell = -1; this.msg = TG(TG(TG('它放在哪一格？')));
+      // ★ 2026-11-08（ai-fixer-a）代打「看过」这间屋子：抄一份自己的记忆
+      this.aiMem = this.slots.slice();
     }, MEM_MS);
   }
 
@@ -215,8 +219,20 @@ export struct GMemoryPalace {
     if (this.over || this.phase !== 1) {
       return true;
     }
-    this.answer(this.target);
-    return !this.over;
+    // ★ 2026-11-08（ai-fixer-a）**不再读 target（答案格号）**：
+    //   phase 0「记忆」结束时把整间屋子抄进 aiMem（这就是"看过"），
+    //   作答时从屏幕上的提问物（slots[target]，题面）反查自己记住的格子。
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    const ask: string = this.slots[this.target];
+    for (let i = 0; i < this.aiMem.length; i++) {
+      if (this.aiMem[i] === ask && this.aiMem[i] !== '') {
+        this.answer(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

@@ -36,7 +36,7 @@ export interface Intent {
   untimed: boolean;
   /** 想「多人/联机」 */
   multiplayer: boolean;
-  /** 想「棋牌类」（tags 里有 board/card） */
+  /** 想「棋牌类」（按**名字**判：棋/牌/麻将/博弈 —— tags 里没有 board/card） */
   board: boolean;
   /** ★ 2026-11-08：「像 XX 那样的」—— 用户提到的那款游戏的 id（找不到就空串） */
   similar: string;
@@ -97,6 +97,11 @@ const SHORT_WORDS: string[] = ['三五分钟', '几分钟', '短', '快', '一�
 const LONG_WORDS: string[] = ['长', '久', '一直玩', '耐玩', 'long', 'endless', 'lange', 'longtemps', 'долг', 'طويل',
   // ★ 2026-11-08 补：日语/韩语的「长」（与 SHORT 对称）
   '長い', '긴'];
+
+/** 真·联机对打：引用 `LanMatch` 的 8 款（355 款都有 LanRace 竞速，那不算对打） */
+const MULTI_IDS: string[] = [
+  'checkers', 'connect_four', 'go9', 'gomoku', 'mancala', 'nim', 'reversi', 'tic_tac_toe'
+];
 
 export class ChatFinder {
   /**
@@ -185,8 +190,10 @@ export class ChatFinder {
 
   /** 意图是否「什么都没抽到」（这时该追问，而不是乱推） */
   static isEmpty(it: Intent): boolean {
+    // ★★★ 2026-11-08（game-balancer）：`pausable` / `untimed` 已**退出打分**（覆盖 91%，没有筛选力）
+    //   ⇒ 它们不能再算「听懂了」：只有这两个命中时必须**走追问**，而不是返回 323 款。
     return it.category === null && it.difficulty === null && !it.short && !it.long
-      && !it.pausable && !it.untimed && !it.multiplayer && !it.board && it.similar.length === 0;
+      && !it.multiplayer && !it.board && it.similar.length === 0;
   }
 
   /** 按意图给一款游戏打分（越高越合适） */
@@ -210,16 +217,28 @@ export class ChatFinder {
     }
     // ★ 2026-11-08 **死判据修复**（verifier-eng2 实测）：数据里 **`quick` 是 0 款**，
     //   真实存在的是 **`short`(166)** 与 `timed`(32) ⇒ 「十分钟/短一局」原来**永远匹配不到**。
-    if (it.short && (g.tags.indexOf('short') >= 0 || g.tags.indexOf('timed') >= 0 || g.tags.indexOf('quick') >= 0)) { sc += 15; }
-    if (it.long && (g.tags.indexOf('endless') >= 0 || g.tags.indexOf('untimed') >= 0)) { sc += 15; }
-    if (it.pausable && g.tags.indexOf('pausable') >= 0) { sc += 12; }
-    if (it.untimed && g.tags.indexOf('untimed') >= 0) { sc += 12; }
-    if (it.multiplayer && (g.tags.indexOf('multiplayer') >= 0 || g.tags.indexOf('board') >= 0)) { sc += 10; }
+    if (it.short && (g.tags.indexOf('short') >= 0 || g.tags.indexOf('timed') >= 0)) { sc += 15; }
+    // ★★★ 2026-11-08（game-balancer）**「长局」改用真·时长 tag**：
+    //   原来是 `endless | untimed` ⇒ untimed 覆盖 323 款 ⇒ 「找个长局」返回 **332 款**（等于没筛）。
+    //   改成 `long`(64) | `endless`(22) ⇒ **78 款**，正好落在 20~80 的理想筛选区间。
+    if (it.long && (g.tags.indexOf('long') >= 0 || g.tags.indexOf('endless') >= 0)) { sc += 15; }
+    // ★★★ 2026-11-08（game-balancer）**「能暂停 / 不限时」不再参与打分**。
+    //   判据：`pausable` 覆盖 147 款、`untimed` 覆盖 **323 款（91%）**
+    //   ⇒ 加分等于给整个库加同一个常数，对排序**零贡献**；
+    //     单独问「找个能暂停的」还会把 323 款全捞出来（等于没筛）。
+    //   ⇒ 这两个字段现在只用于文案；**只命中它们时会走追问**（见 isEmpty）。
+    //   （依据：_巡检记录/tag分布-20261108.md §2 / §6）
+
+    // ★★★ 2026-11-08（game-balancer）**死查表修复**：原来查 `multiplayer` / `board` 两个 tag，
+    //   而 GameTags 的 25 个 tag 里**这两个都不存在（0 款）** ⇒ 「联机对打」永远返回 0 结果。
+    //   改成**静态名单**：真·联机对打 = 引用 `LanMatch` 的 8 款（其余 355 款只有 LanRace 竞速、不算对打）。
+    //   重新生成：`grep -l LanMatch entry/src/main/ets/games/*.ets`
+    if (it.multiplayer && MULTI_IDS.indexOf(g.id) >= 0) { sc += 10; }
     // ★ 2026-11-07 模拟验证：355 款的 tags 里**根本没有 board/card** ⇒ 改用「名称含棋/牌」判断
     //   （`9 路围棋`/`跳棋`/`五子棋`/`四子棋`/`黑白棋` 全命中，而 `宝石迷阵` 不会）
     if (it.board) {
       const nm: string = g.name;
-      if (nm.indexOf('棋') >= 0 || nm.indexOf('牌') >= 0 || nm.indexOf('麻将') >= 0) { sc += 30; }
+      if (nm.indexOf('棋') >= 0 || nm.indexOf('牌') >= 0 || nm.indexOf('麻将') >= 0 || nm.indexOf('博弈') >= 0) { sc += 30; }
     }
     // ★ 2026-11-08「像 XX 那样」：同类别 +18、同难度 +8、共享 tags 每个 +4（最多 +16）
     //   ⚠️ **不推荐它自己**（用户说「像 2048」意思是要「别的」，不是「再玩一次 2048」）

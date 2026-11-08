@@ -1154,6 +1154,7 @@ export function gameName(id: string, zh: string, en: string): string {
 }
 
 const EXTRA: Record<string, Record<string, string>> = {
+  "💤 没有可合并的相邻格了，这一局到此为止": { "ja": "💤 合体できる隣接マスがないので、この勝負はここまで", "ko": "💤 합칠 수 있는 인접 칸이 없어 이번 판은 여기까지", "es": "💤 No quedan casillas adyacentes combinables, la partida termina aqui", "fr": "💤 Plus de cases adjacentes combinables, la partie s arrete ici", "de": "💤 Keine kombinierbaren Nachbarfelder mehr, die Runde endet hier", "pt": "💤 Sem casas adjacentes combinaveis, a rodada termina aqui", "ru": "💤 Нет соседних клеток для слияния, раунд закончен", "it": "💤 Nessuna casella adiacente combinabile, la partita finisce qui", "ar": "💤 لا توجد خلايا متجاورة قابلة للدمج، انتهت الجولة هنا", "zh-Hant": "💤 沒有可合併的相鄰格了，這一局到此為止" },
   "是「{0}」类": { "ja": "「{0}」系", "ko": "「{0}」류", "es": "Del tipo «{0}»", "fr": "Type « {0} »", "de": "Typ „{0}“", "pt": "Do tipo «{0}»", "ru": "Тип «{0}»", "it": "Del tipo «{0}»", "ar": "من نوع «{0}»", "zh-Hant": "是「{0}」類" },
   "难度对得上": { "ja": "難易度が合ってる", "ko": "난이도가 맞음", "es": "Dificultad adecuada", "fr": "Difficulte adaptee", "de": "Passender Schwierigkeitsgrad", "pt": "Dificuldade certa", "ru": "Подходящая сложность", "it": "Difficolta giusta", "ar": "صعوبة مناسبة", "zh-Hant": "難度對得上" },
   "和你说的那款相近": { "ja": "言ったあの作品に似てる", "ko": "말한 그 게임과 비슷", "es": "Similar al que dijiste", "fr": "Similaire a celui cite", "de": "Ahnlich wie das genannte", "pt": "Parecido com o que citou", "ru": "Похоже на названное", "it": "Simile a quello citato", "ar": "مشابه لما ذكرته", "zh-Hant": "和你說的那款相近" },

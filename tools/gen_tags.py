@@ -70,7 +70,7 @@ CAT_ATTR = {
     'CLASSIC': ['logic'],
     'LOGIC':   ['logic'],
     'MATH':    ['calc'],
-    'MEMORY':  ['memory', 'focus'],
+    'MEMORY':  ['memory'],
     'WORD':    ['word'],
     'SPATIAL': ['space'],
 }
@@ -136,13 +136,20 @@ def tags_for(gid, name, tag, cat):
 
     # ── ① 脑力（分类主导）──
     t |= set(CAT_ATTR.get(cat, ['logic']))
+    # 焦点：只给「持续注意 / 抑制控制」类
+    # ★ 2026-11-08（game-balancer）：原来 focus 直接由 CAT_ATTR 给整个 MEMORY 类 ⇒
+    #   `focus ≡ memory`（74 款完全相同，两个 tag 一条信息）。改成按关键词认。
+    if re.search(r'attention|vigilance|stroop|flanker|go_no_go|stop_signal|distractor|neglect|'
+                 r'peripheral|change_blindness|d2_attention|divided_attention|dual_task|'
+                 r'tunnel|salience|cueing|blink', hay):
+        t.add('focus')
 
     # ── ② 时长（分类主导 + 关键词覆盖）──
     #   极速：反应/闪现/限时点击类
     if re.search(r'reflex|blink|flash|reaction|subitiz|speed|sprint|dash|rush|frequency|go_no_go|stop_signal|ghost|orbit|probe', hay):
         t.add('speed')
     #   长时间：格点逻辑谜题（数织/数回/数独这类一盘要坐一会儿）
-    elif cat == 'LOGIC' or re.search(r'nonogram|slitherlink|nurikabe|yajilin|tapa|heyawake|kakuro|kenken|hitori|shikaku|bridges|masyu|dominosa|fillomino|akari|lighthouse|magnet|kurodoko|norinori|gokigen|kakurasu|crown|futoshiki|solitaire|freecell|spider|mahjong|crossword|maze|tangram|sokoban|klotski|slither|paper_folding|cube_net|polyomino|wireframe|jigsaw', hay):
+    elif cat == 'LOGIC' or re.search(r'go9|nonogram|slitherlink|nurikabe|yajilin|tapa|heyawake|kakuro|kenken|hitori|shikaku|bridges|masyu|dominosa|fillomino|akari|lighthouse|magnet|kurodoko|norinori|gokigen|kakurasu|crown|futoshiki|solitaire|freecell|spider|mahjong|crossword|maze|tangram|sokoban|klotski|slither|paper_folding|cube_net|polyomino|wireframe|jigsaw', hay):
         t.add('long')
     #   短：单题式的数字/记忆/文字小游戏
     elif cat in ('MATH', 'MEMORY', 'WORD'):
@@ -151,7 +158,7 @@ def tags_for(gid, name, tag, cat):
         t.add('medium')
 
     # ── ③ 难度（分类主导 + 关键词覆盖）──
-    if re.search(r'nurikabe|slitherlink|yajilin|tapa|heyawake|gokigen|hitori|nonogram|kakuro|kenken|einstein|tower_of_london|n_back|double_n_back|corsi|sternberg|wireframe|mental_rotation|perspective|block_count_3d|cube_net|complex_folding', hay):
+    if re.search(r'go9|nurikabe|slitherlink|yajilin|tapa|heyawake|gokigen|hitori|nonogram|kakuro|kenken|einstein|tower_of_london|n_back|double_n_back|corsi|sternberg|wireframe|mental_rotation|perspective|block_count_3d|cube_net|complex_folding', hay):
         t.add('hard')
     elif re.search(r'tic_tac_toe|simon_says|pong|flappy|whack|counting_sheep|bubble|match3|bejewel|color_flood|water_sort|nim|mancala|reversi|checkers|tower_of_hanoi', hay):
         t.add('easy')
@@ -181,7 +188,6 @@ def tags_for(gid, name, tag, cat):
         t.add('timed')
     else:
         t.add('untimed')
-        t.add('pausable')
 
     # ── ⑥ 场景 ──
     if re.search(r'onehand|reflex|flash|reaction|subitiz|speed|sprint|tap|click', hay):
@@ -190,10 +196,16 @@ def tags_for(gid, name, tag, cat):
         t.add('endless')
     if re.search(r'zen|relax|mandala|counting_sheep|color|hue|sort|sand|garden|aquarium|breath|pixel|shape_shifter|kaleido', hay):
         t.add('zen')
-    if 'hard' in t:
+    if 'hard' in t and 'long' in t:
         t.add('brainy')
     if re.search(r'2048|match3|bejewel|bubble|solitaire|spider|freecell|mahjong|nonogram|sudoku|color_flood|water_sort|pixel|tangram|jigsaw|mandala', hay):
         t.add('cozy')
+
+    # 可暂停：不限时 ∧ 不是跑分局 ∧ 这局要坐一会儿（30 秒的局不需要暂停）
+    # ★ 2026-11-08（game-balancer）：原来与 untimed 在同一个 else 里一起 add ⇒
+    #   `pausable ≡ untimed`（323 款完全相同）。改成 untimed 的真子集。
+    if 'untimed' in t and 'endless' not in t and ('medium' in t or 'long' in t):
+        t.add('pausable')
 
     # ── ⑦ 兜底：四类必须各有一个 ──
     if not (t & {'speed', 'short', 'medium', 'long'}):

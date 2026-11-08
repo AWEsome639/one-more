@@ -55,6 +55,8 @@ export struct GContinuousRecognition {
   onFinish: (r: GameResult) => void = () => {};
 
   @State seq: RecItem[] = [];
+  /** ★ 2026-11-08 代打见过的图标（按出现顺序，自己记的） */
+  private aiSeen: string[] = [];
   @State trial: number = 0;
   @State correct: number = 0;
   @State wrong: number = 0;
@@ -203,7 +205,18 @@ export struct GContinuousRecognition {
     if (this.trial >= this.seq.length) {
       return true;
     }
-    this.answer(this.seq[this.trial].isOld);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 isOld（答案）**：
+    //   屏幕上出现的图标是题面；「见过没有」用自己按顺序记下的清单判断。
+    const cur: string = this.seq[this.trial].icon;
+    let old: boolean = false;
+    for (let i = 0; i < this.aiSeen.length; i++) {
+      if (this.aiSeen[i] === cur) {
+        old = true;
+        break;
+      }
+    }
+    this.aiSeen = this.aiSeen.concat([cur]);
+    this.answer(old);
     return !this.over;
   }
 

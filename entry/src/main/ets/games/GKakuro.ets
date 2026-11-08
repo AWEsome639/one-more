@@ -10,6 +10,7 @@
  * 胜负：四条串全部满足 ⇒ 通关（solved=true）；步数用尽 ⇒ 失败（solved=false）。
  */
 
+import { Bp } from '../core/Bp';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
@@ -619,6 +620,13 @@ export struct GKakuro {
         }, (r: number) => 'kr' + r)
       }
       .width('100%')
+      // ★★★ 2026-11-08 **横屏按钮被挤出视口**（verifier-dev 真机实测）：
+      //   本款根容器是 `Column`（无 Scroll），按钮行在棋盘之后；
+      //   而棋盘是 `width('100%')` + 内部格子 `aspectRatio(1)` ⇒ **853 宽 ⇒ 813 高**
+      //   ⇒ 2560×1600 下棋盘线索撑到 `y≈1593`，**「提示 / AI 代打」两个按钮被挤出视口**
+      //   （dump 25 个节点里没有任何按钮，玩家和验证器都点不到）。
+      //   ⇒ 按判据 1802：**约束加在「棋盘容器」上**，横屏按可用高反推。
+      .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 260 : 9999 })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
