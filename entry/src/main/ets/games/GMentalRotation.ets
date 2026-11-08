@@ -120,6 +120,35 @@ export struct GMentalRotation {
   @State private msg: string = ''; @State private over: boolean = false; @State private won: boolean = false;
   private startAt: number = 0; private nextTo: number = -1; private cur: Round | null = null;
   private done: boolean = false;
+  /** ★ 2026-11-08 自己判断 cand 是不是「镜像后再旋转」（不读 truth） */
+  private aiMirror(): boolean {
+    const k: number = Math.round(this.deg / 90);
+    const rotBase: boolean[] = turn(k, this.base);
+    const rotMir: boolean[] = turn(k, this.mir);
+    const eqBase: boolean = this.aiSame(this.cand, rotBase);
+    const eqMir: boolean = this.aiSame(this.cand, rotMir);
+    if (eqBase && !eqMir) {
+      return false;
+    }
+    if (eqMir) {
+      return true;
+    }
+    return false;
+  }
+
+  /** 两个布尔网格逐格比较 */
+  private aiSame(a: boolean[], b: boolean[]): boolean {
+    if (a.length !== b.length) {
+      return false;
+    }
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   aboutToAppear(): void {
     LanRace.noteStart(); this.startAt = Date.now(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
@@ -255,7 +284,10 @@ export struct GMentalRotation {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.answer(this.truth);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.truth（答案）**：
+    //   屏幕上给了 base / cand / 旋转角 ⇒ 自己把 base 转过去（以及镜像后再转），
+    //   看 cand 跟哪个一致，就知道是不是镜像。
+    this.answer(this.aiMirror());
     return !this.over;
   }
 

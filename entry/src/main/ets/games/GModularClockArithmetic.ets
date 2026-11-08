@@ -239,8 +239,16 @@ export struct GModularClockArithmetic {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    // ★ 2026-11-08 代打「不抄答案」：屏幕上有「现在 X 点 / 过(前) Y 小时」
+    //   ⇒ 自己用 12 点表盘算：wrap12(start ± delta)，再在选项里找同值项
+    const want: number = this.forward ? wrap12(this.start + this.delta) : wrap12(this.start - this.delta);
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;              // 算不出/对不上 ⇒ 停手（不读 ans）
   }
 
   private askAuto(): void {

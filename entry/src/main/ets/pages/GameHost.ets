@@ -3446,8 +3446,15 @@ struct GameHost {
         //   `-120`（同 pong）⇒ 场地高 90 → **160vp**，缝隙 27 → **48vp**，小鸟占比 96% → **54%**。
         //   ⚠️ 与 pong 同理：flappy 的飞行区是 `layoutWeight(1)`（不参与 aspectRatio 反推），
         //      长高只会向下延伸；下方 msg/按钮会跟着下移 ~70vp，需真机复核是否挤到提示行。
-        .constraintSize({ maxHeight: Bp.height - (this.gameId === 'pong' ? 120
-          : (this.gameId === 'flappy' ? 120 : 190)) })
+                // ★★★ 2026-11-08 再追加 `doodle_jump`（code-hunter 真机实测）：
+        //   场地 Stack 实测 **813 × 36.3vp**（比 flappy 的 90vp 还矮 2.5 倍）⇒ 判定双向都错：
+        //   · 横向 P_W=10% ⇒ 81.3vp vs 青蛙视觉 24vp = **3.39×**（离平台还有 57vp 就算踩上）
+        //   · 纵向 P_H=9%  ⇒ 3.3vp vs 视觉 20vp = **0.16×**（青蛙大半个身子陷进平台还没判定）
+        //   · 平台 PLAT_H=2.6% × 36.3 = **0.94vp ⇒ 渲染成 1 像素发丝线**
+        //   ⇒ 先按同一思路把游戏区放宽（36 → ~71vp）；**判定系数与平台高度留到下一轮**再拍
+        //     （36vp 的场地里怎么调都是错的 —— 这是 code-hunter 与 lead 的共同结论）。
+        .constraintSize({ maxHeight: Bp.height - ((this.gameId === 'pong' || this.gameId === 'flappy'
+          || this.gameId === 'doodle_jump') ? 120 : 190) })
         // ★★★ 2026-11-08 **回滚 `.clip(true)`**（真机截图证实它更糟）：
         //   clip 只是把棋盘**切成两半**（上半可见、下半被切掉），
         //   底部按钮**并没有因此回到屏内** —— 它们本来就在容器外的流式布局里。

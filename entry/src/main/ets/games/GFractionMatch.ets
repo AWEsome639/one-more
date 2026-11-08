@@ -41,6 +41,13 @@ export struct GFractionMatch {
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
   @State private keys: string[] = [];
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来第二张直接比 `this.keys[a] === this.keys[b]` —— 读的是**牌背真值**（玩家看不见）。
+   *   ⇒ 改成 AI 只记「自己翻到过的牌面」(`aiSeen[i]` = 翻到时看到的 label)，
+   *     配对时**用看得见的分数自己判等值**（交叉相乘 a/b ≡ c/d ⇔ a·d = c·b）。
+   */
+  private aiSeen: string[] = [];
   @State private open: number[] = [];
   @State private done: boolean[] = [];
   // ★ 难度作用到玩法：本局时限 = 基础 × 难度倍率（简单 1.5× / 普通 1× / 困难 0.7×）
@@ -102,6 +109,7 @@ export struct GFractionMatch {
       seen[bi] = seen[bi] + 1; labels.push(String(BASE_N[bi] * mult) + '/' + String(BASE_D[bi] * mult)); keys.push(String(bi));
     }
     this.labels = labels; this.keys = keys; this.open = []; this.done = new Array<boolean>(CARD).fill(false);
+    this.aiSeen = new Array<string>(CARD).fill('');   // ★ 新一局：记忆清空
   }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // ═══════════ 演示动画（项目 C）═══════════
@@ -186,6 +194,76 @@ export struct GFractionMatch {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /** 两个分数 label 是否等值（"a/b" ≡ "c/d" ⇔ a·d = c·b），全用**看得见的牌面**算 */
+  private aiEq(x: string, y: string): boolean {
+    if (x.length === 0 || y.length === 0) {
+      return false;
+    }
+    const px: string[] = x.split('/');
+    const py: string[] = y.split('/');
+    if (px.length !== 2 || py.length !== 2) {
+      return false;
+    }
+    const a: number = Number.parseInt(px[0], 10);
+    const b: number = Number.parseInt(px[1], 10);
+    const c: number = Number.parseInt(py[0], 10);
+    const d: number = Number.parseInt(py[1], 10);
+    if (isNaN(a) || isNaN(b) || isNaN(c) || isNaN(d) || b === 0 || d === 0) {
+      return false;
+    }
+    return a * d === c * b;
+  }
+
+  /** 只用「自己翻到过的牌面」决定翻哪张；没信息就翻没见过的牌探路 */
+  private aiPick(): number {
+    const known = (i: number): boolean => i >= 0 && i < this.aiSeen.length && this.aiSeen[i].length > 0;
+    const free = (i: number): boolean => !this.done[i] && this.open.indexOf(i) < 0;
+    if (this.open.length === 1) {
+      const a: number = this.open[0];
+      // ① 记得等值的牌 ⇒ 直接翻
+      for (let i = 0; i < CARD; i++) {
+        if (i !== a && free(i) && known(i) && this.aiEq(this.aiSeen[i], this.aiSeen[a])) {
+          return i;
+        }
+      }
+      // ② 没记住 ⇒ 翻一张没见过的
+      for (let i = 0; i < CARD; i++) {
+        if (free(i) && !known(i)) {
+          return i;
+        }
+      }
+      // ③ 都见过 ⇒ 随便翻一张没开的
+      for (let i = 0; i < CARD; i++) {
+        if (i !== a && free(i)) {
+          return i;
+        }
+      }
+      return -1;
+    }
+    // open 为空：优先翻「记得、且记得它的等值牌也还在」的
+    for (let i = 0; i < CARD; i++) {
+      if (!free(i) || !known(i)) {
+        continue;
+      }
+      for (let j = 0; j < CARD; j++) {
+        if (j !== i && free(j) && known(j) && this.aiEq(this.aiSeen[i], this.aiSeen[j])) {
+          return i;
+        }
+      }
+    }
+    for (let i = 0; i < CARD; i++) {
+      if (free(i) && !known(i)) {
+        return i;
+      }
+    }
+    for (let i = 0; i < CARD; i++) {
+      if (free(i)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -193,23 +271,12 @@ export struct GFractionMatch {
     if (this.open.length >= 2) {
       return true;
     }
-    if (this.open.length === 1) {
-      const a: number = this.open[0];
-      for (let i = 0; i < CARD; i++) {
-        if (i !== a && !this.done[i] && this.keys[i] === this.keys[a]) {
-          this.flip(i);
-          return !this.over;
-        }
-      }
-      return true;
+    const pick: number = this.aiPick();
+    if (pick < 0) {
+      return false;
     }
-    for (let i = 0; i < CARD; i++) {
-      if (!this.done[i]) {
-        this.flip(i);
-        return !this.over;
-      }
-    }
-    return false;
+    this.flip(pick);
+    return !this.over;
   }
 
   private computeHint(): HintResult {
@@ -268,6 +335,9 @@ export struct GFractionMatch {
   private flip(i: number): void {
     if (this.over || this.done[i] || this.open.indexOf(i) >= 0 || this.open.length >= 2) { return; }
     const cur: number[] = this.open.concat([i]); this.open = cur;
+    if (i >= 0 && i < this.aiSeen.length) {
+      this.aiSeen[i] = this.labels[i];      // ★ 这张被翻开了 ⇒ AI 记住了它的分数
+    }
     if (cur.length < 2) { return; }
     this.tries = this.tries + 1;
     if (this.keys[cur[0]] === this.keys[cur[1]]) {

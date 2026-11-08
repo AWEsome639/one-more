@@ -244,7 +244,9 @@ export struct GMentalCalendar {
     if (this.pickedW >= 0 || this.over) {
       return true;
     }
-    this.pick(this.ansW);
+    // ★ 2026-11-08 代打「不抄答案」：屏幕上是「YYYY 年 M 月 D 日」
+    //   ⇒ 用同一套日历算法自己推星期（Zeller），答案 = 星期序号
+    this.pick(weekdayOf(this.yr, this.mon, this.day));
     return !this.over;
   }
 

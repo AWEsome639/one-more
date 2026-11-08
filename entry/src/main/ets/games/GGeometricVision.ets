@@ -84,6 +84,17 @@ export struct GGeometricVision {
     return out;
   }
 
+  /** ★ 2026-11-08 自己数图里的实心格（不读 na/nb） */
+  private aiCount(cells: boolean[]): number {
+    let n: number = 0;
+    for (let i = 0; i < cells.length; i++) {
+      if (cells[i]) {
+        n = n + 1;
+      }
+    }
+    return n;
+  }
+
   private roll(): void {
     const na: number = 3 + Math.floor(Math.random() * 9);
     let nb: number = 3 + Math.floor(Math.random() * 9);
@@ -191,7 +202,11 @@ export struct GGeometricVision {
     if (this.over) {
       return true;
     }
-    this.answer(this.na > this.nb ? 0 : 1);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 na/nb（现成计数）**：
+    //   屏幕上两幅图就是 aCells/bCells ⇒ 自己数实心格，再比大小。
+    const ka: number = this.aiCount(this.aCells);
+    const kb: number = this.aiCount(this.bCells);
+    this.answer(ka > kb ? 0 : 1);
     return !this.over;
   }
 

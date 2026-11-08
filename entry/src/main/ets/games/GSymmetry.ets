@@ -119,6 +119,33 @@ export struct GSymmetry {
     this.over = false; this.won = false; this.done = false; this.startAt = Date.now();
     this.makeRound();
   }
+  /** ★ 2026-11-08 自己验 4 条对称轴（与 axisCount 同一套映射，但不读 axis） */
+  private aiAxis(): number {
+    const n: number = this.diffTotal;
+    for (let a = 0; a < 4; a++) {
+      let ok: boolean = true;
+      for (let r = 0; r < n && ok; r++) {
+        for (let c = 0; c < n && ok; c++) {
+          let m: number = r * n + (n - 1 - c);
+          if (a === 1) {
+            m = (n - 1 - r) * n + c;
+          } else if (a === 2) {
+            m = c * n + r;
+          } else if (a === 3) {
+            m = (n - 1 - c) * n + (n - 1 - r);
+          }
+          if (this.grid[m] !== this.grid[r * n + c]) {
+            ok = false;
+          }
+        }
+      }
+      if (ok) {
+        return a;
+      }
+    }
+    return -1;
+  }
+
   private makeRound(): void {
     let axis: number = Math.floor(Math.random() * 4);
     let g: number[] = buildSym(axis, this.diffTotal);
@@ -240,7 +267,13 @@ export struct GSymmetry {
     if (this.over || this.revealed) {
       return true;              // 还没到能作答的时刻 / 已经答过，等推进
     }
-    this.answer(this.axis);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.axis（答案）**：
+    //   屏幕上就是那张 4×4 图 ⇒ 自己对 4 条轴逐一验对称，取成立的那条。
+    const axis: number = this.aiAxis();
+    if (axis < 0) {
+      return false;
+    }
+    this.answer(axis);
     return !this.over;
   }
 

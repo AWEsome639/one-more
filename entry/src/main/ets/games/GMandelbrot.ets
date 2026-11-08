@@ -255,7 +255,10 @@ export struct GMandelbrot {
       this.next();               // 已作答 ⇒ 替玩家按「下一题」
       return !this.over;
     }
-    this.answer(this.inside);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.inside（答案）**：
+    //   屏幕上给的是复平面点 (cx, cy) ⇒ 自己跑 Mandelbrot 迭代，看它会不会逃逸。
+    const it: number = escapeIter(this.cx, this.cy);
+    this.answer(it >= MAXIT);
     return !this.over;
   }
 

@@ -254,8 +254,16 @@ export struct GPercentageShopping {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    // ★ 2026-11-08 代打「不抄答案」：屏幕上有「原价 ¥P / 打 N 折」
+    //   ⇒ 折后价 = P × N ÷ 10，再在选项里找同值项
+    const want: number = this.price * this.off / 10;
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;              // 对不上 ⇒ 停手（不读 ans）
   }
 
   private askAuto(): void {

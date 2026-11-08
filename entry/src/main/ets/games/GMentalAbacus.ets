@@ -245,8 +245,37 @@ export struct GMentalAbacus {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    // ★ 2026-11-08 代打「不抄答案」：屏幕上的算式串就是 `chips.join(' ')`（全角 ＋/−）
+    //   ⇒ 解析这串自己累加，再在选项里找同值项（**不需要算盘规则**，判据 1824：看函数体）
+    const parts: string[] = this.quiz.split(' ');
+    let sum: number = -1;
+    if (parts.length > 0) {
+      const first: number = Number.parseInt(parts[0], 10);
+      if (!isNaN(first)) {
+        sum = first;
+        for (let k = 1; k < parts.length; k++) {
+          const p: string = parts[k];
+          if (p.length < 2) {
+            continue;
+          }
+          const c0: string = p.charAt(0);
+          const sign: number = c0 === '＋' || c0 === '+' ? 1 : -1;
+          const n: number = Number.parseInt(p.substring(1), 10);
+          if (isNaN(n)) {
+            sum = -1;
+            break;
+          }
+          sum = sum + sign * n;
+        }
+      }
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === sum) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;              // 算不出/对不上 ⇒ 停手（不读 ans）
   }
 
   private askAuto(): void {

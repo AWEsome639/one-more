@@ -247,7 +247,19 @@ export struct GPerspectiveTaking {
     if (this.chosen >= 0) {
       return true;
     }
-    this.choose(this.answer);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.answer（答案）**：
+    //   方位题有现成规则函数 rel()（观察者 + 朝向 + 方位）⇒ 对 3 件物品逐个判，
+    //   落在被问方位里的那一件就是答案。
+    const n: number = this.diffTotal;
+    const or: number = Math.floor(this.obs / n);
+    const oc: number = this.obs % n;
+    for (let k = 0; k < this.items.length; k++) {
+      if (rel(or, oc, this.items[k], this.face, this.ask, n)) {
+        this.choose(k);
+        return !this.over;
+      }
+    }
+    return false;
     return !this.over;
   }
 
