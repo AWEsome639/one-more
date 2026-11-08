@@ -73,6 +73,9 @@ export struct GCryptoArithmetic {
   @State private puz: Crypto = { form: 0, sol: [1, 4, 6, 2, 0] };
   @State private slots: number[] = [-1, -1, -1, -1, -1];
   @State private sel: number = 0;
+  /** ★ 2026-11-08 代打「不抄答案」：自己搜出来的解（按 form 缓存，换题自动失效） */
+  private aiSol: number[] = [];
+  private aiSolForm: number = -1;
   @State private round: number = 0;
   @State private right: number = 0;
   @State private score: number = 0;
@@ -210,6 +213,52 @@ export struct GCryptoArithmetic {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」（判据 1824：先读题面生成 `makeCrypto` + `check`）：
+   *   题面是「AB + C = DE」或「AB × C = DE」（**运算符就画在屏幕上**，`puz.form` 是题面不是答案），
+   *   胜负是 `check()`：五个字母互不相同、A/C/D≠0、且等式成立 ⇒ **任何一组合法解都算过**。
+   *   ⇒ 所以 AI 可以**自己搜**：枚举 a(1..9) / b(0..9) / c，算出 10d+e，检查互异与范围
+   *     （≈720 次循环，毫秒级），拿到任意一组合法解即可，**完全不需要读 `puz.sol`**。
+   */
+  private aiSolve(): number[] {
+    if (this.aiSol.length === 5 && this.aiSolForm === this.puz.form) {
+      return this.aiSol;
+    }
+    const form: number = this.puz.form;
+    const cLo: number = form === 0 ? 1 : 2;
+    for (let a = 1; a <= 9; a++) {
+      for (let b = 0; b <= 9; b++) {
+        if (b === a) {
+          continue;
+        }
+        for (let c = cLo; c <= 9; c++) {
+          if (c === a || c === b) {
+            continue;
+          }
+          const lhs: number = form === 0 ? (10 * a + b) + c : (10 * a + b) * c;
+          if (lhs < 10 || lhs > 99) {
+            continue;
+          }
+          const d: number = Math.floor(lhs / 10);
+          const e: number = lhs % 10;
+          if (d === 0) {
+            continue;
+          }
+          if (d === a || d === b || d === c
+            || e === a || e === b || e === c || e === d) {
+            continue;
+          }
+          const out: number[] = [a, b, c, d, e];
+          this.aiSol = out.slice();
+          this.aiSolForm = form;
+          return out;
+        }
+      }
+    }
+    this.aiSol = [];
+    return [];
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -218,8 +267,12 @@ export struct GCryptoArithmetic {
     if (s < 0) {
       return false;
     }
+    const sol: number[] = this.aiSolve();
+    if (sol.length !== 5) {
+      return false;              // 搜不到解 ⇒ 停手（不读 puz.sol）
+    }
     this.sel = s;
-    this.tapDigit(this.puz.sol[s]);
+    this.tapDigit(sol[s]);
     return !this.over;
   }
 

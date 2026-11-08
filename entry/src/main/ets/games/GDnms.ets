@@ -208,7 +208,19 @@ export struct GDnms {
     if (this.pick >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.answer(this.ansIdx);
+    // ★ 2026-11-09（ai-fixer-a）**不再读 ansIdx（答案下标）**：
+    //   规则是「选没见过的那个」⇒ 用屏幕上给过的 samples 逐个比对，第一个不在样例里的就是答案。
+    let k: number = -1;
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.samples.indexOf(this.opts[i]) < 0) {
+        k = i;
+        break;
+      }
+    }
+    if (k < 0) {
+      return false;
+    }
+    this.answer(k);
     return !this.over;
   }
 

@@ -207,7 +207,20 @@ export struct GAngleFinder {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ansIdx);
+    // ★ 2026-11-09（ai-fixer-a）**不再读 ansIdx（答案下标）**：
+    //   多边形内角和 = (n-2)×180，已知角都印在图上 ⇒ 自己求出缺的那个角，再在选项里找。
+    const want: number = (this.n - 2) * 180 - this.sumOf(this.known);
+    let k: number = -1;
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        k = i;
+        break;
+      }
+    }
+    if (k < 0) {
+      return false;
+    }
+    this.pick(k);
     return !this.over;
   }
 

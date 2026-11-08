@@ -697,7 +697,16 @@ export struct GKenken {
       //   而格子在 Row(width 100%) 里 `layoutWeight(1) + aspectRatio(1)`
       //   ⇒ **棋盘高 = 棋盘宽 = 813vp**，数字键与按钮被挤出屏幕（截图拍到）。
       //   ⇒ 与扫雷/不等式同一类修法：边长取 min(可用宽, 可用高)。
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360)))
+      // ★★★ 2026-11-09（perf-hunter 横屏 12 款抽检）：底部数字键盘行 bounds 只有 51px 高
+      //   （正常 ~130px）⇒ **被屏幕底边裁掉约 80px，用户点不到按键下半截**。
+      //   根因：本行下方那句 `Math.max(200, Bp.height - 360)` —— **下限 200 反噬**：
+      //     屏高 533 时 `533 − 360 = 173 < 200`，下限把棋盘撑回 200，
+      //     多出的 27vp（≈79px）正好把键盘顶出屏幕 —— 与实测 80px 缺口吻合。
+      //   ⇒ 判据 1802：约束加在**棋盘容器**上（不动子项）；矮屏把下限降到 150、留白 360 → 380。
+      //   ★ 手机零回归：`Bp.height >= 600` 时与原来的式子逐字一致。
+      .width(Math.min(Bp.width - 2 * Space.lg,
+        Math.max(Bp.height < 600 ? 150 : 200,
+          Bp.height < 600 ? Bp.height - 380 : Bp.height - 360)))
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
@@ -739,6 +748,9 @@ export struct GKenken {
           })
       }
       .width('100%')
+      // ★ 2026-11-09 判据 1829（主轴版）：**控件行不许被压缩** —— 默认 `flexShrink(1)`
+      //   ⇒ 内容一超高就先挤它（实测键位行被压到 51px 高，正常 130px）。给 0 保底。
+      .flexShrink(0)
 
       Row({ space: Space.xs }) {
         ForEach(this.k1, (d: number) => {
@@ -786,6 +798,9 @@ export struct GKenken {
         this.delBtn()
       }
       .width('100%')
+      // ★ 2026-11-09 判据 1829（主轴版）：**控件行不许被压缩** —— 默认 `flexShrink(1)`
+      //   ⇒ 内容一超高就先挤它（实测键位行被压到 51px 高，正常 130px）。给 0 保底。
+      .flexShrink(0)
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

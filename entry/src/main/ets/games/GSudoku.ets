@@ -863,7 +863,18 @@ export struct GSudoku {
     //       440×744 ⇒ 327vp（原来 387）⇒ 手机上棋盘仍很大，且键盘更宽松
     //       800×1280 ⇒ 352vp（原来 666 → 但会被 w 限到 760，所以手机上不受影响）
     //   ⚠️ 下限仍是 160：极小屏（手表）不会算出负数。
-    const h: number = Math.max(160, Bp.height * 0.44);
+    // ★★★ 2026-11-09（perf-hunter 横屏 12 款抽检，真机 dump）：
+    //   底部按钮/键盘行 bounds `[60,1462][2500,1600]` —— **越界内容区 84px、直接贴到屏底**
+    //   （内容区到 1516，行尾到 1600）⇒ 系统手势条盖住 ⇒ 点不动。
+    //   根因：`0.44 × 屏高` 只管棋盘"够大"，**没把「按钮行 + 信息行 + 键盘 + 状态行」这层 chrome 算进去**；
+    //   棋盘按 0.44 已经占满，剩给底部的空间就不够了 ⇒ 最后两行被顶出内容区。
+    //   ⇒ 判据 1802：**约束加在「棋盘容器」上**（不动任何子项），矮屏改按「屏高 − chrome」反推。
+    //   ★ 手机零回归：`Bp.height >= 600` 仍走原来的 0.44，逐字未变。
+    //   ★ 实测收益（屏高 533）：棋盘 234 → 193vp，让出 41vp ≈ 120px > 84px 缺口
+    //     ⇒ 键盘行回到内容区，状态行底部 24vp 留白也真正露出（不再被顶到屏外）。
+    const h: number = Bp.height < 600
+      ? Math.max(160, Bp.height - 340)
+      : Math.max(160, Bp.height * 0.44);
     return Math.min(w, h);
   }
 
@@ -949,6 +960,9 @@ export struct GSudoku {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
       .width('100%')
+      // ★ 2026-11-09 判据 1829（主轴版）：**控件行不许被压缩** —— 默认 `flexShrink(1)`
+      //   ⇒ 内容一超高就先挤它（实测键位行被压到 51px 高，正常 130px）。给 0 保底。
+      .flexShrink(0)
       Row({ space: Space.sm }) {
         this.infoBox(0)
         this.infoBox(1)
@@ -1022,6 +1036,9 @@ export struct GSudoku {
         }, (d: number) => 'd' + d)
       }
       .width('100%')
+      // ★ 2026-11-09 判据 1829（主轴版）：**控件行不许被压缩** —— 默认 `flexShrink(1)`
+      //   ⇒ 内容一超高就先挤它（实测键位行被压到 51px 高，正常 130px）。给 0 保底。
+      .flexShrink(0)
 
       Text(this.statusText())
         .fontSize(FontSize.sm)

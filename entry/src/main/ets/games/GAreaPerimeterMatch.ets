@@ -195,7 +195,11 @@ export struct GAreaPerimeterMatch {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ansIdx);
+    // ★ 2026-11-09（ai-fixer-a）**不再读 ansIdx**：
+    //   图上给了两个矩形的宽高，比面积或周长（metric 写在屏幕上）⇒ 自己算两个再比。
+    const a: number = this.val(this.w1, this.h1);
+    const b: number = this.val(this.w2, this.h2);
+    this.pick(a > b ? 0 : (a === b ? 2 : 1));
     return !this.over;
   }
 

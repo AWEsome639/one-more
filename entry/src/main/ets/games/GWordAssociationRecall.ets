@@ -57,6 +57,24 @@ export struct GWordAssociationRecall {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
+  /** ★ 2026-11-09 代打的记忆：学习阶段看到的那几组配对（PAIRS 下标） */
+  private aiMem: number[] = [];
+
+  /** ★ 2026-11-09 屏幕上问的是哪一组（用屏幕上的提示词反查） */
+  private aiCue(): string {
+    return PAIRS[this.pairIdx()].cue;
+  }
+
+  /** ★ 2026-11-09 从自己记住的配对里查 mate */
+  private aiMateOf(cue: string): string {
+    for (let i = 0; i < this.aiMem.length; i++) {
+      const p: Pair = PAIRS[this.aiMem[i]];
+      if (p.cue === cue) {
+        return p.mate;
+      }
+    }
+    return '';
+  }
   @State private study: number[] = []; @State private order: number[] = [];
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   @State private qi: number = 0; @State private opts: Opt[] = [];
@@ -110,7 +128,11 @@ export struct GWordAssociationRecall {
     if (gap < limit) { this.leftMs = limit - gap; return; }
     if (this.leftMs === 0) { return; }
     this.leftMs = 0;
-    if (this.phase === 0) { this.phase = 1; this.qi = 0; this.loadQuestion(); return; }
+    if (this.phase === 0) {
+      // ★ 2026-11-09（ai-fixer-a）代打「记住」刚才那一屏配对
+      this.aiMem = this.study.slice();
+      this.phase = 1; this.qi = 0; this.loadQuestion(); return;
+    }
     if (this.locked) { return; }
     this.locked = true; this.msg = TG2('⏰ 没想起来，它配的是 {0}', PAIRS[this.pairIdx()].mate);
     this.feed = setTimeout(() => { this.feed = -1; this.next(); }, FEED_MS);
@@ -232,8 +254,14 @@ export struct GWordAssociationRecall {
     if (this.over || this.locked || this.phase === 0) {
       return true;
     }
+    // ★ 2026-11-09（ai-fixer-a）**不再读 opts[i].ok（答案标记）**：
+    //   记忆阶段把「看过的配对」抄进 aiMem，作答时拿屏幕上的提示词去自己记忆里查另一半。
+    const mate: string = this.aiMateOf(this.aiCue());
+    if (mate.length === 0) {
+      return false;
+    }
     for (let i = 0; i < this.opts.length; i++) {
-      if (this.opts[i].ok) {
+      if (this.opts[i].text === mate) {
         this.tap(i);
         return true;
       }

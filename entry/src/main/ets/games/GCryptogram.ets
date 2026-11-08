@@ -185,11 +185,35 @@ export struct GCryptogram {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /** 暴力破凯撒：cipher 反向移 1..25 位，命中词库即为明文（不读 this.word） */
+  private aiWord(): string {
+    const c: string = this.cipher;
+    if (c.length === 0) {
+      return '';
+    }
+    for (let k = 1; k < 26; k++) {
+      const cand: string = shiftWord(c, 26 - k);
+      for (let i = 0; i < POOL.length; i++) {
+        if (POOL[i].w === cand) {
+          return cand;
+        }
+      }
+    }
+    return '';
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
     }
-    this.autoSubmit(this.word);
+    // ★ 2026-11-08 代打「不抄答案」（判据 1824：`cipher = shiftWord(word, k)`、词库 = POOL）
+    //   ⇒ 不读明文 `this.word`，改成**暴力破凯撒**：把 cipher 反向移 1..25 位，
+    //     取「移位结果是词库里的词」那一个 —— 这就是破凯撒的标准解法。
+    const w: string = this.aiWord();
+    if (w.length === 0) {
+      return false;              // 破不出来 ⇒ 停手（不读 this.word）
+    }
+    this.autoSubmit(w);
     return !this.over;
   }
 

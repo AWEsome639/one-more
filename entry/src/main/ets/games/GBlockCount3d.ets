@@ -204,7 +204,23 @@ export struct GBlockCount3d {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ansIdx);
+    // ★ 2026-11-09（ai-fixer-a）**不再读 ansIdx**：
+    //   方块总数 = 每根柱子高度之和（高度图就是屏幕上的那堆方块）⇒ 自己加一遍再找选项。
+    let sum: number = 0;
+    for (let i = 0; i < this.h.length; i++) {
+      sum = sum + this.h[i];
+    }
+    let k: number = -1;
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === sum) {
+        k = i;
+        break;
+      }
+    }
+    if (k < 0) {
+      return false;
+    }
+    this.pick(k);
     return !this.over;
   }
 
