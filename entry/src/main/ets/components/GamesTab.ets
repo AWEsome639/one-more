@@ -1594,7 +1594,14 @@ build() {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .layoutWeight(1)
       // 右边：★ 位置固定的统一切换按钮（常驻，不随状态销毁 ⇒ 图标不闪）
-      this.collapseToggle()
+      // ★★★ 2026-11-08 perf-hunter：**矮屏不渲染这个按钮**。
+      //   `effCollapsed()` 现在是 `topCollapsed || Bp.isShort()` ⇒ 矮屏恒 true
+      //   ⇒ 展开态**不可能出现** ⇒ 这个按钮点了**不会有任何视觉变化** = 哑按钮。
+      //   判据：「哑按钮比没按钮更糟」（用户会以为坏了）。隐藏它；`collapseLabel()` 保持不动，
+      //   等哪天矮屏允许展开（阈值改动）就会自动回来。
+      if (!Bp.isShort()) {
+        this.collapseToggle()
+      }
     }
     .width('100%')
     // ★ 大字/紧凑模式下高度也要跟着变（否则字会被裁）
