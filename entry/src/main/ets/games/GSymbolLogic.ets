@@ -106,16 +106,29 @@ export struct GSymbolLogic {
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // 答案就在状态里（this.ans）+ 有"已答"守卫
-  /** 提示：直接报正确的那个选项 */
+  /**
+   * 提示：直接报正确的那个选项。
+   * ★★★ 2026-11-08 真机 BUG 修复（perf-hunter 抓到「看这里：答案是 undefined」）：
+   *   原来写的是 `const n = this.ans; … this.opts[n]` —— **把"答案的值"当成了"选项下标"**。
+   *   `this.ans` 是值（`newPuzzle` 里 `this.ans = a`，a ∈ 2..11），而 `this.opts` 只有 4 个元素、
+   *   且**从未洗牌**（`opts = [a, 干扰项...]`）⇒ `opts[a]` 在 a≥4 时是 `undefined`（拼出来就是 "undefined"），
+   *   在 a=2/3 时更糟：拿到的是**干扰项**，提示直接说错答案。
+   *   ⇒ 正确写法：用 `indexOf(ans)` 求下标；求不到（理论上不该发生）就**退回一句不含数字的提示**，绝不拼 undefined。
+   */
   private computeHint(): HintResult {
     const t0: number = Date.now();
     if (this.over) {
       return Hint.none('none');
     }
-    const n: number = this.ans;
-    return Hint.make([n],
-      TG2('答案是 {0}', String(this.opts[n])),
-      TG2('The answer is {0}', String(this.opts[n])), t0);
+    const idx: number = this.opts.indexOf(this.ans);
+    if (idx < 0) {
+      // 兜底：状态异常时不报数字（宁可少说，也不说 undefined / 错答案）
+      return Hint.make([], TG('想一想：第一个符号是几'),
+        TG('Think: what is the first symbol?'), t0);
+    }
+    return Hint.make([idx],
+      TG2('答案是 {0}', String(this.ans)),
+      TG2('The answer is {0}', String(this.ans)), t0);
   }
 
   private askHint(): void {

@@ -23,7 +23,7 @@ import { Bp } from '../core/Bp';
 import { RollingNumber } from '../core/MotionKit';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Layout, Accent, Cell } from '../core/Design';
 import { GAMES, GameMeta, GameCategory, CatCount, categoryList, findGame, colorOf, displayName, displayTagline, gamesByCategory } from '../core/GameRegistry';
-import { ProgressStore } from '../core/ProgressStore';
+import { ProgressStore, Keys } from '../core/ProgressStore';
 import { GameLog, PlayRecord } from '../core/GameLog';   // ★ 2026-11-07：近期板块的数据源（每局日志）
 import { LevelHeader, iconOf } from './Common';
 import { Haptics } from '../core/Haptics';
@@ -1139,7 +1139,7 @@ build() {
       .width('100%').height(5)
 
       // 已点亮的徽章（最多显示 12 个，避免刷屏）
-      if (ProgressStore.badgeProgress() > 0) {
+      if (this.badgeClearedCount() > 0) {
         Flex({ wrap: FlexWrap.Wrap }) {
           ForEach(this.litBadges(), (g: GameMeta) => {
             Row({ space: 4 }) {
@@ -1166,13 +1166,31 @@ build() {
     .shadow(Shadow.card)
   }
 
-  private badgePct(): number {
-    return Math.round(ProgressStore.tierTotal() * 100 / (GAMES.length * 4));
-  }
+  // ★★★ 2026-11-08（P2-4 **徽章墙记忆化**）—— 与上面成就墙的 `achvCacheKey` 同一套路。
+  //
+  //   原来：`badgePct()` 每次 `ProgressStore.tierTotal()` ⇒ **JSON.parse 整个 perGameClears**；
+  //         `litBadges()` 每次 `clearedGames()` ⇒ **split 整个已通关串**；
+  //         外层还有 `ProgressStore.badgeProgress() > 0` ⇒ 再一次 split。
+  //   而这三个都在 `build()` 里，**一次渲染会调多次**（进度条 + ForEach + 空状态判断）。
+  //
+  //   ⇒ 用「两份原始串 + renderRev」当键，**只有数据真变了才重算**，一次渲染内零重复解析。
+  //     与成就墙对称（那边用 `unlockedIds().join(',') + '#' + renderRev`）。
+  private badgeKey: string = '\u0000';
+  private badgeTotal: number = 0;
+  private badgeCleared: number = 0;
+  private badgeLit: GameMeta[] = [];
 
-  /** 已点亮的徽章对应的游戏（最多 12 个） */
-  private litBadges(): GameMeta[] {
-    const ids: string[] = ProgressStore.clearedGames();
+  private refreshBadge(): void {
+    const rawClears: string = AppStorage.get<string>(Keys.perGameClears) ?? '{}';
+    const rawClearedIds: string = AppStorage.get<string>(Keys.cleared) ?? '';
+    const key: string = rawClears + '#' + rawClearedIds + '#' + this.renderRev;
+    if (key === this.badgeKey) {
+      return;
+    }
+    this.badgeKey = key;
+    this.badgeTotal = ProgressStore.tierTotal();
+    const ids: string[] = rawClearedIds.length === 0 ? [] : rawClearedIds.split(',');
+    this.badgeCleared = ids.length;
     const out: GameMeta[] = [];
     for (let i = 0; i < ids.length && out.length < 12; i++) {
       const g: GameMeta | undefined = findGame(ids[i]);
@@ -1180,7 +1198,25 @@ build() {
         out.push(g);
       }
     }
-    return out;
+    this.badgeLit = out;
+  }
+
+  private badgePct(): number {
+    this.refreshBadge();
+    const all: number = GAMES.length * 4;
+    return all <= 0 ? 0 : Math.round(this.badgeTotal * 100 / all);
+  }
+
+  /** 已通关过几款（= 徽章墙的"点亮了"判断依据，走缓存不重复 split） */
+  private badgeClearedCount(): number {
+    this.refreshBadge();
+    return this.badgeCleared;
+  }
+
+  /** 已点亮的徽章对应的游戏（最多 12 个） */
+  private litBadges(): GameMeta[] {
+    this.refreshBadge();
+    return this.badgeLit;
   }
 
   @Builder

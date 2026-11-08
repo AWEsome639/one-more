@@ -42,6 +42,21 @@ export const TAGS: GameTag[] = [
   { group: '场景', id: 'zen', icon: '🌸', label: '解压放松', enLabel: 'Wind down', enGroup: 'Vibe' },
   { group: '场景', id: 'brainy', icon: '🎓', label: '烧脑挑战', enLabel: 'Challenge', enGroup: 'Vibe' },
   { group: '场景', id: 'cozy', icon: '🛋️', label: '躺着玩', enLabel: 'Cosy', enGroup: 'Vibe' },
+  { group: '玩法', id: 'ps_match', icon: '💥', label: '消除配对', enLabel: 'Match', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_merge', icon: '🔢', label: '合并滚雪球', enLabel: 'Merge', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_push', icon: '📦', label: '挪块推箱', enLabel: 'Push', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_maze', icon: '🌀', label: '走格寻路', enLabel: 'Maze', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_fill', icon: '🧩', label: '填格谜题', enLabel: 'Fill-in', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_board', icon: '♟️', label: '棋类对弈', enLabel: 'Board', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_word', icon: '🔤', label: '拼词文字', enLabel: 'Words', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_memory', icon: '🧠', label: '记忆回忆', enLabel: 'Memory', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_reaction', icon: '⚡', label: '反应手速', enLabel: 'Reaction', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_quiz', icon: '🧮', label: '答题估算', enLabel: 'Quiz', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_search', icon: '🔍', label: '眼力搜寻', enLabel: 'Spotting', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_spatial', icon: '📐', label: '折转空间', enLabel: 'Spatial', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_attention', icon: '🎯', label: '注意力任务', enLabel: 'Attention', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_run', icon: '🏃', label: '跑分局', enLabel: 'Run', enGroup: 'Playstyle' },
+  { group: '玩法', id: 'ps_other', icon: '❓', label: '其它玩法', enLabel: 'Other', enGroup: 'Playstyle' },
 ];
 
 /** 分组清单（按出现顺序） */

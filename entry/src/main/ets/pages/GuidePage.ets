@@ -427,7 +427,14 @@ struct GuidePage {
             Text(L(ProgressStore.TIER_NAME[i][0], ProgressStore.TIER_NAME[i][1]))
               .fontSize(FontSize.micro)
               .fontColor(ProgressStore.tierOf(gid) > i ? this.theme().ink : this.theme().inkFaint)
-            Text(Digits(String(ProgressStore.clearsOf(gid)), this.langCode) + '/' +
+            // ★★★ 2026-11-08（P2-2 **倒挂**）：原来分子用的是"这款的总通关次数"，
+            //   而 4 格共用同一个数 ⇒ 通了 60 次时会显示 `60/1`、`60/10`、`60/50`、`60/100`，
+            //   前三格都是"超额"的倒挂写法，看着像 bug。
+            //   ⇒ 分子**封顶在本档门槛**：已达成的档显示 `1/1`、`10/10`、`50/50`（"这档满了"），
+            //     未达成的档才是真实的 `x/need`。信息量不变，但读起来不再倒退。
+            Text(Digits(String(ProgressStore.tierOf(gid) > i
+                ? ProgressStore.TIER_NEED[i]
+                : ProgressStore.clearsOf(gid)), this.langCode) + '/' +
               Digits(String(ProgressStore.TIER_NEED[i]), this.langCode))
               .fontSize(FontSize.micro).fontColor(this.theme().inkFaint)
           }

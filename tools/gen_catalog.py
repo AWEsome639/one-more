@@ -11,6 +11,7 @@ import os
 import re
 import glob
 import json
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -76,6 +77,12 @@ def main():
     tagmap = {}
     if os.path.exists('/tmp/game_tags.json'):
         tagmap = json.load(open('/tmp/game_tags.json', encoding='utf-8'))
+    # ★★★ 2026-11-08（game-balancer）**硬闸**：没有 tags 数据就拒绝生成。
+    #   原行为：tagmap 为空 ⇒ `tagmap.get(id, [])` ⇒ **355 款 tags 被静默写空**（真踩过）。
+    #   真要更新 tags 请用 tools/apply_tags.py（只替换 tags 段，不动其它字节）。
+    if not tagmap:
+        sys.exit('❌ 缺 /tmp/game_tags.json —— 拒绝生成（会把 355 款 tags 写空）。\n'
+                 '   正确顺序：tools/gen_tags.py → tools/apply_tags.py --write')
     enmap = {}
     if os.path.exists('/tmp/game_en.json'):
         enmap = json.load(open('/tmp/game_en.json', encoding='utf-8'))
@@ -263,6 +270,12 @@ export function enterDelay(index: number): number {
   return d > 400 ? 400 : d;
 }
 """)
+
+    # ★★★ F3（game-balancer）：**写盘前自检** —— 有款 tags 为空说明数据链断了，直接拒绝写。
+    empty = [g['id'] for g in games if not tagmap.get(g['id'])]
+    if empty:
+        sys.exit('❌ %d 款 tags 为空（例：%s）—— 数据链断了，请改用 tools/apply_tags.py'
+                 % (len(empty), ', '.join(empty[:5])))
 
     dst = os.path.join(ROOT, 'entry/src/main/ets/core/GameRegistry.ets')
     with open(dst, 'w', encoding='utf-8') as f:

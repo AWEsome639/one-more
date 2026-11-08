@@ -1195,8 +1195,11 @@ export class ProgressStore {
   //    ② 熟练   通关 10 次
   //    ③ 精通   通关 50 次
   //    ④ 大师   通关 100 次
-  //  全部游戏 × 4 档 ≈ 1420 枚，所以**不塞进成就墙**（会撑爆），
-  //  而是：① 在每款游戏的玩法说明页显示它的 4 档进度；② 统计页只显示总进度 x/1416。
+  //  全部游戏 × 4 档（= `totalGames() × 4`，现在 355 款 ⇒ **1420** 枚），
+  //  所以**不塞进成就墙**（会撑爆），
+  //  而是：① 在每款游戏的玩法说明页显示它的 4 档进度；② 统计页只显示总进度 `x / (totalGames × 4)`。
+  //  ★ 2026-11-08：原来这里写死「x/1416」—— 那是 354 款时代的数，加了一款就陈旧了。
+  //    凡是"分母"都别写字面量，用 `totalGames()`（UI 里那处用的就是 `GAMES.length * 4` ✓）。
 
   /** 4 档的门槛 */
   static readonly TIER_NEED: number[] = [1, 10, 50, 100];
@@ -1227,7 +1230,7 @@ export class ProgressStore {
     return t;
   }
 
-  /** 全应用一共点亮了多少枚分级徽章 / 1416 */
+  /** 全应用一共点亮了多少枚分级徽章（上限 = `totalGames() × 4`，现在 1420 —— 别写死分母） */
   static tierTotal(): number {
     const raw: string = AppStorage.get<string>(Keys.perGameClears) ?? '{}';
     let sum: number = 0;
@@ -1263,7 +1266,11 @@ export class ProgressStore {
     ProgressStore.putString(Keys.perGameClears, j);
   }
 
-  /** 徽章墙进度：通关过的款数 / 354 */
+  /**
+   * 徽章墙进度：**通关过的款数**（分母是 `totalGames()`，现在 355 —— 别在这里写死数字）
+   * ⚠️ 实现是 `clearedGames().length`，即**每次都 split 整个已通关串** ⇒ 别在 `build()`
+   *    里逐帧调用；统计页已改成走自己的缓存（`StatsTab.refreshBadge()`），不再每帧打这里。
+   */
   static badgeProgress(): number {
     return ProgressStore.clearedGames().length;
   }

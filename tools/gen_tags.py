@@ -25,10 +25,15 @@ EN = {
     'space': 'Spatial', 'logic': 'Logic', 'focus': 'Focus',
     'onehand': 'One hand', 'endless': 'Endless', 'zen': 'Wind down',
     'brainy': 'Challenge', 'cozy': 'Cosy',
+    # 玩法（playStyle）
+    'ps_match': 'Match', 'ps_merge': 'Merge', 'ps_push': 'Push', 'ps_maze': 'Maze',
+    'ps_fill': 'Fill-in', 'ps_board': 'Board', 'ps_word': 'Words', 'ps_memory': 'Memory',
+    'ps_reaction': 'Reaction', 'ps_quiz': 'Quiz', 'ps_search': 'Spotting',
+    'ps_spatial': 'Spatial', 'ps_attention': 'Attention', 'ps_run': 'Run', 'ps_other': 'Other',
 }
 
 GRP_EN = {'时长': 'Length', '难度': 'Difficulty', '操作': 'Controls',
-          '节奏': 'Pace', '脑力': 'Skills', '场景': 'Vibe'}
+          '节奏': 'Pace', '脑力': 'Skills', '场景': 'Vibe', '玩法': 'Playstyle'}
 
 TAGS = [
     ('时长', 'speed',   '⚡', '30 秒内'),
@@ -61,6 +66,27 @@ TAGS = [
     ('场景', 'zen',     '🌸', '解压放松'),
     ('场景', 'brainy',  '🎓', '烧脑挑战'),
     ('场景', 'cozy',    '🛋️', '躺着玩'),
+
+    # ── 玩法（playStyle）★★ 2026-11-08（game-balancer）──
+    #   为什么加：355 款按「类别 + tag」只剩 62~64 种签名、最大一组 54 款完全不可区分
+    #   （三消/发射消泡的 tag 一模一样）⇒ 「像 2048」只能把三消排在前面。
+    #   规则见下方 PLAY_STYLE_RULES：**每款恰好 1 个（划分，不是多标签）**，兜底 ps_other。
+    #   方案与数字：_巡检记录/playStyle方案-20261108.md
+    ('玩法', 'ps_match',    '💥', '消除配对'),
+    ('玩法', 'ps_merge',    '🔢', '合并滚雪球'),
+    ('玩法', 'ps_push',     '📦', '挪块推箱'),
+    ('玩法', 'ps_maze',     '🌀', '走格寻路'),
+    ('玩法', 'ps_fill',     '🧩', '填格谜题'),
+    ('玩法', 'ps_board',    '♟️', '棋类对弈'),
+    ('玩法', 'ps_word',     '🔤', '拼词文字'),
+    ('玩法', 'ps_memory',   '🧠', '记忆回忆'),
+    ('玩法', 'ps_reaction', '⚡', '反应手速'),
+    ('玩法', 'ps_quiz',     '🧮', '答题估算'),
+    ('玩法', 'ps_search',   '🔍', '眼力搜寻'),
+    ('玩法', 'ps_spatial',  '📐', '折转空间'),
+    ('玩法', 'ps_attention','🎯', '注意力任务'),
+    ('玩法', 'ps_run',      '🏃', '跑分局'),
+    ('玩法', 'ps_other',    '❓', '其它玩法'),
 ]
 
 # ── 打标规则 ──
@@ -74,6 +100,35 @@ CAT_ATTR = {
     'WORD':    ['word'],
     'SPATIAL': ['space'],
 }
+
+# 3) 玩法（playStyle）——★ 顺序即优先级，首个命中即定 ⇒ 每款恰好 1 个（划分）
+#   匹配面与 tags_for 里的 hay 完全一致（id + tagline + name 小写），不新增任何输入。
+#   实测：325/355 = 91.5% 自动命中，剩 30 款落 ps_other（纸牌接龙/算法可视化/序列记忆…）。
+PLAY_STYLE_RULES = [
+    ('ps_board',     r'gomoku|checkers|connect_four|reversi|mancala|\bnim\b|tic_tac|go9|chess'),
+    ('ps_match',     r'match3|bejewel|bubble|mahjong|color_flood|water_sort|hue_sort|gravity_sort|chain_reaction|jewel|collaps'),
+    ('ps_merge',     r'2048|fibonacci|merge|number_bond|exponent_tower|sum_pyramid|collatz|sum_snake|target_number|prime_factor|magic_square'),
+    ('ps_push',      r'sokoban|klotski|slide1|block_escape|tangram|polyomino|hanoi|peg_solitaire|block_stacking|block_count|box_completion|tower_of_london'),
+    ('ps_maze',      r'maze|path_finder|trace_path|pipes|laser|circuit_connect|wire|vector_grid|path_intersect|path_recall|lock_pattern|grid_displacement'),
+    ('ps_fill',      r'sudoku|kakuro|kenken|nonogram|hitori|heyawake|slitherlink|nurikabe|yajilin|tapa|akari|magnet|lighthouse|kurodoko|norinori|gokigen|kakurasu|dominosa|fillomino|futoshiki|crown|shikaku|bridges|masyu|tents|tenner|skyscraper|binary_puzzle|lights_out|minesweeper|dominosa'),
+    ('ps_word',      r'word|anagram|cryptogram|letter|vowel|rhyme|homophone|spelling|typing|scramble|palindrome|pangram|portmanteau|spoonerism|consonant|crossword|affix|etymolog|grammar|silent_letter|semantic|vocabulary|analog|definition|context_clues|oxymoron|cognate|typoglyc|syllable|category_fluency|story_builder|chalk'),
+    ('ps_memory',    r'memory|n_back|corsi|span|recall|chimp|simon|delayed_match|dnms|card_counting|spatial_cabinet|word_pair|paired_associate'),
+    ('ps_reaction',  r'reflex|blink|flash|reaction|subitiz|go_no_go|stop_signal|vigilance|orbit|ghost_tap|whack|frequency|rhythm'),
+    ('ps_quiz',      r'estimat|guess|mental_calendar|mental_abacus|percentage|fraction|angle|numeric|currency|unit_converter|radical|roman|arithmetic|algebra|inequality|base_conversion|base_shift|binary_code|modular|modulo|divisibility|matrix|vector|dot_product|pythagor|prime|factor|gcd|common_denominator|venn|set_theory|balance_scale|digit_swap|missing_operator|calculation_sprint|countdown_math|quick_math|target_10|math_path|binomial'),
+    ('ps_search',    r'visual_search|schulte|odd_one_out|silhouette|shape_shifter|shadow_pivot|symmetry|topology|color_match|area_perimeter|geometric_vision|navon|negative_space|spotlight|multiple_object|visual_crowding|ab_reversal|cross_section|room_inspector|find_word'),
+    ('ps_spatial',   r'fold|cube_net|paper_folding|rotation|perspective|gear_|mirror|pixel_mimic|graph_coordinate|triplets_logic|temporal_order'),
+    ('ps_attention', r'stroop|flanker|d2_attention|sdmt|trail_making|task_switch|switch_task|posner|divided_attention|dual_coding|dual_task|change_blindness|conjunction_search|continuous_recognition|dynamic_salience|visual_statistical|source_monitoring|sopt|wisconsin|rule_switcher|sternberg|object_shuffle|object_displacement|shell_game|grocery_list|face_|associative_pairs'),
+    ('ps_run',       r'breakout|doodle|flappy|pong|snake|tetris'),
+]
+
+
+def play_style_for(hay):
+    """玩法归类：顺序即优先级，首个命中即定；都不中就 ps_other。"""
+    for pid, pat in PLAY_STYLE_RULES:
+        if re.search(pat, hay):
+            return pid
+    return 'ps_other'
+
 
 # 2) 关键词 → 追加标签（按 id 或描述匹配）
 KW = [
@@ -216,6 +271,10 @@ def tags_for(gid, name, tag, cat):
         t.add('tap')
     if not (t & {'timed', 'untimed'}):
         t.add('untimed')
+
+    # ── ⑧ 玩法（playStyle）：每款恰好 1 个（划分，兜底 ps_other）──
+    t.add(play_style_for(hay))
+
     return sorted(t)
 
 

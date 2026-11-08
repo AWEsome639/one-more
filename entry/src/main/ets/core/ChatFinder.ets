@@ -103,6 +103,60 @@ const MULTI_IDS: string[] = [
   'checkers', 'connect_four', 'go9', 'gomoku', 'mancala', 'nim', 'reversi', 'tic_tac_toe'
 ];
 
+/**
+ * ★★★ 2026-11-08（game-balancer）取一款的**玩法标签**（`ps_*`，每款恰好 1 个）。
+ *   为什么不用 `new field`：`tags` 里已经带上了，零新增字段、零迁移。
+ *   ArkTS 没有 `Array.some` 的惯用写法 ⇒ 老实用 for + indexOf('ps_') === 0。
+ */
+function styleOf(g: GameMeta): string {
+  for (let i = 0; i < g.tags.length; i++) {
+    if (g.tags[i].indexOf('ps_') === 0) {
+      return g.tags[i];
+    }
+  }
+  return '';
+}
+
+/**
+ * ★★★ 2026-11-08：**20 款热门游戏的俄语/德语别名**（聊天找游戏用）
+ *
+ * 为什么需要：`similar` 只认**中文名 + 英文名**，所以
+ *   `как сапёр`（俄语「像扫雷」）、`wie Minesweeper` 都匹配不到 ⇒ 整句空。
+ *
+ * 为什么只做 20 款：其余 335 款被用户「拿名字点名」的概率极低，
+ *   标 355 款的成本收益不划算（判据：覆盖头部就够）。
+ *
+ * 为什么用 **game id** 当键（而不是中文名）：id 是不可变的，中文名可能被改；
+ *   而且中文名在 `displayName()` 里会随语言变，当键不稳。
+ *
+ * ⚠️ 别名一律小写（`parse()` 里 `s` 已经 toLowerCase），且**避开太常见的词**
+ *   （如不把德语 'dame' 收进来 —— 它在英语里也是常见词，会误命中）。
+ */
+// ★ 2026-11-08 ArkTS 严格模式**不支持 `Record` 字面量**（只能 `{}` 空对象再赋值）
+//   ⇒ 改成**二维数组**：`[gameId, 别名1, 别名2, ...]`，查找时遍历。40 条数据，遍历开销可忽略。
+const ALIAS: string[][] = [
+  ['minesweeper', 'сапёр', 'сапер', 'минное поле', 'minensucher', 'minenfeld'],
+  ['snake', 'змейка', 'змейку', 'schlange'],
+  ['bejeweled', 'три в ряд', 'ювелир', 'juwelen', 'edelsteine'],
+  ['breakout', 'арканоид', 'арканойд', 'mauerbrecher', 'klötze'],
+  ['sudoku', 'судоку'],
+  ['reversi', 'реверси', 'отэлло', 'othello'],
+  ['gomoku', 'гомоку', 'пять в ряд', 'fünf in einer reihe'],
+  ['checkers', 'шашки', 'шашках', 'damespiel'],
+  ['connect_four', 'четыре в ряд', 'vier gewinnt'],
+  ['tic_tac_toe', 'крестики-нолики', 'крестики', 'drei gewinnt'],
+  ['go9', 'вэйци'],
+  ['sokoban', 'сокобан', 'ящики', 'kisten'],
+  ['freecell', 'косынка', 'солитер', 'solitär'],
+  ['mahjong_solitaire', 'маджонг', 'mahjong'],
+  ['bubble_shooter', 'шарики', 'пузыри', 'seifenblasen'],
+  ['nonogram', 'нонограмма', 'японский кроссворд', 'nonogramm', 'kreuzworträtsel'],
+  ['slide_puzzle', 'пятнашки', 'schiebepuzzle'],
+  ['klotski', 'клотски'],
+  ['classic_maze', 'лабиринт', 'labyrinth', 'irrgarten'],
+  ['snake_3d', 'змейка 3д'],
+];
+
 export class ChatFinder {
   /**
    * 把一句人话解析成意图。
@@ -184,8 +238,32 @@ export class ChatFinder {
         it.hits.push(GAMES[i].enName);   // ★ 用户用英文问，就把英文名回显给他
         break;
       }
+      // ★ 2026-11-08：俄语/德语别名（见 ALIAS）。命名一致 ⇒ 不做词边界，纯子串即可：
+      //   西里尔字母不会像拉丁字母那样撞进英文单词里。
+      const al: string[] = ChatFinder.aliasOf(GAMES[i].id);
+      if (al.length > 0) {
+        let hit: string = '';
+        for (let a = 0; a < al.length; a++) {
+          if (s.indexOf(al[a]) >= 0) { hit = al[a]; break; }
+        }
+        if (hit.length > 0) {
+          it.similar = GAMES[i].id;
+          it.hits.push(hit);
+          break;
+        }
+      }
     }
     return it;
+  }
+
+  /** 从二维数组里取某款的别名（ArkTS 不支持 Record 字面量，只能遍历） */
+  private static aliasOf(id: string): string[] {
+    for (let i = 0; i < ALIAS.length; i++) {
+      if (ALIAS[i][0] === id) {
+        return ALIAS[i].slice(1);
+      }
+    }
+    return [];
   }
 
   /** 意图是否「什么都没抽到」（这时该追问，而不是乱推） */
@@ -239,7 +317,7 @@ export class ChatFinder {
     //   （依据：_巡检记录/tag分布-20261108.md §2 / §6）
 
     // ★★★ 2026-11-08（game-balancer）**死查表修复**：原来查 `multiplayer` / `board` 两个 tag，
-    //   而 GameTags 的 25 个 tag 里**这两个都不存在（0 款）** ⇒ 「联机对打」永远返回 0 结果。
+    //   而 GameTags 的 40 个 tag 里**这两个都不存在（0 款）** ⇒ 「联机对打」永远返回 0 结果。
     //   改成**静态名单**：真·联机对打 = 引用 `LanMatch` 的 8 款（其余 355 款只有 LanRace 竞速、不算对打）。
     //   重新生成：`grep -l LanMatch entry/src/main/ets/games/*.ets`
     if (it.multiplayer && MULTI_IDS.indexOf(g.id) >= 0) { sc += 10; }
@@ -257,8 +335,32 @@ export class ChatFinder {
         if (GAMES[i].id === it.similar) { ref = GAMES[i]; break; }
       }
       if (ref !== undefined) {
-        if (g.category === ref.category) { sc += 18; }
-        if (g.difficulty === ref.difficulty) { sc += 8; }
+        // ★★★ 2026-11-08（game-balancer）**玩法相同是主信号，且与「同类别」互斥**。
+        //   为什么必须互斥 + 给到 40：非同类候选的上限是 `18(类别) + 8(难度) + 16(共享tag) = 42`。
+        //   实测（_巡检记录/playStyle方案-20261108.md §5）：只给 +25 时，「像 2048」的
+        //   ps_merge 候选只有 37 分 < 三消的 42 ⇒ **top-3 一分不变**；
+        //   改成 +40 且互斥后，候选最低 `40 + 8 = 48 > 42` ⇒ 必然胜出（实测 52 vs 42）。
+        const gs: string = styleOf(g);
+        const rs: string = styleOf(ref);
+        const sameStyle: boolean = gs.length > 0 && gs === rs;
+        if (sameStyle) {
+          sc += 40;
+        } else if (g.category === ref.category) {
+          sc += 18;
+        }
+        // ★ 2026-11-08 **「同难度 +8」不再白送**：`difficulty` 字段 354/355 都是 NORMAL
+        //   ⇒ 原来等于给所有候选加同一个常数。现在只在双方都是**非普通**档时才给。
+        if (g.difficulty === ref.difficulty && g.difficulty !== Difficulty.NORMAL) { sc += 8; }
+        // ★ 2026-11-08 **操作方式相同 +10**：`tap/swipe/drag/type` 是手感维度，
+        //   「2048 和 数字蛇 都是 swipe」确实比「考拉兹（点按）」更像。
+        for (let t = 0; t < g.tags.length; t++) {
+          const tt: string = g.tags[t];
+          if ((tt === 'tap' || tt === 'swipe' || tt === 'drag' || tt === 'type')
+            && ref.tags.indexOf(tt) >= 0) {
+            sc += 10;
+            break;
+          }
+        }
         let shared: number = 0;
         for (let t = 0; t < g.tags.length; t++) {
           if (ref.tags.indexOf(g.tags[t]) >= 0) { shared = shared + 1; }
