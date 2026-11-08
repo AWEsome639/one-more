@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""布局溢出静态检查器（三类）
+"""布局溢出静态检查器（四类）
 
 ★ 背景（2026-11-08）：ai-fixer-b 发现 **165 款横屏棋盘溢出** ——
   根因是 `width('100%') + aspectRatio(1)` 假设「宽 ≤ 高」，横屏（853×533）下
@@ -20,6 +20,12 @@
      · 竖排估算：按「最近的 Row」归组，同一行取最大高度（横向一排不算累加），
        再把各行高度加起来 —— 不这样归组会把横向按钮行误判成竖排。
   ③ **`position({ y: 字面量 })` 超出屏高**：y 是字面量且 > 500 ⇒ 报（有 constraintSize 或 tinyWatch 分支的放过）。
+  ④ **「提示按钮」在正方形棋盘之后 + 文件无限高**（2026-11-08，判据 1819 同族）：
+     `Button(TG('提示'))` 的行号 > 某处 `aspectRatio(1)` 的行号（棋盘在按钮前、按宽撑满），
+     且**整个文件**没有限高/限宽（`constraintSize` / `maxHeight` / `Bp.height±` / `boardPx` /
+     `width(Math.min(...))`）、也没有 `Scroll` ⇒ 报「按钮可能被挤出」候选。
+     · 这是**候选**（很多 `aspectRatio(1)` 是小格子/图标，不是整块棋盘）——真机复核后收敛；
+     · tinyWatch 分支放过。
 
 ★ 输出：机读行 `布局溢出：N 处`；退出码 0 = 无 ｜ 1 = 有 ｜ 2 = 解析/自检失败。
 用法：
@@ -49,6 +55,8 @@ ASPECT = re.compile(r'\.aspectRatio\(\s*([^)]*)\)')
 CELLOF = re.compile(r'Cell\.of\(\s*(\d+)\s*\)')
 POSITION = re.compile(r'\.position\(\s*\{')
 CAP_RE = re.compile(r'constraintSize|maxHeight|maxWidth')
+# ④ 判据 1819：自绘「提示」按钮（HintBar 的按钮不是这个写法，不在此类）
+HINT_BTN_RE = re.compile(r"Button\(\s*TG\(\s*['\"]提示['\"]\s*\)\s*\)")
 
 
 def mask(src, strings_too=False):
@@ -183,8 +191,8 @@ def scan_file(path, ref_h=REF_HEIGHT):
     mk = mask(src)                 # 注释空、字符串留（读 width('100%')）
     ms = mask(src, True)           # 字符串也空（结构）
     raw_lines = src.split('\n')
-    found = {'wide': [], 'stack': [], 'pos': []}
-    allowed = {'wide': [], 'stack': [], 'pos': []}
+    found = {'wide': [], 'stack': [], 'pos': [], 'pushout': []}
+    allowed = {'wide': [], 'stack': [], 'pos': [], 'pushout': []}
     conts = containers(ms)
     funcs = function_spans(ms)
 
@@ -311,6 +319,27 @@ def scan_file(path, ref_h=REF_HEIGHT):
         found['pos'].append({'file': rel, 'line': ln, 'sym': 'y=%s' % ym.group(1),
                              'code': raw_lines[ln - 1].strip()[:110], 'kind': 'y>500'})
 
+    # ── ④ 提示按钮在正方形棋盘之后 + 文件无限高（判据 1819 同族） ──
+    #   只在「棋盘按宽撑满 + 按钮在棋盘之后」时才会把按钮顶出去；
+    #   文件级上限（constraintSize/Bp.height±/boardPx/width(Math.min)）或 Scroll 都算已处理。
+    file_cap = (bool(CAP_RE.search(mk)) or bool(re.search(r'Bp\.height\s*[-*]', mk))
+                or ('boardPx' in mk) or bool(re.search(r'width\(Math\.min\(', mk)))
+    has_scroll = ('Scroll()' in mk) or ('Scroll{' in mk)
+    if not file_cap and not has_scroll:
+        asp_lines = [line_of(mk, m.start()) for m in ASPECT.finditer(mk)]
+        for bm in HINT_BTN_RE.finditer(mk):
+            bl = line_of(mk, bm.start())
+            before = [al for al in asp_lines if al < bl]
+            if not before:
+                continue
+            item = {'file': rel, 'line': bl,
+                    'code': raw_lines[bl - 1].strip()[:110],
+                    'kind': 'hint-after-square-board'}
+            if near_tiny(bm.start()):
+                allowed['pushout'].append((item, 'tinyWatch 分支'))
+            else:
+                found['pushout'].append(item)
+
     return found, allowed
 
 
@@ -346,6 +375,31 @@ struct Demo {
 '''
 
 
+SELF4_BAD = '''
+@Component
+struct Demo4Bad {
+  build() {
+    Column() {
+      Stack() { Text('board') }.width('100%').aspectRatio(1)
+      Button(TG('提示')) { Text('hint') }
+    }
+  }
+}
+'''
+SELF4_OK = '''
+@Component
+struct Demo4Ok {
+  build() {
+    Column() {
+      Stack() { Text('board') }.width('100%').aspectRatio(1)
+        .constraintSize({ maxHeight: 300 })
+      Button(TG('提示')) { Text('hint') }
+    }
+  }
+}
+'''
+
+
 def self_test():
     import tempfile
     d = tempfile.mkdtemp(prefix='overflow_')
@@ -353,10 +407,18 @@ def self_test():
         p = os.path.join(d, 'demo.ets')
         io.open(p, 'w', encoding='utf-8').write(SELF_SRC)
         found, allowed = scan_file(p)
+        p4b = os.path.join(d, 'demo4_bad.ets')
+        p4o = os.path.join(d, 'demo4_ok.ets')
+        io.open(p4b, 'w', encoding='utf-8').write(SELF4_BAD)
+        io.open(p4o, 'w', encoding='utf-8').write(SELF4_OK)
+        f4b, _ = scan_file(p4b)
+        f4o, _ = scan_file(p4o)
         ok = [
             ('① 宽驱动无上限：应命中 1 处', len(found['wide']) == 1, '%d 处' % len(found['wide'])),
             ('② 固定高堆叠：应命中 1 处', len(found['stack']) == 1, '%d 处' % len(found['stack'])),
             ('③ position y>500：应命中 1 处', len(found['pos']) == 1, '%d 处' % len(found['pos'])),
+            ('④ 提示在棋盘后+无限高：应命中 1 处', len(f4b['pushout']) == 1, '%d 处' % len(f4b['pushout'])),
+            ('④ 有 constraintSize 时：应 0 处', len(f4o['pushout']) == 0, '%d 处' % len(f4o['pushout'])),
         ]
     finally:
         try:
@@ -386,9 +448,9 @@ def main():
         print('  🔴 没找到 .ets 文件')
         return 2
 
-    totals = {'wide': 0, 'stack': 0, 'pos': 0}
-    found_all = {'wide': [], 'stack': [], 'pos': []}
-    allowed_all = {'wide': [], 'stack': [], 'pos': []}
+    totals = {'wide': 0, 'stack': 0, 'pos': 0, 'pushout': 0}
+    found_all = {'wide': [], 'stack': [], 'pos': [], 'pushout': []}
+    allowed_all = {'wide': [], 'stack': [], 'pos': [], 'pushout': []}
     for p in files:
         found, allowed = scan_file(p, ref_h)
         for k in totals:
@@ -398,11 +460,12 @@ def main():
 
     names = {'wide': "① 宽驱动棋盘无上限（width('100%') + aspectRatio，链上无 constraintSize）",
              'stack': '② 固定高元素堆叠（Cell.of(40..59) ≥4 且竖排估算 > %d）' % (ref_h - CHROME_H),
-             'pos': '③ position y 字面量 > 500（可能超出屏高）'}
+             'pos': '③ position y 字面量 > 500（可能超出屏高）',
+             'pushout': '④ 提示按钮在 aspectRatio 棋盘之后 + 文件无限高（按钮可能被挤出，候选）'}
     print('  ═══ 布局溢出静态检查 ═══')
     print('  扫描 .ets：%d 个（games/components/pages）｜ 参考高 %d，可用高 %d'
           % (len(files), ref_h, ref_h - CHROME_H))
-    for k in ('wide', 'stack', 'pos'):
+    for k in ('wide', 'stack', 'pos', 'pushout'):
         print('\n  %s：%d 处' % (names[k], totals[k]))
         for h in found_all[k][: (100 if verbose else 8)]:
             print('     · %s:%d  %s' % (h['file'], h['line'], h['code']))

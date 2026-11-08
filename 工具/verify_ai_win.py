@@ -133,6 +133,12 @@ RESET_BUDGET = 150.0   # 每款之间「回列表」的复位预算（比单款�
 ACTIVE_WINDOW = 0.0    # 判据 1713：>0 才启用「读数动够就收工」；默认 0 = 不早退（保住 WIN 基线）
 ACTIVE_MIN_MOVES = 2   # 判据 1713：早退要求的最少**进度类**变化次数
 ACTIVE_COUNTS_PASS = False  # 判据 1810：--active-pass 打开时 ACTIVE 计入通过
+# ★ 判据 1819 配套（2026-11-08）：**按钮被挤出 = 独立判定 PUSHED_OUT**（≠ FAIL）
+#   「提示 / AI 代打」的下沿必须 ≤ 安全底线；被挤出的款玩家点不到 AI —— 可定位的布局缺陷。
+# ★ 默认 None = **自动按屏底算**（max(y2) - 16）：纯 1336 会在「数谜」这类
+#   正常可点（y2=1571，实测点 AI 能赢）的款上误报；要严格口径用
+#   `--pushed-out-max-y 1336` 显式指定。
+PUSHED_OUT_MAX_Y = None
 DUMP_REMOTE = '/data/local/tmp/_vaw.json'
 DUMP_LOCAL = '/tmp/_vaw.json'
 
@@ -183,8 +189,10 @@ USAGE = """用法：
   --device <host:port>      设备地址（默认 127.0.0.1:5555）
   --active-window <秒>      读数动够就判 ACTIVE 收工（默认 0 = 不早退，判据 1713）
   --active-pass             **ACTIVE 视为通过**（判据 1810：实时/无尽/长局没有结算可等）
-退出码：0 全通过 ｜ 1 有失败/TIMEOUT/（未开 --active-pass 时的）ACTIVE ｜ 2 脚本异常 ｜ 3 设备不可用
-        （开 --active-pass 时 ACTIVE 计入通过 ⇒ 全 ACTIVE 也返回 0）
+  --pushed-out-max-y <px>   PUSHED_OUT 阈值；默认自动 = 屏底-16（判据 1819）
+                            （显式给 1336 = 严格「底栏上沿」口径，会偏严）
+退出码：0 全通过 ｜ 1 有失败/TIMEOUT/PUSHED_OUT/（未开 --active-pass 时的）ACTIVE ｜ 2 脚本异常 ｜ 3 设备不可用
+        （开 --active-pass 时 ACTIVE 计入通过 ⇒ 全 ACTIVE 也返回 0；PUSHED_OUT 永不计通过）
 """
 
 
@@ -417,6 +425,59 @@ def tap(x, wait=1.0):
     cx, cy = center(x)
     sh("uitest uiInput click %d %d" % (cx, cy))
     time.sleep(wait)
+
+
+def _node_y2(x):
+    b = x.get('bounds') or []
+    return int(b[3]) if len(b) >= 4 else 0
+
+
+def _btn_nodes(ns):
+    """取「提示」与「AI 代打」按钮节点。
+
+    · 精确匹配 '提示'：不能用子串 —— 提示语/说明文字里也有「提示」，会拿错节点；
+    · 演示期 AI 按钮文案是「演示中…」，也要认（它仍占位，能判断是否在屏内）。
+    """
+    hint = find(ns, '提示', exact=True)
+    ai = find(ns, 'AI 代打', exact=True)
+    if ai is None:
+        ai = find(ns, '停代打', exact=True)
+    if ai is None:
+        for x in ns:
+            if x.get('text', '').startswith('演示中') and x.get('bounds'):
+                ai = x
+                break
+    return hint, ai
+
+
+def pushout_detail(ns, max_y=None):
+    """判据 1819：**按钮被挤出**（PUSHED_OUT）—— 和 FAIL/导航失败分开记。
+
+    判据：进游戏后「提示 / AI 代打」必须存在，且**下沿 ≤ max_y**（底栏上沿，默认 1336px）。
+    返回 None = 正常；返回 str = 判定说明（作为 verdict='PUSHED_OUT' 的 detail）。
+    · 两个按钮都不在页面里 ⇒ 返回 None（可能是「进错游戏」，交给原流程，不抢判）。
+    """
+    if max_y is None:
+        # ★ 自动模式：用页面里最靠下的节点当作屏底（游戏页没有底栏，1336 会误报）。
+        max_y = PUSHED_OUT_MAX_Y
+        if max_y is None:
+            bottom = max([_node_y2(x) for x in ns if x.get('bounds')] or [0])
+            max_y = (bottom - 16) if bottom > 0 else 1336
+    hint, ai = _btn_nodes(ns)
+    if hint is None and ai is None:
+        return None
+    bad = []
+    if hint is not None and _node_y2(hint) > max_y:
+        bad.append('提示 y2=%d>%d' % (_node_y2(hint), max_y))
+    if ai is not None and _node_y2(ai) > max_y:
+        bad.append('AI 代打 y2=%d>%d' % (_node_y2(ai), max_y))
+    if ai is None:
+        bad.append('缺「AI 代打」')
+    if hint is None:
+        bad.append('缺「提示」')
+    if not bad:
+        return None
+    return '按钮被挤出（PUSHED_OUT，判据 1819）：' + '；'.join(bad)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -1006,6 +1067,12 @@ def verify(name):
             break
         time.sleep(2.0)
     if not ai:
+        # ★ 判据 1819：找不到 AI 按钮时，先看「提示」是不是被挤出屏幕 ——
+        #   若提示已 > 底栏上沿，说明是「按钮被挤出」，不该记成普通 FAIL。
+        hint0 = find(ns, '提示', exact=True)
+        if hint0 is not None and _node_y2(hint0) > PUSHED_OUT_MAX_Y:
+            return 'PUSHED_OUT', ('找不到 AI 代打，且「提示」y2=%d>%d（按钮被挤出）'
+                                  % (_node_y2(hint0), PUSHED_OUT_MAX_Y))
         return 'FAIL', '找不到 AI 代打按钮'
     # ★ 判据 1711：点之前**再 dump 一次拿最新 bounds** —— 演示结束/布局切换会把按钮
     #   从 y543 挪回 y429，用旧 bounds 会点空（二项式配对就栽在这，误判成 TIMEOUT）
@@ -1015,6 +1082,12 @@ def verify(name):
         ai2 = find(nodes(d2), 'AI 代打')
         if ai2:
             ai = ai2
+    # ★ 判据 1819（2026-11-08）：进游戏后「提示 / AI 代打」必须在屏内
+    #   （下沿 ≤ 底栏上沿）；否则记 PUSHED_OUT —— 独立于 FAIL，
+    #   它是可定位的布局缺陷（玩家点不到），不是导航/工具失败。
+    _pd = pushout_detail(nodes(d2) if d2 else ns)
+    if _pd:
+        return 'PUSHED_OUT', _pd
     # ★ 判据 1720：回合制游戏（井井棋）AI 走完一步就停是正常的 ——
     #   记下点之前的读数指纹，1717 判「算不出」时要求「读数也没变」才算
     _sig_before = readout_sig(ns)
@@ -1097,8 +1170,9 @@ def save(name, verdict, detail):
 
 def _stats_line(stats):
     """判据 1679 + 1712：一行汇总（ACTIVE 单列，绝不并进 WIN）"""
-    base = 'WIN %d · ACTIVE %d · FAIL %d · TIMEOUT %d · ERROR %d' % (
-        stats['WIN'], stats['ACTIVE'], stats['FAIL'], stats['TIMEOUT'], stats['ERROR'])
+    base = 'WIN %d · ACTIVE %d · FAIL %d · TIMEOUT %d · ERROR %d · PUSHED_OUT %d' % (
+        stats['WIN'], stats['ACTIVE'], stats['FAIL'], stats['TIMEOUT'], stats['ERROR'],
+        stats['PUSHED_OUT'])
     if ACTIVE_COUNTS_PASS:
         # 判据 1810：把「ACTIVE 计入通过」这件事显式打出来，避免看统计的人误以为 WIN 变多了
         base += ' ｜ ACTIVE 计入通过 ⇒ 通过 %d/%d' % (
@@ -1124,7 +1198,8 @@ def _reset_home():
 # ════════════════════════════════════════════════════════════════════════════
 def parse_args(argv):
     opts = {'names': [], 'limit': 10, 'per_game': PER_GAME, 'out': OUT, 'device': DEV,
-            'active_window': ACTIVE_WINDOW, 'active_pass': False}
+            'active_window': ACTIVE_WINDOW, 'active_pass': False,
+            'pushed_out_max_y': PUSHED_OUT_MAX_Y}
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -1136,7 +1211,7 @@ def parse_args(argv):
             i += 1
             continue
         if a in ('--limit', '--per-game-timeout', '--names-file', '--out', '--device',
-                 '--active-window'):
+                 '--active-window', '--pushed-out-max-y'):
             if i + 1 >= len(argv):
                 print('🔴 参数缺值：%s\n%s' % (a, USAGE), file=sys.stderr)
                 raise SystemExit(2)
@@ -1148,6 +1223,8 @@ def parse_args(argv):
                 opts['per_game'] = float(v)
             elif a == '--active-window':
                 opts['active_window'] = float(v)
+            elif a == '--pushed-out-max-y':
+                opts['pushed_out_max_y'] = float(v)
             elif a == '--names-file':
                 try:
                     lines = io.open(v, encoding='utf-8').read().splitlines()
@@ -1170,13 +1247,15 @@ def parse_args(argv):
 
 
 def main():
-    global OUT, DEV, PER_GAME, _BUDGET, ACTIVE_WINDOW, ACTIVE_COUNTS_PASS
+    global OUT, DEV, PER_GAME, _BUDGET, ACTIVE_WINDOW, ACTIVE_COUNTS_PASS, PUSHED_OUT_MAX_Y
     opts = parse_args(sys.argv[1:])
     OUT = os.path.abspath(opts['out'])
     DEV = opts['device']
     PER_GAME = float(opts['per_game'])
     ACTIVE_WINDOW = float(opts['active_window'])
     ACTIVE_COUNTS_PASS = bool(opts.get('active_pass', False))
+    _pomy = opts.get('pushed_out_max_y')
+    PUSHED_OUT_MAX_Y = float(_pomy) if _pomy is not None else None
 
     if not os.path.exists(HC):
         print('🔴 找不到 hdc：%s' % HC, file=sys.stderr)
@@ -1257,9 +1336,18 @@ def main():
         print('  ACTIVE（读数在动·没等到结算，判据 1712）：', flush=True)
         for nm, dd in active:
             print('    %s => %s' % (nm, (dd or '')[:110]), flush=True)
+    pushed = [(nm, dd) for nm, v, dd in bad if v == 'PUSHED_OUT']
+    if pushed:
+        # ★ 判据 1819：PUSHED_OUT **单列**（布局缺陷，不是导航/工具失败），
+        #   不混进「未通过（FAIL/TIMEOUT）」那一段。
+        print('  PUSHED_OUT（按钮被挤出，判据 1819）：', flush=True)
+        for nm, dd in pushed:
+            print('    %s => %s' % (nm, (dd or '')[:120]), flush=True)
     if bad:
         print('  未通过：', flush=True)
         for nm, v, dd in bad:
+            if v == 'PUSHED_OUT':
+                continue
             print('    %s => %s（%s）' % (nm, v, (dd or '')[:120]), flush=True)
     # ★ 判据 1810：开了 --active-pass ⇒ ACTIVE（有进度、无失败）也算通过
     passed_n = stats['WIN'] + (stats['ACTIVE'] if ACTIVE_COUNTS_PASS else 0)

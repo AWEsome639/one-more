@@ -9,6 +9,7 @@ import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -542,6 +543,14 @@ export struct GKakuroMini {
         }, (r: number) => 'gr' + r)
       }
       .width('100%')
+      // ★★★ 2026-11-08 **横屏棋盘下沿被底部 tab 栏裁掉**（verifier-dev 真机实测）：
+      //   本款根容器是 `Column`（无 Scroll），棋盘 `width('100%')` + 内部格子 `aspectRatio(1)`
+      //   ⇒ 853 宽时棋盘高 ≈813vp，远超声高 ⇒ 底边压到 y≈1600，被 tab 栏盖住。
+      //   ⇒ 判据 1802：**约束加在「棋盘容器」上**（不是格子），横屏按可用高反推；
+      //   ★ 模板取自同族的 `GKakuro`（那边用 -310，因为它按钮行**紧贴棋盘正下方**；
+      //     本款按钮在上方 ⇒ 先用 -260，真机量了不够再压）。
+      //   ★ 手机零回归：`Bp.height >= 600` 走 9999（等于不约束）。
+      .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 260 : 9999 })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

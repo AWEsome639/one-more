@@ -466,6 +466,8 @@ export struct GamesTab {
    *   同一类入口：分类 chip / 全部·收藏·最近 / 特征标签 / 清空 / 网格⇄A-Z。
    */
   private resetGridScroll(): void {
+    // ★ 2026-11-08 **临时诊断日志**（lead 批准）：谁把列表拽回顶部。
+    hilog.info(0x0001, 'perf', 'resetGridScroll 被调用（scrollEdge Top）');
     setTimeout(() => {
       try {
         this.gridScroller.scrollEdge(Edge.Top);
@@ -475,10 +477,10 @@ export struct GamesTab {
     }, 0);
   }
   /**
-   * **备用**：`LazyForEach` 的数据源（`core/GameSource.ets`）。
-   * ⚠️ 2026-11-08 实测首帧空白 ⇒ **当前未参与渲染**（网格仍走 `ForEach`）。
-   *   保留这里 + `list()` 里的 `reset()`，是为了将来重试时改一行就能接上；
-   *   现在它只是把同样的数组存一份（无监听者 ⇒ `reset` 里 notify 是空循环）。
+   * `LazyForEach` 的数据源（`core/GameSource.ets`）—— **已实际参与渲染**。
+   *   2026-11-08 分两步落地：① 直接迁 `LazyForEach` ⇒ 首帧空白（挂载时拿不到 `aboutToAppear` 预填的数据）；
+   *   ② 加 `gridReady` 闸门（首帧用 `ForEach` 直出、挂载后切 `LazyForEach`）⇒ 首帧 8 张、之后懒加载。
+   *   `list()` 缓存未命中时 `reset()` 一次；`reset()` 内部先比 id，内容没变不通知。
    */
   private source: GameSource = new GameSource();
   private listCache: GameMeta[] = [];
@@ -502,6 +504,10 @@ export struct GamesTab {
     // ★ 2026-11-08 perf-hunter：LazyForEach 的数据源跟着刷新（**整表换 + 通知**）。
     //   放在这里 = **一处覆盖六个变化来源**（分段/分类/特征/搜索/收藏 tick/返回首页）。
     //   ⚠️ `reset()` 内部会先比一遍 id，结果没变就不通知，避免白重载整张网格。
+    // ★ 2026-11-08 **临时诊断日志**（lead 批准）：定位「fling 后被弹回顶部」是谁干的。
+    //   判读：跳回那一刻若只有这一行 ⇒ `LazyForEach` 整表重载（`onDataReloaded` 会复位滚动位置）；
+    //        若同时出现 `resetGridScroll` ⇒ 是 `scrollEdge(Edge.Top)` 被调用（程序或误触）。
+    hilog.info(0x0001, 'perf', 'list miss key=%{public}s len=%{public}d', key, this.listCache.length);
     this.source.reset(this.listCache);
     return this.listCache;
   }
@@ -1367,22 +1373,14 @@ build() {
             });
           }
         })
-        // ⚠️⚠️ 2026-11-08 perf-hunter **纠正一处长期误解**：`cachedCount` 在 `ForEach` 下**没有任何作用**。
-      //   官方 SDK 原文（<SDK>/openharmony/ets/component/grid.d.ts:563–567）：
-      //     "It works only in `LazyForEach` and `Repeat` with the `virtualScroll` option enabled."
-      //   ⇒ 2026-10-14 那次「6 ⇒ 20，多预加载 14 张卡，快速滑动时内容已经建好」**从未生效**：
-      //     `ForEach` 本来就把这 355 张卡**全量创建**了（官方 FAQ faqs-arkui-1291：
-      //     「初始化渲染时，ForEach 会加载数据源的所有数据」）⇒ 根本不存在"预加载"这回事。
-      //   ⇒ **为什么还留着这行**：将来若把本网格迁到 `LazyForEach`（评估见
-      //     `_巡检记录/LazyForEach可行性-20261108.md`），它**才会真正生效**，届时直接可用。
-      //   ⚠️ 迁移时注意：缓存量 = **cachedCount × 列数**（4 列时 20 ⇒ 预建 80 张卡），
-      //      建议先降到 **8–12** 再观察首屏节点数与滚动连贯，别把省下来的节点又预建回去。
-      // ★★★ 2026-11-08 perf-hunter 步骤 5：**20 → 12**（这次它真的生效了 —— 网格已走 LazyForEach）。
-      //   官方 SDK（grid.d.ts:563–568）：`cachedCount` 只在 `LazyForEach`/`Repeat+virtualScroll` 下生效，
-      //   且原文写明「缓存数量 = **cachedCount × 列数**」（本平板 4 列）。
-      //   ⇒ 选 **12** 而不是 8 的理由：可视区是 4 列 × 2 行 = 8 张，12 给的是「前后共约 1.5 屏」的余量，
-      //     快速甩动时不容易甩出缓存而白屏；而 20（=80 张预建）纯属把刚省下的节点又建回去 —— 12 已省 40%。
-      //   ⚠️ 若以后改成 3 列/2 列（手机/手表），实际缓存量会随之下降（×列数），不用另调。
+      // ★★★ 2026-11-08 perf-hunter（**唯一有效版本，旧注释已合并**）：
+      //   ① SDK 原文（`grid.d.ts:563–568`）：`cachedCount` 只在 **`LazyForEach` / `Repeat+virtualScroll`** 下生效，
+      //      且「缓存数量 = **cachedCount × 列数**」。
+      //      ⇒ 2026-10-14 那次「6 ⇒ 20」在 `ForEach` 下**从未生效**（`ForEach` 本来就把 355 张全建了，官方 FAQ faqs-arkui-1291）。
+      //   ② 现在网格**已走 `LazyForEach`**（`gridReady` 闸门，见文件上方 `source` 注释）⇒ 这行**真的生效了**。
+      //   ③ 取值 **12**：可视区 4 列 × 2 行 = 8 张，12×4 = 48 张预建 ≈「前后共 1.5 屏」——
+      //      快速甩动不易甩出缓存；而 20（=80 张）等于把刚省下的节点又建回去，**12 已省 40%**。
+      //   ④ 换 3 列/2 列（手机/手表）时预建量按 ×列数 自动下降，**不用另调**。
       .cachedCount(12)
       }
     }
