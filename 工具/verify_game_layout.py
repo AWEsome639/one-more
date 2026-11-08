@@ -114,7 +114,7 @@ def verify_one(en_name):
         return ('NO_CARD', {})
     sh(f'uitest uiInput click {target[0]} {target[1]}')
     time.sleep(2.2)
-    d2 = dump()
+    d2 = dump(f'/data/local/tmp/game_{en_name}.json')   # ← v4：落盘，明早可查
     if not d2:
         sh('uitest uiInput keyEvent Back'); close_search()
         return ('GAME_DUMP_FAIL', {})
@@ -124,9 +124,14 @@ def verify_one(en_name):
     if not in_game:
         sh('uitest uiInput keyEvent Back'); close_search()
         return ('NOT_IN_GAME', {'texts': texts2[:5]})
-    # 内容区：找「最底部有内容的节点」
-    nodes = collect(d2, lambda t: True)
+    # ⚠️ v4：max_bottom 只看「有文本」的节点（排除根容器/装饰背景）
+    nodes = collect(d2, lambda t: len(t.strip()) > 0)
     max_bottom = max((y2 for _, (_, _, _, y2) in nodes), default=0)
+    # 同时记「最底下那个元素是什么」（供人工核对）
+    lowest = ''
+    for t, (_, _, _, y2) in nodes:
+        if y2 == max_bottom:
+            lowest = t[:30]; break
     if max_bottom <= CONTENT_BOTTOM:
         status = 'OK'
     elif max_bottom <= GESTURE_LIMIT:
@@ -136,7 +141,7 @@ def verify_one(en_name):
     sh('uitest uiInput keyEvent Back')
     time.sleep(0.8)
     close_search()
-    return (status, {'max_bottom': max_bottom, 'count': cnt})
+    return (status, {'max_bottom': max_bottom, 'lowest': lowest, 'count': cnt})
 
 def main():
     if len(sys.argv) < 2:
