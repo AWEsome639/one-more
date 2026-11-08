@@ -242,8 +242,17 @@ export struct GMatrixMultiplier {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    // ★ 2026-11-08 代打「不抄答案」：屏幕上是**两个 2×2 矩阵 ma / mb** + 问「第 wantR 行 × 第 wantC 列」
+    //   ⇒ 自己算点积（本款考的就是矩阵乘法）
+    const want: number = this.ma[this.wantR * SIZE] * this.mb[this.wantC]
+      + this.ma[this.wantR * SIZE + 1] * this.mb[SIZE + this.wantC];
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

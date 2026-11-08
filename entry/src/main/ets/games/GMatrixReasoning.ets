@@ -247,6 +247,34 @@ export struct GMatrixReasoning {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★ 2026-11-08 代打「不抄答案」：**靠规则推理，不读 ans**。
+   *   3×3 格里只有 `hole` 那格是被问号盖住的；把 4 个候选逐个填进去，
+   *   看哪个值能让**三行都满足同一条 `applyRule(kind)`**（kind 只有 0/1/2 三种）。
+   *   ⇒ 这正是人类解题的方式（先用两行补全的行定规则，再算缺的那格）。
+   *   返回选项下标；一个都凑不出（异常）返回 -1 ⇒ 调用方停手。
+   */
+  private aiOption(): number {
+    for (let oi = 0; oi < this.opts.length; oi++) {
+      const v: number = this.opts[oi];
+      const g: number[] = this.cells.slice();
+      g[this.hole] = v;
+      for (let kind = 0; kind < 3; kind++) {
+        let ok: boolean = true;
+        for (let r = 0; r < 3; r++) {
+          if (g[r * 3 + 2] !== applyRule(kind, g[r * 3], g[r * 3 + 1])) {
+            ok = false;
+            break;
+          }
+        }
+        if (ok) {
+          return oi;
+        }
+      }
+    }
+    return -1;
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -254,7 +282,14 @@ export struct GMatrixReasoning {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
+    // ★ 2026-11-08 代打「不抄答案」：屏幕上是 3×3 格（`cells`，其中 `hole` 那格被问号盖住）
+    //   ⇒ 把 4 个候选值逐个填进去，看哪个值能让**三行都满足同一条规则**（`applyRule` 只有 3 种）
+    //     找得到就是答案；这是真正的"从已有两行推规则"，不是读答案
+    const hit: number = this.aiOption();
+    if (hit < 0) {
+      return false;
+    }
+    this.pick(hit);
     return !this.over;
   }
 

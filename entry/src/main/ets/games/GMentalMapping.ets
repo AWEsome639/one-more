@@ -58,6 +58,14 @@ export struct GMentalMapping {
   @State private tx: number = 0;
   @State private ty: number = 0;
   @State private showMap: boolean = true;
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `answerDir()` 直接用 `tx/ty`（**地图藏起来后玩家看不到的目标坐标**）。
+   *   ⇒ 改成 AI 只记「地图亮着那 3 秒里看见的摆法」（`aiSpots`），
+   *     作答时先看**屏幕题面**问的是哪个 emoji（`spots[ty*N+tx]` 那一格的内容），
+   *     再从**自己的记忆**里找回它的格子坐标，算方向。
+   */
+  private aiSpots: string[] = [];
   @State private asked: number = 0;
   @State private right: number = 0;
   @State private wrong: number = 0;
@@ -120,6 +128,7 @@ export struct GMentalMapping {
     }
     // 3 秒后把地图藏起来
     this.timerId = setTimeout(() => {
+      this.aiSpots = this.spots.slice();   // ★ 地图消失的一瞬：AI 把"刚看到的"记下来
       this.showMap = false;
       this.timerId = -1;
     }, 3000);
@@ -243,6 +252,30 @@ export struct GMentalMapping {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /** 用「记忆里的地图」找目标 emoji 的位置，再算方向（八方向下标） */
+  private aiDir(): number {
+    const want: string = this.spots.length > this.ty * N + this.tx
+      ? this.spots[this.ty * N + this.tx] : '';
+    if (want.length === 0) {
+      return -1;
+    }
+    let at: number = -1;
+    for (let i = 0; i < this.aiSpots.length; i++) {
+      if (this.aiSpots[i] === want) {
+        at = i;
+        break;
+      }
+    }
+    if (at < 0) {
+      return -1;
+    }
+    const dx: number = (at % N) - this.px;
+    const dy: number = Math.floor(at / N) - this.py;
+    const sx: number = dx === 0 ? 0 : (dx > 0 ? 1 : -1);
+    const sy: number = dy === 0 ? 0 : (dy > 0 ? 1 : -1);
+    return (sy + 1) * 3 + (sx + 1);
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -250,7 +283,11 @@ export struct GMentalMapping {
     if (this.over || this.showMap) {
       return true;
     }
-    this.answer(this.answerDir());
+    const d: number = this.aiDir();
+    if (d < 0) {
+      return false;              // 没记住 ⇒ 停手（不读 tx/ty）
+    }
+    this.answer(d);
     return !this.over;
   }
 

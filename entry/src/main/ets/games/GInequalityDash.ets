@@ -216,8 +216,27 @@ export struct GInequalityDash {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    // ★ 2026-11-08 代打「不抄答案」（判据 1824：题面 = `"{a}x + {c} {op} {k}"`）
+    //   ⇒ 自己解不等式：a·x + c ⋛ k ⇒ x ⋛ (k−c)/a（a>0 不变号），答案串 = `op + ' ' + 解`
+    const tk: string[] = this.expr.split(' ');
+    if (tk.length < 5) {
+      return false;
+    }
+    const a: number = Number.parseInt(tk[0].replace('x', ''), 10);
+    const c: number = Number.parseInt(tk[2], 10);
+    const op: string = tk[3];
+    const k: number = Number.parseInt(tk[4], 10);
+    if (isNaN(a) || isNaN(c) || isNaN(k) || a === 0) {
+      return false;
+    }
+    const want: string = op + ' ' + String((k - c) / a);
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {
