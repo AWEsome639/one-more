@@ -13,7 +13,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
@@ -413,7 +413,7 @@ export struct GNavonHierarchical {
           .shadow(Shadow.card)
           Column({ space: Space.xs }) {
           Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-          Text((String(this.left) + 's')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          Text((String(this.left) + Sec())).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
           }
           .layoutWeight(1)
           .padding(Space.sm)

@@ -2,6 +2,7 @@
  * 字谜定义 —— 看中文释义，按顺序点字母把单词拼回来
  * 胜负：6 题答对 ≥4 ⇒ 通关｜进度：题号 / 答对 / 每题倒计时（点错罚 3 秒） */
 import { Hint, HintResult } from '../ai/Hint';
+import { Sec } from '../core/I18n';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -308,7 +309,7 @@ export struct GAnagramDefinition {
     this.onFinish(r);
   }
   private bar(): string {
-    return TG('题 ') + Math.min(this.qIndex + 1, QN) + '/' + QN + TG('　答对 ') + this.right + '　剩余 ' + (this.leftMs / 1000).toFixed(1) + 's';
+    return TG('题 ') + Math.min(this.qIndex + 1, QN) + '/' + QN + TG('　答对 ') + this.right + '　剩余 ' + (this.leftMs / 1000).toFixed(1) + Sec();
   }
   private answerText(): string {
     const w: string = this.curWord(); const parts: string[] = [];

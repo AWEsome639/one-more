@@ -11,6 +11,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
+import { Sec } from '../core/I18n';
 import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
@@ -713,7 +714,7 @@ export struct GBinaryPuzzle {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         Text(true ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
-        : (false ? String(this.mistakes) : (this.seconds + 's')))
+        : (false ? String(this.mistakes) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
@@ -728,7 +729,7 @@ export struct GBinaryPuzzle {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         Text(false ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
-        : (true ? String(this.mistakes) : (this.seconds + 's')))
+        : (true ? String(this.mistakes) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
@@ -743,7 +744,7 @@ export struct GBinaryPuzzle {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         Text(false ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
-        : (false ? String(this.mistakes) : (this.seconds + 's')))
+        : (false ? String(this.mistakes) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

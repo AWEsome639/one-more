@@ -4,6 +4,7 @@
  * 胜负：找齐 3 处 ⇒ 通关；错点 3 次或超过 60 秒 ⇒ 失败。　进度：找到几处 / 失误 / 剩余秒
  */
 import { Hint, HintResult } from '../ai/Hint';
+import { Sec } from '../core/I18n';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -316,7 +317,7 @@ export struct GRoomInspector {
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.secs > 0 ? this.secs : 0) + 's')).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((String(this.secs > 0 ? this.secs : 0) + Sec())).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')

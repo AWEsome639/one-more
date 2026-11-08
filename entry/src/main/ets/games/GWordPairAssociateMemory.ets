@@ -12,7 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
@@ -295,7 +295,7 @@ export struct GWordPairAssociateMemory {
     this.onFinish(r);
   }
   private bar(): string {
-    const stage: string = this.phase === 0 ? '记忆 ' + this.leftS + 's'
+    const stage: string = this.phase === 0 ? '记忆 ' + this.leftS + Sec()
       : (this.phase === 1 ? '回忆 ' + Math.min(this.qIndex + 1, this.diffTotal) + '/' + this.diffTotal : TG('结束'));
     return TG2("{0}　答对 {1}　得分 {2}", stage,Digits(String(this.right), this.langCode),Digits(String(this.score), this.langCode));
   }

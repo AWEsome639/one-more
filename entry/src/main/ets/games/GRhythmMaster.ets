@@ -3,6 +3,7 @@
  * 胜负：平均间隔误差 ≤ 150ms ⇒ 通关；进度：阶段 · 已敲 x/4 · 误差
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Ms } from '../core/I18n';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -338,7 +339,7 @@ export struct GRhythmMaster {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('误差'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.errMs >= 0 ? String(this.errMs) + 'ms' : '—')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.errMs >= 0 ? String(this.errMs) + Ms() : '—')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {

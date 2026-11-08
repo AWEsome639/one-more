@@ -8,6 +8,7 @@
  */
 
 import { Hint, HintResult } from '../ai/Hint';
+import { Sec } from '../core/I18n';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
@@ -544,7 +545,7 @@ export struct GWordle {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.diffTotal - this.guesses.length)
-        : (kind === 1 ? (this.guesses.length + '/' + this.diffTotal) : (this.seconds + 's')))
+        : (kind === 1 ? (this.guesses.length + '/' + this.diffTotal) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

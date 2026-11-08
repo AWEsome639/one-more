@@ -3,6 +3,7 @@
  * 胜负：答对 ≥8 题通关；错 3 次或时间耗尽即失败　进度：题号 / 答对 / 失误 / 倒计时
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
+import { Sec } from '../core/I18n';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -320,7 +321,7 @@ export struct GDefinitionDash {
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('倒计时'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text(((this.over ? 0 : this.leftS) + 's')).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+        Text(((this.over ? 0 : this.leftS) + Sec())).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)

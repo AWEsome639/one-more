@@ -22,7 +22,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
@@ -752,7 +752,7 @@ export struct GGame24 {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? this.originText()
-        : (kind === 1 ? String(this.merges) : this.seconds + 's'))
+        : (kind === 1 ? String(this.merges) : this.seconds + Sec()))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

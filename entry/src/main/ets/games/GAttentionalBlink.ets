@@ -12,7 +12,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Ms } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const TRIALS: number = 5;
@@ -325,7 +325,7 @@ export struct GAttentionalBlink {
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: 2 }) {
       Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card); Column({ space: 2 }) {
-      Text((TG('间隔'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.pace() + 'ms')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+      Text((TG('间隔'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint); Text((this.pace() + Ms())).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card) }.width('100%')
       Stack() {
         Text(this.showing && this.idx >= 0 ? this.seq[this.idx] : '·')

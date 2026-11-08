@@ -3,6 +3,7 @@
  * 胜负：平均 < 550ms 且点偏 ≤ 2 次 ⇒ 通关；进度：第几/8 · 平均 · 最快
  */
 import { Hint, HintResult } from '../ai/Hint';
+import { Ms } from '../core/I18n';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -267,11 +268,11 @@ export struct GReflexTap {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('平均'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.avg() > 0 ? String(this.avg()) + 'ms' : '—')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((this.avg() > 0 ? String(this.avg()) + Ms() : '—')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('最快'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.best > 0 ? String(this.best) + 'ms' : '—')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((this.best > 0 ? String(this.best) + Ms() : '—')).fontSize((Bp.tinyScreen() ? FontSize.md : FontSize.lg)).fontWeight(FontWeight.Bold).fontColor(this.theme.ink).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.sm }) {

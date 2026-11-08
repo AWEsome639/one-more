@@ -12,7 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
 import { Tv } from '../core/Tv';
 const LIMIT: number = 75; const COLS: number = 4; const ROWS: number = 5; const TOTAL: number = COLS * ROWS;
@@ -299,7 +299,7 @@ export struct GTarget10 {
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('时间'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text((String(this.left) + 's')).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((String(this.left) + Sec())).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm)
         .shadow(Shadow.card)
         Column({ space: 2 }) {

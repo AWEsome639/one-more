@@ -1179,7 +1179,9 @@ const EXTRA: Record<string, Record<string, string>> = {
   "返回列表：回到游戏列表": { "ja": "一覧へ：ゲーム一覧に戻る", "ko": "목록으로: 게임 목록으로 돌아가기", "es": "Volver: vuelve a la lista", "fr": "Retour : revenir a la liste", "de": "Zurück: zur Spieleliste", "pt": "Voltar: volta a lista de jogos", "ru": "Назад: вернуться к списку", "it": "Indietro: torna all elenco", "ar": "رجوع: عد إلى قائمة الألعاب", "zh-Hant": "返回列表：回到遊戲列表" },
   "再来一局：重玩这一个游戏": { "ja": "もう一度：このゲームをやり直す", "ko": "다시 하기: 이 게임을 다시", "es": "Otra vez: repite este juego", "fr": "Rejouer : refaire ce jeu", "de": "Nochmal: dieses Spiel wiederholen", "pt": "Jogar de novo: repete este jogo", "ru": "Ещё раз: повторить эту игру", "it": "Di nuovo: rigioca questo gioco", "ar": "مرة أخرى: أعد هذه اللعبة", "zh-Hant": "再來一局：重玩這一個遊戲" },
   "下一款：直接开始下一个游戏": { "ja": "次のゲームをすぐに始める", "ko": "다음 게임을 바로 시작", "es": "Siguiente: empieza el siguiente juego", "fr": "Suivant : lancez le jeu suivant", "de": "Weiter: startet das nächste Spiel", "pt": "Proximo: inicia o proximo jogo", "ru": "Далее: сразу начать следующую игру", "it": "Avanti: avvia subito il prossimo gioco", "ar": "التالي: ابدأ اللعبة التالية فوراً", "zh-Hant": "下一款：直接開始下一個遊戲" },
-  "秒": { "ja": "秒", "ko": "초", "es": "s", "fr": "s", "de": "s", "pt": "s", "ru": "с", "it": "s", "ar": "ثانية", "zh-Hant": "秒" },
+  // ★ 2026-11-08：HUD 缩写用。ar 从「ثانية」(6 字符) 改成「ث」(1 字符) —— 大字号格子里 ثانية 会挤
+  "秒": { "ja": "秒", "ko": "초", "es": "s", "fr": "s", "de": "s", "pt": "s", "ru": "с", "it": "s", "ar": "ث", "zh-Hant": "秒" },
+  "毫秒": { "ja": "ミリ秒", "ko": "밀리초", "es": "ms", "fr": "ms", "de": "ms", "pt": "ms", "ru": "мс", "it": "ms", "ar": "مللي ث", "zh-Hant": "毫秒" },
   "还没有记录 —— 玩一局就有了": { "ja": "記録なし —— 1回遊ぶと出ます", "ko": "기록 없음 —— 한 판 하면 생겨요", "es": "Sin registros —— juega una ronda", "fr": "Aucun enregistrement —— jouez une manche", "de": "Noch keine Eintraege —— spiel eine Runde", "pt": "Sem registros —— jogue uma rodada", "ru": "Пока нет записей —— сыграйте раунд", "it": "Nessuna partita —— giocane una", "ar": "لا سجلات بعد —— العب جولة", "zh-Hant": "還沒有記錄 —— 玩一局就有了" },
   "最常玩": { "ja": "よく遊ぶ", "ko": "자주 하는", "es": "Más jugado", "fr": "Le plus joué", "de": "Am meisten gespielt", "pt": "Mais jogado", "ru": "Чаще всего", "it": "Più giocato", "ar": "الأكثر لعبا", "zh-Hant": "最常玩" },
   "通关率": { "ja": "クリア率", "ko": "클리어율", "es": "Tasa de superación", "fr": "Taux de réussite", "de": "Klarquote", "pt": "Taxa de conclusao", "ru": "Доля пройденных", "it": "Tasso di completamento", "ar": "نسبة الإنجاز", "zh-Hant": "通關率" },
@@ -2208,6 +2210,21 @@ export function L(zh: string, en: string): string {
 }
 
 /** 带数字的文案：L2('再攒 {n} 点经验就升级', '{n} XP to next level', n) */
+/**
+ * HUD 里的「秒」后缀（缩写，不是完整词）。
+ * ★ 2026-11-08：**别用 TG('秒')** —— 那套字典（GameI18n）给的是完整词
+ *   （en `Second` / es `Segundo` / ru `Секунда`）⇒ HUD 会渲染成 `12Second`。
+ *   HUD 要的是缩写：en/es/fr/de/pt/it `s` ｜ ru `с` ｜ ja 秒 ｜ ko 초 ｜ ar ث ｜ zh 秒
+ */
+export function Sec(): string {
+  return L('秒', 's');
+}
+
+/** HUD 里的「毫秒」后缀（缩写）。同上，别用 TG。 */
+export function Ms(): string {
+  return L('毫秒', 'ms');
+}
+
 export function L2(zh: string, en: string, n: number): string {
   return L(zh, en).replace('{n}', String(n));
 }

@@ -12,7 +12,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Ms } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const TRIALS: number = 16;
@@ -240,7 +240,7 @@ export struct GTaskSwitching {
     if (this.switched) { this.swSum = this.swSum + rt; this.swN = this.swN + 1; }
     else { this.repSum = this.repSum + rt; this.repN = this.repN + 1; }
     const want: number = this.rule === 0 ? this.shape : this.hue;
-    if (i === want) { this.right = this.right + 1; this.msg = '✅ ' + String(rt) + 'ms'; }
+    if (i === want) { this.right = this.right + 1; this.msg = '✅ ' + String(rt) + Ms(); }
     else { this.wrong = this.wrong + 1; this.msg = TG2('❌ {0}ms，应选 {1}', String(rt), this.optName(want)); }
     this.to = setTimeout(() => {
       this.to = -1;
@@ -324,7 +324,7 @@ export struct GTaskSwitching {
       }.width('100%')
 
       Text(TG2('重复 {0}ms · 切换 {1}ms · 代价 ', String(this.avgRep()), String(this.avgSw()))
-        + String(this.cost()) + 'ms')
+        + String(this.cost()) + Ms())
         .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(Palette.cyan).width('100%').textAlign(TextAlign.Center).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Button(this.over ? TG('再来一局') : TG('重开'))

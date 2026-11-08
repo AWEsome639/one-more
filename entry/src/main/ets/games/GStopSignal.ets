@@ -3,6 +3,7 @@
  * 胜负：12 回合正确 ≥10 且「冲」的平均反应 < 800ms 通关
  */
 import { Hint, HintResult } from '../ai/Hint';
+import { Ms } from '../core/I18n';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -319,7 +320,7 @@ export struct GStopSignal {
       Row() {
         Text(TG2('回合 {0}/{1}', String(this.round), String(this.diffTotal))).fontSize(FontSize.sm).fontColor(this.theme.ink)
         Text(TG2('正确 {0}', String(this.right))).fontSize(FontSize.sm).fontColor(Palette.emerald)
-        Text(TG2("冲均值 {0}", (this.goes > 0 ? String(this.avg()) + 'ms' : '—'))).fontSize(FontSize.sm).fontColor(this.theme.ink)
+        Text(TG2("冲均值 {0}", (this.goes > 0 ? String(this.avg()) + Ms() : '—'))).fontSize(FontSize.sm).fontColor(this.theme.ink)
       }
       .width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
       .borderRadius(Radius.md).shadow(Shadow.card).justifyContent(FlexAlign.SpaceBetween)

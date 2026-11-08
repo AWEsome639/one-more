@@ -19,7 +19,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { Hint, HintResult } from '../ai/Hint';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
@@ -625,7 +625,7 @@ export struct GAlphabetSudoku {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         Text(true ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
-        : (false ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + 's')))
+        : (false ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
@@ -640,7 +640,7 @@ export struct GAlphabetSudoku {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         Text(false ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
-        : (true ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + 's')))
+        : (true ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
@@ -655,7 +655,7 @@ export struct GAlphabetSudoku {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         Text(false ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
-        : (false ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + 's')))
+        : (false ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

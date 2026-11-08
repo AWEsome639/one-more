@@ -15,7 +15,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
 import { Tv } from '../core/Tv';
 
@@ -598,7 +598,7 @@ export struct GCalculationSprint {
       Text(kind === 0 ? TG('剩余') : (kind === 1 ? TG('答对') : TG('得分')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
-      Text(kind === 0 ? this.left + 's'
+      Text(kind === 0 ? this.left + Sec()
         : (kind === 1 ? this.right + '/' + GOAL : String(this.score)))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)

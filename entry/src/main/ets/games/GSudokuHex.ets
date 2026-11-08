@@ -17,7 +17,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 // ★ 2026-10-24 第三期：通用提示层 + AI 代打
 import { Hint, HintResult } from '../ai/Hint';
 import { Tv } from '../core/Tv';
@@ -598,7 +598,7 @@ export struct GSudokuHex {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         Text(true ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
-        : (false ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + 's')))
+        : (false ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
@@ -613,7 +613,7 @@ export struct GSudokuHex {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         Text(false ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
-        : (true ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + 's')))
+        : (true ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
@@ -628,7 +628,7 @@ export struct GSudokuHex {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         Text(false ? (this.filled() + '/' + String(this.diffTotal * this.diffTotal))
-        : (false ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + 's')))
+        : (false ? (this.mistakes + '/' + MAX_MISTAKE) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

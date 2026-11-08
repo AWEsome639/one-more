@@ -15,7 +15,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 /**
@@ -728,7 +728,7 @@ export struct GFlappy {
       Text(kind === 0 ? TG('穿过') : (kind === 1 ? TG('用时') : TG('状态')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? this.score + ' / ' + PIPE_GOAL
-        : (kind === 1 ? this.secs + 's'
+        : (kind === 1 ? this.secs + Sec()
           : (this.over ? (this.won ? TG('通关') : TG('结束')) : TG('飞行中'))))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(kind === 0 ? Palette.primary

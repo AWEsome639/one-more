@@ -17,7 +17,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 import { AppClock } from '../core/AppClock';
 import { Tv } from '../core/Tv';
 
@@ -501,7 +501,7 @@ export struct GBinaryCode {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? this.level + '/' + GOAL
-        : (kind === 1 ? this.left + 's' : String(this.score)))
+        : (kind === 1 ? this.left + Sec() : String(this.score)))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(kind === 1 && this.left <= 15 ? Palette.rose : this.theme.ink)

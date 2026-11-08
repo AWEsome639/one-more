@@ -13,7 +13,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, Sec } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { Bp } from '../core/Bp';
 import { AppClock } from '../core/AppClock';
@@ -322,7 +322,7 @@ export struct GMissingOperator {
           // ★ 2026-11-02（第 847 轮）**233 手表真机抓到**：这个 HUD 的「0/10」被折成两行
           //   （实测 bounds 88×126，高是宽的 1.43 倍）。
           //   ⇒ maxLines(1) 强制单行；极小屏缩一档（lg→md）。
-          Text((String(this.left) + 's'))
+          Text((String(this.left) + Sec()))
           .fontSize(Bp.tinyScreen() ? FontSize.md : FontSize.lg).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
           }
           .layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)

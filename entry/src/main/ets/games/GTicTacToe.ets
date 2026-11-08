@@ -8,6 +8,7 @@
  */
 
 import { Hint, HintResult } from '../ai/Hint';
+import { Sec } from '../core/I18n';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
@@ -722,7 +723,7 @@ export struct GTicTacToe {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(true ? String(this.score0)
-        : (false ? String(this.steps) : (this.seconds + 's')))
+        : (false ? String(this.steps) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
@@ -737,7 +738,7 @@ export struct GTicTacToe {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(false ? String(this.score0)
-        : (true ? String(this.steps) : (this.seconds + 's')))
+        : (true ? String(this.steps) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
@@ -752,7 +753,7 @@ export struct GTicTacToe {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(false ? String(this.score0)
-        : (false ? String(this.steps) : (this.seconds + 's')))
+        : (false ? String(this.steps) : (this.seconds + Sec())))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)
