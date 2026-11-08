@@ -162,6 +162,11 @@ export struct GDivisibilityDash {
       TG2('Can {0} divide by {1}? — {2}', n, String(d), en), t0);
   }
 
+  /** ★ 2026-11-08 自己判断整除（不读 yes） */
+  private aiDivisible(): boolean {
+    return this.div !== 0 && this.num % this.div === 0;
+  }
+
   private askHint(): void {
     Haptics.tap();
     const r: HintResult = Hint.run(() => this.computeHint());
@@ -257,7 +262,9 @@ export struct GDivisibilityDash {
     if (this.over) {
       return false;
     }
-    this.answer(this.yes);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.yes（答案）**：
+    //   屏幕上是「num ÷ div」，自己算余数是否为 0。
+    this.answer(this.aiDivisible());
     return !this.over;
   }
 

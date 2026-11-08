@@ -224,7 +224,13 @@ export struct GAlgebraicBalance {
     if (this.lockTap) {
       return true;
     }
-    this.answer(this.eq.answer);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 eq.answer（答案）**：
+    //   屏幕上是方程原文 ⇒ 自己解析并解出 x（+b / -b / a(x+b) 三种形态）。
+    const got: number = this.aiSolveX();
+    if (got !== got) {
+      return false;
+    }
+    this.answer(got);
     return !this.over;
   }
 
@@ -245,6 +251,42 @@ export struct GAlgebraicBalance {
       this.autoId = -1;
     }
   }
+  /** ★ 2026-11-08 解析屏幕上的方程并解 x（不读 eq.answer） */
+  private aiSolveX(): number {
+    const parts: string[] = this.eq.text.split(' = ');
+    if (parts.length !== 2) {
+      return Number.NaN;
+    }
+    const lhs: string = parts[0];
+    const rhs: number = Number(parts[1]);
+    if (rhs !== rhs) {
+      return Number.NaN;
+    }
+    const lp: number = lhs.indexOf('(');
+    if (lp >= 0) {
+      const a: number = Number(lhs.substring(0, lp));
+      const inner: string = lhs.substring(lp + 1, lhs.indexOf(')'));
+      const sign: number = inner.indexOf('x - ') >= 0 ? -1 : 1;
+      const b: number = Number(inner.replace('x + ', '').replace('x - ', ''));
+      if (a !== a || b !== b) {
+        return Number.NaN;
+      }
+      return rhs / a - sign * b;
+    }
+    const xi: number = lhs.indexOf('x');
+    if (xi < 0) {
+      return Number.NaN;
+    }
+    const a: number = Number(lhs.substring(0, xi));
+    const rest: string = lhs.substring(xi + 1).trim();
+    const op: string = rest.charAt(0);
+    const b: number = Number(rest.substring(1));
+    if (a !== a || b !== b) {
+      return Number.NaN;
+    }
+    return op === '+' ? (rhs - b) / a : (rhs + b) / a;
+  }
+
   private answer(v: number): void {
     if (this.over || this.lockTap) { return; }
     const good: boolean = v === this.eq.answer;

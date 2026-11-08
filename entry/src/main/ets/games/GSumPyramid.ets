@@ -90,6 +90,23 @@ export struct GSumPyramid {
     for (let i = 0; i < CELLS; i++) { shown.push(i < 4 ? pyramid[i] : -1); }
     this.vals = shown; this.msg = TG('从下往上填：每格 = 下面相邻两格之和'); this.ask();
   }
+  /** ★ 2026-11-08 由底层 4 格重算整座金字塔（0..3 是题面，4..9 推算） */
+  private aiPyramid(): number[] {
+    const pyr: number[] = this.vals.slice();
+    for (let i = 0; i < 4; i++) {
+      if (pyr.length <= i) {
+        return [];
+      }
+    }
+    pyr[4] = pyr[0] + pyr[1];
+    pyr[5] = pyr[1] + pyr[2];
+    pyr[6] = pyr[2] + pyr[3];
+    pyr[7] = pyr[4] + pyr[5];
+    pyr[8] = pyr[5] + pyr[6];
+    pyr[9] = pyr[7] + pyr[8];
+    return pyr;
+  }
+
   private current(): number { return this.cursor < ORDER.length ? ORDER[this.cursor] : -1; }
   private ask(): void {
     const idx: number = this.current();
@@ -215,7 +232,14 @@ export struct GSumPyramid {
     if (this.current() < 0) {
       return true;              // 还没出题，等
     }
-    this.choose(this.answer);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.answer（答案）**：
+    //   屏幕上给了底层 4 格 ⇒ 按「每格 = 下面相邻两格之和」自己重算整座金字塔。
+    const idx: number = this.current();
+    const pyr: number[] = this.aiPyramid();
+    if (idx < 0 || pyr.length < CELLS) {
+      return false;
+    }
+    this.choose(pyr[idx]);
     return !this.over;
   }
 

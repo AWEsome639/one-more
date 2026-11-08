@@ -271,6 +271,57 @@ export struct GPercentagePeak {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」（解题/计算族）：
+   *   原来 `this.pick(this.ans)` —— `ans` 是正确选项下标，等于抄答案。
+   *   ⇒ 改成**读屏幕题面自己算**：题面里只有两个数（如「300 的 20% = ?」/「40 是 200 的 ?%」），
+   *     两种可能都算一遍（求百分比的值 / 求百分比本身），**取在选项里出现的那个**
+   *     （`?` 与 `%` 的先后再用来打破平局）。这样不依赖任何语言的措辞。
+   */
+  private aiNums(s: string): number[] {
+    const out: number[] = [];
+    let cur: string = '';
+    for (let i = 0; i < s.length; i++) {
+      const ch: string = s.charAt(i);
+      const isDigit: boolean = ch >= '0' && ch <= '9';
+      if (isDigit) {
+        cur = cur + ch;
+      } else if (cur.length > 0) {
+        out.push(Number.parseInt(cur, 10));
+        cur = '';
+      }
+    }
+    if (cur.length > 0) {
+      out.push(Number.parseInt(cur, 10));
+    }
+    return out;
+  }
+
+  private aiCalc(): number {
+    const ns: number[] = this.aiNums(this.quiz);
+    if (ns.length < 2) {
+      return -1;
+    }
+    const a: number = ns[0];
+    const b: number = ns[1];
+    if (b === 0) {
+      return -1;
+    }
+    const c1: number = Math.round(a * b / 100);     // 求"某个数的百分之几是多少"
+    const c2: number = Math.round(a / b * 100);     // 求"是百分之几"
+    const has1: boolean = this.opts.indexOf(c1) >= 0;
+    const has2: boolean = this.opts.indexOf(c2) >= 0;
+    if (has1 && has2) {
+      const qi: number = this.quiz.indexOf('?');
+      const pi: number = this.quiz.indexOf('%');
+      return (qi >= 0 && pi >= 0 && qi < pi) ? c2 : c1;
+    }
+    if (has1) {
+      return c1;
+    }
+    return has2 ? c2 : -1;
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -278,8 +329,17 @@ export struct GPercentagePeak {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    const v: number = this.aiCalc();
+    if (v < 0) {
+      return false;             // 算不出来 ⇒ 停手（不读 ans 下标）
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === v) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

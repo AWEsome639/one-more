@@ -252,6 +252,31 @@ export struct GRadicalRoots {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」（解题/计算族）：
+   *   原来 `this.choose(this.ans)` —— 直接读化简结果。
+   *   ⇒ 改成**读屏幕题面自己化简**：题面是 `√n`（如 "√72"），
+   *     把 n 分解成最大的完全平方因子 a² 与余数 b ⇒ 答案就是 "a√b"。
+   *   （本款 n = a²·b 且 b 无平方因子 ⇒ 化简唯一，与生成器的 ans 文本必然一致）
+   */
+  private aiAns(): string {
+    const n: number = Number.parseInt(this.q.replace('√', '').trim(), 10);
+    if (isNaN(n) || n <= 1) {
+      return '';
+    }
+    let a: number = 1;
+    for (let k = 2; k * k <= n; k++) {
+      if (n % (k * k) === 0) {
+        a = k;                       // 取最大的完全平方因子
+      }
+    }
+    const b: number = Math.round(n / (a * a));
+    if (b === 1) {
+      return String(a);
+    }
+    return String(a) + '√' + String(b);
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -259,7 +284,11 @@ export struct GRadicalRoots {
     if (this.picked.length > 0) {
       return true;              // 这题答过了，等下一题
     }
-    this.choose(this.ans);
+    const want: string = this.aiAns();
+    if (want.length === 0) {
+      return false;             // 化简不出来 ⇒ 停手（不读 ans）
+    }
+    this.choose(want);
     return !this.over;
   }
 

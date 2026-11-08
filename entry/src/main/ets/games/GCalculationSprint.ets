@@ -287,6 +287,43 @@ export struct GCalculationSprint {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」（解题/计算族）：
+   *   原来 `this.pick(this.ans)` —— `ans` 是"正确选项的下标"，等于直接抄答案。
+   *   ⇒ 改成**读屏幕题面自己算**（`this.quiz` 形如 "45 ＋ 67 = ?"，算符用全角 +/−/×/÷），
+   *     算出来再在 `opts` 里找数值相同的那一项。
+   */
+  private aiCalc(): number {
+    const s: string = this.quiz;
+    const eq: number = s.indexOf(' = ?');
+    if (eq <= 0) {
+      return -1;
+    }
+    const parts: string[] = s.substring(0, eq).split(' ');
+    if (parts.length < 3) {
+      return -1;
+    }
+    const a: number = Number.parseInt(parts[0], 10);
+    const b: number = Number.parseInt(parts[2], 10);
+    if (isNaN(a) || isNaN(b)) {
+      return -1;
+    }
+    const op: string = parts[1];
+    if (op === '＋' || op === '+') {
+      return a + b;
+    }
+    if (op === '−' || op === '-') {
+      return a - b;
+    }
+    if (op === '×' || op === '*') {
+      return a * b;
+    }
+    if (op === '÷' || op === '/') {
+      return b === 0 ? -1 : a / b;
+    }
+    return -1;
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -294,8 +331,17 @@ export struct GCalculationSprint {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    const want: number = this.aiCalc();
+    if (want < 0) {
+      return false;             // 算不出来 ⇒ 停手（不读 ans 下标）
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

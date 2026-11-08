@@ -260,14 +260,44 @@ export struct GQuickMath {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」（解题/计算族）：
+   *   原来 `this.choose(this.ans)` —— 直接读答案值。
+   *   ⇒ 改成**读屏幕题面自己算**（`this.q` 形如 "45 + 67" / "45 − 23" / "6 × 7"）。
+   *   算不出来（格式异常）就返回 -1，绝不回退去读 `ans`。
+   */
+  private aiCalc(): number {
+    const parts: string[] = this.q.split(' ');
+    if (parts.length < 3) {
+      return -1;
+    }
+    const a: number = Number.parseInt(parts[0], 10);
+    const b: number = Number.parseInt(parts[2], 10);
+    if (isNaN(a) || isNaN(b)) {
+      return -1;
+    }
+    const op: string = parts[1];
+    if (op === '+') {
+      return a + b;
+    }
+    if (op === '−' || op === '-') {
+      return a - b;
+    }
+    if (op === '×' || op === '*') {
+      return a * b;
+    }
+    return -1;
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
     }
-    if (this.over) {
-      return true;
+    const v: number = this.aiCalc();
+    if (v < 0) {
+      return false;              // 题面解析不出来 ⇒ 停手（不读 ans）
     }
-    this.choose(this.ans);
+    this.choose(v);
     return !this.over;
   }
 

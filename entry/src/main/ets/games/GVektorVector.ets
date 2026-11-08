@@ -89,6 +89,18 @@ export struct GVektorVector {
       if (!this.over) { this.clock = this.clock + 1; }
     }, 1000);
   }
+  /** ★ 2026-11-08 按 a ± b 自己算分量，返回匹配选项的下标（不读 ok 标记） */
+  private aiVec(): number {
+    const tx: number = this.plus ? this.cur.ax + this.cur.bx : this.cur.ax - this.cur.bx;
+    const ty: number = this.plus ? this.cur.ay + this.cur.by : this.cur.ay - this.cur.by;
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i].x === tx && this.opts[i].y === ty) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   private trueAns(): VecChoice {
     return {
       x: this.plus ? this.cur.ax + this.cur.bx : this.cur.ax - this.cur.bx,
@@ -238,11 +250,12 @@ export struct GVektorVector {
     if (this.over || this.pick >= 0) {
       return true;
     }
-    for (let i = 0; i < this.opts.length; i++) {
-      if (this.opts[i].ok) {
-        this.answer(i);
-        return true;
-      }
+    // ★ 2026-11-08（ai-fixer-a）**不再读 opts[i].ok（答案标记）**：
+    //   屏幕给了 a、b 两个向量和 '+/−' ⇒ 自己算分量，再去选项里找这个结果。
+    const k: number = this.aiVec();
+    if (k >= 0) {
+      this.answer(k);
+      return true;
     }
     return false;
   }

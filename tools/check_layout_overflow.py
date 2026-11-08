@@ -266,6 +266,11 @@ def scan_file(path, ref_h=REF_HEIGHT):
         #   格子类的竖排溢出由 ② 的「按 Row 归组累加高度」负责。
         if "width('100%')" not in chain:
             continue
+        # ★ 2026-11-08 真机（GPong）：链上有 `.layoutWeight(` ⇒ **主轴权重接管高度**，
+        #   aspectRatio 不生效（实测 field：宽 2440、按 0.7 应为 3486 高，实际被 clamp 到 730）。
+        #   这种形态不是「宽驱动 → 高度被锁死」，不算 ① 类（GPong 是最后一个 ① 假阳性）。
+        if '.layoutWeight(' in chain:
+            continue
         host = innermost(conts, pos)
         kind = host[2] if host else ''
         # 格子高度由行分配 ⇒ 不是「宽驱动整块」
@@ -409,6 +414,8 @@ struct Demo {
       Stack() { Text('x') }.width('100%').aspectRatio(1).constraintSize({ maxHeight: 300 })
       // ① 安全：Row 里的格子（高度由行分配）
       Row() { Text('a').layoutWeight(1).aspectRatio(1) }
+      // ① 安全：width100 + layoutWeight（主轴权重接管高度，aspectRatio 不生效；真机 GPong 实测）
+      Stack() { Text('b') }.width('100%').layoutWeight(1).aspectRatio(0.7)
       // ② 违规：竖排 6 个 56 高 = 336 ≤ 343？再叠一行 ⇒ 392 > 343
       Column() {
         Row() { Text('1').height(Cell.of(56)) }

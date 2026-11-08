@@ -210,13 +210,26 @@ export struct GVectorDotProduct {
     if (this.answered) {
       return true;
     }
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.answer（答案）**：
+    //   屏幕上是 u、v 两个向量 ⇒ 按 u·v = Σuᵢvᵢ 自己算，再去选项里找这个值。
+    const got: number = this.aiDot();
     for (let i = 0; i < this.opts.length; i++) {
-      if (this.opts[i] === this.answer) {
+      if (this.opts[i] === got) {
         this.submit(i);
         break;
       }
     }
     return !this.over;
+  }
+
+  /** ★ 2026-11-08 按向量分量自己算点积（不读 answer） */
+  private aiDot(): number {
+    let sum: number = 0;
+    const n: number = this.u.length < this.v.length ? this.u.length : this.v.length;
+    for (let i = 0; i < n; i++) {
+      sum = sum + this.u[i] * this.v[i];
+    }
+    return sum;
   }
 
   private askHint(): void {

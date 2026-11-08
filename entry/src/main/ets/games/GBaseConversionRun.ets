@@ -316,6 +316,71 @@ export struct GBaseConversionRun {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」（解题/计算族）：
+   *   原来 `this.pick(this.ans)` —— `ans` 是"正确选项的下标"，等于直接抄答案。
+   *   ⇒ 改成**读屏幕题面自己换算**（`this.quiz` 只有两种形如：
+   *     · "42₁₀ = ? ₂"（十进制 → 目标进制，目标进制看 `?` 后面那个下标）
+   *     · "101010₂ = ? ₁₀"（目标进制 → 十进制，进制看等号左边那个下标）
+   *   ⇒ 算出来再在 `opts`（字符串数组）里找相同的那一项。
+   */
+  /** 按进制 b 解析数字串（自己写，不依赖 parseInt(radix)） */
+  private aiFromBase(s: string, b: number): number {
+    let v: number = 0;
+    for (let i = 0; i < s.length; i++) {
+      const d: number = DIGITS.indexOf(s.charAt(i).toUpperCase());
+      if (d < 0 || d >= b) {
+        return -1;
+      }
+      v = v * b + d;
+    }
+    return v;
+  }
+  /** 下标字符 → 进制（₂=2 / ₈=8 / ₁₆=16 / 其它=-1） */
+  private aiBaseOf(sub: string): number {
+    if (sub.indexOf('₁₆') >= 0) {
+      return 16;
+    }
+    if (sub.indexOf('₈') >= 0) {
+      return 8;
+    }
+    if (sub.indexOf('₂') >= 0) {
+      return 2;
+    }
+    return -1;
+  }
+  /** 从题面算出正确答案（字符串） */
+  private aiCalc(): string {
+    const q: string = this.quiz;
+    const eq: number = q.indexOf('=');
+    if (eq <= 0) {
+      return '';
+    }
+    const left: string = q.substring(0, eq).trim();
+    const right: string = q.substring(eq + 1).trim();
+    // 右边以 ₁₀ 结尾 ⇒ 十进制作答（左边是某进制的数）
+    if (right.indexOf('₁₀') >= 0) {
+      const b: number = this.aiBaseOf(left);
+      if (b < 0) {
+        return '';
+      }
+      const digits: string = left.replace('₁₆', '').replace('₁₀', '').replace('₂', '').replace('₈', '').trim();
+      const v: number = this.aiFromBase(digits, b);
+      return v < 0 ? '' : String(v);
+    }
+    // 否则右边是目标进制（₂ / ₈ / ₁₆），左边是十进制数
+    const b2: number = this.aiBaseOf(right);
+    if (b2 < 0) {
+      return '';
+    }
+    const nStr: string = left.replace('₁₀', '').replace('₁₆', '').trim();
+    const n: number = Number.parseInt(nStr, 10);
+    if (isNaN(n)) {
+      return '';
+    }
+    return toBase(n, b2);
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -323,8 +388,17 @@ export struct GBaseConversionRun {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    const want: string = this.aiCalc();
+    if (want.length === 0) {
+      return false;             // 换算不出来 ⇒ 停手（不读 ans 下标）
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === want) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {
