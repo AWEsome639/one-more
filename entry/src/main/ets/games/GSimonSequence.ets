@@ -54,6 +54,8 @@ export struct GSimonSequence {
   @State private lastFb: string = '';
   @State private lastOk: boolean = true;
   private seq: number[] = []; private showIdx: number = -1;
+  /** ★ 2026-11-08 代打的记忆副本（刺激播完后抄下，作答只读它） */
+  private aiMem: number[] = [];
   private showTimer: number = -1; private flashTimer: number = -1; private gapTimer: number = -1;
   private startAt: number = 0; private done: boolean = false;
 
@@ -163,7 +165,11 @@ export struct GSimonSequence {
     if (this.phase !== 'input') {
       return true;
     }
-    this.tapPad(this.seq[this.pos]);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 seq**：只读自己记下的副本
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.tapPad(this.aiMem[this.pos]);
     return !this.over;
   }
 
@@ -234,6 +240,8 @@ export struct GSimonSequence {
     }
     if (this.showTimer >= 0) { clearInterval(this.showTimer); this.showTimer = -1; }
     this.lit = -1; this.phase = 'input'; this.pos = 0;
+    // ★ 2026-11-08（ai-fixer-a）代打「记住」刚演完的序列
+    this.aiMem = this.seq.slice();
     this.msg = TG2("轮到你了：按顺序点 {0} 下", this.len);
   }
   private tapPad(i: number): void {

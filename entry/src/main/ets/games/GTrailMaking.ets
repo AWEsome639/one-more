@@ -68,6 +68,14 @@ export struct GTrailMaking {
      this.reset(); }
 
   /** 1→A→2→B→…→12→L→13，共 25 个 */
+  /** ★ 2026-11-08 按「数字/字母交替」规则推第 step 步该点的标签（偶数=数字，奇数=字母） */
+  private aiWant(step: number): string {
+    if (step % 2 === 0) {
+      return String(step / 2 + 1);
+    }
+    return LETTERS[Math.floor(step / 2)];
+  }
+
   private buildSeq(): string[] {
     const s: string[] = [];
     for (let i = 0; i < 13; i++) {
@@ -184,7 +192,14 @@ export struct GTrailMaking {
     if (this.step >= this.diffTotal) {
       return true;
     }
-    this.tap(this.cells.indexOf(this.seq[this.step]));
+    // ★ 2026-11-08（ai-fixer-a）**不再读 seq（答案顺序）**：
+    //   规则就写在题面文案里「1→A→2→B…」⇒ 自己按步号推这一格该点哪个标签。
+    const want: string = this.aiWant(this.step);
+    const idx: number = this.cells.indexOf(want);
+    if (idx < 0) {
+      return false;
+    }
+    this.tap(idx);
     return !this.over;
   }
 

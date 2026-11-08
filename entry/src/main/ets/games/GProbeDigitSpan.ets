@@ -47,6 +47,8 @@ export struct GProbeDigitSpan {
   @State private diffTotal: number = GameDiff.sizeNow(8);
   onFinish: (r: GameResult) => void = () => {};
   @State digits: number[] = [];
+  /** ★ 2026-11-08 代打的记忆副本（刺激播完后抄下，作答只读它） */
+  private aiMem: number[] = [];
   @State phase: number = 0;        // 0 呈现　1 探针　2 反馈
   @State at: number = 0; @State probe: number = 0; @State len: number = START_LEN;
   @State typed: string = ''; @State right: number = 0; @State score: number = 0;
@@ -91,6 +93,8 @@ export struct GProbeDigitSpan {
 
   private askProbe(): void {
     this.phase = 1;
+    // ★ 2026-11-08（ai-fixer-a）代打「记住」刚闪过的数字
+    this.aiMem = this.digits.slice();
     this.probe = Math.floor(Math.random() * this.digits.length);
     this.typed = '';
     this.msg = TG2("第 {0} 位是几？（从左数）", (this.probe + 1));
@@ -186,7 +190,12 @@ export struct GProbeDigitSpan {
     if (this.phase !== 1) {
       return true;
     }
-    this.answer(this.digits[this.probe]);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 digits[probe]（答案）**：
+    //   数字闪过时抄进 aiMem，作答只查自己的记忆。
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.answer(this.aiMem[this.probe]);
     return !this.over;
   }
 

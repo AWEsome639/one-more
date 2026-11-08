@@ -51,6 +51,8 @@ export struct GPathRecall {
   }
   onFinish: (r: GameResult) => void = () => {};
   @State private seq: number[] = []; @State private playIdx: number = -1; @State private step: number = 0;
+  /** ★ 2026-11-08 代打的记忆副本（刺激播完后抄下，作答只读它） */
+  private aiMem: number[] = [];
   @State private round: number = 1; @State private phase: string = '看';
   @State private over: boolean = false; @State private won: boolean = false; @State private msg: string = '';
   private startAt: number = 0; private timer: number = -1; private done: boolean = false;
@@ -108,6 +110,8 @@ export struct GPathRecall {
       i = i + 1;
       if (i >= this.seq.length) {
         this.halt(); this.playIdx = -1; this.phase = TG('点');
+        // ★ 2026-11-08（ai-fixer-a）代打「记住」刚亮过的路径
+        this.aiMem = this.seq.slice();
         this.msg = TG2("按顺序点出这 {0} 格", String(this.seq.length));
         return;
       }
@@ -236,10 +240,14 @@ export struct GPathRecall {
     if (this.over || this.phase !== TG('点')) {
       return true;              // 还在播放/过渡，等
     }
-    if (this.step >= this.seq.length) {
+    if (this.step >= this.aiMem.length) {
       return true;              // 这一轮答完了，等它开下一轮
     }
-    this.tap(this.seq[this.step]);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 seq（答案路径）**：播放时逐格记进 aiMem
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.tap(this.aiMem[this.step]);
     return !this.over;
   }
 

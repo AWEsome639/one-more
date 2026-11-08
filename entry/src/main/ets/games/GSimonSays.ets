@@ -65,6 +65,8 @@ export struct GSimonSays {
   @State private msg: string = '';
 
   private seq: number[] = [];
+  /** ★ 2026-11-08 代打的记忆副本（刺激播完后抄下，作答只读它） */
+  private aiMem: number[] = [];
   private showIdx: number = -1;
   private inputIdx: number = 0;
   private showTimer: number = -1;
@@ -154,6 +156,8 @@ export struct GSimonSays {
     }
     this.lit = -1;
     this.phase = 'input';
+    // ★ 2026-11-08（ai-fixer-a）代打「记住」刚闪过的序列
+    this.aiMem = this.seq.slice();
     this.inputIdx = 0;
     this.msg = TG2("轮到你了，按顺序点 {0} 下", this.len);
   }
@@ -248,7 +252,11 @@ export struct GSimonSays {
     if (this.phase !== 'input') {
       return true;
     }
-    this.tapPad(this.seq[this.inputIdx]);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 seq（答案序列）**：只读自己记下的副本
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.tapPad(this.aiMem[this.inputIdx]);
     return !this.over;
   }
 

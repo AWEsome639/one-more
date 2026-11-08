@@ -31,6 +31,7 @@ import { GameCard, CategoryBar, iconOf } from './Common';
 import { firstLetterOf, LETTERS } from '../core/GamePinyin';
 // ★ 2026-10-13「动画拉满」item ④：图标按下弹一下（统一倍率，别每处各写一个）
 import { IconPress } from '../core/MotionKit';
+import { GameSource } from '../core/GameSource';
 
 /** 顶部分段 */
 enum Seg {
@@ -170,6 +171,9 @@ export struct GamesTab {
   private azScroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
+    // ★ 2026-11-08 perf-hunter：先灌一次数据源，避免首帧 `LazyForEach` 拿到空表
+    //   （`list()` 本身带记忆化，这里调用是幂等的；`reset()` 内部还会再比一次 id）。
+    this.source.reset(this.list());
     // ★ 大字模式默认收起顶部（否则网格被挤出屏幕 —— 实测）
     if (this.uiMode === 'elder') {
       this.topCollapsed = true;
@@ -460,6 +464,11 @@ export struct GamesTab {
       }
     }, 0);
   }
+  /**
+   * ★ LazyForEach 的数据源（355 款不再全量创建，见 `core/GameSource.ets` 顶部说明）。
+   *   与 `listCache` 同步：`list()` 缓存未命中时 `reset()` 一次。
+   */
+  private source: GameSource = new GameSource();
   private listCache: GameMeta[] = [];
   private listCacheKey: string = '\u0000';
 
@@ -478,6 +487,10 @@ export struct GamesTab {
     //   ⇒ **只有第一次进去有「精选 24 款」，之后全部退回 355 款**。
     //   ⇒ 修：过滤后的结果才进缓存，两条路径口径一致。
     this.listCache = this.watchFilter(this.computeList());
+    // ★ 2026-11-08 perf-hunter：LazyForEach 的数据源跟着刷新（**整表换 + 通知**）。
+    //   放在这里 = **一处覆盖六个变化来源**（分段/分类/特征/搜索/收藏 tick/返回首页）。
+    //   ⚠️ `reset()` 内部会先比一遍 id，结果没变就不通知，避免白重载整张网格。
+    this.source.reset(this.listCache);
     return this.listCache;
   }
 
@@ -1132,7 +1145,11 @@ build() {
         this.azList()
       } else {
         Grid(this.gridScroller) {
-          ForEach(this.list(), (g: GameMeta, i: number) => {
+          // ★ 2026-11-08 perf-hunter：`ForEach` → `LazyForEach`（只建可视区 + cachedCount 范围）。
+          //   官方 FAQ faqs-arkui-1291：「初始化渲染时 ForEach 会加载数据源的所有数据」⇒
+          //   原来 355 卡 × 19 节点 ≈ 6,745 个节点首帧全建。
+          //   ⚠️ keyGenerator 必须给（缺省会退化成 index+JSON.stringify，比 ForEach 还慢）。
+          LazyForEach(this.source, (g: GameMeta, i: number) => {
             GridItem() {
               GameCard({
                 meta: g,
@@ -2005,7 +2022,13 @@ build() {
     //     · 440 屏：min(300, 280) = **280**
     //     · 853/800/960：min(300, 693+) = **300**（与改前完全一致）
     //   ⚠️ 「屏高 - 160」里的 160 是上方仍要留的空间（顶栏 + 分类芯片 + 计数行）。
-    .constraintSize({ maxHeight: Math.max(60, Math.min(300, Bp.height - 160)) })
+    // ★★★ 2026-11-08 **底栏遮挡**（verifier-dev 真机实测）：
+    //   原 `maxHeight = min(300, Bp.height - 160)` **没扣底部 tab 栏（≈117px）**
+    //   ⇒ 面板底沿到 1647px，而可视区只到 y≈1336（**底栏上沿**）
+    //   ⇒ **最后一行 chip 永远压在底栏后面**（853×533 下「玩法」组 15 个 chip
+    //      只有 1px 可见高度，滑动 7 次位置完全不变 ⇒ **滑不出来**）。
+    //   ⇒ 扣掉底栏高度。
+    .constraintSize({ maxHeight: Math.max(60, Math.min(300, Bp.height - 160 - 117)) })
     .margin({ left: Space.lg, right: Space.lg, top: Space.xs })
     .backgroundColor(this.theme().surface)
     .borderRadius(Radius.md)
