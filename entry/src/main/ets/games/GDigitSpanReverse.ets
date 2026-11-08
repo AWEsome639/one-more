@@ -33,6 +33,8 @@ export struct GDigitSpanReverse {
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
    *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
   @State private tvFocus: string = '';
+  /** ★ 2026-11-08 代打的记忆副本（刺激播完后抄下，作答只看它） */
+  private aiMem: number[] = [];
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -91,6 +93,8 @@ export struct GDigitSpanReverse {
   private play(k: number): void {
     if (k >= this.seq.length) {
       this.cursor = ASK; this.flash = false; this.msg = TG('倒序点出来：先点最后一个');
+      // ★ 2026-11-08（ai-fixer-a）代打「记住」刚播完的数字（自己的记忆副本）
+      this.aiMem = this.seq.slice();
       return;
     }
     this.cursor = k; this.flash = true; this.to1 = setTimeout(() => {
@@ -188,7 +192,11 @@ export struct GDigitSpanReverse {
     if (this.cursor !== ASK) {
       return true;
     }
-    this.tapDigit(this.seq[this.seq.length - 1 - this.typed.length]);
+    // ★ 2026-11-08 只读自己的记忆副本（播完那一刻抄下的）；没记到就停手，不回退读 seq
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.tapDigit(this.aiMem[this.aiMem.length - 1 - this.typed.length]);
     return !this.over;
   }
 

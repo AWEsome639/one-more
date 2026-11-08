@@ -40,6 +40,8 @@ export struct GMemoryMatrix {
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private lit: boolean[] = [];
+  /** ★ 2026-11-08 代打的「记忆副本」：亮灯阶段结束时抄下来的 */
+  private aiSeen: boolean[] = new Array<boolean>(CELLS).fill(false);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
   @State private need: number = 0;
@@ -110,6 +112,8 @@ export struct GMemoryMatrix {
     this.msg = TG2('第 {0} 关：记住 {1} 个亮格', String(this.level), String(k));
     this.showTo = setTimeout(() => {
       this.showTo = -1; this.phase = 1; this.msg = TG(TG(TG('把亮过的格子点出来')));
+      // ★ 2026-11-08（ai-fixer-a）代打「记住」刚刚亮过的格子（自己的记忆副本）
+      this.aiSeen = this.lit.slice();
     }, SHOW_MS);
   }
 
@@ -209,8 +213,10 @@ export struct GMemoryMatrix {
 
   /** 代打/提示共用：下一个还没点过的亮格（-1 = 没有） */
   private memNext(): number {
+    // ★ 2026-11-08（ai-fixer-a）读**自己的记忆副本**（亮灯阶段结束时抄下来的），
+    //   而不是一直读题目状态 lit（那等于开卷）。
     for (let i = 0; i < CELLS; i++) {
-      if (this.lit[i] && this.picks.indexOf(i) < 0) {
+      if (this.aiSeen[i] && this.picks.indexOf(i) < 0) {
         return i;
       }
     }

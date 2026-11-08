@@ -51,6 +51,8 @@ export struct GGroceryList {
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
   @State private list: string[] = [];
+  /** ★ 2026-11-08 代打的记忆副本（看完清单那一刻抄下） */
+  private aiMem: string[] = [];
   @State private probes: Probe[] = [];
   @State private pIdx: number = 0;
   @State private round: number = 1;
@@ -107,6 +109,8 @@ export struct GGroceryList {
     this.msg = TG2('记住这 {0} 样东西', String(n));
     this.memTo = setTimeout(() => {
       this.memTo = -1; this.phase = 1; this.pick = -1; this.msg = TG(TG(TG('刚才的东西，在清单里吗？')));
+      // ★ 2026-11-08（ai-fixer-a）代打「记住」刚看过的清单（自己的记忆副本）
+      this.aiMem = this.list.slice();
     }, MEM_MS);
   }
 
@@ -200,7 +204,16 @@ export struct GGroceryList {
     if (this.phase !== 1 || this.pick >= 0) {
       return true;
     }
-    this.answer(this.probes[this.pIdx].inside);
+    // ★ 2026-11-08 不再读 probes[].inside（出题答案）：用自己记住的清单判断「在不在」
+    const probe: string = this.probes[this.pIdx].icon;
+    let inside: boolean = false;
+    for (let i = 0; i < this.aiMem.length; i++) {
+      if (this.aiMem[i] === probe) {
+        inside = true;
+        break;
+      }
+    }
+    this.answer(inside);
     return !this.over;
   }
 

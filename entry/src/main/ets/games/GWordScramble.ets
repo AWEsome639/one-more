@@ -292,12 +292,32 @@ export struct GWordScramble {
   private tileTone(i: number): string { return this.used.length > i && this.used[i] ? (this.theme.isDark ? '#2A2A2A' : '#D8DDE6') : this.theme.surface; }
   /** AI 用：按单词顺序，点出下一个字母 */
   private aiTap(_d: number): void {
-    const w: string = this.word();
-    if (this.typed.length >= w.length) { return; }
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.word()（答案）**：
+    //   用「当前这排乱序字母」在词库里做**变位词匹配**——这才是解字谜本人会干的事。
+    const w: string = this.aiSolve();
+    if (w.length === 0 || this.typed.length >= w.length) { return; }
     const ch: string = w[this.typed.length];
     for (let i = 0; i < this.tiles.length; i++) {
       if (this.tiles[i] === ch && !this.used[i]) { this.tap(i); return; }
     }
+  }
+
+  /** 变位词求解：把 tiles 排序后当 key，去词库找同 key 的词 */
+  private aiSolve(): string {
+    const key: string = this.aiKey(this.tiles.join(''));
+    for (let i = 0; i < BANK.length; i++) {
+      const w: string = BANK[i].w;
+      if (w.length === this.tiles.length && this.aiKey(w) === key) {
+        return w;
+      }
+    }
+    return '';
+  }
+
+  private aiKey(s: string): string {
+    const arr: string[] = s.split('');
+    arr.sort();
+    return arr.join('');
   }
 
   build() {

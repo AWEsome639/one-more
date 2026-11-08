@@ -30,6 +30,8 @@ export struct GActionSequenceRecall {
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
    *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
   @State private tvFocus: string = '';
+  /** ★ 2026-11-08 代打的记忆副本（刺激播完后抄下，作答只看它） */
+  private aiMem: number[] = [];
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -90,7 +92,9 @@ export struct GActionSequenceRecall {
     if (this.over || !this.playing) { return; }
     const k: number = Math.floor(this.tickN / 2);
     if (k >= this.seq.length) {
-      this.playing = false; this.showIdx = -1; this.msg = TG('轮到你了 —— 按同样顺序点一遍'); return;
+      this.playing = false; this.showIdx = -1; this.msg = TG('轮到你了 —— 按同样顺序点一遍');
+      // ★ 2026-11-08（ai-fixer-a）代打「记住」刚演完的动作序列
+      this.aiMem = this.seq.slice(); return;
     }
     this.showIdx = this.tickN % 2 === 0 ? this.seq[k] : -1;
     this.tickN = this.tickN + 1;
@@ -212,7 +216,11 @@ export struct GActionSequenceRecall {
     if (this.cursor >= this.seq.length) {
       return true;              // 这一轮答完了，等它开下一轮
     }
-    this.tap(this.seq[this.cursor]);
+    // ★ 2026-11-08 只读自己的记忆副本；没记到就停手
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.tap(this.aiMem[this.cursor]);
     return !this.over;
   }
 

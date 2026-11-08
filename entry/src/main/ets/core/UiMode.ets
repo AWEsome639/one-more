@@ -62,6 +62,26 @@ function simple(): Spec {
 export class UiModeMgr {
   private static cur: string = UiMode.NORMAL;
 
+  /**
+   * ★★★ 2026-11-08（`save()` 立刻落盘）**落盘钩子**
+   *
+   *   问题：本类是**纯静态类，拿不到 `abilityContext`**，自己开不了 preferences。
+   *   原来只能靠 `EntryAbility.onBackground` 补写 ⇒ 用户切完模式**直接强杀进程**就丢了。
+   *
+   *   ⇒ 由 `EntryAbility.onCreate` 注册一个"会写盘的人"：
+   *      `UiModeMgr.bindWriter((m: string) => this.persistUiMode(m))`
+   *      这样 `save()` 一被点就落盘，不再依赖"有没有切过后台"。
+   *
+   *   ⚠️ 没注册的进程（例如桌面卡片 Form 渲染进程里也 import 了本类）⇒ 什么都不写，
+   *      且**绝不抛异常** —— `save()` 必须永远安全。
+   */
+  private static writer: ((mode: string) => void) | null = null;
+
+  /** 注册落盘通道（幂等：后注册的覆盖先注册的） */
+  static bindWriter(fn: (mode: string) => void): void {
+    UiModeMgr.writer = fn;
+  }
+
   static current(): string {
     return UiModeMgr.cur;
   }
@@ -101,14 +121,30 @@ export class UiModeMgr {
     AppStorage.setOrCreate('uiMode', mode);
   }
 
-  /** 落盘（走工程既有的 preferences 通道 —— PersistentStorage 在本工程"只写不读"，见 I18n 的结论） */
+  /**
+   * 切换档位 + **立刻落盘**（实际写盘由 `bindWriter()` 注册的钩子完成 —— 见上面的说明）
+   *
+   * ★ 2026-11-08 修：原来这里只写了内存里的 `uiModePersist`（全库没有第二处读它）⇒
+   *   **切完模式重启就回默认**；后来由 `EntryAbility.onBackground` 补写，
+   *   但"切完直接强杀进程"仍然会丢 ⇒ 现在改成**点一下就写**。
+   */
   static save(mode: string): void {
     UiModeMgr.apply(mode);
     try {
-      // 由 ProgressStore 统一写盘（它已持有 preferences 通道）
+      // 兼容旧键（历史遗留，别的地方没人读，留着不影响）
       AppStorage.setOrCreate('uiModePersist', mode);
     } catch (e) {
-      // 落盘失败只影响"下次启动的记忆"，不影响本次切换
+      // AppStorage 写不进去也不影响下面真正的落盘
+    }
+    // ★ 立刻落盘：钩子由 EntryAbility 注册（它才有 abilityContext）
+    try {
+      const w: ((mode: string) => void) | null = UiModeMgr.writer;
+      if (w !== null) {
+        w(mode);
+      }
+      // 没注册 ⇒ 静默跳过：本次切换照样生效，只是"下次启动的记忆"要等 onBackground 补
+    } catch (e) {
+      // 存储满 / context 失效 ⇒ 静默失败（界面已经切好了，不能因为写盘失败而报错）
     }
   }
 

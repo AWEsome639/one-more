@@ -44,6 +44,8 @@ export struct GDirectionsRecall {
   onFinish: (r: GameResult) => void = () => {};
 
   @State private seq: number[] = [];
+  /** ★ 2026-11-08 代打的记忆副本（演完后抄下） */
+  private aiMem: number[] = [];
   @State private input: number[] = [];
   @State private flash: number = -1;
   @State private round: number = 0;
@@ -93,6 +95,8 @@ export struct GDirectionsRecall {
     }
     this.timers.push(setTimeout(() => {
       this.phase = 'input';
+      // ★ 2026-11-08（ai-fixer-a）代打「记住」刚演完的方向序列
+      this.aiMem = this.seq.slice();
       this.note = TG(TG(TG('轮到你了 —— 按原顺序点回来')));
     }, GAP_MS + len * FLASH_MS));
   }
@@ -187,7 +191,11 @@ export struct GDirectionsRecall {
     if (this.phase !== 'input') {
       return true;
     }
-    this.tap(this.seq[this.input.length]);
+    // ★ 2026-11-08 只读自己的记忆副本；没记到就停手
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.tap(this.aiMem[this.input.length]);
     return true;
   }
 

@@ -56,6 +56,9 @@ export default class EntryAbility extends UIAbility {
     //   ⇒ 落到 `onemore_progress` 库的 'uiMode' 键（与 `lang` 同一个库、同一套写法）。
     //   ⚠️ 必须在第一帧（onWindowStageCreate→loadContent）之前跑完，否则会先按 NORMAL 画一帧。
     this.loadUiMode();
+    // ★ 2026-11-08：把「落盘通道」注册给 UiModeMgr —— 设置页一点模式就写盘，
+    //   不再依赖"用户有没有切过后台"（原来只在 onBackground 写，切完直接强杀就丢）。
+    UiModeMgr.bindWriter((m: string) => { this.persistUiMode(m); });
 
     // 进度系统：读 XP/等级/连胜/打卡（失败也不阻塞启动，ProgressStore 内部有兜底）
     ProgressStore.init(this.context).then(() => {
@@ -235,20 +238,37 @@ export default class EntryAbility extends UIAbility {
     }
   }
 
-  /** 把当前模式写盘（唯一真相源是 `AppStorage 'uiMode'`，由 UiModeMgr.apply 维护） */
-  private saveUiMode(): void {
+  /**
+   * 把**指定档位**写盘。
+   * ★ 2026-11-08：从 `saveUiMode()` 里拆出来 —— 两条触发路径共用：
+   *   ① `UiModeMgr.save()`（设置页点一下，通过 `bindWriter` 注册的钩子，**立刻写**）
+   *   ② `saveUiMode()`（onBackground / onDestroy 兜底，读当前 AppStorage 值）
+   */
+  private persistUiMode(mode: string): void {
     try {
-      const m: string | undefined = AppStorage.get<string>('uiMode');
-      if (m === undefined || m.length === 0) {
+      if (mode.length === 0) {
         return;
       }
       const opt: preferences.Options = { name: STORE_NAME };
       const pr: preferences.Preferences = preferences.getPreferencesSync(this.context, opt);
       // 存储满时 putSync/flush 会抛 ⇒ 静默失败（同 ProgressStore.putString 的做法）
-      pr.putSync('uiMode', m);
+      pr.putSync('uiMode', mode);
       pr.flush();
     } catch (e) {
       // 写不进去只影响"下次启动的记忆"，不动声色
+    }
+  }
+
+  /** 兜底：把当前模式写盘（唯一真相源是 `AppStorage 'uiMode'`，由 UiModeMgr.apply 维护） */
+  private saveUiMode(): void {
+    try {
+      const m: string | undefined = AppStorage.get<string>('uiMode');
+      if (m === undefined) {
+        return;
+      }
+      this.persistUiMode(m);
+    } catch (e) {
+      // 同上：静默
     }
   }
 

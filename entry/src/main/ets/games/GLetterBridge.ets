@@ -201,8 +201,28 @@ export struct GLetterBridge {
     if (this.over) {
       return true;
     }
-    this.pick(this.cur().letter);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 cur().letter（答案）**：
+    //   屏幕上是 left + 空格 + right + 4 个候选 ⇒ 用「词库当字典」逐个拼出真词。
+    const l: string = this.aiLetter();
+    if (l.length === 0) {
+      return false;
+    }
+    this.pick(l);
     return !this.over;
+  }
+
+  /** 对每个候选字母，拼接 left+l+right 去词库里查——查得到的那个就是答案 */
+  private aiLetter(): string {
+    const q: LB = this.cur();
+    for (let i = 0; i < q.opts.length; i++) {
+      const w: string = q.left + q.opts[i] + q.right;
+      for (let k = 0; k < BANK.length; k++) {
+        if (BANK[k].left + BANK[k].letter + BANK[k].right === w) {
+          return q.opts[i];
+        }
+      }
+    }
+    return '';
   }
 
   private computeHint(): HintResult {

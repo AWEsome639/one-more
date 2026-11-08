@@ -55,6 +55,8 @@ export struct GCardCountingMemory {
   @State private round: number = 1;
   @State private right: number = 0;
   @State private dupIdx: number = -1;
+  /** ★ 2026-11-08 代打的「记忆」：看牌阶段逐张记下来的牌面 */
+  private aiSeen: number[] = [];
   @State private pick: number = -1;
   @State private msg: string = '';
   @State private over: boolean = false;
@@ -93,6 +95,7 @@ export struct GCardCountingMemory {
   }
   /** 造 8 张牌：5 张不同 + 其中一张的重份 + 1 张新的 ⇒ 恰好一张出现两次 */
   private newRound(): void {
+    this.aiSeen = [];   // ★ 新一轮：清空代打记忆
     const base: number[] = [];
     while (base.length < 5) {
       const c: number = Math.floor(Math.random() * 52);
@@ -128,6 +131,10 @@ export struct GCardCountingMemory {
     this.phase = 1;
     this.idx = k;
     this.showing = true;
+    // ★ 代打「看到」这一张：记进自己的记忆里（不读 stream 的答案字段）
+    if (this.aiSeen.length <= k) {
+      this.aiSeen = this.aiSeen.concat([this.stream[k]]);
+    }
     this.tickTo = setTimeout(() => {
       this.tickTo = -1;
       this.showing = false;
@@ -243,7 +250,13 @@ export struct GCardCountingMemory {
     if (this.over || this.phase !== 2 || this.pick >= 0) {
       return true;
     }
-    this.answer(this.dupIdx);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 dupIdx（答案）**：
+    //   在 phase 1「看牌」时把看到的牌面记进 aiSeen（见 deal()），作答时从自己的记录里找重复。
+    const dup: number = this.aiDupFromSeen();
+    if (dup < 0) {
+      return false;
+    }
+    this.answer(dup);
     return !this.over;
   }
 
@@ -263,6 +276,18 @@ export struct GCardCountingMemory {
       Hint.autoStop(this.autoId);
       this.autoId = -1;
     }
+  }
+
+  /** ★ 2026-11-08 从自己的记忆里找出第一次重复出现的位置 */
+  private aiDupFromSeen(): number {
+    for (let i = 0; i < this.aiSeen.length; i++) {
+      for (let j = 0; j < i; j++) {
+        if (this.aiSeen[j] === this.aiSeen[i]) {
+          return i;
+        }
+      }
+    }
+    return -1;
   }
 
   private answer(i: number): void {

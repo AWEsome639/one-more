@@ -97,6 +97,24 @@ export struct GAnagramDefinition {
     this.picked = []; this.leftMs = this.diffTotal; this.roundAt = Date.now(); this.msg = TG('把字母拼回这个单词');
   }
   private cur(): AnaQ { return this.qIndex >= QN ? BANK[0] : BANK[this.queue[this.qIndex]]; }
+  /** ★ 2026-11-08 变位词求解：给定字母排序后与词库比对（不读答案） */
+  private aiSolve(): string {
+    const key: string = this.aiKey(this.letters.join(''));
+    for (let i = 0; i < BANK.length; i++) {
+      const w: string = BANK[i].word;
+      if (w.length === this.letters.length && this.aiKey(w) === key) {
+        return w;
+      }
+    }
+    return '';
+  }
+
+  private aiKey(s: string): string {
+    const arr: string[] = s.split('');
+    arr.sort();
+    return arr.join('');
+  }
+
   private curWord(): string { return this.qIndex >= QN ? '' : this.cur().word; }
   private guess(): string { return this.picked.map((k: number) => this.letters[k]).join(''); }
   private tick(): void {
@@ -195,7 +213,17 @@ export struct GAnagramDefinition {
     if (this.feed >= 0) {
       return true;
     }
-    this.tap(this.letters.map((ch: string, i: number) => (ch === this.curWord().charAt(this.picked.length) && this.picked.indexOf(i) < 0) ? i : -1).filter((v: number) => v >= 0)[0]);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 curWord()（答案）**：用给出的字母做**变位词匹配**。
+    const w: string = this.aiSolve();
+    if (w.length === 0) {
+      return false;
+    }
+    const want: string = w.charAt(this.picked.length);
+    const idxs: number[] = this.letters.map((ch: string, i: number) => (ch === want && this.picked.indexOf(i) < 0) ? i : -1).filter((v: number) => v >= 0);
+    if (idxs.length === 0) {
+      return false;
+    }
+    this.tap(idxs[0]);
     return !this.over;
   }
 

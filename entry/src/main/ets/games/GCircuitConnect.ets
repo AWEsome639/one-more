@@ -279,7 +279,11 @@ export struct GCircuitConnect {
    if (this.over) {
      return false;
    }
-   this.spin(this.autoCell());
+   const i: number = this.autoCell();
+   if (i < 0) {
+     return false;        // 全部转正了（正常不会到这：那时已通关）
+   }
+   this.spin(i);
    return !this.over;
  }
 
@@ -399,13 +403,22 @@ export struct GCircuitConnect {
   }
 
   /** 代打：转哪一格最能推进；一点进步都没有就随机转一格破局 */
+  /**
+   * ★★★ 2026-11-08（lead 批准）**代打按"答案"走，不再贪心**：
+   *   `genSolved()` 造出的盘面以 `rot[i] === 0` 为"已解开"（reset 再给每格随机转 k 圈），
+   *   所以 AI 只要**把每格转回 0** 就一定能赢：
+   *   朴素步数 = Σ (4−rot[i])%4，模拟最长 22 / 36 / 55 ⇒ 都在 `turns()`(23/40/63) 预算内。
+   *   原来用 `trySpin()` 贪心会卡在局部最优 —— 实测只解出 7~13%，那才是 AI 代打 FAIL 的真因。
+   *   返回 -1 = 所有格子都已转正（此刻其实已通关）。
+   */
   private autoCell(): number {
     const total: number = this.diffTotal * this.diffTotal;
-    const best: number = this.trySpin();
-    if (best < 0) {
-      return Math.floor(Math.random() * total);
+    for (let i = 0; i < total; i++) {
+      if (this.rot[i] % 4 !== 0) {
+        return i;
+      }
     }
-    return best;
+    return -1;
   }
  private spin(i: number): void {
  if (this.over) { return; }

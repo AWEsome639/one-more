@@ -37,6 +37,8 @@ export struct GCorsiBlocks {
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
    *   （`.focusBox()` 从不渲染 ⇒ 改用 `.outline()` 自己画）*/
   @State private tvFocus: string = '';
+  /** ★ 2026-11-08 代打的记忆副本（刺激播完后抄下，作答只看它） */
+  private aiMem: number[] = [];
   @State private autoId: number = -1;
   /** 演示动画（项目 C）：-1 = 未运行 */
   @State private demoId: number = -1;
@@ -112,6 +114,8 @@ export struct GCorsiBlocks {
       this.active = -1;
       this.phase = 1;
       this.tapIdx = 0;
+      // ★ 2026-11-08（ai-fixer-a）代打「记住」刚闪过的顺序
+      this.aiMem = this.seq.slice();
       this.msg = TG('按原顺序点回来');
       return;
     }
@@ -235,7 +239,11 @@ export struct GCorsiBlocks {
     if (this.tapIdx >= this.seq.length) {
       return true;              // 这一轮答完了，等它开下一轮
     }
-    this.tap(this.seq[this.tapIdx]);
+    // ★ 2026-11-08 只读自己的记忆副本；没记到就停手
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.tap(this.aiMem[this.tapIdx]);
     return !this.over;
   }
 
