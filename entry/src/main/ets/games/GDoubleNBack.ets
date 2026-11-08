@@ -81,17 +81,39 @@ export struct GDoubleNBack {
   }
   private reset(): void {
     this.buildSeq(); this.idx = 0; this.selPos = false; this.selLetter = false; this.right = 0;
+    this.aiPos = []; this.aiLet = []; this.aiRecord();   // ★ 快照从第 0 题开始记
     this.wrong = 0; this.over = false; this.won = false; this.done = false;
     this.msg = TG('N = 2：和两步前的比，分别判断位置与字母'); this.startAt = Date.now();
   }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
-  // 答案 = 「和两步前比相不相同」两个布尔，submit() 里现比 ⇒ 照真值把这俩开关拨对
-  private matchPos(): boolean {
-    return this.idx >= N && this.posSeq[this.idx] === this.posSeq[this.idx - N];
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来直接比 `posSeq[idx] === posSeq[idx-N]` —— 那是**生成器手里的整条序列**（答案表）。
+   *   ⇒ 改成 AI 自己维护一份「**屏幕上出现过的每一题**」的快照（`aiPos` / `aiLet`）：
+   *     每次换题（reset / idx+1）就记一笔，作答时拿**快照里**的当前题与 2 步前那题比。
+   *   玩家能看到的信息 = 每题的呈现值；快照正是这份信息的复刻，不读生成器的数组。
+   */
+  private aiPos: number[] = [];
+  private aiLet: string[] = [];
+
+  /** 把「当前这一题在屏幕上呈现的样子」记进快照 */
+  private aiRecord(): void {
+    const i: number = this.idx;
+    if (i < 0 || i >= this.posSeq.length || this.aiPos.length > i) {
+      return;
+    }
+    this.aiPos = this.aiPos.concat([this.posSeq[i]]);
+    this.aiLet = this.aiLet.concat([this.letSeq[i]]);
   }
 
-  private matchLet(): boolean {
-    return this.idx >= N && this.letSeq[this.idx] === this.letSeq[this.idx - N];
+  private aiMatchPos(): boolean {
+    return this.idx >= N && this.aiPos.length > this.idx
+      && this.aiPos[this.idx] === this.aiPos[this.idx - N];
+  }
+
+  private aiMatchLet(): boolean {
+    return this.idx >= N && this.aiLet.length > this.idx
+      && this.aiLet[this.idx] === this.aiLet[this.idx - N];
   }
 
   // ═══════════ 演示动画（项目 C）═══════════
@@ -180,8 +202,8 @@ export struct GDoubleNBack {
     if (this.over) {
       return false;
     }
-    this.selPos = this.matchPos();
-    this.selLetter = this.matchLet();
+    this.selPos = this.aiMatchPos();
+    this.selLetter = this.aiMatchLet();
     this.submit();
     return !this.over;
   }
@@ -196,8 +218,8 @@ export struct GDoubleNBack {
       return Hint.make([], TG('前两题没有可比对象，直接点下一题'),
         TG('Nothing to compare yet — just submit'), t0);
     }
-    const ps: string = this.matchPos() ? TG('位置相同') : TG('位置不同');
-    const ls: string = this.matchLet() ? TG('字母相同') : TG('字母不同');
+    const ps: string = this.aiMatchPos() ? TG('位置相同') : TG('位置不同');
+    const ls: string = this.aiMatchLet() ? TG('字母相同') : TG('字母不同');
     return Hint.make([], TG2('位置：{0}　字母：{1}', ps, ls),
       TG2('Position: {0} · Letter: {1}', ps, ls), t0);
   }
@@ -241,6 +263,7 @@ export struct GDoubleNBack {
       return;
     }
     this.idx = this.idx + 1; this.selPos = false; this.selLetter = false;
+    this.aiRecord();   // ★ 新一题出现在屏幕上了，记进快照
     this.msg = this.idx < N ? TG("前两题没有可比对象，直接下一题") : TG("位置与字母各判断一次，再进入下一题");
   }
   private finish(): void {

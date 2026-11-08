@@ -41,6 +41,8 @@ export struct GFeatureMatrixRecallAll {
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private hiColors: string[] = [];
+  /** ★★★ 2026-11-08 代打「不抄答案」：AI 自己的记忆副本（记忆阶段结束那一刻拍下），作答只查它 */
+  private aiSeen: string[] = [];
   @State private picked: boolean[] = [];
   @State private phase: number = 0;      // 0 记忆 1 作答 2 判定
   // ★ 难度作用到玩法：本局时限 = 基础 × 难度倍率（简单 1.5× / 普通 1× / 困难 0.7×）
@@ -83,6 +85,7 @@ export struct GFeatureMatrixRecallAll {
       colors[slots[i]] = i % 2 === 0 ? Palette.violet : Palette.teal;
     }
     this.hiColors = colors;
+    this.aiSeen = [];   // ★ 新一局，记忆清空
     this.picked = new Array<boolean>(TOTAL).fill(false);
     this.phase = 0; this.secLeft = this.total; this.over = false; this.won = false; this.done = false;
     this.msg = TG('记住亮起的 6 格（颜色只是装饰）');
@@ -93,6 +96,7 @@ export struct GFeatureMatrixRecallAll {
       this.secLeft = this.secLeft - 1;
       if (this.secLeft <= 0) {
         this.clearAll();
+        this.aiSeen = this.hiColors.slice();   // ★ 亮格消失的一瞬：AI 记住"刚才哪几格亮"
         this.phase = 1;
         this.msg = TG('把这 6 格全部点回来');
       }
@@ -191,7 +195,7 @@ export struct GFeatureMatrixRecallAll {
       return true;              // 还在记忆/倒计时，等
     }
     for (let i = 0; i < TOTAL; i++) {
-      const want: boolean = this.hiColors[i] !== '';
+      const want: boolean = i < this.aiSeen.length && this.aiSeen[i] !== '';
       if (this.picked[i] !== want) {
         this.toggle(i);
         return true;

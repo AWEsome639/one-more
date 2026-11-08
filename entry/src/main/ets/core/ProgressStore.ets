@@ -674,12 +674,16 @@ export class ProgressStore {
       ['daily_100', '🏵️', '挑战之王', '完成 100 次今天这一局', 'Daily Legend', 'Finish 100 of the daily pick'],
 
       // ── 分类专精（玩遍某一类）──
-      ['cat_classic', '🎲', '经典通', '玩过 30 款经典', 'Classic Buff', 'Play 30 classic games'],
-      ['cat_logic', '🧩', '逻辑通', '玩过 30 款逻辑', 'Logic Buff', 'Play 30 logic games'],
-      ['cat_math', '🧮', '算术通', '玩过 30 款数字', 'Number Buff', 'Play 30 number games'],
-      ['cat_memory', '🧠', '记忆通', '玩过 40 款记忆', 'Memory Buff', 'Play 40 memory games'],
-      ['cat_word', '🔤', '文字通', '玩过 30 款文字', 'Word Buff', 'Play 30 word games'],
-      ['cat_spatial', '📐', '空间通', '玩过 40 款空间', 'Spatial Buff', 'Play 40 spatial games'],
+      // ★★★ 2026-11-08：**文案不再写死 30/40** —— 判定已改成「类内款数的一半」（`catNeed()`），
+      //   文案里带绝对数就会像 `super_10` 那样"文案撒谎"（说 30 款，实际 23 款就解锁）。
+      //   ⚠️ 这 6 句的中文原文在 `I18n.ets` 里**各有 10 语言译文** ⇒ 改了中文就是换 key，
+      //      必须同步补 6 条新 key（否则 9 种语言掉回英文，判据 1790）。
+      ['cat_classic', '🎲', '经典通', '玩过一半经典', 'Classic Buff', 'Play half the classics'],
+      ['cat_logic', '🧩', '逻辑通', '玩过一半逻辑', 'Logic Buff', 'Play half the logic games'],
+      ['cat_math', '🧮', '算术通', '玩过一半数字', 'Number Buff', 'Play half the number games'],
+      ['cat_memory', '🧠', '记忆通', '玩过一半记忆', 'Memory Buff', 'Play half the memory games'],
+      ['cat_word', '🔤', '文字通', '玩过一半文字', 'Word Buff', 'Play half the word games'],
+      ['cat_spatial', '📐', '空间通', '玩过一半空间', 'Spatial Buff', 'Play half the spatial games'],
 
       // ── 单游戏连胜 ──
       ['streak_game_5', '🎯', '五连霸', '同一个游戏连赢 5 局', 'Five Straight', 'Win 5 in a row in one game'],
@@ -781,12 +785,17 @@ export class ProgressStore {
       ['daily_30', daily >= 30 ? '1' : '0'],
       ['daily_100', daily >= 100 ? '1' : '0'],
 
-      ['cat_classic', catMax[0] >= 30 ? '1' : '0'],
-      ['cat_logic', catMax[1] >= 30 ? '1' : '0'],
-      ['cat_math', catMax[2] >= 30 ? '1' : '0'],
-      ['cat_memory', catMax[3] >= 40 ? '1' : '0'],
-      ['cat_word', catMax[4] >= 30 ? '1' : '0'],
-      ['cat_spatial', catMax[5] >= 40 ? '1' : '0'],
+      // ★★★ 2026-11-08：**分类专精改成「类内款数的一半」**（原来写死 30/30/30/40/30/40）。
+      //   为什么：这 6 个绝对数会随库增长陈旧（加游戏就得人肉复核），
+      //   而 `all_kinds`/`clear_all` 早就用 `totalGames()` —— 这里向它看齐。
+      //   ✅ 选 50% 的依据：6 类新门槛 **全部 ≤ 旧门槛**（23/22/30/37/27/40 vs 30/30/30/40/30/40）
+      //      ⇒ 已解锁的人不受影响（成就只 push 不删），**没解锁的人也不会"白玩"**。
+      ['cat_classic', catMax[0] >= ProgressStore.catNeed(0) ? '1' : '0'],
+      ['cat_logic', catMax[1] >= ProgressStore.catNeed(1) ? '1' : '0'],
+      ['cat_math', catMax[2] >= ProgressStore.catNeed(2) ? '1' : '0'],
+      ['cat_memory', catMax[3] >= ProgressStore.catNeed(3) ? '1' : '0'],
+      ['cat_word', catMax[4] >= ProgressStore.catNeed(4) ? '1' : '0'],
+      ['cat_spatial', catMax[5] >= ProgressStore.catNeed(5) ? '1' : '0'],
 
       ['streak_game_5', gameStreak >= 5 ? '1' : '0'],
       ['streak_game_10', gameStreak >= 10 ? '1' : '0'],
@@ -849,6 +858,34 @@ export class ProgressStore {
   /** 累计打卡天数 */
   static totalDays(): number {
     return AppStorage.get<number>('totalDays') ?? 0;
+  }
+
+  /**
+   * ★★★ 2026-11-08 **分类专精门槛 = 类内款数的 50%**
+   *
+   *   原来 6 个 `cat_*` 成就写死 30/30/30/40/30/40（绝对数）⇒ **加一款游戏就要人肉复核**，
+   *   而 `all_kinds`/`clear_all` 早就用 `totalGames()` 自动跟着走。
+   *
+   *   为什么是 **50**：现占比 65.2% / 68.2% / 50.8% / 54.1% / 56.6% / 50.6%，
+   *   取 50% 后 6 类新门槛 = **23 / 22 / 30 / 37 / 27 / 40**，**全部 ≤ 旧门槛** ⇒
+   *     ① 已解锁的人不受影响（成就只 push 不删）
+   *     ② 没解锁的人也不会"白玩"（门槛只降不升）
+   *     ③ 经典/逻辑从 65/68% 拉平到 50%，更符合"专精"直觉
+   *
+   *   ⚠️ 库增长时门槛会**自己涨**（经典 +20 款 ⇒ 23→33）。这是"占比语义"的自然结果，
+   *      2026-11-08 决定**接受**：加游戏时在提交信息里记一句即可
+   *      （不做"只降不升"，那要新存储键，不值得）。
+   */
+  static readonly CAT_PCT: number = 50;
+
+  /** 第 i 类现在要**玩过几款**才给成就（跟着类内款数自动变） */
+  static catNeed(i: number): number {
+    if (i < 0 || i >= GAME_IDS_BY_CAT.length) {
+      return 1;
+    }
+    const total: number = GAME_IDS_BY_CAT[i].length;
+    const n: number = Math.ceil(total * ProgressStore.CAT_PCT / 100);
+    return n < 1 ? 1 : n;
   }
 
   /** 六大门类各玩过多少款（下标对应 GameCategory 顺序） */

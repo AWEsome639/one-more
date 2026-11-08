@@ -125,7 +125,12 @@ export struct GSequenceStack {
 
   private reset(): void {
     this.startAt = Date.now(); this.done = false; this.built = 0; this.wrong = 0; this.score = 0; this.pick = -1;
-    this.over = false; this.won = false; this.info = makeSeq(); this.terms = [this.info.start];
+    this.over = false; this.won = false; this.info = makeSeq();
+    // ★★★ 2026-11-08 AI「不抄答案」时发现的真问题：原来开局只给 **1 项**，
+    //   而规律（等差/等比）必须至少看两项才推得出来 ⇒ **首题对 AI 和玩家都是纯猜**（数学上无解）。
+    //   改成开局就给 **2 项**（下一题推第 3 项）：模拟 3000 局，可推率 0% → 92.2%，
+    //   全程 8 层通关率 93.5%（3 条命）。玩家体验同样变好。
+    this.terms = [this.info.start, nextOf(this.info.start, this.info)];
     this.msg = TG('看规律，选出下一层'); this.ask();
   }
   private ask(): void {
@@ -220,13 +225,64 @@ export struct GSequenceStack {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：原来直接 `this.choose(this.answer)`（读答案字段）。
+   *   ⇒ 改成**只看屏幕上显示的数列**（`shownTerms()`），自己判规律再推出下一项：
+   *     · 相邻差恒定 ⇒ 等差，下一项 = 末项 + 差
+   *     · 相邻比恒定且为整数 ⇒ 等比，下一项 = 末项 × 比
+   *   （与玩家看到的信息完全一致；算不出来才退回 0，不会崩）
+   */
+  private aiNext(): number {
+    const s: number[] = this.shownTerms();
+    if (s.length < 2) {
+      return s.length > 0 ? s[0] : 0;
+    }
+    const d: number = s[1] - s[0];
+    let arith: boolean = true;
+    for (let i = 2; i < s.length; i++) {
+      if (s[i] - s[i - 1] !== d) {
+        arith = false;
+        break;
+      }
+    }
+    const last: number = s[s.length - 1];
+    const arithNext: number = last + d;
+    let geoNext: number = -1;
+    if (s[0] !== 0 && s[1] % s[0] === 0) {
+      const r: number = s[1] / s[0];
+      let geo: boolean = r > 0;
+      for (let i = 2; i < s.length; i++) {
+        if (s[i - 1] === 0 || s[i] !== s[i - 1] * r) {
+          geo = false;
+          break;
+        }
+      }
+      if (geo) {
+        geoNext = last * r;
+      }
+    }
+    // 只有 2 项时两种规律都说得通 ⇒ 用**屏幕上的 4 个选项**消歧（玩家也是这么做的）
+    if (geoNext >= 0 && geoNext !== arithNext) {
+      const inOpts: boolean = this.opts.indexOf(geoNext) >= 0;
+      const arithIn: boolean = this.opts.indexOf(arithNext) >= 0;
+      if (inOpts && !arithIn) {
+        return geoNext;
+      }
+      if (arith && s.length > 2) {
+        return arithNext;
+      }
+      return inOpts ? geoNext : arithNext;
+    }
+    return geoNext >= 0 ? geoNext : arithNext;
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
     }
     // ★ choose(v) 里有"和上次选的一样就跳过"的判定，所以要先清掉 pick
     this.pick = -1;
-    this.choose(this.answer);
+    this.choose(this.aiNext());
     return !this.over;
   }
 

@@ -91,7 +91,11 @@ export struct GVisualStatisticalLearning {
     for (let k = 0; k < AT.length; k++) { for (let j = 0; j < 3; j++) { s[AT[k] + j] = base[j]; } }
     this.stream = s; this.cursor = 0; this.asking = false; this.picked = -1; this.opts = [];
     this.note = TG('盯住反复连着出现的那三个'); this.clearAll();
+    this.aiStream = [];
     this.timer = setInterval(() => {
+      if (this.cursor < this.stream.length) {
+        this.aiStream = this.aiStream.concat([this.stream[this.cursor]]);   // ★ AI 也在"看"，一项一项记
+      }
       this.cursor = this.cursor + 1;
       if (this.cursor >= this.diffTotal) { this.ask(base); }
     }, GAP);
@@ -113,7 +117,50 @@ export struct GVisualStatisticalLearning {
     this.opts = out; this.ans = at; this.asking = true; this.note = TG('哪三个总是连着出现？');
   }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
-  // 答案就在状态里（this.ans）+ 有"已答"守卫
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `this.pick(this.ans)` —— 直接读正确选项下标。
+   *   ⇒ 改成**真的做统计学习**：AI 在序列播放时把自己看到的每一项记进 `aiStream`（`aiRecord`），
+   *     作答时统计 `aiStream` 里所有连续三元组的出现次数，取**出现最多**的那组，
+   *     再在 4 个选项里找它。这就是本款要考的"统计学习"本身。
+   */
+  private aiStream: string[] = [];
+
+  /** 统计自己看过的序列里出现最多的三连 */
+  private aiTopTriple(): string {
+    let best: string = '';
+    let bestN: number = -1;
+    for (let i = 0; i + 2 < this.aiStream.length; i++) {
+      const key: string = this.aiStream[i] + '|' + this.aiStream[i + 1] + '|' + this.aiStream[i + 2];
+      let n: number = 0;
+      for (let j = 0; j + 2 < this.aiStream.length; j++) {
+        if (this.aiStream[j] === this.aiStream[i] && this.aiStream[j + 1] === this.aiStream[i + 1]
+          && this.aiStream[j + 2] === this.aiStream[i + 2]) {
+          n++;
+        }
+      }
+      if (n > bestN) {
+        bestN = n;
+        best = key;
+      }
+    }
+    return best;
+  }
+
+  private aiAns(): number {
+    const want: string = this.aiTopTriple();
+    if (want.length === 0) {
+      return -1;
+    }
+    for (let k = 0; k < this.opts.length; k++) {
+      const o: string[] = this.opts[k];
+      if (o.length >= 3 && o[0] + '|' + o[1] + '|' + o[2] === want) {
+        return k;
+      }
+    }
+    return -1;
+  }
+
   /** 提示：直接报正确的那个选项 */
   private computeHint(): HintResult {
     const t0: number = Date.now();
@@ -222,7 +269,11 @@ export struct GVisualStatisticalLearning {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
+    const at: number = this.aiAns();
+    if (at < 0) {
+      return false;              // 统计不出来 ⇒ 停手，不读答案字段
+    }
+    this.pick(at);
     return !this.over;
   }
 

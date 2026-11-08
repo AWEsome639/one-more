@@ -47,6 +47,8 @@ export struct GStaircaseMemory {
 
   @State private order: number[] = [];   // 本关要走的台阶
   @State private cursor: number = 0;      // 演示到第几级（-1 = 演示结束 / 0 = 还没开始）
+  /** ★ 本关要复述的级数（= 界面上写着的 n），代打只用它，不读答案数组 */
+  @State private spanCount: number = 0;
   @State private cur: number = 0;         // 轮到玩家点第几级
   @State private level: number = 1;
   @State private phase: number = 0;       // 0 演示 1 作答 2 判错
@@ -99,6 +101,7 @@ export struct GStaircaseMemory {
     const pick: number[] = [];
     for (let i = 0; i < n; i++) { pick.push(i); }
     this.order = pick;
+    this.spanCount = n;      // ★ 级数 = 界面上写着的「看它亮 {n} 级」⇒ AI 用这个就够，不必读答案数组
     this.cur = 0;
     this.cursor = 0;
     this.phase = 0;
@@ -198,14 +201,19 @@ export struct GStaircaseMemory {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：原来读 `this.order[this.cur]`（答案数组）。
+   *   这款的玩法固定是「从最低一级起，一层一层往上」（`newLevel()` 里 order 恒为 [0..n-1]），
+   *   玩家照着亮过的顺序点就是 0、1、2… ⇒ AI 按**规则**点第 `cur` 级即可，不必读答案。
+   */
   private autoStep(): boolean {
     if (this.over) {
       return false;
     }
-    if (this.phase !== 1 || this.cur >= this.order.length) {
+    if (this.phase !== 1 || this.cur >= this.spanCount) {
       return true;
     }
-    this.tap(this.order[this.cur]);
+    this.tap(this.cur);
     return !this.over;
   }
 

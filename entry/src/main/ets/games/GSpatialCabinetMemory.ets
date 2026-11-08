@@ -87,6 +87,7 @@ export struct GSpatialCabinetMemory {
   private reset(): void {
     this.clearAll();
     this.slotOf = []; this.items = []; this.target = -1; this.pick = -1; this.phase = 0;
+    this.aiSlots = [];   // ★ 新一局，记忆清空
     this.round = 1; this.hit = 0; this.score = 0;
     this.over = false; this.won = false; this.done = false;
     this.startAt = Date.now();
@@ -116,12 +117,21 @@ export struct GSpatialCabinetMemory {
     this.msg = TG(TG(TG('记住每件物品的柜格')));
     this.hideTo = setTimeout(() => {
       this.hideTo = -1;
+      this.aiSlots = this.slotOf.slice();   // ★ 柜子盖上的一瞬间，把"刚看到的摆法"记下来
       this.phase = 1;
       this.msg = TG2('{0} 刚才在哪一格？点它', ICONS[this.target]);
     }, SHOW_MS);
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `this.tap(this.slotOf.indexOf(this.target))` —— 直接读**盘面数组**（答案）。
+   *   ⇒ 改成 AI 在**记忆阶段结束那一刻**拍一张快照（`aiSlots`），作答时从**自己的记忆**里找：
+   *     `aiSlots.indexOf(target)`。玩家能记住的就是那一屏摆法，快照与之一致。
+   */
+  private aiSlots: number[] = [];
+
   // ═══════════ 演示动画（项目 C）═══════════
   // ★ 两条退出路径：
   //   ① 演完 6 步（demoFinish）⇒ **必须 reset()**：成绩/记录回到干净开局
@@ -212,7 +222,8 @@ export struct GSpatialCabinetMemory {
     if (this.phase !== 1 || this.pick >= 0) {
       return true;
     }
-    this.tap(this.slotOf.indexOf(this.target));
+    const at: number = this.aiSlots.indexOf(this.target);
+    this.tap(at >= 0 ? at : 0);
     return !this.over;
   }
 

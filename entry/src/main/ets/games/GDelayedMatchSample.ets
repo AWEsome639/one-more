@@ -81,7 +81,7 @@ export struct GDelayedMatchSample {
 
   private reset(): void {
     this.clearTimers();
-    this.trial = 1; this.correct = 0; this.wrong = 0;
+    this.trial = 1; this.correct = 0; this.wrong = 0; this.aiSample = '';
     this.over = false; this.won = false; this.finished = false;
     this.startAt = Date.now();
     this.nextTrial();
@@ -110,6 +110,7 @@ export struct GDelayedMatchSample {
     this.phase = 0;
     this.msg = TG('记住它');
     this.t1 = setTimeout(() => {
+      this.aiSample = this.sample;          // ★ 遮住的一瞬：AI 把"刚看到的那个"记下来
       this.phase = 1;
       this.msg = TG('遮住了…… 保持住');
       this.t2 = setTimeout(() => {
@@ -118,6 +119,14 @@ export struct GDelayedMatchSample {
       }, DELAY_MS);
     }, SHOW_MS);
   }
+
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `this.answer(this.sample)` —— 直接读**本局样例**（答案）。
+   *   ⇒ 改成 AI 在**样例被遮住那一刻**记下自己看到的东西（`aiSample`），
+   *     作答时在**屏幕上的 4 个选项**里找它（玩家就是这么做的）。
+   */
+  private aiSample: string = '';
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // ═══════════ 演示动画（项目 C）═══════════
@@ -210,7 +219,17 @@ export struct GDelayedMatchSample {
     if (this.phase !== 2) {
       return true;
     }
-    this.answer(this.sample);
+    let at: number = -1;
+    for (let i = 0; i < this.options.length; i++) {
+      if (this.options[i] === this.aiSample) {
+        at = i;
+        break;
+      }
+    }
+    if (at < 0) {
+      return false;                       // 没记住/对不上 ⇒ 停手（不猜答案字段）
+    }
+    this.answer(this.options[at]);
     return !this.over;
   }
 

@@ -86,6 +86,7 @@ export struct GCountingSpan {
     this.counts = cs;
     this.cardIdx = 0;
     this.recallIdx = 0;
+    this.aiCounts = [];          // ★ 新一局：AI 的清点记录清空
     this.phase = 0;
     this.msg = TG('数出每张卡有几个黄点，别写下来');
     this.deal();
@@ -121,6 +122,25 @@ export struct GCountingSpan {
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来直接读 `this.counts[this.recallIdx]`（出题答案）。
+   *   ⇒ 改成 AI **自己在数**：phase 0 每张卡显示时，数一数**屏幕上亮着的黄点**（`this.dots` 里的 true）
+   *     记进 `aiCounts`；回忆阶段答自己的记录。这才是"数卡"这件事本身。
+   */
+  private aiCounts: number[] = [];
+
+  /** 数当前这张卡上亮着的黄点 */
+  private aiCountDots(): number {
+    let n: number = 0;
+    for (let i = 0; i < this.dots.length; i++) {
+      if (this.dots[i]) {
+        n++;
+      }
+    }
+    return n;
+  }
+
   // 两个阶段：0=数卡（要点「数好了，下一张」）1=回忆（答案 = counts[recallIdx]）
   // ═══════════ 演示动画（项目 C）═══════════
   // 沙盒规则：跑 Hint.DEMO_STEPS 步或一旦 over 就立刻停，然后 reset()
@@ -209,13 +229,17 @@ export struct GCountingSpan {
       return false;
     }
     if (this.phase === 0) {
+      if (this.aiCounts.length <= this.cardIdx) {
+        this.aiCounts = this.aiCounts.concat([this.aiCountDots()]);   // ★ 数这一张
+      }
       this.nextCard();                 // 数完这张 ⇒ 翻下一张 / 进回忆
       return true;
     }
     if (this.phase !== 1 || this.recallIdx >= this.counts.length) {
       return true;                     // 等过渡（换局 / 结算）
     }
-    this.answerCount(this.counts[this.recallIdx]);
+    const mine: number = this.recallIdx < this.aiCounts.length ? this.aiCounts[this.recallIdx] : 0;
+    this.answerCount(mine);
     return !this.over;
   }
 

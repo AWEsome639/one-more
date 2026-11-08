@@ -41,6 +41,8 @@ export struct GFeatureMatrixRecall {
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private hiColors: string[] = [];
+  /** ★★★ 2026-11-08 代打「不抄答案」：AI 自己的记忆副本（记忆阶段结束那一刻拍下），作答只查它 */
+  private aiSeen: string[] = [];
   @State private picked: boolean[] = [];
   @State private askColor: string = Palette.rose;
   @State private phase: number = 0;      // 0 记忆 1 作答 2 判定
@@ -83,6 +85,7 @@ export struct GFeatureMatrixRecall {
     for (let i = 0; i < PER_COLOR; i++) { colors[slots[i]] = Palette.rose; }
     for (let i = PER_COLOR; i < PER_COLOR * 2; i++) { colors[slots[i]] = Palette.sky; }
     this.hiColors = colors;
+    this.aiSeen = [];   // ★ 新一局，记忆清空
     this.picked = new Array<boolean>(TOTAL).fill(false);
     this.askColor = Math.random() < 0.5 ? Palette.rose : Palette.sky;   // 遮蔽后才公布问哪种
     this.phase = 0; this.secLeft = this.total; this.over = false; this.won = false; this.done = false;
@@ -94,6 +97,7 @@ export struct GFeatureMatrixRecall {
       this.secLeft = this.secLeft - 1;
       if (this.secLeft <= 0) {
         this.clearAll();
+        this.aiSeen = this.hiColors.slice();   // ★ 颜色消失的一瞬：AI 把"刚看到的"记下来
         this.phase = 1;
         this.msg = TG2('点出全部「{0}」格子（3 格）', this.colorName(this.askColor));
       }
@@ -110,7 +114,7 @@ export struct GFeatureMatrixRecall {
       return -1;
     }
     for (let i = 0; i < TOTAL; i++) {
-      if (this.hiColors[i] === this.askColor && !this.picked[i]) {
+      if (i < this.aiSeen.length && this.aiSeen[i] === this.askColor && !this.picked[i]) {
         return i;
       }
     }

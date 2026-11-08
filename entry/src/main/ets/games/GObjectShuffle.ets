@@ -53,6 +53,8 @@ export struct GObjectShuffle {
   @State roundNo: number = 1; @State right: number = 0; @State score: number = 0;
   @State msg: string = ''; @State over: boolean = false; @State won: boolean = false;
   private gemAt: number = 0; private startAt: number = 0;
+  /** ★ 2026-11-08 代打「不抄答案」：AI 自己的追踪位置（开局看一次宝石在哪，之后跟着每次交换走） */
+  private aiGem: number = 0;
   private timer: number = -1; private done: boolean = false;
 
   aboutToAppear(): void {
@@ -92,7 +94,9 @@ export struct GObjectShuffle {
     this.pairA = -1; this.pairB = -1; this.pick = -1; this.phase = 0;
     this.msg = TG2("第 {0} 轮：看清 💎 在哪只盒子下", this.roundNo);
     this.timer = setTimeout(() => {
-      this.timer = -1; this.cups = this.hide(); this.phase = 1;
+      this.timer = -1;
+      this.aiGem = this.gemAt;        // ★ 盖杯之前：AI 看见宝石在这一只
+      this.cups = this.hide(); this.phase = 1;
       this.msg = TG2('洗牌 {0} 步：高亮的两只盒子在互换',Digits(String(this.stepTotal), this.langCode));
       this.shuffleStep();
     }, PEEK_MS);
@@ -112,6 +116,8 @@ export struct GObjectShuffle {
     const tmp: string = next[a]; next[a] = next[b]; next[b] = tmp;
     this.cups = next;
     if (this.gemAt === a) { this.gemAt = b; } else if (this.gemAt === b) { this.gemAt = a; }
+    // ★ 2026-11-08 代打「不抄答案」：AI 也跟着这一下交换自己的记忆（人是盯着杯子走的）
+    if (this.aiGem === a) { this.aiGem = b; } else if (this.aiGem === b) { this.aiGem = a; }
     this.pairA = a; this.pairB = b;
     this.left = this.left - 1;
     this.timer = setTimeout(() => { this.timer = -1; this.shuffleStep(); }, SWAP_MS);
@@ -226,7 +232,7 @@ export struct GObjectShuffle {
     if (this.phase !== 2) {
       return true;
     }
-    this.answer(this.gemAt);
+    this.answer(this.aiGem);
     return !this.over;
   }
 

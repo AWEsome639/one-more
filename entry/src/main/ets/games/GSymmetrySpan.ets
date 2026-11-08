@@ -67,9 +67,16 @@ export struct GSymmetrySpan {
      this.reset(); }
   aboutToDisappear(): void { this.clearAll(); }
   private clearAll(): void { if (this.timer >= 0) { clearTimeout(this.timer); this.timer = -1; } }
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：原来遍历 `this.target`（答案数组）。
+   *   ⇒ 改成 AI 在**图案消失那一刻**存一份快照（`aiSeen`），作答时照自己的记忆点。
+   *   与玩家掌握的信息一致（记忆阶段看得见，之后只能靠记）。
+   */
+  private aiSeen: number[] = [];
 
   private reset(): void {
     this.clearAll(); this.round = 1; this.hits = 0; this.score = 0;
+    this.aiSeen = [];   // ★ 新一局，记忆清空
     this.over = false; this.won = false; this.done = false; this.startAt = Date.now();
     this.makeRound();
   }
@@ -92,7 +99,9 @@ export struct GSymmetrySpan {
     this.target = g; this.chosen = []; this.phase = 0;
     this.msg = TG2("第 {0} / {1} 题：记住这 {2} 格（左右对称）", this.round, ROUNDS, SPAN);
     this.timer = setTimeout(() => {
-      this.timer = -1; this.phase = 1;
+      this.timer = -1;
+      this.aiSeen = this.target.slice();   // ★ 图案消失的一瞬间，把"刚看到的"记下来
+      this.phase = 1;
       this.msg = TG2('点出刚才的 {0} 格（再点一下可取消）', SPAN);
     }, SHOW_MS);
   }
@@ -206,8 +215,8 @@ export struct GSymmetrySpan {
     if (this.phase !== 1) {
       return true;              // 还没进入选择阶段，等它
     }
-    for (let i = 0; i < this.target.length; i++) {
-      if (this.target[i] === 1 && this.chosen.indexOf(i) < 0) {
+    for (let i = 0; i < this.aiSeen.length; i++) {
+      if (this.aiSeen[i] === 1 && this.chosen.indexOf(i) < 0) {
         this.tap(i);
         return !this.over;
       }

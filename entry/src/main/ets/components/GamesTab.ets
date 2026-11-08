@@ -173,7 +173,12 @@ export struct GamesTab {
   aboutToAppear(): void {
     // ★ 2026-11-08 perf-hunter：先灌一次数据源，避免首帧 `LazyForEach` 拿到空表
     //   （`list()` 本身带记忆化，这里调用是幂等的；`reset()` 内部还会再比一次 id）。
-    this.source.reset(this.list());
+    this.source.reset(this.list())
+    // ★ 2026-11-08 **首帧空白修复**：挂载后无条件再通知一次
+    //   （`aboutToAppear` 里 `reset` 时 LazyForEach 还没注册 listener）
+    setTimeout(() => {
+      this.source.reload();
+    }, 0);;
     // ★ 大字模式默认收起顶部（否则网格被挤出屏幕 —— 实测）
     if (this.uiMode === 'elder') {
       this.topCollapsed = true;
@@ -2009,7 +2014,10 @@ build() {
       }, (grp: string) => grp)
       }
       .width('100%')
-      .padding(Space.md)
+      // ★ 2026-11-08 **第 15 个 chip 被裁**（verifier-dev 实测 14/15，第 3 行在 y≈1336..1408）：
+      //   视口底 1336 = 底栏上沿，差 ~72px ⇒ **给内容加底部 padding**，
+      //   让最后一行能滚进视口（`Space.xxl=32` 不够，用 120）。
+      .padding({ left: Space.md, right: Space.md, top: Space.md, bottom: 120 })
     }
     .width('100%')
     // ★★★ 2026-11-03（第 897 轮）**`maxHeight: 300` 是写死的 —— 在 195 屏上装不下**。
@@ -2028,6 +2036,9 @@ build() {
     //   ⇒ **最后一行 chip 永远压在底栏后面**（853×533 下「玩法」组 15 个 chip
     //      只有 1px 可见高度，滑动 7 次位置完全不变 ⇒ **滑不出来**）。
     //   ⇒ 扣掉底栏高度。
+    // ★ 2026-11-08 **第 15 个 chip 仍被裁**（verifier-dev 实测：14/15 可见，第 3 行在 y≈1336..1408）：
+    //   视口底 1336（底栏上沿），差 **~72px**（建议留 96~120 余量）
+    //   ⇒ 给内容加底部 padding，让第 3 行能滚进视口。
     .constraintSize({ maxHeight: Math.max(60, Math.min(300, Bp.height - 160 - 117)) })
     .margin({ left: Space.lg, right: Space.lg, top: Space.xs })
     .backgroundColor(this.theme().surface)

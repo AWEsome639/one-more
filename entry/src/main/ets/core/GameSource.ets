@@ -103,4 +103,15 @@ export class GameSource implements IDataSource {
     }
     return true;
   }
+
+  /** ★ 2026-11-08 **首帧空白修复**（perf-hunter 真机实测）：
+   *   `reset()` 在 `aboutToAppear` 里调用时，`LazyForEach` **还没注册 listener**
+   *   ⇒ 框架首帧查 `totalCount()` 时没拿到预填数据，之后又无事件触发 `onDataReloaded()`
+   *   ⇒ **冷启后网格区 0 张卡**，直到任何一次列表变化（切分类）才出 8 张。
+   *   ⇒ 挂载后用 `setTimeout(0)` 补一次无条件通知。 */
+  reload(): void {
+    for (let i = 0; i < this.listeners.length; i++) {
+      this.listeners[i].onDataReloaded();
+    }
+  }
 }

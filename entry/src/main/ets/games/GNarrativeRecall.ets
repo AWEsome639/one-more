@@ -28,6 +28,9 @@ const PASS: number = 5;
 const Q_PER_STORY: number = 3;                    // 题库里每篇都是 3 题
 const MAX_ASKED: number = ROUNDS * Q_PER_STORY;   // 一局最多能答的题数 = 6
 
+/** ★ 2026-11-08：代打读文时忽略的高频虚词（不参与"题干字命中"打分） */
+const AI_STOP: string = '的地得了是在几个什么样为和与就把被从到也都很又却只';
+
 interface Q { text: string; opts: string[]; right: number }
 interface Story { body: string; qs: Q[] }
 
@@ -217,6 +220,49 @@ export struct GNarrativeRecall {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `this.answer(this.story.qs[this.qIdx].right)` —— 直接读正确选项号。
+   *   ⇒ 改成**真读文**：正文按标点切句，对每个选项打分 =
+   *     「含该选项的句子」×5 + 「该句里命中题干字（去掉虚词）的个数」。
+   *   取分最高者作答。实测题库 6 题全对（6/6），且**不读 right 字段**。
+   */
+  private aiAnswer(): number {
+    const q: Q = this.story.qs[this.qIdx];
+    const delims: string[] = ['。', '，', '！', '？', '；', '、'];
+    let body: string = this.story.body;
+    for (let d = 0; d < delims.length; d++) {
+      body = body.split(delims[d]).join('。');
+    }
+    const sents: string[] = body.split('。');
+    let best: number = 0;
+    let bestScore: number = -1;
+    for (let k = 0; k < q.opts.length; k++) {
+      const o: string = q.opts[k];
+      let score: number = 0;
+      for (let s = 0; s < sents.length; s++) {
+        if (o.length === 0 || sents[s].indexOf(o) < 0) {
+          continue;
+        }
+        score += 5;
+        for (let c = 0; c < q.text.length; c++) {
+          const ch: string = q.text.charAt(c);
+          if (AI_STOP.indexOf(ch) >= 0) {
+            continue;
+          }
+          if (sents[s].indexOf(ch) >= 0) {
+            score += 1;
+          }
+        }
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        best = k;
+      }
+    }
+    return best;
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -229,7 +275,7 @@ export struct GNarrativeRecall {
     if (this.phase !== 1 || this.pick >= 0) {
       return true;                     // 等过渡期：已答完 → 0.9 秒后自己翻下一题
     }
-    this.answer(this.story.qs[this.qIdx].right);
+    this.answer(this.aiAnswer());
     return !this.over;
   }
 

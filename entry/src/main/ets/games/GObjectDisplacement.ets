@@ -91,14 +91,38 @@ export struct GObjectDisplacement {
     const moved: string[] = layout.slice();
     moved[holeAt] = layout[srcAt]; moved[srcAt] = '';
     this.first = layout; this.second = moved; this.fromAt = srcAt; this.toAt = holeAt;
+    this.aiFirst = [];   // ★ 新一局，记忆清空（真正的快照在遮住那一刻拍）
     this.pick = -1; this.phase = 0;
     this.msg = TG2("第 {0} 轮：记住每个物件在哪一格", this.roundNo);
     this.timer = setTimeout(() => {
-      this.timer = -1; this.phase = 1; this.msg = TG('遮住了…');
+      this.timer = -1;
+      this.aiFirst = this.first.slice();   // ★ 遮住的一瞬：AI 记下"挪之前每个物件在哪"
+      this.phase = 1; this.msg = TG('遮住了…');
       this.timer = setTimeout(() => {
         this.timer = -1; this.phase = 2; this.msg = TG('哪个物件换了格子？点它');
       }, VEIL_MS);
     }, PEEK_MS);
+  }
+
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `this.answer(this.toAt)` —— 直接读答案格号。
+   *   ⇒ 改成**靠记忆找不同**：phase 0 遮住时记下 `first`（`aiFirst`），
+   *     phase 2 屏幕上是 `second` ⇒ 逐格比对"现在有物件、而记忆里这里是空的/别的"⇒ 那就是挪到的格子。
+   */
+  private aiFirst: string[] = [];
+
+  /** 用「记忆里的摆法」和屏幕上现在的摆法比对，找出物件挪到的那一格 */
+  private aiMovedTo(): number {
+    for (let i = 0; i < this.second.length; i++) {
+      if (i >= this.aiFirst.length) {
+        continue;
+      }
+      if (this.second[i] !== this.aiFirst[i] && this.second[i] !== '') {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /** 提示：直接报答案（代打用的就是这个字段） */
@@ -210,7 +234,11 @@ export struct GObjectDisplacement {
     if (this.phase !== 2 || this.pick >= 0) {
       return true;
     }
-    this.answer(this.toAt);
+    const at: number = this.aiMovedTo();
+    if (at < 0) {
+      return false;              // 没记住 ⇒ 停手，不读答案字段
+    }
+    this.answer(at);
     return !this.over;
   }
 

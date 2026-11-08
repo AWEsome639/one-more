@@ -174,6 +174,84 @@ export struct GSequenceSleuth {
   }
 
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：原来 `choose(this.ans)`（读答案）。
+   *   ⇒ 只看屏幕上已给的 5 项（`this.terms`），按四种常见规律各试一遍，推出第 6 项：
+   *     ① 等差（相邻差恒定）② 等比（相邻比恒定）③ 斐波那契型（每项=前两项之和）④ 连续平方数
+   *   都不成立才退回「按最后一段差继续」。
+   */
+  private aiAns(): number {
+    const s: number[] = this.terms;
+    const n: number = s.length;
+    if (n < 2) {
+      return n === 1 ? s[0] : 0;
+    }
+    const last: number = s[n - 1];
+    // ① 等差
+    const d: number = s[1] - s[0];
+    let arith: boolean = true;
+    for (let i = 2; i < n; i++) {
+      if (s[i] - s[i - 1] !== d) {
+        arith = false;
+        break;
+      }
+    }
+    if (arith) {
+      return last + d;
+    }
+    // ② 等比
+    if (s[0] !== 0 && s[1] % s[0] === 0) {
+      const r: number = s[1] / s[0];
+      let geo: boolean = r > 1;
+      for (let i = 2; i < n; i++) {
+        if (s[i - 1] === 0 || s[i] !== s[i - 1] * r) {
+          geo = false;
+          break;
+        }
+      }
+      if (geo) {
+        return last * r;
+      }
+    }
+    // ③ 斐波那契型
+    let fib: boolean = n >= 3;
+    for (let i = 2; i < n; i++) {
+      if (s[i] !== s[i - 1] + s[i - 2]) {
+        fib = false;
+        break;
+      }
+    }
+    if (fib) {
+      return s[n - 1] + s[n - 2];
+    }
+    // ④ 连续平方数
+    const roots: number[] = [];
+    let square: boolean = true;
+    for (let i = 0; i < n; i++) {
+      const r0: number = Math.round(Math.sqrt(s[i]));
+      if (r0 * r0 !== s[i]) {
+        square = false;
+        break;
+      }
+      roots.push(r0);
+    }
+    if (square) {
+      let cons: boolean = true;
+      for (let i = 1; i < roots.length; i++) {
+        if (roots[i] - roots[i - 1] !== 1) {
+          cons = false;
+          break;
+        }
+      }
+      if (cons) {
+        const nr: number = roots[roots.length - 1] + 1;
+        return nr * nr;
+      }
+    }
+    // 兜底：沿用最后一段差
+    return last + (s[n - 1] - s[n - 2]);
+  }
+
   // 答案就在状态里（this.ans）+ 有"已答"守卫
   // ═══════════ 演示动画（项目 C）═══════════
   // ★ 两条退出路径：
@@ -265,7 +343,7 @@ export struct GSequenceSleuth {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.choose(this.ans);
+    this.choose(this.aiAns());
     return !this.over;
   }
 

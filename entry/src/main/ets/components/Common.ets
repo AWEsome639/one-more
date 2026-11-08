@@ -875,6 +875,9 @@ class CardBadgeCache {
   private static bestMap: Map<string, number> = new Map<string, number>();
   private static clearedRaw: string = '@@init@@';
   private static clearedSet: Set<string> = new Set<string>();
+  /** 每款通关次数（档位用）—— 与 best/cleared 同构：同一份串只解析一次 */
+  private static clearsRaw: string = '@@init@@';
+  private static clearsMap: Map<string, number> = new Map<string, number>();
 
   /** 最高分；0 = 没玩过 / 没有分 */
   static best(raw: string, id: string): number {
@@ -894,6 +897,36 @@ class CardBadgeCache {
     }
     const v: number | undefined = CardBadgeCache.bestMap.get(id);
     return v === undefined ? 0 : v;
+  }
+
+  /**
+   * ★★★ 2026-11-08（成就 P2 · 方案 A）**每款徽章档位 0~4**
+   *
+   *   0 = 没通关（不画）；1 = 首通(≥1)；2 = 熟练(≥10)；3 = 精通(≥50)；4 = 大师(≥100)
+   *   门槛与 `ProgressStore.TIER_NEED = [1,10,50,100]` **同口径**（那边是单一真相源；
+   *   这里为了不把 ProgressStore 的整条依赖链拉进每个卡片，硬编码同一组数并靠注释对齐）。
+   *   ⚠️ 解析走同一套"原始串变了才重解析"的缓存 ⇒ 355 张卡共享一次 `JSON.parse`。
+   */
+  static tier(raw: string, id: string): number {
+    if (raw !== CardBadgeCache.clearsRaw) {
+      CardBadgeCache.clearsRaw = raw;
+      CardBadgeCache.clearsMap = new Map<string, number>();
+      try {
+        const m: Record<string, number> = JSON.parse(raw.length > 0 ? raw : '{}') as Record<string, number>;
+        const keys: string[] = Object.keys(m);
+        for (let i = 0; i < keys.length; i++) {
+          CardBadgeCache.clearsMap.set(keys[i], m[keys[i]]);
+        }
+      } catch (e) {
+        CardBadgeCache.clearsMap = new Map<string, number>();
+      }
+    }
+    const n: number = CardBadgeCache.clearsMap.get(id) ?? 0;
+    if (n >= 100) { return 4; }
+    if (n >= 50) { return 3; }
+    if (n >= 10) { return 2; }
+    if (n >= 1) { return 1; }
+    return 0;
   }
 
   /** 这款通关过吗 */
@@ -1071,6 +1104,14 @@ export struct GameCard {
   @StorageProp('clearedGames') clearedRaw: string = '';
   @StorageProp('perGameBest') bestRaw: string = '{}';
   /**
+   * ★★★ 2026-11-08（成就 P2 · 方案 A）：**每款通关次数** —— 角标小点的数据源。
+   * 为什么用 @StorageProp 而不是在 build 里问 ProgressStore：
+   *   `bumpClears()` 已经把整张表 `setOrCreate` 进 AppStorage ⇒ 通关一局，卡片**自动重建**
+   *   （比 `tierOf()` 现算可靠：ForEach 同 key 不重跑 itemGenerator 的老坑，见上面 streaks 的注释）。
+   * ⚠️ key 必须与 `ProgressStore.Keys.perGameClears` 的字面量一致（@StorageProp 只能写字面量）。
+   */
+  @StorageProp('perGameClears') clearsRaw: string = '{}';
+  /**
    * 共享元素转场 id（动画 ①）—— 非空时这张卡参与 `geometryTransition` 补间。
    * 默认空串 = 不参与；GamesTab 只在"正在点开的那一张"上传入。
    */
@@ -1221,9 +1262,34 @@ export struct GameCard {
     return Digits(fmtBest(n, Bp.width < 420), this.langCode);
   }
 
-  /** 🏆 显示条件（没通关就不画，省得 355 张卡里 340 张都有个空位） */
+  /** 🏆 / 档位点的显示条件（没通关就不画，省得 355 张卡里 340 张都有个空位） */
   private showCrown(): boolean {
     return this.isCleared();
+  }
+
+  /**
+   * 档位点：`i` 是第几档（0~3）—— 已达成填实心，未达成留淡色。
+   * 3vp 直径 = 胶囊里最小的可辨识尺寸（`FontSize.micro` 是 10，点直径取 0.3 倍）。
+   */
+  @Builder
+  tierDot(i: number) {
+    Row()
+      .width(3).height(3)
+      .borderRadius(1.5)
+      .backgroundColor(this.tierNow() > i ? Overlay.onColor : Overlay.onColorFaint)
+      .opacity(this.tierNow() > i ? 1 : 0.5)
+  }
+
+  /**
+   * 这款练到第几档（0~4）。`tier >= 1 ⇔ 通关过` ——
+   * 所以"档位点"在信息上**完全覆盖** 🏆（方案 A 敢直接替换它的依据）。
+   */
+  private tierNow(): number {
+    if (!this.meta) {
+      return 0;
+    }
+    const observed: string = this.clearsRaw;   // ← 依赖声明，别删
+    return CardBadgeCache.tier(observed, this.meta.id);
   }
 
   /**
@@ -1494,11 +1560,34 @@ build() {
       if (this.hasBadge()) {
         Row({ space: 3 }) {
           if (this.showCrown()) {
-            Text('🏆').fontSize(FontSize.micro)
-              // ★ 2026-11-07 emoji 固定盒子：横向 1.2em（字形 advance 实测 1.00em，留 20% 余量）、
-              //   纵向 1.4em（≥ 1.30em 行盒，防竖切）。角标胶囊刚收窄到 ~64vp，所以宽度只给 +2vp。
-              .width(12).height(14).textAlign(TextAlign.Center)
+            if (Bp.tinyWatch()) {
+              // ★ 极小屏（195vp / 58vp 卡高）：**保持 🏆**，不画点。
+              //   理由：4 点占 16.5vp，而那个尺寸下胶囊还要塞 🔥 + 天数，会把标题挤没
+              //   （见 `badgePadRight()` 里 2026-11-07 的真机实测）。
+              Text('🏆').fontSize(FontSize.micro)
+                .width(12).height(14).textAlign(TextAlign.Center)
+                .accessibilityLevel('no')
+            } else {
+              // ★★★ 2026-11-08（成就 P2 · **方案 A：4 个档位点替换 🏆**）
+              //   为什么敢替换：`tier >= 1 ⇔ 通关过` ⇒ 点和 🏆 是同一件事的两种画法，
+              //   替换后信息**只增不减**（"通没通" → "练到第几档"）。
+              //   宽度账：🏆 12vp → 4 点 16.5vp（点 3 + 间隔 1.5）⇒ **只 +4.5vp**，
+              //   三样全亮时胶囊 64 → 68.5vp（`badgePadRight()` 给的 18 仍留了余量，不用改）。
+              //   ⚠️ RTL：`.direction(Direction.Ltr)` 把顺序钉死成"少→多"。
+              //     判据 1796（`direction` 能编译 ≠ 会生效）—— **阿语下必须真机看一眼**；
+              //     万一不生效，点会从右往左长：对"进度感"来说其实**也不算错**（RTL 本就该从右起），
+              //     但和设计稿不一致 ⇒ 那时退回"保持 🏆"。
+              Row({ space: 1.5 }) {
+                this.tierDot(0)
+                this.tierDot(1)
+                this.tierDot(2)
+                this.tierDot(3)
+              }
+              .direction(Direction.Ltr)
+              .height(14)
+              .alignItems(VerticalAlign.Center)
               .accessibilityLevel('no')
+            }
           }
           // ★★★ 2026-11-07 **真机实测**（verifier-eng2 853×533）：三样全亮时胶囊 **94.3vp**，
           //   把副标题压到 **25.3vp** ⇒「交换消宝石」被压到 **8vp 字号**（行盒 9.65 vs 正常 14.0）。

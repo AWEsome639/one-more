@@ -76,6 +76,7 @@ export struct GMemory {
 
   private reset(): void {
     this.settled = false;
+    this.aiKnown = [];
     const deck: string[] = FACES.slice(0, this.pairCount).concat(FACES.slice(0, this.pairCount));   // 8 对 = 16 张
     for (let i = deck.length - 1; i > 0; i--) {
       const j: number = Math.floor(Math.random() * (i + 1));
@@ -88,6 +89,7 @@ export struct GMemory {
       return c;
     });
     this.cards = cs;
+    this.aiKnown = new Array<string>(cs.length).fill('');   // ★ 记忆表：'' = 这张还没见过
     this.picked = [];
     this.tries = 0;
     this.done = false;
@@ -178,6 +180,58 @@ export struct GMemory {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★ 2026-11-08 代打挑牌：**只用自己记住的牌面**（`aiKnown`），不读背面真值。
+   *   第一张：优先「记得、且记得它的另一张也还在」的牌；否则翻没见过的（收集信息）。
+   *   第二张：从**记得的**牌里找配对；记不到就随便翻一张（和人类一样靠猜）。
+   */
+  private aiPick(): number {
+    const n: number = this.cards.length;
+    const closed: boolean[] = [];
+    for (let i = 0; i < n; i++) {
+      const c: Card = this.cards[i];
+      closed.push(!c.matched && !c.open);
+    }
+    if (this.picked.length === 0) {
+      for (let i = 0; i < n; i++) {
+        if (!closed[i] || this.aiKnown[i].length === 0) {
+          continue;
+        }
+        for (let j = 0; j < n; j++) {
+          if (j !== i && closed[j] && this.aiKnown[j] === this.aiKnown[i]) {
+            return i;                 // 记得配对 ⇒ 先翻它
+          }
+        }
+      }
+      for (let i = 0; i < n; i++) {
+        if (closed[i] && this.aiKnown[i].length === 0) {
+          return i;                   // 没见过 ⇒ 翻一张探路
+        }
+      }
+      for (let i = 0; i < n; i++) {
+        if (closed[i]) {
+          return i;
+        }
+      }
+      return -1;
+    }
+    const first: number = this.picked[0];
+    const want: string = first >= 0 && first < n ? this.aiKnown[first] : '';
+    if (want.length > 0) {
+      for (let i = 0; i < n; i++) {
+        if (i !== first && closed[i] && this.aiKnown[i] === want) {
+          return i;                   // 记住了配对 ⇒ 直接翻
+        }
+      }
+    }
+    for (let i = 0; i < n; i++) {
+      if (i !== first && closed[i]) {
+        return i;                     // 记不到 ⇒ 猜一张
+      }
+    }
+    return -1;
+  }
+
   private autoStep(): boolean {
     if (this.done) {
       return false;
@@ -185,7 +239,11 @@ export struct GMemory {
     if (this.lock || this.done) {
       return true;
     }
-    this.tap(this.picked.length === 0 ? this.cards.map((c: Card, i: number) => (!c.matched && !c.open) ? i : -1).filter((v: number) => v >= 0)[0] : this.cards.map((c: Card, i: number) => (!c.matched && !c.open && i !== this.picked[0] && c.face === this.cards[this.picked[0]].face) ? i : -1).filter((v: number) => v >= 0)[0]);
+    const pick: number = this.aiPick();
+    if (pick < 0) {
+      return false;
+    }
+    this.tap(pick);
     return !this.done;
   }
 
@@ -232,6 +290,15 @@ export struct GMemory {
     Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来第二张牌直接比 `c.face === this.cards[picked[0]].face` —— 读的是**牌面真值**
+   *   （闭着的牌玩家根本看不见）⇒ 等于透视。
+   *   ⇒ 改成 AI 只记「自己翻看过的牌面」(`aiKnown[i]`)：翻开时记一笔，配对时只从**记住的**里找。
+   *   记不到就退化成随便翻一张（和人类一样靠猜）。
+   */
+  private aiKnown: string[] = [];
+
   private tap(i: number): void {
     if (this.settled) {
       return;
@@ -248,6 +315,9 @@ export struct GMemory {
     }
     cur[i].open = true;
     this.cards = cur;
+    if (i >= 0 && i < this.aiKnown.length) {
+      this.aiKnown[i] = cur[i].face;      // ★ 它被翻开了 ⇒ AI 记住了这一张
+    }
     const p: number[] = this.picked.concat([i]);
     this.picked = p;
 
