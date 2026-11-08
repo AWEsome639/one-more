@@ -539,6 +539,54 @@ export struct GPong {
       }
       .width('100%')
 
+      // ★★★ 2026-11-08（判据 1819，**产品缺陷**不是「命令假阳性」）
+      //   `verifier-dev` 真机 dump 里**没有**「暂停/继续、重新开始、状态文本」节点：
+      //   球场是 `layoutWeight(1)`，会把 `870→1600` 的剩余高度**全部吃光**，
+      //   原先放在球场**之后**的控制行 + 状态文本就被顶出视口（玩家点不到、验证器也读不到）。
+      //   ⇒ 修法①（改动最小）：**控制行移到球场之前** —— 球场 `layoutWeight(1)` 会自动占满
+      //     "剩余空间"，前面放什么都不会被它挤走；不动底栏（避免和现有 HintBar 冲突）。
+      Row({ space: Space.md }) {
+        Button(this.running ? TG('暂停') : TG('继续'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(this.running ? Palette.sky : Palette.emerald)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(BTN_H)
+          .enabled(!this.over)
+          .onClick(() => {
+            Haptics.tap();
+            this.togglePause();
+          })
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L599'; })
+          .onBlur(() => { if (this.tvFocus === 'L599') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L599'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.togglePause(); }); })
+        Button(TG('重新开始'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.violet)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(BTN_H)
+          .onClick(() => {
+            Haptics.tap();
+            this.reset();
+          })
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L614'; })
+          .onBlur(() => { if (this.tvFocus === 'L614') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L614'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+      }
+      .width('100%')
+
+      Text(this.status())
+        .fontSize(FontSize.xxs)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
       Stack({ alignContent: Alignment.TopStart }) {
         // 中线
         ForEach(NET, (i: number) => {
@@ -606,48 +654,6 @@ export struct GPong {
           })
       )
 
-      Row({ space: Space.md }) {
-        Button(this.running ? TG('暂停') : TG('继续'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(this.running ? Palette.sky : Palette.emerald)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(BTN_H)
-          .enabled(!this.over)
-          .onClick(() => {
-            Haptics.tap();
-            this.togglePause();
-          })
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L599'; })
-          .onBlur(() => { if (this.tvFocus === 'L599') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L599'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.togglePause(); }); })
-        Button(TG('重新开始'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.violet)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(BTN_H)
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L614'; })
-          .onBlur(() => { if (this.tvFocus === 'L614') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L614'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      }
-      .width('100%')
-
-      Text(this.status())
-        .fontSize(FontSize.xxs)
-        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
