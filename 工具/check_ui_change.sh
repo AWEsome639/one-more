@@ -95,12 +95,33 @@ fi
 
 echo
 if [ "$STRICT" -eq 1 ] && [ "$NEED_DEVICE" -eq 1 ]; then
-  if [ "${UI_VERIFIED:-0}" != "1" ]; then
-    echo "❌ --strict：有布局几何改动，但没有 UI_VERIFIED=1 的证据"
-    echo "   跑完 dumpLayout 并确认过四个自检项后，再："
-    echo "   UI_VERIFIED=1 bash 工具/check_ui_change.sh --strict"
+  EVIDENCE_OK=0
+  # ① 首选：UI_EVIDENCE=<报告路径>（真证据：报告存在 + 里面有 dump/像素差关键词）
+  if [ -n "${UI_EVIDENCE:-}" ]; then
+    if [ ! -f "${UI_EVIDENCE}" ]; then
+      echo "❌ --strict：UI_EVIDENCE 指向的报告不存在：${UI_EVIDENCE}"
+      exit 1
+    fi
+    if grep -qE "像素差|dump|bounds|边界|坐标" "${UI_EVIDENCE}" 2>/dev/null; then
+      echo "✅ --strict：证据来自报告 ${UI_EVIDENCE}（含 dump/bounds/像素差关键词）"
+      EVIDENCE_OK=1
+    else
+      echo "❌ --strict：报告 ${UI_EVIDENCE} 里没有 dump/bounds/像素差 等关键词 —— 不算证据"
+      exit 1
+    fi
+  fi
+  # ② 向后兼容：UI_VERIFIED=1（弱证据，任何人能设；不推荐）
+  if [ "$EVIDENCE_OK" -eq 0 ] && [ "${UI_VERIFIED:-0}" = "1" ]; then
+    echo "🟡 --strict：用的是 UI_VERIFIED=1（弱证据，任何人都能设）"
+    echo "   建议改用：UI_EVIDENCE=<报告路径> bash 工具/check_ui_change.sh --strict"
+    EVIDENCE_OK=1
+  fi
+  if [ "$EVIDENCE_OK" -eq 0 ]; then
+    echo "❌ --strict：有布局几何改动，但没有证据"
+    echo "   跑完 dumpLayout 并写成报告后："
+    echo "   UI_EVIDENCE=_巡检记录/<报告>.md bash 工具/check_ui_change.sh --strict"
+    echo "   （旧的 UI_VERIFIED=1 仍可用，但属弱证据）"
     exit 1
   fi
-  echo "✅ --strict：UI 已验证（UI_VERIFIED=1）"
 fi
 exit 0
