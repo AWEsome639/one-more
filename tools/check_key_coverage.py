@@ -57,7 +57,7 @@ DICT_FNS = {'TG', 'TG2', 'TG4'}
 
 SKIP_FILES = {'I18n.ets', 'GameI18n.ets'}
 
-SCAN_DIRS = ['components', 'pages', 'games', 'core']
+SCAN_DIRS = ['components', 'pages', 'games', 'core', 'ai']   # ★ 2026-11-08：加 ai/（原盲区，Hint.ets 有 3 处 TG）
 STATS = {'files': 0, 'calls': 0, 'cn_literals': 0, 'skip_en': 0, 'skip_same': 0,
          'skip_expr': 0, 'skip_other': 0}
 
