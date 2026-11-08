@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 6; const CELLS: number = N * N;
 const WORDS: string[] = ['CAT', 'DOG', 'SUN', 'MAP', 'PEN', 'BOX', 'ICE', 'JAM', 'KEY', 'OWL', 'RAT', 'TUB'];
@@ -54,7 +55,7 @@ export struct GFindWord {
   private timer: number = -1; private feed: number = -1; private done: boolean = false;
 
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GFindWord')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -227,12 +228,12 @@ export struct GFindWord {
     this.g = grid;
     this.path = []; this.found = []; this.score = 0; this.leftMs = this.diffTotal;
     this.locked = false; this.over = false; this.won = false; this.done = false;
-    this.msg = TG('按顺序连点字母，拼出 3 个字母的单词'); this.startAt = Date.now(); this.roundAt = Date.now();
+    this.msg = TG('按顺序连点字母，拼出 3 个字母的单词'); this.startAt = AppClock.netNow(); this.roundAt = AppClock.netNow();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private tick(): void {
-    if (this.over || this.locked) { return; }
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused() || this.over || this.locked) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) {
       this.over = true; this.won = false;
@@ -273,7 +274,7 @@ export struct GFindWord {
     if (this.done) { return; }
     this.done = true;
     const r: GameResult = { gameId: 'find_word', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.found.length };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.found.length };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

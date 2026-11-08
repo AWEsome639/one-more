@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 const ROUNDS: number = 8; const LIMIT_MS: number = 150000;
 const TICK_MS: number = 100; const FEED_MS: number = 900;
 interface Entry { w: string; hint: string }
@@ -76,7 +77,7 @@ export struct GWordScramble {
   private startAt: number = 0; private timer: number = -1; private feed: number = -1;
   private settled: boolean = false;
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GWordScramble')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -227,7 +228,7 @@ export struct GWordScramble {
     this.stopAll();
     this.queue = mixEntries(BANK).slice(0, this.diffTotal);
     this.idx = 0; this.score = 0; this.solved = 0; this.leftMs = LIMIT_MS;
-    this.over = false; this.won = false; this.settled = false; this.startAt = Date.now();
+    this.over = false; this.won = false; this.settled = false; this.startAt = AppClock.netNow();
     this.load();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
@@ -244,8 +245,8 @@ export struct GWordScramble {
     this.msg = TG2('按顺序点字母，拼出「{0}」', this.hint());
   }
   private tick(): void {
-    if (this.over) { return; }
-    const gap: number = Date.now() - this.startAt;
+    if (AppClock.isPaused() || this.over) { return; }
+    const gap: number = AppClock.netNow() - this.startAt;
     this.leftMs = gap >= LIMIT_MS ? 0 : LIMIT_MS - gap;
     if (gap >= LIMIT_MS) {
       this.over = true; this.won = false; this.msg = TG2("⌛ 时间到 —— 拼对 {0} 个词", this.solved); this.finish(false);
@@ -285,7 +286,7 @@ export struct GWordScramble {
     if (this.settled) { return; }
     this.settled = true; this.stopAll();
     const r: GameResult = { gameId: 'word_scramble', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.solved };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.solved };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

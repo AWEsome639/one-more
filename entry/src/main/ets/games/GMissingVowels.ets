@@ -11,6 +11,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const QN: number = 6; const PASS: number = 4; const FEED_MS: number = 900;
 const LIMIT_MS: number = 15000; const TICK_MS: number = 100;
@@ -62,7 +63,7 @@ export struct GMissingVowels {
   private startAt: number = 0; private roundAt: number = 0; private timer: number = -1;
   private feed: number = -1; private done: boolean = false;
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GMissingVowels')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -78,7 +79,7 @@ export struct GMissingVowels {
   private reset(): void {
     this.stop(); this.queue = pickIndexes(BANK.length, QN);
     this.qIndex = 0; this.right = 0; this.score = 0; this.over = false; this.won = false;
-    this.done = false; this.pressed = -1; this.startAt = Date.now(); this.load();
+    this.done = false; this.pressed = -1; this.startAt = AppClock.netNow(); this.load();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private word(): string { return this.qIndex >= QN ? '' : BANK[this.queue[this.qIndex]].word; }
@@ -87,9 +88,10 @@ export struct GMissingVowels {
     for (let i = 0; i < w.length; i++) { if (isVowel(w.charAt(i))) { n = n + 1; } }
     return n;
   }
-  private load(): void { this.filled = []; this.leftMs = this.diffTotal; this.roundAt = Date.now(); this.msg = TG('依次点元音，补全这个单词'); }
+  private load(): void { this.filled = []; this.leftMs = this.diffTotal; this.roundAt = AppClock.netNow(); this.msg = TG('依次点元音，补全这个单词'); }
   private tick(): void {
-    if (this.over || this.feed >= 0) { return; } const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused()) { return; }
+    if (this.over || this.feed >= 0) { return; } const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时：答案是 {0}', this.word()); this.advance(); }
   }
@@ -282,7 +284,7 @@ export struct GMissingVowels {
   private finish(solved: boolean): void {
     if (this.done) { return; } this.done = true;
     const r: GameResult = { gameId: 'missing_vowels', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.right };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.right };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

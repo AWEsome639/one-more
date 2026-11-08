@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const LIMIT_MS: number = 60000; const TICK_MS: number = 100;
 const MAX_WRONG: number = 4; const PASS: number = 8; const PENALTY_MS: number = 3000;
@@ -80,7 +81,7 @@ export struct GEtymologyOrigin {
   private timer: number = -1; private done: boolean = false;
 
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GEtymologyOrigin')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -96,14 +97,14 @@ export struct GEtymologyOrigin {
     this.qIdx = Math.floor(Math.random() * BANK.length);
     this.right = 0; this.wrong = 0; this.score = 0; this.leftMs = this.diffTotal;
     this.over = false; this.won = false; this.done = false;
-    this.msg = TG('这个单词是从哪门语言借来的？'); this.startAt = Date.now(); this.roundAt = Date.now();
+    this.msg = TG('这个单词是从哪门语言借来的？'); this.startAt = AppClock.netNow(); this.roundAt = AppClock.netNow();
     this.load();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private load(): void { this.opts = shuffleStr(BANK[this.qIdx].opts); }
   private tick(): void {
-    if (this.over) { return; }
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused() || this.over) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) {
       this.over = true; this.won = false; this.msg = TG2("⌛ 时间到 —— 共答对 {0} 个", this.right);
@@ -253,7 +254,7 @@ export struct GEtymologyOrigin {
     } else {
       this.wrong = this.wrong + 1; this.msg = TG2('❌ 它其实来自 {0}', BANK[this.qIdx].lang);
       const keep: number = this.leftMs - PENALTY_MS > 800 ? this.leftMs - PENALTY_MS : 800;
-      this.leftMs = keep; this.roundAt = Date.now() - (this.diffTotal - keep);
+      this.leftMs = keep; this.roundAt = AppClock.netNow() - (this.diffTotal - keep);
       if (this.wrong >= MAX_WRONG) {
         this.over = true; this.won = false;
         this.finish(false);
@@ -267,7 +268,7 @@ export struct GEtymologyOrigin {
     if (this.done) { return; }
     this.done = true;
     const r: GameResult = { gameId: 'etymology_origin', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.right };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.right };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

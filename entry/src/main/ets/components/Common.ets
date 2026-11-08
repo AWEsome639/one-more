@@ -1426,7 +1426,7 @@ build() {
               .fontSize(FontSize.micro).fontColor(Color.White).fontWeight(FontWeight.Bold)
           }
         }
-        .padding({ left: 7, right: 7, top: 2, bottom: 2 })
+        .padding({ left: 7, right: 7, top: Space.xxs, bottom: Space.xxs })
         .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(Space.xs), bottom: Space.xs })
         .backgroundColor(Overlay.chip)
         .borderRadius(Radius.full)

@@ -12,6 +12,7 @@ import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const QN: number = 6; const PASS: number = 4;
 const LIMIT_MS: number = 20000; const TICK_MS: number = 100;
@@ -71,7 +72,7 @@ export struct GAnagramDefinition {
   private timer: number = -1; private feed: number = -1; private done: boolean = false;
 
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GAnagramDefinition')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -89,12 +90,12 @@ export struct GAnagramDefinition {
     this.stop();
     this.queue = pickIndexes(BANK.length, QN);
     this.qIndex = 0; this.right = 0; this.score = 0; this.over = false; this.won = false;
-    this.done = false; this.startAt = Date.now(); this.load();
+    this.done = false; this.startAt = AppClock.netNow(); this.load();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private load(): void {
     this.letters = shuffleStr(this.curWord().split(''));
-    this.picked = []; this.leftMs = this.diffTotal; this.roundAt = Date.now(); this.msg = TG('把字母拼回这个单词');
+    this.picked = []; this.leftMs = this.diffTotal; this.roundAt = AppClock.netNow(); this.msg = TG('把字母拼回这个单词');
   }
   private cur(): AnaQ { return this.qIndex >= QN ? BANK[0] : BANK[this.queue[this.qIndex]]; }
   /** ★ 2026-11-08 变位词求解：给定字母排序后与词库比对（不读答案） */
@@ -118,8 +119,8 @@ export struct GAnagramDefinition {
   private curWord(): string { return this.qIndex >= QN ? '' : this.cur().word; }
   private guess(): string { return this.picked.map((k: number) => this.letters[k]).join(''); }
   private tick(): void {
-    if (this.over || this.feed >= 0) { return; }
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused() || this.over || this.feed >= 0) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时，答案是 {0}', this.curWord()); this.picked = []; this.advance(); }
   }
@@ -288,7 +289,7 @@ export struct GAnagramDefinition {
     }
     this.msg = TG('❌ 拼错了，再试一次'); this.picked = [];
     const keep: number = this.leftMs - PENALTY_MS > 600 ? this.leftMs - PENALTY_MS : 600;
-    this.leftMs = keep; this.roundAt = Date.now() - (this.diffTotal - keep);
+    this.leftMs = keep; this.roundAt = AppClock.netNow() - (this.diffTotal - keep);
   }
   private advance(): void {
     this.qIndex = this.qIndex + 1;
@@ -302,7 +303,7 @@ export struct GAnagramDefinition {
   private finish(solved: boolean): void {
     if (this.done) { return; }
     this.done = true;
-    const r: GameResult = { gameId: 'anagram_definition', solved: solved, score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.right };
+    const r: GameResult = { gameId: 'anagram_definition', solved: solved, score: this.score, durationMs: AppClock.netNow() - this.startAt, levelReached: this.right };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

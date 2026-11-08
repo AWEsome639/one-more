@@ -79,6 +79,8 @@ export struct GCryptoArithmetic {
   /** ★ 2026-10-15 得分跳动 */
   @State private scorePulse: number = 1;
   @State private over: boolean = false;
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能用它做守卫） */
+  private settled: boolean = false;
   @State private tip: string = TG('选一个字母，再点数字');
 
   private startAt: number = 0;
@@ -103,6 +105,7 @@ export struct GCryptoArithmetic {
     this.right = 0;
     this.score = 0;
     this.over = false;
+    this.settled = false;
     this.tip = TG('选一个字母，再点数字');
     this.load();
   }
@@ -325,11 +328,15 @@ export struct GCryptoArithmetic {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const res: GameResult = {
       gameId: 'crypto_arithmetic', solved: solved, score: this.score,
       durationMs: Date.now() - this.startAt, levelReached: this.right
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(res);
   }
 

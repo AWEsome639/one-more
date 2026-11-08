@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const ROUNDS: number = 5; const LIMIT_MS: number = 25000;
 const TICK_MS: number = 100; const PASS_ACC: number = 90;
@@ -79,7 +80,7 @@ export struct GTypingSpeed {
   private baseOk: number = 0; private baseTyped: number = 0; private finished: boolean = false;
 
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GTypingSpeed')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -111,7 +112,7 @@ export struct GTypingSpeed {
     this.qi = 0; this.typed = ''; this.leftMs = this.total; this.wpm = 0; this.acc = 100;
     this.doneRounds = 0; this.over = false; this.won = false; this.finished = false;
     this.baseOk = 0; this.baseTyped = 0;
-    this.startAt = Date.now(); this.roundAt = Date.now();
+    this.startAt = AppClock.netNow(); this.roundAt = AppClock.netNow();
     this.msg = TG('照着上面那句打，打完自动换句');
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
@@ -251,7 +252,7 @@ export struct GTypingSpeed {
   private statsNow(): void {
     const totalOk: number = this.baseOk + matched(this.typed, this.target());
     const totalTyped: number = this.baseTyped + this.typed.length;
-    const mins: number = (Date.now() - this.startAt) / 60000;
+    const mins: number = (AppClock.netNow() - this.startAt) / 60000;
     this.wpm = mins > 0 ? Math.round((totalOk / 5) / mins) : 0;
     this.bumpK();
     this.acc = totalTyped > 0 ? Math.round(totalOk * 100 / totalTyped) : 100;
@@ -263,12 +264,12 @@ export struct GTypingSpeed {
     this.typed = ''; this.statsNow();
     this.doneRounds = this.doneRounds + 1;
     if (this.qi + 1 >= ROUNDS) { this.end(); return; }
-    this.qi = this.qi + 1; this.leftMs = this.total; this.roundAt = Date.now();
+    this.qi = this.qi + 1; this.leftMs = this.total; this.roundAt = AppClock.netNow();
   }
 
   private tick(): void {
-    if (this.over) { return; }
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused() || this.over) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     if (gap >= LIMIT_MS) {
       if (this.leftMs === 0) { return; }
       this.leftMs = 0; this.msg = TG('⌛ 超时，这句算错');
@@ -285,7 +286,7 @@ export struct GTypingSpeed {
     this.won = this.doneRounds >= ROUNDS && this.acc >= PASS_ACC;
     this.msg = TG2("{0}{1} WPM ｜ 正确率 {2}%", (this.won ? TG('🎉 通关：') : TG('💤 结束：')), this.wpm, this.acc);
     const r: GameResult = { gameId: 'typing_speed', solved: this.won, score: this.wpm,
-      durationMs: Date.now() - this.startAt, levelReached: this.doneRounds };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.doneRounds };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

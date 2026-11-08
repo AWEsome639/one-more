@@ -93,6 +93,8 @@ export struct GArithmeticChain {
   @State private clears: number = 0;
   @State private score: number = 0;
   @State private over: boolean = false;
+  /** ★ 2026-11-08 重入闩锁（结算函数可能被多路径调用；over 由调用方先置，不能用它做守卫） */
+  private settled: boolean = false;
   @State private tip: string = TG(TG(TG('点运算符，凑到目标数')));
   @State private chain: string[] = [];
 
@@ -196,6 +198,7 @@ export struct GArithmeticChain {
     this.clears = 0;
     this.score = 0;
     this.over = false;
+    this.settled = false;
     this.tip = TG(TG(TG('点运算符，凑到目标数')));
     this.load(0);
   }
@@ -382,11 +385,15 @@ export struct GArithmeticChain {
   }
 
   private finish(solved: boolean): void {
+    if (this.settled) {
+      return;
+    }
     const res: GameResult = {
       gameId: 'arithmetic_chain', solved: solved, score: this.score,
       durationMs: Date.now() - this.startAt, levelReached: this.clears
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
+    this.settled = true;
     this.onFinish(res);
   }
 

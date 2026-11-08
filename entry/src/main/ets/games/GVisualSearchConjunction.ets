@@ -15,6 +15,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 5; const CELLS: number = N * N; const IDX: number[] = [0, 1, 2, 3, 4];
 const ROUNDS: number = 6; const PASS: number = 5;
@@ -56,7 +57,7 @@ export struct GVisualSearchConjunction {
   private timer: number = -1; private feed: number = -1; private done: boolean = false;
 
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GVisualSearchConjunction')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -78,7 +79,7 @@ export struct GVisualSearchConjunction {
   private reset(): void {
     this.stop();
     this.round = 1; this.hits = 0; this.score = 0; this.over = false; this.won = false;
-    this.done = false; this.startAt = Date.now(); this.newRound();
+    this.done = false; this.startAt = AppClock.netNow(); this.newRound();
   }
   /** 干扰项只与目标共享一个特征：同形状异色，或同色异形状 */
   private newRound(): void {
@@ -92,12 +93,13 @@ export struct GVisualSearchConjunction {
     const at: number = Math.floor(Math.random() * CELLS);
     sh[at] = ts; co[at] = tc;
     this.shapes = sh; this.colors = co; this.tShape = ts; this.tColor = tc; this.badIdx = -1;
-    this.leftMs = LIMIT_MS; this.roundAt = Date.now();
+    this.leftMs = LIMIT_MS; this.roundAt = AppClock.netNow();
     this.msg = TG2("第 {0} 局：形状和颜色都要对上",Digits(String(this.round), this.langCode));
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private tick(): void {
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused()) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= LIMIT_MS ? 0 : LIMIT_MS - gap;
     if (gap >= LIMIT_MS) { this.endRound(false); }
   }
@@ -268,7 +270,7 @@ export struct GVisualSearchConjunction {
     if (this.done) { return; }
     this.done = true;
     const r: GameResult = { gameId: 'visual_search_conjunction', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.round };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.round };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

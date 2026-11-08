@@ -11,6 +11,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const QN: number = 6; const PASS: number = 4; const FEED_MS: number = 1000;
 const LIMIT_MS: number = 10000; const TICK_MS: number = 100;
@@ -71,7 +72,7 @@ export struct GPortmanteauSplit {
   private startAt: number = 0; private roundAt: number = 0; private timer: number = -1;
   private feed: number = -1; private done: boolean = false;
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GPortmanteauSplit')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -215,15 +216,16 @@ export struct GPortmanteauSplit {
   private reset(): void {
     this.stop();
     this.qIndex = 0; this.right = 0; this.score = 0; this.over = false; this.won = false;
-    this.done = false; this.pressed = -1; this.nextQ(); this.startAt = Date.now();
+    this.done = false; this.pressed = -1; this.nextQ(); this.startAt = AppClock.netNow();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private nextQ(): void {
-    this.q = makeRound(); this.sel = []; this.leftMs = this.diffTotal; this.roundAt = Date.now();
+    this.q = makeRound(); this.sel = []; this.leftMs = this.diffTotal; this.roundAt = AppClock.netNow();
     this.msg = TG('选出拼成它的两个词');
   }
   private tick(): void {
-    if (this.over || this.feed >= 0) { return; } const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused()) { return; }
+    if (this.over || this.feed >= 0) { return; } const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时：{0} + {1}', this.q.a, this.q.b); this.advance(); }
   }
@@ -260,7 +262,7 @@ export struct GPortmanteauSplit {
   private finish(solved: boolean): void {
     if (this.done) { return; } this.done = true;
     const r: GameResult = { gameId: 'portmanteau_split', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.right };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.right };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

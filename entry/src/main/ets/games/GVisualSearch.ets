@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const N: number = 6; const CELLS: number = N * N; const IDX: number[] = [0, 1, 2, 3, 4, 5];
 const ROUNDS: number = 8; const PASS: number = 6;
@@ -57,7 +58,7 @@ export struct GVisualSearch {
   private timer: number = -1; private feed: number = -1; private done: boolean = false;
 
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GVisualSearch')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -74,7 +75,7 @@ export struct GVisualSearch {
   private reset(): void {
     this.stop();
     this.round = 1; this.found = 0; this.score = 0; this.over = false; this.won = false;
-    this.done = false; this.startAt = Date.now(); this.newRound();
+    this.done = false; this.startAt = AppClock.netNow(); this.newRound();
   }
   private newRound(): void {
     const pair: string[] = PAIRS[Math.floor(Math.random() * PAIRS.length)];
@@ -82,12 +83,13 @@ export struct GVisualSearch {
     const at: number = Math.floor(Math.random() * CELLS);
     arr[at] = pair[0];
     this.cells = arr; this.target = pair[0]; this.targetIdx = at; this.badIdx = -1;
-    this.leftMs = LIMIT_MS; this.roundAt = Date.now();
+    this.leftMs = LIMIT_MS; this.roundAt = AppClock.netNow();
     this.msg = TG2("第 {0} 局：找出 {1}",Digits(String(this.round), this.langCode), this.target);
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private tick(): void {
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused()) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= LIMIT_MS ? 0 : LIMIT_MS - gap;
     if (gap >= LIMIT_MS) { this.endRound(false); }
   }
@@ -249,7 +251,7 @@ export struct GVisualSearch {
     if (this.done) { return; }
     this.done = true;
     const r: GameResult = { gameId: 'visual_search', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.round };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.round };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

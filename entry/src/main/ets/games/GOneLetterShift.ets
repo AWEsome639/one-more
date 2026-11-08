@@ -12,6 +12,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const QN: number = 8; const PASS: number = 5; const FEED_MS: number = 800;
 const LIMIT_MS: number = 5000; const TICK_MS: number = 100;
@@ -59,7 +60,7 @@ export struct GOneLetterShift {
   private startAt: number = 0; private roundAt: number = 0; private timer: number = -1;
   private feed: number = -1; private done: boolean = false;
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GOneLetterShift')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -76,12 +77,12 @@ export struct GOneLetterShift {
   private reset(): void {
     this.stop();
     this.qIndex = 0; this.right = 0; this.score = 0; this.over = false; this.won = false;
-    this.done = false; this.pressed = -1; this.nextQ(); this.startAt = Date.now();
+    this.done = false; this.pressed = -1; this.nextQ(); this.startAt = AppClock.netNow();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private nextQ(): void {
     this.q = PAIRS[Math.floor(Math.random() * PAIRS.length)];
-    this.leftMs = this.diffTotal; this.roundAt = Date.now(); this.msg = TG('点出左边要换掉的那个字母');
+    this.leftMs = this.diffTotal; this.roundAt = AppClock.netNow(); this.msg = TG('点出左边要换掉的那个字母');
   }
   private range(n: number): number[] {
     const out: number[] = [];
@@ -94,8 +95,8 @@ export struct GOneLetterShift {
     return 0;
   }
   private tick(): void {
-    if (this.over || this.feed >= 0) { return; }
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused() || this.over || this.feed >= 0) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时：第 {0} 位要换', String(this.diffAt() + 1)); this.advance(); }
   }
@@ -254,7 +255,7 @@ export struct GOneLetterShift {
     if (this.done) { return; }
     this.done = true;
     const r: GameResult = { gameId: 'one_letter_shift', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.right };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.right };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

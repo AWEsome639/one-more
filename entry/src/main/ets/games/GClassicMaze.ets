@@ -378,7 +378,12 @@ export struct GClassicMaze {
  LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
  this.onFinish({
  gameId: 'classic_maze', solved: solved,
- score: solved ? 70 + Math.max(0, this.dmax() - this.steps * 3) : this.steps * 3,
+ // ★★★ 2026-11-08 **系数对齐**（game-balancer 抓到）：
+    //   上一版把 `dmax()` 改成 `max(2.2×最短路, 3n)`，但这里扣分系数是 `×3`
+    //   ⇒ `2.2b − 3b < 0` **恒被 Math.max(0,...) 夹死** ⇒ **通关分恒 70，打得好也不涨**。
+    //   ⇒ 扣分系数降到 `×0.6`（2.2b 上限下有 ≈1.6b 的发挥空间）；
+    //     输局的分也从 `steps*3` 降到 `steps*0.6`（**原来困难档输 ≤411 > 赢 70，倒挂 5.9 倍**）
+    score: solved ? 70 + Math.max(0, Math.round(this.dmax() - this.steps * 0.6)) : Math.round(this.steps * 0.6),
  durationMs: Date.now() - this.startAt, levelReached: solved ? 2 : 1
  });
  }

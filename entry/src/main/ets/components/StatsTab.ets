@@ -1016,7 +1016,7 @@ build() {
       }
       .width('100%')
       .justifyContent(FlexAlign.Center)
-      .padding({ top: 6, bottom: 2 })
+      .padding({ top: Space.xs, bottom: Space.xxs })
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'ST967'; })
       .onBlur(() => { if (this.tvFocus === 'ST967') { this.tvFocus = ''; } })
@@ -1072,7 +1072,7 @@ build() {
             }
             .width('100%')
             .constraintSize({ minHeight: Cell.of(70) })
-            .padding({ left: 6, right: 6 })
+            .padding({ left: Space.xs, right: Space.xs })
             .backgroundColor(this.theme().surfaceAlt)
             .borderRadius(Radius.sm)
             .opacity(ProgressStore.isUnlocked(a[0]) ? 1 : 0.55)
@@ -1146,8 +1146,8 @@ build() {
               Text(g.icon).fontSize(FontSize.sm)
               Text(displayName(g)).fontSize(FontSize.xxs).fontColor(this.theme().ink)
             }
-            .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-            .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: 6 })
+            .padding({ left: Space.tiny, right: Space.tiny, top: 4, bottom: 4 })
+            .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: Space.xs })
             .backgroundColor(this.theme().surfaceAlt)
             .borderRadius(Radius.full)
           }, (g: GameMeta) => g.id)
@@ -1210,7 +1210,7 @@ build() {
     // ★ 2026-10-19 自查 A3：与上面那张徽章卡同一模式 —— 3 行文字 + 写死 70vp
     //   大字模式字号 +25~42% ⇒ 会被裁 ⇒ 改最小高度（可长高）
     .constraintSize({ minHeight: Cell.of(70) })
-    .padding({ left: 6, right: 6 })
+    .padding({ left: Space.xs, right: Space.xs })
     .backgroundColor(this.theme().surfaceAlt)
     .borderRadius(Radius.sm)
     .opacity(ProgressStore.isUnlocked(a[0]) ? 1 : 0.55)

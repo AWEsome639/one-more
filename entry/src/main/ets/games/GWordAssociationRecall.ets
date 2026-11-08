@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const SETS: number = 6; const PASS: number = 4; const STUDY_MS: number = 9000;
 const Q_MS: number = 8000; const TICK_MS: number = 100; const FEED_MS: number = 800;
@@ -69,7 +70,7 @@ export struct GWordAssociationRecall {
   private startAt: number = 0; private roundAt: number = 0; private timer: number = -1;
   private feed: number = -1; private done: boolean = false;
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GWordAssociationRecall')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -89,7 +90,7 @@ export struct GWordAssociationRecall {
     this.qi = 0; this.right = 0; this.score = 0; this.picked = -1; this.locked = false;
     this.phase = 0; this.over = false; this.won = false; this.done = false;
     this.leftMs = this.total; this.msg = TG(TG('记住每一组搭配，9 秒后开始回忆'));
-    this.startAt = Date.now(); this.roundAt = Date.now();
+    this.startAt = AppClock.netNow(); this.roundAt = AppClock.netNow();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
   private loadQuestion(): void {
@@ -99,12 +100,12 @@ export struct GWordAssociationRecall {
     const seq: number[] = pickIndexes(others.length, 3);
     for (let i = 0; i < seq.length; i++) { raw.push({ text: PAIRS[others[seq[i]]].mate, ok: false }); }
     this.opts = pickIndexes(raw.length, raw.length).map((k: number) => raw[k]);
-    this.picked = -1; this.locked = false; this.leftMs = Q_MS; this.roundAt = Date.now();
+    this.picked = -1; this.locked = false; this.leftMs = Q_MS; this.roundAt = AppClock.netNow();
     this.msg = TG(TG('它刚才和谁配成一对？'));
   }
   private tick(): void {
-    if (this.over) { return; }
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused() || this.over) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     const limit: number = this.phase === 0 ? STUDY_MS : Q_MS;
     if (gap < limit) { this.leftMs = limit - gap; return; }
     if (this.leftMs === 0) { return; }
@@ -275,7 +276,7 @@ export struct GWordAssociationRecall {
     this.done = true; this.over = true; this.phase = 2; this.won = this.right >= PASS;
     this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("回忆对 {0}/{1}", this.right, SETS);
     const r: GameResult = { gameId: 'word_association_recall', solved: this.won, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.right };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.right };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

@@ -11,6 +11,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const QN: number = 8; const PASS: number = 5; const OPT_N: number = 4;
 const LIMIT_MS: number = 6000; const TICK_MS: number = 100; const FEED_MS: number = 900;
@@ -72,7 +73,7 @@ export struct GLetterFrequencyScan {
   private startAt: number = 0; private roundAt: number = 0; private timer: number = -1;
   private feed: number = -1; private done: boolean = false;
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GLetterFrequencyScan')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -89,13 +90,13 @@ export struct GLetterFrequencyScan {
   private reset(): void {
     this.stop();
     this.qIndex = 0; this.right = 0; this.score = 0; this.over = false; this.won = false;
-    this.done = false; this.pressed = -1; this.q = makeQ(); this.load(); this.startAt = Date.now();
+    this.done = false; this.pressed = -1; this.q = makeQ(); this.load(); this.startAt = AppClock.netNow();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
-  private load(): void { this.leftMs = this.diffTotal; this.roundAt = Date.now(); this.msg = TG('点出这个字母出现了几次'); }
+  private load(): void { this.leftMs = this.diffTotal; this.roundAt = AppClock.netNow(); this.msg = TG('点出这个字母出现了几次'); }
   private tick(): void {
-    if (this.over || this.feed >= 0) { return; }
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused() || this.over || this.feed >= 0) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= this.diffTotal ? 0 : this.diffTotal - gap;
     if (gap >= this.diffTotal) { this.msg = TG2('⌛ 超时：其实是 {0} 次', String(this.q.opts[this.q.ans])); this.advance(); }
   }
@@ -254,7 +255,7 @@ export struct GLetterFrequencyScan {
     if (this.done) { return; }
     this.done = true;
     const r: GameResult = { gameId: 'letter_frequency_scan', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.right };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.right };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }

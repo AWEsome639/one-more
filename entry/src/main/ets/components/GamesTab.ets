@@ -1087,7 +1087,7 @@ build() {
               .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
           }
           .width('100%')
-          .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+          .padding({ left: Space.xs, right: Space.xs, top: Space.xxs, bottom: Space.xxs })
         } else {
           this.topBar()
           // ★ 第 1215 轮：收起态也要能展开搜索（否则 🔍 只变色，用户以为坏了）
@@ -1399,7 +1399,7 @@ build() {
         .rotate({ angle: this.topCollapsed ? 0 : 180 })
         .animation({ duration: 520, curve: Motion.spring() })
     }
-    .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
+    .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
     .backgroundColor(this.theme().surfaceAlt)
     .borderRadius(Radius.full)
     .focusable(Tv.on())
@@ -1693,7 +1693,7 @@ build() {
         Text(Digits(this.tn('{n} 天', '{n} d', this.streak, '{n} день', '{n} дня', '{n} дней'), this.langCode)).fontSize(FontSize.xs).fontWeight(FontWeight.Bold)
           .fontColor(this.streak > 0 ? Palette.amber : this.theme().inkFaint)
       }
-      .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+      .padding({ left: Space.tiny, right: Space.tiny, top: 4, bottom: 4 })
       .backgroundColor(this.playedTodayAll ? '#1AF59E0B' : this.theme().surfaceAlt)
       .borderRadius(Radius.full)
     }
@@ -1722,7 +1722,7 @@ build() {
         .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
     }
     .width('100%')
-    .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+    .padding({ left: Space.xs, right: Space.xs, top: Space.xxs, bottom: Space.xxs })
   }
 
   /**
@@ -1768,7 +1768,7 @@ build() {
           .layoutWeight(1)
         Text(this.dailyDone ? this.t('再看看', 'View') : this.t('开始 ›', 'Play ›'))
           .fontSize(FontSize.xxs).fontWeight(FontWeight.Bold).fontColor(Overlay.onColor)
-          .padding({ left: 8, right: 8, top: 3, bottom: 3 })
+          .padding({ left: Space.tiny, right: Space.tiny, top: 3, bottom: 3 })
           .backgroundColor(Overlay.chip)
           .borderRadius(Radius.full)
       }
@@ -1797,7 +1797,7 @@ build() {
             Text(this.dailyDone ? this.t('今天已完成', 'Done today') : this.t('通关 +50 经验', 'Clear it: +50 XP'))
               .fontSize(FontSize.xxs).fontWeight(FontWeight.Bold)
               .fontColor(this.dailyDone ? '#A7F3D0' : '#FDE68A')
-              .padding({ left: 6, right: 6, top: 1, bottom: 1 })
+              .padding({ left: Space.xs, right: Space.xs, top: 1, bottom: 1 })
               .backgroundColor(Overlay.chip)
               .borderRadius(Radius.full)
           }
@@ -1815,7 +1815,7 @@ build() {
 
         Text(this.dailyDone ? this.t('再看看', 'View') : this.t('开始 ›', 'Play ›'))
           .fontSize(FontSize.xs).fontWeight(FontWeight.Bold).fontColor(Overlay.onColor)
-          .padding({ left: 12, right: 12, top: 7, bottom: 7 })
+          .padding({ left: Space.snug, right: Space.snug, top: 7, bottom: 7 })
           .backgroundColor(Overlay.chip)
           .borderRadius(Radius.full)
       }
@@ -1906,7 +1906,7 @@ build() {
       if (this.picked.length > 0) {
         Text(this.t('清空', 'Clear'))
           .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
-          .padding({ left: 8, right: 8, top: 3, bottom: 3 })
+          .padding({ left: Space.tiny, right: Space.tiny, top: 3, bottom: 3 })
           .backgroundColor(this.theme().surfaceAlt)
           .borderRadius(Radius.full)
           .focusable(Tv.on())
@@ -2011,8 +2011,8 @@ build() {
       .fontSize(FontSize.xxs)
       .fontWeight(this.picked.indexOf(t.id) >= 0 ? FontWeight.Bold : FontWeight.Normal)
       .fontColor(this.picked.indexOf(t.id) >= 0 ? Color.White : this.theme().inkSoft)
-      .padding({ left: 10, right: 10, top: 5, bottom: 5 })
-      .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: 6 })
+      .padding({ left: Space.sm, right: Space.sm, top: 5, bottom: 5 })
+      .margin({ start: LengthMetrics.vp(0), end: LengthMetrics.vp(6), bottom: Space.xs })
       .backgroundColor(this.picked.indexOf(t.id) >= 0 ? this.accentColor() : this.theme().surfaceAlt)
       .borderRadius(Radius.full)
       .animation({ duration: Motion.fast, curve: Motion.spring() })
@@ -2060,7 +2060,7 @@ build() {
       .fontSize(FontSize.xs)
       .fontWeight(this.seg === s ? FontWeight.Bold : FontWeight.Normal)
       .fontColor(this.seg === s ? Color.White : this.theme().inkSoft)
-      .padding({ left: Space.md, right: Space.md, top: 6, bottom: 6 })
+      .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
       .backgroundColor(this.seg === s ? this.accentColor() : this.theme().surface)
       .borderRadius(Radius.full)
       .shadow(Shadow.card)
@@ -2243,7 +2243,7 @@ build() {
       .fontSize(FontSize.xxs)
       .fontWeight(this.viewMode === mode ? FontWeight.Bold : FontWeight.Normal)
       .fontColor(this.viewMode === mode ? Color.White : this.theme().inkSoft)
-      .padding({ left: 10, right: 10, top: 4, bottom: 4 })
+      .padding({ left: Space.sm, right: Space.sm, top: 4, bottom: 4 })
       .backgroundColor(this.viewMode === mode ? this.accentColor() : this.theme().surfaceAlt)
       .border({ width: 1, color: this.viewMode === mode ? this.accentColor() : this.theme().line })
       .borderRadius(Radius.full)
@@ -2510,7 +2510,7 @@ build() {
         .fontSize(FontSize.micro).fontColor(this.theme().inkFaint)
     }
     .width('100%')
-    .padding({ left: Space.lg, right: Space.lg, top: Space.xs, bottom: 2 })
+    .padding({ left: Space.lg, right: Space.lg, top: Space.xs, bottom: Space.xxs })
     .backgroundColor(this.theme().bg)
     .opacity(enterIdx >= 0 ? (this.azShown ? 1 : 0) : 1)   // ★ azShown 是 boolean ⇒ opacity 要 number（编译期就报 No overload）
     .animation({ duration: Motion.base, curve: Motion.enter(),
@@ -2613,6 +2613,10 @@ build() {
           })
           // ★ 2026-11-08 perf-hunter：键盘回车要把防抖里的词立刻落地
           //   （否则「按了回车没反应」，等 150ms 才变）
+          // ★ 2026-11-08 **Enter 不灵的真因**（verifier-eng2 真机实测）：
+          //   没设 `enterKeyType` ⇒ IME 的"前往/搜索"键不会触发 `onSubmit`。
+          //   `EnterKeyType.Go` 让键盘右下角显示「前往」，按下才会走 `onSubmit`。
+          .enterKeyType(EnterKeyType.Go)
           .onSubmit(() => {
             this.flushSearch();
           })

@@ -14,6 +14,7 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
+import { AppClock } from '../core/AppClock';
 
 const QN: number = 6;
 const PASS: number = 4;
@@ -77,7 +78,7 @@ export struct GLogicalSyllogisms {
   private timer: number = -1; private feed: number = -1; private done: boolean = false;
 
   aboutToAppear(): void {
-    LanRace.noteStart(); this.startAt = Date.now(); this.reset();
+    LanRace.noteStart(); this.startAt = AppClock.netNow(); this.reset();
     // ★ 演示：进来 3 秒内没人动就开始演（一碰就停，见根容器 .onTouch）
     if (Hint.demoOnce('GLogicalSyllogisms')) {
       setTimeout(() => { this.demoStart(); }, 3000);
@@ -114,7 +115,7 @@ export struct GLogicalSyllogisms {
     this.order = ord; this.qIndex = 0; this.right = 0; this.score = 0;
     this.feedback = ''; this.answered = false;
     this.over = false; this.won = false; this.done = false;
-    this.startAt = Date.now(); this.roundAt = Date.now(); this.leftMs = LIMIT_MS;
+    this.startAt = AppClock.netNow(); this.roundAt = AppClock.netNow(); this.leftMs = LIMIT_MS;
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
 
@@ -125,8 +126,8 @@ export struct GLogicalSyllogisms {
   }
 
   private tick(): void {
-    if (this.over || this.answered) { return; }
-    const gap: number = Date.now() - this.roundAt;
+    if (AppClock.isPaused() || this.over || this.answered) { return; }
+    const gap: number = AppClock.netNow() - this.roundAt;
     this.leftMs = gap >= LIMIT_MS ? 0 : LIMIT_MS - gap;
     if (gap >= LIMIT_MS) { this.judge(false, TG('⌛ 超时，未作答')); }
   }
@@ -286,14 +287,14 @@ export struct GLogicalSyllogisms {
       return;
     }
     this.answered = false; this.feedback = '';
-    this.leftMs = LIMIT_MS; this.roundAt = Date.now();
+    this.leftMs = LIMIT_MS; this.roundAt = AppClock.netNow();
   }
 
   private finish(solved: boolean): void {
     if (this.done) { return; }
     this.done = true;
     const r: GameResult = { gameId: 'logical_syllogisms', solved: solved, score: this.score,
-      durationMs: Date.now() - this.startAt, levelReached: this.right };
+      durationMs: AppClock.netNow() - this.startAt, levelReached: this.right };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }
