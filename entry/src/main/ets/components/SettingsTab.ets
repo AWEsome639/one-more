@@ -555,7 +555,9 @@ build() {
         // ★ 2026-11-08：反馈卡（原来被误插在 `themeModePicker()` 里，见 feedbackCard 的注释）
         this.feedbackCard()
         // ★★★ 2026-11-09（code-hunter 建议 #2）**AI 诊断卡**（放在「关于」区最后一张）
-        this.sectionTitle('AI 诊断', 'AI diagnostics')
+        // ★ 2026-11-09 临时诊断（lead 批）：标题带上版本号，肉眼/截图即可判断"组件有没有重建"
+        //   ⚠️ 定死 H1/H3 后**必须改回** `this.sectionTitle('AI 诊断', 'AI diagnostics')`
+        this.sectionTitle('AI 诊断 ' + this.diagRev, 'AI diagnostics ' + this.diagRev)
         this.aiDiagCard(this.diagRev)
 
         Text('One More · ' + this.tn('{n} 款小游戏，不用联网也能玩', '{n} mini games, playable offline', GAMES.length,
@@ -780,6 +782,9 @@ build() {
     this.diagReadyV = LocalLLM.stat.ready;
     // ★ 版本号 +1 ⇒ 父 build 依赖它、@Builder 参数也变 ⇒ 强制重建（否则 @Builder 内部读 @State 不重建）
     this.diagRev = this.diagRev + 1;
+    // ★ 2026-11-09 临时诊断（lead 批）：一次看清「rev 到底有没有变」
+    //   若点击后这行都没打 ⇒ 赋值被吃了/函数没走到；若打了 rev 变大而界面不动 ⇒ 是"重建调度"问题
+    hilog.info(0x0001, 'diag', 'rev=%{public}d', this.diagRev);
   }
 
   /**
