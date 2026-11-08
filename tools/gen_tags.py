@@ -192,6 +192,12 @@ PLAY_STYLE_PIN = {
     'prime_hunter': 'ps_search',
     #   —— 计数+抑制干扰 ⇒ ps_attention
     'distractor_matrix': 'ps_attention',
+    # ═══ 2026-11-08 第六轮：ps_fill / ps_match 抽样闸门（各 8 款，系统抽样）═══
+    #   ps_fill 抽 8 错 0；另补查 4 个可疑 → 只有下面 1 条要挪。
+    'pattern_sequence_draw': 'ps_search',  # 3×3 按序点亮走图案 = 与「舒尔特方格」同源（按序点目标），不是填格
+    #   ps_match 抽 8 错 2（25%），补读满 12 款 = 2/12（16.7%）⇒ 不必全量，但这 2 条要挪。
+    'chain_reaction': 'ps_other',          # 点格累积到爆炸、四邻 +1 连锁 ⇒ 连锁解谜，不是「配对消除」
+    'color_flood': 'ps_other',             # Flood-It：把左上连通块染色吞并 ⇒ 染扩策略，不是「配对消除」
     # ⚠️ 'peg_solitaire'（孔明棋）**不是纸牌**，但它含 solitaire 会被 ps_card 正则抢走 ⇒ 钉回 ps_push
     'peg_solitaire': 'ps_push',
     # ① ps_other 里本可归类的 23 款（真·other 只留 7：4 款可视化 + 3 款纸牌）
@@ -206,7 +212,6 @@ PLAY_STYLE_PIN = {
     'multi_track_counter': 'ps_attention',
     'double_trouble': 'ps_attention',
     'einstein_riddle': 'ps_fill',
-    'pattern_sequence_draw': 'ps_fill',
     'slide_puzzle': 'ps_spatial',
     'interlock_puzzle': 'ps_spatial',
     'spatial_conflict': 'ps_attention',   # 2026-11-08 二轮：箭头方向/文字/位置互相捣乱 = Stroop 式干扰
@@ -235,7 +240,8 @@ def _check_pin_dups():
     ps_push 没生效、只在 17/18 行里体现）⇒ 生成前先查重，重复就报错。"""
     from collections import Counter
     src = open(__file__, encoding='utf-8').read()
-    keys = re.findall(r"^    '([a-z0-9_]+)': 'ps_[a-z]+',$", src, re.M)
+    # ⚠️ 行尾带注释的条目也必须算进去（2026-11-08 第二轮踩到：带注释的重复没被识别）
+    keys = re.findall(r"^ +'([a-z0-9_]+)': 'ps_[a-z]+' *,? *(?:#.*)?$", src, re.M)
     dup = [k for k, c in Counter(keys).items() if c > 1]
     if dup:
         raise SystemExit('❌ PLAY_STYLE_PIN 有重复 key（后者会静默覆盖前者）：%s' % ', '.join(sorted(dup)))
