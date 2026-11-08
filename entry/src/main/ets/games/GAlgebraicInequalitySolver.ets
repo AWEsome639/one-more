@@ -228,10 +228,13 @@ export struct GAlgebraicInequalitySolver {
     if (this.over || this.lockTap) {
       return true;
     }
-    if (this.quiz.answer.length === 0) {
-      return true;
+    // ★ 2026-11-08（ai-fixer-a）**不再读 quiz.answer（答案）**：
+    //   屏幕上是 ax ± b sign RHS ⇒ 自己移项除系数解出 x，再去选项里找这条。
+    const want: string = this.aiSolveIneq();
+    if (want.length === 0) {
+      return false;
     }
-    this.answer(this.quiz.answer);
+    this.answer(want);
     return !this.over;
   }
 
@@ -268,6 +271,25 @@ export struct GAlgebraicInequalitySolver {
     Haptics.tap();
     const r: HintResult = this.computeHint();
     Hint.toastResult(r, TG('这一步看不出答案'));
+  }
+
+  /** ★ 2026-11-08 解析屏幕上的不等式并解出 x（形如「3x + 5 > 20」/「3x - 5 ≥ 20」） */
+  private aiSolveIneq(): string {
+    const parts: string[] = this.quiz.text.split(' ');
+    if (parts.length < 5) {
+      return '';
+    }
+    const a: number = Number(parts[0].replace('x', ''));
+    const op: string = parts[1];
+    const b: number = Number(parts[2]);
+    const sign: string = parts[3];
+    const rhs: number = Number(parts[4]);
+    if (a !== a || b !== b || rhs !== rhs || a === 0) {
+      return '';
+    }
+    const v: number = op === '+' ? (rhs - b) / a : (rhs + b) / a;
+    const sg: string = a > 0 ? sign : flip(sign);   // 除以负数要变号
+    return 'x ' + sg + ' ' + String(v);
   }
 
   private answer(s: string): void {

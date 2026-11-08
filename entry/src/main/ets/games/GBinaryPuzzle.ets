@@ -219,6 +219,8 @@ export struct GBinaryPuzzle {
   /** 出题时的完整解 */
 
   private solCells: number[] = [];
+  /** ★ 2026-11-08 代打现场解出来的盘面（不读 solCells）；空 = 未算 */
+  private aiSol: number[] = [];
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
@@ -274,6 +276,7 @@ export struct GBinaryPuzzle {
     const p: Puzzle = makePuzzle(this.diffTotal);
     // ★ 2026-10-24 第三期：出题时就有完整解（p.answer），以前丢掉了
     this.solCells = p.answer.slice();
+    this.aiSol = [];   // ★ 新题：代打解作废
     const cells: number[] = p.quiz.slice();
     const fixed: boolean[] = [];
     for (let i = 0; i < this.diffTotal * this.diffTotal; i++) {
@@ -505,11 +508,16 @@ export struct GBinaryPuzzle {
       return false;
     }
     const n: number = this.diffTotal;
-    if (this.solCells.length < n * n) {
+    // ★ 2026-11-08（ai-fixer-a）**不再抄出题解 solCells**：
+    //   复用文件里现成的规则回溯 `fill()`（只吃 fits 的两条规则：每行列数量相等 + 不能三连）。
+    if (this.aiSol.length !== n * n) {
+      this.aiSol = this.solveByRules(n);
+    }
+    if (this.aiSol.length !== n * n) {
       return false;
     }
     for (let i = 0; i < n * n; i++) {
-      if (this.cells[i] !== this.solCells[i] && !this.fixed[i]) {
+      if (this.cells[i] !== this.aiSol[i] && !this.fixed[i]) {
         this.tap(i);
         return true;
       }
@@ -560,6 +568,17 @@ export struct GBinaryPuzzle {
     this.hintIdx = -1;
     this.hintMsg = TG('这一步纯靠规则推不出来，得试着填一格看看');
     setTimeout(() => { this.hintMsg = ''; }, 4500);
+  }
+
+  /** ★ 2026-11-08 代打求解：只用题面固定格 + 两条规则（fill/fits），不碰 solCells */
+  private solveByRules(n: number): number[] {
+    const board: number[] = new Array<number>(n * n).fill(EMPTY);
+    for (let i = 0; i < n * n; i++) {
+      if (this.fixed[i]) {
+        board[i] = this.cells[i];
+      }
+    }
+    return fill(board, 0, n) ? board : [];
   }
 
   private tap(i: number): void {

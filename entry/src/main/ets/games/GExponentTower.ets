@@ -212,8 +212,14 @@ export struct GExponentTower {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    const val: number = ipow(this.a, ipow(this.b, this.c));   // 屏幕题面就是 a^(b^c)
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === val) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

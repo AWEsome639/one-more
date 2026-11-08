@@ -270,8 +270,14 @@ export struct GCommonDenominator {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    const l: number = this.b * this.d / gcd(this.b, this.d);   // 屏幕题面是两个分母 b / d
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === l) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

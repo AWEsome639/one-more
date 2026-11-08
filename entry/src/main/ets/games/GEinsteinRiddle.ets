@@ -135,6 +135,8 @@ export struct GEinsteinRiddle {
 
   @State private lines: string[] = [];
   @State private sol: number[] = [];
+  /** ★ 2026-11-08 代打用的线索副本（从屏幕上的线索推答案） */
+  private aiClues: Clue[] = [];
   @State private grid: number[] = new Array<number>(this.houses).fill(-1);
   /** 代打计时器（-1 = 未运行）。必须 @State */
   /** ★ 第 1161 轮：焦点框自绘用的当前聚焦元素 id
@@ -177,6 +179,7 @@ export struct GEinsteinRiddle {
     // 线索里未必直接给全 —— 补一次穷举，把唯一解算出来
     const found: number[] = this.solveUnique(clues);
     this.lines = lines;
+    this.aiClues = clues;   // ★ 2026-11-08 代打：留着线索自己推（不读 sol）
     this.sol = found.length === this.houses ? found : sol;
     this.grid = new Array<number>(this.houses).fill(-1);
     this.tries = 0; this.hintOn = false; this.over = false;
@@ -303,8 +306,14 @@ export struct GEinsteinRiddle {
     if (this.over) {
       return false;
     }
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.sol（答案）**：
+    //   线索都印在屏幕上 ⇒ 用已有的 solveUnique(线索) 穷举推唯一解，再一格一格拨。
+    const p: number[] = this.solveUnique(this.aiClues);
+    if (p.length !== this.houses) {
+      return false;
+    }
     for (let i = 0; i < this.houses; i++) {
-      if (this.grid[i] !== this.sol[i]) {
+      if (this.grid[i] !== p[i]) {
         this.tap(i);
         return !this.over;
       }

@@ -246,6 +246,53 @@ export struct GModuloClock {
     this.demoId = Demo.run((_p: number) => this.demoBeat());
   }
 
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」（解题/计算族）：
+   *   原来 `this.pick(this.ans)` —— `ans` 是正确选项下标，等于抄答案。
+   *   ⇒ 改成**读屏幕题面自己算**：题面里只有两个数（「现在 3 点，再过 5 小时是几点？」/「…5 小时前…」），
+   *     而**"后"还是"前"写在不同语言里** ⇒ 不用措辞判断，改走**候选反查**：
+   *     两个方向都算一遍（12 点表盘取模），**取在 4 个选项里出现的那个**；
+   *     万一两个都在（罕见）按本款 60% 是"后"的先验取"后"。
+   */
+  private aiNums(s: string): number[] {
+    const out: number[] = [];
+    let cur: string = '';
+    for (let i = 0; i < s.length; i++) {
+      const ch: string = s.charAt(i);
+      const isDigit: boolean = ch >= '0' && ch <= '9';
+      if (isDigit) {
+        cur = cur + ch;
+      } else if (cur.length > 0) {
+        out.push(Number.parseInt(cur, 10));
+        cur = '';
+      }
+    }
+    if (cur.length > 0) {
+      out.push(Number.parseInt(cur, 10));
+    }
+    return out;
+  }
+
+  private aiCalc(): number {
+    const ns: number[] = this.aiNums(this.quiz);
+    if (ns.length < 2) {
+      return -1;
+    }
+    const now: number = ns[0];
+    const delta: number = ns[1];
+    const fwd: number = onDial(now + delta);
+    const bwd: number = onDial(now - delta);
+    const hasF: boolean = this.opts.indexOf(fwd) >= 0;
+    const hasB: boolean = this.opts.indexOf(bwd) >= 0;
+    if (hasF && hasB) {
+      return fwd;               // 两个都在 ⇒ 按本款"后"更常见的先验
+    }
+    if (hasF) {
+      return fwd;
+    }
+    return hasB ? bwd : -1;
+  }
+
   private autoStep(): boolean {
     if (this.over) {
       return false;
@@ -253,8 +300,17 @@ export struct GModuloClock {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    const v: number = this.aiCalc();
+    if (v < 0) {
+      return false;             // 两个方向都不在选项里 ⇒ 停手（不读 ans 下标）
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === v) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

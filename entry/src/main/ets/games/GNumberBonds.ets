@@ -245,8 +245,17 @@ export struct GNumberBonds {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    const truth: number = this.target - this.shown;
+    if (truth <= 0) {
+      return false;             // 题面异常 ⇒ 停手（不读 ans 下标）
+    }
+    for (let i = 0; i < this.opts.length; i++) {
+      if (this.opts[i] === truth) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;
   }
 
   private askAuto(): void {

@@ -204,8 +204,23 @@ export struct GFractionMatcher {
     if (this.picked >= 0) {
       return true;              // 这题答过了，等 setTimeout 进下一题
     }
-    this.pick(this.ans);
-    return !this.over;
+    // 屏幕题面是 a/b，选项是 "p/q"：**等值**判据 = p*b === a*q（约分后相同）
+    for (let i = 0; i < this.opts.length; i++) {
+      const parts: string[] = this.opts[i].split('/');
+      if (parts.length !== 2) {
+        continue;
+      }
+      const p: number = Number.parseInt(parts[0], 10);
+      const q: number = Number.parseInt(parts[1], 10);
+      if (isNaN(p) || isNaN(q)) {
+        continue;
+      }
+      if (p * this.b === this.a * q) {
+        this.pick(i);
+        return !this.over;
+      }
+    }
+    return false;             // 没有等值项 ⇒ 停手（不读 ans 下标）
   }
 
   private askAuto(): void {

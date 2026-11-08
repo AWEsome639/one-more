@@ -1076,7 +1076,7 @@ struct GameHost {
           //   顶栏 44 + 演示条 38 已经吃掉 109vp，内容区只剩 86vp。
           //   ⇒ 极小屏**不显示标题**（玩家刚点进来，知道自己在玩什么），
           //     用空 Row 占 layoutWeight(1) 把「难度 / 重开」推到右侧，保持顶栏不变形。
-          if (!this.tinyScreen()) {
+          if (!Bp.hideGameTitle()) {
             Column({ space: 2 }) {
               Text(this.meta ? displayName(this.meta) : '')
                 // ★★ 2026-11-01 真机（手表 195×195）：标题原来没限行，窄屏上被压成
@@ -1087,7 +1087,7 @@ struct GameHost {
                 .maxLines(1)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
               // 副标题：极小屏直接不显示（让位给演示条/棋盘）
-              if (!this.tinyScreen()) {
+              if (!Bp.hideGameTitle()) {
                 Text(this.meta ? displayTagline(this.meta) : '')
                   .fontSize(FontSize.xs)
                   .fontColor(this.theme().inkFaint)
@@ -1112,7 +1112,11 @@ struct GameHost {
           //   ⇒ 改成：只把 **☆** 在极小屏隐藏（`visibility.None` 不占位），
           //     **? 始终显示**。这样不动任何大括号配对，风险最低。
           Text(this.fav ? '⭐' : '☆')
-            .visibility(this.tinyScreen() ? Visibility.None : Visibility.Visible)
+            // ★ 2026-11-08：改用 `Bp.hideFav()`（width < 300），**不再跟着 narrowScreen 收紧到 460**。
+            //   理由：440 宽竖屏手机上顶栏 5 个按钮（‹ ☆ ? 普通 ↻ ≈ 200vp）放得下，
+            //   隐藏收藏是**不可逆的体验损失**；只有 195 手表那种确实放不下才隐藏。
+            //   （`?` 帮助任何尺寸都不隐藏 —— 2026-11-02 手表真机教训）
+            .visibility(Bp.hideFav() ? Visibility.None : Visibility.Visible)
             // ★★★ 2026-11-01：**原来是 focusBox 但没有 focusable** ⇒
             //   电视/键盘用户进游戏后，顶栏按钮根本拿不到焦点（连"重开"都按不到）。
             .backgroundColor(this.hdrHover === 1 ? this.theme().surfaceAlt : Color.Transparent)

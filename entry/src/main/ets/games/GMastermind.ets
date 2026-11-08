@@ -102,6 +102,62 @@ export struct GMastermind {
     this.startAt = Date.now();
   }
 
+  /** ★ 2026-11-08 候选反查：枚举全部码，保留与历史反馈全一致的第一个 */
+  private aiCode(): number[] {
+    const len: number = this.diffTotal;
+    let total: number = 1;
+    for (let i = 0; i < len; i++) {
+      total = total * COLORS;
+    }
+    for (let code = 0; code < total; code++) {
+      const cand: number[] = [];
+      let x: number = code;
+      for (let i = 0; i < len; i++) {
+        cand.push(x % COLORS);
+        x = Math.floor(x / COLORS);
+      }
+      let good: boolean = true;
+      for (let r = 0; r < this.rows.length; r++) {
+        const row: GuessRow = this.rows[r];
+        const fb: Fb = this.aiFb(cand, row.guess);
+        if (fb.exact !== row.exact || fb.partial !== row.partial) {
+          good = false;
+          break;
+        }
+      }
+      if (good) {
+        return cand;
+      }
+    }
+    return [];
+  }
+
+  /** 与 feedback() 同规则，但目标是任意码（不读 secret） */
+  private aiFb(g: number[], s: number[]): Fb {
+    const len: number = this.diffTotal;
+    let exact: number = 0;
+    for (let i = 0; i < len; i++) {
+      if (g[i] === s[i]) {
+        exact = exact + 1;
+      }
+    }
+    let partial: number = 0;
+    for (let c = 0; c < COLORS; c++) {
+      let inG: number = 0;
+      let inS: number = 0;
+      for (let i = 0; i < len; i++) {
+        if (g[i] === c) {
+          inG = inG + 1;
+        }
+        if (s[i] === c) {
+          inS = inS + 1;
+        }
+      }
+      partial = partial + Math.min(inG, inS);
+    }
+    return { exact: exact, partial: partial - exact };
+  }
+
   private feedback(g: number[]): Fb {
     let exact: number = 0;
     for (let i = 0; i < this.diffTotal; i++) {
@@ -225,7 +281,14 @@ export struct GMastermind {
       this.submit();
       return !this.over;
     }
-    this.sel = this.secret[i];
+    // ★ 2026-11-08（ai-fixer-a）**不再读 this.secret（答案）**：
+    //   枚举全部 COLORS^diffTotal 种码，用历史每行的 (exact, partial) 反馈筛掉，
+    //   剩下的第一个候选就是这一猜（纯约束反查，不碰答案）。
+    const code: number[] = this.aiCode();
+    if (code.length !== this.diffTotal) {
+      return false;
+    }
+    this.sel = code[i];
     this.tapSlot(i);
     return true;
   }

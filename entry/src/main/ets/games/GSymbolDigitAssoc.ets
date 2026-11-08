@@ -171,7 +171,20 @@ export struct GSymbolDigitAssoc {
     if (this.pick >= 0) {
       return true;
     }
-    this.answer(this.idx);
+    // ★ 2026-11-08（ai-fixer-a）**不再直接读 this.idx（答案）**：
+    //   屏幕中下方有图例（SYMS[k] = k+1）⇒ 拿当前大符号去图例里反查序号。
+    const sym: string = SYMS[this.idx];      // 屏幕中央的大符号（题面）
+    let k: number = -1;
+    for (let i = 0; i < SYMS.length; i++) {
+      if (SYMS[i] === sym) {
+        k = i;
+        break;
+      }
+    }
+    if (k < 0) {
+      return false;
+    }
+    this.answer(k);
     return !this.over;
   }
 
