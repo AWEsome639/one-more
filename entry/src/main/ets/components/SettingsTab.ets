@@ -1251,14 +1251,32 @@ build() {
 
       Text(this.t(o.zh, o.en))
         .fontSize(FontSize.micro)
-        .maxLines(1)
+        // ★★★ 2026-11-09：**窄屏 + 大字模式 ⇒ 允许两行**。
+        //   实测（本机 853vp，切换到 elder 后重新 dump）：
+        //     `FontSize.micro` 10→15 ⇒ 色名宽度**正好 ×1.50**
+        //     （`Как в системе` 66.0→99.0vp、`Индиго` 35.7→53.3、`Красный` 42.0→63.0、`Оранжевый` 56.3→84.3）
+        //   ⇒ 俄语最长名在 elder 下 = 84.7 × 1.5 = **127vp**。
+        //   而 360vp 手机上 elder 档的卡片内容宽只有 ≈ **252vp**（Space.lg/md 也跟着变大）
+        //   ⇒ 就算降到 **两列 45% = 113vp 也不够**（127 > 113），**一列 100% 才够但太丑**。
+        //   ⇒ 所以窄屏 + elder 用「**三列 + 两行**」：30% = 75.6vp/行，两行 ≈ 151vp 容量 > 127vp ✓
+        //   ⚠️ 同样**本机验不到**（853vp ⇒ 条件恒 false），是按下表推算的（见报告 §4）。
+        .maxLines(Bp.width < 420 && this.uiMode === 'elder' ? 2 : 1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(this.isAccent(o.id) ? this.theme().ink : this.theme().inkFaint)
     }
     // ★★★ 判据 1829：**色块必须"固定尺寸 + 不参与压缩"**。
     //   23% 是"四列一行"的宽度基准；`flexShrink(0)` 保证 Flex 换行时它不会被压成椭圆/细条
     //   （1875 那次的教训就是 `SymbolGlyph` 在 Row 里被拉伸成一片紫）。
-    .width('23%')
+    //
+    // ★★★ 2026-11-09（窄屏色块）：**窄屏（< 420vp）改 30% —— 四列变三列**
+    //   真机实测（853vp 平板窗口，normal 档）：色名 `Небесно-голубой` = **84.7vp**，格宽 189vp。
+    //   换算到 360vp 手机：内容宽 ≈ 288vp ⇒ 23% = **66.2vp** < 84.7vp ⇒ **会被省略号截断**。
+    //   30% ⇒ 288 × 30% = **86.4vp**，刚好容下 84.7vp（余 1.7vp）。
+    //   ⚠️ 本机是 853vp ⇒ `Bp.width < 420` **恒 false** ⇒ 这半句**在本机上验不到**（见巡检报告）。
+    //   ⚠️ `Bp.width` 是静态类 `core/Bp` 的字段，由 `EntryAbility` 在 window 创建/尺寸变化时写入
+    //      （`Bp.update(w,h)`）⇒ `@Builder` 里读它是合法的；同文件 `Common.ets:1250` 早已这么用。
+    //      但它**不是 ArkUI 的观察状态** ⇒ 只有页面因别的原因重建时才会跟着换列（窗口 resize 本身会触发重建）。
+    .width(Bp.width < 420 ? '30%' : '23%')
     .flexShrink(0)
     .padding({ top: Space.xs, bottom: Space.xs })
     // ★★★ 2026-11-08 读屏缺口修复（审计 P0-5 第 1 条）：
