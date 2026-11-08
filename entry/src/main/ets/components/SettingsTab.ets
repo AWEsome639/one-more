@@ -162,6 +162,8 @@ export struct SettingsTab {
   @State private diagInitV: number = 0;
   @State private diagFirstV: number = 0;
   @State private diagCallsV: number = 0;
+  /** 模型是否 ready（失败态要显示「装好系统模型后，点这里重试」那行） */
+  @State private diagReadyV: boolean = false;
   /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环（判据：可点组件必须有 focusable） */
   @State private tvFocus: string = '';
   @State private copyHint: string = '';   // 「已复制 ✓」提示
@@ -664,7 +666,13 @@ build() {
       this.diagRow('首字延迟', 'First token', this.diagMs(this.diagFirstV))
       // 行 4：问答次数（0 = 从来没真问过 ⇒ 上面 reason 是 idle 就说明"还没试过"，不是"坏了"）
       this.diagRow('问答次数', 'Calls', Digits(String(this.diagCallsV), this.lang))
-      // 行 5：规则版兜底（永远 true —— 四层兜底保证 AI 挂了也能玩）
+      // 行 5：失败态的"自愈提示"（只有没 ready 时才显示）
+      if (!this.diagReadyV) {
+        Text(this.t('装好系统模型后，点这里重试', 'After installing the system model, tap here to retry'))
+          .fontSize(FontSize.xs).fontColor(this.theme().inkFaint)
+          .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      // 行 6：规则版兜底（永远 true —— 四层兜底保证 AI 挂了也能玩）
       Row({ space: Space.sm }) {
         Text(this.t('规则版已启用', 'Rule-based fallback on'))
           .fontSize(FontSize.xs).fontColor(Palette.success)
@@ -697,13 +705,29 @@ build() {
     .outline(Tv.focusOutline(this.tvFocus === 'S-AIDIAG'))
     .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
       Haptics.tap();
-      this.refreshDiag();
+      this.retryDiag();
      }); })
     .onClick(() => {
       Haptics.tap();
-      // ★ 判据 1824 的落地：`LocalLLM.stat` 没有观察源 ⇒ 点一下把它的当前值抄进 @State
-      this.refreshDiag();
+      this.retryDiag();
     })
+  }
+
+  /**
+   * ★★★ 2026-11-09 perf-hunter：诊断卡「点一下刷新」= **真重试**，不再只是重读快照。
+   *
+   * 为什么改：`LocalLLM` 的 `init()` 以前一旦失败就把 `inited` 永久置真
+   *   ⇒ 用户把系统模型装好也不会自愈、必须重启 app（产品缺陷）。
+   *   现在 `init()` 失败会把 `inited` 放回 false，并用 60s 冷却防重试风暴；
+   *   这里 `reset()` 先清冷却，再**主动 init 一次** ⇒ 用户点一下就能看到新的 `模型状态`。
+   *   ⚠️ 不 `await`：不阻塞 UI；结果回来后 `refreshDiag()` 再抄一次快照。
+   */
+  private retryDiag(): void {
+    LocalLLM.retry();          // 清 inited + 冷却，**保留 calls 统计**（判据：失败不能永久缓存）
+    this.refreshDiag();        // 先把 idle 抄进来，用户立刻看到"在重试"
+    LocalLLM.init().then(() => {
+      this.refreshDiag();      // 结果回来后再抄一次（ok / init-false / no-syscap）
+    });
   }
 
   /** 诊断卡的一行：固定宽标签 + 值（判据 1829：都不许被压） */
@@ -732,6 +756,7 @@ build() {
     this.diagInitV = LocalLLM.stat.initMs;
     this.diagFirstV = LocalLLM.stat.firstTokenMs;
     this.diagCallsV = LocalLLM.stat.calls;
+    this.diagReadyV = LocalLLM.stat.ready;
   }
 
   /**

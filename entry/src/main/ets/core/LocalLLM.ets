@@ -48,6 +48,29 @@ export class LocalLLM {
   };
   private static inited: boolean = false;
   private static seq: number = 0;
+  /**
+   * ★★★ 2026-11-09 perf-hunter（产品缺陷修复）：**失败不再永久缓存**。
+   *
+   * 旧行为（缺陷）：`init()` 一旦失败，`inited` 仍是 `true` ⇒ 之后**永远**走规则版，
+   *   用户把系统模型装好/修好也**不会自愈**（必须杀进程重启）。
+   *   实测证据：第一次问出 `init=false 耗时 1118ms`；第二次问**一条日志都没有**（命中缓存 + 零重试）。
+   *
+   * 新行为：
+   *   ① **失败 ⇒ `inited = false`**（允许下次重试）
+   *   ② **但失败后 `RETRY_COOLDOWN_MS` 内不再真 init**（否则每次提问都要拉一次系统模型，实测 1118ms）
+   *   ③ `reset()` 会把冷却清掉 ⇒ 诊断卡「点一下刷新」可以立刻重试
+   */
+  static readonly RETRY_COOLDOWN_MS: number = 60000;
+  /** 上次失败时刻（0 = 没失败过）；冷却判据用它 */
+  private static lastFailMs: number = 0;
+
+  /** 失败收尾：**把 inited 放回 false**，并记下失败时刻（判据：失败不能永久缓存） */
+  private static fail(reason: string): void {
+    LocalLLM.inited = false;
+    LocalLLM.lastFailMs = Date.now();
+    LocalLLM.stat.ready = false;
+    LocalLLM.stat.reason = reason;
+  }
 
   /** 设备是否具备该系统能力（canIUse 自身不抛，仍包一层） */
   static available(): boolean {
@@ -63,27 +86,35 @@ export class LocalLLM {
     if (LocalLLM.inited) {
       return LocalLLM.stat.ready;
     }
+    // ★ 冷却：刚失败过就先不真 init（返回值仍是 false ⇒ 调用方照常回落规则版）
+    if (LocalLLM.lastFailMs > 0 && (Date.now() - LocalLLM.lastFailMs) < LocalLLM.RETRY_COOLDOWN_MS) {
+      return false;
+    }
     LocalLLM.inited = true;
     if (!LocalLLM.available()) {
-      LocalLLM.stat.reason = 'no-syscap';
       hilog.warn(0x0000, TAG, '设备无 LocalChatModel syscap ⇒ 降级到规则版');
+      LocalLLM.fail('no-syscap');
       return false;
     }
     const t0: number = Date.now();
     try {
       const ok: boolean = await localChatModel.init();
-      LocalLLM.stat.ready = ok;
-      LocalLLM.stat.reason = ok ? 'ok' : 'init-false';
       LocalLLM.stat.initMs = Date.now() - t0;
       hilog.info(0x0000, TAG, 'init=%{public}s 耗时 %{public}dms', String(ok), LocalLLM.stat.initMs);
-      return ok;
+      if (!ok) {
+        LocalLLM.fail('init-false');
+        return false;
+      }
+      LocalLLM.stat.ready = true;
+      LocalLLM.stat.reason = 'ok';
+      LocalLLM.lastFailMs = 0;
+      return true;
     } catch (e) {
       const err = e as BusinessError;
-      LocalLLM.stat.ready = false;
-      LocalLLM.stat.reason = 'init-failed';
       LocalLLM.stat.initMs = Date.now() - t0;
       hilog.warn(0x0000, TAG, 'init 失败 code=%{public}d msg=%{public}s ⇒ 降级到规则版',
         err.code, err.message);
+      LocalLLM.fail('init-failed');
       return false;
     }
   }
@@ -155,9 +186,21 @@ export class LocalLLM {
     });
   }
 
+  /**
+   * ★ 2026-11-09：**只重置 init 缓存与冷却，保留统计**（`calls` 等）—— 诊断卡「重试」用。
+   * 为什么不直接用 `reset()`：`reset()` 会把 `stat.calls` 一起清零，
+   *   用户点一下"重试"就丢掉"问答次数"历史，诊断信息反而变少。
+   */
+  static retry(): void {
+    LocalLLM.inited = false;
+    LocalLLM.lastFailMs = 0;
+    LocalLLM.stat.reason = 'idle';
+  }
+
   /** 重置状态（诊断/测试用；正式流程不需要） */
   static reset(): void {
     LocalLLM.inited = false;
+    LocalLLM.lastFailMs = 0;   // ★ 清冷却 ⇒ 诊断卡「点一下刷新」可以立刻重试
     LocalLLM.seq = 0;
     LocalLLM.stat = {
       ready: false, reason: 'idle', initMs: 0, firstTokenMs: 0, totalMs: 0, calls: 0
