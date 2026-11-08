@@ -2679,6 +2679,13 @@ build() {
           .backgroundColor(this.accentColor())
           .borderRadius(Radius.md)
           .height(Cell.of(40))
+          // ★ 2026-11-08 真机（853×533）：「找」按钮被挤成 **12vp 宽**贴在右边缘（x=841~853），
+          //   点不到 ⇒ 对话找游戏在这块矮屏上**无法提交**。
+          //   输入框虽然有 `layoutWeight(1)`，但长 placeholder 按 min-content 撑住，
+          //   按钮没有自己的宽度 ⇒ 被压到 12vp。
+          //   ⇒ 给按钮定宽 + 禁止收缩（用户侧 bug，verifier-eng2 报、lead 批准改这一处）。
+          .width(Cell.of(56))
+          .flexShrink(0)
           .accessibilityGroup(true)
           .accessibilityText(this.t('找', 'Go'))
           .accessibilityLevel('yes')

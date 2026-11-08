@@ -101,7 +101,7 @@ export class Diag {
    *
    * ⚠️ 验完就改回 `false`（它会在每次冷启动调一次系统模型接口）。
    */
-  static readonly llmProbe: boolean = true;
+  static readonly llmProbe: boolean = false;
 
   /**
    * ★★★ 2026-11-05（第 1277 轮）：**调试期强制默认页签**（-1 = 不强制）
