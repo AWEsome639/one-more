@@ -266,7 +266,7 @@ export struct GBinaryMatrixRankAll {
     this.onFinish(r);
   }
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
               onHintTap: () => { this.askHint(); },
@@ -277,24 +277,27 @@ export struct GBinaryMatrixRankAll {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((this.round + '/' + TOTAL)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.rightN + '/' + PASS)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        .justifyContent(FlexAlign.SpaceBetween)
       }
       .width('100%')
-      Column({ space: 2 }) {
+      Row({ space: Space.xs }) {
         ForEach(this.rows, (r: number) => {
           Row({ space: Space.xs }) {
           ForEach(this.rows, (c: number) => {
