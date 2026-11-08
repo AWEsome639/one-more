@@ -220,9 +220,43 @@ export struct GPong {
   /** 从中间发球，方向随机 */
   private launch(): void {
     const dir: number = Math.random() < 0.5 ? -1 : 1;
-    const tilt: number = (Math.random() - 0.5) * 1.2;
+    // ★ 2026-11-08：`tilt` 是**弧度**（±0.6 rad ≈ ±34°），与 sin/cos 的单位一致；
+    //   但纯随机会抽到 |tilt|≈0 的"死平球"（真机实测抓到 8.2° 那种近水平轨迹）
+    //   ⇒ 保底偏角 0.16rad ≈ 9°，保证一开球就是能看的斜线。
+    let tilt: number = (Math.random() - 0.5) * 1.2;
+    if (Math.abs(tilt) < 0.16) {
+      tilt = tilt < 0 ? -0.16 : 0.16;
+    }
     this.vx = SPEED * dir * Math.cos(tilt);
     this.vy = SPEED * Math.sin(tilt);
+  }
+
+  /**
+   * ★★★ 2026-11-08 真机「球 8.2° 近水平」根因：**不是 tilt 没生效，而是回球角度 = rel × MAX_TILT**
+   *   —— 拍子居中命中时 `rel≈0` ⇒ `vy≈0` ⇒ **回球是水平直线**；
+   *   而 AI（和自动代打）总是把拍子对准球 ⇒ **一拍接一拍把竖直分量洗成 0**，
+   *   所以连拍看到的全是 8° 左右的近水平轨迹（实测 dy/dx=0.144 ⇒ atan=8.2° ✓ 与"打回后 vy 被洗掉"吻合）。
+   *   ⇒ 给回球一个**最小偏角**（0.14rad ≈ 8°：居中命中时按 rel 的方向/随机取正负），
+   *     保留 rel 越大角度越大的手感（上限 MAX_TILT = 0.95rad ≈ 54°）。
+   */
+  private bounceAngle(relIn: number): number {
+    const rel: number = relIn > 1 ? 1 : (relIn < -1 ? -1 : relIn);
+    const MIN_ANG: number = 0.14;
+    // ★ 放大「击球点偏移 → 出射角」的映射（×1.8，上限仍 MAX_TILT）：真机对拉时 rel 只有 ±0.2 左右，
+    //   原映射只出 10° 左右的平球；放大后同样偏移能出 17°~39°，对拉才有来回拉锯的样子。
+    let a: number = rel * MAX_TILT * 1.8;
+    // ★ 再叠一点随机抖动（±0.05rad ≈ ±3°），避免"同一落点永远同一角度"的机械感
+    a = a + (Math.random() - 0.5) * 0.10;
+    if (a > MAX_TILT) {
+      a = MAX_TILT;
+    } else if (a < -MAX_TILT) {
+      a = -MAX_TILT;
+    }
+    if (Math.abs(a) < MIN_ANG) {
+      const sign: number = rel === 0 ? (Math.random() < 0.5 ? -1 : 1) : (rel > 0 ? 1 : -1);
+      a = sign * MIN_ANG;
+    }
+    return a;
   }
 
   /** 轴的横纵比 K = 球场高 / 球场宽（宽场 < 1）：x 位移乘它 ⇒ 两方向 vp 速度一致 */
@@ -338,7 +372,7 @@ export struct GPong {
       && y >= this.px - ry && y <= this.px + PADDLE_H + ry) {
       x = PADDLE_X + PADDLE_W + rx;
       const rel: number = (y - (this.px + PADDLE_H / 2)) / (PADDLE_H / 2);
-      const ang: number = (rel > 1 ? 1 : (rel < -1 ? -1 : rel)) * MAX_TILT;
+      const ang: number = this.bounceAngle(rel);
       this.vx = SPEED * Math.cos(ang);
       this.vy = SPEED * Math.sin(ang);
     }
@@ -348,7 +382,7 @@ export struct GPong {
       && y >= this.ay - ry && y <= this.ay + PADDLE_H + ry) {
       x = AI_X - rx;
       const rel2: number = (y - (this.ay + PADDLE_H / 2)) / (PADDLE_H / 2);
-      const ang2: number = (rel2 > 1 ? 1 : (rel2 < -1 ? -1 : rel2)) * MAX_TILT;
+      const ang2: number = this.bounceAngle(rel2);
       this.vx = -SPEED * Math.cos(ang2);
       this.vy = SPEED * Math.sin(ang2);
     }
