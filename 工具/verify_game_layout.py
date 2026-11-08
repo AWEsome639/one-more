@@ -69,10 +69,18 @@ def search_game(en_name):
     if not in_search_mode():
         sh('uitest uiInput click 2276 264')   # 打开搜索
         time.sleep(0.9)
+    # 先点 ✕ 清空残留（如果有）
+    d0 = dump('/data/local/tmp/probe2.json')
+    if d0:
+        for t, (x1, y1, x2, y2) in collect(d0, lambda t: True):
+            if t.strip() == '✕' and 380 <= y1 <= 490:
+                sh(f'uitest uiInput click {(x1+x2)//2} {(y1+y2)//2}')
+                time.sleep(0.5)
+                break
     sh('uitest uiInput click 1280 435')       # 聚焦搜索框
     time.sleep(0.6)
     sh(f"uinput -K -t '{en_name}'")
-    time.sleep(1.4)
+    time.sleep(1.6)
 
 def close_search():
     if in_search_mode():
@@ -105,11 +113,17 @@ def verify_one(en_name):
         close_search()
         return ('NO_CARD', {})
     sh(f'uitest uiInput click {target[0]} {target[1]}')
-    time.sleep(2.0)
+    time.sleep(2.2)
     d2 = dump()
     if not d2:
         sh('uitest uiInput keyEvent Back'); close_search()
         return ('GAME_DUMP_FAIL', {})
+    # ⭐ 进游戏判据：dump 里必须出现「游戏内元素」（提示 / AI 代打 / 重开）
+    texts2 = [t for t, _ in collect(d2, lambda t: True)]
+    in_game = any(k in ''.join(texts2) for k in ('提示', 'AI 代打', '重开', '换一题', '放弃'))
+    if not in_game:
+        sh('uitest uiInput keyEvent Back'); close_search()
+        return ('NOT_IN_GAME', {'texts': texts2[:5]})
     # 内容区：找「最底部有内容的节点」
     nodes = collect(d2, lambda t: True)
     max_bottom = max((y2 for _, (_, _, _, y2) in nodes), default=0)
