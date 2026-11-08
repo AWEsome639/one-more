@@ -14,6 +14,7 @@ import { Digits, I18n } from '../core/I18n';   // ★ 2026-10-16 数字本地化
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Overlay, Accent, Cell } from '../core/Design';
 import { GameMeta, GameCategory, CatCount, colorOf, enterDelay, catLabelEn, ACCENT_TAG, ACCENT_DEEP_TAG, displayName, displayTagline } from '../core/GameRegistry';
 import { L, TN } from '../core/I18n';
+import { ProgressStore } from '../core/ProgressStore';   // ★ 2026-11-08：卡片自己取连胜/今日（净解析走 CardBadgeCache）
 
 // ─── ICON_MAP:BEGIN（由 tools/gen_icon_map.py 生成，勿手改）───
 /**
@@ -857,6 +858,17 @@ export struct LevelHeader {
 //    而且 @Prop Map 的比较/传递比字符串更绕；现在的方案是"只改一个文件就生效"。
 //    代价：角标数据一变，355 张卡的 @StorageProp 都会被标记脏（Grid 虚拟化下实际只重建可见的几张）。
 // ════════════════════════════════════════════════════════════════════════════
+/**
+ * 每款连胜（`ProgressStore.streaks` 里 `GameStreak` 的**最小投影**）。
+ * ★ 为什么不直接 import `GameStreak`：它是 `ProgressStore.ets` 里**未导出**的 interface，
+ *   而这里只需要三个字段 ⇒ 本地声明一份最小投影，结构兼容即可（`JSON.parse ... as` 断言）。
+ */
+interface StreakInfo {
+  current: number;
+  lastDay: string;      // YYYY-MM-DD
+  solvedToday: boolean;
+}
+
 class CardBadgeCache {
   /** 上次解析用的原始串（哨兵值：保证首帧一定解析一次） */
   private static bestRaw: string = '@@init@@';
@@ -899,6 +911,58 @@ class CardBadgeCache {
       }
     }
     return CardBadgeCache.clearedSet.has(id);
+  }
+
+  // ───────── 每款连胜 / 今日已玩（2026-11-08 perf-hunter）─────────
+  //  ★ 为什么要这层：这两个值原来是**父组件传的 `@Prop`**（`GamesTab` 在 ForEach 的
+  //    itemGenerator 里现调 `ProgressStore.streakOf/playedToday`）。
+  //    而 ForEach/LazyForEach **同 key 不重跑 itemGenerator** ⇒ 玩完一局回到首页，
+  //    卡片上的 🔥「N 天」/「今日已玩」**不会刷新**（连切语言也救不回来：重渲染用的是那份拷贝）。
+  //  ⇒ 改成卡片自己 `@StorageProp('streaks')` 订阅，和角标（`clearedGames`/`perGameBest`）**同构**；
+  //    `ProgressStore.persistStreaks()` 现在每次连胜变化都会把整张表写进 AppStorage（那才是根因）。
+  //  ⚠️ 与角标一样：同一份串只 `JSON.parse` 一次，355 张卡共享。
+  private static streakRaw: string = '@@init@@';
+  private static streakMap: Map<string, StreakInfo> = new Map<string, StreakInfo>();
+
+  private static ensureStreaks(raw: string): void {
+    if (raw === CardBadgeCache.streakRaw) {
+      return;
+    }
+    CardBadgeCache.streakRaw = raw;
+    CardBadgeCache.streakMap = new Map<string, StreakInfo>();
+    try {
+      const m: Record<string, StreakInfo> = JSON.parse(raw.length > 0 ? raw : '{}') as Record<string, StreakInfo>;
+      const keys: string[] = Object.keys(m);
+      for (let i = 0; i < keys.length; i++) {
+        CardBadgeCache.streakMap.set(keys[i], m[keys[i]]);
+      }
+    } catch (e) {
+      // 坏数据 ⇒ 当空表：少一个 🔥，界面绝不崩（同角标的处理）
+      CardBadgeCache.streakMap = new Map<string, StreakInfo>();
+    }
+  }
+
+  /** 这款当前连胜局数（0 = 没有 🔥） */
+  static streak(raw: string, id: string): number {
+    CardBadgeCache.ensureStreaks(raw);
+    const s: StreakInfo | undefined = CardBadgeCache.streakMap.get(id);
+    if (s === undefined) {
+      return 0;
+    }
+    // ⚠️ 不写 `s.current === undefined`：ArkTS 严格模式下「number 与 undefined 比较」会报无用比较；
+    //    这里用 `> 0` 兜住 undefined / NaN（两者 `> 0` 都是 false），行为等价且无类型告警。
+    const v: number = s.current;
+    return v > 0 ? v : 0;
+  }
+
+  /** 这款今天玩过没（口径与 `ProgressStore.playedToday` 一致：solvedToday && lastDay === 今天） */
+  static playedToday(raw: string, id: string): boolean {
+    CardBadgeCache.ensureStreaks(raw);
+    const s: StreakInfo | undefined = CardBadgeCache.streakMap.get(id);
+    if (s === undefined) {
+      return false;
+    }
+    return s.solvedToday === true && s.lastDay === ProgressStore.today();
   }
 }
 
@@ -964,8 +1028,35 @@ export struct GameCard {
   @StorageProp('uiMode') uiMode: string = 'normal';
   @Prop index: number = 0;
   @Prop theme: Theme = Theme.light();
-  @Prop streak: number = 0;
-  @Prop playedToday: boolean = false;
+  /**
+   * ★★★ 2026-11-08 perf-hunter：**每款连胜 /「今日已玩」改为卡片自己订阅 AppStorage**
+   *   原来这两个是父组件传的 `@Prop`（`GamesTab` 在 ForEach 的 itemGenerator 里现调
+   *   `ProgressStore.streakOf/playedToday`）。而 **ForEach/LazyForEach 同 key 不重跑 itemGenerator**
+   *   ⇒ 玩完一局回到首页，🔥「N 天」/「今日已玩」**不会刷新**；连切语言也救不回来
+   *   （重渲染用的是 `@Prop` 那份**拷贝**，不会重新求值）。
+   *   ⇒ 与角标（`clearedGames`/`perGameBest`，见下）**同构**：卡片自己 `@StorageProp` 订阅。
+   *   配套改动：`ProgressStore.persistStreaks()` 现在每次连胜变化都会把整张表写进 `'streaks'`。
+   *   ⚠️ 解析走 `CardBadgeCache`（同一份串只 parse 一次，355 张卡共享），别在 build 里直接 JSON.parse。
+   */
+  @StorageProp('streaks') streaksRaw: string = '{}';
+
+  /** 这款当前连胜（0 = 没有 🔥）；读 @StorageProp 建立 ArkUI 依赖，解析走 CardBadgeCache */
+  private streakNow(): number {
+    if (!this.meta) {
+      return 0;
+    }
+    const observed: string = this.streaksRaw;   // ← 依赖声明，别删
+    return CardBadgeCache.streak(observed, this.meta.id);
+  }
+
+  /** 这款今天玩过没（口径同 `ProgressStore.playedToday`） */
+  private playedTodayNow(): boolean {
+    if (!this.meta) {
+      return false;
+    }
+    const observed: string = this.streaksRaw;   // ← 依赖声明，别删
+    return CardBadgeCache.playedToday(observed, this.meta.id);
+  }
   /**
    * ★★★ 2026-11-07：**卡片角标（已通关 🏆 / 最高分）的数据源**。
    *
@@ -1153,11 +1244,11 @@ export struct GameCard {
     if (narrowCard) {
       return 48;
     }
-    if (this.showCrown() && this.bestText().length > 0 && this.streak > 0) {
+    if (this.showCrown() && this.bestText().length > 0 && this.streakNow() > 0) {
       // 三样全亮：角标只画 🏆 + 🔥（分数让位给副标题 —— 判据：可读文字 > 装饰数字）
       return 64;
     }
-    let p: number = this.streak > 0 ? 48 : Space.xs;
+    let p: number = this.streakNow() > 0 ? 48 : Space.xs;
     if (this.showCrown()) {
       p += 18;
     }
@@ -1177,7 +1268,7 @@ export struct GameCard {
    *   ⇒ 三样全亮时不画分数（只留 🏆 + 🔥 N 天）⇒ 胶囊 → ~64vp。判据：可读文字 > 装饰数字。
    */
   private hasThreeBadges(): boolean {
-    return this.showCrown() && this.streak > 0 && this.bestText().length > 0;
+    return this.showCrown() && this.streakNow() > 0 && this.bestText().length > 0;
   }
 
   /**
@@ -1200,7 +1291,7 @@ export struct GameCard {
 
   /** 有没有任何底部角标要画 */  /** 有没有任何底部角标要画 */
   private hasBadge(): boolean {
-    return this.showCrown() || this.bestText().length > 0 || this.streak > 0;
+    return this.showCrown() || this.bestText().length > 0 || this.streakNow() > 0;
   }
 
 build() {
@@ -1240,7 +1331,7 @@ build() {
             Text(this.meta.icon).fontSize(FontSize.xxl).width(56).height(56)
               .textAlign(TextAlign.Center)
           }
-          if (this.playedToday) {
+          if (this.playedTodayNow()) {
             Text('✓')
               .accessibilityLevel('no')
               .fontSize(FontSize.micro)
@@ -1418,11 +1509,11 @@ build() {
               .fontSize(FontSize.micro).fontColor(Color.White).fontWeight(FontWeight.Bold)
               .accessibilityLevel('no')
           }
-          if (this.streak > 0) {
+          if (this.streakNow() > 0) {
             Text('🔥').fontSize(FontSize.micro)
               .width(12).height(14).textAlign(TextAlign.Center)
               .accessibilityLevel('no')
-            Text(this.tn('{n} 天', '{n} d', this.streak, '{n} день', '{n} дня', '{n} дней'))
+            Text(this.tn('{n} 天', '{n} d', this.streakNow(), '{n} день', '{n} дня', '{n} дней'))
               .fontSize(FontSize.micro).fontColor(Color.White).fontWeight(FontWeight.Bold)
           }
         }
@@ -1575,7 +1666,7 @@ build() {
     //   修：两处都走 L(zh, en)
     .accessibilityText(
       this.meta ? (displayName(this.meta) + L('，', ', ') + displayTagline(this.meta)
-        + (this.playedToday ? L('，今日已玩', ', played today') : '')
+        + (this.playedTodayNow() ? L('，今日已玩', ', played today') : '')
         // ★ 2026-11-07：角标也要"读得出来" —— 读屏用户看不见 🏆 和数字。
         //   这里用 bestScore() 而不是 bestText()：极小屏上数字**不显示**，
         //   但读屏仍然该听到（信息不该因为屏幕小而消失）。

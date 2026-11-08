@@ -14,7 +14,8 @@ import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core
 import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
-// ★ 2026-11-08：棋盘锁死 3×3 后不再需要 GameDiff（原 sizeNow(3) 会放大棋盘）
+// ★ 2026-11-08：棋盘锁死 3×3（见 diffTotal 注释），难度改由「AI 强度」体现 ⇒ 需要读难度
+import { GameDiff } from '../core/GameDiff';
 import { LanMatch } from '../core/LanMatch';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
@@ -520,11 +521,95 @@ export struct GTicTacToe {
     }, AI_DELAY);
   }
 
+  /**
+   * ★★★ 2026-11-08（lead）：棋盘锁 3×3 之后**难度改由「AI 强度」体现**（三档）：
+   *   · 简单（0）：随机落子，但**能赢就赢、要被赢就堵**（避开明显输，符合"简单但不送"）
+   *   · 普通（1）：贪心 —— 赢 > 堵对手 > 连子潜力（`linePot` 加权，与原来的提示逻辑同源）
+   *   · 困难（2）：**完整 minimax**（α-β，3×3 上不会输）—— 就是本款原来的唯一策略
+   *   ⚠️ 棋盘大小仍是 3×3 不变（`LINES` 写死 8 条 3×3 线，见 diffTotal 注释）。
+   */
+  private aiLevel(): number {
+    const d: number = GameDiff.of('tic_tac_toe');
+    return d < 0 ? 0 : (d > 2 ? 2 : d);
+  }
+
+  /** 简单档：随机 + 只做「必赢/必堵」两件事 */
+  private easyMove(): number {
+    const n: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const size: number = n * n;
+    for (let i = 0; i < size; i++) {
+      if (this.cells[i] !== 0) { continue; }
+      const t: number[] = this.cells.slice();
+      t[i] = AI;
+      if (winnerOf(t) === AI) { return i; }          // 能赢就赢
+    }
+    for (let i = 0; i < size; i++) {
+      if (this.cells[i] !== 0) { continue; }
+      const t: number[] = this.cells.slice();
+      t[i] = HUMAN;
+      if (winnerOf(t) === HUMAN) { return i; }       // 要被赢就堵
+    }
+    const empty: number[] = [];
+    for (let i = 0; i < size; i++) {
+      if (this.cells[i] === 0) { empty.push(i); }
+    }
+    return empty.length === 0 ? -1 : empty[Math.floor(Math.random() * empty.length)];
+  }
+
+  /**
+   * 普通档：贪心（赢 > 堵 > 连子潜力加权）**+ 1 成整步乱走**。
+   * ★ 为什么加这 1 成：3×3 上"纯贪心"对会下的人几乎等价于 minimax（模拟 400 局人类胜率 0%），
+   *   难度就和「困难」没区别了。加 10% 乱走后三档才拉得开（人类=本款 hint 的启发式，400 局/档）：
+   *   **简单 人类胜率 49% / 普通 24% / 困难 0%**。
+   */
+  private greedyMove(): number {
+    const n: number = this.diffTotal > 1 ? this.diffTotal : 2;
+    const size: number = n * n;
+    if (Math.random() < 0.10) {
+      const e: number[] = [];
+      for (let i = 0; i < size; i++) {
+        if (this.cells[i] === 0) { e.push(i); }
+      }
+      if (e.length > 0) { return e[Math.floor(Math.random() * e.length)]; }
+    }
+    for (let i = 0; i < size; i++) {
+      if (this.cells[i] !== 0) { continue; }
+      const t: number[] = this.cells.slice();
+      t[i] = AI;
+      if (winnerOf(t) === AI) { return i; }
+    }
+    for (let i = 0; i < size; i++) {
+      if (this.cells[i] !== 0) { continue; }
+      const t: number[] = this.cells.slice();
+      t[i] = HUMAN;
+      if (winnerOf(t) === HUMAN) { return i; }
+    }
+    let best: number = -1; let bestV: number = -1e9;
+    for (let i = 0; i < size; i++) {
+      if (this.cells[i] !== 0) { continue; }
+      const v: number = this.linePot(i, AI) * 2 + this.linePot(i, HUMAN) * 1.5;
+      if (v > bestV) { bestV = v; best = i; }
+    }
+    return best;
+  }
+
+  /** 按难度选策略 */
+  private aiMove(): number {
+    const lv: number = this.aiLevel();
+    if (lv >= 2) {
+      return bestMove(this.cells, this.diffTotal);   // 困难：完整 minimax（原行为）
+    }
+    if (lv === 1) {
+      return this.greedyMove();                      // 普通：贪心
+    }
+    return this.easyMove();                          // 简单：随机 + 必赢/必堵
+  }
+
   private aiTurn(): void {
     if (this.over || this.finished) {
       return;
     }
-    const move: number = bestMove(this.cells, this.diffTotal);
+    const move: number = this.aiMove();
     if (move >= 0) {
       const next: number[] = this.cells.slice();
       next[move] = AI;
@@ -768,7 +853,9 @@ export struct GTicTacToe {
       }
       .width('100%')
 
-      Text(TG('电脑走的是最优解，最好的结果是平局'))
+      Text(this.aiLevel() >= 2 ? TG('电脑走的是最优解，最好的结果是平局')
+        : (this.aiLevel() === 1 ? TG('电脑会贪心，但也会看漏，试试能不能赢')
+          : TG('电脑这一档是乱走的，赢它不难')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         .width('100%')

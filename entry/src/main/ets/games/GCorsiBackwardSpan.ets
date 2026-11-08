@@ -50,6 +50,8 @@ export struct GCorsiBackwardSpan {
   onFinish: (r: GameResult) => void = () => {};
 
   @State seq: number[] = [];
+  /** ★ 2026-11-08 代打的记忆副本（闪现结束后抄下） */
+  private aiMem: number[] = [];
   @State active: number = -1;
   @State tapIdx: number = 0;
   @State span: number = START_SPAN;
@@ -110,6 +112,8 @@ export struct GCorsiBackwardSpan {
     if (step >= this.seq.length) {
       this.active = -1;
       this.phase = 1;
+      // ★ 2026-11-08（ai-fixer-a）代打「记住」刚闪过的顺序
+      this.aiMem = this.seq.slice();
       this.tapIdx = 0;
       this.msg = TG('倒着点回来：先点最后亮的那个');
       return;
@@ -210,7 +214,12 @@ export struct GCorsiBackwardSpan {
     if (this.phase !== 1) {
       return true;
     }
-    this.tap(this.seq[this.seq.length - 1 - this.tapIdx]);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 seq（题目序列）**：播放结束那一刻抄一份自己的记忆，
+    //   倒序作答时只读这份记忆。
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.tap(this.aiMem[this.aiMem.length - 1 - this.tapIdx]);
     return !this.over;
   }
 

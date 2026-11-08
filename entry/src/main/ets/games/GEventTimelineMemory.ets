@@ -53,6 +53,8 @@ export struct GEventTimelineMemory {
   @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
   onFinish: (r: GameResult) => void = () => {};
   @State private evs: Ev[] = [];        // 真实顺序
+  /** ★ 2026-11-08 代打的记忆：登场顺序（边看边记） */
+  private aiOrder: number[] = [];
   @State private cards: Ev[] = [];      // 打乱后的牌面
   @State private shown: number = 0;     // 已登场几个
   @State private picks: number[] = [];
@@ -91,12 +93,17 @@ export struct GEventTimelineMemory {
       picked.push(bag.splice(Math.floor(Math.random() * bag.length), 1)[0]);
     }
     this.evs = picked; this.cards = []; this.picks = []; this.shown = 0; this.phase = 0;
+    this.aiOrder = [];   // ★ 新一轮：清空代打记忆
     this.msg = TG2("第 {0} 轮：记住登场顺序", String(this.roundNo)); this.reveal(0);
   }
   private reveal(k: number): void {
     if (k >= LEN) {
       this.msg = TG('记住顺序了？点「打乱作答」');
       return;
+    }
+    // ★ 2026-11-08（ai-fixer-a）代打「记住」第 k 个登场的事件
+    if (this.aiOrder.length === k) {
+      this.aiOrder = this.aiOrder.concat([this.evs[k].k]);
     }
     this.shown = k + 1; this.to1 = setTimeout(() => { this.to1 = -1; this.reveal(k + 1); }, REVEAL);
   }
@@ -205,7 +212,12 @@ export struct GEventTimelineMemory {
     if (this.phase !== 1) {
       return true;               // 2 = 结算中，等 1300ms 换下一轮
     }
-    const want: number = this.evs[this.picks.length].k;
+    // ★ 2026-11-08（ai-fixer-a）**不再读 evs[].k（答案顺序）**：
+    //   登场阶段一个个抄进 aiOrder（见 reveal），作答按自己记的顺序来。
+    if (this.aiOrder.length === 0) {
+      return false;
+    }
+    const want: number = this.aiOrder[this.picks.length];
     for (let i = 0; i < this.cards.length; i++) {
       if (this.cards[i].k === want) {
         this.tapCard(i);

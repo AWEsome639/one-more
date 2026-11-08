@@ -218,10 +218,19 @@ export class ChatFinder {
     // ★ 2026-11-08 **死判据修复**（verifier-eng2 实测）：数据里 **`quick` 是 0 款**，
     //   真实存在的是 **`short`(166)** 与 `timed`(32) ⇒ 「十分钟/短一局」原来**永远匹配不到**。
     if (it.short && (g.tags.indexOf('short') >= 0 || g.tags.indexOf('timed') >= 0)) { sc += 15; }
+    // ★★★ 2026-11-08 二级排序（修「195 款同分、靠 id 字典序」）：
+    //   `short` 命中 195 款，其中只有 **32 款带 timed/speed**（有明确计时/限时玩法），
+    //   其余 163 款只是"标了 short"（可能只是时长短）。
+    //   ⇒ 给带 timed/speed 的再加 6 分，把并列从 195 路压到 32 路。
+    //   ⚠️ **不能用 baseXp 当二级键** —— 355 款全是 12（常量）；
+    //      `GameMeta` 也没有时长/步数这类字段，`tags` 是唯一可用杠杆。
+    if (it.short && (g.tags.indexOf('timed') >= 0 || g.tags.indexOf('speed') >= 0)) { sc += 6; }
     // ★★★ 2026-11-08（game-balancer）**「长局」改用真·时长 tag**：
     //   原来是 `endless | untimed` ⇒ untimed 覆盖 323 款 ⇒ 「找个长局」返回 **332 款**（等于没筛）。
     //   改成 `long`(64) | `endless`(22) ⇒ **78 款**，正好落在 20~80 的理想筛选区间。
     if (it.long && (g.tags.indexOf('long') >= 0 || g.tags.indexOf('endless') >= 0)) { sc += 15; }
+    // ★ 同上（对称）：长局 78 款里只有 22 款是真正的 endless ⇒ 同样 +6 托到前面
+    if (it.long && g.tags.indexOf('endless') >= 0) { sc += 6; }
     // ★★★ 2026-11-08（game-balancer）**「能暂停 / 不限时」不再参与打分**。
     //   判据：`pausable` 覆盖 147 款、`untimed` 覆盖 **323 款（91%）**
     //   ⇒ 加分等于给整个库加同一个常数，对排序**零贡献**；

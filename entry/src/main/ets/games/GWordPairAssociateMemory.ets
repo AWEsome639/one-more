@@ -62,6 +62,8 @@ export struct GWordPairAssociateMemory {
   onFinish: (r: GameResult) => void = () => {};
 
   @State pairs: WordPair[] = []; @State opts: string[] = [];
+  /** ★ 2026-11-08 代打的记忆：记忆阶段看过的配对 */
+  private aiPairs: WordPair[] = [];
   @State phase: number = 0; @State leftS: number = STUDY_S;
   @State qIndex: number = 0; @State right: number = 0; @State score: number = 0;
   @State pickedOk: number = -1; @State lastPick: string = ''; @State msg: string = '';
@@ -100,9 +102,22 @@ export struct GWordPairAssociateMemory {
   }
   private startQuiz(): void {
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
+    // ★ 2026-11-08（ai-fixer-a）代打「记住」刚配对过的词表
+    this.aiPairs = this.pairs.slice();
     this.phase = 1; this.leftS = 0; this.ask();
   }
   /** 3 个别的搭档 + 正确答案塞进随机位置 */
+  /** ★ 2026-11-08 从「记住的配对」里找当前提问词的另一半（不读答案字段） */
+  private aiLookup(): string {
+    const qa: string = this.pairs[this.qIndex].a;   // 屏幕上的提问词（题面）
+    for (let i = 0; i < this.aiPairs.length; i++) {
+      if (this.aiPairs[i].a === qa) {
+        return this.aiPairs[i].b;
+      }
+    }
+    return '';
+  }
+
   private ask(): void {
     const p: WordPair = this.pairs[this.qIndex];
     const others: string[] = [];
@@ -205,7 +220,13 @@ export struct GWordPairAssociateMemory {
     if (this.pickedOk >= 0) {
       return true;
     }
-    this.pick(this.pairs[this.qIndex].b);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 pairs[qIndex].b（答案配对）**：
+    //   记忆阶段把「看到过的配对」抄进 aiPairs，作答时按自己记的那对来点。
+    const want: string = this.aiLookup();
+    if (want.length === 0) {
+      return false;
+    }
+    this.pick(want);
     return !this.over;
   }
 

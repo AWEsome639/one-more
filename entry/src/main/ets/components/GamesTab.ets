@@ -1150,8 +1150,10 @@ build() {
                 //   ⇒ 改成 -1：★ 首屏之外【不做入场动画，直接显示】
                 index: i < 8 ? i : -1,
                 theme: this.theme(),
-                streak: ProgressStore.streakOf(g.id),
-                playedToday: ProgressStore.playedToday(g.id),
+                // ★ 2026-11-08 perf-hunter：**这两个参数删了** —— 卡片改成自己 `@StorageProp('streaks')` 订阅。
+                //   原因：原来靠父传 `@Prop`，而 ForEach **同 key 不重跑 itemGenerator** ⇒ 玩完一局回首页
+                //   🔥「N 天」/「今日已玩」不刷新（连切语言都不行）。现在由 `ProgressStore.persistStreaks()`
+                //   每次连胜变化时写 AppStorage，卡片自订阅 —— 与角标（`clearedGames`/`perGameBest`）同构。
                 onOpen: (id: string) => {
                   this.openGame(id);
                 },

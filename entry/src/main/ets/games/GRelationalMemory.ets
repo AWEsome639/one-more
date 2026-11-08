@@ -52,6 +52,8 @@ export struct GRelationalMemory {
   onFinish: (r: GameResult) => void = () => {};
   @State private sideA: string[] = [];
   @State private sideB: string[] = [];
+  /** ★ 2026-11-08 代打的记忆：study 阶段记下的另一半 */
+  private aiMem: string[] = [];
   @State private options: string[] = [];
   @State private phase: string = 'study';
   @State private qIdx: number = 0;
@@ -84,6 +86,8 @@ export struct GRelationalMemory {
     this.sideB = pool.slice(this.diffTotal, this.diffTotal * 2);
     this.options = [];
     this.phase = 'study'; this.qIdx = 0; this.hits = 0; this.pick = -1;
+    // ★ 2026-11-08（ai-fixer-a）代打「记住」这一组配对（study 阶段看到的）
+    this.aiMem = this.sideB.slice();
     this.over = false; this.won = false; this.done = false; this.startAt = Date.now();
     this.msg = TG2("记住这 {0} 组配对", String(this.diffTotal));
     this.toId = setTimeout(() => { this.toId = -1; this.ask(0); }, STUDY_MS);
@@ -190,7 +194,12 @@ export struct GRelationalMemory {
     if (this.phase !== 'quiz' || this.pick >= 0) {
       return true;
     }
-    this.answer(this.sideB[this.qIdx]);
+    // ★ 2026-11-08（ai-fixer-a）**不再读 sideB[qIdx]（答案）**：
+    //   study 阶段把成对关系抄进 aiMem，作答时按自己记的来找。
+    if (this.aiMem.length === 0) {
+      return false;
+    }
+    this.answer(this.aiMem[this.qIdx]);
     return !this.over;
   }
 

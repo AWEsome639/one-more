@@ -159,6 +159,9 @@ ERROR_WORDS = ('配错', '错手', '失误', '错误', '撞墙', '判错')
 SCORE_LABELS = ('你', '电脑', '我')
 # 判据 1712 ③：时钟/计时 —— 每秒都在动，必须排除，否则卡死的游戏会被误判成 ACTIVE
 CLOCK_PAT = re.compile(r'\d{1,3}\s*[:：]\s*\d{2}')
+# ★ 2026-11-08：用时读数（`9.9 秒`/`8.2 秒`）也必须排除 —— 否则 `得分` 标签的下一节点
+#   若是「8.2 秒」，会被当成得分写进 detail/指纹（AI 重验报告里的 readout 瑕疵）
+TIME_PAT = re.compile(r'\d+(?:\.\d+)?\s*秒')
 # 判据 1712 ②：从一整句话里拆「词 + 数字（可带 /分母）」
 PAIR_PAT = re.compile(r'([\u4e00-\u9fa5A-Za-z]{1,6})\s*[:：]?\s*(\d+(?:\s*/\s*\d+)?)')
 
@@ -778,7 +781,10 @@ def read_readouts(ns):
     out = {}
     for i, t in enumerate(txt):
         if t in ('步数', '得分', '归位') and i + 1 < len(txt):
-            out[t] = txt[i + 1]
+            v = txt[i + 1]
+            if TIME_PAT.search(v):
+                continue                 # 用时不是读数（2026-11-08）
+            out[t] = v
     return out
 
 
@@ -813,7 +819,8 @@ def readout_sig(ns):
                 and (t in SCORE_LABELS or kind in ('p', 'e'))):
             if i + 1 < len(txt):
                 v = txt[i + 1]
-                if len(v) <= 16 and re.search(r'\d', v) and not CLOCK_PAT.search(v):
+                if (len(v) <= 16 and re.search(r'\d', v)
+                        and not CLOCK_PAT.search(v) and not TIME_PAT.search(v)):
                     sig['L:' + t] = v.strip()
         # ② 一整句话里的读数：「已补 1/12 格　步数 1」⇒ 已补=1/12 · 步数=1
         if len(t) > 40 or not re.search(r'\d', t):
@@ -824,6 +831,8 @@ def readout_sig(ns):
             w = m.group(1)
             if len(w) < 2 and w not in SCORE_LABELS:
                 continue                 # 单个字母/符号（'v'、'x'）不算读数标签
+            if re.match(r'\s*(?:\.\d+)?\s*秒', t[m.end():]):
+                continue                 # 「得分 8.2 秒」里的 8.2 不是得分（2026-11-08）
             sig['C:' + w] = re.sub(r'\s+', '', m.group(2))
     return sig
 

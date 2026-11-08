@@ -48,6 +48,8 @@ export struct GDualTaskMemory {
   onFinish: (r: GameResult) => void = () => {};
   @State private phase: number = 0;      // 0 记忆 1 心算 2 回忆 3 结束
   @State private digits: number[] = [];
+  /** ★ 2026-11-08 代打的记忆副本（数字展示结束后抄下） */
+  private aiMem: number[] = [];
   @State private typed: number[] = [];
   @State private qs: MathQ[] = [];
   @State private qIdx: number = 0;
@@ -109,7 +111,23 @@ export struct GDualTaskMemory {
     const q: MathQ = { text: String(a) + (plus ? ' + ' : ' − ') + String(b) + ' = ?', ans: ans, opts: opts };
     return q;
   }
+  /** ★ 2026-11-08 自己算算式（题面形如 "37 + 45 = ?"，减号是 U+2212） */
+  private aiEval(text: string): number {
+    const parts: string[] = text.replace(' = ?', '').split(' ');
+    if (parts.length !== 3) {
+      return Number.NaN;
+    }
+    const a: number = Number(parts[0]);
+    const b: number = Number(parts[2]);
+    if (a !== a || b !== b) {
+      return Number.NaN;
+    }
+    return parts[1] === '+' ? a + b : a - b;
+  }
+
   private toMath(): void {
+    // ★ 2026-11-08（ai-fixer-a）代打「记住」刚看过的 4 个数字
+    this.aiMem = this.digits.slice();
     this.phase = 1; this.qIdx = 0; this.pick = -1; this.msg = TG(TG(TG('边算边记：数字别忘了')));
   }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
@@ -203,12 +221,32 @@ export struct GDualTaskMemory {
       if (this.qIdx >= this.qs.length) {
         return false;
       }
+      // ★ 2026-11-08（ai-fixer-a）**不再读 q.ans（答案）**：
+      //   屏幕上的算式就是题面 ⇒ 自己解析 a ± b 算出来，再去选项里找这个数。
       const q: MathQ = this.qs[this.qIdx];
-      this.answerMath(q.opts.indexOf(q.ans));
+      const val: number = this.aiEval(q.text);
+      if (val !== val) {
+        return false;                 // NaN：解析失败就不动
+      }
+      let idx: number = -1;
+      for (let i = 0; i < q.opts.length; i++) {
+        if (q.opts[i] === val) {
+          idx = i;
+          break;
+        }
+      }
+      if (idx < 0) {
+        return false;
+      }
+      this.answerMath(idx);
       return !this.over;
     }
     if (this.phase === 2 && this.typed.length < SPAN) {
-      this.tapDigit(this.digits[this.typed.length]);
+      // ★ 2026-11-08 数字只读自己的记忆副本（记忆阶段结束时抄下的）
+      if (this.aiMem.length === 0) {
+        return false;
+      }
+      this.tapDigit(this.aiMem[this.typed.length]);
       return !this.over;
     }
     return true;

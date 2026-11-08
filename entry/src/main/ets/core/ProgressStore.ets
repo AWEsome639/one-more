@@ -1568,17 +1568,31 @@ export class ProgressStore {
   }
 
   private static persistStreaks(): void {
-    const p = ProgressStore.pref;
-    if (!p) {
-      return;
-    }
+    // ★★★ 2026-11-08 perf-hunter：**先把整张连胜表同步进 AppStorage**，再落盘。
+    //   根因：`'streaks'` 这个键此前**只在 `init()` 里写过一次**（:263），之后永不更新
+    //     ⇒ 卡片的 🔥连胜 /「今日已玩」永远是启动那一刻的快照。
+    //     （原来这两个值靠父组件传 `@Prop`，而 ForEach/LazyForEach 同 key 不重跑 itemGenerator
+    //       ⇒ 玩完一局回到首页**不会刷新**。现在改成卡片自己 `@StorageProp('streaks')` 订阅。）
+    //   ⚠️ 这一行**必须放在 `if (!p) return` 之前**：pref 没就绪时内存态已经是新的，
+    //     若先 return，UI 就永远等不到那次通知（判据 879 的同类坑：只写一半的同步链）。
     const obj: Record<string, GameStreak> = {};
     ProgressStore.streaks.forEach((v: GameStreak, k: string) => {
       obj[k] = v;
     });
+    let raw: string = '{}';
+    try {
+      raw = JSON.stringify(obj);
+    } catch (e) {
+      raw = '{}';
+    }
+    AppStorage.setOrCreate('streaks', raw);
+    const p = ProgressStore.pref;
+    if (!p) {
+      return;
+    }
     // ★★★ 存储满时 putSync 会抛 ⇒ 静默失败（内存态已更新）
     try {
-      p.putSync('streaks', JSON.stringify(obj));
+      p.putSync('streaks', raw);
       p.flush();
     } catch (e) {
     }

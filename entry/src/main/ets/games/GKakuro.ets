@@ -626,7 +626,10 @@ export struct GKakuro {
       //   ⇒ 2560×1600 下棋盘线索撑到 `y≈1593`，**「提示 / AI 代打」两个按钮被挤出视口**
       //   （dump 25 个节点里没有任何按钮，玩家和验证器都点不到）。
       //   ⇒ 按判据 1802：**约束加在「棋盘容器」上**，横屏按可用高反推。
-      .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 260 : 9999 })
+      //   ★ 2026-11-08 第二次校准（verifier-dev 真机量）：`-260` 时棋盘 273vp，
+      //     但按钮行实际 y = 1613–1727px（屏高 1600）⇒ **超出 13~127px**。
+      //     再压 43vp ⇒ `-310`（棋盘 ≈230vp），按钮应落到 ≈1478–1592px（屏内）。
+      .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 310 : 9999 })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
