@@ -447,7 +447,7 @@ export struct StreakFlame {
     Row({ space: Space.xs }) {
       Text('🔥')
         .accessibilityLevel('no')
-        .fontSize(FontSize.lg)
+        .fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center)
         // ★ 2026-11-07 emoji 固定盒子：lg=18 ⇒ 24×24（1.33em，≥ 1.30em 行盒；advance 实测 1.00em）
         .width(24).height(24).textAlign(TextAlign.Center)
         .scale({ x: this.pulse, y: this.pulse })

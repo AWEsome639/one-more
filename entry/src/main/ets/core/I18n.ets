@@ -1154,6 +1154,7 @@ export function gameName(id: string, zh: string, en: string): string {
 }
 
 const EXTRA: Record<string, Record<string, string>> = {
+  "难度对得上": { "ja": "難易度が合ってる", "ko": "난이도가 맞음", "es": "Dificultad adecuada", "fr": "Difficulte adaptee", "de": "Passender Schwierigkeitsgrad", "pt": "Dificuldade certa", "ru": "Подходящая сложность", "it": "Difficolta giusta", "ar": "صعوبة مناسبة", "zh-Hant": "難度對得上" },
   "和你说的那款相近": { "ja": "言ったあの作品に似てる", "ko": "말한 그 게임과 비슷", "es": "Similar al que dijiste", "fr": "Similaire a celui cite", "de": "Ahnlich wie das genannte", "pt": "Parecido com o que citou", "ru": "Похоже на названное", "it": "Simile a quello citato", "ar": "مشابه لما ذكرته", "zh-Hant": "和你說的那款相近" },
   "棋牌": { "ja": "ボード・カード", "ko": "보드/카드", "es": "Tablero y cartas", "fr": "Plateau et cartes", "de": "Brett und Karten", "pt": "Tabuleiro e cartas", "ru": "Доска и карты", "it": "Tavolo e carte", "ar": "لوح وورق", "zh-Hant": "棋牌" },
   "联机": { "ja": "オンライン", "ko": "온라인", "es": "En linea", "fr": "En ligne", "de": "Online", "pt": "Online", "ru": "Онлайн", "it": "Online", "ar": "عبر الشبكة", "zh-Hant": "聯機" },

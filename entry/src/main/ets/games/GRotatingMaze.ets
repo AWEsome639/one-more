@@ -356,7 +356,7 @@ export struct GRotatingMaze {
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Row({ space: Space.xs }) {
-        Text('🌀').accessibilityLevel('no').fontSize(FontSize.lg).rotate({ angle: this.turns * 90 })
+        Text('🌀').accessibilityLevel('no').fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center).rotate({ angle: this.turns * 90 })
           .animation({ duration: Motion.base, curve: Motion.snap() })
         Text(this.note).fontSize(FontSize.sm)
         // ★ 通关庆祝

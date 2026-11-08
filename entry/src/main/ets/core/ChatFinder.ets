@@ -155,7 +155,21 @@ export class ChatFinder {
   private static scoreOf(g: GameMeta, it: Intent): number {
     let sc: number = 0;
     if (it.category !== null && g.category === it.category) { sc += 40; }
-    if (it.difficulty !== null && g.difficulty === it.difficulty) { sc += 25; }
+    // ★★★ 2026-11-08 **难度数据修复**（verifier-eng2 实测：`EASY` 只有 **0 款**、`HARD` 1 款，
+    //   355 款里 354 款是 NORMAL）⇒ 「简单点 / 太难了 / 适合小孩」这三类最常见问法**永远答不出**。
+    //   `difficulty` 字段本身是坏的（全 NORMAL），但 **`tags` 里有 `easy`(48) / `hard`(58) / `medium`(103)**
+    //   ⇒ 匹配时**两个都看**：字段对上 +25，tag 对上 +20（不重复加，取较高那档）。
+    if (it.difficulty !== null) {
+      const tagHit: boolean =
+        (it.difficulty === Difficulty.EASY && g.tags.indexOf('easy') >= 0)
+        || (it.difficulty === Difficulty.HARD && g.tags.indexOf('hard') >= 0)
+        || (it.difficulty === Difficulty.NORMAL && g.tags.indexOf('medium') >= 0);
+      if (g.difficulty === it.difficulty) {
+        sc += 25;
+      } else if (tagHit) {
+        sc += 20;
+      }
+    }
     // ★ 2026-11-08 **死判据修复**（verifier-eng2 实测）：数据里 **`quick` 是 0 款**，
     //   真实存在的是 **`short`(166)** 与 `timed`(32) ⇒ 「十分钟/短一局」原来**永远匹配不到**。
     if (it.short && (g.tags.indexOf('short') >= 0 || g.tags.indexOf('timed') >= 0 || g.tags.indexOf('quick') >= 0)) { sc += 15; }
@@ -204,7 +218,7 @@ export class ChatFinder {
       if (sc <= 0) { continue; }
       let why: string = '';
       if (it.category !== null && g.category === it.category) { why = TG('是「' + it.category + '」类'); }
-      else if (it.difficulty !== null && g.difficulty === it.difficulty) { why = TG('难度正好是「' + it.difficulty + '」'); }
+      else if (it.difficulty !== null && (g.difficulty === it.difficulty || g.tags.indexOf(it.difficulty === Difficulty.EASY ? 'easy' : (it.difficulty === Difficulty.HARD ? 'hard' : 'medium')) >= 0)) { why = TG('难度对得上'); }
       else if (it.pausable && g.tags.indexOf('pausable') >= 0) { why = TG('可以随时暂停'); }
       else if (it.similar.length > 0 && g.id !== it.similar) { why = TG('和你说的那款相近'); }
       else { why = TG('符合你的口味'); }

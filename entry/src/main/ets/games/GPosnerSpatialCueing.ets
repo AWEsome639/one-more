@@ -289,7 +289,7 @@ export struct GPosnerSpatialCueing {
           if (this.phase === 1 && this.cueSide === (0)) {
           Text(true ? '⬅️' : '➡️').fontSize(FontSize.xxl)
           } else if (this.phase >= 2 && this.targetSide === (0)) {
-          Text('🎯').accessibilityLevel('no').fontSize(FontSize.xxxl)
+          Text('🎯').accessibilityLevel('no').fontSize(FontSize.xxxl).width(40).height(40).textAlign(TextAlign.Center)
           } else {
           Text('·').accessibilityLevel('no').fontSize(FontSize.lg).fontColor(this.theme.inkFaint)
           }
@@ -300,7 +300,7 @@ export struct GPosnerSpatialCueing {
           if (this.phase === 1 && this.cueSide === (1)) {
           Text(false ? '⬅️' : '➡️').fontSize(FontSize.xxl)
           } else if (this.phase >= 2 && this.targetSide === (1)) {
-          Text('🎯').fontSize(FontSize.xxxl)
+          Text('🎯').fontSize(FontSize.xxxl).width(40).height(40).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           } else {
           Text('·').fontSize(FontSize.lg).fontColor(this.theme.inkFaint)

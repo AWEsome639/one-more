@@ -295,7 +295,7 @@ export struct SettingsTab {
   starCard() {
     Column({ space: Space.xs }) {
       Row({ space: Space.sm }) {
-        Text('⭐').fontSize(FontSize.lg)
+        Text('⭐').fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center)
           .accessibilityLevel('no')
         Column({ space: 2 }) {
           Text(this.t('在 GitHub 上标星', 'Star it on GitHub'))
@@ -768,7 +768,7 @@ build() {
       //   设计：① 只放必要信息（不放真名/学号）② 邮箱可复制（不裸链）③ 署名用英文名
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
-          Text('✉️').fontSize(FontSize.lg)
+          Text('✉️').fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           Column({ space: 2 }) {
             Text(this.t('反馈与关于', 'Feedback & about'))
@@ -784,7 +784,7 @@ build() {
         //   ⇒ 作者邮箱下面多一行「拾海（AI）」的邮箱，给用户第二条直达通道。
         Row({ space: Space.sm }) {
           Text('🤖')
-            .fontSize(FontSize.sm)
+            .fontSize(FontSize.sm).width(19).height(19).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           Text(About.SHAJIA_EMAIL)
             .minFontSize(9)
@@ -852,7 +852,7 @@ build() {
         Divider().color(this.theme().line).margin({ top: Space.xs, bottom: Space.xs })
 
         Row({ space: Space.sm }) {
-          Text('🔒').fontSize(FontSize.md)
+          Text('🔒').fontSize(FontSize.md).width(22).height(22).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           Text(this.t(About.PRIVACY_TITLE_CN, About.PRIVACY_TITLE_EN))
             .fontSize(FontSize.sm).fontColor(this.theme().ink).layoutWeight(1)
@@ -1083,7 +1083,7 @@ build() {
         // ★ 2026-10-13 奥森：「可以加"长辈模式""简约模式"什么的」⇒ 定名【大字模式 / 紧凑模式】
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
-          Text('🔠').fontSize(FontSize.lg)
+          Text('🔠').fontSize(FontSize.lg).width(24).height(24).textAlign(TextAlign.Center)
             .accessibilityLevel('no')
           Column({ space: 2 }) {
             Text(this.t('界面模式', 'Layout scale'))
@@ -1396,7 +1396,7 @@ build() {
   confirmPanel() {
     Column({ space: Space.sm }) {
       Row({ space: Space.xs }) {
-        Text('⚠️').fontSize(FontSize.md)
+        Text('⚠️').fontSize(FontSize.md).width(22).height(22).textAlign(TextAlign.Center)
           .accessibilityLevel('no')
         Text(this.t('真的要清空吗？', 'Really clear everything?'))
           .fontSize(FontSize.sm)
