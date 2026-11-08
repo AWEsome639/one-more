@@ -45,6 +45,13 @@ export struct GAttentionalBlink {
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State private seq: string[] = [];
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来遍历 `opts` 找 `this.digit`（答案是生成器手里的那个数字）。
+   *   ⇒ 改成 AI **把闪现过的每一项记进 `aiSeen`**，作答时取「记忆里出现、且也在 4 个选项里」的那一个
+   *     （字母不在选项里 ⇒ 自然只剩那个数字）。这就是本款要考的"从流里捞出数字"。
+   */
+  private aiSeen: string[] = [];
   @State private digit: string = '0';
   @State private idx: number = -1;      // -1 未开始，LEN = 已播完
   @State private showing: boolean = false;
@@ -101,6 +108,7 @@ export struct GAttentionalBlink {
     this.opts = mixed;
     this.pick = -1;
     this.idx = -1;
+    this.aiSeen = [];
     this.showing = false;
     this.msg = TG2("第 {0} 轮：数字混在字母里，记住它是几", String(this.trialNo));
     this.nextTo = setTimeout(() => { this.nextTo = -1; this.play(0); }, 600);
@@ -115,6 +123,7 @@ export struct GAttentionalBlink {
     }
     this.idx = k;
     this.showing = true;
+    this.aiSeen = this.aiSeen.concat([this.seq[k]]);   // ★ AI 也在看：每闪一个记一个
     this.tickTo = setTimeout(() => {
       this.tickTo = -1;
       this.showing = false;
@@ -229,13 +238,16 @@ export struct GAttentionalBlink {
     if (this.over || this.pick >= 0 || this.idx < LEN) {
       return true;              // 还在刺激/过渡阶段，等
     }
-    for (let i = 0; i < this.opts.length; i++) {
-      if (this.opts[i] === this.digit) {
-        this.answer(i);
-        return true;
+    for (let s = this.aiSeen.length - 1; s >= 0; s--) {
+      const seen: string = this.aiSeen[s];
+      for (let i = 0; i < this.opts.length; i++) {
+        if (this.opts[i] === seen) {
+          this.answer(i);
+          return true;
+        }
       }
     }
-    return false;
+    return false;              // 没看住 ⇒ 停手，不读 digit 字段
   }
 
   private askHint(): void {

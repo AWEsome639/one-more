@@ -144,6 +144,27 @@ PLAY_STYLE_PIN = {
     #   判据 =「玩家实际在做什么操作」，不是「游戏名像什么」。
     'dynamic_salience': 'ps_reaction',    # 20 秒内点掉会自己换位置的亮方块 = 追移动目标
     'polyomino_tiling': 'ps_fill',        # 铺满网格（polyomino tiling）⇒ 与多米诺拼盘同源
+    # ═══ 2026-11-08 四轮抽检（98.0%）：**ps_search 被类别兜底系统性污染**（22 款里 13 款不是「找目标」）═══
+    #   根因：这批游戏 category 几乎全是 SPATIAL，被 `space` 的兜底顺带塞进 search。
+    #   ✅ 判据（code-hunter 记）：**某类抽样错误率 >25% 时必须全量看**，别只抽 —— 这轮就是抽样漏掉的。
+    'cross_section_slice': 'ps_spatial',      # 5×5×5 方块堆只画第 h 层，逆推几个 = 空间想象
+    'shadow_pivot': 'ps_spatial',             # 光源转角度挑对应影子 = 心理旋转
+    'symmetry': 'ps_spatial',                 # 判断关于哪条轴对称
+    'silhouette_match': 'ps_spatial',         # 剪影匹配
+    'silhouette_match_ortho': 'ps_spatial',   # 正投影剪影
+    'shape_shifter': 'ps_spatial',            # 形状变换
+    'geometric_vision': 'ps_quiz',            # 几何直觉 = 比两块图形谁占的格子多 ⇒ 与「面积周长」同源（不是在脑内转形）
+    'topology': 'ps_spatial',                 # 拓扑等价判断
+    'area_perimeter_match': 'ps_quiz',        # 两个矩形比面积/周长，10 题答对 ≥7 = 答题
+    'color_match': 'ps_match',                # 点中同色连同整片消掉 = 三消
+    'navon_hierarchical': 'ps_attention',     # 大图字母+小图字母 = Navon 整体/局部冲突
+    'visual_crowding_acuity': 'ps_attention', # 拥挤视力 = 外周辨认（不是"找目标"）
+    'ab_reversal_oddball': 'ps_reaction',     # AB 反转 = 交替刺激+24 帧限时点「反转」⇒ 与「注意瞬脱/奇偶闪现」同族
+    # 反向：这两款**真的是 search / memory**，却被 attention 正则吃了
+    'conjunction_search': 'ps_search',        # 联合特征搜索 = 多特征找目标
+    'dual_coding': 'ps_memory',               # 图文双通道 = 记忆编码
+    # 麻将连连看：4×4 共 16 张、点两张相同的牌 = **配对**，不是纸牌接龙
+    'mahjong_solitaire': 'ps_match',
     # ⚠️ 'peg_solitaire'（孔明棋）**不是纸牌**，但它含 solitaire 会被 ps_card 正则抢走 ⇒ 钉回 ps_push
     'peg_solitaire': 'ps_push',
     # ① ps_other 里本可归类的 23 款（真·other 只留 7：4 款可视化 + 3 款纸牌）

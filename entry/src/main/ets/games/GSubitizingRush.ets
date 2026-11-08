@@ -48,6 +48,13 @@ export struct GSubitizingRush {
   onFinish: (r: GameResult) => void = () => {};
 
   @State private dots: number[] = [];
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `this.answer(this.cnt)` —— 直接读出题时存下的个数。
+   *   ⇒ 改成 AI 在**圆点消失那一刻**自己数一遍（`this.dots.length`，屏幕上亮着的那些）记进 `aiCnt`，
+   *     作答答自己的计数。
+   */
+  private aiCnt: number = 0;
   @State private cnt: number = 0;
   @State private shown: boolean = true;   // 圆点是否还亮着
   @State private round: number = 1;
@@ -106,6 +113,7 @@ export struct GSubitizingRush {
     this.msg = TG(TG(TG('一眼看出有几个点')));
     this.hideTo = setTimeout(() => {
       this.hideTo = -1;
+      this.aiCnt = this.dots.length;   // ★ 圆点消失的一瞬：AI 把自己看到的个数记下来
       this.shown = false;
       this.msg = TG(TG(TG('刚才有几个点？')));
     }, SHOW_MS);
@@ -211,7 +219,7 @@ export struct GSubitizingRush {
     if (this.pick >= 0 || this.shown) {
       return true;
     }
-    this.answer(this.cnt);
+    this.answer(this.aiCnt);
     return !this.over;
   }
 

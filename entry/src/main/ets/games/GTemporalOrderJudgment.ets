@@ -47,6 +47,13 @@ export struct GTemporalOrderJudgment {
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State embA: string = ''; @State embB: string = ''; @State sideA: number = 0;
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `this.answer(this.sideA)` —— 直接读答案（先出现的那一侧）。
+   *   ⇒ 改成 AI 在**第一个图案消失那一刻**记下"它出现在哪一侧"（`aiFirstSide`），
+   *     作答时答自己的记忆。
+   */
+  private aiFirstSide: number = 0;
   @State lit: number = -1;       // -1 无　0 第一次闪现　1 第二次闪现
   @State phase: number = 0;      // 0 第一下　1 间隔　2 第二下　3 作答　4 反馈
   @State trial: number = 1; @State hits: number = 0; @State score: number = 0;
@@ -82,7 +89,9 @@ export struct GTemporalOrderJudgment {
     this.lit = 0; this.phase = 0;
     this.msg = TG2("第 {0} / {1} 次：看清先后",Digits(String(this.trial), this.langCode),Digits(String(this.diffTotal), this.langCode));
     this.timer = setTimeout(() => {
-      this.timer = -1; this.lit = -1; this.phase = 1;
+      this.timer = -1;
+      this.aiFirstSide = this.sideA;     // ★ 第一个图案刚消失：记住它在哪一侧
+      this.lit = -1; this.phase = 1;
       this.timer = setTimeout(() => {
         this.timer = -1; this.lit = 1; this.phase = 2;
         this.timer = setTimeout(() => {
@@ -202,7 +211,7 @@ export struct GTemporalOrderJudgment {
     if (this.phase !== 3 || this.over) {
       return true;
     }
-    this.answer(this.sideA);
+    this.answer(this.aiFirstSide);
     return !this.over;
   }
 

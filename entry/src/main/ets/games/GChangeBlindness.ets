@@ -49,6 +49,13 @@ export struct GChangeBlindness {
   @State private base: string[] = [];
   @State private shown: string[] = [];
   @State private at: number = -1;       // 被换掉的那一格
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `this.answer(this.at)` —— 直接读"哪一格被换"。
+   *   ⇒ 改成**靠记忆找不同**：第一眼遮住那一刻抄下 `base`（`aiBase`），
+   *     第二眼把屏幕上的 `shown` 与记忆逐格比对 ⇒ 不一样的那一格就是答案。
+   */
+  private aiBase: string[] = [];
   @State private phase: number = 0;     // 0=第一眼 1=翻动 2=第二眼
   @State private idx: number = 0;
   @State private roundNo: number = 1;
@@ -109,7 +116,11 @@ export struct GChangeBlindness {
     this.at = at;
     this.pick = -1; this.idx = 0; this.phase = 0;
     this.msg = TG2("第 {0} 轮：记住这 9 个符号", String(this.roundNo));
-    this.stepTo = setTimeout(() => { this.stepTo = -1; this.phase = 1; this.msg = TG('翻动中…'); this.flip(0); }, PEEK_MS);
+    this.stepTo = setTimeout(() => {
+      this.stepTo = -1;
+      this.aiBase = this.base.slice();   // ★ 第一眼结束：记住刚才那 9 个符号
+      this.phase = 1; this.msg = TG('翻动中…'); this.flip(0);
+    }, PEEK_MS);
   }
   /** 一格一格遮住第一眼（约 540ms），遮完立刻进入第二眼 */
   private flip(k: number): void {
@@ -230,7 +241,17 @@ export struct GChangeBlindness {
     if (this.phase !== 2 || this.pick >= 0) {
       return true;              // 还在第一眼/翻动中，或已答完等下一轮
     }
-    this.answer(this.at);
+    let changed: number = -1;
+    for (let i = 0; i < this.shown.length; i++) {
+      if (i < this.aiBase.length && this.shown[i] !== this.aiBase[i]) {
+        changed = i;
+        break;
+      }
+    }
+    if (changed < 0) {
+      return false;              // 没记住 ⇒ 停手，不读答案字段
+    }
+    this.answer(changed);
     return !this.over;
   }
 

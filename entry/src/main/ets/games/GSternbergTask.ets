@@ -47,6 +47,13 @@ export struct GSternbergTask {
   @State private diffTotal: number = GameDiff.sizeNow(TRIALS);
   onFinish: (r: GameResult) => void = () => {};
   @State memo: string[] = []; @State probe: string = ''; @State inSet: boolean = false;
+  /**
+   * ★★★ 2026-11-08 代打「不抄答案」：
+   *   原来 `this.answer(this.inSet)` —— 直接读答案布尔。
+   *   ⇒ 改成 AI 在**集合被收起那一刻**把看到的 `memo` 抄进 `aiMemo`（这就是"记住了"），
+   *     作答时判断**检测项**（`probe` 是屏幕上的题面）在不在自己的记忆里。
+   */
+  private aiMemo: string[] = [];
   @State phase: number = 0;      // 0 记忆　1 探测　2 反馈
   @State trial: number = 1; @State hits: number = 0; @State score: number = 0;
   @State over: boolean = false; @State won: boolean = false; @State msg: string = '';
@@ -86,7 +93,9 @@ export struct GSternbergTask {
     this.phase = 0;
     this.msg = TG2("第 {0} / {1} 次：记住这 {2} 个",Digits(String(this.trial), this.langCode),Digits(String(this.diffTotal), this.langCode), SET_N);
     this.timer = setTimeout(() => {
-      this.timer = -1; this.phase = 1; this.shownAt = Date.now();
+      this.timer = -1;
+      this.aiMemo = this.memo.slice();     // ★ 收起集合的一瞬：记住这几个
+      this.phase = 1; this.shownAt = Date.now();
       this.msg = TG2('刚才的集合里有 {0} 吗？', this.probe);
     }, SHOW_MS);
   }
@@ -198,7 +207,14 @@ export struct GSternbergTask {
     if (this.over) {
       return false;
     }
-    this.answer(this.inSet);
+    let hit: boolean = false;
+    for (let i = 0; i < this.aiMemo.length; i++) {
+      if (this.aiMemo[i] === this.probe) {
+        hit = true;
+        break;
+      }
+    }
+    this.answer(hit);
     return !this.over;
   }
 
