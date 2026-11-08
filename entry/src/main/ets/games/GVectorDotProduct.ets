@@ -285,7 +285,7 @@ export struct GVectorDotProduct {
     this.onFinish(r); }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -297,17 +297,19 @@ export struct GVectorDotProduct {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.round) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.right) + '/' + String(PASS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
         // ★ 得分跳动
@@ -315,6 +317,7 @@ export struct GVectorDotProduct {
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
+        .justifyContent(FlexAlign.SpaceBetween)
       }.width('100%')
       Column({ space: Space.xs }) {
         Text(TG('➡️ 点积')).fontSize(FontSize.sm).fontColor(Palette.primary)
@@ -324,6 +327,7 @@ export struct GVectorDotProduct {
           .fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card)
+        .justifyContent(FlexAlign.SpaceBetween)
       Text(this.msg).fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.sm }) {

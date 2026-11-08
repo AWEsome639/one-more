@@ -342,21 +342,24 @@ export struct GAlgebraicInequalitySolver {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('进度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((String(this.idx + 1) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        .justifyContent(FlexAlign.SpaceBetween)
       }.width('100%')
 
       Column({ space: Space.sm }) {
@@ -365,6 +368,7 @@ export struct GAlgebraicInequalitySolver {
         Text(this.quiz.text).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         Text(TG('求 x 的解集')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+        .justifyContent(FlexAlign.SpaceBetween)
       .animation({ duration: Motion.base, curve: Motion.snap() })
 
       Text(this.tip).fontSize(FontSize.sm).fontColor(this.lastRight ? Palette.emerald : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
