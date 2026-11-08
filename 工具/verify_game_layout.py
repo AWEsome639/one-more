@@ -46,6 +46,31 @@ def dump(path='/data/local/tmp/layout.json'):
     except Exception:
         return None
 
+def clipped_text(tree, tol=4):
+    """⚠️ v12：「真被裁」的机器判据。
+    节点底边 > 父容器底边 + tol ⇒ 这个节点溢出了父盒子（会被裁/压）。
+    返回 (被裁节点数, 最深的那个节点的 y2, 文本)。
+    ⚠️ 为什么不用「max_bottom >= 1584」：按钮「贴屏底」是设计（Sudoku 就是），不算裁。
+    """
+    hits = []
+    def walk(n, parent_bottom):
+        a = n.get('attributes', {})
+        t = (a.get('text') or ''); b = (a.get('bounds') or '')
+        y2 = None
+        m = re.match(r'\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]', b or '')
+        if m:
+            y2 = int(m.group(4))
+            if y2 is not None and parent_bottom is not None and y2 > parent_bottom + tol:
+                hits.append((y2, t))
+        nb = y2 if y2 is not None else parent_bottom
+        for c in (n.get('children') or []):
+            walk(c, nb)
+    walk(tree, None)
+    if not hits:
+        return (0, 0, '')
+    hits.sort(reverse=True)
+    return (len(hits), hits[0][0], hits[0][1][:30])
+
 def collect(d, pred):
     out = []
     def w(n):
@@ -197,6 +222,7 @@ def verify_one(en_name):
             if y2 == mb:
                 lo = t[:30]; break
         return mb, lo
+    clip_n, clip_y, clip_t = clipped_text(d2 if d2 else {})
     cands = []
     for tree in (d2, d2b, d2c):
         if tree:
@@ -205,6 +231,10 @@ def verify_one(en_name):
         cands = [(0, '')]
     max_bottom, lowest = min(cands, key=lambda x: x[0])   # 取 best-case（三次里的最小值）
 
+    # ⚠️ v12 尝试：「用『有没有节点被父盒子裁掉』判真/假」——**失败，已回退**
+    #   实测 `Sudoku`（看图完全正常）也被判 clip=2：因为「底部按钮行」整个在
+    #   「游戏区盒子（底 1516）」之外，属设计，不是裁。
+    #   ⇒ **结论：自动分级不可靠，一律给截图（v11），由人看图判**（判据 1854）。
     if max_bottom <= CONTENT_BOTTOM:
         status = 'OK'
     elif max_bottom <= GESTURE_LIMIT:
@@ -217,7 +247,7 @@ def verify_one(en_name):
     sh('uitest uiInput keyEvent Back')
     time.sleep(0.8)
     close_search()
-    return (status, {'max_bottom': max_bottom, 'lowest': lowest, 'count': cnt, 'shot': shot})
+    return (status, {'max_bottom': max_bottom, 'lowest': lowest, 'count': cnt, 'shot': shot, 'clip': clip_n, 'clip_at': f'{clip_t}@{clip_y}'})
 
 def main():
     if len(sys.argv) < 2:
