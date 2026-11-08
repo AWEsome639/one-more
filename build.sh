@@ -57,7 +57,7 @@ _strict_pre() {
   local newer
   newer=$(find entry/src/main/ets -name '*.ets' -newer "$ABC_PATH" -print -quit 2>/dev/null)
   if [ -n "$newer" ]; then
-    echo "── BUILD_STRICT：源码比产物新（$newer）──"
+    echo "── BUILD_STRICT：源码比产物新（${newer}）──"
     echo "   ⇒ 先 clean 再全量构建；**代价：全量重建实测约 10 分 48 秒**"
     "$DEVECO_CLI_CLT_PATH/hvigor/bin/hvigorw" --no-daemon clean >/dev/null 2>&1 || true
   fi
