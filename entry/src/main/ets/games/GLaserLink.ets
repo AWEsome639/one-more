@@ -242,7 +242,13 @@ export struct GLaserLink {
     if (this.over) {
       return true;
     }
-    this.aiTurn(0);
+    // ★ 2026-11-09（ai-fixer-a）**不再按 this.slots 的预置顺序转**：
+    //   对每个可转格试一次「翻过去」，用纯函数 refresh() 读点亮数，取提升最大的那格。
+    const s: number = this.aiBestSlot();
+    if (s < 0) {
+      return false;
+    }
+    this.rotateAt(s);
     return !this.over;
   }
 
@@ -328,6 +334,29 @@ export struct GLaserLink {
     return t > 0 ? (t === 1 ? Palette.cyan : Palette.amber) : this.theme.surface;
   }
   /** AI 用：每面镜子都只需转一次（造局时把解态取反当开局）⇒ 按槽位顺序各转一次 */
+  /** ★ 2026-11-09 一眼看穿：逐格试转，取「点亮数最多」的那格（refresh() 是纯计算） */
+  private aiBestSlot(): number {
+    const base: number[] = this.grid.slice();
+    const baseLit: number = this.lit;
+    let best: number = -1;
+    let bestLit: number = baseLit;
+    for (let i = 0; i < this.slots.length; i++) {
+      const sl: number = this.slots[i];
+      const g: number[] = base.slice();
+      g[sl] = g[sl] >= 2 ? 1 : g[sl] + 1;
+      this.grid = g;
+      this.refresh();
+      const got: number = this.lit;
+      if (got > bestLit) {
+        bestLit = got;
+        best = sl;
+      }
+    }
+    this.grid = base.slice();
+    this.refresh();          // 恢复光束与已亮数（纯计算，无副作用）
+    return best;
+  }
+
   private aiTurn(_d: number): void {
     if (this.over || this.moves >= this.slots.length) { return; }
     this.rotateAt(this.slots[this.moves]);

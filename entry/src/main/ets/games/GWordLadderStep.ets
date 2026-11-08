@@ -240,8 +240,12 @@ export struct GWordLadderStep {
     if (this.picked >= 0) {
       return true;              // 已答，等它换下一题
     }
+    // ★ 2026-11-09（ai-fixer-a）**不再读 opts[i].ok（答案标记）**：
+    //   规则写在题面「挑只差一个字母的真实单词」⇒ 对每个选项算 differs(cur) 并查词库，
+    //   差 1 个字母且是真词的那条就是答案。
     for (let i = 0; i < this.opts.length; i++) {
-      if (this.opts[i].ok) {
+      const w: string = this.opts[i].text;
+      if (differs(w, this.cur) === 1 && isWord(w)) {
         this.tap(i);
         return !this.over;
       }

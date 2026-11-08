@@ -89,6 +89,28 @@ export struct GGridDisplacement {
     this.msg = TG(TG(TG('被墙挡住的那一步，原地不动')));
   }
 
+  /** ★ 2026-11-09 按方向序列从起点推终点（被墙挡住的那步原地不动） */
+  private aiFinal(): number {
+    let r: number = Math.floor(this.startPos / N);
+    let c: number = this.startPos % N;
+    for (let i = 0; i < this.steps.length; i++) {
+      const st: Step = this.steps[i];
+      if (!st.ok) {
+        continue;
+      }
+      if (st.d === 0) {
+        r = r - 1;
+      } else if (st.d === 2) {
+        r = r + 1;
+      } else if (st.d === 1) {
+        c = c + 1;
+      } else {
+        c = c - 1;
+      }
+    }
+    return r * N + c;
+  }
+
   private seqText(): string {
     const parts: string[] = [];
     for (let i = 0; i < this.steps.length; i++) { parts.push(ARROWS[this.steps[i].d]); }
@@ -187,7 +209,9 @@ export struct GGridDisplacement {
     if (this.over) {
       return true;
     }
-    this.tap(this.curPos);
+    // ★ 2026-11-09（ai-fixer-a）**不再读 curPos（答案位置）**：
+    //   屏幕上给了起点 + 每一步的方向和是否被墙挡住 ⇒ 自己从 startPos 一步步推。
+    this.tap(this.aiFinal());
     return !this.over;
   }
 
