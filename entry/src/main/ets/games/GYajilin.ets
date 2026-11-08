@@ -449,7 +449,11 @@ export struct GYajilin {
       }.width('100%').aspectRatio(1).padding(Space.xs).backgroundColor(this.theme.surfaceAlt)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      // ★ 2026-11-09：真机 dump 实测「提示」按钮到 1600（屏底）⇒ 溢出
+    //   原写法 Math.max(140, Bp.height - 360) 的【下限 140 会反噬】：
+    //   -360 只限制了「棋盘的 maxHeight」，没算「HUD + 说明 + 提示 + 按钮行」
+    //   ⇒ 下限 140、N 360 一起调（判据 1826 + 1848 候选）
+    .constraintSize({ maxHeight: Math.max(120, Bp.height - 380) })
       .borderRadius(Radius.lg).shadow(Shadow.card)
 
       Text(this.tip).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
