@@ -352,7 +352,7 @@ export struct GDoubleTrouble {
   }
 
   build() {
-    Column({ space: Space.sm }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -364,33 +364,36 @@ export struct GDoubleTrouble {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('轮次'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.round + ' / ' + ROUNDS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('生命'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.hearts())).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
-        Column({ space: 2 }) {
+        .justifyContent(FlexAlign.SpaceBetween)
+        Row({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.right), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
+        .justifyContent(FlexAlign.SpaceBetween)
       }
       .width('100%')
 

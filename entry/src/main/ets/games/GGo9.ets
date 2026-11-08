@@ -1009,7 +1009,7 @@ export struct GGo9 {
 
 
   build() {
-    Column({ space: Space.sm }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -1111,17 +1111,18 @@ export struct GGo9 {
   /** 顶部小格：kind 0=我提子 1=对方提子 2=手数（只收种类，不收值） */
   @Builder
   statBox(kind: number) {
-    Column({ space: 2 }) {
+    Row({ space: Space.xs }) {
       Text(kind === 0 ? TG('我提子') : (kind === 1 ? (LanMatch.isActive() ? TG('对手提子') : TG('电脑提子')) : TG('手数')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(kind === 0 ? String(this.myCap) : (kind === 1 ? String(this.foeCap) : String(this.moves)))
         .fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
     }
     .layoutWeight(1)
-    .padding(Space.sm)
+    .padding(Space.xs)
     .backgroundColor(this.theme.surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
+    .justifyContent(FlexAlign.SpaceBetween)
   }
 
   /**
