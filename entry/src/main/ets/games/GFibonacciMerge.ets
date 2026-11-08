@@ -280,7 +280,11 @@ export struct GFibonacciMerge {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    // ★ 2026-11-09：根 Column 的 space 从 md(16) 降到 sm(8) —— 7 个子块之间有 6 个间隙，
+    //   6×8vp = 48vp = 144px。真机 dump：提示行底 1567 > 游戏区底 1516（溢出 51px）。
+    //   ⚠️ 上一版「压上方 padding」只降了 9px —— 因为上方压了、间隙没变（判据 1851 的同类：
+    //   真正占高的是「间隙」和「固定高块」，不是「padding」。
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -311,7 +315,7 @@ export struct GFibonacciMerge {
       Column({ space: Space.xs }) {
         // ★ 2026-11-09：删 '🌀'（24vp）—— 真机实测「重开」按钮到 1600（屏底），压上方元素（判据 1850 之外，属 1826）
         Text(TG('把相邻两数合成斐波那契数')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.primary).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.xs }) {
         ForEach(this.slots, (i: number) => {
           Stack() {
