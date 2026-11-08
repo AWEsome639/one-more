@@ -79,7 +79,10 @@ def search_game(en_name):
                 break
     sh('uitest uiInput click 1280 435')       # 聚焦搜索框
     time.sleep(0.6)
-    sh(f"uinput -K -t '{en_name}'")
+    # ⚠️ v5：uinput 对「带空格的字符串」不可靠（v4 实测 8/10 失败）
+    #   ⇒ 只输「第一个词」（如 'Snake 3D' → 'Snake'），多搜几款没关系，点第一个
+    kw = en_name.split()[0] if en_name.split() else en_name
+    sh(f"uinput -K -t '{kw}'")
     time.sleep(1.6)
 
 def close_search():
