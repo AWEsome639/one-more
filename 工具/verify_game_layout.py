@@ -83,7 +83,7 @@ def search_game(en_name):
     #   ⇒ 只输「第一个词」（如 'Snake 3D' → 'Snake'），多搜几款没关系，点第一个
     kw = en_name.split()[0] if en_name.split() else en_name
     sh(f"uinput -K -t '{kw}'")
-    time.sleep(1.6)
+    time.sleep(2.6)   # ⚠️ v6：1.6 不够（手动 debug 2026-11-09 06:32）
 
 def close_search():
     if in_search_mode():
@@ -116,7 +116,7 @@ def verify_one(en_name):
         close_search()
         return ('NO_CARD', {})
     sh(f'uitest uiInput click {target[0]} {target[1]}')
-    time.sleep(2.2)
+    time.sleep(3.0)   # ⚠️ v6：2.2 不够
     d2 = dump(f'/data/local/tmp/game_{en_name}.json')   # ← v4：落盘，明早可查
     if not d2:
         sh('uitest uiInput keyEvent Back'); close_search()
