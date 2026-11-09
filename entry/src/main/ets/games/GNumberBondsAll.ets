@@ -338,7 +338,7 @@ export struct GNumberBondsAll {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -350,21 +350,21 @@ export struct GNumberBondsAll {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('目标'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.target), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Row({ space: Space.xs }) {
         Text((TG('已拆'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.found.length + '/' + this.total())).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Row({ space: Space.xs }) {
         Text((TG('失误'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.err + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         // ★ 错误抖动
         .translate({ x: this.shakeX })
         .animation({ duration: Motion.fast, curve: Motion.snap() })
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
 
       Column({ space: Space.sm }) {

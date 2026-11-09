@@ -7,6 +7,7 @@
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -351,7 +352,7 @@ export struct GNumberBonds {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
 
@@ -368,21 +369,21 @@ export struct GNumberBonds {
 
       })
       Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('第几题'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Row({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.right + '/' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Row({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
 
       Column({ space: Space.xs }) {
@@ -391,17 +392,17 @@ export struct GNumberBonds {
           .accessibilityLevel('no')
           .fontSize(FontSize.lg).fontColor(this.theme.inkFaint)
         Row({ space: Space.lg }) {
-          Text((this.hideFirst) ? '?' : String((this.shown))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor((this.hideFirst) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).width(84).height(Cell.of(64)).backgroundColor((this.hideFirst) ? Palette.teal : this.theme.surfaceAlt).borderRadius(Radius.md)
-          Text((!this.hideFirst) ? '?' : String((this.shown))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor((!this.hideFirst) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).width(84).height(Cell.of(64)).backgroundColor((!this.hideFirst) ? Palette.teal : this.theme.surfaceAlt).borderRadius(Radius.md)
+          Text((this.hideFirst) ? '?' : String((this.shown))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor((this.hideFirst) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).width(84).height(Cell.of(52)).backgroundColor((this.hideFirst) ? Palette.teal : this.theme.surfaceAlt).borderRadius(Radius.md)
+          Text((!this.hideFirst) ? '?' : String((this.shown))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor((!this.hideFirst) ? '#FFFFFF' : this.theme.ink).textAlign(TextAlign.Center).width(84).height(Cell.of(52)).backgroundColor((!this.hideFirst) ? Palette.teal : this.theme.surfaceAlt).borderRadius(Radius.md)
         }.width('100%').justifyContent(FlexAlign.Center)
-      }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
       Column({ space: Space.sm }) {
         ForEach(this.slots, (i: number) => {
           Row({ space: Space.sm }) {
             Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
             Text(String(this.opts[i])).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
-          }.width('100%').height(Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+          }.width('100%').height(Cell.of(36)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
             Haptics.tick();
             this.pick(i);
           })
@@ -417,6 +418,9 @@ export struct GNumberBonds {
 
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
 
+      // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 是同一个动作）—— 判据 1859；
+      //   真机里它把「答案数字键」最后一行挤到 1590px（屏底），本身也被裁。
+      if (!Bp.isShort()) {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White).backgroundColor(Palette.teal).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => {
           Haptics.tap();
@@ -427,6 +431,7 @@ export struct GNumberBonds {
       .onBlur(() => { if (this.tvFocus === 'L412') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L412'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+      }
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
