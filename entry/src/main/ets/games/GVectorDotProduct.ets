@@ -4,6 +4,7 @@
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -406,7 +407,9 @@ export struct GVectorDotProduct {
         .onBlur(() => { if (this.tvFocus === 'L377') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L377'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('提示：对应分量相乘再全部相加，负号也算进去')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+      Text(TG('提示：对应分量相乘再全部相加，负号也算进去'))
+        // ★ 2026-11-09：矮屏不渲染说明行（A1 可删，判据 1853/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

@@ -5,6 +5,7 @@
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -345,6 +346,8 @@ export struct GCognateCatch {
         .onBlur(() => { if (this.tvFocus === 'L332') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L332')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：词形像不等于同源 —— 要看它们能不能追到同一个古词根'))
+        // ★ 2026-11-09：矮屏不渲染说明行（A1 可删，判据 1853/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {

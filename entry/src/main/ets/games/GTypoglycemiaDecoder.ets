@@ -4,6 +4,7 @@
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -332,7 +333,9 @@ export struct GTypoglycemiaDecoder {
           .outline(Tv.focusOutline(this.tvFocus === 'L327'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }.width('100%')
-      Text(TG('提示：首尾字母没动，中间只是被洗过牌')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(TG('提示：首尾字母没动，中间只是被洗过牌'))
+        // ★ 2026-11-09：矮屏不渲染说明行（A1 可删，判据 1853/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

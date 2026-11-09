@@ -341,6 +341,8 @@ export struct GAffixFactory {
         .onBlur(() => { if (this.tvFocus === 'L334') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L334')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：un- / re- / dis- 走前面，-ful / -less / -ness 挂后面'))
+        // ★ 2026-11-09：矮屏不渲染说明行（A1 可删，判据 1853/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

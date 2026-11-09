@@ -8,6 +8,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Motion, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -377,6 +378,8 @@ export struct GConsonantReconstruct {
       }
       .width('100%')
       Text(TG('提示：下划线是被人挖走的元音，字母总数照原样保留'))
+        // ★ 2026-11-09：矮屏不渲染说明行（A1 可删，判据 1853/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {

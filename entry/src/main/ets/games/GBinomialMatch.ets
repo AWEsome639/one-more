@@ -9,6 +9,7 @@
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -511,6 +512,8 @@ export struct GBinomialMatch {
         })
 
       Text(TG('提示：C(n,k) 从杨辉三角读最快 —— 例如 C(4,2) = 6'))
+        // ★ 2026-11-09：矮屏不渲染说明行（A1 可删，判据 1853/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         .width('100%')
