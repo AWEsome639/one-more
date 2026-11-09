@@ -302,7 +302,7 @@ export struct GCorsiBlocks {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -320,20 +320,20 @@ export struct GCorsiBlocks {
 
       })
       Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('长度'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.span), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('最长'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(Digits(String(this.best), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.primary))
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('生命'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.life + ' / ' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
 
