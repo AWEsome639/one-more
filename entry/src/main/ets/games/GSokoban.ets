@@ -657,7 +657,8 @@ export struct GSokoban {
       }
       .width('100%')
 
-      // ── 关卡圆点 ──
+      // ── 关卡圆点 ──（★ 2026-11-09：矮屏不渲染 —— 纯装饰，真机里它是「底部按钮被裁」的最后一根稻草）
+      if (!Bp.isShort()) {
       Row({ space: Space.xs }) {
         ForEach(LEVELS, (lv: Level, i: number) => {
           Row()
@@ -670,6 +671,7 @@ export struct GSokoban {
         }, (lv: Level, i: number) => 'dot' + i)
       }
       .width('100%')
+      }
 
       // ── 棋盘 ──
       Column({ space: 0 }) {
@@ -693,6 +695,7 @@ export struct GSokoban {
       //   ★ 数值依据（真机预算）：游戏区上限 = Bp.height − 190 = 343vp；
       //     游戏内部固定项（HUD 60 + 状态 20 + **方向键区 ~96** + 间距 ~64）≈ 240vp
       //     ⇒ 棋盘可用高 ≈ Bp.height − 480（533 → 53vp；8 行 ⇒ 每格 10vp（下限），棋盘 80×80）。
+      //   ★★ 2026-11-09：方向键挪到「状态行右侧」后，竖向预算改成 − 380（533 → 153vp；8 行 ⇒ 每格 19vp）。
       //   ★★★ 2026-11-08 真机回归（verifier-eng2）**第一次算少了 50vp**：
       //     原来写 `− 390`（棋盘 136vp），实测方向键容器 `y=489~533`、`▲` 底边 = 屏高 533.3
       //     ⇒ **零余量，`↓/←/→` 三个方向键全被裁掉**（dump 里根本没有这三个节点）。
@@ -700,7 +703,7 @@ export struct GSokoban {
       //     ⇒ 改成 `− 440`，棋盘 88vp ⇒ 方向键区上方多出 ~48vp 余量。
       .constraintSize({
         maxWidth: Bp.height < 600
-          ? Math.min(Bp.width - 40, this.w * Math.max(10, Math.floor((Bp.height - 480) / Math.max(1, this.h))))
+          ? Math.min(Bp.width - 40, this.w * Math.max(10, Math.floor((Bp.height - 440) / Math.max(1, this.h))))
           : 9999
       })
       .padding(Space.xs)
@@ -736,18 +739,22 @@ export struct GSokoban {
           })
       )
 
-      Text(this.statusText())
-        .fontSize(FontSize.sm)
-        .fontColor(this.solvedNow ? Palette.emerald : this.theme.inkSoft)
-
-      // ── 方向键 ──
-      Column({ space: Space.sm }) {
-        this.padBtn('▲', 'U', 0, -1)
-        Row({ space: Space.sm }) {
+      // ★ 2026-11-09：状态行与方向键并排 —— 横屏里方向键原来独占 ~96vp 竖向，
+      //   逼得棋盘只能 10vp/格（真机截图：棋盘缩成 150px 一团、底部四按钮还被裁）。
+      //   挪到右侧后棋盘可用高回到 ~180vp（判据 1851：先看「谁占了多少竖向」）。
+      Row({ space: Space.sm }) {
+        Text(this.statusText())
+          .fontSize(FontSize.sm)
+          .fontColor(this.solvedNow ? Palette.emerald : this.theme.inkSoft)
+          .layoutWeight(1)
+        // ★ 十字布局改「一排四键」：竖向 106vp → 48vp，省 58vp 给棋盘（判据 1851）
+        Row({ space: Space.xs }) {
           this.padBtn('◀', 'L', -1, 0)
+          this.padBtn('▲', 'U', 0, -1)
           this.padBtn('▼', 'D', 0, 1)
           this.padBtn('▶', 'R', 1, 0)
         }
+        .width(Cell.of(340))
       }
       .width('100%')
 
@@ -760,7 +767,7 @@ export struct GSokoban {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(48))
+          .height(Cell.of(42))
           .enabled(this.level > 0)
           .onClick(() => {
             Haptics.tap();
@@ -778,7 +785,7 @@ export struct GSokoban {
           .backgroundColor(Palette.primary)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(48))
+          .height(Cell.of(42))
           .onClick(() => {
             Haptics.tap();
             this.load(this.level);
@@ -795,7 +802,7 @@ export struct GSokoban {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(48))
+          .height(Cell.of(42))
           .onClick(() => {
             Haptics.tap();
             this.undo();
@@ -812,7 +819,7 @@ export struct GSokoban {
           .backgroundColor(this.solvedNow ? Palette.emerald : this.theme.lineSoft)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(48))
+          .height(Cell.of(42))
           .enabled(this.level < LEVELS.length - 1)
           .onClick(() => {
             Haptics.tap();
@@ -864,7 +871,7 @@ export struct GSokoban {
       .backgroundColor(this.pressed === key ? Palette.primary : this.theme.surfaceAlt)
       .borderRadius(Radius.md)
       .width(80)
-      .height(Cell.of(48))
+      .height(Cell.of(42))
       .scale({
         x: this.pressed === key ? Motion.pressScale : 1,
         y: this.pressed === key ? Motion.pressScale : 1
