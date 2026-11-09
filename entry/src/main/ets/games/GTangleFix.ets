@@ -551,8 +551,10 @@ export struct GTangleFix {
           .fontWeight(FontWeight.Bold)
           .fontColor(Palette.primaryDeep)
           }
-          .layoutWeight(1)
-          .aspectRatio(1)
+          // ★ 2026-11-09：原来 `layoutWeight(1)+aspectRatio(1)` ⇒ 每个圆直径 = 行宽/6 ≈ 139vp
+          //   （判据 1822 的乘法形态）⇒ 把下方「彩色横条」面板整行挤出屏。改成固定 56vp。
+          .width(Cell.of(56))
+          .height(Cell.of(56))
           .backgroundColor(tint(Palette.wheel[this.order[(p)] % Palette.wheel.length], this.theme.isDark))
           .borderRadius(Radius.full)
           .border({
@@ -573,6 +575,7 @@ export struct GTangleFix {
         }, (p: number) => 'p' + p)
       }
       .width('100%')
+      .justifyContent(FlexAlign.SpaceAround)
 
       // 每条线一行「公交图」，重叠 = 交叉
       Column({ space: Space.xs }) {

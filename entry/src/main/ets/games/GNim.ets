@@ -406,7 +406,7 @@ export struct GNim {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -418,23 +418,23 @@ export struct GNim {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.md }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('剩余石子'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.total(this.piles)))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
-        .layoutWeight(1).padding(Space.sm)
+        .layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('你的步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text(Digits(String(this.moves), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
-        .layoutWeight(1).padding(Space.sm)
+        .layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('轮到'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((this.over ? '—' : (this.turn === 0 ? TG('你') : 'AI'))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
-        .layoutWeight(1).padding(Space.sm)
+        .layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }
       .width('100%')
