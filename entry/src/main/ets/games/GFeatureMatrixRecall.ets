@@ -327,7 +327,7 @@ export struct GFeatureMatrixRecall {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -381,7 +381,7 @@ export struct GFeatureMatrixRecall {
       }.width('100%').aspectRatio(1).padding(Space.sm)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      .constraintSize({ maxHeight: Math.max(120, Bp.height - 420) })   // ★ 2026-11-09：-360 → -420（提交键被裁）
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
       Button(this.phase === 2 ? TG('再来一局') : TG('提交'))
