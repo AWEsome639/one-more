@@ -616,7 +616,10 @@ export struct GTetris {
       .aspectRatio(COLS / ROWS)
       // ★ 2026-10-31 真机：宽驱动 + 无高度上限 ⇒ 横屏 853×533 上棋盘撑到 813vp 高，
       //   把「重开」等按钮挤出屏幕。限高让它按 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      // ★ 2026-11-09：-360 → -390。真机截图：棋盘（10×20 竖方）底边被控制行遮住、
+      //   再下面「重开」紫按钮只露一条边 ⇒ 竖向再让 30vp 出来。
+      //   （棋盘 10:20 的竖方在横屏里必然超高，格子边长只能按「可用高 ÷ 20」定 —— 判据 1856）
+      .constraintSize({ maxHeight: Math.max(100, Bp.height - 420) })
       .padding(GAP)
       .backgroundColor(this.theme.isDark ? '#0B0B12' : '#E2E8F0')
       .borderRadius(Radius.lg)
@@ -672,7 +675,8 @@ export struct GTetris {
   /** kind: 0=得分 1=消行 2=等级 */
   @Builder
   infoBox(kind: number) {
-    Column({ space: 2 }) {
+    // ★ 2026-11-09：竖排两行 → 横排一行（矮屏省 ~10vp；真机里「重开」按钮被裁下沿）
+    Row({ space: Space.xs }) {
       Text(kind === 0 ? TG('得分') : (kind === 1 ? TG('消行') : TG('等级')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
@@ -683,7 +687,8 @@ export struct GTetris {
         .fontColor(this.theme.ink)
     }
     .layoutWeight(1)
-    .padding(Space.sm)
+    .justifyContent(FlexAlign.SpaceBetween)
+    .padding(Space.xs)
     .backgroundColor(this.theme.surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
