@@ -269,6 +269,16 @@ def verify_one(en_name):
     if not in_game:
         sh('uitest uiInput keyEvent Back'); close_search()
         return ('NOT_IN_GAME', {'texts': texts2[:5]})
+    # ★ 2026-11-09（判据 1865）：**先等演示结束再量** —— 演示条占 `~24vp(72px)`，
+    #   不固定这个状态，同一款两次测量能差 80px。
+    for _dw in range(5):
+        if '演示中' not in ''.join(texts2):
+            break
+        time.sleep(3.0)
+        _d = dump('/data/local/tmp/c2.json')
+        if _d:
+            d2 = _d
+            texts2 = [t for t, _ in collect(d2, lambda t: True)]
     # ⚠️ v4：max_bottom 只看「有文本」的节点（排除根容器/装饰背景）
     def bottom_of(tree):
         ns = collect(tree, lambda t: len(t.strip()) > 0)
