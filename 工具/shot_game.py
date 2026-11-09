@@ -82,9 +82,13 @@ def main():
     if len(sys.argv) < 2:
         print(__doc__); return
     name = sys.argv[1]
-    for _ in range(3):
+    # ★ 2026-11-09：回首页兜底（复测里 40 款 `NOT_HOME` 就是这里只有「Back 三次」）
+    for _ in range(4):
         if is_home(): break
         sh('uitest uiInput keyEvent Back'); time.sleep(1.2)
+    if not is_home():
+        sh('aa force-stop com.andrewoscar.onemore'); time.sleep(1.0)
+        sh('aa start -a EntryAbility -b com.andrewoscar.onemore'); time.sleep(6.0)
     if not is_home():
         print('NOT_HOME'); return
     # ⚠️ 2026-11-09：**搜索词只取第一个词会搜不到**（如 "Set Theory Venn" 只打 "Set"）
