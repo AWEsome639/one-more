@@ -289,9 +289,10 @@ def verify_one(en_name):
         for t, (_, _, _, y2) in ns:
             if y2 == mb:
                 lo = t[:30]; break
-        def walk(n):
+        def walk(n, anc_click=False):
             nonlocal lo_click
             a = n.get('attributes', {})
+            here = anc_click or ((a.get('clickable') or '') == 'true')
             t = (a.get('text') or '').strip()
             b = a.get('bounds', '')
             if t and b.startswith('['):
@@ -300,9 +301,9 @@ def verify_one(en_name):
                 except Exception:
                     y2 = -1
                 if y2 == mb:
-                    lo_click = (a.get('clickable') or '')
+                    lo_click = 'true' if here else 'false'
             for c in (n.get('children') or []):
-                walk(c)
+                walk(c, here)
         try:
             walk(tree)
         except Exception:
