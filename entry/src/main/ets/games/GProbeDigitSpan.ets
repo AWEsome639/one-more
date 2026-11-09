@@ -298,7 +298,7 @@ export struct GProbeDigitSpan {
             ForEach(COLS, (col: number) => { Button(String((row * 5 + col)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF')
             .backgroundColor(this.typed === String((row * 5 + col)) && this.phase === 1 ? Palette.sky : Palette.primary).animation({ duration: Motion.fast, curve: Motion.snap() })
-            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50))
+            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(42))
             .enabled(this.phase === 1)
             .onClick(() => { Haptics.tap(); this.answer((row * 5 + col)); })
             .focusable(Tv.on())

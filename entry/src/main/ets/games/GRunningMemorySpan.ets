@@ -300,7 +300,7 @@ export struct GRunningMemorySpan {
       Row({ space: Space.xs }) {
         ForEach([1, 2, 3, 4, 5], (d: number) => {
           Text(String((d))).fontSize(FontSize.xl).fontColor(this.theme.ink).textAlign(TextAlign.Center)
-          .layoutWeight(1).height(Cell.of(50)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
+          .layoutWeight(1).height(Cell.of(42)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
           .opacity(this.phase === 'input' ? 1 : 0.4)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.keyTap((d)); })
@@ -314,7 +314,7 @@ export struct GRunningMemorySpan {
       Row({ space: Space.xs }) {
         ForEach([6, 7, 8, 9, 0], (d: number) => {
           Text(String((d))).fontSize(FontSize.xl).fontColor(this.theme.ink).textAlign(TextAlign.Center)
-          .layoutWeight(1).height(Cell.of(50)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
+          .layoutWeight(1).height(Cell.of(42)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
           .opacity(this.phase === 'input' ? 1 : 0.4)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.keyTap((d)); })

@@ -457,7 +457,7 @@ export struct GBinaryMatrixRank {
               .layoutWeight(1)
           }
           .width('100%')
-          .height(Cell.of(48))
+          .height(Cell.of(42))
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
