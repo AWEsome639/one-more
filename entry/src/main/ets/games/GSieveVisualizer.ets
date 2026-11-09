@@ -351,6 +351,12 @@ export struct GSieveVisualizer {
    *    ⇒ 按真实可用空间算。模式已在 GBejeweled / GReversi 真机验过：
    *      横屏 293vp（装得下、按钮可见）/ 竖屏 704vp（尽量大、无空白）。
    */
+    /** 格内数字字号：三位数（100）在 10 列格子里最挤 ⇒ 降几号，避免折行/省略号 */
+    private cellFont(n: number): number {
+    // 10 列格子在横屏只有 ~13vp 宽；用「绝对值」而不是相对档位，保证三位数也单行
+    return n >= 100 ? 6 : (n >= 10 ? 7 : 8);
+  }
+
     private boardPx(): number {
     // ★★★ 2026-10-31 · 第四版（前三版都错，完整记录）：
     //   ① `Bp.height * 0.55`          ⇒ 横屏 293vp，把「重开」挤出屏幕
@@ -361,9 +367,12 @@ export struct GSieveVisualizer {
     //   ④ 用实测数据反推：需要棋盘 ≤ 205vp ⇒ 比例取 **0.70**。
     //      横屏 (533-260)*0.70 = 191vp ⇒ 「重开」约 480vp（安全）
     //      竖屏 (1280-260)*0.70 = 714vp（受宽度限，仍比旧 704 大）
-    const FIXED: number = 200;   // ★ 第 1020 轮：与 GBejeweled 同步（算式逐字相同 ⇒ 可套同值）   // ★ 第五版：实测黑白棋固定部分更大，取 300 覆盖所有款
+    // ★ 2026-11-09：FIXED 200 → 300、比例 0.70 → 0.62。
+    //   真机（533vp）：旧式 = (533-200)*0.70 = 233vp ⇒ 棋盘太大，把「说明行 + 开始按钮行」挤出屏。
+    //   新式 = (533-300)*0.62 = 144vp ⇒ 棋盘 144vp（10×10 每格 14vp，够点），底部按钮回屏内。
+    const FIXED: number = 300;
     const w: number = Math.max(160, Bp.width - 40);
-    const h: number = Math.max(120, (Bp.height - FIXED) * 0.70);
+    const h: number = Math.max(120, (Bp.height - FIXED) * 0.56);   // ★ 2026-11-09：0.62 → 0.56，给底部图例行留位置
     return Math.min(w, h);
   }
 
@@ -425,7 +434,8 @@ export struct GSieveVisualizer {
             ForEach(COLS_IDX, (c: number) => {
               Stack() {
               Text(String((r * COLS + c + 1)))
-              .fontSize(FontSize.xxs)
+              .fontSize(this.cellFont(r * COLS + c + 1))
+              .maxLines(1).textOverflow({ overflow: TextOverflow.Clip })
               .fontWeight(FontWeight.Bold)
               .fontColor(this.numColor((r * COLS + c + 1)))
               }

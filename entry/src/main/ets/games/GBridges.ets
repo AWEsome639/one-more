@@ -1099,7 +1099,8 @@ export struct GBridges {
   /** kind: 0=桥 1=完成岛 2=用时 */
   @Builder
   infoBox(kind: number) {
-    Column({ space: 2 }) {
+    // ★ 2026-11-09：竖排两行 → 横排一行（判据 1857；真机里底部四按钮下沿被裁）
+    Row({ space: Space.xs }) {
       Text(kind === 0 ? TG('桥') : (kind === 1 ? TG('完成岛') : TG('用时')))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
@@ -1110,7 +1111,8 @@ export struct GBridges {
         .fontColor(this.theme.ink)
     }
     .layoutWeight(1)
-    .padding(Space.sm)
+    .justifyContent(FlexAlign.SpaceBetween)
+    .padding(Space.xs)
     .backgroundColor(this.theme.surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
