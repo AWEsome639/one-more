@@ -334,7 +334,10 @@ export struct GPeripheralFocus {
       .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L326'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+      // ★ 2026-11-09（判据 1867）：矮屏不渲染这条「说明」（A1 型可删；游玩不依赖它）
+      if (!Bp.isShort()) {
       Text(TG('提示：视线始终留在中心 ➕ 上，只靠余光看四周的格子')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+      }
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
