@@ -294,3 +294,56 @@ const dim: string = JSON.stringify(want.parameters[formInfo.FormParam.DIMENSION_
 - **没查 `previewImages` 的图片该放哪、什么规格**（`rawfile`/`media`、1:1？）—— 真要加得再查官方。
 - **没动"卡片点击行为"**：卡片文案说「点我开一局」，但 `form_config.json` 没配 `action`
   （要在卡片里配 `FormLink`/`onClick` 才能跳转）⇒ 这条**可能本来就是个空承诺**，建议单独核。
+
+---
+
+## 9. 执行记录（2026-11-08 晚，Lead 拍板后落地）
+
+> **断言基线**：`bash 工具/check_assertions.sh` ⇒ **200359 / 0** ✅（每步都跑）。**未编译**。
+
+### 9.1 ① 「点我开一局」——**修法改了**（不是 `formConfigAbility`）
+
+| 项 | 结论 |
+|---|---|
+| 官方对 `formConfigAbility` 的定义 | 「表示桌面**点击编辑后**，需要拉起的 ability 路径」⇒ 那是**编辑**入口，**不是普通点击** |
+| 正确机制 | `postCardAction(this, { action: 'router', abilityName: 'EntryAbility' })`（官方《卡片跳转到应用页面（router事件）》）|
+| 为什么能直接用 | `postCardAction` 声明在 `component/common.d.ts`（**全局函数**，卡片内无需 import）；`router` 官方注明「**只允许在点击事件中触发**」 |
+| 落地 | 卡片**根 Column** 加 `.onClick` + `try/catch`（异常时回到"点了没反应"，不会崩） |
+| 能直达指定页吗 | **能，但要两段**：`params: { targetPage }` + `EntryAbility.onCreate/onNewWant` 读 `want.parameters.params` 再 `loadContent`。本工程没做这层 ⇒ **现在只到首页**（Lead 已认可"首页也算能用"） |
+
+> `FormLink` 是**静态卡片**用的；我们是动态卡（`isDynamic` 默认 true），所以不用它。
+
+### 9.2 ② `previewImages`
+
+| 项 | 结论 |
+|---|---|
+| 值格式 | `$media:xxx`（本地 `sdk/.../modulecheck/forms.json` schema 就是这么约束的）|
+| 顺序 | 与 `supportDimensions` **一一对应** |
+| 生成了 4 张（后两张是 ③ 的）| `card_preview_2x2.png` 512×512 · `2x4` 1024×512 · `2x3` 512×768 · `3x3` 768×768 |
+| 画法 | **纯色 + 几何**：`#1E1B4B` 卡底 + 主题色圆（LV 环）+ 白杠（称号/状态）+ 进度条。**无文字、无标注、无水印**（奥森 2026-11-03 定的原则）|
+
+> ⚠️ **一个差点编译失败的坑**：我第一版把说明写成 `//` 注释塞进 `form_config.json`，
+> 当场用 `json.loads` 验证 ⇒ `Expecting property name enclosed in double quotes: line 23`
+> —— **`.json` 是严格 JSON（只有 `.json5` 允许注释）**。注释已全部删掉，理由记在这里。
+
+### 9.3 ③ 手表版布局（`2*3` / `3*3` 纯手表卡）
+
+| 环节 | 做法 |
+|---|---|
+| **尺寸检测** | `StatsCardAbility.onAddForm(want)` 读 `want.parameters[formInfo.FormParam.DIMENSION_KEY]` → `dimName()` 映射成 `'2*3'`/`'3*3'`/`'2*2'`… → 随 `formBindingData` 注入 |
+| **刷新时怎么知道尺寸** | `onUpdateForm/onFormVisible` **只给 formId、不给 want** ⇒ 用 `Map<formId, dim>` 在 `onAddForm` 时记下，`push()` 按 id 取回（取不到退回 `'2*2'`）|
+| **卡片怎么判** | `@LocalStorageProp('dim')` + `isWatchCard()` = `dim === '2*3' \|\| dim === '3*3'`（**不用 `Bp`** —— 卡片进程里 Bp 恒为 360×780，`tinyWatch()` 永远 false）|
+| **新手表卡** | `form_config.json` 加第二条 `StatsCardWatch`，`supportDimensions: ["2*3","3*3"]`（官方：这两档**仅手表**）⇒ **天然区分设备**，手机那条 `StatsCard`（2*2/2*4）**完全不动** |
+| **手表版布局** | 删：品牌名整行、🔥 连胜、底部文案；留：LV 环 40→**28**、等级 16→**13**、称号 13→**12** + `maxLines(1)`、今日打卡（micro）、进度条 5；行距 8→**6**、内边距 12→**8** |
+| **竖长卡的空白** | 手表卡加 `justifyContent(FlexAlign.SpaceBetween)` ⇒ 进度条压到底边（否则 2*3 下半屏全黑）|
+| 新增资源 | `card_watch_display_name` / `card_watch_desc`（`base/element/string.json`）|
+
+**手表版高度复算**：`8 + max(28, 12+2+14) + 6 + 5 + 8 = **≈ 67vp**`（桌面版 ≈124vp）⇒ 2*3 里绰绰有余。
+
+### 9.4 ⚠️ 仍然没验的（要真机）
+
+1. **`2*3`/`3*3` 在手表上到底多大** —— 官方不给 vp，我的 67vp 是按"结构"算的，**真实 bounds 要 dump**。
+2. **`postCardAction` 是否真的拉起 App** —— 卡片的 `router` 事件只在**点击**时触发，桌面环境里跑不了静态检查。
+3. **`SpaceBetween` 在 2*3 上的观感**（`3*3` 是方卡、`2*3` 是竖长卡，两档可能给人不同感觉）。
+4. **两张新卡的自增预览图是否被卡片中心接受**（`$media:` 路径 + PNG 尺寸对不上官方要求时会静默不显示）。
+5. **`dims` Map 的生命周期**：`FormExtensionAbility` 进程被回收后 Map 清空 ⇒ 之后 `push()` 会退回 `'2*2'`（**手表卡会瞬间变回桌面布局**）。稳妥做法是把 dim 也塞进卡片的 LocalStorage 持久化，或从 `formBindingData` 反查 —— **本轮没做**（要再验一次系统是否允许在 update 时不带 dim）。
