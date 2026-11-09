@@ -8,6 +8,7 @@
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2, TG4 } from '../core/GameI18n';
@@ -391,6 +392,9 @@ export struct GNumberBondsAll {
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('100%').layoutWeight(1)
+      // ★ 2026-11-09：格子区是 `layoutWeight` 型 —— 删「重开」只会让它更大（判据 1851）。
+      //   真机：`max_bottom=1600`、`lowest='2'`（格子里数字贴屏底）⇒ 给它「上限」才真的省高度。
+      .constraintSize({ maxHeight: Math.max(120, Bp.height - 380) })
 
       Text(this.found.length > 0 ? TG2('已拆出：{0}', this.found.join('  ')) : TG('还没拆出任何一组')).fontSize(FontSize.xs).fontColor(Palette.violet).width('100%')
 
@@ -399,6 +403,8 @@ export struct GNumberBondsAll {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
+      // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859）
+      if (!Bp.isShort()) {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White).backgroundColor(Palette.violet).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => {
           Haptics.tap();
@@ -409,6 +415,7 @@ export struct GNumberBondsAll {
       .onBlur(() => { if (this.tvFocus === 'L403') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L403'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+      }
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
