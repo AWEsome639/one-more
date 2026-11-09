@@ -429,7 +429,7 @@ export struct GCryptoArithmetic {
           Stack() {
           Text(this.slots[(0)] < 0 ? this.letterAt((0)) : String(this.slots[(0)])).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
           .fontColor(this.slots[(0)] < 0 ? this.theme.inkFaint : (this.sel === (0) ? '#FFFFFF' : this.theme.ink))
-          }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (0) ? Palette.violet : this.theme.surfaceAlt)
+          }.layoutWeight(1).height(Cell.of(52)).backgroundColor(this.sel === (0) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L371'; })
@@ -440,7 +440,7 @@ export struct GCryptoArithmetic {
           Stack() {
           Text(this.slots[(1)] < 0 ? this.letterAt((1)) : String(this.slots[(1)])).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
           .fontColor(this.slots[(1)] < 0 ? this.theme.inkFaint : (this.sel === (1) ? '#FFFFFF' : this.theme.ink))
-          }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (1) ? Palette.violet : this.theme.surfaceAlt)
+          }.layoutWeight(1).height(Cell.of(52)).backgroundColor(this.sel === (1) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L380'; })
@@ -453,7 +453,7 @@ export struct GCryptoArithmetic {
           Stack() {
           Text(this.slots[(2)] < 0 ? this.letterAt((2)) : String(this.slots[(2)])).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
           .fontColor(this.slots[(2)] < 0 ? this.theme.inkFaint : (this.sel === (2) ? '#FFFFFF' : this.theme.ink))
-          }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (2) ? Palette.violet : this.theme.surfaceAlt)
+          }.layoutWeight(1).height(Cell.of(52)).backgroundColor(this.sel === (2) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L391'; })
@@ -466,7 +466,7 @@ export struct GCryptoArithmetic {
           Stack() {
           Text(this.slots[(3)] < 0 ? this.letterAt((3)) : String(this.slots[(3)])).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
           .fontColor(this.slots[(3)] < 0 ? this.theme.inkFaint : (this.sel === (3) ? '#FFFFFF' : this.theme.ink))
-          }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (3) ? Palette.violet : this.theme.surfaceAlt)
+          }.layoutWeight(1).height(Cell.of(52)).backgroundColor(this.sel === (3) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L402'; })
@@ -477,7 +477,7 @@ export struct GCryptoArithmetic {
           Stack() {
           Text(this.slots[(4)] < 0 ? this.letterAt((4)) : String(this.slots[(4)])).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold)
           .fontColor(this.slots[(4)] < 0 ? this.theme.inkFaint : (this.sel === (4) ? '#FFFFFF' : this.theme.ink))
-          }.layoutWeight(1).aspectRatio(1).backgroundColor(this.sel === (4) ? Palette.violet : this.theme.surfaceAlt)
+          }.layoutWeight(1).height(Cell.of(52)).backgroundColor(this.sel === (4) ? Palette.violet : this.theme.surfaceAlt)
           .borderRadius(Radius.md).animation({ duration: Motion.fast, curve: Motion.snap() })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L411'; })
@@ -495,7 +495,7 @@ export struct GCryptoArithmetic {
         Row({ space: Space.xs }) {
           ForEach([0, 1, 2, 3, 4], (d: number) => { Button(String((d)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.usedDigit((d)) ? this.theme.inkFaint : this.theme.ink)
-          .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 40 : 48))
+          .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 36 : 48))
           .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L424'; })
           .onBlur(() => { if (this.tvFocus === 'L424') { this.tvFocus = ''; } })
@@ -504,7 +504,7 @@ export struct GCryptoArithmetic {
         Row({ space: Space.xs }) {
           ForEach([5, 6, 7, 8, 9], (d: number) => { Button(String((d)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor(this.usedDigit((d)) ? this.theme.inkFaint : this.theme.ink)
-          .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 40 : 48))
+          .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 36 : 48))
           .enabled(!this.over && !this.usedDigit((d))).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L430'; })
           .onBlur(() => { if (this.tvFocus === 'L430') { this.tvFocus = ''; } })
@@ -513,12 +513,16 @@ export struct GCryptoArithmetic {
       }.width('100%')
 
       Row({ space: Space.sm }) {
+        // ★ 2026-11-09：矮屏不渲染「重开」按钮 —— 页头已有 ↻ 那是同一个动作；
+        //   真机里它把「0–9 数字键盘」之外的最后 22vp 占掉，导致它自己被屏底裁断。
+        if (!Bp.isShort()) {
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L437'; })
           .onBlur(() => { if (this.tvFocus === 'L437') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L437')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+        }
         Text(TG('五个字母的数字两两不同')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       }.width('100%')
     }
