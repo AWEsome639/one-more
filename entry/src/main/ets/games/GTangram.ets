@@ -407,7 +407,7 @@ export struct GTangram {
       }.width('100%').aspectRatio(1).padding(Space.sm).backgroundColor(this.theme.surface)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - 420) })
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
