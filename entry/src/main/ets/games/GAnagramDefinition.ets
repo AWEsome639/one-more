@@ -317,7 +317,7 @@ export struct GAnagramDefinition {
     return parts.join(' ');
   }
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -343,13 +343,13 @@ export struct GAnagramDefinition {
       Row({ space: Space.sm }) {
         Button(TG('退一格'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on())
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L313'; })
           .onBlur(() => { if (this.tvFocus === 'L313') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L313')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.picked = this.picked.slice(0, this.picked.length - 1); }); }).onClick(() => { Haptics.tap(); this.picked = this.picked.slice(0, this.picked.length - 1); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on())
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L316'; })
           .onBlur(() => { if (this.tvFocus === 'L316') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L316')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

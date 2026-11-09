@@ -279,7 +279,7 @@ export struct GDnms {
     return this.pick >= 0 ? this.opts[this.pick] : '·';
   }
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -331,7 +331,7 @@ export struct GDnms {
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.lime)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .borderRadius(Radius.md).width('100%').height(Cell.of(40)).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L313'; })
         .onBlur(() => { if (this.tvFocus === 'L313') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L313')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

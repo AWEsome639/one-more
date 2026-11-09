@@ -281,7 +281,7 @@ export struct GCategoryFluency {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -321,12 +321,12 @@ export struct GCategoryFluency {
           .placeholderFont({ size: FontSize.sm }).placeholderColor(this.theme.inkFaint)
           .fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surface).borderRadius(Radius.md)
-          .layoutWeight(1).height(Cell.of(46)).padding({ left: Space.sm, right: Space.sm })
+          .layoutWeight(1).height(Cell.of(40)).padding({ left: Space.sm, right: Space.sm })
           .onChange((v: string) => { this.input = v; })
           .onSubmit(() => { this.submit(); })
         Button(TG('提交'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.lime)
-          .borderRadius(Radius.md).width(84).height(Cell.of(46))
+          .borderRadius(Radius.md).width(84).height(Cell.of(40))
           .enabled(!this.over).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L323'; })
           .onBlur(() => { if (this.tvFocus === 'L323') { this.tvFocus = ''; } })
@@ -340,7 +340,7 @@ export struct GCategoryFluency {
       Row({ space: Space.sm }) {
         Button(TG('换下一类'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).enabled(!this.over)
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).enabled(!this.over)
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L335'; })
           .onBlur(() => { if (this.tvFocus === 'L335') { this.tvFocus = ''; } })
@@ -349,7 +349,7 @@ export struct GCategoryFluency {
           .onClick(() => { Haptics.tap(); this.nextCat(); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on())
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L340'; })
           .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L340')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
