@@ -26,7 +26,7 @@ def rows():
     seen = {}
     for f in sorted(glob.glob(os.path.join(ROOT, '_巡检记录/layout-*.jsonl'))):
         for ln in io.open(f, encoding='utf-8'):
-            m = re.match(r"\[\d+\]\s+(\w+)\s+(.+?)\s+\{", ln.strip())
+            m = re.match(r"(?:\[\d+\]\s+)?(\w+)\s{2,}(.+?)\s+\{", ln.strip())
             if m and m.group(1) in ('OK', 'TIGHT', 'PUSHED_OUT', 'NOT_HOME', 'NOT_IN_GAME', 'NO_CARD', 'WRONG_GAME'):
                 seen.setdefault(m.group(2).strip(), m.group(1))
             m2 = re.match(r"\[(\d+)\] ([^:]+): max_bottom=(\d+) lowest='(.*?)'", ln.strip())
@@ -46,6 +46,12 @@ def main():
             mb = int(v[2:])
             key = 'OK' if mb <= OK_MAX else ('TIGHT' if mb <= TIGHT_MAX else '溢出')
             buckets[key].append((name, mb))
+        elif v == 'OK':
+            buckets['OK'].append((name, 'OK'))
+        elif v == 'TIGHT':
+            buckets['TIGHT'].append((name, 'TIGHT'))
+        elif v == 'PUSHED_OUT':
+            buckets['溢出'].append((name, 'PUSHED_OUT'))
         else:
             buckets['未测到'].append((name, v))
     lines = ['# 全量布局基线（停演示基线，判据 1865）', '']
