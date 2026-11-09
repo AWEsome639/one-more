@@ -413,6 +413,8 @@ export struct GTargetNumber {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((i)); }); })
       }, (i: number) => 'o' + i)
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
+      // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859）——`Visibility.None` 不占布局
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46)).onClick(() => {
