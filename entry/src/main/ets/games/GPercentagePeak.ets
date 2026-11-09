@@ -444,7 +444,7 @@ export struct GPercentagePeak {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
 
