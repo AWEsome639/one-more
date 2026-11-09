@@ -283,21 +283,47 @@ def verify_one(en_name):
     def bottom_of(tree):
         ns = collect(tree, lambda t: len(t.strip()) > 0)
         mb = max((y2 for _, (_, _, _, y2) in ns), default=0)
-        lo = ''
+        lo = ''; lo_click = ''
+        # ★ 2026-11-09（判据 1872）：**同时记下最底那个节点「可点不可点」** ——
+        #   可点 = 裁控件（严重度高）；不可点 = 裁文字（低）。这样明天能自动分级。
         for t, (_, _, _, y2) in ns:
             if y2 == mb:
                 lo = t[:30]; break
-        return mb, lo
+        def walk(n):
+            nonlocal lo_click
+            a = n.get('attributes', {})
+            t = (a.get('text') or '').strip()
+            b = a.get('bounds', '')
+            if t and b.startswith('['):
+                try:
+                    y2 = int(b.split('][')[1].split(',')[1].rstrip(']'))
+                except Exception:
+                    y2 = -1
+                if y2 == mb:
+                    lo_click = (a.get('clickable') or '')
+            for c in (n.get('children') or []):
+                walk(c)
+        try:
+            walk(tree)
+        except Exception:
+            pass
+        return mb, lo, lo_click
     if d2 and isinstance(d2, dict):
         ok_t, want_t = verify_title(d2, en_name)
         if not ok_t:
             sh('uitest uiInput keyEvent Back'); close_search()
             return ('WRONG_GAME', {'want': want_t})
     clip_n, clip_y, clip_t = clipped_text(d2 if d2 else {})
+    lowest_click = ''
+    if d2 and isinstance(d2, dict):
+        try:
+            lowest_click = bottom_of(d2)[2]
+        except Exception:
+            lowest_click = ''
     cands = []
     for tree in (d2, d2b, d2c):
         if tree:
-            cands.append(bottom_of(tree))
+            cands.append(bottom_of(tree)[:2])
     if not cands:
         cands = [(0, '')]
     max_bottom, lowest = min(cands, key=lambda x: x[0])   # 取 best-case（三次里的最小值）
@@ -318,7 +344,7 @@ def verify_one(en_name):
     sh('uitest uiInput keyEvent Back')
     time.sleep(0.8)
     close_search()
-    return (status, {'max_bottom': max_bottom, 'lowest': lowest, 'count': cnt, 'shot': shot, 'clip': clip_n, 'clip_at': f'{clip_t}@{clip_y}'})
+    return (status, {'max_bottom': max_bottom, 'lowest': lowest, 'count': cnt, 'shot': shot, 'clip': clip_n, 'clip_at': f'{clip_t}@{clip_y}', 'lowest_click': lowest_click})
 
 def main():
     if len(sys.argv) < 2:
