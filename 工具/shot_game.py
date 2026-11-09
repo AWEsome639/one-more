@@ -97,6 +97,14 @@ def main():
     tokens = tokens[:3] + [name]
     d = None
     for tok in tokens:
+        # ⚠️ 2026-11-09：**每次尝试都必须「先回到首页」** —— 否则 Back 会把 App 退掉，
+        #   后续 click 落到系统界面（真机实测：点进了「设置」）⇒ 全部 FAIL
+        for _b in range(4):
+            if is_home():
+                break
+            sh('uitest uiInput keyEvent Back'); time.sleep(1.0)
+        if not is_home():
+            sh('aa start -a EntryAbility -b com.andrewoscar.onemore'); time.sleep(6.0)
         sh('uitest uiInput click 2276 264'); time.sleep(1.2)
         sh('uitest uiInput click 1280 435'); time.sleep(0.8)
         sh(f"uinput -K -t '{tok}'"); time.sleep(2.4)
