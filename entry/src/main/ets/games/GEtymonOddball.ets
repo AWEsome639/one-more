@@ -278,7 +278,7 @@ export struct GEtymonOddball {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -308,22 +308,22 @@ export struct GEtymonOddball {
 
       Column({ space: Space.sm }) {
         Button((0) < this.shown.length ? this.shown[(0)] : '')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(40)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L304'; })
       .onBlur(() => { if (this.tvFocus === 'L304') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L304')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(0)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(0)]); })
         Button((1) < this.shown.length ? this.shown[(1)] : '')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(40)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L306'; })
       .onBlur(() => { if (this.tvFocus === 'L306') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L306')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(1)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(1)]); })
         Button((2) < this.shown.length ? this.shown[(2)] : '')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(40)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L308'; })
       .onBlur(() => { if (this.tvFocus === 'L308') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L308')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(2)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(2)]); })
         Button((3) < this.shown.length ? this.shown[(3)] : '')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(46)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surface).borderRadius(Radius.md).width('100%').height(Cell.of(40)).enabled(!this.over).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L310'; })
       .onBlur(() => { if (this.tvFocus === 'L310') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L310')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick(this.shown[(3)]); }); }).onClick(() => { Haptics.tap(); this.pick(this.shown[(3)]); })
@@ -332,7 +332,7 @@ export struct GEtymonOddball {
       Text(this.msg).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Button(TG('重开'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(40)).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L316'; })
       .onBlur(() => { if (this.tvFocus === 'L316') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L316')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

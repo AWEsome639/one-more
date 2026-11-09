@@ -301,7 +301,7 @@ export struct GPalindromeBuilder {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -355,7 +355,7 @@ export struct GPalindromeBuilder {
       Row({ space: Space.sm }) {
         Button(TG('退一格'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40))
           .onClick(() => { Haptics.tap(); this.back(); })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L354'; })
@@ -364,7 +364,7 @@ export struct GPalindromeBuilder {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.back(); }); })
         Button(TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
+          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40))
           .onClick(() => { Haptics.tap(); this.reset(); })
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L361'; })
