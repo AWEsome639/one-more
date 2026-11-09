@@ -1,0 +1,57 @@
+[1] Mahjong Solitaire: max_bottom=1586 lowest='点第一张牌，再点能和它连起来的同款牌' -> /Users/a0000/dev/One More/_巡检记录/截图-Mahjong_Solitaire-175518.jpeg
+[2] Match 3: max_bottom=1579 lowest='点一个果子，再点旁边的换位' -> /Users/a0000/dev/One More/_巡检记录/截图-Match_3-175557.jpeg
+[3] Nim: max_bottom=1600 lowest='重开' -> /Users/a0000/dev/One More/_巡检记录/截图-Nim-175636.jpeg
+[4] Phonetic Guess: max_bottom=1578 lowest='elephant' -> /Users/a0000/dev/One More/_巡检记录/截图-Phonetic_Guess-175715.jpeg
+[5] Sieve Visualizer: max_bottom=1454 lowest='步数 0 · 绿字 = 素数，灰底 = 被划掉的合数' -> /Users/a0000/dev/One More/_巡检记录/截图-Sieve_Visualizer-175753.jpeg
+[6] Sokoban: max_bottom=1430 lowest='上一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Sokoban-175832.jpeg
+[7] Solitaire: max_bottom=1351 lowest='自动收牌' -> /Users/a0000/dev/One More/_巡检记录/截图-Solitaire-175911.jpeg
+[8] Sudoku Hex: max_bottom=1600 lowest='✕ 擦除' -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku_Hex-175949.jpeg
+[9] Tetris: max_bottom=1540 lowest='目标：消满 10 行通关；堆到顶就输了' -> /Users/a0000/dev/One More/_巡检记录/截图-Tetris-180029.jpeg
+[10] Tic-Tac-Toe: max_bottom=1600 lowest='重开' -> /Users/a0000/dev/One More/_巡检记录/截图-Tic_Tac_Toe-180109.jpeg
+[11] Alphabet Sudoku: max_bottom=1600 lowest='✕ 擦除' -> /Users/a0000/dev/One More/_巡检记录/截图-Alphabet_Sudoku-180149.jpeg
+[12] Binary Puzzle: max_bottom=1600 lowest='清空' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Puzzle-180236.jpeg
+[13] Bridges: max_bottom=1600 lowest='点一个岛 → 点另一个岛，桥数 0→1→2→0 循环' -> /Users/a0000/dev/One More/_巡检记录/截图-Bridges-180324.jpeg
+[14] Tangle Fix: max_bottom=1564 lowest='点一个节点，再点另一个换位' -> /Users/a0000/dev/One More/_巡检记录/截图-Tangle_Fix-180411.jpeg
+[15] Tapa: max_bottom=1562 lowest='点格子涂黑/擦白；数字 = 8 邻域里连续黑格的段长' -> /Users/a0000/dev/One More/_巡检记录/截图-Tapa-180458.jpeg
+[16] Tents And Trees: max_bottom=1600 lowest='2' -> /Users/a0000/dev/One More/_巡检记录/截图-Tents_And_Trees-180544.jpeg
+[17] Algebraic Balance: max_bottom=1600 lowest='x = -5' -> /Users/a0000/dev/One More/_巡检记录/截图-Algebraic_Balance-180632.jpeg
+[18] Balance Scale: max_bottom=1531 lowest='13' -> /Users/a0000/dev/One More/_巡检记录/截图-Balance_Scale-180719.jpeg
+[19] Binary Code: max_bottom=1600 lowest='⚫' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Code-180807.jpeg
+[20] Binary Matrix Rank: max_bottom=1505 lowest='秩 = 4' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Matrix_Rank-180856.jpeg
+[21] Binary Scale Balance: max_bottom=1600 lowest='拨开关，把右盘凑到 38' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Scale_Balance-180944.jpeg
+[22] Binomial Match: max_bottom=1600 lowest='a²b²' -> /Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-181032.jpeg
+[23] Collatz: max_bottom=1600 lowest='C' -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-181119.jpeg
+[24] Common Denominator: max_bottom=1600 lowest='C' -> /Users/a0000/dev/One More/_巡检记录/截图-Common_Denominator-181206.jpeg
+[25] Crypto Arithmetic: max_bottom=1492 lowest='五个字母的数字两两不同' -> /Users/a0000/dev/One More/_巡检记录/截图-Crypto_Arithmetic-181255.jpeg
+[26] Divisibility Dash: max_bottom=1600 lowest='重开' -> /Users/a0000/dev/One More/_巡检记录/截图-Divisibility_Dash-181344.jpeg
+[27] Fractional Pizza: max_bottom=1571 lowest='确认' -> /Users/a0000/dev/One More/_巡检记录/截图-Fractional_Pizza-181430.jpeg
+[28] Mental Calendar: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Calendar-181516.jpeg
+[29] Modular Clock Arithmetic: max_bottom=1583 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Modular_Clock_Arithmetic-181602.jpeg
+[30] Modulo Clock: max_bottom=1600 lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Modulo_Clock-181648.jpeg
+[31] Modulo Path: max_bottom=1565 lowest='10' -> /Users/a0000/dev/One More/_巡检记录/截图-Modulo_Path-181734.jpeg
+[32] Number Bonds: max_bottom=1584 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds-181820.jpeg
+[33] Number Bonds All: max_bottom=1403 lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds_All-181905.jpeg
+[34] Percentage Peak: max_bottom=1600 lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Peak-181951.jpeg
+[35] Percentage Shopping: max_bottom=1552 lowest='¥54' -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-182037.jpeg
+[36] Prime Factor Trees: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Factor_Trees-182123.jpeg
+[37] Prime Gap Hunt: max_bottom=1586 lowest='重开' -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Gap_Hunt-182213.jpeg
+[38] Pythagorean Triple Builder: max_bottom=1582 lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-182259.jpeg
+[39] Quick Math: max_bottom=1583 lowest='重开' -> /Users/a0000/dev/One More/_巡检记录/截图-Quick_Math-182345.jpeg
+[40] Roman Arithmetic: max_bottom=1550 lowest='重开' -> /Users/a0000/dev/One More/_巡检记录/截图-Roman_Arithmetic-182432.jpeg
+[41] Sequence Sleuth: max_bottom=1535 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Sequence_Sleuth-182517.jpeg
+[42] Set Theory Venn: max_bottom=1392 lowest='提示：先看这个数在不在 A 里，再看在不在 B 里' -> /Users/a0000/dev/One More/_巡检记录/截图-Set_Theory_Venn-182555.jpeg
+[43] Target Number: max_bottom=1600 lowest='6 × 7 + 5' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_Number-182641.jpeg
+[44] Unit Converter Pro: max_bottom=1600 lowest='0.0977' -> /Users/a0000/dev/One More/_巡检记录/截图-Unit_Converter_Pro-182727.jpeg
+[45] Vector Grid Alignment: max_bottom=1519 lowest='(dx, dy)：+ 列向右、+ 行向下' -> /Users/a0000/dev/One More/_巡检记录/截图-Vector_Grid_Alignment-182812.jpeg
+[46] Vektor Vector: max_bottom=1600 lowest='(8, 10)' -> /Users/a0000/dev/One More/_巡检记录/截图-Vektor_Vector-182858.jpeg
+[47] Venn Numbers: max_bottom=1591 lowest='重开' -> /Users/a0000/dev/One More/_巡检记录/截图-Venn_Numbers-182944.jpeg
+[48] Associative Pairs: max_bottom=1600 lowest='📮 邮筒' -> /Users/a0000/dev/One More/_巡检记录/截图-Associative_Pairs-183030.jpeg
+[49] Attentional Blink: max_bottom=1600 lowest='8' -> /Users/a0000/dev/One More/_巡检记录/截图-Attentional_Blink-183116.jpeg
+[50] Attentional Blink Probe: max_bottom=1600 lowest='6' -> /Users/a0000/dev/One More/_巡检记录/截图-Attentional_Blink_Probe-183202.jpeg
+[51] Card Counting Memory: max_bottom=1591 lowest='10♠️' -> /Users/a0000/dev/One More/_巡检记录/截图-Card_Counting_Memory-183249.jpeg
+[52] Conjunction Search: max_bottom=1600 lowest='重开' -> /Users/a0000/dev/One More/_巡检记录/截图-Conjunction_Search-183335.jpeg
+[53] Corsi Blocks: max_bottom=1445 lowest='顺背：长度升到 6 即通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Corsi_Blocks-183422.jpeg
+[54] Counting Span: max_bottom=1600 lowest='数出每张卡有几个黄点，别写下来' -> /Users/a0000/dev/One More/_巡检记录/截图-Counting_Span-183508.jpeg
+[55] d2 Attention: max_bottom=1600 lowest='重开' -> /Users/a0000/dev/One More/_巡检记录/截图-d2_Attention-183555.jpeg
+[56] Sequence Stack: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Sequence_Stack-183642.jpeg
+DONE

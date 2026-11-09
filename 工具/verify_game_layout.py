@@ -257,6 +257,15 @@ def verify_one(en_name):
     # ⭐ 进游戏判据：dump 里必须出现「游戏内元素」（提示 / AI 代打 / 重开）
     texts2 = [t for t, _ in collect(d2, lambda t: True)]
     in_game = any(k in ''.join(texts2) for k in ('提示', 'AI 代打', '重开', '换一题', '放弃'))
+    # ⚠️ 2026-11-09：进游戏后**首帧可能是空的**（App 还在构建）⇒ 再等 2.5s 重 dump 一次
+    #   （实测 `Delayed Match Sample` 就因此被判 NOT_IN_GAME）
+    if not in_game or not ''.join(texts2).strip():
+        time.sleep(2.5)
+        d2b = dump('/data/local/tmp/c.json')
+        if d2b:
+            d2 = d2b
+            texts2 = [t for t, _ in collect(d2, lambda t: True)]
+            in_game = any(k in ''.join(texts2) for k in ('提示', 'AI 代打', '重开', '换一题', '放弃'))
     if not in_game:
         sh('uitest uiInput keyEvent Back'); close_search()
         return ('NOT_IN_GAME', {'texts': texts2[:5]})
