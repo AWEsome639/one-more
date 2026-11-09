@@ -1005,17 +1005,38 @@ class CardBadgeCache {
  *   compact（窄卡片）→ `1.2k` ｜ `980`
  * ★ 只做"给人看"的千分位/缩写；数字本地化（阿拉伯-印度数字等）交给 Digits()，与全项目一致。
  */
+/**
+ * ★ 2026-11-10（判据：12 语言一视同仁）：`compact` 分支的 `k`/`M` 原本写死拉丁字母。
+ *   在 zh/ja/ko/ru/ar 里，这与周围数字/文字不是一套 ⇒ 按语言给缩写，其余语言仍用 `k`/`M`。
+ *   ⚠️ 不把 `M` 翻成「万」（`万` = 10^4，`M` = 10^6，量级不同）。
+ */
+function kUnit(): string {
+  const l: string = I18n.current();
+  if (l === 'zh' || l === 'ja') { return '千'; }
+  if (l === 'ko') { return '천'; }
+  if (l === 'ru') { return 'тыс.'; }
+  if (l === 'ar') { return 'ألف'; }
+  return 'k';
+}
+
+function mUnit(): string {
+  const l: string = I18n.current();
+  if (l === 'ru') { return 'млн'; }
+  if (l === 'ar') { return 'مليون'; }
+  return 'M';
+}
+
 function fmtBest(n: number, compact: boolean): string {
   const v: number = Math.floor(n);
   if (compact) {
     // ★ 窄卡片：省 2~3 个字符（角标区还要放 🏆 和 🔥，标题不能被挤没）
     if (v >= 1000) {
-      return String(Math.round(v / 100) / 10) + 'k';
+      return String(Math.round(v / 100) / 10) + kUnit();
     }
     return String(v);
   }
   if (v >= 1000000) {
-    return String(Math.round(v / 100000) / 10) + 'M';
+    return String(Math.round(v / 100000) / 10) + mUnit();
   }
   const s: string = String(v);
   // ★★★ 2026-11-08：千分位分隔符要跟语言走。
