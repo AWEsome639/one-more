@@ -7,6 +7,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -255,7 +256,7 @@ export struct GSetTheoryVenn {
 
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -267,23 +268,23 @@ export struct GSetTheoryVenn {
         autoOn: this.autoId >= 0
       })
       Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text((String(this.round) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
         Text((String(this.right) + '/' + String(PASS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
-        Column({ space: 2 }) {
+        Row({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
+        }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.sm }) {
@@ -303,8 +304,12 @@ export struct GSetTheoryVenn {
           Text((String(this.setB.length) + TG(' 个'))).fontSize(FontSize.xxs).fontColor('#FFFFFF')
           }.layoutWeight(1).padding(Space.sm).backgroundColor((Palette.rose)).borderRadius(Radius.lg).shadow(Shadow.card)
         }.width('100%')
-        Text(setText('A', this.setA)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
-        Text(setText('B', this.setB)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+        // ★ 2026-11-09：矮屏不渲染「A={…}/B={…}」两行（次要参照，判据 1853）——
+        //   真机里它们把「A、B 都有 / 都不在」两个答案键挤出屏（只剩上沿）
+        if (!Bp.isShort()) {
+          Text(setText('A', this.setA)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+          Text(setText('B', this.setB)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+        }
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm)
@@ -315,7 +320,7 @@ export struct GSetTheoryVenn {
         .backgroundColor(this.pick === (0)
         ? ((0) === this.solution() ? Palette.emerald : Palette.rose)
         : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50)).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
         Haptics.tap();
         this.submit((0));
@@ -330,7 +335,7 @@ export struct GSetTheoryVenn {
         .backgroundColor(this.pick === (1)
         ? ((1) === this.solution() ? Palette.emerald : Palette.rose)
         : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50)).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
         Haptics.tap();
         this.submit((1));
@@ -347,7 +352,7 @@ export struct GSetTheoryVenn {
         .backgroundColor(this.pick === (2)
         ? ((2) === this.solution() ? Palette.emerald : Palette.rose)
         : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50)).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
         Haptics.tap();
         this.submit((2));
@@ -362,7 +367,7 @@ export struct GSetTheoryVenn {
         .backgroundColor(this.pick === (3)
         ? ((3) === this.solution() ? Palette.emerald : Palette.rose)
         : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50)).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).animation({ duration: Motion.fast, curve: Motion.snap() })
         .onClick(() => {
         Haptics.tap();
         this.submit((3));
@@ -373,6 +378,8 @@ export struct GSetTheoryVenn {
         .outline(Tv.focusOutline(this.tvFocus === 'L362'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((3)); }); })
       }.width('100%')
+      // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859）
+      if (!Bp.isShort()) {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
@@ -385,6 +392,7 @@ export struct GSetTheoryVenn {
         .onBlur(() => { if (this.tvFocus === 'L373') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L373'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+      }
       Text(TG('提示：先看这个数在不在 A 里，再看在不在 B 里')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {

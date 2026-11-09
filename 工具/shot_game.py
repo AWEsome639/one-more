@@ -64,6 +64,11 @@ def verify_title(tree, en_name):
     joined = '\n'.join(texts)
     if not want:
         return True, ''
+    # ⚠️ 2026-11-09：**光「包含标题」不够** —— 首页的卡片上也写着「文氏图, 集合运算」
+    #   ⇒ 必须同时「没有首页标记」（底部 tab「今天这一局 / 全部」与搜索框）
+    on_home = ('今天这一局' in joined) or ('全部' in joined and '🎯' in joined)
+    if on_home:
+        return False, want
     return (want in joined), want
 
 def is_home():
@@ -82,10 +87,26 @@ def main():
         sh('uitest uiInput keyEvent Back'); time.sleep(1.2)
     if not is_home():
         print('NOT_HOME'); return
-    sh('uitest uiInput click 2276 264'); time.sleep(1.2)
-    sh('uitest uiInput click 1280 435'); time.sleep(0.8)
-    sh(f"uinput -K -t '{name.split()[0]}'"); time.sleep(2.6)
-    d = dump('/data/local/tmp/shot_r.json')
+    # ⚠️ 2026-11-09：**搜索词只取第一个词会搜不到**（如 "Set Theory Venn" 只打 "Set"）
+    #   ⇒ 依次试「最长词 / 首词 / 全名」；每次重开搜索页（不靠清空输入框）
+    want_zh = game_title_map().get(name, '')
+    tokens = []
+    for t in sorted(set(name.split()), key=lambda w: -len(w)):
+        if t.lower() not in ('all', 'the'):
+            tokens.append(t)
+    tokens = tokens[:3] + [name]
+    d = None
+    for tok in tokens:
+        sh('uitest uiInput click 2276 264'); time.sleep(1.2)
+        sh('uitest uiInput click 1280 435'); time.sleep(0.8)
+        sh(f"uinput -K -t '{tok}'"); time.sleep(2.4)
+        d = dump('/data/local/tmp/shot_r.json')
+        if not d:
+            continue
+        hit = any(((want_zh and want_zh in (t or '')) or (name in (t or ''))) for t, _ in texts(d))
+        if hit:
+            break
+        sh('uitest uiInput keyEvent Back'); time.sleep(0.8)
     if not d:
         print('DUMP_FAIL'); return
     # ⚠️ 判据 1861：**按名字挑卡片**，不能「点第一张」（搜索没过滤时会点到「宝石迷阵」）

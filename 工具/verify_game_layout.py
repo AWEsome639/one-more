@@ -169,6 +169,11 @@ def verify_title(tree, en_name):
     joined = '\n'.join(texts)
     if not want:
         return True, ''
+    # ⚠️ 2026-11-09：**光「包含标题」不够** —— 首页的卡片上也写着「文氏图, 集合运算」
+    #   ⇒ 必须同时「没有首页标记」（底部 tab「今天这一局 / 全部」与搜索框）
+    on_home = ('今天这一局' in joined) or ('全部' in joined and '🎯' in joined)
+    if on_home:
+        return False, want
     return (want in joined), want
 
 def is_home():
