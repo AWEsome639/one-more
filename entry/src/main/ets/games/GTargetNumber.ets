@@ -383,7 +383,7 @@ export struct GTargetNumber {
         Row({ space: Space.sm }) {
           ForEach(this.nums, (v: number, i: number) => {
             Text(String((v))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-            .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(46)).backgroundColor(this.theme.surfaceAlt)
+            .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(40)).backgroundColor(this.theme.surfaceAlt)
             .borderRadius(Radius.md)
           }, (v: number, i: number) => 'n' + i + '_' + v)
         }.width('100%')
@@ -398,7 +398,7 @@ export struct GTargetNumber {
         .fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).backgroundColor(this.pick === (i)
         ? ((i) === this.ansIdx ? Palette.emerald : Palette.rose)
         : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).animation({ duration: Motion.fast, curve: Motion.snap() })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(40)).animation({ duration: Motion.fast, curve: Motion.snap() })
         // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
         .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
           .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
@@ -417,7 +417,7 @@ export struct GTargetNumber {
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary).borderRadius(Radius.md)
-        .width('100%').height(Cell.of(46)).onClick(() => {
+        .width('100%').height(Cell.of(40)).onClick(() => {
           Haptics.tap();
           this.reset();
         })

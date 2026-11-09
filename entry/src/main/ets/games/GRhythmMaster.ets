@@ -5,6 +5,7 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Ms } from '../core/I18n';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -364,6 +365,8 @@ export struct GRhythmMaster {
       Text(this.msg).fontSize(FontSize.sm).textAlign(TextAlign.Center).width('100%')
         .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(this.over ? TG('再来一局') : TG('重开'))
+      // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
         .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })

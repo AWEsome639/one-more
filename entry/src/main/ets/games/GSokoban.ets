@@ -779,6 +779,8 @@ export struct GSokoban {
           .outline(Tv.focusOutline(this.tvFocus === 'L727'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(this.level - 1); }); })
         Button(TG('重开'))
+      // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.sm)
           .fontColor(Color.White)

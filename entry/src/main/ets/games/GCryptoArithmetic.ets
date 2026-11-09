@@ -517,6 +517,8 @@ export struct GCryptoArithmetic {
         //   真机里它把「0–9 数字键盘」之外的最后 22vp 占掉，导致它自己被屏底裁断。
         if (!Bp.isShort()) {
         Button(TG('重开'))
+      // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
           .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L437'; })
