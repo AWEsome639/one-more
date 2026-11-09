@@ -142,6 +142,35 @@ def save_shot(safe_name):
         pass
     return ''
 
+def game_title_map():
+    """enName → 中文名（从 GameRegistry 解析，判据 1861 用：确认点进去的是「目标那一款」）"""
+    import re as _re
+    try:
+        s = io.open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                 'entry/src/main/ets/core/GameRegistry.ets'), encoding='utf-8').read()
+    except Exception:
+        return {}
+    m = {}
+    for mm in _re.finditer(r"id:\s*'([^']+)'.*?name:\s*'([^']+)'.*?enName:\s*'([^']+)'", s, _re.S):
+        m[mm.group(3)] = mm.group(2)
+    return m
+
+def verify_title(tree, en_name):
+    """返回 (ok, 实际标题)。用「中文名是否出现在 dump 里」判「点对了没」"""
+    m = game_title_map()
+    want = m.get(en_name, '')
+    texts = []
+    def w(n):
+        a = n.get('attributes', {})
+        t = (a.get('text') or '')
+        if t: texts.append(t)
+        for c in (n.get('children') or []): w(c)
+    w(tree)
+    joined = '\n'.join(texts)
+    if not want:
+        return True, ''
+    return (want in joined), want
+
 def is_home():
     """首页判据：有「355 款」或「🔍/💬」顶栏 + 有分类标签「全部」"""
     d = dump('/data/local/tmp/home.json')
@@ -152,12 +181,22 @@ def is_home():
     return ('One More' in joined) and ('全部' in joined or '355 款' in joined)
 
 def ensure_home():
-    """⚠️ v9：工具必须从首页开始。在游戏内时先 Back（最多 3 次，且每次都先确认不是首页）"""
-    for _ in range(3):
+    """⚠️ v13：回首页（全量扫描里 28 款 `NOT_HOME` ⇒ 三次 Back 不够）
+    ① Back 最多 4 次，每次 1.2s
+    ② 兜底：重开 Ability（首页必然干净）
+    """
+    for _ in range(4):
         if is_home():
             return True
         sh('uitest uiInput keyEvent Back')
         time.sleep(1.2)
+    if is_home():
+        return True
+    # 兜底：直接重启 Ability（比「猜 Back 几次」可靠）
+    sh('aa force-stop com.andrewoscar.onemore')
+    time.sleep(1.0)
+    sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
+    time.sleep(6.0)
     return is_home()
 
 def verify_one(en_name):
@@ -222,6 +261,11 @@ def verify_one(en_name):
             if y2 == mb:
                 lo = t[:30]; break
         return mb, lo
+    if d2 and isinstance(d2, dict):
+        ok_t, want_t = verify_title(d2, en_name)
+        if not ok_t:
+            sh('uitest uiInput keyEvent Back'); close_search()
+            return ('WRONG_GAME', {'want': want_t})
     clip_n, clip_y, clip_t = clipped_text(d2 if d2 else {})
     cands = []
     for tree in (d2, d2b, d2c):
