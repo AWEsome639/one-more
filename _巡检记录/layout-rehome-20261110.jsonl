@@ -1,0 +1,44 @@
+[1] NO_CARD  Compound Connect（搜索结果里没有「复合连线」的卡片；不盲点第一张）
+[2] Connect Four: max_bottom=1406 lowest='点任意一列（或箭头）投子，横、竖、斜先连成四个就赢' -> /Users/a0000/dev/One More/_巡检记录/截图-Connect_Four-040206.jpeg
+[3] NO_CARD  Reading Span（搜索结果里没有「阅读广度」的卡片；不盲点第一张）
+[4] Relational Memory: max_bottom=1600 lowest='🌙' -> /Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-040338.jpeg
+[5] Reverse Stroop: max_bottom=1600 lowest='点「字义」，别看墨色' -> /Users/a0000/dev/One More/_巡检记录/截图-Reverse_Stroop-040430.jpeg
+[6] Rhyme Master: max_bottom=1600 lowest='哪个词和它押韵？' -> /Users/a0000/dev/One More/_巡检记录/截图-Rhyme_Master-040520.jpeg
+[7] Rhythm Master: max_bottom=1600 lowest='看节奏：每 600 ms 一下' -> /Users/a0000/dev/One More/_巡检记录/截图-Rhythm_Master-040609.jpeg
+[8] Rule Switcher: max_bottom=1600 lowest='判定：15 题答对 ≥ 12 且平均 < 1600 ' -> /Users/a0000/dev/One More/_巡检记录/截图-Rule_Switcher-040703.jpeg
+[9] Running Memory Span: max_bottom=1596 lowest='6' -> /Users/a0000/dev/One More/_巡检记录/截图-Running_Memory_Span-040830.jpeg
+[10] Sdmt: max_bottom=1600 lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Sdmt-040924.jpeg
+[11] Semantic Association: max_bottom=1600 lowest='提到「火」，最先想到哪个？' -> /Users/a0000/dev/One More/_巡检记录/截图-Semantic_Association-041016.jpeg
+[12] Semantic Distance: max_bottom=1544 lowest='10 题，答对 ≥7 通关：词义越近越好' -> /Users/a0000/dev/One More/_巡检记录/截图-Semantic_Distance-041107.jpeg
+[13] Sentence Unscramble: max_bottom=934 lowest='句子重组, 打乱的句子还原, 1 天' -> /Users/a0000/dev/One More/_巡检记录/截图-Sentence_Unscramble-041157.jpeg
+[14] Sequence Stack: max_bottom=1549 lowest='提示：答错不换题，想清楚再点' -> /Users/a0000/dev/One More/_巡检记录/截图-Sequence_Stack-041250.jpeg
+[15] Set Theory Venn: max_bottom=1392 lowest='提示：先看这个数在不在 A 里，再看在不在 B 里' -> /Users/a0000/dev/One More/_巡检记录/截图-Set_Theory_Venn-041341.jpeg
+[16] Sieve Visualizer: max_bottom=1454 lowest='步数 0 · 绿字 = 素数，灰底 = 被划掉的合数' -> /Users/a0000/dev/One More/_巡检记录/截图-Sieve_Visualizer-041434.jpeg
+[17] Sokoban: max_bottom=1430 lowest='上一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Sokoban-041525.jpeg
+[18] Solitaire: max_bottom=1351 lowest='自动收牌' -> /Users/a0000/dev/One More/_巡检记录/截图-Solitaire-041615.jpeg
+[19] Spelling Sprint: max_bottom=1522 lowest='60 秒内答对 ≥8 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Spelling_Sprint-041712.jpeg
+[20] Stop Signal: max_bottom=1600 lowest='判定：正确 ≥ 10/12 且冲均值 < 800 m' -> /Users/a0000/dev/One More/_巡检记录/截图-Stop_Signal-041803.jpeg
+[21] Stroop Number Size: max_bottom=1471 lowest='判定：12 题答对 ≥ 10 题' -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Number_Size-041858.jpeg
+[22] Stroop Test: max_bottom=1600 lowest='蓝' -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-041951.jpeg
+[23] Sudoku: max_bottom=1547 lowest='点一个空格，再点数字填入' -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku-042044.jpeg
+[24] Sudoku Hex: max_bottom=1547 lowest='点一个空格，再点数字填入' -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku_Hex-042131.jpeg
+[25] Symbol Digit Assoc: max_bottom=1600 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Symbol_Digit_Assoc-042257.jpeg
+[26] Symbol Logic: max_bottom=934 lowest='符号逻辑, 符号推理' -> /Users/a0000/dev/One More/_巡检记录/截图-Symbol_Logic-042345.jpeg
+[27] Tangle Fix: max_bottom=1564 lowest='点一个节点，再点另一个换位' -> /Users/a0000/dev/One More/_巡检记录/截图-Tangle_Fix-042434.jpeg
+[28] Tangram: max_bottom=1577 lowest='重开（换一题）' -> /Users/a0000/dev/One More/_巡检记录/截图-Tangram-042527.jpeg
+[29] Target Number: max_bottom=1594 lowest='6 × (8 + 2)' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_Number-042618.jpeg
+[30] Task Switching: max_bottom=1600 lowest='重复 0ms · 切换 0ms · 代价 0毫秒' -> /Users/a0000/dev/One More/_巡检记录/截图-Task_Switching-042711.jpeg
+[31] Tents And Trees: max_bottom=1600 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Tents_And_Trees-042803.jpeg
+[32] Tetris: max_bottom=1465 lowest='目标：消满 10 行通关；堆到顶就输了' -> /Users/a0000/dev/One More/_巡检记录/截图-Tetris-042857.jpeg
+[33] Trail Making: max_bottom=1600 lowest='13' -> /Users/a0000/dev/One More/_巡检记录/截图-Trail_Making-042947.jpeg
+[34] Typoglycemia Decoder: max_bottom=1574 lowest='把乱序的句子读顺，再选出它原本的样子' -> /Users/a0000/dev/One More/_巡检记录/截图-Typoglycemia_Decoder-043038.jpeg
+[35] Unit Converter Pro: max_bottom=1558 lowest='提示：长度 10 进、数据 1024 进、时间 60' -> /Users/a0000/dev/One More/_巡检记录/截图-Unit_Converter_Pro-043132.jpeg
+[36] Vector Dot Product: max_bottom=1374 lowest='-18' -> /Users/a0000/dev/One More/_巡检记录/截图-Vector_Dot_Product-043226.jpeg
+[37] Vektor Vector: max_bottom=1597 lowest='选一个正确答案' -> /Users/a0000/dev/One More/_巡检记录/截图-Vektor_Vector-043317.jpeg
+[38] Venn Numbers: max_bottom=1501 lowest='提示：A ∩ B = 既是 3 的倍数又是偶数，比如' -> /Users/a0000/dev/One More/_巡检记录/截图-Venn_Numbers-043410.jpeg
+[39] Visual Crowding Acuity: max_bottom=1600 lowest='N' -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Crowding_Acuity-043504.jpeg
+[40] Visual Search: max_bottom=1600 lowest='🐝' -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Search-043554.jpeg
+[41] NO_CARD  Visual Search All（搜索结果里没有「视觉搜索进阶」的卡片；不盲点第一张）
+[42] Word Pair Associate Memory: max_bottom=1600 lowest='记住这 6 组词对' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Pair_Associate_Memory-043719.jpeg
+[43] d2 Attention: max_bottom=1489 lowest='目标＝字母 d 且上下小撇共 2 个；30 秒内找齐' -> /Users/a0000/dev/One More/_巡检记录/截图-d2_Attention-043812.jpeg
+DONE
