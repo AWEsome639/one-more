@@ -500,7 +500,7 @@ export struct GBinomialMatch {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.emerald)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(46))
+        .height(Cell.of(40))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L496'; })
         .onBlur(() => { if (this.tvFocus === 'L496') { this.tvFocus = ''; } })

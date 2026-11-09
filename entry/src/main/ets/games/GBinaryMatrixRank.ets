@@ -492,7 +492,7 @@ export struct GBinaryMatrixRank {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(46))
+        .height(Cell.of(40))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L481'; })
         .onBlur(() => { if (this.tvFocus === 'L481') { this.tvFocus = ''; } })

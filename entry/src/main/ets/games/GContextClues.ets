@@ -349,7 +349,7 @@ export struct GContextClues {
       Row({ space: Space.sm }) {
         Button(this.picked < 0 ? TG('选一个释义') : TG('下一题 →'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-          .backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
+          .backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40))
           .enabled(this.picked >= 0).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L341'; })
           .onBlur(() => { if (this.tvFocus === 'L341') { this.tvFocus = ''; } })
@@ -358,7 +358,7 @@ export struct GContextClues {
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width(96).height(Cell.of(46))
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width(96).height(Cell.of(40))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L346'; })
           .onBlur(() => { if (this.tvFocus === 'L346') { this.tvFocus = ''; } })
