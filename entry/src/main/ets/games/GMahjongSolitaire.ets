@@ -547,6 +547,8 @@ export struct GMahjongSolitaire {
 
       Row({ space: Space.md }) {
         Button(TG('提示'))
+        // ★ 2026-11-09：矮屏不渲染页内「提示」（`HintBar` 已有同名入口，判据 1859/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md).fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)

@@ -48,7 +48,7 @@ const EMPTY: number = -1;
 const GIVEN_RATIO: number = 0.5;
 const TICK_MS: number = 1000;
 const GAP: number = 2;
-const KEY_H: number = 46;
+const KEY_H: number = 40;   // ★ 2026-11-09：46 → 40
 
 interface Puzzle {
   quiz: number[];
@@ -789,7 +789,7 @@ export struct GBinaryPuzzle {
         }, (r: number) => 'r' + r)
       }
       // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
-      .width(this.boardPx(278))
+      .width(this.boardPx(400))   // ★ 2026-11-09：278 → 350（棋盘 255vp 太高，把底部按钮行挤出屏）
       .height(this.boardPx(278))
       .alignSelf(ItemAlign.Center)
       .padding(Space.xs)
@@ -798,6 +798,8 @@ export struct GBinaryPuzzle {
 
       Row({ space: Space.sm }) {
         Button(TG('提示'))
+          // ★ 2026-11-09：矮屏不渲染页内「提示」（`HintBar` 已有同名入口，判据 1859/1867）
+          .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
           .fontSize(FontSize.sm)
           .fontColor('#FFFFFF')
           .backgroundColor(Palette.cyan)
