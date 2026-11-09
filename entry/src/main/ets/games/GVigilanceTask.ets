@@ -329,6 +329,8 @@ export struct GVigilanceTask {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.strike(); }); })
 
       Button(this.over ? TG('再来一局') : TG('重开'))
+      // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(Palette.primaryDeep).borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .onClick(() => { Haptics.tap(); this.reset(); })

@@ -4,6 +4,7 @@
  */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -349,6 +350,8 @@ export struct GFindWord {
       .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L340')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.path = []; this.locked = false; this.msg = TG('已清空，重新连'); }); }).onClick(() => { Haptics.tap(); this.path = []; this.locked = false; this.msg = TG('已清空，重新连'); })
         Button(TG('重开'))
+      // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46)).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L342'; })
       .onBlur(() => { if (this.tvFocus === 'L342') { this.tvFocus = ''; } })

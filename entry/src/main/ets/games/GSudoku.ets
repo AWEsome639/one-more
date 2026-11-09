@@ -953,6 +953,8 @@ export struct GSudoku {
         //   「重开（新题）」放不下 ⇒ 被截断成「重开...」（真机截图抓到）。
         //   ⇒ 缩短文案 + 加 textOverflow 兜底（万一将来语言变长也不会硬切）。
         Button(TG('重开'))
+      // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.md)
           .fontColor(Color.White)

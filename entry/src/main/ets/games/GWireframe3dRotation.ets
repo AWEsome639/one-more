@@ -3,6 +3,7 @@
  * 4 题答对 ≥3 ⇒ 通关，否则失败。 */
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2, TG4 } from '../core/GameI18n';
@@ -302,6 +303,8 @@ export struct GWireframe3dRotation {
       Text(this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).width('100%')
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       Button(this.over ? (this.win() ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
+      // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md)
         .fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
         .backgroundColor(this.win() ? Palette.emerald : Palette.primary)
