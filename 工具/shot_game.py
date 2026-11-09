@@ -134,6 +134,14 @@ def main():
     if not card:
         print('NO_CARD'); return
     sh(f'uitest uiInput click {card[0]} {card[1]}'); time.sleep(3.0)
+    # ★ 2026-11-09（判据 1865）：**先等演示结束再量** —— 演示条 `DemoBar` 占 `~24vp(72px)`，
+    #   不固定这个状态，两次测量能差 80px（`Nim` 1351 vs 1600 就是它）
+    for _dw in range(6):
+        _d = dump('/data/local/tmp/shot_g.json')
+        _jt = '\n'.join(t for t, _ in texts(_d)) if _d else ''
+        if '演示中' not in _jt:
+            break
+        time.sleep(3.0)
     d2 = dump('/data/local/tmp/shot_g.json')
     if d2 and isinstance(d2, dict):
         ok, want = verify_title(d2, name)
