@@ -416,12 +416,14 @@ export struct GAlgebraicBalance {
 
       Row({ space: Space.sm }) {
         Button(TG('提示'))
+      // ★ 2026-11-09：矮屏不渲染页内「提示」（`HintBar` 已有同名入口，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
           .fontSize(FontSize.sm)
           .fontColor(this.theme.ink)
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(42))
+          .height(Cell.of(36))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L367'; })
           .onBlur(() => { if (this.tvFocus === 'L367') { this.tvFocus = ''; } })
@@ -467,7 +469,7 @@ export struct GAlgebraicBalance {
   choice(k: number) {
     Button('x = ' + String(this.eq.choices[k] ?? 0))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.theme.ink)
-      .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
+      .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(46))
       .enabled(!this.lockTap && !this.over).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L405'; })
       .onBlur(() => { if (this.tvFocus === 'L405') { this.tvFocus = ''; } })

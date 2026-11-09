@@ -447,12 +447,14 @@ export struct GBinaryCode {
         .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Button(TG('提示'))
+        // ★ 2026-11-09：矮屏不渲染页内「提示」（`HintBar` 已有同名入口，判据 1859/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.sm)
         .fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(42))
+        .height(Cell.of(36))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L445'; })
         .onBlur(() => { if (this.tvFocus === 'L445') { this.tvFocus = ''; } })
@@ -470,7 +472,7 @@ export struct GBinaryCode {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primaryDeep)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(46))
+        .height(Cell.of(40))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L459'; })
         .onBlur(() => { if (this.tvFocus === 'L459') { this.tvFocus = ''; } })
@@ -482,6 +484,8 @@ export struct GBinaryCode {
         })
 
       Text(TG('提示：从左到右每位的权重是 128 64 32 16 8 4 2 1，亮 = 1、灭 = 0'))
+        // ★ 2026-11-09：矮屏不渲染这句「权重说明」（次要信息，判据 1853）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         .width('100%')
@@ -521,7 +525,7 @@ export struct GBinaryCode {
       Text(this.flag[i] ? '💡' : '⚫')
         .fontSize(FontSize.sm)
       Text(this.flag[i] ? '1' : '0')
-        .fontSize(FontSize.xxl)
+        .fontSize(FontSize.xl)   // ★ 2026-11-09：xxl → xl（2 行 × 4 列，每行都高）
         .fontWeight(FontWeight.Bold)
         .fontColor(this.flag[i] ? '#FFFFFF' : this.theme.inkFaint)
       Text(String(WEIGHTS[i]))
@@ -530,7 +534,7 @@ export struct GBinaryCode {
     }
     .layoutWeight(1)
     .justifyContent(FlexAlign.Center)
-    .padding({ top: Space.sm, bottom: Space.sm })
+    .padding({ top: Space.xxs, bottom: Space.xxs })   // ★ 2026-11-09：sm → xxs（省 8vp/格，两行省 48px）
     .backgroundColor(this.flag[i] ? Palette.primaryDeep : this.theme.surface)
     .borderRadius(Radius.md)
     .shadow(Shadow.card)
