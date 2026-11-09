@@ -219,13 +219,16 @@ def verify_one(en_name):
         close_search()
         return ('NOT_FOUND', {})
     # 点第一个「结果卡片」（卡片区 y≈627-934 的第一列）
+    # ⚠️ v15（判据 1861）：**按名字挑卡片**，不盲点第一张（搜索没过滤时会点到首页卡）
+    want = game_title_map().get(en_name, '')
     target = None
     for t, (x1, y1, x2, y2) in cards:
         if 560 < y1 < 1000 and x2 > x1 + 100:
-            target = ((x1 + x2) // 2, (y1 + y2) // 2); break
+            if (want and want in t) or (en_name in t):
+                target = ((x1 + x2) // 2, (y1 + y2) // 2); break
     if not target:
         close_search()
-        return ('NO_CARD', {})
+        return ('NO_CARD', {'want': want})
     sh(f'uitest uiInput click {target[0]} {target[1]}')
     time.sleep(3.0)   # ⚠️ v6：2.2 不够
     # ⚠️ v8：路径不能有空格（hdc shell 会按空格切参数）
