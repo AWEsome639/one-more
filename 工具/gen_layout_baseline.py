@@ -24,14 +24,17 @@ TIGHT_MAX = 1584
 
 def rows():
     seen = {}
-    for f in sorted(glob.glob(os.path.join(ROOT, '_巡检记录/layout-*.jsonl'))):
+    # ★ 2026-11-09：**后写的覆盖先写的**（同一款可能被测过多次；要取「最新」而不是「最早」）
+    files = glob.glob(os.path.join(ROOT, '_巡检记录/layout-*.jsonl'))
+    files.sort(key=lambda p: os.path.getmtime(p))
+    for f in files:
         for ln in io.open(f, encoding='utf-8'):
             m = re.match(r"(?:\[\d+\]\s+)?(\w+)\s{2,}(.+?)\s+\{", ln.strip())
             if m and m.group(1) in ('OK', 'TIGHT', 'PUSHED_OUT', 'NOT_HOME', 'NOT_IN_GAME', 'NO_CARD', 'WRONG_GAME'):
-                seen.setdefault(m.group(2).strip(), m.group(1))
+                seen[m.group(2).strip()] = m.group(1)
             m2 = re.match(r"\[(\d+)\] ([^:]+): max_bottom=(\d+) lowest='(.*?)'", ln.strip())
             if m2:
-                seen.setdefault(m2.group(2).strip(), 'mb%s' % m2.group(3))
+                seen[m2.group(2).strip()] = 'mb%s' % m2.group(3)
     return seen
 
 
