@@ -320,7 +320,7 @@ export struct GAffixFactory {
       Column({ space: Space.sm }) {
         ForEach(this.opts, (o: string) => { Button((o))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
-        .backgroundColor(this.tone((o))).borderRadius(Radius.md).width('100%').height(Cell.of(48))
+        .backgroundColor(this.tone((o))).borderRadius(Radius.md).width('100%').height(Cell.of(40))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
         .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
