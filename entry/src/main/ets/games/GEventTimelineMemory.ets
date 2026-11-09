@@ -9,6 +9,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -382,6 +383,8 @@ export struct GEventTimelineMemory {
           .outline(Tv.focusOutline(this.tvFocus === 'L361')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.shuffleIn(); }); }).onClick(() => { Haptics.tap(); this.shuffleIn(); })
       }
       Button(this.over ? TG('再来一局') : TG('重开'))
+      // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.phase === 0 ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.phase === 0 ? Palette.primary : this.theme.surfaceAlt)
         .borderRadius(Radius.md).width('100%').height(Cell.of(40)).focusable(Tv.on())
