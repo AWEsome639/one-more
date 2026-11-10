@@ -680,7 +680,7 @@ export struct GTentsAndTrees {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('100%')
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(160, Bp.height - 380)))
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
