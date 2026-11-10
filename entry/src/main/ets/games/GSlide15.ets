@@ -726,7 +726,7 @@ export struct GSlide15 {
           .backgroundColor(Palette.primary)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(40))
+          .height(Cell.of(32))
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -743,7 +743,7 @@ export struct GSlide15 {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(40))
+          .height(Cell.of(32))
           .onClick(() => {
             Haptics.tap();
             this.retrySame();

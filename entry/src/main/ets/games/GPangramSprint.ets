@@ -308,7 +308,7 @@ export struct GPangramSprint {
         Row({ space: Space.xs }) {
           ForEach(row, (i: number) => {
             Text(ALPHA[(i)]).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
-            .fontColor(this.sel.indexOf((i)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(40))
+            .fontColor(this.sel.indexOf((i)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(32))
             .backgroundColor(this.sel.indexOf((i)) >= 0 ? Palette.lime : this.theme.surface)
             .borderRadius(Radius.xs).shadow(Shadow.card)
             .scale({ x: this.pressed === (i) ? Motion.pressScale : 1, y: this.pressed === (i) ? Motion.pressScale : 1 })
