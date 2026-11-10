@@ -635,6 +635,8 @@ export struct GSlitherlink {
       // ★★★ 2026-10-30 · 用「算出来的边长」，不用百分比（见 boardPx 注释）
       .width(this.boardPx())
       .height(this.boardPx())
+      // ★ 2026-11-10（判据 1886/1890）：**限高**而不是缩 `boardPx` 入参（缩入参会把下方往下推）
+      .constraintSize({ maxHeight: Bp.isShort() ? 300 : 2000 })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)

@@ -457,7 +457,7 @@ export struct GBinaryMatrixRank {
               .layoutWeight(1)
           }
           .width('100%')
-          .height(Cell.of(42))
+          .height(Cell.of(34))   // ★ 2026-11-10（判据 1890 ②）：42 → 34，4 行省 96px
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
