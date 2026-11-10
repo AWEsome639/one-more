@@ -114,7 +114,7 @@ export struct GColorMazeNav {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(6);
+  @State private diffTotal: number = Bp.isShort() ? Math.min(GameDiff.sizeNow(6), 6) : GameDiff.sizeNow(6);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
 
@@ -144,7 +144,7 @@ export struct GColorMazeNav {
     }
  }
  onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(6);
+    this.diffTotal = Bp.isShort() ? Math.min(GameDiff.sizeNow(6), 6) : GameDiff.sizeNow(6);
      this.reset(); }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // ═══════════ 演示动画（项目 C）═══════════
@@ -400,7 +400,7 @@ export struct GColorMazeNav {
    .textShadow(A11y.glyphShadow())
  Text(this.pos === r * this.diffTotal + c ? '🔵' : (r * this.diffTotal + c === this.goal ? '🏁' : '')).fontSize(FontSize.md)
  }
- }.layoutWeight(1).height(Cell.tap(32)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+ }.layoutWeight(1).height(Bp.isShort() ? Cell.of(30) : Cell.tap(32)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
  .onFocus(() => { this.tvFocus = 'L351'; })
  .onBlur(() => { if (this.tvFocus === 'L351') { this.tvFocus = ''; } })
  .outline(Tv.focusOutline(this.tvFocus === 'L351', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); }); }).onClick(() => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); })
@@ -416,6 +416,7 @@ export struct GColorMazeNav {
  })
 )
  Text(this.note).fontSize(FontSize.sm)
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center)
