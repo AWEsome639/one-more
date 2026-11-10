@@ -434,7 +434,7 @@ export struct GMatrixMultiplier {
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(32))
+        .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Bp.isShort() ? Cell.of(32) : Cell.tap(32))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L406'; })

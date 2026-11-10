@@ -425,7 +425,7 @@ export struct GColorMazeNav {
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向上移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(32)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Bp.isShort() ? Cell.of(32) : Cell.tap(32)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L373'; })
       .onBlur(() => { if (this.tvFocus === 'L373') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L373', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(-1, 0); }); }).onClick(() => { Haptics.tap(); this.go(-1, 0); })
@@ -434,7 +434,7 @@ export struct GColorMazeNav {
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向下移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(32)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Bp.isShort() ? Cell.of(32) : Cell.tap(32)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L379'; })
       .onBlur(() => { if (this.tvFocus === 'L379') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L379', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(1, 0); }); }).onClick(() => { Haptics.tap(); this.go(1, 0); })
@@ -443,7 +443,7 @@ export struct GColorMazeNav {
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向左移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(32)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Bp.isShort() ? Cell.of(32) : Cell.tap(32)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L385'; })
       .onBlur(() => { if (this.tvFocus === 'L385') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L385', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(0, -1); }); }).onClick(() => { Haptics.tap(); this.go(0, -1); })
@@ -452,14 +452,14 @@ export struct GColorMazeNav {
       //   读屏把箭头符号念成「上箭头」—— 用户不知道这是移动还是上一项。
       .accessibilityText(TG('向右移动'))
       .accessibilityLevel('yes')
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(32)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Bp.isShort() ? Cell.of(32) : Cell.tap(32)).fontSize(FontSize.lg).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L391'; })
       .onBlur(() => { if (this.tvFocus === 'L391') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L391', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.go(0, 1); }); }).onClick(() => { Haptics.tap(); this.go(0, 1); })
  Button(TG('重开'))
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Cell.of(32)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.sm).focusable(Tv.on())
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).layoutWeight(1).height(Bp.isShort() ? Cell.of(32) : Cell.tap(32)).fontSize(FontSize.sm).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.sm).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L393'; })
       .onBlur(() => { if (this.tvFocus === 'L393') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L393', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

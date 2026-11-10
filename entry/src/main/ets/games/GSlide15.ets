@@ -9,6 +9,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -726,7 +727,7 @@ export struct GSlide15 {
           .backgroundColor(Palette.primary)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(32))
+          .height(Bp.isShort() ? Cell.of(32) : Cell.tap(32))
           .onClick(() => {
             Haptics.tap();
             this.reset();
@@ -743,7 +744,7 @@ export struct GSlide15 {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(Cell.of(32))
+          .height(Bp.isShort() ? Cell.of(32) : Cell.tap(32))
           .onClick(() => {
             Haptics.tap();
             this.retrySame();

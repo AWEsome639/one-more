@@ -314,7 +314,7 @@ export struct GSymbolDigitAssoc {
             ForEach(COLS, (c: number) => {
               Text(String((r * 3 + c) + 1)).fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
               .fontColor(this.pick >= 0 ? '#FFFFFF' : this.theme.ink)
-              .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(32))
+              .textAlign(TextAlign.Center).layoutWeight(1).height(Bp.isShort() ? Cell.of(32) : Cell.tap(32))
               .backgroundColor(this.pick === (r * 3 + c) ? Palette.rose : this.theme.surfaceAlt)
               .borderRadius(Radius.md).shadow(Shadow.card)
               .scale({ x: this.pick === (r * 3 + c) ? Motion.pressScale : 1, y: this.pick === (r * 3 + c) ? Motion.pressScale : 1 })
@@ -334,7 +334,7 @@ export struct GSymbolDigitAssoc {
       // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-        .backgroundColor(Palette.rose).borderRadius(Radius.md).width('100%').height(Cell.of(32)).onClick(() => { Haptics.tap(); this.reset(); })
+        .backgroundColor(Palette.rose).borderRadius(Radius.md).width('100%').height(Bp.isShort() ? Cell.of(32) : Cell.tap(32)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L314'; })
         .onBlur(() => { if (this.tvFocus === 'L314') { this.tvFocus = ''; } })
