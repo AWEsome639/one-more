@@ -344,7 +344,7 @@ export struct GAbReversalOddball {
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).width(96).height(Cell.tap(44)).focusable(Tv.on())
+          .borderRadius(Radius.md).width(96).height(Cell.tap(38)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L310'; })
           .onBlur(() => { if (this.tvFocus === 'L310') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L310')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

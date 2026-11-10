@@ -617,7 +617,7 @@ export struct GMazeNav3d {
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
-        .width('100%').height(Cell.tap(44))
+        .width('100%').height(Cell.tap(32))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L543'; })
         .onBlur(() => { if (this.tvFocus === 'L543') { this.tvFocus = ''; } })

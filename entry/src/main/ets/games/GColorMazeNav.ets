@@ -400,7 +400,7 @@ export struct GColorMazeNav {
    .textShadow(A11y.glyphShadow())
  Text(this.pos === r * this.diffTotal + c ? '🔵' : (r * this.diffTotal + c === this.goal ? '🏁' : '')).fontSize(FontSize.md)
  }
- }.layoutWeight(1).height(Cell.tap(44)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+ }.layoutWeight(1).height(Cell.tap(32)).backgroundColor(HUE[this.color[r * this.diffTotal + c]]).borderRadius(Radius.sm).borderWidth(this.pos === r * this.diffTotal + c ? 3 : 0).borderColor('#FFFFFF').animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
  .onFocus(() => { this.tvFocus = 'L351'; })
  .onBlur(() => { if (this.tvFocus === 'L351') { this.tvFocus = ''; } })
  .outline(Tv.focusOutline(this.tvFocus === 'L351', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); }); }).onClick(() => { Haptics.tick(); this.note = TG('滑动或按方向键走同色砖 🌀'); })

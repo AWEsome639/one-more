@@ -657,7 +657,7 @@ export struct GSlitherlink {
           .backgroundColor(Palette.lime)
           .borderRadius(Radius.md)
           .width(96)
-          .height(Cell.tap(44))
+          .height(Cell.tap(38))
           .onClick(() => {
             Haptics.tap();
             this.reset();
