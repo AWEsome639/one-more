@@ -1,0 +1,209 @@
+[2026-11-10T10:29:08] Bejeweled: max_bottom=1351 lowest='🍀' -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-102907.jpeg
+[2026-11-10T10:29:38] Breakout: max_bottom=1351 lowest='拖动挡板对准，点棋盘或按「发球」开球' -> /Users/a0000/dev/One More/_巡检记录/截图-Breakout-102938.jpeg
+[2026-11-10T10:30:09] Bubble Shooter: max_bottom=1600 lowest='同色连 3 颗起炸；把全场炸光通关，28 次发射用完' -> /Users/a0000/dev/One More/_巡检记录/截图-Bubble_Shooter-103008.jpeg
+[2026-11-10T10:30:37] Checkers: max_bottom=696 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Checkers-103037.jpeg
+NO_CARD  Compound Connect（搜索结果里没有「复合连线」的卡片；不盲点第一张）
+[2026-11-10T10:31:18] Connect Four: max_bottom=1406 lowest='点任意一列（或箭头）投子，横、竖、斜先连成四个就赢' -> /Users/a0000/dev/One More/_巡检记录/截图-Connect_Four-103118.jpeg
+NO_CARD  Continuous Paired Associate（搜索结果里没有「连续配对」的卡片；不盲点第一张）
+[2026-11-10T10:31:59] Doodle Jump: max_bottom=1456 lowest='踩到平台自动弹起，爬到 500 米通关；掉出底部就结' -> /Users/a0000/dev/One More/_巡检记录/截图-Doodle_Jump-103159.jpeg
+[2026-11-10T10:32:56] Double Trouble: max_bottom=1552 lowest='每轮两个任务都要答对；答错扣一条命，3 条命用完就结' -> /Users/a0000/dev/One More/_巡检记录/截图-Double_Trouble-103255.jpeg
+[2026-11-10T10:33:55] Dual Mirror: max_bottom=1403 lowest='点左板 (r,c) ⇒ 左 (r,c) 与右 (r,' -> /Users/a0000/dev/One More/_巡检记录/截图-Dual_Mirror-103355.jpeg
+[2026-11-10T10:34:49] Flappy: max_bottom=1456 lowest='穿 12 根管道通关；撞管道或撞地就结束（点场地也能' -> /Users/a0000/dev/One More/_巡检记录/截图-Flappy-103449.jpeg
+[2026-11-10T10:35:42] FreeCell: max_bottom=1435 lowest='♠5' -> /Users/a0000/dev/One More/_巡检记录/截图-FreeCell-103542.jpeg
+[2026-11-10T10:36:41] 2048: max_bottom=1557 lowest='←' -> /Users/a0000/dev/One More/_巡检记录/截图-2048-103641.jpeg
+[2026-11-10T10:37:32] Game24: max_bottom=1558 lowest='撤销' -> /Users/a0000/dev/One More/_巡检记录/截图-Game24-103732.jpeg
+[2026-11-10T10:38:31] Go (9x9): max_bottom=1445 lowest='黑先 · 无气提子 · 打劫不能立刻提回 · 双方停' -> /Users/a0000/dev/One More/_巡检记录/截图-Go__9x9_-103830.jpeg
+[2026-11-10T10:39:23] Gomoku: max_bottom=732 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Gomoku-103923.jpeg
+[2026-11-10T10:40:20] Hanoi: max_bottom=1351 lowest='升到 4 盘' -> /Users/a0000/dev/One More/_巡检记录/截图-Hanoi-104020.jpeg
+[2026-11-10T10:41:18] Kakuro Mini: max_bottom=1179 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-104118.jpeg
+NO_CARD  Lock Pattern（搜索结果里没有「生命游戏」的卡片；不盲点第一张）
+[2026-11-10T10:43:59] Mahjong Solitaire: max_bottom=1466 lowest='点第一张牌，再点能和它连起来的同款牌' -> /Users/a0000/dev/One More/_巡检记录/截图-Mahjong_Solitaire-104359.jpeg
+[2026-11-10T10:45:32] Mancala: max_bottom=1373 lowest='●' -> /Users/a0000/dev/One More/_巡检记录/截图-Mancala-104531.jpeg
+[2026-11-10T10:46:57] Mandelbrot: max_bottom=732 lowest='1/8' -> /Users/a0000/dev/One More/_巡检记录/截图-Mandelbrot-104657.jpeg
+[2026-11-10T10:48:06] Mastermind: max_bottom=1600 lowest='A' -> /Users/a0000/dev/One More/_巡检记录/截图-Mastermind-104806.jpeg
+[2026-11-10T10:49:22] Match 3: max_bottom=1579 lowest='点一个果子，再点旁边的换位' -> /Users/a0000/dev/One More/_巡检记录/截图-Match_3-104922.jpeg
+[2026-11-10T10:50:09] Memory: max_bottom=1351 lowest='重新开始' -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-105009.jpeg
+[2026-11-10T10:50:57] Minesweeper: max_bottom=732 lowest='10' -> /Users/a0000/dev/One More/_巡检记录/截图-Minesweeper-105057.jpeg
+[2026-11-10T10:51:48] Nim: max_bottom=1555 lowest='小提示：三堆都只剩 1 颗时，谁先动手谁输' -> /Users/a0000/dev/One More/_巡检记录/截图-Nim-105148.jpeg
+[2026-11-10T10:52:39] Peg Solitaire: max_bottom=1380 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Peg_Solitaire-105239.jpeg
+[2026-11-10T10:53:29] Phonetic Guess: max_bottom=1578 lowest='January' -> /Users/a0000/dev/One More/_巡检记录/截图-Phonetic_Guess-105329.jpeg
+[2026-11-10T10:54:27] Pong: max_bottom=894 lowest='准备发球…' -> /Users/a0000/dev/One More/_巡检记录/截图-Pong-105426.jpeg
+[2026-11-10T10:55:28] Reversi: max_bottom=1600 lowest='你执黑先行' -> /Users/a0000/dev/One More/_巡检记录/截图-Reversi-105528.jpeg
+[2026-11-10T10:56:15] Schulte Table: max_bottom=1600 lowest='14' -> /Users/a0000/dev/One More/_巡检记录/截图-Schulte_Table-105615.jpeg
+[2026-11-10T10:57:02] Sieve Visualizer: max_bottom=1454 lowest='步数 0 · 绿字 = 素数，灰底 = 被划掉的合数' -> /Users/a0000/dev/One More/_巡检记录/截图-Sieve_Visualizer-105702.jpeg
+[2026-11-10T10:57:49] Simon Says: max_bottom=1345 lowest='🐸' -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Says-105749.jpeg
+[2026-11-10T10:58:38] Slide15: max_bottom=1600 lowest='13' -> /Users/a0000/dev/One More/_巡检记录/截图-Slide15-105837.jpeg
+[2026-11-10T10:59:22] Snake: max_bottom=1351 lowest='滑动棋盘或点方向键转向；吃满 12 个食物算通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Snake-105922.jpeg
+[2026-11-10T11:00:09] Snake 3D: max_bottom=804 lowest='上层' -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-110009.jpeg
+[2026-11-10T11:01:01] Sokoban: max_bottom=1430 lowest='上一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Sokoban-110101.jpeg
+[2026-11-10T11:01:53] Solitaire: max_bottom=1351 lowest='自动收牌' -> /Users/a0000/dev/One More/_巡检记录/截图-Solitaire-110152.jpeg
+[2026-11-10T11:02:40] Sorting Visualizer: max_bottom=1351 lowest='开始' -> /Users/a0000/dev/One More/_巡检记录/截图-Sorting_Visualizer-110239.jpeg
+[2026-11-10T11:03:27] Spider Solitaire: max_bottom=1351 lowest='单花色（全黑桃）· 集齐 K→A 收一组 · 空列时' -> /Users/a0000/dev/One More/_巡检记录/截图-Spider_Solitaire-110327.jpeg
+[2026-11-10T11:04:14] Sudoku Hex: max_bottom=1547 lowest='点一个空格，再点数字填入' -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku_Hex-110414.jpeg
+[2026-11-10T11:05:03] Tetris: max_bottom=1465 lowest='目标：消满 10 行通关；堆到顶就输了' -> /Users/a0000/dev/One More/_巡检记录/截图-Tetris-110502.jpeg
+[2026-11-10T11:05:53] Tic-Tac-Toe: max_bottom=1541 lowest='电脑会贪心，但也会看漏，试试能不能赢' -> /Users/a0000/dev/One More/_巡检记录/截图-Tic_Tac_Toe-110553.jpeg
+[2026-11-10T11:06:44] Wordle: max_bottom=732 lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-110644.jpeg
+[2026-11-10T11:07:31] Akari (Light Up): max_bottom=1529 lowest='点空格放灯，点灯撤掉' -> /Users/a0000/dev/One More/_巡检记录/截图-Akari__Light_Up_-110731.jpeg
+[2026-11-10T11:08:21] Alphabet Sudoku: max_bottom=1547 lowest='点空格 → 点字母填入' -> /Users/a0000/dev/One More/_巡检记录/截图-Alphabet_Sudoku-110820.jpeg
+[2026-11-10T11:09:08] Binary Puzzle: max_bottom=1571 lowest='点格子循环切换：空 → 0 → 1' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Puzzle-110908.jpeg
+WRONG_GAME  Block Escape（找不到标题「华容道逃脱」；页面首几个文本=['‹', '华容道逃脱', '移开障碍让方块出去', '☆', '?', '普通']）
+[2026-11-10T11:10:51] Bridges: max_bottom=1475 lowest='点一个岛 → 点另一个岛，桥数 0→1→2→0 循环' -> /Users/a0000/dev/One More/_巡检记录/截图-Bridges-111051.jpeg
+[2026-11-10T11:11:43] Bridges All: max_bottom=1600 lowest='拆光重来' -> /Users/a0000/dev/One More/_巡检记录/截图-Bridges_All-111142.jpeg
+[2026-11-10T11:12:31] Color Flood: max_bottom=1351 lowest='C' -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Flood-111231.jpeg
+[2026-11-10T11:13:20] Crown: max_bottom=732 lowest='0/6' -> /Users/a0000/dev/One More/_巡检记录/截图-Crown-111320.jpeg
+[2026-11-10T11:14:09] Dominosa: max_bottom=1467 lowest='2' -> /Users/a0000/dev/One More/_巡检记录/截图-Dominosa-111408.jpeg
+[2026-11-10T11:14:57] Fillomino: max_bottom=1327 lowest='8' -> /Users/a0000/dev/One More/_巡检记录/截图-Fillomino-111456.jpeg
+[2026-11-10T11:15:50] Futoshiki: max_bottom=1588 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Futoshiki-111550.jpeg
+[2026-11-10T11:16:38] Gokigen Naname: max_bottom=1520 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Gokigen_Naname-111638.jpeg
+[2026-11-10T11:17:26] Heyawake: max_bottom=880 lowest='2' -> /Users/a0000/dev/One More/_巡检记录/截图-Heyawake-111725.jpeg
+[2026-11-10T11:18:12] Hitori: max_bottom=1481 lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori-111812.jpeg
+[2026-11-10T11:19:00] Hitori All: max_bottom=1499 lowest='2' -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori_All-111900.jpeg
+[2026-11-10T11:19:47] Kakurasu Sums: max_bottom=1567 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-111947.jpeg
+[2026-11-10T11:20:33] Kakuro: max_bottom=1179 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-112033.jpeg
+[2026-11-10T11:21:24] KenKen: max_bottom=1469 lowest='重开一题' -> /Users/a0000/dev/One More/_巡检记录/截图-KenKen-112123.jpeg
+[2026-11-10T11:22:10] Klotski: max_bottom=1492 lowest='←' -> /Users/a0000/dev/One More/_巡检记录/截图-Klotski-112210.jpeg
+[2026-11-10T11:22:56] Kurodoko: max_bottom=980 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Kurodoko-112256.jpeg
+[2026-11-10T11:23:41] Lighthouses: max_bottom=1070 lowest='🪨' -> /Users/a0000/dev/One More/_巡检记录/截图-Lighthouses-112341.jpeg
+[2026-11-10T11:24:28] Lights Out: max_bottom=1460 lowest='💡' -> /Users/a0000/dev/One More/_巡检记录/截图-Lights_Out-112428.jpeg
+[2026-11-10T11:25:15] Magnets: max_bottom=1183 lowest='现 0' -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-112515.jpeg
+[2026-11-10T11:26:01] Masyu: max_bottom=1586 lowest='⚫' -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-112601.jpeg
+[2026-11-10T11:26:47] Math Maze: max_bottom=1584 lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Maze-112647.jpeg
+[2026-11-10T11:27:33] Math Path: max_bottom=1173 lowest='6' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-112732.jpeg
+[2026-11-10T11:28:19] Nonogram: max_bottom=1557 lowest='1 1' -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-112818.jpeg
+[2026-11-10T11:29:05] Norinori: max_bottom=1541 lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Norinori-112905.jpeg
+[2026-11-10T11:29:51] Nurikabe: max_bottom=1068 lowest='2' -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-112951.jpeg
+[2026-11-10T11:30:38] Path Finder: max_bottom=986 lowest='🧍' -> /Users/a0000/dev/One More/_巡检记录/截图-Path_Finder-113038.jpeg
+[2026-11-10T11:31:25] Path Intersect: max_bottom=1566 lowest='⬤' -> /Users/a0000/dev/One More/_巡检记录/截图-Path_Intersect-113125.jpeg
+[2026-11-10T11:32:12] Pipes: max_bottom=1572 lowest='╴' -> /Users/a0000/dev/One More/_巡检记录/截图-Pipes-113211.jpeg
+[2026-11-10T11:32:58] Shikaku: max_bottom=1548 lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Shikaku-113258.jpeg
+[2026-11-10T11:33:44] Skyscrapers: max_bottom=1427 lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Skyscrapers-113344.jpeg
+[2026-11-10T11:34:30] Slide Puzzle: max_bottom=1600 lowest='点空格旁边的块把它推进去' -> /Users/a0000/dev/One More/_巡检记录/截图-Slide_Puzzle-113430.jpeg
+[2026-11-10T11:35:16] Slitherlink: max_bottom=1408 lowest='点边线切换；数字变绿说明这一格满足了' -> /Users/a0000/dev/One More/_巡检记录/截图-Slitherlink-113516.jpeg
+[2026-11-10T11:35:55] Sudoku: max_bottom=1547 lowest='点一个空格，再点数字填入' -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku-113555.jpeg
+[2026-11-10T11:36:41] Sum Snake: max_bottom=1573 lowest='🐍 蛇头在外框高亮；紫色外框是蛇尾（点它回退）' -> /Users/a0000/dev/One More/_巡检记录/截图-Sum_Snake-113641.jpeg
+[2026-11-10T11:37:27] Tangle Fix: max_bottom=1564 lowest='点一个节点，再点另一个换位' -> /Users/a0000/dev/One More/_巡检记录/截图-Tangle_Fix-113727.jpeg
+[2026-11-10T11:38:13] Tapa: max_bottom=1562 lowest='点格子涂黑/擦白；数字 = 8 邻域里连续黑格的段长' -> /Users/a0000/dev/One More/_巡检记录/截图-Tapa-113813.jpeg
+[2026-11-10T11:38:58] Tenner Grid: max_bottom=1600 lowest='每行每列都要有 0~9 各一次；灰底是题目给的数' -> /Users/a0000/dev/One More/_巡检记录/截图-Tenner_Grid-113858.jpeg
+[2026-11-10T11:39:44] Tents And Trees: max_bottom=1600 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Tents_And_Trees-113944.jpeg
+[2026-11-10T11:40:31] Water Sort: max_bottom=1351 lowest='倒水规则：只有颜色相同、或目标管是空的才能倒；倒的量' -> /Users/a0000/dev/One More/_巡检记录/截图-Water_Sort-114031.jpeg
+[2026-11-10T11:41:17] Yajilin: max_bottom=1454 lowest='提示 (-5)' -> /Users/a0000/dev/One More/_巡检记录/截图-Yajilin-114117.jpeg
+[2026-11-10T11:42:03] Algebraic Balance: max_bottom=1520 lowest='点候选值 → 立刻判分' -> /Users/a0000/dev/One More/_巡检记录/截图-Algebraic_Balance-114203.jpeg
+[2026-11-10T11:42:50] Algebraic Inequality Solver: max_bottom=1572 lowest='严格/非严格要看清楚' -> /Users/a0000/dev/One More/_巡检记录/截图-Algebraic_Inequality_Solver-114250.jpeg
+[2026-11-10T11:43:37] Arithmetic Chain: max_bottom=1484 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Arithmetic_Chain-114337.jpeg
+[2026-11-10T11:44:33] Balance Scale: max_bottom=1531 lowest='10' -> /Users/a0000/dev/One More/_巡检记录/截图-Balance_Scale-114432.jpeg
+[2026-11-10T11:45:53] Base Conversion Run: max_bottom=1495 lowest='18' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-114552.jpeg
+[2026-11-10T11:47:05] Base Shift: max_bottom=1578 lowest='1264' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-114704.jpeg
+[2026-11-10T11:48:26] Binary Code: max_bottom=1575 lowest='点亮开关凑出 28' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Code-114825.jpeg
+[2026-11-10T11:49:34] Binary Matrix Rank: max_bottom=1600 lowest='C' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Matrix_Rank-114934.jpeg
+[2026-11-10T11:50:46] Binary Scale Balance: max_bottom=1597 lowest='右盘 2 · 还差 16' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Scale_Balance-115045.jpeg
+[2026-11-10T11:52:13] Binomial Match: max_bottom=1426 lowest='换一组' -> /Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-115212.jpeg
+[2026-11-10T11:53:23] Calculation Sprint: max_bottom=1527 lowest='186' -> /Users/a0000/dev/One More/_巡检记录/截图-Calculation_Sprint-115321.jpeg
+[2026-11-10T11:54:28] Collatz: max_bottom=1522 lowest='23' -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-115427.jpeg
+[2026-11-10T11:55:47] Common Denominator: max_bottom=1496 lowest='公分母 = 168' -> /Users/a0000/dev/One More/_巡检记录/截图-Common_Denominator-115546.jpeg
+[2026-11-10T11:57:01] Countdown Math: max_bottom=1409 lowest='10' -> /Users/a0000/dev/One More/_巡检记录/截图-Countdown_Math-115700.jpeg
+[2026-11-10T11:58:11] Crypto Arithmetic: max_bottom=1492 lowest='五个字母的数字两两不同' -> /Users/a0000/dev/One More/_巡检记录/截图-Crypto_Arithmetic-115810.jpeg
+[2026-11-10T11:59:28] Digit Swap Eq: max_bottom=1402 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Digit_Swap_Eq-115927.jpeg
+[2026-11-10T12:00:42] Divisibility Dash: max_bottom=1533 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Divisibility_Dash-120041.jpeg
+[2026-11-10T12:02:05] Exponent Tower: max_bottom=1302 lowest='\u3000' -> /Users/a0000/dev/One More/_巡检记录/截图-Exponent_Tower-120205.jpeg
+[2026-11-10T12:03:30] Factor Finder: max_bottom=1452 lowest='8' -> /Users/a0000/dev/One More/_巡检记录/截图-Factor_Finder-120329.jpeg
+WRONG_GAME  Fibonacci Merge（找不到标题「斐波那契合并」；页面首几个文本=['One More', '🌙', '中', '🔍', '💬', '🔍']）
+[2026-11-10T12:05:48] Fraction Match: max_bottom=1139 lowest='?' -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Match-120548.jpeg
+[2026-11-10T12:07:22] Fraction Matcher: max_bottom=1582 lowest='3/7' -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-120720.jpeg
+[2026-11-10T12:08:48] Fractional Pizza: max_bottom=1571 lowest='确认' -> /Users/a0000/dev/One More/_巡检记录/截图-Fractional_Pizza-120847.jpeg
+[2026-11-10T12:10:03] Inequality Balance Ops: max_bottom=1565 lowest='提示：先算乘、再算加；两边都算完才好放符号' -> /Users/a0000/dev/One More/_巡检记录/截图-Inequality_Balance_Ops-121003.jpeg
+[2026-11-10T12:10:56] Inequality Dash: max_bottom=1501 lowest='提示：ax + c > k ⇒ x > (k−c)/' -> /Users/a0000/dev/One More/_巡检记录/截图-Inequality_Dash-121055.jpeg
+[2026-11-10T12:11:50] Magic Squares: max_bottom=1496 lowest='提示：点已填的格子可以把数字取回托盘' -> /Users/a0000/dev/One More/_巡检记录/截图-Magic_Squares-121149.jpeg
+[2026-11-10T12:12:37] Matrix Multiplier: max_bottom=1600 lowest='8' -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Multiplier-121237.jpeg
+[2026-11-10T12:13:26] Matrix Multiplier Match: max_bottom=1591 lowest='先点左边算式，再点下边它的积' -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Multiplier_Match-121326.jpeg
+WRONG_GAME  Matrix Reasoning（找不到标题「矩阵推理」；页面首几个文本=['‹', '矩阵推理', '找规律填矩阵', '☆', '?', '普通']）
+[2026-11-10T12:15:13] Mental Abacus: max_bottom=1406 lowest='提示：一步一算，别跳步 —— 减法看准方向' -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Abacus-121513.jpeg
+[2026-11-10T12:15:59] Mental Calendar: max_bottom=1543 lowest='提示：一三五七八十腊，三十一天永不差；闰年二月二十九' -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Calendar-121559.jpeg
+[2026-11-10T12:16:46] Missing Operator: max_bottom=1316 lowest='\u3000' -> /Users/a0000/dev/One More/_巡检记录/截图-Missing_Operator-121646.jpeg
+[2026-11-10T12:17:34] Modular Clock Arithmetic: max_bottom=1583 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Modular_Clock_Arithmetic-121734.jpeg
+[2026-11-10T12:18:20] Modulo Clock: max_bottom=1521 lowest='9 点' -> /Users/a0000/dev/One More/_巡检记录/截图-Modulo_Clock-121820.jpeg
+[2026-11-10T12:19:06] Modulo Path: max_bottom=1541 lowest='23' -> /Users/a0000/dev/One More/_巡检记录/截图-Modulo_Path-121906.jpeg
+[2026-11-10T12:19:52] Number Bonds: max_bottom=1584 lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds-121952.jpeg
+[2026-11-10T12:20:39] Number Bonds All: max_bottom=1403 lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds_All-122039.jpeg
+[2026-11-10T12:21:26] Numerical Estimation: max_bottom=1577 lowest='10' -> /Users/a0000/dev/One More/_巡检记录/截图-Numerical_Estimation-122125.jpeg
+[2026-11-10T12:22:12] Pattern Sequence Draw: max_bottom=1545 lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Pattern_Sequence_Draw-122212.jpeg
+[2026-11-10T12:22:58] Percentage Peak: max_bottom=1499 lowest='850' -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Peak-122258.jpeg
+[2026-11-10T12:23:45] Percentage Shopping: max_bottom=1552 lowest='¥656' -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-122345.jpeg
+[2026-11-10T12:24:32] Prime Factor Trees: max_bottom=1442 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Factor_Trees-122432.jpeg
+[2026-11-10T12:25:19] Prime Gap Hunt: max_bottom=1526 lowest='素数：只能被 1 与自身整除' -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Gap_Hunt-122519.jpeg
+[2026-11-10T12:26:06] Prime Hunter: max_bottom=1548 lowest='41' -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Hunter-122606.jpeg
+[2026-11-10T12:26:53] Pythagorean Triple Builder: max_bottom=1582 lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-122653.jpeg
+[2026-11-10T12:27:40] Quick Math: max_bottom=1523 lowest='连击越高分越多' -> /Users/a0000/dev/One More/_巡检记录/截图-Quick_Math-122739.jpeg
+[2026-11-10T12:28:26] Radical Roots: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Radical_Roots-122826.jpeg
+[2026-11-10T12:29:12] Roman Arithmetic: max_bottom=1490 lowest='左减右加：IV=4，IX=9，XL=40' -> /Users/a0000/dev/One More/_巡检记录/截图-Roman_Arithmetic-122912.jpeg
+[2026-11-10T12:29:58] Sequence Sleuth: max_bottom=1535 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Sequence_Sleuth-122958.jpeg
+[2026-11-10T12:30:45] Sequence Stack: max_bottom=1549 lowest='提示：答错不换题，想清楚再点' -> /Users/a0000/dev/One More/_巡检记录/截图-Sequence_Stack-123045.jpeg
+[2026-11-10T12:31:31] Set Theory Venn: max_bottom=1392 lowest='提示：先看这个数在不在 A 里，再看在不在 B 里' -> /Users/a0000/dev/One More/_巡检记录/截图-Set_Theory_Venn-123131.jpeg
+[2026-11-10T12:32:18] Sum Pyramid: max_bottom=1517 lowest='提示：相邻两格之和往上搬，一层层来' -> /Users/a0000/dev/One More/_巡检记录/截图-Sum_Pyramid-123217.jpeg
+[2026-11-10T12:33:04] Target 10: max_bottom=1142 lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_10-123304.jpeg
+[2026-11-10T12:33:50] Target Number: max_bottom=1600 lowest='(7 − 2) × 7' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_Number-123350.jpeg
+[2026-11-10T12:34:37] Unit Converter Pro: max_bottom=1558 lowest='提示：长度 10 进、数据 1024 进、时间 60' -> /Users/a0000/dev/One More/_巡检记录/截图-Unit_Converter_Pro-123436.jpeg
+[2026-11-10T12:35:23] Vector Dot Product: max_bottom=1374 lowest='-6' -> /Users/a0000/dev/One More/_巡检记录/截图-Vector_Dot_Product-123523.jpeg
+[2026-11-10T12:36:09] Vector Grid Alignment: max_bottom=1519 lowest='(dx, dy)：+ 列向右、+ 行向下' -> /Users/a0000/dev/One More/_巡检记录/截图-Vector_Grid_Alignment-123609.jpeg
+[2026-11-10T12:36:57] Vektor Vector: max_bottom=1573 lowest='提示：a − b 是逐分量相减，符号别弄反' -> /Users/a0000/dev/One More/_巡检记录/截图-Vektor_Vector-123656.jpeg
+[2026-11-10T12:37:45] Venn Numbers: max_bottom=1501 lowest='提示：A ∩ B = 既是 3 的倍数又是偶数，比如' -> /Users/a0000/dev/One More/_巡检记录/截图-Venn_Numbers-123744.jpeg
+[2026-11-10T12:38:32] Associative Pairs: max_bottom=1600 lowest='🎵 旋律' -> /Users/a0000/dev/One More/_巡检记录/截图-Associative_Pairs-123832.jpeg
+[2026-11-10T12:39:19] Attentional Blink: max_bottom=1525 lowest='提示：数字只出现一次，其余字母都是干扰项' -> /Users/a0000/dev/One More/_巡检记录/截图-Attentional_Blink-123919.jpeg
+[2026-11-10T12:40:06] Attentional Blink Probe: max_bottom=1547 lowest='提示：探针只会出现在数字之后，出现与否各半' -> /Users/a0000/dev/One More/_巡检记录/截图-Attentional_Blink_Probe-124006.jpeg
+[2026-11-10T12:40:53] Card Counting Memory: max_bottom=1441 lowest='5♣️' -> /Users/a0000/dev/One More/_巡检记录/截图-Card_Counting_Memory-124052.jpeg
+[2026-11-10T12:41:42] Change Blindness: max_bottom=1564 lowest='提示：第一次只闪 1.3 秒，第二眼才换掉一格；越快' -> /Users/a0000/dev/One More/_巡检记录/截图-Change_Blindness-124141.jpeg
+[2026-11-10T12:42:29] Choice Reaction Time: max_bottom=1470 lowest='判定：平均 < 900 ms 且答错 ≤ 1 次（答' -> /Users/a0000/dev/One More/_巡检记录/截图-Choice_Reaction_Time-124229.jpeg
+[2026-11-10T12:43:50] Color Word Match Up: max_bottom=1351 lowest='答满 24 题且答对 ≥ 16 即通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Word_Match_Up-124349.jpeg
+[2026-11-10T12:44:36] Conjunction Search: max_bottom=1367 lowest='目标＝红色 □ 与蓝色 ● 的联合：唯一的红 ●' -> /Users/a0000/dev/One More/_巡检记录/截图-Conjunction_Search-124436.jpeg
+[2026-11-10T12:45:25] Continuous Recognition: max_bottom=1351 lowest='答满 24 题且答对 ≥ 17 即通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Continuous_Recognition-124525.jpeg
+[2026-11-10T12:46:11] Corsi Backward Span: max_bottom=1351 lowest='倒背：长度升到 5 即通关；倒着点，别顺着点' -> /Users/a0000/dev/One More/_巡检记录/截图-Corsi_Backward_Span-124611.jpeg
+[2026-11-10T12:46:58] Corsi Blocks: max_bottom=1295 lowest='顺背：长度升到 6 即通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Corsi_Blocks-124658.jpeg
+[2026-11-10T12:47:48] Counting Span: max_bottom=1523 lowest='张数升到 5 即通关；黄点 1~5 个不等' -> /Users/a0000/dev/One More/_巡检记录/截图-Counting_Span-124748.jpeg
+[2026-11-10T12:48:51] d2 Attention: max_bottom=1489 lowest='目标＝字母 d 且上下小撇共 2 个；30 秒内找齐' -> /Users/a0000/dev/One More/_巡检记录/截图-d2_Attention-124851.jpeg
+[2026-11-10T12:49:40] Delayed Match Sample: max_bottom=1469 lowest='样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；' -> /Users/a0000/dev/One More/_巡检记录/截图-Delayed_Match_Sample-124940.jpeg
+[2026-11-10T12:50:29] Digit Span Reverse: max_bottom=1600 lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Digit_Span_Reverse-125029.jpeg
+[2026-11-10T12:51:17] Divided Attention: max_bottom=1388 lowest=' ' -> /Users/a0000/dev/One More/_巡检记录/截图-Divided_Attention-125117.jpeg
+[2026-11-10T12:52:06] Dnms: max_bottom=1543 lowest='提示：其余几个刚才都见过，只有一个是全新的' -> /Users/a0000/dev/One More/_巡检记录/截图-Dnms-125205.jpeg
+[2026-11-10T12:52:54] Double N Back: max_bottom=1444 lowest='M' -> /Users/a0000/dev/One More/_巡检记录/截图-Double_N_Back-125254.jpeg
+[2026-11-10T12:53:43] Dual Coding: max_bottom=1558 lowest='看图记词，两条通道一起用' -> /Users/a0000/dev/One More/_巡检记录/截图-Dual_Coding-125343.jpeg
+[2026-11-10T12:54:35] Dual Task Memory: max_bottom=1426 lowest='40' -> /Users/a0000/dev/One More/_巡检记录/截图-Dual_Task_Memory-125435.jpeg
+[2026-11-10T12:55:25] Dynamic Salience: max_bottom=1486 lowest='提示：它每 1.5 秒换一次位置，手快一点' -> /Users/a0000/dev/One More/_巡检记录/截图-Dynamic_Salience-125524.jpeg
+[2026-11-10T12:56:13] Event Timeline Memory: max_bottom=1493 lowest='打乱作答 ▶' -> /Users/a0000/dev/One More/_巡检记录/截图-Event_Timeline_Memory-125613.jpeg
+[2026-11-10T12:57:02] Face Name Association: max_bottom=1428 lowest='判定：6 题答对 ≥ 5 即通关。人名皆为虚构。' -> /Users/a0000/dev/One More/_巡检记录/截图-Face_Name_Association-125702.jpeg
+[2026-11-10T12:57:51] Face Trait Association: max_bottom=1600 lowest='判定：6 题答对 ≥ 5 即通关。特质皆为虚构。' -> /Users/a0000/dev/One More/_巡检记录/截图-Face_Trait_Association-125751.jpeg
+[2026-11-10T12:58:36] Feature Matrix Recall: max_bottom=1374 lowest='只看不抄：3 红 3 蓝，遮蔽后按指定颜色复原' -> /Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall-125836.jpeg
+[2026-11-10T12:59:22] Feature Matrix Recall All: max_bottom=1374 lowest='不许多点也不许漏点：选满 6 格才能提交' -> /Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall_All-125922.jpeg
+[2026-11-10T13:00:10] Flanker Test: max_bottom=1374 lowest='判定：答对 ≥ 11/12 且平均 < 900 ms' -> /Users/a0000/dev/One More/_巡检记录/截图-Flanker_Test-130010.jpeg
+[2026-11-10T13:00:57] Frequency Tap: max_bottom=1565 lowest='▶️' -> /Users/a0000/dev/One More/_巡检记录/截图-Frequency_Tap-130057.jpeg
+[2026-11-10T13:01:45] Ghost Tap: max_bottom=1529 lowest='判定：15 只里抓到 12 只即通关，点偏会拖慢节奏' -> /Users/a0000/dev/One More/_巡检记录/截图-Ghost_Tap-130145.jpeg
+[2026-11-10T13:03:04] Go / No-Go: max_bottom=1536 lowest='判定：正确 ≥ 17/20 且误点 ≤ 1 次 · ' -> /Users/a0000/dev/One More/_巡检记录/截图-Go___No_Go-130304.jpeg
+[2026-11-10T13:03:50] Grocery List: max_bottom=1351 lowest='提示：每轮清单更长，答对 75% 即通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Grocery_List-130350.jpeg
+[2026-11-10T13:04:38] Mandala Recall: max_bottom=1452 lowest='提示：只看位置，颜色只是帮你分组；点满即自动判定' -> /Users/a0000/dev/One More/_巡检记录/截图-Mandala_Recall-130438.jpeg
+NO_CARD  Memory Matrix（搜索结果里没有「记忆矩阵」的卡片；不盲点第一张）
+[2026-11-10T13:06:33] Memory Palace: max_bottom=1571 lowest='提示：把格子想成房间里的固定位置，靠位置记住东西' -> /Users/a0000/dev/One More/_巡检记录/截图-Memory_Palace-130633.jpeg
+[2026-11-10T13:07:24] Multiple Object Tracking: max_bottom=1452 lowest='提示：先扫全场再锁定目标；目标数 3/4/5 递增' -> /Users/a0000/dev/One More/_巡检记录/截图-Multiple_Object_Tracking-130724.jpeg
+[2026-11-10T13:08:12] N-Back: max_bottom=1444 lowest='K' -> /Users/a0000/dev/One More/_巡检记录/截图-N_Back-130812.jpeg
+[2026-11-10T13:09:00] Narrative Recall: max_bottom=1351 lowest='提示：不用背原文，抓住时间、地点、数字与人名' -> /Users/a0000/dev/One More/_巡检记录/截图-Narrative_Recall-130900.jpeg
+[2026-11-10T13:09:47] Negative Space Detection: max_bottom=1514 lowest='提示：别盯着色块，看它们中间空出来的那一块' -> /Users/a0000/dev/One More/_巡检记录/截图-Negative_Space_Detection-130947.jpeg
+[2026-11-10T13:10:34] Object Displacement: max_bottom=1576 lowest='提示：遮罩后只有一个物件换格，点它（点它原来的位置也' -> /Users/a0000/dev/One More/_巡检记录/截图-Object_Displacement-131034.jpeg
+[2026-11-10T13:11:25] Object Shuffle: max_bottom=1351 lowest='提示：洗牌时高亮的一对盒子正在互换，跟着 💎 走' -> /Users/a0000/dev/One More/_巡检记录/截图-Object_Shuffle-131125.jpeg
+[2026-11-10T13:12:17] Odd Even Flash: max_bottom=1351 lowest='提示：数字消失后才能作答，答满 18 题对 13 题' -> /Users/a0000/dev/One More/_巡检记录/截图-Odd_Even_Flash-131217.jpeg
+[2026-11-10T13:13:10] Operation Span: max_bottom=1516 lowest='本轮 2 个算式：先算对，最后一起回忆结果' -> /Users/a0000/dev/One More/_巡检记录/截图-Operation_Span-131309.jpeg
+[2026-11-10T13:13:59] Peripheral Focus: max_bottom=1548 lowest='刚才余光里的符号是哪个？（950 ms）' -> /Users/a0000/dev/One More/_巡检记录/截图-Peripheral_Focus-131358.jpeg
+[2026-11-10T13:14:46] Posner Spatial Cueing: max_bottom=1351 lowest='提示：提示有 1/4 是错的，别抢答，等 🎯 出来再' -> /Users/a0000/dev/One More/_巡检记录/截图-Posner_Spatial_Cueing-131446.jpeg
+[2026-11-10T13:15:35] Probe Digit Span: max_bottom=1435 lowest='提示：位数从 3 涨到 8，答错一次就结束' -> /Users/a0000/dev/One More/_巡检记录/截图-Probe_Digit_Span-131535.jpeg
+NO_CARD  Reading Span（搜索结果里没有「阅读广度」的卡片；不盲点第一张）
+[2026-11-10T13:17:01] Reflex Tap: max_bottom=1536 lowest='判定：8 次平均 < 550 ms 且点偏 ≤ 2 ' -> /Users/a0000/dev/One More/_巡检记录/截图-Reflex_Tap-131701.jpeg
+NO_CARD  Relational Memory（搜索结果里没有「关系记忆」的卡片；不盲点第一张）
+[2026-11-10T13:18:32] Reverse Stroop: max_bottom=1462 lowest='判定：12 题答对 ≥ 10 且平均 < 1800 ' -> /Users/a0000/dev/One More/_巡检记录/截图-Reverse_Stroop-131831.jpeg
+[2026-11-10T13:19:27] Rhythm Master: max_bottom=1465 lowest='判定：4 下平均间隔误差 ≤ 150 ms（目标间隔' -> /Users/a0000/dev/One More/_巡检记录/截图-Rhythm_Master-131926.jpeg
+[2026-11-10T13:20:18] Rule Switcher: max_bottom=1549 lowest='判定：15 题答对 ≥ 12 且平均 < 1600 ' -> /Users/a0000/dev/One More/_巡检记录/截图-Rule_Switcher-132018.jpeg
+[2026-11-10T13:21:47] Running Memory Span: max_bottom=1441 lowest='判定：连过 广度 3 → 4 → 5 三关；数字 7' -> /Users/a0000/dev/One More/_巡检记录/截图-Running_Memory_Span-132147.jpeg
+[2026-11-10T13:22:45] Sdmt: max_bottom=1600 lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Sdmt-132245.jpeg
+NO_CARD  Shell Game（搜索结果里没有「猜球」的卡片；不盲点第一张）
+[2026-11-10T13:23:30] Sopt: max_bottom=1372 lowest='第 1/3 轮：按 1 → 9 依次点' -> /Users/a0000/dev/One More/_巡检记录/截图-Sopt-132330.jpeg
+[2026-11-10T13:24:27] Spatial Cabinet Memory: max_bottom=1296 lowest='☕ 刚才在哪一格？点它' -> /Users/a0000/dev/One More/_巡检记录/截图-Spatial_Cabinet_Memory-132427.jpeg
+[2026-11-10T13:25:21] Spotlight Track: max_bottom=670 lowest='轮次 1/8' -> /Users/a0000/dev/One More/_巡检记录/截图-Spotlight_Track-132521.jpeg
+NO_CARD  Staircase Memory（搜索结果里没有「阶梯记忆」的卡片；不盲点第一张）
+[2026-11-10T13:26:56] Stop Signal: max_bottom=1426 lowest='判定：正确 ≥ 10/12 且冲均值 < 800 m' -> /Users/a0000/dev/One More/_巡检记录/截图-Stop_Signal-132656.jpeg
+[2026-11-10T13:28:25] Stroop Number Size: max_bottom=1471 lowest='判定：12 题答对 ≥ 10 题' -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Number_Size-132824.jpeg
+[2026-11-10T13:29:21] Stroop Test: max_bottom=1600 lowest='蓝' -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-132921.jpeg

@@ -320,7 +320,7 @@ export struct GMatrixMultiplier {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xxs }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
 
