@@ -370,7 +370,7 @@ export struct GRadicalRoots {
         Text(Digits(String(this.wrong), this.langCode)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
       }.width('100%')
-      Column({ space: Space.xs }) {
+      Column({ space: Space.xxs }) {
         Text(this.q).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         Text(TG('= ?（最简根式）')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface)

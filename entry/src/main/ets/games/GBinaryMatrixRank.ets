@@ -401,7 +401,7 @@ export struct GBinaryMatrixRank {
   }
 
   build() {
-    Column({ space: Space.xs }) {
+    Column({ space: Space.xxs }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
 
