@@ -632,7 +632,7 @@ export struct GMazeNav3d {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
       if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
     })
-    .width('100%')
+    .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
     .height('100%')
     .padding(Space.md)
   }

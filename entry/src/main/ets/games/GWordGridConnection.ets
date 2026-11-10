@@ -357,7 +357,7 @@ export struct GWordGridConnection {
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
-      }.width('100%')
+      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })

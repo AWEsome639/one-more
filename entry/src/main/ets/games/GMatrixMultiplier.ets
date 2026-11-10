@@ -399,7 +399,7 @@ export struct GMatrixMultiplier {
         Text(TG2("求 C 的第 {0} 行第 {1} 列", String(this.wantR + 1), String(this.wantC + 1)))
           .fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor(Palette.rose)
       }
-      .width('100%').padding(Space.md).backgroundColor(this.theme.surface)
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360))).padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card)
 
       Text(this.msg).fontSize(FontSize.sm).width('100%')

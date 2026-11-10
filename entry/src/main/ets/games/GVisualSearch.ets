@@ -285,7 +285,7 @@ export struct GVisualSearch {
       Row({ space: Space.sm }) {
         Text(this.target).fontSize(FontSize.xxl)
         Text(TG2('在下面 {0} 个里找出它', CELLS)).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
-      }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360))).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Row() {
         Row().height(Space.xs).width(String(Math.round((this.leftMs / LIMIT_MS) * 100)) + '%')
           .backgroundColor(this.leftMs > 2500 ? Palette.emerald : Palette.rose)

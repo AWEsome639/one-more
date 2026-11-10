@@ -328,7 +328,7 @@ export struct GTrailMaking {
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
-      }.width('100%').padding(Space.sm).backgroundColor(this.theme.isDark ? '#141414' : '#E8EDF5')
+      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360))).padding(Space.sm).backgroundColor(this.theme.isDark ? '#141414' : '#E8EDF5')
       .borderRadius(Radius.lg)
 
       Text(this.msg)

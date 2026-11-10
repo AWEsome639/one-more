@@ -290,7 +290,7 @@ export struct GLetterGridSwapper {
       Column({ space: Space.xs }) {
         Text(TG('目标单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(this.goal).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.amber)
-      }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
+      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360))).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
         ForEach(this.rowIdx(), (r: number) => {
