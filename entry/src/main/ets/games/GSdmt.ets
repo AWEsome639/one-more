@@ -245,7 +245,7 @@ export struct GSdmt {
     this.onFinish(r);
   }
   build() {
-    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.xxs : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -284,13 +284,13 @@ export struct GSdmt {
       Column({ space: Space.xs }) {
         Text(SYMS[this.cur]).fontSize(FontSize.hero).fontColor(Palette.lime)
         Text(TG('这个符号对应哪个数字？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      }.width('100%').height(Bp.isShort() ? 74 : 120).justifyContent(FlexAlign.Center)
+      }.width('100%').height(Bp.isShort() ? 56 : 120).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
-      Column({ space: Space.sm }) {
+      Column({ space: Bp.height < 600 ? Space.xxs : Space.sm }) {
         Row({ space: Space.sm }) {
           ForEach([1, 2, 3], (d: number) => {
             Text(String((d))).fontSize(FontSize.xl).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 54)).borderRadius(Radius.md)
+            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 54)).borderRadius(Radius.md)
             .backgroundColor(this.tapped === (d) ? (this.ok ? Palette.emerald : Palette.rose) : Palette.primary)
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -305,7 +305,7 @@ export struct GSdmt {
         Row({ space: Space.sm }) {
           ForEach([4, 5, 6], (d: number) => {
             Text(String((d))).fontSize(FontSize.xl).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 54)).borderRadius(Radius.md)
+            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 54)).borderRadius(Radius.md)
             .backgroundColor(this.tapped === (d) ? (this.ok ? Palette.emerald : Palette.rose) : Palette.primary)
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -320,7 +320,7 @@ export struct GSdmt {
         Row({ space: Space.sm }) {
           ForEach([7, 8, 9], (d: number) => {
             Text(String((d))).fontSize(FontSize.xl).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 54)).borderRadius(Radius.md)
+            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 54)).borderRadius(Radius.md)
             .backgroundColor(this.tapped === (d) ? (this.ok ? Palette.emerald : Palette.rose) : Palette.primary)
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
