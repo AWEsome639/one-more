@@ -194,7 +194,12 @@ def is_home():
     if not d:
         return False
     j = ''.join(t for t, _ in texts(d))
-    return 'One More' in j and ('全部' in j or '355 款' in j)
+    ok = 'One More' in j and ('全部' in j or '355 款' in j)
+    # ★ 2026-11-11（判据 1910）：**「首页 + 搜索框有内容」不算初始态** ——
+    #   `✕` 只在搜索框有内容时出现；不清空就会把新词拼到旧词后面 ⇒ 全部 no_card
+    if ok and '✕' in j:
+        return False
+    return ok
 
 
 # ═══════════════ ④ 统一出口 ═══════════════
