@@ -439,7 +439,7 @@ export struct GCompassMaze {
  ForEach(this.rowIdx(), (c: number) => {
  Stack() {
  Text(this.pos === r * this.diffTotal + c ? '🔵' : (r * this.diffTotal + c === this.goalIdx() ? '🏁' : '')).fontSize(FontSize.sm)
- }.layoutWeight(1).height(Cell.of(40)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).borderWidth({
+ }.layoutWeight(1).height(Cell.of(32)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).borderWidth({
  top: (this.walls[r * this.diffTotal + c] & 1) !== 0 ? 2 : 0, right: (this.walls[r * this.diffTotal + c] & 2) !== 0 ? 2 : 0,
  bottom: (this.walls[r * this.diffTotal + c] & 4) !== 0 ? 2 : 0,
  left: (this.walls[r * this.diffTotal + c] & 8) !== 0 ? 2 : 0
