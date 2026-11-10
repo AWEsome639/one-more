@@ -1,0 +1,38 @@
+[1] Affix Factory: max_bottom=1564 lowest='词根「happy」该接哪个词缀？' -> /Users/a0000/dev/One More/_巡检记录/截图-Affix_Factory-082412.jpeg
+[2] Akari (Light Up): max_bottom=1529 lowest='点空格放灯，点灯撤掉' -> /Users/a0000/dev/One More/_巡检记录/截图-Akari__Light_Up_-082505.jpeg
+[3] Attentional Blink: max_bottom=1525 lowest='提示：数字只出现一次，其余字母都是干扰项' -> /Users/a0000/dev/One More/_巡检记录/截图-Attentional_Blink-082601.jpeg
+[4] Attentional Blink Probe: max_bottom=0 lowest='' -> /Users/a0000/dev/One More/_巡检记录/截图-Attentional_Blink_Probe-082821.jpeg
+[5] Binary Puzzle: max_bottom=1571 lowest='点格子循环切换：空 → 0 → 1' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Puzzle-082925.jpeg
+[6] Binomial Match: max_bottom=1576 lowest='换一组' -> /Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-083018.jpeg
+[7] Bubble Shooter: max_bottom=1600 lowest='同色连 3 颗起炸；把全场炸光通关，28 次发射用完' -> /Users/a0000/dev/One More/_巡检记录/截图-Bubble_Shooter-083048.jpeg
+[8] Choice Reaction Time: max_bottom=1470 lowest='判定：平均 < 900 ms 且答错 ≤ 1 次（答' -> /Users/a0000/dev/One More/_巡检记录/截图-Choice_Reaction_Time-083116.jpeg
+[9] Consonant Reconstruct: max_bottom=1310 lowest='跳过（-1 命）' -> /Users/a0000/dev/One More/_巡检记录/截图-Consonant_Reconstruct-083215.jpeg
+[10] Context Clues: max_bottom=1600 lowest='选一个释义' -> /Users/a0000/dev/One More/_巡检记录/截图-Context_Clues-083321.jpeg
+[11] WRONG_GAME  Definition Dash（找不到标题「释义冲刺」；页面首几个文本=['One More', '🌙', '中', '🔍', '💬', '🔍']）
+[12] Etymology Origin: max_bottom=1386 lowest='答对 8 个通关；答错扣 3 秒，错满 4 次结束' -> /Users/a0000/dev/One More/_巡检记录/截图-Etymology_Origin-083543.jpeg
+[13] Find Word: max_bottom=1600 lowest='P' -> /Users/a0000/dev/One More/_巡检记录/截图-Find_Word-083639.jpeg
+[14] FreeCell: max_bottom=1435 lowest='♠1' -> /Users/a0000/dev/One More/_巡检记录/截图-FreeCell-083734.jpeg
+[15] Grammar Sort: max_bottom=1312 lowest='16 个词，45 秒内答对 ≥12 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Grammar_Sort-083828.jpeg
+[16] Letter Cancellation: max_bottom=1600 lowest='C' -> /Users/a0000/dev/One More/_巡检记录/截图-Letter_Cancellation-083921.jpeg
+[17] Letter Grid Swapper: max_bottom=1600 lowest='G' -> /Users/a0000/dev/One More/_巡检记录/截图-Letter_Grid_Swapper-084014.jpeg
+[18] Probe Digit Span: max_bottom=1435 lowest='提示：位数从 3 涨到 8，答错一次就结束' -> /Users/a0000/dev/One More/_巡检记录/截图-Probe_Digit_Span-084113.jpeg
+[19] Radical Roots: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Radical_Roots-084208.jpeg
+[20] NO_CARD  Relational Memory（搜索结果里没有「关系记忆」的卡片；不盲点第一张）
+[21] Reverse Stroop: max_bottom=1462 lowest='判定：12 题答对 ≥ 10 且平均 < 1800 ' -> /Users/a0000/dev/One More/_巡检记录/截图-Reverse_Stroop-084345.jpeg
+[22] Rhyme Master: max_bottom=1409 lowest='8 题，答对 ≥6 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Rhyme_Master-084439.jpeg
+[23] Rhythm Master: max_bottom=1465 lowest='判定：4 下平均间隔误差 ≤ 150 ms（目标间隔' -> /Users/a0000/dev/One More/_巡检记录/截图-Rhythm_Master-084536.jpeg
+[24] Rule Switcher: max_bottom=1549 lowest='判定：15 题答对 ≥ 12 且平均 < 1600 ' -> /Users/a0000/dev/One More/_巡检记录/截图-Rule_Switcher-084629.jpeg
+[25] NO_CARD  Running Memory Span（搜索结果里没有「记忆广度」的卡片；不盲点第一张）
+[26] Sdmt: max_bottom=1600 lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Sdmt-084823.jpeg
+[27] Semantic Association: max_bottom=1409 lowest='10 题，答对 ≥7 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Semantic_Association-084916.jpeg
+[28] Stop Signal: max_bottom=1426 lowest='判定：正确 ≥ 10/12 且冲均值 < 800 m' -> /Users/a0000/dev/One More/_巡检记录/截图-Stop_Signal-085014.jpeg
+[29] Stroop Test: max_bottom=1600 lowest='蓝' -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-085119.jpeg
+[30] Symbol Digit Assoc: max_bottom=1594 lowest='提示：先扫一眼对照表再点；同一个符号不会连着出现' -> /Users/a0000/dev/One More/_巡检记录/截图-Symbol_Digit_Assoc-085247.jpeg
+[31] Target Number: max_bottom=1600 lowest='3 × (5 + 4)' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_Number-085352.jpeg
+[32] Task Switching: max_bottom=1499 lowest='提示：切换试次比重复试次慢多少，就是这一局的「切换代' -> /Users/a0000/dev/One More/_巡检记录/截图-Task_Switching-085446.jpeg
+[33] Tents And Trees: max_bottom=1600 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Tents_And_Trees-085550.jpeg
+[34] Trail Making: max_bottom=1600 lowest='6' -> /Users/a0000/dev/One More/_巡检记录/截图-Trail_Making-085650.jpeg
+[35] Vektor Vector: max_bottom=1600 lowest='✅ 对了！' -> /Users/a0000/dev/One More/_巡检记录/截图-Vektor_Vector-085738.jpeg
+[36] Visual Crowding Acuity: max_bottom=1549 lowest='R' -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Crowding_Acuity-085841.jpeg
+[37] Visual Search: max_bottom=1600 lowest='🌟' -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Search-085952.jpeg
+[38] Word Pair Associate Memory: max_bottom=1272 lowest='记住这 6 组词对' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Pair_Associate_Memory-090218.jpeg
