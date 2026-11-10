@@ -328,7 +328,7 @@ export struct GRoomInspector {
       Row({ space: Space.xs }) {
       ForEach(IDXC, (c: number) => { Stack() {
       Text(false ? this.down[(r * COLS + c)] : this.up[(r * COLS + c)]).fontSize(FontSize.xl)
-      }.layoutWeight(1).height(Cell.of(46))
+      }.layoutWeight(1).height(Cell.of(32))
       .backgroundColor(this.bgOf((r * COLS + c), ((0)))).borderRadius(Radius.sm).borderWidth(2)
       .borderColor(this.borderOf((r * COLS + c), ((0))))
       .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -352,7 +352,7 @@ export struct GRoomInspector {
       Row({ space: Space.xs }) {
       ForEach(IDXC, (c: number) => { Stack() {
       Text(true ? this.down[(r * COLS + c)] : this.up[(r * COLS + c)]).fontSize(FontSize.xl)
-      }.layoutWeight(1).height(Cell.of(46))
+      }.layoutWeight(1).height(Cell.of(32))
       .backgroundColor(this.bgOf((r * COLS + c), ((1)))).borderRadius(Radius.sm).borderWidth(2)
       .borderColor(this.borderOf((r * COLS + c), ((1))))
       .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -379,7 +379,7 @@ export struct GRoomInspector {
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(this.won ? Palette.emerald : Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => { Haptics.tap(); this.reset(); })
+        .borderRadius(Radius.md).width('100%').height(Cell.of(32)).onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L369'; })
         .onBlur(() => { if (this.tvFocus === 'L369') { this.tvFocus = ''; } })

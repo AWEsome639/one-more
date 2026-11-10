@@ -449,7 +449,7 @@ export struct GMirrorImage {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(46))
+        .height(Cell.of(32))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L443'; })

@@ -314,7 +314,7 @@ export struct GSymbolDigitAssoc {
             ForEach(COLS, (c: number) => {
               Text(String((r * 3 + c) + 1)).fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
               .fontColor(this.pick >= 0 ? '#FFFFFF' : this.theme.ink)
-              .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(56))
+              .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(32))
               .backgroundColor(this.pick === (r * 3 + c) ? Palette.rose : this.theme.surfaceAlt)
               .borderRadius(Radius.md).shadow(Shadow.card)
               .scale({ x: this.pick === (r * 3 + c) ? Motion.pressScale : 1, y: this.pick === (r * 3 + c) ? Motion.pressScale : 1 })

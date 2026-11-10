@@ -393,7 +393,7 @@ export struct GMatrixMultiplier {
           }.layoutWeight(1)
           Text('=').accessibilityText(TG('等于')).fontSize(FontSize.xl).fontColor(this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
           Text('?').accessibilityText(TG('待求')).fontSize(FontSize.xl).minFontSize(13).maxFontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(Palette.rose).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-            .textAlign(TextAlign.Center).width(48).height(Cell.of(48)).backgroundColor(HOT).borderRadius(Radius.xs)
+            .textAlign(TextAlign.Center).width(48).height(Cell.of(32)).backgroundColor(HOT).borderRadius(Radius.xs)
         }.width('100%').alignItems(VerticalAlign.Center)
 
         Text(TG2("求 C 的第 {0} 行第 {1} 列", String(this.wantR + 1), String(this.wantC + 1)))
@@ -434,7 +434,7 @@ export struct GMatrixMultiplier {
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-        .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(46))
+        .fontSize(FontSize.md).fontColor('#FFFFFF').borderRadius(Radius.md).width('100%').height(Cell.of(32))
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.primary)
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L406'; })

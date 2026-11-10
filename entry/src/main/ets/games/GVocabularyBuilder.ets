@@ -345,7 +345,7 @@ export struct GVocabularyBuilder {
   option(o: Opt, i: number) {
     Text(o.text).fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
       .fontColor(this.locked && (this.picked === i || o.ok) ? '#FFFFFF' : this.theme.ink)
-      .width('100%').height(Cell.of(48)).borderRadius(Radius.md).shadow(Shadow.card)
+      .width('100%').height(Cell.of(32)).borderRadius(Radius.md).shadow(Shadow.card)
       .backgroundColor(this.locked && o.ok
         ? Palette.emerald : (this.locked && this.picked === i ? Palette.rose : this.theme.surface))
       .scale({ x: this.picked === i ? Motion.pressScale : 1, y: this.picked === i ? Motion.pressScale : 1 })

@@ -507,7 +507,7 @@ export struct GMazeNav3d {
       // 层切换
       Row({ space: Space.md }) {
         Button(TG('▼ 下层'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).layoutWeight(1).height(Cell.of(42))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).layoutWeight(1).height(Cell.of(32))
           .backgroundColor(this.theme.surfaceAlt).fontColor(this.theme.ink)
           .borderRadius(Radius.sm)
           .enabled(this.pz > 0)
@@ -521,7 +521,7 @@ export struct GMazeNav3d {
             this.tryMove(0, 0, -1);
           })
         Button(TG('▲ 上层'))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).layoutWeight(1).height(Cell.of(42))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).layoutWeight(1).height(Cell.of(32))
           .backgroundColor(this.theme.surfaceAlt).fontColor(this.theme.ink)
           .borderRadius(Radius.sm)
           .enabled(this.pz < this.diffTotal - 1)
