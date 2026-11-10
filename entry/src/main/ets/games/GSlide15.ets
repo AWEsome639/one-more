@@ -677,8 +677,8 @@ export struct GSlide15 {
           .width('100%')
         }, (r: number) => 's15r' + r)
       }
-      .width('100%')
-      .padding(Space.sm)
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+      .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)

@@ -284,7 +284,7 @@ export struct GSdmt {
       Column({ space: Space.xs }) {
         Text(SYMS[this.cur]).fontSize(FontSize.hero).fontColor(Palette.lime)
         Text(TG('这个符号对应哪个数字？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      }.width('100%').height(120).justifyContent(FlexAlign.Center)
+      }.width('100%').height(Bp.isShort() ? 74 : 120).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
