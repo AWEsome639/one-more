@@ -704,7 +704,7 @@ export struct GTapa {
       .aspectRatio(1)
       // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
       //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: '70%' })
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)

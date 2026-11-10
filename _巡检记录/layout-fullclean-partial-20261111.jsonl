@@ -1,0 +1,269 @@
+batch: 354 款 | timeout=150s | out=/Users/a0000/dev/One More/_巡检记录/layout-batch-20261111-012350.jsonl
+cmd: python3 工具/shot_game.py {game}
+{"event": "start", "i": 1, "total": 354, "game": "Bejeweled", "en": "Bejeweled", "ts": "2026-11-11T01:23:50"}
+{"event": "result", "i": 1, "total": 354, "game": "Bejeweled", "en": "Bejeweled", "outcome": "ok", "max_bottom": 1351, "lowest": null, "elapsed_s": 19.7, "returncode": 0, "tail": "Bejeweled\tOK\t1351\t19.6s lowest='💎' -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-012409.jpeg @2026-11-11T01:24:09"}
+{"event": "start", "i": 2, "total": 354, "game": "Breakout", "en": "Breakout", "ts": "2026-11-11T01:24:09"}
+{"event": "result", "i": 2, "total": 354, "game": "Breakout", "en": "Breakout", "outcome": "ok", "max_bottom": 1351, "lowest": null, "elapsed_s": 18.8, "returncode": 0, "tail": "Breakout\tOK\t1351\t18.7s lowest='拖动挡板对准，点棋盘或按「发球」开球' -> /Users/a0000/dev/One More/_巡检记录/截图-Breakout-012428.jpeg @2026-11-11T01:24:28"}
+{"event": "start", "i": 3, "total": 354, "game": "Bubble Shooter", "en": "Bubble Shooter", "ts": "2026-11-11T01:24:28"}
+{"event": "result", "i": 3, "total": 354, "game": "Bubble Shooter", "en": "Bubble Shooter", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 13.8, "returncode": 0, "tail": "Bubble\tNO_CARD\t-\t13.8s no card for 'Bubble' (fallback=(347, 780))"}
+{"event": "start", "i": 4, "total": 354, "game": "Checkers", "en": "Checkers", "ts": "2026-11-11T01:24:42"}
+{"event": "result", "i": 4, "total": 354, "game": "Checkers", "en": "Checkers", "outcome": "ok", "max_bottom": 696, "lowest": null, "elapsed_s": 15.8, "returncode": 0, "tail": "Checkers\tOK\t696\t15.7s lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Checkers-012458.jpeg @2026-11-11T01:24:58"}
+{"event": "start", "i": 5, "total": 354, "game": "Compound Connect", "en": "Compound Connect", "ts": "2026-11-11T01:24:58"}
+{"event": "result", "i": 5, "total": 354, "game": "Compound Connect", "en": "Compound Connect", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 14.3, "returncode": 0, "tail": "Compound\tNO_CARD\t-\t14.2s no card for 'Compound' (fallback=(347, 816))"}
+{"event": "start", "i": 6, "total": 354, "game": "Connect Four", "en": "Connect Four", "ts": "2026-11-11T01:25:12"}
+{"event": "result", "i": 6, "total": 354, "game": "Connect Four", "en": "Connect Four", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.5, "returncode": 0, "tail": "Connect\tNO_CARD\t-\t36.4s no card for 'Connect' (fallback=(347, 780))"}
+{"event": "start", "i": 7, "total": 354, "game": "Continuous Paired Associate", "en": "Continuous Paired Associate", "ts": "2026-11-11T01:25:49"}
+{"event": "result", "i": 7, "total": 354, "game": "Continuous Paired Associate", "en": "Continuous Paired Associate", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.3, "returncode": 0, "tail": "Continuous\tNO_CARD\t-\t36.2s no card for 'Continuous' (fallback=(347, 780))"}
+{"event": "start", "i": 8, "total": 354, "game": "Doodle Jump", "en": "Doodle Jump", "ts": "2026-11-11T01:26:25"}
+{"event": "result", "i": 8, "total": 354, "game": "Doodle Jump", "en": "Doodle Jump", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.2, "returncode": 0, "tail": "Doodle\tNO_CARD\t-\t36.1s no card for 'Doodle' (fallback=(347, 780))"}
+{"event": "start", "i": 9, "total": 354, "game": "Double Trouble", "en": "Double Trouble", "ts": "2026-11-11T01:27:01"}
+{"event": "result", "i": 9, "total": 354, "game": "Double Trouble", "en": "Double Trouble", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.8, "returncode": 0, "tail": "Double\tNO_CARD\t-\t36.7s no card for 'Double' (fallback=(347, 780))"}
+{"event": "start", "i": 10, "total": 354, "game": "Dual Mirror", "en": "Dual Mirror", "ts": "2026-11-11T01:27:38"}
+{"event": "result", "i": 10, "total": 354, "game": "Dual Mirror", "en": "Dual Mirror", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 35.0, "returncode": 0, "tail": "Dual\tNO_CARD\t-\t34.9s no card for 'Dual' (fallback=(347, 780))"}
+{"event": "start", "i": 11, "total": 354, "game": "Flappy", "en": "Flappy", "ts": "2026-11-11T01:28:13"}
+{"event": "result", "i": 11, "total": 354, "game": "Flappy", "en": "Flappy", "outcome": "ok", "max_bottom": 1456, "lowest": null, "elapsed_s": 40.1, "returncode": 0, "tail": "Flappy\tOK\t1456\t40.0s lowest='穿 12 根管道通关；撞管道或撞地就结束（点场地也能' -> /Users/a0000/dev/One More/_巡检记录/截图-Flappy-012853.jpeg @2026-11-11T01:28:53"}
+{"event": "start", "i": 12, "total": 354, "game": "FreeCell", "en": "FreeCell", "ts": "2026-11-11T01:28:53"}
+{"event": "result", "i": 12, "total": 354, "game": "FreeCell", "en": "FreeCell", "outcome": "ok", "max_bottom": 1435, "lowest": null, "elapsed_s": 43.0, "returncode": 0, "tail": "FreeCell\tOK\t1435\t42.9s lowest='♠7' -> /Users/a0000/dev/One More/_巡检记录/截图-FreeCell-012936.jpeg @2026-11-11T01:29:36"}
+{"event": "start", "i": 13, "total": 354, "game": "2048", "en": "2048", "ts": "2026-11-11T01:29:36"}
+{"event": "result", "i": 13, "total": 354, "game": "2048", "en": "2048", "outcome": "ok", "max_bottom": 1557, "lowest": null, "elapsed_s": 42.6, "returncode": 0, "tail": "2048\tOK\t1557\t42.6s lowest='←' -> /Users/a0000/dev/One More/_巡检记录/截图-2048-013018.jpeg @2026-11-11T01:30:18"}
+{"event": "start", "i": 14, "total": 354, "game": "Game24", "en": "Game24", "ts": "2026-11-11T01:30:18"}
+{"event": "result", "i": 14, "total": 354, "game": "Game24", "en": "Game24", "outcome": "ok", "max_bottom": 1558, "lowest": null, "elapsed_s": 43.2, "returncode": 0, "tail": "Game24\tOK\t1558\t43.1s lowest='撤销' -> /Users/a0000/dev/One More/_巡检记录/截图-Game24-013101.jpeg @2026-11-11T01:31:02"}
+{"event": "start", "i": 15, "total": 354, "game": "Go (9x9)", "en": "Go (9x9)", "ts": "2026-11-11T01:31:02"}
+{"event": "result", "i": 15, "total": 354, "game": "Go (9x9)", "en": "Go (9x9)", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 39.1, "returncode": 0, "tail": "Go\tNO_CARD\t-\t39.0s no card for 'Go' (fallback=(347, 780))"}
+{"event": "start", "i": 16, "total": 354, "game": "Gomoku", "en": "Gomoku", "ts": "2026-11-11T01:31:41"}
+{"event": "result", "i": 16, "total": 354, "game": "Gomoku", "en": "Gomoku", "outcome": "ok", "max_bottom": 732, "lowest": null, "elapsed_s": 40.1, "returncode": 0, "tail": "Gomoku\tOK\t732\t40.1s lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Gomoku-013221.jpeg @2026-11-11T01:32:21"}
+{"event": "start", "i": 17, "total": 354, "game": "Hanoi", "en": "Hanoi", "ts": "2026-11-11T01:32:21"}
+{"event": "result", "i": 17, "total": 354, "game": "Hanoi", "en": "Hanoi", "outcome": "ok", "max_bottom": 1351, "lowest": null, "elapsed_s": 44.8, "returncode": 0, "tail": "Hanoi\tOK\t1351\t44.7s lowest='升到 4 盘' -> /Users/a0000/dev/One More/_巡检记录/截图-Hanoi-013305.jpeg @2026-11-11T01:33:06"}
+{"event": "start", "i": 18, "total": 354, "game": "Kakuro Mini", "en": "Kakuro Mini", "ts": "2026-11-11T01:33:06"}
+{"event": "result", "i": 18, "total": 354, "game": "Kakuro Mini", "en": "Kakuro Mini", "outcome": "ok", "max_bottom": 1179, "lowest": null, "elapsed_s": 42.6, "returncode": 0, "tail": "Kakuro\tOK\t1179\t42.5s lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-013348.jpeg @2026-11-11T01:33:48"}
+{"event": "start", "i": 19, "total": 354, "game": "Lock Pattern", "en": "Lock Pattern", "ts": "2026-11-11T01:33:48"}
+{"event": "result", "i": 19, "total": 354, "game": "Lock Pattern", "en": "Lock Pattern", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 39.4, "returncode": 0, "tail": "Lock\tNO_CARD\t-\t39.3s no card for 'Lock' (fallback=(347, 780))"}
+{"event": "start", "i": 20, "total": 354, "game": "Mahjong Solitaire", "en": "Mahjong Solitaire", "ts": "2026-11-11T01:34:28"}
+{"event": "result", "i": 20, "total": 354, "game": "Mahjong Solitaire", "en": "Mahjong Solitaire", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.7, "returncode": 0, "tail": "Mahjong\tNO_CARD\t-\t36.7s no card for 'Mahjong' (fallback=(347, 816))"}
+{"event": "start", "i": 21, "total": 354, "game": "Mancala", "en": "Mancala", "ts": "2026-11-11T01:35:04"}
+{"event": "result", "i": 21, "total": 354, "game": "Mancala", "en": "Mancala", "outcome": "ok", "max_bottom": 1373, "lowest": null, "elapsed_s": 40.5, "returncode": 0, "tail": "Mancala\tOK\t1373\t40.5s lowest='●' -> /Users/a0000/dev/One More/_巡检记录/截图-Mancala-013545.jpeg @2026-11-11T01:35:45"}
+{"event": "start", "i": 22, "total": 354, "game": "Mandelbrot", "en": "Mandelbrot", "ts": "2026-11-11T01:35:45"}
+{"event": "result", "i": 22, "total": 354, "game": "Mandelbrot", "en": "Mandelbrot", "outcome": "ok", "max_bottom": 732, "lowest": null, "elapsed_s": 43.0, "returncode": 0, "tail": "Mandelbrot\tOK\t732\t43.0s lowest='1/8' -> /Users/a0000/dev/One More/_巡检记录/截图-Mandelbrot-013628.jpeg @2026-11-11T01:36:28"}
+{"event": "start", "i": 23, "total": 354, "game": "Mastermind", "en": "Mastermind", "ts": "2026-11-11T01:36:28"}
+{"event": "result", "i": 23, "total": 354, "game": "Mastermind", "en": "Mastermind", "outcome": "ok", "max_bottom": 1465, "lowest": null, "elapsed_s": 42.9, "returncode": 0, "tail": "Mastermind\tOK\t1465\t42.8s lowest='A' -> /Users/a0000/dev/One More/_巡检记录/截图-Mastermind-013711.jpeg @2026-11-11T01:37:11"}
+{"event": "start", "i": 24, "total": 354, "game": "Match 3", "en": "Match 3", "ts": "2026-11-11T01:37:11"}
+{"event": "result", "i": 24, "total": 354, "game": "Match 3", "en": "Match 3", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.1, "returncode": 0, "tail": "Match\tNO_CARD\t-\t38.0s no card for 'Match' (fallback=(347, 780))"}
+{"event": "start", "i": 25, "total": 354, "game": "Memory", "en": "Memory", "ts": "2026-11-11T01:37:49"}
+{"event": "result", "i": 25, "total": 354, "game": "Memory", "en": "Memory", "outcome": "ok", "max_bottom": 1351, "lowest": null, "elapsed_s": 42.2, "returncode": 0, "tail": "Memory\tOK\t1351\t42.2s lowest='重新开始' -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-013831.jpeg @2026-11-11T01:38:31"}
+{"event": "start", "i": 26, "total": 354, "game": "Minesweeper", "en": "Minesweeper", "ts": "2026-11-11T01:38:31"}
+{"event": "result", "i": 26, "total": 354, "game": "Minesweeper", "en": "Minesweeper", "outcome": "ok", "max_bottom": 732, "lowest": null, "elapsed_s": 51.7, "returncode": 0, "tail": "Minesweeper\tOK\t732\t51.6s lowest='10' -> /Users/a0000/dev/One More/_巡检记录/截图-Minesweeper-013923.jpeg @2026-11-11T01:39:23"}
+{"event": "start", "i": 27, "total": 354, "game": "Nim", "en": "Nim", "ts": "2026-11-11T01:39:23"}
+{"event": "result", "i": 27, "total": 354, "game": "Nim", "en": "Nim", "outcome": "ok", "max_bottom": 1555, "lowest": null, "elapsed_s": 52.5, "returncode": 0, "tail": "Nim\tOK\t1555\t52.4s lowest='小提示：三堆都只剩 1 颗时，谁先动手谁输' -> /Users/a0000/dev/One More/_巡检记录/截图-Nim-014015.jpeg @2026-11-11T01:40:15"}
+{"event": "start", "i": 28, "total": 354, "game": "Peg Solitaire", "en": "Peg Solitaire", "ts": "2026-11-11T01:40:15"}
+{"event": "result", "i": 28, "total": 354, "game": "Peg Solitaire", "en": "Peg Solitaire", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.3, "returncode": 0, "tail": "Peg\tNO_CARD\t-\t38.2s no card for 'Peg' (fallback=(347, 780))"}
+{"event": "start", "i": 29, "total": 354, "game": "Phonetic Guess", "en": "Phonetic Guess", "ts": "2026-11-11T01:40:54"}
+{"event": "result", "i": 29, "total": 354, "game": "Phonetic Guess", "en": "Phonetic Guess", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.7, "returncode": 0, "tail": "Phonetic\tNO_CARD\t-\t37.6s no card for 'Phonetic' (fallback=(347, 780))"}
+{"event": "start", "i": 30, "total": 354, "game": "Pong", "en": "Pong", "ts": "2026-11-11T01:41:31"}
+{"event": "result", "i": 30, "total": 354, "game": "Pong", "en": "Pong", "outcome": "ok", "max_bottom": 894, "lowest": null, "elapsed_s": 48.1, "returncode": 0, "tail": "Pong\tOK\t894\t48.1s lowest='准备发球…' -> /Users/a0000/dev/One More/_巡检记录/截图-Pong-014219.jpeg @2026-11-11T01:42:19"}
+{"event": "start", "i": 31, "total": 354, "game": "Reversi", "en": "Reversi", "ts": "2026-11-11T01:42:19"}
+{"event": "result", "i": 31, "total": 354, "game": "Reversi", "en": "Reversi", "outcome": "ok", "max_bottom": 1331, "lowest": null, "elapsed_s": 54.7, "returncode": 0, "tail": "Reversi\tOK\t1331\t54.6s lowest='重新开始' -> /Users/a0000/dev/One More/_巡检记录/截图-Reversi-014314.jpeg @2026-11-11T01:43:14"}
+{"event": "start", "i": 32, "total": 354, "game": "Schulte Table", "en": "Schulte Table", "ts": "2026-11-11T01:43:14"}
+{"event": "result", "i": 32, "total": 354, "game": "Schulte Table", "en": "Schulte Table", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.0, "returncode": 0, "tail": "Schulte\tNO_CARD\t-\t40.0s no card for 'Schulte' (fallback=(347, 780))"}
+{"event": "start", "i": 33, "total": 354, "game": "Sieve Visualizer", "en": "Sieve Visualizer", "ts": "2026-11-11T01:43:54"}
+{"event": "result", "i": 33, "total": 354, "game": "Sieve Visualizer", "en": "Sieve Visualizer", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.1, "returncode": 0, "tail": "Sieve\tNO_CARD\t-\t37.0s no card for 'Sieve' (fallback=(347, 780))"}
+{"event": "start", "i": 34, "total": 354, "game": "Simon Says", "en": "Simon Says", "ts": "2026-11-11T01:44:31"}
+{"event": "result", "i": 34, "total": 354, "game": "Simon Says", "en": "Simon Says", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.0, "returncode": 0, "tail": "Simon\tNO_CARD\t-\t38.0s no card for 'Simon' (fallback=(347, 780))"}
+{"event": "start", "i": 35, "total": 354, "game": "Slide15", "en": "Slide15", "ts": "2026-11-11T01:45:09"}
+{"event": "result", "i": 35, "total": 354, "game": "Slide15", "en": "Slide15", "outcome": "ok", "max_bottom": 1355, "lowest": null, "elapsed_s": 48.7, "returncode": 0, "tail": "Slide15\tOK\t1355\t48.7s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Slide15-014558.jpeg @2026-11-11T01:45:58"}
+{"event": "start", "i": 36, "total": 354, "game": "Snake", "en": "Snake", "ts": "2026-11-11T01:45:58"}
+{"event": "result", "i": 36, "total": 354, "game": "Snake", "en": "Snake", "outcome": "ok", "max_bottom": 1351, "lowest": null, "elapsed_s": 47.3, "returncode": 0, "tail": "Snake\tOK\t1351\t47.2s lowest='滑动棋盘或点方向键转向；吃满 12 个食物算通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Snake-014645.jpeg @2026-11-11T01:46:45"}
+{"event": "start", "i": 37, "total": 354, "game": "Snake 3D", "en": "Snake 3D", "ts": "2026-11-11T01:46:45"}
+{"event": "result", "i": 37, "total": 354, "game": "Snake 3D", "en": "Snake 3D", "outcome": "error", "max_bottom": null, "lowest": null, "elapsed_s": 44.8, "returncode": 0, "tail": "Snake\tWRONG_GAME\t-\t44.7s title '贪吃蛇' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']"}
+{"event": "start", "i": 38, "total": 354, "game": "Sokoban", "en": "Sokoban", "ts": "2026-11-11T01:47:30"}
+{"event": "result", "i": 38, "total": 354, "game": "Sokoban", "en": "Sokoban", "outcome": "ok", "max_bottom": 1430, "lowest": null, "elapsed_s": 49.0, "returncode": 0, "tail": "Sokoban\tOK\t1430\t48.9s lowest='上一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Sokoban-014819.jpeg @2026-11-11T01:48:19"}
+{"event": "start", "i": 39, "total": 354, "game": "Solitaire", "en": "Solitaire", "ts": "2026-11-11T01:48:19"}
+{"event": "result", "i": 39, "total": 354, "game": "Solitaire", "en": "Solitaire", "outcome": "ok", "max_bottom": 1351, "lowest": null, "elapsed_s": 53.1, "returncode": 0, "tail": "Solitaire\tOK\t1351\t53.0s lowest='自动收牌' -> /Users/a0000/dev/One More/_巡检记录/截图-Solitaire-014912.jpeg @2026-11-11T01:49:12"}
+{"event": "start", "i": 40, "total": 354, "game": "Sorting Visualizer", "en": "Sorting Visualizer", "ts": "2026-11-11T01:49:12"}
+{"event": "result", "i": 40, "total": 354, "game": "Sorting Visualizer", "en": "Sorting Visualizer", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.5, "returncode": 0, "tail": "Sorting\tNO_CARD\t-\t38.4s no card for 'Sorting' (fallback=(347, 780))"}
+{"event": "start", "i": 41, "total": 354, "game": "Spider Solitaire", "en": "Spider Solitaire", "ts": "2026-11-11T01:49:51"}
+{"event": "result", "i": 41, "total": 354, "game": "Spider Solitaire", "en": "Spider Solitaire", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.5, "returncode": 0, "tail": "Spider\tNO_CARD\t-\t37.5s no card for 'Spider' (fallback=(347, 780))"}
+{"event": "start", "i": 42, "total": 354, "game": "Sudoku Hex", "en": "Sudoku Hex", "ts": "2026-11-11T01:50:28"}
+{"event": "result", "i": 42, "total": 354, "game": "Sudoku Hex", "en": "Sudoku Hex", "outcome": "ok", "max_bottom": 1547, "lowest": null, "elapsed_s": 51.4, "returncode": 0, "tail": "Sudoku\tOK\t1547\t51.3s lowest='点一个空格，再点数字填入' -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku-015119.jpeg @2026-11-11T01:51:20"}
+{"event": "start", "i": 43, "total": 354, "game": "Tetris", "en": "Tetris", "ts": "2026-11-11T01:51:20"}
+{"event": "result", "i": 43, "total": 354, "game": "Tetris", "en": "Tetris", "outcome": "ok", "max_bottom": 1465, "lowest": null, "elapsed_s": 53.6, "returncode": 0, "tail": "Tetris\tOK\t1465\t53.5s lowest='目标：消满 10 行通关；堆到顶就输了' -> /Users/a0000/dev/One More/_巡检记录/截图-Tetris-015213.jpeg @2026-11-11T01:52:13"}
+{"event": "start", "i": 44, "total": 354, "game": "Tic-Tac-Toe", "en": "Tic-Tac-Toe", "ts": "2026-11-11T01:52:13"}
+{"event": "result", "i": 44, "total": 354, "game": "Tic-Tac-Toe", "en": "Tic-Tac-Toe", "outcome": "ok", "max_bottom": 1541, "lowest": null, "elapsed_s": 53.9, "returncode": 0, "tail": "Tic-Tac-Toe\tOK\t1541\t53.8s lowest='电脑会贪心，但也会看漏，试试能不能赢' -> /Users/a0000/dev/One More/_巡检记录/截图-Tic_Tac_Toe-015307.jpeg @2026-11-11T01:53:07"}
+{"event": "start", "i": 45, "total": 354, "game": "Wordle", "en": "Wordle", "ts": "2026-11-11T01:53:07"}
+{"event": "result", "i": 45, "total": 354, "game": "Wordle", "en": "Wordle", "outcome": "error", "max_bottom": null, "lowest": null, "elapsed_s": 43.8, "returncode": 0, "tail": "Wordle\tWRONG_GAME\t-\t43.7s title '猜词游戏' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']"}
+{"event": "start", "i": 46, "total": 354, "game": "Akari (Light Up)", "en": "Akari (Light Up)", "ts": "2026-11-11T01:53:51"}
+{"event": "result", "i": 46, "total": 354, "game": "Akari (Light Up)", "en": "Akari (Light Up)", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.2, "returncode": 0, "tail": "Akari\tNO_CARD\t-\t37.1s no card for 'Akari' (fallback=(347, 828))"}
+{"event": "start", "i": 47, "total": 354, "game": "Alphabet Sudoku", "en": "Alphabet Sudoku", "ts": "2026-11-11T01:54:28"}
+{"event": "result", "i": 47, "total": 354, "game": "Alphabet Sudoku", "en": "Alphabet Sudoku", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 65.1, "returncode": 0, "tail": "Alphabet\tNO_CARD\t-\t65.0s no card for 'Alphabet' (fallback=(347, 780))"}
+{"event": "start", "i": 48, "total": 354, "game": "Binary Puzzle", "en": "Binary Puzzle", "ts": "2026-11-11T01:55:33"}
+{"event": "result", "i": 48, "total": 354, "game": "Binary Puzzle", "en": "Binary Puzzle", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.0, "returncode": 0, "tail": "Binary\tNO_CARD\t-\t38.0s no card for 'Binary' (fallback=(347, 780))"}
+{"event": "start", "i": 49, "total": 354, "game": "Block Escape", "en": "Block Escape", "ts": "2026-11-11T01:56:11"}
+{"event": "result", "i": 49, "total": 354, "game": "Block Escape", "en": "Block Escape", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.2, "returncode": 0, "tail": "Block\tNO_CARD\t-\t38.2s no card for 'Block' (fallback=(347, 780))"}
+{"event": "start", "i": 50, "total": 354, "game": "Bridges", "en": "Bridges", "ts": "2026-11-11T01:56:49"}
+{"event": "result", "i": 50, "total": 354, "game": "Bridges", "en": "Bridges", "outcome": "ok", "max_bottom": 1475, "lowest": null, "elapsed_s": 51.2, "returncode": 0, "tail": "Bridges\tOK\t1475\t51.1s lowest='点一个岛 → 点另一个岛，桥数 0→1→2→0 循环' -> /Users/a0000/dev/One More/_巡检记录/截图-Bridges-015740.jpeg @2026-11-11T01:57:41"}
+{"event": "start", "i": 51, "total": 354, "game": "Bridges All", "en": "Bridges All", "ts": "2026-11-11T01:57:41"}
+{"event": "result", "i": 51, "total": 354, "game": "Bridges All", "en": "Bridges All", "outcome": "ok", "max_bottom": 1475, "lowest": null, "elapsed_s": 43.6, "returncode": 0, "tail": "Bridges\tOK\t1475\t43.5s lowest='点一个岛 → 点另一个岛，桥数 0→1→2→0 循环' -> /Users/a0000/dev/One More/_巡检记录/截图-Bridges-015824.jpeg @2026-11-11T01:58:24"}
+{"event": "start", "i": 52, "total": 354, "game": "Color Flood", "en": "Color Flood", "ts": "2026-11-11T01:58:24"}
+{"event": "result", "i": 52, "total": 354, "game": "Color Flood", "en": "Color Flood", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.4, "returncode": 0, "tail": "Color\tNO_CARD\t-\t38.4s no card for 'Color' (fallback=(347, 780))"}
+{"event": "start", "i": 53, "total": 354, "game": "Crown", "en": "Crown", "ts": "2026-11-11T01:59:03"}
+{"event": "result", "i": 53, "total": 354, "game": "Crown", "en": "Crown", "outcome": "ok", "max_bottom": 732, "lowest": null, "elapsed_s": 49.8, "returncode": 0, "tail": "Crown\tOK\t732\t49.8s lowest='0/6' -> /Users/a0000/dev/One More/_巡检记录/截图-Crown-015952.jpeg @2026-11-11T01:59:53"}
+{"event": "start", "i": 54, "total": 354, "game": "Dominosa", "en": "Dominosa", "ts": "2026-11-11T01:59:53"}
+{"event": "result", "i": 54, "total": 354, "game": "Dominosa", "en": "Dominosa", "outcome": "ok", "max_bottom": 1467, "lowest": null, "elapsed_s": 53.5, "returncode": 0, "tail": "Dominosa\tOK\t1467\t53.4s lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Dominosa-020046.jpeg @2026-11-11T02:00:46"}
+{"event": "start", "i": 55, "total": 354, "game": "Fillomino", "en": "Fillomino", "ts": "2026-11-11T02:00:46"}
+{"event": "result", "i": 55, "total": 354, "game": "Fillomino", "en": "Fillomino", "outcome": "ok", "max_bottom": 1327, "lowest": null, "elapsed_s": 57.3, "returncode": 0, "tail": "Fillomino\tOK\t1327\t57.3s lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Fillomino-020143.jpeg @2026-11-11T02:01:43"}
+{"event": "start", "i": 56, "total": 354, "game": "Futoshiki", "en": "Futoshiki", "ts": "2026-11-11T02:01:43"}
+{"event": "result", "i": 56, "total": 354, "game": "Futoshiki", "en": "Futoshiki", "outcome": "ok", "max_bottom": 1573, "lowest": null, "elapsed_s": 53.5, "returncode": 0, "tail": "Futoshiki\tOK\t1573\t53.4s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Futoshiki-020236.jpeg @2026-11-11T02:02:37"}
+{"event": "start", "i": 57, "total": 354, "game": "Gokigen Naname", "en": "Gokigen Naname", "ts": "2026-11-11T02:02:37"}
+{"event": "result", "i": 57, "total": 354, "game": "Gokigen Naname", "en": "Gokigen Naname", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 45.8, "returncode": 0, "tail": "Gokigen\tNO_CARD\t-\t45.7s no card for 'Gokigen' (fallback=(347, 816))"}
+{"event": "start", "i": 58, "total": 354, "game": "Heyawake", "en": "Heyawake", "ts": "2026-11-11T02:03:23"}
+{"event": "result", "i": 58, "total": 354, "game": "Heyawake", "en": "Heyawake", "outcome": "ok", "max_bottom": 880, "lowest": null, "elapsed_s": 47.1, "returncode": 0, "tail": "Heyawake\tOK\t880\t46.9s lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Heyawake-020409.jpeg @2026-11-11T02:04:10"}
+{"event": "start", "i": 59, "total": 354, "game": "Hitori", "en": "Hitori", "ts": "2026-11-11T02:04:10"}
+{"event": "result", "i": 59, "total": 354, "game": "Hitori", "en": "Hitori", "outcome": "ok", "max_bottom": 1481, "lowest": null, "elapsed_s": 51.5, "returncode": 0, "tail": "Hitori\tOK\t1481\t51.4s lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori-020501.jpeg @2026-11-11T02:05:01"}
+{"event": "start", "i": 60, "total": 354, "game": "Hitori All", "en": "Hitori All", "ts": "2026-11-11T02:05:01"}
+{"event": "result", "i": 60, "total": 354, "game": "Hitori All", "en": "Hitori All", "outcome": "ok", "max_bottom": 1481, "lowest": null, "elapsed_s": 45.7, "returncode": 0, "tail": "Hitori\tOK\t1481\t45.4s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori-020546.jpeg @2026-11-11T02:05:47"}
+{"event": "start", "i": 61, "total": 354, "game": "Kakurasu Sums", "en": "Kakurasu Sums", "ts": "2026-11-11T02:05:47"}
+{"event": "result", "i": 61, "total": 354, "game": "Kakurasu Sums", "en": "Kakurasu Sums", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.7, "returncode": 0, "tail": "Kakurasu\tNO_CARD\t-\t38.6s no card for 'Kakurasu' (fallback=(347, 780))"}
+{"event": "start", "i": 62, "total": 354, "game": "Kakuro", "en": "Kakuro", "ts": "2026-11-11T02:06:26"}
+{"event": "result", "i": 62, "total": 354, "game": "Kakuro", "en": "Kakuro", "outcome": "ok", "max_bottom": 1179, "lowest": null, "elapsed_s": 50.6, "returncode": 0, "tail": "Kakuro\tOK\t1179\t50.6s lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-020716.jpeg @2026-11-11T02:07:16"}
+{"event": "start", "i": 63, "total": 354, "game": "KenKen", "en": "KenKen", "ts": "2026-11-11T02:07:16"}
+{"event": "result", "i": 63, "total": 354, "game": "KenKen", "en": "KenKen", "outcome": "ok", "max_bottom": 1469, "lowest": null, "elapsed_s": 50.1, "returncode": 0, "tail": "KenKen\tOK\t1469\t50.0s lowest='重开一题' -> /Users/a0000/dev/One More/_巡检记录/截图-KenKen-020806.jpeg @2026-11-11T02:08:06"}
+{"event": "start", "i": 64, "total": 354, "game": "Klotski", "en": "Klotski", "ts": "2026-11-11T02:08:06"}
+{"event": "result", "i": 64, "total": 354, "game": "Klotski", "en": "Klotski", "outcome": "ok", "max_bottom": 1492, "lowest": null, "elapsed_s": 52.3, "returncode": 0, "tail": "Klotski\tOK\t1492\t52.2s lowest='←' -> /Users/a0000/dev/One More/_巡检记录/截图-Klotski-020858.jpeg @2026-11-11T02:08:59"}
+{"event": "start", "i": 65, "total": 354, "game": "Kurodoko", "en": "Kurodoko", "ts": "2026-11-11T02:08:59"}
+{"event": "result", "i": 65, "total": 354, "game": "Kurodoko", "en": "Kurodoko", "outcome": "ok", "max_bottom": 1460, "lowest": null, "elapsed_s": 52.9, "returncode": 0, "tail": "Kurodoko\tOK\t1460\t52.8s lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Kurodoko-020951.jpeg @2026-11-11T02:09:52"}
+{"event": "start", "i": 66, "total": 354, "game": "Lighthouses", "en": "Lighthouses", "ts": "2026-11-11T02:09:52"}
+{"event": "result", "i": 66, "total": 354, "game": "Lighthouses", "en": "Lighthouses", "outcome": "ok", "max_bottom": 1070, "lowest": null, "elapsed_s": 51.9, "returncode": 0, "tail": "Lighthouses\tOK\t1070\t51.9s lowest='🪨' -> /Users/a0000/dev/One More/_巡检记录/截图-Lighthouses-021043.jpeg @2026-11-11T02:10:43"}
+{"event": "start", "i": 67, "total": 354, "game": "Lights Out", "en": "Lights Out", "ts": "2026-11-11T02:10:43"}
+{"event": "result", "i": 67, "total": 354, "game": "Lights Out", "en": "Lights Out", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.8, "returncode": 0, "tail": "Lights\tNO_CARD\t-\t40.6s no card for 'Lights' (fallback=(347, 780))"}
+{"event": "start", "i": 68, "total": 354, "game": "Magnets", "en": "Magnets", "ts": "2026-11-11T02:11:24"}
+{"event": "result", "i": 68, "total": 354, "game": "Magnets", "en": "Magnets", "outcome": "ok", "max_bottom": 1183, "lowest": null, "elapsed_s": 47.7, "returncode": 0, "tail": "Magnets\tOK\t1183\t47.6s lowest='现 0' -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-021212.jpeg @2026-11-11T02:12:12"}
+{"event": "start", "i": 69, "total": 354, "game": "Masyu", "en": "Masyu", "ts": "2026-11-11T02:12:12"}
+{"event": "result", "i": 69, "total": 354, "game": "Masyu", "en": "Masyu", "outcome": "ok", "max_bottom": 1586, "lowest": null, "elapsed_s": 51.6, "returncode": 0, "tail": "Masyu\tOK\t1586\t51.5s lowest='⚪' -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-021303.jpeg @2026-11-11T02:13:04"}
+{"event": "start", "i": 70, "total": 354, "game": "Math Maze", "en": "Math Maze", "ts": "2026-11-11T02:13:04"}
+{"event": "result", "i": 70, "total": 354, "game": "Math Maze", "en": "Math Maze", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.4, "returncode": 0, "tail": "Math\tNO_CARD\t-\t40.3s no card for 'Math' (fallback=(347, 780))"}
+{"event": "start", "i": 71, "total": 354, "game": "Math Path", "en": "Math Path", "ts": "2026-11-11T02:13:44"}
+{"event": "result", "i": 71, "total": 354, "game": "Math Path", "en": "Math Path", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.4, "returncode": 0, "tail": "Math\tNO_CARD\t-\t36.3s no card for 'Math' (fallback=(347, 780))"}
+{"event": "start", "i": 72, "total": 354, "game": "Nonogram", "en": "Nonogram", "ts": "2026-11-11T02:14:20"}
+{"event": "result", "i": 72, "total": 354, "game": "Nonogram", "en": "Nonogram", "outcome": "ok", "max_bottom": 1557, "lowest": null, "elapsed_s": 46.5, "returncode": 0, "tail": "Nonogram\tOK\t1557\t46.4s lowest='1 1' -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-021506.jpeg @2026-11-11T02:15:07"}
+{"event": "start", "i": 73, "total": 354, "game": "Norinori", "en": "Norinori", "ts": "2026-11-11T02:15:07"}
+{"event": "result", "i": 73, "total": 354, "game": "Norinori", "en": "Norinori", "outcome": "ok", "max_bottom": 1541, "lowest": null, "elapsed_s": 52.6, "returncode": 0, "tail": "Norinori\tOK\t1541\t52.5s lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Norinori-021559.jpeg @2026-11-11T02:15:59"}
+{"event": "start", "i": 74, "total": 354, "game": "Nurikabe", "en": "Nurikabe", "ts": "2026-11-11T02:15:59"}
+{"event": "result", "i": 74, "total": 354, "game": "Nurikabe", "en": "Nurikabe", "outcome": "ok", "max_bottom": 1068, "lowest": null, "elapsed_s": 52.3, "returncode": 0, "tail": "Nurikabe\tOK\t1068\t52.2s lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-021651.jpeg @2026-11-11T02:16:52"}
+{"event": "start", "i": 75, "total": 354, "game": "Path Finder", "en": "Path Finder", "ts": "2026-11-11T02:16:52"}
+{"event": "result", "i": 75, "total": 354, "game": "Path Finder", "en": "Path Finder", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.8, "returncode": 0, "tail": "Path\tNO_CARD\t-\t40.7s no card for 'Path' (fallback=(347, 780))"}
+{"event": "start", "i": 76, "total": 354, "game": "Path Intersect", "en": "Path Intersect", "ts": "2026-11-11T02:17:32"}
+{"event": "result", "i": 76, "total": 354, "game": "Path Intersect", "en": "Path Intersect", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.9, "returncode": 0, "tail": "Path\tNO_CARD\t-\t36.8s no card for 'Path' (fallback=(347, 780))"}
+{"event": "start", "i": 77, "total": 354, "game": "Pipes", "en": "Pipes", "ts": "2026-11-11T02:18:09"}
+{"event": "result", "i": 77, "total": 354, "game": "Pipes", "en": "Pipes", "outcome": "ok", "max_bottom": 1562, "lowest": null, "elapsed_s": 49.7, "returncode": 0, "tail": "Pipes\tOK\t1562\t49.7s lowest='╭' -> /Users/a0000/dev/One More/_巡检记录/截图-Pipes-021859.jpeg @2026-11-11T02:18:59"}
+{"event": "start", "i": 78, "total": 354, "game": "Shikaku", "en": "Shikaku", "ts": "2026-11-11T02:18:59"}
+{"event": "result", "i": 78, "total": 354, "game": "Shikaku", "en": "Shikaku", "outcome": "ok", "max_bottom": 1548, "lowest": null, "elapsed_s": 53.2, "returncode": 0, "tail": "Shikaku\tOK\t1548\t53.1s lowest='10' -> /Users/a0000/dev/One More/_巡检记录/截图-Shikaku-021952.jpeg @2026-11-11T02:19:52"}
+{"event": "start", "i": 79, "total": 354, "game": "Skyscrapers", "en": "Skyscrapers", "ts": "2026-11-11T02:19:52"}
+{"event": "result", "i": 79, "total": 354, "game": "Skyscrapers", "en": "Skyscrapers", "outcome": "ok", "max_bottom": 1427, "lowest": null, "elapsed_s": 53.2, "returncode": 0, "tail": "Skyscrapers\tOK\t1427\t53.1s lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Skyscrapers-022045.jpeg @2026-11-11T02:20:45"}
+{"event": "start", "i": 80, "total": 354, "game": "Slide Puzzle", "en": "Slide Puzzle", "ts": "2026-11-11T02:20:45"}
+{"event": "result", "i": 80, "total": 354, "game": "Slide Puzzle", "en": "Slide Puzzle", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 39.8, "returncode": 0, "tail": "Slide\tNO_CARD\t-\t39.8s no card for 'Slide' (fallback=(347, 780))"}
+{"event": "start", "i": 81, "total": 354, "game": "Slitherlink", "en": "Slitherlink", "ts": "2026-11-11T02:21:25"}
+{"event": "result", "i": 81, "total": 354, "game": "Slitherlink", "en": "Slitherlink", "outcome": "ok", "max_bottom": 1408, "lowest": null, "elapsed_s": 50.8, "returncode": 0, "tail": "Slitherlink\tOK\t1408\t50.7s lowest='点边线切换；数字变绿说明这一格满足了' -> /Users/a0000/dev/One More/_巡检记录/截图-Slitherlink-022216.jpeg @2026-11-11T02:22:16"}
+{"event": "start", "i": 82, "total": 354, "game": "Sudoku", "en": "Sudoku", "ts": "2026-11-11T02:22:16"}
+{"event": "result", "i": 82, "total": 354, "game": "Sudoku", "en": "Sudoku", "outcome": "ok", "max_bottom": 1547, "lowest": null, "elapsed_s": 51.4, "returncode": 0, "tail": "Sudoku\tOK\t1547\t51.3s lowest='点一个空格，再点数字填入' -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku-022307.jpeg @2026-11-11T02:23:07"}
+{"event": "start", "i": 83, "total": 354, "game": "Sum Snake", "en": "Sum Snake", "ts": "2026-11-11T02:23:07"}
+{"event": "result", "i": 83, "total": 354, "game": "Sum Snake", "en": "Sum Snake", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 39.1, "returncode": 0, "tail": "Sum\tNO_CARD\t-\t39.0s no card for 'Sum' (fallback=(347, 780))"}
+{"event": "start", "i": 84, "total": 354, "game": "Tangle Fix", "en": "Tangle Fix", "ts": "2026-11-11T02:23:47"}
+{"event": "result", "i": 84, "total": 354, "game": "Tangle Fix", "en": "Tangle Fix", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.3, "returncode": 0, "tail": "Tangle\tNO_CARD\t-\t36.2s no card for 'Tangle' (fallback=(347, 780))"}
+{"event": "start", "i": 85, "total": 354, "game": "Tapa", "en": "Tapa", "ts": "2026-11-11T02:24:23"}
+{"event": "result", "i": 85, "total": 354, "game": "Tapa", "en": "Tapa", "outcome": "ok", "max_bottom": 1562, "lowest": null, "elapsed_s": 45.9, "returncode": 0, "tail": "Tapa\tOK\t1562\t45.8s lowest='点格子涂黑/擦白；数字 = 8 邻域里连续黑格的段长' -> /Users/a0000/dev/One More/_巡检记录/截图-Tapa-022508.jpeg @2026-11-11T02:25:09"}
+{"event": "start", "i": 86, "total": 354, "game": "Tenner Grid", "en": "Tenner Grid", "ts": "2026-11-11T02:25:09"}
+{"event": "result", "i": 86, "total": 354, "game": "Tenner Grid", "en": "Tenner Grid", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 39.3, "returncode": 0, "tail": "Tenner\tNO_CARD\t-\t39.2s no card for 'Tenner' (fallback=(347, 780))"}
+{"event": "start", "i": 87, "total": 354, "game": "Tents And Trees", "en": "Tents And Trees", "ts": "2026-11-11T02:25:48"}
+{"event": "result", "i": 87, "total": 354, "game": "Tents And Trees", "en": "Tents And Trees", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.1, "returncode": 0, "tail": "Tents\tNO_CARD\t-\t36.0s no card for 'Tents' (fallback=(347, 780))"}
+{"event": "start", "i": 88, "total": 354, "game": "Water Sort", "en": "Water Sort", "ts": "2026-11-11T02:26:24"}
+{"event": "result", "i": 88, "total": 354, "game": "Water Sort", "en": "Water Sort", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.7, "returncode": 0, "tail": "Water\tNO_CARD\t-\t36.6s no card for 'Water' (fallback=(347, 780))"}
+{"event": "start", "i": 89, "total": 354, "game": "Yajilin", "en": "Yajilin", "ts": "2026-11-11T02:27:01"}
+{"event": "result", "i": 89, "total": 354, "game": "Yajilin", "en": "Yajilin", "outcome": "ok", "max_bottom": 1454, "lowest": null, "elapsed_s": 48.5, "returncode": 0, "tail": "Yajilin\tOK\t1454\t48.5s lowest='提示 (-5)' -> /Users/a0000/dev/One More/_巡检记录/截图-Yajilin-022749.jpeg @2026-11-11T02:27:49"}
+{"event": "start", "i": 90, "total": 354, "game": "Algebraic Balance", "en": "Algebraic Balance", "ts": "2026-11-11T02:27:49"}
+{"event": "result", "i": 90, "total": 354, "game": "Algebraic Balance", "en": "Algebraic Balance", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 39.1, "returncode": 0, "tail": "Algebraic\tNO_CARD\t-\t39.0s no card for 'Algebraic' (fallback=(347, 780))"}
+{"event": "start", "i": 91, "total": 354, "game": "Algebraic Inequality Solver", "en": "Algebraic Inequality Solver", "ts": "2026-11-11T02:28:28"}
+{"event": "result", "i": 91, "total": 354, "game": "Algebraic Inequality Solver", "en": "Algebraic Inequality Solver", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.1, "returncode": 0, "tail": "Algebraic\tNO_CARD\t-\t36.1s no card for 'Algebraic' (fallback=(347, 780))"}
+{"event": "start", "i": 92, "total": 354, "game": "Arithmetic Chain", "en": "Arithmetic Chain", "ts": "2026-11-11T02:29:05"}
+{"event": "result", "i": 92, "total": 354, "game": "Arithmetic Chain", "en": "Arithmetic Chain", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.5, "returncode": 0, "tail": "Arithmetic\tNO_CARD\t-\t36.4s no card for 'Arithmetic' (fallback=(347, 780))"}
+{"event": "start", "i": 93, "total": 354, "game": "Balance Scale", "en": "Balance Scale", "ts": "2026-11-11T02:29:41"}
+{"event": "result", "i": 93, "total": 354, "game": "Balance Scale", "en": "Balance Scale", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.5, "returncode": 0, "tail": "Balance\tNO_CARD\t-\t36.5s no card for 'Balance' (fallback=(347, 780))"}
+{"event": "start", "i": 94, "total": 354, "game": "Base Conversion Run", "en": "Base Conversion Run", "ts": "2026-11-11T02:30:18"}
+{"event": "result", "i": 94, "total": 354, "game": "Base Conversion Run", "en": "Base Conversion Run", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.8, "returncode": 0, "tail": "Base\tNO_CARD\t-\t37.3s no card for 'Base' (fallback=(347, 780))"}
+{"event": "start", "i": 95, "total": 354, "game": "Base Shift", "en": "Base Shift", "ts": "2026-11-11T02:30:55"}
+{"event": "result", "i": 95, "total": 354, "game": "Base Shift", "en": "Base Shift", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.6, "returncode": 0, "tail": "Base\tNO_CARD\t-\t36.5s no card for 'Base' (fallback=(347, 780))"}
+{"event": "start", "i": 96, "total": 354, "game": "Binary Code", "en": "Binary Code", "ts": "2026-11-11T02:31:32"}
+{"event": "result", "i": 96, "total": 354, "game": "Binary Code", "en": "Binary Code", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 35.1, "returncode": 0, "tail": "Binary\tNO_CARD\t-\t35.1s no card for 'Binary' (fallback=(347, 780))"}
+{"event": "start", "i": 97, "total": 354, "game": "Binary Matrix Rank", "en": "Binary Matrix Rank", "ts": "2026-11-11T02:32:07"}
+{"event": "result", "i": 97, "total": 354, "game": "Binary Matrix Rank", "en": "Binary Matrix Rank", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.9, "returncode": 0, "tail": "Binary\tNO_CARD\t-\t37.8s no card for 'Binary' (fallback=(347, 780))"}
+{"event": "start", "i": 98, "total": 354, "game": "Binary Scale Balance", "en": "Binary Scale Balance", "ts": "2026-11-11T02:32:45"}
+{"event": "result", "i": 98, "total": 354, "game": "Binary Scale Balance", "en": "Binary Scale Balance", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.5, "returncode": 0, "tail": "Binary\tNO_CARD\t-\t38.4s no card for 'Binary' (fallback=(347, 780))"}
+{"event": "start", "i": 99, "total": 354, "game": "Binomial Match", "en": "Binomial Match", "ts": "2026-11-11T02:33:23"}
+{"event": "result", "i": 99, "total": 354, "game": "Binomial Match", "en": "Binomial Match", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.7, "returncode": 0, "tail": "Binomial\tNO_CARD\t-\t36.6s no card for 'Binomial' (fallback=(347, 780))"}
+{"event": "start", "i": 100, "total": 354, "game": "Calculation Sprint", "en": "Calculation Sprint", "ts": "2026-11-11T02:34:00"}
+{"event": "result", "i": 100, "total": 354, "game": "Calculation Sprint", "en": "Calculation Sprint", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.7, "returncode": 0, "tail": "Calculation\tNO_CARD\t-\t36.6s no card for 'Calculation' (fallback=(347, 780))"}
+{"event": "start", "i": 101, "total": 354, "game": "Collatz", "en": "Collatz", "ts": "2026-11-11T02:34:37"}
+{"event": "result", "i": 101, "total": 354, "game": "Collatz", "en": "Collatz", "outcome": "ok", "max_bottom": 1522, "lowest": null, "elapsed_s": 51.7, "returncode": 0, "tail": "Collatz\tOK\t1522\t51.6s lowest='244' -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-023528.jpeg @2026-11-11T02:35:28"}
+{"event": "start", "i": 102, "total": 354, "game": "Common Denominator", "en": "Common Denominator", "ts": "2026-11-11T02:35:28"}
+{"event": "result", "i": 102, "total": 354, "game": "Common Denominator", "en": "Common Denominator", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 39.6, "returncode": 0, "tail": "Common\tNO_CARD\t-\t39.6s no card for 'Common' (fallback=(347, 780))"}
+{"event": "start", "i": 103, "total": 354, "game": "Countdown Math", "en": "Countdown Math", "ts": "2026-11-11T02:36:08"}
+{"event": "result", "i": 103, "total": 354, "game": "Countdown Math", "en": "Countdown Math", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.2, "returncode": 0, "tail": "Countdown\tNO_CARD\t-\t38.2s no card for 'Countdown' (fallback=(347, 780))"}
+{"event": "start", "i": 104, "total": 354, "game": "Crypto Arithmetic", "en": "Crypto Arithmetic", "ts": "2026-11-11T02:36:46"}
+{"event": "result", "i": 104, "total": 354, "game": "Crypto Arithmetic", "en": "Crypto Arithmetic", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.2, "returncode": 0, "tail": "Crypto\tNO_CARD\t-\t37.1s no card for 'Crypto' (fallback=(347, 816))"}
+{"event": "start", "i": 105, "total": 354, "game": "Digit Swap Eq", "en": "Digit Swap Eq", "ts": "2026-11-11T02:37:23"}
+{"event": "result", "i": 105, "total": 354, "game": "Digit Swap Eq", "en": "Digit Swap Eq", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.9, "returncode": 0, "tail": "Digit\tNO_CARD\t-\t37.9s no card for 'Digit' (fallback=(347, 780))"}
+{"event": "start", "i": 106, "total": 354, "game": "Divisibility Dash", "en": "Divisibility Dash", "ts": "2026-11-11T02:38:01"}
+{"event": "result", "i": 106, "total": 354, "game": "Divisibility Dash", "en": "Divisibility Dash", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.5, "returncode": 0, "tail": "Divisibility\tNO_CARD\t-\t36.4s no card for 'Divisibility' (fallback=(347, 780))"}
+{"event": "start", "i": 107, "total": 354, "game": "Exponent Tower", "en": "Exponent Tower", "ts": "2026-11-11T02:38:38"}
+{"event": "result", "i": 107, "total": 354, "game": "Exponent Tower", "en": "Exponent Tower", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 35.9, "returncode": 0, "tail": "Exponent\tNO_CARD\t-\t35.8s no card for 'Exponent' (fallback=(347, 780))"}
+{"event": "start", "i": 108, "total": 354, "game": "Factor Finder", "en": "Factor Finder", "ts": "2026-11-11T02:39:14"}
+{"event": "result", "i": 108, "total": 354, "game": "Factor Finder", "en": "Factor Finder", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.0, "returncode": 0, "tail": "Factor\tNO_CARD\t-\t36.9s no card for 'Factor' (fallback=(347, 780))"}
+{"event": "start", "i": 109, "total": 354, "game": "Fibonacci Merge", "en": "Fibonacci Merge", "ts": "2026-11-11T02:39:51"}
+{"event": "result", "i": 109, "total": 354, "game": "Fibonacci Merge", "en": "Fibonacci Merge", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.6, "returncode": 0, "tail": "Fibonacci\tNO_CARD\t-\t36.5s no card for 'Fibonacci' (fallback=(347, 780))"}
+{"event": "start", "i": 110, "total": 354, "game": "Fraction Match", "en": "Fraction Match", "ts": "2026-11-11T02:40:27"}
+{"event": "result", "i": 110, "total": 354, "game": "Fraction Match", "en": "Fraction Match", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.7, "returncode": 0, "tail": "Fraction\tNO_CARD\t-\t36.7s no card for 'Fraction' (fallback=(347, 780))"}
+{"event": "start", "i": 111, "total": 354, "game": "Fraction Matcher", "en": "Fraction Matcher", "ts": "2026-11-11T02:41:04"}
+{"event": "result", "i": 111, "total": 354, "game": "Fraction Matcher", "en": "Fraction Matcher", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.3, "returncode": 0, "tail": "Fraction\tNO_CARD\t-\t38.2s no card for 'Fraction' (fallback=(347, 780))"}
+{"event": "start", "i": 112, "total": 354, "game": "Fractional Pizza", "en": "Fractional Pizza", "ts": "2026-11-11T02:41:42"}
+{"event": "result", "i": 112, "total": 354, "game": "Fractional Pizza", "en": "Fractional Pizza", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.6, "returncode": 0, "tail": "Fractional\tNO_CARD\t-\t36.5s no card for 'Fractional' (fallback=(347, 780))"}
+{"event": "start", "i": 113, "total": 354, "game": "Inequality Balance Ops", "en": "Inequality Balance Ops", "ts": "2026-11-11T02:42:19"}
+{"event": "result", "i": 113, "total": 354, "game": "Inequality Balance Ops", "en": "Inequality Balance Ops", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.6, "returncode": 0, "tail": "Inequality\tNO_CARD\t-\t36.5s no card for 'Inequality' (fallback=(347, 780))"}
+{"event": "start", "i": 114, "total": 354, "game": "Inequality Dash", "en": "Inequality Dash", "ts": "2026-11-11T02:42:56"}
+{"event": "result", "i": 114, "total": 354, "game": "Inequality Dash", "en": "Inequality Dash", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.6, "returncode": 0, "tail": "Inequality\tNO_CARD\t-\t38.6s no card for 'Inequality' (fallback=(347, 780))"}
+{"event": "start", "i": 115, "total": 354, "game": "Magic Squares", "en": "Magic Squares", "ts": "2026-11-11T02:43:34"}
+{"event": "result", "i": 115, "total": 354, "game": "Magic Squares", "en": "Magic Squares", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.5, "returncode": 0, "tail": "Magic\tNO_CARD\t-\t36.4s no card for 'Magic' (fallback=(347, 780))"}
+{"event": "start", "i": 116, "total": 354, "game": "Matrix Multiplier", "en": "Matrix Multiplier", "ts": "2026-11-11T02:44:11"}
+{"event": "result", "i": 116, "total": 354, "game": "Matrix Multiplier", "en": "Matrix Multiplier", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.7, "returncode": 0, "tail": "Matrix\tNO_CARD\t-\t36.6s no card for 'Matrix' (fallback=(347, 780))"}
+{"event": "start", "i": 117, "total": 354, "game": "Matrix Multiplier Match", "en": "Matrix Multiplier Match", "ts": "2026-11-11T02:44:47"}
+{"event": "result", "i": 117, "total": 354, "game": "Matrix Multiplier Match", "en": "Matrix Multiplier Match", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.5, "returncode": 0, "tail": "Matrix\tNO_CARD\t-\t38.5s no card for 'Matrix' (fallback=(347, 780))"}
+{"event": "start", "i": 118, "total": 354, "game": "Matrix Reasoning", "en": "Matrix Reasoning", "ts": "2026-11-11T02:45:26"}
+{"event": "result", "i": 118, "total": 354, "game": "Matrix Reasoning", "en": "Matrix Reasoning", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.3, "returncode": 0, "tail": "Matrix\tNO_CARD\t-\t37.3s no card for 'Matrix' (fallback=(347, 780))"}
+{"event": "start", "i": 119, "total": 354, "game": "Mental Abacus", "en": "Mental Abacus", "ts": "2026-11-11T02:46:03"}
+{"event": "result", "i": 119, "total": 354, "game": "Mental Abacus", "en": "Mental Abacus", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.9, "returncode": 0, "tail": "Mental\tNO_CARD\t-\t36.8s no card for 'Mental' (fallback=(347, 780))"}
+{"event": "start", "i": 120, "total": 354, "game": "Mental Calendar", "en": "Mental Calendar", "ts": "2026-11-11T02:46:40"}
+{"event": "result", "i": 120, "total": 354, "game": "Mental Calendar", "en": "Mental Calendar", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.1, "returncode": 0, "tail": "Mental\tNO_CARD\t-\t37.0s no card for 'Mental' (fallback=(347, 780))"}
+{"event": "start", "i": 121, "total": 354, "game": "Missing Operator", "en": "Missing Operator", "ts": "2026-11-11T02:47:17"}
+{"event": "result", "i": 121, "total": 354, "game": "Missing Operator", "en": "Missing Operator", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.2, "returncode": 0, "tail": "Missing\tNO_CARD\t-\t36.2s no card for 'Missing' (fallback=(347, 780))"}
+{"event": "start", "i": 122, "total": 354, "game": "Modular Clock Arithmetic", "en": "Modular Clock Arithmetic", "ts": "2026-11-11T02:47:53"}
+{"event": "result", "i": 122, "total": 354, "game": "Modular Clock Arithmetic", "en": "Modular Clock Arithmetic", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 39.6, "returncode": 0, "tail": "Modular\tNO_CARD\t-\t39.5s no card for 'Modular' (fallback=(347, 780))"}
+{"event": "start", "i": 123, "total": 354, "game": "Modulo Clock", "en": "Modulo Clock", "ts": "2026-11-11T02:48:33"}
+{"event": "result", "i": 123, "total": 354, "game": "Modulo Clock", "en": "Modulo Clock", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.2, "returncode": 0, "tail": "Modulo\tNO_CARD\t-\t37.1s no card for 'Modulo' (fallback=(347, 780))"}
+{"event": "start", "i": 124, "total": 354, "game": "Modulo Path", "en": "Modulo Path", "ts": "2026-11-11T02:49:10"}
+{"event": "result", "i": 124, "total": 354, "game": "Modulo Path", "en": "Modulo Path", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.4, "returncode": 0, "tail": "Modulo\tNO_CARD\t-\t37.3s no card for 'Modulo' (fallback=(347, 780))"}
+{"event": "start", "i": 125, "total": 354, "game": "Number Bonds", "en": "Number Bonds", "ts": "2026-11-11T02:49:48"}
+{"event": "result", "i": 125, "total": 354, "game": "Number Bonds", "en": "Number Bonds", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.2, "returncode": 0, "tail": "Number\tNO_CARD\t-\t38.2s no card for 'Number' (fallback=(347, 780))"}
+{"event": "start", "i": 126, "total": 354, "game": "Number Bonds All", "en": "Number Bonds All", "ts": "2026-11-11T02:50:26"}
+{"event": "result", "i": 126, "total": 354, "game": "Number Bonds All", "en": "Number Bonds All", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.4, "returncode": 0, "tail": "Number\tNO_CARD\t-\t36.4s no card for 'Number' (fallback=(347, 780))"}
+{"event": "start", "i": 127, "total": 354, "game": "Numerical Estimation", "en": "Numerical Estimation", "ts": "2026-11-11T02:51:02"}
+{"event": "result", "i": 127, "total": 354, "game": "Numerical Estimation", "en": "Numerical Estimation", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.2, "returncode": 0, "tail": "Numerical\tNO_CARD\t-\t38.2s no card for 'Numerical' (fallback=(347, 780))"}
+{"event": "start", "i": 128, "total": 354, "game": "Pattern Sequence Draw", "en": "Pattern Sequence Draw", "ts": "2026-11-11T02:51:41"}
+{"event": "result", "i": 128, "total": 354, "game": "Pattern Sequence Draw", "en": "Pattern Sequence Draw", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.7, "returncode": 0, "tail": "Pattern\tNO_CARD\t-\t36.7s no card for 'Pattern' (fallback=(347, 780))"}
+{"event": "start", "i": 129, "total": 354, "game": "Percentage Peak", "en": "Percentage Peak", "ts": "2026-11-11T02:52:17"}
+{"event": "result", "i": 129, "total": 354, "game": "Percentage Peak", "en": "Percentage Peak", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.0, "returncode": 0, "tail": "Percentage\tNO_CARD\t-\t36.9s no card for 'Percentage' (fallback=(347, 780))"}
+{"event": "start", "i": 130, "total": 354, "game": "Percentage Shopping", "en": "Percentage Shopping", "ts": "2026-11-11T02:52:54"}
+{"event": "result", "i": 130, "total": 354, "game": "Percentage Shopping", "en": "Percentage Shopping", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.1, "returncode": 0, "tail": "Percentage\tNO_CARD\t-\t37.1s no card for 'Percentage' (fallback=(347, 780))"}
+{"event": "start", "i": 131, "total": 354, "game": "Prime Factor Trees", "en": "Prime Factor Trees", "ts": "2026-11-11T02:53:31"}
+{"event": "result", "i": 131, "total": 354, "game": "Prime Factor Trees", "en": "Prime Factor Trees", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 37.9, "returncode": 0, "tail": "Prime\tNO_CARD\t-\t37.8s no card for 'Prime' (fallback=(347, 780))"}
+{"event": "start", "i": 132, "total": 354, "game": "Prime Gap Hunt", "en": "Prime Gap Hunt", "ts": "2026-11-11T02:54:09"}
+{"event": "result", "i": 132, "total": 354, "game": "Prime Gap Hunt", "en": "Prime Gap Hunt", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 36.8, "returncode": 0, "tail": "Prime\tNO_CARD\t-\t36.8s no card for 'Prime' (fallback=(347, 780))"}
+{"event": "start", "i": 133, "total": 354, "game": "Prime Hunter", "en": "Prime Hunter", "ts": "2026-11-11T02:54:46"}
+{"event": "result", "i": 133, "total": 354, "game": "Prime Hunter", "en": "Prime Hunter", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 124.1, "returncode": 0, "tail": "Prime\tNO_CARD\t-\t123.9s no card for 'Prime' (fallback=None)"}
+{"event": "start", "i": 134, "total": 354, "game": "Pythagorean Triple Builder", "en": "Pythagorean Triple Builder", "ts": "2026-11-11T02:56:50"}

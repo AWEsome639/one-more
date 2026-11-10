@@ -608,7 +608,7 @@ export struct GBreakout {
         //   ⇒ 场地溢出屏幕两倍多，「暂停/重开」按钮**浮在砖块上面**（截图证据）。
         //   ⇒ 限高：宽度仍 100%，但高度不超过父容器的 58%，
         //     aspectRatio 会据此反推宽度 ⇒ 大屏上是一个居中的正方形场地。
-        .constraintSize({ maxHeight: '100%' })
+        .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
