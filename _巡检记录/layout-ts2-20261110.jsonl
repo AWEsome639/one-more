@@ -1,0 +1,156 @@
+[2026-11-10T13:48:14] Rule Switcher: max_bottom=1549 lowest='判定：15 题答对 ≥ 12 且平均 < 1600 ' -> /Users/a0000/dev/One More/_巡检记录/截图-Rule_Switcher-134814.jpeg
+[2026-11-10T13:49:30] Running Memory Span: max_bottom=1441 lowest='判定：连过 广度 3 → 4 → 5 三关；数字 7' -> /Users/a0000/dev/One More/_巡检记录/截图-Running_Memory_Span-134930.jpeg
+[2026-11-10T13:50:17] Sdmt: max_bottom=1600 lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Sdmt-135016.jpeg
+NO_CARD  Shell Game（搜索结果里没有「猜球」的卡片；不盲点第一张）
+[2026-11-10T13:50:51] Sopt: max_bottom=1372 lowest='第 1/3 轮：按 1 → 9 依次点' -> /Users/a0000/dev/One More/_巡检记录/截图-Sopt-135051.jpeg
+[2026-11-10T13:51:37] Spatial Cabinet Memory: max_bottom=1296 lowest='📕 刚才在哪一格？点它' -> /Users/a0000/dev/One More/_巡检记录/截图-Spatial_Cabinet_Memory-135137.jpeg
+[2026-11-10T13:52:23] Spotlight Track: max_bottom=670 lowest='轮次 1/8' -> /Users/a0000/dev/One More/_巡检记录/截图-Spotlight_Track-135223.jpeg
+NO_CARD  Staircase Memory（搜索结果里没有「阶梯记忆」的卡片；不盲点第一张）
+[2026-11-10T13:53:44] Stop Signal: max_bottom=1426 lowest='判定：正确 ≥ 10/12 且冲均值 < 800 m' -> /Users/a0000/dev/One More/_巡检记录/截图-Stop_Signal-135343.jpeg
+[2026-11-10T13:55:06] Stroop Number Size: max_bottom=1471 lowest='判定：12 题答对 ≥ 10 题' -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Number_Size-135505.jpeg
+[2026-11-10T13:55:57] Stroop Test: max_bottom=1600 lowest='蓝' -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-135557.jpeg
+[2026-11-10T13:56:54] Subitizing Rush: max_bottom=1579 lowest='2' -> /Users/a0000/dev/One More/_巡检记录/截图-Subitizing_Rush-135654.jpeg
+[2026-11-10T13:57:48] Switch Task: max_bottom=1576 lowest='>5 算大' -> /Users/a0000/dev/One More/_巡检记录/截图-Switch_Task-135748.jpeg
+[2026-11-10T13:58:41] Symbol Digit Assoc: max_bottom=1594 lowest='提示：先扫一眼对照表再点；同一个符号不会连着出现' -> /Users/a0000/dev/One More/_巡检记录/截图-Symbol_Digit_Assoc-135840.jpeg
+[2026-11-10T13:59:44] Symbol Logic: max_bottom=1600 lowest='提示：先算第二个符号，再回代求第一个' -> /Users/a0000/dev/One More/_巡检记录/截图-Symbol_Logic-135944.jpeg
+[2026-11-10T14:00:42] Symbolic Flanker: max_bottom=1519 lowest='提示：两侧反向时会被明显拖慢 —— 那就是侧抑制' -> /Users/a0000/dev/One More/_巡检记录/截图-Symbolic_Flanker-140042.jpeg
+[2026-11-10T14:01:57] Task Switching: max_bottom=1499 lowest='提示：切换试次比重复试次慢多少，就是这一局的「切换代' -> /Users/a0000/dev/One More/_巡检记录/截图-Task_Switching-140157.jpeg
+[2026-11-10T14:02:59] Trail Making: max_bottom=1600 lowest='8' -> /Users/a0000/dev/One More/_巡检记录/截图-Trail_Making-140258.jpeg
+[2026-11-10T14:04:00] Vigilance Task: max_bottom=1558 lowest='看到 ◆ 就点我' -> /Users/a0000/dev/One More/_巡检记录/截图-Vigilance_Task-140400.jpeg
+[2026-11-10T14:04:59] Visual Crowding Acuity: max_bottom=1549 lowest='N' -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Crowding_Acuity-140458.jpeg
+[2026-11-10T14:06:16] Visual Search: max_bottom=1600 lowest='🌟' -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Search-140615.jpeg
+NO_CARD  Visual Search Conjunction（搜索结果里没有「联合搜索」的卡片；不盲点第一张）
+[2026-11-10T14:08:21] Wisconsin Card Sorting: max_bottom=1541 lowest='提示：规则只认颜色 / 形状 / 数量之一，连对 4' -> /Users/a0000/dev/One More/_巡检记录/截图-Wisconsin_Card_Sorting-140821.jpeg
+[2026-11-10T14:10:46] Word Pair Associate Memory: max_bottom=1272 lowest='记住这 6 组词对' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Pair_Associate_Memory-141046.jpeg
+[2026-11-10T14:11:54] Affix Factory: max_bottom=1564 lowest='词根「write」该接哪个词缀？' -> /Users/a0000/dev/One More/_巡检记录/截图-Affix_Factory-141153.jpeg
+[2026-11-10T14:13:08] Anagram Definition: max_bottom=1545 lowest='把字母拼回这个单词' -> /Users/a0000/dev/One More/_巡检记录/截图-Anagram_Definition-141306.jpeg
+[2026-11-10T14:14:13] Category Fluency: max_bottom=1417 lowest='提示：每类 25 秒，共列 8 个有效词即通关（词库' -> /Users/a0000/dev/One More/_巡检记录/截图-Category_Fluency-141412.jpeg
+[2026-11-10T14:15:22] Chalk And Talk: max_bottom=1496 lowest='两件事同时干：说类别 + 踩点落笔' -> /Users/a0000/dev/One More/_巡检记录/截图-Chalk_And_Talk-141521.jpeg
+[2026-11-10T14:16:39] Chimp Test: max_bottom=1075 lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Chimp_Test-141637.jpeg
+[2026-11-10T14:18:02] Cognate Catch: max_bottom=1481 lowest='同源 ✅' -> /Users/a0000/dev/One More/_巡检记录/截图-Cognate_Catch-141801.jpeg
+[2026-11-10T14:19:10] Consonant Reconstruct: max_bottom=1310 lowest='跳过（-1 命）' -> /Users/a0000/dev/One More/_巡检记录/截图-Consonant_Reconstruct-141909.jpeg
+[2026-11-10T14:20:23] Context Clues: max_bottom=1600 lowest='选一个释义' -> /Users/a0000/dev/One More/_巡检记录/截图-Context_Clues-142023.jpeg
+[2026-11-10T14:21:38] Conundrum Anagram: max_bottom=1600 lowest='字母乱序（-40 分）' -> /Users/a0000/dev/One More/_巡检记录/截图-Conundrum_Anagram-142138.jpeg
+[2026-11-10T14:22:57] Crossword: max_bottom=677 lowest='0/5' -> /Users/a0000/dev/One More/_巡检记录/截图-Crossword-142256.jpeg
+[2026-11-10T14:24:16] Cryptogram: max_bottom=1600 lowest='揭一条映射（-30 分）' -> /Users/a0000/dev/One More/_巡检记录/截图-Cryptogram-142415.jpeg
+[2026-11-10T14:25:33] Definition Dash: max_bottom=1362 lowest='六十秒，越快分越高' -> /Users/a0000/dev/One More/_巡检记录/截图-Definition_Dash-142533.jpeg
+[2026-11-10T14:26:46] Etymology Origin: max_bottom=1386 lowest='答对 8 个通关；答错扣 3 秒，错满 4 次结束' -> /Users/a0000/dev/One More/_巡检记录/截图-Etymology_Origin-142644.jpeg
+[2026-11-10T14:28:09] Etymon Oddball: max_bottom=1421 lowest='共 8 轮，答对 ≥5 通关；每题 20 秒' -> /Users/a0000/dev/One More/_巡检记录/截图-Etymon_Oddball-142809.jpeg
+NO_CARD  Find Word（搜索结果里没有「找词」的卡片；不盲点第一张）
+[2026-11-10T14:30:18] Grammar Police: max_bottom=1430 lowest='每题 15 秒，点错罚 3 秒；答对 ≥5 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Grammar_Police-143018.jpeg
+WRONG_GAME  Grammar Sort（找不到标题「语法分类」；页面首几个文本=['One More', '🌙', '中', '🔍', '💬', '🔍']）
+[2026-11-10T14:32:59] Homophone Hunt: max_bottom=1558 lowest='哪个词是这个读音？' -> /Users/a0000/dev/One More/_巡检记录/截图-Homophone_Hunt-143258.jpeg
+NO_CARD  Letter Bridge（搜索结果里没有「字母桥」的卡片；不盲点第一张）
+[2026-11-10T14:36:03] Letter Cancellation: max_bottom=1600 lowest='S' -> /Users/a0000/dev/One More/_巡检记录/截图-Letter_Cancellation-143602.jpeg
+[2026-11-10T14:36:55] Letter Frequency Scan: max_bottom=1487 lowest='提示：看清整串字母再选，别只数开头几个' -> /Users/a0000/dev/One More/_巡检记录/截图-Letter_Frequency_Scan-143654.jpeg
+WRONG_GAME  Letter Grid Swapper（找不到标题「字母换位」；页面首几个文本=['One More', '🌙', '中', '🔍', '💬', '🔍']）
+[2026-11-10T14:38:27] Missing Vowels: max_bottom=1571 lowest='退一格' -> /Users/a0000/dev/One More/_巡检记录/截图-Missing_Vowels-143827.jpeg
+[2026-11-10T14:39:15] One Letter Shift: max_bottom=1558 lowest='提示：换掉一个字母就变成另一个词，位置就是两词不一样' -> /Users/a0000/dev/One More/_巡检记录/截图-One_Letter_Shift-143915.jpeg
+[2026-11-10T14:40:02] Oxymoron Hunt: max_bottom=1431 lowest='哪一个搭配自相矛盾？' -> /Users/a0000/dev/One More/_巡检记录/截图-Oxymoron_Hunt-144002.jpeg
+[2026-11-10T14:40:50] Palindrome Builder: max_bottom=1437 lowest='按顺序点字母，摆出一个回文' -> /Users/a0000/dev/One More/_巡检记录/截图-Palindrome_Builder-144050.jpeg
+[2026-11-10T14:41:39] Pangram Sprint: max_bottom=1600 lowest='S' -> /Users/a0000/dev/One More/_巡检记录/截图-Pangram_Sprint-144138.jpeg
+[2026-11-10T14:42:26] Portmanteau Split: max_bottom=1580 lowest='EMOTION' -> /Users/a0000/dev/One More/_巡检记录/截图-Portmanteau_Split-144226.jpeg
+[2026-11-10T14:43:13] Rhyme Master: max_bottom=1409 lowest='8 题，答对 ≥6 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Rhyme_Master-144312.jpeg
+[2026-11-10T14:43:59] Semantic Association: max_bottom=1409 lowest='10 题，答对 ≥7 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Semantic_Association-144358.jpeg
+[2026-11-10T14:44:45] Semantic Distance: max_bottom=1544 lowest='10 题，答对 ≥7 通关：词义越近越好' -> /Users/a0000/dev/One More/_巡检记录/截图-Semantic_Distance-144445.jpeg
+[2026-11-10T14:45:32] Semantic Link: max_bottom=1600 lowest='云朵' -> /Users/a0000/dev/One More/_巡检记录/截图-Semantic_Link-144532.jpeg
+[2026-11-10T14:46:19] Sentence Unscramble: max_bottom=1600 lowest='5 句，答对 ≥4 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Sentence_Unscramble-144619.jpeg
+[2026-11-10T14:46:59] Silent Letter Search: max_bottom=1348 lowest='10 题，答对 ≥7 通关：点错扣一条命' -> /Users/a0000/dev/One More/_巡检记录/截图-Silent_Letter_Search-144658.jpeg
+[2026-11-10T14:47:48] Spelling Sprint: max_bottom=1522 lowest='60 秒内答对 ≥8 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Spelling_Sprint-144748.jpeg
+[2026-11-10T14:48:36] Spoonerism Solver: max_bottom=1570 lowest='把「SAD · BALLADS」的首音对调，得到？' -> /Users/a0000/dev/One More/_巡检记录/截图-Spoonerism_Solver-144836.jpeg
+[2026-11-10T14:49:25] Story Builder: max_bottom=1564 lowest='贴上邮票投进邮筒' -> /Users/a0000/dev/One More/_巡检记录/截图-Story_Builder-144925.jpeg
+[2026-11-10T14:50:12] Syllable Stack: max_bottom=1570 lowest='按顺序点音节，叠出这个词' -> /Users/a0000/dev/One More/_巡检记录/截图-Syllable_Stack-145012.jpeg
+[2026-11-10T14:51:06] Typing Speed: max_bottom=1373 lowest='提示：不区分大小写；25 秒没打完算这句错' -> /Users/a0000/dev/One More/_巡检记录/截图-Typing_Speed-145106.jpeg
+[2026-11-10T14:51:55] Typoglycemia Decoder: max_bottom=1574 lowest='把乱序的句子读顺，再选出它原本的样子' -> /Users/a0000/dev/One More/_巡检记录/截图-Typoglycemia_Decoder-145155.jpeg
+[2026-11-10T14:52:43] Verbal Analogies: max_bottom=1600 lowest='SHARP 锋利的' -> /Users/a0000/dev/One More/_巡检记录/截图-Verbal_Analogies-145242.jpeg
+[2026-11-10T14:53:30] Vocabulary Builder: max_bottom=1600 lowest='rewrite' -> /Users/a0000/dev/One More/_巡检记录/截图-Vocabulary_Builder-145329.jpeg
+[2026-11-10T14:54:18] Vowel Reconstruct: max_bottom=1349 lowest='提示：元音被整体挪过 1～3 格，辅音位置没动' -> /Users/a0000/dev/One More/_巡检记录/截图-Vowel_Reconstruct-145418.jpeg
+[2026-11-10T14:55:37] Word Association Recall: max_bottom=1535 lowest='医生 👨\u200d⚕️' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Association_Recall-145536.jpeg
+[2026-11-10T14:56:22] Word Grid Connection: max_bottom=1600 lowest='SMALL' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Grid_Connection-145622.jpeg
+NO_CARD  Word Ladder（搜索结果里没有「单词阶梯」的卡片；不盲点第一张）
+[2026-11-10T14:57:43] Word Ladder Step: max_bottom=1600 lowest='EAKV' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Ladder_Step-145743.jpeg
+NO_CARD  Word Mastermind（搜索结果里没有「猜词大师」的卡片；不盲点第一张）
+[2026-11-10T14:59:34] Word Scramble: max_bottom=1600 lowest='R' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Scramble-145933.jpeg
+NO_CARD  Word Search（搜索结果里没有「找单词」的卡片；不盲点第一张）
+[2026-11-10T15:01:02] Word Snake Trail: max_bottom=1600 lowest='O' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Snake_Trail-150101.jpeg
+NO_CARD  Word Surge（搜索结果里没有「词汇冲刺」的卡片；不盲点第一张）
+[2026-11-10T15:02:33] Word Wheel: max_bottom=1600 lowest='提交' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Wheel-150233.jpeg
+[2026-11-10T15:03:24] Ab Reversal Oddball: max_bottom=1600 lowest='正在跑…' -> /Users/a0000/dev/One More/_巡检记录/截图-Ab_Reversal_Oddball-150323.jpeg
+[2026-11-10T15:04:47] Action Sequence Recall: max_bottom=1548 lowest='拍手' -> /Users/a0000/dev/One More/_巡检记录/截图-Action_Sequence_Recall-150447.jpeg
+[2026-11-10T15:05:35] Angle Finder: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Angle_Finder-150535.jpeg
+WRONG_GAME  Area Perimeter Match（找不到标题「面积周长」；页面首几个文本=['‹', '面积周长', '匹配面积周长', '☆', '?', '普通']）
+[2026-11-10T15:08:23] Binary Matrix Rank All: max_bottom=1047 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Matrix_Rank_All-150823.jpeg
+[2026-11-10T15:09:12] Blink Detector: max_bottom=1600 lowest='盯住眼睛 —— 眨的瞬间点「眨眼了！」' -> /Users/a0000/dev/One More/_巡检记录/截图-Blink_Detector-150912.jpeg
+[2026-11-10T15:10:04] Block Count 3D: max_bottom=713 lowest='1/8' -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Count_3D-151004.jpeg
+[2026-11-10T15:10:55] Block Stacking Physics: max_bottom=1598 lowest='点柱子把方块放进去' -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Stacking_Physics-151055.jpeg
+[2026-11-10T15:11:48] Box Completion: max_bottom=1600 lowest='清空点亮' -> /Users/a0000/dev/One More/_巡检记录/截图-Box_Completion-151148.jpeg
+[2026-11-10T15:12:38] Chain Reaction: max_bottom=1520 lowest='悔一步' -> /Users/a0000/dev/One More/_巡检记录/截图-Chain_Reaction-151238.jpeg
+[2026-11-10T15:13:28] Circuit Connect: max_bottom=1475 lowest='转动元件，把电送到右下角 🔋' -> /Users/a0000/dev/One More/_巡检记录/截图-Circuit_Connect-151328.jpeg
+[2026-11-10T15:14:19] Classic Maze: max_bottom=1600 lowest='滑动或按方向键，找出口 🌀' -> /Users/a0000/dev/One More/_巡检记录/截图-Classic_Maze-151418.jpeg
+[2026-11-10T15:15:07] Color Match: max_bottom=1600 lowest='同色两格以上就能消 🎨' -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Match-151507.jpeg
+[2026-11-10T15:15:50] Color Maze Nav: max_bottom=1600 lowest='↑' -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Maze_Nav-151550.jpeg
+[2026-11-10T15:16:38] Compass Maze: max_bottom=1600 lowest='走一步 ↓' -> /Users/a0000/dev/One More/_巡检记录/截图-Compass_Maze-151637.jpeg
+[2026-11-10T15:17:26] Complex Folding Nets: max_bottom=1398 lowest='14 层' -> /Users/a0000/dev/One More/_巡检记录/截图-Complex_Folding_Nets-151726.jpeg
+[2026-11-10T15:18:13] Counting Sheep: max_bottom=1600 lowest='🐑' -> /Users/a0000/dev/One More/_巡检记录/截图-Counting_Sheep-151813.jpeg
+[2026-11-10T15:19:00] Cross Section Slice: max_bottom=1489 lowest='⬛' -> /Users/a0000/dev/One More/_巡检记录/截图-Cross_Section_Slice-151859.jpeg
+[2026-11-10T15:19:46] Cryptogram All: max_bottom=1343 lowest='BAFFLE' -> /Users/a0000/dev/One More/_巡检记录/截图-Cryptogram_All-151946.jpeg
+[2026-11-10T15:20:33] Cube Net Fold: max_bottom=1152 lowest='·' -> /Users/a0000/dev/One More/_巡检记录/截图-Cube_Net_Fold-152033.jpeg
+NO_CARD  Directions Recall（搜索结果里没有「方向回忆」的卡片；不盲点第一张）
+[2026-11-10T15:21:56] Distractor Matrix: max_bottom=1072 lowest='🔷' -> /Users/a0000/dev/One More/_巡检记录/截图-Distractor_Matrix-152155.jpeg
+[2026-11-10T15:22:42] Einstein Riddle: max_bottom=1571 lowest='提示 −100' -> /Users/a0000/dev/One More/_巡检记录/截图-Einstein_Riddle-152242.jpeg
+[2026-11-10T15:23:28] Fact Binder: max_bottom=1581 lowest='左右各点一个，把事实与答案绑起来 🔗' -> /Users/a0000/dev/One More/_巡检记录/截图-Fact_Binder-152328.jpeg
+[2026-11-10T15:24:07] Focus Tunnel: max_bottom=1600 lowest='亮区里只有一个 🎯，点它 🔦' -> /Users/a0000/dev/One More/_巡检记录/截图-Focus_Tunnel-152407.jpeg
+[2026-11-10T15:24:55] Gear Rotation: max_bottom=1380 lowest='口诀：啮合反向 · 皮带同向' -> /Users/a0000/dev/One More/_巡检记录/截图-Gear_Rotation-152455.jpeg
+[2026-11-10T15:25:42] Gear Train Direction: max_bottom=1420 lowest='↻ 顺时针' -> /Users/a0000/dev/One More/_巡检记录/截图-Gear_Train_Direction-152542.jpeg
+[2026-11-10T15:26:28] Geometric Vision: max_bottom=1275 lowest='VS' -> /Users/a0000/dev/One More/_巡检记录/截图-Geometric_Vision-152628.jpeg
+[2026-11-10T15:27:14] Graph Coordinate Plot: max_bottom=1551 lowest='照坐标顺序点，把菱形围出来 ✏️' -> /Users/a0000/dev/One More/_巡检记录/截图-Graph_Coordinate_Plot-152714.jpeg
+NO_CARD  Gravity Sort（搜索结果里没有「重力排序」的卡片；不盲点第一张）
+[2026-11-10T15:28:36] Grid Displacement: max_bottom=1593 lowest='被墙挡住的那一步，原地不动' -> /Users/a0000/dev/One More/_巡检记录/截图-Grid_Displacement-152836.jpeg
+[2026-11-10T15:29:25] Hue Sort: max_bottom=1455 lowest='正确顺序：左上 → 右下，色相 0° 递增到 337' -> /Users/a0000/dev/One More/_巡检记录/截图-Hue_Sort-152925.jpeg
+[2026-11-10T15:30:15] Interlock Puzzle: max_bottom=1552 lowest='格子里的数字 = 还压着它的零件数（灰色 = 抽不动' -> /Users/a0000/dev/One More/_巡检记录/截图-Interlock_Puzzle-153015.jpeg
+NO_CARD  Laser Link（搜索结果里没有「激光连线」的卡片；不盲点第一张）
+[2026-11-10T15:31:40] Laser Reflect: max_bottom=1459 lowest='点 ／＼ 换朝向，把光折到 🎯\u3000🔦发射器 🎯探头' -> /Users/a0000/dev/One More/_巡检记录/截图-Laser_Reflect-153140.jpeg
+[2026-11-10T15:32:38] Logical Syllogisms: max_bottom=1501 lowest='分 0' -> /Users/a0000/dev/One More/_巡检记录/截图-Logical_Syllogisms-153238.jpeg
+NO_CARD  Math Guess（搜索结果里没有「猜数字」的卡片；不盲点第一张）
+[2026-11-10T15:34:06] Maze Nav 3D: max_bottom=1600 lowest='▼ 下层' -> /Users/a0000/dev/One More/_巡检记录/截图-Maze_Nav_3D-153405.jpeg
+[2026-11-10T15:35:02] Mental Mapping: max_bottom=1597 lowest='↖' -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Mapping-153501.jpeg
+[2026-11-10T15:35:52] Mental Rotation: max_bottom=1396 lowest='判定：10 题答对 ≥ 8 题 · 提示：不对称图形' -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Rotation-153552.jpeg
+[2026-11-10T15:36:44] Mirror Image: max_bottom=1600 lowest='判定：10 题答对 ≥ 8 题 · 干扰项是「上下翻' -> /Users/a0000/dev/One More/_巡检记录/截图-Mirror_Image-153643.jpeg
+NO_CARD  Mirror Maze（搜索结果里没有「镜像迷宫」的卡片；不盲点第一张）
+[2026-11-10T15:38:27] Mirror Tracing: max_bottom=1117 lowest='●' -> /Users/a0000/dev/One More/_巡检记录/截图-Mirror_Tracing-153827.jpeg
+[2026-11-10T15:39:24] Multi Track Counter: max_bottom=1600 lowest='报数：共 0 下' -> /Users/a0000/dev/One More/_巡检记录/截图-Multi_Track_Counter-153924.jpeg
+[2026-11-10T15:40:17] Navon Hierarchical: max_bottom=1327 lowest='大图形是什么字母？小图形又是什么字母？' -> /Users/a0000/dev/One More/_巡检记录/截图-Navon_Hierarchical-154016.jpeg
+[2026-11-10T15:41:47] Odd One Out: max_bottom=1268 lowest='◼' -> /Users/a0000/dev/One More/_巡检记录/截图-Odd_One_Out-154146.jpeg
+NO_CARD  Odd Rotation（搜索结果里没有「旋转异类」的卡片；不盲点第一张）
+[2026-11-10T15:43:27] Orbit Tap: max_bottom=974 lowest='🛰️' -> /Users/a0000/dev/One More/_巡检记录/截图-Orbit_Tap-154326.jpeg
+[2026-11-10T15:44:22] Paper Folding: max_bottom=1459 lowest='展开后要有 12 个孔，位置你自己找' -> /Users/a0000/dev/One More/_巡检记录/截图-Paper_Folding-154422.jpeg
+NO_CARD  Path Recall（搜索结果里没有「路径回忆」的卡片；不盲点第一张）
+[2026-11-10T15:46:25] Perspective Shift View: max_bottom=1365 lowest='A' -> /Users/a0000/dev/One More/_巡检记录/截图-Perspective_Shift_View-154624.jpeg
+[2026-11-10T15:49:06] Perspective Taking: max_bottom=1318 lowest='🏀' -> /Users/a0000/dev/One More/_巡检记录/截图-Perspective_Taking-154905.jpeg
+[2026-11-10T15:50:26] Pixel Mimic: max_bottom=821 lowest='目标' -> /Users/a0000/dev/One More/_巡检记录/截图-Pixel_Mimic-155026.jpeg
+[2026-11-10T15:51:35] Polyomino Tiling: max_bottom=703 lowest='▬' -> /Users/a0000/dev/One More/_巡检记录/截图-Polyomino_Tiling-155135.jpeg
+[2026-11-10T15:52:22] Room Inspector: max_bottom=1600 lowest='🖼️' -> /Users/a0000/dev/One More/_巡检记录/截图-Room_Inspector-155221.jpeg
+NO_CARD  Rotating Maze（搜索结果里没有「旋转迷宫」的卡片；不盲点第一张）
+[2026-11-10T15:53:45] Shadow Pivot: max_bottom=907 lowest='顺时针 270°' -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-155345.jpeg
+[2026-11-10T15:54:32] Shape Shifter: max_bottom=1234 lowest='看这 4 个图，第 5 个该是哪个？' -> /Users/a0000/dev/One More/_巡检记录/截图-Shape_Shifter-155432.jpeg
+NO_CARD  Silhouette Match（搜索结果里没有「剪影匹配」的卡片；不盲点第一张）
+[2026-11-10T15:55:48] Silhouette Match Ortho: max_bottom=1357 lowest='三层压在一起，俯视剪影是哪个？' -> /Users/a0000/dev/One More/_巡检记录/截图-Silhouette_Match_Ortho-155547.jpeg
+[2026-11-10T15:56:43] Simon Command: max_bottom=1563 lowest='红' -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Command-155643.jpeg
+[2026-11-10T15:57:34] Simon Sequence: max_bottom=1249 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Sequence-155734.jpeg
+[2026-11-10T15:58:24] Source Monitoring: max_bottom=1341 lowest='我记好了 ▶' -> /Users/a0000/dev/One More/_巡检记录/截图-Source_Monitoring-155823.jpeg
+[2026-11-10T15:59:20] Spatial Conflict: max_bottom=1569 lowest='⬅️ 左' -> /Users/a0000/dev/One More/_巡检记录/截图-Spatial_Conflict-155919.jpeg
+NO_CARD  Sternberg Task（搜索结果里没有「斯滕伯格」的卡片；不盲点第一张）
+[2026-11-10T16:00:51] Symmetry: max_bottom=1600 lowest='左右对称' -> /Users/a0000/dev/One More/_巡检记录/截图-Symmetry-160051.jpeg
+NO_CARD  Symmetry Span（搜索结果里没有「对称广度」的卡片；不盲点第一张）
+[2026-11-10T16:02:15] Tangram: max_bottom=1600 lowest='重开（换一题）' -> /Users/a0000/dev/One More/_巡检记录/截图-Tangram-160214.jpeg
+[2026-11-10T16:03:07] Temporal Order: max_bottom=1577 lowest='·' -> /Users/a0000/dev/One More/_巡检记录/截图-Temporal_Order-160306.jpeg
+[2026-11-10T16:03:58] Temporal Order Judgment: max_bottom=1563 lowest='⬅️ ⭐ 左边先' -> /Users/a0000/dev/One More/_巡检记录/截图-Temporal_Order_Judgment-160358.jpeg
+[2026-11-10T16:05:16] Topology: max_bottom=1600 lowest='第 1 / 8 题：它俩拓扑等价吗？' -> /Users/a0000/dev/One More/_巡检记录/截图-Topology-160516.jpeg
+[2026-11-10T16:06:15] Tower of Hanoi: max_bottom=1205 lowest='点柱子拿起最上面的盘，再点另一根放下' -> /Users/a0000/dev/One More/_巡检记录/截图-Tower_of_Hanoi-160615.jpeg
+[2026-11-10T16:07:26] Tower of London: max_bottom=1595 lowest='每次搬一个球 · 大球不能压小球 · 摆成目标' -> /Users/a0000/dev/One More/_巡检记录/截图-Tower_of_London-160725.jpeg
+NO_CARD  Trace Path（搜索结果里没有「描路径」的卡片；不盲点第一张）
+NOT_HOME
+WRONG_GAME  Triplets Logic（找不到标题「三元逻辑」；页面首几个文本=['One More', '🌙', '中', '🔍', '💬', '🔍']）
+NO_CARD  Visual Search All（搜索结果里没有「视觉搜索进阶」的卡片；不盲点第一张）
+NOT_HOME
+DONE
