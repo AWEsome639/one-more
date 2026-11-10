@@ -285,7 +285,7 @@ export struct GReverseStroop {
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => {
           Text(WORDS[(i)]).fontSize(FontSize.lg).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-          .layoutWeight(1).height(Cell.of(72)).borderRadius(Radius.md)
+          .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 54 : 72)).borderRadius(Radius.md)
           .backgroundColor(this.pick === (i) && (i) !== this.wIdx ? Palette.primaryDeep : INKS[(i)])
           .opacity(this.pick >= 0 && (i) !== this.wIdx && (i) !== this.pick ? 0.45 : 1)
           .animation({ duration: Motion.fast, curve: Motion.snap() })

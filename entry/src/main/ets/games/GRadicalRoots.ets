@@ -379,7 +379,7 @@ export struct GRadicalRoots {
       Row({ space: Space.sm }) {
         ForEach([0, 1], (i: number) => { Button(this.opts[(i)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked.length === 0 && !this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 40 : 56)).enabled(this.picked.length === 0 && !this.over)
         .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L349'; })
@@ -390,7 +390,7 @@ export struct GRadicalRoots {
       Row({ space: Space.sm }) {
         ForEach([2, 3], (i: number) => { Button(this.opts[(i)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.optInk((i))).backgroundColor(this.optTone((i)))
-        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked.length === 0 && !this.over)
+        .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 40 : 56)).enabled(this.picked.length === 0 && !this.over)
         .onClick(() => { Haptics.tap(); this.choose(this.opts[(i)]); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L358'; })
@@ -405,7 +405,7 @@ export struct GRadicalRoots {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(44)
+          .height(Bp.height < 600 ? 34 : 44)
           .onClick(() => {
             this.askHint();
           })
