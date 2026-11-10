@@ -333,7 +333,9 @@ export struct GVocabularyBuilder {
           .outline(Tv.focusOutline(this.tvFocus === 'L321'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }.width('100%')
-      Text(TG('提示：un- 表否定，-ness 变名词，-ly 变副词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(TG('提示：un- 表否定，-ness 变名词，-ly 变副词'))
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
@@ -345,7 +347,7 @@ export struct GVocabularyBuilder {
   option(o: Opt, i: number) {
     Text(o.text).fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
       .fontColor(this.locked && (this.picked === i || o.ok) ? '#FFFFFF' : this.theme.ink)
-      .width('100%').height(Cell.of(32)).borderRadius(Radius.md).shadow(Shadow.card)
+      .width('100%').height(Cell.of(28)).borderRadius(Radius.md).shadow(Shadow.card)
       .backgroundColor(this.locked && o.ok
         ? Palette.emerald : (this.locked && this.picked === i ? Palette.rose : this.theme.surface))
       .scale({ x: this.picked === i ? Motion.pressScale : 1, y: this.picked === i ? Motion.pressScale : 1 })

@@ -438,7 +438,7 @@ export struct GBubbleShooter {
   private cellPx(): number {
     // 9 行 + 8 个 2vp 间隙 ⇒ 每格 = (可用高 - 间隙) / 9
     const gap: number = 2 * (ROWS - 1);
-    const avail: number = Math.max(120, Bp.height * 0.30);   // 横屏 533 ⇒ 160vp
+    const avail: number = Math.max(120, Bp.height * (Bp.isShort() ? 0.26 : 0.30));   // 横屏 533 ⇒ 160vp
     return Math.max(10, (avail - gap) / ROWS);
   }
 
