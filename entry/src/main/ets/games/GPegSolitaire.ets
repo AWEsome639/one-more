@@ -475,7 +475,7 @@ export struct GPegSolitaire {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xxs }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
