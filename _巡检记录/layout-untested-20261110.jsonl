@@ -1,0 +1,42 @@
+[1] WRONG_GAME  Block Escape（找不到标题「华容道逃脱」；页面首几个文本=['‹', '华容道逃脱', '移开障碍让方块出去', '☆', '?', '普通']）
+[2] Color Flood: max_bottom=1351 lowest='D' -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Flood-090643.jpeg
+[3] Crown: max_bottom=732 lowest='0/6' -> /Users/a0000/dev/One More/_巡检记录/截图-Crown-090751.jpeg
+[4] Dominosa: max_bottom=1593 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Dominosa-090845.jpeg
+[5] Fraction Matcher: max_bottom=1582 lowest='1/7' -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-090943.jpeg
+[6] Futoshiki: max_bottom=1573 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Futoshiki-091036.jpeg
+[7] NO_CARD  Go / No-Go（搜索结果里没有「去或停」的卡片；不盲点第一张）
+[8] Gokigen Naname: max_bottom=1520 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Gokigen_Naname-091212.jpeg
+[9] Heyawake: max_bottom=880 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Heyawake-091313.jpeg
+[10] Hitori: max_bottom=1481 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori-091413.jpeg
+[11] Hitori All: max_bottom=1600 lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori_All-091508.jpeg
+[12] Inequality Balance Ops: max_bottom=1565 lowest='提示：先算乘、再算加；两边都算完才好放符号' -> /Users/a0000/dev/One More/_巡检记录/截图-Inequality_Balance_Ops-091617.jpeg
+[13] Inequality Dash: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Inequality_Dash-091716.jpeg
+[14] Kakurasu Sums: max_bottom=1600 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-091818.jpeg
+[15] Kakuro: max_bottom=1179 lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-091921.jpeg
+[16] KenKen: max_bottom=1600 lowest='重开一题' -> /Users/a0000/dev/One More/_巡检记录/截图-KenKen-092015.jpeg
+[17] Kurodoko: max_bottom=1586 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Kurodoko-092117.jpeg
+[18] Lighthouses: max_bottom=1070 lowest='🪨' -> /Users/a0000/dev/One More/_巡检记录/截图-Lighthouses-092214.jpeg
+[19] Lights Out: max_bottom=1586 lowest='💡' -> /Users/a0000/dev/One More/_巡检记录/截图-Lights_Out-092307.jpeg
+[20] Magic Squares: max_bottom=1600 lowest='8' -> /Users/a0000/dev/One More/_巡检记录/截图-Magic_Squares-092404.jpeg
+[21] Magnets: max_bottom=1183 lowest='现 0' -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-092522.jpeg
+[22] Masyu: max_bottom=1586 lowest='⚪' -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-092624.jpeg
+[23] WRONG_GAME  Math Maze（找不到标题「数学迷宫」；页面首几个文本=['One More', '🌙', '中', '🔍', '💬', '🔍']）
+[24] Math Path: max_bottom=1173 lowest='+' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-092820.jpeg
+[25] NO_CARD  Memory Palace（搜索结果里没有「记忆宫殿」的卡片；不盲点第一张）
+[26] Mental Abacus: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Abacus-092957.jpeg
+[27] Nonogram: max_bottom=1557 lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-093057.jpeg
+[28] Nurikabe: max_bottom=1068 lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-093157.jpeg
+[29] Object Displacement: max_bottom=1576 lowest='提示：遮罩后只有一个物件换格，点它（点它原来的位置也' -> /Users/a0000/dev/One More/_巡检记录/截图-Object_Displacement-093308.jpeg
+[30] Path Finder: max_bottom=986 lowest='🧍' -> /Users/a0000/dev/One More/_巡检记录/截图-Path_Finder-093408.jpeg
+[31] Path Intersect: max_bottom=1566 lowest='⬤' -> /Users/a0000/dev/One More/_巡检记录/截图-Path_Intersect-093501.jpeg
+[32] Peg Solitaire: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Peg_Solitaire-093556.jpeg
+[33] Pipes: max_bottom=1562 lowest='╭' -> /Users/a0000/dev/One More/_巡检记录/截图-Pipes-093648.jpeg
+[34] Shikaku: max_bottom=1548 lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Shikaku-093742.jpeg
+[35] Skyscrapers: max_bottom=1427 lowest='2' -> /Users/a0000/dev/One More/_巡检记录/截图-Skyscrapers-093834.jpeg
+[36] Slide Puzzle: max_bottom=1600 lowest='点空格旁边的块把它推进去' -> /Users/a0000/dev/One More/_巡检记录/截图-Slide_Puzzle-093928.jpeg
+[37] Slitherlink: max_bottom=1576 lowest='点边线切换；数字变绿说明这一格满足了' -> /Users/a0000/dev/One More/_巡检记录/截图-Slitherlink-094021.jpeg
+[38] Sum Pyramid: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Sum_Pyramid-094115.jpeg
+[39] Sum Snake: max_bottom=1573 lowest='🐍 蛇头在外框高亮；紫色外框是蛇尾（点它回退）' -> /Users/a0000/dev/One More/_巡检记录/截图-Sum_Snake-094217.jpeg
+[40] Tenner Grid: max_bottom=1600 lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Tenner_Grid-094308.jpeg
+[41] Visual Search Conjunction: max_bottom=1367 lowest='目标＝红色 □ 与蓝色 ● 的联合：唯一的红 ●' -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Search_Conjunction-094401.jpeg
+DONE
