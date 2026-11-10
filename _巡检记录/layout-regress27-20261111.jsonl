@@ -1,0 +1,26 @@
+Tents And Trees	OK	1243	82.8s lowest='🌳 树固定不动；每棵树上下左右恰好一顶 ⛺；行列数字' -> /Users/a0000/dev/One More/_巡检记录/截图-Tents_And_Trees-042052.jpeg @2026-11-11T04:20:52
+Color Maze Nav	OK	1318	80.8s lowest='↑' -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Maze_Nav-042213.jpeg @2026-11-11T04:22:13
+Symbol Digit Assoc	OK	1324	134.9s lowest='提示：先扫一眼对照表再点；同一个符号不会连着出现' -> /Users/a0000/dev/One More/_巡检记录/截图-Symbol_Digit_Assoc-042428.jpeg @2026-11-11T04:24:28
+Room Inspector	OK	1426	92.0s lowest='下面那间有 3 处不同，点它' -> /Users/a0000/dev/One More/_巡检记录/截图-Room_Inspector-042559.jpeg @2026-11-11T04:26:00
+Word Ladder Step	OK	1478	80.0s lowest='提示：选「改一个字母就是真词」的那个；另外三个其实不' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Ladder_Step-042720.jpeg @2026-11-11T04:27:20
+Tenner Grid	OK	1563	81.7s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Tenner_Grid-042842.jpeg @2026-11-11T04:28:42
+Block Stacking Physics	OK	1580	81.5s lowest='换一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Stacking_Physics-043004.jpeg @2026-11-11T04:30:04
+Trail Making	OK	1259	82.4s lowest='从 1 开始，数字与字母交替点：1→A→2→B…' -> /Users/a0000/dev/One More/_巡检记录/截图-Trail_Making-043126.jpeg @2026-11-11T04:31:26
+Word Grid Connection	OK	1295	81.6s lowest='提示：8 对同义词混在 16 格里；连错扣分，错满 ' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Grid_Connection-043248.jpeg @2026-11-11T04:32:48
+Letter Cancellation	OK	1392	82.4s lowest='划满 3 盘通关；漏一个罚 3 秒，点错也罚 3 秒' -> /Users/a0000/dev/One More/_巡检记录/截图-Letter_Cancellation-043410.jpeg @2026-11-11T04:34:11
+Word Snake Trail	OK	1460	88.0s lowest='提示：吃错字母、撞墙、咬自己都扣一条命' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Snake_Trail-043538.jpeg @2026-11-11T04:35:39
+Matrix Multiplier	OK	1352	80.6s lowest='提示：C(r,c) = A[r][0]×B[0][c' -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Multiplier-043659.jpeg @2026-11-11T04:36:59
+Maze Nav 3D	OK	1500	45.9s lowest='←' -> /Users/a0000/dev/One More/_巡检记录/截图-Maze_Nav_3D-043745.jpeg @2026-11-11T04:37:45
+Mirror Image	OK	1528	82.2s lowest='是镜像' -> /Users/a0000/dev/One More/_巡检记录/截图-Mirror_Image-043907.jpeg @2026-11-11T04:39:08
+Associative Pairs	OK	1438	77.8s lowest='看上面的词，选它最自然的搭档' -> /Users/a0000/dev/One More/_巡检记录/截图-Associative_Pairs-044025.jpeg @2026-11-11T04:40:26
+Box Completion	OK	1493	74.0s lowest='清空点亮' -> /Users/a0000/dev/One More/_巡检记录/截图-Box_Completion-044139.jpeg @2026-11-11T04:41:40
+Bubble Shooter	OK	1545	36.7s lowest='同色连 3 颗起炸；把全场炸光通关，28 次发射用完' -> /Users/a0000/dev/One More/_巡检记录/截图-Bubble_Shooter-044216.jpeg @2026-11-11T04:42:17
+Letter Grid Swapper	OK	1428	53.9s lowest='点两个字母交换位置' -> /Users/a0000/dev/One More/_巡检记录/截图-Letter_Grid_Swapper-044310.jpeg @2026-11-11T04:43:10
+Mental Mapping	OK	1562	90.4s lowest='↙' -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Mapping-044441.jpeg @2026-11-11T04:44:41
+Radical Roots	OK	1526	81.0s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Radical_Roots-044602.jpeg @2026-11-11T04:46:02
+Reversi	OK	1331	100.1s lowest='重新开始' -> /Users/a0000/dev/One More/_巡检记录/截图-Reversi-044742.jpeg @2026-11-11T04:47:42
+Sdmt	OK	1512	77.6s lowest='判定：90 秒内答对 ≥ 25 个通关（答错只影响分' -> /Users/a0000/dev/One More/_巡检记录/截图-Sdmt-044859.jpeg @2026-11-11T04:49:00
+Slide Puzzle	OK	1533	80.9s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Slide_Puzzle-045021.jpeg @2026-11-11T04:50:21
+Slide15	OK	1355	83.9s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Slide15-045144.jpeg @2026-11-11T04:51:45
+Stroop Test	OK	1600	79.8s lowest='蓝' -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-045304.jpeg @2026-11-11T04:53:05
+Visual Search	OK	1333	85.6s lowest='第 1 局：找出 🐸' -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Search-045430.jpeg @2026-11-11T04:54:30
