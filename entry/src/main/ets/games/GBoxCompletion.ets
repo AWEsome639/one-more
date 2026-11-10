@@ -366,7 +366,7 @@ export struct GBoxCompletion {
  Text(this.cells[r * this.diffTotal + c] && this.lit[r * this.diffTotal + c] ? '✨'
  : (this.cells[r * this.diffTotal + c] ? '⬛'
  : (this.lit[r * this.diffTotal + c] ? '🟨' : ''))).fontSize(FontSize.xxl)
- }.layoutWeight(1).height(Cell.of(62)).backgroundColor(this.lit[r * this.diffTotal + c] ? Palette.amber : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] ? Palette.ink : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+ }.layoutWeight(1).height(Bp.height < 600 ? Cell.of(52) : Cell.of(62)).backgroundColor(this.lit[r * this.diffTotal + c] ? Palette.amber : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] ? Palette.ink : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
  .onFocus(() => { this.tvFocus = 'L343'; })
  .onBlur(() => { if (this.tvFocus === 'L343') { this.tvFocus = ''; } })
  .outline(Tv.focusOutline(this.tvFocus === 'L343')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(r * this.diffTotal + c); }); }).onClick(() => { Haptics.tick(); this.pick(r * this.diffTotal + c); })

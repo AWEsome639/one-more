@@ -711,7 +711,7 @@ export struct GSlide15 {
           .backgroundColor(this.theme.surfaceAlt)
           .borderRadius(Radius.md)
           .layoutWeight(1)
-          .height(44)
+          .height(Bp.height < 600 ? 30 : 44)
           .onClick(() => {
             this.askHint();
           })
