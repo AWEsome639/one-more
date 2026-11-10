@@ -280,7 +280,7 @@ export struct GReverseStroop {
       Column({ space: Space.xs }) {
         Text(TG('点「字义」· 别看墨色')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(WORDS[this.wIdx]).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(INKS[this.kIdx])
-      }.width('100%').height(150).justifyContent(FlexAlign.Center)
+      }.width('100%').height(Bp.isShort() ? 104 : 150).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => {

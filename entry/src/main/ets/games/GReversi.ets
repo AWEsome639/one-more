@@ -558,7 +558,7 @@ export struct GReversi {
     //   ④ 用实测数据反推：需要棋盘 ≤ 205vp ⇒ 比例取 **0.70**。
     //      横屏 (533-260)*0.70 = 191vp ⇒ 「重开」约 480vp（安全）
     //      竖屏 (1280-260)*0.70 = 714vp（受宽度限，仍比旧 704 大）
-    const FIXED: number = 200;   // ★ 第 1020 轮：与 GBejeweled 同步（算式逐字相同 ⇒ 可套同值）   // ★ 第五版：实测黑白棋固定部分更大，取 300 覆盖所有款
+    const FIXED: number = Bp.isShort() ? 320 : 200;   // ★ 第 1020 轮：与 GBejeweled 同步（算式逐字相同 ⇒ 可套同值）   // ★ 第五版：实测黑白棋固定部分更大，取 300 覆盖所有款
     const w: number = Math.max(160, Bp.width - 40);
     const h: number = Math.max(120, (Bp.height - FIXED) * 0.70);
     return Math.min(w, h);

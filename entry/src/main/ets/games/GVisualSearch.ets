@@ -308,7 +308,7 @@ export struct GVisualSearch {
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
-      }.width('100%').padding(Space.sm).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg)
+      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 400))).padding(Space.sm).backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg)
       Text(this.msg).fontSize(FontSize.md).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(TG('重开'))

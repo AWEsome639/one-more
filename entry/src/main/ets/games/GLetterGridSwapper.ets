@@ -318,7 +318,7 @@ export struct GLetterGridSwapper {
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
-      }.width('100%')
+      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 380)))
       Text(this.msg).fontSize(FontSize.md)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
