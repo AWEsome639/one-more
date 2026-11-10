@@ -219,10 +219,15 @@ def _body(name, t0):
     #   ⇒ 依次试「最长词 / 首词 / 全名」；每次重开搜索页（不靠清空输入框）
     want_zh = game_title_map().get(name, '')
     tokens = []
-    for t in sorted(set(name.split()), key=lambda w: -len(w)):
-        if t.lower() not in ('all', 'the'):
+    # ★ 2026-11-11：**中文名优先** —— 搜英文名对一批游戏（`Go (9x9)` / `Bubble Shooter` …）`NO_CARD`；
+    #   中文名才是搜索框真正认的词。另外**去掉括号里的限定词**（`Go (9x9)` → `Go`）。
+    _base = name.split('(')[0].strip()
+    if want_zh:
+        tokens.append(want_zh)
+    for t in sorted(set(_base.split()), key=lambda w: -len(w)):
+        if t.lower() not in ('all', 'the') and t not in tokens:
             tokens.append(t)
-    tokens = tokens[:3] + [name]
+    tokens = tokens[:4] + [_base, name]
     d = None
     for tok in tokens:
         if not _need_budget(name, t0, 'search:%s' % tok):
