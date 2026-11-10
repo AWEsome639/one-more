@@ -1,3 +1,4 @@
+import re
 # -*- coding: utf-8 -*-
 """对某一款游戏「拍照存证」——给「PUSHED_OUT 候选」做人工核对用（判据 1819 第五类）
 
@@ -122,6 +123,24 @@ def texts(tree, pred=lambda t: True):
 _TITLE_CACHE = None
 
 
+def _find_text_node(tree, want):
+    """在 dump 树里找 text==want 的节点，返回其中心 (x, y)；找不到返回 None。"""
+    hit = []
+
+    def walk(n):
+        if isinstance(n, dict):
+            a = n.get('attributes', {}) or {}
+            if a.get('text') == want:
+                b = (a.get('bounds') or '').strip()
+                nums = [int(x) for x in re.findall(r'-?\d+', b)] if b else []
+                if len(nums) == 4:
+                    hit.append(((nums[0] + nums[2]) // 2, (nums[1] + nums[3]) // 2))
+            for c in (n.get('children') or []):
+                walk(c)
+    walk(tree)
+    return hit[0] if hit else None
+
+
 def game_title_map():
     """enName → 中文名（从 GameRegistry 解析；**带缓存**，不只因慢，也避免中途文件变化）"""
     global _TITLE_CACHE
@@ -244,6 +263,14 @@ def _body(name, t0):
         if not is_home():
             sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
             time.sleep(6.0)
+        # ★ 2026-11-11（真机抓到的 bug）：**首页「搜索框里还留着上一次的词」也算 home**
+        #   ⇒ 新词会拼到旧词后面 ⇒ 搜不到任何卡片（今晚 27 款回归全 no_card 就是这个）
+        #   ⇒ 搜之前先点 `✕` 清空（`✕` 只在搜索框有内容时出现）
+        _d0 = dump()
+        _hit = _find_text_node(_d0, '✕') if _d0 else None
+        if _hit:
+            sh('uitest uiInput click %d %d' % (_hit[0], _hit[1]))
+            time.sleep(0.6)
         sh('uitest uiInput click 2276 264')
         time.sleep(1.2)
         sh('uitest uiInput click 1280 435')
