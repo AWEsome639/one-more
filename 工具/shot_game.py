@@ -171,7 +171,10 @@ def main():
     sh(f'snapshot_display -f /data/local/tmp/shot_{safe}.jpeg')
     subprocess.run([HC, '-t', DEV, 'file', 'recv', f'/data/local/tmp/shot_{safe}.jpeg', out],
                    capture_output=True, text=True, timeout=90)
-    print(f'{name}: max_bottom={mb} lowest={lo!r} -> {out}')
+    # ★ 2026-11-10（判据 1889）：**每行带测量时间戳** —— 否则「按文件 mtime 取最新」会被拷贝污染
+    import datetime as _dt
+    _ts = _dt.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    print(f'[{_ts}] {name}: max_bottom={mb} lowest={lo!r} -> {out}')
 
 if __name__ == '__main__':
     main()

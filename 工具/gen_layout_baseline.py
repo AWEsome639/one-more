@@ -32,6 +32,15 @@ def rows():
             m = re.match(r"(?:\[\d+\]\s+)?(\w+)\s{2,}(.+?)\s+\{", ln.strip())
             if m and m.group(1) in ('OK', 'TIGHT', 'PUSHED_OUT', 'NOT_HOME', 'NOT_IN_GAME', 'NO_CARD', 'WRONG_GAME'):
                 seen[m.group(2).strip()] = m.group(1)
+            # ★ 2026-11-10（判据 1889）：优先用「行内时间戳」判断新旧；没有才退回「后写覆盖」
+            m3 = re.match(r"\[(\d{4}-\d\d-\d\dT[\d:]+)\] ([^:]+): max_bottom=(\d+)", ln.strip())
+            if m3:
+                name = m3.group(2).strip()
+                prev = seen.get(name)
+                ts = m3.group(1)
+                if not (isinstance(prev, tuple) and prev[0] > ts):
+                    seen[name] = (ts, 'mb%s' % m3.group(3))
+                continue
             m2 = re.match(r"\[(\d+)\] ([^:]+): max_bottom=(\d+) lowest='(.*?)'", ln.strip())
             if m2:
                 seen[m2.group(2).strip()] = 'mb%s' % m2.group(3)
@@ -45,6 +54,8 @@ def main():
     data = rows()
     buckets = {'OK': [], 'TIGHT': [], '溢出': [], '未测到': []}
     for name, v in sorted(data.items()):
+        if isinstance(v, tuple):
+            v = v[1]
         if v.startswith('mb'):
             mb = int(v[2:])
             key = 'OK' if mb <= OK_MAX else ('TIGHT' if mb <= TIGHT_MAX else '溢出')
