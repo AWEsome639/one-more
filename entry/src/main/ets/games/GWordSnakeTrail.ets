@@ -328,7 +328,7 @@ export struct GWordSnakeTrail {
   }
   private toneAt(i: number): string { const at: number = this.body.indexOf(i); return at === 0 ? Palette.emerald : (at > 0 ? Palette.primary : this.theme.surface); }
   build() {
-    Column({ space: Space.sm }) {
+    Column({ space: Space.xxs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({

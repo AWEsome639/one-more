@@ -310,7 +310,7 @@ export struct GWordLadderStep {
     return this.opts[i].ok ? Palette.emerald : this.theme.surface;
   }
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Space.xxs }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({

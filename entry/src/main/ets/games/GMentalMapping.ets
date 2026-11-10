@@ -430,7 +430,7 @@ export struct GMentalMapping {
       .borderRadius(Radius.md)
 
       // 方向键盘
-      Column({ space: Space.xs }) {
+      Column({ space: Space.xxs }) {
         Row({ space: Space.xs }) {
           Text(DIRS[(0)])
           .fontSize(FontSize.lg)

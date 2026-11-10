@@ -376,7 +376,7 @@ export struct GMirrorTracing {
     // ★ 2026-10-30：内容总高在 533vp 横屏上超出（reserve 已触底）
     //   ⇒ **套 Scroll**：超高时可滚，棋盘尺寸不再受"必须一屏装下"约束。
     Scroll() {
-      Column({ space: Space.md }) {
+      Column({ space: Space.xxs }) {
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       HintBar({
