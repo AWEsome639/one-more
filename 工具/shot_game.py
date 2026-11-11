@@ -253,6 +253,12 @@ def _body(name, t0):
     _base = name.split('(')[0].strip()
     if want_zh:
         tokens.append(want_zh)
+        # ★ 2026-11-11（code-hunter 的推断）：**含空格/数字的中文名最容易被 `uinput` 打字层吃掉**
+        #   全库只有 7 款这种名（`24 点` / `9 路围棋` / `双 N-back` / `AB 反转` / `3D 迷宫` / `d2 注意` / `2048`）
+        #   ⇒ 再试一个「去数字、去空格、去连字符」的变体
+        _stripped = re.sub(r'[0-9０-９\s\-]', '', want_zh)
+        if _stripped and _stripped != want_zh and len(_stripped) >= 2:
+            tokens.append(_stripped)
     for t in sorted(set(_base.split()), key=lambda w: -len(w)):
         if t.lower() not in ('all', 'the') and t not in tokens:
             tokens.append(t)
