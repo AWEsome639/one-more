@@ -330,7 +330,7 @@ export struct GInequalityBalanceOps {
         ForEach(this.slots, (i: number) => {
           Button(sym(i))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xxl).fontColor(this.btnInk(i))
-            .backgroundColor(this.btnBg(i)).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(56))
+            .backgroundColor(this.btnBg(i)).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
             .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'L315'; })
             .onBlur(() => { if (this.tvFocus === 'L315') { this.tvFocus = ''; } })
@@ -345,7 +345,7 @@ export struct GInequalityBalanceOps {
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .borderRadius(Radius.md).width('100%').height(Cell.of(Bp.height < 600 ? 38 : 46)).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L326'; })
         .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L326')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
