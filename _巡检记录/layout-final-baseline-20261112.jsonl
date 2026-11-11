@@ -1,0 +1,213 @@
+Bejeweled	OK	1351	33.9s lowest='💧' -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-025630.jpeg @2026-11-12T02:56:30
+Breakout	OK	1351	54.7s lowest='拖动挡板对准，点棋盘或按「发球」开球' -> /Users/a0000/dev/One More/_巡检记录/截图-Breakout-025725.jpeg @2026-11-12T02:57:25
+Bubble Shooter	OK	1545	35.7s lowest='同色连 3 颗起炸；把全场炸光通关，28 次发射用完' -> /Users/a0000/dev/One More/_巡检记录/截图-Bubble_Shooter-025801.jpeg @2026-11-12T02:58:01
+Checkers	OK	1351	42.8s lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Checkers-025844.jpeg @2026-11-12T02:58:44
+Compound Connect	NO_CARD	-	35.6s no card for '复合连线' (fallback=(347, 828))
+Connect Four	NO_CARD	-	37.0s no card for '四子棋' (fallback=(347, 828))
+Continuous Paired Associate	NO_CARD	-	35.6s no card for '连续配对' (fallback=(347, 828))
+Doodle Jump	NO_CARD	-	36.7s no card for '登高' (fallback=(347, 828))
+Double Trouble	OK	1552	84.0s lowest='每轮两个任务都要答对；答错扣一条命，3 条命用完就结' -> /Users/a0000/dev/One More/_巡检记录/截图-Double_Trouble-030233.jpeg @2026-11-12T03:02:33
+Dual Mirror	OK	1403	86.9s lowest='点左板 (r,c) ⇒ 左 (r,c) 与右 (r,' -> /Users/a0000/dev/One More/_巡检记录/截图-Dual_Mirror-030400.jpeg @2026-11-12T03:04:00
+Flappy	OK	1456	86.0s lowest='穿 12 根管道通关；撞管道或撞地就结束（点场地也能' -> /Users/a0000/dev/One More/_巡检记录/截图-Flappy-030526.jpeg @2026-11-12T03:05:26
+FreeCell	OK	1435	85.1s lowest='♠8' -> /Users/a0000/dev/One More/_巡检记录/截图-FreeCell-030651.jpeg @2026-11-12T03:06:51
+2048	OK	1557	40.0s lowest='←' -> /Users/a0000/dev/One More/_巡检记录/截图-2048-030731.jpeg @2026-11-12T03:07:31
+Game24	OK	1558	42.8s lowest='撤销' -> /Users/a0000/dev/One More/_巡检记录/截图-Game24-030814.jpeg @2026-11-12T03:08:14
+Go (9x9)	OK	1445	35.7s lowest='黑先 · 无气提子 · 打劫不能立刻提回 · 双方停' -> /Users/a0000/dev/One More/_巡检记录/截图-Go__9x9_-030850.jpeg @2026-11-12T03:08:50
+Gomoku	NOT_HOME	-	39.1s could not reach home
+Hanoi	NOT_HOME	-	38.5s could not reach home
+Kakuro Mini	NOT_HOME	-	39.1s could not reach home
+Lock Pattern	NOT_HOME	-	38.8s could not reach home
+Mahjong Solitaire	NOT_HOME	-	38.7s could not reach home
+Mancala	NOT_HOME	-	38.4s could not reach home
+Mandelbrot	NOT_HOME	-	39.2s could not reach home
+Mastermind	NOT_HOME	-	38.9s could not reach home
+Match 3	NOT_HOME	-	38.7s could not reach home
+Memory	NOT_HOME	-	38.6s could not reach home
+Minesweeper	NOT_HOME	-	39.3s could not reach home
+Nim	NOT_HOME	-	38.4s could not reach home
+Peg Solitaire	NOT_HOME	-	38.5s could not reach home
+Phonetic Guess	NOT_HOME	-	38.3s could not reach home
+Pong	NOT_HOME	-	38.5s could not reach home
+Reversi	OK	1331	78.4s lowest='重新开始' -> /Users/a0000/dev/One More/_巡检记录/截图-Reversi-032410.jpeg @2026-11-12T03:24:10
+Schulte Table	OK	1439	85.3s lowest='18' -> /Users/a0000/dev/One More/_巡检记录/截图-Schulte_Table-032535.jpeg @2026-11-12T03:25:36
+Sieve Visualizer	OK	1454	82.6s lowest='步数 0 · 绿字 = 素数，灰底 = 被划掉的合数' -> /Users/a0000/dev/One More/_巡检记录/截图-Sieve_Visualizer-032658.jpeg @2026-11-12T03:26:58
+Simon Says	OK	1345	89.1s lowest='🐸' -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Says-032825.jpeg @2026-11-12T03:28:28
+Slide15	OK	1355	86.5s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Slide15-032954.jpeg @2026-11-12T03:29:54
+Snake	OK	1351	81.4s lowest='滑动棋盘或点方向键转向；吃满 12 个食物算通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Snake-033116.jpeg @2026-11-12T03:31:16
+Snake 3D	OK	1575	86.5s lowest='上层' -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-033242.jpeg @2026-11-12T03:32:42
+Sokoban	OK	1430	85.6s lowest='上一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Sokoban-033408.jpeg @2026-11-12T03:34:08
+Solitaire	OK	1351	90.6s lowest='自动收牌' -> /Users/a0000/dev/One More/_巡检记录/截图-Solitaire-033538.jpeg @2026-11-12T03:35:39
+Sorting Visualizer	OK	1351	82.7s lowest='开始' -> /Users/a0000/dev/One More/_巡检记录/截图-Sorting_Visualizer-033701.jpeg @2026-11-12T03:37:01
+Spider Solitaire	OK	1351	86.2s lowest='单花色（全黑桃）· 集齐 K→A 收一组 · 空列时' -> /Users/a0000/dev/One More/_巡检记录/截图-Spider_Solitaire-033828.jpeg @2026-11-12T03:38:28
+Sudoku Hex	OK	1547	85.6s lowest='点一个空格，再点数字填入' -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku_Hex-033953.jpeg @2026-11-12T03:39:53
+Tetris	OK	1465	82.7s lowest='目标：消满 10 行通关；堆到顶就输了' -> /Users/a0000/dev/One More/_巡检记录/截图-Tetris-034116.jpeg @2026-11-12T03:41:16
+Tic-Tac-Toe	OK	1541	82.4s lowest='电脑会贪心，但也会看漏，试试能不能赢' -> /Users/a0000/dev/One More/_巡检记录/截图-Tic_Tac_Toe-034238.jpeg @2026-11-12T03:42:39
+Wordle	OK	1600	87.0s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-034405.jpeg @2026-11-12T03:44:06
+Akari (Light Up)	NOT_HOME	-	39.0s could not reach home
+Alphabet Sudoku	NOT_HOME	-	38.2s could not reach home
+Binary Puzzle	NOT_HOME	-	38.5s could not reach home
+Block Escape	NOT_HOME	-	38.8s could not reach home
+Bridges	NOT_HOME	-	38.8s could not reach home
+Bridges All	NOT_HOME	-	38.7s could not reach home
+Color Flood	NOT_HOME	-	38.3s could not reach home
+Crown	NOT_HOME	-	38.8s could not reach home
+Dominosa	NOT_HOME	-	38.6s could not reach home
+Fillomino	NOT_HOME	-	38.3s could not reach home
+Futoshiki	NOT_HOME	-	38.4s could not reach home
+Gokigen Naname	NOT_HOME	-	38.4s could not reach home
+Heyawake	NOT_HOME	-	38.7s could not reach home
+Hitori	NOT_HOME	-	38.4s could not reach home
+Hitori All	NOT_HOME	-	38.7s could not reach home
+Kakurasu Sums	OK	1600	83.3s lowest='涂黑 / 擦白' -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-035929.jpeg @2026-11-12T03:59:29
+Kakuro	OK	1600	86.0s lowest='0' -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-040055.jpeg @2026-11-12T04:00:55
+KenKen	OK	1469	80.0s lowest='重开一题' -> /Users/a0000/dev/One More/_巡检记录/截图-KenKen-040215.jpeg @2026-11-12T04:02:15
+Klotski	OK	1492	87.0s lowest='←' -> /Users/a0000/dev/One More/_巡检记录/截图-Klotski-040342.jpeg @2026-11-12T04:03:42
+Kurodoko	OK	1583	83.1s lowest='重开一题' -> /Users/a0000/dev/One More/_巡检记录/截图-Kurodoko-040505.jpeg @2026-11-12T04:05:05
+Lighthouses	OK	1351	89.8s lowest='🪨' -> /Users/a0000/dev/One More/_巡检记录/截图-Lighthouses-040635.jpeg @2026-11-12T04:06:35
+Lights Out	OK	1565	86.9s lowest='重开一题' -> /Users/a0000/dev/One More/_巡检记录/截图-Lights_Out-040802.jpeg @2026-11-12T04:08:02
+Magnets	OK	1600	87.4s lowest='现 0' -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-040929.jpeg @2026-11-12T04:09:30
+Masyu	OK	1457	86.6s lowest='⚫ 必须拐弯 · ⚪ 必须直行 · 回路要闭合成一圈' -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-041056.jpeg @2026-11-12T04:10:56
+Math Maze	OK	1584	83.1s lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Maze-041219.jpeg @2026-11-12T04:12:19
+Math Path	OK	1600	85.3s lowest='退一步' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-041345.jpeg @2026-11-12T04:13:45
+Nonogram	OK	1395	85.9s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-041511.jpeg @2026-11-12T04:15:11
+Norinori	OK	1541	90.5s lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Norinori-041641.jpeg @2026-11-12T04:16:41
+Nurikabe	OK	1479	82.9s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-041804.jpeg @2026-11-12T04:18:04
+Path Finder	OK	1600	86.8s lowest='🧍 是你，🏁 是终点：按方向键或点相邻格' -> /Users/a0000/dev/One More/_巡检记录/截图-Path_Finder-041931.jpeg @2026-11-12T04:19:31
+Path Intersect	NOT_HOME	-	38.5s could not reach home
+Pipes	NOT_HOME	-	38.7s could not reach home
+Shikaku	NOT_HOME	-	38.5s could not reach home
+Skyscrapers	NOT_HOME	-	38.4s could not reach home
+Slide Puzzle	NOT_HOME	-	38.8s could not reach home
+Slitherlink	NOT_HOME	-	38.6s could not reach home
+Sudoku	NOT_HOME	-	38.5s could not reach home
+Sum Snake	NOT_HOME	-	38.8s could not reach home
+Tangle Fix	NOT_HOME	-	38.3s could not reach home
+Tapa	NOT_HOME	-	38.9s could not reach home
+Tenner Grid	NOT_HOME	-	38.5s could not reach home
+Tents And Trees	NOT_HOME	-	38.5s could not reach home
+Water Sort	NOT_HOME	-	38.8s could not reach home
+Yajilin	NOT_HOME	-	38.4s could not reach home
+Algebraic Balance	NOT_HOME	-	38.5s could not reach home
+Algebraic Inequality Solver	OK	1572	84.9s lowest='严格/非严格要看清楚' -> /Users/a0000/dev/One More/_巡检记录/截图-Algebraic_Inequality_Solver-043456.jpeg @2026-11-12T04:34:56
+Arithmetic Chain	OK	1484	82.8s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Arithmetic_Chain-043619.jpeg @2026-11-12T04:36:19
+Balance Scale	OK	1531	86.3s lowest='4' -> /Users/a0000/dev/One More/_巡检记录/截图-Balance_Scale-043745.jpeg @2026-11-12T04:37:45
+Base Conversion Run	OK	1600	83.5s lowest='110001' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-043908.jpeg @2026-11-12T04:39:09
+Base Shift	OK	1578	86.9s lowest='37888' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-044035.jpeg @2026-11-12T04:40:36
+Binary Code	OK	1575	83.6s lowest='点亮开关凑出 71' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Code-044159.jpeg @2026-11-12T04:41:59
+Binary Matrix Rank	OK	1568	86.8s lowest='秩 = 2' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Matrix_Rank-044326.jpeg @2026-11-12T04:43:26
+Binary Scale Balance	OK	1471	84.6s lowest='提示：右盘一旦超过物体重量，天平就翻了 —— 本局结' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Scale_Balance-044451.jpeg @2026-11-12T04:44:51
+Binomial Match	OK	1600	86.9s lowest='左边点项、右边点系数，配成一对' -> /Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-044618.jpeg @2026-11-12T04:46:18
+Calculation Sprint	OK	1572	86.6s lowest='45' -> /Users/a0000/dev/One More/_巡检记录/截图-Calculation_Sprint-044744.jpeg @2026-11-12T04:47:44
+Collatz	OK	1586	79.1s lowest='99' -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-044903.jpeg @2026-11-12T04:49:04
+Common Denominator	OK	1585	86.0s lowest='这两个分数的最小公分母是多少？' -> /Users/a0000/dev/One More/_巡检记录/截图-Common_Denominator-045030.jpeg @2026-11-12T04:50:30
+Countdown Math	OK	1409	88.4s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Countdown_Math-045158.jpeg @2026-11-12T04:51:58
+Crypto Arithmetic	OK	1492	86.4s lowest='五个字母的数字两两不同' -> /Users/a0000/dev/One More/_巡检记录/截图-Crypto_Arithmetic-045325.jpeg @2026-11-12T04:53:25
+Digit Swap Eq	OK	1402	79.0s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Digit_Swap_Eq-045444.jpeg @2026-11-12T04:54:44
+Divisibility Dash	NOT_HOME	-	38.3s could not reach home
+Exponent Tower	NOT_HOME	-	38.3s could not reach home
+Factor Finder	NOT_HOME	-	38.3s could not reach home
+Fibonacci Merge	NOT_HOME	-	38.5s could not reach home
+Fraction Match	NOT_HOME	-	39.0s could not reach home
+Fraction Matcher	NOT_HOME	-	40.1s could not reach home
+Fractional Pizza	NOT_HOME	-	39.4s could not reach home
+Inequality Balance Ops	NOT_HOME	-	42.2s could not reach home
+Inequality Dash	NOT_HOME	-	42.1s could not reach home
+Magic Squares	NOT_HOME	-	42.7s could not reach home
+Matrix Multiplier	NOT_HOME	-	45.1s could not reach home
+Matrix Multiplier Match	NOT_HOME	-	43.9s could not reach home
+Matrix Reasoning	NOT_HOME	-	41.2s could not reach home
+Mental Abacus	NOT_HOME	-	47.4s could not reach home
+Mental Calendar	NOT_HOME	-	44.8s could not reach home
+Missing Operator	NOT_HOME	-	44.6s could not reach home
+Modular Clock Arithmetic	NOT_HOME	-	43.8s could not reach home
+Modulo Clock	NOT_HOME	-	41.7s could not reach home
+Modulo Path	NOT_HOME	-	44.1s could not reach home
+Number Bonds	NOT_HOME	-	42.2s could not reach home
+Number Bonds All	NOT_HOME	-	43.4s could not reach home
+Numerical Estimation	NOT_HOME	-	41.1s could not reach home
+Pattern Sequence Draw	NOT_HOME	-	45.0s could not reach home
+Percentage Peak	NOT_HOME	-	41.5s could not reach home
+Percentage Shopping	NOT_HOME	-	44.0s could not reach home
+Prime Factor Trees	NOT_HOME	-	42.8s could not reach home
+Prime Gap Hunt	NOT_HOME	-	43.9s could not reach home
+Prime Hunter	NOT_HOME	-	42.0s could not reach home
+Pythagorean Triple Builder	NOT_HOME	-	41.1s could not reach home
+Quick Math	NOT_HOME	-	42.3s could not reach home
+Radical Roots	NOT_HOME	-	44.0s could not reach home
+Roman Arithmetic	NOT_HOME	-	40.7s could not reach home
+Sequence Sleuth	NOT_HOME	-	41.2s could not reach home
+Sequence Stack	NOT_HOME	-	42.1s could not reach home
+Set Theory Venn	NOT_HOME	-	40.9s could not reach home
+Sum Pyramid	NOT_HOME	-	42.1s could not reach home
+Target 10	NOT_HOME	-	42.0s could not reach home
+Target Number	NOT_HOME	-	41.4s could not reach home
+Unit Converter Pro	NOT_HOME	-	40.3s could not reach home
+Vector Dot Product	NOT_HOME	-	41.8s could not reach home
+Vector Grid Alignment	NOT_HOME	-	43.9s could not reach home
+Vektor Vector	NOT_HOME	-	44.0s could not reach home
+Venn Numbers	NOT_HOME	-	41.2s could not reach home
+Associative Pairs	NOT_HOME	-	40.5s could not reach home
+Attentional Blink	NOT_HOME	-	39.9s could not reach home
+Attentional Blink Probe	NOT_HOME	-	40.1s could not reach home
+Card Counting Memory	NOT_HOME	-	39.1s could not reach home
+Change Blindness	NOT_HOME	-	40.0s could not reach home
+Choice Reaction Time	NOT_HOME	-	39.1s could not reach home
+Color Word Match Up	NOT_HOME	-	39.3s could not reach home
+Conjunction Search	NOT_HOME	-	39.7s could not reach home
+Continuous Recognition	NOT_HOME	-	40.2s could not reach home
+Corsi Backward Span	NOT_HOME	-	39.2s could not reach home
+Corsi Blocks	NOT_HOME	-	41.2s could not reach home
+Counting Span	NOT_HOME	-	40.0s could not reach home
+d2 Attention	NOT_HOME	-	40.3s could not reach home
+Delayed Match Sample	NOT_HOME	-	41.9s could not reach home
+Digit Span Reverse	NOT_HOME	-	39.7s could not reach home
+Divided Attention	NOT_HOME	-	41.2s could not reach home
+Dnms	NOT_HOME	-	39.0s could not reach home
+Double N Back	NOT_HOME	-	41.6s could not reach home
+Dual Coding	NOT_HOME	-	41.1s could not reach home
+Dual Task Memory	NOT_HOME	-	42.6s could not reach home
+Dynamic Salience	NOT_HOME	-	39.7s could not reach home
+Event Timeline Memory	NOT_HOME	-	40.0s could not reach home
+Face Name Association	NOT_HOME	-	39.5s could not reach home
+Face Trait Association	NOT_HOME	-	41.5s could not reach home
+Feature Matrix Recall	NOT_HOME	-	40.8s could not reach home
+Feature Matrix Recall All	NOT_HOME	-	39.2s could not reach home
+Flanker Test	NOT_HOME	-	40.0s could not reach home
+Frequency Tap	NOT_HOME	-	39.8s could not reach home
+Ghost Tap	NOT_HOME	-	40.3s could not reach home
+Go / No-Go	NOT_HOME	-	39.3s could not reach home
+Grocery List	NOT_HOME	-	40.2s could not reach home
+Mandala Recall	NOT_HOME	-	39.3s could not reach home
+Memory Matrix	NOT_HOME	-	40.6s could not reach home
+Memory Palace	NOT_HOME	-	38.8s could not reach home
+Multiple Object Tracking	NOT_HOME	-	39.1s could not reach home
+N-Back	NOT_HOME	-	39.0s could not reach home
+Narrative Recall	NOT_HOME	-	39.1s could not reach home
+Negative Space Detection	NOT_HOME	-	41.4s could not reach home
+Object Displacement	NOT_HOME	-	39.0s could not reach home
+Object Shuffle	NOT_HOME	-	42.6s could not reach home
+Odd Even Flash	NOT_HOME	-	40.2s could not reach home
+Operation Span	NOT_HOME	-	40.7s could not reach home
+Peripheral Focus	NOT_HOME	-	40.7s could not reach home
+Posner Spatial Cueing	NOT_HOME	-	41.4s could not reach home
+Probe Digit Span	NOT_HOME	-	39.9s could not reach home
+Reading Span	NOT_HOME	-	40.8s could not reach home
+Reflex Tap	NOT_HOME	-	39.2s could not reach home
+Relational Memory	NOT_HOME	-	40.8s could not reach home
+Reverse Stroop	NOT_HOME	-	41.0s could not reach home
+Rhythm Master	NOT_HOME	-	40.8s could not reach home
+Rule Switcher	NOT_HOME	-	40.3s could not reach home
+Running Memory Span	NOT_HOME	-	41.6s could not reach home
+Sdmt	NOT_HOME	-	41.6s could not reach home
+Shell Game	NOT_HOME	-	40.6s could not reach home
+Sopt	NOT_HOME	-	40.3s could not reach home
+Spatial Cabinet Memory	NOT_HOME	-	40.9s could not reach home
+Spotlight Track	NOT_HOME	-	40.1s could not reach home
+Staircase Memory	NOT_HOME	-	40.2s could not reach home
+Stop Signal	NOT_HOME	-	41.1s could not reach home
+Stroop Number Size	NOT_HOME	-	39.4s could not reach home
+Stroop Test	NOT_HOME	-	41.8s could not reach home
+Subitizing Rush	NOT_HOME	-	39.9s could not reach home
+Switch Task	NOT_HOME	-	39.5s could not reach home
+Symbol Digit Assoc	NOT_HOME	-	40.3s could not reach home
+Symbol Logic	NOT_HOME	-	39.4s could not reach home
