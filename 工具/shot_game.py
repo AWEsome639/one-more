@@ -222,6 +222,16 @@ def _need_budget(name, t0, where):
 # ═══════════════ 主流程 ═══════════════
 
 def _body(name, t0):
+    # ★ 2026-11-11（判据 1920）：**每款开工前先「干净重启 + 轮询到首页」** ——
+    #   放在 `_body` 最前面（不是搜索前），因为 `NOT_HOME` 的出入口就在这里。
+    #   结算弹层没有任何可点关闭件时，`Back` 永远被吃；只有重启能回初始态。
+    sh('aa force-stop com.andrewoscar.onemore')
+    time.sleep(1.0)
+    sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
+    for _w in range(6):
+        time.sleep(3.0)
+        if is_home():
+            break
     # ★ 2026-11-09：回首页兜底（复测里 40 款 `NOT_HOME` 就是这里只有「Back 三次」）
     for _ in range(4):
         if not _need_budget(name, t0, 'home-loop'):
