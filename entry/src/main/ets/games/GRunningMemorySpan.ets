@@ -300,7 +300,7 @@ export struct GRunningMemorySpan {
       Row({ space: Space.xs }) {
         ForEach([1, 2, 3, 4, 5], (d: number) => {
           Text(String((d))).fontSize(FontSize.xl).fontColor(this.theme.ink).textAlign(TextAlign.Center)
-          .layoutWeight(1).height(Cell.of(42)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
+          .layoutWeight(1).height(Bp.isShort() ? Cell.of(42) : Cell.tap(42)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
           .opacity(this.phase === 'input' ? 1 : 0.4)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.keyTap((d)); })
@@ -314,7 +314,7 @@ export struct GRunningMemorySpan {
       Row({ space: Space.xs }) {
         ForEach([6, 7, 8, 9, 0], (d: number) => {
           Text(String((d))).fontSize(FontSize.xl).fontColor(this.theme.ink).textAlign(TextAlign.Center)
-          .layoutWeight(1).height(Cell.of(42)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
+          .layoutWeight(1).height(Bp.isShort() ? Cell.of(42) : Cell.tap(42)).backgroundColor(this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card)
           .opacity(this.phase === 'input' ? 1 : 0.4)
           .animation({ duration: Motion.fast, curve: Motion.snap() })
           .onClick(() => { Haptics.tick(); this.keyTap((d)); })
@@ -331,7 +331,7 @@ export struct GRunningMemorySpan {
       // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
-        .backgroundColor(Palette.rose).borderRadius(Radius.md).width('100%').height(Cell.of(40))
+        .backgroundColor(Palette.rose).borderRadius(Radius.md).width('100%').height(Bp.isShort() ? Cell.of(40) : Cell.tap(40))
         .onClick(() => { Haptics.tap(); this.reset(); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L327'; })

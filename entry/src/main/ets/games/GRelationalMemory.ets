@@ -308,7 +308,7 @@ export struct GRelationalMemory {
           Text(this.sideA[this.qIdx]).fontSize(FontSize.hero).textAlign(TextAlign.Center)
             .width('100%').height(110).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
           ForEach(this.options, (o: string) => {
-            Text((o)).fontSize(FontSize.xxl).textAlign(TextAlign.Center).width('100%').height(Cell.of(42))
+            Text((o)).fontSize(FontSize.xxl).textAlign(TextAlign.Center).width('100%').height(Bp.isShort() ? Cell.of(42) : Cell.tap(42))
             .backgroundColor(this.pick >= 0 && (o) === this.sideB[this.qIdx] ? Palette.emerald : this.theme.surface)
             .borderRadius(Radius.md).shadow(Shadow.card)
             .animation({ duration: Motion.fast, curve: Motion.snap() })

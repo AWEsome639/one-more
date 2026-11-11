@@ -344,7 +344,7 @@ export struct GAnagramDefinition {
       Row({ space: Space.sm }) {
         Button(TG('退一格'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).focusable(Tv.on())
+          .borderRadius(Radius.md).layoutWeight(1).height(Bp.isShort() ? Cell.of(40) : Cell.tap(40)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L313'; })
           .onBlur(() => { if (this.tvFocus === 'L313') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L313')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.picked = this.picked.slice(0, this.picked.length - 1); }); }).onClick(() => { Haptics.tap(); this.picked = this.picked.slice(0, this.picked.length - 1); })
@@ -352,7 +352,7 @@ export struct GAnagramDefinition {
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).focusable(Tv.on())
+          .borderRadius(Radius.md).layoutWeight(1).height(Bp.isShort() ? Cell.of(40) : Cell.tap(40)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L316'; })
           .onBlur(() => { if (this.tvFocus === 'L316') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L316')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

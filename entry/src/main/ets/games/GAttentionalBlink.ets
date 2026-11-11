@@ -388,7 +388,7 @@ export struct GAttentionalBlink {
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF')
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(40)).focusable(Tv.on())
+        .borderRadius(Radius.md).width('100%').height(Bp.isShort() ? Cell.of(40) : Cell.tap(40)).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L365'; })
         .onBlur(() => { if (this.tvFocus === 'L365') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L365')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

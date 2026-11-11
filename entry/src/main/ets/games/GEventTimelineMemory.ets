@@ -376,7 +376,7 @@ export struct GEventTimelineMemory {
       if (this.phase === 0) {
         Button(TG('打乱作答 ▶'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.berry)
-          .borderRadius(Radius.md).width('100%').height(Cell.of(40)).enabled(this.shown >= LEN)
+          .borderRadius(Radius.md).width('100%').height(Bp.isShort() ? Cell.of(40) : Cell.tap(40)).enabled(this.shown >= LEN)
           .opacity(this.shown >= LEN ? 1 : 0.5).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L361'; })
           .onBlur(() => { if (this.tvFocus === 'L361') { this.tvFocus = ''; } })
@@ -387,7 +387,7 @@ export struct GEventTimelineMemory {
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.phase === 0 ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.phase === 0 ? Palette.primary : this.theme.surfaceAlt)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(40)).focusable(Tv.on())
+        .borderRadius(Radius.md).width('100%').height(Bp.isShort() ? Cell.of(40) : Cell.tap(40)).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L366'; })
         .onBlur(() => { if (this.tvFocus === 'L366') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L366')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

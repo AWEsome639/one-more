@@ -327,7 +327,7 @@ export struct GCategoryFluency {
           .onSubmit(() => { this.submit(); })
         Button(TG('提交'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.lime)
-          .borderRadius(Radius.md).width(84).height(Cell.of(40))
+          .borderRadius(Radius.md).width(84).height(Bp.isShort() ? Cell.of(40) : Cell.tap(40))
           .enabled(!this.over).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L323'; })
           .onBlur(() => { if (this.tvFocus === 'L323') { this.tvFocus = ''; } })
@@ -341,7 +341,7 @@ export struct GCategoryFluency {
       Row({ space: Space.sm }) {
         Button(TG('换下一类'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink).backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).enabled(!this.over)
+          .borderRadius(Radius.md).layoutWeight(1).height(Bp.isShort() ? Cell.of(40) : Cell.tap(40)).enabled(!this.over)
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L335'; })
           .onBlur(() => { if (this.tvFocus === 'L335') { this.tvFocus = ''; } })
@@ -352,7 +352,7 @@ export struct GCategoryFluency {
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(40)).focusable(Tv.on())
+          .borderRadius(Radius.md).layoutWeight(1).height(Bp.isShort() ? Cell.of(40) : Cell.tap(40)).focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L340'; })
           .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L340')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

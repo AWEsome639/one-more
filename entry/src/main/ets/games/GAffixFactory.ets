@@ -320,7 +320,7 @@ export struct GAffixFactory {
       Column({ space: Space.sm }) {
         ForEach(this.opts, (o: string) => { Button((o))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF')
-        .backgroundColor(this.tone((o))).borderRadius(Radius.md).width('100%').height(Cell.of(40))
+        .backgroundColor(this.tone((o))).borderRadius(Radius.md).width('100%').height(Bp.isShort() ? Cell.of(40) : Cell.tap(40))
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
         .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -338,7 +338,7 @@ export struct GAffixFactory {
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary)
-        .borderRadius(Radius.md).width('100%').height(Cell.of(40)).focusable(Tv.on())
+        .borderRadius(Radius.md).width('100%').height(Bp.isShort() ? Cell.of(40) : Cell.tap(40)).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L334'; })
         .onBlur(() => { if (this.tvFocus === 'L334') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L334')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })

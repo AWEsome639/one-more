@@ -298,7 +298,7 @@ export struct GProbeDigitSpan {
             ForEach(COLS, (col: number) => { Button(String((row * 5 + col)))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor('#FFFFFF')
             .backgroundColor(this.typed === String((row * 5 + col)) && this.phase === 1 ? Palette.sky : Palette.primary).animation({ duration: Motion.fast, curve: Motion.snap() })
-            .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(42))
+            .borderRadius(Radius.md).layoutWeight(1).height(Bp.isShort() ? Cell.of(42) : Cell.tap(42))
             .enabled(this.phase === 1)
             .onClick(() => { Haptics.tap(); this.answer((row * 5 + col)); })
             .focusable(Tv.on())
@@ -313,7 +313,7 @@ export struct GProbeDigitSpan {
       Button(TG('重开'))
       // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Cell.of(40)).onClick(() => { Haptics.tap(); this.reset(); })
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(Palette.primary).borderRadius(Radius.md).width('100%').height(Bp.isShort() ? Cell.of(40) : Cell.tap(40)).onClick(() => { Haptics.tap(); this.reset(); })
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L301'; })
       .onBlur(() => { if (this.tvFocus === 'L301') { this.tvFocus = ''; } })
