@@ -225,6 +225,11 @@ def _body(name, t0):
     # ★ 2026-11-11（判据 1920）：**每款开工前先「干净重启 + 轮询到首页」** ——
     #   放在 `_body` 最前面（不是搜索前），因为 `NOT_HOME` 的出入口就在这里。
     #   结算弹层没有任何可点关闭件时，`Back` 永远被吃；只有重启能回初始态。
+    # ★ 2026-11-11（判据 1921）：**`Back` 会把 App 退到系统、把「设置」拉到前台** ——
+    #   实测 `dump` 出来的可见文本是 `['设置','One More',…]` ⇒ 之后 `is_home()` 永远假。
+    #   ⇒ 先按 `Home`（回桌面），再重启 App。
+    sh('uitest uiInput keyEvent Home')
+    time.sleep(0.8)
     sh('aa force-stop com.andrewoscar.onemore')
     time.sleep(1.0)
     sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
@@ -256,6 +261,14 @@ def _body(name, t0):
 
     # ⚠️ 2026-11-09：**搜索词只取第一个词会搜不到**（如 "Set Theory Venn" 只打 "Set"）
     #   ⇒ 依次试「最长词 / 首词 / 全名」；每次重开搜索页（不靠清空输入框）
+    # ★ 2026-11-11（判据 1922）：**中文名搜不到 —— `uitest uiInput` 打不进中文**（IME 层）
+    #   实测：`七巧板`/`上下文线索`/`不等式` 全 `NO_CARD`，而 `Tangram`/`Context Clues` 一次就成。
+    #   ⇒ 传进来若是中文名，**先反查英文名**再用英文搜。
+    if re.search(r'[\u4e00-\u9fff]', name):
+        _reg = io.open('entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
+        _m = re.search(r"name: '%s'.*?enName: '([^']+)'" % re.escape(name), _reg)
+        if _m:
+            name = _m.group(1)
     want_zh = game_title_map().get(name, '')
     tokens = []
     # ★ 2026-11-11：**中文名优先** —— 搜英文名对一批游戏（`Go (9x9)` / `Bubble Shooter` …）`NO_CARD`；
