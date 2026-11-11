@@ -629,7 +629,7 @@ export struct GKakuro {
       //   ★ 2026-11-08 第二次校准（verifier-dev 真机量）：`-260` 时棋盘 273vp，
       //     但按钮行实际 y = 1613–1727px（屏高 1600）⇒ **超出 13~127px**。
       //     再压 43vp ⇒ `-310`（棋盘 ≈230vp），按钮应落到 ≈1478–1592px（屏内）。
-      .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 310 : 9999 })
+      .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)) : 9999 })   // ★ 2026-11-12（判据 1928）：`aspectRatio(1)` 的棋盘 **`maxHeight` 只裁不缩**，必须用 `maxWidth` 才能真缩小
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
