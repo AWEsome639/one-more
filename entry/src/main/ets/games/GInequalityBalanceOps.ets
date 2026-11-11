@@ -319,7 +319,7 @@ export struct GInequalityBalanceOps {
         Text(false ? this.exprL : this.exprR).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.teal)
         Text(this.picked < 0 ? '？' : String(false ? this.panL : this.panR)).fontSize(FontSize.xl).fontColor(this.theme.ink)
         }.layoutWeight(1)
-      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      }.width('100%').padding(Bp.isShort() ? Space.sm : Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
@@ -349,7 +349,8 @@ export struct GInequalityBalanceOps {
         .onFocus(() => { this.tvFocus = 'L326'; })
         .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L326')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
-      Text(TG('提示：先算乘、再算加；两边都算完才好放符号')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+      Text(TG('提示：先算乘、再算加；两边都算完才好放符号'))
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
