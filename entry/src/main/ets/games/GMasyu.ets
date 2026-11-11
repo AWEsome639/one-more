@@ -565,7 +565,7 @@ export struct GMasyu {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -641,7 +641,7 @@ export struct GMasyu {
           .width('100%')
         }, (r: number) => 'yr' + r)
       }
-      .width('100%')
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 380)))
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

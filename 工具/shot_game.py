@@ -408,9 +408,31 @@ def _body(name, t0):
 
     mb = 0
     lo = ''
+    # ★ 2026-11-11（判据 1925，`verifier-eng2` 查出）：**旧尺子只量「有文字的节点」** ——
+    #   格子本身没字的游戏（棋盘格 / 色块 / Canvas）永远量偏小。
+    #   实测 `Masyu` 首帧 732（圈还没渲染）vs 正常 1586（圈渲染后），**同一布局差 854px**。
+    #   ⇒ 改成「整棵 dump 树的最大 y2」（`lowest` 仍取最深**文字**，只作人读参考）
+    def _max_y2(n, acc):
+        # ⚠️ 2026-11-11：**只数「叶子节点」** —— 整树最大 y2 会被根容器（height 100%）钉死在屏幕底，
+        #   那也是 1600，但那是背景不是内容。叶子才是真正画出来的东西。
+        if isinstance(n, dict):
+            kids = n.get('children') or []
+            if not kids:
+                a = n.get('attributes', {}) or {}
+                b = (a.get('bounds') or '').strip()
+                if b:
+                    nums = [int(x) for x in re.findall(r'-?\d+', b)]
+                    if len(nums) == 4 and nums[3] > acc:
+                        acc = nums[3]
+            for c in kids:
+                acc = _max_y2(c, acc)
+        return acc
+    mb = _max_y2(d2, 0)
+    # lowest 取「文字节点里 y2 最大」的那个（人读参考）
+    best = -1
     for t, (_, _, _, y2) in texts(d2):
-        if y2 > mb:
-            mb = y2
+        if y2 > best:
+            best = y2
             lo = t[:26]
 
     safe = re.sub(r'[^A-Za-z0-9_]', '_', name)
