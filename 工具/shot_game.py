@@ -266,8 +266,19 @@ def _body(name, t0):
             sh('uitest uiInput keyEvent Back')
             time.sleep(1.0)
         if not is_home():
+            # ★ 2026-11-11（判据 1912）：**`NOT_HOME` 占全部失败的 2/3** ——
+            #   38/58 是「回不到首页」。根因：**弹层/结算页把 Back 吃掉**，且重启 App 后 6s 不够。
+            #   ⇒ 改成「强杀 + 重启 + 轮询 until home」（最多 4 轮 × 4s）
+            sh('aa force-stop com.andrewoscar.onemore')
+            time.sleep(1.0)
             sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
-            time.sleep(6.0)
+            for _w in range(4):
+                time.sleep(4.0)
+                if is_home():
+                    break
+                sh('aa force-stop com.andrewoscar.onemore')
+                time.sleep(1.0)
+                sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
         # ★ 2026-11-11（真机抓到的 bug）：**首页「搜索框里还留着上一次的词」也算 home**
         #   ⇒ 新词会拼到旧词后面 ⇒ 搜不到任何卡片（今晚 27 款回归全 no_card 就是这个）
         #   ⇒ 搜之前先点 `✕` 清空（`✕` 只在搜索框有内容时出现）
