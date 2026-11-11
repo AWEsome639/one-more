@@ -17,7 +17,7 @@ def walk(n, path=''):
         if not kids and b:
             nums = [int(x) for x in re.findall(r'-?\d+', b)]
             if len(nums) == 4:
-                leaves.append((nums[3], nums[1], a.get('text', '')[:20], a.get('type', '')))
+                leaves.append((nums[3], nums[1], nums[0], nums[2], a.get('text', '')[:16], a.get('type', '')))
         for c in kids: walk(c, path)
     return
 d = dump()
@@ -26,5 +26,5 @@ if not d:
 walk(d)
 leaves.sort(reverse=True)
 print('最深 6 个叶子:')
-for y2, y1, t, ty in leaves[:6]:
-    print('  y2=%4d  y1=%4d  type=%-10s text=%r' % (y2, y1, ty, t))
+for y2, y1, x1, x2, t, ty in leaves[:6]:
+    print('  y2=%4d y1=%4d  x=[%4d..%4d] w=%4d h=%4d  %-9s %r' % (y2, y1, x1, x2, x2-x1, y2-y1, ty, t))
