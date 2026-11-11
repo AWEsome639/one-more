@@ -66,11 +66,33 @@ def run(argv, timeout):
         raise Timeout('timeout %ss: %s' % (timeout, argv[-1:][0][:60] if argv else ''))
 
 
+# ★ 2026-11-12（判据 1934，**今晚 `153` 次 `NOT_HOME` 的真凶**）：
+#   **模拟器的端口会变** —— `adb` 占着 `5555` 时它退到 `5557`；`adb` 退出后又回到 `5555`。
+#   而本工具写死了 `127.0.0.1:5557` ⇒ **端口一变，全部命令打到空气里**，报出来却是 `NOT_HOME`（指向被测对象）。
+#   ⇒ 每次执行命令前，把它里面的 `127.0.0.1:5557` 换成「`hdc list targets` 真正给出的那个」。
+TARGET_PORT_FIX = True
+
+
+def _target():
+    env = os.environ.get('ONEMORE_TARGET', '').strip()
+    if env:
+        return env
+    try:
+        out = subprocess.run('hdc list targets', shell=True, capture_output=True, text=True, timeout=20).stdout
+    except Exception:
+        out = ''
+    for line in (out or '').splitlines():
+        line = line.strip()
+        if re.match(r'^\d+\.\d+\.\d+\.\d+:\d+$', line):
+            return line
+    return '127.0.0.1:5557'
+
+
 def sh(cmd, timeout=30):
     """跑一条设备 shell 命令，返回 `(ok, out)`；**失败不吞成空串**（ok=False 让上层能判断）。"""
     t = min(float(timeout), max(2.0, budget_left()))
     try:
-        rc, out, _err = run([HC, '-t', DEV, 'shell', cmd], t)
+        rc, out, _err = run([HC, '-t', _target(), 'shell', cmd], t)
         return (rc == 0), (out or '')
     except Timeout:
         return False, ''
@@ -443,7 +465,7 @@ def _body(name, t0):
 
     recv_ok = False
     try:
-        rc, _o, _e = run([HC, '-t', DEV, 'file', 'recv', remote, out], 60)
+        rc, _o, _e = run([HC, '-t', _target(), 'file', 'recv', remote, out], 60)
         recv_ok = (rc == 0 and os.path.exists(out))
     except Timeout:
         recv_ok = False
