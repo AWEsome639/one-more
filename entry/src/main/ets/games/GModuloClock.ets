@@ -448,7 +448,7 @@ export struct GModuloClock {
           Row({ space: Space.sm }) {
             Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
             Text(TG2("{0} 点", String(this.opts[i]))).fontSize(FontSize.xl).minFontSize(13).maxFontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-          }.width('100%').height(Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+          }.width('100%').height(Cell.of(Bp.isShort() ? 34 : 50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
             Haptics.tick();
             this.pick(i);
           })
@@ -467,7 +467,7 @@ export struct GModuloClock {
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White).backgroundColor(Palette.emerald).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => {
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White).backgroundColor(Palette.emerald).borderRadius(Radius.md).width('100%').height(Cell.of(Bp.isShort() ? 34 : 46)).onClick(() => {
           Haptics.tap();
           this.reset();
         })

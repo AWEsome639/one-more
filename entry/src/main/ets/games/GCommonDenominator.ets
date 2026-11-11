@@ -422,7 +422,7 @@ export struct GCommonDenominator {
               .layoutWeight(1)
           }
           .width('100%')
-          .height(Cell.of(50))
+          .height(Cell.of(Bp.isShort() ? 34 : 50))
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
@@ -470,7 +470,7 @@ export struct GCommonDenominator {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.violet).animation({ duration: Motion.fast, curve: Motion.snap() })
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(46))
+        .height(Cell.of(Bp.isShort() ? 34 : 46))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L459'; })
         .onBlur(() => { if (this.tvFocus === 'L459') { this.tvFocus = ''; } })

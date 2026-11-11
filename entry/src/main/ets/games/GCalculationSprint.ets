@@ -531,7 +531,7 @@ export struct GCalculationSprint {
               .layoutWeight(1)
           }
           .width('100%')
-          .height(Cell.of(52))
+          .height(Cell.of(Bp.isShort() ? 34 : 52))
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
@@ -569,7 +569,7 @@ export struct GCalculationSprint {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(46))
+        .height(Cell.of(Bp.isShort() ? 34 : 46))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L520'; })
         .onBlur(() => { if (this.tvFocus === 'L520') { this.tvFocus = ''; } })

@@ -641,7 +641,7 @@ export struct GKakuro {
       Row({ space: Space.sm }) {
         Button(TG('提示'))
           .layoutWeight(1)
-          .height(Cell.of(38))
+          .height(Cell.of(Bp.isShort() ? 34 : 38))
           // ★★★ 2026-10-31：这个「提示」按钮原来**没有 backgroundColor** ⇒
           //   用 ArkUI 平台默认色，与全项目 HintBar 的 Palette.cyan 不一致。
           .backgroundColor(Palette.cyan)
@@ -657,7 +657,7 @@ export struct GKakuro {
         Button(LanRace.isRacing() ? TG('联机禁用')
           : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
           .layoutWeight(1)
-          .height(Cell.of(38))
+          .height(Cell.of(Bp.isShort() ? 34 : 38))
                     // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
           //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
           .enabled(!LanRace.isRacing())
@@ -680,7 +680,7 @@ export struct GKakuro {
           .fontColor('#FFFFFF')
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(40))
+          .height(Cell.of(Bp.isShort() ? 34 : 40))
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -705,7 +705,7 @@ export struct GKakuro {
           .fontColor(this.theme.ink)
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .height(Cell.of(40))
+          .height(Cell.of(Bp.isShort() ? 34 : 40))
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.sm)
           .shadow(Shadow.card)
@@ -771,7 +771,7 @@ export struct GKakuro {
       .fontColor(Palette.rose)
       .textAlign(TextAlign.Center)
       .layoutWeight(1)
-      .height(Cell.of(40))
+      .height(Cell.of(Bp.isShort() ? 34 : 40))
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.sm)
       .focusable(Tv.on())

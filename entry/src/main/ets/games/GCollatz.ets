@@ -8,6 +8,7 @@
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -425,7 +426,7 @@ export struct GCollatz {
               .layoutWeight(1)
           }
           .width('100%')
-          .height(Cell.of(52))
+          .height(Cell.of(Bp.isShort() ? 34 : 52))
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
@@ -467,7 +468,7 @@ export struct GCollatz {
         //   配上 height(44) 直接被压成 0 ⇒ 按钮渲染不出来（真机实测：dump 里根本没有它）。
         //   ⇒ 改成 width('100%') + height，与「换个数」保持一致。
         .width('100%')
-        .height(Cell.of(46))
+        .height(Cell.of(Bp.isShort() ? 34 : 46))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L459'; })
         .onBlur(() => { if (this.tvFocus === 'L459') { this.tvFocus = ''; } })
@@ -483,7 +484,7 @@ export struct GCollatz {
         .backgroundColor(this.over && !this.won ? Palette.rose : Palette.teal).animation({ duration: Motion.fast, curve: Motion.snap() })
         .borderRadius(Radius.md)
         .width('100%')
-        .height(Cell.of(46))
+        .height(Cell.of(Bp.isShort() ? 34 : 46))
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L473'; })
         .onBlur(() => { if (this.tvFocus === 'L473') { this.tvFocus = ''; } })
