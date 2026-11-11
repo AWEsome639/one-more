@@ -252,6 +252,16 @@ def _body(name, t0):
         if t.lower() not in ('all', 'the') and t not in tokens:
             tokens.append(t)
     tokens = tokens[:4] + [_base, name]
+    # ★ 2026-11-11（判据 1916）：**每款开工前先「强杀 + 重启 + 轮询到首页」** ——
+    #   部分游戏的结算弹层没有任何可点关闭件，Back 永远被吃 ⇒ NOT_HOME 占到失败的 3/4。
+    #   实测「干净重启」是唯一稳的回初始态方式（每款多 ~8s，换来接近 100% 的覆盖率）。
+    sh('aa force-stop com.andrewoscar.onemore')
+    time.sleep(1.0)
+    sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
+    for _w in range(5):
+        time.sleep(3.0)
+        if is_home():
+            break
     d = None
     for tok in tokens:
         if not _need_budget(name, t0, 'search:%s' % tok):

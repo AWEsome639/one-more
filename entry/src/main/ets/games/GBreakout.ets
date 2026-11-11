@@ -606,7 +606,7 @@ export struct GBreakout {
         //   场地是「宽度驱动」的正方形（width 100% + aspectRatio(1)），
         //   在 1280vp 宽的平板上 ⇒ **正方形高 1280vp，而屏幕只有 533vp 高**
         //   ⇒ 场地溢出屏幕两倍多，「暂停/重开」按钮**浮在砖块上面**（截图证据）。
-        //   ⇒ 限高：宽度仍 100%，但高度不超过父容器的 58%，
+        //   ⇒ 限高：宽度仍 100%，但高度 = min(屏宽−40, 屏高−360)（定值，判据 1906；原注释写 58% 与代码 70% 早已不一致），
         //     aspectRatio 会据此反推宽度 ⇒ 大屏上是一个居中的正方形场地。
         .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
         .backgroundColor(this.theme.surface)
