@@ -263,6 +263,17 @@ def _body(name, t0):
                 return
             if is_home():
                 break
+            # ★ 2026-11-11（判据 1913）：**结算弹层会吃掉 Back** ——
+            #   先找弹层上的「关闭/返回/知道了/✕/再来一局」，有就点它，再按 Back。
+            _dd = dump()
+            _closed = False
+            for _t in ('关闭', '知道了', '返回', '再来一局', '✕', '×'):
+                _h = _find_text_node(_dd, _t) if _dd else None
+                if _h:
+                    sh('uitest uiInput click %d %d' % (_h[0], _h[1]))
+                    time.sleep(1.0)
+                    _closed = True
+                    break
             sh('uitest uiInput keyEvent Back')
             time.sleep(1.0)
         if not is_home():
