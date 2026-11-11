@@ -1,0 +1,45 @@
+Maze Nav 3D	OK	1500	57.4s lowest='←' -> /Users/a0000/dev/One More/_巡检记录/截图-Maze_Nav_3D-172029.jpeg @2026-11-11T17:20:30
+Ab Reversal Oddball	OK	1557	144.7s lowest='提示：这一局会刷出多少反转是随机的；连续两次同一个时' -> /Users/a0000/dev/One More/_巡检记录/截图-Ab_Reversal_Oddball-172254.jpeg @2026-11-11T17:22:55
+Tangram	OK	1325	102.1s lowest='重开（换一题）' -> /Users/a0000/dev/One More/_巡检记录/截图-Tangram-172436.jpeg @2026-11-11T17:24:37
+Context Clues	OK	1577	130.1s lowest='选一个释义' -> /Users/a0000/dev/One More/_巡检记录/截图-Context_Clues-172646.jpeg @2026-11-11T17:26:47
+Futoshiki	OK	1588	108.1s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Futoshiki-172835.jpeg @2026-11-11T17:28:35
+Binary Puzzle	OK	1571	88.6s lowest='点格子循环切换：空 → 0 → 1' -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Puzzle-173004.jpeg @2026-11-11T17:30:04
+Binomial Match	OK	1576	84.6s lowest='换一组' -> /Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-173128.jpeg @2026-11-11T17:31:29
+Tower of London	OK	1451	95.7s lowest='每次搬一个球 · 大球不能压小球 · 摆成目标' -> /Users/a0000/dev/One More/_巡检记录/截图-Tower_of_London-173304.jpeg @2026-11-11T17:33:05
+Pangram Sprint	OK	1343	89.9s lowest='这句话里少了哪几个字母？' -> /Users/a0000/dev/One More/_巡检记录/截图-Pangram_Sprint-173434.jpeg @2026-11-11T17:34:35
+Relational Memory	OK	1600	106.1s lowest='判定：6 题答对 ≥ 5 通关；看 5 秒后开始答题' -> /Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-173621.jpeg @2026-11-11T17:36:21
+Task Switching	OK	1499	87.1s lowest='提示：切换试次比重复试次慢多少，就是这一局的「切换代' -> /Users/a0000/dev/One More/_巡检记录/截图-Task_Switching-173748.jpeg @2026-11-11T17:37:48
+Tenner Grid	OK	1563	171.2s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Tenner_Grid-174039.jpeg @2026-11-11T17:40:39
+Klotski	OK	1492	98.7s lowest='←' -> /Users/a0000/dev/One More/_巡检记录/截图-Klotski-174218.jpeg @2026-11-11T17:42:18
+Word Snake Trail	OK	1460	124.8s lowest='提示：吃错字母、撞墙、咬自己都扣一条命' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Snake_Trail-174423.jpeg @2026-11-11T17:44:23
+Word Wheel	OK	1503	213.7s lowest='提示：词都是 3~6 个字母的常见英文词，先凑短的再' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Wheel-174753.jpeg @2026-11-11T17:47:57
+单词重排	NOT_HOME	-	55.3s could not reach home
+反向斯特鲁普	NOT_HOME	-	48.8s could not reach home
+Block Stacking Physics	OK	1580	97.8s lowest='换一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Stacking_Physics-175119.jpeg @2026-11-11T17:51:19
+Sentence Unscramble	OK	1297	93.6s lowest='5 句，答对 ≥4 通关' -> /Users/a0000/dev/One More/_巡检记录/截图-Sentence_Unscramble-175253.jpeg @2026-11-11T17:52:53
+Vektor Vector	OK	1573	123.6s lowest='提示：a − b 是逐分量相减，符号别弄反' -> /Users/a0000/dev/One More/_巡检记录/截图-Vektor_Vector-175457.jpeg @2026-11-11T17:54:57
+Peripheral Focus	OK	1548	130.8s lowest='刚才余光里的符号是哪个？（950 ms）' -> /Users/a0000/dev/One More/_巡检记录/截图-Peripheral_Focus-175707.jpeg @2026-11-11T17:57:08
+
+图案锁	NOT_HOME	-	93.1s could not reach home
+塔帕	NOT_HOME	-	41.4s could not reach home
+复合连线	NOT_HOME	-	38.9s could not reach home
+多轨计数	NOT_HOME	-	38.9s could not reach home
+字母划消	NOT_HOME	-	39.6s could not reach home
+字母换位	NOT_HOME	-	39.7s could not reach home
+字母桥	NOT_HOME	-	39.2s could not reach home
+字谜定义	NOT_HOME	-	39.4s could not reach home
+密文破译	NOT_HOME	-	41.1s could not reach home
+对称	NOT_HOME	-	41.3s could not reach home
+帐篷与树	NOT_HOME	-	39.2s could not reach home
+心理地图	NOT_HOME	-	39.5s could not reach home
+房间检查	NOT_HOME	-	40.2s could not reach home
+打砖块	NOT_HOME	-	38.7s could not reach home
+找角度	NOT_HOME	-	38.5s could not reach home
+找词	NOT_HOME	-	38.5s could not reach home
+押韵大师	NOT_HOME	-	38.5s could not reach home
+拓扑	NOT_HOME	-	38.6s could not reach home
+拥挤视力	NOT_HOME	-	38.7s could not reach home
+数回	NOT_HOME	-	38.5s could not reach home
+数字探针	NOT_HOME	-	38.5s could not reach home
+数羊	NOT_HOME	-	38.5s could not reach home
+数蛇	NOT_HOME	-	38.5s could not reach home
