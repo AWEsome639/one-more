@@ -19,7 +19,7 @@ import io, os, re, signal, subprocess, sys, time, json, traceback
 HC = '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
 DEV = '127.0.0.1:5557'
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BUDGET_S = 150.0          # ③ 单款硬预算
+BUDGET_S = 260.0          # ③ 单款硬预算（2026-11-11：机器负载高时单次 dump 可达 20s，150 会把正常款判成 TIMEOUT）
 DEADLINE = 0.0            # main() 里初始化
 
 
@@ -234,7 +234,12 @@ def _body(name, t0):
         sh('aa force-stop com.andrewoscar.onemore')
         time.sleep(1.0)
         sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
-        time.sleep(6.0)
+        # ★ 2026-11-11（判据 1912 的真落地）：**固定 sleep(6) 不够**（冷启动常常 >6s）
+        #   改成轮询：4 轮 × 3s，每轮都试 `is_home()`
+        for _w in range(4):
+            time.sleep(3.0)
+            if is_home():
+                break
     if not is_home():
         finish(name, 'NOT_HOME', t0, None, 'could not reach home')
         return
@@ -255,13 +260,6 @@ def _body(name, t0):
     # ★ 2026-11-11（判据 1916）：**每款开工前先「强杀 + 重启 + 轮询到首页」** ——
     #   部分游戏的结算弹层没有任何可点关闭件，Back 永远被吃 ⇒ NOT_HOME 占到失败的 3/4。
     #   实测「干净重启」是唯一稳的回初始态方式（每款多 ~8s，换来接近 100% 的覆盖率）。
-    sh('aa force-stop com.andrewoscar.onemore')
-    time.sleep(1.0)
-    sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
-    for _w in range(5):
-        time.sleep(3.0)
-        if is_home():
-            break
     d = None
     for tok in tokens:
         if not _need_budget(name, t0, 'search:%s' % tok):
