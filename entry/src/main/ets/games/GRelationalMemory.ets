@@ -295,10 +295,10 @@ export struct GRelationalMemory {
         Column({ space: Space.xs }) {
           ForEach([0, 1, 2, 3, 4, 5], (i: number) => {
             Row({ space: Space.sm }) {
-            Text(this.sideA[(i)]).fontSize(FontSize.lg).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(42))
+            Text(this.sideA[(i)]).fontSize(FontSize.lg).textAlign(TextAlign.Center).layoutWeight(1).height(Bp.isShort() ? Cell.of(34) : Cell.of(42))
             .backgroundColor(this.theme.surface).borderRadius(Radius.sm)
             Text('↔').accessibilityText(TG('对应')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).width(18).height(18).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-            Text(this.sideB[(i)]).fontSize(FontSize.lg).textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(42))
+            Text(this.sideB[(i)]).fontSize(FontSize.lg).textAlign(TextAlign.Center).layoutWeight(1).height(Bp.isShort() ? Cell.of(34) : Cell.of(42))
             .backgroundColor(this.theme.surface).borderRadius(Radius.sm)
             }.width('100%')
           }, (i: number) => 'p' + i)
