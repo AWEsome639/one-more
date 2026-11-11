@@ -17,7 +17,7 @@ import re
 import io, os, re, signal, subprocess, sys, time, json, traceback
 
 HC = '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
-DEV = '127.0.0.1:5557'
+DEV = '127.0.0.1:5557'   # ⚠️ 已被 _target() 取代（保留仅为兼容老引用；实际调用都走 _target()）
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUDGET_S = 260.0          # ③ 单款硬预算（2026-11-11：机器负载高时单次 dump 可达 20s，150 会把正常款判成 TIMEOUT）
 DEADLINE = 0.0            # main() 里初始化
@@ -78,7 +78,9 @@ def _target():
     if env:
         return env
     try:
-        out = subprocess.run('hdc list targets', shell=True, capture_output=True, text=True, timeout=20).stdout
+        # ★ 2026-11-12：**必须用绝对路径 `HC`** —— 裸 `hdc` 在 subprocess 里常常不在 PATH，
+        #   失败后回落到硬编码 5557，反而把「端口变了」伪装成「设备不在」。
+        out = subprocess.run('%s list targets' % HC, shell=True, capture_output=True, text=True, timeout=20).stdout
     except Exception:
         out = ''
     for line in (out or '').splitlines():
