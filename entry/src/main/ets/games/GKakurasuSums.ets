@@ -23,7 +23,9 @@ import { Tv } from '../core/Tv';
 
 const N: number = 5;
 const MAX_MOVES: number = 150;
-const LBL_W: number = 40;
+// ★ 2026-11-12（判据 1939）：棋盘格边长按屏高分档 —— 需腾 84px、6 行 ⇒ 12px/行 ⇒ 40 → 28（矮屏）
+const LBL_W_FULL: number = 40;
+const LBL_W_SHORT: number = 28;
 
 @Component
 export struct GKakurasuSums {
@@ -523,7 +525,7 @@ export struct GKakurasuSums {
         Row({ space: 2 }) {
           Row() {
           }
-          .width(LBL_W)
+          .width(Bp.isShort() ? LBL_W_SHORT : LBL_W_FULL)
           ForEach([0, 1, 2, 3, 4], (c: number) => {
             Column({ space: 2 }) {
             Text(String((false) ? this.rowLab[(c)] : this.colLab[(c)]))
@@ -535,8 +537,8 @@ export struct GKakurasuSums {
             .fontSize(FontSize.xxs)
             .fontColor(this.theme.inkFaint)
             }
-            .width(LBL_W)
-            .height(LBL_W)
+            .width(Bp.isShort() ? LBL_W_SHORT : LBL_W_FULL)
+            .height(Bp.isShort() ? LBL_W_SHORT : LBL_W_FULL)
             .justifyContent(FlexAlign.Center)
           }, (c: number) => 'ksh' + c)
         }
@@ -554,8 +556,8 @@ export struct GKakurasuSums {
             .fontSize(FontSize.xxs)
             .fontColor(this.theme.inkFaint)
             }
-            .width(LBL_W)
-            .height(LBL_W)
+            .width(Bp.isShort() ? LBL_W_SHORT : LBL_W_FULL)
+            .height(Bp.isShort() ? LBL_W_SHORT : LBL_W_FULL)
             .justifyContent(FlexAlign.Center)
             ForEach([0, 1, 2, 3, 4], (c: number) => {
               Stack() {
