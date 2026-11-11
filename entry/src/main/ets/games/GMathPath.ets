@@ -582,7 +582,7 @@ export struct GMathPath {
   private aiNodes: number = 0;
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -660,6 +660,7 @@ export struct GMathPath {
       .borderRadius(Radius.md)
 
       Text(this.tip)
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
