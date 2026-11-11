@@ -11,6 +11,7 @@
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -697,7 +698,7 @@ export struct GMagnets {
           }, (c: number) => 'mq' + c)
           Row().width(CLUE_W).height(CLUE_W)
         }
-        .width('100%')
+        .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
       }
       .width('100%')
       .padding(Space.sm)

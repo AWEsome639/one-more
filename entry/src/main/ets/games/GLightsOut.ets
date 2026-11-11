@@ -8,6 +8,7 @@
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 // ★★★ 2026-10-23 第二期：通用提示层
@@ -479,7 +480,7 @@ export struct GLightsOut {
           .width('100%')
         }, (r: number) => 'or' + r)
       }
-      .width('100%')
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)

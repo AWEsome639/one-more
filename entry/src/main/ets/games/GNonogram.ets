@@ -604,7 +604,7 @@ export struct GNonogram {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('100%')
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)

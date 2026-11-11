@@ -348,7 +348,7 @@ export struct GCorsiBackwardSpan {
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
-      }.width('100%').padding(Space.sm).layoutWeight(1)
+      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360))).padding(Space.sm).layoutWeight(1)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg)
 
       Text(this.msg).fontSize(FontSize.sm)
