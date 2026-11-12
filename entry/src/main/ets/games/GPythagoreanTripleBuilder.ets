@@ -341,7 +341,11 @@ export struct GPythagoreanTripleBuilder {
           .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.berry)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      // ★ 2026-11-12（判据 1950）：键盘 `7/8/9` 那行**只露出上半截**（点不到）⇒
+      //   键帽 `Cell.tap(44)` 有触控下限不能缩（判据 1899）⇒ 砍纯说明行（~50px）。
+      Text(this.tip).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).maxLines(2)
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
       Column({ space: Space.xs }) {
         Row({ space: Space.xs }) {
         Button((('1')))
