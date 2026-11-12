@@ -488,7 +488,8 @@ export struct GWordle {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width(Bp.isShort() ? 220 : 614)
+            // 2026-11-13 第二档：键盘在 1518..1600 只露上半截 ⇒ 棋盘再收 40px（220 → 185）
+      .width(Bp.isShort() ? 150 : 614)
 
       Column({ space: Space.xs }) {
         ForEach(KEY_CHARS, (row: string[], ri: number) => {
