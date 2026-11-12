@@ -9,6 +9,7 @@
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
+import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2, TG4 } from '../core/GameI18n';
@@ -624,7 +625,9 @@ export struct GMathMaze {
           .width('100%')
         }, (r: number) => 'xr' + r)
       }
-      .width('100%')
+      // ★ 2026-11-12（判据 1928/1939）：棋盘 `width('100%')` + 格子 `aspectRatio(1)` ⇒ 按宽度撑到 790px，
+      //   越界 84px。按「限宽即限高」封顶：4×4 格 + 说明行 + 按钮行 ⇒ `Bp.height - 330`。
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 330)))
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
