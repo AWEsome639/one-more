@@ -50,7 +50,10 @@ def blocks(t):
             if len(nums) == 4:
                 h = nums[3] - nums[1]
                 ty = a.get('type') or ''
-                if h < 1590:            # 排除整屏根容器
+                # ★ 2026-11-12 修正：整屏容器（`root`/`WindowScene`/`Stack`/`Flex`/`EffectComponent`）
+                #   会占满高度而毫无信息量 ⇒ 排除；同时只保留**页头以下**（`y1 >= 340`）的真实内容块。
+                ROOTISH = ('root', 'WindowScene', 'EffectComponent', 'Flex')
+                if h < 1400 and nums[1] >= 340 and ty not in ROOTISH:
                     rows.append((h, nums[1], nums[3], ty, (a.get('text') or '')[:14]))
         for c in (n.get('children') or []):
             walk(c)
@@ -72,8 +75,15 @@ def main():
     fh = io.open(OUT, 'a', encoding='utf-8')
     for g in names:
         # 先让 shot_game 把游戏打开（它自己会处理搜索/精确定位）
-        subprocess.run(['python3', os.path.join(ROOT, '工具', 'shot_game.py'), g],
-                       capture_output=True, text=True, timeout=320, cwd=ROOT)
+        r = subprocess.run(['python3', os.path.join(ROOT, '工具', 'shot_game.py'), g],
+                           capture_output=True, text=True, timeout=320, cwd=ROOT)
+        last = (r.stdout or '').strip().split('\n')[-1]
+        # ★ 2026-11-12：**打开失败就别 dump** —— 否则量到的是首页卡片（`Tapa` 那次就是这样）
+        if '\tOK\t' not in last and '\tOK_NOSHOT\t' not in last:
+            print('\n=== %s === 跳过（打开失败）: %s' % (g, last[:70]), flush=True)
+            fh.write('%s\tSKIP\t-\t-\t%s\t%s\n' % (g, 'open-failed', last.split('\t')[1] if '\t' in last else '?'))
+            continue
+        print('\n=== %s === %s' % (g, last.split('\t')[2]), flush=True)
         rows = blocks(t)
         print('\n=== %s ===' % g, flush=True)
         for h, y1, y2, ty, tx in rows:
