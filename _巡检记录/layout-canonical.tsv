@@ -25,3 +25,14 @@
 2026-11-12T10:40:57	Visual Search All	NOT_HOME	-	58.1s could not reach home
 2026-11-12T10:41:56	Cryptogram All	NOT_HOME	-	58.0s could not reach home
 2026-11-12T10:42:52	Word Ladder	NOT_HOME	-	56.7s could not reach home
+2026-11-12T10:48:29	__nope__	NO_CARD	-	68.9s no card for '__nope__' (fallback=(1280, 1022))
+2026-11-12T11:02:57	Number Bonds	NOT_HOME	-	172.1s could not reach home
+2026-11-12T11:05:45	Math Maze	OK	1584	162.8s lowest='9' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Maze-110544.jpeg @2026-11-12T11:05:45
+2026-11-12T11:08:30	Tapa	OK	1583	161.5s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Tapa-110830.jpeg @2026-11-12T11:08:30
+2026-11-12T11:14:04	Number Bonds	OK	1584	134.8s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds-111404.jpeg @2026-11-12T11:14:04
+2026-11-12T11:16:01	Tapa	NOT_HOME	-	115.7s could not reach home
+2026-11-12T11:18:16	Context Clues	OK	1577	129.8s lowest='选一个释义' -> /Users/a0000/dev/One More/_巡检记录/截图-Context_Clues-111816.jpeg @2026-11-12T11:18:16
+2026-11-12T11:25:39	Context Clues	OK	1577	119.4s lowest='选一个释义' -> /Users/a0000/dev/One More/_巡检记录/截图-Context_Clues-112539.jpeg @2026-11-12T11:25:39
+2026-11-12T11:56:06	Context Clues	NOT_HOME	-	218.7s could not reach home
+2026-11-12T11:58:49	Context Clues	NOT_HOME	-	53.1s could not reach home
+2026-11-12T12:10:11	Context Clues	NOT_HOME	-	50.5s could not reach home
