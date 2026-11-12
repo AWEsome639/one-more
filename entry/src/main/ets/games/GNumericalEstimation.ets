@@ -454,7 +454,9 @@ export struct GNumericalEstimation {
           Row({ space: Space.sm }) {
             Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
             Text(fmt(this.opts[i])).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
-          }.width('100%').height(Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+          // ★ 2026-11-12（判据 1957/1958）：截图显示第 4 个选项完全在屏外（只有 3 个可选）
+          //   `50 × 0.85 = 42.5vp = 127px` × 4 行 ⇒ 矮屏压到 `32`（每行省 ~46px，4 行省 184px）
+          }.width('100%').height(Bp.isShort() ? Cell.of(32) : Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
             Haptics.tick();
             this.pick(i);
           })
