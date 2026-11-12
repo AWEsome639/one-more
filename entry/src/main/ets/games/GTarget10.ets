@@ -347,7 +347,10 @@ export struct GTarget10 {
         }, (r: number) => 'r' + r)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card)
+      // 2026-11-13（判据 1950）：probe 实测棋盘结束在 1494（安全），真凶是这行提示 1542..1591
+      //   ⇒ 矮屏只在「有反馈」（`msg` 被结算/报错改写）时显示，不让静态说明占位
       Text(this.msg).fontSize(FontSize.sm)
+        .visibility(Bp.isShort() && this.msg === TG('点两块相加等于 10 的牌') ? Visibility.None : Visibility.Visible)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() })
