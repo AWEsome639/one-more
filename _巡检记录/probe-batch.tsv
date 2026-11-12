@@ -79,3 +79,11 @@ Base Shift	DEEP	492	1108	1600	Column
 Base Shift	DEEP	132	1468	1600	Row	
 Base Shift	DEEP	70	1508	1578	Text	183
 Base Shift	DEEP	49	1519	1568	Text	C
+Wordle	TALL	1030	381	1411	Column	
+Wordle	TALL	970	381	1351	Column	
+Wordle	TALL	790	810	1600	Column	
+Wordle	TALL	337	810	1147	Row	
+Wordle	DEEP	790	810	1600	Column	
+Wordle	DEEP	80	1520	1600	Row	
+Wordle	DEEP	80	1520	1600	Stack	
+Wordle	DEEP	80	1520	1600	Stack	
