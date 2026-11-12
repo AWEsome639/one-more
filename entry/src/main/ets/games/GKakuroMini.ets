@@ -554,7 +554,9 @@ export struct GKakuroMini {
       //   而安全区是 1516px ⇒ **还差 ~20px**（仍压在手势区边缘）。
       //   对照 `GShikaku`（同批同一修法）：它格底 1385px、收进来 215px ⇒ **已安全**。
       //   ⇒ 再收 20px。
-            .constraintSize({ maxHeight: Bp.height < 600 ? Bp.height - 280 : 9999 })
+            // ★ 2026-11-12（判据 1928+1939）：`aspectRatio(1)` 板子 **`maxHeight` 只裁不缩** ⇒ 改 `maxWidth`；
+            //   按 3×3 反推：可用高 ~343vp − 键盘两行(~90) − 提示(17) ≈ 236vp ⇒ 留余量取 `Bp.height - 320`。
+            .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 320)) : 9999 })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
@@ -563,6 +565,9 @@ export struct GKakuroMini {
         (this.hint.length > 0 ? '⚠️ ' + this.hint :
           (this.sel < 0 ? TG('点一个格子开始填数') : TG('点下面数字填入选中格；再点格子可清空'))))
         .fontSize(FontSize.sm)
+        // ★ 2026-11-12（判据 1939）：矮屏只隐藏「空闲那句长说明」（两行、占 ~40px），
+        //   **保留 `over`（胜负）与 `hint`（报错）** —— 反馈不能丢。
+        .visibility(Bp.isShort() && !this.over && this.hint.length === 0 ? Visibility.None : Visibility.Visible)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
 
       // 数字键盘

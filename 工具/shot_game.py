@@ -379,16 +379,23 @@ def _body(name, t0):
 
     # ⚠️ 判据 1861：**按名字挑卡片**，不能「点第一张」（搜索没过滤时会点到「宝石迷阵」）
     want = game_title_map().get(name, '')
+    # ★ 2026-11-12（判据 1942）：**精确名优先** —— 全库有 15 对「名字互为前缀」的游戏
+    #   （`Kakuro` ⊂ `Kakuro Mini`、`二进制` ⊂ `二进制码` …）⇒ 只做子串匹配会**打开另一个游戏**。
+    #   我因此在 `Kakuro` 上白改了十次（改 `GKaкuro`，测 `GKakuroMini`）。
     card = None
     fallback = None
+    exact = None
     for t, (x1, y1, x2, y2) in texts(d):
         if 560 < y1 < 1000 and x2 > x1 + 100:
             cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
             if fallback is None:
                 fallback = (cx, cy)
-            if (want and want in t) or (name in t):
+            tt = t.strip()
+            if exact is None and ((want and tt == want) or tt == name):
+                exact = (cx, cy)
+            if card is None and ((want and want in t) or (name in t)):
                 card = (cx, cy)
-                break
+    card = exact or card
     if card is None:
         finish(name, 'NO_CARD', t0, None,
                'no card for %r (fallback=%r)' % (want or name, fallback))
