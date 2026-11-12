@@ -389,36 +389,6 @@ def _body(name, t0):
         sh("uinput -K -t '%s'" % tok)
         time.sleep(2.4)
         d = dump('r')
-        # ★ 2026-11-13（判据 1978，队友 `82fcab75`/`cbb43f1b` 两次救我之后加的）：
-        #   **单次 dump 不可当判据** —— `max_bottom` 在 Wordle 上 20 分钟抖 ±250px，
-        #   叶子/块的身份会随浮层·键盘·提示条生灭。
-        #   ⇒ 默认采 3 次，报**中位数** + min~max 跨度。跨度 > 40px 时在输出里标 `!jitter`。
-        _samples = []
-        _mb_median = None
-        _mb_span = 0
-        _n_samples = 3
-        if '--samples1' in sys.argv:
-            _n_samples = 1
-        if d:
-            try:
-                _samples.append(_max_y2(d, 0))
-            except Exception:
-                pass
-            for _k in range(1, _n_samples):
-                time.sleep(1.5)
-                _dd = dump('s%d' % _k)
-                if _dd:
-                    try:
-                        _samples.append(_max_y2(_dd, 0))
-                    except Exception:
-                        pass
-        if len(_samples) > 1:
-            _samples.sort()
-            _mb_median = _samples[len(_samples) // 2]
-            _mb_span = _samples[-1] - _samples[0]
-        else:
-            _mb_median = _samples[0] if _samples else 0
-            _mb_span = 0
         if not d:
             continue
         hit = any(((want_zh and want_zh in (t or '')) or (name in (t or ''))) for t, _ in texts(d))
@@ -511,7 +481,7 @@ def _body(name, t0):
             for c in kids:
                 acc = _max_y2(c, acc)
         return acc
-    mb = _mb_median if _mb_median is not None else _max_y2(d2, 0)
+    mb = _max_y2(d2, 0)
     # lowest 取「文字节点里 y2 最大」的那个（人读参考）
     best = -1
     lo_bounds = ''
