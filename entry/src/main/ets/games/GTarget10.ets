@@ -343,7 +343,7 @@ export struct GTarget10 {
               .outline(Tv.focusOutline(this.tvFocus === 'L337'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * COLS + c)); }); })
             }, (c: number) => this.tileKey(r * COLS + c))
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 290)))
         }, (r: number) => 'r' + r)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card)
