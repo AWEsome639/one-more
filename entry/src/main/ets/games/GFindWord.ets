@@ -308,16 +308,16 @@ export struct GFindWord {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('已找'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text((this.found.length + ' / ' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.lime))
-        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Text((this.found.length + ' / ' + PASS)).fontSize(Bp.isShort() ? FontSize.md : FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.lime))
+        }.layoutWeight(1).padding(Bp.isShort() ? Space.xxs : Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
-        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Text(Digits(String(this.score), this.langCode)).fontSize(Bp.isShort() ? FontSize.md : FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+        }.layoutWeight(1).padding(Bp.isShort() ? Space.xxs : Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text(((this.leftMs / 1000).toFixed(1) + Sec())).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
-        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Text(((this.leftMs / 1000).toFixed(1) + Sec())).fontSize(Bp.isShort() ? FontSize.md : FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
+        }.layoutWeight(1).padding(Bp.isShort() ? Space.xxs : Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
 
       Column({ space: Space.xs }) {
@@ -329,7 +329,7 @@ export struct GFindWord {
         ForEach([0, 1, 2, 3, 4, 5], (r: number) => {
           Row({ space: Space.xs }) {
             ForEach([0, 1, 2, 3, 4, 5], (c: number) => {
-              Text(this.g.length > (r * N + c) ? this.g[(r * N + c)] : '').fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.path.indexOf((r * N + c)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).aspectRatio(1).backgroundColor(this.path.indexOf((r * N + c)) >= 0 ? Palette.lime : this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+              Text(this.g.length > (r * N + c) ? this.g[(r * N + c)] : '').fontSize(Bp.isShort() ? FontSize.md : FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.path.indexOf((r * N + c)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).aspectRatio(1).backgroundColor(this.path.indexOf((r * N + c)) >= 0 ? Palette.lime : this.theme.surface).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'L327'; })
               .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
               .outline(Tv.focusOutline(this.tvFocus === 'L327', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }).onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
