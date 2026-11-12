@@ -78,3 +78,64 @@
 2026-11-12T17:41:02	Numerical Estimation	OK	1562	104.9s lowest='25' -> /Users/a0000/dev/One More/_巡检记录/截图-Numerical_Estimation-174102.jpeg @2026-11-12T17:41:02
 2026-11-12T17:51:42	Wordle	OK	1600	102.0s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-175142.jpeg @2026-11-12T17:51:42
 2026-11-12T18:18:16	Wordle	OK	1591	100.6s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-181815.jpeg @2026-11-12T18:18:16
+2026-11-12T18:29:00	Wordle	OK	1591	101.1s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-182900.jpeg @2026-11-12T18:29:00
+2026-11-12T18:39:11	Wordle	OK	1351	99.5s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-183911.jpeg @2026-11-12T18:39:11
+2026-11-12T18:58:33	Wordle	OK	1600	99.9s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-185833.jpeg @2026-11-12T18:58:33
+2026-11-12T19:01:00	Wordle	OK	1600	102.2s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-190100.jpeg @2026-11-12T19:01:00
+2026-11-12T19:11:06	Wordle	OK	1600	99.0s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-191106.jpeg @2026-11-12T19:11:06
+2026-11-12T19:29:24	Wordle	OK	1600	99.1s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-192923.jpeg @2026-11-12T19:29:24
+2026-11-12T19:40:25	Wordle	OK	1600	99.1s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-194025.jpeg @2026-11-12T19:40:25
+2026-11-12T19:50:57	Wordle	OK	1600	100.4s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-195057.jpeg @2026-11-12T19:50:57
+2026-11-12T20:01:58	Wordle	OK	1600	100.1s lowest='5' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-200158.jpeg @2026-11-12T20:01:58
+2026-11-12T20:12:04	Wordle	OK	1600	100.5s lowest='Q' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-201204.jpeg @2026-11-12T20:12:04
+2026-11-12T20:22:43	Wordle	OK	1600	102.2s lowest='A' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-202243.jpeg @2026-11-12T20:22:43
+2026-11-12T20:32:42	Wordle	OK	1600	99.8s lowest='Z' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-203242.jpeg @2026-11-12T20:32:42
+2026-11-12T20:43:13	Wordle	OK	1600	104.0s lowest='Z' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-204313.jpeg @2026-11-12T20:43:13
+2026-11-12T20:48:45	Phonetic Guess	OK	1578	247.7s lowest='university' -> /Users/a0000/dev/One More/_巡检记录/截图-Phonetic_Guess-204844.jpeg @2026-11-12T20:48:45
+2026-11-12T21:05:57	Phonetic Guess	NOT_HOME	-	205.6s could not reach home
+2026-11-12T21:09:01	Phonetic Guess	NOT_HOME	-	96.1s could not reach home
+2026-11-12T21:24:30	Path Recall	NOT_HOME	-	143.6s could not reach home
+2026-11-12T21:26:17	Polyomino Tiling	OK	1583	103.8s lowest='▬' -> /Users/a0000/dev/One More/_巡检记录/截图-Polyomino_Tiling-212617.jpeg @2026-11-12T21:26:17
+2026-11-12T21:28:15	Frequency Tap	OK	1565	115.0s lowest='▶️' -> /Users/a0000/dev/One More/_巡检记录/截图-Frequency_Tap-212815.jpeg @2026-11-12T21:28:15
+2026-11-12T21:30:44	Object Displacement	OK	1576	107.4s lowest='提示：遮罩后只有一个物件换格，点它（点它原来的位置也' -> /Users/a0000/dev/One More/_巡检记录/截图-Object_Displacement-213044.jpeg @2026-11-12T21:30:44
+2026-11-12T21:44:16	Counting Sheep	OK	1499	134.5s lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Counting_Sheep-214415.jpeg @2026-11-12T21:44:16
+2026-11-12T21:46:16	Target 10	OK	1591	116.4s lowest='点两块相加等于 10 的牌' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_10-214615.jpeg @2026-11-12T21:46:16
+2026-11-12T21:49:48	Word Search	WRONG_GAME	-	208.7s title '找单词' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']
+2026-11-12T21:55:02	Counting Sheep	TIMEOUT	-	278.4s budget exhausted at search:Counting Sheep
+2026-11-12T21:59:28	Distractor Matrix	DUMP_FAIL	-	264.1s no search dump
+2026-11-12T22:01:11	Target 10	NOT_HOME	-	99.7s could not reach home
+2026-11-12T22:03:40	Fraction Match	NOT_HOME	-	146.8s could not reach home
+2026-11-12T22:06:27	Cross Section Slice	OK	1600	165.4s lowest='5 个' -> /Users/a0000/dev/One More/_巡检记录/截图-Cross_Section_Slice-220626.jpeg @2026-11-12T22:06:27
+2026-11-12T22:08:48	Prime Hunter	OK	1546	137.9s lowest='绿=捞到 红=点错' -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Hunter-220847.jpeg @2026-11-12T22:08:48
+2026-11-12T22:11:35	Visual Search Conjunction	NOT_HOME	-	165.1s could not reach home
+2026-11-12T22:13:31	Find Word	NOT_HOME	-	113.5s could not reach home
+2026-11-12T22:15:10	Rotating Maze	NOT_HOME	-	96.0s could not reach home
+2026-11-12T22:16:48	Word Search	NOT_HOME	-	96.0s could not reach home
+2026-11-12T22:18:27	Pixel Mimic	NOT_HOME	-	96.3s could not reach home
+2026-11-12T22:20:05	Factor Finder	NOT_HOME	-	96.1s could not reach home
+2026-11-12T22:20:24	Word Search	NOT_HOME	-	95.9s could not reach home
+2026-11-12T22:21:43	Path Recall	NOT_HOME	-	95.5s could not reach home
+2026-11-12T22:22:03	Counting Sheep	NOT_HOME	-	95.2s could not reach home
+2026-11-12T22:23:21	Object Displacement	NOT_HOME	-	96.0s could not reach home
+2026-11-12T22:23:42	Target 10	NOT_HOME	-	95.5s could not reach home
+2026-11-12T22:32:21	Counting Sheep	OK	1600	185.9s lowest='🐑' -> /Users/a0000/dev/One More/_巡检记录/截图-Counting_Sheep-223220.jpeg @2026-11-12T22:32:21
+2026-11-12T22:35:59	Distractor Matrix	NOT_HOME	-	215.7s could not reach home
+2026-11-12T22:37:46	Target 10	NOT_HOME	-	104.7s could not reach home
+2026-11-12T22:39:28	Fraction Match	NOT_HOME	-	98.8s could not reach home
+2026-11-12T22:41:06	Cross Section Slice	NOT_HOME	-	96.5s could not reach home
+2026-11-12T22:42:45	Prime Hunter	NOT_HOME	-	96.1s could not reach home
+2026-11-12T22:44:23	Visual Search Conjunction	NOT_HOME	-	96.0s could not reach home
+2026-11-12T22:46:01	Find Word	NOT_HOME	-	95.8s could not reach home
+2026-11-12T22:47:39	Rotating Maze	NOT_HOME	-	96.3s could not reach home
+2026-11-12T22:49:17	Word Search	NOT_HOME	-	95.7s could not reach home
+2026-11-12T22:50:55	Pixel Mimic	NOT_HOME	-	95.6s could not reach home
+2026-11-12T22:52:34	Factor Finder	NOT_HOME	-	97.0s could not reach home
+2026-11-12T22:53:50	Counting Sheep	NOT_HOME	-	95.6s could not reach home
+2026-11-12T22:54:13	Path Recall	NOT_HOME	-	96.3s could not reach home
+2026-11-12T22:55:52	Object Displacement	NOT_HOME	-	96.8s could not reach home
+2026-11-12T23:00:58	Counting Sheep	OK	1600	100.3s lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Counting_Sheep-230058.jpeg @2026-11-12T23:00:58
+2026-11-12T23:02:41	Target 10	OK	1600	99.1s lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_10-230240.jpeg @2026-11-12T23:02:41
+2026-11-12T23:04:54	Word Search	OK	1600	130.1s lowest='藏词：PLANT · SNAKE · BREAD ·' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Search-230453.jpeg @2026-11-12T23:04:54
+2026-11-12T23:15:42	Counting Sheep	OK	1499	99.3s lowest='3' -> /Users/a0000/dev/One More/_巡检记录/截图-Counting_Sheep-231542.jpeg @2026-11-12T23:15:42
+2026-11-12T23:17:24	Target 10	OK	1591	99.7s lowest='点两块相加等于 10 的牌' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_10-231724.jpeg @2026-11-12T23:17:24
+2026-11-12T23:19:35	Word Search	OK	1599	128.6s lowest='提示：单词只横放或竖放，点首尾两格即可（倒着也算）' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Search-231934.jpeg @2026-11-12T23:19:35
