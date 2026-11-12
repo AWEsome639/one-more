@@ -87,3 +87,43 @@ Wordle	DEEP	790	810	1600	Column
 Wordle	DEEP	80	1520	1600	Row	
 Wordle	DEEP	80	1520	1600	Stack	
 Wordle	DEEP	80	1520	1600	Stack	
+Wordle	TALL	1030	381	1411	Column	
+Wordle	TALL	970	381	1351	Column	
+Wordle	TALL	660	810	1470	Column	
+Wordle	TALL	171	591	762	Row	
+Wordle	DEEP	82	1518	1600	Column	
+Wordle	DEEP	82	1518	1600	Row	
+Wordle	DEEP	82	1518	1600	Text	Q
+Wordle	DEEP	82	1518	1600	Text	W
+Phonetic Guess	TALL	1030	381	1411	Column	
+Phonetic Guess	TALL	970	381	1351	Column	
+Phonetic Guess	TALL	366	1215	1581	Scroll	
+Phonetic Guess	TALL	366	1215	1581	Column	
+Phonetic Guess	DEEP	366	1215	1581	Scroll	
+Phonetic Guess	DEEP	366	1215	1581	Column	
+Phonetic Guess	DEEP	69	1512	1581	Row	
+Phonetic Guess	DEEP	63	1515	1578	Text	university
+Object Displacement	TALL	1030	381	1411	Column	
+Object Displacement	TALL	970	381	1351	Column	
+Object Displacement	TALL	560	822	1382	Grid	
+Object Displacement	TALL	560	822	1382	GridItem	
+Object Displacement	DEEP	42	1534	1576	Text	提示：遮罩后只有一个物件换格
+Object Displacement	DEEP	56	1430	1486	Text	哪个物件换了格子？点它
+Object Displacement	DEEP	1030	381	1411	Column	
+Object Displacement	DEEP	560	822	1382	Grid	
+Target 10	TALL	1030	381	1411	Column	
+Target 10	TALL	970	381	1351	Column	
+Target 10	TALL	715	779	1494	Column	
+Target 10	TALL	140	591	731	Row	
+Target 10	DEEP	49	1542	1591	Text	点两块相加等于 10 的牌
+Target 10	DEEP	715	779	1494	Column	
+Target 10	DEEP	117	1347	1464	Row	
+Target 10	DEEP	117	1347	1464	Stack	
+Word Search	TALL	1030	381	1411	Column	
+Word Search	TALL	970	381	1351	Column	
+Word Search	TALL	802	798	1600	Column	
+Word Search	TALL	159	591	750	Row	
+Word Search	DEEP	802	798	1600	Column	
+Word Search	DEEP	38	1562	1600	Row	
+Word Search	DEEP	38	1562	1600	Text	U
+Word Search	DEEP	38	1562	1600	Text	T
