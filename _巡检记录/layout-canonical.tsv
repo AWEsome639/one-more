@@ -165,8 +165,6 @@
 2026-11-13T01:45:42	Sokoban	OK	1340	103.1s lowest='上一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Sokoban-014542.jpeg @2026-11-13T01:45:42
 2026-11-13T01:47:31	Hitori	OK	1600	106.6s lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori-014731.jpeg @2026-11-13T01:47:31
 2026-11-13T01:49:15	Futoshiki	OK	1588	102.4s lowest='点格子选中，再点下面数字填入；粗黑数字是题目提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Futoshiki-014915.jpeg @2026-11-13T01:49:15
-2026-11-13T01:52:43	Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin	NO_CARD	-	180.4s no card for 'Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin' (fallback=None)
-2026-11-13T01:55:39	Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin	NO_CARD	-	174.9s no card for 'Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin' (fallback=None)
 2026-11-13T02:15:36	Nonogram	OK	1365	102.6s lowest='提示' [2308,1233][2500,1365] -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-021536.jpeg @2026-11-13T02:15:36
 2026-11-13T02:17:31	Nonogram	OK	1323	93.9s lowest='提示' [2308,1191][2500,1323] -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-021731.jpeg @2026-11-13T02:17:31
 2026-11-13T02:19:13	Nurikabe	OK	1407	102.0s lowest='提示' [1304,1275][2500,1407] -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-021913.jpeg @2026-11-13T02:19:13
@@ -269,3 +267,12 @@
 2026-11-13T06:12:53	Tenner Grid	OK	1563	101.4s lowest='提示' [60,1431][2116,1563] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Tenner_Grid-061252.jpeg @2026-11-13T06:12:53
 2026-11-13T06:23:11	Match 3	OK	1348	102.8s lowest='点一个果子，再点旁边的换位' [1007,1299][1554,1348] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Match_3-062311.jpeg @2026-11-13T06:23:11
 2026-11-13T06:24:56	Pixel Mimic	OK	1420	102.0s lowest='照左边画，多点的格子再点一次就擦掉' [60,1371][2500,1420] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Pixel_Mimic-062456.jpeg @2026-11-13T06:24:56
+2026-11-13T06:27:34	Nonogram	OK	1323	100.9s lowest='提示' [2308,1191][2500,1323] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-062734.jpeg @2026-11-13T06:27:34
+2026-11-13T06:29:15	Nurikabe	OK	1407	100.4s lowest='提示' [1304,1275][2500,1407] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-062914.jpeg @2026-11-13T06:29:15
+2026-11-13T06:30:55	Masyu	OK	1457	100.8s lowest='⚫ 必须拐弯 · ⚪ 必须直行 · 回路要闭合成一圈' [900,1415][1661,1457] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-063055.jpeg @2026-11-13T06:30:55
+2026-11-13T06:33:06	Relational Memory	OK	1465	130.3s lowest='判定：6 题答对 ≥ 5 通关；看 5 秒后开始答题' [60,1423][2500,1465] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-063306.jpeg @2026-11-13T06:33:06
+2026-11-13T06:34:46	Math Path	OK	1450	100.1s lowest='步数 0/30 · 相邻成路、数字与运算符交替、从左' [697,1408][1864,1450] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-063446.jpeg @2026-11-13T06:34:46
+2026-11-13T06:36:27	Kakurasu Sums	OK	1464	100.9s lowest='上方数字 = 该列黑格的行号之和；左侧数字 = 该行' [601,1422][1959,1464] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-063627.jpeg @2026-11-13T06:36:27
+2026-11-13T06:38:09	Wordle	OK	1600	101.9s lowest='换一题' [60,1572][857,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-063809.jpeg @2026-11-13T06:38:09
+2026-11-13T06:39:50	Kakuro Mini	OK	1600	101.1s lowest='6' [60,1588][534,1600] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-063950.jpeg @2026-11-13T06:39:50
+2026-11-13T06:41:32	Magnets	OK	1600	101.9s lowest='2＋' [2370,1597][2438,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-064132.jpeg @2026-11-13T06:41:32
