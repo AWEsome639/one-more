@@ -300,7 +300,7 @@ export struct GMissingOperator {
     // ★★ 2026-11-01 真机（手表 195×195）：内容总高远超 195vp，
     //   而原 build 没套 Scroll ⇒ 棋盘与操作区完全不可见（截图拍到只剩演示条）。
     Scroll() {
-      Column({ space: Space.md }) {
+      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         HintBar({
         

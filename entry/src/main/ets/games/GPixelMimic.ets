@@ -272,7 +272,7 @@ export struct GPixelMimic {
   /** mode 1 = 目标图，0 = 我的画布 */
   private pixOf(mode: number, i: number): boolean { return mode === 1 ? this.goal[i] : this.mine[i]; }
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({

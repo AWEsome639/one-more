@@ -527,7 +527,7 @@ export struct GKlotski {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       // ★★★ 2026-10-31 真机定位（第 3 次 @Prop 出问题）：
       //   HintBar 的 `@Prop demoOn` **只进不出** —— 演示结束后它仍停在 true，

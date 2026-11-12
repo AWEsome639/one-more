@@ -650,7 +650,7 @@ export struct GMinesweeper {
     //   ⇒ 底部「插旗模式 / 提示 / 重开」露出一条却点不到。
     //   套 Scroll 兜底（本项目已有 5 款用同一模板：GColorFlood / GFillomino 等）。
     Scroll() {
-      Column({ space: Space.md }) {
+      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         // ★ 演示条（共用组件；未演示时高度为 0，不占位）
         HintBar({

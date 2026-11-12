@@ -687,7 +687,7 @@ export struct GBlockEscape {
     // ★ 2026-10-30：内容总高在 533vp 横屏上超出（reserve 已触底）
     //   ⇒ **套 Scroll**：超高时可滚，棋盘尺寸不再受"必须一屏装下"约束。
     Scroll() {
-      Column({ space: Space.md }) {
+      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         Row({ space: Space.sm }) {
           this.infoBox(0)

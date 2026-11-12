@@ -478,7 +478,7 @@ export struct GColorFlood {
     //   ★ 同一套结构已在 GBlockEscape / GNavonHierarchical / GMirrorTracing
     //     上真机验过（第 511 轮），三款都成立。
     Scroll() {
-      Column({ space: Space.md }) {
+      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
         DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
         // ★ 演示条（共用组件；未演示时高度为 0，不占位）
         HintBar({

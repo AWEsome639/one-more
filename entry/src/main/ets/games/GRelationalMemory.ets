@@ -304,7 +304,7 @@ export struct GRelationalMemory {
           }, (i: number) => 'p' + i)
         }.width('100%')
       } else {
-        Column({ space: Space.md }) {
+        Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
           Text(this.sideA[this.qIdx]).fontSize(FontSize.hero).textAlign(TextAlign.Center)
             .width('100%').height(110).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
           ForEach(this.options, (o: string) => {

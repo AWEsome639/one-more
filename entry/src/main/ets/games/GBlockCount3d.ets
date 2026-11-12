@@ -273,7 +273,7 @@ export struct GBlockCount3d {
     this.onFinish(r);
   }
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
         showHint: true,

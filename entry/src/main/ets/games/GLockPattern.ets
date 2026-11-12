@@ -377,7 +377,7 @@ export struct GLockPattern {
       }
       .width('100%')
 
-      Column({ space: Space.md }) {
+      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
         ForEach([0, 1, 2], (r: number) => {
           Row({ space: Space.md }) {
             ForEach([0, 1, 2], (c: number) => {

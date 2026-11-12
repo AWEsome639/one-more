@@ -361,7 +361,7 @@ export struct GContinuousPairedAssociate {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -452,7 +452,7 @@ export struct GContinuousPairedAssociate {
             this.startTrial();
           })
       } else {
-        Column({ space: Space.md }) {
+        Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
           Text(this.cur().a)
             .fontSize(FontSize.hero)
             .padding(Space.lg)
