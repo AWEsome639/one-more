@@ -8,6 +8,7 @@
  */
 
 import { Hint, HintResult } from '../ai/Hint';
+import { Bp } from '../core/Bp';
 import { Sec } from '../core/I18n';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
@@ -37,6 +38,10 @@ const WORDS: string[] = [
 ];
 
 const KEY_ROWS: string[] = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM⌫⏎'];
+// fix20261113: 预计算成稳定的二维数组 —— 在 builder 里每次 `charsOf(row)` 都会产生**新数组**，
+//   ArkUI 的 ForEach 拿到的数据源每帧都变身份 ⇒ 可能直接跳过。
+const KEY_CHARS: string[][] = [['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'], ['Z','X','C','V','B','N','M','⌫','⏎']];
 
 /** 把一行键盘字符串拆成字符数组 */
 function charsOf(row: string): string[] {
@@ -483,14 +488,17 @@ export struct GWordle {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('72%')
+      .width(Bp.isShort() ? 220 : 614)
 
       Column({ space: Space.xs }) {
-        ForEach(KEY_ROWS, (row: string, ri: number) => {
+        ForEach(KEY_CHARS, (row: string[], ri: number) => {
           Row({ space: Space.xs }) {
-            ForEach(charsOf(row), (ch: string) => {
+            ForEach(row, (ch: string) => {
               this.keyView(ch)
-            }, (ch: string) => 'k' + ri + ch)
+            // diag20261113 FIX: key 生成器原来引用外层 `ri` —— ArkUI 在 diff 阶段调用它时
+            //   外层变量可能尚未绑定 ⇒ 内层 items 被静默跳过（日志证明 charsOf 正常返回 10/9/9）。
+            //   ⇒ key 只用内层 `ch`（同一行内字母不重复）。
+            }, (ch: string) => 'k' + ri + '-' + ch)
           }
           .width('100%')
           .justifyContent(FlexAlign.Center)
