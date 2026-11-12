@@ -402,7 +402,7 @@ export struct GNumberBonds {
           Row({ space: Space.sm }) {
             Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
             Text(String(this.opts[i])).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
-          }.width('100%').height(Cell.of(36)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+          }.width('100%').height(Bp.isShort() ? Cell.of(28) : Cell.of(36))   /* ★ 2026-11-12（判据 1939）：选项区 498px=4 行×124px，越界 84px ⇒ 每行减 21px ⇒ 36→28 */.padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
             Haptics.tick();
             this.pick(i);
           })
