@@ -571,7 +571,8 @@ export struct GWordle {
   tileView(r: number, c: number) {
     Stack() {
       Text(this.letterAt(r, c))
-        .fontSize(FontSize.xl)
+        // 2026-11-13（队友审出）：棋盘宽 120vp ⇒ 格子 24vp，而 `FontSize.xl`=20 装进去很挤
+        .fontSize(Bp.isShort() ? FontSize.md : FontSize.xl)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.tileInk(r, c))
     }
