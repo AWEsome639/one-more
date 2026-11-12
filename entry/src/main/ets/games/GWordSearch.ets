@@ -357,16 +357,16 @@ export struct GWordSearch {
       Row({ space: Space.sm }) {
         Column({ space: Space.xs }) {
         Text((TG('已找'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text((this.hits() + ' / ' + COUNT)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
-        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Text((this.hits() + ' / ' + COUNT)).fontSize(Bp.isShort() ? FontSize.md : FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        }.layoutWeight(1).padding(Bp.isShort() ? Space.xxs : Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
-        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Text(Digits(String(this.score), this.langCode)).fontSize(Bp.isShort() ? FontSize.md : FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
+        }.layoutWeight(1).padding(Bp.isShort() ? Space.xxs : Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text(((this.leftMs / 1000).toFixed(1) + Sec())).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
-        }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Text(((this.leftMs / 1000).toFixed(1) + Sec())).fontSize(Bp.isShort() ? FontSize.md : FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
+        }.layoutWeight(1).padding(Bp.isShort() ? Space.xxs : Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
         ForEach([0, 1, 2, 3, 4, 5, 6, 7], (r: number) => {
