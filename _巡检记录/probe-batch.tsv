@@ -54,3 +54,28 @@ Kurodoko	DEEP	132	1451	1583	Button	重开一题
 Kurodoko	DEEP	132	1313	1445	Button	提示
 Kurodoko	DEEP	1030	381	1411	Column	
 Kurodoko	DEEP	970	381	1351	Column	
+Fraction Matcher	SKIP	-	-	open-failed	NOT_HOME
+Math Maze	TALL	1030	381	1411	Column	
+Math Maze	TALL	970	381	1351	Column	
+Math Maze	TALL	610	810	1420	Column	
+Math Maze	TALL	171	591	762	Row	
+Math Maze	DEEP	35	1565	1600	Row	
+Math Maze	DEEP	35	1565	1600	Button	提示
+Math Maze	DEEP	35	1565	1600	Button	退一步
+Math Maze	DEEP	35	1565	1600	Button	重开一题
+Number Bonds	TALL	1030	381	1411	Column	
+Number Bonds	TALL	970	381	1351	Column	
+Number Bonds	TALL	498	1102	1600	Column	
+Number Bonds	TALL	436	648	1084	Column	
+Number Bonds	DEEP	498	1102	1600	Column	
+Number Bonds	DEEP	102	1498	1600	Row	
+Number Bonds	DEEP	70	1514	1584	Text	7
+Number Bonds	DEEP	49	1525	1574	Text	4
+Base Shift	TALL	1030	381	1411	Column	
+Base Shift	TALL	970	381	1351	Column	
+Base Shift	TALL	492	1108	1600	Column	
+Base Shift	TALL	250	810	1060	Column	
+Base Shift	DEEP	492	1108	1600	Column	
+Base Shift	DEEP	132	1468	1600	Row	
+Base Shift	DEEP	70	1508	1578	Text	183
+Base Shift	DEEP	49	1519	1568	Text	C

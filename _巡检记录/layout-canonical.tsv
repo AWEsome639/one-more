@@ -36,3 +36,40 @@
 2026-11-12T11:56:06	Context Clues	NOT_HOME	-	218.7s could not reach home
 2026-11-12T11:58:49	Context Clues	NOT_HOME	-	53.1s could not reach home
 2026-11-12T12:10:11	Context Clues	NOT_HOME	-	50.5s could not reach home
+2026-11-12T13:03:53	Context Clues	OK	1481	77.0s lowest='选一个释义' -> /Users/a0000/dev/One More/_巡检记录/截图-Context_Clues-130353.jpeg @2026-11-12T13:03:53
+2026-11-12T13:05:56	Number Bonds	OK	1584	92.3s lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds-130555.jpeg @2026-11-12T13:05:56
+2026-11-12T13:07:35	Math Maze	OK	1584	98.1s lowest='9' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Maze-130734.jpeg @2026-11-12T13:07:35
+2026-11-12T13:09:43	Tapa	OK	1583	127.1s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Tapa-130943.jpeg @2026-11-12T13:09:43
+2026-11-12T13:11:15	Kurodoko	OK	1583	91.3s lowest='重开一题' -> /Users/a0000/dev/One More/_巡检记录/截图-Kurodoko-131115.jpeg @2026-11-12T13:11:15
+2026-11-12T13:16:05	Tapa	OK	1583	85.6s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Tapa-131605.jpeg @2026-11-12T13:16:05
+2026-11-12T13:17:06	Kurodoko	OK	1583	60.3s lowest='重开一题' -> /Users/a0000/dev/One More/_巡检记录/截图-Kurodoko-131706.jpeg @2026-11-12T13:17:06
+2026-11-12T13:36:25	Tapa	OK	1486	74.5s lowest='黑格要连成一片、不能出现 2×2；白格也必须连通' -> /Users/a0000/dev/One More/_巡检记录/截图-Tapa-133624.jpeg @2026-11-12T13:36:25
+2026-11-12T13:58:39	Kurodoko	OK	1480	153.4s lowest='重开一题' -> /Users/a0000/dev/One More/_巡检记录/截图-Kurodoko-135839.jpeg @2026-11-12T13:58:39
+2026-11-12T14:15:54	Math Maze	NOT_HOME	-	102.1s could not reach home
+2026-11-12T14:18:03	Math Maze	NOT_HOME	-	41.9s could not reach home
+2026-11-12T14:25:30	Math Maze	NOT_HOME	-	106.5s could not reach home
+2026-11-12T14:45:40	Modular Clock Arithmetic	NOT_HOME	-	42.1s could not reach home
+2026-11-12T14:46:27	Fraction Matcher	NOT_HOME	-	42.0s could not reach home
+2026-11-12T14:59:31	Math Maze	TIMEOUT	-	265.7s budget exhausted at search-home:Maze
+2026-11-12T15:01:37	Modular Clock Arithmetic	NOT_HOME	-	120.6s could not reach home
+2026-11-12T15:04:33	Fraction Matcher	OK	1582	170.1s lowest='8/21' -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-150433.jpeg @2026-11-12T15:04:33
+2026-11-12T15:06:41	Fraction Matcher	NOT_HOME	-	74.7s could not reach home
+2026-11-12T15:10:45	Fraction Matcher	NOT_HOME	-	152.4s could not reach home
+2026-11-12T15:18:39	Fraction Matcher	NOT_HOME	-	153.6s could not reach home
+2026-11-12T15:22:01	Fraction Matcher	WRONG_GAME	-	131.3s title '分数匹配' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']
+2026-11-12T15:23:52	Matcher	NO_CARD	-	55.1s no card for 'Matcher' (fallback=(347, 780))
+2026-11-12T15:25:57	Math Maze	OK	1600	118.3s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Maze-152555.jpeg @2026-11-12T15:25:57
+2026-11-12T15:27:46	Math Maze	OK	1600	95.9s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Maze-152745.jpeg @2026-11-12T15:27:46
+2026-11-12T15:43:25	Math Maze	OK	1597	115.3s lowest='步数 0/20 · 从左上角走到右下角 🏁，和要刚好' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Maze-154325.jpeg @2026-11-12T15:43:25
+2026-11-12T15:46:01	Number Bonds	OK	1584	103.5s lowest='10' -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds-154601.jpeg @2026-11-12T15:46:01
+2026-11-12T15:47:57	Pythagorean Triple Builder	OK	1582	112.0s lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-154757.jpeg @2026-11-12T15:47:57
+2026-11-12T15:50:06	Block Stacking Physics	OK	1580	124.5s lowest='换一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Stacking_Physics-155006.jpeg @2026-11-12T15:50:06
+2026-11-12T15:52:22	Number Bonds	OK	1584	111.3s lowest='7' -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds-155221.jpeg @2026-11-12T15:52:22
+2026-11-12T16:03:11	Number Bonds	OK	1583	101.0s lowest='目标数 = 左半 + 右半，把缺的那半补上' -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds-160311.jpeg @2026-11-12T16:03:11
+2026-11-12T16:14:43	Pythagorean Triple Builder	OK	1600	102.0s lowest='⌫' -> /Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-161442.jpeg @2026-11-12T16:14:43
+2026-11-12T16:17:16	Base Shift	OK	1578	103.1s lowest='1664' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-161716.jpeg @2026-11-12T16:17:16
+2026-11-12T16:19:03	Numerical Estimation	OK	1577	102.7s lowest='4,000' -> /Users/a0000/dev/One More/_巡检记录/截图-Numerical_Estimation-161903.jpeg @2026-11-12T16:19:03
+2026-11-12T16:29:16	Base Shift	OK	1578	102.0s lowest='507904' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-162916.jpeg @2026-11-12T16:29:16
+2026-11-12T16:31:50	Base Shift	OK	1578	101.5s lowest='183' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-163150.jpeg @2026-11-12T16:31:50
+2026-11-12T16:42:58	Base Shift	OK	1569	103.2s lowest='121' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-164257.jpeg @2026-11-12T16:42:58
+2026-11-12T17:04:22	Numerical Estimation	NOT_HOME	-	95.1s could not reach home
