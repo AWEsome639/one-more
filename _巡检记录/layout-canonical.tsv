@@ -201,3 +201,9 @@
 2026-11-13T03:14:01	Kakurasu Sums	OK	1464	101.1s lowest='上方数字 = 该列黑格的行号之和；左侧数字 = 该行' [601,1422][1959,1464] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-031400.jpeg @2026-11-13T03:14:01
 2026-11-13T03:15:47	Wordle	OK	1600	101.4s lowest='换一题' [60,1572][857,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-031546.jpeg @2026-11-13T03:15:47
 2026-11-13T03:17:31	Magnets	OK	1600	102.3s lowest='2＋' [2370,1597][2438,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-031731.jpeg @2026-11-13T03:17:31
+2026-11-13T03:19:53	Wordle	OK	1600	101.9s lowest='换一题' [60,1572][857,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-031953.jpeg @2026-11-13T03:19:53
+2026-11-13T03:21:41	Wordle	OK	1600	101.7s lowest='换一题' [60,1572][857,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-032141.jpeg @2026-11-13T03:21:41
+2026-11-13T03:23:24	Nonogram	OK	1323	101.0s lowest='提示' [2308,1191][2500,1323] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-032324.jpeg @2026-11-13T03:23:24
+2026-11-13T03:25:11	Magnets	OK	1600	101.9s lowest='2＋' [2370,1597][2438,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-032511.jpeg @2026-11-13T03:25:11
+2026-11-13T03:26:54	Context Clues	OK	1481	100.6s lowest='选一个释义' [60,1391][2500,1481] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Context_Clues-032653.jpeg @2026-11-13T03:26:54
+2026-11-13T03:28:37	Kakuro Mini	OK	1600	101.2s lowest='6' [60,1588][534,1600] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-032837.jpeg @2026-11-13T03:28:37

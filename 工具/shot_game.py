@@ -540,18 +540,30 @@ def _body(name, t0):
         if root is not None:
             ra = root.get('attributes', {}) or {}
             root_desc = '%s@%s' % (str(ra.get('type', '?')), str(ra.get('bounds', '?')))
-            for ch in (root.get('children') or []):
-                ca = ch.get('attributes', {}) or {}
-                cb = (ca.get('bounds') or '').strip()
-                nums = [int(v) for v in re.findall(r'-?\d+', cb)]
-                if len(nums) != 4:
-                    continue
-                over = nums[3] - (GAME_BOTTOM + SLACK)
-                if over > 0:
-                    block_over_n += 1
-                    block_over_px += over
-                    if over > block_over_max:
-                        block_over_max = over
+            # 2026-11-13 校准 v4：**越界块通常不在根的直接子层** ——
+            #   实测 `Wordle` 的结构是 root→Column(游戏区,[.381..1411])→Column(内容,[.381..1411])，
+            #   而越界的是**更深的键盘行**。⇒ 取「深度 ≤4 的所有布局块」里越界的。
+            SKIP = ('root', 'WindowScene', 'EffectComponent', 'Flex', 'Text', 'Image', 'Path', 'Stack')
+
+            def _scan(x, depth):
+                nonlocal block_over_n, block_over_px, block_over_max
+                if not isinstance(x, dict) or depth > 4:
+                    return
+                a = x.get('attributes', {}) or {}
+                typ = str(a.get('type', ''))
+                b = (a.get('bounds') or '').strip()
+                nums = [int(v) for v in re.findall(r'-?\d+', b)]
+                if len(nums) == 4 and typ not in SKIP:
+                    over = nums[3] - (GAME_BOTTOM + SLACK)
+                    if over > 0:
+                        block_over_n += 1
+                        block_over_px += over
+                        if over > block_over_max:
+                            block_over_max = over
+                for c in (x.get('children') or []):
+                    _scan(c, depth + 1)
+
+            _scan(root, 0)
     except Exception:
         pass
 
