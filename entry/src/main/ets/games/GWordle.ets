@@ -13,7 +13,6 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
 import { Demo } from '../core/Demo';
-import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
@@ -496,10 +495,7 @@ export struct GWordle {
           .justifyContent(FlexAlign.Center)
         }, (row: string, ri: number) => 'row' + ri)
       }
-      // ★ 2026-11-12（判据 1928/1959）：本款**此前完全没有矮屏意识**（`Bp.isShort()` 出现 0 次）。
-      //   棋盘 `width('100%')` + 格子 `aspectRatio(1)` ⇒ 6 行 × 5 列 ≈ 813vp ≫ 预算 343vp。
-      //   ⇒ 限宽即限高：按可用高反推棋盘宽度。
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+      .width('100%')
 
       Row({ space: Space.md }) {
                 Button(TG('换一题'))
