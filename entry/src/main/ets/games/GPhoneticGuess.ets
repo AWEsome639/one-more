@@ -6,6 +6,7 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+import { Bp } from '../core/Bp';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
@@ -509,6 +510,8 @@ export struct GPhoneticGuess {
       }
       .width('100%')
       .scrollBar(BarState.Off)
+      // 2026-11-13: Scroll 原本到 y=1581（越界 65px），下面的状态行与按钮全被推出屏外
+      .constraintSize({ maxHeight: Bp.isShort() ? 280 : 2000 })
 
       Text(this.status())
         .fontSize(FontSize.sm)

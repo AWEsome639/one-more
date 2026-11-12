@@ -3,6 +3,7 @@
  * 胜负：20 拍命中 ≥ 16 ⇒ 通关；进度：拍号 / 命中数 / 上次误差 ms
  */
 import { Hint, HintResult } from '../ai/Hint';
+import { Bp } from '../core/Bp';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow } from '../core/Design';
@@ -343,6 +344,8 @@ export struct GFrequencyTap {
         Text(this.phase === 1 ? '👆' : (this.phase === 2 ? (this.won ? '🎉' : '💤') : '▶️'))
           .fontSize(FontSize.hero)
       }.width('64%').aspectRatio(1)
+      // 2026-11-13: `%` 宽 + aspectRatio(1) ⇒ 高度被宽度锁死；限高后 aspectRatio 反推宽度
+      .constraintSize({ maxHeight: Math.max(120, Bp.height - 400) })
       .backgroundColor(this.pulse ? Palette.rose : this.theme.surfaceAlt)
       .borderRadius(Radius.full).shadow(Shadow.card)
       .scale({ x: this.pulse ? 1.05 : 0.95, y: this.pulse ? 1.05 : 0.95 })

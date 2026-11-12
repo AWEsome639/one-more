@@ -337,6 +337,8 @@ export struct GPathRecall {
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('86%').aspectRatio(1)
+      // 2026-11-13: `%` 宽 + aspectRatio(1) ⇒ 高度被宽度锁死；限高后 aspectRatio 反推宽度
+      .constraintSize({ maxHeight: Math.max(120, Bp.height - 400) })
       Text(this.phase === TG('看') ? TG('👀 看清顺序') : (this.phase === TG('点') ? TG('👆 轮到你了') : TG('🏁 本局结束')))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
         .fontColor(this.phase === TG('点') ? Palette.emerald : this.theme.inkSoft)
