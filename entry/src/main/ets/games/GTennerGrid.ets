@@ -635,7 +635,7 @@ export struct GTennerGrid {
       // ★★ 2026-11-01 真机（横屏 853×533）：棋盘无宽度上限，
       //   而格子在 Row 里 `layoutWeight(1) + aspectRatio(1)` ⇒ 高度 = 宽度
       //   ⇒ 10×10 撑破屏幕，数字键与按钮全不可见（截图拍到）。
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 290)))
 
       Column({ space: Space.xs }) {
         Row({ space: Space.xs }) {
