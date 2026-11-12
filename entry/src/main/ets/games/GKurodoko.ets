@@ -704,10 +704,13 @@ export struct GKurodoko {
       .borderRadius(Radius.md)
 
       Text(this.tip)
+        .visibility(Bp.isShort() && !this.over ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Text(TG('数字 = 从这格朝四个方向能看见的黑格数；黑格不能相邻；白格要连成一片'))
+        // ★ 2026-11-12（判据 1950）：底按钮行结束在 1583（越界 67px）⇒ 先砍纯说明行
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
 
