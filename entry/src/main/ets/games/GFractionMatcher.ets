@@ -364,7 +364,9 @@ export struct GFractionMatcher {
         .onFocus(() => { this.tvFocus = 'L326'; })
         .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L326')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
-      Text(TG('提示：分子分母同乘（同除）一个非零数，分数的值不变')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+      Text(TG('提示：分子分母同乘（同除）一个非零数，分数的值不变'))
+        // ★ 2026-11-12（判据 1950）：纯说明行，矮屏隐藏腾 ~17vp
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

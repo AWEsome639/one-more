@@ -421,6 +421,8 @@ export struct GModularClockArithmetic {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
 
       Text(TG('提示：12 点之后回到 1 点，模运算只看余数'))
+        // ★ 2026-11-12（判据 1950）：纯说明行，矮屏隐藏腾 ~17vp
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {
