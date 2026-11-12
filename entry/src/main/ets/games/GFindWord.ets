@@ -334,7 +334,7 @@ export struct GFindWord {
               .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
               .outline(Tv.focusOutline(this.tvFocus === 'L327', Radius.sm)).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }).onClick(() => { Haptics.tick(); this.tap((r * N + c)); })
             }, (c: number) => 'c' + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 290)))
         }, (r: number) => 'r' + r)
       }.width('100%')
 
