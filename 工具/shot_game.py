@@ -105,7 +105,11 @@ def sh(cmd, timeout=30):
 _SEQ = 0
 
 
-def dump(tag='d', timeout=25):
+def dump(tag='d', timeout=60):
+    # ★ 2026-11-12（判据 1953）：**`dump` 超时 25s 太短** ——
+    #   机器负载高时单次 dump 可达 `30~40s` ⇒ 返回 None ⇒ `is_home()` 假 ⇒ **误报 `NOT_HOME`**。
+    #   今天下午大量 `NOT_HOME` 其实是这个：手工 `cat` 同一个 dump 文件是**有内容**的。
+    #   ⇒ 放宽到 `60s`（仍有 `budget_left()` 兜底）。
     """dump 当前布局。**唯一路径 + 先 rm** ⇒ 绝不清到上一款的旧文件。"""
     global _SEQ
     _SEQ += 1
@@ -266,8 +270,18 @@ def _body(name, t0):
     sh('aa force-stop com.andrewoscar.onemore')
     time.sleep(1.0)
     sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
-    for _w in range(6):
-        time.sleep(3.0)
+    # ★ 2026-11-12（判据 1949 的量化）：**App 冷启动要 30~60s** ——
+    #   原来「6×3s=18s」在高负载下不够，`dump` 只拿到状态栏（`['03:11','100']`）⇒ 误报 `NOT_HOME`。
+    #   ⇒ 先固定等 `20s`（给启动过程），再轮询 `10×4s=40s`。
+    # ★★★ 2026-11-12（判据 1954，**今天下午所有 `NOT_HOME` 的真凶**）：
+    #   `aa force-stop` 之后再 `aa start`，**`uitest dumpLayout` 会抓不到 App 窗口**
+    #   （只返回状态栏 `['03:11','100']`）⇒ `is_home()` 假 ⇒ 误报 `NOT_HOME`。
+    #   **实测：再发一次 `aa start` 就正常了。**
+    time.sleep(25.0)
+    sh('aa start -a EntryAbility -b com.andrewoscar.onemore')   # ← 关键：第二次 start
+    time.sleep(8.0)
+    for _w in range(10):
+        time.sleep(4.0)
         if is_home():
             break
     # ★ 2026-11-09：回首页兜底（复测里 40 款 `NOT_HOME` 就是这里只有「Back 三次」）
