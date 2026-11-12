@@ -286,7 +286,7 @@ export struct GTarget10 {
   /** 内容随牌面变化 ⇒ key 带上牌值，保证格子重绘 */
   private tileKey(i: number): string { return 't' + i + '_' + this.tiles[i] + (this.sel === i ? 's' : ''); }
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
