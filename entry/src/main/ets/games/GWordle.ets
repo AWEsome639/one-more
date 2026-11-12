@@ -477,7 +477,8 @@ export struct GWordle {
           Row({ space: GAP }) {
             ForEach([0, 1, 2, 3, 4], (c: number) => {
               this.tileView(r, c)
-            }, (c: number) => 'c' + c)
+            // fix20261112: inner ForEach key was 'c'+c, identical across all 5 rows -> duplicate keys
+            }, (c: number) => 'c' + r + '-' + c)
           }
           .width('100%')
         }, (r: number) => 'r' + r)
