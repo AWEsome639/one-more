@@ -232,7 +232,16 @@ def finish(name, outcome, t0, mb=None, extra=''):
     """**所有 return 都走这里**：一款一行，带 outcome / max_bottom / 耗时，永不静默。"""
     el = time.monotonic() - t0
     head = '%s\t%s\t%s\t%.1fs' % (name, outcome, '-' if mb is None else str(mb), el)
-    print(head + ((' ' + extra) if extra else ''), flush=True)
+    line = head + ((' ' + extra) if extra else '')
+    print(line, flush=True)
+    # ★ 2026-11-12（判据 1945）：**每次测量都追加到唯一一份正式台账** ——
+    #   我之前只在终端打印，聚合时只能退回「文件 mtime」，**差点被自己的表骗了**
+    #   （已修好的 `Math Path 1450` / `Kakurasu 1464` 在聚合表里仍显示 `1600`）。
+    try:
+        with io.open(os.path.join(ROOT, '_巡检记录', 'layout-canonical.tsv'), 'a', encoding='utf-8') as fh:
+            fh.write('%s\t%s\n' % (time.strftime('%Y-%m-%dT%H:%M:%S'), line))
+    except Exception:
+        pass
 
 
 def _need_budget(name, t0, where):
