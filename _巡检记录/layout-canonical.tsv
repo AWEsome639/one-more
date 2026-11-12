@@ -276,3 +276,11 @@
 2026-11-13T06:38:09	Wordle	OK	1600	101.9s lowest='换一题' [60,1572][857,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-063809.jpeg @2026-11-13T06:38:09
 2026-11-13T06:39:50	Kakuro Mini	OK	1600	101.1s lowest='6' [60,1588][534,1600] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-063950.jpeg @2026-11-13T06:39:50
 2026-11-13T06:41:32	Magnets	OK	1600	101.9s lowest='2＋' [2370,1597][2438,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-064132.jpeg @2026-11-13T06:41:32
+2026-11-13T06:44:42	Path Finder	WRONG_GAME	-	190.2s title '找路径' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']
+2026-11-13T06:45:08	Stroop Test	OK	1600	178.5s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-064507.jpeg @2026-11-13T06:45:08
+2026-11-13T06:47:39	Base Conversion Run	OK	1576	176.0s lowest='123' [170,1513][2452,1576] blk=2/32px max=16 -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-064738.jpeg @2026-11-13T06:47:39
+2026-11-13T06:49:18	Binomial Match	WRONG_GAME	-	99.1s title '二项式配对' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']
+2026-11-13T06:51:09	Modulo Clock	OK	1600	110.8s lowest='钟面只有 1~12 点：转满 12 点就回到 1 点' [60,1558][2500,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Modulo_Clock-065109.jpeg @2026-11-13T06:51:09
+2026-11-13T06:53:01	Number Bonds All	OK	1600	112.0s lowest='1' [336,1333][372,1403] blk=1/22px max=22 -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds_All-065301.jpeg @2026-11-13T06:53:01
+2026-11-13T06:56:31	Stroop Test	OK	1600	101.1s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-065631.jpeg @2026-11-13T06:56:31
+2026-11-13T07:06:54	Stroop Test	OK	1600	102.6s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-070654.jpeg @2026-11-13T07:06:54
