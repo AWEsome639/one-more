@@ -394,7 +394,9 @@ export struct GNumberBondsAll {
       }.width('100%').layoutWeight(1)
       // ★ 2026-11-09：格子区是 `layoutWeight` 型 —— 删「重开」只会让它更大（判据 1851）。
       //   真机：`max_bottom=1600`、`lowest='2'`（格子里数字贴屏底）⇒ 给它「上限」才真的省高度。
-      .constraintSize({ maxHeight: Math.max(120, Bp.height - 380) })
+      // ★ 2026-11-12（判据 1928）：格子是 `aspectRatio(1)` + 宽度驱动 ⇒ **`maxHeight` 只裁不缩**，
+      //   必须同时给 `maxWidth`（限宽即限高，`GGo9.boardMax()` 同款范式）。
+      .constraintSize({ maxHeight: Math.max(120, Bp.height - 380), maxWidth: Bp.isShort() ? Math.max(140, Bp.width - 2 * Space.lg) : 9999 })
 
       Text(this.found.length > 0 ? TG2('已拆出：{0}', this.found.join('  ')) : TG('还没拆出任何一组')).fontSize(FontSize.xs).fontColor(Palette.violet).width('100%')
 
