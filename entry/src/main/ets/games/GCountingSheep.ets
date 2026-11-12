@@ -332,7 +332,7 @@ export struct GCountingSheep {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
             }, (c: number) => 'c' + c)
-          }.width('100%')
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
         }, (r: number) => 'r' + r)
       }.width('100%')
 
