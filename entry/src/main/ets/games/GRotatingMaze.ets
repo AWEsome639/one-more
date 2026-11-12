@@ -391,7 +391,7 @@ export struct GRotatingMaze {
             }.layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
             .backgroundColor(this.walls[(r * this.diffTotal + c)] === 1 ? (this.theme.isDark ? '#2A2A2A' : '#B9C2D0') : this.theme.surfaceAlt)
             .animation({ duration: Motion.fast, curve: Motion.snap() }) }, (c: number) => 'c' + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 290)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
         }, (r: number) => 'r' + r)
       }.width('100%').padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Row({ space: Space.xs }) {

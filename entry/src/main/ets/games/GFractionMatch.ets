@@ -414,7 +414,7 @@ export struct GFractionMatch {
               .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
               .outline(Tv.focusOutline(this.tvFocus === 'L338')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.flip((row * 4 + col)); }); }).onClick(() => { Haptics.tick(); this.flip((row * 4 + col)); })
             }, (col: number) => 'fmc' + col)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 290)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
         }, (row: number) => 'fmr' + row)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)

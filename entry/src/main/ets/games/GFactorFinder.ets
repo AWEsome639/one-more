@@ -329,7 +329,7 @@ export struct GFactorFinder {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
             }, (col: number) => 'ffc' + col)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 290)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
         }, (row: number) => 'ffr' + row)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)

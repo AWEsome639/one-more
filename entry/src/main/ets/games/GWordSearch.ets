@@ -377,7 +377,7 @@ export struct GWordSearch {
             .onBlur(() => { if (this.tvFocus === 'L368') { this.tvFocus = ''; } })
             .outline(Tv.focusOutline(this.tvFocus === 'L368', Radius.xs))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }) }, (c: number) => 'c' + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 290)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
         }, (r: number) => 'r' + r)
       }.width('100%')
       Text(TG2('藏词：{0}', this.words.join(' · '))).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
