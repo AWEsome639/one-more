@@ -22,3 +22,35 @@ Context Clues	1030	381	1411	Column
 Context Clues	970	381	1351	Column	
 Context Clues	245	653	898	Column	
 Context Clues	140	507	647	Row	
+Number Bonds	1030	381	1411	Column	
+Number Bonds	970	381	1351	Column	
+Number Bonds	498	1102	1600	Column	
+Number Bonds	436	648	1084	Column	
+Math Maze	1030	381	1411	Column	
+Math Maze	970	381	1351	Column	
+Math Maze	790	810	1600	Column	
+Math Maze	462	840	1302	Stack	
+Tapa	1030	381	1411	Column	
+Tapa	970	381	1351	Column	
+Tapa	520	786	1306	Column	
+Tapa	147	591	738	Row	
+Kurodoko	1030	381	1411	Column	
+Kurodoko	970	381	1351	Column	
+Kurodoko	520	684	1204	Column	
+Kurodoko	171	507	678	Row	
+Tapa	TALL	1030	381	1411	Column	
+Tapa	TALL	970	381	1351	Column	
+Tapa	TALL	520	786	1306	Column	
+Tapa	TALL	147	591	738	Row	
+Tapa	DEEP	132	1451	1583	Button	提示
+Tapa	DEEP	1030	381	1411	Column	
+Tapa	DEEP	49	1354	1403	Text	点格子涂黑/擦白；数字 = 
+Tapa	DEEP	970	381	1351	Column	
+Kurodoko	TALL	1030	381	1411	Column	
+Kurodoko	TALL	970	381	1351	Column	
+Kurodoko	TALL	520	684	1204	Column	
+Kurodoko	TALL	171	507	678	Row	
+Kurodoko	DEEP	132	1451	1583	Button	重开一题
+Kurodoko	DEEP	132	1313	1445	Button	提示
+Kurodoko	DEEP	1030	381	1411	Column	
+Kurodoko	DEEP	970	381	1351	Column	

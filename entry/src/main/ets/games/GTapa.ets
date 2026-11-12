@@ -617,7 +617,7 @@ export struct GTapa {
   }
 
   build() {
-    Column({ space: Space.md }) {
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -710,6 +710,9 @@ export struct GTapa {
       .borderRadius(Radius.lg)
 
       Text(this.tip())
+        // ★ 2026-11-12（判据 1939）：底按钮行结束在 1583（越界 67px）
+        //   ⇒ 矮屏隐藏「静态说明」那一行（49px）+ 根间距收 30vp（90px）就够了
+        .visibility(Bp.isShort() && !this.over ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.sm)
         .fontColor(this.over
           ? (this.won ? Palette.emerald : Palette.rose)

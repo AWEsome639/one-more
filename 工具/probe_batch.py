@@ -59,8 +59,14 @@ def blocks(t):
             walk(c)
 
     walk(d)
-    rows.sort(reverse=True)
-    return rows[:4]
+    # ★ 2026-11-12（判据 1925 的延伸）：**「最高的」和「最靠下的」是两回事** ——
+    #   `Tapa`/`Kurodoko` 的最深块只到 `1306/1204`，但 `max_bottom=1583` ⇒
+    #   真正触底的是**一个很矮的节点（说明行/按钮）**，只看「最高 4 个」看不见它。
+    rows.sort(key=lambda r: -r[0])
+    tallest = rows[:4]
+    rows.sort(key=lambda r: -r[2])
+    deepest = rows[:4]
+    return tallest, deepest
 
 
 def main():
@@ -84,11 +90,15 @@ def main():
             fh.write('%s\tSKIP\t-\t-\t%s\t%s\n' % (g, 'open-failed', last.split('\t')[1] if '\t' in last else '?'))
             continue
         print('\n=== %s === %s' % (g, last.split('\t')[2]), flush=True)
-        rows = blocks(t)
+        tallest, deepest = blocks(t)
         print('\n=== %s ===' % g, flush=True)
-        for h, y1, y2, ty, tx in rows:
-            line = '%s\t%d\t%d\t%d\t%s\t%s' % (g, h, y1, y2, ty, tx)
-            fh.write(line + '\n')
+        print('  ── 最高 4 个（谁占空间）──', flush=True)
+        for h, y1, y2, ty, tx in tallest:
+            fh.write('%s\tTALL\t%d\t%d\t%d\t%s\t%s\n' % (g, h, y1, y2, ty, tx))
+            print('  h=%4d y=[%4d..%4d] %-10s %r' % (h, y1, y2, ty, tx), flush=True)
+        print('  ── 最靠下 4 个（谁触底）──', flush=True)
+        for h, y1, y2, ty, tx in deepest:
+            fh.write('%s\tDEEP\t%d\t%d\t%d\t%s\t%s\n' % (g, h, y1, y2, ty, tx))
             print('  h=%4d y=[%4d..%4d] %-10s %r' % (h, y1, y2, ty, tx), flush=True)
     fh.close()
     print('\n诊断表已追加到 %s' % OUT)
