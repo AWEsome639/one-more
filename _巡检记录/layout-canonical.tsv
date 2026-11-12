@@ -168,3 +168,36 @@
 2026-11-13T01:52:43	Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin	NO_CARD	-	180.4s no card for 'Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin' (fallback=None)
 2026-11-13T01:55:39	Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin	NO_CARD	-	174.9s no card for 'Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin' (fallback=None)
 2026-11-13T02:15:36	Nonogram	OK	1365	102.6s lowest='提示' [2308,1233][2500,1365] -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-021536.jpeg @2026-11-13T02:15:36
+2026-11-13T02:17:31	Nonogram	OK	1323	93.9s lowest='提示' [2308,1191][2500,1323] -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-021731.jpeg @2026-11-13T02:17:31
+2026-11-13T02:19:13	Nurikabe	OK	1407	102.0s lowest='提示' [1304,1275][2500,1407] -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-021913.jpeg @2026-11-13T02:19:13
+2026-11-13T02:20:55	Masyu	OK	1457	101.4s lowest='⚫ 必须拐弯 · ⚪ 必须直行 · 回路要闭合成一圈' [900,1415][1661,1457] -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-022055.jpeg @2026-11-13T02:20:55
+2026-11-13T02:23:06	Relational Memory	OK	1465	130.9s lowest='判定：6 题答对 ≥ 5 通关；看 5 秒后开始答题' [60,1423][2500,1465] -> /Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-022306.jpeg @2026-11-13T02:23:06
+2026-11-13T02:24:48	Math Path	OK	1450	101.6s lowest='步数 0/30 · 相邻成路、数字与运算符交替、从左' [697,1408][1864,1450] -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-022447.jpeg @2026-11-13T02:24:48
+2026-11-13T02:26:29	Kakurasu Sums	OK	1464	100.9s lowest='上方数字 = 该列黑格的行号之和；左侧数字 = 该行' [601,1422][1959,1464] -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-022628.jpeg @2026-11-13T02:26:29
+2026-11-13T02:28:09	Wordle	OK	1600	100.5s lowest='换一题' [60,1572][857,1600] -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-022809.jpeg @2026-11-13T02:28:09
+2026-11-13T02:29:50	Kakuro Mini	OK	1600	101.1s lowest='6' [60,1588][534,1600] -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-022950.jpeg @2026-11-13T02:29:50
+2026-11-13T02:31:32	Magnets	OK	1600	101.6s lowest='2＋' [2370,1597][2438,1600] -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-023132.jpeg @2026-11-13T02:31:32
+2026-11-13T02:33:13	Path Finder	OK	1557	101.1s lowest='提示' [2308,1425][2500,1557] -> /Users/a0000/dev/One More/_巡检记录/截图-Path_Finder-023313.jpeg @2026-11-13T02:33:13
+2026-11-13T02:34:54	Base Conversion Run	OK	1576	100.7s lowest='111010' [170,1513][2452,1576] -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-023454.jpeg @2026-11-13T02:34:54
+2026-11-13T02:36:35	Binomial Match	OK	1576	101.1s lowest='换一组' [60,1462][2500,1576] -> /Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-023635.jpeg @2026-11-13T02:36:35
+2026-11-13T02:38:18	Modulo Clock	OK	1600	102.4s lowest='钟面只有 1~12 点：转满 12 点就回到 1 点' [60,1558][2500,1600] -> /Users/a0000/dev/One More/_巡检记录/截图-Modulo_Clock-023818.jpeg @2026-11-13T02:38:18
+2026-11-13T02:40:00	Number Bonds All	OK	1600	101.7s lowest='4' [336,1333][372,1403] -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds_All-023959.jpeg @2026-11-13T02:40:00
+2026-11-13T02:41:41	Pattern Sequence Draw	OK	1599	101.0s lowest='4' [435,1515][479,1599] -> /Users/a0000/dev/One More/_巡检记录/截图-Pattern_Sequence_Draw-024140.jpeg @2026-11-13T02:41:41
+2026-11-13T02:46:34	Percentage Peak	OK	1585	103.7s lowest='答对 12 题通关；答错不扣时间，但断连击' [60,1536][2500,1585] -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Peak-024634.jpeg @2026-11-13T02:46:34
+2026-11-13T02:48:16	Stroop Test	OK	1600	102.1s lowest='蓝' [60,1471][1265,1600] -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-024816.jpeg @2026-11-13T02:48:16
+2026-11-13T02:49:58	Corsi Backward Span	OK	1351	101.7s lowest='倒背：长度升到 5 即通关；倒着点，别顺着点' [918,1309][1642,1351] -> /Users/a0000/dev/One More/_巡检记录/截图-Corsi_Backward_Span-024958.jpeg @2026-11-13T02:49:58
+2026-11-13T02:51:40	Futoshiki	OK	1588	102.0s lowest='点格子选中，再点下面数字填入；粗黑数字是题目提示' [848,1546][1713,1588] -> /Users/a0000/dev/One More/_巡检记录/截图-Futoshiki-025140.jpeg @2026-11-13T02:51:40
+2026-11-13T02:53:22	Collatz	OK	1586	101.3s lowest='75' [60,1544][2500,1586] -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-025321.jpeg @2026-11-13T02:53:22
+2026-11-13T02:55:03	Common Denominator	OK	1585	101.4s lowest='这两个分数的最小公分母是多少？' [60,1536][2500,1585] -> /Users/a0000/dev/One More/_巡检记录/截图-Common_Denominator-025503.jpeg @2026-11-13T02:55:03
+2026-11-13T02:57:13	Binary Matrix Rank All	OK	1047	129.5s lowest='0' [60,909][393,1047] -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Matrix_Rank_All-025713.jpeg @2026-11-13T02:57:13
+2026-11-13T02:59:23	Visual Search All	OK	1600	130.2s lowest='把 🍎 全点掉 · 点错扣 2 秒' [60,1598][2500,1600] -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Search_All-025923.jpeg @2026-11-13T02:59:23
+2026-11-13T03:01:05	Cryptogram All	OK	1343	101.5s lowest='SPIRAL' [60,1205][1265,1343] -> /Users/a0000/dev/One More/_巡检记录/截图-Cryptogram_All-030104.jpeg @2026-11-13T03:01:05
+2026-11-13T03:03:16	Word Ladder	OK	1600	131.1s lowest='提示：起点 COLD → 目标 WARM，词库里都是' [60,1592][2500,1600] -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Ladder-030316.jpeg @2026-11-13T03:03:16
+2026-11-13T03:05:11	Wordle	OK	1600	189.2s lowest='换一题' [60,1572][857,1600] blk=1/60px max=60 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-030511.jpeg @2026-11-13T03:05:11
+2026-11-13T03:06:55	Nonogram	OK	1365	102.1s lowest='提示' [2308,1233][2500,1365] blk=1/60px max=60 -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-030655.jpeg @2026-11-13T03:06:55
+2026-11-13T03:08:43	Nonogram	OK	1323	100.8s lowest='提示' [2308,1191][2500,1323] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-030842.jpeg @2026-11-13T03:08:43
+2026-11-13T03:10:25	Kakurasu Sums	OK	1464	100.4s lowest='上方数字 = 该列黑格的行号之和；左侧数字 = 该行' [601,1422][1959,1464] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-031025.jpeg @2026-11-13T03:10:25
+2026-11-13T03:12:17	Nonogram	OK	1323	101.0s lowest='提示' [2308,1191][2500,1323] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-031217.jpeg @2026-11-13T03:12:17
+2026-11-13T03:14:01	Kakurasu Sums	OK	1464	101.1s lowest='上方数字 = 该列黑格的行号之和；左侧数字 = 该行' [601,1422][1959,1464] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-031400.jpeg @2026-11-13T03:14:01
+2026-11-13T03:15:47	Wordle	OK	1600	101.4s lowest='换一题' [60,1572][857,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-031546.jpeg @2026-11-13T03:15:47
+2026-11-13T03:17:31	Magnets	OK	1600	102.3s lowest='2＋' [2370,1597][2438,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-031731.jpeg @2026-11-13T03:17:31

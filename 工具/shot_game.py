@@ -493,6 +493,68 @@ def _body(name, t0):
             #   记上 bounds，判据就能从「文本相同」升级成「节点相同」。
             lo_bounds = '[%d,%d][%d,%d]' % (x1, y1, x2, y2)
 
+    # ★ 2026-11-13（判据 1978/1980，队友 `c3b9dcff` 设计）：**抗抖动指标**
+    #   `max_bottom` = max() over 叶子 ⇒ 叶子会随状态换人（键盘/浮层生灭），实测 `Wordle`
+    #   20 分钟内 1600/1591/1351/1600 抖 ±250px。
+    #   ⇒ 换一级：数**根内容列的直接子块**里越界（y2 > 1516 + 24）的块数与越界量。
+    #   块的「身份」稳定（HUD/棋盘/按钮行还是那几块），状态抖动传不到指标上。
+    GAME_BOTTOM = 1516
+    # 2026-11-13 校准：SLACK 24 → 60 —— 底部手势/导航条恒定结束在 1576(=1516+60)，
+    #   用 24 会把「系统条」当成越界块（`Nonogram 1365` 也报 blk=1/60px 就是它）。
+    SLACK = 60
+
+    def _kids_root(n):
+        """找根内容列：优先 type 含 Column 且子树最深、bounds 最宽的节点。"""
+        best = None
+        best_w = -1
+
+        def walk(x, depth):
+            nonlocal best, best_w
+            if not isinstance(x, dict):
+                return
+            a = x.get('attributes', {}) or {}
+            b = (a.get('bounds') or '').strip()
+            typ = str(a.get('type', ''))
+            nums = [int(v) for v in re.findall(r'-?\d+', b)]
+            # 2026-11-13 校准：**跳过框架层容器** —— 实测最外层是
+            #   root[0,117][2560,1600] + WindowScene[0,0][2560,117]，它们不是内容块。
+            #   只认真正的布局容器（Column/Row/Scroll 等），且宽度接近全屏、起点在上半屏。
+            if (typ not in ('root', 'WindowScene', 'EffectComponent', 'Flex', '')
+                    and 'Column' in typ and len(nums) == 4):
+                w = nums[2] - nums[0]
+                if w >= 2000 and nums[1] < 700 and w > best_w:
+                    best_w = w
+                    best = x
+            for c in (x.get('children') or []):
+                walk(c, depth + 1)
+
+        walk(n, 0)
+        return best
+
+    block_over_n = 0
+    block_over_px = 0
+    block_over_max = 0
+    root_desc = ''
+    try:
+        root = _kids_root(d2)
+        if root is not None:
+            ra = root.get('attributes', {}) or {}
+            root_desc = '%s@%s' % (str(ra.get('type', '?')), str(ra.get('bounds', '?')))
+            for ch in (root.get('children') or []):
+                ca = ch.get('attributes', {}) or {}
+                cb = (ca.get('bounds') or '').strip()
+                nums = [int(v) for v in re.findall(r'-?\d+', cb)]
+                if len(nums) != 4:
+                    continue
+                over = nums[3] - (GAME_BOTTOM + SLACK)
+                if over > 0:
+                    block_over_n += 1
+                    block_over_px += over
+                    if over > block_over_max:
+                        block_over_max = over
+    except Exception:
+        pass
+
     safe = re.sub(r'[^A-Za-z0-9_]', '_', name)
     ts = time.strftime('%H%M%S')
     out = os.path.join(ROOT, '_巡检记录', '截图-%s-%s.jpeg' % (safe, ts))
@@ -511,7 +573,7 @@ def _body(name, t0):
     _ts = _dt.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     if recv_ok:
         finish(name, 'OK', t0, mb,
-               'lowest=%r %s -> %s @%s' % (lo, lo_bounds, out, _ts))
+               'lowest=%r %s blk=%d/%dpx max=%d -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, block_over_max, out, _ts))
     else:
         finish(name, 'OK_NOSHOT', t0, mb,
                'lowest=%r %s recv failed @%s' % (lo, lo_bounds, _ts))
