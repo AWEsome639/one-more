@@ -492,7 +492,11 @@ export struct GBaseShift {
               .layoutWeight(1)
           }
           .width('100%')
-          .height(Cell.of(52))
+          // ★ 2026-11-12（判据 1957 功能优先 + 1939 算式）：
+          //   截图：`C` 只露顶边、`D` 完全在屏外 ⇒ 只有 2 个选项可选，**游戏玩不了**。
+          //   probe 实测：选项行 `132px`（= `Cell.of(52)` = 44vp）；4 行 `528px` > 可用 `492px` ⇒ 超 `120px`。
+          //   `Cell.of` **可以缩**（判据 1899 只限制 `Cell.tap`）⇒ 矮屏压到 `34`：每行省 `46px`，4 行省 `184px`。
+          .height(Bp.isShort() ? Cell.of(34) : Cell.of(52))
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
