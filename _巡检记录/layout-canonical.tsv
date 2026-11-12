@@ -1,0 +1,27 @@
+2026-11-12T09:59:12	Nothing	NOT_HOME	-	42.0s could not reach home
+2026-11-12T10:05:37	Nonogram	OK	1395	141.2s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-100537.jpeg @2026-11-12T10:05:37
+2026-11-12T10:08:28	Nurikabe	OK	1479	170.6s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-100828.jpeg @2026-11-12T10:08:28
+2026-11-12T10:10:44	Masyu	DUMP_FAIL	-	135.8s no in-game dump
+2026-11-12T10:15:56	Relational Memory	TIMEOUT	-	311.7s budget exhausted at search:Memory
+2026-11-12T10:18:11	Math Path	NOT_HOME	-	132.9s could not reach home
+2026-11-12T10:18:36	__selftest__	OK	1234	0.0s
+2026-11-12T10:18:57	Kakurasu Sums	NOT_HOME	-	46.6s could not reach home
+2026-11-12T10:19:50	Wordle	NOT_HOME	-	52.4s could not reach home
+2026-11-12T10:20:51	Kakuro Mini	NOT_HOME	-	60.4s could not reach home
+2026-11-12T10:21:33	Magnets	NOT_HOME	-	42.7s could not reach home
+2026-11-12T10:22:14	Path Finder	NOT_HOME	-	40.8s could not reach home
+2026-11-12T10:22:58	Base Conversion Run	NOT_HOME	-	43.7s could not reach home
+2026-11-12T10:23:55	Binomial Match	NOT_HOME	-	56.6s could not reach home
+2026-11-12T10:24:42	Modulo Clock	NOT_HOME	-	46.7s could not reach home
+2026-11-12T10:25:26	Number Bonds All	NOT_HOME	-	44.2s could not reach home
+2026-11-12T10:26:12	Pattern Sequence Draw	NOT_HOME	-	45.6s could not reach home
+2026-11-12T10:29:13	Percentage Peak	NOT_HOME	-	51.0s could not reach home
+2026-11-12T10:32:47	Stroop Test	NOT_HOME	-	213.7s could not reach home
+2026-11-12T10:35:43	Corsi Backward Span	NOT_HOME	-	175.8s could not reach home
+2026-11-12T10:36:33	Futoshiki	NOT_HOME	-	49.5s could not reach home
+2026-11-12T10:37:37	Collatz	NOT_HOME	-	64.1s could not reach home
+2026-11-12T10:38:50	Common Denominator	NOT_HOME	-	73.1s could not reach home
+2026-11-12T10:39:59	Binary Matrix Rank All	NOT_HOME	-	68.1s could not reach home
+2026-11-12T10:40:57	Visual Search All	NOT_HOME	-	58.1s could not reach home
+2026-11-12T10:41:56	Cryptogram All	NOT_HOME	-	58.0s could not reach home
+2026-11-12T10:42:52	Word Ladder	NOT_HOME	-	56.7s could not reach home
