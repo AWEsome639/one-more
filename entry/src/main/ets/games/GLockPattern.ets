@@ -344,7 +344,7 @@ export struct GLockPattern {
   }
 
   build() {
-    Column({ space: Space.lg }) {
+    Column({ space: Bp.isShort() ? Space.md : Space.lg }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
         showHint: true,
@@ -377,7 +377,8 @@ export struct GLockPattern {
       }
       .width('100%')
 
-      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
+      // 2026-11-13 队友抓出：这行是**九宫格容器**不是根 ⇒ 缩了会导致行距 10 / 列距 16 不对称
+      Column({ space: Space.md }) {
         ForEach([0, 1, 2], (r: number) => {
           Row({ space: Space.md }) {
             ForEach([0, 1, 2], (c: number) => {
