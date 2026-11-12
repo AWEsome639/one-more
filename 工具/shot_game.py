@@ -484,10 +484,14 @@ def _body(name, t0):
     mb = _max_y2(d2, 0)
     # lowest 取「文字节点里 y2 最大」的那个（人读参考）
     best = -1
-    for t, (_, _, _, y2) in texts(d2):
+    lo_bounds = ''
+    for t, (x1, y1, x2, y2) in texts(d2):
         if y2 > best:
             best = y2
             lo = t[:26]
+            # 2026-11-13（判据 1973）：只记文本不够 —— 同一个词可能来自不同节点。
+            #   记上 bounds，判据就能从「文本相同」升级成「节点相同」。
+            lo_bounds = '[%d,%d][%d,%d]' % (x1, y1, x2, y2)
 
     safe = re.sub(r'[^A-Za-z0-9_]', '_', name)
     ts = time.strftime('%H%M%S')
@@ -507,10 +511,10 @@ def _body(name, t0):
     _ts = _dt.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     if recv_ok:
         finish(name, 'OK', t0, mb,
-               'lowest=%r -> %s @%s' % (lo, out, _ts))
+               'lowest=%r %s -> %s @%s' % (lo, lo_bounds, out, _ts))
     else:
         finish(name, 'OK_NOSHOT', t0, mb,
-               'lowest=%r recv failed @%s' % (lo, _ts))
+               'lowest=%r %s recv failed @%s' % (lo, lo_bounds, _ts))
 
 
 def main():

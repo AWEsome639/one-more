@@ -143,3 +143,28 @@
 2026-11-12T23:32:42	Target 10	OK	1584	101.3s lowest='提示：连续消对会加连击分，消错会掉分' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_10-233242.jpeg @2026-11-12T23:32:42
 2026-11-12T23:44:15	Word Search	OK	1600	131.8s lowest='T' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Search-234414.jpeg @2026-11-12T23:44:15
 2026-11-12T23:46:36	Word Search	OK	1600	134.8s lowest='U' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Search-234636.jpeg @2026-11-12T23:46:36
+2026-11-12T23:58:41	Wordle	OK	1600	102.9s lowest='Z' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-235841.jpeg @2026-11-12T23:58:41
+2026-11-13T00:11:56	Word Search	OK	1568	139.4s lowest='提示：单词只横放或竖放，点首尾两格即可（倒着也算）' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Search-001156.jpeg @2026-11-13T00:11:56
+2026-11-13T00:39:05	Base Shift	OK	1589	102.8s lowest='选出移位后的十进制值' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-003905.jpeg @2026-11-13T00:39:05
+2026-11-13T00:40:48	Fraction Matcher	OK	1600	101.2s lowest='B' -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-004048.jpeg @2026-11-13T00:40:48
+2026-11-13T00:42:32	Object Displacement	OK	1486	101.3s lowest='提示：遮罩后只有一个物件换格，点它（点它原来的位置也' -> /Users/a0000/dev/One More/_巡检记录/截图-Object_Displacement-004231.jpeg @2026-11-13T00:42:32
+2026-11-13T00:55:14	Base Shift	OK	1569	101.3s lowest='60928' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-005513.jpeg @2026-11-13T00:55:14
+2026-11-13T00:57:07	Fraction Matcher	OK	1582	111.1s lowest='4/6' -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-005707.jpeg @2026-11-13T00:57:07
+2026-11-13T00:58:51	Object Displacement	OK	1486	102.0s lowest='提示：遮罩后只有一个物件换格，点它（点它原来的位置也' -> /Users/a0000/dev/One More/_巡检记录/截图-Object_Displacement-005851.jpeg @2026-11-13T00:58:51
+2026-11-13T01:15:26	Wordle	NOT_HOME	-	113.5s could not reach home
+2026-11-13T01:20:40	Wordle	OK	1600	104.4s lowest='换一题' -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-012040.jpeg @2026-11-13T01:20:40
+2026-11-13T01:22:24	Math Maze	OK	1489	101.9s lowest='步数 0/20 · 从左上角走到右下角 🏁，和要刚好' -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Maze-012224.jpeg @2026-11-13T01:22:24
+2026-11-13T01:24:11	Fraction Matcher	OK	1600	105.5s lowest='B' -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-012411.jpeg @2026-11-13T01:24:11
+2026-11-13T01:25:48	Base Shift	OK	1589	94.0s lowest='选出移位后的十进制值' -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-012547.jpeg @2026-11-13T01:25:48
+2026-11-13T01:27:34	Target 10	OK	1512	104.7s lowest='提示：连续消对会加连击分，消错会掉分' -> /Users/a0000/dev/One More/_巡检记录/截图-Target_10-012734.jpeg @2026-11-13T01:27:34
+2026-11-13T01:29:18	Phonetic Guess	OK	1570	101.6s lowest='这个音标是哪个词？' -> /Users/a0000/dev/One More/_巡检记录/截图-Phonetic_Guess-012918.jpeg @2026-11-13T01:29:18
+2026-11-13T01:31:33	Word Search	OK	1460	133.2s lowest='提示：单词只横放或竖放，点首尾两格即可（倒着也算）' -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Search-013133.jpeg @2026-11-13T01:31:33
+2026-11-13T01:33:29	Numerical Estimation	OK	1579	114.1s lowest='不用精算，挑最接近的那个' -> /Users/a0000/dev/One More/_巡检记录/截图-Numerical_Estimation-013329.jpeg @2026-11-13T01:33:29
+2026-11-13T01:35:20	Prime Hunter	OK	1456	108.1s lowest='绿=捞到 红=点错' -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Hunter-013519.jpeg @2026-11-13T01:35:20
+2026-11-13T01:43:57	Nonogram	OK	1365	102.9s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-014357.jpeg @2026-11-13T01:43:57
+2026-11-13T01:45:42	Sokoban	OK	1340	103.1s lowest='上一关' -> /Users/a0000/dev/One More/_巡检记录/截图-Sokoban-014542.jpeg @2026-11-13T01:45:42
+2026-11-13T01:47:31	Hitori	OK	1600	106.6s lowest='1' -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori-014731.jpeg @2026-11-13T01:47:31
+2026-11-13T01:49:15	Futoshiki	OK	1588	102.4s lowest='点格子选中，再点下面数字填入；粗黑数字是题目提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Futoshiki-014915.jpeg @2026-11-13T01:49:15
+2026-11-13T01:52:43	Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin	NO_CARD	-	180.4s no card for 'Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin' (fallback=None)
+2026-11-13T01:55:39	Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin	NO_CARD	-	174.9s no card for 'Hitori,Futoshiki,Nonogram,Sokoban,Flow Free,KenKen,Masyu,Nurikabe,Slitherlink,Star Battle,Akari,TentsAndTrees,Light Up,Heyawake,Yajilin' (fallback=None)
+2026-11-13T02:15:36	Nonogram	OK	1365	102.6s lowest='提示' [2308,1233][2500,1365] -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-021536.jpeg @2026-11-13T02:15:36
