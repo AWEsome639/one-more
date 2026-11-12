@@ -45,3 +45,41 @@ static of(base: number): number {
 - **⇒ 这不影响「有没有效果」，只影响「效果多大」**
 
 **⇒ 所以今晚「零效果」的那几刀，**不是**这个原因造成的 —— 那是另一个问题。**
+
+---
+
+## 又一层：`Cell.k` 也是缩放系数（`core/UiMode.ets:112-119`）
+
+```ts
+if (mode === UiMode.ELDER)      Cell.k = 1.33;   // 长辈模式格子 ×1.33
+else if (mode === UiMode.SIMPLE) Cell.k = 0.9;   // 简约模式 ×0.9
+else                             Cell.k = 1;     // 默认
+```
+
+**⇒ `Cell.of(62)` 在默认模式下 = `round(62 × 1 × Bp.scale() × 0.85)` = **`53vp`（`159px`）**。**
+
+## 但 `Stroop` 的按钮实测是 `129px`（`43vp`）—— **对不上**
+
+**`43vp` 反推 base ≈ `50`（`43 / 0.85 / 1`），不是我写的 `62`，也不是我改的 `34`。**
+
+**⇒ 说明那个按钮的 `height` **既不是 `Cell.of(62)` 也不是 `Cell.of(34)`** —— 它被别的东西覆盖了。**
+
+## 到此为止（静态分析已到极限）
+
+**今晚在这款上的结论链：**
+1. 不是矮屏判定失效（`Wordle` 反证 `isShort()` 返回 `true`）
+2. 不是包没更新（HAP 时间戳新）
+3. 不是组件映射错（`stroop_test` → `GStroopTest` 正确）
+4. **不是 `layoutWeight` 吃掉高度**（我在 `Row` 上加高度也零效果）
+5. **不是 `Cell.of` 的缩放**（`Cell.k=1`、`shrink=0.85` 算得出 `53vp`，实测 `43vp`，两种都解释不了）
+
+**⇒ 唯一剩下的手段是**运行时日志**，而 `console.log` → `hilog` 这条路今晚**没打通**
+（加了日志、编译进包、安装成功，`hilog -x | grep SDIAG` 无输出）**
+
+## 明天必须解决的两个「工具级」问题
+
+1. **`console.log` 为什么在 `hilog` 里看不到** —— 不加日志，所有「零效果」都无法归因
+   - 试：`hdc shell hilog -b D`（提高级别）、`hilog -T JSAPP`、或看 `hdc shell hilog | grep onemore`
+2. **`Stroop` 那个按钮的真实尺寸来源** —— 有日志后打一行 `console.log(Cell.of(62))` 就能确认
+
+**⇒ 这两个问题不解决，这类「怎么改都不动」的款会一直卡着。**
