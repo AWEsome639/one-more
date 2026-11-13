@@ -9,7 +9,13 @@ LOG=/tmp/overnight_sweep.log
 say() { echo "[$(date +%H:%M:%S)] $*" | tee -a "$LOG"; }
 
 # ① 等到 00:05 之后（他睡了）
-while [ "$(date +%H%M)" -lt 0005 ] && [ "$(date +%H%M)" -gt 0500 ]; do sleep 60; done
+# ★ 修 bug（2026-11-13 22:11 实测踩到）：原条件写反了 ⇒ 22:11 就开跑了。
+#   正确：**只在 00:05–05:00 这个窗口内跑**；否则每 60 秒看一次，等到窗口。
+in_window() {
+  local hm; hm=$(date +%H%M)
+  [ "$hm" -ge 5 ] && [ "$hm" -le 500 ]
+}
+while ! in_window; do sleep 60; done
 say "开始：现在是 $(date +%H:%M)"
 
 # ② 等机器空下来（load1 < 15）
