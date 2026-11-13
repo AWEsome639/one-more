@@ -226,7 +226,10 @@ def is_home():
     if not d:
         return False
     j = ''.join(t for t, _ in texts(d))
-    ok = 'One More' in j and ('全部' in j or '355 款' in j)
+    # ★ 2026-11-13（真机踩到）：**App 切成英文后，首页标记变成 `All` / `355 games`**
+    #   而这里只认中文 `全部` / `355 款` ⇒ `is_home()` 永远 false ⇒ 全款 `NO_CARD`/`NOT_HOME`。
+    #   ⇒ 中英都要认。
+    ok = 'One More' in j and ('全部' in j or '355 款' in j or 'All' in j or '355 games' in j)
     # ★ 2026-11-11（判据 1910）：**「首页 + 搜索框有内容」不算初始态** ——
     #   `✕` 只在搜索框有内容时出现；不清空就会把新词拼到旧词后面 ⇒ 全部 no_card
     if ok and '✕' in j:
