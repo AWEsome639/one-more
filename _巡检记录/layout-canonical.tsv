@@ -361,3 +361,18 @@
 2026-11-13T17:15:28	Cube Net Fold	OK	1464	132.0s lowest='可填 A' [60,1368][853,1464] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Cube_Net_Fold-171527.jpeg @2026-11-13T17:15:28
 2026-11-13T17:35:25	Action Sequence Recall	OK	1464	121.9s lowest='看好机器人做 3 个动作…' [60,1415][2500,1464] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Action_Sequence_Recall-173523.jpeg @2026-11-13T17:35:25
 2026-11-13T17:57:19	Card Counting Memory	OK	1441	130.7s lowest='6♥️' [60,1303][648,1441] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Card_Counting_Memory-175718.jpeg @2026-11-13T17:57:19
+2026-11-13T18:18:17	Temporal Order Judgment	NOT_HOME	-	125.0s could not reach home
+2026-11-13T18:22:52	Temporal Order Judgment	NOT_HOME	-	268.4s could not reach home
+2026-11-13T19:23:10	Temporal Order Judgment	NO_CARD	-	220.5s no card for '时序判断' (fallback=(347, 828))
+2026-11-13T19:26:23	Spatial Conflict	NO_CARD	-	190.5s no card for '空间冲突' (fallback=(347, 828))
+2026-11-13T19:30:59	Temporal Order Judgment	NO_CARD	-	225.8s no card for '时序判断' (fallback=(347, 828))
+2026-11-13T19:34:47	Temporal Order Judgment	NO_CARD	-	217.6s no card for '时序判断' (fallback=(347, 828))
+2026-11-13T19:39:25	Temporal Order Judgment	NO_CARD	-	230.7s no card for '时序判断' (fallback=(1280, 675))
+2026-11-13T19:42:31	Spatial Conflict	NO_CARD	-	183.4s no card for '空间冲突' (fallback=(1280, 675))
+2026-11-13T19:53:54	Temporal Order Judgment	NO_CARD	-	229.0s no card for '时序判断' (fallback=(1280, 675))
+2026-11-13T19:58:20	Temporal Order Judgment	NO_CARD	-	236.0s no card for '时序判断' (fallback=(1280, 675))
+2026-11-13T20:03:12	Temporal Order Judgment	DUMP_FAIL	-	259.7s no search dump
+2026-11-13T20:06:05	Temporal Order Judgment	NOT_HOME	-	142.5s could not reach home
+2026-11-13T20:18:56	Temporal Order Judgment	DUMP_FAIL	-	261.1s no search dump
+2026-11-13T20:23:06	Temporal Order Judgment	OK	1462	229.6s lowest='两次闪现之间夹着一小段空白，别看错先后' [60,1420][2500,1462] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Temporal_Order_Judgment-202305.jpeg @2026-11-13T20:23:06
+2026-11-13T20:25:54	Spatial Conflict	OK	1468	162.5s lowest='规矩只有一条：跟箭头走，字和位置都在骗你' [60,1426][2500,1468] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Spatial_Conflict-202551.jpeg @2026-11-13T20:25:54

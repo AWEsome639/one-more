@@ -288,7 +288,9 @@ export struct GSpatialConflict {
         }.layoutWeight(1).height('100%')
         .backgroundColor(this.flash < 0 ? this.theme.surfaceAlt : (this.flash === 1 ? '#2210B981' : '#22EF4444'))
         .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      }.width('100%').height(Bp.isShort() ? 140 : 180)
+      }.width('100%').height(Bp.isShort() ? 120 : 180)
+      // 2026-11-13 真机截图：底部第二行（`lastFb` 反馈行）贴着手势条
+      //   ⇒ 这张卡再让 20vp（140 → 120）。**这行不能隐藏**（是对错反馈）
       Row({ space: Space.sm }) {
         Button((TG('⬅️ 左')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(true ? Palette.sky : Palette.violet)

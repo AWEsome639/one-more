@@ -320,7 +320,9 @@ export struct GTemporalOrderJudgment {
         }.layoutWeight(1).height('100%')
         .backgroundColor(this.isLit((1)) ? (this.lit === 0 ? Palette.amber : Palette.sky) : this.theme.surfaceAlt)
         .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      }.width('100%').height(Bp.isShort() ? 140 : 180)
+      }.width('100%').height(Bp.isShort() ? 120 : 180)
+      // 2026-11-13 真机截图：底部第二行（`lastFb` 反馈行）被手势条压住
+      //   ⇒ 这块卡再让 20vp（140 → 120）。**不能隐藏那行** —— 它是答题对错反馈
       Row({ space: Space.sm }) {
         Button((true ? '⬅️ ' : '➡️ ') + this.embAt((0)) + (true ? TG(' 左边先') : TG(' 右边先')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
