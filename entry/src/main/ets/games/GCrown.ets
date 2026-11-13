@@ -603,7 +603,7 @@ export struct GCrown {
               })
             }, (c: number) => 'cr' + r + '-' + c)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 240)))
+          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
         }, (r: number) => 'crw' + r)
       }
       .width('100%')

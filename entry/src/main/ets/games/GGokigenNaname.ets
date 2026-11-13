@@ -625,7 +625,7 @@ export struct GGokigenNaname {
               })
             }, (c: number) => 'gk' + r + '-' + c)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 240)))
+          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
         }, (r: number) => 'gkr' + r)
       }
       .width('100%')

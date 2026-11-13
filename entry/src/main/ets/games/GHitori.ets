@@ -840,7 +840,7 @@ export struct GHitori {
       // 2026-11-13 真机截图：**6×6 盘面只有 2 行可见**（4 行整块在屏外）
       //   格子是 `layoutWeight(1).aspectRatio(1)` ⇒ 按宽度分 ⇒ 6 列 × 142vp = 853vp 高
       //   ⇒ **限宽即限高**（判据 1966）：封顶到 `Bp.height - 240` ≈ 293vp
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 240)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

@@ -774,7 +774,7 @@ export struct GShikaku {
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 240)))
+          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
         }, (r: number) => 'r' + r)
       }
       .width('100%')

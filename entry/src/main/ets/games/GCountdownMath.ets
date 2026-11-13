@@ -539,7 +539,7 @@ export struct GCountdownMath {
       }
       // 2026-11-14 真机截图：**四张数字卡底部被切**（每张 ~350px 高，是宽度撑的）
       //   卡片按宽度分配 ⇒ 限宽即限高（判据 1966）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 240)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
 
       Row({ space: Space.sm }) {
         Button(('+'))

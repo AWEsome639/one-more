@@ -746,7 +746,7 @@ export struct GSkyscrapers {
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.skyTap((gr), (gc)); }); })
             }, (gc: number) => 'g' + gc)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 240)))
+          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
         }, (gr: number) => 'gr' + gr)
       }
       .width('100%')
