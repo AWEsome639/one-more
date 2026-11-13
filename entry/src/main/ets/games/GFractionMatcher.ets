@@ -318,12 +318,13 @@ export struct GFractionMatcher {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
-        Text('½').fontSize(FontSize.xxl)
+        // 2026-11-13 真机截图（lowest='B' 在 1600）：**选项 B 被切** ⇒ 按判据 1886 缩**上方**的题卡
+        Text('½').fontSize(Bp.isShort() ? FontSize.lg : FontSize.xxl)
         Row({ space: Space.sm }) {
           Column({ space: 2 }) {
-            Text(Digits(String(this.a), this.langCode)).fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
+            Text(Digits(String(this.a), this.langCode)).fontSize(Bp.isShort() ? FontSize.xxl : FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
             Row().width(48).height(2).backgroundColor(this.theme.lineSoft)
-            Text(Digits(String(this.b), this.langCode)).fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
+            Text(Digits(String(this.b), this.langCode)).fontSize(Bp.isShort() ? FontSize.xxl : FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
           }.alignItems(HorizontalAlign.Center)
           Text('= ?')          // ★ 2026-11-03（第 1119 轮）**装饰性元素从无障碍树摘掉**
           //   「= ?」是题目版式的一部分（题目本身由 q 表达），

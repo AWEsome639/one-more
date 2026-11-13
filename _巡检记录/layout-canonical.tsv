@@ -397,3 +397,5 @@
 2026-11-13T22:11:02	Block Count 3D	NO_CARD	-	197.5s no card for '数方块' (fallback=(1280, 757))
 2026-11-13T22:30:31	Pattern Sequence Draw	NO_CARD	-	199.0s no card for '画规律' (fallback=(1280, 757))
 2026-11-13T22:34:11	Pattern Sequence Draw	NO_CARD	-	199.6s no card for '画规律' (fallback=(1280, 757))
+2026-11-13T22:51:37	Fraction Matcher	NO_CARD	-	166.1s no card for '分数匹配' (fallback=(1280, 757))
+2026-11-13T22:54:42	Fraction Matcher	NO_CARD	-	167.6s no card for '分数匹配' (fallback=(1280, 757))
