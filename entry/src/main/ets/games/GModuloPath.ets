@@ -426,7 +426,7 @@ export struct GModuloPath {
               .outline(Tv.focusOutline(this.tvFocus === 'L420'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * GRID + c)); }); })
             }, (c: number) => 'mc' + c)
-          }.width('100%')
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 240)))
         }, (r: number) => 'mr' + r)
       }.width('100%').layoutWeight(1)
 

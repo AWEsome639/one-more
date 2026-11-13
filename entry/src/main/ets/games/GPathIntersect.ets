@@ -822,7 +822,7 @@ export struct GPathIntersect {
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
             }, (c: number) => 'c' + c)
           }
-          .width('100%')
+          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 240)))
         }, (r: number) => 'r' + r)
       }
       .width('100%')
