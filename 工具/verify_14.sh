@@ -76,12 +76,24 @@ if ! echo "$OUT" | grep -q "install bundle successfully"; then
 fi
 echo "✅ 安装成功" | tee -a "$LOG"
 
+# ★ 2026-11-13 断点续跑：`onemore` 每 10~15 分钟会掉线，一次跑不完 14 款。
+#   已经测出**确定结果**的款跳过（NOT_HOME / DUMP_FAIL / TIMEOUT 不算完成，要重测）。
+done_list() {
+  [ -f "$LOG" ] || return 0
+  grep -E "^[^\t]+\t(OK|TIGHT|OVER|NEAR)" "$LOG" 2>/dev/null | cut -f1
+}
+SKIPPED=0
 BAD=0
 for g in \
   "Spatial Conflict" "Stroop Number Size" "Temporal Order Judgment" \
   "Blink Detector" "Choice Reaction Time" "Stop Signal" "Topology" \
   "Ab Reversal Oddball" "Action Sequence Recall" "Card Counting Memory" "Venn Numbers" \
   "Cube Net Fold" "Spotlight Track" "Geometric Vision" ; do
+  if done_list | grep -qxF "$g"; then
+    echo "$g\t(已完成，跳过)" | tee -a "$LOG"
+    SKIPPED=$((SKIPPED+1))
+    continue
+  fi
   r=$(timeout 300 python3 工具/shot_game.py "$g" 2>&1 | tail -1 | cut -f1-4,6 | cut -c1-110)
   echo "$r" | tee -a "$LOG"
   # ★ 快速失败：NOT_HOME/DUMP_FAIL 是**环境问题**（设备不稳/方向错），不是某款的问题
@@ -97,4 +109,4 @@ for g in \
   esac
   sleep 2
 done
-echo "DONE" | tee -a "$LOG"
+echo "DONE（跳过 $SKIPPED 款已完成的）" | tee -a "$LOG"
