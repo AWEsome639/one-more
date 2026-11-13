@@ -289,6 +289,26 @@ def _body(name, t0):
     time.sleep(25.0)
     sh('aa start -a EntryAbility -b com.andrewoscar.onemore')   # ← 关键：第二次 start
     time.sleep(8.0)
+    # ★★★ 2026-11-13（判据 2000）：**全新实例/全新装包会连弹三道闸** ——
+    #   ① 首启弹窗：隐私说明（同意并继续）→ 欢迎来到 One More（开始玩）
+    #   ② 输入法权限：搜索要打字 ⇒ 系统弹「小艺输入法 · 同意/取消」⇒ **整个界面被系统弹窗盖住**
+    #   ③ 界面语言：英文界面下所有中文判据都 false（判据 1999 已双语化）
+    #   不点掉这三道，后面全部 NO_CARD/NOT_HOME。
+    for _gate in range(6):
+        _d = dump('gate%d' % _gate)
+        if not _d:
+            time.sleep(3.0)
+            continue
+        _hit = None
+        for _t in ('同意并继续', '开始玩', '同意', 'Agree', 'Continue', 'OK'):
+            _h = _find_text_node(_d, _t)
+            if _h:
+                _hit = _h
+                break
+        if not _hit:
+            break
+        sh('uitest uiInput click %d %d' % (_hit[0], _hit[1]))
+        time.sleep(2.5)
     for _w in range(10):
         time.sleep(4.0)
         if is_home():
