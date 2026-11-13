@@ -56,6 +56,21 @@ export default class EntryAbility extends UIAbility {
     //   ⇒ 落到 `onemore_progress` 库的 'uiMode' 键（与 `lang` 同一个库、同一套写法）。
     //   ⚠️ 必须在第一帧（onWindowStageCreate→loadContent）之前跑完，否则会先按 NORMAL 画一帧。
     this.loadUiMode();
+    // ★ 2026-11-13：端侧推理链路的**调试触发** —— `aa start … --ps selfTest true` 时跑一次自检，
+    //   结果只进 hilog（tag `LLMTEST`）。默认**不触发**，不影响正常启动。
+    //   ⇒ 这样今晚验证 MindSpore Lite 链路不需要改界面、也不需要临时页面。
+    try {
+      const sd: string = ((want.parameters ?? {}) as Record<string, Object>)['selfTest'] as string;
+      if (sd === 'true') {
+        import('../core/MindSporeSelfTest').then((m) => {
+          m.MindSporeSelfTest.run(this.context);
+        }).catch((e: Error) => {
+          hilog.error(0x0001, 'LLMTEST', 'fail step=import %{public}s', JSON.stringify(e));
+        });
+      }
+    } catch (err) {
+      hilog.error(0x0001, 'LLMTEST', 'fail step=want-param');
+    }
     // ★ 2026-11-08：把「落盘通道」注册给 UiModeMgr —— 设置页一点模式就写盘，
     //   不再依赖"用户有没有切过后台"（原来只在 onBackground 写，切完直接强杀就丢）。
     UiModeMgr.bindWriter((m: string) => { this.persistUiMode(m); });

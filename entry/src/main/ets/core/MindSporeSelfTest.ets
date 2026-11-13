@@ -6,7 +6,8 @@
  *
  * 用法（默认**没有人调用**，只在调试时手动触发）：
  *   import { MindSporeSelfTest } from './MindSporeSelfTest';
- *   MindSporeSelfTest.run();       // 结果只进 hilog，tag = 'LLMTEST'
+ *   MindSporeSelfTest.run(ctx);    // 结果只进 hilog，tag = 'LLMTEST'
+ *   （`ctx` 从调用方传入 —— ArkTS strict 下静态方法里不能用 `getContext(this)`）
  *
  * 通过判据（`hdc shell hilog -x | grep LLMTEST`）：
  *   `LLMTEST ok outputs=1 bytes=1000`
@@ -30,10 +31,9 @@ export class MindSporeSelfTest {
    * 跑一次链路自检。**不抛异常**；结果全部进 hilog（tag `LLMTEST`）。
    * @returns true = 链路通（`predict` 返回了至少一个输出张量）
    */
-  static async run(): Promise<boolean> {
+  static async run(ctx: Context): Promise<boolean> {
     let t0: number = Date.now();
     try {
-      const ctx: Context = getContext(this) as Context;
       const rm = ctx.resourceManager;
       let bytes: Uint8Array;
       try {
