@@ -28,13 +28,15 @@ def parse(since=None):
         mb = f[3] if len(f) > 3 else '-'
         blk = 0
         m = re.search(r'blk=(\d+)/(\d+)px', ln)
+        # 2026-11-14（判据 2001）：**被遮挡文字节点数** —— 抓「内容太高把上方元素盖住」
+        cm = re.search(r'cov=(-?\d+)', ln)
         if m:
             blk = int(m.group(2))
         low = ''
         m2 = re.search(r"lowest='([^']*)'", ln)
         if m2:
             low = m2.group(1)
-        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, low=low))
+        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, low=low, cov=(int(cm.group(1)) if cm else -1)))
     return rows
 
 def main():
@@ -60,6 +62,14 @@ def main():
         lst.sort(key=lambda r: -r['blk'] if 'blk' in r else 0)
 
     print('== %d 款有测量结果，%d 款是环境失败（要重测）==' % (len(got), len(env)))
+
+    # ★ 2026-11-14（判据 2001）：**被遮挡**优先于所有档位 —— 因为这类 `blk` 往往最小却最严重
+    #   （`Memory` 24 / `Schulte Table` 24 / `Simon Says` 48 / `Number Bonds All` 22）
+    COV = [r for r in got if r.get('cov', -1) > 0]
+    if COV:
+        print('\n【⚠️ 被遮挡】cov > 0（有元素被盖住 ⇒ **`blk` 再小也要看截图**）%d 款' % len(COV))
+        for r in COV:
+            print('  %-30s cov=%-3d blk=%-3d max=%-5s' % (r['name'], r['cov'], r['blk'], r['mb']))
     print('\n【A 档】blk ≥ 24px（真越界，先看这些）%d 款' % len(A))
     for r in A:
         print('  %-30s blk=%-3d max=%-5s lowest=%s' % (r['name'], r['blk'], r['mb'], r['low'][:26]))
