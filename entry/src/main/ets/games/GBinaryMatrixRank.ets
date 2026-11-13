@@ -457,7 +457,9 @@ export struct GBinaryMatrixRank {
               .layoutWeight(1)
           }
           .width('100%')
-          .height(Cell.of(34))   // ★ 2026-11-10（判据 1890 ②）：42 → 34，4 行省 96px
+          // 2026-11-14 真机截图（blk=32px）：**选项 `C 秩=0` 被切、`D` 完全不见** ⇒ 答不了题
+        //   按判据 1886：动上方（矩阵格），不动选项（选项是内容，缩了也照样被切）
+        .height(Bp.isShort() ? Cell.of(28) : Cell.of(34))   // ★ 2026-11-10（判据 1890 ②）：42 → 34，4 行省 96px
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
