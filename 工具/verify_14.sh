@@ -29,7 +29,14 @@ ensure() {
         [ -f "$CFG" ] || continue
         W=$(grep -oE "hw.lcd.single.width=[0-9]+" "$CFG" | cut -d= -f2)
         H=$(grep -oE "hw.lcd.single.height=[0-9]+" "$CFG" | cut -d= -f2)
-        if [ -n "$W" ] && [ -n "$H" ] && [ "$W" -gt "$H" ]; then LANDS="$LANDS $cand"; fi
+        # ★ 判据 1997：**必须和台账基准 853x533 vp 一致**，否则数据不可比！
+        #   `onemore5` 是 `960x540`（横向多 107vp）⇒ 它测出来的「溢出」会消失 ⇒ 不能当主用实例
+        DN=$(grep -oE "hw.lcd.density=[0-9]+" "$CFG" | cut -d= -f2)
+        if [ -n "$W" ] && [ -n "$H" ] && [ -n "$DN" ] && [ "$W" -gt "$H" ]; then
+          VW=$(awk -v w="$W" -v d="$DN" 'BEGIN{printf "%d", w/(d/160)+0.5}')
+          VH=$(awk -v h="$H" -v d="$DN" 'BEGIN{printf "%d", h/(d/160)+0.5}')
+          if [ "$VW" -eq 853 ] && [ "$VH" -eq 533 ]; then LANDS="$cand"; fi
+        fi
       done
       echo "· 候选横屏实例:$LANDS" >> "$LOG"
       for inst in $LANDS; do
