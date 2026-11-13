@@ -376,3 +376,4 @@
 2026-11-13T20:18:56	Temporal Order Judgment	DUMP_FAIL	-	261.1s no search dump
 2026-11-13T20:23:06	Temporal Order Judgment	OK	1462	229.6s lowest='两次闪现之间夹着一小段空白，别看错先后' [60,1420][2500,1462] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Temporal_Order_Judgment-202305.jpeg @2026-11-13T20:23:06
 2026-11-13T20:25:54	Spatial Conflict	OK	1468	162.5s lowest='规矩只有一条：跟箭头走，字和位置都在骗你' [60,1426][2500,1468] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Spatial_Conflict-202551.jpeg @2026-11-13T20:25:54
+2026-11-13T20:32:20	Ab Reversal Oddball	NOT_HOME	-	135.2s could not reach home
