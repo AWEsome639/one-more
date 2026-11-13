@@ -270,7 +270,8 @@ export struct GStroopTest {
           .animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }
-      .width('100%').height(180).justifyContent(FlexAlign.Center)
+      // 2026-11-13：ArkUI 的 `height(180)` 是 **180vp = 540px**（不是 180px）——这才那张大卡的真实高度
+      .width('100%').height(Bp.isShort() ? 130 : 180).justifyContent(FlexAlign.Center)
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.sm }) {
         this.opt(0)
