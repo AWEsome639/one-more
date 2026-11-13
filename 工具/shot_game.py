@@ -121,6 +121,10 @@ def dump(tag='d', timeout=60):
     ok2, txt = sh('cat ' + p, 15)
     if not ok2 or not txt.strip():
         return None                               # 文件不存在/空 ⇒ 本次无效
+    # 2026-11-13（判据 1990）：**dump 用完即删** —— 今晚 `/data/local/tmp` 累积了
+    #   32886 个文件 / 2.6GB，把模拟器磁盘撑到 95%，`hdc install` 开始静默失败，
+    #   导致我几小时的改动全都没进包（判据 1989）。
+    sh('rm -f ' + p, 8)
     try:
         return json.loads(txt)
     except Exception:
@@ -579,6 +583,8 @@ def _body(name, t0):
         recv_ok = (rc == 0 and os.path.exists(out))
     except Timeout:
         recv_ok = False
+    # 2026-11-13（判据 1990）：**截图也从设备删掉** —— 别在模拟器上堆文件（今晚堆到 2.6GB 把盘撑满）
+    sh('rm -f ' + remote, 8)
 
     # ★ 2026-11-10（判据 1889）：结果行带测量时间戳，否则「按文件 mtime 取最新」会被拷贝污染
     import datetime as _dt
