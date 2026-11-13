@@ -435,7 +435,7 @@ export struct GMemory {
       // 2026-11-14 真机截图：**翻牌格子巨大（~550px），「重新开始」浮在牌面上，底部整排被切**
       //   卡片 layoutWeight(1).aspectRatio(0.82) ⇒ 4 列 × ~625px 宽 ⇒ 每张高 ~762px ⇒ 4 行 = 3048px
       //   ⇒ 限容器宽度（判据 1966：限宽即限高）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 300)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
       .layoutWeight(1)
 
       Text(this.done ? TG('🎉 全部配对！') : (this.tries >= 20 ? TG('有点多哦，沉住气') : TG('每次翻两张，找相同的')))

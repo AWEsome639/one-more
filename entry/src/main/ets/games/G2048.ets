@@ -814,7 +814,7 @@ export struct G2048 {
       //   根因：`width('100%')` + `aspectRatio(1)` ⇒ 宽度 2500px、按比例要高也 2500px，
       //   而下面那个 `constraintSize({maxHeight:'46%'})` **只是把方形裁掉一半**，
       //   **格子仍按 2500px 的方形排** ⇒ 视觉上又小又错位（判据 1966：要限**宽**，不是限高）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 230)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
       .aspectRatio(1)
       // ★★★ 2026-10-29 真机抓到（**第三次**同一个坑）：
       //   棋盘 aspectRatio(1) ⇒ 高度被宽度锁死 ⇒ 把「提示 / 重开」那一行挤到屏幕外

@@ -336,7 +336,7 @@ export struct GFactorFinder {
       }
       // 2026-11-14 真机截图：底部按钮只露上沿（判据 1886：缩上方）
       //   数字格是 aspectRatio(1) ⇒ 4 列按宽度分 ⇒ 限宽即限高（判据 1966）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(220, Bp.height - 240)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(220, Bp.height - 360)))
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
