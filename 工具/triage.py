@@ -67,7 +67,9 @@ def main():
     #   （`Memory` 24 / `Schulte Table` 24 / `Simon Says` 48 / `Number Bonds All` 22）
     COV = [r for r in got if r.get('cov', -1) > 0]
     if COV:
-        print('\n【⚠️ 被遮挡】cov > 0（有元素被盖住 ⇒ **`blk` 再小也要看截图**）%d 款' % len(COV))
+        print('\n【⚠️ 被遮挡】cov > 0（有元素被别的元素整个覆盖）%d 款' % len(COV))
+        print('   ⇒ **必须看截图判真假**：可能是真缺陷（盘面盖住统计行），也可能是**正常浮层**（徽标/角标叠在卡片上）')
+        print('   ⇒ 合成测试实证：正常布局 cov=0 / 被盖住 cov=2 / **浮层(设计如此) cov=1** ⇒ 天生有误报')
         for r in COV:
             print('  %-30s cov=%-3d blk=%-3d max=%-5s' % (r['name'], r['cov'], r['blk'], r['mb']))
     print('\n【A 档】blk ≥ 24px（真越界，先看这些）%d 款' % len(A))
