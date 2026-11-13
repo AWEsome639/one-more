@@ -214,8 +214,10 @@ def verify_title(tree, en_name):
     # ⚠️ 2026-11-09：**光「包含标题」不够** —— 首页的卡片上也写着「文氏图, 集合运算」
     #   ⇒ 必须同时「没有首页标记」（底部 tab「今天这一局 / 全部」与搜索框）
     # ★ 2026-11-10：**首页标记不可靠**（换 tab 就没有「今天这一局」）⇒ 改成「必须有游戏内元素」
-    on_home = ('今天这一局' in joined) or ('全部' in joined and '🎯' in joined)
-    in_game = ('AI 代打' in joined) or ('提示' in joined)
+    # ★ 2026-11-13（判据 1999）：App 能切语言 ⇒ 首页/游戏内标记必须**中英双语**
+    on_home = ('今天这一局' in joined or 'Today' in joined) or \
+              (('全部' in joined or 'All' in joined) and '🎯' in joined)
+    in_game = ('AI 代打' in joined or 'AI Play' in joined) or ('提示' in joined or 'Hint' in joined)
     if on_home or not in_game:
         return False, want
     return (want in joined), want
