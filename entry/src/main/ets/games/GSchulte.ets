@@ -5,6 +5,7 @@
  */
 
 import { Hint, HintResult } from '../ai/Hint';
+import { Bp } from '../core/Bp';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -335,7 +336,9 @@ export struct GSchulte {
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((this.nums[r * this.diffTotal + c]), (r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
-          .width('100%')
+      // 2026-11-14 真机截图：**5×5 格子只有 2 行可见**，`重新开始` 和提示浮在格子上
+      //   格子 aspectRatio(1) ⇒ 5 列 × ~500px ⇒ 5 行 = 2500px ≫ 可用（判据 1966：限宽即限高）
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 250)))
         }, (r: number) => 'r' + r)
       }
       .width('100%')
