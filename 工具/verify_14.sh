@@ -14,15 +14,18 @@ target() {
 }
 
 ensure() {
+  # 2026-11-13 修 bug：原来 `ensure()` 把提示文字也 echo 出来了
+  #   ⇒ `T=$(ensure)` 拿到的是「· 设备不在…\n127.0.0.1:5555」⇒ `install -t "$T"` 直接失败。
+  #   ⇒ 现在提示只进 LOG，**stdout 只输出设备名**。
   local t; t=$(target)
   case "$t" in
     *Empty*|"")
-      echo "· 设备不在 ⇒ 起 onemore3（onemore 疑似损坏）" | tee -a "$LOG"
+      echo "· 设备不在 ⇒ 起 onemore3（onemore 疑似损坏）" >> "$LOG"
       (nohup "$EMU" -start onemore3 -noWindow > /tmp/emu_verify.log 2>&1 &)
       sleep 300
       t=$(target);;
   esac
-  echo "$t"
+  printf '%s' "$t"
 }
 
 T=$(ensure)
