@@ -30,7 +30,13 @@ case "$T" in *Empty*|"") echo "❌ 设备起不来" | tee -a "$LOG"; exit 1;; es
 echo "设备: $T" | tee -a "$LOG"
 
 # 装包 —— 必须看到 successfully（判据 1989）
+# 2026-11-13：`onemore3` 上可能没装过 App ⇒ `install -r` 会失败
+#   ⇒ 先试 `-r`（替换），失败再试不带 `-r`（全新安装）
 OUT=$("$HC" -t "$T" install -r "$HAP" 2>&1)
+if ! echo "$OUT" | grep -q "install bundle successfully"; then
+  echo "· -r 失败，改试全新安装" | tee -a "$LOG"
+  OUT=$("$HC" -t "$T" install "$HAP" 2>&1)
+fi
 if ! echo "$OUT" | grep -q "install bundle successfully"; then
   echo "❌ [闸] 安装失败，停。输出：" | tee -a "$LOG"
   echo "$OUT" | tail -3 | tee -a "$LOG"
