@@ -150,6 +150,36 @@ def texts(tree, pred=lambda t: True):
     return out
 
 
+def covered_count(items):
+    """**被别的元素整个盖住的文字节点数**（2026-11-14 新增，判据 2001）。
+
+    为什么需要它：`blk` 只量「越界」，而有一类问题**越界极小、后果极重** ——
+    内容太高 ⇒ 把**上方**的元素顶出原位并被盖住。今天撞到 `4` 次（`Memory` /
+    `Schulte Table` / `Simon Says` / `Number Bonds All`），`blk` 全 ≤ `48px`，
+    但截图里统计行/按钮被整块盖住 ⇒ **界面不可用**。
+
+    判据：`cov` > 0 ⇒ 有元素被盖住 ⇒ **必须看截图**，别信 `blk`。
+    """
+    try:
+        covers = 0
+        for i, (_t1, r1) in enumerate(items):
+            x1, y1, x2, y2 = r1
+            if x2 - x1 < 8 or y2 - y1 < 8:
+                continue          # 太小的（图标/角标）不算
+            for j, (_t2, r2) in enumerate(items):
+                if i == j:
+                    continue
+                a1, b1, a2, b2 = r2
+                # r2 完全盖住 r1（留 2px 容差）
+                if a1 <= x1 + 2 and b1 <= y1 + 2 and a2 >= x2 - 2 and b2 >= y2 - 2:
+                    if (a2 - a1) * (b2 - b1) > (x2 - x1) * (y2 - y1):
+                        covers += 1
+                        break
+        return covers
+    except Exception:
+        return -1
+
+
 # ═══════════════ ⑦ 标题表缓存（顺手，每款至少 3 次调用） ═══════════════
 
 _TITLE_CACHE = None
@@ -614,9 +644,15 @@ def _body(name, t0):
     # ★ 2026-11-10（判据 1889）：结果行带测量时间戳，否则「按文件 mtime 取最新」会被拷贝污染
     import datetime as _dt
     _ts = _dt.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    # 2026-11-14（判据 2001）：**被遮挡文字节点数** —— 抓「内容太高把上方元素盖住」那一类
+    try:
+        _cov = covered_count(texts(d2))
+    except Exception:
+        _cov = -1
+
     if recv_ok:
         finish(name, 'OK', t0, mb,
-               'lowest=%r %s blk=%d/%dpx max=%d -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, block_over_max, out, _ts))
+               'lowest=%r %s blk=%d/%dpx cov=%d max=%d -> %s @%s' % (lo, lo_bounds, block_over_n, _cov, block_over_max, out, _ts))
     else:
         finish(name, 'OK_NOSHOT', t0, mb,
                'lowest=%r %s recv failed @%s' % (lo, lo_bounds, _ts))
