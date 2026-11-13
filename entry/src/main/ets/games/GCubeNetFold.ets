@@ -359,7 +359,9 @@ export struct GCubeNetFold {
               }
               .layoutWeight(1).aspectRatio(1)
             }, (c: number) => 'c' + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+          }// 2026-11-13 真机截图：底部「可填 A/B/C」三个按钮被切掉一半（`blk=1/24px`）
+      //   ⇒ 盘面再让 40vp 出来（`-360` → `-400`），按钮就完整了
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 400)))
         }, (r: number) => 'r' + r)
       }.width('100%')
 
