@@ -338,7 +338,9 @@ export struct GPythagoreanTripleBuilder {
       Column({ space: Space.sm }) {
         Text(this.ask).fontSize(FontSize.lg).fontColor(this.theme.ink).textAlign(TextAlign.Center).width('100%')
         Text(this.typed.length > 0 ? this.typed : '?')
-          .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.berry)
+          // 2026-11-13 真机截图：数字键盘**最下排（⌫ / 0 / 确认）被切掉** ⇒ 点不到「确认」
+          //   按判据 1886：**动上方题卡**（`hero` 36 → 矮屏 `xxl` 24），不动底部键盘
+          .fontSize(Bp.isShort() ? FontSize.xxl : FontSize.hero).fontWeight(FontWeight.Bold).fontColor(Palette.berry)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
       // ★ 2026-11-12（判据 1950）：键盘 `7/8/9` 那行**只露出上半截**（点不到）⇒
