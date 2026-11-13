@@ -310,7 +310,9 @@ export struct GFactorFinder {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Column({ space: Space.xs }) {
-        Text('➗').fontSize(FontSize.xxl)
+        // 2026-11-14 真机截图：底部那个按钮（`重开`/`提示`）**只露上沿**，提示行也贴底
+        //   按判据 1886：动上方（题卡里的 ➗ emoji 与题面字号）
+        Text('➗').fontSize(Bp.isShort() ? FontSize.lg : FontSize.xxl)
           .accessibilityLevel('no')
         Text(TG2('找出 {0} 的全部因数', String(this.n))).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.isDark ? Palette.primary : Palette.primaryDeep)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
@@ -331,7 +333,9 @@ export struct GFactorFinder {
             }, (col: number) => 'ffc' + col)
           }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
         }, (row: number) => 'ffr' + row)
-      }.width('100%')
+      // 2026-11-14 真机截图：底部按钮只露上沿（判据 1886：缩上方）
+      //   数字格是 aspectRatio(1) ⇒ 4 列按宽度分 ⇒ 限宽即限高（判据 1966）
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(220, Bp.height - 240)))
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
