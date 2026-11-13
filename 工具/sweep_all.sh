@@ -51,7 +51,10 @@ todo = [n for n in alln if n not in done]
 #   ⇒ 用 git 找出「最近改动过的 .ets」→ 映射到英文名 → 提到队首。
 import subprocess as _sp
 try:
-    out = _sp.check_output(['git', 'diff', '--name-only', 'HEAD~40..HEAD'],
+    # ⚠️ 2026-11-14 修正：原来用 `HEAD~40..HEAD`（按提交数）⇒ **我今天提交太多，
+    #   早期改动掉出了 40 个提交的窗口** ⇒ 优先级从 27 款掉到 21 款，**16 款改动没被优先**。
+    #   ⇒ 改成**按时间**（`--since`），与提交数无关。
+    out = _sp.check_output(['git', 'log', '--since=2026-11-13 22:00', '--name-only', '--pretty=format:'],
                            stderr=_sp.DEVNULL).decode('utf-8', 'replace')
     changed_files = [l.strip() for l in out.split('\n') if l.strip().startswith('entry/src/main/ets/games/')]
     reg = io.open('entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
