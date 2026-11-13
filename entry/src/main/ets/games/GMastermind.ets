@@ -444,7 +444,7 @@ export struct GMastermind {
             .border({ width: 1, color: this.theme.line })
         }, (i: number) => 'sec' + i)
       }
-      .width('100%')
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 260)))
 
       // 调色盘
       Row({ space: Space.sm }) {
@@ -474,7 +474,7 @@ export struct GMastermind {
             })
         }, (c: number) => 'hue' + c)
       }
-      .width('100%')
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 260)))
 
       // 这一行猜的
       Row({ space: Space.sm }) {
@@ -506,7 +506,7 @@ export struct GMastermind {
             })
         }, (i: number) => 'cur' + i)
       }
-      .width('100%')
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 260)))
       .padding(Space.xs)
 
       Row({ space: Space.md }) {
