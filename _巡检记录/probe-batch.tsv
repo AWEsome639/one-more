@@ -127,3 +127,11 @@ Word Search	DEEP	802	798	1600	Column
 Word Search	DEEP	38	1562	1600	Row	
 Word Search	DEEP	38	1562	1600	Text	U
 Word Search	DEEP	38	1562	1600	Text	T
+Stroop Test	TALL	1030	381	1411	Column	
+Stroop Test	TALL	970	381	1351	Column	
+Stroop Test	TALL	540	694	1234	Column	
+Stroop Test	TALL	177	1264	1441	Row	
+Stroop Test	DEEP	129	1471	1600	Row	
+Stroop Test	DEEP	129	1471	1600	Button	蓝
+Stroop Test	DEEP	129	1471	1600	Button	绿
+Stroop Test	DEEP	177	1264	1441	Row	
