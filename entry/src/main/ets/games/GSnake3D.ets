@@ -7,6 +7,7 @@
  */
 
 import { Hint, HintResult } from '../ai/Hint';
+import { Bp } from '../core/Bp';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -525,7 +526,11 @@ export struct GSnake3D {
           this.layer(z)
         }, (z: number) => 'L' + z)
       }
-      .width('100%')
+      // 2026-11-14 真机截图（blk=4/96px，全库最重）：**三块 4×4 网格并排，最下面一行全被切**
+      //   三块各占 `~827px` 宽 ⇒ 方格 `aspectRatio(1)` ⇒ 高也 `~827px` ⇒ 加头就超
+      //   ⇒ 限整行宽度（三块等分缩小）⇒ 判据 1966「限宽即限高」
+      //   `533` 屏下封顶 `Bp.height-180 = 353vp` ⇒ 每块 `~115vp`、每格 `~29vp`（够点，且这游戏主要靠方向键）
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(300, Bp.height - 180)))
       // ★ P9：手指直接在棋盘上滑 = 转方向（不用去够下面那排小按钮）
       .gesture(
         PanGesture({ fingers: 1, direction: PanDirection.All, distance: 8 })
