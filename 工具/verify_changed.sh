@@ -39,6 +39,15 @@ CASES=(
   "Target Number|题卡 xxxl→xl|—"
   "Visual Search All|盘面限宽|—"
   "Word Ladder|词格 60→48|键盘末行被切"
+  # ★ 2026-11-14 补漏：以下 8 款之前漏登记（改动在位核对里有，本脚本没登记）
+  "Number Bonds All|行容器限宽 233vp|22px（统计行被盖住）"
+  "Kakuro Mini|题卡/盘面再收 40vp|24px（盘末行+键被切）"
+  "Kakuro|提示行矮屏隐藏|13px（6-9 键被切）"
+  "Schulte Table|盘面限宽|24px（5×5 只见 2 行）"
+  "Countdown Math|四张数字卡限宽|24px（卡底部被切）"
+  "Factor Finder|限宽 + ➗ 降档|24px（底部按钮被切）"
+  "Percentage Shopping|题卡降档|48px（选项 4 不见）"
+  "Binary Matrix Rank|矩阵格 34→28|32px（选项 D 不见）"
 )
 
 echo "=== 今晚 ${#CASES[@]} 处改动复核 ==="
