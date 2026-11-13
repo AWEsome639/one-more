@@ -636,6 +636,9 @@ export struct GKakuro {
 
       Text(this.tip)
         .fontSize(FontSize.sm)
+        // 2026-11-14 真机截图（blk=13px）：**数字键 `6 7 8 9 ⌫` 那一行被切**
+        //   按判据 1886：动上方 —— 矮屏隐藏这句**长说明**（键盘和 `over`/`warn` 反馈不动）
+        .visibility(Bp.isShort() && !this.over ? Visibility.None : Visibility.Visible)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row({ space: Space.sm }) {
