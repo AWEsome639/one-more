@@ -485,7 +485,10 @@ export struct GPercentagePeak {
       }.width('100%').height(8)
 
       Column({ space: Space.xs }) {
-        Text(this.quiz).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.lime).textAlign(TextAlign.Center)
+        Text(this.quiz)
+        // 2026-11-13 真机截图：选项 `4 60` 底部被切 + 提示行被切
+        //   按判据 1886：动上方题卡字号（xxl 24 → 矮屏 lg 18）
+        .fontSize(Bp.isShort() ? FontSize.lg : FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.lime).textAlign(TextAlign.Center)
         Text(TG2("连击 ×{0} · 已答 {1} 题", this.combo, (this.right + this.wrong))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         // ★ 错误抖动
         .translate({ x: this.shakeX })

@@ -399,7 +399,9 @@ export struct GCollatz {
 
       Column({ space: Space.xs }) {
         Text(Digits(String(this.n), this.langCode))
-          .fontSize(FontSize.hero)
+          // 2026-11-13 真机截图：选项 `D 76` 底部被切 + 提示行几乎不见
+          //   按判据 1886：动上方（题卡中央的大号数字），不动底部选项
+          .fontSize(Bp.isShort() ? FontSize.xxl : FontSize.hero)
           .fontWeight(FontWeight.Bold)
           .fontColor(this.n % 2 === 0 ? Palette.teal : Palette.orange)
         Text(this.n % 2 === 0 ? TG('偶数 → 下一步是 ÷2') : TG('奇数 → 下一步是 ×3＋1'))

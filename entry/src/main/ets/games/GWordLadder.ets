@@ -355,7 +355,7 @@ export struct GWordLadder {
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
       Row({ space: Space.sm }) {
-        ForEach([0, 1, 2, 3], (i: number) => { Text(this.word.length > (i) ? this.word.charAt((i)) : '').fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(60)).backgroundColor(this.pick === (i) ? Palette.primary : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapPos((i)); })
+        ForEach([0, 1, 2, 3], (i: number) => { Text(this.word.length > (i) ? this.word.charAt((i)) : '').fontSize(FontSize.xxxl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.pick === (i) ? '#FFFFFF' : this.theme.ink).layoutWeight(1).height(Cell.of(Bp.isShort() ? 48 : 60)).backgroundColor(this.pick === (i) ? Palette.primary : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tapPos((i)); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L356'; })
         .onBlur(() => { if (this.tvFocus === 'L356') { this.tvFocus = ''; } })
