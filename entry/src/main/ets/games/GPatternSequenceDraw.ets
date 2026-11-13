@@ -325,7 +325,10 @@ export struct GPatternSequenceDraw {
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
-      }.width('100%').layoutWeight(1)
+      }
+      // 2026-11-13 真机截图（blk=1/24px）：棋盘最后一行（4/5/6）压在手势条下
+      //   ⇒ 盘面底部留 32px，格子随之缩小、整行上移
+      .width('100%').layoutWeight(1).padding({ bottom: Bp.isShort() ? 32 : 0 })
 
       Text(this.over ? this.msg : TG2('下一笔该点 {0} —— {1}', this.want(), this.msg)).fontSize(FontSize.sm).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         // ★ 通关庆祝

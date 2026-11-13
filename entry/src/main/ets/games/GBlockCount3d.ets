@@ -316,7 +316,10 @@ export struct GBlockCount3d {
               Text('🧊').accessibilityLevel('no').fontSize(FontSize.lg)
               }
               }
-              .layoutWeight(1).height(112).justifyContent(FlexAlign.End).padding(Space.xs)
+              .layoutWeight(1)
+              // 2026-11-13 真机截图（blk=2/48px）：**棋盘的第三行被切掉**（整行看不到）
+              //   每格 112vp × 3 行 = 336vp，加上头/统计/按钮就超了 ⇒ 矮屏降到 88
+              .height(Bp.isShort() ? 88 : 112).justifyContent(FlexAlign.End).padding(Space.xs)
               .backgroundColor(this.theme.surface).borderRadius(Radius.xs)
             }, (c: number) => 'bc' + r + '-' + c)
           }

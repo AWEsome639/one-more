@@ -392,3 +392,8 @@
 2026-11-13T21:23:29	Area Perimeter Match	OK	1600	132.1s lowest='提示：面积看长宽之积，周长看四条边之和 —— 细长条' [712,1573][1848,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Area_Perimeter_Match-212329.jpeg @2026-11-13T21:23:29
 2026-11-13T21:34:02	Base Conversion Run	OK	1576	107.1s lowest='180' [170,1513][2452,1576] blk=2/32px max=16 -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-213401.jpeg @2026-11-13T21:34:02
 2026-11-13T21:45:35	Base Conversion Run	OK	1600	102.2s lowest='把进制换算对，答错扣 3 秒' [60,1594][2500,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-214535.jpeg @2026-11-13T21:45:35
+2026-11-13T22:03:33	Block Count 3D	NO_CARD	-	235.7s no card for '数方块' (fallback=(1280, 757))
+2026-11-13T22:07:14	Block Count 3D	NO_CARD	-	199.2s no card for '数方块' (fallback=(1280, 757))
+2026-11-13T22:11:02	Block Count 3D	NO_CARD	-	197.5s no card for '数方块' (fallback=(1280, 757))
+2026-11-13T22:30:31	Pattern Sequence Draw	NO_CARD	-	199.0s no card for '画规律' (fallback=(1280, 757))
+2026-11-13T22:34:11	Pattern Sequence Draw	NO_CARD	-	199.6s no card for '画规律' (fallback=(1280, 757))
