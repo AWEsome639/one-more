@@ -357,6 +357,9 @@ export struct GActionSequenceRecall {
         .outline(Tv.focusOutline(this.tvFocus === 'L325')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
       Text(TG('提示：回放期间按钮不响应，等「轮到你了」再动手'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        // 2026-11-13 真机截图：矮屏上这一行**被屏幕底边切掉一半**
+        //   ⇒ 这行是**静态提示**（不是反馈），矮屏隐藏安全（同 `GTarget10` 的门控写法）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
