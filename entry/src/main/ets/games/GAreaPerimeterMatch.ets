@@ -285,7 +285,7 @@ export struct GAreaPerimeterMatch {
         .width(this.pct((this.w1))).height(this.pct((this.h1))).backgroundColor((Palette.emerald)).borderRadius(Radius.xs)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         }
-        .width('100%').height(96).justifyContent(FlexAlign.Center)
+        .width('100%').height(Bp.isShort() ? 76 : 96).justifyContent(FlexAlign.Center)
         Text(true ? 'A' : 'B').fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         Text(this.picked < 0 ? TG('面积 ?  周长 ?')
           : TG2('面积 {0} · 周长 {1}', this.area((this.w1), (this.h1)), this.peri((this.w1), (this.h1))))
@@ -300,7 +300,7 @@ export struct GAreaPerimeterMatch {
         .width(this.pct((this.w2))).height(this.pct((this.h2))).backgroundColor((Palette.sky)).borderRadius(Radius.xs)
         .animation({ duration: Motion.fast, curve: Motion.snap() })
         }
-        .width('100%').height(96).justifyContent(FlexAlign.Center)
+        .width('100%').height(Bp.isShort() ? 76 : 96).justifyContent(FlexAlign.Center)
         Text(false ? 'A' : 'B').fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor((Palette.sky))
         Text(this.picked < 0 ? TG('面积 ?  周长 ?')
           : TG2('面积 {0} · 周长 {1}', this.area((this.w2), (this.h2)), this.peri((this.w2), (this.h2))))

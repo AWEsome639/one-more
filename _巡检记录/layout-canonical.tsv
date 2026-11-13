@@ -377,3 +377,17 @@
 2026-11-13T20:23:06	Temporal Order Judgment	OK	1462	229.6s lowest='两次闪现之间夹着一小段空白，别看错先后' [60,1420][2500,1462] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Temporal_Order_Judgment-202305.jpeg @2026-11-13T20:23:06
 2026-11-13T20:25:54	Spatial Conflict	OK	1468	162.5s lowest='规矩只有一条：跟箭头走，字和位置都在骗你' [60,1426][2500,1468] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Spatial_Conflict-202551.jpeg @2026-11-13T20:25:54
 2026-11-13T20:32:20	Ab Reversal Oddball	NOT_HOME	-	135.2s could not reach home
+2026-11-13T20:41:14	Balance Scale	OK	1571	108.0s lowest='点砝码放上右盘，凑到刚好 33' [60,1522][2500,1571] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Balance_Scale-204114.jpeg @2026-11-13T20:41:14
+2026-11-13T20:42:58	Base Conversion Run	OK	1576	103.5s lowest='15' [170,1513][2452,1576] blk=2/32px max=16 -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-204258.jpeg @2026-11-13T20:42:58
+2026-11-13T20:46:21	Binary Code	DUMP_FAIL	-	203.1s no search dump
+2026-11-13T20:52:05	Calculation Sprint	NOT_HOME	-	135.7s could not reach home
+2026-11-13T20:54:10	Attentional Blink	OK	1525	125.0s lowest='提示：数字只出现一次，其余字母都是干扰项' [60,1483][2500,1525] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Attentional_Blink-205409.jpeg @2026-11-13T20:54:10
+2026-11-13T20:56:05	Affix Factory	OK	1564	114.7s lowest='词根「teach」该接哪个词缀？' [60,1508][2500,1564] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Affix_Factory-205604.jpeg @2026-11-13T20:56:05
+2026-11-13T20:58:44	Angle Finder	OK	1448	136.6s lowest='提示：先把已知角加起来，再用内角和去减' [938,1406][1623,1448] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Angle_Finder-205843.jpeg @2026-11-13T20:58:44
+2026-11-13T21:01:01	Area Perimeter Match	OK	1600	136.0s lowest='提示' [60,1489][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Area_Perimeter_Match-210058.jpeg @2026-11-13T21:01:01
+2026-11-13T21:03:13	Block Count 3D	OK	1600	131.4s lowest='1/8' [417,621][496,677] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Count_3D-210312.jpeg @2026-11-13T21:03:13
+2026-11-13T21:07:29	Binary Code	DUMP_FAIL	-	255.3s no search dump
+2026-11-13T21:13:45	Calculation Sprint	TIMEOUT	-	282.5s budget exhausted at search:Calculation Sprint
+2026-11-13T21:21:14	Base Conversion Run	OK	1576	103.2s lowest='13' [170,1513][2452,1576] blk=2/32px max=16 -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-212114.jpeg @2026-11-13T21:21:14
+2026-11-13T21:23:29	Area Perimeter Match	OK	1600	132.1s lowest='提示：面积看长宽之积，周长看四条边之和 —— 细长条' [712,1573][1848,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Area_Perimeter_Match-212329.jpeg @2026-11-13T21:23:29
+2026-11-13T21:34:02	Base Conversion Run	OK	1576	107.1s lowest='180' [170,1513][2452,1576] blk=2/32px max=16 -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-213401.jpeg @2026-11-13T21:34:02
