@@ -556,7 +556,10 @@ export struct GKakuroMini {
       //   ⇒ 再收 20px。
             // ★ 2026-11-12（判据 1928+1939）：`aspectRatio(1)` 板子 **`maxHeight` 只裁不缩** ⇒ 改 `maxWidth`；
             //   按 3×3 反推：可用高 ~343vp − 键盘两行(~90) − 提示(17) ≈ 236vp ⇒ 留余量取 `Bp.height - 320`。
-            .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 320)) : 9999 })
+            // 2026-11-14 真机截图（blk=24px）：**盘面末行 + 数字键 `1~5` 都被切**
+            //   11-12 那条 `Bp.height - 320` 还不够（两行键盘 `~90vp` + 提示 + 头 `480px` 已把预算吃满）
+            //   ⇒ 再收 40vp：`Bp.height - 360`（3×3 ⇒ 每格 ~58vp，仍在 44 触控下限之上）
+            .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 360)) : 9999 })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
