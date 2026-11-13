@@ -20,8 +20,19 @@ ensure() {
   local t; t=$(target)
   case "$t" in
     *Empty*|"")
-      # 2026-11-13：`onemore` 今天冷启动失败多次（疑似损坏）⇒ 依次试 onemore3/4/5/6
-      for inst in onemore3 onemore4 onemore5 onemore6; do
+      # 2026-11-13（判据 1996 补充）：**先读 config.ini 挑横屏实例，别瞎试**
+      #   `hw.lcd.single.width` < `height` 的是竖屏 ⇒ 排除（`onemore2`/`onemore3` 都是）
+      #   已知：onemore=2560x1600横(用一天已不稳) / onemore4=699方 / onemore5=2880x1620横 / onemore6=585方
+      LANDS=""
+      for cand in onemore5 onemore onemore4 onemore6; do
+        CFG="$HOME/.Huawei/Emulator/deployed/$cand/config.ini"
+        [ -f "$CFG" ] || continue
+        W=$(grep -oE "hw.lcd.single.width=[0-9]+" "$CFG" | cut -d= -f2)
+        H=$(grep -oE "hw.lcd.single.height=[0-9]+" "$CFG" | cut -d= -f2)
+        if [ -n "$W" ] && [ -n "$H" ] && [ "$W" -gt "$H" ]; then LANDS="$LANDS $cand"; fi
+      done
+      echo "· 候选横屏实例:$LANDS" >> "$LOG"
+      for inst in $LANDS; do
         echo "· 设备不在 ⇒ 起 $inst" >> "$LOG"
         (nohup "$EMU" -start "$inst" -noWindow > "/tmp/emu_$inst.log" 2>&1 &)
         sleep 300
