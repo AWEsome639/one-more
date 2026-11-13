@@ -497,7 +497,11 @@ export struct GSimonSays {
           .outline(Tv.focusOutline(this.tvFocus === 'L481', Radius.lg))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((1)); }); })
         }
-        .width('100%')
+        // 2026-11-14 真机截图：A/B 两块**压住了上面的统计行**，且下沿超出屏幕
+        //   两块是 `layoutWeight(1).aspectRatio(1)` ⇒ 宽 = 行宽的一半 ⇒ 高也一半
+        //   `2500px` 行宽 ⇒ 每块 `1250px` 高 ≫ 可用 ⇒ 溢出并盖住上方
+        //   ⇒ 限行宽（判据 1966：限宽即限高）：`2 × (Bp.height - 200)` = `666vp`
+        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(140, Bp.height - 200)))
         Row({ space: Space.sm }) {
           Stack() {
           Text(PAD_ICON[(2)]).fontSize(FontSize.xxxl)
