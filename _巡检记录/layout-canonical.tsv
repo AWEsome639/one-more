@@ -318,3 +318,20 @@
 2026-11-13T10:03:34	Find Word	OK	1570	108.2s lowest='提示：横竖相邻即可，拼 3 个字母；5 个通关' [60,1528][2500,1570] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Find_Word-100334.jpeg @2026-11-13T10:03:34
 2026-11-13T10:05:23	Letter Cancellation	OK	1392	106.5s lowest='划满 3 盘通关；漏一个罚 3 秒，点错也罚 3 秒' [60,1350][2500,1392] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Letter_Cancellation-100522.jpeg @2026-11-13T10:05:23
 2026-11-13T10:07:44	Word Search	OK	1460	138.6s lowest='提示：单词只横放或竖放，点首尾两格即可（倒着也算）' [60,1418][2500,1460] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Search-100743.jpeg @2026-11-13T10:07:44
+2026-11-13T10:15:36	Stroop Test	OK	1570	116.7s lowest='判定：12 题答对 ≥ 10 题；答的是墨色，不是字' [60,1528][2500,1570] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-101535.jpeg @2026-11-13T10:15:36
+2026-11-13T10:17:54	Nonogram	OK	1323	130.9s lowest='提示' [2308,1191][2500,1323] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-101754.jpeg @2026-11-13T10:17:54
+2026-11-13T10:19:48	Nurikabe	OK	1407	114.3s lowest='提示' [1304,1275][2500,1407] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-101948.jpeg @2026-11-13T10:19:48
+2026-11-13T10:21:39	Masyu	OK	1457	110.2s lowest='⚫ 必须拐弯 · ⚪ 必须直行 · 回路要闭合成一圈' [900,1415][1661,1457] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-102138.jpeg @2026-11-13T10:21:39
+2026-11-13T10:23:31	Relational Memory	OK	1465	112.2s lowest='判定：6 题答对 ≥ 5 通关；看 5 秒后开始答题' [60,1423][2500,1465] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-102331.jpeg @2026-11-13T10:23:31
+2026-11-13T10:25:19	Math Path	OK	1450	107.9s lowest='步数 0/30 · 相邻成路、数字与运算符交替、从左' [697,1408][1864,1450] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-102519.jpeg @2026-11-13T10:25:19
+2026-11-13T10:27:20	Kakurasu Sums	OK	1464	120.5s lowest='上方数字 = 该列黑格的行号之和；左侧数字 = 该行' [601,1422][1959,1464] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-102719.jpeg @2026-11-13T10:27:20
+2026-11-13T10:29:12	Wordle	OK	1600	112.2s lowest='换一题' [60,1572][857,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-102912.jpeg @2026-11-13T10:29:12
+2026-11-13T10:31:26	Kakuro Mini	OK	1600	133.7s lowest='6' [60,1588][534,1600] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-103125.jpeg @2026-11-13T10:31:26
+2026-11-13T10:33:30	Magnets	OK	1600	124.1s lowest='2＋' [2370,1597][2438,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-103330.jpeg @2026-11-13T10:33:30
+2026-11-13T10:37:28	Path Finder	DUMP_FAIL	-	237.4s no search dump
+2026-11-13T10:41:49	Base Conversion Run	OK	1576	129.3s lowest='47' [170,1513][2452,1576] blk=2/32px max=16 -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-104148.jpeg @2026-11-13T10:41:49
+2026-11-13T10:46:10	Binomial Match	TIMEOUT	-	261.6s budget exhausted at search-home:Binomial Match
+2026-11-13T10:46:45	Magnets	TIMEOUT	-	265.0s budget exhausted at enter-game
+2026-11-13T10:50:29	Modulo Clock	WRONG_GAME	-	258.4s title '模钟' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']
+2026-11-13T10:51:57	Magnets	TIMEOUT	-	273.8s budget exhausted at search:Magnets
+2026-11-13T11:06:17	Magnets	NOT_HOME	-	182.3s could not reach home
