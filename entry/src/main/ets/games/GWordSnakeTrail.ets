@@ -358,7 +358,7 @@ export struct GWordSnakeTrail {
         ForEach([0, 1, 2, 3, 4, 5, 6, 7], (r: number) => {
           Row({ space: Space.xs }) {
             ForEach([0, 1, 2, 3, 4, 5, 6, 7], (c: number) => { Text(this.letters.length > (r * N + c) ? this.letters[(r * N + c)] : '').fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.body.indexOf((r * N + c)) >= 0 ? '#FFFFFF' : this.theme.ink).layoutWeight(1).aspectRatio(1).backgroundColor(this.toneAt((r * N + c))).borderRadius(Radius.xs).animation({ duration: Motion.fast, curve: Motion.snap() }) }, (c: number) => 'c' + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 290)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
         }, (r: number) => 'r' + r)
       }.width('100%')
       Text(this.msg).fontSize(FontSize.sm)
