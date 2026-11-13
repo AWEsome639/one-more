@@ -389,7 +389,10 @@ export struct GNumberBondsAll {
               .outline(Tv.focusOutline(this.tvFocus === 'L383'))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if ((r * COLS + c) < this.tiles.length) { this.tap((r * COLS + c)); } }); })
             }, (c: number) => 'c' + c)
-          }.width('100%')
+      // 2026-11-14 真机截图：**统计行（目标 12 / 已拆 0/6 / 失误 0/3）被四张卡盖住**，
+      //   说明文字也浮在卡面上，四张卡还超出屏底（blk=22px）
+      //   卡片是 aspectRatio(1) ⇒ 4 列按宽度分 ⇒ 限宽即限高（判据 1966）
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 300)))
         }, (r: number) => 'r' + r)
       }.width('100%').layoutWeight(1)
       // ★ 2026-11-09：格子区是 `layoutWeight` 型 —— 删「重开」只会让它更大（判据 1851）。
