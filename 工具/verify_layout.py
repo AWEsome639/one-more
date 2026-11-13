@@ -103,6 +103,15 @@ def main():
     for i, g in enumerate(names, 1):
         if i > 1 and (i - 1) % every == 0:
             restart_emu()
+        # ★ 2026-11-14：**连续 `2` 次 `NO_CARD`/`NOT_HOME` 就立刻换设备** ——
+        #   之前只按固定节拍（`--every 8`）重启，而实测**掉线常发生在第 `3~5` 款**，
+        #   等不到节拍点就已经白测 `3~4` 款（今天 `19` 款环境失败就是这么来的）。
+        #   ⇒ 改成「按症状触发」，比加密节拍省时间（重启一次 ~2 分钟）。
+        if len(results) >= 2:
+            last2 = [ln.split('\t') for ln in results[-2:]]
+            if all(len(x) > 2 and x[2] == '-' for x in last2):
+                print('  · 连续 2 款测不到 ⇒ 立刻换设备', flush=True)
+                restart_emu()
         ensure_device()
         t0 = time.time()
         try:
