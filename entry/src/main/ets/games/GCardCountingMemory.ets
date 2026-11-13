@@ -382,7 +382,9 @@ export struct GCardCountingMemory {
         .onFocus(() => { this.tvFocus = 'L344'; })
         .onBlur(() => { if (this.tvFocus === 'L344') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L344')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
-      Text(TG('提示：下面 8 张就是刚才闪过的牌，只有一张出现两次')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+      Text(TG('提示：下面 8 张就是刚才闪过的牌，只有一张出现两次')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        // 2026-11-13 真机截图：矮屏上这一行被屏幕底边切掉一半 ⇒ 静态提示，矮屏隐藏
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
