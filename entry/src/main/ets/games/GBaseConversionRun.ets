@@ -550,7 +550,10 @@ export struct GBaseConversionRun {
       // 题目卡
       Column({ space: Space.xs }) {
         Text(this.quiz)
-          .fontSize(FontSize.xxxl)
+          // ★★ 2026-11-13（判据 1886）：**要动的是**选项上方**的这张题卡，不是底部选项** ——
+          //   缩底部选项只会让整块往下移，`max_bottom` 不动（实测两次）。
+          //   矮屏把算式从 `xxxl(28)` 降到 `xl(20)`，卡高约省 `12vp ≈ 36px`。
+          .fontSize(Bp.isShort() ? FontSize.xl : FontSize.xxxl)
           .fontWeight(FontWeight.Bold)
           .fontColor(Palette.orange)
         Text(TG2("第 {0} 题 · 目标答对 {1} 题", String(this.right + this.wrong + 1), String(GOAL)))
