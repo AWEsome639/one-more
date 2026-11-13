@@ -12,6 +12,19 @@ LOG=/tmp/sweep_all.log
 : > "$LOG"
 say() { echo "[$(date +%H:%M:%S)] $*" | tee -a "$LOG"; }
 
+# ★ 2026-11-14：**名字清单自愈** —— `/tmp/all355.txt` 若不存在（重启/清理）就当场从注册表重建
+#   （否则脚本会拿空清单跑一场空，今晚就白等了）
+if [ ! -s /tmp/all355.txt ]; then
+  echo "[$(date +%H:%M:%S)] /tmp/all355.txt 不见了 ⇒ 从 GameRegistry 重建" | tee -a "$LOG"
+  python3 - <<'PY' >> "$LOG" 2>&1
+import io, re
+reg = io.open('entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
+names = re.findall(r"enName: '([^']+)'", reg)
+io.open('/tmp/all355.txt', 'w', encoding='utf-8').write('\n'.join(names) + '\n')
+print('重建 %d 个游戏名' % len(names))
+PY
+fi
+
 TODO=/tmp/todo_all.txt
 
 # ① 生成待办：全库名 − 今天已测
