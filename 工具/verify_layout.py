@@ -24,15 +24,27 @@ SUSPECT = ['Wordle', 'Kakuro Mini', 'Magnets', 'Path Finder', 'Base Conversion R
 AMBIG = ['Binary Matrix Rank All', 'Visual Search All', 'Cryptogram All', 'Word Ladder']
 
 
+# ★ 2026-11-13：默认实例改成 **`onemore7`**（新建的专用测量实例，`853x533 vp` 与台账一致）；
+#   `onemore` 跑了上百轮已不稳。端口也不写死（新实例是 5555，旧的是 5557）⇒ 用 list targets 探测。
+EMU_INST = os.environ.get('DSH_EMU_INST', 'onemore7')
+
+def _dev():
+    r = subprocess.run('%s list targets' % HC, shell=True, capture_output=True, text=True, timeout=20)
+    line = (r.stdout or '').strip().split('\n')[0].strip()
+    return '' if ('Empty' in line or not line) else line
+
 def restart_emu():
-    print('  · 重启模拟器…', flush=True)
-    subprocess.run('%s -stop onemore' % EMU, shell=True, capture_output=True, timeout=90)
+    print('  · 重启模拟器 %s…' % EMU_INST, flush=True)
+    subprocess.run('%s -stop %s' % (EMU, EMU_INST), shell=True, capture_output=True, timeout=90)
     time.sleep(5)
-    subprocess.Popen('%s -start onemore -noWindow > /tmp/emu_verify.log 2>&1' % EMU, shell=True)
-    time.sleep(120)
-    hc = '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
-    subprocess.run('%s tconn 127.0.0.1:5557' % hc, shell=True, capture_output=True, timeout=30)
-    time.sleep(3)
+    subprocess.Popen('%s -start %s -noWindow > /tmp/emu_verify.log 2>&1' % (EMU, EMU_INST), shell=True)
+    for _ in range(24):
+        time.sleep(15)
+        t = _dev()
+        if t:
+            print('  · 设备就绪: %s' % t, flush=True)
+            return
+    print('  · ⚠️ 设备未就绪', flush=True)
 
 
 HC = '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
