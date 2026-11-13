@@ -2868,7 +2868,13 @@ build() {
       }
       ForEach(this.chatPicks, (p: Suggestion) => {
         Row({ space: Space.sm }) {
-          Text(p.game.icon).fontSize(FontSize.lg)
+          // 2026-11-13：和列表卡一样走 `iconOf`（预渲染位图），emoji 只作兜底 ——
+          //   原来这里是纯 emoji，跨设备长得不一样（同 `GamesTab:2696` 的写法对齐）
+          if (iconOf(p.game.id) !== undefined) {
+            Image(iconOf(p.game.id)).width(24).height(24).objectFit(ImageFit.Contain)
+          } else {
+            Text(p.game.icon).fontSize(FontSize.lg)
+          }
           Column({ space: 1 }) {
             Text(this.t(p.game.name, p.game.enName))
               .fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme().ink)
