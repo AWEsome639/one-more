@@ -82,6 +82,28 @@ print('已测 %d, 待测 %d' % (len(done), len(todo)))
 PY
 cat /tmp/todo_gen.out | tee -a "$LOG"
 
+# ★ 2026-11-14：**写入「可复算基线」快照** —— 目标要求「一次跑完、可复算的正式基线」，
+#   而「可复算」的前提是**能追溯是哪个 HAP / 哪个提交 / 哪台实例跑出来的**。
+#   ⇒ 每次开跑前落一份 md，把环境与构建指纹固定下来。
+SNAP="_巡检记录/基线快照-$(date +%Y%m%d-%H%M).md"
+{
+  echo "# 基线快照 $(date '+%Y-%m-%d %H:%M:%S')"
+  echo
+  echo '| 项 | 值 |'
+  echo '|---|---|'
+  echo "| git HEAD | \`$(git rev-parse --short HEAD)\` |"
+  echo "| 工作区脏 | $(git status --porcelain | wc -l | tr -d ' ') 个文件 |"
+  echo "| HAP | \`$(ls -l entry/build/default/outputs/default/entry-default-signed.hap 2>/dev/null | awk '{print $5}')\` bytes |"
+  echo "| HAP sha256 | \`$(shasum -a 256 entry/build/default/outputs/default/entry-default-signed.hap 2>/dev/null | cut -c1-16)…\` |"
+  echo "| 实例 | onemore7（\`2560x1600@480\` ⇒ \`853x533 vp\`）|"
+  echo "| 待办 | $(wc -l < "$TODO" 2>/dev/null | tr -d ' ') 款 |"
+  echo "| 工具版本 | \`shot_game.py\` $(shasum -a 256 工具/shot_game.py | cut -c1-8)… \`sweep_all.sh\` $(shasum -a 256 工具/sweep_all.sh | cut -c1-8)… |"
+  echo
+  echo "**⇒ 复算方法**：同一 HAP + 同一实例 ⇒ 跑 \`bash 工具/sweep_all.sh\`；"
+  echo "差异只应来自环境失败（\`NO_CARD\`/\`NOT_HOME\`），那些要重测。"
+} > "$SNAP" 2>/dev/null
+say "基线快照 → $SNAP"
+
 # ★ 2026-11-14：**`--dry` 只生成待办，绝不碰设备**
 #   教训：这脚本没有 dry-run 之前，我为了「验证 todo 生成」跑了一次它，
 #   结果它真的去起了模拟器（他当时醒着）。白天测试必须走这条分支。
