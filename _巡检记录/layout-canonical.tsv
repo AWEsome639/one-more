@@ -399,3 +399,181 @@
 2026-11-13T22:34:11	Pattern Sequence Draw	NO_CARD	-	199.6s no card for '画规律' (fallback=(1280, 757))
 2026-11-13T22:51:37	Fraction Matcher	NO_CARD	-	166.1s no card for '分数匹配' (fallback=(1280, 757))
 2026-11-13T22:54:42	Fraction Matcher	NO_CARD	-	167.6s no card for '分数匹配' (fallback=(1280, 757))
+2026-11-14T00:09:19	Nonogram	OK	1365	132.3s lowest='提示' [2308,1233][2500,1365] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-000919.jpeg @2026-11-14T00:09:19
+2026-11-14T00:11:05	Nurikabe	OK	1407	105.4s lowest='提示' [1304,1275][2500,1407] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-001104.jpeg @2026-11-14T00:11:05
+2026-11-14T00:12:48	Masyu	OK	1457	103.2s lowest='⚫ 必须拐弯 · ⚪ 必须直行 · 回路要闭合成一圈' [900,1415][1661,1457] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-001248.jpeg @2026-11-14T00:12:48
+2026-11-14T00:15:05	Relational Memory	OK	1465	136.9s lowest='判定：6 题答对 ≥ 5 通关；看 5 秒后开始答题' [60,1423][2500,1465] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-001504.jpeg @2026-11-14T00:15:05
+2026-11-14T00:16:52	Math Path	OK	1450	106.8s lowest='步数 0/30 · 相邻成路、数字与运算符交替、从左' [697,1408][1864,1450] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-001652.jpeg @2026-11-14T00:16:52
+2026-11-14T00:18:37	Kakurasu Sums	OK	1464	105.1s lowest='上方数字 = 该列黑格的行号之和；左侧数字 = 该行' [601,1422][1959,1464] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-001837.jpeg @2026-11-14T00:18:37
+2026-11-14T00:20:20	Wordle	OK	1600	103.0s lowest='换一题' [60,1572][857,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-002020.jpeg @2026-11-14T00:20:20
+2026-11-14T00:22:02	Kakuro Mini	OK	1600	101.5s lowest='6' [60,1588][534,1600] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-002201.jpeg @2026-11-14T00:22:02
+2026-11-14T00:25:51	Magnets	OK	1600	207.1s lowest='2＋' [2370,1597][2438,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-002550.jpeg @2026-11-14T00:25:51
+2026-11-14T00:28:11	Path Finder	OK	1557	139.5s lowest='提示' [2308,1425][2500,1557] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Path_Finder-002811.jpeg @2026-11-14T00:28:11
+2026-11-14T00:30:13	Base Conversion Run	OK	1600	122.0s lowest='把进制换算对，答错扣 3 秒' [60,1594][2500,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-003013.jpeg @2026-11-14T00:30:13
+2026-11-14T00:32:11	Binomial Match	OK	1600	117.6s lowest='左边点项、右边点系数，配成一对' [60,1557][2500,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-003210.jpeg @2026-11-14T00:32:11
+2026-11-14T00:34:03	Modulo Clock	OK	1600	111.7s lowest='钟面只有 1~12 点：转满 12 点就回到 1 点' [60,1558][2500,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Modulo_Clock-003402.jpeg @2026-11-14T00:34:03
+2026-11-14T00:35:53	Number Bonds All	OK	1600	109.9s lowest='12' [318,1333][390,1403] blk=1/22px max=22 -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds_All-003552.jpeg @2026-11-14T00:35:53
+2026-11-14T00:37:59	Pattern Sequence Draw	OK	1599	126.3s lowest='4' [435,1515][479,1599] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Pattern_Sequence_Draw-003758.jpeg @2026-11-14T00:37:59
+2026-11-14T00:39:49	Percentage Peak	OK	1585	109.9s lowest='答对 12 题通关；答错不扣时间，但断连击' [60,1536][2500,1585] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Peak-003948.jpeg @2026-11-14T00:39:49
+2026-11-14T00:42:08	Stroop Test	OK	1570	117.6s lowest='判定：12 题答对 ≥ 10 题；答的是墨色，不是字' [60,1528][2500,1570] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-004208.jpeg @2026-11-14T00:42:08
+2026-11-14T00:43:50	Corsi Backward Span	OK	1351	101.8s lowest='倒背：长度升到 5 即通关；倒着点，别顺着点' [918,1309][1642,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Corsi_Backward_Span-004350.jpeg @2026-11-14T00:43:50
+2026-11-14T00:48:31	Futoshiki	TIMEOUT	-	281.1s budget exhausted at search:Futoshiki
+2026-11-14T00:50:55	Collatz	NOT_HOME	-	142.7s could not reach home
+2026-11-14T00:54:04	Common Denominator	NO_CARD	-	188.4s no card for '通分' (fallback=(1280, 757))
+2026-11-14T00:57:25	Binary Matrix Rank All	NO_CARD	-	201.3s no card for '矩阵秩进阶' (fallback=(1280, 757))
+2026-11-14T01:00:18	Visual Search All	NO_CARD	-	173.2s no card for '视觉搜索进阶' (fallback=(1280, 757))
+2026-11-14T01:02:39	Cryptogram All	NO_CARD	-	141.1s no card for '密文进阶' (fallback=(1280, 757))
+2026-11-14T01:06:41	Word Ladder	NO_CARD	-	174.7s no card for '单词阶梯' (fallback=(1280, 757))
+2026-11-14T01:09:01	Futoshiki	NO_CARD	-	140.5s no card for '不等式' (fallback=(1280, 757))
+2026-11-14T01:11:22	Collatz	NO_CARD	-	140.4s no card for '考拉兹' (fallback=(1280, 757))
+2026-11-14T01:14:12	Common Denominator	NO_CARD	-	170.3s no card for '通分' (fallback=(1280, 757))
+2026-11-14T01:17:35	Binary Matrix Rank All	NO_CARD	-	203.3s no card for '矩阵秩进阶' (fallback=(1280, 757))
+2026-11-14T01:20:37	Visual Search All	NO_CARD	-	181.1s no card for '视觉搜索进阶' (fallback=(1280, 757))
+2026-11-14T01:22:59	Cryptogram All	NO_CARD	-	141.9s no card for '密文进阶' (fallback=(1280, 757))
+2026-11-14T01:25:47	Word Ladder	NO_CARD	-	168.5s no card for '单词阶梯' (fallback=(1280, 757))
+2026-11-14T01:59:11	Bejeweled	OK	1351	75.2s lowest='🍀' [948,1329][1027,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-015910.jpeg @2026-11-14T01:59:11
+2026-11-14T02:00:25	Breakout	OK	1351	73.3s lowest='拖动挡板对准，点棋盘或按「发球」开球' [956,1309][1605,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Breakout-020024.jpeg @2026-11-14T02:00:25
+2026-11-14T02:01:35	Bubble Shooter	OK	1545	70.0s lowest='同色连 3 颗起炸；把全场炸光通关，28 次发射用完' [767,1503][1794,1545] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Bubble_Shooter-020134.jpeg @2026-11-14T02:01:35
+2026-11-14T02:02:47	Checkers	OK	1351	71.4s lowest='0' [440,633][473,696] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Checkers-020246.jpeg @2026-11-14T02:02:47
+2026-11-14T02:03:52	Compound Connect	NO_CARD	-	64.9s no card for '复合连线' (fallback=(347, 816))
+2026-11-14T02:04:48	Connect Four	NO_CARD	-	56.4s no card for '四子棋' (fallback=(347, 816))
+2026-11-14T02:05:57	Continuous Paired Associate	NO_CARD	-	69.3s no card for '连续配对' (fallback=(347, 828))
+2026-11-14T02:07:02	Doodle Jump	NO_CARD	-	64.4s no card for '登高' (fallback=(347, 816))
+2026-11-14T02:12:17	Double Trouble	TIMEOUT	-	291.2s budget exhausted at search-home:Trouble
+2026-11-14T02:14:40	Dual Mirror	NOT_HOME	-	134.1s could not reach home
+2026-11-14T02:20:08	Flappy	NOT_HOME	-	118.2s could not reach home
+2026-11-14T02:24:21	FreeCell	OK	1435	130.5s lowest='♥5' [319,1386][397,1435] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-FreeCell-022420.jpeg @2026-11-14T02:24:21
+2026-11-14T02:25:28	2048	OK	1600	66.9s lowest='滑动或按方向键' [60,1518][2259,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-2048-022527.jpeg @2026-11-14T02:25:28
+2026-11-14T02:26:34	Game24	OK	1558	66.5s lowest='撤销' [60,1426][841,1558] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Game24-022634.jpeg @2026-11-14T02:26:34
+2026-11-14T02:27:40	Go (9x9)	OK	1445	66.0s lowest='黑先 · 无气提子 · 打劫不能立刻提回 · 双方停' [613,1403][1947,1445] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Go__9x9_-022740.jpeg @2026-11-14T02:27:40
+2026-11-14T02:29:27	Gomoku	OK	1600	106.2s lowest='0' [434,633][467,696] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Gomoku-022926.jpeg @2026-11-14T02:29:27
+2026-11-14T02:32:16	Hanoi	OK	1351	147.3s lowest='升到 4 盘' [60,1219][2452,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Hanoi-023213.jpeg @2026-11-14T02:32:16
+2026-11-14T02:35:35	Lock Pattern	NO_CARD	-	199.0s no card for '生命游戏' (fallback=(347, 780))
+2026-11-14T02:37:31	Mahjong Solitaire	OK	1307	115.3s lowest='点第一张牌，再点能和它连起来的同款牌' [902,1258][1659,1307] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Mahjong_Solitaire-023730.jpeg @2026-11-14T02:37:31
+2026-11-14T02:39:25	Mancala	OK	1351	114.4s lowest='轮到你：点一个自己的坑撒石子' [986,1302][1575,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Mancala-023925.jpeg @2026-11-14T02:39:25
+2026-11-14T02:41:42	Mandelbrot	OK	1600	136.1s lowest='1/8' [407,633][495,696] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Mandelbrot-024141.jpeg @2026-11-14T02:41:42
+2026-11-14T02:43:35	Mastermind	OK	1465	113.2s lowest='A' [235,1416][266,1465] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Mastermind-024335.jpeg @2026-11-14T02:43:35
+2026-11-14T02:45:28	Match 3	OK	1348	112.6s lowest='点一个果子，再点旁边的换位' [1007,1299][1554,1348] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Match_3-024527.jpeg @2026-11-14T02:45:28
+2026-11-14T02:47:17	Memory	OK	1600	109.5s lowest='重新开始' [60,1219][2500,1351] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-024717.jpeg @2026-11-14T02:47:17
+2026-11-14T02:49:30	Minesweeper	OK	1338	110.7s lowest='10' [424,633][489,696] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Minesweeper-024929.jpeg @2026-11-14T02:49:30
+2026-11-14T02:51:17	Nim	OK	1555	107.0s lowest='小提示：三堆都只剩 1 颗时，谁先动手谁输' [936,1513][1624,1555] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nim-025116.jpeg @2026-11-14T02:51:17
+2026-11-14T02:53:04	Peg Solitaire	OK	1380	107.3s lowest='提示' [60,1266][1265,1380] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Peg_Solitaire-025304.jpeg @2026-11-14T02:53:04
+2026-11-14T02:54:50	Phonetic Guess	OK	1570	105.5s lowest='这个音标是哪个词？' [1091,1521][1470,1570] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Phonetic_Guess-025449.jpeg @2026-11-14T02:54:50
+2026-11-14T02:56:36	Pong	OK	1456	106.0s lowest='准备发球…' [1190,852][1371,894] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Pong-025635.jpeg @2026-11-14T02:56:36
+2026-11-14T02:58:20	Reversi	OK	1331	104.3s lowest='重新开始' [60,1193][2500,1331] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Reversi-025820.jpeg @2026-11-14T02:58:20
+2026-11-14T03:00:05	Schulte Table	OK	1439	104.4s lowest='4' [274,1369][310,1439] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Schulte_Table-030004.jpeg @2026-11-14T03:00:05
+2026-11-14T03:01:50	Sieve Visualizer	OK	1454	104.9s lowest='步数 0 · 绿字 = 素数，灰底 = 被划掉的合数' [936,1412][1624,1454] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Sieve_Visualizer-030149.jpeg @2026-11-14T03:01:50
+2026-11-14T03:04:44	Simon Says	OK	1291	153.2s lowest='🐸' [610,1192][715,1291] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Says-030444.jpeg @2026-11-14T03:04:44
+2026-11-14T03:09:13	Slide15	NO_CARD	-	268.1s no card for '十五格华容道' (fallback=(1280, 757))
+2026-11-14T03:12:02	Snake	NO_CARD	-	169.4s no card for '贪吃蛇' (fallback=(1280, 757))
+2026-11-14T03:15:25	Snake 3D	NO_CARD	-	202.3s no card for '立体贪吃蛇' (fallback=(1280, 757))
+2026-11-14T03:18:48	Sokoban	OK	1340	203.1s lowest='上一关' [60,1220][843,1340] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Sokoban-031845.jpeg @2026-11-14T03:18:48
+2026-11-14T03:23:29	Solitaire	DUMP_FAIL	-	280.5s no search dump
+2026-11-14T03:26:40	Sorting Visualizer	OK	1351	110.1s lowest='开始' [60,1225][1250,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Sorting_Visualizer-032640.jpeg @2026-11-14T03:26:40
+2026-11-14T03:28:18	Spider Solitaire	WRONG_GAME	-	98.0s title '蜘蛛纸牌' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']
+2026-11-14T03:29:23	Compound Connect	NO_CARD	-	64.7s no card for '复合连线' (fallback=(347, 828))
+2026-11-14T03:30:26	Connect Four	NO_CARD	-	63.5s no card for '四子棋' (fallback=(347, 828))
+2026-11-14T03:31:30	Continuous Paired Associate	NO_CARD	-	63.8s no card for '连续配对' (fallback=(347, 828))
+2026-11-14T03:32:34	Doodle Jump	NO_CARD	-	63.9s no card for '登高' (fallback=(347, 828))
+2026-11-14T03:34:20	Double Trouble	OK	1552	105.8s lowest='每轮两个任务都要答对；答错扣一条命，3 条命用完就结' [687,1510][1874,1552] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Double_Trouble-033420.jpeg @2026-11-14T03:34:20
+2026-11-14T03:36:05	Dual Mirror	OK	1403	104.7s lowest='点左板 (r,c) ⇒ 左 (r,c) 与右 (r,' [651,1351][1910,1403] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Dual_Mirror-033605.jpeg @2026-11-14T03:36:05
+2026-11-14T03:37:49	Flappy	OK	1456	103.7s lowest='穿 12 根管道通关；撞管道或撞地就结束（点场地也能' [782,1414][1779,1456] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Flappy-033748.jpeg @2026-11-14T03:37:49
+2026-11-14T03:39:54	Lock Pattern	NO_CARD	-	125.2s no card for '生命游戏' (fallback=(347, 780))
+2026-11-14T03:41:42	Slide15	OK	1355	107.9s lowest='提示' [60,1265][841,1355] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Slide15-034142.jpeg @2026-11-14T03:41:42
+2026-11-14T03:43:23	Snake	OK	1351	101.0s lowest='滑动棋盘或点方向键转向；吃满 12 个食物算通关' [890,1309][1671,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Snake-034323.jpeg @2026-11-14T03:43:23
+2026-11-14T03:45:04	Snake 3D	OK	1575	100.7s lowest='上层' [424,762][497,804] blk=4/96px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-034504.jpeg @2026-11-14T03:45:04
+2026-11-14T03:46:49	Solitaire	OK	1351	104.8s lowest='自动收牌' [60,1219][1265,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Solitaire-034649.jpeg @2026-11-14T03:46:49
+2026-11-14T03:48:34	Spider Solitaire	OK	1351	104.8s lowest='单花色（全黑桃）· 集齐 K→A 收一组 · 空列时' [818,1309][1742,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Spider_Solitaire-034833.jpeg @2026-11-14T03:48:34
+2026-11-14T03:50:19	Sudoku Hex	OK	1547	105.4s lowest='点一个空格，再点数字填入' [60,1498][2500,1547] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku_Hex-035019.jpeg @2026-11-14T03:50:19
+2026-11-14T03:52:04	Tetris	OK	1357	104.2s lowest='目标：消满 10 行通关；堆到顶就输了' [60,1315][2500,1357] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Tetris-035203.jpeg @2026-11-14T03:52:04
+2026-11-14T03:53:50	Tic-Tac-Toe	OK	1541	106.3s lowest='电脑会贪心，但也会看漏，试试能不能赢' [60,1499][2500,1541] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Tic_Tac_Toe-035350.jpeg @2026-11-14T03:53:50
+2026-11-14T03:55:35	Akari (Light Up)	OK	1529	105.2s lowest='点空格放灯，点灯撤掉' [60,1480][2500,1529] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Akari__Light_Up_-035535.jpeg @2026-11-14T03:55:35
+2026-11-14T03:57:20	Alphabet Sudoku	OK	1547	104.8s lowest='点空格 → 点字母填入' [60,1498][2500,1547] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Alphabet_Sudoku-035720.jpeg @2026-11-14T03:57:20
+2026-11-14T03:59:06	Binary Puzzle	OK	1571	105.5s lowest='点格子循环切换：空 → 0 → 1' [60,1522][2500,1571] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Puzzle-035906.jpeg @2026-11-14T03:59:06
+2026-11-14T04:00:52	Block Escape	OK	1351	105.5s lowest='提示' [60,1290][1265,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Escape-040051.jpeg @2026-11-14T04:00:52
+2026-11-14T04:02:36	Bridges	OK	1475	104.7s lowest='点一个岛 → 点另一个岛，桥数 0→1→2→0 循环' [60,1426][2500,1475] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Bridges-040236.jpeg @2026-11-14T04:02:36
+2026-11-14T04:05:29	Bridges All	OK	1487	150.8s lowest='大棋盘：点两个岛连桥，桥数 0→1→2→0\u3000违规 0' [60,1438][2500,1487] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Bridges_All-040528.jpeg @2026-11-14T04:05:29
+2026-11-14T04:07:48	Color Flood	OK	1351	138.6s lowest='D' [962,1348][983,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Flood-040747.jpeg @2026-11-14T04:07:48
+2026-11-14T04:09:39	Crown	OK	1600	111.5s lowest='0/6' [407,633][495,696] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Crown-040939.jpeg @2026-11-14T04:09:39
+2026-11-14T04:11:39	Dominosa	OK	1467	119.8s lowest='3' [299,1383][343,1467] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Dominosa-041139.jpeg @2026-11-14T04:11:39
+2026-11-14T04:13:33	Fillomino	OK	1351	113.7s lowest='5' [1318,1257][1354,1327] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Fillomino-041333.jpeg @2026-11-14T04:13:33
+2026-11-14T04:15:28	Futoshiki	OK	1558	115.2s lowest='点格子选中，再点下面数字填入；粗黑数字是题目提示' [848,1516][1713,1558] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Futoshiki-041528.jpeg @2026-11-14T04:15:28
+2026-11-14T04:17:18	Gokigen Naname	OK	1600	109.5s lowest='1' [197,1417][223,1466] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Gokigen_Naname-041718.jpeg @2026-11-14T04:17:18
+2026-11-14T04:19:06	Heyawake	OK	1600	108.3s lowest='1' [84,1181][108,1227] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Heyawake-041906.jpeg @2026-11-14T04:19:06
+2026-11-14T04:21:15	Hitori	OK	1600	107.5s lowest='2' [258,1357][294,1427] blk=3/62px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori-042114.jpeg @2026-11-14T04:21:15
+2026-11-14T04:23:05	Hitori All	OK	1499	109.1s lowest='2' [211,1443][240,1499] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Hitori_All-042304.jpeg @2026-11-14T04:23:05
+2026-11-14T04:24:49	Kakuro	OK	1589	104.5s lowest='6' [60,1493][534,1589] blk=1/13px max=13 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-042449.jpeg @2026-11-14T04:24:49
+2026-11-14T04:26:30	KenKen	OK	1469	100.2s lowest='重开一题' [60,1337][2500,1469] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-KenKen-042629.jpeg @2026-11-14T04:26:30
+2026-11-14T04:28:15	Klotski	OK	1420	104.9s lowest='←' [869,1306][1061,1420] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Klotski-042814.jpeg @2026-11-14T04:28:15
+2026-11-14T04:29:59	Kurodoko	OK	1480	104.3s lowest='重开一题' [60,1348][2500,1480] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kurodoko-042959.jpeg @2026-11-14T04:29:59
+2026-11-14T04:31:43	Lighthouses	OK	1351	104.2s lowest='🪨' [283,1000][358,1070] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Lighthouses-043143.jpeg @2026-11-14T04:31:43
+2026-11-14T04:33:28	Lights Out	OK	1565	105.0s lowest='重开一题' [60,1433][2500,1565] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Lights_Out-043328.jpeg @2026-11-14T04:33:28
+2026-11-14T04:37:43	Math Maze	WRONG_GAME	-	232.6s title '数学迷宫' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']
+2026-11-14T04:42:00	Norinori	OK	1487	256.7s lowest='4' [310,1445][331,1487] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Norinori-044159.jpeg @2026-11-14T04:42:00
+2026-11-14T04:43:47	Path Intersect	OK	1600	106.9s lowest='⬤' [1249,1420][1310,1512] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Path_Intersect-044347.jpeg @2026-11-14T04:43:47
+2026-11-14T04:45:33	Pipes	OK	1508	106.0s lowest='╭' [284,1424][357,1508] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Pipes-044533.jpeg @2026-11-14T04:45:33
+2026-11-14T04:47:20	Shikaku	OK	1600	106.4s lowest='提示' [2308,1575][2500,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Shikaku-044719.jpeg @2026-11-14T04:47:20
+2026-11-14T04:49:06	Skyscrapers	OK	1600	106.5s lowest='2' [273,1324][299,1373] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Skyscrapers-044906.jpeg @2026-11-14T04:49:06
+2026-11-14T04:50:51	Slide Puzzle	OK	1461	104.7s lowest='提示' [2308,1329][2500,1461] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Slide_Puzzle-045051.jpeg @2026-11-14T04:50:51
+2026-11-14T04:52:38	Slitherlink	OK	1408	107.0s lowest='点边线切换；数字变绿说明这一格满足了' [60,1359][2500,1408] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Slitherlink-045238.jpeg @2026-11-14T04:52:38
+2026-11-14T04:57:08	Sudoku	DUMP_FAIL	-	247.6s no search dump
+2026-11-14T05:00:40	Sum Snake	OK	1342	131.5s lowest='🐍 蛇头在外框高亮；紫色外框是蛇尾（点它回退）' [875,1300][1686,1342] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Sum_Snake-050039.jpeg @2026-11-14T05:00:40
+2026-11-14T05:02:38	Tangle Fix	OK	1550	118.4s lowest='🔴 AC 与 BD 交叉' [60,1504][2500,1550] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Tangle_Fix-050238.jpeg @2026-11-14T05:02:38
+2026-11-14T05:04:46	Tapa	OK	1486	127.4s lowest='黑格要连成一片、不能出现 2×2；白格也必须连通' [884,1444][1676,1486] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Tapa-050445.jpeg @2026-11-14T05:04:46
+2026-11-14T05:06:44	Tenner Grid	OK	1563	118.2s lowest='提示' [60,1431][2116,1563] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Tenner_Grid-050644.jpeg @2026-11-14T05:06:44
+2026-11-14T05:08:36	Tents And Trees	OK	1243	111.3s lowest='🌳 树固定不动；每棵树上下左右恰好一顶 ⛺；行列数字' [676,1201][1884,1243] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Tents_And_Trees-050835.jpeg @2026-11-14T05:08:36
+2026-11-14T05:10:19	Water Sort	OK	1351	103.5s lowest='倒水规则：只有颜色相同、或目标管是空的才能倒；倒的量' [632,1309][1929,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Water_Sort-051019.jpeg @2026-11-14T05:10:19
+2026-11-14T05:12:03	Yajilin	OK	1454	103.7s lowest='提示 (-5)' [60,1322][2500,1454] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Yajilin-051203.jpeg @2026-11-14T05:12:03
+2026-11-14T05:13:46	Math Maze	OK	1489	103.1s lowest='步数 0/20 · 从左上角走到右下角 🏁，和要刚好' [831,1447][1729,1489] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Maze-051346.jpeg @2026-11-14T05:13:46
+2026-11-14T05:15:31	Sudoku	OK	1435	104.3s lowest='底 2 · 挖空 40 格 · 唯一解 —— 点一个' [710,1386][1850,1435] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku-051530.jpeg @2026-11-14T05:15:31
+2026-11-14T05:17:14	Algebraic Balance	OK	1520	102.9s lowest='点候选值 → 立刻判分' [60,1478][404,1520] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Algebraic_Balance-051714.jpeg @2026-11-14T05:17:14
+2026-11-14T05:18:56	Algebraic Inequality Solver	OK	1572	102.3s lowest='严格/非严格要看清楚' [60,1530][399,1572] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Algebraic_Inequality_Solver-051856.jpeg @2026-11-14T05:18:56
+2026-11-14T05:20:39	Arithmetic Chain	OK	1484	102.3s lowest='提示' [60,1364][2500,1484] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Arithmetic_Chain-052038.jpeg @2026-11-14T05:20:39
+2026-11-14T05:22:21	Balance Scale	OK	1571	102.6s lowest='点砝码放上右盘，凑到刚好 59' [60,1522][2500,1571] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Balance_Scale-052221.jpeg @2026-11-14T05:22:21
+2026-11-14T05:24:03	Base Shift	OK	1589	101.8s lowest='选出移位后的十进制值' [60,1540][2500,1589] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Shift-052403.jpeg @2026-11-14T05:24:03
+2026-11-14T05:25:46	Binary Code	OK	1575	102.7s lowest='点亮开关凑出 200' [60,1526][2500,1575] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Code-052545.jpeg @2026-11-14T05:25:46
+2026-11-14T05:27:28	Binary Matrix Rank	OK	1568	102.5s lowest='秩 = 0' [167,1505][2452,1568] blk=2/32px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Matrix_Rank-052728.jpeg @2026-11-14T05:27:28
+2026-11-14T05:29:11	Binary Scale Balance	OK	1471	102.4s lowest='提示：右盘一旦超过物体重量，天平就翻了 —— 本局结' [60,1429][2500,1471] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Scale_Balance-052911.jpeg @2026-11-14T05:29:11
+2026-11-14T05:31:15	Calculation Sprint	OK	1600	102.6s lowest='31' [170,1538][2452,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Calculation_Sprint-053115.jpeg @2026-11-14T05:31:15
+2026-11-14T05:32:58	Collatz	OK	1586	102.8s lowest='42' [60,1544][2500,1586] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-053258.jpeg @2026-11-14T05:32:58
+2026-11-14T05:34:41	Common Denominator	OK	1585	102.7s lowest='这两个分数的最小公分母是多少？' [60,1536][2500,1585] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Common_Denominator-053440.jpeg @2026-11-14T05:34:41
+2026-11-14T05:36:23	Countdown Math	OK	1409	102.6s lowest='6' [332,1325][376,1409] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Countdown_Math-053623.jpeg @2026-11-14T05:36:23
+2026-11-14T05:38:06	Crypto Arithmetic	OK	1492	102.6s lowest='五个字母的数字两两不同' [60,1450][457,1492] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Crypto_Arithmetic-053806.jpeg @2026-11-14T05:38:06
+2026-11-14T05:39:48	Digit Swap Eq	OK	1312	102.3s lowest='提示' [60,1192][2181,1312] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Digit_Swap_Eq-053948.jpeg @2026-11-14T05:39:48
+2026-11-14T05:41:32	Divisibility Dash	OK	1533	103.1s lowest='提示' [60,1419][2012,1533] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Divisibility_Dash-054131.jpeg @2026-11-14T05:41:32
+2026-11-14T05:43:14	Exponent Tower	OK	1351	102.6s lowest='\u3000' [60,1260][2500,1302] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Exponent_Tower-054314.jpeg @2026-11-14T05:43:14
+2026-11-14T05:45:20	Factor Finder	OK	1600	104.3s lowest='提示' [60,1547][2500,1600] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Factor_Finder-054520.jpeg @2026-11-14T05:45:20
+2026-11-14T05:47:02	Fibonacci Merge	OK	1171	102.3s lowest='提示：相邻两格之和要落在 1,2,3,5,8,13,' [60,1129][2500,1171] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Fibonacci_Merge-054702.jpeg @2026-11-14T05:47:02
+2026-11-14T05:48:45	Fraction Match	OK	1152	102.9s lowest='提示：2/4 与 1/2 等值 —— 同乘（同除）同' [60,1110][2500,1152] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Match-054845.jpeg @2026-11-14T05:48:45
+2026-11-14T05:50:28	Fraction Matcher	OK	1600	102.8s lowest='B' [108,1586][136,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-055028.jpeg @2026-11-14T05:50:28
+2026-11-14T05:52:10	Fractional Pizza	OK	1600	102.0s lowest='提示：分母 = 一共几片，分子 = 取几片' [60,1590][2500,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Fractional_Pizza-055210.jpeg @2026-11-14T05:52:10
+2026-11-14T05:53:52	Inequality Balance Ops	OK	1166	102.2s lowest='<' [60,1028][853,1166] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Inequality_Balance_Ops-055352.jpeg @2026-11-14T05:53:52
+2026-11-14T05:55:35	Inequality Dash	OK	1501	101.9s lowest='提示：ax + c > k ⇒ x > (k−c)/' [60,1449][2500,1501] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Inequality_Dash-055534.jpeg @2026-11-14T05:55:35
+2026-11-14T05:57:17	Magic Squares	OK	1496	102.7s lowest='提示：点已填的格子可以把数字取回托盘' [956,1454][1605,1496] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Magic_Squares-055717.jpeg @2026-11-14T05:57:17
+2026-11-14T05:59:21	Matrix Multiplier	OK	1352	102.7s lowest='提示：C(r,c) = A[r][0]×B[0][c' [907,1310][1654,1352] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Multiplier-055921.jpeg @2026-11-14T05:59:21
+2026-11-14T06:01:04	Matrix Multiplier Match	OK	1429	102.4s lowest='提示：2×2 乘积 C[r][c] = A[r][0' [820,1387][1741,1429] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Multiplier_Match-060104.jpeg @2026-11-14T06:01:04
+2026-11-14T06:02:47	Matrix Reasoning	OK	1600	102.7s lowest='提示' [60,1526][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Reasoning-060246.jpeg @2026-11-14T06:02:47
+2026-11-14T06:04:29	Mental Abacus	OK	1406	101.9s lowest='提示：一步一算，别跳步 —— 减法看准方向' [928,1364][1632,1406] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Abacus-060428.jpeg @2026-11-14T06:04:29
+2026-11-14T06:06:11	Mental Calendar	OK	1543	102.6s lowest='提示：一三五七八十腊，三十一天永不差；闰年二月二十九' [794,1501][1767,1543] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Calendar-060611.jpeg @2026-11-14T06:06:11
+2026-11-14T06:07:54	Missing Operator	OK	1351	102.8s lowest='＋' [60,1256][648,1351] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Missing_Operator-060754.jpeg @2026-11-14T06:07:54
+2026-11-14T06:09:37	Modular Clock Arithmetic	OK	1475	102.9s lowest='提示' [60,1361][1265,1475] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Modular_Clock_Arithmetic-060937.jpeg @2026-11-14T06:09:37
+2026-11-14T06:11:20	Modulo Path	OK	1517	103.2s lowest='19' [256,1447][328,1517] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Modulo_Path-061120.jpeg @2026-11-14T06:11:20
+2026-11-14T06:13:25	Number Bonds	OK	1583	103.5s lowest='目标数 = 左半 + 右半，把缺的那半补上' [60,1534][2500,1583] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds-061325.jpeg @2026-11-14T06:13:25
+2026-11-14T06:15:09	Numerical Estimation	OK	1579	103.5s lowest='不用精算，挑最接近的那个' [60,1530][2500,1579] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Numerical_Estimation-061509.jpeg @2026-11-14T06:15:09
+2026-11-14T06:16:51	Percentage Shopping	OK	1600	102.5s lowest='3' [108,1595][134,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-061651.jpeg @2026-11-14T06:16:51
+2026-11-14T06:18:34	Prime Factor Trees	OK	1442	102.6s lowest='提示' [60,1310][2052,1442] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Factor_Trees-061834.jpeg @2026-11-14T06:18:34
+2026-11-14T06:20:16	Prime Gap Hunt	OK	1526	102.0s lowest='素数：只能被 1 与自身整除' [60,1484][496,1526] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Gap_Hunt-062016.jpeg @2026-11-14T06:20:16
+2026-11-14T06:21:59	Prime Hunter	OK	1456	102.8s lowest='绿=捞到 红=点错' [60,1414][327,1456] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Prime_Hunter-062159.jpeg @2026-11-14T06:21:59
+2026-11-14T06:23:41	Pythagorean Triple Builder	OK	1600	102.2s lowest='⌫' [60,1521][861,1600] blk=2/48px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-062341.jpeg @2026-11-14T06:23:41
+2026-11-14T06:25:24	Quick Math	OK	1523	102.6s lowest='连击越高分越多' [60,1481][313,1523] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Quick_Math-062524.jpeg @2026-11-14T06:25:24
+2026-11-14T06:27:06	Radical Roots	OK	1526	101.5s lowest='提示' [60,1424][1929,1526] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Radical_Roots-062705.jpeg @2026-11-14T06:27:06
+2026-11-14T06:28:48	Roman Arithmetic	OK	1490	102.6s lowest='左减右加：IV=4，IX=9，XL=40' [60,1448][567,1490] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Roman_Arithmetic-062848.jpeg @2026-11-14T06:28:48
+2026-11-14T06:30:32	Sequence Sleuth	OK	1535	103.2s lowest='提示' [60,1403][1947,1535] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Sequence_Sleuth-063031.jpeg @2026-11-14T06:30:32
+2026-11-14T06:32:14	Sequence Stack	OK	1549	102.4s lowest='提示：答错不换题，想清楚再点' [60,1507][2500,1549] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Sequence_Stack-063214.jpeg @2026-11-14T06:32:14
+2026-11-14T06:33:59	Set Theory Venn	OK	1392	104.8s lowest='提示：先看这个数在不在 A 里，再看在不在 B 里' [60,1350][2500,1392] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Set_Theory_Venn-063359.jpeg @2026-11-14T06:33:59
+2026-11-14T06:35:42	Sum Pyramid	OK	1517	102.9s lowest='提示：相邻两格之和往上搬，一层层来' [60,1475][2500,1517] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Sum_Pyramid-063542.jpeg @2026-11-14T06:35:42
+2026-11-14T06:37:24	Target 10	OK	1512	102.1s lowest='提示：连续消对会加连击分，消错会掉分' [60,1470][2500,1512] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Target_10-063724.jpeg @2026-11-14T06:37:24
+2026-11-14T06:39:08	Target Number	OK	1558	103.5s lowest='提示：先算乘除，再算加减；括号先算' [60,1516][2500,1558] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Target_Number-063907.jpeg @2026-11-14T06:39:08
+2026-11-14T06:41:12	Unit Converter Pro	OK	1558	102.7s lowest='提示：长度 10 进、数据 1024 进、时间 60' [60,1516][2500,1558] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Unit_Converter_Pro-064111.jpeg @2026-11-14T06:41:12
+2026-11-14T06:42:54	Vector Dot Product	OK	1374	101.9s lowest='51' [60,1242][1265,1374] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Vector_Dot_Product-064253.jpeg @2026-11-14T06:42:54
+2026-11-14T06:44:36	Vector Grid Alignment	OK	1592	102.5s lowest='按方向键，把 🧭 走到 🎯' [60,1543][2500,1592] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Vector_Grid_Alignment-064436.jpeg @2026-11-14T06:44:36
