@@ -305,7 +305,10 @@ export struct GVisualSearchAll {
           .width('100%')
         }, (r: number) => 'vr' + r)
       }
-      .width('100%').padding(Space.sm).backgroundColor(this.theme.surfaceAlt)
+      // 2026-11-13 真机截图：**第三行格子整行被切**（只露上沿）+ 底部提示行完全不见
+      //   ⇒ 盘面是方形格 `aspectRatio` ⇒ **限宽即限高**（判据 1966）
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 220)))
+      .padding(Space.sm).backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.note).fontSize(FontSize.sm)
         // ★ 通关庆祝
