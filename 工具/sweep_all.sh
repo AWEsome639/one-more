@@ -41,6 +41,34 @@ for ln in io.open('_巡检记录/layout-canonical.tsv', encoding='utf-8'):
         done.add(f[1])
 alln = [l.strip() for l in io.open('/tmp/all355.txt', encoding='utf-8') if l.strip()]
 todo = [n for n in alln if n not in done]
+# ★ 2026-11-14：**改过的款排最前** —— 今晚要验那 32 处改动，
+#   如果按文件名顺序跑，7 小时只能跑 ~180 款，改过的款可能排在后面 ⇒ 白等一晚。
+#   ⇒ 用 git 找出「最近改动过的 .ets」→ 映射到英文名 → 提到队首。
+import subprocess as _sp
+try:
+    out = _sp.check_output(['git', 'diff', '--name-only', 'HEAD~40..HEAD'],
+                           stderr=_sp.DEVNULL).decode('utf-8', 'replace')
+    changed_files = [l.strip() for l in out.split('\n') if l.strip().startswith('entry/src/main/ets/games/')]
+    reg = io.open('entry/src/main/ets/core/GameRegistry.ets', encoding='utf-8').read()
+    import re as _re
+    id2en = dict(_re.findall(r"id: '([^']+)'[^}]*?enName: '([^']+)'", reg))
+    prio = []
+    for f in changed_files:
+        src = io.open(f, encoding='utf-8').read()
+        m = _re.search(r"(?:id|gameId)\s*[:=]\s*'([a-z0-9_]+)'", src)
+        if m and m.group(1) in id2en:
+            en = id2en[m.group(1)]
+            if en not in prio:
+                prio.append(en)
+    # ⚠️ 2026-11-14 关键修正：**改过的款即使「今天已测」，也必须重测**
+    #   因为它们今天的测量是**改动生效之前**的（`00:05-06:45` 那轮用的是旧 HAP）
+    #   ⇒ 若按「已测就跳过」处理，今晚恰恰会**跳过我要验的那 32 款**。
+    if prio:
+        todo = prio + [n for n in todo if n not in prio]
+        print('优先 %d 款（改过的排最前，且强制重测）' % len(prio))
+except Exception as e:
+    print('（优先排序跳过: %s）' % e)
+
 io.open('/tmp/todo_all.txt', 'w', encoding='utf-8').write('\n'.join(todo) + '\n')
 print('已测 %d, 待测 %d' % (len(done), len(todo)))
 PY
