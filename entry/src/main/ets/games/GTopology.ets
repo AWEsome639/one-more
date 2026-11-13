@@ -287,7 +287,7 @@ export struct GTopology {
         .fontColor(this.revealed ? Palette.orange : this.theme.inkFaint)
         }.layoutWeight(1).height('100%').justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      }.width('100%').height(170)
+      }.width('100%').height(Bp.isShort() ? 130 : 170)
       Row({ space: Space.sm }) {
         Button(Bp.tinyScreen() || Bp.isWatch()
           ? TG('等价')

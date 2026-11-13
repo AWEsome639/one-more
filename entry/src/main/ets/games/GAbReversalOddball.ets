@@ -324,7 +324,7 @@ export struct GAbReversalOddball {
         Text(this.sym).fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
           .fontColor(this.flash.length > 0 ? '#FFFFFF' : this.theme.ink)
       }
-      .width('100%').height(160)
+      .width('100%').height(Bp.isShort() ? 120 : 160)
       .backgroundColor(this.boxColor()).borderRadius(Radius.lg).shadow(Shadow.lifted)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
 

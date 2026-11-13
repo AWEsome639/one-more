@@ -341,7 +341,7 @@ export struct GVennNumbers {
         .onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L328'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapZone((2)); }); }) }
-          .width('100%').height(150).justifyContent(FlexAlign.Center)
+          .width('100%').height(Bp.isShort() ? 110 : 150).justifyContent(FlexAlign.Center)
       }.width('100%').height(150)
       // ★ 2026-11-08 RTL：背后两个 `Circle` 用 `position({ x: 8 / 78 })` **绝对坐标**，
       //   而 A/B 选项是 Row 流式排列（RTL 会整体镜像）⇒ 不钉住的话圆会跑到另一个选项底下。

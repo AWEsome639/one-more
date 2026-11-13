@@ -315,7 +315,7 @@ export struct GActionSequenceRecall {
         Text(this.showIdx < 0 ? (this.playing ? '·' : '👀') : ACTS[this.showIdx])
           .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
       }
-      .width('100%').height(150)
+      .width('100%').height(Bp.isShort() ? 110 : 150)
       .backgroundColor(this.showIdx < 0 ? this.theme.surfaceAlt : Palette.primary)
       .borderRadius(Radius.lg).shadow(Shadow.lifted).animation({ duration: Motion.fast, curve: Motion.snap() })
       Row({ space: Space.xs }) {

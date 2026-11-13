@@ -358,7 +358,7 @@ export struct GBlinkDetector {
       Stack() {
         Text(this.eye ? '😑' : '👁').fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
       }
-      .width('100%').height(170)
+      .width('100%').height(Bp.isShort() ? 130 : 170)
       .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg).shadow(Shadow.lifted)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
 

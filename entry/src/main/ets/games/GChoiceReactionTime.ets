@@ -297,7 +297,7 @@ export struct GChoiceReactionTime {
         Text(this.live ? String(this.val) : '👀').fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
           .fontColor(this.live ? Palette.orange : this.theme.inkFaint)
         Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      }.width('100%').height(170).justifyContent(FlexAlign.Center)
+      }.width('100%').height(Bp.isShort() ? 130 : 170).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.md }) {
         // ★ 演示条（共用组件；未演示时高度为 0，不占位）

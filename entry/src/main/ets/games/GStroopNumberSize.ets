@@ -265,7 +265,7 @@ export struct GStroopNumberSize {
           .animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       }
-      .width('100%').height(180).justifyContent(FlexAlign.Center)
+      .width('100%').height(Bp.isShort() ? 140 : 180).justifyContent(FlexAlign.Center)
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.md }) {
         // ★ 演示条（共用组件；未演示时高度为 0，不占位）

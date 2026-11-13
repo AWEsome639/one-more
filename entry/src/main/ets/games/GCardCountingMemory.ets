@@ -372,7 +372,7 @@ export struct GCardCountingMemory {
 
         } }, (i: number) => 'cc' + i)
       }.columnsTemplate('1fr 1fr 1fr 1fr').rowsGap(Space.sm).columnsGap(Space.sm)
-        .width('100%').height(150).opacity(this.phase === 2 ? 1 : 0.35)
+        .width('100%').height(Bp.isShort() ? 110 : 150).opacity(this.phase === 2 ? 1 : 0.35)
       Button(this.over ? TG('再来一局') : TG('重开'))
       // ★ 2026-11-09：矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)

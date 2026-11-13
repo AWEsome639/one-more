@@ -288,7 +288,7 @@ export struct GSpatialConflict {
         }.layoutWeight(1).height('100%')
         .backgroundColor(this.flash < 0 ? this.theme.surfaceAlt : (this.flash === 1 ? '#2210B981' : '#22EF4444'))
         .borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
-      }.width('100%').height(180)
+      }.width('100%').height(Bp.isShort() ? 140 : 180)
       Row({ space: Space.sm }) {
         Button((TG('⬅️ 左')))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.lg).fontColor('#FFFFFF').backgroundColor(true ? Palette.sky : Palette.violet)
