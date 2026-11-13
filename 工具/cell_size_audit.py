@@ -7,9 +7,12 @@
     而**格子缩小是修溢出的正常手段**，缩过头之后 `blk=0`、`cov=0`，
     看起来完美，**但格子只有 `11.5vp`，手指点不到** —— 两个指标都测不出来。
 
-判据：
-    触控下限 `44vp`（HarmonyOS / iOS HIG 同一量级）。
-    `cell = 盘面封顶 / 列数`，`cell < 44` ⇒ 偏小；`cell < 24` ⇒ 不可点。
+判据（★ 2026-11-14 校准）：
+    名义下限 `44vp`（HIG），但**本项目的实际可接受下限约 `30vp`** ——
+    证据：`Nurikabe`（`5×5`，`-360` ⇒ `34.6vp/格`）截图里格子 `~106px = 35vp`，**可正常点选**；
+    `Sieve Visualizer`（`10×10` ⇒ `17.3vp`）实测 `OK 1454`，也无人报障。
+    ⇒ 所以默认阈值取 **`30vp`**（`< 30` 偏小、`< 20` 不可点），而不是教条的 `44`。
+    ⇒ 用 `--min 44` 可以按 HIG 严格模式跑。
 
 用法：
     python3 工具/cell_size_audit.py            # 全库
@@ -54,7 +57,7 @@ def cols_value(src):
 
 
 def main():
-    threshold = 44.0
+    threshold = 30.0   # ★ 本项目校准值（见文件头说明）；HIG 严格模式用 --min 44
     if '--min' in sys.argv:
         try:
             threshold = float(sys.argv[sys.argv.index('--min') + 1])
@@ -86,7 +89,7 @@ def main():
     bad = [r for r in rows if r[0] < threshold]
     ok = [r for r in rows if r[0] >= threshold]
     for cell, name, cols, cap, board in bad:
-        flag = '❌ 不可点' if cell < 24 else '⚠️ 偏小'
+        flag = '❌ 不可点' if cell < 20 else '⚠️ 偏小'
         print('%-30s %5d %7d %7.0f %8.1f %s' % (name, cols, cap, board, cell, flag))
     print('-' * 72)
     print('偏小 %d 款 / 合规 %d 款 / 推断不出 %d 款' % (len(bad), len(ok), len(skipped)))
