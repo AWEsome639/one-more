@@ -2,6 +2,11 @@
 # 2026-11-14：**全量 354 款分批扫**
 #   背景：`verify_layout.py` 默认只跑「固定 32 款」，不是全库。
 #   约束：macOS 自带 bash 3.2 **没有 mapfile**；游戏名带空格 ⇒ 必须用 `--names-file`。
+# 用法：
+#   bash 工具/sweep_all.sh          # 真跑（会起模拟器）
+#   bash 工具/sweep_all.sh --dry    # **只生成待办并打印，不碰设备**（白天安全测试用）
+#
+# ⚠️ 2026-11-14 教训：这个脚本**没有 dry-run 之前，白天测试它会真起模拟器**（我犯过）。
 set +u
 # ★ 2026-11-14 实测踩到：**脚本自己的路径里有中文（`工具/`）**
 #   ⇒ `dirname "$0"` 在没有 UTF-8 locale 的 bash 3.2 里会产出非法字节 ⇒ 整脚本挂掉
@@ -73,6 +78,17 @@ io.open('/tmp/todo_all.txt', 'w', encoding='utf-8').write('\n'.join(todo) + '\n'
 print('已测 %d, 待测 %d' % (len(done), len(todo)))
 PY
 cat /tmp/todo_gen.out | tee -a "$LOG"
+
+# ★ 2026-11-14：**`--dry` 只生成待办，绝不碰设备**
+#   教训：这脚本没有 dry-run 之前，我为了「验证 todo 生成」跑了一次它，
+#   结果它真的去起了模拟器（他当时醒着）。白天测试必须走这条分支。
+if [ "${1:-}" = "--dry" ]; then
+  echo "===== --dry：前 40 款（不会起设备）=====" | tee -a "$LOG"
+  head -40 "$TODO" | nl -ba | sed 's/^/  /' | tee -a "$LOG"
+  echo "===== --dry 结束，共 $(wc -l < "$TODO" | tr -d ' ') 款 =====" | tee -a "$LOG"
+  exit 0
+fi
+
 
 for round in $(seq 1 24); do
   n=$(wc -l < "$TODO" | tr -d ' ')
