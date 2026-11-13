@@ -1502,8 +1502,13 @@ export class ProgressStore {
       //   ⇒ 输一局拿 60 分、上一把赢局只拿 40 分 ⇒ 结算页庆祝一场失败。
       //   ⇒ 新纪录必须同时满足「这局赢了」。
       //   ⚠️ 已知残留：下面的 `mb[gameId] = score` 仍会记输局的分数——
-      //     若某款「输比赢分多」（如未修的 classic_maze）会把最高分刷成失败分。
+      //     若某款「输比赢分多」会把最高分刷成失败分。
       //     那属于各款分数公式的问题，不在这里做二次裁决。
+      // ★ 2026-11-14 更正：**`classic_maze` 已于 `2026-11-08` 修好**
+      //   （`GClassicMaze.ets` 的 `finish()` 把扣分系数从 `×3` 降到 `×0.6`）。
+      //   核实：`dmax = max(2.2×最短路, 3×diffTotal)`，`diffTotal ∈ {6,9,12}`
+      //   ⇒ `dmax ≲ 110`，而「赢局最低分 > 输局最高分」在 `dmax < 353` 时恒成立 ✅
+      //   ⇒ 注释里原来写「未修的 classic_maze」是**过时的**，别再拿它当待办。
       ProgressStore.lastWasBest = solved && score > prevBest;
       if (score > prevBest) {
         mb[gameId] = score;
