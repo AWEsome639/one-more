@@ -1057,7 +1057,7 @@ export struct GGomoku {
               })
             }, (c: number) => 'gk' + r + '-' + c)
           }
-          .width('100%')
+          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 240)))
         }, (r: number) => 'gkr' + r)
       }
       .width('100%')
