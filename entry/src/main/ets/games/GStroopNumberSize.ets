@@ -277,6 +277,13 @@ export struct GStroopNumberSize {
           disabled: this.demoId >= 0,
           autoOn: this.autoId >= 0
         })
+      }
+      // ★★★ 2026-11-13 真机截图抓到的**严重**问题：
+      //   原来「提示/AI 代打」和两个答案按钮**挤在同一行**，`HintBar` 占了太宽
+      //   ⇒ `比 5 大` / `比 5 小` 被挤出右边界（截图里只剩一个橙色角）
+      //   ⇒ **玩家根本点不到答案**。而 `blk` 只量**垂直**越界 ⇒ 完全没报出来。
+      //   修法：答案按钮单独一行。
+      Row({ space: Space.md }) {
         Button(TG('比 5 大'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
           .fontSize(FontSize.lg).fontColor('#FFFFFF')
