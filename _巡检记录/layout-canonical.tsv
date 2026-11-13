@@ -335,3 +335,11 @@
 2026-11-13T10:50:29	Modulo Clock	WRONG_GAME	-	258.4s title '模钟' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']
 2026-11-13T10:51:57	Magnets	TIMEOUT	-	273.8s budget exhausted at search:Magnets
 2026-11-13T11:06:17	Magnets	NOT_HOME	-	182.3s could not reach home
+2026-11-13T15:17:36	Spatial Conflict	NOT_HOME	-	209.6s could not reach home
+2026-11-13T15:19:18	Stroop Number Size	NOT_HOME	-	99.3s could not reach home
+2026-11-13T15:21:41	Temporal Order Judgment	NOT_HOME	-	141.0s could not reach home
+2026-11-13T15:26:10	Blink Detector	DUMP_FAIL	-	266.7s no search dump
+2026-11-13T15:31:01	Choice Reaction Time	TIMEOUT	-	287.5s budget exhausted at search:Choice Reaction Time
+2026-11-13T15:31:21	Spatial Conflict	TIMEOUT	-	262.7s budget exhausted at search:Spatial
+2026-11-13T15:41:08	Spatial Conflict	NOT_HOME	-	210.4s could not reach home
+2026-11-13T15:42:49	Stroop Number Size	NOT_HOME	-	97.8s could not reach home
