@@ -90,7 +90,14 @@ def main():
     if '--every' in args:
         every = int(args[args.index('--every') + 1])
     names = FIXED + SUSPECT + AMBIG
-    if '--names' in args:
+    # ★ 2026-11-14：`--names-file <path>` —— 每行一个游戏名。
+    #   为什么需要它：macOS 自带 bash 3.2 **没有 `mapfile`**，而游戏名里有空格
+    #   （`Block Count 3D`），用 `--names a b c` 传会被 word splitting 打散。
+    if '--names-file' in args:
+        fp = args[args.index('--names-file') + 1]
+        with io.open(fp, encoding='utf-8') as f:
+            names = [ln.strip() for ln in f if ln.strip()]
+    elif '--names' in args:
         names = [a for a in args[args.index('--names') + 1:] if not a.startswith('--')]
     results = []
     for i, g in enumerate(names, 1):
