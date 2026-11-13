@@ -821,6 +821,11 @@ export struct G2048 {
       //   （真机 dump：屏上只有「AI 代打」，**没有任何「提示」元素**）
       //   ⇒ 给棋盘限高，让下面那行回到可视区。
       //   （数独、孔明棋都修过同一个问题 —— 这是第三处）
+      //   ★★ 2026-11-14 更正（真机截图 + 算术）：
+      //     **前三次修的应该都是「限高」，而限高对 `aspectRatio(1)` 只裁不缩 ⇒ 三次都没修对。**
+      //     正确做法是**限宽**（`width: Math.min(Bp.width-40, Bp.height-360)` ⇒ `173vp`），
+      //     因为 `N×N` 方阵的**高恰好等于宽度封顶值**（判据 `1966`）。
+      //     `2026-11-14` 已按限宽改掉，并删掉了下面那个 `maxHeight`。
       .padding(Space.sm)
       .backgroundColor(this.theme.isDark ? '#141414' : '#BBADA0')
       .borderRadius(Radius.lg)

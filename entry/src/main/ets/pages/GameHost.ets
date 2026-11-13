@@ -3883,7 +3883,11 @@ struct GameHost {
         //     · 顶栏 5 个按钮：稳定 id `hdr-0..4` + 显式 requestFocus（差异 24699，已验证）
         //     · 棋盘 1166 处格子：需要先给每处一个稳定 id —— 独立工程
         //
-        //   ⇒ 所以这里保留顶栏的显式移动；上下键暂不处理（棋盘还没接进来）。
+        //   ⇒ 所以这里保留顶栏的显式移动；上下键暂不处理。
+        //   ★ 2026-11-14 更正：**别把上面这句读成「棋盘没做电视适配」** ——
+        //     棋盘焦点是**各游戏自己用 `Tv.handleKey` + `focusable(Tv.on())` 处理**的，
+        //     全库 `355/355` 款都有（`grep -rl` 实测）。
+        //     `GameHost` 这一层只是**不越权去管**棋盘焦点，不是缺口。
         const cur: number = this.focusIdx;
         const isLR: boolean = e.keyCode === Tv.KEY_LEFT || e.keyCode === Tv.KEY_RIGHT;
         if (isLR && cur >= 0 && cur <= 4) {
