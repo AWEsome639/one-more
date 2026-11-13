@@ -290,3 +290,31 @@
 2026-11-13T08:00:33	Stroop Test	OK	1600	103.5s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-080033.jpeg @2026-11-13T08:00:33
 2026-11-13T08:02:45	Binomial Match	OK	1576	102.3s lowest='换一组' [60,1462][2500,1576] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-080245.jpeg @2026-11-13T08:02:45
 2026-11-13T08:13:53	Stroop Test	OK	1600	102.2s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-081352.jpeg @2026-11-13T08:13:53
+2026-11-13T08:24:48	Nonogram	OK	1323	108.3s lowest='提示' [2308,1191][2500,1323] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-082447.jpeg @2026-11-13T08:24:48
+2026-11-13T08:26:31	Nurikabe	OK	1407	102.8s lowest='提示' [1304,1275][2500,1407] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-082630.jpeg @2026-11-13T08:26:31
+2026-11-13T08:28:13	Masyu	OK	1457	102.1s lowest='⚫ 必须拐弯 · ⚪ 必须直行 · 回路要闭合成一圈' [900,1415][1661,1457] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-082813.jpeg @2026-11-13T08:28:13
+2026-11-13T08:30:25	Relational Memory	OK	1465	132.3s lowest='判定：6 题答对 ≥ 5 通关；看 5 秒后开始答题' [60,1423][2500,1465] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-083025.jpeg @2026-11-13T08:30:25
+2026-11-13T08:32:10	Math Path	OK	1450	104.7s lowest='步数 0/30 · 相邻成路、数字与运算符交替、从左' [697,1408][1864,1450] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-083210.jpeg @2026-11-13T08:32:10
+2026-11-13T08:33:57	Kakurasu Sums	OK	1464	106.6s lowest='上方数字 = 该列黑格的行号之和；左侧数字 = 该行' [601,1422][1959,1464] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakurasu_Sums-083356.jpeg @2026-11-13T08:33:57
+2026-11-13T08:37:32	Stroop Test	OK	1600	163.7s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-083731.jpeg @2026-11-13T08:37:32
+2026-11-13T08:41:19	Stroop Test	OK	1600	191.9s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-084118.jpeg @2026-11-13T08:41:19
+2026-11-13T08:53:04	Stroop Test	OK	1600	104.0s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-085304.jpeg @2026-11-13T08:53:04
+2026-11-13T09:04:41	Stroop Test	OK	1600	111.9s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-090441.jpeg @2026-11-13T09:04:41
+2026-11-13T09:07:21	Stroop Test	OK	1600	105.9s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-090720.jpeg @2026-11-13T09:07:21
+2026-11-13T09:09:28	Stroop Test	OK	1600	106.6s lowest='蓝' [60,1471][1265,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-090928.jpeg @2026-11-13T09:09:28
+2026-11-13T09:12:00	Stroop Test	OK	1570	112.8s lowest='判定：12 题答对 ≥ 10 题；答的是墨色，不是字' [60,1528][2500,1570] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-091200.jpeg @2026-11-13T09:12:00
+2026-11-13T09:25:09	Stroop Test	OK	1570	104.4s lowest='判定：12 题答对 ≥ 10 题；答的是墨色，不是字' [60,1528][2500,1570] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-092509.jpeg @2026-11-13T09:25:09
+2026-11-13T09:27:55	Nonogram	OK	1323	105.8s lowest='提示' [2308,1191][2500,1323] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-092754.jpeg @2026-11-13T09:27:55
+2026-11-13T09:29:47	Target 10	OK	1512	106.5s lowest='提示：连续消对会加连击分，消错会掉分' [60,1470][2500,1512] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Target_10-092946.jpeg @2026-11-13T09:29:47
+2026-11-13T09:31:36	Match 3	OK	1558	107.0s lowest='点一个果子，再点旁边的换位' [1007,1509][1554,1558] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Match_3-093135.jpeg @2026-11-13T09:31:36
+2026-11-13T09:33:29	Pixel Mimic	OK	1600	111.0s lowest='照左边画，多点的格子再点一次就擦掉' [60,1581][2500,1600] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Pixel_Mimic-093329.jpeg @2026-11-13T09:33:29
+2026-11-13T09:35:13	Word Snake Trail	OK	1600	101.6s lowest='↑' [60,1532][640,1600] blk=5/120px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Snake_Trail-093512.jpeg @2026-11-13T09:35:13
+2026-11-13T09:37:01	Tenner Grid	OK	1600	105.8s lowest='提示' [60,1561][2116,1600] blk=3/72px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Tenner_Grid-093700.jpeg @2026-11-13T09:37:01
+2026-11-13T09:38:58	Find Word	OK	1600	115.7s lowest='按顺序连点字母，拼出 3 个字母的单词' [60,1587][2500,1600] blk=2/10px max=5 -> /Users/a0000/dev/One More/_巡检记录/截图-Find_Word-093858.jpeg @2026-11-13T09:38:58
+2026-11-13T09:55:50	Word Snake Trail	OK	1460	91.3s lowest='提示：吃错字母、撞墙、咬自己都扣一条命' [60,1418][2500,1460] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Snake_Trail-095550.jpeg @2026-11-13T09:55:50
+2026-11-13T09:57:39	Tenner Grid	OK	1563	106.6s lowest='提示' [60,1431][2116,1563] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Tenner_Grid-095739.jpeg @2026-11-13T09:57:39
+2026-11-13T09:59:55	Match 3	OK	1348	106.9s lowest='点一个果子，再点旁边的换位' [1007,1299][1554,1348] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Match_3-095954.jpeg @2026-11-13T09:59:55
+2026-11-13T10:01:44	Pixel Mimic	OK	1420	107.2s lowest='照左边画，多点的格子再点一次就擦掉' [60,1371][2500,1420] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Pixel_Mimic-100143.jpeg @2026-11-13T10:01:44
+2026-11-13T10:03:34	Find Word	OK	1570	108.2s lowest='提示：横竖相邻即可，拼 3 个字母；5 个通关' [60,1528][2500,1570] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Find_Word-100334.jpeg @2026-11-13T10:03:34
+2026-11-13T10:05:23	Letter Cancellation	OK	1392	106.5s lowest='划满 3 盘通关；漏一个罚 3 秒，点错也罚 3 秒' [60,1350][2500,1392] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Letter_Cancellation-100522.jpeg @2026-11-13T10:05:23
+2026-11-13T10:07:44	Word Search	OK	1460	138.6s lowest='提示：单词只横放或竖放，点首尾两格即可（倒着也算）' [60,1418][2500,1460] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Search-100743.jpeg @2026-11-13T10:07:44
