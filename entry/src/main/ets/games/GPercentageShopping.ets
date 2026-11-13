@@ -395,8 +395,9 @@ export struct GPercentageShopping {
       }.width('100%')
 
       Column({ space: Space.xs }) {
-        Text(this.icon).fontSize(FontSize.hero)
-        Text(TG2('¥{0} 打 {1} 折', this.price, this.off)).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
+        // 2026-11-14 真机截图：**选项 `3` 只露上沿、`4` 完全不见** ⇒ 按判据 1886 缩上方题卡
+        Text(this.icon).fontSize(Bp.isShort() ? FontSize.xxl : FontSize.hero)
+        Text(TG2('¥{0} 打 {1} 折', this.price, this.off)).fontSize(Bp.isShort() ? FontSize.lg : FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
         Text(TG('现价多少？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
