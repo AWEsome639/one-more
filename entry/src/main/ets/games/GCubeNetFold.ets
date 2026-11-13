@@ -359,7 +359,7 @@ export struct GCubeNetFold {
               }
               .layoutWeight(1).aspectRatio(1)
             }, (c: number) => 'c' + c)
-          }.width('100%')
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
         }, (r: number) => 'r' + r)
       }.width('100%')
 

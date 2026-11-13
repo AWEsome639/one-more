@@ -319,7 +319,7 @@ export struct GSpotlightTrack {
           }.width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('100%').padding(Space.xs)
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360))).padding(Space.xs)
       .backgroundColor(this.theme.isDark ? '#141414' : '#E2E8F0').borderRadius(Radius.lg)
       Text(this.msg)
         .fontSize(FontSize.md).fontColor(this.chasing ? this.theme.inkSoft : Palette.primary)

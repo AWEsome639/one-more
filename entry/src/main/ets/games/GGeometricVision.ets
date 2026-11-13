@@ -347,7 +347,7 @@ export struct GGeometricVision {
           ForEach(COLS, (c: number) => { this.blkA(r * 4 + c) }, (c: number) => 'ac' + r + '_' + c)
         }.width('100%')
       }, (r: number) => 'ar' + r)
-    }.width('100%')
+    }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
   }
 
   @Builder
