@@ -20,10 +20,16 @@ ensure() {
   local t; t=$(target)
   case "$t" in
     *Empty*|"")
-      echo "· 设备不在 ⇒ 起 onemore3（onemore 疑似损坏）" >> "$LOG"
-      (nohup "$EMU" -start onemore3 -noWindow > /tmp/emu_verify.log 2>&1 &)
-      sleep 300
-      t=$(target);;
+      # 2026-11-13：`onemore` 今天冷启动失败多次（疑似损坏）⇒ 依次试 onemore3/4/5/6
+      for inst in onemore3 onemore4 onemore5 onemore6; do
+        echo "· 设备不在 ⇒ 起 $inst" >> "$LOG"
+        (nohup "$EMU" -start "$inst" -noWindow > "/tmp/emu_$inst.log" 2>&1 &)
+        sleep 300
+        t=$(target)
+        case "$t" in *Empty*|"") ;; *) break;; esac
+        for p in $(ps aux | grep "[E]mulator -start" | awk '{print $2}'); do kill -9 $p 2>/dev/null; done
+        sleep 5
+      done;;
   esac
   printf '%s' "$t"
 }
