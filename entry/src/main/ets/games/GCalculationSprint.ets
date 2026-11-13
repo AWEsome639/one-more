@@ -501,7 +501,7 @@ export struct GCalculationSprint {
 
       Column({ space: Space.xs }) {
         Text(this.quiz)
-          .fontSize(FontSize.hero)
+          .fontSize(Bp.isShort() ? FontSize.xl : FontSize.hero)
           .fontWeight(FontWeight.Bold)
           .fontColor(Palette.amber)
         Text(TG2('连击 ×{0} · 最高 ×{1} · 第 {2} 题', String(this.combo), String(this.best), String(this.right + this.wrong + 1)))

@@ -439,7 +439,7 @@ export struct GModuloClock {
       }.width('100%')
 
       Column({ space: Space.xs }) {
-        Text(this.face).fontSize(FontSize.hero)
+        Text(this.face).fontSize(Bp.isShort() ? FontSize.xl : FontSize.hero)
         Text(this.quiz).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(Palette.emerald).textAlign(TextAlign.Center)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
