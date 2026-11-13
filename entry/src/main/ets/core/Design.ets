@@ -109,7 +109,9 @@ export class Cell {
     //     533 × 0.85 ≈ 453 ⇒ 按压 192→163、间距 80→68，省下 41vp，够放回底部一行。
     //   ⚠️ 手机上 `Bp.height` ≥ 600 ⇒ 系数 1.0，**与改造前逐像素一致**（零回归）。
     let shrink: number = 1;
-    if (Bp.height > 0 && Bp.height < 600) {
+    // 2026-11-13（队友静态分析）：**电视不缩** —— 电视的 `Bp.scale()` 已是 `1.45`，
+    //   再乘 `0.85` 会把「3 米视距要更大」抵消掉一半（`1.45 × 0.85 = 1.23`）。
+    if (Bp.height > 0 && Bp.height < 600 && !Bp.isTv()) {
       shrink = 0.85;
     }
     return Math.round(base * Cell.k * Bp.scale() * shrink);

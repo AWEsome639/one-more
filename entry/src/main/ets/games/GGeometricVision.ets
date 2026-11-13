@@ -358,7 +358,9 @@ export struct GGeometricVision {
           ForEach(COLS, (c: number) => { this.blkB(r * 4 + c) }, (c: number) => 'bc' + r + '_' + c)
         }.width('100%')
       }, (r: number) => 'br' + r)
-    }.width('100%')
+    // 2026-11-13 队友抓出：`gridA` 已限宽而 `gridB` 还是 100% ⇒ A/B 不对称，
+    //   而本款玩法就是「比 A/B 一样不一样」⇒ 会误导玩家。两处必须一致。
+    }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
   }
 
   @Builder
