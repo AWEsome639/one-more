@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""2026-11-14：**改动在位核对** —— 确认这批改动没有被后续编辑吃掉
+
+为什么需要它：
+    今天有 `37` 处改动，每处都用「整行替换」手工定位行号改的。
+    而今天**已经发生过一次**「脚本把行首 `}` 吃掉」的事故 ⇒ 同理也可能把改动本身改丢。
+    `preflight.sh` 只查语法对不对，**不查改动还在不在**。
+
+判据：
+    每处改动有一个「特征串」。特征串在 ⇒ 改动在位；不在 ⇒ 被吃掉了。
+
+用法：
+    python3 工具/verify_changes_present.py
+
+注意：
+    这是**本批改动**的清单（`2026-11-14`）。改完之后记得更新这里的 `checks`，
+    或者把它当成「一次性的交付核对」用。
+"""
+import io
+import os
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
+
+# (类名, 特征串, 说明)
+CHECKS = [
+    ('G2048', 'Bp.height - 360', '限宽'),
+    ('GBlockCount3d', 'Bp.isShort() ? 88 : 112', '格高降档'),
+    ('GCalculationSprint', 'Bp.isShort() ? FontSize.xl : FontSize.hero', '题卡降档'),
+    ('GCollatz', 'Bp.isShort() ? FontSize.xxl : FontSize.hero', '题卡降档'),
+    ('GCrown', 'Bp.height - 360', '限宽'),
+    ('GDominosa', 'Bp.height - 360', '限宽'),
+    ('GFractionMatcher', 'Bp.isShort() ? FontSize.xxl', '题卡降档'),
+    ('GGokigenNaname', 'Bp.height - 360', '限宽'),
+    ('GGomoku', 'Bp.height - 360', '限宽'),
+    ('GHeyawake', 'Bp.height - 360', '限宽'),
+    ('GHitori', 'Bp.height - 360', '限宽'),
+    ('GHitoriAll', 'Bp.height - 360', '限宽'),
+    ('GMatrixReasoning', 'Bp.height - 360', '限宽'),
+    ('GMemory', 'Bp.height - 360', '限宽'),
+    ('GModuloClock', 'Bp.isShort() ? FontSize.xl : FontSize.hero', '题卡降档'),
+    ('GModuloPath', 'Bp.height - 360', '限宽'),
+    ('GNoriNori', 'Bp.height - 360', '限宽'),
+    ('GPathIntersect', 'Bp.height - 360', '限宽'),
+    ('GPatternSequenceDraw', 'Bp.isShort() ? 32 : 0', '盘面底部留白'),
+    ('GPercentagePeak', 'Bp.isShort() ? FontSize.lg', '题卡降档'),
+    ('GPipes', 'Bp.height - 360', '限宽'),
+    ('GPythagoreanTripleBuilder', 'Bp.isShort() ? FontSize.xxl : FontSize.hero', '题卡降档'),
+    ('GShikaku', 'Bp.height - 360', '限宽'),
+    ('GSimonSays', 'Bp.height - 200', '限行宽'),
+    ('GSkyscrapers', 'Bp.height - 360', '限宽'),
+    ('GSnake3D', 'Bp.height - 180', '限整行宽'),
+    ('GTargetNumber', 'Bp.isShort() ? FontSize.xl : FontSize.xxxl', '题卡降档'),
+    ('GVisualSearchAll', 'Bp.height - 220', '限宽'),
+    ('GWordLadder', 'Bp.isShort() ? 48 : 60', '词格降档'),
+    ('GNumberBondsAll', 'Bp.height - 300', '限宽'),
+    ('GKakuroMini', 'Bp.height - 360', '盘面再收'),
+    ('GKakuro', 'Bp.isShort() && !this.over', '提示行隐藏'),
+    ('GSchulte', 'Bp.height - 360', '限宽'),
+    ('GCountdownMath', 'Bp.height - 360', '限宽'),
+    ('GFactorFinder', 'Bp.height - 360', '限宽'),
+    ('GPercentageShopping', 'Bp.isShort() ? FontSize.xxl : FontSize.hero', '题卡降档'),
+    ('GBinaryMatrixRank', 'Cell.of(28)', '矩阵格降档'),
+]
+
+
+def main():
+    ok = 0
+    miss = []
+    for cls, pat, desc in CHECKS:
+        p = os.path.join(GAMES, '%s.ets' % cls)
+        if not os.path.exists(p):
+            miss.append((cls, '文件不存在', desc))
+            continue
+        s = io.open(p, encoding='utf-8').read()
+        if pat in s:
+            ok += 1
+        else:
+            miss.append((cls, '缺「%s」' % pat, desc))
+
+    print('== 改动在位核对：%d 处 ==' % len(CHECKS))
+    if miss:
+        print('❌ %d 处不在位：' % len(miss))
+        for cls, why, desc in miss:
+            print('  %-30s %s（%s）' % (cls, why, desc))
+        print('\n⇒ 说明这批改动里有被后续编辑吃掉的，**先修这个再 build**。')
+        return 1
+    print('✅ %d 处全部在位（改动没被吃掉）' % ok)
+    print('⇒ 可以 build。build 之后跑 `bash 工具/verify_changed.sh` 看台账。')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
