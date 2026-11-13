@@ -343,3 +343,17 @@
 2026-11-13T15:31:21	Spatial Conflict	TIMEOUT	-	262.7s budget exhausted at search:Spatial
 2026-11-13T15:41:08	Spatial Conflict	NOT_HOME	-	210.4s could not reach home
 2026-11-13T15:42:49	Stroop Number Size	NOT_HOME	-	97.8s could not reach home
+2026-11-13T15:56:55	Spatial Conflict	OK	1528	104.6s lowest='规矩只有一条：跟箭头走，字和位置都在骗你' [60,1486][2500,1528] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Spatial_Conflict-155655.jpeg @2026-11-13T15:56:55
+2026-11-13T15:58:40	Stroop Number Size	OK	1279	102.1s lowest='判定：12 题答对 ≥ 10 题' [60,1237][2500,1279] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Stroop_Number_Size-155839.jpeg @2026-11-13T15:58:40
+2026-11-13T16:00:25	Temporal Order Judgment	OK	1522	103.2s lowest='两次闪现之间夹着一小段空白，别看错先后' [60,1480][2500,1522] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Temporal_Order_Judgment-160025.jpeg @2026-11-13T16:00:25
+2026-11-13T16:02:10	Blink Detector	OK	1335	102.8s lowest='提示：一共会眨 10 次；乱点会扣分，误报超过 3 ' [816,1293][1745,1335] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Blink_Detector-160209.jpeg @2026-11-13T16:02:10
+2026-11-13T16:03:55	Choice Reaction Time	OK	1350	103.3s lowest='判定：平均 < 900 ms 且答错 ≤ 1 次（答' [60,1308][2500,1350] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Choice_Reaction_Time-160355.jpeg @2026-11-13T16:03:55
+2026-11-13T16:05:39	Stop Signal	OK	1306	101.5s lowest='判定：正确 ≥ 10/12 且冲均值 < 800 m' [60,1264][2500,1306] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Stop_Signal-160538.jpeg @2026-11-13T16:05:39
+2026-11-13T16:07:51	Topology	OK	1348	130.4s lowest='判据是洞的个数：能拉伸、能压扁，洞既不会变多也不会变' [60,1306][2500,1348] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Topology-160751.jpeg @2026-11-13T16:07:51
+2026-11-13T16:09:39	Ab Reversal Oddball	NO_CARD	-	105.2s no card for 'AB 反转' (fallback=(347, 816))
+2026-11-13T16:12:06	Action Sequence Recall	OK	1536	144.6s lowest='提示：回放期间按钮不响应，等「轮到你了」再动手' [866,1494][1695,1536] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Action_Sequence_Recall-161205.jpeg @2026-11-13T16:12:06
+2026-11-13T16:14:44	Card Counting Memory	OK	1525	156.4s lowest='提示：下面 8 张就是刚才闪过的牌，只有一张出现两次' [60,1483][2500,1525] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Card_Counting_Memory-161443.jpeg @2026-11-13T16:14:44
+2026-11-13T16:17:11	Venn Numbers	OK	1381	145.0s lowest='提示：A ∩ B = 既是 3 的倍数又是偶数，比如' [60,1339][2500,1381] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Venn_Numbers-161711.jpeg @2026-11-13T16:17:11
+2026-11-13T16:19:45	Cube Net Fold	OK	1600	151.2s lowest='可填 A' [60,1528][853,1600] blk=1/24px max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Cube_Net_Fold-161945.jpeg @2026-11-13T16:19:45
+2026-11-13T16:21:05	Spotlight Track	NO_CARD	-	77.5s no card for '聚光追踪' (fallback=(347, 828))
+2026-11-13T16:23:24	Geometric Vision	OK	1406	137.5s lowest='A 更多' [60,1268][1265,1406] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Geometric_Vision-162324.jpeg @2026-11-13T16:23:24
