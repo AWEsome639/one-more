@@ -603,3 +603,4 @@
 2026-11-14T18:36:06	Kakuro Mini	NOT_HOME	-	148.5s could not reach home; last texts=[]
 2026-11-14T18:41:07	Kakuro Mini	OK	1600	68.2s lowest='6' [60,1468][534,1600] blk=1/24px cov=5 board=520x520@1020,756 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-184106.jpeg @2026-11-14T18:41:07
 2026-11-14T18:47:54	Kakuro Mini	OK	1576	67.4s lowest='6' [60,1444][534,1576] blk=0/0px cov=5 board=496x496@1032,756 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-184754.jpeg @2026-11-14T18:47:54
+2026-11-14T18:50:06	Pythagorean Triple Builder	OK	1600	66.5s lowest='背熟的勾股数：3-4-5、5-12-13、8-15-' [60,1580][757,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-185006.jpeg @2026-11-14T18:50:06
