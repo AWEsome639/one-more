@@ -26,8 +26,28 @@ LEDGER = os.path.join(ROOT, '_巡检记录', 'layout-canonical.tsv')
 GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 
 
+# 台账里出现、但与「显示名 → G<名>.ets」规则对不上的真游戏。
+# 来历：首次跑工具时报「找不到 .ets」的 8 款里，只有这几个是真游戏。
+ALIAS = {
+    'Word Snake': 'GWordSnakeTrail',   # 真类是 GWordSnakeTrail.ets
+    'Go (9x9)':   'GGo9',              # 真类是 GGo9.ets
+    'Schulte Table': 'GSchulte',        # 真类是 GSchulte.ets
+    'Akari (Light Up)': 'GAkari',       # 真类是 GAkari.ets
+}
+
+# 不是游戏、只是台账里出现过的测试/异常条目 ⇒ 跳过，别计入新鲜度统计
+SKIP = {
+    'Nothing',       # NOT_HOME 探针
+    '__selftest__',  # 自检
+    '__nope__',      # 故意不存在的名字
+    'Matcher',       # NO_CARD：某个被截断的名字，不是真游戏
+}
+
+
 def class_name(game):
     """游戏显示名 → .ets 类名。'Matrix Reasoning' → 'GMatrixReasoning'。"""
+    if game in ALIAS:
+        return ALIAS[game]
     return 'G' + re.sub(r'[^0-9A-Za-z\u4e00-\u9fff]', '', game)
 
 
@@ -56,6 +76,9 @@ def main():
             top = int(a.split('=')[1]) if '=' in a else 20
 
     last = parse_ledger()
+    for _g in list(last.keys()):
+        if _g in SKIP:
+            del last[_g]
     rows = []
     no_file = []
     for game, (t, n, status) in last.items():
