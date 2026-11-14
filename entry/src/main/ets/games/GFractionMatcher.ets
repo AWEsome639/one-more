@@ -289,6 +289,25 @@ export struct GFractionMatcher {
     return i === this.picked ? '#FFFFFF' : this.theme.inkFaint;
   }
 
+  // ★ 2026-11-14：选项卡片抽成 Builder —— 矮屏 2×2 时用 `layoutWeight(1)` 平分宽度，
+  //   高屏竖列时用 `width('100%')` 独占一行。其余样式与原来逐字一致。
+  @Builder optCard(i: number, inGrid: boolean) {
+    Row({ space: Space.sm }) {
+      Text(LETTERS[i]).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+      Text(this.opts[i]).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
+    }.width('100%').layoutWeight(inGrid ? 1 : 0).height(Cell.of(48))
+    .padding({ left: Space.sm, right: Space.sm })
+    .backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card)
+    .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+    .onFocus(() => { this.tvFocus = 'L306'; })
+    .onBlur(() => { if (this.tvFocus === 'L306') { this.tvFocus = ''; } })
+    .outline(Tv.focusOutline(this.tvFocus === 'L306'))
+    .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
+    .onClick(() => { Haptics.tick(); this.pick(i); })
+    .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
+      .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+  }
+
   build() {
     Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
@@ -332,28 +351,31 @@ export struct GFractionMatcher {
           .accessibilityLevel('no')
           .fontSize(FontSize.xl).fontColor(this.theme.inkFaint)
         }.alignItems(VerticalAlign.Center)
-      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      // ★ 2026-11-14：`md(16) → sm(10)`，上下共省 12vp = 36px（题卡内部，不碰触控区）
+      }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
       Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
         .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
         .width('100%').textAlign(TextAlign.Center)
-      Column({ space: Space.sm }) {
-        ForEach(this.slots, (i: number) => {
-          Row({ space: Space.sm }) {
-            Text(LETTERS[i]).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
-            Text(this.opts[i]).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
-          }.width('100%').height(Cell.of(48)).padding({ left: Space.md, right: Space.md })
-          .backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card)
-          .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L306'; })
-          .onBlur(() => { if (this.tvFocus === 'L306') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L306')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); }).onClick(() => { Haptics.tick(); this.pick(i); })
-          // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
-          .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
-            .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-        }, (i: number) => 'fmat' + i + '_' + this.opts[i])
+      // ★ 2026-11-14 真机（判据 2605）：**矮屏上 4 个选项竖排装不下** ——
+      //   每个 `Cell.of(48)`≈41vp、间隙 `Space.sm`=10vp ⇒ 选项区本身就要 ~194vp，
+      //   而题卡之后只剩 ~148vp ⇒ 实测（`截图-Fraction_Matcher-185409.jpeg`）：
+      //   只有 `A` 完整、`B` 被屏底切掉、**`C`/`D` 完全不在屏内**。
+      //   而 `L90` 明确生成 **4 个**选项 ⇒ 答案落在 C/D 时玩家**根本点不到** = 不能正常玩。
+      //   ⇒ 矮屏改 **2×2**（省约 102vp，且选项更宽、点击目标更大），高屏保留竖列。
+      Column({ space: Bp.isShort() ? Space.xs : Space.sm }) {
+        ForEach(Bp.isShort() ? [0, 2] : [0, 1, 2, 3], (i: number) => {
+          if (Bp.isShort()) {
+            Row({ space: Space.sm }) {
+              this.optCard(i, true)
+              this.optCard(i + 1, true)
+            }.width('100%')
+          } else {
+            this.optCard(i, false)
+          }
+        }, (i: number) => 'fmat' + i + '_' + this.opts[i] + '_' + (Bp.isShort() ? this.opts[i + 1] : ''))
       }.width('100%')
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
