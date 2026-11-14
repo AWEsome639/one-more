@@ -71,6 +71,20 @@ try:
     # ⚠️ 2026-11-14 关键修正：**改过的款即使「今天已测」，也必须重测**
     #   因为它们今天的测量是**改动生效之前**的（`00:05-06:45` 那轮用的是旧 HAP）
     #   ⇒ 若按「已测就跳过」处理，今晚恰恰会**跳过我要验的那 32 款**。
+    # ★ 2026-11-14（判据 2003）：**已知「缺数据」的款排第二优先**
+    #   这 6 款的旧行没有 `blk=` 字段（`11-12`/`11-13` 测的），而 `triage.py` 原来把
+    #   「缺数据」当成「blk=0 干净」⇒ 它们一直没被发现要重测。
+    #   ⇒ 现在把它们顶到最前面，**即使今晚跑不完 245 款，这几个缺口也先填上**。
+    KNOWN_GAP = [
+        'Block Stacking Physics', 'Polyomino Tiling', 'Frequency Tap',
+        'Counting Sheep', 'Object Displacement',
+    ]
+    gaps = [g for g in KNOWN_GAP if g in todo]
+    if gaps:
+        todo = gaps + [n for n in todo if n not in gaps]
+        print('已知缺数据 %d 款顶到最前（判据 2003）' % len(gaps))
+    prio = [n for n in prio if n not in gaps]
+
     if prio:
         todo = prio + [n for n in todo if n not in prio]
         print('优先 %d 款（改过的排最前，且强制重测）' % len(prio))
