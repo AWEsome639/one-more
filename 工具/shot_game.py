@@ -186,6 +186,32 @@ def biggest_square(tree):
         return None
 
 
+def all_nodes(tree):
+    """**所有**有 bounds 的节点 → `(text 或 None, rect)`（2026-11-14 修）。
+
+    ⚠️ 为什么不能只给文字节点：真正盖住文字的那个东西**通常是容器**（盘面/卡片），
+    而它没有 `text` 字段。
+    **⇒ 只传文字节点时，`covered_count` 永远数不到「文字被容器盖住」** ——
+    而那正是它被设计出来要抓的那类 bug（`Memory` / `Schulte Table` / `Simon Says` / `Number Bonds All`）。
+    """
+    out = []
+
+    def walk(n):
+        if not isinstance(n, dict):
+            return
+        a = n.get('attributes', {}) or {}
+        b = (a.get('bounds') or '').strip()
+        if b:
+            nums = [int(x) for x in re.findall(r'-?\d+', b)]
+            if len(nums) == 4:
+                out.append((a.get('text'), tuple(nums)))
+        for c in (n.get('children') or []):
+            walk(c)
+
+    walk(tree)
+    return out
+
+
 def covered_count(items):
     """**被别的元素整个盖住的文字节点数**（2026-11-14 新增，判据 2001）。
 
@@ -199,6 +225,10 @@ def covered_count(items):
     try:
         covers = 0
         for i, (_t1, r1) in enumerate(items):
+            # ★ 2026-11-14 修：**只有「有文字的」才算被盖住的对象**
+            #   （容器被别的容器盖住是正常布局，不能算缺陷）
+            if _t1 is None or not str(_t1).strip():
+                continue
             x1, y1, x2, y2 = r1
             if x2 - x1 < 8 or y2 - y1 < 8:
                 continue          # 太小的（图标/角标）不算
@@ -697,7 +727,7 @@ def _body(name, t0):
 
     # 2026-11-14（判据 2001）：**被遮挡文字节点数** —— 抓「内容太高把上方元素盖住」那一类
     try:
-        _cov = covered_count(texts(d2))
+        _cov = covered_count(all_nodes(d2))   # ★ 必须用「所有节点」，见 all_nodes() 的注释
     except Exception:
         _cov = -1
 
