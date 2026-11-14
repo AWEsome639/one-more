@@ -26,6 +26,10 @@ GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 
 # (类名, 特征串, 说明)
 CHECKS = [
+    ('GMagnets', 'Bp.height - 375', 'A①盘面 173→158vp'),
+    ('GFractionMatcher', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'A②题卡 padding lg→md'),
+    ('GPythagoreanTripleBuilder', '? Space.xs : Space.md', 'A③外层间距 sm→xs（省 72px）'),
+    ('GWordle', 'Scroll()', 'A④套 Scroll 兜底'),
     ('G2048', 'Bp.height - 360', '限宽'),
     ('GBlockCount3d', 'Bp.isShort() ? 88 : 112', '格高降档'),
     ('GCalculationSprint', 'Bp.isShort() ? FontSize.xl : FontSize.hero', '题卡降档'),

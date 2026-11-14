@@ -42,6 +42,13 @@ for a in "$@"; do [ "$a" = '--with-b' ] && WITH_B=1; done
 fix "$G/GMagnets.ets"            701 'Math.max(140, Bp.height - 360)' 'Math.max(140, Bp.height - 375)' 'A①Magnets 盘面 -375'
 fix "$G/GFractionMatcher.ets"    335 '.padding(Space.lg)'              '.padding(Space.md)'               'A②FractionMatcher 题卡 padding'
 
+# A③ Pythagorean Triple Builder：底部行（⌫/0/确认）被屏底截断
+#     外层 Column 间距 Space.sm(10vp) → Space.xs(6vp)，6 处 ⇒ 省 24vp = 72px
+#     ⚠️ 只影响矮屏（Bp.height < 600），桌面/TV 保持 Space.md 不变
+fix "$G/GPythagoreanTripleBuilder.ets" 313 '? Space.sm : Space.md' '? Space.xs : Space.md' 'A③PTB 外层间距 sm→xs（省 72px）'
+#     若 A③ 不够（确认 仍被切）⇒ 再叠加这行：
+# fix "$G/GPythagoreanTripleBuilder.ets" 344 ".padding(Space.md)" ".padding(Space.sm)" 'A③b PTB 题干卡 padding md→sm（+36px）'
+
 if [ "$WITH_B" = 1 ]; then
   echo '⚠️ 已显式开启 B 档（那两款测的是旧代码、可能已修好）'
   fix "$G/GPercentageShopping.ets" 402 '.padding(Space.lg)'              '.padding(Space.md)'               'B③PercentageShopping 题卡 padding'

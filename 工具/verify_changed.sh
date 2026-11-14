@@ -10,6 +10,7 @@ TSV=_巡检记录/layout-canonical.tsv
 
 # 游戏名 | 改动摘要 | 改动前状态
 CASES=(
+  "Wordle|套 Scroll 兜底（按钮露出 23%→可滚达）|—"
   "2048|盘面限宽（去掉假 maxHeight）|72px"
   "Block Count 3D|格高 112→88|48px"
   "Calculation Sprint|题卡 hero→xl|48px"

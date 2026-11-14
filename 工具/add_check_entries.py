@@ -20,7 +20,8 @@ WITH_B = '--with-b' in sys.argv
 NEW = [
     ('GMagnets',         'Bp.height - 375',                                            'A①盘面 173→158vp'),
     ('GFractionMatcher', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'A②题卡 padding lg→md'),
-    ('GWordle',          'Scroll()',                                                   'A③套 Scroll 兜底'),
+    ('GPythagoreanTripleBuilder', '? Space.xs : Space.md',                          'A③外层间距 sm→xs（省 72px）'),
+    ('GWordle',          'Scroll()',                                                   'A④套 Scroll 兜底'),
 ]
 if WITH_B:
     NEW += [
