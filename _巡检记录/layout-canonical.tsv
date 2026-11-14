@@ -585,3 +585,6 @@
 2026-11-14T15:42:11	Connect Four	NO_CARD	-	63.5s no card for '四子棋' (fallback=(347, 828))
 2026-11-14T16:22:58	Pipes	NOT_HOME	-	148.0s could not reach home; last texts=[]
 2026-11-14T16:35:32	Magnets	OK	1600	68.5s lowest='2＋' [2370,1597][2438,1600] blk=2/48px cov=5 board=544x544@90,810 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-163532.jpeg @2026-11-14T16:35:32
+2026-11-14T16:37:30	Fraction Matcher	OK	1569	68.4s lowest='6/7' [166,1506][2452,1569] blk=2/48px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-163730.jpeg @2026-11-14T16:37:30
+2026-11-14T16:39:17	Pythagorean Triple Builder	OK	1600	69.2s lowest='背熟的勾股数：3-4-5、5-12-13、8-15-' [60,1580][757,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-163917.jpeg @2026-11-14T16:39:17
+2026-11-14T16:40:52	Wordle	OK	1351	68.7s lowest='A' [60,1284][315,1351] blk=0/0px cov=5 board=360x360@1100,756 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-164052.jpeg @2026-11-14T16:40:52
