@@ -611,3 +611,4 @@
 2026-11-14T19:16:22	Percentage Shopping	OK	1591	71.1s lowest='¥730' [164,1521][2452,1591] blk=2/48px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-191621.jpeg @2026-11-14T19:16:22
 2026-11-14T19:37:13	Percentage Shopping	OK	1521	68.3s lowest='打 n 折 = 原价 × n ÷ 10' [60,1472][2500,1521] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-193713.jpeg @2026-11-14T19:37:13
 2026-11-14T19:40:15	Matrix Reasoning	OK	1600	67.0s lowest='提示' [60,1526][1265,1600] blk=3/72px cov=5 board=520x520@1020,612 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Reasoning-194015.jpeg @2026-11-14T19:40:15
+2026-11-14T19:51:46	Matrix Reasoning	OK	1600	68.6s lowest='提示：先看完整的两行推出规律，再用到缺格那一行' [866,1586][1695,1600] blk=0/0px cov=5 board=436x436@1062,612 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Reasoning-195146.jpeg @2026-11-14T19:51:46
