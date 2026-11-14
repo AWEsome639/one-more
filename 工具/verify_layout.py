@@ -69,16 +69,22 @@ def ensure_device(wait_s=200):
     print('  · 设备不在 ⇒ 冷启动模拟器…', flush=True)
     subprocess.run('pkill -9 -f "Emulator -start"', shell=True, capture_output=True, timeout=30)
     time.sleep(3)
-    subprocess.Popen('%s -stop onemore' % EMU, shell=True,
+    # ★ 2026-11-14 修（队友异常路径审计）：这里原来写死 `onemore` + 端口 `5557`，
+    #   与文件头 L27-28 的设计注释（「默认实例改成 onemore7…端口也不写死」）自相矛盾。
+    #   ⇒ onemore7 一掉线，冷启动会拉起**另一台**（不稳定、配置可能是别的分辨率），
+    #     而 shot_game 的 `_target()` 是动态探测 ⇒ 后续测量静默切过去，台账分辨不出来。
+    subprocess.Popen('%s -stop %s' % (EMU, EMU_INST), shell=True,
                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(4)
-    subprocess.Popen('%s -start onemore -noWindow > /tmp/emu_wd.log 2>&1' % EMU, shell=True)
+    subprocess.Popen('%s -start %s -noWindow > /tmp/emu_wd.log 2>&1' % (EMU, EMU_INST), shell=True)
     t0 = time.time()
     while time.time() - t0 < wait_s:
         time.sleep(10)
         if device_alive():
-            subprocess.run('%s tconn 127.0.0.1:5557' % HC, shell=True,
-                           capture_output=True, timeout=25)
+            # 端口也不写死：新实例 5555、旧实例 5557，两个都试一次
+            for _port in ('5555', '5557'):
+                subprocess.run('%s tconn 127.0.0.1:%s' % (HC, _port), shell=True,
+                               capture_output=True, timeout=25)
             time.sleep(3)
             return True
     return False
