@@ -593,7 +593,15 @@ def _body(name, t0):
     #   20 分钟内 1600/1591/1351/1600 抖 ±250px。
     #   ⇒ 换一级：数**根内容列的直接子块**里越界（y2 > 1516 + 24）的块数与越界量。
     #   块的「身份」稳定（HUD/棋盘/按钮行还是那几块），状态抖动传不到指标上。
-    GAME_BOTTOM = 1516
+    # ★ 2026-11-14：**几何量改成可外部覆盖** —— 为了在 TV 模拟器（`-deviceType tv`）上复用同一个工具。
+    #   手机（`onemore7` `2560x1600@480`）：`GAME_BOTTOM=1516`、手势起点 `1584`、`3px = 1vp`。
+    #   TV 的屏幕高度与 chrome 都不同 ⇒ 用环境变量传，默认值保持不变（不影响手机路径）：
+    #     SHOT_SCREEN_H  屏高(px)        SHOT_GAME_BOTTOM 游戏区底(px)     SHOT_GESTURE 手势起点(px)
+    #     SHOT_PX_PER_VP 每 vp 多少 px
+    try:
+        GAME_BOTTOM = int(os.environ.get('SHOT_GAME_BOTTOM', '1516'))
+    except Exception:
+        GAME_BOTTOM = 1516
     # 2026-11-13 校准：SLACK 24 → 60 —— 底部手势/导航条恒定结束在 1576(=1516+60)，
     #   用 24 会把「系统条」当成越界块（`Nonogram 1365` 也报 blk=1/60px 就是它）。
     SLACK = 60
