@@ -169,7 +169,7 @@ if [ "$FAIL" -eq 0 ]; then
   echo "      （⚠️ hdc 不在 PATH 里，上面那条是全路径；照抄裸 hdc 会 command not found）"
   echo "      ⇒ **必须看见 install bundle successfully**（退出码 0 不算，判据 1989）"
   echo "   ①½ bash 工具/preflight_install.sh   # 🔴 退出码非 0 就停（比对设备包与本地 HAP）
-   ② bash 工具/verify_changed.sh      # 38 处改动的台账状态"
+   ② bash 工具/verify_changed.sh      # 39 处改动的台账状态"
   echo "   ③ python3 工具/triage.py           # 五档（含「无 blk 数据」档）"
   echo "   ④ bash 工具/sweep_all.sh           # 会**自动落基线快照**"
 else
