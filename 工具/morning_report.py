@@ -100,6 +100,27 @@ def main():
     shots = screenshot_mtimes()
     rows = latest_rows()
 
+    # ★ 判据 2316：**先报分母** —— 任何「找到 N 个问题」都只在「已测」范围内成立
+    print('== ⓪ 覆盖率（判据 2316：结论必须带分母）==')
+    try:
+        reg = io.open(os.path.join(ROOT, 'entry/src/main/ets/core/GameRegistry.ets'),
+                      encoding='utf-8').read()
+        all_en = [n for n in re.findall(r"enName: '([^']+)'", reg) if n]
+    except (IOError, OSError):
+        all_en = []
+    tried = set(rows) - {'__nope__'}
+    oks = {g for g, (_t, o, _e, _l) in rows.items()
+           if o in ('OK', 'TIGHT', 'OVER', 'NEAR') and g != '__nope__'}
+    if all_en:
+        n = len(all_en)
+        print('  全库 %d 款 ｜ 尝试过 %d（%.0f%%） ｜ 有成功测量 %d（%.0f%%） ｜ **从未尝试 %d**'
+              % (n, len(tried), 100.0 * len(tried) / n,
+                 len(oks), 100.0 * len(oks) / n, n - len(tried)))
+        print('  ⇒ 下面每一条结论都只在「已测 %d 款」里成立，**不是全库**' % len(oks))
+    else:
+        print('  ⚠️ 读不到注册表 ⇒ 无法算分母')
+
+    print()
     print('== ① 证据新鲜度 ==')
     if hm is None:
         print('  ⚠️ 找不到 HAP ⇒ 无法判断新旧')
