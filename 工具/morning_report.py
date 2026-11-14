@@ -48,11 +48,29 @@ def screenshot_mtimes():
 
 
 def latest_rows():
+    """每款返回 (最后一次**成功**测量的时间, outcome, extra, 最新一次的 outcome)。
+
+    ⚠️ 为什么要分开：最新一行可能是 `NO_CARD`/`NOT_HOME`（测量失败，无 lowest）
+    ⇒ 若直接取「最后一行」，那些款会被静默跳过（实锤：Visual Search All / Word Ladder 最新行是 NO_CARD，
+      而它们上一次成功测量是有 lowest 数据的）。
+    ⇒ 所以：数值取「最后一次成功测量」，同时把「最新一次 outcome」带出来供人判断新鲜度。
+    """
+    GOOD = ('OK', 'TIGHT', 'OVER', 'NEAR')
     rows = {}
     for ln in io.open(TSV, encoding='utf-8'):
         f = ln.rstrip('\n').split('\t')
-        if len(f) > 4:
-            rows[f[1]] = (f[0], f[2], f[4])
+        if len(f) <= 4:
+            continue
+        g, ts, oc, ex = f[1], f[0], f[2], f[4]
+        prev = rows.get(g)
+        last_oc = oc if prev is None else oc
+        if oc in GOOD:
+            rows[g] = (ts, oc, ex, last_oc)
+        elif g not in rows:
+            rows[g] = ('', oc, '', oc)
+        else:
+            t0, o0, e0, _ = rows[g]
+            rows[g] = (t0, o0, e0, oc)
     return rows
 
 
@@ -101,7 +119,7 @@ def main():
     print()
     print('== ② 盘面是否被切（board 的 y+H − %d）==' % SCREEN_H)
     any_cut = False
-    for g, (_ts, _oc, ex) in sorted(rows.items()):
+    for g, (_ts, _oc, ex, _last) in sorted(rows.items()):
         b = parse_board(ex)
         if not b:
             continue
@@ -117,7 +135,8 @@ def main():
     print('== ③ 文字到边且可见高度 < 20px ==')
     print('   ⚠️ 「宽度」列很大 ⇒ bounds 是**一整行**（判据 2306），可见高度是行的不是元素的')
     hit = False
-    for g, (_ts, _oc, ex) in sorted(rows.items()):
+    rows3 = []
+    for g, (_ts, _oc, ex, _last) in sorted(rows.items()):
         lo = parse_lowest(ex)
         if not lo:
             continue
@@ -127,14 +146,31 @@ def main():
             hit = True
             wid = x2 - x1
             flag = ' ← 整行' if wid > 1000 else ''
+            rows3.append((g, txt, vis, wid))
             print('  ⚠️ %-26s %-12r 可见 %3dpx  宽度 %4dpx%s' % (g, txt[:10], vis, wid, flag))
     if not hit:
         print('  ✅ 没有')
+    # ★ 判据 2308/2310：按 bounds 宽度几何分档（不读语义）
+    func = [(g, t, v, w) for g, t, v, w in rows3 if w < 100]
+    vis = [(g, t, v, w) for g, t, v, w in rows3 if w > 1000]
+    mid = [(g, t, v, w) for g, t, v, w in rows3 if 100 <= w <= 1000]
+    print()
+    print('  ── 几何分档（判据 2308：宽度即「元素跨了多宽」）──')
+    print('  功能级（宽 <100px，单元素，**高优先**）: %d 款' % len(func))
+    for g, t, v, w in func:
+        print('     %-24s %-12r 可见 %3dpx 宽 %4dpx' % (g, t[:10], v, w))
+    print('  视觉级（宽 >1000px，整行说明，低优先）: %d 款' % len(vis))
+    for g, t, v, w in vis:
+        print('     %-24s %-14r 可见 %3dpx' % (g, t[:12], v))
+    if mid:
+        print('  待看（100~1000px，可能是行也可能是大元素）: %d 款' % len(mid))
+        for g, t, v, w in mid:
+            print('     %-24s %-12r 可见 %3dpx 宽 %4dpx' % (g, t[:10], v, w))
 
     print()
     print('== ④ 被遮挡（cov > 0）==')
     hit = False
-    for g, (_ts, _oc, ex) in sorted(rows.items()):
+    for g, (_ts, _oc, ex, _last) in sorted(rows.items()):
         m = re.search(r'cov=(-?\d+)', ex)
         if m and int(m.group(1)) > 0:
             hit = True
