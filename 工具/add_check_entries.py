@@ -28,6 +28,10 @@ NEW = [
     ('G2048',            'Scroll()',                                                   '白天·套 Scroll（blk 30→0）'),
     ('GPercentageShopping', 'Scroll()',                                                '白天·套 Scroll（blk 48→0）'),
     ('GShikaku',         'Math.max(200, Bp.height - 360)',                              '白天·下限 240→200（blk 72→0）'),
+    # 补齐：这三款上午的条目登记的是「另一处改动」，Scroll 本身没被守
+    ('GMagnets',         'Scroll()',                                                   '白天·套 Scroll（blk 48→0）'),
+    ('GFractionMatcher', 'Scroll()',                                                   '白天·套 Scroll（blk 48→0）'),
+    ('GPythagoreanTripleBuilder', 'Scroll()',                                          '白天·套 Scroll（blk 24→0）'),
 ]
 if WITH_B:
     NEW += [
