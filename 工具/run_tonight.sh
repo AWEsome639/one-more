@@ -30,9 +30,17 @@ fi
 echo "✅ Colima 状态：$(pgrep -x limactl >/dev/null 2>&1 && echo '仍在' || echo '已停')"
 
 step 3 '起模拟器 onemore7'
-"$EMU" -a onemore7 > /tmp/tonight_emu.log 2>&1 &
-echo '⇒ 等满 180 秒（判据 1949：模拟器启动要等满，不是等看到界面）'
-sleep 180
+# ★ 幂等：若设备已在线，就不要重复 `-a`（可能报错或起第二个实例）
+if "$HC" list targets 2>/dev/null | grep -qiE 'onemore|emulator'; then
+  echo '✅ 已有设备在线 ⇒ 跳过启动'
+else
+  "$EMU" -a onemore7 > /tmp/tonight_emu.log 2>&1 &
+  echo '⇒ 等满 180 秒（判据 1949：模拟器启动要等满，不是等看到界面）'
+  sleep 180
+fi
+# 无论如何，装包前确认设备真的在
+"$HC" list targets 2>/dev/null | grep -qiE 'onemore|emulator' \
+  || fail 3 '设备不在线（模拟器没起来）⇒ 看 /tmp/tonight_emu.log' 
 
 step 4 '装包（必须见 install bundle successful）'
 [ -f "$HAP" ] || fail 4 "HAP 不存在：$HAP ⇒ 先编译"
