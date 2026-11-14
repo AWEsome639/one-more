@@ -33,9 +33,28 @@ GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 SCREEN_H = 533.0   # onemore7 的 vp 高度（2560x1600 @480 ⇒ 853x533）
 
 
+def _strip_comments(src):
+    """★ 2026-11-14（判据 2004）：**去掉注释行** —— 否则会读出注释里讲的旧值。
+
+    实例：`GGo9` 的注释写着「h = (Bp.height - 300) * 0.70」（那是公式的一步），
+    而真正的横屏封顶是 `-360`（同一文件 `L1047` 的注释明确写「实测 173vp」）。
+    **⇒ 不去注释就会把 `GGo9` 读成 `X=300`，而它实际是 `360`。**
+    """
+    out = []
+    for ln in src.split('\n'):
+        t = ln.strip()
+        if t.startswith('//') or t.startswith('*') or t.startswith('/*'):
+            continue
+        out.append(ln)
+    return '\n'.join(out)
+
+
 def cap_value(src):
-    """从 `.width(Math.min(Bp.width - ..., Math.max(lo, Bp.height - X)))` 里取 X"""
-    m = re.search(r'Bp\.height\s*-\s*(\d+)', src)
+    """从 `.width(Math.min(Bp.width - ..., Math.max(lo, Bp.height - X)))` 里取 X
+
+    ⚠️ 必须先去掉注释行（判据 2004）—— 否则会命中注释里的演示值。
+    """
+    m = re.search(r'Bp\.height\s*-\s*(\d+)', _strip_comments(src))
     return int(m.group(1)) if m else None
 
 
