@@ -105,18 +105,29 @@ def main():
     try:
         reg = io.open(os.path.join(ROOT, 'entry/src/main/ets/core/GameRegistry.ets'),
                       encoding='utf-8').read()
-        all_en = [n for n in re.findall(r"enName: '([^']+)'", reg) if n]
+        # ⚠️ 判据 2325：必须**兼容双引号** —— GameRegistry.ets:92 的
+        #   `enName: "Conway's Life"` 是全库唯一一处双引号；只认单引号会少一款（354 → 355）。
+        all_en = [m.group(1) for m in re.finditer(r"""enName:\s*(['"])(.*?)\1""", reg) if m.group(2)]
     except (IOError, OSError):
         all_en = []
     tried = set(rows) - {'__nope__'}
     oks = {g for g, (_t, o, _e, _l) in rows.items()
            if o in ('OK', 'TIGHT', 'OVER', 'NEAR') and g != '__nope__'}
+    never_ok = tried - oks          # 尝试过但从未成功
     if all_en:
         n = len(all_en)
-        print('  全库 %d 款 ｜ 尝试过 %d（%.0f%%） ｜ 有成功测量 %d（%.0f%%） ｜ **从未尝试 %d**'
-              % (n, len(tried), 100.0 * len(tried) / n,
-                 len(oks), 100.0 * len(oks) / n, n - len(tried)))
-        print('  ⇒ 下面每一条结论都只在「已测 %d 款」里成立，**不是全库**' % len(oks))
+        never_tried = n - len(tried)
+        print('  全库 %d 款 ⇒ 三分法（判据 2317）：' % n)
+        print('    ① 测过且成功  %3d（%.0f%%）' % (len(oks), 100.0 * len(oks) / n))
+        print('    ② 测过但从未成功 %3d（%.1f%%）' % (len(never_ok), 100.0 * len(never_ok) / n))
+        print('    ③ 从未被尝试   %3d（%.1f%%）' % (never_tried, 100.0 * never_tried / n))
+        chk = len(oks) + len(never_ok) + never_tried
+        print('  ⇒ 校验 %d + %d + %d = %d %s' % (len(oks), len(never_ok), never_tried, chk,
+                                                 '✅' if chk == n else '❌ 对不上总数'))
+        print('  ⇒ 下面每条结论都只在 ① 的 %d 款里成立，**不是全库**' % len(oks))
+        if never_ok:
+            print('  ⚠️ ②「测过但从未成功」的 %d 款（判据 2329：这是累积口径，不是「最后一次」）：' % len(never_ok))
+            print('     ' + ' '.join(sorted(never_ok)[:12]) + (' …' if len(never_ok) > 12 else ''))
     else:
         print('  ⚠️ 读不到注册表 ⇒ 无法算分母')
 
