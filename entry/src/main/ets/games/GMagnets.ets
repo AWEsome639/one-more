@@ -529,7 +529,7 @@ export struct GMagnets {
   }
 
   build() {
-    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
+    Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       Row({ space: Space.sm }) {
@@ -607,7 +607,7 @@ export struct GMagnets {
         Text((String(this.moves) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
@@ -616,7 +616,7 @@ export struct GMagnets {
         Text((String(this.goodDominoes()) + '/8')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
@@ -625,7 +625,7 @@ export struct GMagnets {
         Text((String(this.placed()) + '/' + String(CELLS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1)
-        .padding(Space.sm)
+        .padding(Space.xs)
         .backgroundColor(this.theme.surface)
         .borderRadius(Radius.md)
         .shadow(Shadow.card)
