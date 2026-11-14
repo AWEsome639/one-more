@@ -34,13 +34,24 @@ TODO=/tmp/todo_all.txt
 
 # ① 生成待办：全库名 − 今天已测
 python3 - <<'PY' > /tmp/todo_gen.out 2>&1
-import io
+import io, os, time
+# ★ 2026-11-14 修（异常路径审计 #4）：原来硬编码 `2026-11-14`。
+#   ① 跨零点后新行写 `11-15` ⇒ 若 03:00 挂了重启，仍只认 `11-14` ⇒ **从第 1 款重测**
+#   ② 明天起新行永远不计入 done ⇒ 每轮都从头测 354 款
+#   改成：**基线日 = 本地 HAP 的构建日**，接受「构建当日起」的所有行。
+#   ⇒ 现在（HAP 建于 `11-14 07:31`）基线=`11-14`：行为与原来完全一致（已测 144 / 待测 245）
+#   ⇒ 今晚跨零点后：`11-15` 的新行自动计入 ⇒ 重启不会重测已完成的部分
+try:
+    _hap_ts = os.path.getmtime('entry/build/default/outputs/default/entry-default-signed.hap')
+    BASELINE = time.strftime('%Y-%m-%d', time.localtime(_hap_ts))
+except Exception:
+    BASELINE = ''
 done = set()
 for ln in io.open('_巡检记录/layout-canonical.tsv', encoding='utf-8'):
     f = ln.rstrip('\n').split('\t')
     if len(f) < 3:
         continue
-    if not f[0].startswith('2026-11-14'):
+    if BASELINE and f[0][:10] < BASELINE:
         continue
     if f[2] in ('OK', 'TIGHT', 'OVER', 'NEAR'):
         done.add(f[1])
