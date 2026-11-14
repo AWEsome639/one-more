@@ -98,6 +98,15 @@ echo "  候选：类A+类B 共 $A 处（详见 /tmp/fc8.log）"
 echo "  ⓘ 这是**线索**不是缺陷数；今晚要用的 6 个工具已全部过检"
 echo "  ⓘ 今晚链路工具：shot_game / triage / verify_changed / verify_changes_present"
 echo "                  / cell_size_audit / fixed_audit"
+echo
+echo "───── ⑦½ cov 仪器回归（5 个样本 / 判据 2006+2022）─────"
+if python3 工具/test_cov.py > /tmp/fc_cov.log 2>&1; then
+  echo "  ✅ 5/5 全过 ⇒ cov 这一列今晚可以信"
+else
+  echo "  ❌ cov 仪器坏了 ⇒ **今晚不要跑**（跑了那 245 行 cov 全是假数据）"
+  tail -6 /tmp/fc_cov.log | sed 's/^/     /'
+  FAIL=$((FAIL+1))
+fi
 
 step "⑧ 扫描器 dry-run（不起设备）"
 timeout 120 bash 工具/sweep_all.sh --dry > /tmp/fc7.log 2>&1
