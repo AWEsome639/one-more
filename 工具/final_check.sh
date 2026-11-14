@@ -103,9 +103,9 @@ echo "───── ⑥½ 改动清单 × 溢出名单 交叉核对（判据 2
 python3 工具/crosscheck_backlog.py > /tmp/fc_x.log 2>&1
 XRC=$?
 head -3 /tmp/fc_x.log | sed 's/^/  /'
-grep -E "^【A 档没碰过】|^⚠️|^✅ A 档" /tmp/fc_x.log | sed 's/^/  /'
+grep -E "^【A 档不在今天清单里】|^⚠️|^✅ A 档" /tmp/fc_x.log | sed 's/^/  /'
 if [ "$XRC" -ne 0 ]; then
-  echo "  ⓘ 有 A 档遗漏 ⇒ 明天要补进清单（不算今晚的阻塞项，今晚照跑）"
+  echo "  ⓘ 不算今晚的阻塞项 —— 按上面那条自己判断一遍就行，今晚照跑"
 fi
 echo
 echo "───── ⑦½ cov 仪器回归（5 个样本 / 判据 2006+2022）─────"
@@ -133,7 +133,8 @@ if [ "$FAIL" -eq 0 ]; then
   echo "✅ 全部就绪 —— 今晚可以按四步跑"
   echo "   ① hdc install -r entry/build/default/outputs/default/entry-default-signed.hap"
   echo "      ⇒ **必须看见 install bundle successfully**（退出码 0 不算，判据 1989）"
-  echo "   ② bash 工具/verify_changed.sh      # 37 处改动的台账状态"
+  echo "   ①½ bash 工具/preflight_install.sh   # 🔴 退出码非 0 就停（比对设备包与本地 HAP）
+   ② bash 工具/verify_changed.sh      # 38 处改动的台账状态"
   echo "   ③ python3 工具/triage.py           # 五档（含「无 blk 数据」档）"
   echo "   ④ bash 工具/sweep_all.sh           # 会**自动落基线快照**"
 else
