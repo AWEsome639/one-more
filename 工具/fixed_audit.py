@@ -48,7 +48,7 @@ FLOOR18 = ['2048','Crown','Dominosa','Gokigen Naname','Gomoku','Heyawake','Hitor
            'Skyscrapers','Schulte Table','Countdown Math']
 
 
-def floor_mode(margin):
+def floor_mode(margin, since=''):
     """2026-11-14：**把今晚的 `blk` 换成明天的 `floor`**
 
     ⇒ 那 `18` 款写的是 `Math.max(240, Bp.height - 360)`，在 `533vp` 屏上取 `240`
@@ -60,10 +60,20 @@ def floor_mode(margin):
         f = ln.rstrip('\n').split('\t')
         if len(f) < 4:
             continue
+        if since and f[0] < since:
+            continue          # ★ 判据 2012：只认 `--since` 之后的行
         m = re.search(r'blk=(\d+)/(\d+)px', ln)
         if m:
             last[f[1]] = (int(m.group(2)), f[0][:16], ln)
     print('== 把 `blk` 换成明天的 `floor`（余量 %.0fvp）==' % margin)
+    if not since:
+        print()
+        print('🚨 **没给 `--since`** —— 现在用的是台账里「每款最新一行」，')
+        print('   而那可能是**改动之前**测的（判据 2012：旧 `max` 被截在 1600，不能用来算 floor）。')
+        print('   **正确用法**：`--since 2026-11-15T00:10`（今晚 install 之后的时刻）')
+        print()
+    else:
+        print('   （只统计 `%s` 之后的行）' % since)
     print('%-22s %8s %10s %12s %s' % ('游戏', 'blk(px)', '新 floor', '盘面将变成', '测于 / 判读'))
     print('-' * 84)
     for name in FLOOR18:
@@ -101,7 +111,13 @@ def main():
                 _f = float(sys.argv[sys.argv.index('--margin') + 1])
             except Exception:
                 pass
-        return floor_mode(_f)
+        _since = ''
+        if '--since' in sys.argv:
+            try:
+                _since = sys.argv[sys.argv.index('--since') + 1]
+            except Exception:
+                pass
+        return floor_mode(_f, _since)
     if '--margin' in sys.argv:
         try:
             margin = float(sys.argv[sys.argv.index('--margin') + 1])
