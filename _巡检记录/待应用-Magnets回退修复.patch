@@ -1,0 +1,23 @@
+diff --git a/entry/src/main/ets/games/GMagnets.ets b/entry/src/main/ets/games/GMagnets.ets
+index df167644..8c4668e5 100644
+--- a/entry/src/main/ets/games/GMagnets.ets
++++ b/entry/src/main/ets/games/GMagnets.ets
+@@ -649,7 +649,6 @@ export struct GMagnets {
+               //   ⇒ 只显示了约 2.8 行。容器的 .width(158vp) 被忽略（因为格子缩不下去）。
+               //   实测可用高 ~283vp，但要减去底部线索行 CLUE_W=44 ⇒ 每格上限 ~50vp ⇒ 加 maxWidth，
+               //   aspectRatio(1) 会由宽度定高度、纵向同时收住。（66 时余 44px，再收到 50。）
+-              .constraintSize({ maxWidth: Bp.isShort() ? 50 : 9999 })
+               .backgroundColor(this.marks[(r * N + c)] === PLUS ? '#33F43F5E' : (this.marks[(r * N + c)] === MINUS ? '#330EA5E9' : this.theme.surface))
+               .borderRadius(Radius.sm)
+               .border({ width: 1, color: this.theme.line })
+@@ -704,7 +703,9 @@ export struct GMagnets {
+           }, (c: number) => 'mq' + c)
+           Row().width(CLUE_W).height(CLUE_W)
+         }
+-        .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 375)))
++        // ★ 2026-11-14 23:5x 修回归：格子层不能加 maxWidth（会让 layoutWeight 失效、棋盘缩成左侧一块）；
++        //   正确做法是只收**容器**的高度预算：-375 → -391（再收 16vp = 48px）。
++        .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 391)))
+       }
+       .width('100%')
+       .padding(Space.sm)
