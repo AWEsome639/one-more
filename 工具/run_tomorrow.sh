@@ -59,8 +59,8 @@ step 8 '收尾'
 HAP=entry/build/default/outputs/default/entry-default-signed.hap
 [ -f "$HAP" ] && echo "HAP: $(ls -l "$HAP" | awk '{print $5}') 字节（与改前比应变化）"
 echo
-echo "⚠️⚠️ 还有一款需**手工**处理：Pythagorean Triple Builder（图确认底部行 ⌫/0/确认 被屏底截断）"
-echo "   ⇒ 改法：缩上方（题干卡/数字区）或去掉致溢出的下限；**不要**用四处 46→40（会让键更小）"
+echo "⚠️ Pythagorean Triple Builder 现在**已自动化**（apply_fixes.sh 的 A③：L313 外层间距 sm→xs，省 72px）"
+echo "   ⇒ 若 A③ 不够（确认仍被切）⇒ 叠加 L344 题干卡 padding md→sm（见 apply_fixes.sh 里注释掉的那行，+36px）"
 echo "   ⇒ 改完后单测：python3 工具/shot_game.py \"Pythagorean Triple Builder\" ⇒ 看 lowest 里 确认 是否完整"
 echo
 echo '⇒ 接下来：git add + commit + push（push 后 ls-remote 验真同步）'
