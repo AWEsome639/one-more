@@ -110,7 +110,15 @@ def main():
     print('\n【B 档】0 < blk < 24px（轻微）%d 款' % len(B))
     for r in B:
         print('  %-30s blk=%-3d max=%-5s' % (r['name'], r['blk'], r['mb']))
-    print('\n【C 档】blk=0 但 max_bottom ≥ %d（触到手势区）%d 款' % (GESTURE, len(C)))
+    # ★ 2026-11-14 补（判据 2062）：**C 档是「嫌疑名单」，不是「待办名单」**
+    #   实证：`7` 款 C 档全部早已有矮屏降档，`blk=0` 是硬指标；
+    #   而 `max_bottom` 只统计**有文字**的节点（`shot_game.py:134 texts()`），
+    #   一个满屏游戏的说明行/按钮行**本来就该**排到 1584 以下
+    #   （手势线 1584、屏底 1600，中间还有 16px）。
+    #   ⇒ 还有判据 `1973`：「`max_bottom` 变大 ≠ 变差 —— 是『最低节点换人』」。
+    print('\n【C 档 · 嫌疑名单】blk=0 但 max_bottom ≥ %d（有文字排到近屏底）%d 款' % (GESTURE, len(C)))
+    print('  ⇒ **多数是正常满屏**，不是缺陷：`blk=0` 是硬指标，而 `max_bottom` 只量**有文字**的节点。')
+    print('  ⇒ 只看截图确认（判据 1998）；**不要按 max_bottom 去改代码**（判据 1973）。')
     for r in C:
         print('  %-30s max=%-5s lowest=%s' % (r['name'], r['mb'], r['low'][:26]))
     print('\n【D 档】blk=0 且 max < %d（看起来干净，仍需扫一眼截图）%d 款' % (GESTURE, len(D)))
