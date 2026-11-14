@@ -129,15 +129,15 @@ echo "  emulator procs: $EMU  (must be 0)"
 
 echo
 # ★ 2026-11-14 判据 2198：开窗前必须查磁盘 —— 今晚 1.2GiB 时差点跑到一半崩
-echo "───── ⑨ 磁盘（判据 2198：< 10 GiB 必须先腾）─────"
+echo "───── ⑨ 磁盘（判据 2198 + 白天实测：模拟器要 ~15 GiB）─────"
 AVAIL_KB=$(df -k /Users 2>/dev/null | tail -1 | awk '{print $4}')
 if [ -z "$AVAIL_KB" ]; then
   echo "  ⚠️ 读不到磁盘可用空间 —— 不阻塞（fail-open），但请手动 df -h 看一眼"
 else
   AVAIL_GB=$(( AVAIL_KB / 1024 / 1024 ))
-  echo "  /Users 可用: ${AVAIL_GB} GiB  (阈值 10 GiB)"
-  if [ "$AVAIL_GB" -lt 10 ]; then
-    echo "  ❌ 磁盘 < 10 GiB ⇒ **必须先腾**，否则今晚会跑到一半失败（截图丢失/台账写坏）"
+  echo "  /Users 可用: ${AVAIL_GB} GiB  (阈值 15 GiB —— 模拟器 CheckRuntimeEnv 需要)"
+  if [ "$AVAIL_GB" -lt 15 ]; then
+    echo "  ❌ 磁盘 < 15 GiB ⇒ **必须先腾**：白天实测 14 GiB 时模拟器 CheckRuntimeEnv 直接报 'No enough space to start Emulator' 而拒绝启动（不是慢、是拒绝）"
     echo "     腾的顺序：废弃模拟器 > 旧编译产物 > 缓存；在用的 onemore/onemore7 与 ~/.dsh/work 不动"
     FAIL=$((FAIL+1))
   else

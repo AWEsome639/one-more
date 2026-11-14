@@ -73,10 +73,28 @@ else
     [ $((WAITED % 60)) -eq 0 ] && echo "   …已等 $WAITED 秒"
   done
   [ "$WAITED" -lt 600 ] || echo '   ⚠️ 等满 600 秒仍未上线'
+  # ★ 2026-11-14 白天实测：`Emulator -start` 有时会**静默卡死** —— 进程活着但 CPU `0.0%`、
+  #   `/tmp` 日志为空、`hdc` 一直 `[Empty]`；而**清掉进程再起就能 60 秒上线**（实测两次：一次卡 10 分钟、清完 60 秒成功）。
+  #   ⇒ 失败时重试一次，不要一次失败就中止整晚。
+  if ! "$HC" list targets 2>/dev/null | grep -qE '^[0-9A-Za-z]'; then
+    echo '   ⚠️ 首次启动失败 ⇒ 清进程后重试一次（白天实测有效）'
+    pkill -f 'qemu-system-x86_64' 2>/dev/null
+    pkill -f 'Emulator -start' 2>/dev/null
+    sleep 5
+    "$EMU" -start onemore7 >> /tmp/tonight_emu.log 2>&1 &
+    WAITED=0
+    while [ "$WAITED" -lt 300 ]; do
+      sleep 15; WAITED=$((WAITED + 15))
+      if "$HC" list targets 2>/dev/null | grep -qE '^[0-9A-Za-z]'; then
+        echo "   ✅ 重试后第 $WAITED 秒上线"
+        break
+      fi
+    done
+  fi
 fi
 # 无论如何，装包前确认设备真的在
 "$HC" list targets 2>/dev/null | grep -qE '^[0-9A-Za-z]' \
-  || fail 3 '设备不在线（模拟器没起来）⇒ 看 /tmp/tonight_emu.log' 
+  || fail 3 "设备不在线（模拟器没起来）⇒ 看 /tmp/tonight_emu.log 与 ~/.Huawei/Emulator/deployed/onemore7/Log/Emulator.log（白天实测两种失败：① 磁盘 14 GiB 时 CheckRuntimeEnv 报 'No enough space' 直接拒绝启动；② 静默崩溃、日志为空、需 kill 残留进程后重试）" 
 
 # ★★ 设备唯一性守卫（2026-11-14）：
 #   shot_game.py 硬编码 2560x1600 做坐标计算，而设备选择取 `hdc list targets` 的第一个。
