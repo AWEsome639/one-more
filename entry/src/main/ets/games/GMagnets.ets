@@ -28,6 +28,10 @@ const MAX_MOVES: number = 60;
 const PLUS: number = 1;
 const MINUS: number = 2;
 const CLUE_W: number = 44;
+// ★ 2026-11-15（判据 2674）：dump 实测：`layoutWeight(1)` 会覆盖父容器 .width()、子元素
+//   aspectRatio() 与 constraintSize()（棋盘实测 793vp、格子 544x288 不是正方形）
+//   ⇒ 改成**显式尺寸**。可用高约 293vp：4×52 + 3×1 + 44 = 255vp ✅ 装得下、留 38vp 余量。
+const MAG_CELL: number = 52;
 
 function range(n: number): number[] {
   const a: number[] = [];
@@ -642,13 +646,7 @@ export struct GMagnets {
               .fontWeight(FontWeight.Bold)
               .fontColor(this.marks[(r * N + c)] === PLUS ? Palette.rose : Palette.sky)
               }
-              .layoutWeight(1)
-              .aspectRatio(1)
-              // ★ 2026-11-14 真机（判据 2623）：格子是 layoutWeight(1)+aspectRatio(1)、
-              //   而**文字尺寸把格子撑到不可缩**（实测每格 ~186vp、4 行 = 744vp > 屏高 533vp）
-              //   ⇒ 只显示了约 2.8 行。容器的 .width(158vp) 被忽略（因为格子缩不下去）。
-              //   实测可用高 ~283vp，但要减去底部线索行 CLUE_W=44 ⇒ 每格上限 ~50vp ⇒ 加 maxWidth，
-              //   aspectRatio(1) 会由宽度定高度、纵向同时收住。（66 时余 44px，再收到 50。）
+              .width(MAG_CELL).height(MAG_CELL)
               .backgroundColor(this.marks[(r * N + c)] === PLUS ? '#33F43F5E' : (this.marks[(r * N + c)] === MINUS ? '#330EA5E9' : this.theme.surface))
               .borderRadius(Radius.sm)
               .border({ width: 1, color: this.theme.line })
@@ -704,7 +702,10 @@ export struct GMagnets {
           Row().width(CLUE_W).height(CLUE_W)
         }
         // ★ 2026-11-14 23:5x 修回归：格子层不能加 maxWidth（会让 layoutWeight 失效、棋盘缩成左侧一块）；
-        .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 391)))
+        .width(4 * MAG_CELL + CLUE_W + 4 * Space.xs)
+        // ★ 2026-11-15 dump：Row 宽对了（276vp）但**高度没设**⇒ 只拿到 154px（一个格子高），
+        //   4 个格子竖向需 4×52=208vp ⇒ 纵向溢出。补上高度。
+        .height(4 * MAG_CELL + 3)
       }
       .width('100%')
       .padding(Space.sm)
