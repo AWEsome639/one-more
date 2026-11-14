@@ -32,6 +32,7 @@ CASES=(
   "Pattern Sequence Draw|盘面底部留 32|24px"
   "Percentage Peak|题卡 xxl→lg|48px"
   "Pipes|盘面限宽|48px"
+  "Magnets|按钮行 if(!isShort) + 统计卡压紧|48px"
   "Pythagorean Triple Builder|? hero→xxl|48px"
   "Shikaku|盘面限宽|72px"
   "Simon Says|限行宽|48px"
