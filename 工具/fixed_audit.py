@@ -43,8 +43,65 @@ PX_PER_VP = 3.0          # onemore7: 2560x1600 @480 ⇒ 3px = 1vp
 SCREEN_VP = 533.0
 
 
+FLOOR18 = ['2048','Crown','Dominosa','Gokigen Naname','Gomoku','Heyawake','Hitori','Hitori All',
+           'Matrix Reasoning','Memory','Modulo Path','Norinori','Path Intersect','Pipes','Shikaku',
+           'Skyscrapers','Schulte Table','Countdown Math']
+
+
+def floor_mode(margin):
+    """2026-11-14：**把今晚的 `blk` 换成明天的 `floor`**
+
+    ⇒ 那 `18` 款写的是 `Math.max(240, Bp.height - 360)`，在 `533vp` 屏上取 `240`
+      ⇒ 盘面 `240vp`。若今晚 `blk = N px`，说明还溢出 `N/3 vp`
+      ⇒ **新 floor = 240 − N/3**（把盘面再收 `N/3`），并留 `margin`。
+    """
+    last = {}
+    for ln in io.open(TSV, encoding='utf-8'):
+        f = ln.rstrip('\n').split('\t')
+        if len(f) < 4:
+            continue
+        m = re.search(r'blk=(\d+)/(\d+)px', ln)
+        if m:
+            last[f[1]] = (int(m.group(2)), f[0][:16], ln)
+    print('== 把 `blk` 换成明天的 `floor`（余量 %.0fvp）==' % margin)
+    print('%-22s %8s %10s %12s %s' % ('游戏', 'blk(px)', '新 floor', '盘面将变成', '测于 / 判读'))
+    print('-' * 84)
+    for name in FLOOR18:
+        v = last.get(name)
+        if not v:
+            print('%-22s %8s' % (name, '（无数据）')); continue
+        blk, ts, _ = v
+        # ★ 2026-11-14（判据 2012）：**必须确认这一行是「改动后」测的**
+        #   改动前的 `max` 被截在 1600、`blk` 反映的是旧盘面 ⇒ 拿它算新 floor 会**再错一次**。
+        #   所以把时间戳打出来，由人确认它晚于今晚的 `install` 时刻。
+        new_floor = 240 - blk / 3.0 - margin
+        board = max(new_floor, 533 - 360)
+        if blk == 0:
+            print('%-22s %8d %10s %12s %s ✅ 不必改' % (name, blk, '—', '240', ts))
+        elif new_floor < 120:
+            print('%-22s %8d %10.0f %12.0f %s ⚠️ floor<120 ⇒ 减盘面尺寸更合适'
+                  % (name, blk, new_floor, board, ts))
+        else:
+            print('%-22s %8d %10.0f %12.0f %s → floor=%.0f'
+                  % (name, blk, new_floor, board, ts, round(new_floor)))
+    print()
+    print('⚠️ **先看「测于」那列**：必须是**今晚 install 之后**的行；')
+    print('   改动前的行 `max` 被截在 1600、`blk` 反映旧盘面 ⇒ 拿它算 floor 会再错一次（判据 2012）。')
+    print('⇒ 用法：把上表「新 floor」那一列写进对应文件的 `Math.max(240, …)`')
+    print('⇒ `blk=0` 的**不要动** —— 改小 floor 只会让格子变小、白占空间')
+    return 0
+
+
 def main():
     margin = 30.0
+    if '--floor' in sys.argv:
+        _f = 30.0
+        if '--margin' in sys.argv:
+            try:
+                _f = float(sys.argv[sys.argv.index('--margin') + 1])
+            except Exception:
+                pass
+        return floor_mode(_f)
     if '--margin' in sys.argv:
         try:
             margin = float(sys.argv[sys.argv.index('--margin') + 1])
