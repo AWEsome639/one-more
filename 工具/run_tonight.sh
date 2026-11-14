@@ -60,6 +60,20 @@ fi
 "$HC" list targets 2>/dev/null | grep -qiE 'onemore|emulator' \
   || fail 3 '设备不在线（模拟器没起来）⇒ 看 /tmp/tonight_emu.log' 
 
+# ★★ 设备唯一性守卫（2026-11-14）：
+#   shot_game.py 硬编码 2560x1600 做坐标计算，而设备选择取 `hdc list targets` 的第一个。
+#   ⇒ 若电视模拟器（onemore_tv，1280x720）也在线，命令会打到电视、却按手机分辨率算 ⇒ 数据全错且不报错。
+#   ⇒ 所以：多于一台在线就中止；并把串号打进日志，让每行数据可归因。
+NDEV=$("$HC" list targets 2>/dev/null | grep -vciE '^\[Empty\]|^[[:space:]]*$')
+if [ "$NDEV" -ne 1 ]; then
+  echo "❌ 在线设备 $NDEV 台（应为 1）⇒ 中止，避免测错设备："
+  "$HC" list targets 2>/dev/null | sed 's/^/     /'
+  fail 3 "在线设备 $NDEV 台，不是 1 台"
+fi
+DEV=$(  "$HC" list targets 2>/dev/null | head -1 | tr -d ' \r')
+echo "✅ 唯一在线设备：$DEV"
+echo "   设备 $DEV ｜ $(date '+%F %T')" >> /tmp/tonight_device.log
+
 step 4 '装包（必须见 install bundle successful）'
 [ -f "$HAP" ] || fail 4 "HAP 不存在：$HAP ⇒ 先编译"
 INS=$("$HC" install -r "$HAP" 2>&1)
