@@ -86,6 +86,9 @@ try:
     #   这 6 款的旧行没有 `blk=` 字段（`11-12`/`11-13` 测的），而 `triage.py` 原来把
     #   「缺数据」当成「blk=0 干净」⇒ 它们一直没被发现要重测。
     #   ⇒ 现在把它们顶到最前面，**即使今晚跑不完 245 款，这几个缺口也先填上**。
+    # ★ 2026-11-14 核实（队友审计提的「注释说 6 款、列表只 5 项」）：
+    #   台账里「有最新行但 extra 无 blk=」共 27 款，但其中**只有这 5 款是 `OK`**（成功测了却没 blk = 真缺口）；
+    #   其余 22 款是 `NOT_HOME`/`NO_CARD` 的失败测量，会自然重测。⇒ **列表 5 项是对的，旧注释的「6」是错的。**
     KNOWN_GAP = [
         'Block Stacking Physics', 'Polyomino Tiling', 'Frequency Tap',
         'Counting Sheep', 'Object Displacement',
