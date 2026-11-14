@@ -42,8 +42,17 @@ i_end = next(i for i in range(i_col, len(L)) if L[i] == '  }')
 
 # ③ 找 .height('100%')（在 i_col..i_end 之间，且属于外层 Column 的修饰符）
 i_h = [i for i in range(i_col, i_end) if L[i].strip() == ".height('100%')"]
-if len(i_h) > 1:
-    sys.exit('⚠️ .height(100%%) 找到 %d 处（>1，不知该注释哪个）⇒ 手工确认' % len(i_h))
+# ★ 2026-11-14：多处 `.height('100%')` 时可用 `--height-line N` 指定注释哪一处
+#   （通常要注释的是**外层 Column 的**那处，缩进与 Column 的修饰符同级）。
+_hl = [a.split('=',1)[1] for a in sys.argv[1:] if a.startswith('--height-line=')]
+if _hl:
+    _want = int(_hl[0])
+    if _want-1 not in i_h:
+        sys.exit('❌ --height-line=%d 不在候选里：%r' % (_want, [x+1 for x in i_h]))
+    i_h = [_want-1]
+elif len(i_h) > 1:
+    sys.exit('⚠️ .height(100%%) 找到 %d 处（>1）⇒ 用 --height-line=N 指定要注释哪一处；候选行：%r'
+             % (len(i_h), [x+1 for x in i_h]))
 # ★ 2026-11-14：`0` 处是**正常**的 —— 有些游戏的外层 Column 本来就没有 `.height('100%')`
 #   （`GBejeweled` 那个 Scroll 模板就没有）⇒ 无需注释、直接包。原来这里 `!=1` 会误拒。
 i_h = i_h[0] if i_h else None
