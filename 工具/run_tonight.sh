@@ -4,6 +4,12 @@
 #       bash 工具/run_tonight.sh --check    # 只做前四步（不启跑批）
 #
 # ⚠️ 每步失败即停、并打印「卡在哪一步」，不静默继续。
+#
+# ⚠️⚠️ 必须**后台跑**：第 5 步 sweep_all 要 6.75 小时，同步调用会被超时杀掉。
+#   ⇒ 用 `run_in_background`，或 `nohup bash 工具/run_tonight.sh > /tmp/tonight.log 2>&1 &`
+#   ⇒ 起来后 5 分钟内 `tail -5 /tmp/tonight.log` 确认已过第 1–2 步（十项 + 停 Colima）
+#   ⇒ 之后每 30–60 分钟 `tail -3` 看进度；`/tmp/sweep_all.log` 是跑批自己的日志
+
 set -u
 cd "/Users/a0000/dev/One More" || exit 1
 EMU='/Applications/DevEco-Studio.app/Contents/tools/emulator/Emulator'
