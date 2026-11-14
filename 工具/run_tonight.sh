@@ -48,7 +48,7 @@ echo "✅ Colima 状态：$(pgrep -x limactl >/dev/null 2>&1 && echo '仍在' ||
 
 step 3 '起模拟器 onemore7'
 # ★ 幂等：若设备已在线，就不要重复 `-a`（可能报错或起第二个实例）
-if "$HC" list targets 2>/dev/null | grep -qiE 'onemore|emulator'; then
+if "$HC" list targets 2>/dev/null | grep -qE '^[0-9A-Za-z]'; then
   echo '✅ 已有设备在线 ⇒ 跳过启动'
 else
   "$EMU" -start onemore7 > /tmp/tonight_emu.log 2>&1 &   # ★ 2026-11-14 修：原为 `-a`（非法选项，Emulator 只认 `-start <name>`）
@@ -57,7 +57,7 @@ else
   WAITED=0
   while [ "$WAITED" -lt 600 ]; do
     sleep 15; WAITED=$((WAITED + 15))
-    if "$HC" list targets 2>/dev/null | grep -qiE 'onemore|emulator'; then
+    if "$HC" list targets 2>/dev/null | grep -qE '^[0-9A-Za-z]'; then
       echo "   ✅ 第 $WAITED 秒上线"
       break
     fi
@@ -66,7 +66,7 @@ else
   [ "$WAITED" -lt 600 ] || echo '   ⚠️ 等满 600 秒仍未上线'
 fi
 # 无论如何，装包前确认设备真的在
-"$HC" list targets 2>/dev/null | grep -qiE 'onemore|emulator' \
+"$HC" list targets 2>/dev/null | grep -qE '^[0-9A-Za-z]' \
   || fail 3 '设备不在线（模拟器没起来）⇒ 看 /tmp/tonight_emu.log' 
 
 # ★★ 设备唯一性守卫（2026-11-14）：
