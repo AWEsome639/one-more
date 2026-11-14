@@ -74,6 +74,7 @@ CHECKS = [
 def main():
     ok = 0
     miss = []
+    pending = []
     for cls, pat, desc in CHECKS:
         p = os.path.join(GAMES, '%s.ets' % cls)
         if not os.path.exists(p):
@@ -82,6 +83,13 @@ def main():
         s = io.open(p, encoding='utf-8').read()
         if pat in s:
             ok += 1
+        elif desc[:2] in ('A①', 'A②', 'A③', 'A④'):
+            # ★ 2026-11-14：A 档四项是**明天才应用**的改动（今晚装的是改之前的 HAP）
+            #   ⇒ 它们不在位是**预期状态**，不是「被后编辑吃掉」⇒ 记为待应用、不计失败。
+            #   ⚠️ 按 desc 前缀区分而不是按类名：GFractionMatcher 同时有「A②题卡 padding」（待应用）
+            #      和「Bp.isShort() ? FontSize.xxl」（已应用），按类名豁免会连已应用的也放过。
+            #   ⚠️ A 档应用完之后，这些条目的 desc 应去掉 A 前缀（或出现即算 ok，本条自动不再触发）。
+            pending.append((cls, desc))
         else:
             miss.append((cls, '缺「%s」' % pat, desc))
 
@@ -91,6 +99,10 @@ def main():
         print('❌ 清单只有 %d 条（预期 ≥37）⇒ 有人在删条目，结论不可信' % len(CHECKS))
         return 2
     print('== 改动在位核对：%d 处 ==' % len(CHECKS))
+    if pending:
+        print('⏸ %d 处待明天应用（A 档，今晚装的是改之前的 HAP）：' % len(pending))
+        for cls, desc in pending:
+            print('  %-30s %s' % (cls, desc))
     if miss:
         print('❌ %d 处不在位：' % len(miss))
         for cls, why, desc in miss:
