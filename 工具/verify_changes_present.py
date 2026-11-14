@@ -27,10 +27,8 @@ GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 # (类名, 特征串, 说明)
 CHECKS = [
     ('GFractionMatcher', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'A②题卡 padding lg→md'),
-    ('GFractionMatcher', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'A②题卡 padding lg→md'),
     ('GShikaku', 'Math.max(200, Bp.height - 360)', '白天·下限 240→200（blk 72→0）'),
     ('GMagnets', 'Bp.height - 375', 'A①盘面 173→158vp'),
-    ('GFractionMatcher', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'A②题卡 padding lg→md'),
     ('GPythagoreanTripleBuilder', '? Space.xs : Space.md', 'A③外层间距 sm→xs（省 72px）'),
     # ⛔⛔ 2026-11-14 作废：`GWordle` 套 `Scroll` 后**中间全黑、棋盘与键盘都没渲染**
     #   （`.height('100%')` 被注释掉之后，`Scroll` 里的内容没有内在高度 ⇒ 高度 0）。
