@@ -49,6 +49,7 @@ PathIntersect|GPathIntersect.ets|825|Math.max(240, Bp.height - 360)|Math.max(200
 Pipes|GPipes.ets|553|Math.max(240, Bp.height - 360)|Math.max(200, Bp.height - 360)
 Schulte|GSchulte.ets|341|Math.max(240, Bp.height - 360)|Math.max(200, Bp.height - 360)
 Shikaku|GShikaku.ets|777|Math.max(240, Bp.height - 360)|Math.max(200, Bp.height - 360)
+MatrixReasoning|GMatrixReasoning.ets|394|Math.max(240, Bp.height - 360)|Math.max(200, Bp.height - 360)
 Skyscrapers|GSkyscrapers.ets|749|Math.max(240, Bp.height - 360)|Math.max(200, Bp.height - 360)
 '
 
