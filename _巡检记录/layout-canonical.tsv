@@ -617,3 +617,5 @@
 2026-11-14T20:10:12	Factor Finder	OK	1600	68.7s lowest='提示' [60,1507][2500,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Factor_Finder-201011.jpeg @2026-11-14T20:10:12
 2026-11-14T20:23:55	Kakuro Mini	OK	1576	73.1s lowest='6' [60,1444][534,1576] blk=0/0px cov=5 board=496x496@1032,756 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-202355.jpeg @2026-11-14T20:23:55
 2026-11-14T20:25:33	Fraction Matcher	OK	1521	71.0s lowest='4/7' [148,1458][1235,1521] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-202532.jpeg @2026-11-14T20:25:33
+2026-11-14T20:38:23	Magnets	OK	1596	70.0s lowest='现 0' [987,1502][1054,1544] blk=2/44px cov=5 board=198x198@90,750 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-203822.jpeg @2026-11-14T20:38:23
+2026-11-14T20:45:26	Magnets	OK	1554	71.7s lowest='现 0' [1043,1506][1110,1548] blk=1/8px cov=5 board=150x150@90,750 max=8 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-204525.jpeg @2026-11-14T20:45:26

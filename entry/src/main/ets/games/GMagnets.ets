@@ -644,6 +644,12 @@ export struct GMagnets {
               }
               .layoutWeight(1)
               .aspectRatio(1)
+              // ★ 2026-11-14 真机（判据 2623）：格子是 layoutWeight(1)+aspectRatio(1)、
+              //   而**文字尺寸把格子撑到不可缩**（实测每格 ~186vp、4 行 = 744vp > 屏高 533vp）
+              //   ⇒ 只显示了约 2.8 行。容器的 .width(158vp) 被忽略（因为格子缩不下去）。
+              //   实测可用高 ~283vp，但要减去底部线索行 CLUE_W=44 ⇒ 每格上限 ~50vp ⇒ 加 maxWidth，
+              //   aspectRatio(1) 会由宽度定高度、纵向同时收住。（66 时余 44px，再收到 50。）
+              .constraintSize({ maxWidth: Bp.isShort() ? 50 : 9999 })
               .backgroundColor(this.marks[(r * N + c)] === PLUS ? '#33F43F5E' : (this.marks[(r * N + c)] === MINUS ? '#330EA5E9' : this.theme.surface))
               .borderRadius(Radius.sm)
               .border({ width: 1, color: this.theme.line })
