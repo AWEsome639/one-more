@@ -231,13 +231,32 @@ def main():
     print()
     print('== ④ 被遮挡（cov > 0）==')
     hit = False
+    unmeasured = []
+    measured = 0          # ★ 有多少行真的带 cov= 数据
     for g, (_ts, _oc, ex, _last) in sorted(rows.items()):
         m = re.search(r'cov=(-?\d+)', ex)
-        if m and int(m.group(1)) > 0:
+        if not m:
+            continue
+        measured += 1
+        v = int(m.group(1))
+        if v > 0:
             hit = True
             print('  ⚠️ %-26s cov=%s' % (g, m.group(1)))
-    if not hit:
-        print('  ✅ 没有')
+        elif v < 0:
+            # ★ 2026-11-14 修（对齐 triage.py L78 / 判据 2007）：`cov = -1` 是「测不出来」，
+            #   不能当成「没遮挡」⇒ 原来静默跳过、报告会打「✅ 没有」，那是假的干净。
+            unmeasured.append(g)
+    if unmeasured:
+        print('  ⚠️ %d 款 cov=-1（**测不出来**，不等于没遮挡）：' % len(unmeasured))
+        for g in unmeasured[:8]:
+            print('     %-24s cov=-1' % g)
+        if len(unmeasured) > 8:
+            print('     …（还有 %d 款）' % (len(unmeasured) - 8))
+    if measured == 0:
+        # ★ 2026-11-14：「一条数据都没有」不等于「没有遮挡」——原来这里会打「✅ 没有」
+        print('  ⚠️ 台账里**还没有 cov= 数据**（不是「没有遮挡」，是「没测过」）')
+    elif not hit and not unmeasured:
+        print('  ✅ 没有（%d 行有 cov= 数据且全为 0）' % measured)
 
     print()
     print('⚠️ ②③④ 的结论都要配**新图**看（判据 2300：证据早于构建 ⇒ 待复验）')
