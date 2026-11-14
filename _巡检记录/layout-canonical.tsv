@@ -608,3 +608,5 @@
 2026-11-14T18:54:10	Fraction Matcher	OK	1569	66.6s lowest='3/5' [166,1506][2452,1569] blk=2/48px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-185409.jpeg @2026-11-14T18:54:10
 2026-11-14T19:06:28	Fraction Matcher	OK	1569	76.0s lowest='20/28' [148,1506][1235,1569] blk=2/48px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-190627.jpeg @2026-11-14T19:06:28
 2026-11-14T19:13:23	Fraction Matcher	OK	1521	72.9s lowest='4/10' [148,1458][1235,1521] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-191322.jpeg @2026-11-14T19:13:23
+2026-11-14T19:16:22	Percentage Shopping	OK	1591	71.1s lowest='¥730' [164,1521][2452,1591] blk=2/48px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-191621.jpeg @2026-11-14T19:16:22
+2026-11-14T19:37:13	Percentage Shopping	OK	1521	68.3s lowest='打 n 折 = 原价 × n ÷ 10' [60,1472][2500,1521] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-193713.jpeg @2026-11-14T19:37:13

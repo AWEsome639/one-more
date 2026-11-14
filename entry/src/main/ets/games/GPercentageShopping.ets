@@ -359,6 +359,25 @@ export struct GPercentageShopping {
     return i === this.picked ? '#FFFFFF' : this.theme.inkFaint;
   }
 
+  // ★ 2026-11-14 真机（判据 2605）：矮屏上 4 个选项竖排装不下 ——
+  //   每个 `Cell.of(50)`≈42vp、间隙 `Space.sm`=10vp ⇒ 选项区 ~204vp，
+  //   而题卡之后只剩 ~130vp ⇒ 实测末个选项文字底到 `1591`（离屏底仅 9px）、容器被切 48px。
+  //   ⇒ 矮屏改 **2×2**（省约 130vp），高屏保留竖列。
+  @Builder optCard(i: number, inGrid: boolean) {
+            Row({ space: Space.sm }) {
+              Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
+              Text('¥' + this.opts[i]).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
+            }.width('100%').layoutWeight(inGrid ? 1 : 0).height(Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+              Haptics.tick();
+              this.pick(i);
+            })
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L387'; })
+            .onBlur(() => { if (this.tvFocus === 'L387') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L387'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
+  }
+
   build() {
     Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
@@ -401,21 +420,17 @@ export struct GPercentageShopping {
         Text(TG('现价多少？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
-      Column({ space: Space.sm }) {
-        ForEach(this.slots, (i: number) => {
-          Row({ space: Space.sm }) {
-            Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
-            Text('¥' + this.opts[i]).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
-          }.width('100%').height(Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
-            Haptics.tick();
-            this.pick(i);
-          })
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L387'; })
-          .onBlur(() => { if (this.tvFocus === 'L387') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L387'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
-        }, (i: number) => 'ps' + i)
+      Column({ space: Bp.isShort() ? Space.xs : Space.sm }) {
+        ForEach(Bp.isShort() ? [0, 2] : [0, 1, 2, 3], (i: number) => {
+          if (Bp.isShort()) {
+            Row({ space: Space.sm }) {
+              this.optCard(i, true)
+              this.optCard(i + 1, true)
+            }.width('100%')
+          } else {
+            this.optCard(i, false)
+          }
+        }, (i: number) => 'ps' + i + '_' + this.opts[i] + '_' + (Bp.isShort() ? this.opts[i + 1] : ''))
       }.width('100%')
 
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
