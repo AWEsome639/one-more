@@ -212,6 +212,71 @@ def all_nodes(tree):
     return out
 
 
+def covered_count_tree(tree):
+    """**被「非祖先」元素整个盖住的文字节点数**（2026-11-14 第三版，判据 2006）。
+
+    ⚠️ 为什么不能只用矩形比：`bounds` 是**屏幕绝对坐标**，
+    而**父容器必然包含子元素** ⇒ 用 `all_nodes` 拍平后比较，**每个文字都会被它的父容器「盖住」**
+    ⇒ `cov` 会等于文字总数（几千），毫无信息。
+
+    ⇒ 必须带祖先关系：只有**既不是祖先、也不是后代**的元素才算「盖住」。
+    """
+    try:
+        try:
+            SCREEN_W = int(os.environ.get('SHOT_SCREEN_W', '2560'))
+            SCREEN_H = int(os.environ.get('SHOT_SCREEN_H', '1600'))
+        except Exception:
+            SCREEN_W, SCREEN_H = 2560, 1600
+        flat = []          # (idx, text, rect, ancestor_ids)
+        _counter = [0]     # ★ 单调计数器：**不能用 len(flat)**
+        #   ✗ 用 `len(flat)` 时，**没有 bounds 的节点不占号** ⇒ 它的第一个有 bounds 的孩子
+        #     会拿到**和它相同的 id** ⇒ 兄弟节点被误判成「后代」而被排除 ⇒ `cov` 恒 0。
+        #   （这正是我第一版踩的坑，被判据 2006 的「反向样本」抓出来。）
+
+        def walk(n, anc):
+            if not isinstance(n, dict):
+                return
+            a = n.get('attributes', {}) or {}
+            b = (a.get('bounds') or '').strip()
+            i = _counter[0]
+            _counter[0] += 1
+            if b:
+                nums = [int(x) for x in re.findall(r'-?\d+', b)]
+                if len(nums) == 4:
+                    flat.append((i, a.get('text'), tuple(nums), frozenset(anc)))
+            for c in (n.get('children') or []):
+                walk(c, anc | {i})
+
+        walk(tree, frozenset())
+
+        # 后代集合：用于排除「子元素盖住父元素里的文字」这种正常嵌套
+        descendant = {}
+        for idx, _t, _r, anc in flat:
+            for a in anc:
+                descendant.setdefault(a, set()).add(idx)
+
+        covers = 0
+        for i, t, r1, anc1 in flat:
+            if t is None or not str(t).strip():
+                continue
+            x1, y1, x2, y2 = r1
+            if x2 - x1 < 8 or y2 - y1 < 8:
+                continue
+            for j, _t2, r2, _a2 in flat:
+                if i == j or j in anc1 or j in descendant.get(i, ()):
+                    continue          # 自己 / 祖先 / 后代 都不算
+                a1, b1, a2, b2 = r2
+                if (a2 - a1) * (b2 - b1) > 0.8 * (SCREEN_W * SCREEN_H):
+                    continue          # 根/全屏容器不算
+                if a1 <= x1 + 2 and b1 <= y1 + 2 and a2 >= x2 - 2 and b2 >= y2 - 2:
+                    if (a2 - a1) * (b2 - b1) > (x2 - x1) * (y2 - y1):
+                        covers += 1
+                        break
+        return covers
+    except Exception:
+        return -1
+
+
 def covered_count(items):
     """**被别的元素整个盖住的文字节点数**（2026-11-14 新增，判据 2001）。
 
@@ -739,7 +804,7 @@ def _body(name, t0):
 
     # 2026-11-14（判据 2001）：**被遮挡文字节点数** —— 抓「内容太高把上方元素盖住」那一类
     try:
-        _cov = covered_count(all_nodes(d2))   # ★ 必须用「所有节点」，见 all_nodes() 的注释
+        _cov = covered_count_tree(d2)   # ★ 必须带祖先关系，见 covered_count_tree() 的注释
     except Exception:
         _cov = -1
 
