@@ -49,14 +49,14 @@ CHECKS = [
     ('GPipes', 'Bp.height - 360', '限宽'),
     ('GPythagoreanTripleBuilder', 'Bp.isShort() ? FontSize.xxl : FontSize.hero', '题卡降档'),
     ('GShikaku', 'Bp.height - 360', '限宽'),
-    ('GSimonSays', 'Bp.height - 200', '限行宽'),
+    ('GSimonSays', '2 * Math.max(140, Bp.height - 200)', '限行宽'),   # ★ 2026-11-14：原特征串落在注释上，改成**代码行**
     ('GSkyscrapers', 'Bp.height - 360', '限宽'),
     ('GSnake3D', 'Bp.height - 180', '限整行宽'),
     ('GTargetNumber', 'Bp.isShort() ? FontSize.xl : FontSize.xxxl', '题卡降档'),
     ('GVisualSearchAll', 'Bp.height - 220', '限宽'),
     ('GWordLadder', 'Bp.isShort() ? 48 : 60', '词格降档'),
     ('GNumberBondsAll', 'Bp.height - 300', '限宽'),
-    ('GKakuroMini', 'Bp.height - 360', '盘面再收'),
+    ('GKakuroMini', 'maxWidth: Bp.height < 600', '盘面再收'),   # ★ 同上：原来会匹配注释
     ('GKakuro', 'Bp.isShort() && !this.over', '提示行隐藏'),
     ('GSchulte', 'Bp.height - 360', '限宽'),
     ('GCountdownMath', 'Bp.height - 360', '限宽'),
