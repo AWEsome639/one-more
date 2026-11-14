@@ -176,12 +176,16 @@ def main():
             continue
         n2b += 1
         h_vp = h / 3.0
+        # ⚠️ 判据 2409：**不能假设所有盘面都该是 240vp** ——
+        #   下限 `240` 的款期望 240vp；下限 `140` 的（如 Magnets）期望 173vp；
+        #   下限 `120` 的（如 KakuroMini）期望 173vp。期望值取决于各款的 max 下限。
+        #   ⇒ 所以这里只**报实测值**，不擅自判「压缩过」。
         if h < 720:
-            verdict = '✅ 压缩到 %.0fvp（< 240）' % h_vp
+            verdict = '实测 %.0fvp（< 240 ⇒ 可能被压，也可能下限本就低）' % h_vp
         elif h == 720:
-            verdict = '⚠️ 正好 240vp（余 0，紧）'
+            verdict = '实测 240vp（= 下限 240 的期望值）'
         else:
-            verdict = '❌ **%0.fvp > 240**（说明没有被压缩）' % h_vp
+            verdict = '实测 %.0fvp（> 240 ⇒ 未被压）' % h_vp
         over = (y + h) - SCREEN_H
         print('   %-26s H=%4dpx (%3.0fvp) 盘底%+4dpx %s' % (g, h, h_vp, over, verdict))
     if n2b == 0:
