@@ -410,7 +410,9 @@ export struct GLockPattern {
       .aspectRatio(1)
       // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
       //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      // ★ 2026-11-14 真机：maxHeight 173vp 时底部「再看一次」按钮被切 48px（2/48px）
+      //   ⇒ 再收 16vp（=48px）：maxHeight → Bp.height - 376（3×3 九点仍远大于触控下限）。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - 376) })
       .padding(Space.lg)
       .backgroundColor(this.theme.surface)
       .borderRadius(Radius.lg)
