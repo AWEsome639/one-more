@@ -12,6 +12,14 @@
 
 set -u
 cd "/Users/a0000/dev/One More" || exit 1
+# ★ 单实例锁：launchd 定时与手工执行可能撞车 ⇒ 只允许一个实例
+LOCK=/tmp/onemore_nightrun.lock
+if [ -e "$LOCK" ] && kill -0 "$(cat "$LOCK" 2>/dev/null)" 2>/dev/null; then
+  echo "❌ 已有实例在跑（PID $(cat "$LOCK")）⇒ 退出，避免两个跑批同时动设备"
+  exit 0
+fi
+echo $$ > "$LOCK"
+trap 'rm -f "$LOCK"' EXIT
 EMU='/Applications/DevEco-Studio.app/Contents/tools/emulator/Emulator'
 HC='/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
 HAP='entry/build/default/outputs/default/entry-default-signed.hap'
