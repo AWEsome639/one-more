@@ -529,200 +529,198 @@ export struct GMagnets {
   }
 
   build() {
-    Scroll() {
-      Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
-        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-        Row({ space: Space.sm }) {
-          Button(TG('提示'))
+    Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
+      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      Row({ space: Space.sm }) {
+        Button(TG('提示'))
 
-            .fontSize(FontSize.sm)
+          .fontSize(FontSize.sm)
 
-            .fontColor('#FFFFFF')
+          .fontColor('#FFFFFF')
 
-            .backgroundColor(Palette.cyan)
+          .backgroundColor(Palette.cyan)
 
-            .borderRadius(Radius.md)
+          .borderRadius(Radius.md)
 
-            // ★ 2026-10-24 修（同一个坑第二次）：Column 的直接子元素不能用 layoutWeight 当宽度
-            .layoutWeight(1)
-            .height(46)
+          // ★ 2026-10-24 修（同一个坑第二次）：Column 的直接子元素不能用 layoutWeight 当宽度
+          .layoutWeight(1)
+          .height(46)
 
 
-            .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L657'; })
-            .onBlur(() => { if (this.tvFocus === 'L657') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L657'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
-            .onClick(() => {
-
-              this.askHint();
-
-            })
-
-          Button(LanRace.isRacing() ? TG('联机禁用')
-            : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
-
-            .layoutWeight(1)
-
-            .height(46)
-
-            // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
-            //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
-            .backgroundColor(Palette.cyan)
-            .fontColor('#FFFFFF')
-                      // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
-            //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
-            .enabled(!LanRace.isRacing())
-            .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L680'; })
-            .onBlur(() => { if (this.tvFocus === 'L680') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L680'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
-            .onClick(() => {
-
-              this.askAuto();
-
-            })
-
-          Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
-          .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-            .fontSize(FontSize.md)
-            .fontColor(Color.White)
-            .backgroundColor(Palette.rose)
-            .borderRadius(Radius.md)
-            .layoutWeight(1)
           .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L698'; })
-          .onBlur(() => { if (this.tvFocus === 'L698') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L698'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+          .onFocus(() => { this.tvFocus = 'L657'; })
+          .onBlur(() => { if (this.tvFocus === 'L657') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L657'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
           .onClick(() => {
-            Haptics.tap();
-            this.reset();
+
+            this.askHint();
+
           })
-        }
-        Row({ space: Space.sm }) {
-          Column({ space: 2 }) {
-          Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-          Text((String(this.moves) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-          }
-          .layoutWeight(1)
-          .padding(Space.xs)
-          .backgroundColor(this.theme.surface)
-          .borderRadius(Radius.md)
-          .shadow(Shadow.card)
-          Column({ space: 2 }) {
-          Text((TG('成对磁铁'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-          Text((String(this.goodDominoes()) + '/8')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-          }
-          .layoutWeight(1)
-          .padding(Space.xs)
-          .backgroundColor(this.theme.surface)
-          .borderRadius(Radius.md)
-          .shadow(Shadow.card)
-          Column({ space: 2 }) {
-          Text((TG('已定格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-          Text((String(this.placed()) + '/' + String(CELLS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-          }
-          .layoutWeight(1)
-          .padding(Space.xs)
-          .backgroundColor(this.theme.surface)
-          .borderRadius(Radius.md)
-          .shadow(Shadow.card)
-        }
-        .width('100%')
 
-        Column({ space: Space.xs }) {
-          ForEach(this.rows, (r: number) => {
-            Row({ space: Space.xs }) {
-              ForEach(this.rows, (c: number) => {
-                Stack() {
-                Text(this.marks[(r * N + c)] === PLUS ? '＋' : (this.marks[(r * N + c)] === MINUS ? '－' : ''))
-                .fontSize(FontSize.xxl)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(this.marks[(r * N + c)] === PLUS ? Palette.rose : Palette.sky)
-                }
-                .layoutWeight(1)
-                .aspectRatio(1)
-                .backgroundColor(this.marks[(r * N + c)] === PLUS ? '#33F43F5E' : (this.marks[(r * N + c)] === MINUS ? '#330EA5E9' : this.theme.surface))
-                .borderRadius(Radius.sm)
-                .border({ width: 1, color: this.theme.line })
-                .animation({ duration: Motion.fast, curve: Motion.snap() })
-                // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
-                .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
-                  .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-                .focusable(Tv.on())
-                .onFocus(() => { this.tvFocus = 'L581'; })
-                .onBlur(() => { if (this.tvFocus === 'L581') { this.tvFocus = ''; } })
-                .outline(Tv.focusOutline(this.tvFocus === 'L581', Radius.sm))
-                .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
-                .onClick(() => {
-                Haptics.tick();
-                this.tap((r * N + c));
-                })
-              }, (c: number) => 'mc' + r + '-' + c)
-              Column({ space: 1 }) {
-              Text(String(this.rowClue[(r)]) + '＋')
-              .fontSize(FontSize.sm)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(this.plusInRow((r)) === this.rowClue[(r)] ? Palette.emerald : this.theme.inkSoft)
-              Text(TG2('现 {0}', String(this.plusInRow((r)))))
-              .fontSize(FontSize.xxs)
-              .fontColor(this.theme.inkFaint)
-              }
-              .width(CLUE_W)
-              .height(CLUE_W)
-              .justifyContent(FlexAlign.Center)
-              .backgroundColor(this.theme.surface)
-              .borderRadius(Radius.xs)
-            }
-            .width('100%')
-          }, (r: number) => 'mr' + r)
+        Button(LanRace.isRacing() ? TG('联机禁用')
+          : (this.demoId >= 0 ? TG('演示中…') : (this.autoId >= 0 ? TG('停代打') : TG('AI 代打'))))
 
+          .layoutWeight(1)
+
+          .height(46)
+
+          // ★★★ 2026-10-31（按 Button 分块修）：这个「AI 代打」按钮**没有 backgroundColor**
+          //   ⇒ 用 ArkUI 平台默认蓝，与 HintBar 的 Palette.cyan 不一致。
+          .backgroundColor(Palette.cyan)
+          .fontColor('#FFFFFF')
+                    // ★★★ 2026-11-01 奥森硬约束：**AI 代打在联机对战中不能启用**
+          //   这 16 款是自绘按钮行，HintBar 那套保护没走到它们身上
+          .enabled(!LanRace.isRacing())
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L680'; })
+          .onBlur(() => { if (this.tvFocus === 'L680') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L680'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askAuto(); }); })
+          .onClick(() => {
+
+            this.askAuto();
+
+          })
+
+        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('已结束')) : TG('重开一题'))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.rose)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L698'; })
+        .onBlur(() => { if (this.tvFocus === 'L698') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L698'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+        .onClick(() => {
+          Haptics.tap();
+          this.reset();
+        })
+      }
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text((TG('步数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
+        Text((String(this.moves) + '/' + String(this.diffTotal))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.xs)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('成对磁铁'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
+        Text((String(this.goodDominoes()) + '/8')).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.xs)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('已定格'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
+        Text((String(this.placed()) + '/' + String(CELLS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }
+        .layoutWeight(1)
+        .padding(Space.xs)
+        .backgroundColor(this.theme.surface)
+        .borderRadius(Radius.md)
+        .shadow(Shadow.card)
+      }
+      .width('100%')
+
+      Column({ space: Space.xs }) {
+        ForEach(this.rows, (r: number) => {
           Row({ space: Space.xs }) {
             ForEach(this.rows, (c: number) => {
-              Column({ space: 1 }) {
-              Text(String(this.colClue[(c)]) + '＋')
-              .fontSize(FontSize.sm)
+              Stack() {
+              Text(this.marks[(r * N + c)] === PLUS ? '＋' : (this.marks[(r * N + c)] === MINUS ? '－' : ''))
+              .fontSize(FontSize.xxl)
               .fontWeight(FontWeight.Bold)
-              .fontColor(this.plusInCol((c)) === this.colClue[(c)] ? Palette.emerald : this.theme.inkSoft)
-              Text(TG2('现 {0}', String(this.plusInCol((c)))))
-              .fontSize(FontSize.xxs)
-              .fontColor(this.theme.inkFaint)
+              .fontColor(this.marks[(r * N + c)] === PLUS ? Palette.rose : Palette.sky)
               }
               .layoutWeight(1)
               .aspectRatio(1)
-              .justifyContent(FlexAlign.Center)
-              .backgroundColor(this.theme.surface)
-              .borderRadius(Radius.xs)
-            }, (c: number) => 'mq' + c)
-            Row().width(CLUE_W).height(CLUE_W)
+              .backgroundColor(this.marks[(r * N + c)] === PLUS ? '#33F43F5E' : (this.marks[(r * N + c)] === MINUS ? '#330EA5E9' : this.theme.surface))
+              .borderRadius(Radius.sm)
+              .border({ width: 1, color: this.theme.line })
+              .animation({ duration: Motion.fast, curve: Motion.snap() })
+              // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
+              .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
+                .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+              .focusable(Tv.on())
+              .onFocus(() => { this.tvFocus = 'L581'; })
+              .onBlur(() => { if (this.tvFocus === 'L581') { this.tvFocus = ''; } })
+              .outline(Tv.focusOutline(this.tvFocus === 'L581', Radius.sm))
+              .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); })
+              .onClick(() => {
+              Haptics.tick();
+              this.tap((r * N + c));
+              })
+            }, (c: number) => 'mc' + r + '-' + c)
+            Column({ space: 1 }) {
+            Text(String(this.rowClue[(r)]) + '＋')
+            .fontSize(FontSize.sm)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.plusInRow((r)) === this.rowClue[(r)] ? Palette.emerald : this.theme.inkSoft)
+            Text(TG2('现 {0}', String(this.plusInRow((r)))))
+            .fontSize(FontSize.xxs)
+            .fontColor(this.theme.inkFaint)
+            }
+            .width(CLUE_W)
+            .height(CLUE_W)
+            .justifyContent(FlexAlign.Center)
+            .backgroundColor(this.theme.surface)
+            .borderRadius(Radius.xs)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 375)))
+          .width('100%')
+        }, (r: number) => 'mr' + r)
+
+        Row({ space: Space.xs }) {
+          ForEach(this.rows, (c: number) => {
+            Column({ space: 1 }) {
+            Text(String(this.colClue[(c)]) + '＋')
+            .fontSize(FontSize.sm)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.plusInCol((c)) === this.colClue[(c)] ? Palette.emerald : this.theme.inkSoft)
+            Text(TG2('现 {0}', String(this.plusInCol((c)))))
+            .fontSize(FontSize.xxs)
+            .fontColor(this.theme.inkFaint)
+            }
+            .layoutWeight(1)
+            .aspectRatio(1)
+            .justifyContent(FlexAlign.Center)
+            .backgroundColor(this.theme.surface)
+            .borderRadius(Radius.xs)
+          }, (c: number) => 'mq' + c)
+          Row().width(CLUE_W).height(CLUE_W)
         }
-        .width('100%')
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surfaceAlt)
-        .borderRadius(Radius.md)
-
-        Text(this.tip)
-          .fontSize(FontSize.sm)
-          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-
-        Text(TG('每块磁铁（横向两格）必须一正一负；右侧/下方数字是该行该列 ＋ 的个数'))
-          .fontSize(FontSize.xxs)
-          .fontColor(this.theme.inkFaint)
-
+        .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 375)))
       }
-      .onTouch((e: TouchEvent) => {
-        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-      })
       .width('100%')
-      // .height('100%')  ← 2026-11-14：套 Scroll 后不能用 100%（内容高=视口高⇒滚不动），判据见 _巡检记录
-      .justifyContent(FlexAlign.Start)
+      .padding(Space.sm)
+      .backgroundColor(this.theme.surfaceAlt)
+      .borderRadius(Radius.md)
+
+      Text(this.tip)
+        .fontSize(FontSize.sm)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+
+      Text(TG('每块磁铁（横向两格）必须一正一负；右侧/下方数字是该行该列 ＋ 的个数'))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    })
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
   }
 
 

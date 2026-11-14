@@ -504,132 +504,130 @@ export struct GKakuroMini {
   }
 
   build() {
-    Scroll() {
-      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
-        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-        HintBar({
-          showHint: true,
-          onHintTap: () => { this.askHint(); },
-          onAutoTap: () => { this.askAuto(); },
-          demoOn: false,
-          disabled: this.demoId >= 0,
-          autoOn: this.autoId >= 0
-        })
-        Row({ space: Space.md }) {
-          // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这两格永不刷新
-          this.head(0)
-          this.head(1)
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
+      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        demoOn: false,
+        disabled: this.demoId >= 0,
+        autoOn: this.autoId >= 0
+      })
+      Row({ space: Space.md }) {
+        // ⚠️ 只传「种类」：@Builder 按值传参不建立 ArkUI 观察 ⇒ 传值这两格永不刷新
+        this.head(0)
+        this.head(1)
+      }
+      .width('100%')
+
+      // 4×4：左上角留空，第一行是列和，第一列是行和
+      Column({ space: Space.xs }) {
+        Row({ space: Space.xs }) {
+          this.corner()
+          ForEach([0, 1, 2], (c: number) => {
+            this.colSum(c)
+          }, (c: number) => 'cs' + c)
         }
         .width('100%')
 
-        // 4×4：左上角留空，第一行是列和，第一列是行和
-        Column({ space: Space.xs }) {
+        ForEach([0, 1, 2], (r: number) => {
           Row({ space: Space.xs }) {
-            this.corner()
+            this.rowSum(r)
             ForEach([0, 1, 2], (c: number) => {
-              this.colSum(c)
-            }, (c: number) => 'cs' + c)
+              this.cellBox(r * N + c)
+            }, (c: number) => 'cb' + r + '-' + c)
           }
           .width('100%')
-
-          ForEach([0, 1, 2], (r: number) => {
-            Row({ space: Space.xs }) {
-              this.rowSum(r)
-              ForEach([0, 1, 2], (c: number) => {
-                this.cellBox(r * N + c)
-              }, (c: number) => 'cb' + r + '-' + c)
-            }
-            .width('100%')
-          }, (r: number) => 'gr' + r)
-        }
-        .width('100%')
-        // ★★★ 2026-11-08 **横屏棋盘下沿被底部 tab 栏裁掉**（verifier-dev 真机实测）：
-        //   本款根容器是 `Column`（无 Scroll），棋盘 `width('100%')` + 内部格子 `aspectRatio(1)`
-        //   ⇒ 853 宽时棋盘高 ≈813vp，远超声高 ⇒ 底边压到 y≈1600，被 tab 栏盖住。
-        //   ⇒ 判据 1802：**约束加在「棋盘容器」上**（不是格子），横屏按可用高反推；
-        //   ★ 模板取自同族的 `GKakuro`（那边用 -310，因为它按钮行**紧贴棋盘正下方**；
-        //     本款按钮在上方 ⇒ 先用 -260，真机量了不够再压）。
-        //   ★ 手机零回归：`Bp.height >= 600` 走 9999（等于不约束）。
-        // ★ 2026-11-08 **第二次校准**（verifier-dev 真机量）：`-260` 时格子底 1536px，
-        //   而安全区是 1516px ⇒ **还差 ~20px**（仍压在手势区边缘）。
-        //   对照 `GShikaku`（同批同一修法）：它格底 1385px、收进来 215px ⇒ **已安全**。
-        //   ⇒ 再收 20px。
-              // ★ 2026-11-12（判据 1928+1939）：`aspectRatio(1)` 板子 **`maxHeight` 只裁不缩** ⇒ 改 `maxWidth`；
-              //   按 3×3 反推：可用高 ~343vp − 键盘两行(~90) − 提示(17) ≈ 236vp ⇒ 留余量取 `Bp.height - 320`。
-              // 2026-11-14 真机截图（blk=24px）：**盘面末行 + 数字键 `1~5` 都被切**
-              //   11-12 那条 `Bp.height - 320` 还不够（两行键盘 `~90vp` + 提示 + 头 `480px` 已把预算吃满）
-              //   ⇒ 再收 40vp：`Bp.height - 360`（3×3 ⇒ 每格 ~58vp，仍在 44 触控下限之上）
-              .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 360)) : 9999 })
-        .padding(Space.sm)
-        .backgroundColor(this.theme.surfaceAlt)
-        .borderRadius(Radius.md)
-
-        Text(this.over ? (this.won ? TG('🎉 六条线全对，通关！') : TG('步数用尽，重开一题吧')) :
-          (this.hint.length > 0 ? '⚠️ ' + this.hint :
-            (this.sel < 0 ? TG('点一个格子开始填数') : TG('点下面数字填入选中格；再点格子可清空'))))
-          .fontSize(FontSize.sm)
-          // ★ 2026-11-12（判据 1939）：矮屏只隐藏「空闲那句长说明」（两行、占 ~40px），
-          //   **保留 `over`（胜负）与 `hint`（报错）** —— 反馈不能丢。
-          .visibility(Bp.isShort() && !this.over && this.hint.length === 0 ? Visibility.None : Visibility.Visible)
-          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
-
-        // 数字键盘
-        Row({ space: Space.xs }) {
-          ForEach([1, 2, 3, 4, 5], (d: number) => {
-            this.keyBtn(d)
-          }, (d: number) => 'k' + d)
-        }
-        .width('100%')
-        Row({ space: Space.xs }) {
-          ForEach([6, 7, 8, 9], (d: number) => {
-            this.keyBtn(d)
-          }, (d: number) => 'k' + d)
-          this.delKey()
-        }
-        .width('100%')
-
-        Row({ space: Space.md }) {
-          Button(TG('换一题'))
-        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-            .fontSize(FontSize.md).fontColor(Color.White)
-            .backgroundColor(Palette.teal).borderRadius(Radius.md)
-            .layoutWeight(1).height(Cell.tap(44))
-            .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L567'; })
-            .onBlur(() => { if (this.tvFocus === 'L567') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L567'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-            .onClick(() => {
-              Haptics.tap();
-              this.reset();
-            })
-          Button(TG('重开'))
-        // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
-        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
-        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-            .fontSize(FontSize.md).fontColor(this.theme.ink)
-            .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
-            .layoutWeight(1).height(Cell.tap(44))
-            .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L579'; })
-            .onBlur(() => { if (this.tvFocus === 'L579') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L579'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-            .onClick(() => {
-              Haptics.tap();
-              this.reset();
-            })
-        }
-        .width('100%')
+        }, (r: number) => 'gr' + r)
       }
-      .onTouch((e: TouchEvent) => {
-        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-      })
       .width('100%')
-      // .height('100%')  ← 2026-11-14：套 Scroll 后不能用 100%（内容高=视口高⇒滚不动），判据见 _巡检记录
+      // ★★★ 2026-11-08 **横屏棋盘下沿被底部 tab 栏裁掉**（verifier-dev 真机实测）：
+      //   本款根容器是 `Column`（无 Scroll），棋盘 `width('100%')` + 内部格子 `aspectRatio(1)`
+      //   ⇒ 853 宽时棋盘高 ≈813vp，远超声高 ⇒ 底边压到 y≈1600，被 tab 栏盖住。
+      //   ⇒ 判据 1802：**约束加在「棋盘容器」上**（不是格子），横屏按可用高反推；
+      //   ★ 模板取自同族的 `GKakuro`（那边用 -310，因为它按钮行**紧贴棋盘正下方**；
+      //     本款按钮在上方 ⇒ 先用 -260，真机量了不够再压）。
+      //   ★ 手机零回归：`Bp.height >= 600` 走 9999（等于不约束）。
+      // ★ 2026-11-08 **第二次校准**（verifier-dev 真机量）：`-260` 时格子底 1536px，
+      //   而安全区是 1516px ⇒ **还差 ~20px**（仍压在手势区边缘）。
+      //   对照 `GShikaku`（同批同一修法）：它格底 1385px、收进来 215px ⇒ **已安全**。
+      //   ⇒ 再收 20px。
+            // ★ 2026-11-12（判据 1928+1939）：`aspectRatio(1)` 板子 **`maxHeight` 只裁不缩** ⇒ 改 `maxWidth`；
+            //   按 3×3 反推：可用高 ~343vp − 键盘两行(~90) − 提示(17) ≈ 236vp ⇒ 留余量取 `Bp.height - 320`。
+            // 2026-11-14 真机截图（blk=24px）：**盘面末行 + 数字键 `1~5` 都被切**
+            //   11-12 那条 `Bp.height - 320` 还不够（两行键盘 `~90vp` + 提示 + 头 `480px` 已把预算吃满）
+            //   ⇒ 再收 40vp：`Bp.height - 360`（3×3 ⇒ 每格 ~58vp，仍在 44 触控下限之上）
+            .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 360)) : 9999 })
+      .padding(Space.sm)
+      .backgroundColor(this.theme.surfaceAlt)
+      .borderRadius(Radius.md)
+
+      Text(this.over ? (this.won ? TG('🎉 六条线全对，通关！') : TG('步数用尽，重开一题吧')) :
+        (this.hint.length > 0 ? '⚠️ ' + this.hint :
+          (this.sel < 0 ? TG('点一个格子开始填数') : TG('点下面数字填入选中格；再点格子可清空'))))
+        .fontSize(FontSize.sm)
+        // ★ 2026-11-12（判据 1939）：矮屏只隐藏「空闲那句长说明」（两行、占 ~40px），
+        //   **保留 `over`（胜负）与 `hint`（报错）** —— 反馈不能丢。
+        .visibility(Bp.isShort() && !this.over && this.hint.length === 0 ? Visibility.None : Visibility.Visible)
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+
+      // 数字键盘
+      Row({ space: Space.xs }) {
+        ForEach([1, 2, 3, 4, 5], (d: number) => {
+          this.keyBtn(d)
+        }, (d: number) => 'k' + d)
+      }
+      .width('100%')
+      Row({ space: Space.xs }) {
+        ForEach([6, 7, 8, 9], (d: number) => {
+          this.keyBtn(d)
+        }, (d: number) => 'k' + d)
+        this.delKey()
+      }
+      .width('100%')
+
+      Row({ space: Space.md }) {
+        Button(TG('换一题'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md).fontColor(Color.White)
+          .backgroundColor(Palette.teal).borderRadius(Radius.md)
+          .layoutWeight(1).height(Cell.tap(44))
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L567'; })
+          .onBlur(() => { if (this.tvFocus === 'L567') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L567'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+          .onClick(() => {
+            Haptics.tap();
+            this.reset();
+          })
+        Button(TG('重开'))
+      // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md).fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md)
+          .layoutWeight(1).height(Cell.tap(44))
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L579'; })
+          .onBlur(() => { if (this.tvFocus === 'L579') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L579'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+          .onClick(() => {
+            Haptics.tap();
+            this.reset();
+          })
+      }
+      .width('100%')
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    })
+    .width('100%')
+    .height('100%')
   }
 
   /** 顶部小格：kind 0=步数 1=完成线 */
