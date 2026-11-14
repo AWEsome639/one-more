@@ -779,172 +779,174 @@ export struct G2048 {
   }
 
   build() {
-    Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
-      // ★ 2026-11-01 演示条走共用组件（DemoBar），不再借 HintBar 的 @Prop
-      // ★ 演示条与 HintBar 恒显示：DemoBar 在未演示时高度为 0，不占位
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-      HintBar({
-        showHint: false,
-        onAutoTap: () => { this.askAuto(); },
-        demoOn: false,
-        disabled: this.demoId >= 0,
-        autoOn: this.autoId >= 0
-      })
-      // 得分条
-      // ⚠️ 只传「种类」不传「值」—— 见 scoreBox 的注释（@Builder 按值传参不建立观察）
-      Row({ space: Space.md }) {
-        this.scoreBox(0)
-        this.scoreBox(1)
-      }
-      .width('100%')
-
-      // 棋盘
-      Column({ space: Space.sm }) {
-        ForEach([0, 1, 2, 3], (r: number) => {
-          Row({ space: Space.sm }) {
-            ForEach([0, 1, 2, 3], (c: number) => {
-              this.tile(r, c)
-            }, (c: number) => 'c' + c)
-          }
-          .width('100%')
-        }, (r: number) => 'r' + r)
-      }
-      // ★★★ 2026-11-14 真机截图：棋盘**很小（~430px）而中间一大片空白**，
-      //   底部「滑动或按方向键」+「提示」按钮仍被切。
-      //   根因：`width('100%')` + `aspectRatio(1)` ⇒ 宽度 2500px、按比例要高也 2500px，
-      //   而下面那个 `constraintSize({maxHeight:'46%'})` **只是把方形裁掉一半**，
-      //   **格子仍按 2500px 的方形排** ⇒ 视觉上又小又错位（判据 1966：要限**宽**，不是限高）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360)))
-      .aspectRatio(1)
-      // ★★★ 2026-10-29 真机抓到（**第三次**同一个坑）：
-      //   棋盘 aspectRatio(1) ⇒ 高度被宽度锁死 ⇒ 把「提示 / 重开」那一行挤到屏幕外
-      //   （真机 dump：屏上只有「AI 代打」，**没有任何「提示」元素**）
-      //   ⇒ 给棋盘限高，让下面那行回到可视区。
-      //   （数独、孔明棋都修过同一个问题 —— 这是第三处）
-      //   ★★ 2026-11-14 更正（真机截图 + 算术）：
-      //     **前三次修的应该都是「限高」，而限高对 `aspectRatio(1)` 只裁不缩 ⇒ 三次都没修对。**
-      //     正确做法是**限宽**（`width: Math.min(Bp.width-40, Bp.height-360)` ⇒ `173vp`），
-      //     因为 `N×N` 方阵的**高恰好等于宽度封顶值**（判据 `1966`）。
-      //     `2026-11-14` 已按限宽改掉，并删掉了下面那个 `maxHeight`。
-      .padding(Space.sm)
-      .backgroundColor(this.theme.isDark ? '#141414' : '#BBADA0')
-      .borderRadius(Radius.lg)
-      .gesture(
-        // ★ 手指直接在方块上拖 = 朝那个方向推一次（P9「要能直接滑动方块」）
-        //   用 PanGesture 而不是 SwipeGesture：
-        //   ① SwipeGesture 要"甩"够速度才触发，慢拖没反应（手感差）；
-        //   ② PanGesture 的 offsetX/offsetY 是 vp 位移，方向判定不依赖 angle 的正负口径。
-        PanGesture({ fingers: 1, direction: PanDirection.All, distance: 6 })
-          .onActionStart(() => {
-            this.dragX = 0;
-            this.dragY = 0;
-          })
-          .onActionUpdate((e: GestureEvent) => {
-            const dx: number = e.offsetX - this.dragX;
-            const dy: number = e.offsetY - this.dragY;
-            if (Math.abs(dx) < DRAG_MIN && Math.abs(dy) < DRAG_MIN) {
-              return;
-            }
-            this.dragX = e.offsetX;
-            this.dragY = e.offsetY;
-            if (Math.abs(dx) >= Math.abs(dy)) {
-              this.move(dx > 0 ? 1 : 3);
-            } else {
-              this.move(dy > 0 ? 2 : 0);
-            }
-          })
-          .onActionEnd(() => {
-            this.dragX = 0;
-            this.dragY = 0;
-          })
-      )
-
-      // 方向键 —— 比滑动更精确；也保证在没有手势识别的设备/模拟器上一定能玩
-      Column({ space: Space.xs }) {
-        this.dirBtn('↑', 0)
-        Row({ space: Space.xs }) {
-          this.dirBtn('←', 3)
-          this.dirBtn('↓', 2)
-          this.dirBtn('→', 1)
+    Scroll() {
+      Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
+        // ★ 2026-11-01 演示条走共用组件（DemoBar），不再借 HintBar 的 @Prop
+        // ★ 演示条与 HintBar 恒显示：DemoBar 在未演示时高度为 0，不占位
+        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+        HintBar({
+          showHint: false,
+          onAutoTap: () => { this.askAuto(); },
+          demoOn: false,
+          disabled: this.demoId >= 0,
+          autoOn: this.autoId >= 0
+        })
+        // 得分条
+        // ⚠️ 只传「种类」不传「值」—— 见 scoreBox 的注释（@Builder 按值传参不建立观察）
+        Row({ space: Space.md }) {
+          this.scoreBox(0)
+          this.scoreBox(1)
         }
+        .width('100%')
+
+        // 棋盘
+        Column({ space: Space.sm }) {
+          ForEach([0, 1, 2, 3], (r: number) => {
+            Row({ space: Space.sm }) {
+              ForEach([0, 1, 2, 3], (c: number) => {
+                this.tile(r, c)
+              }, (c: number) => 'c' + c)
+            }
+            .width('100%')
+          }, (r: number) => 'r' + r)
+        }
+        // ★★★ 2026-11-14 真机截图：棋盘**很小（~430px）而中间一大片空白**，
+        //   底部「滑动或按方向键」+「提示」按钮仍被切。
+        //   根因：`width('100%')` + `aspectRatio(1)` ⇒ 宽度 2500px、按比例要高也 2500px，
+        //   而下面那个 `constraintSize({maxHeight:'46%'})` **只是把方形裁掉一半**，
+        //   **格子仍按 2500px 的方形排** ⇒ 视觉上又小又错位（判据 1966：要限**宽**，不是限高）
+        .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360)))
+        .aspectRatio(1)
+        // ★★★ 2026-10-29 真机抓到（**第三次**同一个坑）：
+        //   棋盘 aspectRatio(1) ⇒ 高度被宽度锁死 ⇒ 把「提示 / 重开」那一行挤到屏幕外
+        //   （真机 dump：屏上只有「AI 代打」，**没有任何「提示」元素**）
+        //   ⇒ 给棋盘限高，让下面那行回到可视区。
+        //   （数独、孔明棋都修过同一个问题 —— 这是第三处）
+        //   ★★ 2026-11-14 更正（真机截图 + 算术）：
+        //     **前三次修的应该都是「限高」，而限高对 `aspectRatio(1)` 只裁不缩 ⇒ 三次都没修对。**
+        //     正确做法是**限宽**（`width: Math.min(Bp.width-40, Bp.height-360)` ⇒ `173vp`），
+        //     因为 `N×N` 方阵的**高恰好等于宽度封顶值**（判据 `1966`）。
+        //     `2026-11-14` 已按限宽改掉，并删掉了下面那个 `maxHeight`。
+        .padding(Space.sm)
+        .backgroundColor(this.theme.isDark ? '#141414' : '#BBADA0')
+        .borderRadius(Radius.lg)
+        .gesture(
+          // ★ 手指直接在方块上拖 = 朝那个方向推一次（P9「要能直接滑动方块」）
+          //   用 PanGesture 而不是 SwipeGesture：
+          //   ① SwipeGesture 要"甩"够速度才触发，慢拖没反应（手感差）；
+          //   ② PanGesture 的 offsetX/offsetY 是 vp 位移，方向判定不依赖 angle 的正负口径。
+          PanGesture({ fingers: 1, direction: PanDirection.All, distance: 6 })
+            .onActionStart(() => {
+              this.dragX = 0;
+              this.dragY = 0;
+            })
+            .onActionUpdate((e: GestureEvent) => {
+              const dx: number = e.offsetX - this.dragX;
+              const dy: number = e.offsetY - this.dragY;
+              if (Math.abs(dx) < DRAG_MIN && Math.abs(dy) < DRAG_MIN) {
+                return;
+              }
+              this.dragX = e.offsetX;
+              this.dragY = e.offsetY;
+              if (Math.abs(dx) >= Math.abs(dy)) {
+                this.move(dx > 0 ? 1 : 3);
+              } else {
+                this.move(dy > 0 ? 2 : 0);
+              }
+            })
+            .onActionEnd(() => {
+              this.dragX = 0;
+              this.dragY = 0;
+            })
+        )
+
+        // 方向键 —— 比滑动更精确；也保证在没有手势识别的设备/模拟器上一定能玩
+        Column({ space: Space.xs }) {
+          this.dirBtn('↑', 0)
+          Row({ space: Space.xs }) {
+            this.dirBtn('←', 3)
+            this.dirBtn('↓', 2)
+            this.dirBtn('→', 1)
+          }
+        }
+        .width('100%')
+
+        // ★★★ 2026-10-23 路线 C：提示文字
+        //   ⚠️ 我第一版只加了 hintText 状态和 askHint() 方法，**忘了在界面上渲染它**
+        //      ⇒ 真机点了没反应（状态一直在变，屏幕上什么都看不到）
+        //      ⇒ 教训：加状态必须同一次就把「谁读它」也加上，否则等于没加
+        if (this.hintText.length > 0) {
+          Text(this.hintText)
+            .fontSize(FontSize.sm)
+            .fontColor(this.theme.ink)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.sm)
+            .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
+            .width('100%')
+            .textAlign(TextAlign.Center)
+        }
+
+        // 状态/操作
+        Row({ space: Space.md }) {
+          Button(this.over ? TG('已结束') : (this.won ? TG('已通关 🎉') : TG('滑动或按方向键')))
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.sm)
+            .fontColor(this.theme.inkSoft)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .layoutWeight(1)
+            .height(Cell.of(44))
+            .enabled(false)
+          Button(TG('提示'))
+            .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor(this.theme.ink)
+            .backgroundColor(this.theme.surfaceAlt)
+            .borderRadius(Radius.md)
+            .height(Cell.tap(44))
+            .padding({ left: Space.md, right: Space.md })
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L673'; })
+            .onBlur(() => { if (this.tvFocus === 'L673') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L673'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
+            .onClick(() => {
+              this.askHint();
+            })
+          Button(TG('重开'))
+        // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+            .fontSize(FontSize.md)
+            .fontColor(Color.White)
+            .backgroundColor(Palette.primary)
+            .borderRadius(Radius.md)
+            .width(96)
+            .height(Cell.tap(44))
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L687'; })
+            .onBlur(() => { if (this.tvFocus === 'L687') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L687'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+            .onClick(() => {
+              Haptics.tap();
+              this.reset();
+            })
+        }
+        .width('100%')
+
+        Text(TG('提示：已通关还能继续冲更高分；死局才结算'))
+          .fontSize(FontSize.xxs)
+          .fontColor(this.theme.inkFaint)
       }
+      .onTouch((e: TouchEvent) => {
+        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+      })
       .width('100%')
-
-      // ★★★ 2026-10-23 路线 C：提示文字
-      //   ⚠️ 我第一版只加了 hintText 状态和 askHint() 方法，**忘了在界面上渲染它**
-      //      ⇒ 真机点了没反应（状态一直在变，屏幕上什么都看不到）
-      //      ⇒ 教训：加状态必须同一次就把「谁读它」也加上，否则等于没加
-      if (this.hintText.length > 0) {
-        Text(this.hintText)
-          .fontSize(FontSize.sm)
-          .fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.sm)
-          .padding({ left: Space.md, right: Space.md, top: Space.xs, bottom: Space.xs })
-          .width('100%')
-          .textAlign(TextAlign.Center)
-      }
-
-      // 状态/操作
-      Row({ space: Space.md }) {
-        Button(this.over ? TG('已结束') : (this.won ? TG('已通关 🎉') : TG('滑动或按方向键')))
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.sm)
-          .fontColor(this.theme.inkSoft)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
-          .layoutWeight(1)
-          .height(Cell.of(44))
-          .enabled(false)
-        Button(TG('提示'))
-          .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(this.theme.ink)
-          .backgroundColor(this.theme.surfaceAlt)
-          .borderRadius(Radius.md)
-          .height(Cell.tap(44))
-          .padding({ left: Space.md, right: Space.md })
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L673'; })
-          .onBlur(() => { if (this.tvFocus === 'L673') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L673'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); })
-          .onClick(() => {
-            this.askHint();
-          })
-        Button(TG('重开'))
-      // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
-      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(Palette.primary)
-          .borderRadius(Radius.md)
-          .width(96)
-          .height(Cell.tap(44))
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L687'; })
-          .onBlur(() => { if (this.tvFocus === 'L687') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L687'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
-      }
-      .width('100%')
-
-      Text(TG('提示：已通关还能继续冲更高分；死局才结算'))
-        .fontSize(FontSize.xxs)
-        .fontColor(this.theme.inkFaint)
+      // .height('100%')  ← 2026-11-14：套 Scroll 后不能用 100%（内容高=视口高⇒滚不动），判据见 _巡检记录
+      .justifyContent(FlexAlign.Start)
     }
-    .onTouch((e: TouchEvent) => {
-      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    })
-    .width('100%')
-    .height('100%')
-    .justifyContent(FlexAlign.Start)
   }
 
   /**

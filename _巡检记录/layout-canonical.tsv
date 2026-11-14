@@ -595,3 +595,6 @@
 2026-11-14T17:06:52	2048	OK	1591	73.6s lowest='←' [974,1477][1166,1591] blk=2/30px cov=5 board=600x600@980,727 max=15 -> /Users/a0000/dev/One More/_巡检记录/截图-2048-170651.jpeg @2026-11-14T17:06:52
 2026-11-14T17:14:41	Magnets	OK	1351	73.4s lowest='现 0' [2371,1027][2438,1069] blk=0/0px cov=5 board=544x544@90,750 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-171441.jpeg @2026-11-14T17:14:41
 2026-11-14T17:20:57	Kakuro Mini	OK	1351	69.2s lowest='1' [60,1306][534,1351] blk=0/0px cov=5 board=520x520@1020,756 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-172057.jpeg @2026-11-14T17:20:57
+2026-11-14T17:28:24	2048	OK	1351	72.5s lowest='↑' [1184,1345][1376,1351] blk=0/0px cov=5 board=600x600@980,727 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-2048-172823.jpeg @2026-11-14T17:28:24
+2026-11-14T17:29:59	Matrix Reasoning	WRONG_GAME	-	69.3s title '矩阵推理' not found; first texts=['‹', '矩阵推理', '找规律填矩阵', '☆', '?', '普通']
+2026-11-14T17:31:33	Fraction Matcher	OK	1351	68.6s lowest='A' [108,1345][136,1351] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-173133.jpeg @2026-11-14T17:31:33

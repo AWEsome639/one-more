@@ -31,17 +31,20 @@ i_end = next(i for i in range(i_col, len(L)) if L[i] == '  }')
 
 # ③ 找 .height('100%')（在 i_col..i_end 之间，且属于外层 Column 的修饰符）
 i_h = [i for i in range(i_col, i_end) if L[i].strip() == ".height('100%')"]
-if len(i_h) != 1:
-    sys.exit('⚠️ .height(100%%) 找到 %d 处（预期 1）⇒ 手工确认' % len(i_h))
-i_h = i_h[0]
+if len(i_h) > 1:
+    sys.exit('⚠️ .height(100%%) 找到 %d 处（>1，不知该注释哪个）⇒ 手工确认' % len(i_h))
+# ★ 2026-11-14：`0` 处是**正常**的 —— 有些游戏的外层 Column 本来就没有 `.height('100%')`
+#   （`GBejeweled` 那个 Scroll 模板就没有）⇒ 无需注释、直接包。原来这里 `!=1` 会误拒。
+i_h = i_h[0] if i_h else None
 
-print('定位：build() 在 L%d、Column 在 L%d、build 结尾 L%d、height(100%%) 在 L%d'
-      % (i_build+1, i_col+1, i_end+1, i_h+1))
+print('定位：build() 在 L%d、Column 在 L%d、build 结尾 L%d、height(100%%) 在 %s'
+      % (i_build+1, i_col+1, i_end+1, ('L%d' % (i_h+1)) if i_h is not None else '（无，跳过）'))
 
 # ④ 改动：注释 height、插 Scroll 开头与结尾
 new = list(L)
-new[i_h] = new[i_h].replace(".height('100%')",
-    "// .height('100%')  ← 2026-11-14：套 Scroll 后不能用 100%（内容高=视口高⇒滚不动），判据见 _巡检记录")
+if i_h is not None:
+    new[i_h] = new[i_h].replace(".height('100%')",
+        "// .height('100%')  ← 2026-11-14：套 Scroll 后不能用 100%（内容高=视口高⇒滚不动），判据见 _巡检记录")
 # 插入前先把块内每行 +2 空格（否则 Scroll 里那层缩进比外面还浅，格式不对）
 for k in range(i_col, i_end):
     if new[k].strip():                  # 空行不加空格
