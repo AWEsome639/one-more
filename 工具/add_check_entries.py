@@ -22,6 +22,12 @@ NEW = [
     ('GFractionMatcher', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'A②题卡 padding lg→md'),
     ('GPythagoreanTripleBuilder', '? Space.xs : Space.md',                          'A③外层间距 sm→xs（省 72px）'),
     ('GWordle',          'Scroll()',                                                   'A④套 Scroll 兜底'),
+    # ★ 2026-11-14 白天真机实测修的（全部 blk=0、max=0）——
+    #   加进清单，否则以后 final_check 不会守它们、可能被静默改回。
+    ('GKakuroMini',      'Scroll()',                                                   '白天·套 Scroll（blk 24→0）'),
+    ('G2048',            'Scroll()',                                                   '白天·套 Scroll（blk 30→0）'),
+    ('GPercentageShopping', 'Scroll()',                                                '白天·套 Scroll（blk 48→0）'),
+    ('GShikaku',         'Math.max(200, Bp.height - 360)',                              '白天·下限 240→200（blk 72→0）'),
 ]
 if WITH_B:
     NEW += [
