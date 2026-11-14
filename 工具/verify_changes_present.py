@@ -38,6 +38,7 @@ CHECKS = [
     ('GHeyawake', 'Bp.height - 360', '限宽'),
     ('GHitori', 'Bp.height - 360', '限宽'),
     ('GHitoriAll', 'Bp.height - 360', '限宽'),
+    ('GMastermind', 'Math.max(200, Bp.height - 260)', '三行圆点限宽'),
     ('GMatrixReasoning', 'Bp.height - 360', '限宽'),
     ('GMemory', 'Bp.height - 360', '限宽'),
     ('GModuloClock', 'Bp.isShort() ? FontSize.xl : FontSize.hero', '题卡降档'),
