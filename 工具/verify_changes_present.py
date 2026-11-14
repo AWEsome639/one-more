@@ -26,7 +26,7 @@ GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 
 # (类名, 特征串, 说明)
 CHECKS = [
-    ('GFractionMatcher', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'A②题卡 padding lg→md'),
+    ('GFractionMatcher', "padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg)", '题卡 padding md→sm（配 2×2 收 36px）'),
     ('GShikaku', 'Math.max(200, Bp.height - 360)', '白天·下限 240→200（blk 72→0）'),
     ('GMagnets', 'Bp.height - 375', 'A①盘面 173→158vp'),
     ('GPythagoreanTripleBuilder', '? Space.xs : Space.md', 'A③外层间距 sm→xs（省 72px）'),
@@ -48,7 +48,7 @@ CHECKS = [
     ('GHitori', 'Bp.height - 360', '限宽'),
     ('GHitoriAll', 'Bp.height - 360', '限宽'),
     ('GMastermind', 'Math.max(200, Bp.height - 260)', '三行圆点限宽'),
-    ('GMatrixReasoning', 'Bp.height - 360', '限宽'),
+    ('GMatrixReasoning', 'Bp.height - 388', '限宽'),
     ('GMemory', 'Bp.height - 360', '限宽'),
     ('GModuloClock', 'Bp.isShort() ? FontSize.xl : FontSize.hero', '题卡降档'),
     ('GModuloPath', 'Bp.height - 360', '限宽'),
