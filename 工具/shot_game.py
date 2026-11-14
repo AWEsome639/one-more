@@ -1,3 +1,4 @@
+import os
 import re
 # -*- coding: utf-8 -*-
 """对某一款游戏「拍照存证」——给「PUSHED_OUT 候选」做人工核对用（判据 1819 第五类）
@@ -875,6 +876,35 @@ def _body(name, t0):
         _cov = -1
 
     if recv_ok:
+        # ★ 2026-11-15：ONEMORE_DUMP=1 时把**全部节点**（含无文字容器）写到 /tmp/nodes-<game>.tsv
+        #   用途：先看谁在溢出、它的父链是什么，再决定怎么改。判据 2634/本轮教训：不许再凭 lowest 的文字猜结构。
+        if os.environ.get('ONEMORE_DUMP') == '1':
+            try:
+                rows = []
+                def _walk(n, depth=0, path=''):
+                    if not isinstance(n, dict):
+                        return
+                    a = n.get('attributes', {}) or {}
+                    b = (a.get('bounds') or '').strip()
+                    ty = a.get('type') or ''
+                    tx = (a.get('text') or '').replace('\t', ' ')
+                    if b:
+                        nums = [int(x) for x in re.findall(r'-?\d+', b)]
+                        if len(nums) == 4:
+                            rows.append((nums[3], depth, path, ty, nums, tx[:40]))
+                    for idx, c in enumerate(n.get('children') or []):
+                        _walk(c, depth + 1, path + '/' + str(idx))
+                _walk(d2)
+                rows.sort(key=lambda r: -r[0])
+                outp = '/tmp/nodes-%s.tsv' % re.sub(r'[^0-9A-Za-z]+', '_', name)
+                with io.open(outp, 'w', encoding='utf-8') as f:
+                    f.write('y2\tdepth\ttype\tx1\ty1\tx2\ty2\ttext\tpath\n')
+                    for y2, depth, path, ty, r, tx in rows:
+                        f.write('%d\t%d\t%s\t%d\t%d\t%d\t%d\t%s\t%s\n'
+                                % (y2, depth, ty, r[0], r[1], r[2], r[3], tx, path))
+                print('=== 全部节点已写到 %s（%d 个）===' % (outp, len(rows)))
+            except Exception as _e:
+                print('节点 dump 失败: %r' % _e)
         finish(name, 'OK', t0, mb,
                'lowest=%r %s blk=%d/%dpx cov=%d board=%s max=%d -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, _cov, _board, block_over_max, out, _ts))
     else:
