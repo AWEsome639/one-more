@@ -621,3 +621,5 @@
 2026-11-14T20:45:26	Magnets	OK	1554	71.7s lowest='现 0' [1043,1506][1110,1548] blk=1/8px cov=5 board=150x150@90,750 max=8 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-204525.jpeg @2026-11-14T20:45:26
 2026-11-14T20:52:49	Factor Finder	OK	1600	67.7s lowest='提示' [60,1525][2500,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Factor_Finder-205249.jpeg @2026-11-14T20:52:49
 2026-11-14T21:07:40	Magnets	OK	1554	66.8s lowest='现 0' [1043,1506][1110,1548] blk=1/8px cov=5 board=150x150@90,750 max=8 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-210739.jpeg @2026-11-14T21:07:40
+2026-11-14T21:13:14	Lock Pattern	OK	1600	67.1s lowest='再看一次' [60,1482][2452,1600] blk=2/48px cov=5 board=520x520@1020,810 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Lock_Pattern-211314.jpeg @2026-11-14T21:13:14
+2026-11-14T21:14:55	Word Snake	OK	1460	63.1s lowest='提示：吃错字母、撞墙、咬自己都扣一条命' [60,1418][2500,1460] blk=0/0px cov=82 board=165x155@1198,406 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Snake-211455.jpeg @2026-11-14T21:14:55
