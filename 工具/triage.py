@@ -42,7 +42,7 @@ def parse(since=None):
         m2 = re.search(r"lowest='([^']*)'", ln)
         if m2:
             low = m2.group(1)
-        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, cov=(int(cm.group(1)) if cm else -1)))
+        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, cov=(int(cm.group(1)) if cm else None)))
     return rows
 
 def main():
@@ -75,7 +75,21 @@ def main():
 
     # ★ 2026-11-14（判据 2001）：**被遮挡**优先于所有档位 —— 因为这类 `blk` 往往最小却最严重
     #   （`Memory` 24 / `Schulte Table` 24 / `Simon Says` 48 / `Number Bonds All` 22）
-    COV = [r for r in got if r.get('cov', -1) > 0]
+    # ★ 2026-11-14（判据 2007）：**`cov = -1` 是「测不出来」，不能当成「没遮挡」**
+    #   而这个指标今天才发现一直是坏的（只数文字压文字 ⇒ 恒 0）⇒
+    #   **`10:00` 之前所有行的 `cov=0` 都不可信**，只是当时看不出来。
+    # ★ 判据 2003/2007：三种状态必须分开 —— **没有 field** / **算了但失败** / **算出来了**
+    COV_NODATA = [r for r in got if r.get('cov') is None]
+    COV_FAIL = [r for r in got if r.get('cov') == -1]
+    COV = [r for r in got if (r.get('cov') or 0) > 0]
+    if COV_NODATA:
+        print('\n【⚠️ cov 无数据】%d 款（旧行没这个字段 ⇒ 那时指标还没加，**不是「没遮挡」**）'
+              % len(COV_NODATA))
+        print('  ⇒ 今晚重测后就会有；在此之前 **不要**把它们算进「干净」。')
+    if COV_FAIL:
+        print('\n【⚠️ cov 算失败】%d 款（字段在但值为 `-1`：超时或异常）' % len(COV_FAIL))
+        for r in COV_FAIL[:10]:
+            print('  %-30s cov=-1  max=%-5s' % (r['name'], r['mb']))
     if COV:
         print('\n【⚠️ 被遮挡】cov > 0（有元素被别的元素整个覆盖）%d 款' % len(COV))
         print('   ⇒ **必须看截图判真假**：可能是真缺陷（盘面盖住统计行），也可能是**正常浮层**（徽标/角标叠在卡片上）')
