@@ -36,7 +36,7 @@ CHECKS = [
     #   ⇒ **不要再给 `GWordle` 套 `Scroll`**；它原本的修法是「键盘给 `120vp`」。
     ('GWordle', 'KEY_H', '键盘行高常量 KEY_H（勿改回 Scroll）'),
     ('G2048', 'Bp.height - 360', '限宽'),
-    ('GBlockCount3d', 'Bp.isShort() ? 88 : 112', '格高降档'),
+    ('GBlockCount3d', 'Bp.isShort() ? 76 : 112', '题面格高降档（88→76，blk 31→0）'),
     ('GCalculationSprint', 'Bp.isShort() ? FontSize.xl : FontSize.hero', '题卡降档'),
     ('GCollatz', 'Bp.isShort() ? FontSize.xxl : FontSize.hero', '题卡降档'),
     ('GCrown', 'Bp.height - 360', '限宽'),
