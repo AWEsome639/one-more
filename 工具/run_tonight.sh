@@ -60,7 +60,12 @@ else
     pkill -f 'Emulator -start' 2>/dev/null
     sleep 5
   fi
-  "$EMU" -start onemore7 > /tmp/tonight_emu.log 2>&1 &   # ★ 2026-11-14 修：原为 `-a`（非法选项，Emulator 只认 `-start <name>`）
+  # ⛔ 2026-11-14 21:1x 发现：**模拟器冷启时会问许可协议**（`Please agree to the agreement (y/N)`），
+  #   而裸 `nohup ... -start` 没有 stdin ⇒ 读不到 `y` ⇒ 直接 `Unable to start the emulator`
+  #   ⇒ **整晚白跑**。今天我自己就踩了：第一次 `nohup` 起失败、`printf 'y\n' |` 才起来。
+  #   ⇒ 用一个固定文件喂 stdin（`$EMU` 只读到它要的那行就够，多喂无害）。
+  echo y > /tmp/yes.txt
+  "$EMU" -start onemore7 < /tmp/yes.txt > /tmp/tonight_emu.log 2>&1 &   # ★ 2026-11-14 修：原为 `-a`（非法选项，Emulator 只认 `-start <name>`）
   # ★ 2026-11-14 改：原来死等 180 秒，冷启动若更慢就整晚中止 ⇒ 改成轮询
   echo '⇒ 起模拟器后轮询等待上线（最多 600 秒，每 15 秒查一次）'
   WAITED=0
@@ -81,7 +86,8 @@ else
     pkill -f 'qemu-system-x86_64' 2>/dev/null
     pkill -f 'Emulator -start' 2>/dev/null
     sleep 5
-    "$EMU" -start onemore7 >> /tmp/tonight_emu.log 2>&1 &
+    echo y > /tmp/yes.txt   # 同 L68：重试也要喂许可协议的 `y`
+    "$EMU" -start onemore7 < /tmp/yes.txt >> /tmp/tonight_emu.log 2>&1 &
     WAITED=0
     while [ "$WAITED" -lt 300 ]; do
       sleep 15; WAITED=$((WAITED + 15))
