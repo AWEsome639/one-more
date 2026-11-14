@@ -11,7 +11,7 @@ fail() { echo "❌ 卡在第 $1 步：$2"; exit 1; }
 
 if [ "${1:-}" = '--dry' ]; then
   step 1 '补丁 dry（四处数字 + 一处结构）'
-  bash 工具/apply_fixes.sh --dry || fail 1 'apply_fixes --dry 有未命中'
+  bash 工具/apply_fixes.sh --dry || fail 1 'A 档 apply_fixes --dry 有未命中'
   python3 工具/apply_wordle_scroll.py --dry || fail 1 'wordle scroll --dry 失败'
   echo; echo '✅ dry 全过 ⇒ 可以真改'; exit 0
 fi
@@ -21,8 +21,10 @@ N=$(git status --porcelain | wc -l | tr -d ' ')
 [ "$N" = 0 ] || fail 0 "工作树不干净（$N 项）⇒ 先提交或复原"
 echo '✅ 工作树干净'
 
-step 1 '应用四处数字修复'
+step 1 '应用 A 档数字修复（Magnets / FractionMatcher）'
 bash 工具/apply_fixes.sh || fail 1 'apply_fixes 有未命中'
+# ⚠️ B 档（PercentageShopping / KakuroMini）测的是旧代码、可能已修好 ⇒ 默认不改；
+#    只有今晚数据显示它们仍不达标时，才手动加 --with-b 再跑。
 
 step 2 '应用 Wordle 套 Scroll'
 python3 工具/apply_wordle_scroll.py || fail 2 'wordle scroll 失败'
@@ -42,7 +44,7 @@ echo "$A"
 echo "$A" | grep -q '200359 / 0' || fail 5 '断言不是 200359 / 0'
 echo '✅ 断言一致'
 
-step 6 '补断言条目（5 条 CHECKS + 1 条 CASES）'
+step 6 '补断言条目（A 档 2 条 + Wordle 1 条；B 档若改了再加）'
 python3 工具/add_check_entries.py || fail 6 'add_check_entries 失败'
 
 step 7 '再跑断言（条目加了之后仍须 0）'

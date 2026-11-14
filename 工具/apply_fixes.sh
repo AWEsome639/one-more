@@ -32,10 +32,23 @@ PY
 }
 
 G=entry/src/main/ets/games
-fix "$G/GMagnets.ets"            701 'Math.max(140, Bp.height - 360)' 'Math.max(140, Bp.height - 375)' '①Magnets 盘面 -375'
-fix "$G/GFractionMatcher.ets"    335 '.padding(Space.lg)'              '.padding(Space.md)'               '②FractionMatcher 题卡 padding'
-fix "$G/GPercentageShopping.ets" 402 '.padding(Space.lg)'              '.padding(Space.md)'               '③PercentageShopping 题卡 padding'
-fix "$G/GKakuroMini.ets"         562 'Math.max(120, Bp.height - 360)' 'Math.max(120, Bp.height - 390)' '④KakuroMini 盘面 -390'
+# ★ 2026-11-14 取证时效审计后的分档：
+#   A 档（测的是当前代码 ⇒ 确认要改）：Magnets / FractionMatcher
+#   B 档（测的是旧代码 ⇒ 可能已修好，**需显式 --with-b 才改**）：PercentageShopping / KakuroMini
+#   Wordle 的 Scroll 在另一个脚本（apply_wordle_scroll.py）
+WITH_B=0
+for a in "$@"; do [ "$a" = '--with-b' ] && WITH_B=1; done
+
+fix "$G/GMagnets.ets"            701 'Math.max(140, Bp.height - 360)' 'Math.max(140, Bp.height - 375)' 'A①Magnets 盘面 -375'
+fix "$G/GFractionMatcher.ets"    335 '.padding(Space.lg)'              '.padding(Space.md)'               'A②FractionMatcher 题卡 padding'
+
+if [ "$WITH_B" = 1 ]; then
+  echo '⚠️ 已显式开启 B 档（那两款测的是旧代码、可能已修好）'
+  fix "$G/GPercentageShopping.ets" 402 '.padding(Space.lg)'              '.padding(Space.md)'               'B③PercentageShopping 题卡 padding'
+  fix "$G/GKakuroMini.ets"         562 'Math.max(120, Bp.height - 360)' 'Math.max(120, Bp.height - 390)' 'B④KakuroMini 盘面 -390'
+else
+  echo '⏭  B 档（PercentageShopping / KakuroMini）跳过 —— 它们测的是旧代码，先用今晚数据确认；确定要改再跑 --with-b'
+fi
 
 echo
 echo "==== 结果：成功 ${ok}、失败 $bad ===="
