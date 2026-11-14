@@ -319,7 +319,10 @@ export struct GBlockCount3d {
               .layoutWeight(1)
               // 2026-11-13 真机截图（blk=2/48px）：**棋盘的第三行被切掉**（整行看不到）
               //   每格 112vp × 3 行 = 336vp，加上头/统计/按钮就超了 ⇒ 矮屏降到 88
-              .height(Bp.isShort() ? 88 : 112).justifyContent(FlexAlign.End).padding(Space.xs)
+              // ★ 2026-11-14 真机：题面棋盘 3 行各 88vp ⇒ 第三行被切 31px（2/31px）；
+              //   而截图里被切的「第三行」是**题面**、不是选项（选项是 L336 那一行 Row）。
+              //   ⇒ 矮屏 88 → 76（3 行省 36vp = 108px > 31px）；高屏 112 不动。
+              .height(Bp.isShort() ? 76 : 112).justifyContent(FlexAlign.End).padding(Space.xs)
               .backgroundColor(this.theme.surface).borderRadius(Radius.xs)
             }, (c: number) => 'bc' + r + '-' + c)
           }
