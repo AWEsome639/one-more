@@ -31,19 +31,45 @@ echo "设备：$TGT"
 
 S() { "$HC" -t "$TGT" shell "$1" >/dev/null 2>&1; }
 
-# ② 先在首页（Back 几次，别按太多以免退出 App）
-for i in 1 2; do S "uitest uiInput keyEvent Back"; sleep 1; done
-sleep 1
+# ② 确认在首页 —— ⚠️ 不能盲按 Back：若已在首页，第一次 Back 就退回桌面
+if "$HC" -t "$TGT" shell "uitest dumpLayout -p /data/local/tmp/home.json && cat /data/local/tmp/home.json" 2>/dev/null | grep -q "One More"; then
+  echo "已在首页"
+else
+  for i in 1 2; do S "uitest uiInput keyEvent Back"; sleep 1; done
+  sleep 1
+fi
 
-# ③ 点搜索框 → 点输入区 → 打字（坐标取自 shot_game.py:592-593）
+# ③ 清残留词：✕ 只在搜索框有内容时出现（照 shot_game.py:623-627 —— 不清会把新词拼到旧词后）
+"$HC" -t "$TGT" shell "uitest dumpLayout -p /data/local/tmp/q.json && cat /data/local/tmp/q.json" 2>/dev/null > /tmp/_q.json
+python3 - <<'PYX' > /tmp/_x.txt 2>/dev/null || true
+import json,re
+try:
+    d=json.load(open('/tmp/_q.json',encoding='utf-8'))
+except Exception:
+    raise SystemExit
+def w(n):
+    a=n.get('attributes',{}) or {}
+    if (a.get('text') or '').strip()=='✕':
+        m=re.findall(r'-?\d+', a.get('bounds') or '')
+        if len(m)>=4: print('%d %d'%((int(m[0])+int(m[2]))//2,(int(m[1])+int(m[3]))//2))
+    for c in (n.get('children') or []): w(c)
+w(d)
+PYX
+if [ -s /tmp/_x.txt ]; then echo "清空搜索框: $(cat /tmp/_x.txt)"; S "uitest uiInput click $(cat /tmp/_x.txt)"; sleep 1; fi
+
+# ④ 点搜索框 → 点输入区 → 打字（坐标取自 shot_game.py:628 / :630）
 S "uitest uiInput click 2276 264"; sleep 1
 S "uitest uiInput click 1280 435"; sleep 1
 S "uinput -K -t '$WORD'"; sleep 3
 
 # ④ dump 回来
-"$HC" -t "$TGT" shell "uitest dumpLayout -p /data/local/tmp/probe.json" >/dev/null 2>&1
-"$HC" -t "$TGT" file recv /data/local/tmp/probe.json "$OUT" >/dev/null 2>&1
-if [ ! -s "$OUT" ]; then echo "❌ dump 没拿到"; exit 1; fi
+# ⚠️ 必须**先清两端的旧文件**：否则 dump 失败时 recv 会拿到上次的远端文件，
+#    而 `-s` 只能证明「非空」，不能证明「是这次的」⇒ 会分析旧数据。
+[ -n "$TGT" ] && S "rm -f /data/local/tmp/probe.json"
+rm -f "$OUT"
+"$HC" -t "$TGT" shell "uitest dumpLayout -p /data/local/tmp/probe.json" >/dev/null 2>&1 || { echo "❌ dumpLayout 失败"; exit 1; }
+"$HC" -t "$TGT" file recv /data/local/tmp/probe.json "$OUT" >/dev/null 2>&1 || { echo "❌ file recv 失败（远端文件可能没生成）"; exit 1; }
+if [ ! -s "$OUT" ]; then echo "❌ dump 没拿到（本地为空）"; exit 1; fi
 echo "dump: $OUT（$(wc -c < "$OUT" | tr -d ' ') 字节）"
 
 # ⑤ 分析
@@ -64,7 +90,8 @@ def walk(n, dep=0):
     if bb:
         w, h = bb[2]-bb[0], bb[3]-bb[1]
         if w > 800 and h > 300: biggest.append((w*h, dep, t[:24], a.get('bounds')))
-    if t and (word in t or any(ch in t for ch in word[:2] if ch.strip())):
+    # 命中判定收窄：整串命中，或前两字作为**连续子串**出现（原来逐字 any ⇒ 含「时」或「序」的节点全进）
+    if t and (word in t or (len(word) >= 2 and word[:2] in t)):
         hits.append((dep, t, a.get('bounds'), bb))
     for c in (n.get('children') or []):
         walk(c, dep+1)
@@ -80,6 +107,9 @@ print('\n=== ② 判读 ===')
 exact = [h for h in hits if h[1] == word]
 if exact:
     for dep, t, b, bb in exact:
+        if not bb:
+            print("  ⚠️ 整串命中但 bounds 解析失败（原串 %r）⇒ 无法判断位置" % b)
+            continue
         y1 = bb[1]
         w = bb[2]-bb[0]
         if y1 <= 560: print("  ⚠️ 整串命中但 y1=%d ≤ 560 ⇒ **L620 的 y 窗口把它滤掉了**（主因）" % y1)
