@@ -14,7 +14,8 @@
 ## 数据从哪来
 
 `shot_game.py` 现在输出 `board=WxH@x,y`（最大方形块的宽×高，`px`）。
-配合同一行的 `max=N`（最底叶子的 `y2`，`px`）：
+配合**第 4 列** `max_bottom`（最低内容像素的 `y2`，`px`）——
+⚠️ **不要**用说明里的 `max=N`：那是「`depth≤4` 布局块的越界量」，语义不同（判据 2024）：
 ```
 FIXED_px = max_px − board_H_px
 FIXED_vp = FIXED_px / 3        # 2560x1600@480 ⇒ 3px = 1vp
@@ -69,10 +70,13 @@ def opt_mode(margin):
         f = ln.rstrip('\n').split('\t')
         if len(f) < 4:
             continue
+        # ★ 2026-11-14（判据 2024）：**必须用第 4 列的 `max_bottom`，不能用说明里的 `max=`**
+        #   实测 `303` 行里 `max=` 与第 4 列**从不相等** —— 因为 `max=` 是
+        #   「depth≤4 的布局块越界量(px)」，而第 4 列是「最低内容像素的 y2」。
+        #   语义完全不同：`max=` 回答「越了多少」，第 4 列回答「内容到哪」。
         m = re.search(r'board=(\d+)x(\d+)@', ln)
-        mx = re.search(r'max=(\d+)', ln)
-        if m and mx:
-            last[f[1]] = (int(m.group(2)) / 3.0, int(mx.group(1)) / 3.0, f[0][:16])
+        if m and f[3].isdigit():
+            last[f[1]] = (int(m.group(2)) / 3.0, int(f[3]) / 3.0, f[0][:16])
 
     if not last:
         print('⚠️ 台账里还没有带 `board=` 的测量 ⇒ 今晚跑完再来。')
@@ -217,10 +221,11 @@ def main():
         f = ln.rstrip('\n').split('\t')
         if len(f) < 4:
             continue
+        # ★ 判据 2024：用**第 4 列** `max_bottom`（最低内容像素的 y2），
+        #   不用说明里的 `max=`（那是 depth≤4 布局块的**越界量**，语义完全不同）。
         m = re.search(r'board=(\d+)x(\d+)@', ln)
-        mx = re.search(r'max=(\d+)', ln)
-        if m and mx:
-            last[f[1]] = (f[0][:10], int(m.group(1)), int(m.group(2)), int(mx.group(1)))
+        if m and f[3].isdigit():
+            last[f[1]] = (f[0][:10], int(m.group(1)), int(m.group(2)), int(f[3]))
 
     if not last:
         print('== 逐款 FIXED 审计 ==')
