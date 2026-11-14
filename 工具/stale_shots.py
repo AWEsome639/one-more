@@ -34,12 +34,18 @@ def last_commit(path):
 
 # 每款取最后一次成功测量的截图
 shots = {}
+SUCCESS = ('OK', 'TIGHT', 'OVER', 'NEAR')
 for ln in io.open(TSV, encoding='utf-8'):
     c = ln.rstrip('\n').split('\t')
-    if len(c) > 4 and c[2] in ('OK', 'TIGHT', 'OVER', 'NEAR') and '->' in c[4]:
+    # ★ 2026-11-14 修（判据 2006/2009）：**只取成功行**。
+    #   原来不看 outcome ⇒ `NO_CARD`/`NOT_HOME` 这类失败行也带截图（那是失败现场图），
+    #   于是 `Word Ladder` 被判成「图有效 01:25」，而它最后一次**成功**测量是 11-13 03:03。
+    if len(c) > 4 and c[2] in SUCCESS and '->' in c[4]:
         p = c[4].split('->')[-1].strip().split(' @')[0].strip()
         if p.startswith('/') and os.path.exists(p):
-            shots.setdefault(c[1], p)
+            # ★ 2026-11-14 修：必须保留**最新**成功行（原来 setdefault 保留的是第一条=最旧）
+            #   ⇒ 会让「过期」数偏大（拿最旧的图去比代码时刻）。
+            shots[c[1]] = p
 
 stale, ok, unknown = [], [], []
 for g, p in shots.items():
