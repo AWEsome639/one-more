@@ -150,6 +150,42 @@ def texts(tree, pred=lambda t: True):
     return out
 
 
+def biggest_square(tree):
+    """**找出最大的「近似方形」节点**（2026-11-14，判据 2002）。
+
+    为什么需要：修方阵溢出时，唯一正确的做法是按**每款真实的 `FIXED`**（头部+底部）
+    算盘面上限。而 `FIXED = max_px − 盘面_px`，**盘面_px 就是这里要找的方形块的高**。
+
+    ⇒ 每款测一次就能算出它自己的 `FIXED`，不必再靠「全局 `-360`」这种近似
+      （实测 `FIXED` 跨款方差 `211~350vp`，±33% ⇒ 全局常量本身就是错的）。
+
+    判据：宽高比 `0.8~1.25` 且面积最大；找不到返回 `None`。
+    """
+    try:
+        best = None
+        def walk(n):
+            nonlocal best
+            if not isinstance(n, dict):
+                return
+            a = n.get('attributes', {}) or {}
+            b = (a.get('bounds') or '').strip()
+            nums = [int(x) for x in re.findall(r'-?\d+', b)] if b else []
+            if len(nums) == 4:
+                w, h = nums[2] - nums[0], nums[3] - nums[1]
+                if w >= 120 and h >= 120:
+                    r = w / h if h else 0
+                    if 0.8 <= r <= 1.25:
+                        area = w * h
+                        if best is None or area > best[0]:
+                            best = (area, w, h, nums)
+            for c in (n.get('children') or []):
+                walk(c)
+        walk(tree)
+        return best
+    except Exception:
+        return None
+
+
 def covered_count(items):
     """**被别的元素整个盖住的文字节点数**（2026-11-14 新增，判据 2001）。
 
@@ -644,6 +680,13 @@ def _body(name, t0):
     # ★ 2026-11-10（判据 1889）：结果行带测量时间戳，否则「按文件 mtime 取最新」会被拷贝污染
     import datetime as _dt
     _ts = _dt.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    # 2026-11-14（判据 2002）：**最大方形块的边长（px）** —— `FIXED = max − board`
+    try:
+        _sq = biggest_square(d2)
+        _board = ('%dx%d@%d,%d' % (_sq[1], _sq[2], _sq[3][0], _sq[3][1])) if _sq else '-'
+    except Exception:
+        _board = '-'
+
     # 2026-11-14（判据 2001）：**被遮挡文字节点数** —— 抓「内容太高把上方元素盖住」那一类
     try:
         _cov = covered_count(texts(d2))
@@ -652,7 +695,7 @@ def _body(name, t0):
 
     if recv_ok:
         finish(name, 'OK', t0, mb,
-               'lowest=%r %s blk=%d/%dpx cov=%d max=%d -> %s @%s' % (lo, lo_bounds, block_over_n, _cov, block_over_max, out, _ts))
+               'lowest=%r %s blk=%d/%dpx cov=%d board=%s max=%d -> %s @%s' % (lo, lo_bounds, block_over_n, _cov, _board, block_over_max, out, _ts))
     else:
         finish(name, 'OK_NOSHOT', t0, mb,
                'lowest=%r %s recv failed @%s' % (lo, lo_bounds, _ts))
