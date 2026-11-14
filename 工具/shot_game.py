@@ -256,7 +256,13 @@ def covered_count_tree(tree):
                 descendant.setdefault(a, set()).add(idx)
 
         covers = 0
+        # ★ 2026-11-14（判据 2007）：**时间护栏** —— 这个算法是 `O(n²)`，
+        #   而真实 dump 的节点数未知（可能上千）。若某个 dump 特别大，
+        #   `260s` 的单款预算会被这一项吃光 ⇒ **宁可返回 -1（如实失败）也不要拖住整轮**。
+        _t0 = time.time()
         for i, t, r1, anc1 in flat:
+            if time.time() - _t0 > 3.0:
+                return -1        # 超时就报「测不出来」，不报假数
             if t is None or not str(t).strip():
                 continue
             x1, y1, x2, y2 = r1
