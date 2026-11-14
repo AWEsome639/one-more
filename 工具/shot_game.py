@@ -629,7 +629,10 @@ def _body(name, t0):
         time.sleep(1.2)
         sh('uitest uiInput click 1280 435')
         time.sleep(0.8)
-        sh("uinput -K -t '%s'" % tok)
+        # ★ 2026-11-14 白天实测：`uinput -K -t` **打不进中文**（IME 层）⇒ 像 `磁铁`/`分数匹配`
+        #   这类纯中文名搜索永远不过滤 ⇒ 卡片不在首屏 ⇒ `NO_CARD`。
+        #   而 `uitest uiInput inputText <x> <y> <text>` 能打中文（实测「磁铁」⇒ 过滤成「1 款」）。
+        sh("uitest uiInput inputText 1280 435 '%s'" % tok)
         time.sleep(2.4)
         d = dump('r')
         if not d:
