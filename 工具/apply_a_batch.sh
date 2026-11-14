@@ -19,13 +19,24 @@
 set -u
 cd "/Users/a0000/dev/One More" || exit 1
 DRY=0; ONLY=''
-for a in "$@"; do
-  case "$a" in
-    --dry) DRY=1 ;;
-    --only) shift; ONLY="${1:-}" ;;
-    *) [ -z "$ONLY" ] && [ "${a#--}" = "$a" ] && ONLY="$a" ;;
+# ★ 2026-11-14 修：原来用 `for a in "$@"` + 内部 `shift`，参数顺序为 `--dry --only X` 时
+#   `$1` 已被 shift 掉前一个参数、取到的是 `--only` 本身 ⇒ ONLY="--only" ⇒ 没有任何一款匹配
+#   ⇒ 报「成功 0、跳过 N」但退出码 0 ⇒ **静默什么都不做**（与 BASELINE='' 同类的问题）。
+#   改用 while + shift 逐个消费，并对「--only 缺值」直接报错。
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry) DRY=1; shift ;;
+    --only)
+      shift
+      ONLY="${1:-}"
+      if [ -z "$ONLY" ] || [ "${ONLY#--}" != "$ONLY" ]; then
+        echo "❌ --only 后面要跟游戏名（如 --only 2048）"; exit 2
+      fi
+      shift ;;
+    *) echo "❌ 未知参数：$1（支持 --dry / --only <游戏>）"; exit 2 ;;
   esac
 done
+
 
 # 游戏|文件|行号|旧串|新串   （10 款，按权威清单；行号与旧串都已核实）
 SPEC='
@@ -40,6 +51,12 @@ Schulte|GSchulte.ets|341|Math.max(240, Bp.height - 360)|Math.max(200, Bp.height 
 Shikaku|GShikaku.ets|777|Math.max(240, Bp.height - 360)|Math.max(200, Bp.height - 360)
 Skyscrapers|GSkyscrapers.ets|749|Math.max(240, Bp.height - 360)|Math.max(200, Bp.height - 360)
 '
+
+# ★ 校验 --only 的名字确实在清单里，避免拼错后静默跳过全部
+if [ -n "$ONLY" ]; then
+  # 名字在每行**行首**（`2048|G2048.ets|…`）⇒ 模式要允许「行首」或「前面的 |」
+  echo "$SPEC" | grep -qE "(^|\|)${ONLY}\|" || { echo "❌ --only ${ONLY} 不在 A 批 10 款里"; exit 2; }
+fi
 
 ok=0; bad=0; skip=0
 while IFS='|' read -r name file ln old new; do
