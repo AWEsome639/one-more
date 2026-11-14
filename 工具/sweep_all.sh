@@ -129,6 +129,10 @@ if [ "${1:-}" = "--dry" ]; then
 fi
 
 
+# ★ 2026-11-14：**记下开跑时日志的行号** —— 收工时只统计这一轮新增的行
+LOG_START=$(wc -l < "$LOG" 2>/dev/null | tr -d ' ')
+[ -z "$LOG_START" ] && LOG_START=0
+
 for round in $(seq 1 24); do
   n=$(wc -l < "$TODO" | tr -d ' ')
   if [ "$n" -eq 0 ]; then say "全部完成"; break; fi
@@ -145,4 +149,14 @@ for round in $(seq 1 24); do
   if [ "$hm" -ge 645 ]; then say "到 06:45，收工"; break; fi
 done
 
+# ★ 2026-11-14：**收工统计** —— 明早一句话就知道这一轮跑了多少、成多少
+TOTAL=$(wc -l < "$TODO" 2>/dev/null | tr -d ' ')
+NEW=$(tail -n +$((LOG_START+1)) "$LOG" 2>/dev/null)
+OKN=$(printf '%s\n' "$NEW" | grep -cE '\t(OK|TIGHT|OVER|NEAR)\t' || echo 0)
+BAD=$(printf '%s\n' "$NEW" | grep -cE '\t(NO_CARD|NOT_HOME|DUMP_FAIL|TIMEOUT|WRONG_GAME)\t' || echo 0)
+say "──── 收工统计 ────"
+say "本轮跑到: $(date '+%H:%M')   剩下未测: ${TOTAL:-?} 款"
+say "有效: $OKN 款   环境失败: $BAD 款   （合计 $((OKN+BAD)) 款）"
+say "明细: $LOG"
+say "下一步: python3 工具/triage.py  看五档；python3 工具/fixed_audit.py 算逐款 X"
 say "sweep_all 结束"
