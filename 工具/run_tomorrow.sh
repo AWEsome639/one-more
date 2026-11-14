@@ -58,5 +58,10 @@ echo '✅ 仍一致'
 step 8 '收尾'
 HAP=entry/build/default/outputs/default/entry-default-signed.hap
 [ -f "$HAP" ] && echo "HAP: $(ls -l "$HAP" | awk '{print $5}') 字节（与改前比应变化）"
+echo
+echo "⚠️⚠️ 还有一款需**手工**处理：Pythagorean Triple Builder（图确认底部行 ⌫/0/确认 被屏底截断）"
+echo "   ⇒ 改法：缩上方（题干卡/数字区）或去掉致溢出的下限；**不要**用四处 46→40（会让键更小）"
+echo "   ⇒ 改完后单测：python3 工具/shot_game.py \"Pythagorean Triple Builder\" ⇒ 看 lowest 里 确认 是否完整"
+echo
 echo '⇒ 接下来：git add + commit + push（push 后 ls-remote 验真同步）'
 echo '⇒ 然后装包、只测 Magnets 一处、看图确认机制通 → 再测其余四款'
