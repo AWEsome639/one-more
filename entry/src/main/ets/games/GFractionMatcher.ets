@@ -290,91 +290,89 @@ export struct GFractionMatcher {
   }
 
   build() {
-    Scroll() {
-      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
-        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-        HintBar({
-          showHint: true,
-          onHintTap: () => { this.askHint(); },
-    onAutoTap: () => { this.askAuto(); },
-          demoOn: false,
-          disabled: this.demoId >= 0,
-          autoOn: this.autoId >= 0
-        })
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
+        demoOn: false,
+        disabled: this.demoId >= 0,
+        autoOn: this.autoId >= 0
+      })
+      Row({ space: Space.sm }) {
+        Column({ space: 2 }) {
+        Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
+        Text((this.right + '/' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        Column({ space: 2 }) {
+        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
+        // ★ 得分跳动
+        .scale({ x: this.scorePulse, y: this.scorePulse })
+        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+      }.width('100%')
+      Column({ space: Space.xs }) {
+        // 2026-11-13 真机截图（lowest='B' 在 1600）：**选项 B 被切** ⇒ 按判据 1886 缩**上方**的题卡
+        Text('½').fontSize(Bp.isShort() ? FontSize.lg : FontSize.xxl)
         Row({ space: Space.sm }) {
           Column({ space: 2 }) {
-          Text((TG('题号'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
-          Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-          }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-          Column({ space: 2 }) {
-          Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-          Text((this.right + '/' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-          }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-          Column({ space: 2 }) {
-          Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
-          Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
-          // ★ 得分跳动
-          .scale({ x: this.scorePulse, y: this.scorePulse })
-          .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-          }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        }.width('100%')
-        Column({ space: Space.xs }) {
-          // 2026-11-13 真机截图（lowest='B' 在 1600）：**选项 B 被切** ⇒ 按判据 1886 缩**上方**的题卡
-          Text('½').fontSize(Bp.isShort() ? FontSize.lg : FontSize.xxl)
+            Text(Digits(String(this.a), this.langCode)).fontSize(Bp.isShort() ? FontSize.xxl : FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
+            Row().width(48).height(2).backgroundColor(this.theme.lineSoft)
+            Text(Digits(String(this.b), this.langCode)).fontSize(Bp.isShort() ? FontSize.xxl : FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
+          }.alignItems(HorizontalAlign.Center)
+          Text('= ?')          // ★ 2026-11-03（第 1119 轮）**装饰性元素从无障碍树摘掉**
+          //   「= ?」是题目版式的一部分（题目本身由 q 表达），
+          //   读屏念「等于问号」只是噪音 ⇒ accessibilityLevel('no')
+          .accessibilityLevel('no')
+          .fontSize(FontSize.xl).fontColor(this.theme.inkFaint)
+        }.alignItems(VerticalAlign.Center)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      Text(this.msg).fontSize(FontSize.sm).width('100%')
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+      // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
+      Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
+        .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
+        .width('100%').textAlign(TextAlign.Center)
+      Column({ space: Space.sm }) {
+        ForEach(this.slots, (i: number) => {
           Row({ space: Space.sm }) {
-            Column({ space: 2 }) {
-              Text(Digits(String(this.a), this.langCode)).fontSize(Bp.isShort() ? FontSize.xxl : FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
-              Row().width(48).height(2).backgroundColor(this.theme.lineSoft)
-              Text(Digits(String(this.b), this.langCode)).fontSize(Bp.isShort() ? FontSize.xxl : FontSize.xxxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
-            }.alignItems(HorizontalAlign.Center)
-            Text('= ?')          // ★ 2026-11-03（第 1119 轮）**装饰性元素从无障碍树摘掉**
-            //   「= ?」是题目版式的一部分（题目本身由 q 表达），
-            //   读屏念「等于问号」只是噪音 ⇒ accessibilityLevel('no')
-            .accessibilityLevel('no')
-            .fontSize(FontSize.xl).fontColor(this.theme.inkFaint)
-          }.alignItems(VerticalAlign.Center)
-        }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
-        Text(this.msg).fontSize(FontSize.sm).width('100%')
-          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-        // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
-        Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
-          .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
-          .width('100%').textAlign(TextAlign.Center)
-        Column({ space: Space.sm }) {
-          ForEach(this.slots, (i: number) => {
-            Row({ space: Space.sm }) {
-              Text(LETTERS[i]).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
-              Text(this.opts[i]).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
-            }.width('100%').height(Cell.of(48)).padding({ left: Space.md, right: Space.md })
-            .backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card)
-            .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L306'; })
-            .onBlur(() => { if (this.tvFocus === 'L306') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L306')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); }).onClick(() => { Haptics.tick(); this.pick(i); })
-            // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
-            .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
-              .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
-          }, (i: number) => 'fmat' + i + '_' + this.opts[i])
-        }.width('100%')
-        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
-        // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
-        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
-        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
-          .backgroundColor(this.over && !this.won ? Palette.rose : Palette.emerald)
-          .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L326'; })
-          .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L326')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
-        Text(TG('提示：分子分母同乘（同除）一个非零数，分数的值不变'))
-          // ★ 2026-11-12（判据 1950）：纯说明行，矮屏隐藏腾 ~17vp
-          .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
-      }
-      .onTouch((e: TouchEvent) => {
-        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-      }).width('100%').height('100%').justifyContent(FlexAlign.Start)
+            Text(LETTERS[i]).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
+            Text(this.opts[i]).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
+          }.width('100%').height(Cell.of(48)).padding({ left: Space.md, right: Space.md })
+          .backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card)
+          .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L306'; })
+          .onBlur(() => { if (this.tvFocus === 'L306') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L306')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); }).onClick(() => { Haptics.tick(); this.pick(i); })
+          // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
+          .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
+            .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
+        }, (i: number) => 'fmat' + i + '_' + this.opts[i])
+      }.width('100%')
+      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
+      // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White)
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.emerald)
+        .borderRadius(Radius.md).width('100%').height(Cell.of(46)).focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L326'; })
+        .onBlur(() => { if (this.tvFocus === 'L326') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L326')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
+      Text(TG('提示：分子分母同乘（同除）一个非零数，分数的值不变'))
+        // ★ 2026-11-12（判据 1950）：纯说明行，矮屏隐藏腾 ~17vp
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 
 

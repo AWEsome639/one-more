@@ -459,94 +459,92 @@ export struct GWordle {
   }
 
   build() {
-    Scroll() {
-      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
-        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-        HintBar({
-          showHint: true,
-          onHintTap: () => { this.askHint(); },
-          onAutoTap: () => { this.askAuto(); },
-          demoOn: false,
-          disabled: this.demoId >= 0,
-          autoOn: this.autoId >= 0
-        })
-        Row({ space: Space.sm }) {
-          this.infoBox(0)
-          this.infoBox(1)
-          this.infoBox(2)
-        }
-        .width('100%')
-
-        Column({ space: GAP }) {
-          ForEach([0, 1, 2, 3, 4], (r: number) => {
-            Row({ space: GAP }) {
-              ForEach([0, 1, 2, 3, 4], (c: number) => {
-                this.tileView(r, c)
-              // fix20261112: inner ForEach key was 'c'+c, identical across all 5 rows -> duplicate keys
-              }, (c: number) => 'c' + r + '-' + c)
-            }
-            .width('100%')
-          }, (r: number) => 'r' + r)
-        }
-              // 2026-11-13 第二档：键盘在 1518..1600 只露上半截 ⇒ 棋盘再收 40px（220 → 185）
-        .width(Bp.isShort() ? 120 : 614)
-
-        Column({ space: Space.xs }) {
-          ForEach(KEY_CHARS, (row: string[], ri: number) => {
-            Row({ space: Space.xs }) {
-              ForEach(row, (ch: string) => {
-                this.keyView(ch)
-              // diag20261113 FIX: key 生成器原来引用外层 `ri` —— ArkUI 在 diff 阶段调用它时
-              //   外层变量可能尚未绑定 ⇒ 内层 items 被静默跳过（日志证明 charsOf 正常返回 10/9/9）。
-              //   ⇒ key 只用内层 `ch`（同一行内字母不重复）。
-              }, (ch: string) => 'k' + ri + '-' + ch)
-            }
-            .width('100%')
-            .justifyContent(FlexAlign.Center)
-          }, (row: string, ri: number) => 'row' + ri)
-        }
-        .width('100%')
-
-        Row({ space: Space.md }) {
-                  Button(TG('换一题'))
-        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-            .fontSize(FontSize.md)
-            .fontColor(Color.White)
-            .backgroundColor(Palette.primary)
-            .borderRadius(Radius.md)
-            .layoutWeight(1)
-            .height(KEY_H)
-            .onClick(() => {
-              Haptics.tap();
-              this.reset();
-            })
-            .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L443'; })
-            .onBlur(() => { if (this.tvFocus === 'L443') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L443'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-          Text(this.status)
-            .fontSize(FontSize.xs)
-            .fontColor(this.over ? Palette.emerald : this.theme.inkSoft)
-            .layoutWeight(2)
-            .textAlign(TextAlign.End)
-        }
-        .width('100%')
-
-        Text(TG('提示：5 个字母的常用英文单词；重复字母会按剩余次数判定'))
-          .fontSize(FontSize.xxs)
-          .fontColor(this.theme.inkFaint)
-          .width('100%')
-      }
-      .onTouch((e: TouchEvent) => {
-        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
+      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      HintBar({
+        showHint: true,
+        onHintTap: () => { this.askHint(); },
+        onAutoTap: () => { this.askAuto(); },
+        demoOn: false,
+        disabled: this.demoId >= 0,
+        autoOn: this.autoId >= 0
       })
+      Row({ space: Space.sm }) {
+        this.infoBox(0)
+        this.infoBox(1)
+        this.infoBox(2)
+      }
       .width('100%')
-      // .height('100%')  ← 2026-11-14：套 Scroll 后不能用 100%（内容高=视口高⇒滚不动），判据见 _巡检记录
-      .justifyContent(FlexAlign.Start)
+
+      Column({ space: GAP }) {
+        ForEach([0, 1, 2, 3, 4], (r: number) => {
+          Row({ space: GAP }) {
+            ForEach([0, 1, 2, 3, 4], (c: number) => {
+              this.tileView(r, c)
+            // fix20261112: inner ForEach key was 'c'+c, identical across all 5 rows -> duplicate keys
+            }, (c: number) => 'c' + r + '-' + c)
+          }
+          .width('100%')
+        }, (r: number) => 'r' + r)
+      }
+            // 2026-11-13 第二档：键盘在 1518..1600 只露上半截 ⇒ 棋盘再收 40px（220 → 185）
+      .width(Bp.isShort() ? 120 : 614)
+
+      Column({ space: Space.xs }) {
+        ForEach(KEY_CHARS, (row: string[], ri: number) => {
+          Row({ space: Space.xs }) {
+            ForEach(row, (ch: string) => {
+              this.keyView(ch)
+            // diag20261113 FIX: key 生成器原来引用外层 `ri` —— ArkUI 在 diff 阶段调用它时
+            //   外层变量可能尚未绑定 ⇒ 内层 items 被静默跳过（日志证明 charsOf 正常返回 10/9/9）。
+            //   ⇒ key 只用内层 `ch`（同一行内字母不重复）。
+            }, (ch: string) => 'k' + ri + '-' + ch)
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.Center)
+        }, (row: string, ri: number) => 'row' + ri)
+      }
+      .width('100%')
+
+      Row({ space: Space.md }) {
+                Button(TG('换一题'))
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+          .fontSize(FontSize.md)
+          .fontColor(Color.White)
+          .backgroundColor(Palette.primary)
+          .borderRadius(Radius.md)
+          .layoutWeight(1)
+          .height(KEY_H)
+          .onClick(() => {
+            Haptics.tap();
+            this.reset();
+          })
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L443'; })
+          .onBlur(() => { if (this.tvFocus === 'L443') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L443'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+        Text(this.status)
+          .fontSize(FontSize.xs)
+          .fontColor(this.over ? Palette.emerald : this.theme.inkSoft)
+          .layoutWeight(2)
+          .textAlign(TextAlign.End)
+      }
+      .width('100%')
+
+      Text(TG('提示：5 个字母的常用英文单词；重复字母会按剩余次数判定'))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+        .width('100%')
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    })
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
   }
 
   /** kind: 0=次数 1=已用 2=用时 */
