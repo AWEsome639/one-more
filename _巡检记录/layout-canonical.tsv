@@ -577,3 +577,9 @@
 2026-11-14T06:41:12	Unit Converter Pro	OK	1558	102.7s lowest='提示：长度 10 进、数据 1024 进、时间 60' [60,1516][2500,1558] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Unit_Converter_Pro-064111.jpeg @2026-11-14T06:41:12
 2026-11-14T06:42:54	Vector Dot Product	OK	1374	101.9s lowest='51' [60,1242][1265,1374] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Vector_Dot_Product-064253.jpeg @2026-11-14T06:42:54
 2026-11-14T06:44:36	Vector Grid Alignment	OK	1592	102.5s lowest='按方向键，把 🧭 走到 🎯' [60,1543][2500,1592] blk=0/0px max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Vector_Grid_Alignment-064436.jpeg @2026-11-14T06:44:36
+2026-11-14T15:24:36	Magnets	NO_CARD	-	143.8s no card for '磁铁' (fallback=(1280, 757))
+2026-11-14T15:27:28	Fraction Matcher	NO_CARD	-	172.4s no card for '分数匹配' (fallback=(1280, 757))
+2026-11-14T15:34:22	Connect Four	NO_CARD	-	168.4s no card for '四子棋' (fallback=(1280, 757))
+2026-11-14T15:36:32	Connect Four	NO_CARD	-	64.2s no card for '四子棋' (fallback=(347, 828))
+2026-11-14T15:39:31	Bejeweled	OK	1351	62.2s lowest='💧' [948,1329][1027,1351] blk=0/0px cov=5 board=700x625@930,726 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-153930.jpeg @2026-11-14T15:39:31
+2026-11-14T15:42:11	Connect Four	NO_CARD	-	63.5s no card for '四子棋' (fallback=(347, 828))
