@@ -65,10 +65,15 @@ def parse_board(ex):
 
 
 def parse_lowest(ex):
+    """返回 (文字, x1, y1, x2, y2)。
+
+    ⚠️ 判据 2306：x2−x1 很大时，bounds 是**一整行**而不是单个元素
+    ⇒ 此时的「可见高度」只说明那一行露了多少，不说明行内每个元素露了多少。
+    """
     m = re.search(r"lowest='([^']*)'\s*\[\s*(-?\d+),(-?\d+)\]\[\s*(-?\d+),(-?\d+)\]", ex)
     if not m:
         return None
-    return m.group(1), int(m.group(3)), int(m.group(5))
+    return m.group(1), int(m.group(2)), int(m.group(3)), int(m.group(4)), int(m.group(5))
 
 
 def main():
@@ -110,16 +115,19 @@ def main():
 
     print()
     print('== ③ 文字到边且可见高度 < 20px ==')
+    print('   ⚠️ 「宽度」列很大 ⇒ bounds 是**一整行**（判据 2306），可见高度是行的不是元素的')
     hit = False
     for g, (_ts, _oc, ex) in sorted(rows.items()):
         lo = parse_lowest(ex)
         if not lo:
             continue
-        txt, y1, y2 = lo
+        txt, x1, y1, x2, y2 = lo
         vis = SCREEN_H - y1 if y1 < SCREEN_H else 0
         if y2 >= SCREEN_H and vis < 20:
             hit = True
-            print('  ⚠️ %-26s lowest=%r y1=%d 可见 %dpx' % (g, txt[:10], y1, vis))
+            wid = x2 - x1
+            flag = ' ← 整行' if wid > 1000 else ''
+            print('  ⚠️ %-26s %-12r 可见 %3dpx  宽度 %4dpx%s' % (g, txt[:10], vis, wid, flag))
     if not hit:
         print('  ✅ 没有')
 
