@@ -396,7 +396,15 @@ def verify_title(tree, en_name):
     # ★ 2026-11-13（判据 1999）：App 能切语言 ⇒ 首页/游戏内标记必须**中英双语**
     on_home = ('今天这一局' in joined or 'Today' in joined) or \
               (('全部' in joined or 'All' in joined) and '🎯' in joined)
-    in_game = ('AI 代打' in joined or 'AI Play' in joined) or ('提示' in joined or 'Hint' in joined)
+    # ★ 2026-11-14：**`in_game` 不能只认「提示/`AI 代打`」** ——
+    #   它们是 `HintBar`/`DemoBar` 上的文字，而 `uitest dumpLayout` **只报可见节点**；
+    #   一旦给游戏套了 `Scroll`，`HintBar` 会被滚出视野 ⇒ `in_game=False` ⇒ 误判 `WRONG_GAME`
+    #   （今天的 `Matrix Reasoning` 就是这样：失败备注里标题明明在前 6 个文本里）。
+    #   ⇒ 补一条「返回箭头 `‹` + 标题都在」的判据：这两个在游戏内稳定、且不会被滚走。
+    #   夹具验证：`['‹','矩阵推理',...,'☆','?','普通']` 由 False 变 True；
+    #             首页 `['全部','🎯','355 款小游戏']` 仍 False；别的游戏仍 False。
+    in_game = ('AI 代打' in joined or 'AI Play' in joined) or ('提示' in joined or 'Hint' in joined) \
+              or ('‹' in joined and bool(want) and want in joined)
     if on_home or not in_game:
         return False, want
     return (want in joined), want
