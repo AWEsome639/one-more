@@ -14,13 +14,19 @@ PRESENT = '工具/verify_changes_present.py'
 CHANGED = '工具/verify_changed.sh'
 
 # (文件, 断言片段, 说明) —— 第一项.ets 文件名不带扩展名
+# ★ 与 apply_fixes.sh 的 A/B 分档保持一致：
+#   A 档（默认会改）⇒ 必加断言；B 档（要 --with-b 才改）⇒ 只有改了才加，否则断言会找不到片段而失败。
+WITH_B = '--with-b' in sys.argv
 NEW = [
-    ('GMagnets',            'Bp.height - 375',                                            '①盘面 173→158vp'),
-    ('GFractionMatcher',    ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", '②题卡 padding lg→md'),
-    ('GPercentageShopping', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", '③题卡 padding lg→md'),
-    ('GKakuroMini',         'Bp.height - 390',                                            '④盘面 173→143vp'),
-    ('GWordle',             'Scroll()',                                                   '⑤套 Scroll 兜底'),
+    ('GMagnets',         'Bp.height - 375',                                            'A①盘面 173→158vp'),
+    ('GFractionMatcher', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'A②题卡 padding lg→md'),
+    ('GWordle',          'Scroll()',                                                   'A③套 Scroll 兜底'),
 ]
+if WITH_B:
+    NEW += [
+        ('GPercentageShopping', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'B③题卡 padding lg→md'),
+        ('GKakuroMini',         'Bp.height - 390',                                            'B④盘面 173→143vp'),
+    ]
 # CASES 用「游戏显示名|描述|改前」
 NEW_CASES = [
     ('Magnets',              '盘面 173→158vp（线索格露出 6%→74%）',      '15vp'),
