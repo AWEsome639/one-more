@@ -27,16 +27,22 @@ def parse(since=None):
             continue
         mb = f[3] if len(f) > 3 else '-'
         blk = 0
+        # ★ 2026-11-14（判据 2003）：**必须区分「blk=0」与「没有 blk 数据」**
+        #   旧行（11-12/11-13 测的）没有 `blk=` 字段 ⇒ 原来一律默认 0
+        #   ⇒ 那 6 款被算进 D 档「看起来干净」，实际**根本没量过溢出**。
+        #   ⇒ 缺数据 ≠ 干净；这类必须重测。
+        has_blk = False
         m = re.search(r'blk=(\d+)/(\d+)px', ln)
         # 2026-11-14（判据 2001）：**被遮挡文字节点数** —— 抓「内容太高把上方元素盖住」
         cm = re.search(r'cov=(-?\d+)', ln)
         if m:
             blk = int(m.group(2))
+            has_blk = True
         low = ''
         m2 = re.search(r"lowest='([^']*)'", ln)
         if m2:
             low = m2.group(1)
-        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, low=low, cov=(int(cm.group(1)) if cm else -1)))
+        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, cov=(int(cm.group(1)) if cm else -1)))
     return rows
 
 def main():
@@ -57,7 +63,11 @@ def main():
     A = [r for r in got if r['blk'] >= 24]                       # 真越界 ≥ 8vp
     B = [r for r in got if 0 < r['blk'] < 24]                    # 轻微越界
     C = [r for r in got if r['blk'] == 0 and r['mb'] not in ('-',) and int(r['mb']) >= GESTURE]  # 触到手势区
-    D = [r for r in got if r['blk'] == 0 and r['mb'] not in ('-',) and int(r['mb']) < GESTURE]
+    # ★ 2026-11-14（判据 2003）：D 档必须**排除「无 blk 数据」**的
+    #   —— 否则缺数据的款会被算成「干净」，而那正是这条判据要防的事。
+    _noblk = [r for r in got if r['outcome'] in ('OK','TIGHT','OVER','NEAR') and not r.get('has_blk')]
+    D = [r for r in got if r['blk'] == 0 and r['mb'] not in ('-',) and int(r['mb']) < GESTURE
+         and r['name'] not in {x['name'] for x in _noblk}]
     for lst in (A, B, C, D):
         lst.sort(key=lambda r: -r['blk'] if 'blk' in r else 0)
 
@@ -72,6 +82,14 @@ def main():
         print('   ⇒ 合成测试实证：正常布局 cov=0 / 被盖住 cov=2 / **浮层(设计如此) cov=1** ⇒ 天生有误报')
         for r in COV:
             print('  %-30s cov=%-3d blk=%-3d max=%-5s' % (r['name'], r['cov'], r['blk'], r['mb']))
+    # ★ 2026-11-14：**「无 blk 数据」单独一档** —— 缺数据不等于干净
+    NOBLK = [r for r in got if r['outcome'] in ('OK', 'TIGHT', 'OVER', 'NEAR') and not r.get('has_blk')]
+    if NOBLK:
+        print('\n【⚠️ 无 blk 数据】状态 OK 但旧格式行没有 blk= ⇒ **没量过溢出，要重测** %d 款' % len(NOBLK))
+        for r in NOBLK:
+            print('  %-30s max=%-5s 测于 %s' % (r['name'], r['mb'], r['ts'][:10]))
+        print('  ⇒ 判据 2003：**缺数据 ≠ 干净**。这 %d 款不算在 D 档里。' % len(NOBLK))
+
     print('\n【A 档】blk ≥ 24px（真越界，先看这些）%d 款' % len(A))
     for r in A:
         print('  %-30s blk=%-3d max=%-5s lowest=%s' % (r['name'], r['blk'], r['mb'], r['low'][:26]))
