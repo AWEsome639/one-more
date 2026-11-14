@@ -52,7 +52,11 @@ fix "$G/GPythagoreanTripleBuilder.ets" 313 '? Space.sm : Space.md' '? Space.xs :
 if [ "$WITH_B" = 1 ]; then
   echo '⚠️ 已显式开启 B 档（那两款测的是旧代码、可能已修好）'
   fix "$G/GPercentageShopping.ets" 402 '.padding(Space.lg)'              '.padding(Space.md)'               'B③PercentageShopping 题卡 padding'
-  fix "$G/GKakuroMini.ets"         562 'Math.max(120, Bp.height - 360)' 'Math.max(120, Bp.height - 390)' 'B④KakuroMini 盘面 -390'
+  # ⛔ B④ 已停用（2026-11-14）：它要在 L562 把 `- 360` 改成 `- 390`，而 `-360` 是 07:06 刚调上来的
+  #    （`-320 → -360`，值 40vp）。若今晚数据显示键盘已完整 ⇒ 这一改就是**过度修正**。
+  #    ⇒ 所以不自动改；等今晚数据说「仍被切」再决定数值（候选 -375：再收 15vp=45px）。
+  echo '⏸  B④ KakuroMini 未应用（-360 是 07:06 刚调的；先看今晚数据，若键盘仍被切再改 -375/-390）'
+  # fix "$G/GKakuroMini.ets" 562 'Math.max(120, Bp.height - 360)' 'Math.max(120, Bp.height - 375)' 'B④KakuroMini 盘面 -375（需数据确认）'
 else
   echo '⏭  B 档（PercentageShopping / KakuroMini）跳过 —— 它们测的是旧代码，先用今晚数据确认；确定要改再跑 --with-b'
 fi
