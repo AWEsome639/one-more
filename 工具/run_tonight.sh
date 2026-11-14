@@ -110,6 +110,20 @@ DEV=$(  "$HC" list targets 2>/dev/null | head -1 | tr -d ' \r')
 echo "✅ 唯一在线设备：$DEV"
 echo "   设备 $DEV ｜ $(date '+%F %T')" >> /tmp/tonight_device.log
 
+# ★ 2026-11-14：**代码与 HAP 可能不一致** ——
+#   白天改过 .ets 但没编译（他醒着不许跑 9 分钟的编译）。
+#   ⇒ 开跑前先看「有没有 .ets 比 HAP 新」，有就重编译；**编译失败就用现有 HAP 继续**，不中止整晚。
+HAPF='entry/build/default/outputs/default/entry-default-signed.hap'
+if [ -f "$HAPF" ] && [ -n "$(find entry/src/main/ets -name '*.ets' -newer "$HAPF" 2>/dev/null | head -1)" ]; then
+  echo '⚠️ 有 .ets 比 HAP 新 ⇒ 先重编译对齐（约 9 分钟；失败则用现有 HAP 继续）'
+  if bash build.sh assembleHap > /tmp/tonight_build.log 2>&1; then
+    echo "✅ 重编译完成：$(stat -f '%z' "$HAPF" 2>/dev/null) bytes"
+  else
+    echo '⚠️ 重编译失败 ⇒ 用现有 HAP 继续（今晚数据需标注「包与代码不一致」）'
+    tail -5 /tmp/tonight_build.log 2>/dev/null | sed 's/^/   /'
+  fi
+fi
+
 step 4 '装包（必须见 install bundle successful）'
 [ -f "$HAP" ] || fail 4 "HAP 不存在：$HAP ⇒ 先编译"
 INS=$("$HC" install -r "$HAP" 2>&1)
