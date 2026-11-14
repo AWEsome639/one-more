@@ -80,6 +80,11 @@ def main():
         else:
             miss.append((cls, '缺「%s」' % pat, desc))
 
+    # ★ 2026-11-14（判据 2005）：**先断言「清单本身没缩水」**
+    #   否则有人删掉几条 CHECKS，脚本会在更少的条目上照样报 ✅。
+    if len(CHECKS) < 37:
+        print('❌ 清单只有 %d 条（预期 ≥37）⇒ 有人在删条目，结论不可信' % len(CHECKS))
+        return 2
     print('== 改动在位核对：%d 处 ==' % len(CHECKS))
     if miss:
         print('❌ %d 处不在位：' % len(miss))
