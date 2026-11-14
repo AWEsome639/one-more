@@ -46,6 +46,7 @@ echo '⇒ 若中途崩了要重启：cp /tmp/sweep_all.log "/tmp/sweep_all-$(dat
 bash 工具/sweep_all.sh
 
 step 6 '跑完出报告'
-NEW=$(grep -c "^$(date +%Y-%m-%d)" _巡检记录/layout-canonical.tsv 2>/dev/null || echo 0)
-echo "⇒ 今日新增行数：$NEW（期望 215–221；若为 0 先查 HAP 与 BASELINE，别先查模拟器）"
+_T=$(date +%Y-%m-%d); _Y=$(date -v-1d +%Y-%m-%d 2>/dev/null || date -d yesterday +%Y-%m-%d)
+NEW=$(grep -cE "^($_T|$_Y)" _巡检记录/layout-canonical.tsv 2>/dev/null || echo 0)
+echo "⇒ 本次新增行数（含跨零点）：$NEW（期望 215–221；若为 0 先查 HAP 与 BASELINE，别先查模拟器）"
 python3 工具/morning_report.py
