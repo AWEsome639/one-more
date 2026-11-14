@@ -161,7 +161,7 @@ def main():
             any_cut = True
             print('  ❌ %-26s board=%dx%d@%d,%d ⇒ 盘底 %d，超出 %dpx' % (g, w, h, x, y, y + h, cut))
     if not any_cut:
-        print('  ✅ 台账里没有「盘底超出」的款（或还没有 board= 数据）')
+        print('  ⚠️ 台账里没有可解析的 board= ⇒ **没测过**，不是「没有盘底超出」')
 
     print()
     print('== ②·五 盘面实测高 vs 期望（判据 2356：只看实测，不看估算）==')
@@ -197,10 +197,12 @@ def main():
     print('   ⚠️ 「宽度」列很大 ⇒ bounds 是**一整行**（判据 2306），可见高度是行的不是元素的')
     hit = False
     rows3 = []
+    n_lowest = 0          # ★ 有多少行真的带 lowest= 数据
     for g, (_ts, _oc, ex, _last) in sorted(rows.items()):
         lo = parse_lowest(ex)
         if not lo:
             continue
+        n_lowest += 1
         txt, x1, y1, x2, y2 = lo
         vis = SCREEN_H - y1 if y1 < SCREEN_H else 0
         if y2 >= SCREEN_H and vis < 20:
@@ -209,8 +211,10 @@ def main():
             flag = ' ← 整行' if wid > 1000 else ''
             rows3.append((g, txt, vis, wid))
             print('  ⚠️ %-26s %-12r 可见 %3dpx  宽度 %4dpx%s' % (g, txt[:10], vis, wid, flag))
-    if not hit:
-        print('  ✅ 没有')
+    if n_lowest == 0:
+        print('  ⚠️ 台账里**没有可解析的 lowest=**（不是「没有到边」，是「没数据」）')
+    elif not hit:
+        print('  ✅ 没有（%d 行有 lowest= 且都没到边）' % n_lowest)
     # ★ 判据 2308/2310：按 bounds 宽度几何分档（不读语义）
     func = [(g, t, v, w) for g, t, v, w in rows3 if w < 100]
     vis = [(g, t, v, w) for g, t, v, w in rows3 if w > 1000]
