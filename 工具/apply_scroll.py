@@ -20,8 +20,19 @@ L = src.split('\n')
 
 # ① 定位 build() 与它的外层 Column
 i_build = next(i for i, x in enumerate(L) if x.rstrip() == '  build() {')
-i_col   = i_build + 1
-if not re.search(r'Column\(\{ space: Bp\.isShort\(\) \? Space\.\w+ : Space\.\w+ \}\) \{', L[i_col]):
+# ★ 2026-11-14：`build()` 之后可能有注释（`GPythagoreanTripleBuilder` 就是隔两行注释），
+#   所以不能假设下一行就是 Column ⇒ 往下扫，跳过注释与空行。
+i_col = None
+for _i in range(i_build + 1, min(i_build + 12, len(L))):
+    _st = L[_i].strip()
+    if not _st or _st.startswith('//'):
+        continue
+    if _st.startswith('Column('):
+        i_col = _i
+    break
+if i_col is None:
+    sys.exit('❌ build() 之后 12 行内没找到 Column(')
+if not re.search(r'Column\(\{ space: (Bp\.isShort\(\)|Bp\.height < \d+) \? Space\.\w+ : Space\.\w+ \}\) \{', L[i_col]):
     sys.exit('❌ L%d 不是预期的 Column 行：%r' % (i_col+1, L[i_col][:80]))
 if 'Scroll()' in L[i_col-1]:
     sys.exit('✅ 已经套过 Scroll，无需重复')

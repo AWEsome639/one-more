@@ -360,85 +360,87 @@ export struct GPercentageShopping {
   }
 
   build() {
-    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
-      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-      HintBar({
+    Scroll() {
+      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
+        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+        HintBar({
 
-        showHint: true,
+          showHint: true,
 
-        onHintTap: () => { this.askHint(); },
-  onAutoTap: () => { this.askAuto(); },
+          onHintTap: () => { this.askHint(); },
+    onAutoTap: () => { this.askAuto(); },
 
-        demoOn: false,
+          demoOn: false,
 
-        disabled: this.demoId >= 0,
+          disabled: this.demoId >= 0,
 
-        autoOn: this.autoId >= 0
+          autoOn: this.autoId >= 0
 
-      })
-      Row({ space: Space.sm }) {
-        Column({ space: 2 }) {
-        Text((TG('第几件'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.right + '/' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-        Column({ space: 2 }) {
-        Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
-        // ★ 得分跳动
-        .scale({ x: this.scorePulse, y: this.scorePulse })
-        .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
-      }.width('100%')
-
-      Column({ space: Space.xs }) {
-        // 2026-11-14 真机截图：**选项 `3` 只露上沿、`4` 完全不见** ⇒ 按判据 1886 缩上方题卡
-        Text(this.icon).fontSize(Bp.isShort() ? FontSize.xxl : FontSize.hero)
-        Text(TG2('¥{0} 打 {1} 折', this.price, this.off)).fontSize(Bp.isShort() ? FontSize.lg : FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
-        Text(TG('现价多少？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
-      }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
-
-      Column({ space: Space.sm }) {
-        ForEach(this.slots, (i: number) => {
-          Row({ space: Space.sm }) {
-            Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
-            Text('¥' + this.opts[i]).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
-          }.width('100%').height(Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
-            Haptics.tick();
-            this.pick(i);
-          })
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L387'; })
-          .onBlur(() => { if (this.tvFocus === 'L387') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L387'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
-        }, (i: number) => 'ps' + i)
-      }.width('100%')
-
-      Text(this.msg).fontSize(FontSize.sm).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-
-      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-
-      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
-      // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
-      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
-      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White).backgroundColor(Palette.orange).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => {
-          Haptics.tap();
-          this.reset();
         })
-      .focusable(Tv.on())
-      .onFocus(() => { this.tvFocus = 'L416'; })
-      .onBlur(() => { if (this.tvFocus === 'L416') { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'L416'))
-      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+        Row({ space: Space.sm }) {
+          Column({ space: 2 }) {
+          Text((TG('第几件'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((this.round + '/' + this.diffTotal)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+          Text((this.right + '/' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+          Column({ space: 2 }) {
+          Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
+          Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg)
+          // ★ 得分跳动
+          .scale({ x: this.scorePulse, y: this.scorePulse })
+          .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+          }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+        }.width('100%')
+
+        Column({ space: Space.xs }) {
+          // 2026-11-14 真机截图：**选项 `3` 只露上沿、`4` 完全不见** ⇒ 按判据 1886 缩上方题卡
+          Text(this.icon).fontSize(Bp.isShort() ? FontSize.xxl : FontSize.hero)
+          Text(TG2('¥{0} 打 {1} 折', this.price, this.off)).fontSize(Bp.isShort() ? FontSize.lg : FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
+          Text(TG('现价多少？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+
+        Column({ space: Space.sm }) {
+          ForEach(this.slots, (i: number) => {
+            Row({ space: Space.sm }) {
+              Text(String(i + 1)).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).fontColor(this.theme.inkFaint)
+              Text('¥' + this.opts[i]).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
+            }.width('100%').height(Cell.of(50)).padding({ left: Space.md, right: Space.md }).backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+              Haptics.tick();
+              this.pick(i);
+            })
+            .focusable(Tv.on())
+            .onFocus(() => { this.tvFocus = 'L387'; })
+            .onBlur(() => { if (this.tvFocus === 'L387') { this.tvFocus = ''; } })
+            .outline(Tv.focusOutline(this.tvFocus === 'L387'))
+            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
+          }, (i: number) => 'ps' + i)
+        }.width('100%')
+
+        Text(this.msg).fontSize(FontSize.sm).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+
+        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+
+        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
+        // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(Color.White).backgroundColor(Palette.orange).borderRadius(Radius.md).width('100%').height(Cell.of(46)).onClick(() => {
+            Haptics.tap();
+            this.reset();
+          })
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L416'; })
+        .onBlur(() => { if (this.tvFocus === 'L416') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L416'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+      }
+      .onTouch((e: TouchEvent) => {
+        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+      }).width('100%').height('100%').justifyContent(FlexAlign.Start)
     }
-    .onTouch((e: TouchEvent) => {
-      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
-    }).width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
 
 
