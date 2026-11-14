@@ -99,6 +99,15 @@ echo "  ⓘ 这是**线索**不是缺陷数；今晚要用的 6 个工具已全�
 echo "  ⓘ 今晚链路工具：shot_game / triage / verify_changed / verify_changes_present"
 echo "                  / cell_size_audit / fixed_audit"
 echo
+echo "───── ⑥½ 改动清单 × 溢出名单 交叉核对（判据 2027）─────"
+python3 工具/crosscheck_backlog.py > /tmp/fc_x.log 2>&1
+XRC=$?
+head -3 /tmp/fc_x.log | sed 's/^/  /'
+grep -E "^【A 档没碰过】|^⚠️|^✅ A 档" /tmp/fc_x.log | sed 's/^/  /'
+if [ "$XRC" -ne 0 ]; then
+  echo "  ⓘ 有 A 档遗漏 ⇒ 明天要补进清单（不算今晚的阻塞项，今晚照跑）"
+fi
+echo
 echo "───── ⑦½ cov 仪器回归（5 个样本 / 判据 2006+2022）─────"
 if python3 工具/test_cov.py > /tmp/fc_cov.log 2>&1; then
   echo "  ✅ 5/5 全过 ⇒ cov 这一列今晚可以信"
