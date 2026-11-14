@@ -71,11 +71,11 @@ def main():
     print('== 改动清单 × 最新溢出名单（判据 2027）==')
     print('   我改过 %d 处（%d 个英文名）｜ 台账有数据 %d 款' % (nchk, len(touched), len(last)))
     print()
-    print('【A 档没碰过】%d 款（`blk ≥ 24` 但我没改 ⇒ **要新做**）' % len(A_un))
+    print('【A 档不在今天清单里】%d 款（`blk ≥ 24`，但不在今天那 %d 处改动里）' % (len(A_un), nchk))
     for b, mx, n in A_un:
         print('   %-30s blk=%-3d max_bottom=%d' % (n, b, mx))
     print()
-    print('【C 档没碰过】%d 款（`blk=0` 但 `max_bottom ≥ %d`）' % (len(C_un), GESTURE))
+    print('【C 档不在今天清单里】%d 款（`blk=0` 但 `max_bottom ≥ %d`，且不在今天改动里）' % (len(C_un), GESTURE))
     for mx, n in C_un[:15]:
         print('   %-30s max_bottom=%d' % (n, mx))
     print()
@@ -86,7 +86,7 @@ def main():
         print('   %-30s blk=%-3d max_bottom=%d' % (n, b, mx))
     print()
     if A_un:
-        print('⚠️ 有 %d 款 A 档从未改过 ⇒ 明天要补进清单' % len(A_un))
+        print('⚠️ 有 %d 款 A 档不在今天清单里 ⇒ 先分清「真没做」还是「早先会话做过、台账是旧数据」（`git log -- <file>` 一查就知道）' % len(A_un))
         return 1
     print('✅ A 档无遗漏')
     return 0
