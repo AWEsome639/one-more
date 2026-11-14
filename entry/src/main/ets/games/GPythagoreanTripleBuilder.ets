@@ -501,7 +501,9 @@ export struct GPythagoreanTripleBuilder {
           .onBlur(() => { if (this.tvFocus === 'L446') { this.tvFocus = ''; } })
           .outline(Tv.focusOutline(this.tvFocus === 'L446'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-        Text(TG('背熟的勾股数：3-4-5、5-12-13、8-15-17')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        if (!Bp.isShort()) {   // 判据 2651：矮屏不创建这行提示（超出 24px）
+          Text(TG('背熟的勾股数：3-4-5、5-12-13、8-15-17')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        }
       }.width('100%')
     }
     .onTouch((e: TouchEvent) => {
