@@ -583,3 +583,4 @@
 2026-11-14T15:36:32	Connect Four	NO_CARD	-	64.2s no card for '四子棋' (fallback=(347, 828))
 2026-11-14T15:39:31	Bejeweled	OK	1351	62.2s lowest='💧' [948,1329][1027,1351] blk=0/0px cov=5 board=700x625@930,726 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-153930.jpeg @2026-11-14T15:39:31
 2026-11-14T15:42:11	Connect Four	NO_CARD	-	63.5s no card for '四子棋' (fallback=(347, 828))
+2026-11-14T16:22:58	Pipes	NOT_HOME	-	148.0s could not reach home; last texts=[]
