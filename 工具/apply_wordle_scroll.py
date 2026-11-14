@@ -38,6 +38,11 @@ print('定位：build() 在 L%d、Column 在 L%d、build 结尾 L%d、height(100
 new = list(L)
 new[i_h] = new[i_h].replace(".height('100%')",
     "// .height('100%')  ← 2026-11-14：套 Scroll 后不能用 100%（内容高=视口高⇒滚不动），判据见 _巡检记录")
+# 插入前先把块内每行 +2 空格（否则 Scroll 里那层缩进比外面还浅，格式不对）
+for k in range(i_col, i_end):
+    if new[k].strip():                  # 空行不加空格
+        new[k] = '  ' + new[k]
+
 new.insert(i_col, '    Scroll() {')
 i_end2 = i_end + 1                      # 插入一行后结尾下标 +1
 new.insert(i_end2, '    }')
