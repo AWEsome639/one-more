@@ -504,14 +504,32 @@ def _body(name, t0):
         sh('aa force-stop com.andrewoscar.onemore')
         time.sleep(1.0)
         sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
-        # ★ 2026-11-11（判据 1912 的真落地）：**固定 sleep(6) 不够**（冷启动常常 >6s）
-        #   改成轮询：4 轮 × 3s，每轮都试 `is_home()`
+        # ★★★ 2026-11-14 修（队友静态分析，我逐行验过）：
+        #   这条「回首页兜底」路径原来**比同一文件里的路径 A（:455-470）弱 3 倍** ——
+        #   路径 A：`force-stop → start → sleep(25) → 再 start（判据 1954）→ sleep(8)` = 34s + 双 start；
+        #   路径 C（这里）：`force-stop → start → 轮询 4×3s` = 12s + 单 start。
+        #   ⚠️ `NOT_HOME` 只有下面这一个出口，且只从这条弱路径出来 ⇒
+        #   判据 1949（冷启动 30~60s）与判据 1954（force-stop 后 dump 抓不到 App 窗口，需二次 start）
+        #   这两个修复**只应用在了路径 A，没应用在这里**。
+        #   ⇒ 85 条 `NOT_HOME` 的主因很可能是这个，而不是「结算弹层吃掉 Back」。
+        time.sleep(25.0)
+        sh('aa start -a EntryAbility -b com.andrewoscar.onemore')   # 判据 1954：第二次 start
+        time.sleep(8.0)
         for _w in range(4):
             time.sleep(3.0)
             if is_home():
                 break
     if not is_home():
-        finish(name, 'NOT_HOME', t0, None, 'could not reach home')
+        # ★ 2026-11-14（修法 3）：**加诊断** —— 原来 87 条备注全是同一句 `could not reach home`，
+        #   没有任何诊断信息 ⇒ 下次审计只能靠推。这里附上最后看到的 6 个文本节点，
+        #   一眼就能分出「dump 是空的（没渲染）」还是「卡在某个界面」。
+        _last = []
+        try:
+            _dd = dump('nothome')          # 现 dump 一次（`is_home()` 自己调过 dump，但那个对象没传出来）
+            _last = [t for t, _ in texts(_dd)][:6] if _dd else []
+        except Exception:
+            _last = ['<dump failed>']
+        finish(name, 'NOT_HOME', t0, None, 'could not reach home; last texts=%r' % (_last,))
         return
 
     # ⚠️ 2026-11-09：**搜索词只取第一个词会搜不到**（如 "Set Theory Venn" 只打 "Set"）
