@@ -74,7 +74,15 @@ def main():
                 b_hits.append((fn, i + 1, var))
                 break
 
-    print('== 工具自检：两类「报告会说谎」==\n')
+    # ★ 2026-11-14（判据 2005）：**先断言「到底扫了多少文件」** ——
+    #   今天我自己写的一个校验脚本抽出 `0` 条数据、却因为 `bad` 列表为空而报了 `✅`。
+    #   ⇒ 空数据上的绿是假绿。所以这里先断言扫描量，再报结论。
+    scanned = len([f for f in os.listdir(TDIR) if f.endswith('.py') and f != os.path.basename(__file__)])
+    if scanned < 10:
+        print('❌ 只扫到 %d 个 .py（预期 ≥10）⇒ 路径或权限有问题，结论不可信' % scanned)
+        return 2
+    print('== 工具自检：两类「报告会说谎」==')
+    print('（扫描 %d 个 .py）\n' % scanned)
     print('【类 A】读 `games/*.ets` 用正则取数，但**不去注释** %d 个：' % len(a_hits))
     if a_hits:
         for f in a_hits:
@@ -95,6 +103,8 @@ def main():
         print('  ✅ 无')
 
     total = len(a_hits) + len(b_hits)
+    # 判据 2005：**报结论前先报「检查了多少条」**
+    print('\n（本次检查了 %d 个脚本、匹配到 %d 个候选）' % (scanned, total))
     print('\n──── 合计 %d 个候选 ────' % total)
     print('⚠️ 这是**线索**不是判决：类 A 里有些脚本只用于排序（已自行声明不可作判据），')
     print('   类 B 里有些默认值确实就是 0（如计数器）。要逐个人工确认。')
