@@ -85,7 +85,12 @@ def opt_mode(margin):
     rows = []
     for name, (bh, mx, ts) in last.items():
         bottom = mx - HEADER_VP - bh
+        # ★ 2026-11-14（判据 2053）：`max_bottom` 只统计**有文字**的节点
+        #   （`shot_game.py:134 texts()`）⇒ 盘面底部没字时 mx 偏小、bottom 会成负数
+        #   ⇒ cap 虚高成「放大到 533」这种物理不可能的裁决（533 − 104 = 429 才是上限）。
+        bottom = max(0.0, bottom)             # 负余量无意义，钳到 0
         cap = 533.0 - HEADER_VP - bottom      # 零余量下的盘面上限
+        cap = min(533.0 - HEADER_VP, cap)     # 上限 429：盘面不可能高于「屏高 − 头部」
         safe = cap - margin                    # 留余量的值
         now_total = bh + bottom + HEADER_VP    # 现在的总高
         # 判定：现在溢出 / 现在正好 / 现在有余量可放大
