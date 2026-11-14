@@ -78,5 +78,5 @@ echo "· 仍要看截图（判据 1998）：blk=0 也可能有横向裁切/整�
 echo
 echo "=== 前置（今晚先跑这三步）==="
 echo "  1) BUILD_STRICT=1 bash build.sh assembleHap"
-echo "  2) hdc install -r entry/build/default/outputs/default/entry-default-signed.hap   # 必须见 successfully"
+echo "  2) /Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc install -r entry/build/default/outputs/default/entry-default-signed.hap   # 必须见 successfully"
 echo "  3) python3 工具/shot_game.py \"<游戏名>\"   # 或 bash 工具/verify_changed.sh 只看台账"

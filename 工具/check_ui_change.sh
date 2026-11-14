@@ -76,8 +76,8 @@ NEED_DEVICE=0
 if [ "$GEO" -gt 0 ] || [ -n "$(echo $NEWCOMP | tr -d ' ')" ]; then
   NEED_DEVICE=1
   echo "🔴 触发布局几何检查 —— 必须跑一次真机并贴 bounds 结论："
-  echo "    hdc shell \"uitest dumpLayout -p /data/local/tmp/a.json\""
-  echo "    hdc file recv /data/local/tmp/a.json /tmp/a.json"
+  echo "    /Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc shell \"uitest dumpLayout -p /data/local/tmp/a.json\""
+  echo "    /Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc file recv /data/local/tmp/a.json /tmp/a.json"
   echo "  然后自检四条（判据 1829/1819/1825）："
   echo "    ① 拉伸：实际宽 > 声明宽 × 1.05 ？        ⇒ 加 .flexShrink(0)"
   echo "    ② 撑爆：子节点 height > 父节点 height ？ ⇒ constraintSize / 放宽上限"
