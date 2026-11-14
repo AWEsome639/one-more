@@ -559,7 +559,7 @@ export struct GKakuroMini {
             // 2026-11-14 真机截图（blk=24px）：**盘面末行 + 数字键 `1~5` 都被切**
             //   11-12 那条 `Bp.height - 320` 还不够（两行键盘 `~90vp` + 提示 + 头 `480px` 已把预算吃满）
             //   ⇒ 再收 40vp：`Bp.height - 360`（3×3 ⇒ 每格 ~58vp，仍在 44 触控下限之上）
-            .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 360)) : 9999 })
+            .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 368)) : 9999 })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
