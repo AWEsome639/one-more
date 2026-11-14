@@ -1,5 +1,5 @@
 #!/bin/bash
-# 2026-11-14：**今晚攒下的 29 处改动，一条命令复核**
+# 2026-11-14：**今晚攒下的 38 款改动，一条命令复核**
 #   用法：bash 工具/verify_changed.sh
 #   前置：先 build 并装包（见文件末尾）
 #   判据：blk 必须比改动前小；没降 ⇒ 单独回退那一款
@@ -22,6 +22,7 @@ CASES=(
   "Heyawake|盘面限宽|48px"
   "Hitori|盘面限宽|62px"
   "Hitori All|盘面限宽|48px"
+  "Mastermind|三行圆点限宽（预防性，改前已合规）|1px(噪声级)"
   "Matrix Reasoning|盘面限宽|72px"
   "Memory|盘面限宽|24px"
   "Modulo Clock|题卡 hero→xl|—"

@@ -80,14 +80,16 @@ try:
         'Counting Sheep', 'Object Displacement',
     ]
     gaps = [g for g in KNOWN_GAP if g in todo]
-    if gaps:
-        todo = gaps + [n for n in todo if n not in gaps]
-        print('已知缺数据 %d 款顶到最前（判据 2003）' % len(gaps))
     prio = [n for n in prio if n not in gaps]
 
     if prio:
         todo = prio + [n for n in todo if n not in prio]
         print('优先 %d 款（改过的排最前，且强制重测）' % len(prio))
+    # ★ 2026-11-14 修（`--dry` 实测发现）：原逻辑先拼 gaps、后拼 prio ⇒ prio 覆盖了 gaps
+    #   ⇒ 打印说「缺数据 5 款顶到最前」，实际它们排在第 39–43 位。现在挪到最后拼 ⇒ 真正在前。
+    if gaps:
+        todo = gaps + [n for n in todo if n not in gaps]
+        print('已知缺数据 %d 款顶到最前（判据 2003）' % len(gaps))
 except Exception as e:
     print('（优先排序跳过: %s）' % e)
 
@@ -122,8 +124,8 @@ say "基线快照 → $SNAP"
 #   教训：这脚本没有 dry-run 之前，我为了「验证 todo 生成」跑了一次它，
 #   结果它真的去起了模拟器（他当时醒着）。白天测试必须走这条分支。
 if [ "${1:-}" = "--dry" ]; then
-  echo "===== --dry：前 40 款（不会起设备）=====" | tee -a "$LOG"
-  head -40 "$TODO" | nl -ba | sed 's/^/  /' | tee -a "$LOG"
+  echo "===== --dry：前 12 款（不会起设备）=====" | tee -a "$LOG"
+  head -12 "$TODO" | nl -ba | sed 's/^/  /' | tee -a "$LOG"
   echo "===== --dry 结束，共 $(wc -l < "$TODO" | tr -d ' ') 款 =====" | tee -a "$LOG"
   exit 0
 fi
@@ -137,7 +139,7 @@ for round in $(seq 1 24); do
   n=$(wc -l < "$TODO" | tr -d ' ')
   if [ "$n" -eq 0 ]; then say "全部完成"; break; fi
 
-  head -40 "$TODO" > /tmp/batch.txt
+  head -12 "$TODO" > /tmp/batch.txt
   say "第 $round 批：$(wc -l < /tmp/batch.txt | tr -d ' ') 款（剩 $n）"
   python3 工具/verify_layout.py --every 8 --names-file /tmp/batch.txt >> "$LOG" 2>&1
 
