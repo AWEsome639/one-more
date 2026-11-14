@@ -851,7 +851,7 @@ def _body(name, t0):
 
     if recv_ok:
         finish(name, 'OK', t0, mb,
-               'lowest=%r %s blk=%d/%dpx cov=%d board=%s max=%d -> %s @%s' % (lo, lo_bounds, block_over_n, _cov, _board, block_over_max, out, _ts))
+               'lowest=%r %s blk=%d/%dpx cov=%d board=%s max=%d -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, _cov, _board, block_over_max, out, _ts))
     else:
         finish(name, 'OK_NOSHOT', t0, mb,
                'lowest=%r %s recv failed @%s' % (lo, lo_bounds, _ts))
