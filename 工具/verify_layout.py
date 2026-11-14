@@ -122,7 +122,7 @@ def main():
         t0 = time.time()
         try:
             r = subprocess.run(['python3', os.path.join(ROOT, '工具', 'shot_game.py'), g],
-                               capture_output=True, text=True, timeout=320, cwd=ROOT)
+                               capture_output=True, text=True, timeout=400, cwd=ROOT)
             line = (r.stdout or '').strip().split('\n')[-1]
         except subprocess.TimeoutExpired:
             line = '%s\tTIMEOUT\t-\t%.1fs shot_game 超时' % (g, time.time() - t0)
@@ -140,7 +140,7 @@ def main():
             t0 = time.time()
             try:
                 r = subprocess.run(['python3', os.path.join(ROOT, '工具', 'shot_game.py'), g],
-                                   capture_output=True, text=True, timeout=320, cwd=ROOT)
+                                   capture_output=True, text=True, timeout=400, cwd=ROOT)
                 line = (r.stdout or '').strip().split('\n')[-1]
             except subprocess.TimeoutExpired:
                 line = '%s\tTIMEOUT\t-\t%.1fs 重试超时' % (g, time.time() - t0)

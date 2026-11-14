@@ -501,6 +501,13 @@ def _body(name, t0):
         sh('uitest uiInput keyEvent Back')
         time.sleep(1.2)
     if not is_home():
+        # ★ 2026-11-14（独立审查发现）：下面恢复路径要花 `25+8=33s` 的**裸 sleep**，
+        #   而 `budget_left()` 到 `0` 才打 TIMEOUT ⇒ 预算快见底时仍会硬走完，
+        #   叠加之后可能超过 runner 的 `timeout`（`verify_layout.py:125`）⇒ 进程被杀、**诊断反而丢了**。
+        #   ⇒ 进恢复块前先看预算：不够就别开始一件做不完的事，写清原因退出。
+        if budget_left() < 90:
+            finish(name, 'NOT_HOME', t0, None, 'no budget for recovery path')
+            return
         sh('aa force-stop com.andrewoscar.onemore')
         time.sleep(1.0)
         sh('aa start -a EntryAbility -b com.andrewoscar.onemore')
