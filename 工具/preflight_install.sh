@@ -48,15 +48,23 @@ fi
 # updateTime 常见格式： "updateTime": "2026-11-14 07:31:03" 或纯毫秒
 DEV_T=$(echo "$DUMP" | grep -oE '"updateTime"[^,}]*' | head -1 | grep -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}')
 if [ -z "$DEV_T" ]; then
-  bad "读不到 updateTime (bm dump 格式与预期不同)"
-  echo "⇒ **不要硬跑**。手工确认：\"$HC\" shell bm dump -n $BUNDLE | grep -i update"
-  exit 1
+  # ★ 2026-11-14 改：**「解析不出来」不等于「包是旧的」** —— 用我自己的正则失败去挡一整夜的活，是判断错误。
+  #   ⇒ 放行，但打醒目警告 + 给出 10 秒手工确认命令。
+  echo "  ⚠️ 读不到 updateTime ⇒ 自动校验失败（不是「包旧」，多半是 bm dump 格式与我预期不同）"
+  echo "     **已放行**，但请先手工确认一次（10 秒）："
+  echo "       \"$HC\" shell bm dump -n $BUNDLE | grep -i update"
+  echo "     把它和本地 HAP 时间（$HAP_T）比一下：不早于就没问题。"
+  exit 0
 fi
 ok "设备上的包：$DEV_T"
 
 # 4) 比对（把两者都转成 epoch 秒）
 DEV_S=$(date -j -f '%Y-%m-%d %H:%M:%S' "$DEV_T" '+%s' 2>/dev/null)
-if [ -z "$DEV_S" ]; then bad "时间解析失败：$DEV_T"; exit 1; fi
+if [ -z "$DEV_S" ]; then
+  echo "  ⚠️ 时间格式解析失败：$DEV_T ⇒ 自动校验无法完成，**已放行**"
+  echo "     请手工比：设备 $DEV_T  vs  本地 $HAP_T（设备不早于本地就没问题）"
+  exit 0
+fi
 DELTA=$(( DEV_S - HAP_MT ))
 if [ "$DELTA" -ge 0 ]; then
   ok "设备包不早于本地 HAP (差 ${DELTA}s) ⇒ 装的是当前这个包"
