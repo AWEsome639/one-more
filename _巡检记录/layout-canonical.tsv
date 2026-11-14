@@ -600,4 +600,3 @@
 2026-11-14T17:31:33	Fraction Matcher	OK	1351	68.6s lowest='A' [108,1345][136,1351] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Fraction_Matcher-173133.jpeg @2026-11-14T17:31:33
 2026-11-14T17:43:22	Pythagorean Triple Builder	OK	1351	73.4s lowest='7' [60,1280][861,1351] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-174321.jpeg @2026-11-14T17:43:22
 2026-11-14T17:44:55	Percentage Shopping	OK	1351	68.7s lowest='¥80' [164,1347][2452,1351] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-174455.jpeg @2026-11-14T17:44:55
-2026-11-14T17:54:27	Calculation Sprint	OK	1600	76.3s lowest='算得越快，连击越高；答错扣 3 秒' [60,1594][2500,1600] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Calculation_Sprint-175427.jpeg @2026-11-14T17:54:27

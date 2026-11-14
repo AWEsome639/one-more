@@ -459,141 +459,139 @@ export struct GCalculationSprint {
   }
 
   build() {
-    Scroll() {
-      Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
-        DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
-        HintBar({
+    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
+      DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
+      HintBar({
 
-          showHint: true,
+        showHint: true,
 
-          onHintTap: () => { this.askHint(); },
-    onAutoTap: () => { this.askAuto(); },
+        onHintTap: () => { this.askHint(); },
+  onAutoTap: () => { this.askAuto(); },
 
-          demoOn: false,
+        demoOn: false,
 
-          disabled: this.demoId >= 0,
+        disabled: this.demoId >= 0,
 
-          autoOn: this.autoId >= 0
+        autoOn: this.autoId >= 0
 
-        })
-        Row({ space: Space.sm }) {
-          this.stat(0)
-          this.stat(1)
-          this.stat(2)
-        }
-        .width('100%')
-
-        // 时间条
-        Stack({ alignContent: Alignment.Start }) {
-          Row()
-            .width('100%')
-            .height('100%')
-            .backgroundColor(this.theme.surfaceAlt)
-            .borderRadius(Radius.full)
-          Row()
-            .width(this.left * 100 / this.total + '%')
-            .height('100%')
-            .backgroundColor(this.left <= 15 ? Palette.rose : Palette.amber)
-            .borderRadius(Radius.full)
-            .animation({ duration: Motion.base, curve: Motion.snap() })
-        }
-        .width('100%')
-        .height(8)
-
-        Column({ space: Space.xs }) {
-          Text(this.quiz)
-            .fontSize(Bp.isShort() ? FontSize.xl : FontSize.hero)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(Palette.amber)
-          Text(TG2('连击 ×{0} · 最高 ×{1} · 第 {2} 题', String(this.combo), String(this.best), String(this.right + this.wrong + 1)))
-            .fontSize(FontSize.xxs)
-            // ★ 错误抖动
-            .translate({ x: this.shakeX })
-            .animation({ duration: Motion.fast, curve: Motion.snap() })
-            .fontColor(this.theme.inkFaint)
-        }
-        .width('100%')
-        .padding(Space.lg)
-        .backgroundColor(this.theme.surface)
-        .borderRadius(Radius.lg)
-        .shadow(Shadow.card)
-
-        Column({ space: Space.sm }) {
-          ForEach(this.optsIdx, (i: number) => {
-            Row({ space: Space.sm }) {
-              Text(LETTERS[i])
-                .fontSize(FontSize.sm)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(this.theme.inkFaint)
-              Text(String(this.opts[i]))
-                .fontSize(FontSize.xl)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(this.optInk(i))
-                .layoutWeight(1)
-            }
-            .width('100%')
-            .height(Cell.of(Bp.isShort() ? 34 : 52))
-            .padding({ left: Space.md, right: Space.md })
-            .backgroundColor(this.optBg(i))
-            .borderRadius(Radius.md)
-            .shadow(Shadow.card)
-            .animation({ duration: Motion.fast, curve: Motion.snap() })
-            .focusable(Tv.on())
-            .onFocus(() => { this.tvFocus = 'L477'; })
-            .onBlur(() => { if (this.tvFocus === 'L477') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'L477'))
-            .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
-            .onClick(() => {
-              Haptics.tick();
-              this.pick(i);
-            })
-          }, (i: number) => 'cs' + i)
-        }
-        .width('100%')
-
-        Text(this.msg)
-          .fontSize(FontSize.sm)
-          // ★ 通关庆祝
-          .scale({ x: this.winK, y: this.winK })
-          .animation({ duration: Motion.slow, curve: Motion.spring() })
-          .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
-          .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-
-        // ★ 演示条（共用组件；未演示时高度为 0，不占位）
-
-        Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
-        // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
-        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
-        .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
-          .fontSize(FontSize.md)
-          .fontColor(Color.White)
-          .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
-          .borderRadius(Radius.md)
-          .width('100%')
-          .height(Cell.of(Bp.isShort() ? 34 : 46))
-          .focusable(Tv.on())
-          .onFocus(() => { this.tvFocus = 'L520'; })
-          .onBlur(() => { if (this.tvFocus === 'L520') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'L520'))
-          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-          .onClick(() => {
-            Haptics.tap();
-            this.reset();
-          })
-
-        Text(TG2('提示：答对一题 +1，答错扣 {0} 秒 —— 稳一点比快一点划算',Digits(String(PENALTY), this.langCode)))
-          .fontSize(FontSize.xxs)
-          .fontColor(this.theme.inkFaint)
-          .width('100%')
-      }
-      .onTouch((e: TouchEvent) => {
-        // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
-        if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
       })
+      Row({ space: Space.sm }) {
+        this.stat(0)
+        this.stat(1)
+        this.stat(2)
+      }
       .width('100%')
-      // .height('100%')  ← 2026-11-14：套 Scroll 后不能用 100%（内容高=视口高⇒滚不动），判据见 _巡检记录
-      .justifyContent(FlexAlign.Start)
+
+      // 时间条
+      Stack({ alignContent: Alignment.Start }) {
+        Row()
+          .width('100%')
+          .height('100%')
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.full)
+        Row()
+          .width(this.left * 100 / this.total + '%')
+          .height('100%')
+          .backgroundColor(this.left <= 15 ? Palette.rose : Palette.amber)
+          .borderRadius(Radius.full)
+          .animation({ duration: Motion.base, curve: Motion.snap() })
+      }
+      .width('100%')
+      .height(8)
+
+      Column({ space: Space.xs }) {
+        Text(this.quiz)
+          .fontSize(Bp.isShort() ? FontSize.xl : FontSize.hero)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(Palette.amber)
+        Text(TG2('连击 ×{0} · 最高 ×{1} · 第 {2} 题', String(this.combo), String(this.best), String(this.right + this.wrong + 1)))
+          .fontSize(FontSize.xxs)
+          // ★ 错误抖动
+          .translate({ x: this.shakeX })
+          .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .fontColor(this.theme.inkFaint)
+      }
+      .width('100%')
+      .padding(Space.lg)
+      .backgroundColor(this.theme.surface)
+      .borderRadius(Radius.lg)
+      .shadow(Shadow.card)
+
+      Column({ space: Space.sm }) {
+        ForEach(this.optsIdx, (i: number) => {
+          Row({ space: Space.sm }) {
+            Text(LETTERS[i])
+              .fontSize(FontSize.sm)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.theme.inkFaint)
+            Text(String(this.opts[i]))
+              .fontSize(FontSize.xl)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.optInk(i))
+              .layoutWeight(1)
+          }
+          .width('100%')
+          .height(Cell.of(Bp.isShort() ? 34 : 52))
+          .padding({ left: Space.md, right: Space.md })
+          .backgroundColor(this.optBg(i))
+          .borderRadius(Radius.md)
+          .shadow(Shadow.card)
+          .animation({ duration: Motion.fast, curve: Motion.snap() })
+          .focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L477'; })
+          .onBlur(() => { if (this.tvFocus === 'L477') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L477'))
+          .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick(i); }); })
+          .onClick(() => {
+            Haptics.tick();
+            this.pick(i);
+          })
+        }, (i: number) => 'cs' + i)
+      }
+      .width('100%')
+
+      Text(this.msg)
+        .fontSize(FontSize.sm)
+        // ★ 通关庆祝
+        .scale({ x: this.winK, y: this.winK })
+        .animation({ duration: Motion.slow, curve: Motion.spring() })
+        .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
+        .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+
+      // ★ 演示条（共用组件；未演示时高度为 0，不占位）
+
+      Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
+      // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
+      .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+      .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
+        .fontSize(FontSize.md)
+        .fontColor(Color.White)
+        .backgroundColor(this.over && !this.won ? Palette.rose : Palette.amber)
+        .borderRadius(Radius.md)
+        .width('100%')
+        .height(Cell.of(Bp.isShort() ? 34 : 46))
+        .focusable(Tv.on())
+        .onFocus(() => { this.tvFocus = 'L520'; })
+        .onBlur(() => { if (this.tvFocus === 'L520') { this.tvFocus = ''; } })
+        .outline(Tv.focusOutline(this.tvFocus === 'L520'))
+        .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+        .onClick(() => {
+          Haptics.tap();
+          this.reset();
+        })
+
+      Text(TG2('提示：答对一题 +1，答错扣 {0} 秒 —— 稳一点比快一点划算',Digits(String(PENALTY), this.langCode)))
+        .fontSize(FontSize.xxs)
+        .fontColor(this.theme.inkFaint)
+        .width('100%')
     }
+    .onTouch((e: TouchEvent) => {
+      // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
+      if (this.demoId >= 0 && e.type === TouchType.Down) { this.demoStop(); }
+    })
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
   }
 
   /** kind: 0=剩余 1=答对 2=得分 */
