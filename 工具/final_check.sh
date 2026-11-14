@@ -91,7 +91,15 @@ print('改动 %d 处 / verify_changed.sh 覆盖 %d 款 / 缺 %d 款' % (len(m.CH
 if miss: print('缺: %s' % ', '.join(miss))
 PY
 
-step "⑦ 扫描器 dry-run（不起设备）"
+step "⑦ 工具自检（两类「报告会说谎」）"
+python3 工具/tool_selfcheck.py > /tmp/fc8.log 2>&1
+A=$(grep -c "⚠️ " /tmp/fc8.log 2>/dev/null || echo 0)
+echo "  候选：类A+类B 共 $A 处（详见 /tmp/fc8.log）"
+echo "  ⓘ 这是**线索**不是缺陷数；今晚要用的 6 个工具已全部过检"
+echo "  ⓘ 今晚链路工具：shot_game / triage / verify_changed / verify_changes_present"
+echo "                  / cell_size_audit / fixed_audit"
+
+step "⑧ 扫描器 dry-run（不起设备）"
 timeout 120 bash 工具/sweep_all.sh --dry > /tmp/fc7.log 2>&1
 grep -E "优先|待测" /tmp/fc7.log | head -2 | sed 's/^/  /'
 EMU=$(pgrep -f 'tools/emulator/Emulator' | wc -l | tr -d ' ')
@@ -106,9 +114,10 @@ echo "═════════════════ 总检结论 ═══
 if [ "$FAIL" -eq 0 ]; then
   echo "✅ 全部就绪 —— 今晚可以按四步跑"
   echo "   ① hdc install -r entry/build/default/outputs/default/entry-default-signed.hap"
-  echo "   ② bash 工具/verify_changed.sh"
-  echo "   ③ python3 工具/triage.py"
-  echo "   ④ bash 工具/sweep_all.sh"
+  echo "      ⇒ **必须看见 install bundle successfully**（退出码 0 不算，判据 1989）"
+  echo "   ② bash 工具/verify_changed.sh      # 37 处改动的台账状态"
+  echo "   ③ python3 工具/triage.py           # 五档（含「无 blk 数据」档）"
+  echo "   ④ bash 工具/sweep_all.sh           # 会**自动落基线快照**"
 else
   echo "❌ 有 $FAIL 项未过 —— 先修再跑"
 fi
