@@ -479,7 +479,17 @@ def _body(name, t0):
             time.sleep(3.0)
             continue
         _hit = None
-        for _t in ('同意并继续', '开始玩', '同意', 'Agree', 'Continue', 'OK'):
+        # ★★★ 2026-11-14 修（队友静态分析，我逐行验证）：**这里只认短词，但实际按钮是整句！**
+        #   `Index.ets` 在 853×533 走 `privacyFootStack()` 分支 ⇒ 按钮是 **`Agree and continue`**；
+        #   欢迎卡是 **`Start playing`**。而 `_find_text_node()` 用 `text == want` **精确相等**
+        #   ⇒ `Agree`/`Continue`/`开始玩` **一个都匹配不上** ⇒ 英文界面下两个弹层点不掉
+        #   ⇒ 搜索坐标落在遮罩上 ⇒ 全部 `NO_CARD`。
+        #   ⚠️ 触发条件不需要「数据被清」：`ProgressStore.init()` 异步未 await，
+        #      `privacyAgreed()` 在 `pref===null` 时返回 false（注释写「宁可多弹一次」）
+        #      ⇒ **慢设备上已同意的用户也会再看到隐私卡**。今晚装新包更要防。
+        for _t in ('同意并继续', '开始玩', '同意',
+                   'Agree and continue', 'Start playing',   # 英文整句（853×533 实际形态）
+                   'Agree', 'Continue', 'OK'):
             _h = _find_text_node(_d, _t)
             if _h:
                 _hit = _h
