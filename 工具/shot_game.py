@@ -224,6 +224,12 @@ def covered_count(items):
     """
     try:
         covers = 0
+        # 2026-11-14：屏幕尺寸（px）—— 用于排除「根/全屏容器」这个假覆盖者
+        try:
+            SCREEN_W = int(os.environ.get('SHOT_SCREEN_W', '2560'))
+            SCREEN_H = int(os.environ.get('SHOT_SCREEN_H', '1600'))
+        except Exception:
+            SCREEN_W, SCREEN_H = 2560, 1600
         for i, (_t1, r1) in enumerate(items):
             # ★ 2026-11-14 修：**只有「有文字的」才算被盖住的对象**
             #   （容器被别的容器盖住是正常布局，不能算缺陷）
@@ -236,6 +242,12 @@ def covered_count(items):
                 if i == j:
                     continue
                 a1, b1, a2, b2 = r2
+                # ★ 2026-11-14 修（第二个坑）：**排除「根/全屏容器」**
+                #   根窗口节点 bounds ≈ `[0,0][2560,1600]`，它「盖住」所有文字 ⇒
+                #   不排除的话 `cov` 会等于文字节点总数（永远巨大、毫无信息）。
+                #   判据：覆盖者的面积超过**屏幕 80%** ⇒ 当作根/背景，不算「盖住」。
+                if (a2 - a1) * (b2 - b1) > 0.8 * (SCREEN_W * SCREEN_H):
+                    continue
                 # r2 完全盖住 r1（留 2px 容差）
                 if a1 <= x1 + 2 and b1 <= y1 + 2 and a2 >= x2 - 2 and b2 >= y2 - 2:
                     if (a2 - a1) * (b2 - b1) > (x2 - x1) * (y2 - y1):
