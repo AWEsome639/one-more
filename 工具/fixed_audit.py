@@ -48,6 +48,86 @@ FLOOR18 = ['2048','Crown','Dominosa','Gokigen Naname','Gomoku','Heyawake','Hitor
            'Skyscrapers','Schulte Table','Countdown Math']
 
 
+HEADER_VP = 104.0   # 2026-11-14 队友静态分析：状态栏 39 + 顶栏 45 + padding 20
+
+
+def opt_mode(margin):
+    """2026-11-14：**按每款的「底部内容」算它的最优盘面**（盲区 ④ 的解法）。
+
+    模型（`★头部其实只有104vp-模型修正`）：
+        头部(104) + 盘面 + 底部 ≤ 533
+    ⇒ `底部 = max_px/3 − 104 − 盘面_now`
+    ⇒ `最优盘面 = 533 − 104 − 底部 = 533 − 104 − (max/3 − 104 − 盘面_now)`
+                = `429 − max/3 + 104 + 盘面_now` … 化简成直接算：
+        `bottom = max/3 − 104 − board_now`
+        `board_best = 429 − bottom − margin`
+
+    ⇒ 它回答「这款**该把盘面做成多大**」，而不是「改 X 还是改 floor」。
+    """
+    last = {}
+    for ln in io.open(TSV, encoding='utf-8'):
+        f = ln.rstrip('\n').split('\t')
+        if len(f) < 4:
+            continue
+        m = re.search(r'board=(\d+)x(\d+)@', ln)
+        mx = re.search(r'max=(\d+)', ln)
+        if m and mx:
+            last[f[1]] = (int(m.group(2)) / 3.0, int(mx.group(1)) / 3.0, f[0][:16])
+
+    if not last:
+        print('⚠️ 台账里还没有带 `board=` 的测量 ⇒ 今晚跑完再来。')
+        return 0
+
+    rows = []
+    for name, (bh, mx, ts) in last.items():
+        bottom = mx - HEADER_VP - bh
+        cap = 533.0 - HEADER_VP - bottom      # 零余量下的盘面上限
+        safe = cap - margin                    # 留余量的值
+        now_total = bh + bottom + HEADER_VP    # 现在的总高
+        # 判定：现在溢出 / 现在正好 / 现在有余量可放大
+        if now_total > 533.5:
+            verdict = '⚠️ 现在溢出 %.0f' % (now_total - 533)
+            action = '缩到 %.0f' % safe
+        elif cap - bh > 15:
+            verdict = '可放大 +%.0f' % (cap - bh)
+            action = '放大到 %.0f' % cap
+        else:
+            verdict = '· 正好'
+            action = '不动'
+        rows.append((cap - bh, name, bh, bottom, cap, safe, verdict, action, ts))
+    rows.sort(reverse=True)
+
+    print('== 每款的最优盘面（头部 %.0fvp）==' % HEADER_VP)
+    print('%-24s %7s %7s %8s %8s %s' % ('游戏', '现盘面', '底部', '盘面上限', '留余量', '判读'))
+    print('-' * 86)
+    for d, name, bh, bottom, cap, safe, verdict, action, ts in rows[:25]:
+        print('%-24s %7.0f %7.0f %8.0f %8.0f %s ⇒ %s' % (name, bh, bottom, cap, safe, verdict, action))
+    print('-' * 86)
+    n_up = sum(1 for r in rows if r[0] > 15)
+    n_over = sum(1 for r in rows if r[2] + r[3] + HEADER_VP > 533.5)
+    print('可放大 >15vp: %d 款 / 现在溢出: %d 款 / 其余基本合适（共 %d）'
+          % (n_up, n_over, len(rows)))
+    print('\n⇒ 「盘面上限」= 零余量下能放多大；「留余量」= 再留 %.0fvp。' % margin)
+    print('⚠️ 「底部」是推算值（`max/3 − 104 − 盘面`），误差约 ±20vp。')
+    return 0
+
+    print('== 每款的最优盘面（头部 %.0fvp / 余量 %.0fvp）==' % (HEADER_VP, margin))
+    print('%-26s %8s %8s %10s %9s %s' % ('游戏', '现盘面', '底部', '最优盘面', '可放大', '测于'))
+    print('-' * 84)
+    for d, name, bh, bottom, best, ts in rows[:25]:
+        flag = '✅' if d > 15 else ('·' if d > -15 else '⚠️ 现在超了')
+        print('%-26s %8.0f %8.0f %10.0f %+9.0f %s %s' % (name, bh, bottom, best, d, ts, flag))
+    print('-' * 84)
+    n_up = sum(1 for r in rows if r[0] > 15)
+    n_dn = sum(1 for r in rows if r[0] < -15)
+    print('可放大 >15vp: %d 款 / 需缩小 >15vp: %d 款 / 基本合适: %d 款（共 %d）'
+          % (n_up, n_dn, len(rows) - n_up - n_dn, len(rows)))
+    print('\n⇒ 用法：对「可放大」的款，把盘面调大到「最优盘面」那一列')
+    print('   （方阵：`X = 533 − 最优盘面`；或按 `floor` 调，看哪一档在起作用）')
+    print('⚠️ 「底部」是推算值（`max/3 − 104 − 盘面`），误差约 ±20vp ⇒ 放大时留够余量。')
+    return 0
+
+
 def floor_mode(margin, since=''):
     """2026-11-14：**把今晚的 `blk` 换成明天的 `floor`**
 
@@ -104,6 +184,14 @@ def floor_mode(margin, since=''):
 
 def main():
     margin = 30.0
+    if '--opt' in sys.argv:
+        _m = 30.0
+        if '--margin' in sys.argv:
+            try:
+                _m = float(sys.argv[sys.argv.index('--margin') + 1])
+            except Exception:
+                pass
+        return opt_mode(_m)
     if '--floor' in sys.argv:
         _f = 30.0
         if '--margin' in sys.argv:
