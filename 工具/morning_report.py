@@ -164,6 +164,30 @@ def main():
         print('  ✅ 台账里没有「盘底超出」的款（或还没有 board= 数据）')
 
     print()
+    print('== ②·五 盘面实测高 vs 期望（判据 2356：只看实测，不看估算）==')
+    print('   期望 = 行宽 240vp = 720px；实测 H < 720 ⇒ 被 constraintSize 压缩过（自适应生效）')
+    n2b = 0
+    for g, (_ts, _oc, ex, _l) in sorted(rows.items()):
+        b = parse_board(ex)
+        if not b:
+            continue
+        w, h, x, y = b
+        if w < 480:          # 太小不是盘面（check_board 同口径）
+            continue
+        n2b += 1
+        h_vp = h / 3.0
+        if h < 720:
+            verdict = '✅ 压缩到 %.0fvp（< 240）' % h_vp
+        elif h == 720:
+            verdict = '⚠️ 正好 240vp（余 0，紧）'
+        else:
+            verdict = '❌ **%0.fvp > 240**（说明没有被压缩）' % h_vp
+        over = (y + h) - SCREEN_H
+        print('   %-26s H=%4dpx (%3.0fvp) 盘底%+4dpx %s' % (g, h, h_vp, over, verdict))
+    if n2b == 0:
+        print('   （台账里还没有合格的 board= 数据）')
+
+    print()
     print('== ③ 文字到边且可见高度 < 20px ==')
     print('   ⚠️ 「宽度」列很大 ⇒ bounds 是**一整行**（判据 2306），可见高度是行的不是元素的')
     hit = False
