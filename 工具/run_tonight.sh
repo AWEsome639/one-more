@@ -23,7 +23,7 @@ trap 'rm -f "$LOCK"' EXIT
 EMU='/Applications/DevEco-Studio.app/Contents/tools/emulator/Emulator'
 HC='/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
 HAP='entry/build/default/outputs/default/entry-default-signed.hap'
-step() { echo; echo "════ 第 $1 步：$2 ════"; }
+step() { echo; echo "════ [$(date '+%H:%M:%S')] 第 $1 步：$2 ════"; }
 fail() { echo "❌ 卡在第 $1 步：$2"; echo "⇒ 停。不要跳过、不要盲改脚本。"; exit 1; }
 
 step 1 'final_check（十项）'
