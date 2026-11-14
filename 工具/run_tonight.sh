@@ -51,6 +51,15 @@ step 3 '起模拟器 onemore7'
 if "$HC" list targets 2>/dev/null | grep -qE '^[0-9A-Za-z]'; then
   echo '✅ 已有设备在线 ⇒ 跳过启动'
 else
+  # ★ 2026-11-14 白天实测：`-stop` 之后再 `-start` 会卡住 —— qemu 进程活着但 CPU 只有 ~4%、
+  #   `hdc list targets` 一直 `[Empty]`，且 `Emulator -stop onemore7` 报「emulator is not exists」
+  #   （注册信息已丢）⇒ 必须手工 kill 才干净。起之前先清残留，否则新实例会和半死实例打架。
+  if pgrep -f 'qemu-system-x86_64' >/dev/null 2>&1 || pgrep -f 'Emulator -start' >/dev/null 2>&1; then
+    echo '⚠️ 发现残留模拟器进程 ⇒ 先清理（白天实测：-stop 后再 -start 会卡住）'
+    pkill -f 'qemu-system-x86_64' 2>/dev/null
+    pkill -f 'Emulator -start' 2>/dev/null
+    sleep 5
+  fi
   "$EMU" -start onemore7 > /tmp/tonight_emu.log 2>&1 &   # ★ 2026-11-14 修：原为 `-a`（非法选项，Emulator 只认 `-start <name>`）
   # ★ 2026-11-14 改：原来死等 180 秒，冷启动若更慢就整晚中止 ⇒ 改成轮询
   echo '⇒ 起模拟器后轮询等待上线（最多 600 秒，每 15 秒查一次）'

@@ -332,7 +332,7 @@ export struct GFractionMatcher {
           .accessibilityLevel('no')
           .fontSize(FontSize.xl).fontColor(this.theme.inkFaint)
         }.alignItems(VerticalAlign.Center)
-      }.width('100%').padding(Space.lg).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）

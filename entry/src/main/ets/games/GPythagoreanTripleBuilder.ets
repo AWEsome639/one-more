@@ -310,7 +310,7 @@ export struct GPythagoreanTripleBuilder {
   build() {
     // ★ 2026-11-08 横屏（853×533）：cap 343vp + 键帽×0.85 之后，7/8/9 刚好贴到 533
     //   「0」与「确认」还在屏外 ⇒ 横屏再收一档：间距 md→sm（省 30）、键帽 48→46（省 7）。
-    Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+    Column({ space: Bp.height < 600 ? Space.xs : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
