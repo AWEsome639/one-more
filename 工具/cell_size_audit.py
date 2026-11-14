@@ -50,12 +50,23 @@ def _strip_comments(src):
 
 
 def cap_value(src):
-    """从 `.width(Math.min(Bp.width - ..., Math.max(lo, Bp.height - X)))` 里取 X
+    """取 `(floor, X)` —— **必须两个都取**（2026-11-14 修，判据 2008）。
 
-    ⚠️ 必须先去掉注释行（判据 2004）—— 否则会命中注释里的演示值。
+    ⚠️ 为什么不能只取 X：写法是 `Math.max(240, Bp.height - 360)`，
+       而 `533 - 360 = 173 < 240` ⇒ **`Math.max` 取 `240`** ⇒ **盘面是 `240vp`，
+       不是 `173vp`**。今天有 `18` 处这种写法 ⇒ 只取 X 会把它们的盘面**低估 `67vp`**、
+       把每格**低估 28%**（`Gomoku` 会算成 `11.5vp`，实际 `16.0vp`）。
+
+    ⚠️ 另外必须先去掉注释行（判据 2004）—— 否则会命中注释里的演示值。
     """
-    m = re.search(r'Bp\.height\s*-\s*(\d+)', _strip_comments(src))
-    return int(m.group(1)) if m else None
+    body = _strip_comments(src)
+    m = re.search(r'Bp\.height\s*-\s*(\d+)', body)
+    if not m:
+        return None
+    x = int(m.group(1))
+    mf = re.search(r'Math\.max\(\s*(\d+)\s*,\s*Bp\.height\s*-\s*' + str(x), body)
+    floor = int(mf.group(1)) if mf else 0
+    return (floor, x)
 
 
 def cols_value(src):
@@ -97,9 +108,11 @@ def main():
         if cap is None or not cols or cols < 2:
             skipped.append(fn[:-4])
             continue
-        board = SCREEN_H - cap          # 盘面封顶（vp）
+        floor, x = cap
+        # ★ 判据 2008：盘面 = max(floor, 屏高 - X)；floor 大于它就说明**封顶没生效**
+        board = max(floor, SCREEN_H - x)
         cell = board / cols             # 每格（vp）
-        rows.append((cell, fn[:-4], cols, cap, board))
+        rows.append((cell, fn[:-4], cols, x, board, floor))
 
     rows.sort()   # 小的排前面
     print('== 格子尺寸审计（触控下限 %.0fvp）==' % threshold)
@@ -107,9 +120,10 @@ def main():
     print('-' * 72)
     bad = [r for r in rows if r[0] < threshold]
     ok = [r for r in rows if r[0] >= threshold]
-    for cell, name, cols, cap, board in bad:
+    for cell, name, cols, x, board, floor in bad:
         flag = '❌ 不可点' if cell < 20 else '⚠️ 偏小'
-        print('%-30s %5d %7d %7.0f %8.1f %s' % (name, cols, cap, board, cell, flag))
+        _fl = '' if floor <= (SCREEN_H - x) else ' (floor=%d 生效)' % floor
+        print('%-30s %5d %7d %7.0f %8.1f %s%s' % (name, cols, x, board, cell, flag, _fl))
     print('-' * 72)
     print('偏小 %d 款 / 合规 %d 款 / 推断不出 %d 款' % (len(bad), len(ok), len(skipped)))
     if skipped:
@@ -120,8 +134,8 @@ def main():
     loose = [r for r in rows if r[3] < 340]
     if loose:
         print('\n== ⚠️ 封顶太松（X < 340 ⇒ 盘面 > 193vp，加头部可能溢出）%d 款 ==' % len(loose))
-        for cell, name, cols, cap, board in sorted(loose, key=lambda r: r[3]):
-            print('  %-30s X=%-4d 盘面=%.0fvp  每格=%.1fvp' % (name, cap, board, cell))
+        for cell, name, cols, x, board, floor in sorted(loose, key=lambda r: r[3]):
+            print('  %-30s X=%-4d 盘面=%.0fvp  每格=%.1fvp' % (name, x, board, cell))
         print('  ⇒ 判据：方形盘**高 = 封顶值**，加头部 ~320vp 必须 ≤ 533vp ⇒ **X ≥ 320**')
     else:
         print('\n== ✅ 没有「封顶太松」的款（全部 X ≥ 340）==')
