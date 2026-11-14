@@ -30,6 +30,14 @@ AR_LO, AR_HI = 0.85, 1.18
 CENTER_TOL = 120     # px
 
 
+SCREEN_H = int(os.environ.get('SHOT_SCREEN_H', '1600'))
+
+
+def board_bottom(y, h):
+    """盘底 y+H 距屏底的差（正 = 超出屏底，即盘面被切）"""
+    return (y + h) - SCREEN_H
+
+
 def verdict(w, h, x, y):
     """返回 (ok, reasons)"""
     bad = []
@@ -78,8 +86,10 @@ def main():
             continue
         if not (show_all or only_susp) and ok:
             continue
-        print('%-28s %-18s %s' % (g, '%dx%d@%d,%d' % (w, h, x, y),
-                                  '✅ 像棋盘' if ok else '⚠️ ' + '；'.join(bad)))
+        cut = board_bottom(y, h)
+        cut_s = '✅ 完整' if cut <= 0 else '❌ 被切 %dpx' % cut
+        print('%-28s %-18s %-14s %s' % (g, '%dx%d@%d,%d' % (w, h, x, y), cut_s,
+                                        '✅ 像棋盘' if ok else '⚠️ ' + '；'.join(bad)))
     print()
     print('⇒ ✅ 像棋盘 %d 款 ｜ ⚠️ 可疑 %d 款 ｜ 合计 %d 款'
           % (ok_n, bad_n, ok_n + bad_n))
