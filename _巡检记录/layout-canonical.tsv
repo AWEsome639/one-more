@@ -613,3 +613,5 @@
 2026-11-14T19:40:15	Matrix Reasoning	OK	1600	67.0s lowest='提示' [60,1526][1265,1600] blk=3/72px cov=5 board=520x520@1020,612 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Reasoning-194015.jpeg @2026-11-14T19:40:15
 2026-11-14T19:51:46	Matrix Reasoning	OK	1600	68.6s lowest='提示：先看完整的两行推出规律，再用到缺格那一行' [866,1586][1695,1600] blk=0/0px cov=5 board=436x436@1062,612 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Reasoning-195146.jpeg @2026-11-14T19:51:46
 2026-11-14T19:57:01	Calculation Sprint	OK	1600	77.8s lowest='算得越快，连击越高；答错扣 3 秒' [60,1594][2500,1600] blk=0/0px cov=5 board=145x132@2193,201 max=0 -> /Users/a0000/dev/One More/_巡检记录/截图-Calculation_Sprint-195700.jpeg @2026-11-14T19:57:01
+2026-11-14T19:58:53	Factor Finder	OK	1600	68.6s lowest='提示' [60,1525][2500,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Factor_Finder-195853.jpeg @2026-11-14T19:58:53
+2026-11-14T20:10:12	Factor Finder	OK	1600	68.7s lowest='提示' [60,1507][2500,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Factor_Finder-201011.jpeg @2026-11-14T20:10:12
