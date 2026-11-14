@@ -53,9 +53,9 @@ if "$HC" list targets 2>/dev/null | grep -qiE 'onemore|emulator'; then
 else
   "$EMU" -start onemore7 > /tmp/tonight_emu.log 2>&1 &   # ★ 2026-11-14 修：原为 `-a`（非法选项，Emulator 只认 `-start <name>`）
   # ★ 2026-11-14 改：原来死等 180 秒，冷启动若更慢就整晚中止 ⇒ 改成轮询
-  echo '⇒ 起模拟器后轮询等待上线（最多 300 秒，每 15 秒查一次）'
+  echo '⇒ 起模拟器后轮询等待上线（最多 600 秒，每 15 秒查一次）'
   WAITED=0
-  while [ "$WAITED" -lt 300 ]; do
+  while [ "$WAITED" -lt 600 ]; do
     sleep 15; WAITED=$((WAITED + 15))
     if "$HC" list targets 2>/dev/null | grep -qiE 'onemore|emulator'; then
       echo "   ✅ 第 $WAITED 秒上线"
@@ -63,7 +63,7 @@ else
     fi
     [ $((WAITED % 60)) -eq 0 ] && echo "   …已等 $WAITED 秒"
   done
-  [ "$WAITED" -lt 300 ] || echo '   ⚠️ 等满 300 秒仍未上线'
+  [ "$WAITED" -lt 600 ] || echo '   ⚠️ 等满 600 秒仍未上线'
 fi
 # 无论如何，装包前确认设备真的在
 "$HC" list targets 2>/dev/null | grep -qiE 'onemore|emulator' \
