@@ -96,6 +96,11 @@ if [ "${1:-}" = '--check' ]; then
   echo; echo '==== --check 模式：前四步全过，不启跑批 ===='; exit 0
 fi
 
+# ★ 2026-11-14：**sweep_all.sh 用「HAP 构建日」当基线**；HAP 不在时它的 BASELINE 会是空串，
+#   而空基线会让「所有行都算已测」⇒ 待测 0 款、脚本正常退出（静默跑 0 款，比崩溃危险）。
+#   ⇒ 在调用之前拦一道：HAP 不在就不进跑批。
+[ -f "$HAP" ] || fail 5 "HAP 不见了（$HAP）⇒ sweep_all 会空基线、静默跑 0 款 ⇒ 拒绝进入跑批"
+
 step 5 '跑批（06:45 自停）'
 echo '⇒ 若中途崩了要重启：cp /tmp/sweep_all.log "/tmp/sweep_all-$(date +%H%M)-崩前.log"'
 bash 工具/sweep_all.sh
