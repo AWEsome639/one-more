@@ -18,7 +18,7 @@ echo "── ① 今晚跑出多少新行（期望 215–221；为 0 先查 HAP 
 #   （试跑时明明没有今晚数据却报 433 行）⇒ 改成与**跑批前的基线行数**比。
 BASE_FILE=/tmp/onemore_ledger_baseline
 CUR=$(wc -l < _巡检记录/layout-canonical.tsv 2>/dev/null | tr -d ' ')
-if [ -f "${BASE_FILE}" ]; then
+if [ -f "${BASE_FILE}" ] && [ -n "$(tr -d ' \n' < "${BASE_FILE}" 2>/dev/null)" ]; then
   B=$(cat "${BASE_FILE}" | tr -d ' ')
   N=$((CUR - B))
   echo "   台账行数：${CUR}｜跑批前基线：${B}｜**新增：${N}**"
@@ -28,7 +28,7 @@ else
   N=$(grep -cE "^${T}T(0[0-5]|06:[0-3])" _巡检记录/layout-canonical.tsv 2>/dev/null || echo 0)
   echo "      粗估（今天 00:00–06:39 的行）：${N}"
 fi
-if [ ! -f "${BASE_FILE}" ]; then
+if [ ! -f "${BASE_FILE}" ] || [ -z "$(tr -d ' \n' < "${BASE_FILE}" 2>/dev/null)" ]; then
   # ★ 没有基线 ⇒ **不能判**「有没有新数据」（粗估会把白天测量算进来）
   echo "   ⚠️ 没有基线 ⇒ **无法判断今晚有没有跑**；先看 /tmp/onemore_nightrun.log 的时间戳"
 elif [ "${N}" -le 0 ]; then

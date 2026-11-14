@@ -27,7 +27,13 @@ step() { echo; echo "════ [$(date '+%H:%M:%S')] 第 $1 步：$2 ══�
 fail() { echo "❌ 卡在第 $1 步：$2"; echo "⇒ 停。不要跳过、不要盲改脚本。"; exit 1; }
 
 # ★ 记台账基线：明早 morning_check.sh 用它算「今晚新增多少行」
-wc -l < _巡检记录/layout-canonical.tsv 2>/dev/null | tr -d ' ' > /tmp/onemore_ledger_baseline || echo 0 > /tmp/onemore_ledger_baseline
+#   ⚠️ 不能用 `wc … | tr > f || echo 0 > f`：管道退出码取最后一条命令（tr 成功）⇒ 台账缺失时
+#      会写出**空文件**而不是 0（2026-11-14 实测）。改用 if 判断。
+if [ -f _巡检记录/layout-canonical.tsv ]; then
+  wc -l < _巡检记录/layout-canonical.tsv | tr -d ' ' > /tmp/onemore_ledger_baseline
+else
+  echo 0 > /tmp/onemore_ledger_baseline
+fi
 
 step 1 'final_check（十项）'
 bash 工具/final_check.sh > /tmp/tonight_final.log 2>&1 || fail 1 'final_check 未过（看 /tmp/tonight_final.log）'
