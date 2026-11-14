@@ -779,7 +779,7 @@ export struct G2048 {
   }
 
   build() {
-    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
+    Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
       // ★ 2026-11-01 演示条走共用组件（DemoBar），不再借 HintBar 的 @Prop
       // ★ 演示条与 HintBar 恒显示：DemoBar 在未演示时高度为 0，不占位
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
