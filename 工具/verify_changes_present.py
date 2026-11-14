@@ -32,7 +32,11 @@ CHECKS = [
     ('GMagnets', 'Bp.height - 375', 'A①盘面 173→158vp'),
     ('GFractionMatcher', ".width('100%').padding(Space.md).backgroundColor(this.theme.surface)", 'A②题卡 padding lg→md'),
     ('GPythagoreanTripleBuilder', '? Space.xs : Space.md', 'A③外层间距 sm→xs（省 72px）'),
-    ('GWordle', 'Scroll()', 'A④套 Scroll 兜底'),
+    # ⛔⛔ 2026-11-14 作废：`GWordle` 套 `Scroll` 后**中间全黑、棋盘与键盘都没渲染**
+    #   （`.height('100%')` 被注释掉之后，`Scroll` 里的内容没有内在高度 ⇒ 高度 0）。
+    #   已在 `68bc832a` 回滚到 `b2cacc75` 那个「十四次收敛」的修好版本。
+    #   ⇒ **不要再给 `GWordle` 套 `Scroll`**；它原本的修法是「键盘给 `120vp`」。
+    ('GWordle', 'KEY_H', '键盘行高常量 KEY_H（勿改回 Scroll）'),
     ('G2048', 'Bp.height - 360', '限宽'),
     ('GBlockCount3d', 'Bp.isShort() ? 88 : 112', '格高降档'),
     ('GCalculationSprint', 'Bp.isShort() ? FontSize.xl : FontSize.hero', '题卡降档'),
