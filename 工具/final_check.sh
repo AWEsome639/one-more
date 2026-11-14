@@ -146,6 +146,22 @@ else
 fi
 echo
 
+# ★ 2026-11-14 判据 2236：Colima 预留 10GB 会跟安卓模拟器抢内存
+echo "───── ⑩ 内存与 Colima（判据 2236：看配额不只看占用）─────"
+COLIMA=$(pgrep -f 'limactl hostagent' 2>/dev/null | head -1)
+if [ -n "$COLIMA" ]; then
+  # ⚠️ 只用 ASCII 括号包变量 —— 全角括号 + 变量在部分 locale 下会乱码（本文件 L127 已记载）
+  VMEM=$(ps -o rss= -p "$COLIMA" 2>/dev/null | awk '{printf "%d", $1/1024}')
+  echo "  WARN Colima running: PID=$COLIMA RSS=${VMEM:-?}MB"
+  echo "       it reserves memory and will compete with the Android emulator."
+  echo "       => run 'colima stop' before the window (check 'docker ps' first)."
+else
+  echo "  ✅ Colima 没在跑"
+fi
+FREE=$(memory_pressure 2>/dev/null | awk '/free percentage/{print $NF}')
+echo "  系统内存空闲: ${FREE:-?}"
+echo
+
 echo "═════════════════ 总检结论 ═════════════════"
 if [ "$FAIL" -eq 0 ]; then
   echo "✅ 全部就绪 —— 今晚可以按四步跑"
