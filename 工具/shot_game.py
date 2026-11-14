@@ -364,8 +364,22 @@ def game_title_map():
         _TITLE_CACHE = {}
         return _TITLE_CACHE
     m = {}
-    for mm in re.finditer(r"id:\s*'([^']+)'.*?name:\s*'([^']+)'.*?enName:\s*'([^']+)'", s, re.S):
-        m[mm.group(3)] = mm.group(2)
+    # ⛔ 2026-11-14 21:2x 修：原来用
+    #   re.finditer(r"id:...name:...enName:...", s, re.S)
+    # 在**整个文件**上跑，`.*?` 会跨条目；而 finditer 是非重叠的 ⇒
+    # 一旦某条的 enName 被前面的匹配吃掉，后面的 id+name 就会与**下一条的 enName** 配错。
+    # 实测后果：map 里 `Lock Pattern → 生命游戏`（注册表实际是「图案锁」）⇒
+    #   搜索会打错名字 ⇒ NO_CARD/WRONG_GAME。台账里 12 款真游戏 NO_CARD，这可能是一部分原因。
+    # ⇒ 改成**逐 `{...}` 条目**解析，每条只在它自己的花括号内找 id/name/enName。
+    for block in re.findall(r'\{[^{}]*\}', s):
+        mi = re.search(r"id:\s*'([^']+)'", block)
+        mn = re.search(r"name:\s*'([^']+)'", block)
+        me = re.search(r"enName:\s*'([^']+)'", block)
+        if mi and mn and me:
+            m[me.group(1)] = mn.group(1)
+    # 台账里用的是 `Word Snake`，而注册表的 enName 是 `Word Snake Trail` ⇒ 补一条别名
+    if 'Word Snake Trail' in m and 'Word Snake' not in m:
+        m['Word Snake'] = m['Word Snake Trail']
     _TITLE_CACHE = m
     return m
 
