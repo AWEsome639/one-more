@@ -128,6 +128,24 @@ echo "  emulator procs: $EMU  (must be 0)"
 [ "$EMU" != "0" ] && fail "dry-run 起了模拟器"
 
 echo
+# ★ 2026-11-14 判据 2198：开窗前必须查磁盘 —— 今晚 1.2GiB 时差点跑到一半崩
+echo "───── ⑨ 磁盘（判据 2198：< 10 GiB 必须先腾）─────"
+AVAIL_KB=$(df -k /Users 2>/dev/null | tail -1 | awk '{print $4}')
+if [ -z "$AVAIL_KB" ]; then
+  echo "  ⚠️ 读不到磁盘可用空间 —— 不阻塞（fail-open），但请手动 df -h 看一眼"
+else
+  AVAIL_GB=$(( AVAIL_KB / 1024 / 1024 ))
+  echo "  /Users 可用: ${AVAIL_GB} GiB  (阈值 10 GiB)"
+  if [ "$AVAIL_GB" -lt 10 ]; then
+    echo "  ❌ 磁盘 < 10 GiB ⇒ **必须先腾**，否则今晚会跑到一半失败（截图丢失/台账写坏）"
+    echo "     腾的顺序：废弃模拟器 > 旧编译产物 > 缓存；在用的 onemore/onemore7 与 ~/.dsh/work 不动"
+    FAIL=$((FAIL+1))
+  else
+    echo "  ✅ 够"
+  fi
+fi
+echo
+
 echo "═════════════════ 总检结论 ═════════════════"
 if [ "$FAIL" -eq 0 ]; then
   echo "✅ 全部就绪 —— 今晚可以按四步跑"
