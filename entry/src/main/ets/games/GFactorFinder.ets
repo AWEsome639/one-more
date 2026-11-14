@@ -342,17 +342,21 @@ export struct GFactorFinder {
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).width('100%')
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      Button(TG('提示'))
-        .fontSize(FontSize.sm)
-        .fontColor(this.theme.ink)
-        .backgroundColor(this.theme.surfaceAlt)
-        .borderRadius(Radius.md)
-        .width('100%').height(Cell.of(40)).focusable(Tv.on())
-        .onFocus(() => { this.tvFocus = 'L338'; })
-        .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'L338')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); }).onClick(() => {
-          this.askHint();
-        })
+      // ★ 2026-11-14 真机（判据 2651）：用**条件渲染**而非 visibility 来验证元素身份：
+      //   矮屏不创建这个「提示」按钮（顶部 HintBar 已有同功能的提示）。
+      if (!Bp.isShort()) {
+        Button(TG('提示'))
+          .fontSize(FontSize.sm)
+          .fontColor(this.theme.ink)
+          .backgroundColor(this.theme.surfaceAlt)
+          .borderRadius(Radius.md)
+          .width('100%').height(Cell.of(40)).focusable(Tv.on())
+          .onFocus(() => { this.tvFocus = 'L338'; })
+          .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
+          .outline(Tv.focusOutline(this.tvFocus === 'L338')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { this.askHint(); }); }).onClick(() => {
+            this.askHint();
+          })
+      }
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('重开'))
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
