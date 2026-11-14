@@ -165,7 +165,8 @@ def main():
 
     print()
     print('== ②·五 盘面实测高 vs 期望（判据 2356：只看实测，不看估算）==')
-    print('   期望 = 行宽 240vp = 720px；实测 H < 720 ⇒ 被 constraintSize 压缩过（自适应生效）')
+    print('   ⚠️ 期望值取决于该款的 max 下限：下限 240 ⇒ 240vp(720px)；下限 140/120 ⇒ 173vp(519px)')
+    print('   ⇒ 本节目的是「报实测值」，不是判「压没压」（判据 2409）')
     n2b = 0
     for g, (_ts, _oc, ex, _l) in sorted(rows.items()):
         b = parse_board(ex)
