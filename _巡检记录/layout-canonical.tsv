@@ -907,3 +907,6 @@
 2026-11-15T07:46:01	Magnets	OK	1590	69.3s lowest='现 0' [911,1529][978,1571] blk=2/48px cov=5 board=156x156@90,750 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-074601.jpeg @2026-11-15T07:46:01
 2026-11-15T07:47:49	Magnets	OK	1590	67.0s lowest='现 0' [911,1529][978,1571] blk=2/48px cov=5 board=156x156@90,750 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-074748.jpeg @2026-11-15T07:47:49
 2026-11-15T07:55:05	Magnets	OK	1600	69.6s lowest='现 0' [819,1355][886,1397] blk=2/48px cov=5 board=156x156@90,750 max=24 -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-075505.jpeg @2026-11-15T07:55:05
+2026-11-15T08:04:51	Magnets	NO_CARD	-	158.0s no card for '磁铁' (fallback=(1280, 675))
+2026-11-15T08:08:07	Magnets	NO_CARD	-	144.5s no card for '磁铁' (fallback=(1280, 675))
+2026-11-15T08:11:22	Magnets	NO_CARD	-	147.3s no card for '磁铁' (fallback=(1280, 675))
