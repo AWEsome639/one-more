@@ -94,6 +94,16 @@ def main() -> int:
         print('✅ 已扫 %d 个 dump，未发现截断嫌疑' % len(set(paths)))
         return 0
 
+    # ★ 2026-11-16：同一份 dump 可能同时在 /tmp 与 _巡检记录/dumps/（--all）⇒ 去重
+    uniq = []
+    seen = set()
+    for item in findings:
+        key = (item[0], item[1], item[2])
+        if key in seen:
+            continue
+        seen.add(key)
+        uniq.append(item)
+    findings = uniq
     print('⚠️ 发现 %d 条截断嫌疑（需人眼确认）:' % len(findings))
     for game, s, t in findings[:40]:
         print('  %-26s 源 %2d 字「%s…」 → 屏上 %2d 字「%s」'
