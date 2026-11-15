@@ -603,7 +603,9 @@ export struct GCrown {
               })
             }, (c: number) => 'cr' + r + '-' + c)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
+          .width(Math.min(Bp.width - 2 * Space.lg, // ★ 2026-11-15（判据 2716/2762/2765）：底部「放皇冠/撤销/提示」那行被切（blk=2/48px）。
+          //   533-360=173 < 240 ⇒ **起决定作用的是下限 240**；下限 240→220 让出 20vp=60px ≥ 缺口 48px。
+          Math.max(210, Bp.height - 360)))
         }, (r: number) => 'crw' + r)
       }
       .width('100%')

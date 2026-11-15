@@ -646,7 +646,7 @@ export struct GHeyawake {
               })
             }, (c: number) => 'hw' + r + '-' + c)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
+          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(210, Bp.height - 360)))
         }, (r: number) => 'hwr' + r)
       }
       .width('100%')
