@@ -1,0 +1,70 @@
+// ============================================================
+// 第 ② 项：端侧 LLM 推理骨架（**草稿，不要直接放进 entry/src**）
+// 依据：@ohos.ai.mindSporeLite，API 12 已用官方 .d.ts 核实可用（判据落地见
+//       _巡检记录/★★★★★第2项技术前提已用官方SDK查实-20261116.md）
+// 用法：今晚转换出 .ms 之后，把它落到 entry/src/main/ets/core/OnDeviceLLM.ets
+// ============================================================
+
+import { mindSporeLite } from '@kit.MindSporeLiteKit';
+import { common } from '@kit.AbilityKit';
+
+/** 单例：模型只加载一次，避免每次预测都吃 300MB 的加载开销 */
+export class OnDeviceLLM {
+  private static inst: OnDeviceLLM | null = null;
+  private model: mindSporeLite.Model | null = null;
+  private busy: boolean = false;
+
+  static get(): OnDeviceLLM {
+    if (OnDeviceLLM.inst === null) { OnDeviceLLM.inst = new OnDeviceLLM(); }
+    return OnDeviceLLM.inst;
+  }
+
+  /**
+   * 从 rawfile 加载 .ms
+   * ⚠️ .ms 不能进 HAP 的 rawfile 太大（300MB）⇒ 首选「首次启动从沙箱/网络下载到 filesDir」，
+   *    这里保留 rawfile 路径作为「开发期验证」用。
+   */
+  async load(ctx: common.UIAbilityContext, rawName: string = 'qwen25_05b_q4.ms'): Promise<boolean> {
+    if (this.model !== null) { return true; }
+    try {
+      // 开发期：rawfile 直接读进 buffer（模型小则可行；大文件请改沙箱路径 + loadModelFromFile）
+      const buf: Uint8Array = ctx.resourceManager.getRawFileContentSync(rawName);
+      const cfg: mindSporeLite.Context = {
+        target: ['cpu'],                    // 首版先用 CPU；测出 token/s 后再试 ['nnrt'] 上 NPU
+        cpu: { threadNum: 2, threadAffinityMode: 1, precisionMode: 'preferred_fp16' },
+        // 若改 nnrt：
+        // target: ['nnrt'], nnrt: { deviceID: 0, performanceMode: 'high' }
+      };
+      this.model = await mindSporeLite.loadModelFromBuffer(buf.buffer, cfg);
+      return this.model !== null;
+    } catch (e) {
+      console.error('[OnDeviceLLM] load failed: ' + JSON.stringify(e));
+      return false;
+    }
+  }
+
+  /**
+   * 最小可用调用：给一段 prompt，返回生成的文本
+   * ⚠️ 真实 LLM 需要 tokenizer（BPE/SentencePiece）⇒ **这一步是本项目最大的未知**：
+   *    MindSpore Lite 只负责「张量进、张量出」，分词/采样/停止条件全要自己写或在模型里固化。
+   *    所以首版建议选「已内置 tokenizer 的 .ms」或用 MindSpore 的 LLM 示例工程。
+   */
+  async generate(inputIds: Int32Array, maxNewTokens: number = 32): Promise<Int32Array> {
+    if (this.model === null || this.busy) { return new Int32Array(0); }
+    this.busy = true;
+    try {
+      const inputs: mindSporeLite.MSTensor[] = this.model.getInputs();
+      // 具体形状依赖模型（通常 [1, seqLen]）⇒ 必须先打印 inputs 的 shape 再填
+      // inputs[0].setData(...)  // 按实际 shape 填
+      const outputs: mindSporeLite.MSTensor[] = await this.model.predict(inputs);
+      // outputs[0] 取 logits ⇒ argmax 采样 ⇒ 拼 token
+      return new Int32Array(0);
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  release(): void {
+    if (this.model !== null) { this.model = null; }
+  }
+}
