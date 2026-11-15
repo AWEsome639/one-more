@@ -42,7 +42,16 @@ def parse(since=None):
         m2 = re.search(r"lowest='([^']*)'", ln)
         if m2:
             low = m2.group(1)
-        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, cov=(int(cm.group(1)) if cm else None)))
+        # ★ 2026-11-15（判据 2695/2708）：**真溢出**的两个新字段 —— 11-15 起才有
+        #   · over=   子容器比父容器高（容器尺寸矛盾）
+        #   · sumover= 子元素高度之和 > 父容器高（父预算不足，最后一个被子元素被压）
+        #   ⇒ 这两个 >0 才是**真溢出**；`blk` 只统计「y2>1576 的块」，对父界内的溢出无信息量。
+        om = re.search(r'over=(\d+)px', ln)
+        sm = re.search(r'sumover=(\d+)px', ln)
+        has_over = bool(om)
+        over = int(om.group(1)) if om else 0
+        sumover = int(sm.group(1)) if sm else 0
+        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, cov=(int(cm.group(1)) if cm else None), over=over, sumover=sumover, has_over=has_over))
     return rows
 
 def main():
@@ -58,6 +67,21 @@ def main():
 
     env = [r for r in rows if r['outcome'] in ('NOT_HOME', 'NO_CARD', 'DUMP_FAIL', 'TIMEOUT')]
     got = [r for r in rows if r not in env]
+
+    # ★ 2026-11-15（判据 2695/2708）：**真溢出优先** —— `over>0` 或 `sumover>0` 才是
+    #   容器尺寸矛盾/父预算不足；`blk` 只统计「y2>1576 的块」，对父界内的溢出零信息量。
+    AO = [r for r in got if r.get('over', 0) > 0 or r.get('sumover', 0) > 0]
+    AO.sort(key=lambda r: -(r.get('over', 0) + r.get('sumover', 0)))
+    _has_over_data = [r for r in got if r.get('has_over')]
+    if AO:
+        print('=== 真溢出（over>0 或 sumover>0）%d 款 ===' % len(AO))
+        for r in AO[:25]:
+            print('  %-28s over=%-4d sumover=%-4d %s' % (r['name'], r.get('over', 0), r.get('sumover', 0), r['ts'][:16]))
+        print()
+    elif _has_over_data:
+        print('=== 真溢出：0 款（%d 款有 over/sumover 数据）===\n' % len(_has_over_data))
+    else:
+        print('=== 真溢出：**无数据** —— 这批测量没有 over=/sumover= 字段（旧 HAP 或旧脚本）===\n')
 
     # 分档：越可疑越靠前
     A = [r for r in got if r['blk'] >= 24]                       # 真越界 ≥ 8vp
