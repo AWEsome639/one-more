@@ -308,7 +308,9 @@ export struct GTripletsLogic {
   option(i: number) {
     Text(this.opts.length > i ? this.label(this.opts[i]) : '')
       .fontSize(FontSize.xl).fontColor(this.theme.ink).textAlign(TextAlign.Center)
-      .width('100%').height(Cell.of(52)).backgroundColor(this.theme.surface).borderRadius(Radius.md)
+      .width('100%')// ★ 2026-11-16（判据 2782/2785）：dump：三个选项各 150px、间隔 30px ⇒ 第三个被切 13px。
+      //   Cell.of(52)=150px ⇒ Cell.of(50)=144px（仍 ≥ 132 触控下限）、三项省 18px。
+      .height(Cell.of(50)).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       .borderWidth(2)
       .borderColor(this.picked < 0 ? this.theme.line :
         (i === this.ans ? Palette.emerald : (i === this.picked ? Palette.rose : this.theme.line)))
