@@ -64,7 +64,8 @@ def static_capacity_scan() -> int:
     if not hits:
         print('✅ 静态档：没有 >40 字的整行 Text 中文串')
         return 0
-    print('⚠️ 静态档：%d 处 >40 字整行 Text（容量界 40-43，需 dump 或截图确认）:' % len(hits))
+    # ★ 2026-11-16（判据 2797）：阈值 40 来自 dump 的报数上限，不是屏幕容量 ⇒ 只能当提示
+    print('ℹ️ 静态档（提示，非报警）：%d 处 >40 字整行 Text。阈值 40 来自 dump 报数上限、不是屏幕容量；判截断只能看截图（判据 2797）' % len(hits))
     for g, ln, n, s in hits:
         print('  %-26s L%-5d %2d 字  %s' % (g, ln, n, s[:38]))
     return 0
@@ -105,7 +106,8 @@ def main() -> int:
             if len(cand) != 1:
                 continue
             src_file = cand[0]
-        longs = [s for s in source_strings(src_file) if len(s) >= 20]
+        # ★ 2026-11-16（判据 2797）：dump 的 text 约 40 字封顶 ⇒ 只对 <40 字可信
+        longs = [s for s in source_strings(src_file) if 20 <= len(s) < 40]
         if not longs:
             continue
         texts = dump_texts(p)
