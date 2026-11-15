@@ -165,6 +165,9 @@ python3 工具/verify_layout.py --every 999 --names-file /tmp/batch.txt >> "$LOG
 # ★ dump 归档（/tmp 会被清理，归档到仓库里才能被 check_truncation.py --all 扫到）
 mkdir -p _巡检记录/dumps 2>/dev/null
 cp -f /tmp/nodes-*.tsv _巡检记录/dumps/ 2>/dev/null || true
+# ★ 2026-11-16（判据 2794）：每批归档后跑一次截断检测，结果进日志
+echo "=== 截断检测（判据 2794）===" >> "$LOG"
+python3 工具/check_truncation.py --all >> "$LOG" 2>&1 || true
 
   grep -vxFf /tmp/batch.txt "$TODO" > /tmp/todo_next.txt 2>/dev/null || true
   mv /tmp/todo_next.txt "$TODO"
