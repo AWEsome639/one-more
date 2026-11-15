@@ -294,7 +294,9 @@ export struct GCrossSectionSlice {
               .transition(TransitionEffect.OPACITY.animation({ duration: Motion.fast, curve: Motion.snap() })
                 .combine(TransitionEffect.scale({ x: 0.85, y: 0.85 })))
             }, (c: number) => 'c' + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, // ★ 2026-11-15（判据 2716/2734/2762）：底部两个选项只露上半截、下一行完全被切（blk=3/72px）。
+          //   注意：533-360=173 > 140 ⇒ **下限不生效**，所以要改的是减数（-360→-400 ⇒ 网格 173→133vp）。
+          Math.max(140, Bp.height - 400)))
         }, (r: number) => 'r' + r)
       }.width('100%')
       .padding(Space.sm)
