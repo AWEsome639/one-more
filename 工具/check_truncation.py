@@ -107,7 +107,9 @@ def main() -> int:
                 continue
             src_file = cand[0]
         # ★ 2026-11-16（判据 2797）：dump 的 text 约 40 字封顶 ⇒ 只对 <40 字可信
-        longs = [s for s in source_strings(src_file) if 20 <= len(s) < 40]
+        # ★ 2026-11-16（判据 2802）：dump 已从 tx[:40] 改为 tx[:200]
+        #   ⇒ 动态档可信上限也随之抬到 200（旧 dump 仍只有 40 字，对它们仍需小心）
+        longs = [s for s in source_strings(src_file) if 20 <= len(s) < 200]
         if not longs:
             continue
         texts = dump_texts(p)
@@ -135,6 +137,7 @@ def main() -> int:
         uniq.append(item)
     findings = uniq
     print('⚠️ 发现 %d 条截断嫌疑（需人眼确认）:' % len(findings))
+    print('   ⚠️ 2026-11-16 07:05 之前的 dump 仍带 tx[:40] 旧切片 ⇒ 对它们的报警可能是假阳性；今晚重跑后洗掉。')
     for game, s, t in findings[:40]:
         print('  %-26s 源 %2d 字「%s…」 → 屏上 %2d 字「%s」'
               % (game, len(s), s[:16], len(t), t))
