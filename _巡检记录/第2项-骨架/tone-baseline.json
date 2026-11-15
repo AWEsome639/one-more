@@ -1,0 +1,3200 @@
+{
+  "n_games": 355,
+  "per_game": [
+    {
+      "file": "GCognateCatch",
+      "n_strings": 58,
+      "avg_len": 12.4,
+      "max_len": 31,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GVerbalAnalogies",
+      "n_strings": 58,
+      "avg_len": 8.0,
+      "max_len": 23,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GLogicalSyllogisms",
+      "n_strings": 51,
+      "avg_len": 10.4,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GAssociativePairs",
+      "n_strings": 45,
+      "avg_len": 6.4,
+      "max_len": 17,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 30
+    },
+    {
+      "file": "GOxymoronHunt",
+      "n_strings": 39,
+      "avg_len": 6.8,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GWordAssociationRecall",
+      "n_strings": 39,
+      "avg_len": 6.9,
+      "max_len": 16,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 24
+    },
+    {
+      "file": "GNarrativeRecall",
+      "n_strings": 35,
+      "avg_len": 8.8,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSolitaire",
+      "n_strings": 32,
+      "avg_len": 11.8,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GConsonantReconstruct",
+      "n_strings": 31,
+      "avg_len": 8.5,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 16
+    },
+    {
+      "file": "GSourceMonitoring",
+      "n_strings": 31,
+      "avg_len": 8.9,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GVowelReconstruct",
+      "n_strings": 31,
+      "avg_len": 8.5,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 15
+    },
+    {
+      "file": "GStoryBuilder",
+      "n_strings": 30,
+      "avg_len": 9.2,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSyllableStack",
+      "n_strings": 29,
+      "avg_len": 7.9,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 16
+    },
+    {
+      "file": "GCryptogram",
+      "n_strings": 28,
+      "avg_len": 9.0,
+      "max_len": 30,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 12
+    },
+    {
+      "file": "GConundrumAnagram",
+      "n_strings": 27,
+      "avg_len": 9.2,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GSpiderSolitaire",
+      "n_strings": 27,
+      "avg_len": 11.8,
+      "max_len": 31,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GBridges",
+      "n_strings": 26,
+      "avg_len": 13.9,
+      "max_len": 33,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GCheckers",
+      "n_strings": 26,
+      "avg_len": 10.2,
+      "max_len": 35,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GDivisibilityDash",
+      "n_strings": 26,
+      "avg_len": 14.4,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GGomoku",
+      "n_strings": 26,
+      "avg_len": 11.3,
+      "max_len": 37,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GEtymonOddball",
+      "n_strings": 25,
+      "avg_len": 9.8,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GReadingSpan",
+      "n_strings": 25,
+      "avg_len": 9.3,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GVectorGridAlignment",
+      "n_strings": 25,
+      "avg_len": 10.4,
+      "max_len": 24,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GBridgesAll",
+      "n_strings": 24,
+      "avg_len": 11.8,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GCompoundConnect",
+      "n_strings": 24,
+      "avg_len": 11.5,
+      "max_len": 34,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GContextClues",
+      "n_strings": 24,
+      "avg_len": 7.4,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GGo9",
+      "n_strings": 24,
+      "avg_len": 10.3,
+      "max_len": 29,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GReversi",
+      "n_strings": 24,
+      "avg_len": 9.0,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GChalkAndTalk",
+      "n_strings": 23,
+      "avg_len": 14.9,
+      "max_len": 38,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 9
+    },
+    {
+      "file": "GEinsteinRiddle",
+      "n_strings": 23,
+      "avg_len": 10.7,
+      "max_len": 35,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GCompassMaze",
+      "n_strings": 22,
+      "avg_len": 11.3,
+      "max_len": 26,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GCountdownMath",
+      "n_strings": 22,
+      "avg_len": 10.8,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GMathGuess",
+      "n_strings": 22,
+      "avg_len": 10.5,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GNim",
+      "n_strings": 22,
+      "avg_len": 11.8,
+      "max_len": 28,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GRuleSwitcher",
+      "n_strings": 22,
+      "avg_len": 9.7,
+      "max_len": 40,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GStroopNumberSize",
+      "n_strings": 22,
+      "avg_len": 9.4,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GTicTacToe",
+      "n_strings": 22,
+      "avg_len": 13.0,
+      "max_len": 31,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GAbReversalOddball",
+      "n_strings": 21,
+      "avg_len": 13.7,
+      "max_len": 34,
+      "excl": 3,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GAreaPerimeterMatch",
+      "n_strings": 21,
+      "avg_len": 10.7,
+      "max_len": 33,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GArithmeticChain",
+      "n_strings": 21,
+      "avg_len": 9.8,
+      "max_len": 16,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GCollatz",
+      "n_strings": 21,
+      "avg_len": 14.2,
+      "max_len": 30,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GDoubleNBack",
+      "n_strings": 21,
+      "avg_len": 8.8,
+      "max_len": 22,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GEtymologyOrigin",
+      "n_strings": 21,
+      "avg_len": 7.3,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GFractionalPizza",
+      "n_strings": 21,
+      "avg_len": 12.6,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GGame24",
+      "n_strings": 21,
+      "avg_len": 12.5,
+      "max_len": 32,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GGoNoGo",
+      "n_strings": 21,
+      "avg_len": 10.7,
+      "max_len": 22,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GMasyu",
+      "n_strings": 21,
+      "avg_len": 11.2,
+      "max_len": 26,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GMultipleObjectTracking",
+      "n_strings": 21,
+      "avg_len": 9.1,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GSetTheoryVenn",
+      "n_strings": 21,
+      "avg_len": 10.8,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GTowerOfLondon",
+      "n_strings": 21,
+      "avg_len": 11.6,
+      "max_len": 27,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GAlphabetSudoku",
+      "n_strings": 20,
+      "avg_len": 8.7,
+      "max_len": 18,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GBinomialMatch",
+      "n_strings": 20,
+      "avg_len": 13.7,
+      "max_len": 35,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GBlinkDetector",
+      "n_strings": 20,
+      "avg_len": 12.4,
+      "max_len": 33,
+      "excl": 4,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GCategoryFluency",
+      "n_strings": 20,
+      "avg_len": 10.6,
+      "max_len": 38,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GColorMazeNav",
+      "n_strings": 20,
+      "avg_len": 9.6,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GFaceNameAssociation",
+      "n_strings": 20,
+      "avg_len": 10.2,
+      "max_len": 26,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GFaceTraitAssociation",
+      "n_strings": 20,
+      "avg_len": 10.6,
+      "max_len": 26,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GGroceryList",
+      "n_strings": 20,
+      "avg_len": 8.9,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GHomophoneHunt",
+      "n_strings": 20,
+      "avg_len": 9.0,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GMagicSquares",
+      "n_strings": 20,
+      "avg_len": 10.7,
+      "max_len": 23,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GMandalaRecall",
+      "n_strings": 20,
+      "avg_len": 10.3,
+      "max_len": 29,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GMathMaze",
+      "n_strings": 20,
+      "avg_len": 11.8,
+      "max_len": 28,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GMemoryMatrix",
+      "n_strings": 20,
+      "avg_len": 10.1,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GMentalRotation",
+      "n_strings": 20,
+      "avg_len": 7.7,
+      "max_len": 16,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GMultiTrackCounter",
+      "n_strings": 20,
+      "avg_len": 11.8,
+      "max_len": 34,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GNavonHierarchical",
+      "n_strings": 20,
+      "avg_len": 12.4,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GPerspectiveShiftView",
+      "n_strings": 20,
+      "avg_len": 8.2,
+      "max_len": 19,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GPong",
+      "n_strings": 20,
+      "avg_len": 10.8,
+      "max_len": 26,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GRhythmMaster",
+      "n_strings": 20,
+      "avg_len": 14.1,
+      "max_len": 34,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GSequenceStack",
+      "n_strings": 20,
+      "avg_len": 13.0,
+      "max_len": 32,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GSopt",
+      "n_strings": 20,
+      "avg_len": 9.9,
+      "max_len": 26,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSternbergTask",
+      "n_strings": 20,
+      "avg_len": 7.3,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GStopSignal",
+      "n_strings": 20,
+      "avg_len": 9.2,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GSudokuHex",
+      "n_strings": 20,
+      "avg_len": 8.2,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GTowerOfHanoi",
+      "n_strings": 20,
+      "avg_len": 11.4,
+      "max_len": 27,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GVocabularyBuilder",
+      "n_strings": 20,
+      "avg_len": 8.9,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GAttentionalBlinkProbe",
+      "n_strings": 19,
+      "avg_len": 9.8,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GBinaryPuzzle",
+      "n_strings": 19,
+      "avg_len": 11.3,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GChainReaction",
+      "n_strings": 19,
+      "avg_len": 16.0,
+      "max_len": 31,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GClassicMaze",
+      "n_strings": 19,
+      "avg_len": 9.1,
+      "max_len": 16,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GDefinitionDash",
+      "n_strings": 19,
+      "avg_len": 7.4,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GDividedAttention",
+      "n_strings": 19,
+      "avg_len": 10.7,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 9
+    },
+    {
+      "file": "GDoubleTrouble",
+      "n_strings": 19,
+      "avg_len": 13.5,
+      "max_len": 40,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GDualTaskMemory",
+      "n_strings": 19,
+      "avg_len": 11.4,
+      "max_len": 22,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GEventTimelineMemory",
+      "n_strings": 19,
+      "avg_len": 9.4,
+      "max_len": 15,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GFlappy",
+      "n_strings": 19,
+      "avg_len": 12.9,
+      "max_len": 31,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GFreecell",
+      "n_strings": 19,
+      "avg_len": 12.3,
+      "max_len": 22,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GGearTrainDirection",
+      "n_strings": 19,
+      "avg_len": 9.4,
+      "max_len": 23,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GGhostTap",
+      "n_strings": 19,
+      "avg_len": 10.3,
+      "max_len": 28,
+      "excl": 3,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GMathPath",
+      "n_strings": 19,
+      "avg_len": 10.0,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GMatrixMultiplierMatch",
+      "n_strings": 19,
+      "avg_len": 12.4,
+      "max_len": 32,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GMemoryPalace",
+      "n_strings": 19,
+      "avg_len": 8.8,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GMentalCalendar",
+      "n_strings": 19,
+      "avg_len": 11.3,
+      "max_len": 27,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GMirrorTracing",
+      "n_strings": 19,
+      "avg_len": 12.6,
+      "max_len": 29,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GSpotlightTrack",
+      "n_strings": 19,
+      "avg_len": 8.1,
+      "max_len": 15,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSubitizingRush",
+      "n_strings": 19,
+      "avg_len": 9.0,
+      "max_len": 34,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GTargetNumber",
+      "n_strings": 19,
+      "avg_len": 11.5,
+      "max_len": 21,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GTracePath",
+      "n_strings": 19,
+      "avg_len": 11.5,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GTypingSpeed",
+      "n_strings": 19,
+      "avg_len": 10.0,
+      "max_len": 22,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GVigilanceTask",
+      "n_strings": 19,
+      "avg_len": 11.1,
+      "max_len": 26,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GWordSearch",
+      "n_strings": 19,
+      "avg_len": 13.1,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GWordSnakeTrail",
+      "n_strings": 19,
+      "avg_len": 12.8,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GWordWheel",
+      "n_strings": 19,
+      "avg_len": 13.1,
+      "max_len": 29,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GAnagramDefinition",
+      "n_strings": 18,
+      "avg_len": 8.5,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GBalanceScale",
+      "n_strings": 18,
+      "avg_len": 11.7,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GBinaryCode",
+      "n_strings": 18,
+      "avg_len": 9.4,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GBinaryMatrixRank",
+      "n_strings": 18,
+      "avg_len": 11.9,
+      "max_len": 36,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GBlockStackingPhysics",
+      "n_strings": 18,
+      "avg_len": 10.6,
+      "max_len": 29,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GBubbleShooter",
+      "n_strings": 18,
+      "avg_len": 11.8,
+      "max_len": 33,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GCommonDenominator",
+      "n_strings": 18,
+      "avg_len": 14.5,
+      "max_len": 38,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GConnectFour",
+      "n_strings": 18,
+      "avg_len": 9.3,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GContinuousPairedAssociate",
+      "n_strings": 18,
+      "avg_len": 9.9,
+      "max_len": 22,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GCountingSheep",
+      "n_strings": 18,
+      "avg_len": 12.1,
+      "max_len": 29,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GCrossword",
+      "n_strings": 18,
+      "avg_len": 14.9,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GFibonacciMerge",
+      "n_strings": 18,
+      "avg_len": 13.8,
+      "max_len": 36,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GFrequencyTap",
+      "n_strings": 18,
+      "avg_len": 14.8,
+      "max_len": 38,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GGearRotation",
+      "n_strings": 18,
+      "avg_len": 9.4,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GGeometricVision",
+      "n_strings": 18,
+      "avg_len": 9.6,
+      "max_len": 29,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GInequalityDash",
+      "n_strings": 18,
+      "avg_len": 11.1,
+      "max_len": 38,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GKenken",
+      "n_strings": 18,
+      "avg_len": 9.2,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GMagnets",
+      "n_strings": 18,
+      "avg_len": 10.6,
+      "max_len": 35,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GNBack",
+      "n_strings": 18,
+      "avg_len": 9.8,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GNegativeSpaceDetection",
+      "n_strings": 18,
+      "avg_len": 9.1,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GPatternSequenceDraw",
+      "n_strings": 18,
+      "avg_len": 11.2,
+      "max_len": 32,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GPegSolitaire",
+      "n_strings": 18,
+      "avg_len": 11.2,
+      "max_len": 22,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GPercentageShopping",
+      "n_strings": 18,
+      "avg_len": 9.5,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GRunningMemorySpan",
+      "n_strings": 18,
+      "avg_len": 11.2,
+      "max_len": 34,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GSequenceSleuth",
+      "n_strings": 18,
+      "avg_len": 10.5,
+      "max_len": 16,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GSpellingSprint",
+      "n_strings": 18,
+      "avg_len": 10.0,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GStroopTest",
+      "n_strings": 18,
+      "avg_len": 10.4,
+      "max_len": 31,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSwitchTask",
+      "n_strings": 18,
+      "avg_len": 8.6,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSymbolicFlanker",
+      "n_strings": 18,
+      "avg_len": 8.8,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GTarget10",
+      "n_strings": 18,
+      "avg_len": 11.9,
+      "max_len": 22,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GVennNumbers",
+      "n_strings": 18,
+      "avg_len": 11.4,
+      "max_len": 28,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GActionSequenceRecall",
+      "n_strings": 17,
+      "avg_len": 12.2,
+      "max_len": 29,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GAffixFactory",
+      "n_strings": 17,
+      "avg_len": 8.8,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GAkari",
+      "n_strings": 17,
+      "avg_len": 9.1,
+      "max_len": 21,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GAngleFinder",
+      "n_strings": 17,
+      "avg_len": 11.6,
+      "max_len": 29,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GBaseShift",
+      "n_strings": 17,
+      "avg_len": 11.6,
+      "max_len": 40,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GBinaryMatrixRankAll",
+      "n_strings": 17,
+      "avg_len": 13.2,
+      "max_len": 37,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GBinaryScaleBalance",
+      "n_strings": 17,
+      "avg_len": 11.1,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GCryptogramAll",
+      "n_strings": 17,
+      "avg_len": 10.4,
+      "max_len": 27,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GDigitSwapEq",
+      "n_strings": 17,
+      "avg_len": 10.2,
+      "max_len": 19,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GDistractorMatrix",
+      "n_strings": 17,
+      "avg_len": 10.8,
+      "max_len": 23,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GDualCoding",
+      "n_strings": 17,
+      "avg_len": 8.3,
+      "max_len": 15,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GDynamicSalience",
+      "n_strings": 17,
+      "avg_len": 9.7,
+      "max_len": 21,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GFlankerTest",
+      "n_strings": 17,
+      "avg_len": 10.4,
+      "max_len": 28,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GFractionMatcher",
+      "n_strings": 17,
+      "avg_len": 12.4,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GGrammarPolice",
+      "n_strings": 17,
+      "avg_len": 9.3,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GGrammarSort",
+      "n_strings": 17,
+      "avg_len": 9.4,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GInequalityBalanceOps",
+      "n_strings": 17,
+      "avg_len": 10.5,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GKurodoko",
+      "n_strings": 17,
+      "avg_len": 12.1,
+      "max_len": 35,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GLighthouses",
+      "n_strings": 17,
+      "avg_len": 11.0,
+      "max_len": 29,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GMandelbrot",
+      "n_strings": 17,
+      "avg_len": 12.1,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GMentalAbacus",
+      "n_strings": 17,
+      "avg_len": 10.7,
+      "max_len": 21,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GModularClockArithmetic",
+      "n_strings": 17,
+      "avg_len": 13.1,
+      "max_len": 26,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GModuloClock",
+      "n_strings": 17,
+      "avg_len": 10.9,
+      "max_len": 26,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GNumericalEstimation",
+      "n_strings": 17,
+      "avg_len": 10.3,
+      "max_len": 18,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GOperationSpan",
+      "n_strings": 17,
+      "avg_len": 11.8,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GPhoneticGuess",
+      "n_strings": 17,
+      "avg_len": 8.4,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GPosnerSpatialCueing",
+      "n_strings": 17,
+      "avg_len": 9.8,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GPrimeFactorTrees",
+      "n_strings": 17,
+      "avg_len": 11.5,
+      "max_len": 36,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GQuickMath",
+      "n_strings": 17,
+      "avg_len": 10.5,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GRotatingMaze",
+      "n_strings": 17,
+      "avg_len": 10.8,
+      "max_len": 30,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GSnake3D",
+      "n_strings": 17,
+      "avg_len": 10.4,
+      "max_len": 19,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GSpatialCabinetMemory",
+      "n_strings": 17,
+      "avg_len": 8.4,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GStaircaseMemory",
+      "n_strings": 17,
+      "avg_len": 9.3,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSumPyramid",
+      "n_strings": 17,
+      "avg_len": 11.1,
+      "max_len": 19,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GSymbolDigitAssoc",
+      "n_strings": 17,
+      "avg_len": 10.8,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSymbolLogic",
+      "n_strings": 17,
+      "avg_len": 9.1,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSymmetry",
+      "n_strings": 17,
+      "avg_len": 7.6,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GTaskSwitching",
+      "n_strings": 17,
+      "avg_len": 11.3,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GTypoglycemiaDecoder",
+      "n_strings": 17,
+      "avg_len": 10.1,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GUnitConverterPro",
+      "n_strings": 17,
+      "avg_len": 12.0,
+      "max_len": 28,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GVectorDotProduct",
+      "n_strings": 17,
+      "avg_len": 11.1,
+      "max_len": 21,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GVektorVector",
+      "n_strings": 17,
+      "avg_len": 9.5,
+      "max_len": 21,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GWordMastermind",
+      "n_strings": 17,
+      "avg_len": 11.2,
+      "max_len": 31,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GBoxCompletion",
+      "n_strings": 16,
+      "avg_len": 12.8,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GBreakout",
+      "n_strings": 16,
+      "avg_len": 12.1,
+      "max_len": 22,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GCalculationSprint",
+      "n_strings": 16,
+      "avg_len": 12.6,
+      "max_len": 33,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GCardCountingMemory",
+      "n_strings": 16,
+      "avg_len": 9.8,
+      "max_len": 26,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GChimpTest",
+      "n_strings": 16,
+      "avg_len": 13.9,
+      "max_len": 36,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GCircuitConnect",
+      "n_strings": 16,
+      "avg_len": 11.0,
+      "max_len": 33,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GColorWordMatchUp",
+      "n_strings": 16,
+      "avg_len": 9.1,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GComplexFoldingNets",
+      "n_strings": 16,
+      "avg_len": 10.4,
+      "max_len": 26,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GCryptoArithmetic",
+      "n_strings": 16,
+      "avg_len": 10.9,
+      "max_len": 16,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GCubeNetFold",
+      "n_strings": 16,
+      "avg_len": 13.1,
+      "max_len": 38,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GDirectionsRecall",
+      "n_strings": 16,
+      "avg_len": 9.7,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GDnms",
+      "n_strings": 16,
+      "avg_len": 9.9,
+      "max_len": 21,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GDoodleJump",
+      "n_strings": 16,
+      "avg_len": 12.6,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GExponentTower",
+      "n_strings": 16,
+      "avg_len": 12.2,
+      "max_len": 32,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GFactBinder",
+      "n_strings": 16,
+      "avg_len": 10.6,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GFeatureMatrixRecall",
+      "n_strings": 16,
+      "avg_len": 10.5,
+      "max_len": 23,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GFocusTunnel",
+      "n_strings": 16,
+      "avg_len": 11.9,
+      "max_len": 23,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GFractionMatch",
+      "n_strings": 16,
+      "avg_len": 12.9,
+      "max_len": 36,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GGraphCoordinatePlot",
+      "n_strings": 16,
+      "avg_len": 12.1,
+      "max_len": 27,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GHueSort",
+      "n_strings": 16,
+      "avg_len": 12.5,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GInterlockPuzzle",
+      "n_strings": 16,
+      "avg_len": 13.3,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GLetterBridge",
+      "n_strings": 16,
+      "avg_len": 10.0,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GLetterFrequencyScan",
+      "n_strings": 16,
+      "avg_len": 10.4,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GLetterGridSwapper",
+      "n_strings": 16,
+      "avg_len": 10.1,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GLifeGame",
+      "n_strings": 16,
+      "avg_len": 12.8,
+      "max_len": 39,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GMancala",
+      "n_strings": 16,
+      "avg_len": 11.3,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GMatrixReasoning",
+      "n_strings": 16,
+      "avg_len": 11.4,
+      "max_len": 23,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GMirrorMaze",
+      "n_strings": 16,
+      "avg_len": 12.9,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 7
+    },
+    {
+      "file": "GModuloPath",
+      "n_strings": 16,
+      "avg_len": 11.9,
+      "max_len": 33,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GNumberBondsAll",
+      "n_strings": 16,
+      "avg_len": 11.3,
+      "max_len": 26,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GObjectShuffle",
+      "n_strings": 16,
+      "avg_len": 10.5,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GOddEvenFlash",
+      "n_strings": 16,
+      "avg_len": 9.9,
+      "max_len": 31,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GOddOneOut",
+      "n_strings": 16,
+      "avg_len": 10.9,
+      "max_len": 30,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GOddRotation",
+      "n_strings": 16,
+      "avg_len": 11.2,
+      "max_len": 32,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GPalindromeBuilder",
+      "n_strings": 16,
+      "avg_len": 10.4,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GPangramSprint",
+      "n_strings": 16,
+      "avg_len": 9.7,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GPathIntersect",
+      "n_strings": 16,
+      "avg_len": 11.9,
+      "max_len": 30,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GPortmanteauSplit",
+      "n_strings": 16,
+      "avg_len": 8.9,
+      "max_len": 16,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GRelationalMemory",
+      "n_strings": 16,
+      "avg_len": 10.4,
+      "max_len": 26,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GReverseStroop",
+      "n_strings": 16,
+      "avg_len": 10.4,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GRoomInspector",
+      "n_strings": 16,
+      "avg_len": 9.2,
+      "max_len": 16,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GSdmt",
+      "n_strings": 16,
+      "avg_len": 11.2,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GSemanticLink",
+      "n_strings": 16,
+      "avg_len": 10.9,
+      "max_len": 16,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GSentenceUnscramble",
+      "n_strings": 16,
+      "avg_len": 10.4,
+      "max_len": 22,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GShadowPivot",
+      "n_strings": 16,
+      "avg_len": 9.9,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GSieveVisualizer",
+      "n_strings": 16,
+      "avg_len": 12.4,
+      "max_len": 20,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GSilhouetteMatch",
+      "n_strings": 16,
+      "avg_len": 9.9,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSilhouetteMatchOrtho",
+      "n_strings": 16,
+      "avg_len": 9.4,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GSimonCommand",
+      "n_strings": 16,
+      "avg_len": 9.2,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GSnake",
+      "n_strings": 16,
+      "avg_len": 12.8,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GSokoban",
+      "n_strings": 16,
+      "avg_len": 12.1,
+      "max_len": 21,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GSudoku",
+      "n_strings": 16,
+      "avg_len": 12.1,
+      "max_len": 34,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GTopology",
+      "n_strings": 16,
+      "avg_len": 9.9,
+      "max_len": 27,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GTrailMaking",
+      "n_strings": 16,
+      "avg_len": 13.4,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GTripletsLogic",
+      "n_strings": 16,
+      "avg_len": 8.6,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GVisualCrowdingAcuity",
+      "n_strings": 16,
+      "avg_len": 10.2,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GVisualStatisticalLearning",
+      "n_strings": 16,
+      "avg_len": 9.2,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GWisconsinCardSorting",
+      "n_strings": 16,
+      "avg_len": 10.4,
+      "max_len": 30,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GWordGridConnection",
+      "n_strings": 16,
+      "avg_len": 12.4,
+      "max_len": 33,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GAlgebraicBalance",
+      "n_strings": 15,
+      "avg_len": 12.4,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GAttentionalBlink",
+      "n_strings": 15,
+      "avg_len": 8.8,
+      "max_len": 20,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GBaseConversionRun",
+      "n_strings": 15,
+      "avg_len": 14.3,
+      "max_len": 40,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GBlockCount3d",
+      "n_strings": 15,
+      "avg_len": 10.9,
+      "max_len": 29,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GChangeBlindness",
+      "n_strings": 15,
+      "avg_len": 10.1,
+      "max_len": 31,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GChoiceReactionTime",
+      "n_strings": 15,
+      "avg_len": 8.1,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GColorMatch",
+      "n_strings": 15,
+      "avg_len": 10.9,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GCorsiBackwardSpan",
+      "n_strings": 15,
+      "avg_len": 12.0,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GCountingSpan",
+      "n_strings": 15,
+      "avg_len": 12.7,
+      "max_len": 28,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GFactorFinder",
+      "n_strings": 15,
+      "avg_len": 13.8,
+      "max_len": 38,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GFeatureMatrixRecallAll",
+      "n_strings": 15,
+      "avg_len": 10.3,
+      "max_len": 20,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GFillomino",
+      "n_strings": 15,
+      "avg_len": 9.5,
+      "max_len": 20,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GGravitySort",
+      "n_strings": 15,
+      "avg_len": 12.2,
+      "max_len": 31,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GGridDisplacement",
+      "n_strings": 15,
+      "avg_len": 10.3,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GHanoi",
+      "n_strings": 15,
+      "avg_len": 10.0,
+      "max_len": 29,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GKakuro",
+      "n_strings": 15,
+      "avg_len": 9.5,
+      "max_len": 16,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GLaserReflect",
+      "n_strings": 15,
+      "avg_len": 12.3,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GLetterCancellation",
+      "n_strings": 15,
+      "avg_len": 12.7,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GLightsOut",
+      "n_strings": 15,
+      "avg_len": 12.5,
+      "max_len": 29,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GLockPattern",
+      "n_strings": 15,
+      "avg_len": 9.8,
+      "max_len": 18,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GMatrixMultiplier",
+      "n_strings": 15,
+      "avg_len": 10.9,
+      "max_len": 24,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GMemory",
+      "n_strings": 15,
+      "avg_len": 9.8,
+      "max_len": 23,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GMentalMapping",
+      "n_strings": 15,
+      "avg_len": 10.1,
+      "max_len": 19,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GMinesweeper",
+      "n_strings": 15,
+      "avg_len": 11.7,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GMirrorImage",
+      "n_strings": 15,
+      "avg_len": 10.1,
+      "max_len": 37,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GMissingOperator",
+      "n_strings": 15,
+      "avg_len": 11.4,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GMissingVowels",
+      "n_strings": 15,
+      "avg_len": 9.9,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GObjectDisplacement",
+      "n_strings": 15,
+      "avg_len": 10.9,
+      "max_len": 29,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GOneLetterShift",
+      "n_strings": 15,
+      "avg_len": 11.5,
+      "max_len": 29,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GPeripheralFocus",
+      "n_strings": 15,
+      "avg_len": 10.8,
+      "max_len": 26,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GPerspectiveTaking",
+      "n_strings": 15,
+      "avg_len": 9.1,
+      "max_len": 17,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GPolyominoTiling",
+      "n_strings": 15,
+      "avg_len": 9.7,
+      "max_len": 22,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GPrimeGapHunt",
+      "n_strings": 15,
+      "avg_len": 12.1,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GPrimeHunter",
+      "n_strings": 15,
+      "avg_len": 10.0,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GReflexTap",
+      "n_strings": 15,
+      "avg_len": 11.2,
+      "max_len": 39,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GRhymeMaster",
+      "n_strings": 15,
+      "avg_len": 9.5,
+      "max_len": 16,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GSemanticDistance",
+      "n_strings": 15,
+      "avg_len": 8.9,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GShapeShifter",
+      "n_strings": 15,
+      "avg_len": 9.3,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GShellGame",
+      "n_strings": 15,
+      "avg_len": 9.5,
+      "max_len": 22,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GSilentLetterSearch",
+      "n_strings": 15,
+      "avg_len": 11.0,
+      "max_len": 22,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 6
+    },
+    {
+      "file": "GSpatialConflict",
+      "n_strings": 15,
+      "avg_len": 9.4,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 5
+    },
+    {
+      "file": "GSymmetrySpan",
+      "n_strings": 15,
+      "avg_len": 10.2,
+      "max_len": 22,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GVisualSearchConjunction",
+      "n_strings": 15,
+      "avg_len": 10.9,
+      "max_len": 29,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GWordLadder",
+      "n_strings": 15,
+      "avg_len": 13.3,
+      "max_len": 35,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GWordLadderStep",
+      "n_strings": 15,
+      "avg_len": 11.6,
+      "max_len": 29,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GAlgebraicInequalitySolver",
+      "n_strings": 14,
+      "avg_len": 9.0,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GCorsiBlocks",
+      "n_strings": 14,
+      "avg_len": 10.4,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GCrown",
+      "n_strings": 14,
+      "avg_len": 11.6,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GD2Attention",
+      "n_strings": 14,
+      "avg_len": 11.9,
+      "max_len": 23,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GDigitSpanReverse",
+      "n_strings": 14,
+      "avg_len": 8.9,
+      "max_len": 15,
+      "excl": 2,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GFindWord",
+      "n_strings": 14,
+      "avg_len": 12.5,
+      "max_len": 30,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GFutoshiki",
+      "n_strings": 14,
+      "avg_len": 11.2,
+      "max_len": 24,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GGokigenNaname",
+      "n_strings": 14,
+      "avg_len": 10.6,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GKakuroMini",
+      "n_strings": 14,
+      "avg_len": 12.2,
+      "max_len": 31,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GKlotski",
+      "n_strings": 14,
+      "avg_len": 14.9,
+      "max_len": 28,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GLaserLink",
+      "n_strings": 14,
+      "avg_len": 11.3,
+      "max_len": 18,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GMahjongSolitaire",
+      "n_strings": 14,
+      "avg_len": 10.4,
+      "max_len": 19,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GMatch3",
+      "n_strings": 14,
+      "avg_len": 10.1,
+      "max_len": 19,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GNumberBonds",
+      "n_strings": 14,
+      "avg_len": 10.6,
+      "max_len": 21,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GOrbitTap",
+      "n_strings": 14,
+      "avg_len": 9.4,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GPythagoreanTripleBuilder",
+      "n_strings": 14,
+      "avg_len": 12.4,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GSemanticAssociation",
+      "n_strings": 14,
+      "avg_len": 9.1,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSortingVisualizer",
+      "n_strings": 14,
+      "avg_len": 11.9,
+      "max_len": 22,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GSpoonerismSolver",
+      "n_strings": 14,
+      "avg_len": 9.9,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GSumSnake",
+      "n_strings": 14,
+      "avg_len": 11.3,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GTangram",
+      "n_strings": 14,
+      "avg_len": 11.5,
+      "max_len": 22,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GTemporalOrderJudgment",
+      "n_strings": 14,
+      "avg_len": 9.9,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GTetris",
+      "n_strings": 14,
+      "avg_len": 11.6,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GTripleSequence",
+      "n_strings": 14,
+      "avg_len": 10.4,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GVisualSearch",
+      "n_strings": 14,
+      "avg_len": 9.1,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GVisualSearchAll",
+      "n_strings": 14,
+      "avg_len": 10.3,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GWaterSort",
+      "n_strings": 14,
+      "avg_len": 12.6,
+      "max_len": 36,
+      "excl": 0,
+      "polite": 1,
+      "emoji": 0
+    },
+    {
+      "file": "GWireframe3dRotation",
+      "n_strings": 14,
+      "avg_len": 9.1,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GWordPairAssociateMemory",
+      "n_strings": 14,
+      "avg_len": 8.9,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GWordSurge",
+      "n_strings": 14,
+      "avg_len": 10.3,
+      "max_len": 20,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GBlockEscape",
+      "n_strings": 13,
+      "avg_len": 13.5,
+      "max_len": 32,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GConjunctionSearch",
+      "n_strings": 13,
+      "avg_len": 11.9,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GCrossSectionSlice",
+      "n_strings": 13,
+      "avg_len": 10.2,
+      "max_len": 31,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GDelayedMatchSample",
+      "n_strings": 13,
+      "avg_len": 9.5,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GDualMirror",
+      "n_strings": 13,
+      "avg_len": 12.5,
+      "max_len": 30,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GHitori",
+      "n_strings": 13,
+      "avg_len": 10.9,
+      "max_len": 32,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GHitoriAll",
+      "n_strings": 13,
+      "avg_len": 11.0,
+      "max_len": 33,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GMastermind",
+      "n_strings": 13,
+      "avg_len": 10.2,
+      "max_len": 18,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GMazeNav3d",
+      "n_strings": 13,
+      "avg_len": 10.4,
+      "max_len": 31,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GNonogram",
+      "n_strings": 13,
+      "avg_len": 10.2,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GNoriNori",
+      "n_strings": 13,
+      "avg_len": 10.7,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GPaperFolding",
+      "n_strings": 13,
+      "avg_len": 10.1,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GPathFinder",
+      "n_strings": 13,
+      "avg_len": 11.3,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GPercentagePeak",
+      "n_strings": 13,
+      "avg_len": 8.7,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GPixelMimic",
+      "n_strings": 13,
+      "avg_len": 9.4,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GRadicalRoots",
+      "n_strings": 13,
+      "avg_len": 14.0,
+      "max_len": 36,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GSimonSequence",
+      "n_strings": 13,
+      "avg_len": 10.2,
+      "max_len": 17,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GSlide15",
+      "n_strings": 13,
+      "avg_len": 11.5,
+      "max_len": 36,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GSlitherlink",
+      "n_strings": 13,
+      "avg_len": 9.7,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GTangleFix",
+      "n_strings": 13,
+      "avg_len": 12.2,
+      "max_len": 30,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GTemporalOrder",
+      "n_strings": 13,
+      "avg_len": 9.3,
+      "max_len": 19,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 4
+    },
+    {
+      "file": "GTennerGrid",
+      "n_strings": 13,
+      "avg_len": 10.4,
+      "max_len": 24,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GWordScramble",
+      "n_strings": 13,
+      "avg_len": 12.3,
+      "max_len": 27,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 3
+    },
+    {
+      "file": "GWordle",
+      "n_strings": 13,
+      "avg_len": 11.7,
+      "max_len": 28,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GYajilin",
+      "n_strings": 13,
+      "avg_len": 9.5,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 2
+    },
+    {
+      "file": "GBejeweled",
+      "n_strings": 12,
+      "avg_len": 13.6,
+      "max_len": 32,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GContinuousRecognition",
+      "n_strings": 12,
+      "avg_len": 10.1,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GDominosa",
+      "n_strings": 12,
+      "avg_len": 11.2,
+      "max_len": 31,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GNurikabe",
+      "n_strings": 12,
+      "avg_len": 11.0,
+      "max_len": 22,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GPipes",
+      "n_strings": 12,
+      "avg_len": 11.3,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GSchulte",
+      "n_strings": 12,
+      "avg_len": 9.9,
+      "max_len": 25,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GShikaku",
+      "n_strings": 12,
+      "avg_len": 14.0,
+      "max_len": 40,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GSlidePuzzle",
+      "n_strings": 12,
+      "avg_len": 12.8,
+      "max_len": 36,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GColorFlood",
+      "n_strings": 11,
+      "avg_len": 11.6,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GHeyawake",
+      "n_strings": 11,
+      "avg_len": 11.7,
+      "max_len": 33,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GPathRecall",
+      "n_strings": 11,
+      "avg_len": 8.7,
+      "max_len": 15,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GProbeDigitSpan",
+      "n_strings": 11,
+      "avg_len": 10.6,
+      "max_len": 25,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GRomanArithmetic",
+      "n_strings": 11,
+      "avg_len": 10.5,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GSimonSays",
+      "n_strings": 11,
+      "avg_len": 9.5,
+      "max_len": 15,
+      "excl": 1,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GSkyscrapers",
+      "n_strings": 11,
+      "avg_len": 11.8,
+      "max_len": 21,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GTapa",
+      "n_strings": 11,
+      "avg_len": 12.6,
+      "max_len": 26,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    },
+    {
+      "file": "GTentsAndTrees",
+      "n_strings": 11,
+      "avg_len": 14.1,
+      "max_len": 37,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "GKakurasuSums",
+      "n_strings": 10,
+      "avg_len": 10.2,
+      "max_len": 18,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 1
+    },
+    {
+      "file": "G2048",
+      "n_strings": 9,
+      "avg_len": 12.1,
+      "max_len": 20,
+      "excl": 0,
+      "polite": 0,
+      "emoji": 0
+    }
+  ]
+}
