@@ -981,3 +981,4 @@
 2026-11-15T12:48:50	Kakuro	OK	1582	67.5s lowest='重开一题' [60,1450][2500,1582] blk=2/12px cov=5 board=430x430@1065,612 max=6 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-124850.jpeg @2026-11-15T12:48:50
 2026-11-15T13:00:21	Snake 3D	OK	1600	64.1s lowest='开始' [60,1498][1256,1600] blk=3/72px cov=5 board=322x369@1119,756 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-130021.jpeg @2026-11-15T13:00:21
 2026-11-15T13:06:34	Snake 3D	OK	1600	65.8s lowest='开始' [60,1468][1256,1600] blk=3/72px cov=5 board=292x339@1134,756 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-130633.jpeg @2026-11-15T13:06:34
+2026-11-15T13:17:32	Countdown Math	OK	1600	74.2s lowest='提示' [60,1516][2145,1600] blk=2/48px cov=5 board=143x143@950,1073 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Countdown_Math-131732.jpeg @2026-11-15T13:17:32
