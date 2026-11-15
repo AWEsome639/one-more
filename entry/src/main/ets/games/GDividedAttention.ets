@@ -17,7 +17,12 @@ import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
-const TICKS: number = 12; const PACE: number = 1100; const TARGET: string = '🎯';
+
+// ★ 2026-11-15（判据 2674/2677）：dump 实测两个游戏区 Column 各 1085px 高、而父 Row 只有 875px
+//   ⇒ ≪ℂℂ××≫ 真溢出 210px。`.layoutWeight(1)` 会覆盖一切外部约束，
+//   改成**显式尺寸**：宽 251vp（= 父高 292 × 0.86）、高 292vp。
+const DA_COL_W: number = 251;
+const DA_COL_H: number = 292;const TICKS: number = 12; const PACE: number = 1100; const TARGET: string = '🎯';
 const DECOYS: string[] = ['🍀', '⭐', '🔷', '🌙', '🔺', '🎈', '🧩', '⚡'];
 interface Side {
   sym: string;
@@ -306,7 +311,7 @@ export struct GDividedAttention {
         Text(true ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.left).sym).fontSize(FontSize.hero).fontColor(Palette.rose)
         Text((this.left).done ? ((this.left).on ? TG('✔ 点对了') : TG('✘ 误报')) : ' ').fontSize(FontSize.xxs).fontColor((this.left).done && (this.left).on ? Palette.success : Palette.danger)
-        }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
+        }.width(DA_COL_W).height(DA_COL_H).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
         .borderColor((this.left).done ? ((this.left).on ? Palette.success : Palette.danger) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L307'; })
@@ -316,7 +321,7 @@ export struct GDividedAttention {
         Text(false ? TG('左') : TG('右')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text((this.right).sym).fontSize(FontSize.hero).fontColor(Palette.rose)
         Text((this.right).done ? ((this.right).on ? TG('✔ 点对了') : TG('✘ 误报')) : ' ').fontSize(FontSize.xxs).fontColor((this.right).done && (this.right).on ? Palette.success : Palette.danger)
-        }.layoutWeight(1).aspectRatio(0.86).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
+        }.width(DA_COL_W).height(DA_COL_H).justifyContent(FlexAlign.Center).backgroundColor(this.theme.surface).borderRadius(Radius.lg).borderWidth(2)
         .borderColor((this.right).done ? ((this.right).on ? Palette.success : Palette.danger) : this.theme.line)
         .shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L314'; })
