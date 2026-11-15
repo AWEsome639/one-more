@@ -1,14 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-文本截断检测 —— **⚠️ 2026-11-16 07:00 重大修正：dump 的 text 字段有约 40 字的报数上限。**
-
-⇒ 因此本工具的**动态档（读 dump）只对「源码串 < 40 字」可信**；
-   超过 40 字的字符串在 dump 里一定显示变短，那是 dump 的限制、不是屏幕截断。
-⇒ **真正的截断判据只有截图**（判据 2797：测量工具的输出可能比被测对象多一层限制）。
-
-历史：本条轴最初挂在「容量界 40-43 字」上，该界线来自 dump 上限而非屏幕容量，已作废。
-"""
+文本截断检测（**新轴**：`blk`/`lowh` 都测不到的那一类）。
 
 原理：`uitest dumpLayout` 给出**实际渲染的文本**。若某款源码里有长度 N 的中文字面量，
       而 dump 里同时出现「该字符串的前缀、但更短」的文本 ⇒ 极可能被 maxLines/ellipsis 截断。
@@ -71,8 +64,7 @@ def static_capacity_scan() -> int:
     if not hits:
         print('✅ 静态档：没有 >40 字的整行 Text 中文串')
         return 0
-    print('ℹ️ 静态档（提示，非报警）：%d 处 >40 字整行 Text。' % len(hits))
-    print('   ⚠️ 阈值 40 来自 dump 的报数上限，不是屏幕容量（判据 2797）；判截断只能看截图。')
+    print('⚠️ 静态档：%d 处 >40 字整行 Text（容量界 40-43，需 dump 或截图确认）:' % len(hits))
     for g, ln, n, s in hits:
         print('  %-26s L%-5d %2d 字  %s' % (g, ln, n, s[:38]))
     return 0
@@ -113,8 +105,7 @@ def main() -> int:
             if len(cand) != 1:
                 continue
             src_file = cand[0]
-        # ★ 只对 <40 字可信（dump 的 text 约 40 字封顶）
-        longs = [s for s in source_strings(src_file) if 20 <= len(s) < 40]
+        longs = [s for s in source_strings(src_file) if len(s) >= 20]
         if not longs:
             continue
         texts = dump_texts(p)
