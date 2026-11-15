@@ -20,7 +20,11 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
-const SIDE: number = 3;
+
+// ★ 2026-11-15（判据 2674/2677）：dump 实测格子 Stack 793×793px（264vp）而父 Row 只有 420px（140vp）
+//   ⇒ 每格垂直溢出 374px（over=374px），截图里只看得见 6/9 个格、且说明文字被压。
+//   改成显式尺寸：3×44 + 2间隔 ≈ 134vp = 402px < 父 420px ✅。
+const PS_CELL: number = 44;const SIDE: number = 3;
 const COUNT: number = SIDE * SIDE;
 const LIVES: number = 3;
 const STEPS: number[] = [2, 4, 5, 7];   // 与 9 互质 ⇒ 一定不重复地走遍 9 格
@@ -313,7 +317,7 @@ export struct GPatternSequenceDraw {
               Text(String((r * SIDE + c + 1))).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.rank((r * SIDE + c + 1)) >= 0 ? '#FFFFFF' : this.theme.ink)
               Text(this.rank((r * SIDE + c + 1)) >= 0 ? TG2('第{0}笔', this.rank((r * SIDE + c + 1)) + 1) : '').fontSize(FontSize.xxs).fontColor('#FFFFFF')
               }
-              }.layoutWeight(1).aspectRatio(1).backgroundColor(this.rank((r * SIDE + c + 1)) >= 0 ? Palette.rose : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
+              }.width(PS_CELL).height(PS_CELL).backgroundColor(this.rank((r * SIDE + c + 1)) >= 0 ? Palette.rose : this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => {
               Haptics.tick();
               this.tap((r * SIDE + c + 1));
               })
