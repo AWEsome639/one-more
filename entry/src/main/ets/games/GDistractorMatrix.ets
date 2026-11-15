@@ -328,7 +328,9 @@ export struct GDistractorMatrix {
               .borderRadius(Radius.xs)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
             }, (c: number) => 'c' + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, // ★ 2026-11-15（判据 2734/2743）：底部第二行选项被切（只露 23px、设计 123px ⇒ 缺 ~100px）。
+      //   矩阵格子是 aspectRatio(1) ⇒ 限宽即限高；-360→-400（矩阵 173→133vp）让出 40vp=120px。
+      Math.max(140, Bp.height - 400)))
         }, (r: number) => 'r' + r)
       }.width('100%')
       .padding(Space.sm)
