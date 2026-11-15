@@ -314,7 +314,10 @@ export struct GCrossword {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('100%').padding(Space.sm).backgroundColor(this.theme.surfaceAlt)
+      // ★ 2026-11-15（判据 2759/2762）：格子是 `layoutWeight(1)+aspectRatio(1)`、容器 `.width('100%')`
+      //   ⇒ 五列各 ~480px、五行需 ~2400px ≫ 屏高 ⇒ **只显示第一行五个巨大橙块、线索与输入区全被挤出屏外**（截图实证）。
+      //   ⇒ 按可用高度限宽（aspectRatio 会让格子高度跟着降）。
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360))).padding(Space.sm).backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
       Text(this.over ? this.msg : CLUES[this.cur]).fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
         .width('100%').textAlign(TextAlign.Center)
