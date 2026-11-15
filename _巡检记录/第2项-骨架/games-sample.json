@@ -1,0 +1,86 @@
+{
+  "n_total": 355,
+  "note": "完整列表由 导出355款元信息.py 现场生成，这里只存前 20 款作为可复算证据",
+  "head20": [
+    {
+      "id": "bejeweled",
+      "title": "宝石迷阵"
+    },
+    {
+      "id": "breakout",
+      "title": "打砖块"
+    },
+    {
+      "id": "bubble_shooter",
+      "title": "弹珠消"
+    },
+    {
+      "id": "checkers",
+      "title": "跳棋"
+    },
+    {
+      "id": "compound_connect",
+      "title": "复合连线"
+    },
+    {
+      "id": "connect_four",
+      "title": "四子棋"
+    },
+    {
+      "id": "continuous_paired_associate",
+      "title": "连续配对"
+    },
+    {
+      "id": "doodle_jump",
+      "title": "登高"
+    },
+    {
+      "id": "double_trouble",
+      "title": "双重麻烦"
+    },
+    {
+      "id": "dual_mirror",
+      "title": "双镜像"
+    },
+    {
+      "id": "flappy",
+      "title": "穿云"
+    },
+    {
+      "id": "freecell",
+      "title": "空当接龙"
+    },
+    {
+      "id": "g2048",
+      "title": "2048"
+    },
+    {
+      "id": "game24",
+      "title": "24 点"
+    },
+    {
+      "id": "go9",
+      "title": "9 路围棋"
+    },
+    {
+      "id": "gomoku",
+      "title": "五子棋"
+    },
+    {
+      "id": "hanoi",
+      "title": "汉诺塔"
+    },
+    {
+      "id": "kakuro_mini",
+      "title": "迷你数谜"
+    },
+    {
+      "id": "life_game",
+      "title": "生命游戏"
+    },
+    {
+      "id": "lock_pattern",
+      "title": "图案锁"
+    }
+  ]
+}
