@@ -517,7 +517,9 @@ export struct GCalculationSprint {
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
 
-      Column({ space: Space.sm }) {
+      // ★ 2026-11-15（判据 2723/2725）：与 Base Conversion Run 同型 —— 4 行选项撑爆预算、反馈文字只剩 6px。
+      //   改成 Flex 换行 + 每项 48% 宽 ⇒ 自动 2×2：省 192px+间隙，且每项变高（触控更舒服）。
+      Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween }) {
         ForEach(this.optsIdx, (i: number) => {
           Row({ space: Space.sm }) {
             Text(LETTERS[i])
@@ -530,8 +532,9 @@ export struct GCalculationSprint {
               .fontColor(this.optInk(i))
               .layoutWeight(1)
           }
-          .width('100%')
+          .width('48%')   // ★ 2×2：每项半宽，配合外层 Flex wrap
           .height(Cell.of(Bp.isShort() ? 34 : 52))
+          .margin({ bottom: Space.sm })   // ★ Flex 没有 space 参数，纵向间距用 margin
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
