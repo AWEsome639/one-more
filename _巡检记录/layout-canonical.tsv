@@ -983,3 +983,4 @@
 2026-11-15T13:06:34	Snake 3D	OK	1600	65.8s lowest='开始' [60,1468][1256,1600] blk=3/72px cov=5 board=292x339@1134,756 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-130633.jpeg @2026-11-15T13:06:34
 2026-11-15T13:17:32	Countdown Math	OK	1600	74.2s lowest='提示' [60,1516][2145,1600] blk=2/48px cov=5 board=143x143@950,1073 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Countdown_Math-131732.jpeg @2026-11-15T13:17:32
 2026-11-15T13:30:21	Wordle	OK	1368	69.4s lowest='提示：5 个字母的常用英文单词；重复字母会按剩余次数' [60,1326][2500,1368] blk=0/0px cov=5 board=360x360@1100,756 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-133020.jpeg @2026-11-15T13:30:21
+2026-11-15T13:37:46	Wordle	OK	1600	76.9s lowest='换一题' [60,1572][857,1600] blk=2/48px cov=5 board=360x360@1100,756 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-133745.jpeg @2026-11-15T13:37:46
