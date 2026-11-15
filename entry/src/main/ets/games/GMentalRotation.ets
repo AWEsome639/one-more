@@ -384,6 +384,10 @@ export struct GMentalRotation {
         .shadow(Shadow.card)
       }
       .width('100%')
+      // ★ 2026-11-15（用户报「界面错乱」+ dump 实证）：两个形状 `Column` 原来直接挂在页面根 `Column` 下
+      //   ⇒ **竖着堆叠**（dump：两者 x 都从 60 起、y 只差 131px）⇒ 本该并排比较却上下堆、挤成一团。
+      //   修法：用一个 `Row` 把它们包起来 ⇒ 并排、且整页少用 131px 高度。
+      Row({ space: Space.sm }) {
       Column({ space: Space.xs }) {
       Text((TG('原图'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
       Text(this.rows(((this.base))))
@@ -420,6 +424,7 @@ export struct GMentalRotation {
       .borderColor(Palette.emerald)
       .shadow(Shadow.card)
       .animation({ duration: Motion.fast, curve: Motion.snap() })
+      }
       Text(this.msg)
         .fontSize(FontSize.sm)
         .fontColor(this.over && !this.won ? Palette.rose : this.theme.inkSoft)
