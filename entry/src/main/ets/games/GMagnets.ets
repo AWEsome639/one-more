@@ -31,8 +31,13 @@ const CLUE_W: number = 44;
 // ★ 2026-11-15（判据 2674）：dump 实测：`layoutWeight(1)` 会覆盖父容器 .width()、子元素
 //   aspectRatio() 与 constraintSize()（棋盘实测 793vp、格子 544x288 不是正方形）
 //   ⇒ 改成**显式尺寸**。可用高约 293vp：4×52 + 3×1 + 44 = 255vp ✅ 装得下、留 38vp 余量。
-const MAG_CELL: number = 48;
-// ★ 2026-11-15 07:5x：52 → 48。dump+截图确认 4 行已回来，但**底部横向线索行 3+ 1+ 1+ 3+ 仍在屏外**；
+const MAG_CELL: number = 40;
+// ★ 2026-11-15 08:4x：44 → 40。
+//   44 实测：底部线索行已渲染（lowest='4＋' y2=1600）但被切；4×40+3 = 163vp，再省 16vp = 48px。
+//   历史：52 → 48 → 44 → 40。
+//   上一档 48 实测：board=144x144、blk 仍 2/48px；dump 显示最后一个溢出者是**底部线索行**（d=7 Row, y2=1600）。
+//   4×44 + 3 = 179vp，比 195vp 再省 16vp = **48px**。
+//   历史：52 → 48。dump+截图确认 4 行已回来，但**底部横向线索行 3+ 1+ 1+ 3+ 仍在屏外**；
 //   4×48 + 3 + 44 = 239vp，比原来省 16vp = **48px**，正好清掉那个 48px。
 
 function range(n: number): number[] {
@@ -710,6 +715,8 @@ export struct GMagnets {
         .height(4 * MAG_CELL + 3)
       }
       .width('100%')
+      // ★ 2026-11-15：显式尺寸后棋盘只占左侧（宽 4×40+44+24=228vp / 可用 813vp）⇒ 水平居中。
+      .alignItems(HorizontalAlign.Center)
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
