@@ -101,6 +101,10 @@ export struct HintBar {
         Button(TG('提示'))
           .layoutWeight(1)
           .height(this.barHeight)
+          // ★ 2026-11-15（判据 2738）：`barHeight=38vp` 低于 44vp 触控下限，但**不改高度**
+          //   （作者 2026-11-09 试过降到 32vp 已回退：一好两坏、共享组件改全局证据混合 ⇒ 不发布）。
+          //   ⇒ 用 responseRegion 只把**可点区域**扩到 44vp，视觉与布局完全不变。
+          .responseRegion({ x: 0, y: -3, width: '100%', height: 44 })
           .fontSize(FontSize.sm)
           .backgroundColor(this.disabled ? Palette.lineSoft : Palette.cyan)
           .fontColor(this.disabled ? Palette.inkFaint : Color.White)
@@ -140,6 +144,8 @@ export struct HintBar {
         : this.autoLabel())
         .layoutWeight(1)
         .height(this.barHeight)
+        // ★ 2026-11-15（判据 2738）：同上 —— 只扩可点区域到 44vp，不改进度条高度。
+        .responseRegion({ x: 0, y: -3, width: '100%', height: 44 })
         .fontSize(FontSize.sm)
         .backgroundColor((LanRace.isRacing() || this.disabled)
           ? Palette.lineSoft
