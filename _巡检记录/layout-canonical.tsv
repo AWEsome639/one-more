@@ -987,3 +987,5 @@
 2026-11-15T13:42:28	Base Conversion Run	OK	1600	74.3s lowest='把进制换算对，答错扣 3 秒' [60,1594][2500,1600] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-134228.jpeg @2026-11-15T13:42:28
 2026-11-15T13:59:23	Base Conversion Run	OK	1600	94.7s lowest='提示：₂ 二进制 · ₈ 八进制 · ₁₆ 十六进制' [60,1577][2500,1600] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Base_Conversion_Run-135922.jpeg @2026-11-15T13:59:23
 2026-11-15T14:27:22	Calculation Sprint	OK	1493	78.5s lowest='提示：答对一题 +1，答错扣 3 秒 —— 稳一点比' [60,1451][2500,1493] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Calculation_Sprint-142722.jpeg @2026-11-15T14:27:22
+2026-11-15T15:47:41	Collatz	NOT_HOME	-	166.0s could not reach home; last texts=[]
+2026-11-15T15:57:05	Collatz	NOT_HOME	-	162.5s could not reach home; last texts=[]
