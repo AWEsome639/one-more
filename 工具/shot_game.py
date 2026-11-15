@@ -985,7 +985,10 @@ def _body(name, t0):
                     if b:
                         nums = [int(x) for x in re.findall(r'-?\d+', b)]
                         if len(nums) == 4:
-                            rows.append((nums[3], depth, path, ty, nums, tx[:40]))
+                            # ★ 2026-11-16（判据 2802）：原来是 tx[:40] —— **是我们自己切的**，
+                            #   不是 uitest 的限制；改 200 才能看全整文案（今天的
+                            #   「40 字容量界」假轴就是这一行造成的）。
+                            rows.append((nums[3], depth, path, ty, nums, tx[:200]))
                     for idx, c in enumerate(n.get('children') or []):
                         _walk(c, depth + 1, path + '/' + str(idx))
                 _walk(d2)
