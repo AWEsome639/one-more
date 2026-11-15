@@ -31,7 +31,7 @@ const CLUE_W: number = 44;
 // ★ 2026-11-15（判据 2674）：dump 实测：`layoutWeight(1)` 会覆盖父容器 .width()、子元素
 //   aspectRatio() 与 constraintSize()（棋盘实测 793vp、格子 544x288 不是正方形）
 //   ⇒ 改成**显式尺寸**。可用高约 293vp：4×52 + 3×1 + 44 = 255vp ✅ 装得下、留 38vp 余量。
-const MAG_CELL: number = 40;
+const MAG_CELL: number = 52;
 // ★ 2026-11-15 08:4x：44 → 40。
 //   44 实测：底部线索行已渲染（lowest='4＋' y2=1600）但被切；4×40+3 = 163vp，再省 16vp = 48px。
 //   历史：52 → 48 → 44 → 40。
@@ -712,7 +712,9 @@ export struct GMagnets {
         .width(4 * MAG_CELL + CLUE_W + 4 * Space.xs)
         // ★ 2026-11-15 dump：Row 宽对了（276vp）但**高度没设**⇒ 只拿到 154px（一个格子高），
         //   4 个格子竖向需 4×52=208vp ⇒ 纵向溢出。补上高度。
-        .height(4 * MAG_CELL + 3)
+        .height(4 * MAG_CELL + 3)   // ★ 2026-11-15：每个 Column 除了 4 个格子，**上面还有两行线索文字**
+        //   （`Text(colClue+'＋')` + `Text('现 N')`）⇒ 原来只算 4 格的高度少了这两行、内容在 Row 内部溢出。
+        //   4×52+3+24 = 235vp < 可用 293vp ✅ ⇒ 格子还能用回作者原本的 52。
       }
       .width('100%')
       // ★ 2026-11-15：显式尺寸后棋盘只占左侧（宽 4×40+44+24=228vp / 可用 813vp）⇒ 水平居中。
