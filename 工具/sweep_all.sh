@@ -158,7 +158,13 @@ for round in $(seq 1 24); do
   # ★ 2026-11-15（判据 2775）：原 `--every 8` ⇒ 每 8 款重启一次模拟器；而**重启时会检查磁盘闸门**（阈值 14 GiB），
 #   而模拟器运行时磁盘常态就是 ~13.8 GiB ⇒ **每次重启都会卡住、后面全 NO_CARD**。
 #   ⇒ 整夜不重启（`every=999`，对 127 款等价于不重启）；闸门只在开跑时查一次。
+# ★ 2026-11-16（判据 2794）：跑批也要产 dump ⇒ 截断检测才有料。
+#   每款 ~4 KB × 355 ≈ 1.4 MB，代价可忽略；单款多 ~2-3s。
+export ONEMORE_DUMP=1
 python3 工具/verify_layout.py --every 999 --names-file /tmp/batch.txt >> "$LOG" 2>&1
+# ★ dump 归档（/tmp 会被清理，归档到仓库里才能被 check_truncation.py --all 扫到）
+mkdir -p _巡检记录/dumps 2>/dev/null
+cp -f /tmp/nodes-*.tsv _巡检记录/dumps/ 2>/dev/null || true
 
   grep -vxFf /tmp/batch.txt "$TODO" > /tmp/todo_next.txt 2>/dev/null || true
   mv /tmp/todo_next.txt "$TODO"
