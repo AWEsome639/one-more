@@ -476,6 +476,14 @@ def _body(name, t0):
     # ★ 2026-11-11（判据 1921）：**`Back` 会把 App 退到系统、把「设置」拉到前台** ——
     #   实测 `dump` 出来的可见文本是 `['设置','One More',…]` ⇒ 之后 `is_home()` 永远假。
     #   ⇒ 先按 `Home`（回桌面），再重启 App。
+    # ★ 2026-11-15（判据 2680）：**先唤醒设备**。今天实测出现过屏幕休眠（mission 状态 `lockedState`）
+    #   ⇒ 所有点击都不落到 App 上 ⇒ 连续 5 次 `NO_CARD`，而错误信息只说「没找到卡片」。
+    #   唤醒本身不保证成功（今天唤醒后仍失败），但它能排除一个变量、且成本极低。
+    try:
+        sh('power-shell wakeup')
+        time.sleep(0.6)
+    except Exception:
+        pass
     sh('uitest uiInput keyEvent Home')
     time.sleep(0.8)
     sh('aa force-stop com.andrewoscar.onemore')
@@ -689,8 +697,27 @@ def _body(name, t0):
                 card = (cx, cy)
     card = exact or card
     if card is None:
+        # ★ 2026-11-15（判据 2681）：`NO_CARD` 必须**自带诊断**。
+        #   今天连续 5 次 NO_CARD，错误信息只说「没找到卡片」，
+        #   而真因是屏幕休眠/app 卡在别处 ⇒ 多烧了约 12 分钟瞎试。
+        #   ⇒ 把设备与 App 的真实状态一并写进错误信息。
+        _diag = ''
+        try:
+            _l = sh('aa dump -l').strip().split('\n')
+            _m = [x.strip() for x in _l if 'onemore' in x.lower()]
+            _st = [x.strip() for x in _l if 'state' in x.lower() or 'lock' in x.lower()]
+            _diag = ' | aa: %s' % ('; '.join(_m[:2])[:90] or 'no onemore mission')
+            if _st:
+                _diag += ' | state: %s' % ('; '.join(_st[:2])[:70])
+        except Exception as _e:
+            _diag = ' | aa-diag-fail %r' % (_e,)
+        try:
+            _txt = texts(d)
+            _diag += ' | visible: %r' % ([t for t, _r in _txt][:8],)
+        except Exception:
+            pass
         finish(name, 'NO_CARD', t0, None,
-               'no card for %r (fallback=%r)' % (want or name, fallback))
+               'no card for %r (fallback=%r)%s' % (want or name, fallback, _diag))
         return
     if not _need_budget(name, t0, 'enter-game'):
         return
