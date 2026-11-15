@@ -329,7 +329,8 @@ export struct GWordLadder {
     this.onFinish(r);
   }
   build() {
-    Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
+    // ★ 2026-11-16（判据 2782/2785）：矮屏容器间距 sm→xs（约 5 个间隙共省 60px）
+    Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
