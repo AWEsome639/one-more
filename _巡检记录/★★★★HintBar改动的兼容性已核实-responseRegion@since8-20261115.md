@@ -1,0 +1,38 @@
+# `HintBar` 改动的**兼容性**已核实：`responseRegion` 是 `@since 8`
+
+> `2026-11-15 19:05`。**今天动的是全库 `355` 款共用的组件 ⇒ 必须确认它不会在低版本设备上崩。**
+
+## 一、⇒ 风险是什么
+
+**`build-profile.json5`：`compatibleSdkVersion = "5.0.0(12)"` ⇒ 声明支持 **API 12** 及以上设备。**
+
+**⇒ 我今天给 `HintBar` 的两个按钮加了 `.responseRegion(...)`。**
+**⚠️ 如果这个属性是 `@since 14` 或更高，那它在 API `12`–`13` 设备上会**直接崩或不生效** —— 而我只在模拟器（较新）上测过。**
+
+## 二、⇒ 核实结果：`@since 8`
+
+**`ets/component/common.d.ts` `L17311`：**
+
+```typescript
+responseRegion(value: Array<Rectangle> | Rectangle): T;
+```
+
+**声明上方：`@syscap SystemCapability.ArkUI.ArkUI.Full` / **`@since 8`****
+
+**⇒ `8` < `12` ⇒ **对 API 12+ 全部安全**，零兼容性风险 ✅**
+
+## 三、⇒ 顺带：同文件里还有个更新的变体
+
+**`L17342`：`responseRegionList(regions: Array<ResponseRegion>): T`** —— 这是新版本接口（`@since` 更高）。
+
+**⇒ 我用的是**老的** `responseRegion`（`@since 8`）⇒ 正好对 `compatibleSdkVersion = 12` 兼容。
+   **若我当时"用新的"，反而可能引入版本要求。**
+
+## ⇒ 判据（`2748`）
+
+**改**共用组件**（尤其全库 `355` 款共用）时，新增的 API 必须查 `@since` 并对照 `compatibleSdkVersion`。**
+**⇒ 查法一行：`grep -B8 "<API名>" <SDK>/ets/component/common.d.ts | grep @since`。**
+**⇒ 今天这个检查差点被跳过 —— 而它决定的是「新属性在 API 12 设备上会不会崩」，
+   比"模拟器上看着正常"重要得多（模拟器往往是新版本）。**
+
+**⚠️ 与 `2747` 同源：**能力/接口能不能用，去 `.d.ts` 读 `@since`，不要在模拟器上"试通了"就算。**
