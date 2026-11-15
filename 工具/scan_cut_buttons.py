@@ -15,7 +15,11 @@ import io, re, sys, os
 
 LEDGER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                       '_巡检记录', 'layout-canonical.tsv')
-BTN_H_PX = 132          # 44vp × 3
+BTN_H_PX = 132          # 44vp × 3 —— **仅适用于 `Cell.tap(44)`/`BTN_H=44` 的按钮**
+# ⚠️ 2026-11-15 修正（判据 2719）：不同按钮的**设计高度不同**，不能一律按 132px 算缺口：
+#   · `Wordle` 的 `换一题` 用 `KEY_H = 40` ⇒ 设计 120px、实测 28px ⇒ 真缺口 92px
+#   · `Countdown Math` 的 `提示` 用 `Cell.of(40)` ⇒ 设计 78px、实测 69px ⇒ 真缺口仅 9px（几乎正常）
+#   ⇒ 本脚本给出的「缺口」是上限估计；定位到具体按钮后，必须回代码查它的 `.height()` 才能算真缺口。
 BTN_WORDS = ('提示', '重开', '换一题', '开始', '暂停', '确认', '提交', '继续',
              '下一题', '下一关', '跳过', '再来', '重新开始', '完成', '发送', '作答', '重玩')
 
