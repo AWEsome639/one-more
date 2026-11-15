@@ -414,7 +414,8 @@ export struct GCollatz {
       .borderRadius(Radius.lg)
       .shadow(Shadow.card)
 
-      Column({ space: Space.sm }) {
+      // ★ 2026-11-15（判据 2723/2724/2725）：与前两款同模板 ⇒ 2×2
+      Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween }) {
         ForEach(this.optsIdx, (i: number) => {
           Row({ space: Space.sm }) {
             Text(LETTERS[i])
@@ -427,8 +428,9 @@ export struct GCollatz {
               .fontColor(this.optInk(i))
               .layoutWeight(1)
           }
-          .width('100%')
+          .width('48%')   // ★ 2×2：每项半宽
           .height(Cell.of(Bp.isShort() ? 34 : 52))
+          .margin({ bottom: Space.sm })   // ★ Flex 没有 space 参数
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
