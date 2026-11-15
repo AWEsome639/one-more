@@ -47,3 +47,16 @@ done
 echo
 echo "=== ③ 正文命中（只列文件名与行号，最多 $LIMIT 条）==="
 grep -rilE "$PAT" "$DIR"/*.md 2>/dev/null | head -"$LIMIT" | sed "s|^$DIR/|  |"
+
+# ★ 2026-11-16：**大部分判据记在共享目标文件里**（~/.dsh/goal.md），只搜文档会漏。
+echo
+echo "=== ④ 共享目标文件命中（判据/进展多半在这里）==="
+GOAL="$HOME/.dsh/goal.md"
+if [ -f "$GOAL" ]; then
+  # ★ macOS 的 cut -c 会因多字节报 Illegal byte sequence ⇒ 用 awk 取字符
+  grep -inE "$PAT" "$GOAL" 2>/dev/null | head -"$LIMIT" | awk '{print "  " substr($0,1,200)}'
+  n=$(grep -icE "$PAT" "$GOAL" 2>/dev/null || echo 0)
+  [ "$n" -eq 0 ] && echo "  （无）"
+else
+  echo "  （$GOAL 不存在）"
+fi
