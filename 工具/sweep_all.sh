@@ -166,7 +166,9 @@ python3 工具/verify_layout.py --every 999 --names-file /tmp/batch.txt >> "$LOG
 mkdir -p _巡检记录/dumps 2>/dev/null
 # ★ 2026-11-16：先清当前批的旧 dump —— 否则新旧混在一起，截断工具会拿旧切片报假阳性
 #   （如 MentalRotation 那次）。dump 是可重生的中间产物，清掉不会丢证据——当执行的批会重新生成。
-rm -f _巡检记录/dumps/*.tsv 2>/dev/null || true
+# ★ 2026-11-16：**只在第 1 轮清**——否则每批都把上一批的归档删了，
+#   一夜下来只剩最后一批，明天就查不到全库 dump（而它只有 ~1.4 MB）。
+if [ "${round:-0}" -eq 1 ]; then rm -f _巡检记录/dumps/*.tsv 2>/dev/null || true; fi
 cp -f /tmp/nodes-*.tsv _巡检记录/dumps/ 2>/dev/null || true
 # ★ 2026-11-16（判据 2794）：每批归档后跑一次截断检测，结果进日志
 echo "=== 截断检测（判据 2794）===" >> "$LOG"
