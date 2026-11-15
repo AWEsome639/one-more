@@ -652,7 +652,9 @@ export struct GNoriNori {
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * this.diffTotal + c)); }); })
             }, (c: number) => 'c' + c)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
+          .width(Math.min(Bp.width - 2 * Space.lg, // ★ 2026-11-15（判据 2716/2723）：533-360=173 < 240 ⇒ **起决定作用的是下限 240**。
+          //   底部说明文字只剩 23px、子女合计超父预算 ~130px ⇒ 下限 240→200（放开 40vp=120px）。
+          Math.max(200, Bp.height - 360)))
         }, (r: number) => 'r' + r)
       }
       .width('100%')
