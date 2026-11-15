@@ -530,7 +530,10 @@ export struct GSnake3D {
       //   三块各占 `~827px` 宽 ⇒ 方格 `aspectRatio(1)` ⇒ 高也 `~827px` ⇒ 加头就超
       //   ⇒ 限整行宽度（三块等分缩小）⇒ 判据 1966「限宽即限高」
       //   `533` 屏下封顶 `Bp.height-180 = 353vp` ⇒ 每块 `~115vp`、每格 `~29vp`（够点，且这游戏主要靠方向键）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(300, Bp.height - 180)))
+      // ★ 2026-11-15（判据 2710/2716）：`-180` 时底部「开始」按钮只剩 82px（应 132px、缺 50px）。
+      //   实测 `-200` 只给了 +20px（82→102px）⇒ 再压 `-230`，按线性关系再得 +30px。
+      //   ^a^ 棋盘是**显示用**（靠方向键操作），缩小不影响可玩性。
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(300, Bp.height - 230)))
       // ★ P9：手指直接在棋盘上滑 = 转方向（不用去够下面那排小按钮）
       .gesture(
         PanGesture({ fingers: 1, direction: PanDirection.All, distance: 8 })
