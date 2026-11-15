@@ -168,6 +168,9 @@ cp -f /tmp/nodes-*.tsv _巡检记录/dumps/ 2>/dev/null || true
 # ★ 2026-11-16（判据 2794）：每批归档后跑一次截断检测，结果进日志
 echo "=== 截断检测（判据 2794）===" >> "$LOG"
 python3 工具/check_truncation.py --all >> "$LOG" 2>&1 || true
+# ★ 静态档（不需 dump）：按实测容量界 40-43 字报警
+echo "=== 静态容量档（>40 字）===" >> "$LOG"
+python3 工具/check_truncation.py --static >> "$LOG" 2>&1 || true
 
   grep -vxFf /tmp/batch.txt "$TODO" > /tmp/todo_next.txt 2>/dev/null || true
   mv /tmp/todo_next.txt "$TODO"

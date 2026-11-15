@@ -46,10 +46,38 @@ def dump_texts(path: str) -> list:
     return out
 
 
+def static_capacity_scan() -> int:
+    """
+    静态档：**不需要 dump**。依据实测容量界（判据 2026-11-16：40 字装得下、44 字装不下），
+    把「整行 Text 配 > 40 字中文串」列为嫌疑。高精度来源是两个实测锚点，不是估算。
+    """
+    hits = []
+    for f in sorted(glob.glob(os.path.join(GAMES, '*.ets'))):
+        src = io.open(f, encoding='utf-8').read()
+        for m in re.finditer(r"Text\(\s*(?:TG\()?'([^'\\\n]{41,200})'", src):
+            s = m.group(1)
+            if not CJK.search(s):
+                continue
+            line = src[:m.start()].count('\n') + 1
+            hits.append((os.path.basename(f)[:-4], line, len(s), s))
+    hits.sort(key=lambda x: -x[2])
+    if not hits:
+        print('✅ 静态档：没有 >40 字的整行 Text 中文串')
+        return 0
+    print('⚠️ 静态档：%d 处 >40 字整行 Text（容量界 40-43，需 dump 或截图确认）:' % len(hits))
+    for g, ln, n, s in hits:
+        print('  %-26s L%-5d %2d 字  %s' % (g, ln, n, s[:38]))
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--all', action='store_true')
+    ap.add_argument('--static', action='store_true', help='静态档：不看 dump，按容量界报警')
     args = ap.parse_args()
+
+    if args.static:
+        return static_capacity_scan()
 
     patterns = ['/tmp/nodes-*.tsv']
     if args.all:
