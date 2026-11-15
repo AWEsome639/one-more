@@ -450,8 +450,12 @@ export struct GMatrixReasoning {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
-      Text(TG('提示：先看完整的两行推出规律，再用到缺格那一行'))
-        .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      // ★ 2026-11-15（判据 2651/2700）：这行提示实测在 `1586-1600`（只 14px 高）⇒ 几乎整个挤到屏外。
+      //   矮屏不渲染（页头 `?` 同义；`visibility` 不行，它不退布局 —— 判据 2651）。
+      if (!Bp.isShort()) {
+        Text(TG('提示：先看完整的两行推出规律，再用到缺格那一行'))
+          .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      }
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
