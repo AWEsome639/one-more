@@ -977,3 +977,5 @@
 2026-11-15T12:02:58	Binary Matrix Rank	NOT_HOME	-	148.9s could not reach home; last texts=[]
 2026-11-15T12:07:05	Binary Matrix Rank	OK	1600	68.3s lowest='B' [108,1572][137,1600] blk=2/48px cov=5 board=145x132@2193,201 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Matrix_Rank-120705.jpeg @2026-11-15T12:07:05
 2026-11-15T12:27:36	Countdown Math	OK	1600	66.8s lowest='提示' [60,1531][2500,1600] blk=2/48px cov=5 board=158x158@920,1073 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Countdown_Math-122736.jpeg @2026-11-15T12:27:36
+2026-11-15T12:42:20	Kakuro	OK	1600	69.5s lowest='重开一题' [60,1540][2500,1600] blk=2/48px cov=5 board=520x520@1020,612 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-124220.jpeg @2026-11-15T12:42:20
+2026-11-15T12:48:50	Kakuro	OK	1582	67.5s lowest='重开一题' [60,1450][2500,1582] blk=2/12px cov=5 board=430x430@1065,612 max=6 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-124850.jpeg @2026-11-15T12:48:50
