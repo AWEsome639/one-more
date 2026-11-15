@@ -281,7 +281,9 @@ export struct GStoryBuilder {
         Text(TG('把句子按时间顺序点出来')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
-      Column({ space: Space.sm }) {
+      // ★ 2026-11-16（第二刀）：行间距 sm→xs（4 个间隙省 48px）
+      //   ⇒ 补齐底部提示被切的 24px（行高部分已在第一刀解决）。
+      Column({ space: Space.xs }) {
         ForEach(this.pool, (line: string, i: number) => { this.lineTile(line, i) },
           (line: string, i: number) => 'l' + i + line)
       }.width('100%')
@@ -314,7 +316,12 @@ export struct GStoryBuilder {
         .fontColor(i < this.placed ? Palette.emerald : this.theme.inkFaint)
       Text(line).fontSize(FontSize.md).layoutWeight(1).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(i < this.placed ? this.theme.inkFaint : this.theme.ink)
-    }.width('100%').padding(Space.sm).borderRadius(Radius.md).shadow(Shadow.card)
+    // ★ 2026-11-16（判据 2759/2782）：5 个 lineTile 各 116px（Text 56 + padding 60）、间隔 30
+    //   ⇒ 总需 968+5×116+4×30 = 1668px ⇒ **第 5 行被切**（实测 lowest='＋' 只剩 14px）。
+    //   ⇒ 只压**纵向**内边距（sm→xs，每行省 8vp=24px、5 行省 120px > 缺口 68px）。
+    }.width('100%')
+    .padding({ top: Space.xs, bottom: Space.xs, left: Space.sm, right: Space.sm })
+    .borderRadius(Radius.md).shadow(Shadow.card)
       .backgroundColor(i < this.placed ? this.theme.surfaceAlt : this.theme.surface).animation({ duration: Motion.fast, curve: Motion.snap() })
       .scale({ x: this.pressed === i ? Motion.pressScale : 1, y: this.pressed === i ? Motion.pressScale : 1 })
       .animation({ duration: Motion.fast, curve: Motion.snap() })
