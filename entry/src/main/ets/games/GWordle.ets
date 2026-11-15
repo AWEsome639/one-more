@@ -579,6 +579,10 @@ export struct GWordle {
     .layoutWeight(1)
     .aspectRatio(1)
     .backgroundColor(this.tileBg(r, c))
+    // ★ 2026-11-15（真机截图 104405）：格子默认 `theme.surface`（白）、页面也是白、
+    //   **且没有边框** ⇒ 猜词棋盘整块隐形（截图里从统计行到键盘之间一片空白）。
+    //   加一道 1vp 分隔线边框，让空格与页面有界。
+    .border({ width: 1, color: this.theme.line })
     .borderRadius(Radius.sm)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
   }
