@@ -1003,3 +1003,4 @@
 2026-11-15T18:24:29	Kakuro	OK	1582	68.4s lowest='重开一题' [60,1450][2500,1582] blk=2/12px cov=5 board=430x430@1065,612 max=6 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-182429.jpeg @2026-11-15T18:24:29
 2026-11-15T18:32:25	Wordle	OK	1596	68.5s lowest='换一题' [60,1500][857,1596] blk=2/40px cov=5 board=360x360@1100,756 max=20 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-183224.jpeg @2026-11-15T18:32:25
 2026-11-15T18:35:53	Wordle	OK	1596	69.0s lowest='换一题' [60,1500][857,1596] blk=2/40px cov=5 board=360x360@1100,756 max=20 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-183552.jpeg @2026-11-15T18:35:53
+2026-11-15T18:45:14	Area Perimeter Match	OK	1597	69.0s lowest='提示：面积看长宽之积，周长看四条边之和 —— 细长条' [712,1555][1848,1597] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Area_Perimeter_Match-184514.jpeg @2026-11-15T18:45:14
