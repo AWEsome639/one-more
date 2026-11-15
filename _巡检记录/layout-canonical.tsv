@@ -996,3 +996,4 @@
 2026-11-15T17:46:31	Norinori	OK	1547	74.4s lowest='提示' [1304,1415][2500,1547] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Norinori-174631.jpeg @2026-11-15T17:46:31
 2026-11-15T17:59:26	Visual Search All	OK	1557	70.0s lowest='把 🍎 全点掉 · 点错扣 2 秒' [60,1508][2500,1557] blk=0/0px cov=5 board=880x880@840,622 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Search_All-175926.jpeg @2026-11-15T17:59:26
 2026-11-15T18:02:35	Area Perimeter Match	OK	1600	69.1s lowest='提示：面积看长宽之积，周长看四条边之和 —— 细长条' [712,1573][1848,1600] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Area_Perimeter_Match-180235.jpeg @2026-11-15T18:02:35
+2026-11-15T18:16:18	Snake 3D	OK	1600	65.0s lowest='开始' [60,1468][1256,1600] blk=3/72px cov=5 board=292x339@1134,756 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-181617.jpeg @2026-11-15T18:16:18
