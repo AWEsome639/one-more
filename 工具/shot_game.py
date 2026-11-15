@@ -902,6 +902,40 @@ def _body(name, t0):
     except Exception:
         _cov = -1
 
+    # ★ 2026-11-15（判据 2695）：**子元素高度之和 > 父高度** 也是一类缺陷（排最后的那项会被压）。
+    #   over 只比单个父子、比不出「子之和 vs 父」。今天 Pipes：父 970px、子合计 ~1200px
+    #   ⇒ 底部行被压成 65px、越出父界 184px，而 blk=48px、over=0px 都正常。
+    _sumover = 0
+    try:
+        _kids = {}
+        def _collect2(n, path=''):
+            if not isinstance(n, dict):
+                return
+            a = n.get('attributes', {}) or {}
+            b = (a.get('bounds') or '').strip()
+            if b:
+                nums = [int(x) for x in re.findall(r'-?\d+', b)]
+                if len(nums) == 4:
+                    _kids.setdefault(path, [])
+                    _kids[path].append(nums[3] - nums[1])
+            for idx, c in enumerate(n.get('children') or []):
+                _collect2(c, path + '/' + str(idx))
+        _collect2(d2)
+        _h2 = {}
+        for _p, _lst in _kids.items():
+            if _lst:
+                _h2[_p] = max(_lst)          # 该节点的高度（取子元素最大者）
+        for _p, _lst in _kids.items():
+            if not _lst:
+                continue
+            _tot = sum(_lst)                 # 所有子元素高度之和
+            if _p in _h2:
+                _d = _tot - _h2[_p]
+                if _d > _sumover:
+                    _sumover = _d
+    except Exception:
+        _sumover = -1
+
     # ★ 2026-11-15（判据 2688）：**子容器比父容器高 = 真溢出**，而 blk 可能完全看不见
     #   （今天 Divided Attention：两列 1085px 塞在 875px 的父里 ⇒ 真溢出 210px，而 blk 只报 72px）。
     #   这里算出「子高 - 父高」的最大正差，写进台账明细作为新监测量。
@@ -964,7 +998,7 @@ def _body(name, t0):
             except Exception as _e:
                 print('节点 dump 失败: %r' % _e)
         finish(name, 'OK', t0, mb,
-               'lowest=%r %s blk=%d/%dpx cov=%d board=%s max=%d over=%dpx -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, _cov, _board, block_over_max, _over, out, _ts))
+               'lowest=%r %s blk=%d/%dpx cov=%d board=%s max=%d over=%dpx sumover=%dpx -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, _cov, _board, block_over_max, _over, _sumover, out, _ts))
     else:
         finish(name, 'OK_NOSHOT', t0, mb,
                'lowest=%r %s recv failed @%s' % (lo, lo_bounds, _ts))
