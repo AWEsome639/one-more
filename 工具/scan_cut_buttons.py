@@ -44,7 +44,7 @@ def main():
         # ★ 判据 2714：按钮标签很短（≤ 8 字）且不含「：」；
         #   「提示：面积看长宽之积…」这种长句子是提示文字，不是按钮。
         is_btn = (len(s) <= 8 and '：' not in s and any(w in s for w in BTN_WORDS))
-        if is_btn:
+        if is_btn and h < BTN_H_PX:      # ★ 2026-11-15：已完整的（高 >= 132）不列入
             btn.append((h, g, s[:18]))
         elif h < 40:
             txt.append((h, g, s[:18]))
