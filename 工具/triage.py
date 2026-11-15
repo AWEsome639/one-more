@@ -42,6 +42,11 @@ def parse(since=None):
         m2 = re.search(r"lowest='([^']*)'", ln)
         if m2:
             low = m2.group(1)
+        # ★ 2026-11-16（判据 2782）：解析 lowest 后面的坐标 ⇒ 得到「最低元素的高度」与「它距屏底的间隙」。
+        #   全天手工判断「是不是被切了」靠的就是这两个数：高度远低于设计 ⇒ 被切；y2 贴底 ⇒ 贴边。
+        lm = re.search(r"lowest='[^']*'\s*\[(\d+),(\d+)\]\[(\d+),(\d+)\]", ln)
+        lowh = (int(lm.group(4)) - int(lm.group(2))) if lm else -1
+        lowgap = (1600 - int(lm.group(4))) if lm else -1
         # ★ 2026-11-15（判据 2695/2708）：**真溢出**的两个新字段 —— 11-15 起才有
         #   · over=   子容器比父容器高（容器尺寸矛盾）
         #   · sumover= 子元素高度之和 > 父容器高（父预算不足，最后一个被子元素被压）
@@ -51,7 +56,7 @@ def parse(since=None):
         has_over = bool(om)
         over = int(om.group(1)) if om else 0
         sumover = int(sm.group(1)) if sm else 0
-        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, cov=(int(cm.group(1)) if cm else None), over=over, sumover=sumover, has_over=has_over))
+        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, lowh=lowh, lowgap=lowgap, cov=(int(cm.group(1)) if cm else None), over=over, sumover=sumover, has_over=has_over))
     return rows
 
 def main():
@@ -151,6 +156,20 @@ def main():
     print('\n== 结论 ==')
     print('A+B+C = %d 款需要**优先看截图**；D = %d 款可抽样看。' % (len(A) + len(B) + len(C), len(D)))
     print('⚠️ 但判据 1998：`blk=0` 也可能有横向裁切/同行挤压 ⇒ D 档不能跳过，只能降低优先级。')
+
+    # ★ 2026-11-16（判据 2782）：`lowest` 高度是全天最好用、却一直靠手工看的线索。
+    #   「最低元素贴底 + 高度 < 100px」⇒ 很像被切的文字/按钮（正常按钮 132px、正常文字 42–49px）。
+    #   ⚠️ 这是筛选器、不是判决（判据 2773/2774）。
+    print('')
+    print('== 必看截图清单（lowest 高度新线索，判据 2782）==')
+    watch = [r for r in rows if r.get('outcome') == 'OK' and r.get('lowh', -1) >= 0
+             and (r.get('blk', 0) > 0 or (r['lowh'] < 100 and r.get('lowgap', -1) <= 24))]
+    if not watch:
+        print('  ✅ 没有 —— 所有量过的款都不符合「贴底且短」或 blk>0')
+    for r in sorted(watch, key=lambda x: (x.get('lowgap', 999), x.get('lowh', 0)))[:14]:
+        print('  %-28s lowest_h=%-4d gap=%-4d blk=%-2d %s'
+              % (r['name'], r['lowh'], r['lowgap'], r.get('blk', 0), (r.get('low') or '')[:22]))
+    print('  共 %d 款（排序：贴底程度 → 高度）' % len(watch))
 
 if __name__ == '__main__':
     main()
