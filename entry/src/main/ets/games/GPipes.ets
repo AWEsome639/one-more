@@ -530,7 +530,7 @@ export struct GPipes {
               .fontColor(this.cellOk((r * this.diffTotal + c)) ? Palette.emerald : this.theme.ink)
               }
               .layoutWeight(1)
-              .aspectRatio(1)
+              .height('100%')
               // ★ 2026-11-01：hintIdx 原来只设不画 ⇒ 提示/演示在盘面上没有指向。
               .border({ width: this.hintIdx === (r * this.diffTotal + c) ? 3 : 0, color: Palette.amber })
               .backgroundColor(this.cellOk((r * this.diffTotal + c)) ? (this.theme.isDark ? '#0E2A22' : '#ECFDF5') : this.theme.surface)
@@ -551,9 +551,14 @@ export struct GPipes {
             }, (c: number) => 'c' + c)
           }
           .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
+          // ★ 2026-11-15（判据 2695）：行高由容器分配（否则 5 行各 48vp、底部行被压成 65px）
+          .layoutWeight(1)
         }, (r: number) => 'r' + r)
       }
       .width('100%')
+      // ★ dump：父预算 970px、子合计 ~1200px ⇒ 底部行被压成 65px、放到父界外 184px。
+      //   184vp = 323 可用 − 85 固定 − 6 间隙 − 44 底部行，给底部行留出完整 132px。
+      .height(184)
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
