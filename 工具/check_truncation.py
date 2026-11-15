@@ -68,6 +68,10 @@ def static_capacity_scan() -> int:
     print('ℹ️ 静态档（提示，非报警）：%d 处 >40 字整行 Text。阈值 40 来自 dump 报数上限、不是屏幕容量；判截断只能看截图（判据 2797）' % len(hits))
     for g, ln, n, s in hits:
         print('  %-26s L%-5d %2d 字  %s' % (g, ln, n, s[:38]))
+    print()
+    print('⚠️ 前人已审过这一类：`_巡检记录/文本截断审计-151假阳性-20261114.md` ——')
+    print('   粗扫 151 处、收窄到变量文本后真风险 0。上面 8 处都是**固定字面量**、')
+    print('   而且 7 处无 maxLines(1) ⇒ 会换行、不会截。这份清单只作查阅用。')
     return 0
 
 
