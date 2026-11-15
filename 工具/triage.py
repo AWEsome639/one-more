@@ -166,9 +166,13 @@ def main():
              and (r.get('blk', 0) > 0 or (r['lowh'] < 100 and r.get('lowgap', -1) <= 24))]
     if not watch:
         print('  ✅ 没有 —— 所有量过的款都不符合「贴底且短」或 blk>0')
-    for r in sorted(watch, key=lambda x: (x.get('lowgap', 999), x.get('lowh', 0)))[:14]:
-        print('  %-28s lowest_h=%-4d gap=%-4d blk=%-2d %s'
-              % (r['name'], r['lowh'], r['lowgap'], r.get('blk', 0), (r.get('low') or '')[:22]))
+    # ★ 2026-11-16（判据 2790）：`lowh ≥ 84` 几乎必然是「块底贴 1600」的结构性误报
+    #   （今夜 Skyscrapers 113/115=98%、Dual Coding 132=Cell.tap 精确值、Word Surge 147 均属此类）
+    #   ⇒ 排序按 lowh 升序（真危险的在前），并标出「疑似贴底」。
+    for r in sorted(watch, key=lambda x: (x.get('lowh', 0), x.get('lowgap', 999)))[:14]:
+        tag = ' ⚠️疑似贴底' if r['lowh'] >= 84 else ''
+        print('  %-28s lowest_h=%-4d gap=%-4d blk=%-2d %s%s'
+              % (r['name'], r['lowh'], r['lowgap'], r.get('blk', 0), (r.get('low') or '')[:20], tag))
     print('  共 %d 款（排序：贴底程度 → 高度）' % len(watch))
 
 if __name__ == '__main__':
