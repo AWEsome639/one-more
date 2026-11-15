@@ -902,6 +902,37 @@ def _body(name, t0):
     except Exception:
         _cov = -1
 
+    # ★ 2026-11-15（判据 2688）：**子容器比父容器高 = 真溢出**，而 blk 可能完全看不见
+    #   （今天 Divided Attention：两列 1085px 塞在 875px 的父里 ⇒ 真溢出 210px，而 blk 只报 72px）。
+    #   这里算出「子高 - 父高」的最大正差，写进台账明细作为新监测量。
+    _over = 0
+    try:
+        _nodes = []
+        _walko = [None]
+        def _collect(n, path=''):
+            if not isinstance(n, dict):
+                return
+            a = n.get('attributes', {}) or {}
+            b = (a.get('bounds') or '').strip()
+            if b:
+                nums = [int(x) for x in re.findall(r'-?\d+', b)]
+                if len(nums) == 4:
+                    _nodes.append((path, nums[3] - nums[1]))
+            for idx, c in enumerate(n.get('children') or []):
+                _collect(c, path + '/' + str(idx))
+        _collect(d2)
+        _h = dict(_nodes)
+        for _p, _hh in _nodes:
+            if _p.count('/') <= 1:
+                continue
+            _par = _p.rsplit('/', 1)[0]
+            if _par in _h:
+                _d = _hh - _h[_par]
+                if _d > _over:
+                    _over = _d
+    except Exception:
+        _over = -1
+
     if recv_ok:
         # ★ 2026-11-15：ONEMORE_DUMP=1 时把**全部节点**（含无文字容器）写到 /tmp/nodes-<game>.tsv
         #   用途：先看谁在溢出、它的父链是什么，再决定怎么改。判据 2634/本轮教训：不许再凭 lowest 的文字猜结构。
@@ -933,7 +964,7 @@ def _body(name, t0):
             except Exception as _e:
                 print('节点 dump 失败: %r' % _e)
         finish(name, 'OK', t0, mb,
-               'lowest=%r %s blk=%d/%dpx cov=%d board=%s max=%d -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, _cov, _board, block_over_max, out, _ts))
+               'lowest=%r %s blk=%d/%dpx cov=%d board=%s max=%d over=%dpx -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, _cov, _board, block_over_max, _over, out, _ts))
     else:
         finish(name, 'OK_NOSHOT', t0, mb,
                'lowest=%r %s recv failed @%s' % (lo, lo_bounds, _ts))
