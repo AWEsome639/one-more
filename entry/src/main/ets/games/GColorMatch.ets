@@ -143,7 +143,8 @@ export struct GColorMatch {
  });
  }
  build() {
- Column({ space: Space.sm }) {
+ // ★ 2026-11-16（判据 2782/2785）：dump：5 行各 165px、行距仅 18px，提示只剩 39px（需 49）⇒ 矮屏间距 sm→xs（约 60px）。
+ Column({ space: Bp.isShort() ? Space.xs : Space.sm }) {
    // ★ 演示条（共用组件；未演示时高度为 0，不占位）
    DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
    HintBar({

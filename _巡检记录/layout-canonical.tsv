@@ -1223,3 +1223,5 @@
 2026-11-16T02:58:14	Skyscrapers	OK	1600	70.0s lowest='1' [60,1487][648,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Skyscrapers-025814.jpeg @2026-11-16T02:58:14
 2026-11-16T03:03:41	Word Surge	OK	1600	70.9s lowest='BRIDGE' [60,1453][2500,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Surge-030341.jpeg @2026-11-16T03:03:41
 2026-11-16T03:05:00	Dual Coding	OK	1588	70.2s lowest='我记住了 ▶' [60,1456][2470,1588] blk=2/24px cov=5 board=145x132@2193,201 max=12 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Dual_Coding-030459.jpeg @2026-11-16T03:05:00
+2026-11-16T03:06:43	Color Match	OK	1600	70.0s lowest='同色两格以上就能消 🎨' [60,1561][2500,1600] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Match-030643.jpeg @2026-11-16T03:06:43
+2026-11-16T03:12:04	Color Match	OK	1562	70.8s lowest='同色两格以上就能消 🎨' [60,1513][2500,1562] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Match-031203.jpeg @2026-11-16T03:12:04
