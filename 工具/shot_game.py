@@ -376,8 +376,14 @@ def game_title_map():
         mi = re.search(r"id:\s*'([^']+)'", block)
         mn = re.search(r"name:\s*'([^']+)'", block)
         me = re.search(r"enName:\s*'([^']+)'", block)
-        if mi and mn and me:
-            m[me.group(1)] = mn.group(1)
+        # ★ 2026-11-16（判据 2806）：原来要求 id+name+enName **三者齐全**，
+        #   而 `fraction_matcher` / `matrix_multiplier_match` 这两条**没有 enName** ⇒ 整条被跳过
+        #   ⇒ 查不到中文名 ⇒ 从不试中文搜索 ⇒ NO_CARD。
+        #   改成：有 id+name 就收；**id 也作一个键**，这样传 id 也能查到中文名。
+        if mi and mn:
+            m[mi.group(1)] = mn.group(1)
+            if me:
+                m[me.group(1)] = mn.group(1)
     # 台账里用的是 `Word Snake`，而注册表的 enName 是 `Word Snake Trail` ⇒ 补一条别名
     if 'Word Snake Trail' in m and 'Word Snake' not in m:
         m['Word Snake'] = m['Word Snake Trail']
