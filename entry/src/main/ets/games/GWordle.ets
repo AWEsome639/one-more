@@ -25,7 +25,11 @@ import { AppClock } from '../core/AppClock';
 const LEN: number = 5;
 const TRIES: number = 5;
 const TICK_MS: number = 1000;
-const KEY_H: number = 40;
+// ★ 2026-11-15（判据 2739）：**这个常量从初始提交就是 40、从未改过**（`git log -L` 只有一次），
+//   不是「反复收敛」的产物 ⇒ 可以动。
+//   底部「换一题」按钮设计高 = KEY_H、被切到只剩 28px，缺口 92px。
+//   40 → 32：键盘 3 行各让 8vp（共 72px）+ 按钮设计高降 8vp（少需 24px）⇒ 有效 96px ≥ 92px。
+const KEY_H: number = 32;
 const GAP: number = 6;
 
 const WORDS: string[] = [

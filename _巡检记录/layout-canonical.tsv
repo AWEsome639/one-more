@@ -1001,3 +1001,4 @@
 2026-11-15T18:20:34	Collatz	OK	1600	68.3s lowest='换个数' [60,1520][2500,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-182034.jpeg @2026-11-15T18:20:34
 2026-11-15T18:23:13	Divided Attention	OK	1287	69.5s lowest=' ' [432,1245][442,1287] blk=3/72px cov=5 board=753x875@60,725 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Divided_Attention-182313.jpeg @2026-11-15T18:23:13
 2026-11-15T18:24:29	Kakuro	OK	1582	68.4s lowest='重开一题' [60,1450][2500,1582] blk=2/12px cov=5 board=430x430@1065,612 max=6 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-182429.jpeg @2026-11-15T18:24:29
+2026-11-15T18:32:25	Wordle	OK	1596	68.5s lowest='换一题' [60,1500][857,1596] blk=2/40px cov=5 board=360x360@1100,756 max=20 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-183224.jpeg @2026-11-15T18:32:25
