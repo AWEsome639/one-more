@@ -570,7 +570,9 @@ export struct GBaseConversionRun {
       .shadow(Shadow.card)
 
       // 选项
-      Column({ space: Space.sm }) {
+      // ★ 2026-11-15（判据 2723/2724）：原来 4 行选项占 384px、总内容超父预算 159px ⇒ 反馈文字只剩 6px。
+      //   改成 Flex 换行 + 每项 48% 宽 ⇒ 自动 2×2：省 192px+间隙，且每项变高（32vp→37vp 触控更舒服）。
+      Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween }) {
         ForEach(this.optsIdx, (i: number) => {
           Row({ space: Space.sm }) {
             Text(LETTERS[i])
@@ -583,8 +585,9 @@ export struct GBaseConversionRun {
               .fontColor(this.optInk(i))
               .layoutWeight(1)
           }
-          .width('100%')
+          .width('48%')   // ★ 2×2：每项半宽，配合外层 Flex wrap
           .height(Cell.of(Bp.isShort() ? 34 : 52))
+          .margin({ bottom: Space.sm })   // ★ Flex 没有 space 参数，纵向间距用 margin
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
