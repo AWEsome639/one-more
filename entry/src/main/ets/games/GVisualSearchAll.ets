@@ -307,7 +307,9 @@ export struct GVisualSearchAll {
       }
       // 2026-11-13 真机截图：**第三行格子整行被切**（只露上沿）+ 底部提示行完全不见
       //   ⇒ 盘面是方形格 `aspectRatio` ⇒ **限宽即限高**（判据 1966）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 220)))
+      .width(Math.min(Bp.width - 2 * Space.lg, // ★ 2026-11-15（判据 2734）：底部提示只剩 32px。
+      //   盘面是 aspectRatio(1) 的方形格 ⇒ 限宽即限高，放开 -220→-240 就能让出 ~20vp=60px。
+      Math.max(200, Bp.height - 240)))
       .padding(Space.sm).backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.note).fontSize(FontSize.sm)
