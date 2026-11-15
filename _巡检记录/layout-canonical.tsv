@@ -990,3 +990,5 @@
 2026-11-15T15:47:41	Collatz	NOT_HOME	-	166.0s could not reach home; last texts=[]
 2026-11-15T15:57:05	Collatz	NOT_HOME	-	162.5s could not reach home; last texts=[]
 2026-11-15T17:13:05	Collatz	OK	1600	79.0s lowest='换个数' [60,1520][2500,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-171305.jpeg @2026-11-15T17:13:05
+2026-11-15T17:29:58	Binary Matrix Rank	NO_CARD	-	233.6s no card for '矩阵秩' (fallback=(1280, 675)) | aa-diag-fail AttributeError("'tuple' object has no attribute 'strip'") | visible: ['小艺输入法', '小艺输入法', '快捷准确、安全有趣的输入法', '本应用需要联网，调用通讯录、相机、麦克风权限，可能会开启本地录音、拍照、屏幕截图，读取通讯录、短信内容，读取并传送音频、图片，以提供通讯录词库、验证码提取、语音转文字、拍摄输入、智能推荐帮写相关服务。我们仅在您使用具体业务功能时，才会触发上述行为收集使用相关的个人信息。详情请参阅关于小艺输入法与隐私的声明、权限使用说明。', '请仔细阅读上述声明，点击“同意”，即表示您知悉并同意我们向您提供本应用服务。', '取消', '同意', 'One More']
+2026-11-15T17:31:24	Binary Matrix Rank	OK	1561	67.6s lowest='提示：模 2 消元就是「两行按位异或」；秩 = 化到' [60,1519][2500,1561] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Binary_Matrix_Rank-173124.jpeg @2026-11-15T17:31:24

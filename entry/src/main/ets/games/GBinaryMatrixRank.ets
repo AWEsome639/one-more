@@ -443,7 +443,9 @@ export struct GBinaryMatrixRank {
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
 
-      Column({ space: Space.sm }) {
+      // ★ 2026-11-15（判据 2723/2725）：4 行选项时第 4 个 `D` 被切（功能性缺陷，点不到）。
+      //   改成 Flex 换行 + 每项 48% ⇒ 2×2，省 192px + 间隙。
+      Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.SpaceBetween }) {
         ForEach(this.optsIdx, (i: number) => {
           Row({ space: Space.sm }) {
             Text(LETTERS[i])
@@ -456,10 +458,12 @@ export struct GBinaryMatrixRank {
               .fontColor(this.optInk(i))
               .layoutWeight(1)
           }
-          .width('100%')
           // 2026-11-14 真机截图（blk=32px）：**选项 `C 秩=0` 被切、`D` 完全不见** ⇒ 答不了题
         //   按判据 1886：动上方（矩阵格），不动选项（选项是内容，缩了也照样被切）
+          // ★ 2026-11-15（判据 2723/2725）：选项半宽 ⇒ 2×2；底部间距用 margin（Flex 无 space 参数）
+          .width('48%')
         .height(Bp.isShort() ? Cell.of(28) : Cell.of(34))   // ★ 2026-11-10（判据 1890 ②）：42 → 34，4 行省 96px
+          .margin({ bottom: Space.sm })
           .padding({ left: Space.md, right: Space.md })
           .backgroundColor(this.optBg(i))
           .borderRadius(Radius.md)
