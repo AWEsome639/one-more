@@ -155,7 +155,10 @@ for round in $(seq 1 24); do
 
   head -12 "$TODO" > /tmp/batch.txt
   say "第 $round 批：$(wc -l < /tmp/batch.txt | tr -d ' ') 款（剩 $n）"
-  python3 工具/verify_layout.py --every 8 --names-file /tmp/batch.txt >> "$LOG" 2>&1
+  # ★ 2026-11-15（判据 2775）：原 `--every 8` ⇒ 每 8 款重启一次模拟器；而**重启时会检查磁盘闸门**（阈值 14 GiB），
+#   而模拟器运行时磁盘常态就是 ~13.8 GiB ⇒ **每次重启都会卡住、后面全 NO_CARD**。
+#   ⇒ 整夜不重启（`every=999`，对 127 款等价于不重启）；闸门只在开跑时查一次。
+python3 工具/verify_layout.py --every 999 --names-file /tmp/batch.txt >> "$LOG" 2>&1
 
   grep -vxFf /tmp/batch.txt "$TODO" > /tmp/todo_next.txt 2>/dev/null || true
   mv /tmp/todo_next.txt "$TODO"

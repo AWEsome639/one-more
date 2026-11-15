@@ -399,7 +399,10 @@ export struct GMandelbrot {
           .width('100%')
         }, (r: number) => 'y' + r)
       }
-      .width('100%')
+      // ★ 2026-11-15（判据 2759/2762）：12行×16列的方格网格，容器 `.width('100%')` 无上限
+      //   ⇒ 每格 ~156px、近 12 行需 ~1872px ≫ 屏高 ⇒ **分形下部 4 行被切掉**（截图实证）。
+      //   ⇒ 限宽到 1260px：每格 ~78px、近 12 行约 969px，装得下。
+      .width(Math.min(Bp.width - 2 * Space.lg, 420))
       .padding(Space.xs)
       .backgroundColor('#0B0B14')
       .borderRadius(Radius.md)

@@ -294,7 +294,7 @@ export struct GShapeShifter {
   }
 
   build() {
-    Column({ space: Space.sm }) {
+    Column({ space: Bp.isShort() ? Space.xs : Space.sm }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
@@ -320,7 +320,7 @@ export struct GShapeShifter {
             }, (c: number) => 'gc' + c)
             }.width('100%')
             }, (r: number) => 'gr' + r)
-            }.width('100%') }.width('78%')
+            }.width('100%') }.width(Bp.isShort() ? '66%' : '78%')
             Text(String(i + 1)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         }, (i: number) => 'sq' + i)
@@ -373,8 +373,8 @@ export struct GShapeShifter {
         .onBlur(() => { if (this.tvFocus === 'L366') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L366'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((1)); }); })
-      }.width('100%')
-      Row({ space: Space.sm }) {
+      // ★ 2026-11-15 结构修（判据 2759/2763）：原「2张一行 × 2 行」在 533vp 屏上第二行在 y≈2152 屏外
+      //   ⇒ opts[2]/opts[3] **根本点不到**（约一半的题无解）。并为**一行四张**：卡宽 1205→587 ⇒ 卡高 858→426。
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
         ForEach(ROWS, (r: number) => {

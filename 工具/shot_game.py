@@ -703,7 +703,9 @@ def _body(name, t0):
         #   ⇒ 把设备与 App 的真实状态一并写进错误信息。
         _diag = ''
         try:
-            _l = sh('aa dump -l').strip().split('\n')
+            # ★ 2026-11-15 修：`sh()` 返回 `(ok, out)` **元组**，原写 `sh(...).strip()` ⇒
+            #   AttributeError("'tuple' object has no attribute 'strip'") ⇒ 诊断信息全丢。取 `[1]`。
+            _l = (sh('aa dump -l')[1] or '').strip().split('\n')
             _m = [x.strip() for x in _l if 'onemore' in x.lower()]
             _st = [x.strip() for x in _l if 'state' in x.lower() or 'lock' in x.lower()]
             _diag = ' | aa: %s' % ('; '.join(_m[:2])[:90] or 'no onemore mission')
