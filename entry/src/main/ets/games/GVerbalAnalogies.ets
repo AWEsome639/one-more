@@ -345,7 +345,9 @@ export struct GVerbalAnalogies {
   option(o: Opt, i: number) {
     Text(o.text).fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
       .fontColor(this.locked && (this.picked === i || o.ok) ? '#FFFFFF' : this.theme.ink)
-      .width('100%').height(Cell.of(48)).borderRadius(Radius.md).shadow(Shadow.card)
+      .width('100%').height(// ★ 2026-11-16（判据 2782/2785）：dump 实测 4 个选项各 138px、第二条提示只剩 22px（需 49）⇒ 缺口 27px。
+                //   Cell.of(48)=138px ⇒ Cell.of(44)≈126px、四个选项省 48px。
+                Cell.of(44)).borderRadius(Radius.md).shadow(Shadow.card)
       .backgroundColor(this.locked && o.ok
         ? Palette.emerald : (this.locked && this.picked === i ? Palette.rose : this.theme.surface))
       .scale({ x: this.picked === i ? Motion.pressScale : 1, y: this.picked === i ? Motion.pressScale : 1 })
