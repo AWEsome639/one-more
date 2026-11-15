@@ -343,7 +343,11 @@ export struct GFractionalPizza {
         .onFocus(() => { this.tvFocus = 'L330'; })
         .onBlur(() => { if (this.tvFocus === 'L330') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L330')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
-      Text(TG('提示：分母 = 一共几片，分子 = 取几片')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+      // ★ 2026-11-15（判据 2651/2701）：这行提示实测只有 10px 可见 ⇒ 几乎整个挤到屏外。
+      //   它是**纯提示**（不承载对错反馈）⇒ 矮屏不渲染（页头 `?` 同义）。
+      if (!Bp.isShort()) {
+        Text(TG('提示：分母 = 一共几片，分子 = 取几片')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%')
+      }
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
