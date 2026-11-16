@@ -563,7 +563,10 @@ export struct GKakuroMini {
             //   棋盘按 width('100%') 撑满 711vp ⇒ 高 711vp ⇒ 数字键盘被挤出屏幕（实测截图：无键盘）。
             //   改用与 GGo9.boardMax() 同一规则（高度永远是瓶颈）：竖屏 min(w-40, h-400)。
             .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 368))
-              : Math.min(Bp.width - 2 * Space.lg, Math.max(160, Bp.height - 400)) })
+              : Math.min(Bp.width - 2 * Space.lg, Math.max(160, Bp.height - 440)) })
+            // ★ 2026-11-17（判据 2836 第二轮）：h-400 做到了「第一行键盘可见」，
+            //   但第二行（6 7 8 9 ⌫）仍被屏底切掉 ⇒ 再压小 40vp。
+            //   判据：最低键高应 ≥84px 且 ⌫ 可见。
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
