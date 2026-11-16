@@ -424,7 +424,11 @@ export struct GMentalMapping {
       .aspectRatio(1)
       // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
       //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: Bp.isShort() ? 120 : '70%' })
+      .constraintSize({ maxHeight: Bp.isShort() ? 120 : '50%' })
+      // ★ 2026-11-16（判据 2820/2822）：原来大屏给 '70%'，竖屏折叠屏上
+      //   网格 70%×608=426vp + 头部 85 + 统计/hint 60 + 方向键 150 = 721vp > 内容区 608vp
+      //   ⇒ 方向键第二行被切（实测 blk=10/6992px、lowest=8px）。
+      //   改 50%（304vp）后总计 ≈ 599vp。
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
