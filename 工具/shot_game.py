@@ -404,6 +404,34 @@ def _header_icon(tree, screen_w, frac=0.889):
     return cands[0][0], cands[0][1]
 
 
+def _find_by_type(tree, want_type):
+    """按**组件类型**找节点中心（例：`TextInput`）。
+
+    ★ 2026-11-16（判据 2819）：搜索框在手机与折叠屏上的**坐标完全不同**
+      （手机 (1280,435)、折叠屏 (1167,457)，而按屏高比例算会得 679），
+      但它在 dump 里的**类型都是 `TextInput`** ⇒ 按类型找比按坐标算可靠得多。
+    """
+    hits = []
+
+    def walk(n):
+        if isinstance(n, dict):
+            a = n.get('attributes', {}) or {}
+            ty = (a.get('type') or a.get('componentType') or '').strip()
+            if ty == want_type:
+                b = (a.get('bounds') or '').strip()
+                nums = [int(x) for x in re.findall(r'-?\d+', b)] if b else []
+                if len(nums) == 4 and nums[2] > nums[0] and nums[3] > nums[1]:
+                    hits.append(((nums[0] + nums[2]) // 2, (nums[1] + nums[3]) // 2,
+                                 (nums[2] - nums[0]) * (nums[3] - nums[1])))
+            for c in (n.get('children') or []):
+                walk(c)
+    walk(tree)
+    if not hits:
+        return None
+    hits.sort(key=lambda h: -h[2])      # 取面积最大的那个（真正的输入框）
+    return hits[0][0], hits[0][1]
+
+
 def _node_count(tree):
     """数一下树里有多少个带 bounds 的节点 —— 用作「页面变了吗」的便宜签名。"""
     n = 0
@@ -794,13 +822,19 @@ def _body(name, t0):
             _d1 = dump()
             if _d1 and _node_count(_d1) != _sig0:
                 break
-        _bx, _by = _tap_props(1280 / 2560.0, 435 / 1600.0)
+        # ★ 判据 2819：**优先按类型找 `TextInput`**（手机与折叠屏坐标不同，但类型相同）。
+        _dbox = dump()
+        _ti = _find_by_type(_dbox, 'TextInput') if _dbox else None
+        if _ti:
+            _bx, _by = _ti
+        else:
+            _bx, _by = _tap_props(1280 / 2560.0, 435 / 1600.0)
         sh('uitest uiInput click %d %d' % (_bx, _by))
         time.sleep(0.8)
         # ★ 2026-11-14 白天实测：`uinput -K -t` **打不进中文**（IME 层）⇒ 像 `磁铁`/`分数匹配`
         #   这类纯中文名搜索永远不过滤 ⇒ 卡片不在首屏 ⇒ `NO_CARD`。
         #   而 `uitest uiInput inputText <x> <y> <text>` 能打中文（实测「磁铁」⇒ 过滤成「1 款」）。
-        _tx, _ty = _tap_props(1280 / 2560.0, 435 / 1600.0)
+        _tx, _ty = _bx, _by          # 用刚才真正点中的那个输入框坐标
         sh("uitest uiInput inputText %d %d '%s'" % (_tx, _ty, tok))
         time.sleep(2.4)
         d = dump('r')
