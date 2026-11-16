@@ -1,81 +1,130 @@
 #!/bin/bash
-# 测「isShort == false」那条从未被跑过的分支（判据 2807）。
+# 在「isShort == false」那条路上跑一次（判据 2807 / 2812 / 2814）。
 #
-# 原理：Bp.height 取自 display.getDefaultDisplaySync()，而 `hdc shell wm size`
-#       能在运行时改显示尺寸 ⇒ 把屏幕改成「更高」，isShort() 就会变 false。
+# ✅ 现在用**折叠屏实例**（foldable 镜像已下载，不用下平板镜像）：
+#     onemore_fold = Mate X5, 2224x2496 @500dpi ≈ 711x798vp ⇒ Bp.height ≈ 798 > 690 ⇒ isShort() == false
+# ❌ 「hdc shell wm size」在鸿蒙上不存在（实测 /bin/sh: wm: inaccessible）——这条路已废。
 #
-# 安全设计（三条硬要求）：
-#   ① 先存原尺寸，**任何退出路径**都恢复（trap）
-#   ② 改完先只 dump 一次，确认 board 尺寸真的变了，才继续测量
-#   ③ 全程不写台账 —— 用 `--no-ledger` 或事后人工核对（避免污染唯一台账）
+# ⚠️ 收尾只用 `Emulator -stop <name>`，**绝不 pkill**（判据 2814：强杀会触发 QEMU 断言崩溃）。
 #
-# 用法：
-#   bash 工具/test_nonshort.sh                 # 只做第 ① 步：改尺寸 + dump 一次看通不通
-#   bash 工具/test_nonshort.sh "Mental Mapping" "Color Maze Nav"   # 通了再测指定款
+# 用法:
+#   bash 工具/test_nonshort.sh              # 启动 + 装包 + 验首页渲染 + 截图 + 优雅停止
+#   bash 工具/test_nonshort.sh "Mental Mapping" ...   # 额外逐款测（需先解决导航坐标问题）
 
 set -u
 cd "$(dirname "$0")/.." || exit 1
-
+EMU='/Applications/DevEco-Studio.app/Contents/tools/emulator/Emulator'
 HC='/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
-TARGET="${1:-}"
-[ -z "$TARGET" ] && TARGET=""
+INST='onemore_fold'
+SCREEN='2224x2496'
 
-echo "════ isShort==false 分支测试 $(date '+%H:%M') ════"
+echo "════ isShort==false 测试 $(date '+%H:%M') ════"
 
-# ① 存原尺寸
-ORIG=$("$HC" shell "wm size" 2>/dev/null | tr -d '\r' | grep -oE '[0-9]+x[0-9]+' | head -1)
-if [ -z "$ORIG" ]; then
-  echo "❌ 读不到当前 wm size（设备没连？）"; exit 1
-fi
-echo "原尺寸: $ORIG"
-
-restore() {
-  echo "→ 恢复尺寸 $ORIG"
-  "$HC" shell "wm size reset" >/dev/null 2>&1 || "$HC" shell "wm size $ORIG" >/dev/null 2>&1
-  echo "→ 已恢复：$("$HC" shell 'wm size' 2>/dev/null | tr -d '\r' | tail -1)"
+cleanup() {
+  echo "→ 优雅停止 $INST"
+  "$EMU" -stop "$INST" >/dev/null 2>&1
+  sleep 4
+  echo "→ 残留: $(pgrep -f "Emulator -start" | wc -l | tr -d ' ')"
 }
-trap restore EXIT INT TERM
+trap cleanup EXIT INT TERM
 
-# ② 改成竖高的尺寸（让 Bp.height > 690）
-NEW="1600x2560"
-echo "改成: $NEW（目的：让 Bp.height > 690 ⇒ isShort() == false）"
-"$HC" shell "wm size $NEW" >/dev/null 2>&1
-sleep 3
+# 一次只开一台（判据 2814：上次两台并存就是崩溃的起点）
+if pgrep -f "Emulator -start" >/dev/null 2>&1; then
+  echo "⚠️ 已有模拟器在跑，先优雅停掉："
+  pgrep -fl "Emulator -start" | sed 's/^/     /'
+  for n in $(pgrep -fl "Emulator -start" | sed -n 's/.*-start \([A-Za-z0-9_]*\).*/\1/p' | sort -u); do
+    echo "   stop $n"; "$EMU" -stop "$n" >/dev/null 2>&1
+  done
+  sleep 5
+fi
 
-echo
-echo "── 第 ① 步：dump 一次，看 board 尺寸是否变化 ──"
-python3 - <<'PY'
-import os, subprocess, sys, re, time
-HC = '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
-subprocess.run([HC, 'shell', 'aa', 'force-stop', 'com.andrewoscar.onemore'],
-               capture_output=True, timeout=60)
-subprocess.run([HC, 'shell', 'aa', 'start', '-a', 'EntryAbility', '-b', 'com.andrewoscar.onemore'],
-               capture_output=True, timeout=60)
-time.sleep(8)
-p = '/data/local/tmp/ns.json'
-subprocess.run([HC, 'shell', 'uitest', 'dumpLayout', '-p', p], capture_output=True, timeout=60)
-out = subprocess.run([HC, 'shell', 'cat', p], capture_output=True, text=True, timeout=60).stdout
-nums = re.findall(r'"bounds":\s*"\[(\d+),(\d+)\]\[(\d+),(\d+)\]"', out)
-if not nums:
-    print('❌ dump 里没有 bounds'); sys.exit(1)
-xs = [int(a[2]) for a in nums]; ys = [int(a[3]) for a in nums]
-print('屏幕最大右边界: %d、最大下边界: %d' % (max(xs), max(ys)))
-if max(ys) > 2000:
-    print('✅ 尺寸已生效（下边界 > 2000）⇒ 可以用这个办法测 else 分支')
-else:
-    print('⚠️ 尺寸似乎没生效（下边界仍 ≈ %d）⇒ 换别的办法（建平板模拟器）' % max(ys))
-PY
+echo y > /tmp/yes.txt
+echo "→ 启动 $INST（$SCREEN）"
+(nohup "$EMU" -start "$INST" < /tmp/yes.txt > /tmp/test_nonshort.log 2>&1 &)
+for i in $(seq 1 40); do
+  n=$("$HC" list targets 2>/dev/null | grep -cE '^[0-9A-Za-z]')
+  [ "$n" -ge 1 ] && { echo "   设备就绪 $((i*10))s"; break; }
+  sleep 10
+done
+sleep 22
 
-echo
-if [ -n "$TARGET" ]; then
-  echo "── 第 ② 步：测指定款（⚠️ shot_game 的搜索框坐标按 2560x1600 写死，可能进不去）──"
+echo "→ 屏幕信息"
+"$HC" shell "hidumper -s RenderService -a screen" 2>/dev/null | grep -oE "render resolution=[0-9]+x[0-9]+" | head -1 | sed 's/^/   /'
+
+echo "→ 装包"
+timeout 300 "$HC" install -r entry/build/default/outputs/default/entry-default-signed.hap 2>&1 | tail -1 | sed 's/^/   /'
+
+echo "→ 启动 App"
+"$HC" shell "aa start -a EntryAbility -b com.andrewoscar.onemore" >/dev/null 2>&1
+sleep 10
+
+# ⚠️ 新实例第一次有「隐私说明」弹窗（判据 2812）：不点掉会吃掉所有点击
+echo "→ 检查隐私弹窗"
+"$HC" shell "uitest dumpLayout -p /data/local/tmp/ns.json" >/dev/null 2>&1
+"$HC" shell "cat /data/local/tmp/ns.json" 2>/dev/null | python3 -c "
+import sys, json, re
+try: d = json.loads(sys.stdin.read())
+except Exception: raise SystemExit
+hit = []
+def walk(n):
+    if not isinstance(n, dict): return
+    a = n.get('attributes', {}) or {}
+    if (a.get('text') or '').strip() == '同意并继续':
+        m = re.findall(r'-?\d+', (a.get('bounds') or ''))
+        if len(m) == 4:
+            hit.append(((int(m[0])+int(m[2]))//2, (int(m[1])+int(m[3]))//2))
+    for c in (n.get('children') or []): walk(c)
+walk(d)
+print('%d %d' % hit[0] if hit else '')
+" > /tmp/ns_xy.txt 2>/dev/null
+read -r PX PY < /tmp/ns_xy.txt 2>/dev/null || true
+if [ -n "${PX:-}" ]; then
+  echo "   发现隐私弹窗，点 ($PX,$PY)"
+  "$HC" shell "uitest uiInput click $PX $PY" >/dev/null 2>&1
+  sleep 3
+else
+  echo "   没有隐私弹窗"
+fi
+
+echo "→ 首页渲染检查"
+"$HC" shell "uitest dumpLayout -p /data/local/tmp/ns2.json" >/dev/null 2>&1
+"$HC" shell "cat /data/local/tmp/ns2.json" 2>/dev/null | python3 -c "
+import sys, json
+try: d = json.loads(sys.stdin.read())
+except Exception:
+    print('   ❌ dump 解析失败'); raise SystemExit
+out, ys = [], []
+def walk(n):
+    if not isinstance(n, dict): return
+    a = n.get('attributes', {}) or {}
+    t = (a.get('text') or '').strip()
+    if t: out.append(t)
+    import re as _r
+    m = _r.findall(r'-?\d+', (a.get('bounds') or ''))
+    if len(m) == 4: ys.append(int(m[3]))
+    for c in (n.get('children') or []): walk(c)
+walk(d)
+ok = any('355' in t or 'One More' in t for t in out)
+print('   文本 %d 个、最大下边界 y2=%d' % (len(out), max(ys) if ys else 0))
+print('   %s' % ('✅ App 首页已渲染' if ok else '❌ 没看到首页文本'))
+print('   前 6: %s' % (out[:6],))
+"
+
+echo "→ 截图"
+"$HC" shell "snapshot_display -f /data/local/tmp/ns.jpeg" >/dev/null 2>&1
+"$HC" file recv /data/local/tmp/ns.jpeg "_巡检记录/截图-折叠屏-$(date +%H%M).jpeg" >/dev/null 2>&1
+ls -1 _巡检记录/截图-折叠屏-*.jpeg 2>/dev/null | tail -1 | sed 's/^/   /'
+
+if [ "$#" -gt 0 ]; then
+  echo
+  echo "── 逐款测量（⚠️ 导航坐标问题未解决，可能 NO_CARD）──"
   for g in "$@"; do
-    echo "→ $g"
-    timeout 240 python3 工具/shot_game.py "$g" 2>&1 | tail -1 | cut -c1-120
+    ONEMORE_SCREEN="$SCREEN" timeout 260 python3 工具/shot_game.py "$g" 2>&1 | tail -1 | cut -c1-118
+    sleep 4
   done
 else
-  echo "（未指定款 ⇒ 只验第 ① 步。通了再加款名重跑。）"
+  echo
+  echo "（未指定款 ⇒ 只验「大屏上 App 能否正常渲染」。逐款测量等导航改造。）"
 fi
 
-echo
-echo "════ 完（退出时自动恢复尺寸）════"
+echo "════ 完 ════"
