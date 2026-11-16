@@ -822,9 +822,17 @@ def _body(name, t0):
             _d1 = dump()
             if _d1 and _node_count(_d1) != _sig0:
                 break
-        # ★ 判据 2819：**优先按类型找 `TextInput`**（手机与折叠屏坐标不同，但类型相同）。
-        _dbox = dump()
-        _ti = _find_by_type(_dbox, 'TextInput') if _dbox else None
+        # ★ 判据 2819/2822：**点完要轮询等 `TextInput` 出现**。
+        #   原来只 `sleep 1.2` 就 dump，而搜索页还在动画中 ⇒ 拿到旧树 ⇒ 找不到 TextInput
+        #   ⇒ 退回比例坐标 ⇒ inputText 打空 ⇒ NO_CARD。
+        #   （之前那次能成，是因为我手工先点开了搜索页）。
+        _ti = None
+        for _wt in range(8):
+            _dbox = dump()
+            _ti = _find_by_type(_dbox, 'TextInput') if _dbox else None
+            if _ti:
+                break
+            time.sleep(1.0)
         if _ti:
             _bx, _by = _ti
         else:
