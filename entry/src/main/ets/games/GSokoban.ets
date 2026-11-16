@@ -702,9 +702,12 @@ export struct GSokoban {
       //     对照 `G2048`（正确做法）：D-pad 收在 `y=481~519`（**余 14vp**）⇒ 4 键全在屏内。
       //     ⇒ 改成 `− 440`，棋盘 88vp ⇒ 方向键区上方多出 ~48vp 余量。
       .constraintSize({
-        maxWidth: Bp.height < 600
-          ? Math.min(Bp.width - 40, this.w * Math.max(10, Math.floor((Bp.height - 440) / Math.max(1, this.h))))
-          : 9999
+        // ★ 2026-11-17（判据 2833/2837）：原来非矮屏分支是 `9999`（等于不约束）
+        //   ⇒ 折叠屏竖屏 711x798 上棋盘撑满屏宽、方向键 ◀ ▲ ▼ ▶ 只露上半截（实测截图：
+        //   方向键被切、下面一行几乎看不见；dump 里 lowest=5px 的「上一关」就是被切的那个）。
+        //   这个公式（按可用高度算能装几格）**本来就对所有屏高成立** ⇒ 去掉条件，手机路径行为不变。
+        maxWidth: Math.min(Bp.width - 40,
+          this.w * Math.max(10, Math.floor((Bp.height - 440) / Math.max(1, this.h))))
       })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
