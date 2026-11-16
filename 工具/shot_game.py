@@ -355,6 +355,93 @@ def _tap_props(fx, fy):
     return int(round(fx * w)), int(round(fy * h))
 
 
+def _header_icon(tree, screen_w, frac=0.889):
+    """在「头部行」里找最接近右侧图标位置的那个节点。
+
+    ★ 2026-11-16（判据 2815）：大屏上头部只占 y≈25–100（状态栏占比小），
+      而按屏高比例算会得到 y≈412 —— 根本不在头部。
+      所以必须**先从 dump 找头部行**，再在它的子孙里挑。
+    """
+    rows = []
+
+    def walk(n, depth=0):
+        if not isinstance(n, dict):
+            return
+        a = n.get('attributes', {}) or {}
+        b = (a.get('bounds') or '').strip()
+        nums = [int(x) for x in re.findall(r'-?\d+', b)] if b else []
+        if len(nums) == 4:
+            x1, y1, x2, y2 = nums
+            w, h = x2 - x1, y2 - y1
+            if y1 < 150 and w > 0.55 * screen_w and 40 <= h <= 400:
+                rows.append((h, n))
+        for c in (n.get('children') or []):
+            walk(c, depth + 1)
+    walk(tree)
+    if not rows:
+        return None
+    rows.sort(key=lambda r: r[0])          # 头部行通常是最矮的那个"宽容器"
+    cands = []
+
+    def collect(n):
+        if not isinstance(n, dict):
+            return
+        a = n.get('attributes', {}) or {}
+        b = (a.get('bounds') or '').strip()
+        nums = [int(x) for x in re.findall(r'-?\d+', b)] if b else []
+        if len(nums) == 4:
+            x1, y1, x2, y2 = nums
+            w, h = x2 - x1, y2 - y1
+            if 50 <= w <= 220 and 50 <= h <= 220:
+                cands.append(((x1 + x2) // 2, (y1 + y2) // 2, w * h))
+        for c in (n.get('children') or []):
+            collect(c)
+    collect(rows[0][1])
+    if not cands:
+        return None
+    target = frac * screen_w
+    cands.sort(key=lambda c: abs(c[0] - target))
+    return cands[0][0], cands[0][1]
+
+
+def _node_count(tree):
+    """数一下树里有多少个带 bounds 的节点 —— 用作「页面变了吗」的便宜签名。"""
+    n = 0
+
+    def walk(t):
+        nonlocal n
+        if isinstance(t, dict):
+            a = t.get('attributes', {}) or {}
+            if (a.get('bounds') or '').strip():
+                n += 1
+            for c in (t.get('children') or []):
+                walk(c)
+    walk(tree)
+    return n
+
+
+def _find_text_nodes(tree, want):
+    """返回所有 text==want 的节点中心，按 y 升序（头部在最上）。
+
+    ★ 2026-11-16（判据 2815）：同一文本可能出现多次，「第一个」只是默认值不是选择规则。
+      大屏首页多出分类片后，同一个 🔍 会出现多次 ⇒ 必须按结构位置挑，并验证点完的效果。
+    """
+    hits = []
+
+    def walk(n):
+        if isinstance(n, dict):
+            a = n.get('attributes', {}) or {}
+            if a.get('text') == want:
+                b = (a.get('bounds') or '').strip()
+                nums = [int(x) for x in re.findall(r'-?\d+', b)] if b else []
+                if len(nums) == 4:
+                    hits.append(((nums[0] + nums[2]) // 2, (nums[1] + nums[3]) // 2, nums[1]))
+            for c in (n.get('children') or []):
+                walk(c)
+    walk(tree)
+    return [(x, y) for x, y, _top in sorted(hits, key=lambda h: h[2])]
+
+
 def _find_text_node(tree, want):
     """在 dump 树里找 text==want 的节点，返回其中心 (x, y)；找不到返回 None。"""
     hit = []
@@ -682,10 +769,31 @@ def _body(name, t0):
         if _hit:
             sh('uitest uiInput click %d %d' % (_hit[0], _hit[1]))
             time.sleep(0.6)
-        # ★ 判据 2813：按屏幕比例算（手机 2560x1600 时与原坐标一致）
-        _ix, _iy = _tap_props(2276 / 2560.0, 264 / 1600.0)
-        sh('uitest uiInput click %d %d' % (_ix, _iy))
-        time.sleep(1.2)
+        # ★ 判据 2815：**先找候选、再验证效果**。
+        #   大屏首页上 🔍 会出现多次，直接点第一个会点到错的那个（实测：点完页面没变）。
+        # ★ 2026-11-16：**台词不变手机那条路**。
+        #   手机（2560x1600）一直用比例坐标且已验 355 款 ⇒ 不动它；
+        #   只有非手机屏才走「头部行图标 / 多候选」那套新逻辑。
+        _is_phone = _screen() == (2560, 1600)
+        if _is_phone:
+            _ix, _iy = _tap_props(2276 / 2560.0, 264 / 1600.0)
+            _cand = [(_ix, _iy)]
+        else:
+            _sw = _screen()[0]
+            _hdr = _header_icon(_d0, _sw) if _d0 else None
+            _cand = _find_text_nodes(_d0, '🔍') if _d0 else []
+            if _hdr:
+                _cand = [_hdr] + [c for c in _cand if c != _hdr]
+            if not _cand:
+                _ix, _iy = _tap_props(2276 / 2560.0, 264 / 1600.0)
+                _cand = [(_ix, _iy)]
+        _sig0 = _node_count(_d0) if _d0 else 0
+        for _cx, _cy in _cand[:3]:
+            sh('uitest uiInput click %d %d' % (_cx, _cy))
+            time.sleep(1.2)
+            _d1 = dump()
+            if _d1 and _node_count(_d1) != _sig0:
+                break
         _bx, _by = _tap_props(1280 / 2560.0, 435 / 1600.0)
         sh('uitest uiInput click %d %d' % (_bx, _by))
         time.sleep(0.8)
