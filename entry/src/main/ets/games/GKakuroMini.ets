@@ -559,7 +559,11 @@ export struct GKakuroMini {
             // 2026-11-14 真机截图（blk=24px）：**盘面末行 + 数字键 `1~5` 都被切**
             //   11-12 那条 `Bp.height - 320` 还不够（两行键盘 `~90vp` + 提示 + 头 `480px` 已把预算吃满）
             //   ⇒ 再收 40vp：`Bp.height - 360`（3×3 ⇒ 每格 ~58vp，仍在 44 触控下限之上）
-            .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 368)) : 9999 })
+            // ★ 2026-11-16（判据 2833）：`else 9999` = **没有宽度上限** ⇒ 折叠屏竖屏上
+            //   棋盘按 width('100%') 撑满 711vp ⇒ 高 711vp ⇒ 数字键盘被挤出屏幕（实测截图：无键盘）。
+            //   改用与 GGo9.boardMax() 同一规则（高度永远是瓶颈）：竖屏 min(w-40, h-400)。
+            .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 368))
+              : Math.min(Bp.width - 2 * Space.lg, Math.max(160, Bp.height - 400)) })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
