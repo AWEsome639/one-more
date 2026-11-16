@@ -1270,3 +1270,197 @@
 2026-11-16T12:55:56	Percentage Peak	DUMP_FAIL	-	107.6s no in-game dump
 2026-11-16T12:57:51	Stroop Test	DUMP_FAIL	-	115.1s no in-game dump
 2026-11-16T12:58:59	Distractor Matrix	DUMP_FAIL	-	149.5s no in-game dump
+2026-11-16T13:03:26	Cross Section Slice	NOT_HOME	-	195.2s could not reach home; last texts=['‹', '不等式', '行列不重复且满足不等号', '☆', '?', '普通']
+2026-11-16T13:05:52	Sokoban	DUMP_FAIL	-	94.5s no in-game dump
+2026-11-16T13:05:55	meter Match	NOT_HOME	-	149.0s could not reach home; last texts=[]
+2026-11-16T13:07:10	Hitori	NOT_HOME	-	77.3s could not reach home; last texts=['01, :, 07', '01', ':', '07', '100', '100']
+2026-11-16T13:12:22	Tenner Grid	DUMP_FAIL	-	177.1s no in-game dump
+2026-11-16T13:17:47	Compound Connect	DUMP_FAIL	-	98.0s no in-game dump
+2026-11-16T13:22:22	Stroop Number Size	NOT_HOME	-	199.4s no budget for recovery path
+2026-11-16T13:22:36	Continuous Paired Associate	DUMP_FAIL	-	110.7s no in-game dump
+2026-11-16T13:27:00	Temporal Order Judgment	TIMEOUT	-	277.6s budget exhausted at enter-game
+2026-11-16T13:29:40	Blink Detector	DUMP_FAIL	-	159.3s no in-game dump
+2026-11-16T13:37:52	Topology	TIMEOUT	-	269.8s budget exhausted at search:Topology
+2026-11-16T13:39:55	Go (9x9)	TIMEOUT	-	262.1s budget exhausted at search-home:路围棋
+2026-11-16T13:42:16	Ab Reversal Oddball	TIMEOUT	-	263.7s budget exhausted at search-home:Reversal
+2026-11-16T13:51:39	Cube Net Fold	DUMP_FAIL	-	181.6s no in-game dump
+2026-11-16T13:52:48	Mastermind	DUMP_FAIL	-	139.7s no in-game dump
+2026-11-16T13:56:00	Spotlight Track	TIMEOUT	-	260.4s budget exhausted at demo-wait
+2026-11-16T13:58:13	Geometric Vision	DUMP_FAIL	-	133.5s no in-game dump
+2026-11-16T13:59:29	Minesweeper	DUMP_FAIL	-	157.8s no in-game dump
+2026-11-16T14:02:35	Binary Code	WRONG_GAME	-	78.6s title '二进制码' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T14:06:01	Peg Solitaire	NOT_HOME	-	247.2s could not reach home; last texts=[]
+2026-11-16T14:06:05	Calculation Sprint	NOT_HOME	-	209.0s could not reach home; last texts=['联系人', 'One More', '02, :, 06', '02', ':', '06']
+2026-11-16T14:09:26	Pong	NOT_HOME	-	204.5s could not reach home; last texts=['‹', '停止信号', '抑制反应', '☆', '?', '普通']
+2026-11-16T14:12:55	Affix Factory	TIMEOUT	-	294.0s budget exhausted at search:Factory
+2026-11-16T14:12:59	Reversi	DUMP_FAIL	-	212.8s no in-game dump
+2026-11-16T14:16:16	Angle Finder	NOT_HOME	-	200.2s could not reach home; last texts=[]
+2026-11-16T14:16:36	Schulte Table	NOT_HOME	-	216.5s could not reach home; last texts=[]
+2026-11-16T14:18:53	Area Perimeter Match	NOT_HOME	-	157.2s could not reach home; last texts=[]
+2026-11-16T14:19:21	Sieve Visualizer	NOT_HOME	-	164.9s could not reach home; last texts=[]
+2026-11-16T14:21:28	Block Count 3D	NOT_HOME	-	154.0s could not reach home; last texts=[]
+2026-11-16T14:21:58	Simon Says	NOT_HOME	-	156.7s could not reach home; last texts=[]
+2026-11-16T14:24:13	Bejeweled	NOT_HOME	-	164.0s could not reach home; last texts=['设置', '图库', '文件管理', '日历', '02, :, 24', '02']
+2026-11-16T14:25:51	Slide15	WRONG_GAME	-	232.2s title '十五格华容道' not found; first texts=['联系人', 'One More', '02, :, 25', '02', ':', '25']
+2026-11-16T14:26:03	Breakout	NOT_HOME	-	109.6s could not reach home; last texts=['02, :, 26', '02', ':', '26', '100', '100']
+2026-11-16T14:29:18	Checkers	WRONG_GAME	-	76.8s title '跳棋' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T14:29:28	Snake	NOT_HOME	-	216.8s no budget for recovery path
+2026-11-16T14:33:03	Snake 3D	NOT_HOME	-	215.2s no budget for recovery path
+2026-11-16T14:35:53	Connect Four	DUMP_FAIL	-	272.6s no in-game dump
+2026-11-16T14:37:24	Solitaire	TIMEOUT	-	260.1s budget exhausted at search:Solitaire
+2026-11-16T14:40:00	Continuous Paired Associate	WRONG_GAME	-	246.9s title '连续配对' not found; first texts=['02, :, 39', '02', ':', '39', '100', '100']
+2026-11-16T14:41:56	Sorting Visualizer	TIMEOUT	-	272.3s budget exhausted at enter-game
+2026-11-16T14:45:53	Double Trouble	TIMEOUT	-	277.4s budget exhausted at search:Trouble
+2026-11-16T14:45:55	Spider Solitaire	NOT_HOME	-	238.8s could not reach home; last texts=[]
+2026-11-16T14:50:19	Dual Mirror	NOT_HOME	-	264.7s could not reach home; last texts=[]
+2026-11-16T14:50:23	Sudoku Hex	TIMEOUT	-	266.9s budget exhausted at search-home:Sudoku
+2026-11-16T14:53:08	Tetris	WRONG_GAME	-	164.8s title '落方' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T14:56:57	Tic-Tac-Toe	NOT_HOME	-	229.4s could not reach home; last texts=['‹', '2048', '合并数字，别把自己堵死', '☆', '?', '普通']
+2026-11-16T14:57:03	2048	WRONG_GAME	-	148.3s title '2048' not found; first texts=['02, :, 57', '02', ':', '57', '100', '100']
+2026-11-16T14:59:42	Akari (Light Up)	WRONG_GAME	-	164.8s title '明灯' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T15:01:53	Game24	TIMEOUT	-	289.4s budget exhausted at search:Game24
+2026-11-16T15:04:07	Go (9x9)	NOT_HOME	-	134.4s could not reach home; last texts=['‹', '跳棋', '跳过吃子', '☆', '?', '普通']
+2026-11-16T15:07:55	Binary Puzzle	TIMEOUT	-	282.2s budget exhausted at search:Binary
+2026-11-16T15:07:57	Gomoku	WRONG_GAME	-	230.0s title '五子棋' not found; first texts=['设置', '图库', '文件管理', '日历', '03, :, 07', '03']
+2026-11-16T15:09:11	Block Escape	NOT_HOME	-	76.1s could not reach home; last texts=['‹', '汉诺塔', '三根柱子，挪完为赢', '☆', '?', '普通']
+2026-11-16T15:13:04	Mahjong Solitaire	WRONG_GAME	-	110.6s title '麻将连连看' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T15:13:10	Bridges	WRONG_GAME	-	238.5s title '桥梁' not found; first texts=['联系人', 'One More', '03, :, 13', '03', ':', '13']
+2026-11-16T15:16:33	Mancala	NOT_HOME	-	208.0s no budget for recovery path
+2026-11-16T15:17:42	Color Flood	WRONG_GAME	-	190.8s title '色彩洪水' not found; first texts=['‹', '双重麻烦', '两个任务一起来', '☆', '?', '普通']
+2026-11-16T15:19:09	Mandelbrot	NOT_HOME	-	155.5s could not reach home; last texts=['‹', '皇冠', '每行每列每区一个皇冠', '☆', '?', '普通']
+2026-11-16T15:19:33	Crown	WRONG_GAME	-	110.3s title '皇冠' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T15:21:42	Mastermind	WRONG_GAME	-	152.7s title '珠玑妙算' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T15:26:03	Memory	TIMEOUT	-	261.4s budget exhausted at search-home:Memory
+2026-11-16T15:26:04	Fillomino	TIMEOUT	-	275.0s budget exhausted at search:Fillomino
+2026-11-16T15:30:30	Gokigen Naname	WRONG_GAME	-	265.7s title '斜线数回' not found; first texts=['‹', '尼姆博弈', '拿走最后一颗就输', '☆', '?', '普通']
+2026-11-16T15:30:36	Nim	WRONG_GAME	-	116.8s title '尼姆博弈' not found; first texts=['联系人', 'One More', '03, :, 30', '03', ':', '30']
+2026-11-16T15:35:44	Hitori All	NOT_HOME	-	211.0s no budget for recovery path
+2026-11-16T15:38:43	Kakuro	NOT_HOME	-	178.9s could not reach home; last texts=['One More', '355 款小游戏，不用联网也能玩  ·  v1.0.1', '☀️', '中', '🔍', '💬']
+2026-11-16T15:42:06	Sieve Visualizer	WRONG_GAME	-	115.8s title '筛法可视化' not found; first texts=['联系人', 'One More', '03, :, 42', '03', ':', '42']
+2026-11-16T15:42:41	Klotski	WRONG_GAME	-	109.3s title '华容道' not found; first texts=['联系人', 'One More', '03, :, 42', '03', ':', '42']
+2026-11-16T15:45:15	Lighthouses	WRONG_GAME	-	153.4s title '灯塔' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T15:45:50	Slide15	WRONG_GAME	-	147.8s title '十五格华容道' not found; first texts=['03, :, 45', '03', ':', '45', '100', '100']
+2026-11-16T15:50:12	Snake	TIMEOUT	-	261.8s budget exhausted at demo-wait
+2026-11-16T15:54:36	Shikaku	WRONG_GAME	-	142.6s title '数方' not found; first texts=['联系人', 'One More', '03, :, 54', '03', ':', '54']
+2026-11-16T15:55:47	Skyscrapers	WRONG_GAME	-	71.1s title '数楼' not found; first texts=['03, :, 55', '03', ':', '55', '100', '100']
+2026-11-16T15:57:07	Slide Puzzle	WRONG_GAME	-	79.6s title '数字华容道' not found; first texts=['联系人', 'One More', '03, :, 57', '03', ':', '57']
+2026-11-16T15:57:42	Solitaire	TIMEOUT	-	293.2s budget exhausted at search:Solitaire
+2026-11-16T16:00:35	Sorting Visualizer	WRONG_GAME	-	172.6s title '排序可视化' not found; first texts=[]
+2026-11-16T16:04:14	Spider Solitaire	NOT_HOME	-	218.9s no budget for recovery path
+2026-11-16T16:04:26	Sudoku	TIMEOUT	-	289.4s budget exhausted at home-loop
+2026-11-16T16:08:08	Sudoku Hex	NOT_HOME	-	232.8s could not reach home; last texts=[]
+2026-11-16T16:12:40	Tents And Trees	NOT_HOME	-	190.6s no budget for recovery path
+2026-11-16T16:13:12	Tic-Tac-Toe	WRONG_GAME	-	183.3s title '井字棋' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T16:14:16	Akari (Light Up)	NO_CARD	-	63.7s no card for '明灯' (fallback=(237, 628)) | aa: Mission ID #29  mission name #[#com.andrewoscar.onemore:entry:EntryAbility]  lockedState # | state: Mission ID #29  mission name #[#com.andrewoscar.onemore:entry:EntryAbi | visible: ['One More', '355 款小游戏，不用联网也能玩  ·  v1.0.1', '☀️', '中', '🔍', '💬', '🔍', '明灯倒水排序']
+2026-11-16T16:17:09	Water Sort	TIMEOUT	-	269.1s budget exhausted at enter-game
+2026-11-16T16:22:18	Block Escape	WRONG_GAME	-	106.1s title '华容道逃脱' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T16:23:14	Algebraic Inequality Solver	WRONG_GAME	-	122.8s title '解不等式' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T16:25:09	Bridges	NOT_HOME	-	171.3s could not reach home; last texts=['‹', '十五格华容道', '4×4，1~15 归位', '☆', '?', '普通']
+2026-11-16T16:26:59	Arithmetic Chain	NOT_HOME	-	225.6s no budget for recovery path
+2026-11-16T16:27:30	Bridges All	WRONG_GAME	-	140.3s title '桥梁进阶' not found; first texts=['04, :, 27', '04', ':', '27', '100']
+2026-11-16T16:30:44	Binary Scale Balance	WRONG_GAME	-	146.6s title '二进制天平' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T16:31:19	Crown	WRONG_GAME	-	111.9s title '皇冠' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T16:34:29	Dominosa	WRONG_GAME	-	189.9s title '多米诺拼盘' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T16:35:12	Crypto Arithmetic	NOT_HOME	-	187.4s could not reach home; last texts=['‹', '排序可视化', '看排序算法跳舞', '☆', '?', '普通']
+2026-11-16T16:36:57	Fillomino	NOT_HOME	-	147.4s could not reach home; last texts=[]
+2026-11-16T16:38:53	Divisibility Dash	WRONG_GAME	-	114.8s title '整除冲刺' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T16:40:02	Exponent Tower	WRONG_GAME	-	68.5s title '指数塔' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T16:40:31	Gokigen Naname	NOT_HOME	-	214.1s no budget for recovery path
+2026-11-16T16:44:27	Fibonacci Merge	WRONG_GAME	-	265.2s title '斐波那契合并' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T16:46:19	Hitori All	WRONG_GAME	-	214.5s title '数壹进阶' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T16:48:57	Fractional Pizza	TIMEOUT	-	269.7s budget exhausted at enter-game
+2026-11-16T16:52:10	Inequality Balance Ops	NOT_HOME	-	193.1s no budget for recovery path
+2026-11-16T16:52:34	KenKen	WRONG_GAME	-	164.3s title '聪明格' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T16:56:33	Inequality Dash	TIMEOUT	-	262.5s budget exhausted at demo-wait
+2026-11-16T17:03:17	Matrix Multiplier	TIMEOUT	-	282.3s budget exhausted at search:Multiplier
+2026-11-16T17:04:37	Lights Out	TIMEOUT	-	285.0s budget exhausted at enter-game
+2026-11-16T17:05:08	Matrix Multiplier Match	NO_CARD	-	110.2s no card for '矩阵配对' (fallback=(237, 628)) | aa: Mission ID #29  mission name #[#com.andrewoscar.onemore:entry:EntryAbility]  lockedState # | state: Mission ID #29  mission name #[#com.andrewoscar.onemore:entry:EntryAbi | visible: ['One More', '355 款小游戏，不用联网也能玩  ·  v1.0.1', '☀️', '中', '🔍', '💬', '🔍', '矩阵配对Color']
+2026-11-16T17:12:27	Mental Abacus	WRONG_GAME	-	240.8s title '心算算盘' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T17:16:09	Mental Calendar	NOT_HOME	-	221.7s no budget for recovery path
+2026-11-16T17:20:32	Missing Operator	TIMEOUT	-	263.3s budget exhausted at search-home:Operator
+2026-11-16T17:20:54	Slide Puzzle	NOT_HOME	-	222.1s no budget for recovery path
+2026-11-16T17:24:59	Modulo Path	WRONG_GAME	-	266.0s title '模路径' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T17:28:16	Percentage Shopping	WRONG_GAME	-	196.9s title '打折购物' not found; first texts=['联系人', 'One More', '05, :, 28', '05', ':', '28']
+2026-11-16T17:28:32	Sum Snake	NOT_HOME	-	89.3s could not reach home; last texts=['联系人', 'One More', '05, :, 28', '05', ':', '28']
+2026-11-16T17:29:07	Prime Factor Trees	NOT_HOME	-	50.6s could not reach home; last texts=['联系人', 'One More', '05, :, 29', '05', ':', '29']
+2026-11-16T17:32:46	Prime Gap Hunt	WRONG_GAME	-	219.1s title '素数间隔' not found; first texts=['O', 'n', 'e', ' ', 'M', 'o']
+2026-11-16T17:34:36	Tents And Trees	NOT_HOME	-	252.1s could not reach home; last texts=['One More', '355 款小游戏，不用联网也能玩  ·  v1.0.1', '☀️', '中', '🔍', '💬']
+2026-11-16T17:37:14	Roman Arithmetic	WRONG_GAME	-	106.5s title '罗马数字算术' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T17:39:06	Water Sort	TIMEOUT	-	269.0s budget exhausted at search-home:Water
+2026-11-16T17:41:03	Sequence Sleuth	NOT_HOME	-	229.3s no budget for recovery path
+2026-11-16T17:43:29	Yajilin	TIMEOUT	-	262.3s budget exhausted at enter-game
+2026-11-16T17:50:05	Arithmetic Chain	WRONG_GAME	-	169.9s title '算术链' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T17:51:18	Sum Pyramid	TIMEOUT	-	286.1s budget exhausted at search:Sum Pyramid
+2026-11-16T17:54:30	Unit Converter Pro	WRONG_GAME	-	121.7s title '单位换算' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T17:54:58	Binary Matrix Rank	TIMEOUT	-	293.0s budget exhausted at enter-game
+2026-11-16T18:01:14	Vector Grid Alignment	WRONG_GAME	-	171.3s title '向量对齐' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T18:02:03	Crypto Arithmetic	NOT_HOME	-	125.6s could not reach home; last texts=['One More', '355 款小游戏，不用联网也能玩  ·  v1.0.1', '☀️', '中', '🔍', '💬']
+2026-11-16T18:06:04	Digit Swap Eq	WRONG_GAME	-	240.6s title '数字换位' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T18:11:03	Divisibility Dash	TIMEOUT	-	299.6s budget exhausted at enter-game
+2026-11-16T18:12:38	Attentional Blink Probe	TIMEOUT	-	265.8s budget exhausted at search:Blink
+2026-11-16T18:15:28	Change Blindness	NOT_HOME	-	169.1s could not reach home; last texts=[]
+2026-11-16T18:19:12	Color Word Match Up	NOT_HOME	-	223.7s no budget for recovery path
+2026-11-16T18:21:05	Conjunction Search	NOT_HOME	-	112.9s could not reach home; last texts=['‹', '二进制天平', '二进制称重', '☆', '?', '普通']
+2026-11-16T18:21:41	Magic Squares	WRONG_GAME	-	80.4s title '幻方' not found; first texts=['联系人', 'One More', '06, :, 21', '06', ':', '21']
+2026-11-16T18:24:21	Corsi Blocks	WRONG_GAME	-	83.0s title '空间广度' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T18:24:58	Matrix Multiplier	NOT_HOME	-	196.2s no budget for recovery path
+2026-11-16T18:31:48	Delayed Match Sample	NOT_HOME	-	213.5s could not reach home; last texts=['‹', '心算算盘', '珠算心算', '☆', '?', '普通']
+2026-11-16T18:32:54	Mental Abacus	WRONG_GAME	-	204.1s title '心算算盘' not found; first texts=['‹', '倒背数字', '倒序回忆数字', '☆', '?', '普通']
+2026-11-16T18:33:01	Digit Span Reverse	WRONG_GAME	-	72.5s title '倒背数字' not found; first texts=['06, :, 33', '06', ':', '33', '100', '100']
+2026-11-16T18:35:29	Divided Attention	NOT_HOME	-	148.3s could not reach home; last texts=['‹', '缺运算符', '填入正确运算符', '☆', '?', '普通']
+2026-11-16T18:35:37	Missing Operator	WRONG_GAME	-	76.7s title '缺运算符' not found; first texts=['O', 'n', 'e', ' ', 'M', 'o']
+2026-11-16T18:42:28	Dual Task Memory	WRONG_GAME	-	114.0s title '双任务记忆' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T18:46:15	Dynamic Salience	NOT_HOME	-	227.4s no budget for recovery path
+2026-11-16T18:51:38	Roman Arithmetic	TIMEOUT	-	285.1s budget exhausted at search:Arithmetic
+2026-11-16T18:54:25	Face Trait Association	TIMEOUT	-	294.9s budget exhausted at search:Trait
+2026-11-16T18:54:43	Sequence Sleuth	NOT_HOME	-	184.4s could not reach home; last texts=['One More', '355 款小游戏，不用联网也能玩  ·  v1.0.1', '☀️', '中', '🔍', '💬']
+2026-11-16T18:56:42	Feature Matrix Recall	WRONG_GAME	-	137.4s title '特征矩阵' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T18:58:32	Set Theory Venn	NOT_HOME	-	79.2s could not reach home; last texts=['联系人', 'One More', '06, :, 58', '06', ':', '58']
+2026-11-16T19:03:18	Ghost Tap	WRONG_GAME	-	120.8s title '幽灵点击' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T19:04:23	Target Number	TIMEOUT	-	276.1s budget exhausted at enter-game
+2026-11-16T19:07:19	Grocery List	WRONG_GAME	-	102.0s title '购物清单' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T19:11:45	Mandala Recall	WRONG_GAME	-	265.3s title '曼陀罗回忆' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T19:13:46	Vector Grid Alignment	TIMEOUT	-	277.5s budget exhausted at search:Grid
+2026-11-16T19:15:47	Memory Matrix	NOT_HOME	-	242.5s could not reach home; last texts=['‹', '罗马数字算术', '罗马数字运算', '☆', '?', '普通']
+2026-11-16T19:16:29	Associative Pairs	WRONG_GAME	-	84.4s title '联想配对' not found; first texts=['联系人', 'One More', '07, :, 16', '07', ':', '16']
+2026-11-16T19:20:47	N-Back	WRONG_GAME	-	70.0s title 'N-back' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T19:21:18	Color Word Match Up	WRONG_GAME	-	64.5s title '色词匹配' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T19:22:31	Narrative Recall	WRONG_GAME	-	104.1s title '故事回忆' not found; first texts=['‹', '联合特征', '特征联合搜索', '☆', '?', '普通']
+2026-11-16T19:22:34	Conjunction Search	WRONG_GAME	-	76.0s title '联合特征' not found; first texts=['联系人', 'One More', '07, :, 22', '07', ':', '22']
+2026-11-16T19:24:24	Continuous Recognition	WRONG_GAME	-	109.3s title '连续再认' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T19:26:13	Corsi Blocks	NOT_HOME	-	109.2s could not reach home; last texts=['‹', '文氏图', '集合运算', '☆', '?', '普通']
+2026-11-16T19:28:25	Counting Span	WRONG_GAME	-	131.6s title '计数广度' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T19:29:32	Odd Even Flash	WRONG_GAME	-	105.2s title '奇偶闪现' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T19:31:24	d2 Attention	NOT_HOME	-	178.3s no budget for recovery path
+2026-11-16T19:37:12	Digit Span Reverse	TIMEOUT	-	266.8s budget exhausted at search:Reverse
+2026-11-16T19:42:46	Reflex Tap	TIMEOUT	-	260.8s budget exhausted at demo-wait
+2026-11-16T19:44:03	Dnms	TIMEOUT	-	264.4s budget exhausted at search-home:Dnms
+2026-11-16T19:47:02	Double N Back	WRONG_GAME	-	178.6s title '双 N-back' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T19:57:19	Face Trait Association	NOT_HOME	-	174.5s could not reach home; last texts=[]
+2026-11-16T20:00:38	Sopt	TIMEOUT	-	260.2s budget exhausted at search:Sopt
+2026-11-16T20:04:08	Feature Matrix Recall All	DUMP_FAIL	-	273.9s no in-game dump
+2026-11-16T20:05:30	Spatial Cabinet Memory	TIMEOUT	-	291.2s budget exhausted at home-loop
+2026-11-16T20:09:35	Subitizing Rush	NOT_HOME	-	145.3s could not reach home; last texts=['联系人', 'One More', '08, :, 09', '08', ':', '09']
+2026-11-16T20:11:02	Ghost Tap	WRONG_GAME	-	175.8s title '幽灵点击' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T20:17:13	Mandala Recall	NOT_HOME	-	151.7s could not reach home; last texts=['‹', '分配注意', '双任务', '☆', '?', '普通']
+2026-11-16T20:19:29	Symbol Logic	WRONG_GAME	-	183.7s title '符号逻辑' not found; first texts=['联系人', 'One More', '08, :, 19', '08', ':', '19']
+2026-11-16T20:21:20	Memory Matrix	WRONG_GAME	-	246.4s title '记忆矩阵' not found; first texts=['O', 'n', 'e', ' ', 'M', 'o']
+2026-11-16T20:27:20	Visual Crowding Acuity	WRONG_GAME	-	70.6s title '拥挤视力' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T20:27:30	Multiple Object Tracking	NOT_HOME	-	260.0s no budget for recovery path
+2026-11-16T20:29:39	Visual Search	NO_CARD	-	138.8s no card for '视觉搜索' (fallback=(237, 628)) | aa: Mission ID #28  mission name #[#com.andrewoscar.onemore:entry:EntryAbility]  lockedState # | state: Mission ID #28  mission name #[#com.andrewoscar.onemore:entry:EntryAbi | visible: ['One More', '355 款小游戏，不用联网也能玩  ·  v1.0.1', '☀️', '中', '🔍', '💬', '🔍', 'Timeline视觉搜索']
+2026-11-16T20:31:01	N-Back	WRONG_GAME	-	210.6s title 'N-back' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T20:32:10	Wisconsin Card Sorting	WRONG_GAME	-	151.5s title '威斯康星卡片' not found; first texts=['One More', '☀️', '中', '🔍', '💬', 'LV']
+2026-11-16T20:34:10	Narrative Recall	NOT_HOME	-	189.4s no budget for recovery path
+2026-11-16T20:34:56	Anagram Definition	WRONG_GAME	-	95.6s title '字谜定义' not found; first texts=['O', 'n', 'e', ' ', 'M', 'o']
+2026-11-16T20:36:03	Negative Space Detection	NO_CARD	-	112.6s no card for '负空间' (fallback=(237, 628)) | aa: Mission ID #28  mission name #[#com.andrewoscar.onemore:entry:EntryAbility]  lockedState # | state: Mission ID #28  mission name #[#com.andrewoscar.onemore:entry:EntryAbi | visible: ['One More', '355 款小游戏，不用联网也能玩  ·  v1.0.1', '☀️', '中', '🔍', '💬', '🔍', '人脸特征负空间']
+2026-11-16T20:39:09	Category Fluency	NOT_HOME	-	252.5s could not reach home; last texts=['‹', '特征矩阵', '回忆特征', '☆', '?', '普通']
+2026-11-16T20:41:31	Odd Even Flash	DUMP_FAIL	-	175.8s no in-game dump
+2026-11-16T20:54:14	Definition Dash	NOT_HOME	-	150.1s could not reach home; last texts=['联系人', 'One More', '08, :, 54', '08', ':', '54']
+2026-11-16T21:00:59	Sdmt	NOT_HOME	-	223.9s no budget for recovery path
+2026-11-16T21:03:37	Homophone Hunt	TIMEOUT	-	263.3s budget exhausted at search-home:Homophone
+2026-11-16T21:05:31	Shell Game	TIMEOUT	-	271.8s budget exhausted at search:Shell
+2026-11-16T21:07:35	Letter Bridge	WRONG_GAME	-	237.2s title '字母桥' not found; first texts=['09, :, 07', '09', ':', '07', '100', '100']
+2026-11-16T21:09:21	Letter Frequency Scan	WRONG_GAME	-	105.0s title '字母频率' not found; first texts=['联系人', 'One More', '09, :, 09', '09', ':', '09']
+2026-11-16T21:12:58	Missing Vowels	WRONG_GAME	-	112.6s title '缺元音' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-16T21:13:33	Spatial Cabinet Memory	NOT_HOME	-	220.8s no budget for recovery path
+2026-11-16T21:18:58	Palindrome Builder	WRONG_GAME	-	152.1s title '回文构造' not found; first texts=['‹', '任务切换', '规则切换', '☆', '?', '普通']
