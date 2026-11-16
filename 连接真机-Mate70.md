@@ -90,7 +90,7 @@ bash ~/dev/yiju/真机抽验.sh      # 120 行的脚本，一条命令
 
 **一句话判据**：**点得动 · 显示会变 · 不冻结** ⇒ 三样都对就是过了。
 
-**⇒ 5 款全过 ⇒ 放量 260 文件**（那是"显示冻结"的修复）
+**⇒ 5 款全过 ⇒ 放量 260 文件**（那是“显示冻结”的修复）
 ```bash
 python3 ~/.dsh/storages/games-input-20261013/inline_fix.py \
     --apply --risky ~/dev/yiju/entry/src/main/ets/games/*.ets
