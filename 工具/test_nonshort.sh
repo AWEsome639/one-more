@@ -25,7 +25,9 @@ cleanup() {
   "$EMU" -stop "$INST" >/dev/null 2>&1
   sleep 4
   # ★ 自排除：`pgrep -f "…"` 的子 shell 命令行里也带这个字符串
-  echo "→ 残留: $(ps -eo command | grep -c "[E]mulator -start")"
+  # ★ 判据 2818：**按进程名统计不可靠**（子 shell 自身也含该串；
+  #   而折叠屏那种实例又不叫 qemu-system）⇒ 改用**设备连接状态**做结论。
+  echo "→ 设备状态: $("$HC" list targets 2>/dev/null | head -1 | cut -c1-40)"
 }
 trap cleanup EXIT INT TERM
 
