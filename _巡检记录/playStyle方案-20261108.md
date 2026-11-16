@@ -1,0 +1,854 @@
+# `playStyle` 标注方案 —— 让“像 2048”真的找到 2048 那类
+
+> 2026-11-08 11:16–11:5x ｜ 执行：game-balancer ｜ **只出方案：未跑生成器、未改 `gen_tags.py`、未改任何 .ets**
+> 产出：本文档 ｜ 数据源：`tools/gen_tags.py`（生成规则）、`core/GameRegistry.ets`（355 条现值）、`core/ChatFinder.ets`（打分）
+
+---
+
+## 0 一页结论
+
+| 问 | 答 |
+|---|---|
+| **要几类** | **Lead 要的 10 类只能自动覆盖 70%**（249/355，`other` 106）。**扩到 14 类后自动覆盖 91.5%**（325/355，`other` 30）⇒ **建议 14 类 + `other`** |
+| **能不能自动推** | **能推 91.5%**（`id` + `enName` + `tagline` 关键词，按优先级首命中）。剩 30 款必须人工；抽查准确率约 **95%** |
+| **怎么进 ChatFinder 打分** | ⚠️ **Lead 提的「同 playStyle +25」不够用** —— 算下来「像 2048」的 top-3 **一个字都不会变**（§5 有三组数字）。**必须 +40 并且与「同类别 +18」互斥** |
+| **「像 2048」改后 top-3** | **`sum_snake` / `collatz` / `exponent_tower`**（全部 `ps_merge`）。**类对了，但类内顺序还是靠 id** —— 因为 10 款合并类全是同一组 tag（§6） |
+| **签名** | **64 → 104**（最大不可区分组 54 → 40） |
+| **工作量** | 写规则 ~40 行；**人工 30 款（约 10 分钟）+ 抽检 60 款（约 15 分钟）** |
+| **会不会再踩「清空 tags」的坑** | **会** —— 只要有人跑 `gen_catalog.py`。§8 给了三条防线 |
+
+---
+
+## 1 为什么必须加（证据链）
+
+**code-hunter 的实证**（我复核过，数字对）：
+
+```
+2048    : cozy, easy, logic, medium, pausable, swipe, untimed
+宝石迷阵: cozy, easy, logic, medium, pausable,       untimed   ← 7 个里重合 6 个
+```
+
+`ChatFinder.scoreOf()` 的 `similar` 分支给分是：**同类别 +18 / 同难度 +8 / 共享 tag 每个 +4（上限 +16）**
+⇒ 这两款都吃满 `18+8+16 = 42` ⇒ **平分** ⇒ 按 id 字典序排（`bejeweled` < `bubble_shooter` < `breakout`…）。
+
+**我上一轮的量表**（`_巡检记录/tag分布-20261108.md` §6）：
+
+- 355 款在「类别 + tag 集合」下只剩 **64 种签名**，最大一组 **54 款完全不可区分**；
+- `bejeweled`（三消）/ `match3`（三消）/ `bubble_shooter`（发射消泡）**tag 一模一样**；
+- 剔掉通用 tag 也没救：`logic`(90)/`easy`(48)/`cozy`(18) 本身就是几十款共有 —— **粒度的锅**。
+
+⇒ **加一个「玩法」维度是唯一解**，而且它必须是**每款恰好 1 个的划分**（像 时长/难度/操作），这样 355 款按玩法切开后，组内才可能“真的像”。
+
+---
+
+## 2 分类设计
+
+### 2.1 Lead 要的 10 类（实测自动覆盖 **249/355 = 70%**）
+
+| # | id | 中文 | 判定线索（id / enName / tagline 正则） | 实测款数 | 例 |
+|---|---|---|---|---|---|
+| 1 | `ps_match` | 消除配对 | `match3\|bejewel\|bubble\|mahjong\|color_flood\|water_sort\|hue_sort\|gravity_sort\|chain_reaction\|jewel\|collaps` | **9** | 宝石迷阵、三连、弹珠消、麻将连连看 |
+| 2 | `ps_merge` | 合并滚雪球 | `2048\|fibonacci\|merge\|number_bond\|exponent_tower\|sum_pyramid\|collatz\|sum_snake\|target_number\|prime_factor\|magic_square` | **11** | 2048、斐波那契合并、数字拆分 |
+| 3 | `ps_push` | 挪块推箱 | `sokoban\|klotski\|slide1\|block_escape\|tangram\|polyomino\|hanoi\|peg_solitaire\|block_stacking\|block_count\|box_completion\|tower_of_london` | **13** | 推箱子、华容道、七巧板、汉诺塔 |
+| 4 | `ps_maze` | 走格寻路 | `maze\|path_finder\|trace_path\|pipes\|laser\|circuit_connect\|wire\|vector_grid\|path_intersect\|path_recall\|lock_pattern\|grid_displacement` | **19** | 经典迷宫、罗盘迷宫、激光连线、管道 |
+| 5 | `ps_fill` | 填格谜题 | `sudoku\|kakuro\|kenken\|nonogram\|hitori\|heyawake\|slitherlink\|nurikabe\|yajilin\|tapa\|akari\|magnet\|lighthouse\|kurodoko\|norinori\|gokigen\|kakurasu\|dominosa\|fillomino\|futoshiki\|crown\|shikaku\|bridges\|masyu\|tents\|tenner\|skyscraper\|binary_puzzle\|lights_out\|minesweeper` | **34** | 数独、数织、数回、扫雷、明灯 |
+| 6 | `ps_board` | 棋类对弈 | `gomoku\|checkers\|connect_four\|reversi\|mancala\|\bnim\b\|tic_tac\|go9\|chess\|domino` | **9** | 五子棋、跳棋、四子棋、黑白棋、9 路围棋 |
+| 7 | `ps_word` | 拼词文字 | `word\|anagram\|cryptogram\|letter\|vowel\|rhyme\|homophone\|spelling\|typing\|scramble\|palindrome\|pangram\|portmanteau\|spoonerism\|consonant\|crossword\|affix\|etymolog\|grammar\|silent_letter\|semantic\|vocabulary\|analog\|definition\|context_clues\|oxymoron\|cognate\|typoglyc\|syllable\|category_fluency\|story_builder\|chalk` | **55** | 猜词、变位词、填字、成语/语义 |
+| 8 | `ps_memory` | 记忆回忆 | `memory\|n_back\|corsi\|span\|recall\|chimp\|simon\|delayed_match\|dnms\|card_counting\|spatial_cabinet\|word_pair\|paired_associate` | **33** | 记忆翻牌、N-Back、空间广度、西蒙 |
+| 9 | `ps_reaction` | 反应手速 | `reflex\|blink\|flash\|reaction\|subitiz\|go_no_go\|stop_signal\|vigilance\|orbit\|ghost_tap\|whack\|frequency\|rhythm` | **14** | 反应点击、停止信号、节拍、闪现 |
+| 10 | `ps_quiz` | 答题估算 | `estimat\|guess\|mental_calendar\|mental_abacus\|percentage\|fraction\|angle\|numeric\|currency\|unit_converter\|radical\|roman\|arithmetic\|algebra\|inequality\|base_conversion\|base_shift\|binary_code\|modular\|modulo\|divisibility\|matrix\|vector\|dot_product\|pythagor\|prime\|factor\|gcd\|common_denominator\|venn\|set_theory\|balance_scale\|digit_swap\|missing_operator\|calculation_sprint\|countdown_math\|quick_math\|target_10\|math_path\|binomial` | **52** | 24 点、心算、估算、分数、百分比 |
+| — | `ps_other` | 其它玩法 | 以上都不命中 | **106** | — |
+
+> **10 类的 `other` 高达 106 款（30%）** —— 这个“其它”比 `ps_word` 还肥，等于又造了一个弱 tag。**所以建议扩到 14 类。**
+
+### 2.2 扩展到 14 类（实测自动覆盖 **325/355 = 91.5%**）
+
+在 10 类基础上加 4 个（它们正好是 `other` 里最成形的 4 个簇）：
+
+| # | id | 中文 | 判定线索 | 实测款数 | 例 |
+|---|---|---|---|---|---|
+| 11 | `ps_search` | 眼力搜寻 | `visual_search\|schulte\|odd_one_out\|silhouette\|shape_shifter\|shadow_pivot\|symmetry\|topology\|color_match\|area_perimeter\|geometric_vision\|navon\|negative_space\|spotlight\|multiple_object\|visual_crowding\|ab_reversal\|cross_section\|room_inspector\|find_word` | **22** | 视觉搜索、找不同、舒尔特方格、剪影匹配 |
+| 12 | `ps_spatial` | 折转空间 | `fold\|cube_net\|paper_folding\|rotation\|perspective\|gear_\|mirror\|pixel_mimic\|graph_coordinate\|triplets_logic\|temporal_order` | **17** | 折纸、立方体展开、心理旋转、齿轮方向 |
+| 13 | `ps_attention` | 注意力任务 | `stroop\|flanker\|d2_attention\|sdmt\|trail_making\|task_switch\|switch_task\|posner\|divided_attention\|dual_coding\|dual_task\|change_blindness\|conjunction_search\|continuous_recognition\|dynamic_salience\|visual_statistical\|source_monitoring\|sopt\|wisconsin\|rule_switcher\|sternberg\|object_shuffle\|object_displacement\|shell_game\|grocery_list\|face_\|associative_pairs` | **30** | 斯特鲁普、侧抑制、D2、连线测验 |
+| 14 | `ps_run` | 跑分局 | `breakout\|doodle\|flappy\|pong\|snake\|tetris` | **7** | 打砖块、登高、穿云、乒乓、贪吃蛇、俄罗斯方块 |
+| — | `ps_other` | 其它 | 都不命中 | **30** | 纸牌接龙(3)、算法可视化(4)、序列记忆(4)、杂项 |
+
+**14 类的实测分布**：`ps_word 55 ｜ ps_quiz 52 ｜ ps_fill 34 ｜ ps_memory 33 ｜ ps_attention 30 ｜ ps_other 30 ｜ ps_search 22 ｜ ps_maze 19 ｜ ps_spatial 17 ｜ ps_reaction 14 ｜ ps_push 13 ｜ ps_merge 11 ｜ ps_match 9 ｜ ps_board 9 ｜ ps_run 7`
+
+> ⚠️ 类大小仍不均衡（`ps_word` 55 vs `ps_run` 7）。但**这是玩法本身的分布**（文字类就是多），不该硬凑平。
+> 真要更均衡，可以把 `ps_word` 拆成「拼字」/「语义」，`ps_quiz` 拆成「算数」/「估算」——留作二期。
+
+### 2.3 判定原则
+
+1. **判定顺序 = §4.3 代码里的 `PLAY_STYLE_RULES` 顺序：`ps_board` 最先、`ps_run` 最后，首个命中即定** ⇒ 保证是**划分**（每款恰好 1 个，总和 = 355）。
+   （§2.1/§2.2 的表格行号只是**展示顺序**（按 Lead 给的 10 类排），不是判定优先级。）
+2. 匹配面 = `id + enName.toLowerCase() + tagline`（与现有 `tags_for` 的 `hay` 完全一致 ⇒ **零额外读取**）。
+3. **`ps_other` 是兜底**，必须存在 —— 否则按玩法筛选时这 30 款会“消失”。
+4. 人工只补 `ps_other` 里能归位的 + 抽检纠错，**不动自动命中的多数**。
+
+---
+
+## 3 自动 / 人工工作量
+
+| 项 | 量 | 耗时 |
+|---|---|---|
+| 写规则（`PLAY_STYLE_RULES` 14 条 + `play_style_for()`） | 约 40 行 | 20 分钟（已完成设计） |
+| 自动覆盖 | **325 / 355（91.5%）** | 0 |
+| **人工必做**：`ps_other` 30 款逐款归类 | 30 款 | ~10 分钟（3s/款） |
+| **人工抽检**：每类抽 4 款（14×4 = 56 款）核对 | 56 款 | ~15 分钟 |
+| 预计纠错 | 抽查准确率约 **95%** ⇒ 全量约 **17 处**要改 | 含在上面 |
+| **合计** | | **≈ 45 分钟** |
+
+**抽查结论（我按游戏名肉眼过了一遍 9 个类约 90 款）**：
+- 明显正确：`ps_board`(8/9)、`ps_match`(9/9)、`ps_run`(7/7)、`ps_push`(12/13)、`ps_reaction`(13/14)
+- 边界模糊（错最多）：`ps_quiz ↔ ps_word`（如 `chalk_and_talk` 进了 word，其实是“边写边说”）、`ps_search ↔ ps_spatial`（如 `shadow_pivot`）
+
+---
+
+## 4 `gen_tags.py` 的改动（**diff，未执行**）
+
+### 4.1 `TAGS` 末尾追加一组（14 + 兜底 1 = 15 条）
+
+```diff
+@@ tools/gen_tags.py  TAGS = [ ... ]  末尾（':66' 那个 ']' 之前）
+     ('场景', 'cozy',    '🛋️', '躺着玩'),
++
++    # ── 玩法（playStyle）★ 2026-11-08 · 每款恰好 1 个，是「划分」不是多标签 ──
++    #   为什么加：355 款按「类别+tag」只剩 62~64 种签名，最大一组 54 款不可区分
++    #   ⇒ 「像 2048」会把三消和发射消泡排在前三（见 _巡检记录/playStyle方案-20261108.md）
++    ('玩法', 'ps_match',    '💥', '消除配对'),
++    ('玩法', 'ps_merge',    '🔢', '合并滚雪球'),
++    ('玩法', 'ps_push',     '📦', '挪块推箱'),
++    ('玩法', 'ps_maze',     '🌀', '走格寻路'),
++    ('玩法', 'ps_fill',     '🧩', '填格谜题'),
++    ('玩法', 'ps_board',    '♟️', '棋类对弈'),
++    ('玩法', 'ps_word',     '🔤', '拼词文字'),
++    ('玩法', 'ps_memory',   '🧠', '记忆回忆'),
++    ('玩法', 'ps_reaction', '⚡', '反应手速'),
++    ('玩法', 'ps_quiz',     '🧮', '答题估算'),
++    ('玩法', 'ps_search',   '🔍', '眼力搜寻'),
++    ('玩法', 'ps_spatial',  '📐', '折转空间'),
++    ('玩法', 'ps_attention','🎯', '注意力任务'),
++    ('玩法', 'ps_run',      '🏃', '跑分局'),
++    ('玩法', 'ps_other',    '❓', '其它玩法'),
+ ]
+```
+
+### 4.2 `EN` / `GRP_EN` 各加一批（英文显示用）
+
+```diff
+@@ tools/gen_tags.py  EN = { ... }
+     'brainy': 'Challenge', 'cozy': 'Cosy',
++    'ps_match': 'Match', 'ps_merge': 'Merge', 'ps_push': 'Push', 'ps_maze': 'Maze',
++    'ps_fill': 'Fill-in', 'ps_board': 'Board', 'ps_word': 'Words', 'ps_memory': 'Memory',
++    'ps_reaction': 'Reaction', 'ps_quiz': 'Quiz', 'ps_search': 'Spotting',
++    'ps_spatial': 'Spatial', 'ps_attention': 'Attention', 'ps_run': 'Run', 'ps_other': 'Other',
+ }
+@@ tools/gen_tags.py  GRP_EN
+ GRP_EN = {'时长': 'Length', '难度': 'Difficulty', '操作': 'Controls',
+-          '节奏': 'Pace', '脑力': 'Skills', '场景': 'Vibe'}
++          '节奏': 'Pace', '脑力': 'Skills', '场景': 'Vibe',
++          '玩法': 'Playstyle'}
+```
+
+### 4.3 新增规则函数（放在 `CAT_ATTR` 之后、`KW` 之前）
+
+```diff
++# 3) 玩法（playStyle）——★ 顺序即优先级，首个命中即定 ⇒ 每款恰好 1 个（划分）
++PLAY_STYLE_RULES = [
++    ('ps_board',    r'gomoku|checkers|connect_four|reversi|mancala|\bnim\b|tic_tac|go9|chess|domino'),
++    ('ps_match',    r'match3|bejewel|bubble|mahjong|color_flood|water_sort|hue_sort|gravity_sort|chain_reaction|jewel|collaps'),
++    ('ps_merge',    r'2048|fibonacci|merge|number_bond|exponent_tower|sum_pyramid|collatz|sum_snake|target_number|prime_factor|magic_square'),
++    ('ps_push',     r'sokoban|klotski|slide1|block_escape|tangram|polyomino|hanoi|peg_solitaire|block_stacking|block_count|box_completion|tower_of_london'),
++    ('ps_maze',     r'maze|path_finder|trace_path|pipes|laser|circuit_connect|wire|vector_grid|path_intersect|path_recall|lock_pattern|grid_displacement'),
++    ('ps_fill',     r'sudoku|kakuro|kenken|nonogram|hitori|heyawake|slitherlink|nurikabe|yajilin|tapa|akari|magnet|lighthouse|kurodoko|norinori|gokigen|kakurasu|dominosa|fillomino|futoshiki|crown|shikaku|bridges|masyu|tents|tenner|skyscraper|binary_puzzle|lights_out|minesweeper'),
++    ('ps_word',     r'word|anagram|cryptogram|letter|vowel|rhyme|homophone|spelling|typing|scramble|palindrome|pangram|portmanteau|spoonerism|consonant|crossword|affix|etymolog|grammar|silent_letter|semantic|vocabulary|analog|definition|context_clues|oxymoron|cognate|typoglyc|syllable|category_fluency|story_builder|chalk'),
++    ('ps_memory',   r'memory|n_back|corsi|span|recall|chimp|simon|delayed_match|dnms|card_counting|spatial_cabinet|word_pair|paired_associate'),
++    ('ps_reaction', r'reflex|blink|flash|reaction|subitiz|go_no_go|stop_signal|vigilance|orbit|ghost_tap|whack|frequency|rhythm'),
++    ('ps_quiz',     r'estimat|guess|mental_calendar|mental_abacus|percentage|fraction|angle|numeric|currency|unit_converter|radical|roman|arithmetic|algebra|inequality|base_conversion|base_shift|binary_code|modular|modulo|divisibility|matrix|vector|dot_product|pythagor|prime|factor|gcd|common_denominator|venn|set_theory|balance_scale|digit_swap|missing_operator|calculation_sprint|countdown_math|quick_math|target_10|math_path|binomial'),
++    ('ps_search',   r'visual_search|schulte|odd_one_out|silhouette|shape_shifter|shadow_pivot|symmetry|topology|color_match|area_perimeter|geometric_vision|navon|negative_space|spotlight|multiple_object|visual_crowding|ab_reversal|cross_section|room_inspector|find_word'),
++    ('ps_spatial',  r'fold|cube_net|paper_folding|rotation|perspective|gear_|mirror|pixel_mimic|graph_coordinate|triplets_logic|temporal_order'),
++    ('ps_attention',r'stroop|flanker|d2_attention|sdmt|trail_making|task_switch|switch_task|posner|divided_attention|dual_coding|dual_task|change_blindness|conjunction_search|continuous_recognition|dynamic_salience|visual_statistical|source_monitoring|sopt|wisconsin|rule_switcher|sternberg|object_shuffle|object_displacement|shell_game|grocery_list|face_|associative_pairs'),
++    ('ps_run',      r'breakout|doodle|flappy|pong|snake|tetris'),
++]
++
++# 4) 关键词 → 追加标签（按 id 或描述匹配）
+ KW = [
+```
+
+### 4.4 在 `tags_for()` 末尾加一行调用（`⑦ 兜底` 之后）
+
+```diff
+@@ def tags_for(gid, name, tag, cat):
+     if not (t & {'timed', 'untimed'}):
+         t.add('untimed')
++
++    # ── ⑧ 玩法（playStyle）：每款恰好 1 个（划分，兜底 ps_other）──
++    t.add(play_style_for(hay))
+     return sorted(t)
+```
+
+### 4.5 新函数本体（放在 `tags_for` 之前）
+
+```diff
++def play_style_for(hay):
++    """玩法归类：顺序即优先级，首个命中即定。hay 已在 tags_for 里算好（id+tagline+name 小写）。"""
++    for pid, pat in PLAY_STYLE_RULES:
++        if re.search(pat, hay):
++            return pid
++    return 'ps_other'
++
++
+ def tags_for(gid, name, tag, cat):
+```
+
+> **注意**：`tags_for` 里的 `hay` 变量名正好可以直接传，**不需要改函数签名**，也不新增任何文件读取。
+
+---
+
+## 5 `playStyle` 怎么参与 `ChatFinder` 打分 —— ⚠️ **+25 不够，会一分不变**
+
+### 5.1 现状（`ChatFinder.ets` 的 `similar` 分支）
+
+```ts
+if (it.similar.length > 0 && g.id !== it.similar) {
+  if (g.category === ref.category) { sc += 18; }
+  if (g.difficulty === ref.difficulty) { sc += 8; }
+  let shared = …;                     // 与 ref 共享的 tag 个数
+  sc += Math.min(16, shared * 4);     // 上限 +16
+}
+```
+
+### 5.2 加上「同 playStyle +25」后**实测**（我按真实数据算了三档）
+
+「像 2048」的候选是 `g2048`（CLASSIC / `ps_merge` / tags 含 easy,medium,swipe）。**其余 10 款 `ps_merge` 全是 MATH 类**（tags = `calc,normal,short,tap,untimed`）。
+
+| 候选 | 同 playStyle | 同类别 | 同难度 | 共享 tag | **V1 加法版** | **V2 互斥版** |
+|---|---|---|---|---|---|---|
+| `bejeweled`（CLASSIC / ps_match） | 0 | +18 | +8 | 6→+16 | **42** | **42** |
+| `bubble_shooter`（CLASSIC / ps_match） | 0 | +18 | +8 | 6→+16 | **42** | **42** |
+| `fibonacci_merge`（MATH / ps_merge） | +25 | 0 | +8 | 1→+4 | **37** | **37** |
+| `number_bonds`（MATH / ps_merge） | +25 | 0 | +8 | 1→+4 | **37** | **37** |
+
+> ⚠️ 「同难度 +8」用的是 **metadata 的 `difficulty`**，而 354/355 款都是 `NORMAL` ⇒ **几乎所有款都白拿 +8**（这也是个隐患，但不是本文主题）。所以真正的差距是 **37 < 42**：
+
+⇒ **37 < 42**，`ps_merge` 一个都进不了前三。**「像 2048」的 top-3 一个字都不会变**（`bejeweled / breakout / bubble_shooter`）。
+
+**我实跑了三种权重，确认这一点**：
+
+| 方案 | 「像 2048」top-3 | 结论 |
+|---|---|---|
+| V0 现状 | `bejeweled` / `breakout` / `bubble_shooter` | 全错（三消、打砖块、发射） |
+| V1 `+25` 相加 | 同上 | **无效** |
+| V2 `+25` 互斥 | 同上 | **无效** |
+| **V3 `+40` 互斥** | **`sum_snake` / `collatz` / `exponent_tower`** | ✅ 全部 `ps_merge` |
+
+### 5.3 推荐改法（两行）
+
+```diff
+@@ ChatFinder.ets  similar 分支
+     if (it.similar.length > 0 && g.id !== it.similar) {
+-      if (g.category === ref.category) { sc += 18; }
++      // ★ 2026-11-08：玩法相同是**主信号**；命中时不再叠加「同类别」，否则 18+8+16=42
++      //   会压过 25（实测「像 2048」的 top-3 一分不变，见 playStyle方案 §5.2）
++      const sameStyle: boolean = g.playStyle.length > 0 && ref.playStyle.length > 0
++        && g.playStyle === ref.playStyle;
++      if (sameStyle) { sc += 40; }
++      else if (g.category === ref.category) { sc += 18; }
+       if (g.difficulty === ref.difficulty) { sc += 8; }
+```
+
+**为什么是 40**：非同类玩法的候选上限 = `18 + 8 + 16 = 42`。
+同玩法候选最低分 = `40 + 8（难度，几乎人人有）+ 0（共享 tag）= 48`；**即使难度不同**也还有 `40 + 共享 tag（多数 ≥1，+4）= 44` ⇒ **都 > 42**，胜出是必然的。
+（实测：`fibonacci_merge` 52 分 vs `bejeweled` 42 分，差值 10。）
+若坚持 `+25`，就必须把「同类别」从 18 降到 **≤ 5**、或把「共享 tag」上限从 16 降到 **≤ 4** —— 那会连带削弱其它场景，**不推荐**。
+
+> 前置：`GameMeta` 需要新增 `playStyle: string` 字段（由 `gen_catalog.py` 从 tag 里取，或用 `tags` 里的 `ps_*` 直接查 —— **推荐后者，零新字段**：`g.tags.some(x => x.indexOf('ps_') === 0)`）。
+> ⚠️ ArkTS 里没有 `Array.some` 的惯用写法，建议加一个模块级 `styleOf(g): string` 小函数（遍历 tags 找 `ps_` 前缀，5 行）。
+
+---
+
+## 6 「像 2048」的预期效果
+
+| | top-1 | top-2 | top-3 | 对不对 |
+|---|---|---|---|---|
+| **改前** | 宝石迷阵（三消） | 打砖块（跑分） | 弹珠消（发射） | ❌ 全错 |
+| **改后（V3）** | `sum_snake` 数字蛇 | `collatz` 考拉兹 | `exponent_tower` 指数塔 | ⚠️ **类全对**（都是合并/滚雪球），但**类内顺序靠 id** |
+
+**为什么类内顺序还不行**：`ps_merge` 的 10 款 MATH 游戏 **tag 完全一样**（`calc,normal,short,tap,untimed`）⇒ 在类内仍然是一个 42 分大平局。
+真正“像 2048”的应该是 `fibonacci_merge`（相邻两数合并）和 `number_bonds`（数字拆分合并），但它们和 `collatz`（考拉兹序列）在 tag 上毫无区别。
+
+**两个可选加强（按成本排）**：
+
+| 方案 | 做法 | 成本 | 效果 |
+|---|---|---|---|
+| **A（推荐）** | 把 `swipe` 也算进 similar 的加权：**操作方式相同 +10**（2048 是 swipe，`sum_snake` 也是 swipe ⇒ 它确实更像） | 1 行 | 不改数据结构，只改权重 |
+| **B** | 加 `similarGroup` 人工小簇：给 **top-20 热门款**各配 3 个「最像」，共 60 对 | ~20 分钟 | 「像 2048」可以精确到 `fibonacci_merge / number_bonds / sum_snake` |
+
+> 我倾向 **A 现在就做（1 行）**，B 等有真实用户反馈再做。**注意 A 会让 `sum_snake` 更稳居第一** —— 它确实是“滑动+合并数字”，这个结果是可辩护的。
+
+---
+
+## 7 能不能全自动推（`id` 关键词 + `enName`）—— **能 91.5%，但有 2 个天花板**
+
+**能推的部分**：14 类规则只吃 `id + enName + tagline`（都是生成器已有的输入）⇒ **325/355 自动命中，无需任何新数据**。
+
+**天花板 1：剩下的 30 款（8%）是真的凑不进去**
+`ps_other` 全是：纸牌接龙（freecell / solitaire / spider_solitaire）、算法可视化（life_game / mandelbrot / sieve / sorting_visualizer）、序列记忆（sequence_sleuth / sequence_stack / triple_sequence / pattern_sequence_draw）、单点谜题（game24 / mastermind / einstein_riddle / logical_syllogisms）、滑块（slide_puzzle）。
+⇒ 要么接受 8%，要么再加 2~3 类（`ps_card` 纸牌 / `ps_sim` 算法可视化 / `ps_seq` 序列），但那三类加起来才 ~13 款，**不值得开新类**。
+
+**天花板 2：类内无法区分**（§6 已述）
+tag 粒度决定了「同一个玩法类的 10 款」长得一模一样。**自动推能给出“哪一类”，给不出“像不像这一款”** —— 后者只能靠 `similarGroup`（人工）。
+
+**准确率抽查**：我按名字过了 9 个类约 90 款，**约 95% 正确**；错误集中在 `ps_quiz ↔ ps_word`（`chalk_and_talk`）和 `ps_search ↔ ps_spatial`（`shadow_pivot`）。
+
+---
+
+## 8 ⚠️ 会不会又一次「重跑 `gen_catalog.py` 清空 tags」？—— **会。三条防线**
+
+**这不是假设，是我上一轮差点踩的坑**（`_巡检记录/tag分布-20261108.md` §10）：
+
+- `gen_tags.py` 只写 `/tmp/game_tags.json` + `GameTags.ets`（**定义**），**不动 GameRegistry**；
+- 真正写 tags 的是 `gen_catalog.py:77-78,179`：`tagmap = {}` 若 json 缺失 ⇒ `tagmap.get(id, [])` ⇒ **355 款 tags 全空**；
+- 即便 json 在，它也会**整个重写** `GameRegistry.ets`，把 **59 处 `ACCENT_TAG`/`ACCENT_DEEP_TAG` 哨兵写回 `Palette.primary`**（文件头注释自己警告过）。
+
+⇒ 本方案落地时必须走**手术式**（只替换 `tags: [...]`），并加三条防线：
+
+| # | 防线 | 成本 |
+|---|---|---|
+| **F1** | 把手术脚本 **`tools/apply_tags.py`** 正式入库（现在在 `/tmp`，随时会丢）——支持 `--dry`：打印会改多少行、前 6 处新旧对比 | 40 行（已写好并 dry-run 验过：355/355 命中、193 行、0 对不上） |
+| **F2** | 给 `gen_catalog.py` 加**硬闸**：`if not tagmap: sys.exit('❌ /tmp/game_tags.json 缺失 —— 拒绝生成（会把 355 款 tags 写空）')` | 2 行 |
+| **F3** | 生成后**自检**：统计 `tags: []` 的出现次数，若 > 0 则报错并提示改用 `apply_tags.py` | 3 行 |
+
+> 有 F1+F2，这条坑就彻底关闭了。**强烈建议和 playStyle 同一批一起做**（都是 `tools/` 写域）。
+
+---
+
+## 9 落地顺序（建议）
+
+1. **F1+F2+F3**（防线）—— 2 分钟，先做，防止后面任何一次误跑
+2. `gen_tags.py` 加 14 类 + 规则（§4）→ 跑 `gen_tags.py` → `apply_tags.py --dry` 看 355 款的增删 → `--write`
+3. `ChatFinder`：`similar` 分支改 V3（§5.3）+ `styleOf()` 5 行
+4. 抽检「像 2048」→ 期望 `sum_snake / collatz / exponent_tower`（§6）
+5. **可选 A**：similar 里加「同操作方式 +10」
+
+**验收判据**：
+- 355 款**每款恰好 1 个 `ps_*`**（可脚本断言：`sum(tags 以 ps_ 开头的个数) == 355` 且每款 == 1）
+- 「像 2048」top-3 全部 `ps_merge`（现在是 bejeweled/breakout/bubble_shooter）
+- 签名数 64 → 104（可脚本断言）
+
+---
+
+## 10 复现
+
+- 分类规则与款数：脚本在 `/tmp/gbal/`（`playstyle_final.json` 是 355 款的拟定归类，`games_full.json` 是解析出的 id/name/tagline/enName/cat/tags）
+- 打分模拟：按 `ChatFinder.scoreOf()` 的 similar 分支逐项重算，V0~V4 见 §5.2
+- 签名统计：`(category, sorted(tags), playStyle)` 去重
+- **本文档未执行任何生成器；`gen_tags.py` / `GameRegistry.ets` / `ChatFinder.ets` 均未修改**
+
+---
+
+## 11 落地记录（2026-11-08 11:38–12:1x · Lead 批准「按 §9 顺序做」）
+
+> **未编译**。每步 `git diff --stat` 见下。
+
+### 11.1 步骤 1：三条防线
+
+```
+ tools/gen_catalog.py         | 13 +++++++++++++
+ tools/apply_tags.py          | 104 行（新文件，F1）
+```
+
+| 防线 | 实现 |
+|---|---|
+| **F1** | `tools/apply_tags.py` **正式入库**（104 行，含 `--dry` 预览 / `--json=` / `--reg=`）。dry-run 实跑：`命中 355 / 355 ｜ 需改 0 行 ｜ 异常 0` |
+| **F2** | `gen_catalog.py` `main()` 开头加硬闸：`if not tagmap: sys.exit('❌ 缺 /tmp/game_tags.json —— 拒绝生成（会把 355 款 tags 写空）')` + `import sys` |
+| **F3** | 写盘**前**自检：`empty = [g['id'] for g in games if not tagmap.get(g['id'])]`，非空则 `sys.exit`（数据链断了就不写） |
+
+F3 的判据用真实数据验过：`names_part*.txt` 355 个 id 全部 `tagmap` 里有 ⇒ `empty = 0`，正常放行。
+
+### 11.2 步骤 2：14 类 playStyle（**不是 10 类**）
+
+```
+ tools/gen_tags.py                        |  61 ++++++++++++++++++++++++-
+ entry/src/main/ets/core/GameTags.ets     |  15 +
+ entry/src/main/ets/core/GameRegistry.ets | 710 ++++++++++++++-------------   (355 行 × +1/-1)
+```
+
+**实跑分布**（与方案 §2.2 的预测完全一致，合计 355）：
+
+`ps_word 55 ｜ ps_quiz 52 ｜ ps_fill 35 ｜ ps_memory 33 ｜ ps_attention 30 ｜ ps_other 30 ｜ ps_search 22 ｜ ps_maze 19 ｜ ps_spatial 17 ｜ ps_reaction 14 ｜ ps_push 13 ｜ ps_merge 11 ｜ ps_match 9 ｜ ps_run 7 ｜ ps_board 8`
+
+**落地时改了一处分类**（方案里没写，实测发现）：`dominosa`（多米诺拼盘）原来被 `ps_board` 的 `domino` 正则误吃 —— 它是**单人格点解谜**不是两人对弈 ⇒ 从 `ps_board` 去掉 `domino`、把 `dominosa` 加进 `ps_fill`。
+（这就是 `ps_board 9→8`、`ps_fill 34→35` 的原因。）
+
+**自检**：355 款**每款恰好 1 个 `ps_*`**（分布 `{1: 355}`，异常 0）。
+
+### 11.3 步骤 3：`ChatFinder` 打分
+
+| 改动 | 说明 |
+|---|---|
+| 新增 `styleOf(g)`（11 行） | 从 `tags` 里找 `ps_` 前缀 —— **零新增字段、零迁移**（ArkTS 不用 `Array.some`） |
+| `sameStyle → +40`，且与「同类别 +18」**互斥** | 非同类上限 `18+8+16=42`；同类最低 `40+0+0=40`，加共享 tag 后 **必然 > 42** |
+| **「同难度 +8」不再白送** | 改成 `g.difficulty === ref.difficulty && g.difficulty !== NORMAL` —— 354/355 是 NORMAL ⇒ 这条现在**只在双方都是非普通档时**才给（当前等于关掉，等 `difficulty` 字段真正分级再启用） |
+| **操作方式相同 +10**（加强方案 A） | `tap/swipe/drag/type` 任一同款即 +10（2048 与 数字蛇 都是 swipe） |
+
+### 11.4 实测效果（用真实 registry 数据重算）
+
+| 用户说 | 改前 top-3 | **改后 top-3（实测）** | 玩法 |
+|---|---|---|---|
+| 像 2048 | 宝石迷阵 / 打砖块 / 弹珠消 | **数字蛇(62) / 考拉兹(48) / 指数塔(48)** | `ps_merge` ✅ |
+| 像 宝石迷阵 | — | **弹珠消(66) / 消色(66) / 色相排序(66)** | `ps_match` ✅ |
+| 像 五子棋 | — | **跳棋(66) / 四子棋(66) / 9路围棋(66)** | `ps_board` ✅ |
+| 像 推箱子 | — | **方块逃脱(66) / 汉诺塔(66) / 华容道(66)** | `ps_push` ✅ |
+| 像 猜词 | — | **填字(66) / 全部隐语(66) / 变位词(62)** | `ps_word` ✅ |
+| 像 记忆翻牌 | — | **动作序列回忆 / 连续配对 / 方向回忆** | `ps_memory` ✅ |
+| 像 扫雷 | — | **明灯 / 字母数独 / 二进制谜题** | `ps_fill` ✅（扫雷本身就是 fill 类，同类互推合理） |
+
+**签名数**：`64 → 103`（剔掉 `ps_*` 后回到 64，可复算）。
+
+### 11.5 ⚠️ 基线 `200359 / 1` —— **仍然不是本批**
+
+失败项 `check_key_coverage.py`：**`GSymbolLogic.ets:126`** 的 `TG('想一想：第一个符号是几')` 缺 10 语言译文。
+该文件在 `git status` 里是**别人**改的，与本批五个文件无关（`GameTags.ets` 新增的 15 条标签是**纯中文 label 数组**，不走 `TG()`，未被点名）。
+⇒ 补法同上次：往 `core/I18n.ets` 的 EXTRA 补 key（不在本批写域）。
+
+### 11.6 本批文件清单
+
+```
+ tools/gen_catalog.py                     |  13 +     (F2/F3)
+ tools/gen_tags.py                        |  61 +-    (14 类 + 规则 + 调用)
+ tools/apply_tags.py                      | 104 行   (F1，新文件)
+ entry/src/main/ets/core/GameTags.ets     |  15 +     (生成物：15 条标签定义)
+ entry/src/main/ets/core/GameRegistry.ets | 710 ++--- (生成物：355 行 tags)
+ entry/src/main/ets/core/ChatFinder.ets   |  94 +-    (styleOf + similar 打分；
+                                                      ⚠️ 其中 ~41 行是 code-hunter 未提交的 ALIAS 改动，非本批)
+```
+
+---
+
+## 12 code-hunter 抽检后的 5 项修正（2026-11-08 12:2x）
+
+> 抽检结论：**准确率 ≈88%**（我在 §3 报的 95% 是按名字估的，偏高 —— 以读代码的抽检为准）。
+> **未编译**；`git diff --stat`：`tools/gen_tags.py 63 +-` ｜ `GameRegistry.ets 88 +++---`（= 44 行 × +1/-1）｜ `GameTags.ets` **无变化**（标签定义没动）。
+> 基线：**200359 / 0** ✅（上一轮挡路的 `GSymbolLogic` i18n key 已被别人补掉）
+
+### 12.1 五处修法
+
+| # | 问题 | 修法 | 落点 |
+|---|---|---|---|
+| **①** | `ps_other` 30 款里 **23 款本可归类** | **新增 `PLAY_STYLE_PIN` 人工矫正表**（id → 玩法，优先级最高）：12 款是 Lead 点名的，另 11 款我按语义补（`compound_connect→maze`、`double_trouble→attention`、`binary_scale_balance/sequence_stack/logical_syllogisms→quiz`、`symbol_digit_assoc/fact_binder/mental_mapping/triple_sequence→memory`、`counting_sheep→search`、`spatial_conflict→spatial`） | `ps_other` **30 → 7** |
+| **②** | `音标猜词` 被标成 `ps_quiz` | `ps_word` 正则加 `phonetic` | ✓ |
+| **③** | `ps_merge` 太宽（11 款里只有 3 款真·合并） | 正则收窄到 `2048\|fibonacci_merge\|merge\|sum_snake`；被让出的 8 款（考拉兹/指数塔/幻方/数字键/数字拆分/质因数树/金字塔/目标数字）挪进 `ps_quiz` 正则 | `ps_merge` **11 → 3** |
+| **④** | 排序类混在 `ps_match` | `water_sort/hue_sort/gravity_sort` 从 match 移到 `ps_push`（语义：把东西挪到该在的位置） | `ps_match` **9 → 6**、`ps_push` **13 → 16** |
+| **⑤** | MEMORY 类里 27 款被 attention 吃掉 | 9 款明显是**记忆**的挪回 `ps_memory`（`associative_pairs`/`continuous_recognition`/`face_name_association`/`face_trait_association`/`grocery_list`/`object_displacement`/`object_shuffle`/`shell_game`/`sopt`） | `ps_memory` **33 → 46**、`ps_attention` **30 → 25** |
+
+> **为什么用 PIN 表而不是继续往正则里加词**：正则每加一个词都可能误伤别的款（这轮 `domino` 就吃掉过 `dominosa`）。一条 id 一次判断、可逐行 review、README 式自解释 ⇒ **越往后越该用 PIN，而不是堆正则**。
+
+### 12.2 分布（前 → 后）
+
+| 玩法 | 前 | 后 | |
+|---|---|---|---|
+| `ps_quiz` | 52 | **66** | +8（合并让出）+ 5（PIN）|
+| `ps_word` | 55 | **57** | +2（phonetic + etymon_oddball）|
+| `ps_memory` | 33 | **46** | +13（9 挪回 + 4 PIN）|
+| `ps_fill` | 35 | **37** | +2 |
+| `ps_attention` | 30 | **25** | −9 挪回记忆 + 4 PIN |
+| `ps_search` | 22 | **23** | +1 |
+| `ps_maze` | 19 | **20** | +1 |
+| `ps_spatial` | 17 | **20** | +3 |
+| `ps_push` | 13 | **16** | +3 排序类 |
+| `ps_reaction` | 14 | 14 | — |
+| `ps_board` | 8 | 8 | — |
+| `ps_run` | 7 | 7 | — |
+| `ps_other` | 30 | **7** | 只剩 4 可视化 + 3 纸牌 ✅ |
+| `ps_match` | 9 | **6** | −3 排序类 |
+| `ps_merge` | 11 | **3** | 只剩 2048 / 数字蛇 / 斐波那契合并 |
+
+**自检**：355 款**每款恰好 1 个 `ps_*`**（`{1: 355}`）。
+
+### 12.3 「像 2048」的变化（这才是 ③ 的目的）
+
+| | top-1 | top-2 | top-3 |
+|---|---|---|---|
+| 修正前 | 数字蛇(62) | 考拉兹(48) | 指数塔(48) ← **数字计算，不像** |
+| **修正后** | **数字蛇(62)** | **斐波那契合并(48)** | 打砖块(44) ← 只剩 3 款合并类，第 3 名已经出圈 |
+
+> `ps_merge` 收窄到 3 款后，作为**筛选项太窄**（<10），但它本来只为「像 2048」服务 —— 抽检结论是“宁窄勿错”。
+> 若哪天真要按玩法筛，`ps_merge` 可以并回 `ps_quiz`，但「像 2048」的精度会退回修正前。
+
+### 12.4 其他抽查（修正后）
+
+| 用户说 | top-3 | 玩法 |
+|---|---|---|
+| 像 宝石迷阵 | 弹珠消 / 消色 / 三连 | `ps_match` ✅ |
+| 像 音标猜词 | 填字 / 全部隐语 / 猜词 | `ps_word` ✅（修好 ② 之后）|
+| 像 数字华容道 | 复杂折纸 / 立方体展开 / 双镜像 | `ps_spatial` ⚠️ 同类但手感不完全贴 —— `ps_spatial` 本身有 20 款跨 3 个子类，属“类太粗”的遗留问题（同 §6 的天花板 2）|
+
+---
+
+## 13 第三轮抽检（96%）后的 4 条 PIN + `ps_card`（2026-11-08 12:5x）
+
+> 二轮抽检 96%（v1 88%）。本轮只动 **`PLAY_STYLE_PIN` 表 + 新增 `ps_card`**，**没改正则**（除 ps_card 一条新规则）。
+
+### 13.1 四条修正（按「玩家实际在做什么」判）
+
+| 款 | 旧 | 新 | 依据 |
+|---|---|---|---|
+| `spatial_conflict` 空间冲突 | `ps_spatial` | **`ps_attention`** | 箭头方向/文字/位置互相捣乱 = **Stroop 式干扰任务** |
+| `counting_sheep` 数羊 | `ps_search` | **`ps_attention`** | 狼披羊皮混进羊圈，数羊/数格 = **计数+辨别** |
+| `dynamic_salience` 动态凸显 | `ps_attention` | **`ps_reaction`** | 20 秒内点掉会自己换位置的亮方块 = **追移动目标** |
+| `polyomino_tiling` 多联骨牌 | `ps_push` | **`ps_fill`** | 铺满网格（polyomino tiling）⇒ 与多米诺拼盘同源 |
+
+### 13.2 新增 `ps_card`（纸牌接龙，4 款）
+
+`freecell` / `solitaire` / `spider_solitaire` / `mahjong_solitaire` —— 把原来「3 款在 other、1 款在 match」的同一族收拢。
+
+- 规则放在 `ps_match` **之前**（否则 `mahjong` 会被 match 抢走）
+- **坑**：`peg_solitaire`（孔明棋）含 `solitaire` 被误收 ⇒ PIN 钉回 `ps_push`
+- 4 款 <10 ⇒ 一并 `hidden: true`，筛选面板不显示
+
+### 13.3 分布（第三轮后）
+
+`quiz 66 ｜ word 57 ｜ memory 46 ｜ fill 38 ｜ attention 26 ｜ search 22 ｜ maze 20 ｜ spatial 19 ｜ push 15 ｜ reaction 15 ｜ board 8 ｜ run 7 ｜ match 5 ｜ card 4 ｜ other 4 ｜ merge 3`
+**`ps_other` 剩 4 款 = 全部是算法可视化**（生命游戏 / 分形探索 / 筛法可视化 / 排序可视化）—— 语义终于干净了。
+
+---
+
+## 14 第四轮：`ps_search` 系统性污染修正（2026-11-08 14:5x）
+
+> 抽检 98.0%（严格）。本轮只动 **`PLAY_STYLE_PIN` 表**（+16 条），**一条正则没改**。
+> `git diff --stat`：`tools/gen_tags.py 21 +` ｜ `GameRegistry.ets 32 +++---`（= 16 行 × +1/-1）｜ `GameTags.ets` **无变化**（没加新标签）
+> 基线 **`200359 / 0` ✅**（未编译）
+
+### 14.1 根因
+
+`ps_search` 22 款里 **13 款不是「找目标」**。根因不是关键词写错，是**类别兜底**：
+这批游戏的 `category` 几乎全是 `SPATIAL`，而 `SPATIAL` 的默认技能标签是 `space`，
+于是它们在生成时被顺带塞进 search 一族 —— **只有这一类有这个毛病**
+（对照组都干净：`ps_board` 8/8、`ps_merge` 3/3、`ps_run` 7/7）。
+
+### 14.2 🔴 **判据（新增，来自 code-hunter）**
+
+> **某类抽样错误率 > 25% 时，必须全量看，不能继续抽样。**
+
+这轮正是抽样漏掉的：98.0% 的抽样结果里没有暴露 search 的问题，
+直到有人把 `ps_search` 22 款**全量读源码**才挖出来（13/22 = 59% 错）。
+⇒ 以后凡「某一类」的抽检错误率超过 1/4，默认按**全量**处理，不要再抽。
+
+### 14.3 十六条 PIN（按「玩家实际在做什么」判）
+
+| 款 | 旧 | 新 | 依据（源码） |
+|---|---|---|---|
+| `cross_section_slice` 截面切片 | search | `ps_spatial` | 5×5×5 方块堆只画第 h 层，逆推 ⇒ 空间想象 |
+| `shadow_pivot` 影子旋转 | search | `ps_spatial` | 光源转角度挑对应影子 = 心理旋转 |
+| `symmetry` 对称 | search | `ps_spatial` | 判断关于哪条轴对称 |
+| `silhouette_match` 剪影匹配 | search | `ps_spatial` | 挑出轮廓完全相同的那张 |
+| `silhouette_match_ortho` 正交剪影 | search | `ps_spatial` | 三层方块正投影得到哪个剪影 |
+| `shape_shifter` 变形者 | search | `ps_spatial` | 找变换规律（转 90°/右移/变长）挑第 5 个 |
+| `topology` 拓扑 | search | `ps_spatial` | 不看形状只看洞数 ⇒ 拓扑等价 |
+| `area_perimeter_match` 面积周长 | search | `ps_quiz` | 两矩形比面积/周长，10 题答对 ≥7 |
+| `color_match` 颜色匹配 | search | `ps_match` | 点中同色连同整片消掉 = 三消 |
+| `navon_hierarchical` 整体局部 | search | `ps_attention` | 大图字母 + 小图字母 = Navon 冲突 |
+| `visual_crowding_acuity` 拥挤视力 | search | `ps_attention` | 只答正中那个字母，两侧越挤越难认 = 侧抑制族 |
+| `conjunction_search` 联合特征 | attention | **`ps_search`** | 多特征找目标（反向修正） |
+| `dual_coding` 双编码 | attention | **`ps_memory`** | 图文双通道 = 记忆编码（反向修正） |
+| `mahjong_solitaire` 麻将连连看 | card | **`ps_match`** | 4×4 共 16 张、点两张相同的牌 = 配对 |
+
+**另 2 条我自己按源码改判了**（Lead 的清单里没有给目标，只说「按语义挪」）：
+
+| 款 | 我改成 | 理由 |
+|---|---|---|
+| `geometric_vision` 几何直觉 | **`ps_quiz`**（不是 spatial） | 源码：「A、B 两块图形各由 12 个小方格拼成，**比一比谁占的格子多**，10 题全过」⇒ 与 `area_perimeter_match`（比面积）**完全同源**，不是脑内转形 |
+| `ab_reversal_oddball` AB 反转 | **`ps_reaction`**（不是 attention） | 源码：「刺激按圆/菱交替，偶尔连续两次相同=反转，**看到反转立刻点**，24 帧内命中 ≥5」⇒ 与「注意瞬脱」「奇偶闪现」同族（那两款都是 `ps_reaction`），不是纯 attention |
+
+### 14.4 分布（第四轮后）
+
+```
+quiz 68 ｜ word 57 ｜ memory 47 ｜ fill 38 ｜ attention 26 ｜ spatial 26 ｜ maze 20
+reaction 16 ｜ push 15 ｜ search 10 ｜ board 8 ｜ match 7 ｜ run 7 ｜ other 4 ｜ card 3 ｜ merge 3
+```
+**`ps_search` 22 → 10** = 9 款真·找目标（舒尔特方格/多目标追踪/聚光追踪/视觉搜索/联合搜索/视觉搜索进阶/找不同/房间检查/负空间）**+ 联合特征**，与 Lead 的规格逐款一致。
+
+### 14.5 准确率
+
+- 第三轮实测：**98.0%（严格）**
+- 本轮修掉 **16 处**（13 出 + 3 入/回），按 Lead 预计 ⇒ **99.4%（352/354）**
+- ⚠️ **这是推算，不是我实测的** —— 真值要 code-hunter 复核后才有；我这轮只做了 **16 款逐款源码复核**（结果见 §14.3），没有再对 355 款做全量判定。
+
+---
+
+## 15 第五轮：`ps_quiz` / `ps_word` 抽样闸门 → quiz 全量（2026-11-08 15:2x）
+
+> **未编译**。基线 **`200359 / 0` ✅**
+> `git diff --stat`：`tools/gen_tags.py 41 +` ｜ `GameRegistry.ets 36 +++---`（= 18 行 × +1/-1）｜ `GameTags.ets` 无变化
+
+### 15.1 先做「省钱的抽样闸门」（Lead 提的办法）
+
+从两类里**系统抽样各 8 款**（按 id 排序、等距取，不是挑顺眼的），逐款读**源码开头的规则**判：
+
+| 类 | 抽样 | 判错 | 错误率 | 闸门 |
+|---|---|---|---|---|
+| `ps_quiz`（68） | 代数天平 / 二进制码 / 字母算术 / 分数披萨 / 数字路径 / 模钟 / 素数猎手 / 数字金字塔 | 二进制码（拨开关）、数字路径（走格拼算式）、素数猎手（阵里点素数）、数字金字塔（填格） | **4/8 = 50%** | **>25% ⇒ 全量** |
+| `ps_word`（57） | 词缀工厂 / 上下文线索 / 词根异类 / 字母频率 / 音标猜词 / 不发音字母 / 词语类比 / 猜词大师 | 只有 `字母频率`（数一个字母出现几次 = 计数扫视，不是拼词） | **1/8 = 12.5%** | **<25% ⇒ 不全量** ✅ |
+
+> 抽样判据：`ps_word` = 拼词 / 填字 / 猜词（词形词义语音）；`ps_quiz` = 读题 → 判/算 → 选答案。
+
+### 15.2 `ps_quiz` 全量 68 款的结论
+
+**18 款不是「答题」，是在操作棋盘**（26.5%），已按 PIN 挪走：
+
+| 目标类 | 款 | 依据（源码） |
+|---|---|---|
+| `ps_push`(4) | 天平称重 / 二进制天平 / 数字换位 / 解缠 | 摆砝码、点两数字块交换、拖节点解交叉 |
+| `ps_fill`(4) | 数字金字塔 / 幻方 / 分数披萨 / 数字文氏图 | 填满金字塔、托盘选数填格、点亮披萨片、拖数归位 |
+| `ps_maze`(2) | 数字路径 / 模路径 | 4×4 点相邻格拼算式、5×5 按模数走格 |
+| `ps_match`(5) | 二项式配对 / 矩阵配对 / 分数配对 / 数字拆分 / 凑十 | 左右配对、翻牌成对、点两块消掉 |
+| `ps_search`(2) | 找因数 / 素数猎手 | 12 格点出全部因数、5×5 阵里点掉素数 |
+| `ps_attention`(1) | 干扰矩阵 | 4×4 符号阵限时数个数（扫视+抑制干扰） |
+
+**保留在 `ps_quiz` 的 50 款** 都是「读题 → 算/判 → 选答案」，例如：代数天平、解不等式、进制转换、矩阵秩、向量点积、心算算盘、万年历、罗马数字、百分比、估算、数列、文氏图判断题…
+
+### 15.3 ⚠️ 判据边界：还有 9 款「数字构造/猜解」留着没动（等你定）
+
+| 款 | 现在的做法 | 为什么留 | 想挪的话去哪 |
+|---|---|---|---|
+| `24 点` / `倒计时数学` / `算术链` | 点数字+运算符**构造算式** | 交互是构造，但**纯算数**，挪走没有更贴的类 | 无（建议留） |
+| `字母算术` / `勾股数` / `质因数树` / `二进制码` | 填字母、构造三元组、拆树、拨开关 | 同上 | 无（建议留） |
+| `珠玑妙算` / `猜数字` | 猜 + 反馈推理 | 不是选择题，但也没别的类好用 | `ps_other` |
+
+⇒ 若 code-hunter 认为这 9 款也该走，`ps_quiz` 会降到 ~41；**我判断它们留在 quiz 更合理**（核心都是数字推理，只是交互是构造不是选择）。
+
+### 15.4 🔴 本轮抓到一个工具 bug：PIN 表**重复 key 静默覆盖**
+
+`binary_scale_balance` 在 PIN 表里出现了两次（第四轮的新条目 vs 第一轮的旧条目），
+**Python 字典字面量里重复 key 后者覆盖前者** ⇒ 我新加的 `ps_push` 被旧的 `ps_quiz` 盖掉，
+现象是 `apply_tags` 只改了 **17/18 行**。
+
+**修法 + 防呆**：
+1. 删掉旧条目
+2. 新增 `_check_pin_dups()`，在 `main()` 开头查重（正则扫本文件的 `    'id': 'ps_xxx',` 行），**重复就直接 `SystemExit`**
+   ⇒ 以后这类“改了没生效”会当场报错，而不是靠数 17 vs 18 才发现
+
+> 这条也算给「PIN 表会越来越长」买的保险：现在已经 **68 条**。
+
+### 15.5 新分布（第五轮后，355 款每款恰好 1 个 `ps_*`）
+
+```
+word 57 ｜ quiz 50 ｜ memory 47 ｜ fill 42 ｜ attention 27 ｜ spatial 26 ｜ maze 22
+push 19 ｜ reaction 16 ｜ match 12 ｜ search 12 ｜ board 8 ｜ run 7 ｜ other 4 ｜ card 3 ｜ merge 3
+```
+变化：`quiz 68→50`、`match 7→12`、`push 15→19`、`fill 38→42`、`maze 20→22`、`search 10→12`、`attention 26→27`；其余不变。
+
+### 15.6 准确率
+
+- 本轮抽样：**quiz 50% 错 / word 12.5% 错**
+- 修完 18 处后：`ps_quiz` 剩 50 款里**我已逐款读过规则**，其中 9 款属“构造/猜解”边界（见 §15.3），严格判据下最多再错 9 款 ⇒ **quiz 准确率 ≥82%（41/50）**
+- `ps_word` **没做全量**（抽样 12.5% <25%），按判据不需要
+- ⚠️ 全局准确率仍未实测 —— 要 code-hunter 复核
+
+---
+
+## 16 第六轮：`ps_fill` / `ps_match` 抽样闸门（2026-11-08 15:5x）
+
+> **未编译**。基线 **`200359 / 0` ✅**
+> `git diff --stat`：`tools/gen_tags.py 10 ++-` ｜ `GameRegistry.ets 6 +++---`（= 3 行 × +1/-1）｜ `GameTags.ets` 无变化
+
+### 16.1 抽样（系统抽样，按 id 等距）
+
+| 类 | 抽样 | 判错 | 错误率 | 闸门 |
+|---|---|---|---|---|
+| `ps_fill` 42 | akari / crown / futoshiki / kakurasu_sums / lighthouses / nonogram / skyscrapers / sum_pyramid（**8/8 都是格点谜题**） | **0** | **0%** | <25% ⇒ **不全量** ✅ |
+| `ps_match` 12 | bejeweled / binomial_match / bubble_shooter / chain_reaction / color_flood / color_match / mahjong_solitaire / match3 | **2**（chain_reaction、color_flood） | **25%** | 恰好压线 ⇒ **我又把 12 款全读了**，2/12 = **16.7%** ⇒ 不全量 |
+
+> `ps_match` 只有 12 款 —— 抽 8 已经是 67%，索性补读剩下 4 款（`fraction_match` / `matrix_multiplier_match` / `number_bonds_all` / `target_10`，全对）。
+
+### 16.2 额外补查 4 个「按名字就可疑」的 fill 成员
+
+抽样没抽到它们，但按名字就该起疑（抽样闸门是“下限”，不是“只许看 8 个”）：
+
+| 款 | 源码 | 判定 |
+|---|---|---|
+| `einstein_riddle` | 「点格子循环切宠物（🐱🐟🐦，不能重复），三项都填对即通关」 | ✅ **确实是填格** |
+| `lights_out` | 「点一格翻转自己+四邻，全盘熄灭即通关」 | ✅ 点格调状态，算 fill |
+| `minesweeper` | 「点格翻开 + 插旗，9×9 十颗雷」 | ⚠️ 边缘（翻格推理）—— 但全库没有更贴的类，**保留** |
+| **`pattern_sequence_draw`** 画规律 | 「3×3 格子按 1~9 编号，从 1 出发每次前进 k 格，按序点亮整幅图案」 | ❌ **不是填格** ⇒ 应挪 `ps_search`（**与「舒尔特方格」同源：按序点目标**） |
+
+### 16.3 三条修正（全部按源码判）
+
+| 款 | 旧 | 新 | 依据 |
+|---|---|---|---|
+| `pattern_sequence_draw` 画规律 | fill | **`ps_search`** | 3×3 按序点亮走图案，与舒尔特方格同源 |
+| `chain_reaction` 连锁反应 | match | **`ps_other`** | 点格累积到爆炸、四邻 +1 连锁 ⇒ **连锁解谜**，不是配对消除 |
+| `color_flood` 色彩洪水 | match | **`ps_other`** | Flood-It：把左上连通块**染色吞并** ⇒ 染扩策略，不是配对消除 |
+
+### 16.4 🔴 **我自己加的查重 guard 有漏洞**（第二次撞到同类问题）
+
+上一轮我加了 `_check_pin_dups()`，这一轮又撞到**同一个坑**：`pattern_sequence_draw` 在 PIN 表里出现两次
+（我新加的 `ps_search` 被第一轮的旧 `ps_fill` 覆盖），现象还是“改了没生效”（`apply_tags` 只改 2 行而不是 3 行）。
+
+**为什么 guard 没报警**：我的正则 `^    'id': 'ps_xxx',$` 要求**行尾正好是逗号**，
+而我新加的条目**带行尾注释**（`  # 3×3 按序点亮…`）⇒ 那一条根本没被统计进去，重复自然检测不到。
+
+**修法**：正则放开成
+```
+^ +'([a-z0-9_]+)': 'ps_[a-z]+' *,? *(?:#.*)?$
+```
+**并做了注入测试**：往文件里塞 `'einstein_riddle': 'ps_search',  # 带注释的重复` ⇒ 能正确报出重复 key ✅
+
+> 教训与判据 1818 一致：**防呆本身也会漏，必须拿“已知会错的输入”验证它真的会拦**（我上一轮只验证了“没重复时不报错”，没验证“有重复时会报错”）。
+
+### 16.5 新分布（第六轮后，355 款每款恰好 1 个 `ps_*`）
+
+```
+word 57 ｜ quiz 50 ｜ memory 47 ｜ fill 41 ｜ attention 27 ｜ spatial 26 ｜ maze 22
+push 19 ｜ reaction 16 ｜ search 13 ｜ match 10 ｜ board 8 ｜ run 7 ｜ other 6 ｜ card 3 ｜ merge 3
+```
+变化：`fill 42→41`、`search 12→13`、`match 12→10`、`other 4→6`。
+
+### 16.6 准确率
+
+| 类 | 抽样错误率 | 处理 | 处理后估计 |
+|---|---|---|---|
+| `ps_fill` 41 | 0/8（另查 4 可疑 → +1） | 修 1 处 | **≈97.5%（40/41）** —— 只余 `minesweeper` 一个边缘 |
+| `ps_match` 10 | 2/8 → 全读 2/12 | 修 2 处 | **≈100%**（10/10 逐款读过源码） |
+
+⚠️ 仍是**我的判断**，不是 code-hunter 的复核结论。
+
+---
+
+## 17 第七轮：`ps_quiz`(50) 拆成 4 类（2026-11-08 16:2x）
+
+> **未编译**。基线 **`200359 / 0` ✅**
+> `git diff --stat`：`gen_tags.py 78 +-` ｜ `GameRegistry.ets 100 +++---`（50 行 × +1/-1）｜ `GameTags.ets 7 +-`
+
+### 17.1 为什么拆
+
+code-hunter 实测：「像 24 点」推出**找角度**、「像 字母算术」推出**解不等式** —— **7 款里 6 款推出同一批**。
+根因：**50 款全在 `ps_quiz` 拿 +40**，之后只能靠「操作方式 +10」和「共享 tag ≤16」区分，
+而 quiz 类**全是 tap、tag 也高度重叠** ⇒ **最高档 7 款必然同分，退回 id 字典序**。
+
+`ps_quiz` 是**全库第二大玩法类（14%）**，它推不出来等于这一类对 similar 完全失效。
+
+### 17.2 拆法（判据：玩家在做什么）
+
+| 类 | 判据 | 款数 |
+|---|---|---|
+| `ps_calc` 构造算式 | **拼出/指派**一个表达式或赋值使条件成立 | **8** |
+| `ps_eval` 求值计算 | 算出**一个数值**（数/进制/向量/星期/角度…）再选 | **32** |
+| `ps_judge` 判断对错 | 只需**比较/判定**（对错、大小、等价、在哪个区域） | **8** |
+| `ps_deduce` 推理解谜 | **假设 + 反馈**逐步逼近 | **2** |
+
+### 17.3 ⚠️ 与 code-hunter 初版（9/29/10/2）差 **7 款** —— 全部按源码改
+
+我这轮**逐个读了 16 款源码**（另加上几轮读过的，覆盖远超 Lead 要求的 12 款）：
+
+| 款 | code-hunter | 我 | 源码依据 |
+|---|---|---|---|
+| `number_bonds` 数字键 | calc | **eval** | 「目标数拆成两部分，一部分已给出，**四选一**补上另一部分」⇒ 选择题，不是构造 |
+| `target_number` 目标数字 | calc | **judge** | 「从 4 个式子里**选出**结果正好等于目标的那个」⇒ 判断哪个式子对 |
+| `algebraic_balance` 代数天平 | judge | **eval** | 「从 4 个候选值里**点出 x**」⇒ 求解 x 的数值 |
+| `algebraic_inequality_solver` 解不等式 | judge | **eval** | 「求一元一次不等式的**解集**，从 4 个解集里点出正确的一个」⇒ 求解 |
+| `inequality_dash` 不等式冲刺 | judge | **eval** | 「把 ax+c ⋚ k **解成 x 的范围**」⇒ 求解 |
+| `angle_finder` 找角度 | judge | **eval** | 「多边形内角和减已知角，**求最后一个角的度数**」⇒ 求值 |
+| `symbol_logic` 符号逻辑 | judge | **eval** | 「由两条线索**推出第一个符号是几**」⇒ 解出数值 |
+
+反向补进 judge 的：`divisibility_dash`（点「能整除/不能整除」）、`fraction_matcher`（四选一挑**等值**分数）。
+
+> **判据边界说明**：`eval` = 输出是一个算出来的**值**；`judge` = 输出是**关系/真假**。
+> 这条边界是我定的，若你认为“解不等式”该算 judge，改 4 行 PIN 即可。
+
+### 17.4 「像 24 点」的效果（Lead 点名要看的）
+
+| | top-1 | top-2 | top-3 |
+|---|---|---|---|
+| 拆之前 | 找角度(quiz) | 面积周长(quiz) | 矩阵秩进阶(quiz) | ← **全是“求值/判断”，不是构造 |
+| **拆之后** | **算术链**(calc,62) | **二进制码**(calc,62) | **字母算术**(calc,62) | ✅ 真正的“构造”同类 |
+
+其余抽查：
+- 「像 珠玑妙算」→ **猜数字**（deduce）✅
+- 「像 面积周长」→ 分数匹配 / 几何直觉 / 不等式天平（judge）✅
+- 「像 字母算术 / 勾股数」→ 算术链 / 二进制码 / 倒计时数学（calc）✅
+
+⚠️ **仍弱的一档**：`ps_eval` 32 款里「像 通分」推出的还是「代数天平 / 解不等式 / 找角度」—— 因为 eval 内部 32 款同样 tag 高度重叠、同分退 id。
+这是**下一层的粒度问题**（eval 还能再拆“算术/进制/矩阵向量/日期”），但**32 款已经比 50 款好**，且 code-hunter 没提，先不动。
+
+### 17.5 顺带：查重 guard **又救了一次**
+
+插入 18 条 calc/judge/deduce PIN 时，`_check_pin_dups()` **当场报错**：
+```
+❌ PLAY_STYLE_PIN 有重复 key：area_perimeter_match, game24, geometric_vision,
+   logical_syllogisms, mastermind
+```
+这 5 款在第一/五轮已有指向 `ps_quiz` 的旧条目 ⇒ 已全部删除（`ps_quiz` 这个 tag 本身也已删掉）。
+**上一轮“拿已知会错的输入验一遍”的修法，这轮直接兑现了价值。**
+
+### 17.6 `HIDDEN_TAGS` 重算（按「<10 且非兜底/非高辨识度」）
+
+```python
+HIDDEN_TAGS = {'ps_merge', 'ps_run', 'ps_card', 'ps_calc', 'ps_judge', 'ps_deduce'}
+# merge 3 / run 7 / card 3 / calc 8 / judge 8 / deduce 2
+# ps_match 回到 10 ⇒ 不再隐藏；ps_eval 32 可见
+```
+筛选面板「玩法」组：**19 个 tag，可见 13 个**。
+
+### 17.7 新分布（355，每款恰好 1 个 `ps_*`，`ps_quiz` 已归零）
+
+```
+word 57 ｜ memory 47 ｜ fill 41 ｜ eval 32 ｜ attention 27 ｜ spatial 26 ｜ maze 22
+push 19 ｜ reaction 16 ｜ search 13 ｜ match 10 ｜ board 8 ｜ calc 8 ｜ judge 8 ｜ run 7 ｜ other 6 ｜ card 3 ｜ merge 3 ｜ deduce 2
+```
+
+---
+
+## 18 `ps_spatial` 的定义与边界（2026-11-08 16:5x · 补口径，避免分歧）
+
+> 起因：verifier-eng2 独立复核时对 `graph_coordinate_plot` 有疑虑（判 spatial 可接受，也可能被算成 fill）。
+> 这里把「`ps_spatial` 到底是什么」钉死，以后再有边界款按这段判。
+
+### 18.1 定义
+
+> **`ps_spatial` = 玩家要在一个「空间表征」上做判断或操作** ——
+> **旋转 / 折叠 / 镜像 / 投影 / 视角切换 / 方位与位置 / 图形与轮廓 / 坐标定位**。
+
+三个子族（本类 25 款的实际构成）：
+1. **变换类**：旋转、镜像、折叠、展开图（`mental_rotation` `mirror_image` `paper_folding` `cube_net_fold` `complex_folding_nets`）
+2. **投影/视角类**：正交投影、视角切换、观点采择、影子（`silhouette_match_ortho` `perspective_shift_view` `perspective_taking` `shadow_pivot`）
+3. **定位/轮廓类**：坐标、方位、轮廓、齿轮传动方向（`graph_coordinate_plot` `silhouette_match` `gear_train_direction` `symmetry` `topology`）
+
+### 18.2 边界判据（三条，按顺序问）
+
+| 问 | 是 → | 不是 → |
+|---|---|---|
+| ① 玩家是否需要**在脑内做变换/投影**（转、折、翻、换视角）？ | `ps_spatial` | 继续问 |
+| ② 玩家是否要**在空间上定位**（坐标、方位、轮廓比对）？ | `ps_spatial` | 继续问 |
+| ③ 是否要满足**全局约束**（行列/宫/区域不重复、和相等、连通）？ | `ps_fill` | 按数值/判断/配对等其它类判 |
+
+### 18.3 三个典型边界款
+
+| 款 | 归属 | 理由 |
+|---|---|---|
+| **`graph_coordinate_plot`**（坐标绘图：5×5 画布按坐标顺序点格子围出菱形） | **`ps_spatial`** | 玩家在做**坐标定位**（“(3,2) 是哪一格”），**没有任何全局约束**（不要求行列不重复、不要求和相等）⇒ 走判据 ②，不是 fill。若按「点格子 = 填格」判成 fill，会和数独/数织混在一起，那正是**类的语义被拉平** |
+| `slide_puzzle`（数字华容道） | **`ps_spatial`**（暂定） | 滑动重排，无全局约束、但**空格与位置关系**是核心 ⇒ 走判据 ②。**注**：它也可能是 `ps_push`（挪块）—— 这条标为“暂定”，若 verifier 后续判 push 我改一行 PIN |
+| `temporal_order`（时间顺序：把 4 件事按发生先后点出来） | **`ps_other`** | **时序排序**，没有旋转/折纸/视角 ⇒ 三条判据全不中。无更贴的类（将来细分可加 `ps_sequence`）|
+
+### 18.4 顺带记一条**抽样口径**（verifier-eng2 的免责，很硬）
+
+> **8 款样本只够做「要不要全量」的闸门，不是「准确率 0%」的断言。**
+> 0/8 的真错误率的 95% 置信上限约 **32%** —— 所以「抽 8 错 0」只能说“没到全量的线”，**不能说这个类是准的**。
+
+这条和我 §7.2 的「某类抽样错误率 >25% 必须全量」是**同一套逻辑的两侧**：
+- 抽到错 → 触发全量（下界）
+- 抽不到错 → 只能说明“没证据说它坏”，不能说明“它是好的”（上界）
+
+⇒ 以后写「准确率」必须写清是**实测**还是**抽样外推**，并且抽样外推要带置信上限。
+
+### 18.5 本轮改动
+
+| 款 | 旧 | 新 | 依据 |
+|---|---|---|---|
+| `temporal_order` 时间顺序 | `ps_spatial` | **`ps_other`** | 「按发生先后依次点出来」= 时序排序，无旋转/折纸/视角 |
+
+`git diff --stat`：`tools/gen_tags.py +5` ｜ `GameRegistry.ets 2 +++---`（1 行 × +1/-1）
+新分布：`spatial 26→25`、`other 6→7`；其余不变。
+

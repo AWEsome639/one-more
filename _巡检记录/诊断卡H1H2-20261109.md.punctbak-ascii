@@ -1,0 +1,68 @@
+# 诊断卡不更新：H1 / H2 / H3 定案 —— 2026-11-09 02:0x
+
+> 执行：**perf-hunter** ｜ 设备 `127.0.0.1:5557` ｜包 `updateTime=1794160963276` = **02:02:43** ✅
+> 判据 1814 已执行（中文 / 游戏页 / 8 张卡）｜**本轮 .ets 改动 0 行**（只跑验收）
+
+---
+
+## 0. 定案
+
+| 假设 | 结论 | 证据 |
+|---|---|---|
+| **H3**：`refreshDiag()` 压根没被调用 | **❌ 排除** | 进设置页（`aboutToAppear`）就打出 `diag: refresh reason=init-false initMs=1031 …` |
+| **H2**：`stat.initMs` 没写进去（数据侧） | **❌ 排除**（且这一轮根本无法用它判别，见 §2） | `refreshDiag()` 打的正是 `stat` 里的值；而 `LocalLLM.init()` 的 hilog 与 `refreshDiag` 的 `initMs` 一致 |
+| **H1**：`refreshDiag()` 执行了、`@State` 也赋了，**但卡片没重建**（渲染侧） | **✅ 确认** | 点击后 **+0.24s / +0.37s / +0.51s 三张截图，卡片区域像素差 = 0**（0 个像素变化） |
+
+## 1. hilog 原文
+```
+# 进设置页（aboutToAppear → refreshDiag）
+02:05:24.294 ... A00001/com.andrewoscar.onemore/diag: refresh reason=init-false initMs=1031 calls=0 ready=false
+
+# 点卡片（retryDiag：retry() → refreshDiag() → init() → 再 refreshDiag()）
+02:05:48.796 ... diag: refresh reason=idle       initMs=1031 calls=0 ready=false   ← ★ reason 变成 idle 了（不同值！）
+02:05:49.828 ... diag: refresh reason=init-false initMs=1031 calls=0 ready=false
+```
+
+**关键**：第二行证明 **`@State` 的赋值确实发生了，而且 `reason` 从 `init-false` 变成了 `idle`（不同值）**。
+按常理组件必须重建一次、卡面至少显示 1 秒 `idle` —— **实测没有**（见 §3 的像素证据）。
+
+## 2. 为什么这一轮「数字对比」不能用了（数值巧合）
+- 第一次问（X）：`init=false 耗时 1032ms`
+- 65s 后第二次问（Y）：`init=false 耗时 1031ms`
+- 点击卡片触发的那次 init：`initMs=1031`（`diag` 行里的值）
+
+⇒ **三次 init 的耗时几乎相同（1031~1032ms）**，所以「数字没变」**既可能是没渲染、也可能是值本来就一样** —— 这条证据链不成立。
+⇒ 所以我改用**像素差分**：`snapshot_display` 连拍三张，裁同一卡片区域，与点击前比 —— **0 差异**。
+
+## 3. 像素差分证据（决定性）
+```
+卡片 bounds: (0,1084) - (2560,1336)
+d_after0.png (+0.24s): 有差异=False 差异像素=0
+d_after1.png (+0.37s): 有差异=False 差异像素=0
+d_after2.png (+0.51s): 有差异=False 差异像素=0
+```
+点击后 0.5 秒内（`idle` 窗口约 1.03 秒）**卡片一个像素都没变** ⇒ **组件完全没重绘**。
+
+## 4. 根因（最可能）+ 为什么这次不能再信「同值去重」
+- 本文件的注释里**自己就写着**（`:22` / `:89` / `:606`）：
+  > **「`@Builder` 的参数会被 ArkUI 记忆化 ⇒ 只传字面量 (zh, en)，在 Builder 内部算」**
+- `aiDiagCard()` 正是这种形态：**`diagReasonV` / `diagInitV` … 只在 `@Builder` 内部被读取，父 `build()` 不直接依赖它们**。
+- ⇒ 当这些 `@State` 变化时，**父组件的"依赖集"里没有它们**，ArkUI 判定无变化 ⇒ **整个 `@Builder` 子树不重建**。
+- 这与「同值去重」是两回事：这次 `reason` **确实变了**（`init-false`→`idle`），照样没重建。
+
+## 5. 修法（**未实施**，三条按代价排）
+
+| 方案 | 做法 | 评估 |
+|---|---|---|
+| **A 版本号（推荐，改动最小）** | 加 `@State diagRev: number = 0`；`refreshDiag()` 末尾 `this.diagRev += 1`；卡片挂一个**可见依赖**：`.id('diag-' + this.diagRev)`（或把 `diagRev` 拼进 `.accessibilityText`） | 1~3 行；`diagRev` 每次必变 ⇒ 父 build 依赖它 ⇒ 子树必重建。**风险最低** |
+| B 传参进 builder | `this.aiDiagCard(this.diagReasonV, …)` | ❌ **本文件注释已证明"参数记忆化"会挡重建**，走这条反而更糟 |
+| C 上 AppStorage | 把 `LocalLLM.stat` 写成 `AppStorage` 键，卡片 `@StorageProp` 读 | 最干净（真观察源），但要动 `LocalLLM` 的写入点（4 处）+ 卡片读法，**今晚不做** |
+
+## 6. 判据（本轮产出）
+> **「`@Builder` 内部读 `@State`」的卡片/面板不会可靠重建** —— 尤其诊断、统计这类"数值频繁变但结构不变"的 UI。
+> **要么用版本号强制（`.id` 或可见属性参与），要么把数据源放进 `AppStorage` 做真观察。**
+> 另外：**别用"数字没变"当证据** —— 本轮的 init 耗时三次几乎相同（1031~1032ms），
+> 只有**像素差分**（0 变化）才能证明"没渲染"。
+
+## 7. 设备已复位
+首页（聊天面板关）｜简体中文｜8 张卡 ｜主题色靛蓝（本轮未动）

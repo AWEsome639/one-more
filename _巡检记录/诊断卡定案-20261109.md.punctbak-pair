@@ -1,0 +1,104 @@
+# 诊断卡不更新 · 定案（2026-11-09 02:3x）
+
+> 执行：**perf-hunter** ｜ 设备 `127.0.0.1:5557` ｜包 `updateTime=1794162615655` = **02:30:15** ✅
+> 判据 1814 已执行（中文 / 游戏页 / 8 卡）｜判据 1812（像素差分）｜判据 1813b（页面重建对照）
+
+---
+
+## 0. 定案结论
+
+**判读表的第 3 行：`rev` 变大了，但 section 标题没变 ⇒ 组件根本没重建 ⇒ 「事件 → 重建调度」断了。**
+
+| 观察 | 实测 |
+|---|---|
+| 点击后 `rev=` 日志有没有打 | **打了：`02:31:14.057 … diag: rev=2`** |
+| `rev` 有没有变大 | **变大了：进入设置页时标题是 `AI 诊断 1`；点击后日志 `rev=2`** |
+| section 标题有没有跟着变 | **没有：点击后 dump 仍是 `AI 诊断 1`；标题区域**像素差 = 0** |
+| 卡面有没有变 | **没有**：点击前后都是 `模型状态 idle / 初始化 —` |
+
+**⇒ 不是 `@Builder` 记忆化（步骤 1 早已证明页面重建时卡面会更新 `1034`），
+而是 `@State` 变化**没有调度这个组件重建**。**
+
+## 1. 关键原始数据
+
+```
+# 进设置页后（aboutToAppear → refreshDiag）：标题 `AI 诊断 1`，卡面 `idle / —`
+# 点击卡片（先 hilog -r）：
+02:31:14.057 … diag: refresh reason=idle initMs=0 calls=0 ready=false
+02:31:14.057 … diag: rev=2                       ← ★ rev 从 1 涨到 2
+# +0.44s 截图；标题区域像素差 = 0；+1.9s dump：标题仍 `AI 诊断 1`
+```
+（另：卡面 `初始化 —` 是因为冷启后**还没问过任何一句**，`stat.initMs=0` —— 与本问题无关。）
+
+## 2. 三层结论（今晚的完整证据链）
+
+| 层 | 结论 | 证据 |
+|---|---|---|
+| 数据层 | **正常** | `diag: refresh … initMs=1022`（值确实变了）、`rev=2`（版本号确实变了） |
+| 组件重建层 | **断的** | 标题 `AI 诊断 1` → 点击后仍是 `1`；标题区域**像素差 0** |
+| `@Builder` 层 | **正常** | 页面重建（退出再进）时卡面能显示新值 `1034` |
+
+⇒ 问题被夹在「**`@State` 赋值 → 组件重建调度**」这一层。
+
+## 3. 终解（**明天做，今晚只定案**）
+
+**把 `LocalLLM.stat` 五个字段写进 `AppStorage`，卡片用 `@StorageProp` 读** —— 真观察源，不依赖手动重建调度。
+
+```ts
+// LocalLLM.init()/chat() 的写入点（4 处）里同步：
+AppStorage.setOrCreate('llmReason', LocalLLM.stat.reason);
+AppStorage.setOrCreate('llmInitMs', LocalLLM.stat.initMs);
+// … calls / ready / firstTokenMs
+
+// SettingsTab：
+@StorageProp('llmReason') llmReasonV: string = 'idle';
+@StorageProp('llmInitMs') llmInitMsV: number = 0;
+// 卡片直接用这些，不再依赖 refreshDiag() 手动抄
+```
+⚠️ 注意：`@StorageProp` 变化**会**触发重建（这是框架保证的），
+但**前提是它被读在 `build()` 或参与渲染的属性里** ⇒ 终解实施后仍需用**同一套像素差分**验一次。
+
+## 4. 今晚最后做的清理（已做）
+- `section` 标题改回 `'AI 诊断'` ✅
+- 那行 `hilog … rev=` **已删除**，原位置留三条注释：「`rev` 1→2 但标题仍是 1、像素差 0 ⇒ 组件没重建 ⇒ 不是 @Builder 问题」
+- **临时诊断的净改动：`SettingsTab.ets` −2 行**（相对上一版包）
+
+## 5. 判据沉淀（已写进交接文档）
+- **1811**：`@Builder` 内部读 `@State` 的卡片/面板不会可靠重建（**本轮进一步修正：真正的原因是"事件→重建调度"，不是 builder 记忆化**）
+- **1812**：别用「数字没变」当证据，用**像素差分**
+- **1813b**：「页面重建能更新」≠「点击能更新」——先用页面级重建对照分层
+
+## 6. 设备
+首页（聊天面板关）｜简体中文｜8 张卡｜主题色靛蓝
+
+---
+
+## 7. AppStorage 终解已落地（2026-11-09 02:5x，**未编译**）
+
+### 7.1 改了什么
+| 文件 | 改动 |
+|---|---|
+| `core/LocalLLM.ets` | **+21**：新增 `private static sync()` 把 `stat` 的 5 个字段写进 `AppStorage`（`llmReason/llmInitMs/llmFirstMs/llmCalls/llmReady`）；**6 处调用**：`fail()` / `init()` 成功 / `chat()` 的 `finish()` / `retry()` / `reset()`（共 5 个写入点 + 一个统一收尾） |
+| `components/SettingsTab.ets` | **−42 净**：5 个 `@State` → **`@StorageProp('llm…')`**（名字不变，`aiDiagCard`/`diagA11yText` 全不用改）；**删掉 `refreshDiag()` 整个方法**（含 `diag` 日志）；`aboutToAppear` 不再抄快照；`retryDiag()` 只剩「`retry()` + 主动 `init()`」；**版本号 `diagRev` 全撤**（`.id()`/传参/注释一并清） |
+
+### 7.2 现在的链路（为什么这次应该能自愈）
+```
+LocalLLM.init() 失败 → fail(reason) → stat 更新 → sync() → AppStorage.setOrCreate('llmReason', …)
+                                                        ↓（框架保证通知）
+SettingsTab 的 @StorageProp('llmReason') 变化 → 组件重建 → 卡面更新
+```
+**不再依赖**「点击 → 手动 `@State` 赋值 → 期望重建」这条今晚被证明断掉的路。
+
+### 7.3 ⚠️ 过程中的一次事故（记录在案，已修复）
+第一次改的时候我用**跨行正则**删 `refreshDiag()`，结果把 **`retryDiag()` / `diagRow()` 等一大段（约 630 行）**一起吃掉
+（文件仍能配平，但会编译失败）。
+- **发现方式**：`@Builder` 声明数 31 → 24、`comm` 比对 builder 名单发现 `diagRow` 丢失
+- **恢复方式**：`git checkout -- SettingsTab.ets` 回到 HEAD，再**全部改用"精确整串替换"**重做（14 处）
+- **复核**：`@Builder` 声明数 **21 == 21**（与 HEAD 一致）、`diagRow`/`retryDiag` 定义都在、`refreshDiag` 残留 0、括号配平 0/0/0
+⇒ 教训：**批量删改 ArkTS 文件不要用跨行正则**，用“精确整串 + 结构计数校验”（这次就是靠结构计数抓回来的）。
+
+### 7.4 下一版包怎么验（3 步，全用像素差分）
+1. **进设置页**：卡面 `模型状态` 应为 `idle`（从未 init）或上次结果
+2. **点卡片**（先 `hilog -r`）：+0.2/0.4/0.6s 连拍，**裁卡片区域像素差分 > 0**（修前为 0）
+3. **点后 ~2s**：卡面 `初始化` 应等于 `diag`/`LocalLLM` 日志里本次 `initMs`；`reason` 回 `init-false`
+   —— 若 `@StorageProp` 生效，这三步应一次全过

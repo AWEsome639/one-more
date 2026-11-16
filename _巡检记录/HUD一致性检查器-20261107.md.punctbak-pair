@@ -1,0 +1,137 @@
+# HUD 标签一致性检查器 —— 2026-11-08
+
+> 执行：verifier-eng2 ｜ 写域：`tools/` + `工具/`（**没改任何 .ets**）
+> 产物：`tools/check_hud_consistency.py`（新）+ `工具/check_assertions.sh`（挂闸门）
+> 来历：上一轮「行盒错位」审计 —— 三块统计 HUD 是**逐文件复制粘贴**（295 份副本、无共享 `@Builder`），某一块标签 `maxLines(2)`、邻块 1 行或不写 ⇒ 长语言换行时那一块数值**低一整行（xxs 行盒 14vp）**。
+
+## 1. 判据（一条）
+
+**同一个 HUD 容器内，标签的 `maxLines` 必须一致（`minFontSize` 不一致也算）**。
+键 = `(maxLines, minFontSize)`。
+· `maxLines` 不同 ⇒ **真错位**（换行的那块数值低一整行）—— 102 处里 **100 处**是这类；
+· 只有 `minFontSize` 不同 ⇒ 行高一样、只是缩字号上限不同（**2 处**），按你的口径也报，但严重性低。
+
+「标签」的认定（照项目里 HUD 的固定写法）：
+1. `Text(…TG(…))` 且 `fontSize(FontSize.xxs)` 或 `(FontSize.xs)`；
+2. 且链里有 `fontColor(…inkFaint)`（淡色小字）；
+3. 且**紧邻的下一个兄弟是粗体数值**（链里有 `FontWeight.Bold`）。
+
+「提示语」= 同样是淡色小字，但**后面没有粗体数值**（如「选出对应的英文单词」「是奇数还是偶数？」）
+⇒ **允许 2 行**，白名单放行（只计数，不报错）。
+
+两种 HUD 形状都认：
+- 块状：`Row { Column{ 标签, 数值 } × N }` —— N≥2 个块，比较各块标签的键
+- 行内：`Row { 标签, 数值, 标签, 数值 … }` —— 直接比较同一 Row 的 Text 兄弟
+
+**为什么用「键」而不是「值」**：键 = `(maxLines, minFontSize)`；只要同一个容器里出现两种键就报 —— 这正好覆盖「1 行 vs 不限」和「2 行 vs 1 行」两类。
+
+## 2. 用法 / 输出 / 退出码
+
+```bash
+python3 tools/check_hud_consistency.py              # 全仓 games/ + components/
+python3 tools/check_hud_consistency.py --verbose    # 连"提示语放行"明细
+python3 tools/check_hud_consistency.py --paths /tmp/x/games   # 扫别的目录（自检用）
+python3 tools/check_hud_consistency.py --self-test  # 先验证尺子自己（3 段人造代码）
+```
+
+- 人读：逐条 `文件:行 <Row> 各块键=[…]` + 修法提示
+- **机读收尾行：`HUD不一致：N 处`**（`check_assertions.sh` 就抓这一行）
+- 退出码：**0 = 全一致 ｜ 1 = 有 N 处 ｜ 2 = 解析失败/自检失败**
+
+## 3. 自检结果（关键，先说结论）
+
+用 `git archive` 导两个快照对比（`e2d6e4ee` = 「24 款 HUD 统一」那笔提交）：
+
+| 快照 | 结果 |
+|---|---|
+| **修前**（`e2d6e4ee^`） | **HUD不一致：115 处** |
+| **修后**（HEAD） | **HUD不一致：102 处** |
+
+**逐款核对我上一轮修的 24 款**（修前 → 修后）：
+
+| 款 | 修前 | 修后 |
+|---|---|---|
+| GShellGame / GRuleSwitcher / GVektorVector / GSequenceSleuth / GReverseStroop / GRadicalRoots / GBubbleShooter / GMancala / GCategoryFluency / GGrammarSort / GPrimeGapHunt / GWordLadder / GWordMastermind | 各 **1** | 各 **0** ✅ |
+| 其余 11 款（GDigitSpanReverse 等） | 0 | 0 |
+| **合计** | **13** | **0** ✅ |
+
+⇒ **尺子对「我这轮修的」是准的：13 处全部归零**。
+⚠️ 但**没有做到你期望的「修后 0 处」**：因为除这 13 处外，仓库里**还有 102 处同类存量**——
+例如 `GActionSequenceRecall:274`（「关卡/长度」两块没写 maxLines，「得分」写了 `maxLines(1)`）、
+`GBejeweled:612`、`GChalkAndTalk:291`。
+
+**这些不是我修的 24 款里的，也不在我上一轮的扫描口径里**：
+上一轮我只搜 `inkFaint).maxLines(2)`（2 行 vs 1 行的分歧），
+而**「写了 1 行」vs「完全没写」**这一类没有搜 ⇒ 漏了 102 处。
+（`bdf550fb 🌍 91 处窄容器文本加 maxLines(2)` 那笔也给部分块加了 canon、部分没加，是存量的主要来源。）
+
+## 4. 挂进 `check_assertions.sh`
+
+照 `check_dup_symbol.py` / `check_focusable.py` 的写法：**纯闸门**（不动 `TOT`）、**rc=2 也算失败**、机读行抓 `HUD不一致：N 处`。
+
+唯一不同：**带基线**。
+```bash
+HUD_BASE=102        # 入库时存量 102 处（历史遗留，不是这条尺子抓出来的）
+HUD_NEW=$((HUD_N - HUD_BASE)); [ "${HUD_NEW}" -lt 0 ] && HUD_NEW=0
+FAIL=$((FAIL + HUD_NEW))
+printf "     %-42s %6s / %d\n" "check_hud_consistency.py（HUD 一致）" "${HUD_N:-?}/${HUD_BASE}" "${HUD_NEW}"
+```
+- 为什么不在第一天报 102 红：`check_assertions.sh` 的契约是「与基线一致（200359 / 0）」，直接 `FAIL += 102` 会把整条断言打成红墙，而**这 102 处是历史存量、不是回归**。
+- 基线做法的好处：**新的分歧当场变红**（这就是这道尺子的目的），存量数每次打印、可见、可分批还债 —— 与文件里 `BASE=200359` 的纪律一致（「基线变化必须能说清多了哪把尺子」）。
+- 想一次清完：跑 `python3 tools/check_hud_consistency.py` 拿全名单，按 7 款一批修（我上一轮那套补丁器可直接复用），清完把 `HUD_BASE` 改成 0 即可锁死。
+
+## 5. 验证（做了什么、没做什么）
+
+| 项 | 结果 |
+|---|---|
+| 自检 `--self-test`（3 段人造代码：坏的/好的/提示语） | ✅ 通过（坏的报 1、好的报 0、提示语白名单 1） |
+| 修前/修后对比（`git archive` 两个快照） | 115 → 102，我修的 24 款 13 → **0** |
+| `bash -n 工具/check_assertions.sh` | ✅ 语法通过 |
+| 闸门逻辑单独跑（N=102 / BASE=102） | 新增失败 **0**（绿），符合预期 |
+| 整条 `check_assertions.sh`（实测） | **rc=0** ｜ 合计 **200359 / 0**（TOT 未动，符合"纯闸门"要求）｜ 新闸门打印 `check_hud_consistency.py（HUD 一致）  102/102 / 0` |
+| 误报控制 | 提示语（淡色小字但后面没有粗体数值）**白名单放行**；`minFontSize` 差异**不计入失败**（不影响行高） |
+
+## 6. 边界
+
+- 只扫 `games/` + `components/`；`pages/` 没扫（GameHost 的 HUD 另算）。
+- 「标签」的认定是**结构式**的（淡色小字 + 紧邻粗体数值）—— 若某款 HUD 的数值不是粗体，它不会被判为标签（会漏，不会误报）。
+- 解析失败（括号不配平/读不到）⇒ **rc=2**，闸门按 1 处失败计，不会静默变绿。
+- 没改任何 .ets。
+
+---
+
+## 7. 存量清零（2026-11-08 凌晨 · 15 批）
+
+**结果：`HUD不一致：102 → 0`，闸门 `HUD_BASE` 已改成 0 锁死。**
+
+数字轨迹（每批跑一次 checker，逐批下降）：
+```
+102 → 95 → 89 → 82 → 76 → 69 → 62 → 55 → 50 → 45 → 40 → 33 → 26 → 19 → 13 → 9 → 1 → 0
+      批1  批2  批3  批4  批5  批6  批7  批8  批9 批10 批11 批12 批13 批14 批15 异形 手改
+```
+- **每批 7 款**（最后一批 4 款），脚本只做一件事：把该容器内所有标签统一成
+  `.maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)`（已是 canon 的跳过，避免无意义 diff）。
+- **异形结构 9 款手改**（`GChoiceReactionTime`/`GObjectDisplacement`/`GOddEvenFlash`/`GOperationSpan`/
+  `GPeripheralFocus`/`GProbeDigitSpan`/`GReadingSpan`/`GVennNumbers`/`GDoubleNBack`）：
+  它们的标签和数值**挤在同一行、用 `;` 分隔**，脚本按纪律跳过 ⇒ 用定点修复器把 canon 插在 `;` 前（13 处）；
+  最后 2 处是 `GDoubleNBack` 的「判断」和「N」两个标签（数值不是粗体、脚本门禁认不出）⇒ 手工补。
+
+### 每批做了 4 道闸
+1. **先印证据**（判据 1788：`sed -n` 眼看标签行，不靠正则盲推）
+2. 改完跑 `python3 tools/check_hud_consistency.py` —— **数字必须往下掉**
+3. **本批文件**逐行对：去掉 canon 后**逐字相同** ⇒ 纯属性改动，没动任何语句
+4. `Text(` 计数不变 + 括号配平（不通过就整文件放弃）；另加 **mtime 闸**（读后写前 mtime 变了 ⇒ 不写，防队友并发丢更新）
+
+### 收尾状态
+| 项 | 结果 |
+|---|---|
+| `python3 tools/check_hud_consistency.py` | **HUD不一致：0 处** ✅ |
+| `工具/check_assertions.sh` 里我的闸门 | `check_hud_consistency.py（HUD 一致）  0/0 / 0` ✅ |
+| `HUD_BASE` | **0**（已锁死） |
+| 355 个游戏文件括号配平（仓库 `strip_comments` 复核） | 全部 ✅ |
+
+### 两个「不是我的」异常（已核实，别误记成我的锅）
+1. 断言套件 `合计 200359 / 1` 的 **那 1 处来自队友新加的 `tools/check_reset_leak.py`**（未跟踪文件，00:57 创建），
+   报的是 `GSlide15.ets [bestMoves] 复位遗漏`，与 HUD/maxLines 无关。
+2. `GComplexFoldingNets.ets` 用「只去 `//` 注释」的粗检查会**误报括号不配平**；换仓库自带的
+   `ets_parse.strip_comments` 复核 = **配平 ✅**，且该文件不在我的改动里。

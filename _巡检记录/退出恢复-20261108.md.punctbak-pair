@@ -1,0 +1,102 @@
+# 退出恢复（最小版）：上次玩到哪（2026-11-08）
+
+> 范围：只记「**上次玩到第几关 / 什么难度**」，**不序列化棋局**。
+> 写域：`core/ProgressStore.ets` + `games/`。**未编译**，逻辑已用 Node 跑真实代码验证。
+
+## 结论
+
+| 项 | 结果 |
+|---|---|
+| ProgressStore 新接口 | 3 方法 + 1 接口 + 1 存储键，**21 项单测过**（含坏 JSON / 负数 / 落盘失败） |
+| 接入游戏 | **10 款**（全库「真有 level/stage 概念」的款，见 §2 说明） |
+| 往返正确性 | **61 个关卡用例全过**（10 款 × 各自全部关卡，含“第 1 关无需恢复”与“通关后清零”） |
+| 「再来一局」语义 | **未破坏** —— 恢复闸门保证「每进程每款只恢复一次」，见 §3 |
+
+---
+
+## 1. ProgressStore 接口（`core/ProgressStore.ets`，+94 行）
+
+```ts
+export interface LastWhere { level: number; diff: string; at: number; }
+
+export class Keys {
+  static readonly lastWhere: string = 'lastWhere';    // JSON: gameId → LastWhere
+}
+
+export class ProgressStore {
+  /** 无记录 / 坏 JSON / 负数 level ⇒ undefined（调用方当"从第 1 关开始"） */
+  static lastWhere(gameId: string): LastWhere | undefined
+  /** 便捷：无记录 = 0 */
+  static lastLevel(gameId: string): number
+  /** level <= 0 ⇒ **清除记录**（通关后调它，下次从头） */
+  static saveLastWhere(gameId: string, level: number, diff: string): void
+  /** ★ 恢复闸门：本进程该游戏还没恢复过 ⇒ true（且登记） */
+  static shouldRestoreNow(gameId: string): boolean
+}
+```
+
+- 存：`AppStorage.setOrCreate` + 现成的 `putString`（try/catch 静默，存储满也不崩）
+- 读：`AppStorage.get` + `JSON.parse`（坏数据一律当"无记录"）
+- `at` 存写入时间戳，排查"为什么续到这一关"时能看
+
+## 2. 为什么是这 10 款（对 lead 名单的修正）
+
+lead 名单里 **只有 2 款真有“关卡”**：
+- `GSokoban`（`LEVELS[level]`，19 处引用）✓
+- `GHanoi`（"关卡" = 盘数 2~7）✓
+
+其余 8 款 `GKlotski / GNonogram / GFutoshiki / GKenken / GHitori / GSudoku / GSkyscrapers / GKakuro`
+**都是单盘谜题**：全文件没有 `level / stage / round` 字段（难度 = 盘面尺寸），
+“从第几关开始”对它们不存在 —— 硬接只会变成永不触发的死代码。
+
+⇒ 在全库扫「真·关卡制」（`LEVELS[]` 表 / `level++` / `load(level)`）后，改为接这 10 款：
+
+| # | 游戏 | id | level 基准 | 存档点 | 恢复点 |
+|---|---|---|---|---|---|
+| 1 | GSokoban | `sokoban` | 0 基（存 1 基） | `load(idx)` 里 `this.level = idx` 之后：`save(idx+1)` | `aboutToAppear` 里 `load(0)` 之后：`lv>1 && lv<=LEVELS.length` ⇒ `load(lv-1)` |
+| 2 | GHanoi | `hanoi` | 盘数 2~7 | `reset(n)` 开头：`save(n)` | `reset(this.level)` 之后：`2<=lv<=7` ⇒ `level=lv; reset(lv)` |
+| 3 | GBlockStackingPhysics | `block_stacking_physics` | 0 基（存 1 基） | 两处「换一关」按钮：`save(n+1)` | `reset()` 之后：`lv>0 && lv<=LEVELS.length` ⇒ `reset(); level=lv-1; queue=LEVELS[lv-1]` |
+| 4 | GArithmeticChain | `arithmetic_chain` | 0 基（存 1 基） | `next()` 里 `this.level++` 之后：`save(level<diffTotal ? level+1 : 0)` | `reset()` 之后：`lv>=1 && lv<=diffTotal` ⇒ `level=lv-1; load(level)` |
+| 5 | GChimpTest | `chimp_test` | 1 基 | `levelUp()` 里 `level+1; deal()` 之后：`save(level)` | `reset()` 之后：`lv>1 && lv<diffTotal` ⇒ `level=lv; deal()` |
+| 6 | GShellGame | `shell_game` | wins 计数（存 wins+1） | 命中后 `level+1` 之后：`save(wins+1)` | `reset()` 之后：`lv>1 && lv<=diffTotal` ⇒ `wins=lv-1; level=lv-1; newRound()` |
+| 7 | GStaircaseMemory | `staircase_memory` | 1 基 | 过关 `level+1` 之后：`save(level<diffTotal ? level : 0)` | `reset()` 之后：`lv>1 && lv<diffTotal` ⇒ `level=lv; newLevel()` |
+| 8 | GMirrorTracing | `mirror_tracing` | 1 基（共 3 关） | 过关 `level+1` 之后：`save(level)` | `reset()` 之后：`lv>1 && lv<=3` ⇒ `level=lv; makeLevel()` |
+| 9 | GActionSequenceRecall | `action_sequence_recall` | 1 基 | 过关 `level+1; deal()` 之后：`save(level)` | `reset()` 之后：`lv>1 && lv<diffTotal` ⇒ `level=lv; deal()` |
+| 10 | GPythagoreanTripleBuilder | `pythagorean_triple_builder` | 0 基（存 1 基） | `next()` 里 `this.level++` 之后：`save(level<diffTotal ? level+1 : 0)` | `reset()` 之后：`lv>=1 && lv<=diffTotal` ⇒ `level=lv-1; load()` |
+
+- `diff` 一律存 `String(GameDiff.of('<id>'))`（0/1/2 的难度档），本版恢复只用 `level`
+- 每款各加一行 `import { ProgressStore } from '../core/ProgressStore';`
+
+## 3. 为什么不破坏「再来一局」（关键设计）
+
+**坑**：`再来一局 / 顶栏 ↻` 会切 `diffTick` 奇偶 ⇒ 游戏组件**重建** ⇒ `aboutToAppear` **再跑一次**。
+若在那里无条件恢复，玩家点「再来一局」会被莫名续到上次那一关。
+
+**解法**：`shouldRestoreNow(gameId)` —— 每个游戏**每个进程只允许恢复一次**（`private static restored: string[]`）：
+
+| 场景 | 行为 |
+|---|---|
+| 杀进程后重新打开 → 进游戏 | 静态集合为空 ⇒ **恢复上次关卡** ✓（这就是本需求） |
+| 再来一局 / 顶栏 ↻ / 换一局 | 已恢复过 ⇒ **从第 1 关开始** ✓（语义未变） |
+| 返回列表再点进来（同进程） | 已恢复过 ⇒ 从头（可接受：刚玩过） |
+
+另外：恢复代码**只写在 `aboutToAppear`**，`onRestart()` / `reset()` 里一行没加。
+
+## 4. 验证（不编译，跑真实代码）
+
+```bash
+cd ~/dev/One\ More
+node --experimental-strip-types /tmp/ps_test.ts    # 接口单测：21 通过 / 0 失败
+node --experimental-strip-types /tmp/ps_test2.ts   # 往返 + 闸门：16 组 / 0 失败
+```
+
+- `ps_test.ts`：无记录 / 写读回环 / 多游戏互不影响 / `level<=0` 清除 / 坏 JSON / 负数 / 字符串 level / 缺 diff / 缺 at / 小数取整 / 空 id / 落盘失败内存态仍可读
+- `ps_test2.ts`：**10 款 × 各自全部关卡 = 61 个用例**的「存档→恢复」往返（含 0 基↔1 基换算、第 1 关无需恢复、通关清零）+ 闸门（首调 true、二调 false、互不影响、空 id false）
+- 静态校验：11 个文件括号全配平；10 款的 `gameId` 与 `GameResult.gameId` 逐一相等；`saveLastWhere(id)`/`lastLevel(id)` 的 id 与文件自身 id 一致
+
+## 5. 待真机确认（编译后）
+
+1. 玩 `GSokoban` 到第 3 关 → 杀进程 → 重开进游戏 ⇒ 应直接在第 3 关
+2. 同一次运行里点结算「再来一局」 ⇒ 应回到第 1 关（**不是**第 3 关）
+3. `GHanoi`：升到 5 盘 → 杀进程重进 ⇒ 应是 5 盘
+4. 通关最后一关 → 杀进程重进 ⇒ 应从头（记录已清零）

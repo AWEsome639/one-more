@@ -26,13 +26,13 @@ responseRegion(value: Array<Rectangle> | Rectangle): T;
 **`L17342`：`responseRegionList(regions: Array<ResponseRegion>): T`** —— 这是新版本接口（`@since` 更高）。
 
 **⇒ 我用的是**老的** `responseRegion`（`@since 8`）⇒ 正好对 `compatibleSdkVersion = 12` 兼容。
-   **若我当时"用新的"，反而可能引入版本要求。**
+   **若我当时“用新的”，反而可能引入版本要求。**
 
 ## ⇒ 判据（`2748`）
 
 **改**共用组件**（尤其全库 `355` 款共用）时，新增的 API 必须查 `@since` 并对照 `compatibleSdkVersion`。**
 **⇒ 查法一行：`grep -B8 "<API名>" <SDK>/ets/component/common.d.ts | grep @since`。**
 **⇒ 今天这个检查差点被跳过 —— 而它决定的是「新属性在 API 12 设备上会不会崩」，
-   比"模拟器上看着正常"重要得多（模拟器往往是新版本）。**
+   比“模拟器上看着正常”重要得多（模拟器往往是新版本）。**
 
-**⚠️ 与 `2747` 同源：**能力/接口能不能用，去 `.d.ts` 读 `@since`，不要在模拟器上"试通了"就算。**
+**⚠️ 与 `2747` 同源：**能力/接口能不能用，去 `.d.ts` 读 `@since`，不要在模拟器上“试通了”就算。**

@@ -1,0 +1,427 @@
+# 审计：盘面放不下时的现有范式
+
+- 日期：2026-11-14
+- 性质：**只读分析**（未编译、未连 hdc/模拟器、未改任何 `.ets`）
+- 对象：`GokigenNaname`（9×9）、`Gomoku`（15×15）、`Mandelbrot`（12×16）
+
+---
+
+## 0 口径
+
+| 项 | 值 |
+|---|---|
+| 目录范围 | `entry/src/main/ets/`（games 355 个 .ets、components 7、core 32、pages 5、ai 12） |
+| **排除** | 项目根下的 `.animbak*` / `.a11ybak*` / `.tg2bak` / `.clockbak*` 等**备份目录**（另有 60+ 个，含大量旧版 .ets；纳入会把历史代码当成现行做法） |
+| 正则 | 见每节的「复算」命令，逐条可重跑 |
+| **是否含注释** | **含，且单独标注**。本项目注释极重（注释里写结论、写判据、写失败记录），很多"范式"是**注释里声明的**而非代码里显式的。凡引用注释结论都在文中写「（注释）」 |
+| 行号口径 | 一律 `grep -rn` 的物理行号，1-based |
+| 尺寸口径 | `853×533vp`，`3px = 1vp`；可用高按**两个都在用的口径**分别标注：**401vp**（实测 104→505.3）/ **343vp**（`Bp.height - 190`，宿主 `constraintSize`） |
+| 生成文件 | 已排查，见 §6 |
+
+**一条必须写在最前面的口径冲突**：`Layout.touchMin = 44` 注释写的是 **vp**（`core/Design.ets:76`），全库 282 处 `Cell.tap()` 按它抬升；但 `games/GColorFlood.ets:47` 把 **"14.7vp ≈ 44px"** 当作"推荐的最小可点尺寸"。
+两者相差 3 倍（44vp = 132px vs 44px = 14.7vp）。**下文把两套口径分开写**，不混用。
+复算：`grep -rn "44px\|14\.7vp" --include="*.ets" entry/src/main/ets/`
+
+---
+
+## 1 滚动：有，但滚的**不是盘面**，是整页
+
+### 1.1 结论
+
+- 全库 **16 款游戏**用了 `Scroll`，**其中 11 款是"整页 Scroll"**（包住含棋盘在内的整个 `Column`）。
+  （硬核对：`grep -rn "Scroll()" ./games/ | wc -l` = **16**，且恰好落在 16 个不同文件里，与下表逐行对上。）
+- **没有任何一款把棋盘本身当作可滚动视口**（即"盘面比屏幕大、拖动看另一边"）。0 款。
+- **没有任何一款用横向滚动**。`Scroll` 全部走默认的纵向。
+- **没有一个游戏用 `Scroller` 实例**（`Scroller` 只出现在 `components/GamesTab.ets` 的游戏列表页）。
+
+### 1.2 逐个清单
+
+| # | 游戏 | 文件:行号 | 滚的是什么 | 类型 |
+|---|---|---|---|---|
+| 1 | GColorFlood | `games/GColorFlood.ets:480` | 整页（演示条/提示条/信息卡/颜色行/棋盘/按钮） | 整页 |
+| 2 | GFillomino | `games/GFillomino.ets:511` | 整页 | 整页 |
+| 3 | GBejeweled | `games/GBejeweled.ets:584` | 整页 | 整页 |
+| 4 | GBlockEscape | `games/GBlockEscape.ets:689` | 整页 | 整页 |
+| 5 | GMirrorTracing | `games/GMirrorTracing.ets:378` | 整页 | 整页 |
+| 6 | GNavonHierarchical | `games/GNavonHierarchical.ets:383` | 整页 | 整页 |
+| 7 | GMinesweeper | `games/GMinesweeper.ets:652` | 整页 | 整页 |
+| 8 | GCheckers | `games/GCheckers.ets:877` | 整页 | 整页 |
+| 9 | GLighthouses | `games/GLighthouses.ets:530` | 整页 | 整页 |
+| 10 | GExponentTower | `games/GExponentTower.ets:295` | 整页 | 整页 |
+| 11 | GMissingOperator | `games/GMissingOperator.ets:302` | 整页 | 整页 |
+| 12 | GMastermind | `games/GMastermind.ets:562` | **猜测历史列表**（`layoutWeight(1)` + `scrollBar(Off)`） | **盘面内容** |
+| 13 | GSolitaire | `games/GSolitaire.ets:865` | 牌桌列区（`layoutWeight(1)`，纵向） | **盘面区域** |
+| 14 | GSpiderSolitaire | `games/GSpiderSolitaire.ets:1099` | 牌桌列区（`layoutWeight(1)`，纵向） | **盘面区域** |
+| 15 | GPhoneticGuess | `games/GPhoneticGuess.ets:477` | 四个选项（防止 C/D 被裁） | 非盘面 |
+| 16 | GNarrativeRecall | `games/GNarrativeRecall.ets:378` | 故事正文 | 非盘面 |
+
+非游戏文件里的 `Scroll`（宿主/外壳，**不是游戏内做法**，仅列出以免误读）：
+`components/GamesTab.ets`(33 处) / `pages/Index.ets`(12) / `components/StatsTab.ets`(3) / `components/SettingsTab.ets`(3) / `components/Common.ets`(3) / `pages/LanLobby.ets`(2) / `pages/GameHost.ets`(2，**两处都是注释**) / `pages/GuidePage.ets`(1) / `core/GameSource.ets`(1)
+
+另有 **3 款游戏只在注释里出现 `Scroll` 字样**（`grep` 会命中，但代码里没有 `Scroll` 组件）—— 这三处反而是"**不用 Scroll**"的原始记录，值得单列：
+
+| 文件:行号 | 注释说了什么 |
+|---|---|
+| `games/GKakuro.ets:624` | "本款根容器是 `Column`（**无 Scroll**），按钮行在棋盘之后 ⇒ 853 宽 ⇒ 813 高 ⇒ 两个按钮被挤出视口（dump 25 个节点里没有任何按钮）" |
+| `games/GKakuroMini.ets:547` | 同上（同族） |
+| `games/GShikaku.ets:782` | "本款根容器是 `Column`（**无 Scroll**）⇒ 853 宽时棋盘高 ≈813vp，底边被 tab 栏盖住" |
+
+⇒ 这三款的选择是「**限制盘面尺寸**」而不是「套 Scroll」，与 §6 的候选 A 同路。
+
+### 1.3 这套范式自己怎么说
+
+`games/GColorFlood.ets:474-479`（注释，本项目最完整的一次复盘）：
+
+> 之前试过 8 次"调约束"（限高 / aspectRatio / 限宽）全失败 …… ⇒ 真解不是"调约束"，是**改结构**：整页套 `Scroll`，内容自然超高时可滚，而不是硬塞进一屏。
+> ★ 同一套结构已在 GBlockEscape / GNavonHierarchical / GMirrorTracing 上真机验过（第 511 轮），三款都成立。
+
+`games/GMinesweeper.ets:651`（注释）："本项目已有 5 款用同一模板：GColorFlood / GFillomino 等"。
+
+`pages/GameHost.ets:3462-3465`（注释，**宿主的自述，最关键的一条**）：
+
+> **判据 1798：`clip` 不能救「被顶出屏幕」的控件，它只切画面**。
+> 要救只有两条路：① 给每个棋盘设 `maxHeight`（逐款，`aspectRatio` 会同步缩宽）
+> ② 游戏区包 `Scroll`（一处覆盖全部，但 **355 个 if 分支要重构**）
+> 本轮的 `constraintSize` 保留（对 `layoutWeight` 驱动的棋盘有效：2048/LaserLink 已验证）。
+
+⇒ **②「宿主统一包 Scroll」从未实施**。`GameHost` 里唯一的 `Scroll` 字样是两行注释（1280 / 3463），代码里没有 `Scroll` 节点。所以现在只有"逐款自己套"。
+
+### 1.4 一个残酷的副作用（对"放不下"很关键）
+
+整页 Scroll **让棋盘不必挤进一屏，但并没有让格子变大**。`GColorFlood` 的实际做法是把预留值从 420 降到 300，让**棋盘变大**（`GColorFlood.ets:41-55` 注释）：
+
+> 改成 300：棋盘可得约 176vp（每格 14.7vp ≈ 44px，正好是推荐的最小可点尺寸），整页仍可滚动 …… 为什么不是更小（如 240）：一屏只装得下棋盘，颜色行和按钮全在下一屏 ⇒ **每次点颜色都要滚，手感极差**。
+
+⇒ 范式自带一条经验：**滚动是兜底，不是解法；棋子/按钮分处两屏会被明确判为"手感极差"**。
+
+⚠️ **坑**：这段注释里的 vp 数与当前公式对不上 —— `boardPx(300)` 在 533 下算出 `min(813, max(96, 233)) = 233vp`，不是注释说的 176vp；同段还说"533vp 高的游戏区（实际约 476vp）"。**这些常数是历次修补的沉积，注释里的数字不可当权威**，要用真机 dump 复核。
+
+### 1.5 复算
+
+```bash
+cd "entry/src/main/ets"
+grep -rn "Scroll" --include="*.ets" ./games/ | grep -v "//"
+grep -rn "Scroller" --include="*.ets" .                      # 只在 components/GamesTab.ets
+grep -rn "ScrollDirection" --include="*.ets" ./games/        # → 空（无横向滚动）
+grep -c "Scroll" pages/GameHost.ets                          # 2，且两行都是注释
+```
+
+---
+
+## 2 缩放 / 平移：**未找到任何"手势缩放盘面"的先例**
+
+### 2.1 硬结论
+
+| 查了什么 | 结果 |
+|---|---|
+| `PinchGesture` | **0 处**（全项目，含 components/pages） |
+| `matrix4` | **0 处** |
+| `Zoom` / `zoom` | **0 处** |
+| `ScaleGesture` / `GestureGroup` 缩放 | **0 处** |
+| `TapGesture` | **0 处**（游戏里一个都没有） |
+| `PanGesture` | **8 处，全部是玩法输入，没有一处平移视口** |
+| `.scale(` | **1105 处，全是按压反馈/脉冲/入场，0 处缩放盘面** |
+| `.translate(` | 74 处，全是入场/过渡动画的 `y` 偏移，0 处平移视口 |
+| `responseRegion` | **0 处实际调用**（只有 1 行注释在否决它，见 §4） |
+
+### 2.2 `PanGesture` 的 8 处到底是什么
+
+| 文件:行号 | 干什么 |
+|---|---|
+| `games/GPong.ets:849` | 纵向拖动手柄移动挡板 |
+| `games/GBreakout.ets:635` | 横向拖动挡板 |
+| `games/GDoodleJump.ets:564` | 横向拖动角色 |
+| `games/GSnake.ets:603` | 滑动判方向（改朝向） |
+| `games/GSnake3D.ets:536` | 同上 |
+| `games/GSokoban.ets:717` | 滑动推箱子 |
+| `games/GKlotski.ets:726` | 滑动挪块 |
+| `games/G2048.ets:837` | 滑动合块 |
+
+⇒ 全部是"**用滑动来玩**"，不是"用滑动来看"。**没有一个先例把 `PanGesture` 接到 `translate` 上去拖盘面。**
+
+### 2.3 `.scale()` 抽样核对（为什么敢说 1105 处全是动画）
+
+去掉 `pressScale` / `pulse` / `winK` / `stateStyles` / `TransitionEffect` 后的残余，全部是 `Bp.scale()`（设备 DPI 系数，不是缩放盘面）、`IconPress.scale`（图标按压）、`pop` 入场弹窗。抽样：
+
+```bash
+grep -rn "\.scale(" --include="*.ets" . | grep -vi "pressScale\|pulse\|winK\|stateStyles\|TransitionEffect\|Motion\.press"
+```
+
+剩余 25 行里没有一行把 `scale` 值绑定到"棋盘/格子容器"上。
+
+### 2.4 复算
+
+```bash
+cd "entry/src/main/ets"
+grep -rn "PinchGesture"   --include="*.ets" . ; echo "exit=$?"   # 1 = 无匹配
+grep -rn "matrix4\|Zoom"  --include="*.ets" . ; echo "exit=$?"   # 1 = 无匹配
+grep -rn "PanGesture"     --include="*.ets" . | wc -l            # 8（+4 行注释/说明）
+grep -rn "\.scale("       --include="*.ets" . | wc -l            # 1105
+grep -rn "\.translate("   --include="*.ets" . | wc -l            # 74
+grep -rn "responseRegion" --include="*.ets" .                    # 1（注释）
+```
+
+---
+
+## 3 盘面分页：**未找到**
+
+| 查了什么 | 结果 |
+|---|---|
+| `Swiper` | **0 处** |
+| `分页` | **0 处** |
+| `pageIdx` / `curPage` / `pageNo` / `pageCount` | **0 处** |
+| `分屏` / `翻页` / `分段显示` / `分区显示`（游戏内） | **0 处**（仅 `EntryAbility.ets:140` 说"系统分屏"、`ai/Hint.ets:166` 说"翻页后没保住演示标记"，均与盘面无关） |
+| `Grid(` 当盘面 | 5 个文件命中，**逐个人工核对后只有 4 个真用，且没有一个是可滚盘面**（见下） |
+
+`Grid()` 的 5 个命中：
+- `GSkyscrapers` —— **假阳性**（命中的是方法名 `solveGrid` / `this.solveGrid()`，不是组件）
+- `GCardCountingMemory:357` `columnsTemplate('1fr 1fr 1fr 1fr')`，无高度约束、无滚动
+- `GChangeBlindness:334` `.height(Math.min(250, Bp.height * 0.35))` 固定高
+- `GObjectDisplacement:313` 同款 `.height(Math.min(260, Bp.height * 0.35))`
+- `GPeripheralFocus:294` 同款 `.height(Math.min(258, Bp.height * 0.35))`
+
+⇒ 4 处都是**小卡片网格**（记忆/注意类），不是大棋盘，且都靠 `Math.min(..., Bp.height*0.35)` 硬压高度，**没有一处让 Grid 自己滚**。`Grid` 天生可滚这件事在本项目**没被利用过**。
+
+### 3.1 复算
+
+```bash
+cd "entry/src/main/ets"
+grep -rn "Swiper" --include="*.ets" . ; echo "exit=$?"        # 1 = 无匹配
+grep -rn "分页"    --include="*.ets" . ; echo "exit=$?"        # 1 = 无匹配
+grep -rni "pageIdx\|curPage\|pageNo\|pageCount" --include="*.ets" . ; echo "exit=$?"
+grep -rln "Grid(" --include="*.ets" ./games/
+```
+
+---
+
+## 4 格子变小但仍可点：有先例，而且项目**主动否决了"放大热区"**
+
+### 4.1 项目的正式令牌
+
+- `core/Design.ets:76`：`static readonly touchMin: number = 44;`（注释写"可点区域最小边长（**vp**）"）
+- `core/Design.ets:138-140`：`Cell.tap(base)` = `max(Cell.of(base), 44)`，全库 **282 处**调用
+- 853×533 下：`Cell.of(44) = round(44 × 1.12 × 0.85) = 42vp`；`Cell.tap(44) = 44vp`
+  （`Bp.isLg()` 因 853 ≥ 840 返回 1.12；`Cell.of` 在 `Bp.height < 600` 时再乘 0.85）
+
+### 4.2 但项目**大面积主动放弃**这条下限
+
+**137 处 / 60 个文件**采用同一写法：
+
+```
+Bp.isShort() ? Cell.of(N) : Cell.tap(N)
+```
+
+即：**矮屏（533 命中 `Bp.isShort()`，条件 `Bp.height < 690 && !isTv()`）故意走 `Cell.of()`，绕开 44vp 抬升**，把高度让给别的东西。
+
+| 文件:行号 | 尺寸（533 下实算） | 交互方式 |
+|---|---|---|
+| `games/GReverseStroop.ets:310` | `Cell.of(32)` = **30vp** | `.onClick`（`Haptics.tap(); this.reset()`） |
+| `games/GTaskSwitching.ets:335` | `Cell.of(40)` = **38vp** | `.onClick` |
+| `games/GContextClues.ets:306/316/326/336` | `Cell.of(36)` = **34vp** | 选项行，`onClick` |
+| `games/GContextClues.ets:352/361` | `Cell.of(32)` = **30vp** | `.onClick` |
+| `games/GMatrixMultiplier.ets:437` | `Cell.of(32)` = **30vp** | `.onClick` |
+| `games/GVisualSearch.ets:318` | `Cell.of(32)` = **30vp** | `.onClick` |
+
+**这 137 处没有一处加放大热区、没有一处用双击、没有一处用长按。** 交互就是裸 `.onClick`。
+
+### 4.3 "放大热区"被**明文否决**
+
+`core/Design.ets:131-137`（注释，`Cell.tap()` 的文档）：
+
+> ⚠️ **不要给基线本身就 <44 的格子套**（`Cell.of(40)→38`）：`tap(40)` 会 +6vp，而那些款正是**为了塞进 533 才故意选小基线**的棋盘，一改就把棋盘顶出屏幕（比差点按更糟）。已知 **71 处**属于这一类，**2026-11-08 决定接受现状**。
+> ⚠️ 同一条也适用于 `.responseRegion()` 扩热区：**网格相邻格子会重叠 ⇒ 点 A 触发 B，别走这条路。**
+
+⇒ **"放大热区"这条路，项目已经论证过并明确禁止**（理由：相邻格热区重叠会串格）。`responseRegion` 全库 0 处实际调用，与这条否决一致。
+
+### 4.4 小格子上"加第二个动作"的唯一先例：长按 + 吞掉 click
+
+`games/GMinesweeper.ets`（9×9 扫雷，盘面 200vp ⇒ **每格 22.2vp ≈ 67px**）：
+
+- `:826` `LongPressGesture({ repeat: false, duration: LONG_PRESS_MS })`，`LONG_PRESS_MS = 350`（`:35`）
+- `:812` `.onTouch`，`:815-821` 用 `longHandled` / `swallowClick` 标记
+- `:825` 抬手时 `if (this.longHandled) { this.swallowClick = true; }`
+- `:831` `.onClick(() => { this.onCellTap(i); })`
+
+⇒ 这是**"格子小，于是给它一个长按副动作（插旗）"** 的完整正确实现（含长按后不误触点按的吞掉逻辑）。**这是全库唯一一处**：
+`grep -rn "LongPressGesture" --include="*.ets" ./games/` → 仅 `GMinesweeper.ets:826`。
+
+### 4.5 棋盘格子实际只有 17~27vp —— 而且是被接受的
+
+同为 **9×9** 的三款，横屏 853×533 下：
+
+| 游戏 | 公式 | 盘面 | **每格** | 换算 px | 交互 |
+|---|---|---|---|---|---|
+| `GGo9.ets:994` `boardMax()` | 横屏 `max(140, 533-360)` = **173vp** | 173vp | **19.2vp** | 58px | `.onClick` 裸点 |
+| `GMinesweeper.ets:687` | `max(200, 533-360)` = **200vp** | 200vp | **22.2vp** | 67px | `.onClick` + 长按插旗 |
+| `GSudoku.ets:876` | `max(160, 533-385)` = **160vp** | 160vp | **17.8vp** | 53px | `.onClick` 裸点 |
+| `GHitori.ets:847`（6×6） | `max(240, 533-360)` = 240vp | 240vp | 40vp | 120px | `.onClick` 裸点 |
+
+⇒ **项目对 9×9 密盘的实际接受下限是 17~22vp/格（53~67px）**，远低于 `44vp`，但高于 44px。
+`GSudoku.ets:857-879` 的注释把这条修法记成"**宽高都由可用高度反推**"，并明说"平板横 853×533：min(821, 277) = 277 ⇒ 棋盘变小，按钮回到屏内"（后又按实测收到 `Bp.height-385`）。
+
+### 4.6 复算
+
+```bash
+cd "entry/src/main/ets"
+grep -rn "touchMin" core/Design.ets                     # :76 = 44
+grep -rn "Cell.tap(" --include="*.ets" . | wc -l        # 282
+grep -rn "isShort() ? Cell\.of" --include="*.ets" . | wc -l   # 137
+grep -rln "isShort() ? Cell\.of" --include="*.ets" . | wc -l  # 60
+grep -rn "LongPressGesture" --include="*.ets" ./games/  # 1（GMinesweeper:826）
+sed -n '131,137p' core/Design.ets                       # 否决 responseRegion 的原文
+```
+
+---
+
+## 5 汇总表
+
+| 做法 | 先例游戏 | 文件:行号 | 适用性 |
+|---|---|---|---|
+| **整页 Scroll 兜底** | GColorFlood（模板源头）、GFillomino、GBejeweled、GBlockEscape、GMirrorTracing、GNavonHierarchical、GMinesweeper、GCheckers、GLighthouses、GExponentTower、GMissingOperator（11 款） | `GColorFlood.ets:480` 等，见 §1.2 | ★★★ **最成熟、真机验过最多次**。解决"底部按钮被顶出屏幕"。**但不增大格子**，且分处两屏会被判"手感极差" |
+| **盘面区 `Scroll` + `layoutWeight(1)`** | GMastermind（猜测历史）、GSolitaire、GSpiderSolitaire | `GMastermind.ets:562`、`GSolitaire.ets:865`、`GSpiderSolitaire.ets:1099` | ★★ 解决"盘面比视口高/宽"。先例全是 **1D 列表或牌列**，**2D 棋盘无先例**（滚动后失去全局视野） |
+| **`boardPx()` 限宽即限高** | GGo9（9 路，最贴）、GSudoku（9×9）、GHitori、GSlitherlink、GMinesweeper、GSokoban、GTapa | `GGo9.ets:994/1049`、`GSudoku.ets:857`、`GHitori.ets:847`、`GSlitherlink.ets:532`、`GSokoban.ets:706`、`GTapa.ets:704` | ★★★ **最贴这三款的正解**。一行算式，单文件改，格子变小但整盘可见。已有 9×9 同尺寸先例（17~22vp/格被接受） |
+| **`width(Math.min(..., max(floor, Bp.height-360)))`** | **66 款游戏 / 73 处**（floor 取 140 的 37 处、取 240 的 18 处，另有 36 处 `Math.max(140,…)` 写在 `constraintSize` 里） | 各游戏棋盘容器，如 `GNonogram.ets:607`、`GGomoku.ets:1060` | ★★★ 全库主流写法。**floor（140/160/200/240）就是"放不下时"的妥协旋钮** |
+| **`Bp.isShort() ? Cell.of(N) : Cell.tap(N)`** | 137 处 / 60 文件 | `GReverseStroop.ets:310` 等 | ★★ 矮屏主动放弃 44vp 下限，减法而非加法 |
+| **长按副动作 + `swallowClick`** | GMinesweeper（唯一） | `GMinesweeper.ets:812-831` | ★★ 小格子加第二个动作的正确写法 |
+| **放大热区 `.responseRegion()`** | **无（0 处）** | — | ✗ **项目明文否决**：相邻格重叠会串格（`Design.ets:135`） |
+| **手势缩放（Pinch）/ 平移看盘（Pan→translate）** | **无（0 处）** | — | ✗ **未找到任何先例**，需从零实现 |
+| **盘面分页 / Swiper** | **无（0 处）** | — | ✗ **未找到任何先例** |
+| **宿主统一包 Scroll** | **无（0 处，仅注释）** | `GameHost.ets:3463`（注释） | ✗ 未实施，且注释自己说"355 个 if 分支要重构" |
+
+---
+
+## 6 三款的现状（先纠正前提，再给建议）
+
+### 6.1 前提核对：三款的"放不下"是**三种不同的病**
+
+按当前代码在 853×533 下实算（`board 宽度可用 = 853 - 2×Space.lg(20) = 813vp`）：
+
+| 游戏 | 当前源码 | 盘面实算 | 每格 | 换 px | 真实病症 |
+|---|---|---|---|---|---|
+| **GokigenNaname** | `GGokigenNaname.ets:628` `min(813, max(240, 533-360))` | **240vp** | 26.7vp | 80px | **格子偏小**；按公式**不溢出**（240 + chrome ≈ 334 < 401）。要到 44vp/格需 396vp，全屏仅余 5vp ⇒ **物理不可能** |
+| **Gomoku** | `GGomoku.ets:1060` 同一算式 | **240vp** | 15 路 **16.0vp**<br>11 路 21.8vp<br>20 路 12.0vp | 48px<br>65px<br>36px | **格子偏小**（20 路时 36px **低于 44px**，是真的不好点）；要 44vp 需 660vp ⇒ 不可能 |
+| **Mandelbrot** | `GMandelbrot.ets:389-402` `.width('100%')`，格子 `layoutWeight(1)+aspectRatio(1)` | 宽 813 × 高 **≈610vp** | 49.9vp | 150px | **根本不是"格子小"，是纵向溢出 ≈210~267vp**（可用 401/343）。且 **12×16 格子全无 `onClick`**（`:426/:441` 的两个按钮才是输入）⇒ **44vp 约束对它不适用** |
+
+⚠️ **对前提的两点修正**：
+1. **Mandelbrot 的盘面是纯显示**。`GMandelbrot.ets:393-396` 的格子只有 `backgroundColor`，无任何手势/点击；玩家用 `在集合内` / `在集合外` 两个按钮作答（`:415`、`:430`）。**它的格子可以任意小，不存在触控问题**，要修的只是溢出。
+2. **"44vp/格"只有 Gokigen 视作硬目标才有意义，而 44vp 在 9×9 上物理不可行**（需 396vp，可用 401vp，chrome 为 0 都不够）。项目自己在三款 9×9 上已经接受 17~22vp（§4.5）。按**项目既有口径**，Gokigen 现在的 26.7vp 其实**已经比 Sudoku / Go9 / Minesweeper 都大**。
+
+### 6.2 候选范式（按推荐度）
+
+#### 候选 A（首选）：`boardPx()` 限宽即限高 —— 模板 `GGo9.ets:994`
+
+```
+private boardMax(): number {
+  const w = Bp.width, h = Bp.height;
+  if (w > h) return Math.max(140, h - 360);          // 横屏：高度永远是瓶颈
+  return Math.min(Math.max(160, w - 40), Math.max(120, h - 400));
+}
+// 用在：.width('100%').aspectRatio(1).constraintSize({ maxWidth: this.boardMax() })
+```
+
+- **解决的是**：`layoutWeight(1)+aspectRatio(1)` 的格子"**按宽度分 ⇒ 棋盘高 = 棋盘宽**"，横屏 853 宽就撑出 853 高。限宽即限高。
+- **与这三款的差异**：
+  - GGo9 是 **9 路**，与 Gokigen **完全同构**（甚至连"点交叉点划线"都像）⇒ **Gokigen 可直接照抄**，只需把 `140` 调到 `160~200`。
+  - Gomoku 是 15 路（难度可到 20）⇒ 同一函数可用，但 `max(..., h-360)=173` 会给 11.5vp（35px），**比现状 16vp 还小** ⇒ Gomoku 应改用 `h - chrome`（chrome 压到 ~130）或直接取满 `h` 再靠 Scroll 兜按钮。
+  - Mandelbrot 是 **4:3 非正方**（16×12）⇒ 不能直接套 `aspectRatio(1)` 口径，要改成 `宽度 = min(813, (可用高)/12*16)`。
+- **代价**：格子变小（Gokigen→19~27vp，Gomoku→16~27vp，Mandelbrot→28~33vp），换来"整盘同屏可见"。**对 2D 棋类这是对的方向**（棋盘必须一眼看全）。
+
+> ⚠️ **实现上必须先知道的一条（判据 1928，`GKakuro.ets:632`）**：
+> 「**`aspectRatio(1)` 的棋盘，`maxHeight` 只裁不缩，必须用 `maxWidth` 才能真缩小**」。
+> 三款的格子都是 `layoutWeight(1)+aspectRatio(1)` ⇒ 高度由宽度反推 ⇒ **只能从宽度下手**。
+> 反之，`GKakuro` 的上一版就是把 `maxHeight` 当缩放手柄用，结果棋盘被裁、按钮仍在外（`:629-631` 记着第二次校准的实测数）。
+> 附带发现：`GShikaku.ets:787` 仍用 `.constraintSize({ maxHeight: Bp.height - 260 })` 处理同样的 `width('100%')+aspectRatio(1)` 棋盘，与判据 1928 冲突 ⇒ **疑似同类潜在 bug，建议单独复核**（`GShikaku.ets:781-787` 的注释声称它有效，但按 1928 应当只裁不缩）。
+
+#### 候选 B：整页 `Scroll` + `BOARD_RESERVE` —— 模板 `GColorFlood.ets:480`
+
+- **解决的是**：底部按钮被顶出屏幕（本项目修过 9 次的同一个 bug）。
+- **与这三款的差异**：GColorFlood 是**非棋类**（色彩洪水，颜色行必须同屏），它的 Scroll 是为了"颜色行 + 按钮都能到"。**这三个都是棋类**，Scroll 后棋盘会被切成上下两半，与"一眼看全棋盘"冲突。
+- **代价**：每次操作可能要滚；且**不增加格子尺寸**（GColorFlood 把 reserve 从 420 降到 300 才变大）。
+
+#### 候选 C：盘面区 `Scroll` + `layoutWeight(1)` —— 模板 `GMastermind.ets:562`
+
+- **解决的是**："盘面比视口高、但头部/按钮要固定"。
+- **与这三款的差异**：先例全是 **1D**（猜测历史是竖排列表、牌列是横排）。**把 2D 棋盘塞进滚动视口，项目里 0 先例**；且 15×15 棋盘如果放大到 660vp，一屏只能看到 61%，**下棋要来回拖**。
+- **代价**：失去全局视野 + 实现比 A 复杂（要处理滚动与格内手势冲突）。
+
+### 6.3 复算
+
+```bash
+cd "entry/src/main/ets"
+sed -n '628p'  games/GGokigenNaname.ets        # 盘面宽度算式
+sed -n '1060p' games/GGomoku.ets               # 同一算式
+sed -n '389,402p' games/GMandelbrot.ets        # width('100%') 盘面，无 onClick
+sed -n '415,441p' games/GMandelbrot.ets        # 两个作答按钮（真正的输入）
+sed -n '994,1010p' games/GGo9.ets              # boardMax() 模板本体
+python3 -c "
+bw=853-40
+print('Gokigen', min(bw,max(240,533-360)), (min(bw,max(240,533-360)))/9)
+print('Gomoku15', min(bw,max(240,533-360))/15)
+print('Mandelbrot cell', (bw-15)/16, 'height', (bw-15)/16*12+11)
+"
+```
+
+---
+
+## 7 生成文件核查（任务要求）
+
+全项目带"自动生成/勿手改"标记的 `.ets` 共 **5 个**：
+
+| 文件 | 标记 | 源头 | 与本审计的关系 |
+|---|---|---|---|
+| `core/I18n.ets` | `:178` 表由 `tools/gen_s2t.py` 生成 | `tools/gen_s2t.py` | 无关 |
+| `core/GameTags.ets` | `:2` 自动生成 | `tools/gen_catalog.py` / `apply_tags.py` | 无关 |
+| `core/GameRegistry.ets` | `:2` 自动生成 | `tools/gen_dispatcher.py`（`REGISTRY`） | 无关 |
+| `components/Common.ets` | `:19` `ICON_MAP:BEGIN` 由 `tools/gen_icon_map.py` 生成 | 仅 ICON_MAP 段 | 无关（`Scroll` 用法在非生成段） |
+| **`pages/GameHost.ets`** | `:39`「游戏实现（自动生成，勿手改）」 | **`tools/gen_dispatcher.py`** | **有关** ⚠️ |
+
+⚠️ **关键**：`GameHost.ets` 的「导入区」与「分发链」（`:1291` 起，`if (this.gameId === 'g2048') …` 共 355 分支）由 `tools/gen_dispatcher.py` 生成（生成器注释 `gen_dispatcher.py:28-30` 明写）。
+⇒ **"宿主统一包 Scroll"这条范式若要落地，改 `GameHost.ets` 会被下次生成覆盖，必须改生成器模板**（`gen_dispatcher.py` 的 `TAIL_BEFORE_DISPATCH` / `TAIL_AFTER_DISPATCH`，`:49` / `:345`）**再重跑** `python3 tools/gen_dispatcher.py`。
+**本审计引用的所有先例文件（GColorFlood / GGo9 / GSudoku / GMinesweeper / GMastermind 等）全部是手写游戏文件，不在生成之列** ⇒ 照抄安全。
+
+另外项目自带一个静态闸门 `tools/check_layout_overflow.py`：本审计跑了一次（只读）：`python3 tools/check_layout_overflow.py --ref-height 533` ⇒ **0 处命中**。原因是它的判据 ① 只抓 `.width('100%')+aspectRatio` **同一元素**且链上无 `constraintSize`，而三款分别用了 `width(Math.min(...))`（Gokigen/Gomoku）和"格子而非容器带 aspectRatio"（Mandelbrot）⇒ **三款的"放不下"这个静态闸门抓不到**，只能靠真机量和人工复算。这解释了它们为什么漏到现在。
+
+---
+
+## 8 对那三款的建议
+
+### 8.1 首选：候选 A（`boardPx()` 限宽即限高），模板 `GGo9.ets:994`
+
+| 游戏 | 首选 | 为什么 | 代价 |
+|---|---|---|---|
+| **GokigenNaname** | **A**（照抄 `GGo9.boardMax()`） | 同为 9 路/同尺寸/同交互（点交叉点），GGo9 已把三个设备的坑收敛成一个函数；Gokigen 现状 26.7vp 已达标（项目 9×9 先例 17~22vp），**主要缺的是"能算出正确上限"的统一口径**，而不是扩容 | 格子可能从 26.7 降到 ~20vp（若按 GGo9 的 `h-360`）；若要保住 26.7vp，把 floor 定 240、并把状态/按钮行收进 Scroll（A+B 组合） |
+| **Gomoku** | **A + B 组合** | 15 路要 660vp 才 44vp/格，物理不可能；能拿到的最大值 = 可用高（401vp ⇒ 26.7vp/格 = 80px），**前提是按钮不在同一屏内** ⇒ 必须让 chrome 进 Scroll（B），棋盘吃满高度（A）。这样从 16vp → 26.7vp，**提升 67%** | 每次落子后要看状态/按钮需滚一下；20 路难度仍只有 20vp（60px） |
+| **Mandelbrot** | **A（只改宽高比，不要 Scroll）** | 盘面**非交互**，没有触控下限；唯一问题是"按宽算高"溢出 ≈210~267vp。改成 `宽 = min(813, (可用高 − chrome) × 16/12)` ⇒ 高 343 时宽 457、格 28.6vp（86px），完全够看，**且不需要任何滚动** | 格子从 49.9 缩到 28.6vp（150→86px）；需按实际 chrome 实测一次 |
+
+### 8.2 为什么不选另外两条
+
+- **候选 B（整页 Scroll）**：对 Gokigen 是**多余**的（它按公式不溢出，真正的病是格子大小口径）；对 Mandelbrot 是**有害**的（盘面非交互，Scroll 只会把 610vp 的盘面切两半、反而引入"要看全屏却要滚"）；只有 Gomoku 需要它（且是作为 A 的**配套**，而非独立解法）。
+- **候选 C（盘面区滚动 / `layoutWeight(1)`）**：项目里 2D 棋盘 0 先例，且规则类游戏（五子连珠、点交叉点）**必须一眼看全**，滚动后一屏只看得到 61%，会把"看清局势"这个核心体验打掉。
+
+### 8.3 统一口径建议（比选哪个范式更重要）
+
+不要再用 `Math.max(240, Bp.height - 360)` 这种"**floor 大于剩余空间**"的写法 —— 533 下 `Bp.height-360 = 173`，被 `max(240,…)` 抬到 **240**，等于**明明只剩 173 却硬画 240**。这正是 `GColorFlood.ets:463`（同款还见 `GFillomino.ets:500`、`GDualMirror.ets:360`）已经记录过的同一个坑：
+
+> ⚠️ 高度下限只能取 96：原来写 160 的话，533vp 横屏算出 153 会被**抬到 160** ⇒ 棋盘反而比可用空间高 7vp，底部又溢出（等于把刚修好的 bug 请回来）。
+
+现有代码里用 `Math.max(240, Bp.height - 360)` 的共 **18 个游戏**（含三款里的两款）：`GGokigenNaname` / `GGomoku` / `GSkyscrapers` / `GHitori` / `GHitoriAll` / `GHeyawake` / `GShikaku` / `GNoriNori` / `GPipes` / `GDominosa` / `GSchulte` / `GPathIntersect` / `GCrown` / `GMemory` / `GMatrixReasoning` / `GModuloPath` / `GCountdownMath` / `G2048`。
+另 `Math.max(140, Bp.height - 360)` 共 **73 处**（37 处在 `width()` 里、36 处在 `constraintSize` 里），涉及 `GNonogram` / `GNurikabe` / `GTapa` 等。
+⇒ 建议改成"**先算剩余高，再反推宽度**"，并把 floor 压到 96~140（只为防 0/负数，不参与"够不够大"的判断）。
+
+### 8.4 复算
+
+```bash
+cd "entry/src/main/ets"
+grep -rn "Math.max(240, Bp.height - 360)" --include="*.ets" ./games/ | wc -l   # 18
+grep -rln "Math.max(240, Bp.height - 360)" --include="*.ets" ./games/ | wc -l  # 18 个文件
+grep -rn "Math.max(140, Bp.height - 360)" --include="*.ets" ./games/ | wc -l   # 73
+sed -n '463p' games/GColorFlood.ets        # 「下限只能取 96」原文
+sed -n '500p' games/GFillomino.ets
+```
+
+---
+
+## 9 一句话总结
+
+项目里**没有**缩放、没有一个盘面分页、没有横向滚盘、没有放大热区（还明文否决了）；有的只是**"把格子算小到装得下"**（66 款 / 73 处的主流算式 + `boardPx()`）和**"整页滚起来"**（11 款）。
+对这三款，最接近且最安全的现成范式是 **`GGo9.boardMax()` 的「限宽即限高」**（Gokigen 同构可直接抄；Mandelbrot 只需换成 4:3 口径；Gomoku 需叠加整页 Scroll 才能把格子从 16vp 提到 26.7vp）。

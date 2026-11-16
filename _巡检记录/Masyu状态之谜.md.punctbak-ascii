@@ -1,0 +1,146 @@
+# Masyu 的 732 / 1586 之谜 —— 只读分析，未改 .ets
+
+> 执行：verifier-eng2 ｜ ⛔ 未编译、未碰设备、未 commit、未改 .ets
+> 结论先说：**一半是真 bug（盘面没封顶），一半是尺子量错（`max_bottom` 只统计"有文字"的节点）**；
+> 而且 —— **你那条 `constraintSize(240)` 加错文件了**：`Masyu` 映射的是 `GMasyu.ets`，你改的是 `GSlitherlink.ets`（另一款游戏）。
+
+## 0. 一句话
+
+| 读数 | 对应状态 | 依据（历史记录里的 `lowest`） |
+|---|---|---|
+| **732** | **盘面里还没有「圈」文字的那一帧**（首帧 / `reset()` 未完成） | `lowest='0/40'` = 统计卡「步数 0/40」 |
+| **1586** | **正常局面**（⚫/⚪ 已渲染） | `lowest='⚫'`（2 次）/`'⚪'`（1 次）= 盘面里的圈 |
+
+**两者是同一个布局**（盘面宽度驱动、无上限、被容器裁在 529vp）；
+**854px 的差不是"两个界面高度不同"，而是"最深的那段文字在盘面里还是在统计卡上"**。
+
+## 1. 先纠一个文件映射错误（这是整件事的关键）
+
+```
+pages/GameHost.ets:2269   } else if (this.gameId === 'masyu') {
+pages/GameHost.ets:2271       GMasyu({ theme: …, restartToken: this.nonce, onFinish: … })
+pages/GameHost.ets:2925   } else if (this.gameId === 'slitherlink') { GSlitherlink(…) }
+```
+- `GMasyu.ets`（726 行）：**全文 `constraintSize` 出现 0 次**
+- `GSlitherlink.ets:639`：`.constraintSize({ maxHeight: Bp.isShort() ? 240 : 2000 })` ← **你那条加在这里**
+- 历史记录也分得清：Masyu 的 `lowest` 是 `⚫`/`⚪`；Slitherlink 的 `lowest` 是 `点边线切换；数字变绿…`
+
+⇒ **03:10 那次改动对 Masyu 零影响** —— 这正是「改完还是 732」的原因（判据 1869 停手是对的，方向错了而已）。
+
+## 2. 页面上有哪些状态会改变竖向高度？—— **只有一个，最多 +38vp**
+
+逐行读 `GMasyu.build()`（567~724）：
+
+| 状态 | 影响哪块 | Δ 高度 |
+|---|---|---|
+| **演示中**（`demoId ≥ 0`） | `DemoBar`（原本 0 高） | **+38vp（+114px）** |
+| 结算（`over === true`） | 只是按钮文案从「重开」变「已通关 🎉」 | **0** |
+| 难度 4/5/7（`diffTotal`） | 格数变多，但盘面按**宽度**撑、都超屏 | **0** |
+| **首帧**（`reset()` 还没填 `black/white`） | 格子里 `Text('')`（无字）| **高度不变**，但**最深文字节点**从盘面退回统计卡 |
+
+**⇒ 没有任何状态能产生 854px 的高度差。** 854px（=285vp）恰好是「盘面可见区」的高度 —— 它衡量的是**文字节点的深浅**，不是布局。
+
+## 3. 两个读数分别对应哪一帧（反推）
+
+**盘面怎么撑开的**（`GMasyu.ets:607-650`）：
+```ts
+Column({ space: Space.xs }) {
+  ForEach(this.rowIdx(), (r) => {
+    Row({ space: Space.xs }) { ForEach(this.rowIdx(), (c) => {
+      Stack() { Text(⚫/⚪/'') }.layoutWeight(1).aspectRatio(1)   // ← 格子：宽驱动 + 正方形
+    }) }.width('100%')
+  })
+}
+.width('100%')          // ★ 644 行：全文件**没有任何** width/height 上限
+.padding(Space.sm) …
+```
+- 宽 853 ⇒ 每行可用 ≈ 813 ⇒ 5×5 每格 **≈158vp**、7×7 每格 **≈116vp**
+- 盘面整块 **≈814vp 高**，而 `GameHost` 给游戏区的上限只有 **343vp** ⇒ **被裁**（不是缩小）
+- 所以屏幕下沿（529vp ≈ 1586px）总是能看到「盘面最后一行可见的圈」
+
+**为什么会出现「盘面没有字」的那一帧**：
+```ts
+@State private black: number[] = [];      // 初值空
+@State private white: number[] = [];
+aboutToAppear(): void { this.reset(); }   // ★ 首帧之后才填
+Text(this.black.indexOf(...) >= 0 ? '⚫' : (this.white.indexOf(...) >= 0 ? '⚪' : ''))   // ← 非圈格子是空串
+```
+⇒ 首帧（或 demo 未开局、`reset()` 还没跑完）时**整张盘面没有任何 Text**，
+`max_bottom` 只能量到统计卡里的「0/40」⇒ **732**。
+
+## 4. 结论：真 bug 还是量错？
+
+**两个都有，各占一半：**
+
+| 判定 | 内容 | 证据 |
+|---|---|---|
+| 🔴 **真 bug（产品）** | `GMasyu` 盘面**完全没有上限**：5×5 时 814vp、7×7 时更夸张，整个盘面被裁到容器底 ⇒ **用户只看得到最上面一两行圈**，下半盘永远看不见（也点不到） | 644 行 `.width('100%')`；`GMasyu` 里 `constraintSize`/`Math.min` 出现 **0 次** |
+| 🟡 **量错（工具）** | `shot_game.py:411` 的 `max_bottom` **只遍历 `text` 非空的节点** ⇒ 「盘面本身没字」的那一帧量成统计卡底（732），跟真实溢出（1586）差 854px | `lowest='0/40'` vs `lowest='⚫'` |
+
+**⇒ 修两处**：① 给盘面封顶（补丁见 §5）；② 修尺子（见 §6），否则「格子没字」的游戏永远量不准。
+
+## 5. 补丁（`entry/src/main/ets/games/GMasyu.ets`，3 处，可全文匹配）
+
+### A（主刀）盘面封顶 —— 644 行
+```diff
+-        }, (r: number) => 'yr' + r)
+-      }
+-      .width('100%')
++        }, (r: number) => 'yr' + r)
++      }
++      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 380)))
+```
+⇒ 853×533 下：`min(817, max(120, 153)) = **153vp**`（每格 ≈26vp，5×5 可玩）
+（用 `Bp.height − 380` 而不是 `−360`：`−360` 得 173，配上下面的间距仍会超）
+
+### B（必须，A 单独不够）把 Column 间距分档 —— 568 行
+```diff
+-    Column({ space: Space.md }) {
++    Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
+```
+⇒ 7 个子块 6 个间隙：`16×6 = 96` → `6×6 = 36`，**−60vp**
+
+### C（余量，建议一起上）两条说明行矮屏隐藏
+```diff
+@@ 649 行
+-      Text(this.tip)
++      Text(this.tip)
++        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+@@ 710 行
+-      Text(TG('⚫ 必须拐弯 · ⚪ 必须直行 · 回路要闭合成一圈'))
++      Text(TG('⚫ 必须拐弯 · ⚪ 必须直行 · 回路要闭合成一圈'))
++        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+```
+⇒ **−37vp**
+
+**账**（853×533，预算 343）：
+| 方案 | 计算 | 合计 |
+|---|---|---|
+| 只做 A | 38+62+**153**+20+44+17+**96** | **430 ⇒ 仍超 87** |
+| A+B | …间距换 36 | **370 ⇒ 仍超 27** |
+| **A+B+C** | 再省 37 | **333 ✓** |
+
+## 6. 顺手修尺子（`工具/shot_game.py`，只给建议、我没改）
+
+```python
+mb = 0
+for t, (_, _, _, y2) in texts(d2):     # ← 只遍历「有文字」的节点
+```
+⇒ 改成遍历 **整棵树的所有节点**（无文字的容器也算），或至少在 `texts()` 之外单独算一次「所有节点最大 y2」，
+否则「格子本身没文字」的游戏（Masyu / 数织类 / 纯图形棋盘）永远量偏小。
+**判据建议**：`max_bottom` 应定义为「**整棵 dump 树的最大 y2**」，`lowest` 仅作人读参考。
+
+## 7. 回答你的问题 4：`maxHeight: 240` 会不会把盘面压小？
+
+- **对 Masyu：完全不生效**（这行不在 `GMasyu.ets` 里）——这就是为什么改完读数没动
+- **对 GSlitherlink（你实际改的那款）**：
+  - `853×533`：`boardPx() = min(813, max(120,(533−200)×0.70)=233) = **233 < 240**` ⇒ **这条约束是 no-op**
+  - `1280×800`（横屏大屏）：`boardPx() = min(1240, 420) = **420 > 240**` ⇒ 容器高度被压到 240，而格子仍按 420 宽算 ⇒ **盘面下半部被裁掉**（`constraintSize` 只裁不缩）
+  ⇒ **建议删掉这行**（`boardPx()` 本身已经按可用高度算过），或改成「按 240 反推宽度」而不是裁高
+
+## 边界
+
+- 只读静态分析：**未改任何 .ets**、未编译、未碰设备、未 commit。
+- 732/1586 的成因有**直接证据**（历史记录里的 `lowest` 文本 + 两文件的状态初始化时机），不是推测；
+  具体 vp 数（814/153/343）是按代码常量算的，误差 ±10vp。
+- `GSlitherlink` 的读数也在 1408~1576 之间跳（`lowest='点边线切换…'`），成因可能同源（首帧/演示条），但那是另一款，未展开。

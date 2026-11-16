@@ -1,0 +1,152 @@
+# 编译缓存系统性排查（判据 1827）—— 2026-11-08
+
+> 执行：**perf-hunter** ｜ 项目 `/Users/a0000/dev/One More` ｜ hvigor **6.26.8**（`.hvigor/cache/meta.json`）
+> **边界：只读 + 只写本 md**。唯一动过的东西是 `bash build.sh clean`（删 `entry/build`）+ 之后重建（构建产物，可再生）。
+> 触发：今天 `GameHost.ets` 的 `-120` **从没被编进包** —— `modules.abc` 比源码**老 1.5 小时**；清 `intermediates` 重建才生效。
+
+---
+
+## 0. 结论（先给四问的答案）
+
+| 问题 | 答案 |
+|---|---|
+| ① `build.sh` 有缓存处理吗？ | **没有**。它只清「上次崩溃留下的 `.hvigor/.build-lock`」；构建命令固定 `--no-daemon`，**不传** `--no-incremental`、**不碰任何缓存目录** |
+| ② 能不能做「装包前检查」？ | **能**，判据用 mtime：**`modules.abc` 必须比 `src/main/ets` 下所有 `.ets` 新**。**但光比 mtime 不够**（见 §3 的三个坑），要配 `--strict` 时的**强制全量**才可靠 |
+| ③ 能放进 `build.sh` 吗？ | **能**，建议 `BUILD_STRICT=1` 时启用（方案见 §4，**未改代码，等你批**） |
+| ④ `hvigorw clean` vs `rm -rf intermediates` | **实测**：`clean` 删**整个 `entry/build/`**（333MB，**含 outputs 里的 .hap**），**但保留 `.hvigor/cache/`**；`rm -rf intermediates` 只删中间产物、**留下旧 .hap**（危险）。**建议一律用 `clean`** |
+
+---
+
+## 1. 缓存到底长什么样（实测）
+
+```
+.hvigor/cache/            1.3 MB   ← ★ 任务级增量缓存，clean **不会**删
+  ├─ file-cache.json      1.19 MB  ← 111 条「文件 → hashValue」
+  ├─ task-cache.json       161 KB  ← 54 个任务的输入/输出快照
+  ├─ last-build-info.json    21 B  ← {"_":["assembleHap"]}
+  ├─ meta.json               97 B  ← hvigor 6.26.8 / SDK 26.0.0(26.0.0)
+  └─ project-config.json   7.4 KB  ← buildMode=Debug、modulePath 等
+entry/build/             333 MB   ← 产物 + intermediates（clean 会整棵删掉）
+  └─ default/intermediates/loader_out/default/ets/modules.abc   ← ★ 真正进包的那个文件
+```
+
+**`task-cache.json` 的结构**（以 `CompileArkTS` 为例）：
+```
+_inputs      : 46 条 `ValueEntry`（debuggable / isArk / needCoverageInsert / customTypes …＝**配置值**）
+_inputFiles  : dict（**目录/快照**级，不是逐个 .ets）
+_outputFiles : Map：'…/loader_out/default/ets' → {isDirectory:true, fileSnapShotHashValue:'e0ebf8…'}
+```
+⇒ **`CompileArkTS` 的增量判定以「目录快照哈希」为主，不是「每个 .ets 一条哈希」**。
+
+## 2. 三个已经查到的**真隐患**（每个都足以造成"改了没生效"）
+
+### ① 源码文件根本不在文件级哈希里 —— `GameHost.ets` 一条都没有
+```python
+file-cache.json 共 111 条 → 命中 'GameHost' = 0 条
+按根路径分组: {yiju: 49, '/Users/a0000/dev': 57, other: 5}
+```
+⇒ 缓存里 111 条主要是配置/资源；**`.ets` 源码不按文件记账**。
+因此"源码变了"只能靠**目录快照**间接发现 —— 而目录快照的判据（mtime/hash 采集时机）一旦漏，就会**误判为 up-to-date**。
+
+### ② 符号链接 `yiju → One More` 造成**两套任务命名空间**
+```
+task-cache.json 里同时存在：
+  :yiju:entry:default@CompileArkTS          ← 从 /Users/a0000/dev/yiju 构建时写的
+  :One More:entry:default@CompileArkTS      ← 从 /Users/a0000/dev/One More 构建时写的
+```
+（`/Users/a0000/dev/yiju` 是 **symlink** → `One More`，`ls -ld` 可证。）
+⇒ 同一个项目**换个路径进就换一套缓存**：轻则**全量重编（慢）**，重则**状态错配**（一个路径的产物被另一个路径的任务当成"已是最新"）。
+⇒ **建议：所有脚本统一用绝对路径 `/Users/a0000/dev/One More`，不要用 `yiju` 别名**（反之亦然，但只能二选一）。
+
+### ③ `modules.abc` 的时间戳判据只能抓"明显过期"，抓不到"内容没更新但 mtime 更新"
+如果构建把 `modules.abc` 重写了一遍（mtime 变新）但内容其实没包含最新源码（比如只重打包没重编译），
+**mtime 检查会通过**。所以 mtime 只是**第一道闸**，不是保险。
+
+## 3. 建议的「装包前检查」（可直接抄）
+
+```bash
+# ── 判据 1827：产物必须比源码新 ──
+ABC="entry/build/default/intermediates/loader_out/default/ets/modules.abc"
+[ -f "$ABC" ] || { echo "❌ 没有 modules.abc（还没构建过）"; exit 3; }
+
+NEWER=$(find entry/src/main/ets -name '*.ets' -newer "$ABC" -print -quit)
+if [ -n "$NEWER" ]; then
+  echo "❌ 缓存过期：$NEWER 比 modules.abc 新" >&2
+  echo "   ⇒ 必须：bash build.sh clean && bash build.sh assembleHap" >&2
+  exit 3
+fi
+echo "✅ 产物比源码新（$(date -r "$ABC" '+%H:%M:%S')）"
+
+# ── 第二道：hap 必须比 abc 新（防"只编了 abc 没重打包"）──
+HAP="entry/build/default/outputs/default/entry-default-signed.hap"
+[ -f "$HAP" ] && [ "$HAP" -nt "$ABC" ] || { echo "❌ hap 比 abc 老 ⇒ 包是旧的"; exit 3; }
+
+# ── 第三道（可选）：装到设备上的包，其 updateTime 必须 ≥ 本地 hap 的 mtime ──
+#   （今天踩过：本地重建了但设备上还是旧包）
+```
+
+**成本**：`find -newer` 遍历 ~700 个 .ets，实测 < 0.2s；三道闸加起来 ~0.5s，**对 4–9 分钟的构建可忽略**。
+
+## 4. 建议怎么放进 `build.sh`（方案，**未改代码**）
+
+```bash
+TASK="${1:-assembleHap}"
+
+# ★ BUILD_STRICT=1：构建前先做"缓存会骗人"的预防，构建后再验一次产物时间
+STRICT="${BUILD_STRICT:-0}"
+if [ "$STRICT" = "1" ] && [ "$TASK" = "assembleHap" ]; then
+  # 构建前：若源码已比产物新，说明缓存可能不可靠 ⇒ 直接全量
+  ABC="entry/build/default/intermediates/loader_out/default/ets/modules.abc"
+  if [ -f "$ABC" ] && find entry/src/main/ets -name '*.ets' -newer "$ABC" -print -quit | grep -q .; then
+    echo "── BUILD_STRICT：源码比产物新 ⇒ 先 clean 再全量构建 ──"
+    "$DEVECO_CLI_CLT_PATH/hvigor/bin/hvigorw" --no-daemon clean >/dev/null 2>&1 || true
+  fi
+fi
+# ...原有构建...
+# 构建后：无论 strict 与否，都做一次"产物 ≥ 源码"校验（strict 时失败即退出）
+```
+
+- **默认（不设 `BUILD_STRICT`）行为完全不变** —— 日常构建不受影响
+- **`BUILD_STRICT=1` 只在 `assembleHap` 时生效**，语义：**源码比产物新 ⇒ 先 clean 再建**；建完再验一次时间
+- 建议**给 CI / 出包 / 演示前**都用 `BUILD_STRICT=1`
+
+## 5. `hvigorw clean` vs `rm -rf intermediates`（**实测**）
+
+| 操作 | 删什么 | 留什么 | 风险 |
+|---|---|---|---|
+| **`bash build.sh clean`**（= `hvigorw clean`） | **整个 `entry/build/`**（实测 333MB → 0，**含 `outputs/` 里的 .hap**） | `.hvigor/cache/`（1.3MB，任务缓存**保留**） | **无**（旧包也删了，不可能误装旧包） |
+| `rm -rf entry/build/default/intermediates` | 只删中间产物 | **旧 `.hap` 仍留在 `outputs/`**、`.hvigor/cache` 也在 | ⚠️ **危险**：若随后构建失败，`outputs/` 里那枚**旧 hap 还在**，很容易被当成新包安装 |
+
+**结论**：
+- **日常救火用 `clean`**（它把旧包一起删掉，最不容易骗人）
+- `rm -rf intermediates` 只在"只想省时间、且确认构建会成功"时用，**用完必须核对 hap 的 mtime**
+- 注意：`clean` **不清 `.hvigor/cache`**；如果怀疑是**任务缓存**本身坏了（比如 symlink 那套错配），
+  需要**手工删 `.hvigor/cache`**（或删 `.hvigor` 整个目录）再构建 —— 这一步 `clean` **做不到**。
+
+## 6. 判据 1827 的落地用法（写给下一个踩坑的人）
+
+> **「改了源码但行为没变」时，第一步不是读代码，而是查产物时间：**
+> ```bash
+> ls -l entry/build/default/intermediates/loader_out/default/ets/modules.abc
+> find entry/src/main/ets -name '*.ets' -newer entry/build/default/intermediates/loader_out/default/ets/modules.abc
+> ```
+> 有输出 ⇒ **缓存过期**，直接 `bash build.sh clean` 重建，别浪费时间读代码。
+> 全部无输出仍不生效 ⇒ 才去怀疑"装到设备上的包不是这一版"（核对 `bm dump updateTime` vs 本地 hap mtime）。
+
+## 7. 本次实测记录
+
+| 项 | 值 |
+|---|---|
+| 排查时 `modules.abc` | `2026-11-08 21:20:11` |
+| 最新 `.ets` | `20:29:36 pages/GameHost.ets`（**产物比源码新 50 分钟 ⇒ 当时状态正常**） |
+| `file-cache.json` 条目 | 111（**0 条含 GameHost**） |
+| `task-cache.json` 任务数 | 54（**同名任务两套**：`:yiju:` 与 `:One More:`） |
+| `clean` 前后 | `entry/build` 333MB → 删除；`.hvigor/cache` 1.3MB → **保留** |
+| 重建耗时（clean 之后全量） | **10 分 48 秒**（`BUILD SUCCESSFUL`，32 个任务执行 / 1 个 up-to-date） |
+| clean 后遗症 | **`outputs/` 里的 .hap 被一起删掉** ⇒ 重建期间设备侧没有新包可装（其实是好事：不会误装旧包） |
+| 重建后校验 | `modules.abc` 21:41，`find -newer` **无输出** ⇒ ✅ 产物比源码新 |
+
+### 7.1 一条重要的代价数字
+**`clean` 之后必须付一次全量重建：10 分 48 秒**（今天这台机还同时有另一路 hvigor 抢 CPU）。
+⇒ **别把 `clean` 当日常操作**；只在「源码改了但行为没变」或「要出正式包」时才用。
+日常改单个游戏增量构建通常 1–3 分钟；但一旦怀疑缓存，**10 分钟的 clean 重建比"白验一轮"便宜得多**。

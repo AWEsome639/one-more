@@ -1,0 +1,106 @@
+# HUD 追加 · 233×233 纵向复算（2026-11-07）
+
+> 对象：上轮补 HUD 的 18 款。结论先说：**B 类 2 款不需要动（本来就没加行）；A/C 共 8 款在 233 上本来就放不下**
+> ⇒ 按你的「降级优先于溢出」，给这 8 款的**新行**加了「233/手表隐藏」，正常屏保留。**已改完，待你编译。**
+
+---
+
+## 1. 233×233 的纵向预算（逐项，参数都从代码里取）
+
+| 项 | 值 | 依据 |
+|---|---|---|
+| 屏高 | **233vp** | 233×233 圆屏（Bp.height） |
+| GameHost 顶栏 | **42vp** | `iconSize() = Bp.narrowHeight() ? 30 : 44` → 30；padding `tinyScreen ? Space.xs : …` = 6 上下 → 30+12 |
+| 顶栏与游戏区之间 | 0 | 同一 Column 子项 |
+| 游戏区（`.layoutWeight(1)`） | 233 − 42 = **191vp** | `GameHost` 游戏区 Column |
+| 游戏区 padding-bottom | **20vp** | `.padding({ left: lg, right: lg, bottom: Space.lg })` = 20 |
+| 游戏组件可用高 | **171vp** | 191 − 20 |
+| DemoBar（未演示） | **0** | 未演示时高度 0 |
+| HintBar | **38vp** | `HintBar.barHeight = 38`（固定） |
+| **游戏主体可用** | **133vp** | 171 − 38 |
+
+**⇒ 每款游戏在自己的 build 里只有 133vp 可摆：HUD + 棋盘 + 状态行 + 按钮。**
+棋盘基本都是 `layoutWeight(1) + aspectRatio`（会吃剩下的），所以**固定项越多，棋盘越小**。
+
+### 各款的固定项（按代码读到的，不含棋盘）
+
+| 游戏 | 根 Column space | 固定项（HUD/状态/按钮） | 我加的行 | 固定项合计 | 棋盘剩余 |
+|---|---|---|---|---|---|
+| GLaserLink / GLaserReflect | md=16 | HUD 20 + 状态 18 + 按钮 `Cell.of(44)` + 3×16 | **+20** | 130（无我）/ **150（有我）** | 3 → 溢出 17 |
+| GInterlockPuzzle | md=16 | HUD 20 + 状态 18 + 44 + 48 | +20 | 130 / **150** | 3 → 溢出 17 |
+| GFactBinder | sm=10 | HUD 20 + note 18 + 44 + 30 | +20 | 112 / **132** | 21 → 1 |
+| GGravitySort | md=16 | HUD 20 + 状态 18 + 44 + 48 | +20 | 130 / **150** | 3 → 溢出 17 |
+| GGeometricVision | md=16 | HUD 20 + note 18 + 48 + 64 | +20 | 150 / **170** | **已 −17** → 溢出 37 |
+| GGraphCoordinatePlot | xs=6 | HUD 20 + 指令 18 + note 18 + 44 + 24 | +20 | 124 / **144** | 9 → 溢出 11 |
+| GSimonCommand（A 类） | md=16 | 进度条 8 + HUD 20 + 状态 18 + 键盘 48 + 按钮 46 + 80 | +20 | 202 / **222** | **早已 −69** |
+
+> 口径：文字行高按 `FontSize.sm(14) × 1.4 ≈ 20vp` 估、`xxs` 按 17vp；按钮取代码里的 `Cell.of(N)`；
+> 间距取该款根 Column 的 `space`。棋盘一律 `layoutWeight(1)`（有 `aspectRatio` 的会按宽度反推），所以"剩余"为 0 时它会被压扁而不是溢出 ——
+> 但**固定项本身就超过 133vp 的那些款（GeometricVision / SimonCommand）会直接把内容顶出可视区**。
+
+**结论**：这 8 款在 233 上本来就装不下（棋盘 3~9vp 甚至负数）。我上轮各加的一行（~20vp）会让情况更差：
+- 原本棋盘还有 3~9vp 的，变成**溢出 11~17vp**（按钮/状态被裁）；
+- 原本已溢出的，再多溢 20vp。
+
+⇒ **不能合并、只能隐藏**：合并（`步数 3/8 · 剩 12s` 塞进同一 Row）在 233 上只能省纵向 20vp，
+但这 8 款的固定项本来就超了 133vp，省下的 20vp 也救不回来，反而把一行文字挤成两行（宽度 193vp 放不下「已亮 3/6 · 步数 12/14」+ 状态行）。
+
+---
+
+## 2. 处置（已改完，等你编译）
+
+### 2.1 加「233/手表隐藏」守卫的 8 款（A 1 + C 7）
+
+每款在我新增的那行后面补一行：
+
+```ts
+.visibility(Bp.tinyScreen() || Bp.isWatch() ? Visibility.None : Visibility.Visible)
+```
+
+- `Visibility.None` ⇒ **完全不占布局**（不是 Hidden 那种留空），所以 233 上回到上轮之前的排布，**零回归**；
+- 判据用 `Bp.tinyScreen()`（高 < 340，含 233/195）**或** `Bp.isWatch()`（设备类型）——两者都覆盖才不会漏（模拟器 deviceType 常报 phone，所以尺寸判据是主力）；
+- 涉及：`GSimonCommand`（A）、`GLaserLink`、`GLaserReflect`、`GGravitySort`、`GInterlockPuzzle`、`GFactBinder`、`GGeometricVision`、`GGraphCoordinatePlot`（C）；
+- 其中 4 款原本没 import `Bp`（`GSimonCommand` / `GFactBinder` / `GGeometricVision` / `GGraphCoordinatePlot`）⇒ 各补一行 `import { Bp } from '../core/Bp';`（4 款原本已有）。
+
+### 2.2 B 类 2 款（❤×n）**不需要守卫**
+
+`GVocabularyBuilder` / `GVerbalAnalogies` 的 `❤×n` 是塞进**已有的那一 Row**（`题 1/5` 那行），**纵向不增加任何高度**；
+233 上只是把那一行 193vp 的宽度三分（`❤×3` 约 30vp + `题 1/5` 约 55vp + 得分 `xl` 约 30vp，还剩 ~70vp 余量）⇒ 宽度也放得下。
+
+### 2.3 D 类 8 款（`步数 n/max`）**不需要守卫**
+
+改的是**已有那一行**的文字（`Text(Digits(moves))` → `TG2('步数 {0}/{1}', …)`），**没有新增元素**，
+最多让这一行文字变长；`FontSize` 未变。233 上若真放不下会被 Text 自然换行（该行本身是单行显示、上面还有空白），不会顶掉按钮。
+
+---
+
+## 3. 为什么接受"233 上不显示"（而不是硬塞）
+
+1. **这 18 款全都不在手表精选**：`core/WatchGames.ets` 的 `IDS` 只有 24 款，逐个核对 —— 我改的 18 款**一款都不在**。
+2. 233 上正常路径（游戏列表）会被 `GamesTab.watchFilter()` 过滤成那 24 款 ⇒ 这 18 款**根本进不来**；
+   能进来的只有三条"用户主动"路径：今日挑战、随机来一局、统计页「先从这几款开始」。
+3. 也就是说：**233 上能见到它们本身就是边缘路径**；这些款在 233 上棋盘只剩 3~9vp（有的早已溢出），
+   与其再挤一行，不如让这个新 HUD **只在它真正能读的屏幕上出现**。
+4. 真要在手表上做，正确做法是给这 8 款单独做"手表布局"（缩 HUD、砍状态行），那是另一个专项，不该混在这次 HUD 补全里。
+
+---
+
+## 4. 复算
+
+```bash
+cd ~/dev/One\ More
+# 预算参数
+grep -n "iconSize()" -A2 entry/src/main/ets/pages/GameHost.ets          # 30 on 233
+grep -n "barHeight: number" entry/src/main/ets/components/HintBar.ets   # 38
+grep -n "tinyScreen(): boolean" -A3 entry/src/main/ets/core/Bp.ets      # < 340
+# 8 款守卫是否就位
+grep -l "Visibility.None : Visibility.Visible" entry/src/main/ets/games/*.ets | wc -l   # ⇒ 8
+# 18 款是否都不在手表精选
+grep -o "'[a-z0-9_]*'" entry/src/main/ets/core/WatchGames.ets | wc -l                   # ⇒ 24 条
+```
+
+**待真机验证（正常屏，440×744 / 853×533）**：
+1. `GSimonCommand` 倒计时是否跟手（0.0~2.2s，最后 0.6s 红）；
+2. `GLaserLink`/`GLaserReflect` 的「步数 n/14、n/18」与「已亮 x/y」两行是否都完整；
+3. `GGeometricVision`（固定项最满）状态行 + 违规行 + 按钮是否都在屏内；
+4. 233×233：这 8 款**不应**多出任何一行（守卫生效），B/D 类照常显示。

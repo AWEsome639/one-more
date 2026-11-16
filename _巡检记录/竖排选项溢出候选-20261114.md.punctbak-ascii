@@ -1,0 +1,100 @@
+# 竖排选项溢出候选（判据 1886 形状） · 2026-11-14
+
+> **只读**：未改 `.ets`、未编译、**未碰设备/模拟器**、未 commit（全量扫在跑，本轮纯文件分析）。
+> 形状：`AI 代打 / 统计卡 / [进度条] / 题目卡（大字号）/ 选项 1..4` 竖排，最后一两个选项贴屏底被切。
+> 修法（判据 1886：**动上方，不动下方**）：把**题目卡的大字号**在矮屏降档，选项行/高度一个都不动。
+>
+> **⛔⛔⛔ `2026-11-14 21:x` 修订（判据 `2368`）：这条判据**只讲了字号一项，不完整**。
+> 「上方题卡的高度 = 字号 + 行距 + padding」，三项都要查：
+> ① 字号降一档（原文已有）　② 行距（`Column({space})`）降一档　③ **`padding`：`Space.lg(24) → Space.md(16)` ⇒ 上下各省 `8vp`**
+> **铁证：本文档 `L57` 把 `Base Conversion Run` 标成「✅ 已按判据 1886 修好」，而台账 `lowest.y1=1594`（只露 `6px`）⇒ 仍被切。**
+> 详见 `★★★★★判据1886本身不完整-只讲字号没讲padding-20261114.md`。
+
+---
+
+## 0. 结论
+
+**严格同形状候选 6 款**（其中 **4 款实测 `max_bottom` ≥1550**）；
+**最确定的三款**：`GCalculationSprint`(1600) · `GModuloClock`(1600) · `GTargetNumber`(1558)。
+
+**⚠️ 一个必须先说明的发现**：你给的四款「已知」里，**除 `Base Conversion Run` 外，另外三款的题卡大字号早就带 `Bp.isShort()` 降档了**（见 §2）——
+所以它们**不是"未修"，而是"已降过一档"**；如果还溢出，得继续往下降（`xxl(24)` → `xl(20)`），而不是加 guard。
+
+---
+
+## 1. 严格同形状候选（6 款，逐款三行）
+
+### `GCalculationSprint`（心算冲刺）
+· 选项 `ForEach` 在 `L521`（`this.optsIdx`，4 个竖排 `Row`，每个整行可点）
+· 上方大块 `L504`：`FontSize.hero`（36vp，题卡 `Text(this.quiz)`，外层 `.padding(Space.lg)`）
+· 建议：`L504` `.fontSize(FontSize.hero)` → `.fontSize(Bp.isShort() ? FontSize.xl : FontSize.hero)`（矮屏 36→20，省 ~22vp）
+
+### `GModuloClock`（模运算钟）
+· 选项 `ForEach` 在 `L447`（`this.slots`，竖排整行选项）
+· 上方大块 `L442`：`FontSize.hero`（36vp，`Text(this.face)`，外层 `.padding(Space.lg)`）
+· 建议：`L442` `.fontSize(FontSize.hero)` → `.fontSize(Bp.isShort() ? FontSize.xl : FontSize.hero)`（省 ~22vp）
+
+### `GTargetNumber`（目标数）
+· 选项 `ForEach` 在 `L395`（4 个整宽 `Button`，竖排在最下方）
+· 上方大块 `L381`：`FontSize.xxxl`（28vp，`🎯 目标 = …`）
+· 建议：`L381` `.fontSize(FontSize.xxxl)` → `.fontSize(Bp.isShort() ? FontSize.xl : FontSize.xxxl)`（省 ~11vp）
+
+### `GPercentageShopping`（折扣计算）
+· 选项 `ForEach` 在 `L404`（`this.slots`，竖排整行，`Cell.of(50)` 高）
+· 上方大块 `L398`：`FontSize.hero`（36vp，`Text(this.icon)`）；同卡 `L399` 还有 `FontSize.xxl`（24vp）
+· 建议：`L398` hero → 矮屏 `xl`；若还不够，`L399` xxl → 矮屏 `lg`（合计省 ~16vp）
+
+### `GPhoneticGuess`（音标猜测）— 🟡 已有兜底，优先级低
+· 选项 `ForEach` 在 `L479`（4 个 `Row`，但**外面已经套了 `Scroll`**，注释写明「小屏 4 行装不下时可滚」）
+· 上方大块 `L463`：`FontSize.xxl`（24vp，音标卡）
+· 建议：可不改；若要更整齐，`L463` xxl → 矮屏 `xl`（省 ~5vp）
+
+### `GExponentTower`（幂塔）— 🟢 兜底够用
+· 选项 `ForEach` 在 `L342`
+· 上方大块 `L325`：`FontSize.xxl`（24vp）
+· 建议：实测 `max_bottom=1302` 本来就没溢出，**可不改**
+
+---
+
+## 2. 你给的四款「已知」——行号核对 + 现状
+
+| 游戏 | 选项 ForEach | 上方大字号 | 现状 | 结论 |
+|---|---|---|---|---|
+| `Base Conversion Run` | `L574`（`this.optsIdx`） | `L556`：`Bp.isShort() ? FontSize.xl : FontSize.xxxl` | **已修**（矮屏 xl=20） | ✅ 已按判据 1886 修好 |
+| `Collatz` | `L418`（`this.optsIdx`） | `L404`：`Bp.isShort() ? FontSize.xxl : FontSize.hero` | **早就带 guard**（矮屏 xxl=24） | ⚠️ 若要再省，xxl→xl（24→20，省 ~5vp） |
+| `Fraction Matcher` | `L343`（`this.slots`） | `L325/L327`：`Bp.isShort() ? FontSize.xxl : FontSize.xxxl` | **早就带 guard**（矮屏 xxl=24） | ⚠️ 同上，可再降到 xl |
+| `Percentage Peak` | `L499`（`this.slots`） | `L491`：`Bp.isShort() ? FontSize.lg : FontSize.xxl` | **早就带 guard**（矮屏 lg=18） | ✅ 已经是最低一档，**不用再改** |
+
+**⇒ 这三款不是"漏修"，是"已降一档但没降到底"。** 若它们仍在实测里溢出，优先怀疑不是题卡字号，而是别的块（统计卡/进度条/选项高度）。
+
+---
+
+## 3. 排除的假阳性（说明口径）
+
+| 游戏 | 为什么不算 |
+|---|---|
+| `GDigitSpanReverse` | ForEach 是 **3×3 键盘网格**（不是竖排选项），`hero` 那行是方框里的一个大字；改法应是 `Stack` 定高 110 而不是字号 |
+| `GKakuro` | 大字号在**数字键**上，选项区是键盘不是题卡 |
+| `GPhoneticGuess` | 已有 `Scroll` 兜底（列为 🟡 而非 🔴） |
+
+---
+
+## 4. 方法（可复现）
+
+```bash
+# 1) 找 build() 根 Column 里的 ForEach，且 body 同时满足：有 .onClick(、有 .height(Cell.(of|tap))、行宽 100%
+# 2) 排除：内部再套 ForEach（键盘网格）、所在块是 Grid/GridItem
+# 3) 选项之后（到根 Column 结束）只允许 Text/Button/HintBar（无 Stack/Grid/Column）
+# 4) 选项之上存在【没有 Bp.isShort()/tinyScreen 保护】的 FontSize.(xxl|xxxl|hero) 或 Cell.of(N>=50)
+```
+
+筛完 355 款：竖排选项款 **81** → 上方有未降档大字号 **37** → 严格同形状（非网格/非嵌套）**6**。
+
+---
+
+## 5. 局限
+
+- **纯静态**，没有 dump：`max_bottom` 取自台账的最新记录，不代表改动前/后的对照；
+- 「省 Xvp」是按字号差 × 1.4 行高估算（`hero 36→xl 20` ⇒ 16×1.4≈22vp），**不是实测**；
+- 只扫到「根 Column 下最后一个可点 ForEach」这一支；若某款选项在 `@Builder` 里二次封装，可能漏（我按 6 款全查过，暂无发现）；
+- 本轮**没有碰设备/模拟器**，也没有跑任何被测工具。

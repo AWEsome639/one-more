@@ -1,0 +1,151 @@
+# 布局改动风险表（2026-11-12 晚间 24 款）
+
+> 只读审计｜**未改任何 `.ets`**｜未编译、未碰设备
+> 审计基线：`f7f3f8c6`（今日 12:00 前）→ `7fd5eec8`（今晚最后一笔）
+> 设备口径：**853×533**（`Bp.width 853 ≥ 840` ⇒ `scale 1.12`；`height 533 < 600` ⇒ `Cell.of` ×0.85）
+> ⇒ **`Cell.of(x) = round(x × 0.952)`**、`Cell.tap(x) = max(of(x), 44)`；可用高 **343vp**（`GameHost` `maxHeight = Bp.height − 190`）
+
+---
+
+## 0 一句话结论
+
+**24 款里 18 款的可点目标被压到 `< 44vp`**（判据 1899 的触控线）。按严重度分两层：
+
+- **🔴 7 款 ≤24vp —— 真的点不准，必须处理**：
+  `GWordSearch`(16)、`GPixelMimic`(16 / 困难 **12**)、`GRotatingMaze`(20 / 困难 **14**)、
+  `GFindWord`(24)、`GPolyominoTiling`(≈22)、`GPathRecall`(≈22)、`GMathMaze`(≈23)
+- **🟠 11 款 27~39vp —— 偏小，但在项目既有接受区间内**（`Design.ets` A2 条已接受 71 处同类）：
+  `GCrossSectionSlice`(30) `GVisualSearchConjunction`(30) `GPrimeHunter`(30) `GCountingSheep`(39)
+  `GDistractorMatrix`(39) `GFactorFinder`(39) `GFractionMatch`(39) `GTarget10`(39)
+  `GBaseShift`(32 高) `GNumberBonds`(27 高) `GNumericalEstimation`(30 高)
+
+**根因**：343vp 的可用高装不下 8 列 × 44vp（= 352vp）—— **宽度封顶只是把它压小，没有解决"列数太多"**。
+⇒ 7 款 🔴 里 3 款（WordSearch / PixelMimic / RotatingMaze）**建议回退或横屏减列**。
+
+---
+
+## 1 改动清单（按类型）
+
+| 类型 | 款数 | 具体改法 |
+|---|---|---|
+| **A. 棋盘宽度封顶**（`layoutWeight+aspectRatio` 格） | **12** | `width('100%')` → `width(Math.min(Bp.width−2×lg, max(140, Bp.height−360)))` ⇒ 横屏 **≈173vp** |
+| **B. 选项行变矮** | **3** | `Cell.of(52)→34`、`of(36)→28`、`of(50)→32`（矮屏） |
+| **C. 说明行隐藏** | **5** | `.visibility(Bp.isShort() ? None : Visible)` |
+| **D. 盘面 maxHeight 限高** | **4** | `.constraintSize({ maxHeight: max(120, Bp.height−400) })` ⇒ 横屏 **133vp** |
+| **E. 其他** | 若干 | `Wordle` 棋盘宽 `120vp`、`MathMaze` 限宽 `−420`、根间距收窄 |
+
+---
+
+## 2 🔴 触控尺寸表（核心，判据 1899 `touchMin = 44`）
+
+> 格子算法：封顶后每行宽 **173vp**，格间 `Space.xs = 6vp`
+> `cell = (173 − 6×(N−1)) / N`
+
+| 游戏 | 网格 | 格子 vp | 判定 |
+|---|---|---|---|
+| **GWordSearch** | 8×8 | **16** | 🔴 **不可点**（3×3 围）
+| **GPixelMimic** | 8×8 / 难 10×10 | **16 / 12** | 🔴 **不可点**
+| **GRotatingMaze** | 7×7 / 难 9×9 | **20 / 14** | 🔴 **不可点**
+| GFindWord | 6×6 | **24** | 🟠 偏小（约 2 指宽，易误触）
+| GCrossSectionSlice | 5×5 | **30** | 🟠 偏小但可点
+| GVisualSearchConjunction | 5×5 | **30** | 🟠 同上
+| GPrimeHunter | 5×5 | **30** | 🟠 同上
+| GCountingSheep | 4×4 | **39** | 🟡 接近 44，可接受
+| GDistractorMatrix | 4×4 | **39** | 🟡 同上
+| GFactorFinder | 4 列 | **39** | 🟡 同上
+| GFractionMatch | 4 列 | **39** | 🟡 同上
+| GTarget10 | 4 列 | **39** | 🟡 同上（原 5×4，卡片式）
+| GPolyominoTiling | 5×5（限高 133） | **≈22** | 🟠 偏小
+| GPathRecall | 5×5（限高 133） | **≈22** | 🟠 偏小
+| GMathMaze | 5×5（限宽 140） | **≈23** | 🟠 偏小
+| GBaseShift | 选项按钮 | 高 **32** | 🟠 高度不足（宽够）
+| GNumberBonds | 选项按钮 | 高 **27** | 🟠 高度不足（4 行 × 27）
+| GNumericalEstimation | 选项按钮 | 高 **30** | 🟠 高度不足（4 行 × 30） |
+| GWordle | 棋盘格 5×5 | **19**（不可点） | 🟡 非交互，但**文字可能溢出**（见 §4） |
+| GWordle | 键盘键 | **≈76×40** | 🟡 宽够、高 40 略低于 44 |
+| GFrequencyTap / GPhoneticGuess / GTapa / GKurodoko / GContextClues / GPythagoreanTripleBuilder | 只限高/隐藏说明 | — | ✅ 无缩小 |
+
+**⚠️ 口径说明**：`Cell.of()` **允许** <44（判据 1899 只约束 `Cell.tap`）；但**棋盘格子是主要操作对象**，
+`20vp` 以下基本等同「点不准」。项目里已有 71 处 `<44` 的既有接受项（`Design.ets` A2 条），所以
+**30~39vp 属可接受区间**，**≤24vp 必须处理**。
+
+---
+
+## 3 信息丢失（说明行被隐藏的 5 处）
+
+| 游戏 | 隐藏内容 | 风险 | 说明 |
+|---|---|---|---|
+| **GKurodoko** | ① 静态规则行 ② 另一行 | **低** | ① 用 `Bp.isShort() && !this.over` ⇒ **通关/失败后会重新出现** ✓ |
+| **GTapa** | 静态规则行 | **低** | 同上 `&& !this.over` ✓ |
+| **GPythagoreanTripleBuilder** | `this.tip`（提示语） | **低** | 纯提示，非计分反馈 ✓ |
+| **GFractionMatcher** | 「分子分母同乘…」规则句 | **低** | 纯规则说明；首局用户靠页头 `?`（HowTo）仍可看 ✓ |
+| **GModularClockArithmetic** | 纯说明行 | **低** | 同上 |
+
+⇒ **没有一款丢的是「得分反馈 / 状态」**，全是静态规则句；且 2 款用了 `&& !this.over` 保证结局可见。
+**唯一 UX 代价**：矮屏首次进入时看不到规则，需要点页头 `?`。
+
+---
+
+## 4 文字截断风险
+
+| 游戏 | 行高 | 字号 / 行高估算 | 判定 |
+|---|---|---|---|
+| GBaseShift | 32vp | `FontSize.xl`(20) ⇒ ≈26vp | ✅ 够 |
+| GNumberBonds | **27vp** | `FontSize.lg`(18) ⇒ ≈23vp | ⚠️ **只剩 4vp 余量**，多行/大字号模式会切 |
+| GNumericalEstimation | 30vp | `FontSize.lg`(18) ⇒ ≈23vp | ✅ 勉强够 |
+| **GWordle 棋盘格** | **19vp** | `FontSize.xl`(20) ⇒ 字形 ≈24vp | 🔴 **字比格子高** ⇒ 字母会上下溢出（截图肉眼可能不明显，但 `maxFontSize` 未设） |
+| Wordle 键盘键 | 40vp | `FontSize.md`(16) | ✅ 够 |
+
+---
+
+## 5 风险表（汇总）
+
+| 游戏 | 改了什么 | 最小触控 vp | 信息丢失 | 文字截断 | 建议 |
+|---|---|---|---|---|---|
+| **GWordSearch** | 棋盘限宽 173 | **16** | — | — | 🔴 **回退 / 横屏减列到 5** |
+| **GPixelMimic** | 同上（2 处） | **16 / 12** | — | — | 🔴 **回退 / 横屏减列** |
+| **GRotatingMaze** | 同上 | **20 / 14** | — | — | 🔴 **回退 / 横屏减列** |
+| **GWordle** | 棋盘宽 120 | 19（非交互） | — | 🔴 字溢出格子 | 🟠 棋盘格子改 `FontSize.md` 或放宽到 150 |
+| GFindWord | 棋盘限宽 | 24 | — | — | 🟠 可接受，若嫌小减列到 5 |
+| GMathMaze | 限宽 140 | ≈23 | — | — | 🟠 可接受 |
+| GPolyominoTiling | 限高 133 | ≈22 | — | — | 🟠 可接受 |
+| GPathRecall | 限高 133 | ≈22 | — | — | 🟠 可接受 |
+| GNumberBonds | 选项 36→28 | 27（高） | — | ⚠️ 余量 4vp | 🟠 建议 28→32 |
+| GNumericalEstimation | 选项 50→32 | 30（高） | — | ✅ | 🟡 可接受 |
+| GBaseShift | 选项 52→34 | 32（高） | — | ✅ | 🟡 可接受 |
+| GCrossSectionSlice / GVisualSearchConjunction / GPrimeHunter | 棋盘限宽 | 30 | — | — | 🟡 可接受 |
+| GCountingSheep / GDistractorMatrix / GFactorFinder / GFractionMatch / GTarget10 | 棋盘限宽 | 39 | — | — | ✅ OK |
+| GKurodoko / GTapa | 隐藏规则行 | — | 低（结局重现） | — | ✅ OK |
+| GPythagoreanTripleBuilder / GFractionMatcher / GModularClockArithmetic | 隐藏说明行 | — | 低 | — | ✅ OK |
+| GFrequencyTap / GPhoneticGuess / GContextClues | 限高/无改动 | — | — | — | ✅ OK |
+
+---
+
+## 6 建议（按优先级）
+
+1. **优先处理 7 款 ≤24vp**：`GWordSearch`、`GPixelMimic`、`GRotatingMaze`、`GFindWord`、`GPolyominoTiling`、`GPathRecall`、`GMathMaze`
+   —— 8~10 列（或 5 列 + 限高 133）的盘在 343vp 里**物理上放不下可点格子**
+   （8×44 = 352 > 343）。**正解不是封顶宽度，而是横屏减列**（同 `ps` 难度档思路）：
+   ```ts
+   // 例：WordSearch 短屏 8 → 6 列（或让盘面可滚动）
+   .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+   // 并在短屏把 N 降一档
+   ```
+2. **`GWordle` 棋盘格**：19vp 装 20 号字 ⇒ 改 `FontSize.md`(16) 或把棋盘宽 120 → 150（键位还有余量）。
+3. **`GNumberBonds` 选项**：27vp 对 18 号字只剩 4vp 余量，建议 28 → 32。
+4. **其余 14 款**：改动有效且无新增风险，可进 OK。
+
+---
+
+## 7 复现
+
+```bash
+cd "/Users/a0000/dev/One More"
+BASE=$(git log --before="2026-11-12 12:00" -1 --format=%H)
+git diff $BASE HEAD -- entry/src/main/ets/games/ | grep -E "^[+-][^+-]" | grep -vE "^\+\s*//" | head -40
+# 触控线
+grep -n "touchMin\|static tap" entry/src/main/ets/core/Design.ets
+# 单款核对
+grep -n "Math.min(Bp.width - 2 \* Space.lg" entry/src/main/ets/games/GWordSearch.ets
+grep -n "^const N\|space: Space.xs" entry/src/main/ets/games/GWordSearch.ets | head -3
+```

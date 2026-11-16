@@ -1,0 +1,55 @@
+{"event": "start", "i": 1, "total": 27, "game": "Tents And Trees", "en": "Tents And Trees", "ts": "2026-11-11T03:30:45"}
+{"event": "result", "i": 1, "total": 27, "game": "Tents And Trees", "en": "Tents And Trees", "outcome": "error", "max_bottom": null, "lowest": null, "elapsed_s": 67.9, "returncode": 0, "tail": "Tents\tNOT_HOME\t-\t67.9s could not reach home"}
+{"event": "start", "i": 2, "total": 27, "game": "Color Maze Nav", "en": "Color Maze Nav", "ts": "2026-11-11T03:31:53"}
+{"event": "result", "i": 2, "total": 27, "game": "Color Maze Nav", "en": "Color Maze Nav", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 82.6, "returncode": 0, "tail": "Color\tNO_CARD\t-\t82.6s no card for 'Color' (fallback=(347, 780))"}
+{"event": "start", "i": 3, "total": 27, "game": "Symbol Digit Assoc", "en": "Symbol Digit Assoc", "ts": "2026-11-11T03:33:16"}
+{"event": "result", "i": 3, "total": 27, "game": "Symbol Digit Assoc", "en": "Symbol Digit Assoc", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.0, "returncode": 0, "tail": "Symbol\tNO_CARD\t-\t40.0s no card for 'Symbol' (fallback=(347, 780))"}
+{"event": "start", "i": 4, "total": 27, "game": "Room Inspector", "en": "Room Inspector", "ts": "2026-11-11T03:33:56"}
+{"event": "result", "i": 4, "total": 27, "game": "Room Inspector", "en": "Room Inspector", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 41.6, "returncode": 0, "tail": "Room\tNO_CARD\t-\t41.5s no card for 'Room' (fallback=(347, 780))"}
+{"event": "start", "i": 5, "total": 27, "game": "Word Ladder Step", "en": "Word Ladder Step", "ts": "2026-11-11T03:34:37"}
+{"event": "result", "i": 5, "total": 27, "game": "Word Ladder Step", "en": "Word Ladder Step", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 41.8, "returncode": 0, "tail": "Word\tNO_CARD\t-\t41.7s no card for 'Word' (fallback=(347, 780))"}
+{"event": "start", "i": 6, "total": 27, "game": "Tenner Grid", "en": "Tenner Grid", "ts": "2026-11-11T03:35:19"}
+{"event": "result", "i": 6, "total": 27, "game": "Tenner Grid", "en": "Tenner Grid", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.5, "returncode": 0, "tail": "Tenner\tNO_CARD\t-\t40.4s no card for 'Tenner' (fallback=(347, 780))"}
+{"event": "start", "i": 7, "total": 27, "game": "Block Stacking Physics", "en": "Block Stacking Physics", "ts": "2026-11-11T03:36:00"}
+{"event": "result", "i": 7, "total": 27, "game": "Block Stacking Physics", "en": "Block Stacking Physics", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 38.6, "returncode": 0, "tail": "Block\tNO_CARD\t-\t38.6s no card for 'Block' (fallback=(347, 816))"}
+{"event": "start", "i": 8, "total": 27, "game": "Trail Making", "en": "Trail Making", "ts": "2026-11-11T03:36:38"}
+{"event": "result", "i": 8, "total": 27, "game": "Trail Making", "en": "Trail Making", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 41.9, "returncode": 0, "tail": "Trail\tNO_CARD\t-\t41.8s no card for 'Trail' (fallback=(347, 780))"}
+{"event": "start", "i": 9, "total": 27, "game": "Word Grid Connection", "en": "Word Grid Connection", "ts": "2026-11-11T03:37:20"}
+{"event": "result", "i": 9, "total": 27, "game": "Word Grid Connection", "en": "Word Grid Connection", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.7, "returncode": 0, "tail": "Word\tNO_CARD\t-\t40.6s no card for 'Word' (fallback=(347, 780))"}
+{"event": "start", "i": 10, "total": 27, "game": "Letter Cancellation", "en": "Letter Cancellation", "ts": "2026-11-11T03:38:01"}
+{"event": "result", "i": 10, "total": 27, "game": "Letter Cancellation", "en": "Letter Cancellation", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 41.1, "returncode": 0, "tail": "Letter\tNO_CARD\t-\t41.0s no card for 'Letter' (fallback=(347, 780))"}
+{"event": "start", "i": 11, "total": 27, "game": "Word Snake Trail", "en": "Word Snake Trail", "ts": "2026-11-11T03:38:42"}
+{"event": "result", "i": 11, "total": 27, "game": "Word Snake Trail", "en": "Word Snake Trail", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.3, "returncode": 0, "tail": "Word\tNO_CARD\t-\t40.2s no card for 'Word' (fallback=(347, 780))"}
+{"event": "start", "i": 12, "total": 27, "game": "Matrix Multiplier", "en": "Matrix Multiplier", "ts": "2026-11-11T03:39:22"}
+{"event": "result", "i": 12, "total": 27, "game": "Matrix Multiplier", "en": "Matrix Multiplier", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.4, "returncode": 0, "tail": "Matrix\tNO_CARD\t-\t40.3s no card for 'Matrix' (fallback=(347, 780))"}
+{"event": "start", "i": 13, "total": 27, "game": "Maze Nav 3D", "en": "Maze Nav 3D", "ts": "2026-11-11T03:40:03"}
+{"event": "result", "i": 13, "total": 27, "game": "Maze Nav 3D", "en": "Maze Nav 3D", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.4, "returncode": 0, "tail": "Maze\tNO_CARD\t-\t40.3s no card for 'Maze' (fallback=(347, 780))"}
+{"event": "start", "i": 14, "total": 27, "game": "Mirror Image", "en": "Mirror Image", "ts": "2026-11-11T03:40:43"}
+{"event": "result", "i": 14, "total": 27, "game": "Mirror Image", "en": "Mirror Image", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 39.7, "returncode": 0, "tail": "Mirror\tNO_CARD\t-\t39.6s no card for 'Mirror' (fallback=(347, 780))"}
+{"event": "start", "i": 15, "total": 27, "game": "Associative Pairs", "en": "Associative Pairs", "ts": "2026-11-11T03:41:23"}
+{"event": "result", "i": 15, "total": 27, "game": "Associative Pairs", "en": "Associative Pairs", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.4, "returncode": 0, "tail": "Associative\tNO_CARD\t-\t40.3s no card for 'Associative' (fallback=(347, 780))"}
+{"event": "start", "i": 16, "total": 27, "game": "Box Completion", "en": "Box Completion", "ts": "2026-11-11T03:42:03"}
+{"event": "result", "i": 16, "total": 27, "game": "Box Completion", "en": "Box Completion", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.2, "returncode": 0, "tail": "Box\tNO_CARD\t-\t40.1s no card for 'Box' (fallback=(347, 780))"}
+{"event": "start", "i": 17, "total": 27, "game": "Bubble Shooter", "en": "Bubble Shooter", "ts": "2026-11-11T03:42:43"}
+{"event": "result", "i": 17, "total": 27, "game": "Bubble Shooter", "en": "Bubble Shooter", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.2, "returncode": 0, "tail": "Bubble\tNO_CARD\t-\t40.2s no card for 'Bubble' (fallback=(347, 780))"}
+{"event": "start", "i": 18, "total": 27, "game": "Letter Grid Swapper", "en": "Letter Grid Swapper", "ts": "2026-11-11T03:43:24"}
+{"event": "result", "i": 18, "total": 27, "game": "Letter Grid Swapper", "en": "Letter Grid Swapper", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 41.0, "returncode": 0, "tail": "Letter\tNO_CARD\t-\t41.0s no card for 'Letter' (fallback=(347, 780))"}
+{"event": "start", "i": 19, "total": 27, "game": "Mental Mapping", "en": "Mental Mapping", "ts": "2026-11-11T03:44:05"}
+{"event": "result", "i": 19, "total": 27, "game": "Mental Mapping", "en": "Mental Mapping", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.5, "returncode": 0, "tail": "Mental\tNO_CARD\t-\t40.4s no card for 'Mental' (fallback=(347, 780))"}
+{"event": "start", "i": 20, "total": 27, "game": "Radical Roots", "en": "Radical Roots", "ts": "2026-11-11T03:44:45"}
+{"event": "result", "i": 20, "total": 27, "game": "Radical Roots", "en": "Radical Roots", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.6, "returncode": 0, "tail": "Radical\tNO_CARD\t-\t40.5s no card for 'Radical' (fallback=(347, 780))"}
+{"event": "start", "i": 21, "total": 27, "game": "Reversi", "en": "Reversi", "ts": "2026-11-11T03:45:26"}
+{"event": "result", "i": 21, "total": 27, "game": "Reversi", "en": "Reversi", "outcome": "ok", "max_bottom": 1331, "lowest": null, "elapsed_s": 54.1, "returncode": 0, "tail": "Reversi\tOK\t1331\t54.0s lowest='重新开始' -> /Users/a0000/dev/One More/_巡检记录/截图-Reversi-034619.jpeg @2026-11-11T03:46:20"}
+{"event": "start", "i": 22, "total": 27, "game": "Sdmt", "en": "Sdmt", "ts": "2026-11-11T03:46:20"}
+{"event": "result", "i": 22, "total": 27, "game": "Sdmt", "en": "Sdmt", "outcome": "ok", "max_bottom": 1512, "lowest": null, "elapsed_s": 51.6, "returncode": 0, "tail": "Sdmt\tOK\t1512\t51.5s lowest='判定：90 秒内答对 ≥ 25 个通关（答错只影响分' -> /Users/a0000/dev/One More/_巡检记录/截图-Sdmt-034711.jpeg @2026-11-11T03:47:11"}
+{"event": "start", "i": 23, "total": 27, "game": "Slide Puzzle", "en": "Slide Puzzle", "ts": "2026-11-11T03:47:11"}
+{"event": "result", "i": 23, "total": 27, "game": "Slide Puzzle", "en": "Slide Puzzle", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 41.2, "returncode": 0, "tail": "Slide\tNO_CARD\t-\t41.2s no card for 'Slide' (fallback=(347, 780))"}
+{"event": "start", "i": 24, "total": 27, "game": "Slide15", "en": "Slide15", "ts": "2026-11-11T03:47:53"}
+{"event": "result", "i": 24, "total": 27, "game": "Slide15", "en": "Slide15", "outcome": "ok", "max_bottom": 1355, "lowest": null, "elapsed_s": 52.8, "returncode": 0, "tail": "Slide15\tOK\t1355\t52.8s lowest='提示' -> /Users/a0000/dev/One More/_巡检记录/截图-Slide15-034845.jpeg @2026-11-11T03:48:45"}
+{"event": "start", "i": 25, "total": 27, "game": "Stroop Test", "en": "Stroop Test", "ts": "2026-11-11T03:48:45"}
+{"event": "result", "i": 25, "total": 27, "game": "Stroop Test", "en": "Stroop Test", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 42.8, "returncode": 0, "tail": "Stroop\tNO_CARD\t-\t42.7s no card for 'Stroop' (fallback=(347, 780))"}
+{"event": "start", "i": 26, "total": 27, "game": "Visual Search", "en": "Visual Search", "ts": "2026-11-11T03:49:28"}
+{"event": "result", "i": 26, "total": 27, "game": "Visual Search", "en": "Visual Search", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.5, "returncode": 0, "tail": "Visual\tNO_CARD\t-\t40.5s no card for 'Visual' (fallback=(347, 780))"}
+{"event": "start", "i": 27, "total": 27, "game": "Vocabulary Builder", "en": "Vocabulary Builder", "ts": "2026-11-11T03:50:09"}
+{"event": "result", "i": 27, "total": 27, "game": "Vocabulary Builder", "en": "Vocabulary Builder", "outcome": "no_card", "max_bottom": null, "lowest": null, "elapsed_s": 40.9, "returncode": 0, "tail": "Vocabulary\tNO_CARD\t-\t40.8s no card for 'Vocabulary' (fallback=(347, 780))"}
+{"event": "done", "processed": 27, "total": 27, "failures": 24, "started_at": "2026-11-11T03:30:45", "finished_at": "2026-11-11T03:50:50", "out": "/Users/a0000/dev/One More/_巡检记录/layout-batch-20261111-033045.jsonl"}

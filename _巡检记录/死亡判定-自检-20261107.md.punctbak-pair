@@ -1,0 +1,165 @@
+# 死亡判定修复 · 自检 + 剩余提示缺口（2026-11-07）
+
+> 本轮改的是 `games/` 下 39 处（35 款 `won=false` + 拼块铺满撤销 + 3 款收尾守卫）+ 罗盘迷宫分数系数。
+> **未编译**，全部为静态核对（脚本口径见 §4）。结论：**自检 41 项全过，0 个有问题**。
+
+---
+
+## ① 罗盘迷宫：结算分系数 `×5 → ×2`
+
+**改动**：`games/GCompassMaze.ets` 的 `finish()` 里
+```ts
+score: solved ? 70 + Math.max(0, (this.dmax() - this.steps) * 2) : this.steps * 4,
+```
+（同时在上一行补了三条注释说明为什么压系数，方便下一个人别再改回去。）
+
+**当前 `dmax()` = `max(20, diffTotal × 5)`**（你上一轮已改成 5n）⇒ 三档新上限：
+
+| 难度 | 边长 | dmax | **理论上限**<br>70 + dmax×2 | **实际能拿到**<br>（按曼哈顿最少步 8/12/16 通关） | 旧版（dmax20×5） |
+|---|---|---|---|---|---|
+| 简单 | 5×5 | 25 | **120** | 104 | 理论 170 / 实际 130 |
+| 普通 | 7×7 | 35 | **140** | 116 | 理论 170 / 实际 110 |
+| 困难 | 9×9 | 45 | **160** | 128 | 理论 170 / 实际 90 |
+
+- **困难档理论上限 160** —— 与你算的 `70 + 45×2 = 160` 完全一致 ✓
+- 「实际能拿到」= 玩家按最少步数通关时的分（步数越多分越低），三档都在旧版附近，没有分数通胀
+- 失败分不变（`steps × 4`）
+
+---
+
+## ② 39 处逐项自检
+
+### ②-a 35 款 `won = false` 的落点：**35/35 通过**
+
+判据三条同时满足（用**花括号深度栈**跟踪所在方法，不是正则猜）：
+1. 该行与 `finish(false)` 在同一分支（±6 行内）；
+2. 所在方法**不是** `reset()` / `finish()` / `onRestart()`（后者会误伤胜利）；
+3. 该行同时含 `this.over = true;`（说明补在判负的三件套里）。
+
+抽 10 款证据（其余同口径，全量输出见 §4 脚本）：
+
+| # | 文件 | 行 | 所在方法 | 同分支 finish(false) | 结论 |
+|---|---|---|---|---|---|
+| 1 | `G2048.ets` | 742 | `move()` | ✓ | ✓ |
+| 2 | `GColorFlood.ets` | 176 | `pick()` | ✓ | ✓ |
+| 3 | `GCrown.ets` | 497 | `tap()` | ✓ | ✓ |
+| 4 | `GDominosa.ets` | 560 | `tap()` | ✓ | ✓ |
+| 5 | `GFillomino.ets` | 447 | `setVal()` | ✓ | ✓ |
+| 6 | `GFutoshiki.ets` | 493 | `put()` | ✓ | ✓ |
+| 7 | `GGokigenNaname.ets` | 490 | `tapCell()` | ✓ | ✓ |
+| 8 | `GHeyawake.ets` | 529 | `tap()` | ✓ | ✓ |
+| 9 | `GHitori.ets` | 667 | `tap()` | ✓ | ✓ |
+| 10 | `GMatch3.ets` | 452 | `tap()`（`movesLeft<=0` 分支） | ✓ | ✓ |
+
+其余 25 款同样落在 `tap/place/submit/move/lose/crash/shuffleLeft` 这类**玩法方法**里，
+**0 处**落在 `reset()` 或 `finish()`（脚本输出「通过 35 / 35，有问题 0」）。
+
+### ②-b 拼块铺满：`moves` 只统计放置、`LIMIT` 只在放置后判：**通过**
+
+`games/GPolyominoTiling.ets`（剥掉注释后统计）：
+```
+拿起分支 = 行 284..293
+moves 自增行（去注释后）: [301]   → 落在拿起分支里的: 无 ✓
+moves >= LIMIT 判负行:   [303]   → 落在拿起分支里的: 无 ✓
+放置分支自增: [301] ✓（全文件唯一一处自增）
+```
+- 拿起分支现在只做 `b[i] = 0; this.board = b;` + 一句提示（读到 `LIMIT - moves` 是**显示**用途，不是计数）；
+- `moves` 语义 = 实际铺了几次；HUD `moves/LIMIT`（`:335`）自动跟着变；
+- 结算分 `150 + (LIMIT - moves) * 6`（`:312`）也随之变成"铺得越省分越高"，逻辑一致 ✓
+
+### ②-c 3 款收尾守卫是否在函数最开头：**3/3 通过**
+
+| 文件 | 函数 | 定义行 | **第一条语句** | 结论 |
+|---|---|---|---|---|
+| `GFocusTunnel.ets` | `finish()` | 256 | 260: `if (this.over) { return; }` | ✓（不在分支里） |
+| `GPythagoreanTripleBuilder.ets` | `submit()` | 249 | 254: `if (this.over) { return; }` | ✓ |
+| `GWordMastermind.ets` | `submit()` | 230 | 234: `if (this.over) { return; }` | ✓ |
+
+> 说明：3 款都**没有 `done` 字段**，第 4 款 `GWordle` 的 `finish()` 自带 `if (this.finished) return;` ⇒ 按你的指示没动。
+> `GPythagoreanTripleBuilder` **没有独立 `finish()`**（收尾内联在 `next()` 里直接 `onFinish`），
+> 所以守卫加在真正的重复入口 `submit()` 上 —— 这是它与其它两款唯一的结构差异。
+
+**自检合计：35 + 3 + 3 = 41 项，全部 ✓，0 个有问题。**
+
+---
+
+## ③ 剩余提示缺口扫描（只读）：20 款「有上限但玩家看不见剩余」
+
+**口径**：先扫出"会因某个上限判负"的款（时间 `left/secs/timeLeft <= 0`、生命 `life/lives <= 0`、
+步数/错误 `moves/steps/errors/wrong >= X` 且同分支 `finish(false)`），
+再核 HUD 里有没有**该资源的剩余/上限**显示（`Text(...)` / `TG2/TG4` 模板 / `Progress` / HUD 字段引用）。
+
+### A. 时间上限**完全不可见**（3 款，最危险：不知道什么时候就“时间到”）
+
+| # | 文件 | 判负式 | 现状 |
+|---|---|---|---|
+| 1 | `GObjectShuffle.ets` | `this.left <= 0` | HUD 只有「洗牌步数」（玩法计数），**没有倒计时**；`left` 全文件只用于判负与逻辑 |
+| 2 | `GSimonCommand.ets` | `this.left <= 0` | HUD 显示「答对/失误」，**时间不显示** |
+| 3 | `GSpotlightTrack.ets` | `this.left <= 0` | 时间只在开局的 `msg` 里说一次「它会走 N 步」，**没有常驻倒计时** |
+
+### B. 生命**完全不可见**（2 款）
+
+| # | 文件 | 判负式 | 现状 |
+|---|---|---|---|
+| 4 | `GVocabularyBuilder.ets` | `this.life <= 0` | HUD 无生命显示（`life` 不在任何 Text/模板里） |
+| 5 | `GVerbalAnalogies.ets` | `this.life <= 0` | 生命**只在答错后的 msg** 里闪一句「还剩 N 条命」，没有常驻显示（弱提示） |
+
+### C. 步数/错误上限**完全不可见**（7 款）
+
+| # | 文件 | 判负式 | HUD 实际显示 |
+|---|---|---|---|
+| 6 | `GFactBinder.ets` | `wrong >= diffTotal` | 无 `wrong` 显示 |
+| 7 | `GGeometricVision.ets` | `wrong >= LIVES(3)` | 无 `wrong` 显示 |
+| 8 | `GGraphCoordinatePlot.ets` | `wrong >= diffTotal` | 无 `wrong` 显示 |
+| 9 | `GLaserLink.ets` | `moves >= MAX(14)` | 只有「已亮 x/y」——**剩余步数没做**（文件头注释写着"进度：已亮/总数 + 剩余步数"，实际只做了前半） |
+| 10 | `GLaserReflect.ets` | `moves >= MAX(18)` | 同上，只有「已亮 x/y」 |
+| 11 | `GGravitySort.ets` | `moves >= diffTotal` | 只有「已消 x/y」，没有剩余步数 |
+| 12 | `GInterlockPuzzle.ets` | `moves >= diffTotal` | 无 `moves` 显示 |
+
+### D. 只显示“已用”，不显示上限（9 款；取前 8 进榜）
+
+HUD 是 `Text(Digits(String(this.moves)))` —— 玩家看到「步数 12」但不知道上限是多少，**看不到还剩多少**：
+
+| # | 文件 | HUD 行 | 应补 |
+|---|---|---|---|
+| 13 | `GHitori.ets` | `:782` | 「步数 12/26」或「还剩 14」 |
+| 14 | `GHitoriAll.ets` | `:696` | 同上 |
+| 15 | `GKakurasuSums.ets` | `:508` | 同上 |
+| 16 | `GCrown.ets` | `:553` | 同上 |
+| 17 | `GFillomino.ets` | `:612` | 同上 |
+| 18 | `GFutoshiki.ets` | `:540` | 同上 |
+| 19 | `GGokigenNaname.ets` | `:572` | 同上 |
+| 20 | `GHeyawake.ets` | `:593` | 同上 |
+
+> 另外 `GConnectFour.ets:561` 只显示「第 N 手」（不显示 42 手上限），同属 D 类，并列第 20。
+
+### 顺带确认「**已经做对**」的（别改）：12 款规定 HUD 同时显示上限
+`GColorFlood / GDualMirror / GHueSort / GKakuro / GKakuroMini / GKenken / GKlotski / GKurodoko /
+GCompassMaze（步数 {0}/{1} + dmax）/ GBridges（违规 {0}/{1}）/ GColorMatch（步数 {2}/{3}）/ GMathPath`
+—— 它们的模板里带 `/limit` 或 `剩`，不用改。
+
+**修法（一句话）**：A/B/C 三类各加一个 HUD 单元（`⏱ 剩 12s` / `❤×2` / `步数 12/26`），
+D 类把现有 `Text(Digits(String(this.moves)))` 改成模板 `TG2('步数 {0}/{1}', this.moves, <上限>)` —— 一行一处。
+优先级：A（时间）> B（生命）> C > D，因为前两类是**完全没有预警**的突然判负。
+
+---
+
+## ④ 复算 / 自检脚本
+
+```bash
+cd ~/dev/One\ More
+# 自检 ②-a（花括号栈跟踪所在方法 + finish(false) 同分支）：
+python3 /tmp/selfcheck2.py            # ⇒ 通过 35 / 35，有问题 0
+# 自检 ②-b（剥注释后统计 moves / LIMIT 落点）：
+#   同脚本第二段 ⇒ moves 自增 [301]、>=LIMIT [303]，拿起分支内均为空
+# 自检 ②-c（守卫是否函数第一条语句）：
+#   同脚本第三段 ⇒ 3 款都是第一条
+# ③ 扫描：
+python3 /tmp/hud_scan2.py             # 分类统计 + 前 25 名单
+#   补充核对（D 类家族）：
+#   对 `moves >= this.diffTotal` 的 23 款逐款看 HUD 模板里有没有 diffTotal/LIMIT/MAX/剩：
+#   12 款有、11 款没有（名单见 §3-D）
+```
+
+> 口径：全部静态核对，未上机；③ 的“看不见”= HUD（Text/TG 模板/Progress/HUD 字段引用）里没有该资源的剩余或上限，
+> 且已人工复核 A/B/C 每一条（不是纯正则结果）。

@@ -1,0 +1,266 @@
+# 交互死角扫描：「点了没反应」合集（2026-11-07）
+
+> 只读扫描，**未改任何 .ets**，只写这一份报告。
+> 范围：`entry/src/main/ets/components/` + `entry/src/main/ets/pages/`（8 个文件里的 **62 个 `onClick`**）
+
+---
+
+## 结论速览
+
+| 检查项 | 结果 | 判级 |
+|---|---|---|
+| ① `onClick` 里只有 `Haptics.tap()` | **0 处**（62 个 handler 全都有实际动作） | — |
+| ② 可点的非交互组件（无 `focusable` / 无 `accessibilityText`） | **48 处真交互**（另 1 处是「点空白关菜单」的遮罩，已剔除），其中 **41 缺 `focusable`** | **P0**（TV/读屏用户碰不到） |
+| ③ `if` 读到「从不更新」的 `@State` | **1 处**，但**用户能直接碰到** | **P0** |
+| ④ `pushUrl` 到不存在的页面 | **0 处**（15 处引用全部合法） | — |
+| ⑤ `catch` 块为空吞掉用户操作 | **6 处**，其中 **2 处**真的会让用户「点了没反应」 | **P0/P1** |
+
+**最严重的 5 个**（见 §P0-1 ~ §P0-5）都集中在「用户看得见、但操作没效果」。
+
+---
+
+## P0 — 用户能直接碰到
+
+### P0-1 【最重】大字模式下「展开」按钮点了没反应 —— `elderExpanded` 从不被赋值
+
+```ts
+// components/GamesTab.ets:1842-1849
+@State private elderExpanded: boolean = false;   // ← 全文件只此一处，没有任何赋值
+
+private effCollapsed(): boolean {
+  if (this.uiMode === 'elder' && !this.elderExpanded) {
+    return true;                                  // ← 大字模式永远 true
+  }
+  return this.topCollapsed;
+}
+```
+
+```ts
+// components/GamesTab.ets:1309-1318  展开/收起按钮
+.onClick(() => {
+  Haptics.tap();
+  animateTo({ duration: 520, curve: Curve.ExtremeDeceleration }, () => {
+    this.topCollapsed = !this.topCollapsed;       // ← 确实翻转了
+    this.manualUntil = now + 2000;
+    this.lastToggle = now;
+  });
+})
+```
+
+**用户会看到什么**：把真机切到**大字模式**（`uiMode === 'elder'`，就是给看不清的人用的那个）后，
+主界面顶部永远是收起状态；点「展开」→ **手机震一下、界面纹丝不动**；再点也一样。
+注释里写得很清楚「大字模式下他手点"展开"后就不再强制收起（`elderExpanded`）」——
+**这个状态从头到尾没人写**，所以那套「尊重用户」的逻辑等于没接上。
+
+**为什么每条路径都绕不开**：`effCollapsed()` 是大字模式判定的**唯一**入口
+（`:956/957/958/997/1045/1342/1343/1344` 九处都用它），它在大字模式下一律返回 `true`，
+`topCollapsed` 的翻转根本传不到渲染。
+
+**一句话修法**：在 onClick 里补一句——
+
+```ts
+if (this.uiMode === 'elder') { this.elderExpanded = true; }   // 手点过就交给 topCollapsed 管
+```
+
+（放 `animateTo` 外面，避免状态变更被包进动画闭包；展开/收起共用同一句即可。）
+
+---
+
+### P0-2 隐私页「查看全文」打不开时**零反馈**（`catch` 里只有一句注释）
+
+```ts
+// pages/Index.ets:116-124
+private openPrivacy(): void {
+  const url: string = this.langCode === 'en' ? About.PRIVACY_URL_EN : About.PRIVACY_URL;
+  try {
+    const ctx = getContext(this) as common.UIAbilityContext;
+    const want: Want = { action: 'ohos.want.action.viewData', uri: url };
+    ctx.startAbility(want);
+  } catch (e) {
+    // 打不开就把地址显示出来，不让人卡住      ← 注释承诺了，但这个块是空的
+  }
+}
+```
+
+**用户会看到什么**：点「查看全文 / Read policy」，如果系统里没有能打开 http 的应用（或调用失败），
+**屏幕上什么都不会发生**——没有提示、没有兜底地址，用户只能反复点。
+隐私协议打不开在合规场景里是硬伤。
+
+**最扎心的是：同一个 app 打开同一个隐私链接，设置页做对了、隐私页没做。**
+
+```ts
+// components/SettingsTab.ets:789-795   ← 设置页的「隐私政策」行，同一份 url
+ctx.startAbility({ action: 'ohos.want.action.viewData', uri: url }).catch(() => {
+  this.copyHint = this.t('打不开链接，请手动访问：', 'Cannot open link. Please visit: ') + url;
+  setTimeout(() => { this.copyHint = ''; }, 4000);
+});
+```
+
+**同一个项目里还有第二处正确写法**（可直接照抄）：
+
+```ts
+// components/SettingsTab.ets:324-336  「标星」按钮
+ctx.startAbility({ action: 'ohos.want.action.viewData', uri: url })
+  .catch(() => {                       // ← 异步失败
+    this.starHint = this.t('打不开链接，请手动访问：', 'Cannot open link. Please visit: ') + url;
+    setTimeout(() => { this.starHint = ''; }, 6000);
+  });
+} catch (e) {                          // ← 同步失败
+  this.starHint = this.t('打不开链接，请手动访问：', 'Cannot open link. Please visit: ') + url;
+}
+```
+
+**⚠️ 还叠了一个更隐蔽的问题**：`startAbility()` 返回 **Promise**，
+`try/catch` **只能抓同步抛出的异常**，异步失败会变成 unhandled rejection ——
+也就是说现在这个 `catch` 连"打不开"这件事本身都收不到。**必须挂 `.catch()`**。
+
+**一句话修法**：照抄 `SettingsTab:329-335` 的 `.catch()` + 同步 catch 双保险，
+在隐私页加一个 `privacyHint: string` 状态把地址显示出来。
+
+---
+
+### P0-3 主界面/TV：17 个可点的元素**遥控器选不中**（缺 `focusable`）
+
+全项目 **41 个**挂在 `Text` / `Row` / `Column` / `Stack` 上的 `onClick` 没有 `.focusable(Tv.on())`，
+按文件分：
+
+| 文件 | 缺 focusable | 代表位置 |
+|---|---|---|
+| `components/GamesTab.ets` | **16** | `:1264` 分类 chip、`:1309` 展开条、`:1722`/`:2354` 卡片行、`:1454` 搜索图标 |
+| `components/SettingsTab.ets` | **12** | `:653` 语言 chip、`:720`/`:750` 主题模式、`:784` 隐私行、`:1221` 设置行、`:1255`/`:1269` 重置 |
+| `pages/LanLobby.ets` | **5** | `:110`「重扫」、`:207`「连接」、`:178` 游戏 chip、`:247` 房间行 |
+| `components/StatsTab.ets` | 4 | `:786` 等级卡、`:856`/`:946`/`:1170` 卡片行 |
+| `components/Common.ets` | 2 | `:1492`/`:1650` |
+| `pages/GuidePage.ets` / `pages/Splash.ets` | 各 1 | `:185` / `:1363` |
+
+> 已剔除 1 处：`GamesTab.ets:1193` 是「点空白关菜单」的透明遮罩（`.backgroundColor('#00000000')` + `menuId=''`），
+> 它本来就不该被聚焦。
+
+**用户会看到什么**：这个应用有 TV/智慧屏模式（`Tv.on()`，项目 F 阶段专门做过焦点环），
+在电视上用遥控器**只能选到 Button，选不到这些卡片/标签**——
+比如 `:1309` 是「展开/收起」条、`:1722`/`:2354` 是卡片行、`:1454` 是计数胶囊。
+触屏用户不受影响，**TV 用户等于这些入口不存在**。
+
+**对照（做对了的样子）**：同文件 `:1641` 的「今日推荐」卡是完整的三件套——
+`.focusable(Tv.on())` + `.onFocus/.onBlur` + `.onKeyEvent(...Tv.handleKey...)`。
+
+**一句话修法**：给这些卡片/行补 `.focusable(Tv.on())` + `.onFocus/.onBlur`（焦点环）
++ `.onKeyEvent` 里转 `Tv.handleKey(e, () => 原 onClick 逻辑)`；最好抽一个 `@Builder`/复用的修饰串，别 17 处手写。
+
+> **`LanLobby` 那 5 处尤其要紧**：`:110` 是「重扫 / Rescan」、`:207` 是「连接 / Join」——
+> 这两个是联机对战的主操作，TV 上选不中 = 开不了房、进不去别人的房间。
+
+---
+
+### P0-4 读屏用户：41 处可点元素没有 `accessibilityText`
+
+最典型的两处（连「这是个可点的东西」都不会被播报）：
+
+```ts
+// components/SettingsTab.ets:774-795   隐私政策行
+Text(this.t(About.PRIVACY_TITLE_CN, About.PRIVACY_TITLE_EN))
+  .fontSize(FontSize.sm)...layoutWeight(1)
+Text('›').fontSize(FontSize.md)...accessibilityLevel('no')
+}
+.onClick(() => { Haptics.tap(); ... })      // ← Row 上，无 a11yText、无二态说明
+```
+
+```ts
+// components/StatsTab.ets:856-862  「最近玩过」小卡
+.onClick(() => { Haptics.tap(); this.openGame(it.meta.id); })   // ← 无 a11yText
+```
+
+**用户会看到什么**：读屏（TalkBack）会念出里面的文字，但**不会说是"可点击"**；
+而且 `›` 被 `accessibilityLevel('no')` 摘掉了 —— 用户听到一句标题，不知道该点。
+`:1454` 这类纯数字胶囊更糟：读屏念「3」或「12」，完全没有上下文。
+
+**一句话修法**：给这些容器加 `.accessibilityText('动作 + 对象')`
+（如「打开隐私政策」「打开最近玩过的：{游戏名}」）+ `.accessibilityLevel('yes')`。
+
+---
+
+### P0-5 记录/常亮：4 处空 `catch` 把失败全吞了
+
+```ts
+// pages/GameHost.ets:654-658   结算写记录
+try {
+  GameLog.recordResult(r.gameId, r.solved, r.score, r.durationMs, GameDiff.now(), r.levelReached ?? -1);
+} catch (e) {
+}                                   // ← 写失败 = 这一局不计入统计，用户永远不知道
+```
+
+```ts
+// pages/GameHost.ets:541-546 / 582-587   屏幕常亮开关
+try {
+  window.getLastWindow(getContext(this)).then((w: window.Window) => {
+    w.setWindowKeepScreenOn(true);
+  });
+} catch (e) {
+  // 拿不到窗口就算了，不影响游戏
+}
+```
+
+**用户会看到什么**：
+- `:654`：某局结算后「统计页的局数/时长/最差记录」少了一局，**没有任何提示**——这类数据缺失事后无法追查。
+- `:541/:582`：常亮没生效，玩到中途屏幕黑掉（用户会以为是"这游戏自己黑屏"）。
+- **`:541/:582` 的 `try/catch` 对 `.then()` 内的失败完全无效**（异步异常不进同步 catch），
+  真要兜底得 `setWindowKeepScreenOn(...).catch(...)` 或给外层加 `.catch()`。
+
+**一句话修法**：写记录失败至少要 `GameLog` 内部留一行日志（`console.warn`/自建 `Diag`），
+UI 侧不必弹窗；常亮则把 `.catch()` 挂到 `setWindowKeepScreenOn` 的 Promise 上。
+
+---
+
+## P1 — 静默但影响小
+
+| 文件:行 | 代码 | 影响 | 修法 |
+|---|---|---|---|
+| `components/GamesTab.ets:377-383` | `try { gridScroller.scrollEdge(Edge.Top) } catch {}` | 滚动器没挂上时切换分类不回到顶部 | 已有注释说明是刻意忽略，可留；建议 `catch` 里加一句 `console.warn` |
+| `pages/Index.ets:122` | 见 P0-2 | 同 P0-2 | 同 P0-2 |
+
+---
+
+## 附录 A：被证伪的三项（有证据，不用再查）
+
+### ① 「onClick 里只有 Haptics.tap()」= **0 处**
+
+62 个 handler 全部解析过（括号配对），没有一个是空转。最短的几类都有真实动作：
+
+```
+pages/LanLobby.ets:110    () => this.doScan()                 ← 单表达式，有动作
+components/GamesTab.ets:1193  () => { this.menuId = '' }      ← 关菜单
+components/SettingsTab.ets:1221 () => { Haptics.tap(); cfg.tap() }
+```
+
+另外「空方法体且被 onClick 调用」也是 **0**（全项目只有 2 个空方法体：
+`pages/GameHost.ets:1045` 是误报的 `Row`、`pages/Splash.ets:313` 的空 `aboutToAppear`，都不是点击路径）。
+
+### ④ 「`pushUrl` 到不存在的页面」= **0 处**
+
+`main_pages.json` 只有 5 个页面，全项目 15 处路由引用**全部命中**：
+
+```
+pages/GameHost ×9   pages/GuidePage ×3   pages/LanLobby ×1   pages/Index ×1（replaceUrl）
+```
+
+### ③ 的另一半：「@State 声明后从不赋值」全项目只有 1 个
+
+`elderExpanded`（就是 P0-1）。其余 12 处「不赋值」都是 `@Prop`/`@StorageProp`——
+它们的值由父组件/AppStorage 给，**不算问题**，我的初版脚本把它们都算进去是错的，已剔除。
+
+---
+
+## 附录 B：扫描口径
+
+- **结构视图**：先把注释与字符串内容替换成等长空格，再做括号/花括号配对与回溯。
+  这一行是必须的——本项目注释极密，第一版直接对原文扫描时，**62 个 onClick 里有 25 个回溯失败**
+  （`onClick` 前面隔着一行注释就找不到宿主组件）。
+- **宿主组件判定**：从 `.onClick` 往回跳过属性链（`.foo(...)`），再匹配 `组件名(args)` 或
+  `组件名(args) { 子节点 }`，得到 `Text/Row/Column/Stack/Button`。自测 4 例全过。
+- **「非交互组件」定义**：不在 `{Button, Toggle, Checkbox, Radio, Slider, TextInput, TextArea,
+  Search, Select, Rating, MenuItem, ListItem, GridItem, TabContent, Span}` 里的宿主。
+  这些挂 `onClick` 在 ArkUI 里合法，但**默认不可聚焦、也没有按钮语义** ⇒ 才需要手工补 `focusable`/`a11yText`。
+- **「从不更新的 @State」**：只算 `@State`（`@Prop`/`@Link`/`@StorageProp` 由外部驱动，剔除）；
+  判定是「出现次数 == 赋值次数」——**注意自增 `x = x + 1` 会让出现次数虚高**，
+  我第一版用「出现次数 − 赋值次数 ≤ 1」把 `manualUntil`/`lastToggle` 误判成死状态，
+  逐条 `grep` 复核后已修正（它们分别在 `:1147`、`:1155` 被读）。

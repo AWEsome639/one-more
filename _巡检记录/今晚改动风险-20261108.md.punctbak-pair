@@ -1,0 +1,188 @@
+# 今晚改动风险扫描（2026-11-08）
+
+> 只读，**未改任何 .ets**。扫 `core/` + `pages/` + `components/` + `games/`（355 款）。
+> **一句话结论：没有必须今晚回滚的改动。** ①几何风险实际为 0（0 处硬裁）；②缓存正确性无问题（3 个非阻塞隐患）；③`constraintSize` 无实质副作用（唯一候选已用 `onAreaChange` 自适应）。
+
+## 摘要
+
+| 项 | 结论 | 风险等级 |
+|---|---|---|
+| ① `Cell.of ×0.85` 几何裁字 | **0 处「硬裁」**（所有多行固定高块都带 `textOverflow` 省略号）；11 处"可能少显示一行"，其中 **7 处标签是单字符「?」** | 🟢 可忽略 |
+| ② `parseNumMap` 按原始串缓存 | **正确性无问题**（写路径全部 `JSON.parse` 重建 + 写新串 ⇒ 缓存键必变）；3 个隐患见 §2 | 🟡 低（建议加固） |
+| ③ `constraintSize` 对 355 款的副作用 | **无实质副作用**：`maxHeight` 只对超限内容生效（本身不高的款零变化）；依赖全屏坐标的款已自适应 | 🟢 可忽略 |
+
+---
+
+## ① `Cell.of ×0.85` 的几何裁字风险
+
+### 口径（比上次“232 处”严格得多）
+
+上次的 232 处是**宽口径**：只要「固定高块里有 Text」就算，含大量单行标签 ⇒ 基本不成立。
+本次按**真会裁**的三条同时满足来判定：
+1. 高度由 `.height(Cell.of(N))` 决定，且 `N ∈ [36, 54]`（HUD 标签/按钮那档）；
+2. 块内有 `maxLines(2)` 或 `maxLines(3)`（**只有多行才会被 0.85 裁掉第二行**）；
+3. **没有** `minFontSize(...)`（有自适应字号就安全）。
+
+### 结果：**0 处硬裁**
+
+| 类别 | 处数 | 说明 |
+|---|---|---|
+| 有 `textOverflow`（省略号） | **11 处 / 9 款**（严口径：`maxLines` 在同一元素链上）<br>宽松口径（14 行窗口内出现 `maxLines`，多数属于相邻元素）为 **248 处** | 最坏是"少显示一行 + …"，不会出现半个字 |
+| **无 `textOverflow`（硬裁）** | **0 处**（严/宽两种口径都是 0） | — |
+
+11 处清单（`Cell.of(基准) → 0.85 后`）：
+
+| 文件:行号 | 高度 | 标签 | 判断 |
+|---|---|---|---|
+| `GMatrixMultiplier:382` | 48→41vp | 「待求」 | 2 字 ⇒ 一行 ✓ |
+| `GCrown:619` / `:637` | 44→37vp | 「👑 放皇冠」 | 5 字@14pt ≈ 90vp，格子 ~270vp ⇒ 一行 ✓ |
+| `GDoubleNBack:312` / `:323` | 44→37vp | 「位置 = 2-back」 | ~10 字 ≈ 160vp，格子 ~400vp ⇒ 一行 ✓ |
+| `GRuleSwitcher:293` | 40→34vp | 「规则：看奇偶」 | 7 字@16pt ≈ 130vp，整行 813vp ⇒ 一行 ✓（且该款其它标签已用 `minFontSize` 自适应，是正例） |
+| `GBinaryMatrixRank:451` · `GColorFlood:560` · `GCommonDenominator:418` · `GModuloClock:394` · `GTypingSpeed:322` | 48/50/52 | 「?」等单字符 | **单字符永不换行** ⇒ 安全 |
+
+### 唯一残留（非裁字）
+
+长翻译（德语/葡语）在**窄格**（`layoutWeight(1)` 占 1/3 宽）里可能从"两行"变"一行 + …" ——
+属于**信息少显示一行**，不是裁字；且已有省略号，视觉可接受。
+若要彻底消除：给这 11 处加 `minFontSize(10).maxFontSize(...)`（`GRuleSwitcher` 已示范）。
+
+---
+
+## ② `parseNumMap` 按原始字符串缓存 —— 失效风险
+
+### 机制（`ProgressStore.ets:909-926`）
+
+```ts
+private static mapCacheRaw: string = '';
+private static mapCacheVal: Record<string, number> | undefined = undefined;
+private static parseNumMap(raw: string) {
+  if (raw === mapCacheRaw && mapCacheVal !== undefined) return mapCacheVal;  // 只比字符串
+  …JSON.parse…
+}
+```
+
+Lead 的担心「字符串不变但内容该变」—— **核对结论：不会发生**，因为：
+
+| 写入点 | 是否产生**新字符串** |
+|---|---|
+| `:242-243` init 从盘读入 | 是（读到的串） |
+| `:1334-1339` perGamePlays 自增 | 是（`JSON.parse` → 改 → `JSON.stringify` → `setOrCreate`） |
+| `:1347-1356` perGameBest 破纪录时 | 是（同上） |
+| `:1220-1221` reset 写 `'{}'` | 是 |
+
+- 全部写点都用 **`JSON.parse` 直接解析**（**不是** `parseNumMap`）⇒ 不会拿到缓存对象去改。
+- 3 个读点（`:522 playsOf`、`:529 bestOf`、`:536 playedKinds`）**只读**，不写回。
+- 破纪录才写 `perGameBest`；不破纪录时字符串不变 ⇒ 缓存命中是对的（best 本来就不该变）。
+
+### 3 个隐患（都不影响当前正确性，建议加固）
+
+| # | 位置 | 风险 | 触发条件 | 修法 |
+|---|---|---|---|---|
+| 1 | `:913-926` `parseNumMap` **返回缓存对象本体** | 将来任何调用方就地改它（`m[k]=v`）⇒ **raw 不变、内容变** ⇒ 缓存污染（正是 Lead 担心的那种） | 出现新的写调用方时 | 返回前 `return JSON.parse(raw)` 或返回浅拷贝；或加注释「返回值只读」 |
+| 2 | `:909-910` 缓存**全局单条**、跨 key 共用 | `bestOf`/`playsOf`/`diffOf` 交替读会互相踢缓存（**纯性能**，无正确性问题） | 每次交替读 | 改成 `Map<string, Record<string,number>>`（按 key 分槽） |
+| 3 | `:914` 只比字符串 | 两个不同 key 恰好同串（都 `'{}'`）会共享同一对象 | 同时为空时 | 无害（内容相同）；与 #1 一起修更稳 |
+
+---
+
+## ③ `constraintSize`（游戏区上限 343vp）对 355 款的副作用
+
+### 先明确语义：`maxHeight` **只压超限内容**
+
+`maxHeight` 不改变小于上限的尺寸 ⇒ **本来就不超高的款零变化**（没有"本来不大、加了反而变小"这种情况）。
+
+### 逐类核对「依赖全屏」的款
+
+| 依赖类型 | 款数 | 名单（抽样） | 结论 |
+|---|---|---|---|
+| `Canvas` 全屏绘制 | **0** | — | 不涉及 |
+| 读触摸坐标 `touches[0]/offsetX/offsetY` | **8** | `G2048` `GBreakout` `GDoodleJump` `GKlotski` `GPong` `GSnake` `GSnake3D` `GSokoban` | **安全**：其中 4 款只用**方向**（offsetX 差值）；`GBreakout` 的分母 `boardW` 是 `onAreaChange` 实测的（`:128`/`:621`）⇒ 缩板自动跟随 ✓ |
+| 用 `.position({...})` 绝对定位 | **9** | `GBreakout` `GDoodleJump` `GFlappy` `GKlotski` `GOrbitTap` `GPong` `GSolitaire` `GSpiderSolitaire` `GVennNumbers` | **安全**：`GOrbitTap` 完全不用 Bp 宽高；`GKlotski` 只用 `Bp.width <= Bp.height` 判横竖（不拿它当坐标）；其余按**自身容器**百分比 |
+| 把 `Bp.height` 当固定高度 | **4**（15 处） | `GChangeBlindness:50` `GObjectDisplacement:47` `GPeripheralFocus:42`（都是 `Bp.height*0.35` 且 ≤260）+ 我刚改的 `GPythagoreanTripleBuilder` | **安全**：533×0.35≈187vp < 343 上限 |
+| 源码里对 Bp 宽高做四则运算 | **65** | `GAkari` `GBejeweled` `GFutoshiki` … | 多数用于**尺寸微调/分支判断**（如 `Bp.width > Bp.height` 横竖），不构成"必须是全屏"的强依赖 |
+
+### 结论
+
+**没有一款是"棋盘必须占满全屏否则算错坐标"**（唯一像的 `GBreakout` 已用 `onAreaChange` 自适应）。
+⇒ ③ 不存在需要回滚/补丁的副作用。
+
+---
+
+## 万一要“再保险”，只做这两件小的（都不急）
+
+1. **②隐患 #1**：`parseNumMap` 返回值加一层浅拷贝（1 行）—— 防止未来有人就地改缓存对象；
+2. **①残留**：给那 11 处多行标签补 `minFontSize(10).maxFontSize(...)`（11 行）—— 长翻译不再变"…"。
+
+## 复算
+
+```bash
+cd ~/dev/One\ More
+# ① 多行固定高块 + 有无省略号
+python3 - <<'EOF'
+import io,re,glob,os
+for f in sorted(glob.glob('entry/src/main/ets/games/*.ets')):
+    if '.bak' in f: continue
+    L=io.open(f,encoding='utf-8').read().split('\n')
+    for i,l in enumerate(L):
+        if re.search(r'\.height\(Cell\.of\((3[6-9]|4\d|5[0-4])\)\)',l) and i-14>=0:
+            blk='\n'.join(L[i-14:i+1])
+            if 'maxLines(2)' in blk or 'maxLines(3)' in blk:
+                print(os.path.basename(f), i+1, 'ellipsis' if 'textOverflow' in blk else 'HARD-CUT')
+EOF
+# ② 写点是否都 setOrCreate 新串
+grep -n "setOrCreate(Keys.perGameBest\|setOrCreate(Keys.perGamePlays" entry/src/main/ets/core/ProgressStore.ets
+# ③ 依赖全屏坐标的款
+grep -l "touches\[0\]\|\.offsetX" entry/src/main/ets/games/*.ets | wc -l
+grep -l "onAreaChange" entry/src/main/ets/games/*.ets | wc -l
+```
+
+---
+
+## 7. 落实记录（2026-11-08 07:5x，lead 批准后执行）
+
+### ① `parseNumMap` —— 选择「注释约束」而不是「浅拷贝」
+
+lead 倾向注释，我判断**同**，理由（写在这里备查）：
+
+| 方案 | 成本 | 收益 |
+|---|---|---|
+| `return Object.assign({}, mapCacheVal)` | 一次返回列表要读 355 卡 × 4 次 ≈ **1400+ 次**拷贝；每次 355 键 ⇒ **≈50 万次属性复制** | 防将来有人就地改 |
+| **注释 + 写路径重建（采用）** | 0 | 同上（现状已核实无人就地改） |
+
+已落地：`core/ProgressStore.ets:909` 的 `parseNumMap` 上方补 14 行注释，明确
+「**返回缓存对象本体，调用方只读、禁止就地修改**」+ 说明「写路径一律 `JSON.parse` 重解析后写回，新串≠旧串 ⇒ 缓存自然失效」+ 记下为何不做拷贝。
+
+**4 个写点已逐个核实都是「重建」**（不是就地改缓存对象）：
+
+| 写点 | 动作 | 是否产生新串 |
+|---|---|---|
+| `:242-243` init | 从盘读 `bestRaw` 写入 AppStorage | 是 |
+| `:1334-1339` perGamePlays | `JSON.parse` → 改 → `JSON.stringify` → `setOrCreate` | 是 |
+| `:1347-1356` perGameBest | 同上（仅破纪录时） | 是 |
+| `:1220-1221` reset | 写 `'{}'` | 是 |
+
+### ② 11 处多行标签补 `minFontSize`（照抄 `GRuleSwitcher` 的正例）
+
+统一形如 `.fontSize(FontSize.X).minFontSize(<下界>).maxFontSize(FontSize.X).maxLines(2)`：
+
+| # | 文件:行号 | 标签 | 字号 → 下界 |
+|---|---|---|---|
+| 1 | `GBinaryMatrixRank.ets:451` | 「秩 = {0}」 | lg(18) → 12 |
+| 2 | `GColorFlood.ets:560` | 「起点」 | xxs(12) → 9 |
+| 3 | `GCommonDenominator.ets:418` | 「公分母 = {0}」 | lg(18) → 12 |
+| 4 | `GCrown.ets:619` | 「👑 放皇冠」 | sm(14) → 10 |
+| 5 | `GCrown.ets:637` | 「✕ 标排除」 | sm(14) → 10 |
+| 6 | `GDoubleNBack.ets:312` | 「位置 = 2-back」 | sm(14) → 10 |
+| 7 | `GDoubleNBack.ets:323` | 「字母 = 2-back」 | sm(14) → 10 |
+| 8 | `GMatrixMultiplier.ets:382` | 「?」（待求） | xl(20) → 13 |
+| 9 | `GModuloClock.ets:394` | 「{0} 点」 | xl(20) → 13 |
+| 10 | `GRuleSwitcher.ets:293` | 「规则：看奇偶 / 比 50 大小」 | md(16) → 11 |
+| 11 | `GTypingSpeed.ets:322` | 「照着打的句子」 | lg(18) → 12 |
+
+**效果**：长翻译（德语/葡语）在小格子里会自动缩字号保持完整，不再变成「一行 + …」。
+**代价**：正常中文/英文标签字号不变（`maxFontSize` = 原字号），零视觉回归。
+
+### ③ 报告纠正留存（给下一个“我”）
+
+> ❌ 旧结论「232 处几何裁字风险」是**宽口径**（14 行窗口内出现 `Text` 就算），**不成立**。
+> ✅ 正确口径：`Cell.of(36~54)` + `maxLines(2/3)` + 无 `minFontSize` ⇒ **11 处**（上表），且全部有 `textOverflow` 省略号；
+> **硬裁（无省略号）= 0 处**。修这 11 处（已做）即可，不要去碰 232 那个数。

@@ -8,7 +8,7 @@
 
 /** tokenizer.json 里 vocab 的形态：token 字符串 → id */
 export interface VocabJson { [token: string]: number }
-/** merges：每项形如 "Ġ t"（两个待合并的 token，空格分隔），按优先级排列 */
+/** merges：每项形如 “Ġ t”（两个待合并的 token，空格分隔），按优先级排列 */
 export type MergesJson = string[];
 
 /**
@@ -32,17 +32,17 @@ function bytesToUnicode(): Map<number, string> {
 
 /** cl100k / Qwen2 的预切分正则（必须带 u 标志才支持 \p{L}） */
 const PRE_TOKEN_RE: RegExp = new RegExp(
-  "(?i:'s|'t|'re|'ve|'m|'ll|'d)" +
-  "|[^\\r\\n\\p{L}\\p{N}]?\\p{L}+" +
-  "|\\p{N}{1,3}" +
-  "| ?[^\\s\\p{L}\\p{N}]+[\\r\\n]*" +
-  "|\\s*[\\r\\n]+" +
-  "|\\s+(?!\\S)" +
-  "|\\s+", 'gu');
+  “(?i:'s|'t|'re|'ve|'m|'ll|'d)” +
+  “|[^\\r\\n\\p{L}\\p{N}]?\\p{L}+” +
+  “|\\p{N}{1,3}” +
+  “| ?[^\\s\\p{L}\\p{N}]+[\\r\\n]*” +
+  “|\\s*[\\r\\n]+” +
+  “|\\s+(?!\\S)” +
+  “|\\s+”, 'gu');
 
 export class QwenBpeTokenizer {
   private vocab: VocabJson = {};
-  private ranks: Map<string, number> = new Map();     // "a b" -> 合并优先级
+  private ranks: Map<string, number> = new Map();     // “a b” -> 合并优先级
   private encoder: Map<string, number> = new Map();   // token 字符串 -> id
   private bytesMap: Map<number, string> = bytesToUnicode();
 

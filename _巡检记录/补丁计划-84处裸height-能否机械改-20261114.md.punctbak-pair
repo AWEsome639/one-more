@@ -1,0 +1,309 @@
+# 补丁计划：`games/` 里 84 处裸 `Bp.height < 600` 能否机械替换 · 2026-11-14
+
+> **只读**：未改 `.ets`、未编译、未碰模拟器。
+> **范围**：`entry/src/main/ets/games/*.ets`，模式 **`Bp.height < 600`**（字面匹配，不含 `<=`、不含 `Bp.height<600` 无空格写法）
+> **实测计数**：**84 处 / 24 个文件**（与 Lead 的数字一致 ✅）
+
+---
+
+## 0. 汇总
+
+| 类别 | 处数 | 文件数 | 说明 |
+|---|---:|---:|---|
+| **A 类**：纯尺寸/间距二选一 | **77** | 19 | 可机械改成 `Bp.tight()`，改动是**同一处文本替换** |
+| **B 类**：复合算式 / 哨兵值 / 多行表达式 | **7** | 6 | 条件可换，但**必须保留算式**（不能整段替换）|
+| **C 类**：决定行数/列数/布局结构 | **0** | 0 | 这 84 处里**没有**控制行数列数的；它们全是尺寸类 |
+| **合计** | **84** | **24** | |
+
+> ⚠️ **前提一个事实**：`Bp` **目前没有 `tight()`**（只有 `isShort()` / `isTv()` / `narrowHeight()`）。
+> 所以这批改动**前置一步是给 `core/Bp.ets` 加一个静态方法**，否则 84 处都换不了。
+
+```ts
+// 建议加在 Bp.isShort() 旁边（core/Bp.ets，约 L320 之前）
+/** 游戏内「紧凑尺寸」：<600vp 且不是电视。
+ *  与 `Cell.of()` 里的 shrink 条件同源（`height > 0 && height < 600`），补上 `!isTv()` 守卫；
+ *  TV 720vp 时真假不变，1080p TV(540vp) 才生效。 */
+static tight(): boolean {
+  return Bp.height > 0 && Bp.height < 600 && !Bp.isTv();
+}
+```
+
+---
+
+## 1. A 类逐处清单（77 处）
+
+替换规则**全局一致**：把 `Bp.height < 600` 换成 `Bp.tight()`，**其余一个字符都不动**。
+
+> 下表每行：`行号: 改后内容`（原文只是把 `Bp.tight()` 换回 `Bp.height < 600`）
+
+
+### `games/GAlgebraicInequalitySolver.ets`
+
+```ts
+333: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+380: .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+387: .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+396: .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+403: .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+416: .width(120).height(Cell.of(Bp.tight() ? 36 : 44)).focusable(Tv.on())
+```
+
+### `games/GArithmeticChain.ets`
+
+```ts
+401: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+447: .layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(!this.over && (0) < this.stage.palette.length).focusable(Tv.on())
+454: .layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(!this.over && (1) < this.stage.palette.length).focusable(Tv.on())
+463: .layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(!this.over && (2) < this.stage.palette.length).focusable(Tv.on())
+470: .layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(!this.over && (3) < this.stage.palette.length).focusable(Tv.on())
+501: .height(Cell.of(Bp.tight() ? 36 : 44))
+517: .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).focusable(Tv.on())
+```
+
+### `games/GBoxCompletion.ets`
+
+```ts
+369: }.layoutWeight(1).height(Bp.tight() ? Cell.of(52) : Cell.of(62)).backgroundColor(this.lit[r * this.diffTotal + c] ? Palette.amber : this.theme.surface
+```
+
+### `games/GComplexFoldingNets.ets`
+
+```ts
+336: .layoutWeight(1).height(Cell.of(Bp.tight() ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+348: .layoutWeight(1).height(Cell.of(Bp.tight() ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+362: .layoutWeight(1).height(Cell.of(Bp.tight() ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+374: .layoutWeight(1).height(Cell.of(Bp.tight() ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+390: .height(Cell.of(Bp.tight() ? 36 : 44)).fontSize(FontSize.md).fontColor('#FFFFFF')
+```
+
+### `games/GCountdownMath.ets`
+
+```ts
+491: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+```
+
+### `games/GCryptoArithmetic.ets`
+
+```ts
+397: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+498: .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.tight() ? 36 : 48))
+507: .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.tight() ? 36 : 48))
+523: .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).focusable(Tv.on())
+```
+
+### `games/GFillomino.ets`
+
+```ts
+512: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+522: .height(Cell.of(Bp.tight() ? 36 : 44))
+575: .height(Cell.of(Bp.tight() ? 36 : 44))
+690: .height(Cell.of(Bp.tight() ? 36 : 44))
+715: .height(Cell.of(Bp.tight() ? 36 : 44))
+```
+
+### `games/GInequalityBalanceOps.ets`
+
+```ts
+333: .backgroundColor(this.btnBg(i)).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+348: .borderRadius(Radius.md).width('100%').height(Cell.of(Bp.tight() ? 38 : 46)).focusable(Tv.on())
+```
+
+### `games/GMentalMapping.ets`
+
+```ts
+352: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+618: .width('100%').height(Cell.of(Bp.tight() ? 36 : 44))
+```
+
+### `games/GPrimeGapHunt.ets`
+
+```ts
+281: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+315: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+326: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+339: .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GPythagoreanTripleBuilder.ets`
+
+```ts
+313: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+357: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+368: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+379: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+392: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+403: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+414: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+427: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+438: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+449: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+462: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+473: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+484: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+```
+
+### `games/GQuickMath.ets`
+
+```ts
+358: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+395: .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+406: .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+419: .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GRadicalRoots.ets`
+
+```ts
+349: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+382: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 40 : 56)).enabled(this.picked.length === 0 && !this.over)
+393: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 40 : 56)).enabled(this.picked.length === 0 && !this.over)
+408: .height(Bp.tight() ? 34 : 44)
+421: .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GReverseStroop.ets`
+
+```ts
+288: .layoutWeight(1).height(Cell.of(Bp.tight() ? 54 : 72)).borderRadius(Radius.md)
+```
+
+### `games/GRomanArithmetic.ets`
+
+```ts
+372: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+410: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked.length === 0 && !this.over)
+421: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked.length === 0 && !this.over)
+434: .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GSdmt.ets`
+
+```ts
+248: Column({ space: Bp.tight() ? Space.xxs : Space.md }) {
+289: Column({ space: Bp.tight() ? Space.xxs : Space.sm }) {
+293: .layoutWeight(1).height(Cell.of(Bp.tight() ? 38 : 54)).borderRadius(Radius.md)
+308: .layoutWeight(1).height(Cell.of(Bp.tight() ? 38 : 54)).borderRadius(Radius.md)
+323: .layoutWeight(1).height(Cell.of(Bp.tight() ? 38 : 54)).borderRadius(Radius.md)
+343: .borderRadius(Radius.md).width('100%').height(Cell.of(Bp.tight() ? 38 : 46)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GSequenceSleuth.ets`
+
+```ts
+404: Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+438: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+449: .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+477: .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GSlide15.ets`
+
+```ts
+714: .height(Bp.tight() ? 30 : 44)
+```
+
+### `games/GSudoku.ets`
+
+```ts
+895: Column({ space: Bp.tight() ? Space.xs : Space.md }) {
+1064: .margin({ bottom: Bp.tight() ? 8 : 24 })
+```
+
+---
+
+## 2. B 类逐处说明（7 处，不能整段替换）
+
+### `games/GKakuro.ets:632`
+
+· 原文：`constraintSize({ maxWidth: cond ? Math.min(Bp.width - 2*Space.lg, Math.max(140, Bp.height - 360)) : 9999 })`
+· 为什么是 B：条件可换；**保留 `Math.min/Math.max` 算式与 `: 9999` 哨兵**（9999 是"不封顶"的约定值）
+
+### `games/GKakuroMini.ets:562`
+
+· 原文：同 Kakuro（`max(120, ...)` 版本）
+· 为什么是 B：同上
+
+### `games/GKenken.ets:708`
+
+· 原文：`Math.max(cond ? 150 : 200, cond ? Bp.height - 380 : Bp.height - 360)`（708-709 两行）
+· 为什么是 B：**同一行里出现两次条件**；两处都要换成 `Bp.tight()`，且 709 行还有第二个，别只改一处
+
+### `games/GKenken.ets:709`
+
+· 原文：`同上（第二个条件）`
+· 为什么是 B：同上
+
+### `games/GShikaku.ets:787`
+
+· 原文：``constraintSize({ maxHeight: cond ? Bp.height - 260 : 9999 })``
+· 为什么是 B：条件可换；`9999` 哨兵必须保留
+
+### `games/GSokoban.ets:705`
+
+· 原文：``maxWidth: cond ? Math.min(Bp.width - 40, this.w * Math.max(10, Math.floor((Bp.height - 440) / Math.max(1, this.h)))) : 9999`（跨 705-707 三行）`
+· 为什么是 B：**整段是一个表达式**，只能改条件那 6 个词；且用到 `this.w/this.h`，改错会立刻静态错
+
+### `games/GSudoku.ets:875`
+
+· 原文：``const h: number = cond ? Math.max(160, Bp.height - 385) : Math.max(160, Bp.height * 0.44);``
+· 为什么是 B：**多行算式 + 分支里还引用 `Bp.height`**；只能改条件，算式保持；改完要确认 `h` 的取值与今天逐字一致（今天 TV 720 ⇒ 走 else 分支）
+
+---
+
+## 3. C 类：**0 处**（为什么）
+
+我把 84 处逐条看过，**没有一处**用 `Bp.height < 600` 决定「ForEach 的行数/列数」「难度档位」「显隐」：
+
+| 用途 | 处数 | 归类 |
+|---|---:|---|
+| `Column/Row({ space: cond ? Space.X : Space.Y })`（**间距**）| **15** | A |
+| `.height(Cell.of(cond ? N : M))`（**格子/按钮高**）| **58** | A |
+| `.height(cond ? N : M)`（裸数字高）| **2** | A |
+| `constraintSize` / `Math.max` / `9999` 算式（**封顶**）| **5** | B |
+| 多行复合表达式（Sokoban 705 头、Kenken 709 续行）| **2** | B |
+| 其它尺寸（`margin`/`.height(cond ? Cell.of : Cell.of)`）| **2** | A |
+| **合计** | **84** | A 77 / B 7 |
+
+> 显隐类（`visibility(isShort ? None : Visible)`）不在这个模式里 —— 它们用的是 `Bp.isShort()`，**已经带 `!isTv()` 守卫**。
+
+---
+
+## 4. 高频款（≥4 次）—— 适合抽局部变量
+
+| 文件 | 处数 | 建议 |
+|---|---:|---|
+| `games/GPythagoreanTripleBuilder.ets` | **13** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 13 次）|
+| `games/GArithmeticChain.ets` | **7** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 7 次）|
+| `games/GSdmt.ets` | **6** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 6 次）|
+| `games/GAlgebraicInequalitySolver.ets` | **6** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 6 次）|
+| `games/GRadicalRoots.ets` | **5** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 5 次）|
+| `games/GFillomino.ets` | **5** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 5 次）|
+| `games/GComplexFoldingNets.ets` | **5** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 5 次）|
+| `games/GSequenceSleuth.ets` | **4** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 4 次）|
+| `games/GRomanArithmetic.ets` | **4** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 4 次）|
+| `games/GQuickMath.ets` | **4** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 4 次）|
+| `games/GCryptoArithmetic.ets` | **4** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 4 次）|
+| `games/GPrimeGapHunt.ets` | **4** | 抽 `const tight = Bp.tight();` 到 `build()` 顶部，行内用局部变量（省重复调用、也省 84 次里的 4 次）|
+
+⇒ **12 款 / 67 处**（占 84 的 79%）；其中 `GPythagoreanTripleBuilder` 一款就 **13 处**，抽变量收益最大。
+
+---
+
+## 5. 风险评估（要不要一次编译窗口）
+
+| 项 | 结论 |
+|---|---|
+| 今天的行为会不会变？ | **不会**（TV 720vp ⇒ `720 < 600` 为假；`tight()` 也同样为假）|
+| 手机/平板呢？ | `isTv()` 为 false ⇒ `tight()` 与 `Bp.height < 600` **完全等价** ⇒ 逐像素不变 ✅ |
+| 唯一会变的是 | **1080p 电视**（540vp）：从“误判矮屏”变成“不判矮屏” ⇒ 尺寸回大 —— 这正是目的 |
+| 需要编译吗？ | **需要**（新增 `Bp.tight()` 方法 + 84 处替换，ArkTS 静态检查必须过一遍）|
+| 会破坏现有布局吗？ | **🤔判：风险低**。条件表达式本身没改语义（除电视），且 C 类为 0（没有行列数依赖）。为稳妥，B 类 7 处建议**单独一次提交** |
+| 建议拆几次 | ① 先加 `Bp.tight()`（1 文件）② A 类 77 处（纯文本替换）③ B 类 7 处（手工）—— 三步各自可编译验证 |
+
+---
+
+## 6. 局限
+
+- 只做**字面匹配** `Bp.height < 600`：`Bp.height<600`（无空格）、`Bp.height <= 600`、`Bp.height < 620` 等写法**不在统计内**；
+- 「A 类可机械替换」是按**语法形态**判的，没有逐处跑 ArkTS 编译；B 类 7 处的算式我读过了，A 类只抽读，未逐行编译；
+- 本轮没有碰设备/模拟器，也没编译。

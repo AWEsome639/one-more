@@ -1,0 +1,98 @@
+# 今晚 14 款改动复核（纯代码，未跑真机） · 2026-11-13
+
+> **只读**：未改 `.ets`、未编译、未碰设备、未 commit。
+> 审的提交：`edb64d4a`（11 款固定大卡矮屏降档）+ `86834d82`（3 款方形盘面补限宽）。
+
+---
+
+## 0. 一句话
+
+**14 款里 2 款要返工**：**`GVennNumbers` 完全不生效**（外层还写死 150），
+**`GGeometricVision` 只改了一半**（`gridA` 限宽了、`gridB` 还是 `100%` ⇒ A/B 不对称）；其余 12 款判断为**会生效**。
+
+| 判定 | 款数 | 游戏 |
+|---|---:|---|
+| 🔴 不生效（空操作） | 1 | `GVennNumbers` |
+| 🔴 半生效 / 破坏对称 | 1 | `GGeometricVision` |
+| 🟡 生效但视觉偏小 | 2 | `GCubeNetFold`、`GSpotlightTrack`（533 屏上盘面只剩 173vp） |
+| 🟢 会生效 | 10 | 其余 10 款固定大卡 |
+
+---
+
+## 1. 逐款判定表
+
+| 游戏 | 改的行 | 会不会生效 | 理由 | 建议 |
+|---|---|---|---|---|
+| `GAbReversalOddball` | 327 `.height(160→120)` | ✅ **会** | 改的是**整块大卡的容器**（`Text` 外面那层 `.width('100%').height()`），父级是根 `Column`，没有 `layoutWeight` 抢高度 | 保持 |
+| `GActionSequenceRecall` | 318 `.height(150→110)` | ✅ 会 | 同上（父级根 `Column`，无固定高/无 layoutWeight） | 保持 |
+| `GBlinkDetector` | 361 `.height(170→130)` | ✅ 会 | 同上 | 保持 |
+| `GCardCountingMemory` | 375 `Grid.height(150→110)` | ✅ 会（省 40vp） | 改的是**卡牌 Grid**，父级无固定高；同屏另有一张 `.height(110)` 的小卡（354 行）**本来就是 110，不需要改** | 保持 |
+| `GChoiceReactionTime` | 300 `.height(170→130)` | ✅ 会 | 外层 `Column` 只有这个高度，祖父层无固定高 | 保持 |
+| `GSpatialConflict` | 291 `.height(180→140)` | ✅ **会** | 改的是**外层 `Row`**；里面两张卡是 `.layoutWeight(1).height('100%')` —— **正好跟着父级缩**，所以改父级是对的（判据 1895 的坑是"给 layoutWeight 的子项写死高度"，这里没踩） | 保持 |
+| `GStopSignal` | 334 `.height(170→130)` | ✅ 会 | 父级根 `Column`，无固定高 | 保持 |
+| `GStroopNumberSize` | 268 `.height(180→140)` | ✅ 会 | 同上 | 保持 |
+| `GTemporalOrderJudgment` | 323 `.height(180→140)` | ✅ 会 | 同 `GSpatialConflict`（外层 `Row`，内层卡 `layoutWeight(1).height('100%')`） | 保持 |
+| `GTopology` | 290 `.height(170→130)` | ✅ 会 | 同上（外层 `Row`，两张卡跟随） | 保持 |
+| **`GVennNumbers`** | 344 `.height(150→110)` | 🔴 **不会（空操作）** | **345 行外层 `Stack` 仍写死 `.height(150)`** ⇒ 内层省下的 40vp 只是变成 Stack 内的空白，**页面总高一点没变**（判据 1895 的变体：改的是被父级定高的内层） | **把 345 行的 `height(150)` 也改成 `Bp.isShort() ? 110 : 150`**（或直接删掉外层高度让它撑开） |
+| `GCubeNetFold` | 362 `Row.width` → `min(...)` | ✅ 会（但偏小） | 行宽被限到 **173vp**（`min(813, 533-360)`），`Column` 默认居中 ⇒ 盘面窄但居中；高度随方格里 `aspectRatio(1)` 一起缩 | 可保持；若嫌窄，改成 `Math.min(Bp.width - 2 * Space.lg, Bp.height - 250)` 之类给更大余量 |
+| `GSpotlightTrack` | 322 `Column.width` → `min(...)` | ✅ 会（但偏小） | 同上，173vp 含 `.padding(Space.xs)` ⇒ 实际内容 **~157vp**（4 列每格 ≈ 35vp） | 同上；`padding` 建议在窄屏也降档 |
+| **`GGeometricVision`** | 350 `gridA.width` → `min(...)` | 🔴 **只改了一半** | **`gridB()`（361 行）仍是 `.width('100%')`** ⇒ A 被限到 173vp、B 仍吃满槽宽 ⇒ **A/B 两块大小不同**，而这款的核心玩法就是"比 A 和 B 一样不一样" ⇒ 会误导玩家 | **361 行同样改成 `min(...)`**；两块都 173 后在 343vp 游戏区里各占 50% 高，**不算小** |
+
+---
+
+## 2. 回答 Lead 的三个具体问题
+
+### Q1：`height(N)` 到底是谁的高度？—— 10/11 改对了，1 个改了内层
+
+判断口径（判据 1895 的正确用法）：
+
+- ✅ **改容器**（外面那层 `.width('100%').height(N)`）⇒ 有效，因为容器不在 `layoutWeight` 分配链上；
+- ✅ **容器内的元素写 `layoutWeight(1).height('100%')`** ⇒ 它们跟随父级，**改父级就是对的**；
+- ❌ **改被父级写死高度的内层** ⇒ 空操作。`GVennNumbers` 就是这一种。
+
+逐款核对：
+
+```
+改【外层容器】且父级无固定高：AbReversalOddball / ActionSequenceRecall / BlinkDetector /
+  ChoiceReactionTime / StopSignal / StroopNumberSize / CardCountingMemory(Grid 自身即块)
+改【外层 Row】、内层卡 layoutWeight+height100%：SpatialConflict / TemporalOrderJudgment / Topology
+改【内层】但外层写死 150：VennNumbers  ← 唯一空操作
+```
+
+### Q2：`GGeometricVision` 两块各 173vp 会不会太小 / 会不会超宽？
+
+| 项 | 数值 | 结论 |
+|---|---|---|
+| 单块封顶 | `min(853-40, max(140, 533-360))` = **173vp** | 计算正确 |
+| 两块并排 | 2×173 + `Space.sm`(10) + 「VS」文字 ≈ **376vp** | **远小于 853vp，不会超宽** ✅ |
+| 游戏区高度 | 约 **343vp**（533 − 顶栏/间距） | 173/343 ≈ **50%**，方块在区内占比 **不小** ✅ |
+| **但** | `gridB` 没改 ⇒ **A=173、B=槽宽(~398)** | 🔴 **不对称**，比"小"严重得多 |
+
+⇒ **大小不是问题，不对称才是问题。** 两块都改 173 后，A/B 各占 Row 的一半宽、居中显示，视觉上是一致的。
+
+### Q3：有没有"两处都要改、只改了一处"的？—— **有 1 款**
+
+| 游戏 | 两处 |
+|---|---|
+| **`GGeometricVision`** | `gridA`(350) ✅改了 / `gridB`(361) ❌没改 |
+| **`GVennNumbers`** | 内层 A/B 区(344) ✅改了 / 外层 `Stack`(345) ❌没改（**改内层无效**） |
+| `GCardCountingMemory` | 375 Grid ✅改；354 的小卡本来 110，**不需要改**（不是遗漏） |
+
+---
+
+## 3. 建议的最小返工（3 行）
+
+```
+1. GVennNumbers:345   .height(150)            →  .height(Bp.isShort() ? 110 : 150)
+2. GGeometricVision:361  .width('100%')       →  .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+3. (可选) GCubeNetFold / GSpotlightTrack 的 173vp：若真机看太小，把 `Bp.height - 360` 的 360 调成 250~300
+```
+
+---
+
+## 4. 局限
+
+- **纯代码推断**，没跑真机：`GVennNumbers` 的"外层 150 是否真的压住"依赖 ArkUI「固定高父容器不给子项让位」的语义，我按 ArkUI 常规行为判断；
+- 没量 `max_bottom` 的实际变化 ⇒「省 40vp」是按改前改后数值差算的，不是实测；
+- `GCubeNetFold`/`GSpotlightTrack` 的"173 偏小"是**视觉判断**，没有截图；
+- 14 款都没有 `Scroll()`，所以不存在"页面可滚、改了也无所谓"的情况（已 grep 确认）。

@@ -1,0 +1,227 @@
+# 卡片文字映射（NO_CARD 根因分析）
+
+> **只读分析**：未编译、未碰设备、未改 `.ets`、未 commit。
+> 结论先说：**卡片标题是两行（主名 + 英文副名），主名随设备语言变**；
+> **现映射在简体设备上是对的（354/354）**，所以 `NO_CARD` **不是映射算错**，而是别的原因（见 §4）。
+
+---
+
+## ① 卡片标题到底从哪来（代码实证）
+
+**首页只有一个接受 `GameMeta` 的卡片 builder：`azRow(m, enterIdx)`（`GamesTab.ets:2694`）**
+—— 搜索结果与字母列表**共用它**（我全文件搜过，没有第二个）。
+
+标题区（`:2705-2715`）：
+
+```ts
+Column({ space: 2 }) {
+  Text(this.azZhName(m))     // ← 主名（粗体，FontSize.sm）
+    .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+  Text(this.azEnName(m))     // ← 副名（灰，FontSize.xxs）
+    .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+}
+```
+
+**两个 helper 的实现**（`:941` / `:947`）：
+
+```ts
+private azZhName(m: GameMeta): string {
+  const observed: string = this.langCode;
+  return (observed === 'zh' || observed === 'zh-Hant') ? displayName(m) : m.enName;
+}
+private azEnName(m: GameMeta): string {   // 副名；主名已是英文则不重复
+  ...
+}
+```
+
+**再往下追一层**（`GameRegistry:490`）：
+
+```ts
+export function displayName(g: GameMeta): string {
+  return gameName(g.id, g.name, g.enName);
+}
+```
+
+**`gameName()` 的实现**（`I18n.ets:1143`）：
+
+```ts
+const c = I18n.current();
+if (c === Lang.ZH)     { return zh; }        // ← 简体：直接注册表 name
+if (c === Lang.EN)     { return en; }        // ← 英文：enName
+if (c === Lang.ZHTW)   { return toTrad(zh); }// ← 繁體：**注册表名转繁**
+const row = GAME_NAME[id];
+if (row && row[c]) { return row[c]; }        // ← 其它 9 语言：字典
+return en;                                    // ← 兜底 enName
+```
+
+### ⇒ 正确的推导链
+
+```
+卡片主名 = 
+  zh      → GameRegistry.name                      （354 款全部 = 注册表名）
+  zh-Hant → toTrad(GameRegistry.name)              （354 款里 300 款会变，见 §3）
+  en      → GameRegistry.enName
+  其它 9 语言 → GAME_NAME[id][lang] ?? enName
+
+卡片副名 = enName（主名已是英文时不显示）
+```
+
+**⇒ 现在的 `game_title_map()`（`enName → name`）只覆盖了 `zh` 这一支。**
+
+---
+
+## ② 现映射在简体设备上是对的（我逐条验过）
+
+我拿 `shot_game.py` 现有的正则跑了一遍，再跟「逐条精确解析」对比：
+
+```
+现在的正则    → 354 条
+逐条精确解析  → 354 条
+两者不一致    → 0 条
+```
+
+抽查你点名的几款：
+
+| enName | 现映射 | 精确解析 |
+|---|---|---|
+| `Compound Connect` | 复合连线 | 复合连线 ✓ |
+| `Connect Four` | 四子棋 | 四子棋 ✓ |
+| `Doodle Jump` | 登高 | 登高 ✓ |
+| `Lock Pattern` | 生命游戏 | 生命游戏 ✓ |
+| `2048` | 2048 | 2048 ✓ |
+
+**⇒ 正则与映射没错。**它甚至在 `re.S` 跨行下也没错配（因为注册表的字段顺序固定：`id, name, tagline, …, enName`）。
+
+---
+
+## ③ 「注册表名 ≠ 卡片文字」的全集（按语言分）
+
+| 设备语言 | 卡片主名 | 与注册表名不同的款数 |
+|---|---|---:|
+| **zh（简体）** | `name` | **0 / 354** |
+| **zh-Hant（繁體）** | `toTrad(name)` | **300 / 354** |
+| **en 及其它 9 语言** | `enName` / `GAME_NAME[id][lang]` | **354 / 354** |
+
+繁體会变的例子（用项目自己的 `S2T_FROM/TO` 598 字 + 128 词表算的）：
+
+| id | 注册表名 | 繁體卡片 |
+|---|---|---|
+| `compound_connect` | 复合连线 | **復合連線** |
+| `bejeweled` | 宝石迷阵 | 寶石迷陣 |
+| `flappy` | 穿云 | 穿雲 |
+| `game24` | 24 点 | 24 點 |
+| `go9` | 9 路围棋 | 9 路圍棋 |
+| `minesweeper` | 扫雷 | 掃雷 |
+| `life_game` | 生命游戏 | 生命遊戲 |
+
+**⇒ 如果测试机是繁體，`NO_CARD` 会是「300 款」而不是「少数」。**
+你说只有少数 ⇒ **设备应该是简体** ⇒ 映射本身不是根因。
+
+---
+
+## ④ 那 `NO_CARD` 到底为什么？（我能给的边界）
+
+**我能证明的**：映射在简体设备上对 354/354 全对。
+**我不能证明的**：`Compound Connect` / `2048` 具体卡在哪一步 —— 那需要真机跑一次（红线禁止）。
+
+**但有一条高可信度的线索**：注册表里**名字含空格或数字**的只有 **7 款**，正好符合「少数」：
+
+| id | name | enName |
+|---|---|---|
+| `g2048` | **`2048`** | 2048 |
+| `game24` | **`24 点`** | Game24 |
+| `go9` | **`9 路围棋`** | Go (9x9) |
+| `d2_attention` | **`d2 注意`** | d2 Attention |
+| `double_n_back` | **`双 N-back`** | Double N Back |
+| `ab_reversal_oddball` | **`AB 反转`** | Ab Reversal Oddball |
+| `maze_nav_3d` | **`3D 迷宫`** | Maze Nav 3D |
+
+**机制**：工具用 `uinput -K -t '<token>'` 打字。**含空格/数字的词最容易被打字层吃掉或改变**（空格丢失、数字被当键码），搜索框内容与预期不符 ⇒ 0 结果 ⇒ `NO_CARD`。
+**`2048` 更特殊**：`name == enName`，所以**副名被去重省略**（卡片只有一行），且纯数字名在搜索/匹配上没有任何汉字可兜底。
+
+> ⚠️ 这条是**推断**，不是实证。要坐实只需跑一次：
+> `uinput -K -t '24 点'` 之后 dump 看搜索框里的实际文字。
+
+---
+
+## ⑤ `game_title_map()` 的正确实现方案
+
+### 方案 A（推荐）：**不预测，直接从 dump 读**
+
+**理由**：卡片文字是渲染结果，受语言/字典/去重三重影响；**猜它永远是脆的**。
+工具**已经每步都 dump 了**，直接读就行。
+
+```python
+def card_title_candidates(meta):
+    """注册表里能推出的一切可能写法（用于匹配，不用于显示）"""
+    zh, en = meta['name'], meta['enName']
+    out = [zh, en]                    # 简体 + 英文（覆盖 zh/en 两支）
+    tr = to_trad(zh)                  # 用项目 S2T 表（598 字 + 128 词）复刻
+    if tr != zh:
+        out.append(tr)                # 繁體
+    row = game_name_dict().get(meta['id'], {})
+    out += [v for v in row.values() if v]   # GAME_NAME 的 9 语言
+    return [t for t in dict.fromkeys(out) if t]
+
+def card_title_map():
+    """enName → 候选标题列表（不再是单一字符串）"""
+    return {m['enName']: card_title_candidates(m) for m in parse_registry()}
+
+def verify_title(tree, en_name):
+    texts = flatten_texts(tree)
+    joined = '\n'.join(texts)
+    cands = card_title_map().get(en_name, [])
+    ok = any(c in joined for c in cands)        # ← 任一命中即算对
+    ...
+```
+
+**好处**：语言无关、字典无关、去重无关；**300 款繁體问题也一并解决**。
+
+### 方案 B（若一定要预测）：按语言分支
+
+```python
+def expected_card_title(meta, lang):
+    if lang == 'zh':       return meta['name']
+    if lang == 'zh-Hant':  return to_trad(meta['name'])
+    if lang == 'en':       return meta['enName']
+    return GAME_NAME[meta['id']].get(lang) or meta['enName']
+```
+**代价**：得在 Python 里**再实现一份 `toTrad`**（598 字 + 128 词的映射），
+两份实现必然漂移 —— **不推荐**。
+
+### 方案 C（打字层兜底，可与 A 并用）
+
+```python
+def search_tokens(meta):
+    """挑「不会被打字层弄坏」的词"""
+    zh, en = meta['name'], meta['enName']
+    toks = []
+    if zh.isascii() or ' ' not in zh:   toks.append(zh)   # 无空格的直接打
+    else:                                toks.append(zh.replace(' ', ''))  # 去空格再试
+    base = en.split('(')[0].strip()
+    toks += [w for w in base.split() if len(w) >= 4]      # 英文长词（纯 ASCII，最稳）
+    return toks
+```
+
+---
+
+## ⑥ 给 lead 的一句话
+
+**卡片主名 = `displayName(m)`（简体下就是注册表 `name`，繁體走 `toTrad`，其它语言走 `enName`/`GAME_NAME`），副名恒为 `enName`。**
+
+**能推出正确映射，但不该"预测"—— 让工具从 dump 里读实际文字、并用「候选集合任一命中」判定。** 这样一次解决 `NO_CARD`、繁體 300 款、以及新增 emoji/改名带来的漂移。
+
+---
+
+## 附：这份分析用到的证据
+
+| 结论 | 证据 |
+|---|---|
+| 卡片标题是 `azRow` 两行 | 全文件只有 1 个接受 `GameMeta` 的 builder（`azRow:2694`）；两行 `Text` 在 `:2706/:2711` |
+| 主名随语言变 | `azZhName:941` + `gameName:1143` + `displayName:490` 三处函数体逐个读过 |
+| 现映射在简体下 354/354 对 | 用工具现正则 vs 逐条精确解析，差异 0 条 |
+| 繁體 300 款会变 | 用项目自己的 `S2T_FROM/TO`（598 字）+ `S2T_WORDS`（128 词）复刻 `toTrad` 后逐款比对 |
+| 空间/数字名只有 7 款 | 对 354 条 `name` 跑 `' ' in name or re.search(r'\d', name)` |
+
+**⚠️ 没做到的**：`Compound Connect` / `2048` 的具体失败步骤**没有实测坐实**（红线禁止碰设备）。
+§4 给的是**推断 + 一条一次就能验的实验**（打 `24 点` 后 dump 看搜索框实际内容）。

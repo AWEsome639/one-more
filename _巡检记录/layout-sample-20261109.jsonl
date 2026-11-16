@@ -1,0 +1,40 @@
+OK           Bejeweled                {'max_bottom': 1351, 'lowest': '💎', 'count': 1}
+TIGHT        Dual Mirror              {'max_bottom': 1565, 'lowest': '点左板 (r,c) ⇒ 左 (r,c) 与右 (r,3-c)', 'count': 3}
+OK           Lock Pattern             {'max_bottom': 870, 'lowest': '1/5', 'count': 8}
+NOT_IN_GAME  Peg Solitaire            {'texts': ['', '', '', '', '']}
+OK           Snake 3D                 {'max_bottom': 1351, 'lowest': '滑动棋盘或点方向键转向；吃满 12 个食物算通关', 'count': 4}
+PUSHED_OUT   Akari (Light Up)         {'max_bottom': 1600, 'lowest': '换一题', 'count': 1}
+OK           Fillomino                {'max_bottom': 1327, 'lowest': '7', 'count': 1}
+OK           Klotski                  {'max_bottom': 1510, 'lowest': '重开', 'count': 1}
+OK           Norinori                 {'max_bottom': 1175, 'lowest': '4', 'count': 1}
+PUSHED_OUT   Sudoku                   {'max_bottom': 1600, 'lowest': '✕ 擦除', 'count': 3}
+PUSHED_OUT   Algebraic Inequality Solver {'max_bottom': 1589, 'lowest': 'x = -3', 'count': 2}
+TIGHT        Calculation Sprint       {'max_bottom': 1527, 'lowest': '135', 'count': 1}
+OK           Fibonacci Merge          {'max_bottom': 1321, 'lowest': '提示：相邻两格之和要落在 1,2,3,5,8,13,21… ', 'count': 1}
+OK           Matrix Reasoning         {'max_bottom': 1505, 'lowest': '秩 = 1', 'count': 9}
+TIGHT        Numerical Estimation     {'max_bottom': 1517, 'lowest': '5', 'count': 1}
+PUSHED_OUT   Radical Roots            {'max_bottom': 1600, 'lowest': '提示', 'count': 1}
+PUSHED_OUT   Vector Dot Product       {'max_bottom': 1600, 'lowest': '2', 'count': 3}
+PUSHED_OUT   Choice Reaction Time     {'max_bottom': 1590, 'lowest': '奇', 'count': 1}
+OK           Digit Span Reverse       {'max_bottom': 1414, 'lowest': '重开', 'count': 4}
+OK           Face Trait Association   {'max_bottom': 1487, 'lowest': '海玥', 'count': 2}
+OK           Memory Matrix            {'max_bottom': 1351, 'lowest': '重新开始', 'count': 11}
+PUSHED_OUT   Operation Span           {'max_bottom': 1600, 'lowest': '存下第 1 个结果，继续算', 'count': 1}
+PUSHED_OUT   Rule Switcher            {'max_bottom': 1600, 'lowest': '奇', 'count': 1}
+PUSHED_OUT   Stroop Number Size       {'max_bottom': 1600, 'lowest': '红', 'count': 3}
+TIGHT        Vigilance Task           {'max_bottom': 1558, 'lowest': '看到 ◆ 就点我', 'count': 1}
+PUSHED_OUT   Chalk And Talk           {'max_bottom': 1600, 'lowest': '落笔 ✍️', 'count': 1}
+PUSHED_OUT   Etymology Origin         {'max_bottom': 1600, 'lowest': '葡萄牙语', 'count': 1}
+PUSHED_OUT   Letter Grid Swapper      {'max_bottom': 1600, 'lowest': '✅ PLANET —— 行星', 'count': 6}
+PUSHED_OUT   Semantic Distance        {'max_bottom': 1600, 'lowest': '药', 'count': 3}
+PUSHED_OUT   Typoglycemia Decoder     {'max_bottom': 1594, 'lowest': 'practice makes perfect when th', 'count': 1}
+OK           Word Scramble            {'max_bottom': 732, 'lowest': '5', 'count': 15}
+PUSHED_OUT   Binary Matrix Rank All   {'max_bottom': 1600, 'lowest': '提示', 'count': 5}
+OK           Color Maze Nav           {'max_bottom': 1351, 'lowest': 'D', 'count': 4}
+TIGHT        Einstein Riddle          {'max_bottom': 1571, 'lowest': '提示 −100', 'count': 1}
+TIGHT        Hue Sort                 {'max_bottom': 1538, 'lowest': '正确顺序：左上 → 右下，色相 0° 递增到 337°', 'count': 1}
+TIGHT        Mirror Image             {'max_bottom': 1565, 'lowest': '点左板 (r,c) ⇒ 左 (r,c) 与右 (r,3-c)', 'count': 4}
+OK           Path Recall              {'max_bottom': 1173, 'lowest': '3', 'count': 6}
+OK           Silhouette Match         {'max_bottom': 1073, 'lowest': '哪张剪影的轮廓和积木完全一样？', 'count': 2}
+PUSHED_OUT   Tangram                  {'max_bottom': 1600, 'lowest': '铺对 4 / 12 格\u3000剩 11 次', 'count': 1}
+PUSHED_OUT   Visual Search All        {'max_bottom': 1600, 'lowest': '用 2 划倍数：2×2 起', 'count': 7}

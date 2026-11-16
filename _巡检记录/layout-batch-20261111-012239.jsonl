@@ -1,0 +1,5 @@
+{"event": "start", "i": 1, "total": 2, "game": "Memory", "en": "Memory", "ts": "2026-11-11T01:22:39"}
+{"event": "result", "i": 1, "total": 2, "game": "Memory", "en": "Memory", "outcome": "ok", "max_bottom": 1351, "lowest": null, "elapsed_s": 47.4, "returncode": 0, "tail": "Memory\tOK\t1351\t47.3s lowest='重新开始' -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-012326.jpeg @2026-11-11T01:23:26"}
+{"event": "start", "i": 2, "total": 2, "game": "Bejeweled", "en": "Bejeweled", "ts": "2026-11-11T01:23:26"}
+{"event": "result", "i": 2, "total": 2, "game": "Bejeweled", "en": "Bejeweled", "outcome": "ok", "max_bottom": 1351, "lowest": null, "elapsed_s": 19.6, "returncode": 0, "tail": "Bejeweled\tOK\t1351\t19.5s lowest='🔥' -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-012345.jpeg @2026-11-11T01:23:46"}
+{"event": "done", "processed": 2, "total": 2, "failures": 0, "started_at": "2026-11-11T01:22:39", "finished_at": "2026-11-11T01:23:46", "out": "/Users/a0000/dev/One More/_巡检记录/layout-batch-20261111-012239.jsonl"}

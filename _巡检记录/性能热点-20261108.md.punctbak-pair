@@ -1,0 +1,507 @@
+# 渲染开销真实热点 —— 2026-11-08
+
+> 执行：**perf-hunter** ｜ **只读**（没改任何 .ets，只写这一个 md）｜ **没编译、没跑 app、没点屏**
+> 允许范围内的外部取证：① 设备 `127.0.0.1:5557` 上的 **faultlog 原文** ② DevEco 本地**官方文档**（ForEach/LazyForEach 语义）
+> **行号都是现取的**（文件在漂，引用时以 grep 为准）。
+> 设备：`127.0.0.1:5557` = **模拟器**（`const.product.model` = `emulator`），布局根 `[0,0][2560,1600]`px = 853×533 vp @3x ⇒ 就是本项目口语里的「853×533 平板」。
+> 现场状态：app 在跑（PID 21573，停在推箱子那局），**我没导航、没点屏**，只做了 `dumpLayout` 与读日志。
+
+## 0. 一句话结论
+
+**① 和 ④ 昨晚那刀砍对了（`parseNumMap` + `CardBadgeCache` 都成了热点杀手），但 `parseNumMap` 的缓存是「单槽」的，被统计页交替调用打穿，等于白修一半。**
+**② 是唯一的大头：355 张卡 `Grid + ForEach` 全量创建（官方语义如此）＋ `tick` 进了 ForEach 的 key ⇒ 任何「收藏一下」都会重建全部 355 张卡。**
+**③ 定时器清理基本干净（124 处只有 5 处没清理，且都是自清/设计如此）；真正的坑不是「漏清」而是「104/119 款不查 `AppClock.isPaused()`」——后台继续走表。**
+
+## 0.5 状态更新（08:20 复核：我写报告的这十几分钟里，有两条已经被落地了）
+
+我引用过的 `GamesTab.ets` / `ProgressStore.ets` 在 **08:19** 被人改过（不是我改的，我只写这个 md）。我重新核了一遍现状：
+
+| 本报告的条目 | 现状 | 现在的行号 |
+|---|---|---|
+| §2.4 修法 A（把 `+ this.tick` 从 ForEach key 去掉） | ✅ **已实施**，注释署名 perf-hunter | `GamesTab.ets:1136`（网格）/ `:2282`（A-Z）—— 行号比原报告后移 3 行 |
+| §3.2（`parseNumMap` 单槽 → 按 raw 分槽） | ✅ **已实施**，`mapCache: Map<string, Record<string,number>>`，`size >= 8` 时清空 | `ProgressStore.ets:914`（声明）/ `:931–951`（函数） |
+| §2.5（卡片 🔥/今日 刷新） | ⏳ **未动**，且因为上面那条落地，现在「没有顺手的刷新」了 —— 见 §2.5 的说明 | — |
+| 其余（搜索防抖 / 76 款 AppClock / LazyForEach / TG2） | ⏳ 未动 | — |
+
+⚠️ 两条小尾巴：
+1. `ProgressStore.ets:920` 的**文档注释还写着 `mapCacheVal`**（那个字段已经不存在了，现在是 `mapCache` Map）⇒ 下次有人按注释去找会找不到，建议顺手改一句。
+2. §2.4 里我列的「`azSections()` 缓存键也带 `tick`（`:747–748`）」**没被一起改** —— 这是对的（用途不同），别误删：`tick` 现在只剩这一个消费点 + 2 处写入，属于「留着不会有问题，删了会让 A-Z 视图切完不重排」。
+
+---
+
+## 1. 热点排行（按「用户能不能感觉到」）
+
+| # | 级别 | 一句话 | 文件:行 | 用户感知 |
+|---|---|---|---|---|
+| 1 | **P1** | `Grid + ForEach` 355 张卡**全量创建**（≈6,745 个组件），`cachedCount(20)` 挡不住 | `GamesTab.ets:1067–1068` | **返回首页/进首页那一下**（有 faultlog：8s 输入阻塞） |
+| 2 | **P1** | ~~ForEach 的 key 里带了 `this.tick`~~ **✅ 08:19 已修**（key 改成 `g.id`） | `GamesTab.ets:1136`（A-Z 视图 `:2282`） | **长按收藏「点一下卡一下」**（135–400ms 级，估算） |
+| 3 | **P2** | ~~`parseNumMap` 缓存只有 1 个槽~~ **✅ 08:19 已修**（改按 raw 分槽的 `Map`，上限 8） | `ProgressStore.ets:914, 931–951` ← `StatsTab.ets:432–433`（函数 `:422`） | 切到「统计」页的那一下（N 越大越明显） |
+| 4 | **P2** | 搜索框**没有防抖**，每敲一个字：355×3 次 `toLowerCase` + 命中卡全量重建 | `GamesTab.ets:2550–2552` → `:464` | **打字时列表一卡一卡** |
+| 5 | **P2** | 104/119 款带计时器的游戏**不查 `AppClock.isPaused()`**（其中 76 款是倒计时类）⇒ 进后台继续每秒 setState、继续走表 | 355 款通用（清单见 §4.2） | 切出去回来看倒计时少了几十秒 + 发热耗电 |
+| 6 | P3 | `StatsTab` / `SettingsTab` 在 build 里**直接 `JSON.parse`**，绕过缓存 | `StatsTab.ets:408–420`、`SettingsTab.ets:218–225`→`:1288` | 切页面的小顿 |
+| 7 | P3 | A-Z 视图同样是 `List + ListItemGroup + ForEach` 全量 355 行（每行节点比卡片还多） | `GamesTab.ets:2268–2284` | 切到 A-Z 视图那一下 |
+| 8 | P3 | 开屏 16ms ticker 每帧写 **15 个 @State**（≈937 次/秒）⇒ 开屏期间 JS 线程占满 | `Splash.ets:412–495` | 冷启动开屏「不跟手」（设计如此，自清，不泄漏） |
+| 9 | P3 | `Hint.demoRun` 是**死代码**（0 调用），且计时器不登记 `autos`/`Demo.live` ⇒ 一旦有人启用就真泄漏 | `ai/Hint.ets:188–205` | 现在无影响（预防性） |
+| 10 | P3 | `TG2/TG4` 每个占位符做一次 `split('{n}').join()`（2 次分配）；全仓 **2,760 处**，一部分在 build/ForEach 里；**中文用户也照样付**（`TG()` 的 ZH 早退在替换之前） | `core/GameI18n.ets:12262–12297` | 格子类游戏里持续的小开销（几十 µs/帧，察觉不到但纯白费）|
+
+---
+
+## 2. ② `ForEach` 的性能 —— 这是唯一的大头
+
+### 2.1 事实核对（先确认「不是 `LazyForEach`」）
+
+```
+全仓 LazyForEach 出现次数：0        ← grep -rn "LazyForEach" entry/src/main/ets → 空
+GamesTab 列表实现：Grid + ForEach   ← GamesTab.ets:1067 Grid(...) / :1068 ForEach(this.list(), ...)
+A-Z 视图：List + ListItemGroup + ForEach ← GamesTab.ets:2268–2284
+```
+
+**官方语义**（本地 DevEco 文档 `FAQ/UI框架/组件使用/ForEach和LazyForEach的区别/faqs-arkui-1291` 原文）：
+
+> **「在初始化渲染时，ForEach 会加载数据源的所有数据，导致页面卡顿。」**
+> 场景表：*大数据量列表 → ForEach **不推荐（容易造成滚动卡顿）** / LazyForEach 推荐*；
+> *动态数据（频繁更新）→ ForEach **不推荐（每次更新需渲染所有项，性能很差）***。
+
+⇒ 所以 `卡片角标-20261107.md:67` 那句「Grid 有虚拟化（`cachedCount(6)`），实际只重建可见的几张」**不成立**：
+`cachedCount` 是给 `LazyForEach` 按需创建用的*预加载*数量；`ForEach` 已经把 355 个子组件**全建出来了**，它不改变「已创建」这个事实。
+（同理 `GamesTab.ets:1077` 的注释「Grid 虚拟化 ⇒ 滚到第 100 款时它刚创建」也是这个误解——只是没造成 bug，因为 index 已改成 `-1`。）
+
+### 2.2 开销估算
+
+单个 `GameCard` 的 `build()` 里（`Common.ets:1206–1666`，461 行）节点创建调用：
+
+| 类型 | 个数 |
+|---|---|
+| `Text(` | 13 |
+| `Stack(` | 2 |
+| `Row(` | 2 |
+| `Image(` | 1 |
+| `Column(` | 1 |
+| **合计** | **19** |
+
+- **首帧 / 一次全量重建：355 × 19 ≈ 6,745 个组件节点**（另加每卡 6 个 `@Prop`/`@StorageProp` 订阅：`:964–968, 980–981`）。
+- 估算方法：按单节点创建 20–60µs（含 modifier 链）⇒ **真机 135–400ms**；软件渲染的模拟器再 ×3–10。
+  ⚠️ 这是**估算，不是实测**（本轮不许编译/上真机跑 app）。请在修完后用 `Splash` 那套 `Diag` 打点或 `hitrace` 复核。
+- 一次 `tick` 变化（收藏/长按/右键菜单）＝ 同样量级的**销毁 + 重建**，且发生在一次点击的同步路径上 ⇒ 手感「点一下卡一下」。
+
+### 2.3 现场证据（设备上的 faultlog，不是猜的）
+
+`/data/log/faultlog/faultlogger/appfreeze-com.andrewoscar.onemore-20020074-20261107203140271.log`：
+
+| 项 | 值 |
+|---|---|
+| Reason | `APP_INPUT_BLOCK`（"this thread has blocked 8000ms"） |
+| 时间 / 页面切换 | 冻结 20:31:40 ｜ `20:30:51 /pages/GameHost` → **`20:31:36.805 /pages/Index`** |
+| 阻塞线程 | TID 424（主线程），卡在 `vSyncTask`（VIP 优先级，handle 时间未回填） |
+| 同期积压 | High 队列 5 条 `ArkUIRosenWindowRenderServiceTask`（每 130–200ms 一条） |
+| 内存 / GC | MainHeap used **18.97MB** / RSS **414MB** ｜ `maxPause 317.6ms`、`averagePause 40.6ms`、count 25 |
+| 设备 | **`Device info: emulator`**（报告里称的「853×533 平板」就是它：布局根 bounds `[0,0][2560,1600]`px ÷ 3 = **853×533 vp**） |
+
+结论口径：**证据链指向「返回首页时重建 355 卡」这条路径**（阻塞发生在回到 `Index` 的瞬间），但**单凭这份日志不能证明**是它卡死的（模拟器本身也在卡）。
+👉 这条不重复 `HUD真机复核-20261108.md:63` 的结论，只是把它更新成「**现在还有数字**」：6,745 节点 / 双出口（首帧 + tick）。
+
+### 2.4 修法（两步走，先做便宜的）
+
+**修法 A（10 分钟，低风险，先做这个）—— ✅ 已于 08:19 落地（下面保留原文 + 现状行号）** —— 把 `tick` 从 key 里拿掉：
+
+```ts
+// 改前（08:19 之前）GamesTab.ets:1136  }, (g: GameMeta) => g.id + this.tick)
+// 改后（现在）      GamesTab.ets:1136  }, (g: GameMeta) => g.id
+// A-Z 视图同步改：现在在 GamesTab.ets:2282
+```
+- **为什么安全**：卡片角标的两个数据源已经是 `@StorageProp('clearedGames')` / `@StorageProp('perGameBest')`（`Common.ets:980, 981`），**自己会刷新**，根本不依赖父组件换 key；
+  `streak` / `playedToday` 是 `@Prop`（父传），收藏动作不会改变它们。
+- **风险**：① 若将来有人靠 `tick` 刷新卡片上别的东西，会静默失效（建议在 `tick` 声明处写一句「本字段不参与 ForEach key，见 <本文件>」）；
+  ② `azSections()` 的缓存 key 里也带了 `tick`（`:747–748`），去掉后切 A-Z 需要另找刷新点 —— **改 key 时别动 `:747–748`**，那是另一个用途（列表内容变了才重排）。
+
+  ⚠️ **③ 一个必须先去查清的点（不改代码就得先答）**：`this.tick` 只有 3 处读（`:748` az 缓存键、`:1136`、`:2279`），**只有 2 处写**（`:1110` 长按收藏、`:1215` 菜单收藏）。
+  而卡片上的 🔥 连胜 / 「今日已玩」是**父组件传进来的 `@Prop`**（`Common.ets:967–968` ← `GamesTab.ets:1086–1087` 调 `ProgressStore.streakOf/playedToday`）。
+  按官方刷新语义（`faqs-arkui-41`：**key 不变 ⇒ 不触发该子组件的刷新**），ForEach 同 key 的卡片**不会重跑 itemGenerator** ⇒
+  **「玩完一局回到首页，那张卡的 🔥 / 今日标记会不会立刻更新？」我静态上找不到可靠路径**（`onPageShow` 只刷了 `dailyId`，没碰 `tick`）。
+  ⇒ 若实测是「不更新」，那是**既有 bug**（`tick` 挂在收藏动作上，方向就不对）；若实测「会更新」，说明另有机制（我没看全）。
+  ⇒ **两种情况都结论一致**：把 `tick` 从 key 去掉**不会新增**这个问题的严重度，但也**不该**顺手把它当成「刷新手段」保留 —— 真要修刷新，正解是让 `GameCard` 自己 `@StorageProp` 一份每款连胜/今日（现在 AppStorage 里**没有** per-game 的 streak 键，只有落盘的 `preferences['streaks']`，要新加一个 AppStorage 键才行，属于功能改动）。
+
+**修法 B（半天，根治）** —— 换 `LazyForEach` + `IDataSource`：
+
+```ts
+class GameDataSource implements IDataSource { ... totalCount / getData / registerListener / unregisterListener ... }
+Grid(this.gridScroller) { LazyForEach(this.ds, (g: GameMeta, i: number) => { GridItem() { GameCard({...}) } }) }
+```
+- **收益**：首帧只建「可见 + `cachedCount`」≈ 12–20 张卡（6,745 → **~400 节点**，降 94%）；收藏也不再有全量重建。
+- **风险（比 A 高一个数量级，必须单独立项）**：
+  1. **全仓 0 处先例**（没人写过 `IDataSource`），没有可抄的代码；
+  2. `flyingId` 共享元素转场（`GamesTab.ets:1075`）依赖 `sharedId` 与卡片实例的稳定身份 —— 懒加载会在滚动时销毁实例，**转场可能失配**；
+  3. 方向键导航 `moveFocus()`（`:655`）按 `list()` 的下标算，改用 `LazyForEach` 后要改成「按 id 找 index」；
+  4. `dataChangeListener` 需要把筛选/搜索/语言变化正确翻译成 `onDataReloaded()`，否则**列表不刷新**（官方 FAQ `faqs-arkui-41` 就是一整篇讲这个的）。
+- ⚠️ **不建议**在没有真机验收的情况下直接上 B；建议 A 先落，B 等一个专门的验收窗口（需要真机跑「滚动 + 返回 + 收藏 + 切分类 + 切语言」五件事）。
+
+### 2.5 如果要顺手修「卡片 🔥 / 今日标记不刷新」，这是最省的一条路（**方案，未实施**）
+
+我把「为什么 `tick` 会被塞进 key」这件事追到底了，结论比「去掉了事」更有用：
+
+**现状（全部实测）**
+| 事实 | 证据 |
+|---|---|
+| `this.tick` 只有 2 处写（收藏 / 菜单收藏），**玩完一局不会碰它** | `GamesTab.ets:1110`、`:1215` |
+| 卡片 🔥 / 今日标记**靠父传 `@Prop`**，值在 `GamesTab` build 里现调 | `Common.ets:967–968` ← `GamesTab.ets:1086–1087` |
+| 玩完一局后 `GamesTab` **确实会重建**（`@StorageProp('xp'/'totalSolved'/'level'…)` 都变了） | `GamesTab.ets:65–69` ← `ProgressStore.ets:407–413` |
+| 但 ForEach **同 key 不重跑 itemGenerator** ⇒ 卡片上的 🔥/今日 **拿不到新值** | 官方 `faqs-arkui-41` |
+| AppStorage 里**已有** `'streaks'` 键（整张表 `{[gameId]: GameStreak}`），但**只在 `init()` 写一次**，之后永不更新 | `ProgressStore.ets:263`（唯一写入点） |
+| 每局结束时只把**本局那一款**的 `GameStreak` 写进 `'streak'`（单数键） | `ProgressStore.ets:416` |
+
+⇒ `GameStreak` 正好就带 `current` / `lastDay` / `solvedToday`（`ProgressStore.ets:63–67`）—— **🔵 卡贝要的两样东西它都有**，数据早就在内存里，只是没往 AppStorage 同步。
+
+**最省修法（4 步，全部照抄项目已有套路）**
+1. `ProgressStore.persistStreaks()`（`:1479–1494`，那里已经把 `streaks` 拼成 `obj` 了，见 `:1484–1487`）里补 1 行：
+   `AppStorage.setOrCreate('streaks', JSON.stringify(obj));` ← 这一个卡口覆盖**所有**连胜变更（`persistStreaks` 是所有连胜写入的唯一终点，不会漏）。
+2. `Common.ets` 的 `CardBadgeCache`（`:860`）加一个 `streak(raw, id)` / `playedToday(raw, id)`，**完全照抄它已有的 `cleared()`**（`:880–899`）—— 同一份串只 `JSON.parse` 一次，355 卡共享。
+3. `GameCard` 里把 `@Prop streak` / `@Prop playedToday`（`:967–968`）换成 `@StorageProp('streaks')` + 上面两个查询（和 `:980–981` 的角标机制**一模一样**）。
+4. 删掉 `GamesTab.ets:1086–1087` 两个传参 —— 此时 `tick` 就再没有任何理由进 key 了，§2.4 的修法 A 自然成立。
+
+**收益**：① 修掉「玩完回来看不到 🔥/今日更新」（若实测确实不更新）；② 让 `tick` 从 key 里退休有理有据；③ 卡片的连胜查询从「每次重建 355 次 `Map.get` + `today()` 字符串拼接」变成「一次 parse 全表共享」。
+**风险**：① `'streaks'` 一变，355 张卡的 `@StorageProp` 都会被标脏 —— 但这和现有的 `perGameBest`（每局都变）**完全同构**，量级不会新増；② **跨零点**：`playedToday` 现在每次 build 现算（`today()`），改成读串后，零点后若没人玩过，标记会停在「昨天玩过的那款」直到下一次写入 —— 要么接受（下次一玩就正），要么卡里继续现算 `today()` 比对 `lastDay`（推荐后者，1 行）。
+**⚠️ 这 4 步是「功能 + 性能」混合改动，我没做，也不建议和 §7 那三条性能修复放在同一个提交里。**
+
+---
+
+## 3. ① `AppStorage` 读爆炸 —— 昨晚修对了，但留了个「单槽缓存」的洞
+
+### 3.1 已经好的（不要再重复修，也别说没修）
+
+| 已修 | 位置 | 状态 |
+|---|---|---|
+| `parseNumMap` 按原始串缓存 | `ProgressStore.ets:909–940` | ✅ 命中时零解析 |
+| 卡片角标 `CardBadgeCache`（best/cleared 各一份静态缓存） | `Common.ets:860–899` | ✅ 355 卡共享一次 JSON.parse + 一次 split |
+| `list()` 记忆化（key = seg+category+picked+search） | `GamesTab.ets:400–421` | ✅ |
+| `computeList` / `tagCountIn` / `azSections` / `azCounts` 记忆化 | `:464 / :576 / :744 / :792` | ✅ |
+| `theme()` 记忆化（GamesTab / StatsTab / SettingsTab） | 各文件 `themeCache` | ✅ |
+
+**顺带核过**：整个 UI 层几乎没有 `AppStorage.get` —— `components/*` + `pages/*` 一共只有 7 处，其余全走 `@StorageProp`（ArkUI 自己管依赖）。`appStorage` 这条「读爆炸」主线**确实已经收口**。
+
+### 3.2 还剩的洞（P2，就是上表第 3 条）
+
+**`parseNumMap` 的缓存是单槽的**：一个 `mapCacheRaw` + 一个 `mapCacheVal`。
+
+```ts
+// ProgressStore.ets:909–910
+private static mapCacheRaw: string = '';
+private static mapCacheVal: Record<string, number> | undefined = undefined;
+```
+
+调用点只有 3 个，但用**两个不同的 raw**：
+
+| 调用者 | 读哪个 key | 行 |
+|---|---|---|
+| `playsOf()` | `perGamePlays` | `:522` |
+| `bestOf()` | `perGameBest` | `:529` |
+| `playedKinds()` | `perGamePlays` | `:536` |
+
+⇒ **交替调用时 100% 未命中**。而 `StatsTab.topPlayed()` 恰好就是交替的：
+
+```ts
+// StatsTab.ets:432–433（在 ForEach 里：:855 ForEach(this.topPlayed(), ...)；函数本体在 :422）
+plays: ProgressStore.playsOf(g.id),   // 解析 perGamePlays 全串
+best:  ProgressStore.bestOf(g.id),    // 立刻换成 perGameBest 全串 ⇒ 上一发缓存作废
+```
+
+**开销估算**：设 N = 玩过的款数（= `perGamePlays` 的键数）。
+每次 StatsTab 构建 ≈ **1（playedIds）+ 2N 次**全量 `JSON.parse`。
+`N=50` → 101 次 ≈ 3–8ms；`N=200` → 401 次 ≈ 15–40ms（模拟器数倍）。**这就是昨晚那刀在统计页上没砍到的部分。**
+
+**修法**（~10 行，低风险）—— ✅ **08:19 已按此落地**（`ProgressStore.ets:914` 的 `mapCache`，上限 8 时清空）：
+
+```ts
+private static numCache: Map<string, Record<string, number>> = new Map<string, Record<string, number>>();
+private static parseNumMap(raw: string): Record<string, number> {
+  const hit: Record<string, number> | undefined = ProgressStore.numCache.get(raw);
+  if (hit !== undefined) { return hit; }
+  let val: Record<string, number> = {};
+  try { val = JSON.parse(raw) as Record<string, number>; } catch (e) { val = {}; }
+  if (ProgressStore.numCache.size > 4) { ProgressStore.numCache.clear(); }  // 防无界增长（raw 串做 key）
+  ProgressStore.numCache.set(raw, val);
+  return val;
+}
+```
+- **风险**：① 用 raw 串当 key，等于把整串留一份引用（本来 AppStorage 里就有一份，重复引用不复制数据，OK）；
+  ② **必须保留 `:927–940` 那段「返回值只读、写路径重建」的注释语义** —— 缓存对象仍是共享本体，谁 `m[k]=v` 就污染（现有 3 个调用点都只读，安全）；
+  ③ 加 `clear()` 上限是为了防止「每局都换新串」时 Map 无限长（`finishGame` 每次结算都会产生新串）。
+- 顺手：`StatsTab.playedIds()`（`:408–420`）可以改成 `Object.keys(ProgressStore.parseNumMap(raw))` 复用缓存，但那需要把 `parseNumMap` 改成 `static`（现在是 private，同文件内可见即可，跨文件要放开）—— 不做也行，1 次解析不算事。
+
+### 3.3 `split(',')` 类（已核，不是首要矛盾）
+
+`favorites()` / `recent()` / `clearedGames()` 每次调用都 `split(',')` 全串（`ProgressStore.ets:466 / 496 / 944`）。
+- 谁在热路径？`isFavorite()` → `favorites()`：`GameHost.ets:552 / 869`（进游戏、切游戏各 1 次）、菜单 1 次 ⇒ **不在渲染循环里**。
+- `hasCleared()` 在「下一款」里最多 710 次 —— 这条 `三改动回归-20261107.md` 的 P2 **已经记过**，不重复报。
+
+### 3.5 `L()` / `TG()` 的字典查找 —— **实测 O(1)，不是热点，无需优化**（2026-11-08 复核）
+
+有人怀疑「`L(zh,en)` 每次都查 445 条 `EXTRA`，是 `Record` 还是循环」——**实测两个字典都是 `Record` 下标访问，单次 O(1) 哈希，全仓 0 处遍历**：
+
+| 字典 | 形态 | 条目数 | 唯一读取点 | 复杂度 |
+|---|---|---|---|---|
+| `EXTRA`（界面文案） | `Record<string, Record<string,string>>` 对象字面量（`I18n.ets:1156`） | **454** | `I18n.ets:2183` `EXTRA[zh]` → `:2185` `row[cur]` | **O(1) × 2 次哈希** |
+| `DICT`（游戏内文案） | 同上（`GameI18n.ets:25`） | **4574** | `GameI18n.ets:12214` `DICT[zh]` | **O(1)** |
+
+**「有没有循环」的核查口径**：在 `I18n.ets` / `GameI18n.ets` 里搜 `Object.keys|Object.entries|for-in` 对这两个字典的遍历 —— **0 处**。
+两个文件里含循环的函数只有 4 个，**都不在字典查找路径上**：
+
+| 函数 | 循环作用 | 是否热路径 |
+|---|---|---|
+| `toMap` / `toPairMap`（`:325/:334`） | 由字面量建 `Map`（`S2T_CHAR`/`S2T_WORD`） | **只在模块加载时调一次**（`:342–343`） |
+| `toTrad`（`:353`） | 逐字 + 最长词匹配（`Map`） | **只有繁体**且字典缺项时才走到；`O(len × ≤5)` |
+| `Digits`（`:2074`） | 逐字换数字表 | **绝大多数语言立即 `return s`**（只有 AR、以及 JA 的单字符串才建表） |
+
+**`L()` 单次调用的真实成本**（逐行数过）：`I18n.current()`（静态字段 + 1 次 `length===0` 判断）→ 2 次字符串比较 → 最多 2 次哈希 → `Digits()` 早退 ⇒ **常数级，≈百纳秒量级**。
+
+⇒ **结论：不是热点，不动。** 顺带纠正两个数字：`EXTRA` 是 **454** 条（不是 445）；`TG(` 调用点是 **7,198** 处（`TG2` 2,790 / `TG4` 49 / `L(` 60 / `this.t(` 222），之前说的「2760 处」只是 `TG2` 的。
+⇒ 真要抠这块，唯一的杠杆是**模块加载**（454 + 4574 条字面量实例化一次，属于启动耗时），**不是每次调用** —— 那是另一个议题。
+
+### 3.4 `split/join` 型：`TG2` / `TG4` 的占位符替换（P3，**所有语言都付费**，只是金额小）
+
+```ts
+// core/GameI18n.ets:12262–12279（TG2，TG4 同构）
+let out: string = TG(tpl);
+if (p0 !== undefined) { out = out.split('{0}').join(`${p0}`); }   // ← 每替换一次：1 个数组 + 1 个字符串
+if (p1 !== undefined) { out = out.split('{1}').join(`${p1}`); }
+if (p2 !== undefined) { out = out.split('{2}').join(`${p2}`); }
+```
+- **谁在用**：全仓 `TG2(` / `TG4(` 共 **2,760 处**（`GSolitaire` 22、`GCountdownMath` 18、`GCryptoArithmetic` 17…）。其中一部分**在 build/ForEach 里**，例：
+  `GEventTimelineMemory.ets:348` → `Text(... TG2('第 {0} 位', this.picks.indexOf(...) + 1) ...)`，外层是格子 ForEach ⇒ **每格 × 每次渲染**都要 split/join 一遍。
+- **开销估算**：带 1–3 个占位符 ⇒ 每次 2–6 次分配（数组 + 字符串）。64 格 × 3 占位符 ⇒ ≈**384 次分配/帧**。绝对量不大（几十 µs），但它是纯粹的白费。
+- **重要限定**：`TG()` 第一行 `if (cur === Lang.ZH) { return zh; }` —— **简体用户零开销**（直接返回原文，`TG2` 的 `p0` 分支仍然会跑 split/join！⚠️ 注意：这个早退在 `TG` 里，`TG2` 拿到原文后**照样**做 split/join）。
+  ⇒ 也就是说**连中文用户也在付**这笔钱（只是字符串里没有 `{0}`，`split` 返回单元素数组、`join` 原样返回）。
+  ⇒ **这是本报告里唯一一条「中文用户也全量付费」的项**，值得单独记。
+- **修法**（低风险）：`TG2` 里先判「模板里是否真有该占位符」再替换，或改成一次性正则替换；更省的是把 `split/join` 换成 `String.replaceAll`。
+  ```ts
+  if (p0 !== undefined) { out = out.replaceAll('{0}', `${p0}`); }
+  ```
+  风险：`replaceAll` 是 ES2021 的 `String.prototype` 方法，ArkTS 编译目标是否放行**要先核**（保守做法：保留 `split/join`，但先 `if (out.indexOf('{0}') < 0) return out;` 早退）。
+- ⚠️ 不建议在本轮扫「把所有 TG2 换成 TG3/TG4」这类大改：2,760 处，收益 <1ms，风险远大于收益。**只改 `TG2`/`TG4` 这 2 个函数就覆盖全部 2,760 处。**
+
+---
+
+## 4. ③ 定时器 —— 泄漏很少，「不暂停」很多
+
+### 4.1 清理：基本干净（124 处只有 5 处没清理）
+
+扫描口径：剥掉注释与字符串后按行做括号配平，取 `aboutToDisappear` / `onPageHide` 的函数体，判断里面**能否到达** `clearInterval`（直接调或调本地 `stopXxx()`）。
+
+```
+有 setInterval 的文件：119 个 ｜ 调用点：124 处
+「aboutToDisappear/onPageHide 里没有可达清理」：5 处
+   core/Lan.ets:132          —— 联机心跳，全局单例，设计如此（有 stop 但不在生命周期）
+   core/MotionKit.ets:49     —— RollingNumber，走满 18 帧自己 stop；GameHost:573 也手动 stop
+   ai/Hint.ets:188, 266      —— 见 §4.3（188 那件是死代码）
+   pages/GameHost.ets:778    —— 33ms × 30 帧，自己 clearInterval（:781），1 秒内结束
+   pages/Splash.ets:412      —— 16ms ticker，TOTAL/HOLD 到点自己 clearInterval
+```
+**这 5 处全部在 `games/` 之外（core / pages / ai）⇒ `games/` 下 119 个带计时器的文件里「漏清」是 0 个。**
+（`games/` 下没有任何文件进这张清单，说明 355 款游戏自身的 `aboutToDisappear → stopTimer()` 契约是齐的。）
+
+- 抽样 5 款确认「重开也不留双计时器」：`GWordSearch:70–72`、`GTetris:272–273`、`GSudoku:427–428`、`GGame24:229–230`、`GMinesweeper:149–150` —— 都是 `reset()` **第一行** `this.stopTimer()`，`stopTimer()` 里带 `if (timer >= 0)` 守卫。
+- ⚠️ **一个我没法纯静态证明的子问题**：`this.timer = setInterval(...)` 前 6 行内看不到 `clear` 的写法有 **61 处**（粗筛）。我抽的 5 款都是「`reset()` 先 stop、`setInterval` 在尾部」的安全写法，但**其余 56 处没有逐款核**。
+  静态判据只能证明「离开页面时清了」，**证明不了「同一组件里起了两个」**。
+  ⇒ 若要把这条也钉死，最省的办法是运行期加一个断言：`setInterval` 前 `if (this.timer >= 0) { hilog.error(... 'DOUBLE TIMER' ...) }`，玩一轮「重开 / 再来一局 / 切游戏」看有没有打到。
+- ⇒ **「重开一局不清旧计时器 ⇒ 双倍速 / 计时器叠加」这个经典坑，这个项目没踩到（静态可证的部分）。这点值得记一笔，免得后人重查（也免得被 61 那个数字骗到）。**
+
+### 4.2 真问题：104/119 款不查 `AppClock.isPaused()`
+
+`AppClock`（`core/AppClock.ets`）是 2026-10-17 为修「切后台倒计时继续走」造的：`GameHost.onPageHide → AppClock.hide()`，各游戏 tick 里问一句 `isPaused()`。
+
+**实测采用率**：
+
+| 指标 | 数 |
+|---|---|
+| 有 setInterval 的游戏文件 | 119 |
+| 其中引用了 `AppClock` | **15** |
+| **没引用** | **104** |
+| 其中「倒计时类」（1000ms / TICK_MS 驱动剩余时间） | **76** |
+
+⇒ `AppClock.ets` 注释里写的「25 个倒计时游戏在 tick 开头加一行」，**实际只落了约 15 款**；剩下 76 款倒计时游戏切后台仍然照走 —— 就是 10-17 修的那个 bug 在另外 76 款上还在。
+
+**修法**（机械，逐文件 1 行）：
+```ts
+this.timer = setInterval(() => {
+  if (AppClock.isPaused()) { return; }   // ← 只加这一行
+  ...原逻辑
+}, TICK_MS);
+```
+- **风险**：① 逐个确认 tick 里没有「必须跑完的收尾」（例如到点判负/结算）—— 若把结算也 skip 掉，回来会停在「时间已到但没结算」的态；
+  ② 100ms 级的「反应速度测试」类（`LIMIT_MS` + `TICK_MS=100`，约 8 款）**不该暂停** —— 那是测反应，暂停等于作弊，反而应该按墙钟补算。**所以 76 里要先分类再批量改，别一把梭。**
+- 顺带：这也是**发热/耗电**的真来源（后台每秒 `setState` + 重排），不只是体验问题。
+
+### 4.3 死代码：`Hint.demoRun`
+
+```ts
+// ai/Hint.ets:188–205
+static demoRun(tick: () => boolean): number {
+  let id: number = -1;
+  id = setInterval(() => { ... if (!more) { clearInterval(id); id = -1; } }, Hint.DEMO_MS);
+  return id;            // ← 没有 Hint.autos.add(id)，也没有任何全局登记
+}
+```
+- 全仓 **0 调用**（`grep -rn "Hint.demoRun"` → 空）。
+- 但**语义上是定时器泄漏模板**：它既不进 `Hint.autos`（`stopAllAuto()` 管不到），也不进 `Demo.live`（`Demo.stopAll()` 管不到）⇒ 谁哪天启用它，组件销毁后它照跑。
+- 建议：删除，或改成 `Hint.autoRunMs(tick, Hint.DEMO_MS)`（那条路有登记）。风险≈0（无人调用）。
+
+### 4.4 开屏 ticker（P3，设计如此）
+
+`Splash.ets:412–495`：`setInterval(..., 16)`，每帧写 **15 个不同 @State**（`pBg/pNebula/pDust/pTwinkle/pGlow/pStroke/pSun/pGlint/pM/pFill/pSweep/pTitle/pSub/pTag/pOut`），62.5fps 下 ≈ **937 次/秒**。
+- 这是**故意的**（源码注释写明「每步赋值都是 @State 变更 ⇒ 真的触发 build ⇒ 所有 JS 计算拿到真实中间值」），且到 TOTAL/HOLD 自己 `clearInterval`，**不泄漏**。
+- 代价：开屏那 2 秒多 JS 线程被占满，**这期间的任何点击不响应**。如果哪天要优化开屏体感，方向是「把 15 个进度合并成 1 个对象 `@State p: {bg:number,...}`」或改用 `Canvas`（`SparkBurst` 就是这么做的，`Common.ets` 同目录）。
+- **不建议本轮动**（开屏动画是奥森明确要的「动画拉满」，动它风险/收益比不划算）。
+
+---
+
+## 5. ④ 大对象拷贝 / 热路径 `JSON.stringify|parse|Object.assign`
+
+### 5.1 好消息：`JSON.stringify` **不在**渲染路径
+
+全仓 25 处，分布：`EntryAbility`(6, 错误日志) / `GameLog`(5, 落盘 + 导出) / `Lan`, `LanRace`(5, 联机) / `Sound`, `ModelRunner`, `TinyMlp`, `GomokuWorker`(5, 错误日志) / `StatsCardAbility`(3, 卡片进程) / **`GKlotski.ets:361`（1 处，见下）**。
+⇒ **没有任何一处 `JSON.stringify` 会在每帧/每次点击时跑**。（`GKlotski:361` 是 `this.demoSaveBlocks = JSON.stringify(this.blocks)` —— 在演示开始前存一次快照，不是热路径。）
+
+### 5.2 `@Prop` 深拷贝（355 卡 × 2 个对象）
+
+```ts
+// Common.ets
+946:  @Prop meta: GameMeta;        // 11 个字段，含 tags: string[]
+966:  @Prop theme: Theme = Theme.light();   // 9 个字段
+```
+ArkUI 的 `@Prop` 对对象类型做**深拷贝**。一次全量重建 ⇒ **355 ×（11 + 9 + tags 数组）** 的属性复制。
+- 估算：≈7,000 次属性写 + 355 次对象分配 ≈ **0.5–1.5ms**（量级远小于 §2 的 6,745 节点创建）。
+- ⇒ **不是首要矛盾**，但它是「355 全量创建」的**副产品**：换成 `LazyForEach` 后自动从 355 份降到 ~15 份。**别为它单独大改。**
+- 若哪天要单独治：`@Prop meta` 可以退化成 `@Prop gameId: string` + 卡内 `findGame(id)`（多一次线性查找，355×355 = 更多比较，**反而更慢**）；或 `@ObjectLink` + `@Observed`（要改 `GameMeta` 的使用面，风险高）。**结论：不动。**
+
+### 5.3 `computeList()` 里的字符串热路径（P2，与 §1-#4 同源）
+
+```ts
+// GamesTab.ets:464–506，searchText 一变就重跑
+const q: string = this.searchText.trim().toLowerCase();
+for (...355...) {
+  g.name.toLowerCase().indexOf(q)        // 每款 3 次 toLowerCase
+  g.enName.toLowerCase()...
+  g.tagline.toLowerCase()...
+}
+```
+- 每敲 **1 个字**：**355 × 3 = 1,065 次 `toLowerCase` + 1,065 次 `indexOf`**（≈0.3–1ms）**＋ 命中卡的全量重建**（英文/拼音命中可能上百张，那才是大头，见 §2）。
+- **修法**：`TextInput.onChange`（`GamesTab.ets:2550–2552`）加 150ms 防抖；或预存一份小写索引（`Record<id, string>`）在 `GAMES` 加载后建一次。
+- **风险**：防抖要保留「清空 ✕」「回车」立即生效的路径（`:2554–2572` 已有清空按钮，改成同步清 `searchText` 即可）；`listCacheKey` 依赖 `searchText`，防抖后缓存键仍然正确。
+
+---
+
+## 6. 差点被我误判成 P1 的两处（写下来防止后人重犯）
+
+### 6.1 `GameHost` 里 `this.theme()` 出现 **746 次** —— 但一次 build 只执行 1 次
+
+```ts
+// GameHost.ets:1280 起，355 款 × 2 个分支的 if/else 分发链
+if (...) { G2048({ theme: this.theme(), restartToken: this.nonce, ... }) }
+else      { G2048({ theme: this.theme(), restartToken: this.nonce, ... }) }
+```
+`grep -c "theme: this.theme()" pages/GameHost.ets` = **710**，加上 HUD 等处共 746；
+但 ArkUI **只构建被选中的那一支** ⇒ 每次 build 实际只 new 1～3 个 `Theme`。
+- ⚠️ 这与 `GamesTab/StatsTab/SettingsTab` 的 `themeCache`（这三个文件确实有 66/51/76 处 `theme()` 被记忆化）不是一回事，**别把 746 当成 746 次分配去改**。
+- （`GuidePage` 27 处、`Index` 18 处、`LanLobby` 23 处没记忆化 —— 一次 build 就是 18–27 次 `new Theme`，≈160 次字段写，**可忽略，不建议动**。）
+
+### 6.2 `GBinaryPuzzle.ets:811` 的 `for` 循环在 build 里 —— 其实在 `onClick` 闭包里
+
+`Common` 里那几个「build 里出现 indexOf」的命中，绝大多数是「格子颜色 = `path.indexOf(i) >= 0`」这种**渲染期**判定（真的在 render 路径，但数组只有几十个元素，64 格 × ~20 次比较 ≈ 1,280 次/帧，可忽略）；
+而 `GBinaryPuzzle:811` 的 `for` 循环包在 `.onClick(() => { ... })` 里，**不在渲染路径**。判据 1788：这类必须 `sed -n` 看起止行，别信正则。
+
+---
+
+## 7. 建议修复顺序（给 Lead）
+
+| 序 | 动什么 | 改动量 | 风险 | 预期收益 |
+|---|---|---|---|---|
+| ① | ~~`GamesTab.ets:1136` + `:2282` 把 `+ this.tick` 从 ForEach key 拿掉~~ | 2 行 | 低 | ✅ **08:19 已做**（收藏/长按不再卡 135–400ms）|
+| ② | ~~`parseNumMap` 单槽 → 按 raw 分槽（§3.2）~~ | ~10 行 | 低 | ✅ **08:19 已做**（统计页 2N 次解析 → 2–3 次）|
+| ③ | 搜索框 150ms 防抖（§5.3） | ~15 行 | 低 | 打字不卡 |
+| ④ | 76 款倒计时游戏加 `AppClock.isPaused()`（**先分类**，反应类不暂停） | 76 × 1 行 | 中（要逐款核收尾逻辑） | 后台不走表 + 省电 |
+| ⑤ | `LazyForEach` 改造 | 半天 | **高**（无先例 + 转场/方向键/刷新三重风险） | 首帧 6,745 → ~400 节点 |
+| — | ~~`Hint.demoRun` 删除~~ | 1 处 | ≈0 | 预防性，随时可做 |
+
+**没做（本轮禁改 .ets）**：以上全部是「建议」，我一行代码也没动。
+
+## 7.5 行号稳定性（本轮扫描期间别人正在改文件）
+
+`git status` 显示这 16 个 .ets 有改动 —— **不是我改的**（我只写了这一个 md）。其中 3 个是我引用的文件：
+
+| 文件 | 最后修改 | 我的引用是否仍准 |
+|---|---|---|
+| `components/Common.ets` | 08:09（**早于**我第一次读它 08:1x） | ✅ 已复核 `946/966/980/981` 与 `build()` 在 `1206` |
+| `components/SettingsTab.ets` | 08:09 | ✅ 已复核 `218–225` / `1288` |
+| `pages/GameHost.ets` | 08:09 | ✅ 已复核 `769–772` |
+
+**没被动过**（引用稳定）：`components/GamesTab.ets`（06:48）、`components/StatsTab.ets`（06:51）、`core/ProgressStore.ets`（06:51）、`pages/Splash.ets`、`ai/Hint.ets`、`core/MotionKit.ets`。
+⇒ 若后面有人继续动 `Common.ets` / `SettingsTab.ets` / `GameHost.ets`，本文件里那三处行号**会漂**，引用时请以 grep 为准（这也是我在每条都写函数名的原因）。
+
+## 8. 复现 / 验收方法（给下一个人）
+
+1. **断言基线**（改完必跑）：`cd "/Users/a0000/dev/One More" && bash 工具/check_assertions.sh` 必须 `200359 / 0`。
+2. **①③ 的效果怎么量**：最省事的是照抄开屏那套做法 —— 在 `GamesTab.build()` 首尾各取一次 `Date.now()`，把差值打到 hilog（**临时打点，验收后务必删**）；想追帧就用 `hitrace`。⚠️ 别拿 `dumpLayout` 的耗时当渲染耗时（那是另一条路径）。
+3. **真机验证前先核包**（判据 1794）：`hdc -t 127.0.0.1:5557 shell "bm dump -n com.andrewoscar.onemore | grep updateTime"`，与本次构建时间对得上再谈结论。
+4. **⑤（LazyForEach）必须验的六件事**：滚动连贯 / 返回首页 / 收藏角标刷新 / 切分类后列表正确 / 切语言后名字与副标题正确 / A-Z 视图跳转。少一件都会出「数据不刷新」类 bug（官方 FAQ `faqs-arkui-41` 整篇都在讲这个）。
+5. **设备现场（重要，别误读）**：本轮连的 `127.0.0.1:5557` 本身就是**模拟器**（`param get const.product.model` = `emulator`），布局根 bounds `[0,0][2560,1600]`px = **853×533 vp @3x** —— 就是本项目口语里的「853×533 横屏平板」。
+   ⇒ 所以 §2.3 那份 `appfreeze` 与我们的目标设备**同源**，但它跑在**软件渲染的模拟器**上，**绝对耗时不能直接当整机数字**（真机会快，但慢的这几百毫秒在真机上仍是可感的）。
+   ⇒ 要在**物理机**上取同一份证据：插线后 `hdc list targets` 会出现串号，再单独抓 `appfreeze`。
+
+---
+
+## 9. 墙钟型限时 —— `AppClock.netNow()` 改造清单（18 款，样板已做）
+
+**病根**：这 18 款的剩余时间是按**墙钟**算的 ——
+`const gap = Date.now() - this.roundAt; this.leftMs = 上限 - gap;`
+⇒ 切后台 30 秒回来**直接少 30 秒**；后台待超过限时还会**当场判负**。
+当年只给「每秒 tick 型」加了 `isPaused()` 守卫，**墙钟型一款都没修**。
+
+**修法（两件必须一起，缺一不可）**：
+1. `tick()` 开头 `if (AppClock.isPaused()) { return; }` —— 挡「**后台期间**就跑超时判负」
+2. 起表与算 gap 的 `Date.now()` 全换 `AppClock.netNow()` —— 挡「**回到前台后**跳掉一段」
+   （`netNow() = Date.now() - pausedMs`；两端同源 ⇒ 每局基线自动对齐，**不需要额外字段**）
+
+| # | 文件 | 状态 | 该款特殊之处 |
+|---|---|---|---|
+| 1 | `GWordSearch.ets` | ✅ **样板已做** | 无（最干净的一款） |
+| 2 | `GAnagramDefinition.ets` | 待改 | **4 处起表**；`L263` 有「带剩余时间续局」写法 `roundAt = Date.now() - (diffTotal - keep)` |
+| 3 | `GEtymologyOrigin.ets` | 待改 | 3 处起表；同上有续局写法 `L256` |
+| 4 | `GFindWord.ets` | 待改 | 2 处起表（`startAt` + `roundAt` 同一行） |
+| 5 | `GLetterFrequencyScan.ets` | 待改 | 起表在 `load()` 里（L95） |
+| 6 | `GLogicalSyllogisms.ets` | 待改 | 2 处 `roundAt`（L117 / L289） |
+| 7 | `GMissingVowels.ets` | 待改 | 起表在 `load()` 里（L90） |
+| 8 | `GOneLetterShift.ets` | 待改 | 起表在 `nextQ()` 里（L84） |
+| 9 | `GOxymoronHunt.ets` | 待改 | 起表在 `nextQ()` 里（L94） |
+| 10 | `GPalindromeBuilder.ets` | 待改 | 起表在 `nextQ()` 里（L86） |
+| 11 | `GPangramSprint.ets` | 待改 | 起表在 `nextQ()` 里（L90） |
+| 12 | `GPortmanteauSplit.ets` | 待改 | 起表在 `nextQ()` 里（L222） |
+| 13 | **`GTypingSpeed.ets`** | 待改 | ⚠️ `leftMs = LIMIT_MS - gap`（**没有 `>=` 夹取**）⇒ 负数会直接显示；要在算 gap 时兜住 |
+| 14 | `GVisualSearch.ets` | 待改 | 用常量 `LIMIT_MS` 而不是 `this.diffTotal` |
+| 15 | `GVisualSearchConjunction.ets` | 待改 | 同上 |
+| 16 | **`GWordAssociationRecall.ets`** | 待改 | ⚠️ 是 `if (gap < limit) { leftMs = limit - gap; return; }` 分支结构，不是三元 |
+| 17 | `GWordScramble.ets` | 待改 | 无（2 处起表） |
+| 18 | **`GWordSurge.ets`** | 待改 | ⚠️ `gap = Date.now() - startAt + this.penalty`（**带扣时惩罚**），换 netNow 时别把 penalty 弄丢 |
+
+**✅ 真机验收结果（2026-11-08 09:2x，包 updateTime=09:23:09，含 `netNow`）**
+
+| 判据 | 实测 |
+|---|---|
+| ① 倒计时只少游戏时间 | 后台 **30.03s** 期间读数只从 **87.9s → 84.5s**（掉 **3.4s**，同期前台游戏时间 3.6s，差 **−0.2s** 在 0.1s 读数精度内） |
+| ② 后台期间不判负 | 回来后**无**「失败/时间到」字样，棋盘字母**同一局**（SAME，未重启） |
+| ③ `durationMs` 是游戏时间不是墙钟 | 战绩 `{"g":"word_search","ms":90035,...}`：**净 90.03s**，而墙钟经过 **120.16s** ⇒ 差 **30.13s** 正是那 30 秒后台 |
+
+**实测踩到的一个设备坑（值得记）**：`hdc shell "input keyevent 3"` 在这台机器上报 `input: inaccessible or not found`（**HOME 根本没按下去**，会让人误以为冷却正常）。
+⇒ 正确写法：**`uitest uiInput keyEvent Home`**（Back/Home/Power 同理），`uitest uiInput keyEvent Back` 返回。
+
+**✅ 抽验（17 款里的代表，2026-11-08 10:0x，包 updateTime=09:54:12）**
+
+| 款 | 后台前 | 后台 | 回前台 | 掉 | 同期前台游戏时间 | 战绩 `ms` |
+|---|---|---|---|---|---|---|
+| `GFindWord`（普通） | 57.7s | 30.0s | 53.9s | **3.8s** | 3.7s | **60037**（=60s 上限；墙钟跨 ≈90s） |
+| `GWordSurge`（带 penalty） | 57.5s | 30.0s | 53.6s | **3.9s** | 3.9s | **60063**（=60s 上限；墙钟跨 ≈90s） |
+
+两条记录时间戳相隔 136.8s，而两局各只有 60s 净时长 ⇒ 差额正是 30s×2 后台 + 导航开销，与 `ms` 自洽。
+
+**原来的验收口径（已执行）**：
+打一局 → HOME 30 秒 → 回：① 倒计时**只少游戏内停留时间**（不少那 30 秒）② 后台**没弹失败面板** ③ 结算 `durationMs` ≈ 游戏时间。
+（算术已用 4 个场景模拟验证过：单次 30s / 后台 120s 超限时 / 两次后台叠加 / 跨局重开 —— 全部符合预期；**未验证的是平台时序**：`onPageHide` 触发时机、后台 `setInterval` 是否仍跑。）
+

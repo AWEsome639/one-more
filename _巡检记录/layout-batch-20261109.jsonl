@@ -1,0 +1,15 @@
+OK           Bejeweled                {'max_bottom': 1351, 'lowest': '💎', 'count': 1}
+OK           Breakout                 {'max_bottom': 1351, 'lowest': '拖动挡板对准，点棋盘或按「发球」开球', 'count': 1}
+PUSHED_OUT   Bubble Shooter           {'max_bottom': 1600, 'lowest': '重开', 'count': 1}
+OK           Checkers                 {'max_bottom': 696, 'lowest': '0', 'count': 1}
+PUSHED_OUT   Compound Connect         {'max_bottom': 1600, 'lowest': '回退一步', 'count': 1}
+PUSHED_OUT   Connect Four             {'max_bottom': 1600, 'lowest': '回退一步', 'count': 4}
+OK           Continuous Paired Associate {'max_bottom': 1363, 'lowest': '错 3 题就结束；答满 8 题算通关', 'count': 2}
+OK           Doodle Jump              {'max_bottom': 1456, 'lowest': '踩到平台自动弹起，爬到 500 米通关；掉出底部就结束', 'count': 1}
+PUSHED_OUT   Double Trouble           {'max_bottom': 1600, 'lowest': '两个任务都做完才算过一轮', 'count': 2}
+TIGHT        Dual Mirror              {'max_bottom': 1565, 'lowest': '点左板 (r,c) ⇒ 左 (r,c) 与右 (r,3-c)', 'count': 3}
+OK           Flappy                   {'max_bottom': 1456, 'lowest': '穿 12 根管道通关；撞管道或撞地就结束（点场地也能扇翅膀）', 'count': 1}
+PUSHED_OUT   FreeCell                 {'max_bottom': 1597, 'lowest': '♥6', 'count': 1}
+TIGHT        2048                     {'max_bottom': 1557, 'lowest': '←', 'count': 1}
+TIGHT        Game24                   {'max_bottom': 1558, 'lowest': '撤销', 'count': 1}
+PUSHED_OUT   Go (9x9)                 {'max_bottom': 1589, 'lowest': '黑先 · 无气提子 · 打劫不能立刻提回 · 双方停一手后按', 'count': 6}

@@ -1,0 +1,299 @@
+# tag 分布巡检 —— 355 款的 25 个 tag 到底有多少筛选力
+
+> 2026-11-08 10:25–10:5x ｜ 执行：game-balancer ｜ **只读 + 只写本 md**（未改任何 .ets）
+> 数据源：`entry/src/main/ets/core/GameRegistry.ets`（355 条 `tags` 全量）+ `core/GameTags.ets`（25 个 tag 定义）+ `core/ChatFinder.ets`（消费方）+ `tools/gen_tags.py`（**生成规则 —— 根因就在这**）
+
+---
+
+## 0 一句话
+
+**不是「3 个弱 tag」的问题，是整套 tag 系统只有 ~1.5 个独立维度。**
+25 个 tag 里有 **3 对完全重复**（`pausable≡untimed` / `focus≡memory` / `brainy≡hard`）、**4 个是类别的别名**（`calc`=MATH 100%、`word`=WORD 100%、`space`=SPATIAL 100%、`memory`=MEMORY 100%）、**时长/难度/脑力三组直接按类别生成**。
+⇒ **355 款在筛选器眼里只剩 62 种不同的样子，最大的一组 54 款完全不可区分**（三消、发射消泡、三连是同一组）。
+⇒ 所以 ChatFinder 的天花板不是“某几个 tag 太肥”，而是**tag 本身的信息量 ≈ 类别字段**，而类别本来就已经 +40 直接用了。
+
+---
+
+## 1 全量分布（25 个 tag，按覆盖款数排序）
+
+| # | tag | 组 | 款数 | 占比 | 备注 |
+|---|---|---|---|---|---|
+| 1 | `pausable` | 节奏 | **323** | 91.0% | ≡ `untimed`（完全相同） |
+| 2 | `untimed` | 节奏 | **323** | 91.0% | ≡ `pausable` |
+| 3 | `tap` | 操作 | **277** | 78.0% | 兜底值：打不上 swipe/drag/type 的都给它 |
+| 4 | `normal` | 难度 | **249** | 70.1% | 兜底值 |
+| 5 | `short` | 时长 | **166** | 46.8% | 实际是「MATH+MEMORY+WORD 三类」的别名 |
+| 6 | `medium` | 时长 | 103 | 29.0% | **100% = SPATIAL+CLASSIC** |
+| 7 | `logic` | 脑力 | 90 | 25.4% | **100% = CLASSIC+LOGIC** |
+| 8 | `space` | 脑力 | 79 | 22.3% | **100% = SPATIAL** |
+| 9 | `focus` | 脑力 | 74 | 20.8% | ≡ `memory` |
+| 10 | `memory` | 脑力 | 74 | 20.8% | **100% = MEMORY** |
+| 11 | `long` | 时长 | 64 | 18.0% | 86% 落两类（LOGIC 44 + SPATIAL 11） |
+| 12 | `calc` | 脑力 | 59 | 16.6% | **100% = MATH** |
+| 13 | `brainy` | 场景 | 58 | 16.3% | ≡ `hard` |
+| 14 | `hard` | 难度 | 58 | 16.3% | 90% 落两类（LOGIC 42 + SPATIAL 10） |
+| 15 | `word` | 脑力 | 53 | 14.9% | **100% = WORD** |
+| 16 | `easy` | 难度 | 48 | 13.5% | 96% 落两类（CLASSIC 44 + LOGIC 2） |
+| 17 | `type` | 操作 | 37 | 10.4% | 92% 落两类（WORD 32 + CLASSIC 2） |
+| 18 | `timed` | 节奏 | 32 | 9.0% | 唯一真·独立信号之一 |
+| 19 | `swipe` | 操作 | 26 | 7.3% | |
+| 20 | `endless` | 场景 | 22 | 6.2% | |
+| 21 | `speed` | 时长 | 22 | 6.2% | |
+| 22 | `cozy` | 场景 | 18 | 5.1% | |
+| 23 | `drag` | 操作 | 15 | 4.2% | |
+| 24 | `zen` | 场景 | 14 | 3.9% | |
+| 25 | `onehand` | 场景 | 13 | 3.7% | 最窄 |
+
+**每款挂 5~9 个 tag**（5 个:6 款 / 6 个:196 款 / 7 个:135 款 / 8 个:16 款 / 9 个:2 款）。
+
+---
+
+## 2 弱 tag：覆盖 > 100 款（没有筛选力）—— **5 个**
+
+| tag | 款数 | 占全库 | 换成「结果数」是什么概念 |
+|---|---|---|---|
+| `pausable` | 323 | 91% | 用户说「找个能暂停的」⇒ ChatFinder 返回 **323 款**（= 整个库） |
+| `untimed` | 323 | 91% | 「不限时」⇒ **323 款** |
+| `tap` | 277 | 78% | 「点一点就行」⇒ **277 款** |
+| `normal` | 249 | 70% | 默认难度，**跟没筛一样** |
+| `short` | 166 | 47% | 「短一局」⇒ **195 款**（short∪timed）—— 一半的库 |
+
+> code-hunter 说的 `short 166` 对上了；但**真正的病根是 `pausable`/`untimed` 这对 91% 的重复 tag**：
+> `ChatFinder.ets:215-216` 给 `pausable` +12、`untimed` +12，而这两个 tag 是**同一批 323 款**
+> ⇒ 用户一句「能暂停的」，91% 的库 +24 分，排序被整体垫平。
+> 更糟：`ChatFinder.ets:214` 的 `it.long` 也走 `untimed` ⇒ 「找个长局的」= **332 款**。
+
+---
+
+## 3 窄 tag：覆盖 < 10 款 —— **0 个**（但有一组更严重的问题）
+
+严格按「< 10 款」：**一个都没有**，最窄的是 `onehand` 13 款。
+
+放宽到 < 20 款有 **4 个**：`onehand` 13、`zen` 14、`drag` 15、`cozy` 18。
+
+**但真正的问题是「稀疏」而不是「窄」**：
+
+| 组 | 每款平均挂几个 | 空白的款 |
+|---|---|---|
+| 时长 | 1.00（恰好 1 个/款） | 0 |
+| 难度 | 1.00 | 0 |
+| 操作 | 1.00 | 0 |
+| 节奏 | 1.91 | 0 |
+| 脑力 | 1.21 | 0 |
+| **场景** | **0.35** | **244 款（69%）一个都没有** |
+
+按类别看这 244 款：MATH 58/59、MEMORY 61/74、WORD 48/53、SPATIAL 54/79、CLASSIC 23/46、LOGIC 0/44
+⇒ **场景组基本只服务 CLASSIC/LOGIC 的一部分**，另外四类整组空白。拿它做筛选，一选就漏掉 69% 的库。
+
+---
+
+## 4 理想区间 20~80 款 —— 14 个（但只有 6 个是真独立的）
+
+| tag | 款数 | 是否独立信号 |
+|---|---|---|
+| `space` | 79 | ❌ = SPATIAL 类别 |
+| `focus` | 74 | ❌ ≡ memory |
+| `memory` | 74 | ❌ = MEMORY 类别 |
+| `long` | 64 | ⚠️ 86% 落 LOGIC+SPATIAL 两类 |
+| `calc` | 59 | ❌ = MATH 类别 |
+| `brainy` | 58 | ❌ ≡ hard |
+| `hard` | 58 | ⚠️ 90% 落 LOGIC+SPATIAL 两类 |
+| `word` | 53 | ❌ = WORD 类别 |
+| `easy` | 48 | ⚠️ 96% 落 CLASSIC+LOGIC 两类 |
+| `type` | 37 | ✅ 相对独立（92% 在 WORD，但 WORD 里也有非 type 的） |
+| `timed` | 32 | ✅ 独立 |
+| `swipe` | 26 | ✅ 独立 |
+| `endless` | 22 | ✅ 独立 |
+| `speed` | 22 | ✅ 独立 |
+
+**⇒ 真正能提供新信息的只有 6 个**：`type` / `timed` / `swipe` / `endless` / `speed`（+ 半个 `long`）。
+
+---
+
+## 5 结构性冗余（根因：`tools/gen_tags.py` 的生成规则）
+
+### 5.1 三对 tag **完全相同**（不是“相似”，是同一批游戏）
+
+| 对 | 款数 | 生成原因（代码） |
+|---|---|---|
+| `pausable` ≡ `untimed` | 323 | `gen_tags.py:183-184` 同一个 `else` 分支里**连续 add** ⇒ 必然相同 |
+| `focus` ≡ `memory` | 74 | `gen_tags.py:69-77` `CAT_ATTR['MEMORY'] = ['memory','focus']` ⇒ 必然相同 |
+| `brainy` ≡ `hard` | 58 | `gen_tags.py:193-194` `if 'hard' in t: t.add('brainy')` ⇒ 必然相同 |
+
+### 5.2 九个「子集」关系（一方完全包含另一方 ⇒ 等于白加）
+
+`calc ⊂ normal`(59/249)、`word ⊂ normal`(53/249)、`speed ⊂ normal`(22/249)、
+`cozy ⊂ pausable`(18/323)、`drag ⊂ pausable`(15/323)、`zen ⊂ pausable`(14/323)、
+`cozy ⊂ untimed`、`drag ⊂ untimed`、`zen ⊂ untimed`（后三对同前，因 pausable≡untimed）。
+⇒ **场景组里有 2 个（`cozy` 18、`zen` 14）是 `pausable` 的子集** —— 选它永远不会筛掉任何「可暂停」的款；
+> 另外 `speed`(22)、`calc`(59)、`word`(53) 是 `normal` 的子集 ⇒ 同理，「普通难度」这条也筛不掉它们。
+
+### 5.3 三组 tag **直接由类别生成**（等于类别字段的复述）
+
+| 组 | 生成规则 | 后果 |
+|---|---|---|
+| 时长 | `gen_tags.py:145` `cat=='LOGIC'`→long；`:148` `cat in (MATH,MEMORY,WORD)`→short；`:150` else→medium | **时长 = f(类别)**，6 类映射到 4 档 |
+| 难度 | `:158` `cat=='LOGIC'`→hard；`:160` `cat in (MATH,MEMORY)`→normal；`:164` `cat=='CLASSIC'`→easy | **难度 = f(类别)**，`normal` 自然吃到 70% |
+| 脑力 | `:69-77` `CAT_ATTR[类别]` | 5 个 tag 是类别的 1:1 别名（`calc`/`word`/`space`/`memory` 各 100% 落在单类） |
+
+⇒ 这就是「时长×脑力交叉表」里 `short` 与 `logic` 共现 **0 款**的原因（不是设计，是**两个 tag 都从类别推出来的**，互斥是构造出来的）。
+
+### 5.4 三个「死查表」（ChatFinder 引用了数据里不存在的 tag）
+
+| 查表 | 数据里存在吗 | 后果 |
+|---|---|---|
+| `g.tags.indexOf('multiplayer')` | **0 款**（25 个 tag 里没有它） | 「联机/对打/朋友」**永远返回 0 个结果** |
+| `g.tags.indexOf('board')` | **0 款** | 靠后面的「名字含棋/牌」兜底（13 款），但这条永远不生效 |
+| `g.tags.indexOf('quick')` | **0 款** | 已被 `short|timed` 兜住（`ChatFinder.ets:213` 的 `quick` 分支永远不命中，代码注释 `:210-212` 也承认了） |
+
+---
+
+## 6 有效筛选力：355 款 → **62 种签名**，最大一组 **54 款**
+
+按「类别 + tag 集合」去重：
+
+| 签名 | 款数 | 例子（这些款在筛选器眼里**完全一样**） |
+|---|---|---|
+| `[MATH] calc,normal,pausable,short,tap,untimed` | **54** | 平衡代数 / 不等式求解 / 算术链 / 天平 / 进制转换… |
+| `[MEMORY] focus,memory,normal,pausable,short,tap,untimed` | **54** | 联想配对 / 数牌记忆 / 变化盲视 / 延迟匹配… |
+| `[SPATIAL] medium,normal,pausable,space,tap,untimed` | **47** | 角度找 / 面积周长 / 截面切片 / 盒子补齐… |
+| `[LOGIC] brainy,hard,logic,long,pausable,tap,untimed` | **29** | 明灯 / 二进制 / 桥 / 数回 / 数织… |
+| `[WORD] normal,pausable,short,type,untimed,word` | **27** | 变位词 / 辅音重构 / 隐语 / 填字… |
+| `[CLASSIC] easy,logic,medium,pausable,tap,untimed` | **18** | 跳棋 / 四子棋 / 五子棋 / 猜色 / 记忆翻牌… |
+
+**最直接的证据**（三消 / 发射 / 五子棋 / 扫雷 全是同一组）：
+
+| 款 | 玩法 | 类别 | tags |
+|---|---|---|---|
+| `bejeweled` 宝石迷阵 | **三消** | CLASSIC | cozy,easy,logic,medium,pausable,tap,untimed |
+| `match3` 三连 | **三消** | CLASSIC | cozy,easy,logic,medium,pausable,tap,untimed |
+| `bubble_shooter` 弹珠消 | **发射消泡** | CLASSIC | cozy,easy,logic,medium,pausable,tap,untimed |
+| `minesweeper` 扫雷 | **推理** | CLASSIC | easy,logic,medium,pausable,tap,untimed |
+| `gomoku` 五子棋 | **棋类对抗** | CLASSIC | easy,logic,medium,pausable,tap,untimed |
+| `memory` 记忆翻牌 | **记忆** | CLASSIC | easy,logic,medium,pausable,tap,untimed |
+
+⇒ **「三消」和「发射消泡」给用户的是同一批 tag**。这就是天花板：**只要 tag 不变，ChatFinder 永远分不出玩法的差别。**
+
+---
+
+## 7 `playStyle` 可行性：**现有 tag 推不出来**，必须人工建表
+
+### 7.1 从现有 tag 推：**不可能**
+25 个 tag 覆盖 6 个维度 —— 时长 / 难度 / 操作（**输入方式**）/ 节奏 / 脑力（**能力**）/ 场景（**氛围**）。
+**没有任何一个描述"玩法动词"**。`tap` 是"怎么点"，不是"点了会怎样"。
+§6 的 62 个签名已经把上限摆在明面上：**同签名 = 推不出区别**。
+
+### 7.2 从代码自动推：**不可靠**（我试过）
+用 11 个机制正则扫 355 个文件：
+
+| 正则 | 命中 | 说明 |
+|---|---|---|
+| `setInterval\|requestAnimationFrame\|tick(` | **354/355** | 每个游戏都用了定时器 ⇒ 完全无区分度 |
+| `push(` | **298/355** | 多数是数组 `push` ⇒ 误报 |
+| `matchAt\|findMatch\|hasMatch` | **1/355** | 三消类根本不用这套命名 ⇒ 漏报 |
+| `shoot\|fire\|bullet\|aim` | 4/355 | 同上 |
+
+⇒ **正则级别的手段分不开“玩法机制”和“实现细节”**，因为 355 款是 8 个 agent 分头写的，命名没有共识。
+
+### 7.3 从 id/名称关键词粗分：**最多覆盖 51%**
+我按 10 个拟定的 playStyle 类，用 id+英文名关键词跑了一遍：
+
+| 拟 playStyle | 粗分命中 | 例 |
+|---|---|---|
+| `fill-grid` 填格谜题 | 32 | kakuro / sudoku / akari / bridges |
+| `word` 文字 | 37 | wordle / anagram / cryptogram |
+| `memory` 记忆 | 35 | memory / n_back / corsi |
+| `maze/path` 走格 | 23 | maze / path_finder / pipes |
+| `match` 消除配对 | 11 | bejeweled / match3 / mahjong |
+| `merge` 合并收敛 | 11 | 2048 / fibonacci_merge / collatz |
+| `push/slide` 挪块 | 11 | sokoban / klotski / slide15 / hanoi |
+| `reaction` 反应限时 | 15 | blink / go_no_go / stop_signal |
+| `quiz/estimation` 估算答题 | 11 | fraction_match / angle_finder |
+| `board` 棋类对抗 | 9 | gomoku / checkers / go9 |
+
+**命中 182/355（51%），173 款这 10 类都不沾**（而且多类互相覆盖，实际可分性更差）。
+
+### 7.4 结论与成本
+**必须新增一组 `玩法`（playStyle）tag，人工建表。**
+- 建议 **10 类**（上表），每款打 **恰好 1 个**（和 时长/难度/操作 一样是划分，不再是多标签）。
+- 成本：`gen_tags.py` 加 10 条规则可自动覆盖 ~51%，剩下 **173 款**需人工过（按每款 5 秒 ≈ 15 分钟）。
+- 收益：**62 个签名 → 62 × 10 ≈ 数百种**，ChatFinder 才第一次有能力回答「有没有像 2048 那样合并的」「三消类有哪些」。
+
+---
+
+## 8 结论 / 建议（按性价比排序）
+
+| 优先 | 动作 | 成本 | 收益 |
+|---|---|---|---|
+| **P0** | **删掉 3 对重复 tag**：`untimed`（留 `pausable`）、`focus`（留 `memory`）、`brainy`（留 `hard`） | 改 `gen_tags.py` 3 行 + 重跑；改 ChatFinder 3 处查表 | 22 个 tag，去掉「同一批游戏加两次分」的假信号 |
+| **P1** | **`pausable`/`untimed` 别进打分**（或权重从 12 降到 2） | ChatFinder 2 行 | 「找个能暂停的」不再返回 323 款 |
+| **P1** | **修 3 个死查表**：`multiplayer`(0 款) / `board`(0 款) / `quick`(0 款) | ChatFinder 3 行 | 「联机对打」从"永远 0 结果"变成可用（但要先补数据） |
+| **P2** | **补 `场景` 组**：244 款（69%）空白 | 需人工/规则，~1 小时 | 场景筛选不再漏 69% 的库 |
+| **P3** | **新增 `玩法` 组（10 类）** —— 真正的解药 | `gen_tags.py` + 173 款人工过，~30 分钟 | 62 → 数百种签名，ChatFinder 天花板真正打开 |
+
+> ⚠️ **不建议**只把 `short` 从 166 砍小（比如按真实时长重标）—— 因为 `short` 的真实含义是「MATH+MEMORY+WORD 三类」，
+> 砍它等于改类别映射，会连带把 `short×logic=0` 这个结构性矛盾放大。要动就先动 §5.3 那三组「按类别生成」的规则。
+
+---
+
+## 9 复现口径
+
+- 款数统计：正则抽 `GameRegistry.ets` 的 355 条 `tags: [...]`，按 tag 计数（本文件 §1 全部可复算）。
+- 「完全相同 / 子集」：对 25 个 tag 两两比较**游戏 id 集合**（不是比较计数）。
+- 「类别纯度」：某 tag 的游戏集合里，前两大类别占比。
+- 「签名」：`(category, sorted(tags))` 去重。
+- 「单意图结果数」：按 `ChatFinder.scoreOf()` 的 `sc > 0` 判据模拟（`suggest()` 里 `if (sc <= 0) continue`）。
+- 「机制正则扫描」：见 §7.2 表，脚本在 `/tmp/gbal/`（未入库）。
+
+---
+
+## 10 落地记录（2026-11-08 10:57–11:1x · Lead 批「1 确认 / 2 选 a」）
+
+> **未编译**。每步 `git diff --stat` 如下。
+
+```
+ tools/gen_tags.py                        |  22 +-
+ entry/src/main/ets/core/GameRegistry.ets | 386 +++++++++++++++----------------   (193 行 × +1/-1)
+ entry/src/main/ets/core/ChatFinder.ets   |  35 ++-
+ 3 files changed, 237 insertions(+), 206 deletions(-)
+```
+
+### 10.1 `gen_tags.py`（7 处物理改动 / 4 组逻辑改动）
+
+| # | 位置 | 改法 |
+|---|---|---|
+| 1 | `:73` | `'MEMORY': ['memory', 'focus']` → `'MEMORY': ['memory']` |
+| 2 | `:139` 后 | 新增 `focus` 关键词规则（attention/vigilance/stroop/flanker/go_no_go/stop_signal/distractor/…） |
+| 3 | `:188` | ⑤ 的 else 里**只留 `untimed`**，删掉 `t.add('pausable')` |
+| 4 | `:196` | `if 'hard' in t` → `if 'hard' in t and 'long' in t`（brainy） |
+| 5 | `:202` 前 | 新增 `pausable` 规则：`untimed ∧ ¬endless ∧ (medium∨long)` |
+| 6-7 | `:145` / `:154` | long/hard 正则各加 `go9\|`（修 `go9` 数据漂移：否则 9 路围棋会被重跑成「轻松/3-10 分钟」） |
+
+**重跑结果**（脚本自报，与预测完全一致）：`pausable 323→147`、`focus 74→20`、`brainy 58→46`，其余 22 个不变。
+`GameTags.ets` 输出**字节级未变**（定义没动）—— `git status` 可证。
+
+### 10.2 `GameRegistry.ets` —— 手术式替换（**没用 `gen_catalog.py`**）
+
+- 只替换 `tags: [...]` 片段：`193 insertions / 193 deletions`，**除 tags 段外 0 处改动**（`git diff | grep -v "tags: \["` 计数 = 0）。
+- 逐项验证：解析 355 款 → 与 `/tmp/game_tags.json` **完全一致**；`go9` 仍是 `brainy,hard,logic,long,…`（漂移已修）。
+
+### 10.3 `ChatFinder.ets` —— 弱 tag 退出打分 + 3 个死查表
+
+| 改动 | 效果 |
+|---|---|
+| 删 `pausable +12` / `untimed +12` | 「能暂停」不再给 91% 的库加分 |
+| `isEmpty()` 去掉 `!pausable && !untimed` | 只命中这两个 → **走追问**（Lead 选 a） |
+| `it.long`：`endless\|untimed` → **`long\|endless`** | 「找长局」**332 → 78 款**（顺手修的第 4 个死查表） |
+| `multiplayer`：死查 `multiplayer`/`board` tag → **`MULTI_IDS` 静态 8 款** | 「联机对打」**0 → 8 款** |
+| `board`：名字判定补 `博弈` | 尼姆博弈（`nim`）原来漏掉，13 → **14 款** |
+| `quick`：删 | 数据里 0 款，已被 `short\|timed` 覆盖 |
+
+**改后单意图结果数**：长局 **78**｜短局 195｜联机 **8**｜棋牌 **14**｜轻松 48｜烧脑 58｜能暂停 **0（→追问）**。
+
+### 10.4 ⚠️ 基线：`200359 / 0` → **`200359 / 1`**（**不是本批引入**）
+
+失败项是 `check_key_coverage.py`：`GFibonacciMerge.ets:182` 新增了
+`TG('💤 没有可合并的相邻格了，这一局到此为止')`，缺 10 语言译文。
+该文件 mtime **10:57**、`git status` 显示被**别的 agent**改（diff 里是「死锁不再 reset、改为一局到此为止」的修复），与本批三个文件无关。
+⇒ 补法：往 `core/I18n.ets` 的 EXTRA 补这一条 key（**不在本批写域**，留给该 agent / Lead）。
+

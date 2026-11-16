@@ -1,0 +1,155 @@
+# 设置页「AI 诊断」小卡 · 2026-11-09 00:2x–00:5x
+
+> **来由**：`code-hunter` 建议第 2 条 —— `LlmStat` 有 6 个字段却**一个都没在界面上显示**，
+> 用户报「AI 不工作」时只能让他跑 `hdc` 看日志。加一张诊断卡，一句话能定位。
+> **断言基线**：`bash 工具/check_assertions.sh` ⇒ **200359 / 0** ✅（改前改后各一次）
+> **读屏缺口**：🔴 0 / 🟡 0（新增卡片也补齐了）✅
+> **⚠️ 未编译**（Lead 统一编）⇒ 新卡片**还没在任何设备上出现过**。
+
+---
+
+## 0. 先看数据源：`LocalLLM.stat` 到底有哪些字段
+
+`core/LocalLLM.ets:30-43`（**判据 1824：读实现，不读字段名**）：
+
+| 字段 | 类型 | 含义 | 谁写它 |
+|---|---|---|---|
+| `ready` | boolean | 模型可用（init 成功且至少能答一次）| `init()` / `chat()` 成功回调 |
+| `reason` | string | `idle` / `ok` / `no-syscap` / `init-false` / `init-failed` / `chat-failed` / `timeout` | 各失败分支 |
+| `initMs` | number | init 耗时 | `init()` 结束 |
+| `firstTokenMs` | number | 首 token 延迟（0 = 还没拿到过）| 流式回调第一次有内容 |
+| `totalMs` | number | 最近一次问答总耗时 | `chat()` 结束 |
+| `calls` | number | 问答次数 | 每次 `chat()` |
+
+> 注意 `reason` 有 **7 种**取值（Lead 消息里列了 5 种，实际还有 `idle` 和 `timeout`）。
+
+---
+
+## 1. 关键发现：**`LocalLLM.stat` 没有任何观察源**
+
+```ts
+// core/LocalLLM.ets:46
+static stat: LlmStat = { ready: false, reason: 'idle', initMs: 0, ... };
+```
+
+它是**普通静态对象**，不是 `@State`、不是 `@StorageProp`、没进 AppStorage。
+⇒ 直接 `Text(LocalLLM.stat.reason)` 画出来的东西**永远不会自己变**（AI 回答完了页面也不刷新）。
+
+**落地方案（零侵入 `core/LocalLLM.ets`）**：诊断卡自己存一份 `@State` 快照：
+
+```ts
+@State private diagReasonV: string = '';
+@State private diagInitV: number = 0;
+@State private diagFirstV: number = 0;
+@State private diagCallsV: number = 0;
+```
+
+- **页面打开时**：`aboutToAppear()` → `this.refreshDiag()`（一进设置页就是当前值，不是永远 `idle`）
+- **点卡片**：「点一下刷新」→ 再抄一次
+- ⚠️ 真正的**实时**刷新要把 stat 写进 AppStorage 再订阅 —— 那要动 `LocalLLM.ets` 的 4 个写入点，
+  **本轮没做**（见 §6 后续）
+
+---
+
+## 2. 卡片长什么样（5 行）
+
+放在「关于」区最后一张卡（`feedbackCard()` 之后），带 `sectionTitle('AI 诊断', 'AI diagnostics')`：
+
+| 行 | 显示 | 说明 |
+|---|---|---|
+| 标题 | 🤖 + `AI 诊断` + 小字 `点一下刷新` | 可点（点=刷新）|
+| 1 | `模型状态` → `idle`/`ok`/`no-syscap`/… | **定位成败的核心** |
+| 2 | `初始化` → `123 ms` 或 `—` | `—` = 0 = 还没发生过（**不是"很快"**）|
+| 3 | `首字延迟` → `456 ms` 或 `—` | 同上 |
+| 4 | `问答次数` → 数字 | **`0` + `idle` ⇒ 说明"从没试过"，不是"坏了"**（这条能挡掉一半误报）|
+| 5 | `规则版已启用` ✓（绿色）| 恒 true —— 四层兜底保证 AI 挂了也能玩 |
+
+---
+
+## 3. 判据 1829：每行都钉死，不许被压
+
+```ts
+const DIAG_LABEL_W: number = 100;      // 标签列固定宽（vp）
+
+Row({ space: Space.sm }) {
+  Text(标签).width(DIAG_LABEL_W).maxLines(1).textOverflow(Ellipsis).flexShrink(0)   // ★
+  Text(值).layoutWeight(1).maxLines(1).textOverflow(Ellipsis).textAlign(End)
+}
+.width('100%')
+.flexShrink(0)                          // ★
+```
+
+- 标签 **固定 100vp + `flexShrink(0)`** ⇒ 长不了的标签不会把值挤没
+- 值 `layoutWeight(1)` + `maxLines(1)` + 省略号 ⇒ 长 `reason` 只会打省略号，**不会撑破卡片**
+- 行本身 `.width('100%').flexShrink(0)` ⇒ 不被父容器压缩
+- 标题行的 🤖 也给了 `.width(Space.xxl)` + `.flexShrink(0)`
+
+> 100vp 的依据：最长中文标签「规则版已启用」= 6 字 × `FontSize.xs`(13) ≈ 78vp，留了 22vp 余量。
+
+---
+
+## 4. 判据 1805：文案走 `this.t()`，不是 `TG()`
+
+新增 **7 个 key** 进 `core/I18n.ets` 的 EXTRA（每条 10 语言）：`AI 诊断` / `模型状态` / `初始化` /
+`首字延迟` / `问答次数` / `规则版已启用` / `点一下刷新`。
+
+- `python3 tools/check_key_coverage.py` ⇒ **缺字典 0 处** ✅
+- 卡片里**没有一处裸中文**（emoji/`ok`/`ms`/数字除外）
+
+---
+
+## 5. 过程中踩到/修掉的两个真问题
+
+### 5.1 `check_focusable.py` 直接判红（基线 200359/**1**）
+新卡片是「可点容器」，但没写焦点五件套 ⇒ 电视/键盘用户选不中它。补：
+
+```ts
+.focusable(Tv.on())
+.onFocus(() => { this.tvFocus = 'S-AIDIAG'; })
+.onBlur(() => { if (this.tvFocus === 'S-AIDIAG') { this.tvFocus = ''; } })
+.outline(Tv.focusOutline(this.tvFocus === 'S-AIDIAG'))
+.onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.refreshDiag(); }); })
+```
+⇒ 修完 `焦点缺口 0 处`、基线回到 **200359 / 0**。
+
+### 5.2 🟡 读屏缺口 1 处 → 改成「整句念完」
+`check_focusable.py --a11y` 报 `🟡 有文字但无 a11y：SettingsTab:698 <Column>`。
+读屏用户会听到 5 个**断开的碎片**（"模型状态 ok 初始化 — 首字延迟 —"），听不出层级。
+⇒ 加 `.accessibilityGroup(true)` + `.accessibilityText(this.diagA11yText())`，
+把 5 行拼成一句：`AI 诊断。模型状态 idle，初始化 —，首字延迟 —，问答次数 0，规则版已启用。点一下刷新`
+⇒ 修完 `🔴 0 / 🟡 0`。
+
+### 5.3 ⚠️ 差点编译失败：`this.langCode` 不存在
+`Digits(..., this.langCode)` —— `langCode` 是 **`Common.ets` 组件的字段**，
+`SettingsTab` 里叫 **`lang`**（`:171 @StorageProp('lang') lang`）。照抄别处会直接编译报错。
+⇒ 3 处全部改成 `this.lang`（`grep -c langCode` = 0）。
+
+---
+
+## 6. 后续（没做，但记下来）
+
+| # | 项 | 说明 |
+|---|---|---|
+| 1 | **实时刷新** | 把 `LocalLLM.stat` 每次写入时同步到 `AppStorage`（4 个写入点），卡片改 `@StorageProp` ⇒ 不用手点刷新 |
+| 2 | **`totalMs` 没显示** | 它会随每次问答变，语义是"最近一次总耗时"；Lead 只要了 init/first，**没加**（1 行即可） |
+| 3 | **`@Builder` 参数记忆化** | `diagRow(zh, en, value)` 的 `value` 是"算好的串"；切语言时数字（阿语数字）可能不重建 —— 与 `sectionTitle` 的老问题同源。目前只有阿语/波斯数字受影响，**可接受** |
+| 4 | 深链 | 若哪天允许"导出诊断"，可从这张卡一键复制（`Clipboard`）—— 本轮没做 |
+
+---
+
+## 7. 未验证（如实）
+
+- **没编译、没装包** ⇒ 这张卡**没有在设备上出现过**（设备里是 `updateTime=23:55:04` 的旧包）。
+- 没做真机目测：5 行的行高、`.accessibilityText` 的实际朗读顺序、`DIAG_LABEL_W=100` 在
+  **俄语/德语**长标签（`Модель`/`Modellstatus`）下会不会省略号。
+  > 俄语 `Модель статус` ≈ 12 字符 × 13 ≈ 78vp < 100vp ⇒ 按字体度量**应该够**，但**没实测**。
+- `LocalLLM.stat` 在真机上何时变成 `ok`（需要系统有 `DataAugmentation.LocalChatModel`）
+  —— 这台模拟器上大概率是 `no-syscap`，正好适合验证「不可用」这条分支（下轮装包时顺手看）。
+
+---
+
+## 8. 一句话
+
+诊断卡把「AI 为什么不工作」从"跑日志"变成"看一眼设置页"：
+`no-syscap` = 设备没这能力、`init-failed` = 初始化炸了、`chat-failed/timeout` = 问过但失败、
+`idle` + `calls 0` = **根本还没试过**（最常见，也最容易误报成"坏了"）。

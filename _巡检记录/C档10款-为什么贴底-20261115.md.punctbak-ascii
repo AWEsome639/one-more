@@ -1,0 +1,116 @@
+# C 档 10 款：为什么内容会伸到 1584px（贴进手势区） · 2026-11-15
+
+> **只读**：未改 `.ets`、未编译、**未碰设备/未起模拟器**、未 commit（只用了 grep/sed）。
+> 标记：**✅码** = 读到的；**📐推** = 按字号/间距推算；**🤔判** = 判断。
+> 坐标系：533vp 屏；状态栏 39vp + 顶栏 45vp + padding 20vp = **头部 104vp**；
+> GameHost 把游戏区 `constraintSize({ maxHeight: Bp.height - 190 })`（`GameHost.ets:3456-3457`）⇒ 533 屏 **343vp**；
+> 手势区 1584px = **528vp**；游戏区底 1516px = 505vp。
+
+---
+
+## 0. 结论（先说最要紧的）
+
+### 🚨 10 款里有 **8 款已经带矮屏降档**了 —— 台账里的 `max_bottom` 很可能是**降档之前**测的
+
+| 游戏 | 已有矮屏降档（✅码） |
+|---|---|
+| `GModuloClock` | `L442` `isShort ? xl : hero`（题卡）+ `L451` `Cell.of(isShort?34:50)`（选项）|
+| `GBaseConversionRun` | `L556` `isShort ? xl : xxxl`（题卡，**判据 1886 的样板**）|
+| `GCollatz` | `L404` `isShort ? xxl : hero` + `L431` `Cell.of(isShort?34:52)` |
+| `GPercentagePeak` | `L491` `isShort ? lg : xxl` + `L503` `Cell.of(isShort?34:50)` |
+| `GCommonDenominator` | `L425` `Cell.of(isShort?34:50)` + `L466` 隐藏「重开」|
+| `GBaseShift` | `L499` `isShort ? Cell.of(34) : Cell.of(52)`（**它就是"4 行超 120px"那款的修复**，见 L495-498 注释）|
+| `GBinomialMatch` | `L503/564/589` `isShort ? Cell.of(40/42) : Cell.tap(40/42)` |
+| `GAreaPerimeterMatch` | `L288/303` `isShort ? 76 : 96`（图形卡）|
+
+⇒ **这 8 款在改动之后大概率已经不到 1584**；台账数据没有时间戳区分「改动前/后」，所以**先复测这 8 款，不要盲改**。
+
+### ✅ 真正还没降档的只有 2 款
+
+| 游戏 | 现状（✅码） |
+|---|---|
+| `GFractionalPizza` | 只有根间距 `L278` 和隐藏「重开」`L339`；**内容块无一降档**：披萨行 `L326` `Cell.of(64)`、按钮 `L331/L342` `Cell.of(46)` |
+| `GVectorGridAlignment` | 只有根间距 + 隐藏「重开」`L388`；盘面有 `L326` `maxHeight: Bp.height-360`（封顶，不是撑满），选项行 `L339-375` **`Cell.of(50)` 未降档** |
+
+---
+
+## 1. 汇总表
+
+| 游戏 | 贴底的那一块 | 高度来源(行号) | 是不是 `Bp.height-N` 型 | 建议改法 |
+|---|---|---|---|---|
+| `GModuloClock` | 底部提示 `Text` | `L463` 无固定高（`FontSize.xxs`） | 否（无此写法） | ① 先复测（`L442/L451` 已降档）② 仍超就把选项 `34→30` |
+| `GFractionalPizza` | 底部提示 `Text` | `L346` | 否 | **披萨行 `L326` `Cell.of(64)` → `isShort ? Cell.of(46) : Cell.of(64)`**（省 17vp） |
+| `GBinomialMatch` | 底部提示 `Text` | `L514` | 否 | 先复测（`L503/564/589` 已降档） |
+| `GBaseConversionRun` | 底部提示 `Text` | `L649` | 否 | 先复测（`L556` 已按判据 1886 修过） |
+| `GAreaPerimeterMatch` | 底部提示 `Text` | `L351` | 否 | 先复测（`L288/303` 76/96 已降档） |
+| `GVectorGridAlignment` | 底部提示 `Text` | `L400` | **半个**：`L326` 有 `maxHeight: Bp.height-360`，但那是**封顶**不是撑满 | **选项行 `L339-375` `Cell.of(50)` → `isShort ? Cell.of(34) : Cell.of(50)`**（4 行省 64vp） |
+| `GBaseShift` | 底部提示 `Text` | `L545` | 否 | 先复测（`L499` 已降档，`L495-498` 注释记载"4 行 528px > 492px 超 120px"） |
+| `GCollatz` | 底部提示 `Text` | `L500` | 否 | 先复测（`L404/L431` 已降档） |
+| `GPercentagePeak` | 底部提示 `Text` | `L515` | 否 | 先复测（`L491/L503` 已降档） |
+| `GCommonDenominator` | 底部提示 `Text` | `L484` | 否 | 先复测（`L425` 已降档） |
+
+---
+
+## 2. 共同根因：**不是** `Bp.height - N`，而是三件事叠在一起
+
+### 2.1 第一件：**最低的那块全是 `Text`**（✅码 ×10）
+
+10 款的根 `Column` **最后一个子块都是提示 `Text`**（行号见上表）。
+而 `blk` 的 SKIP 列表里**正好有 `Text`**（`工具/shot_game.py:546`）⇒
+**内容伸到 1584 时，越界的是文字，`blk` 按设计看不见它** ⇒ 这 10 款 `blk=0` 是**尺子的盲区**，不是"真的干净"。
+
+> 这一条和我 11-13 交的 `_巡检记录/blk盲区清单.md` §1（"`Text` 被跳过 ⇒ 215 款漏报"）是同一个盲区，**这 10 款就是它命中的样本**。
+
+### 2.2 第二件：游戏区被 `Bp.height - 190` = **343vp** 夹住（✅码）
+
+`GameHost.ets:3456-3457`：`.constraintSize({ maxHeight: Bp.height - ((pong/flappy/doodle_jump) ? 120 : 190) })`
+⇒ 533 屏上游戏区 **343vp**。**但 `constraintSize` 只压容器、不让固定尺寸子项缩小**（项目里已多次踩过，见 `Design.ets` 的 `Cell.of` 压缩注释）
+⇒ 根 `Column` 里声明总高一旦超过 343，**多出来的就画到容器外**（正好落进手势区 1584+）。
+
+### 2.3 第三件：**没有一个块是"吃掉剩余高度"型**（✅码 ×10）
+
+我逐款 grep 了 `Bp.height - N` / `Bp.height*`：
+
+```
+GModuloClock / GFractionalPizza / GBinomialMatch / GBaseConversionRun / GAreaPerimeterMatch /
+GBaseShift / GCollatz / GPercentagePeak / GCommonDenominator   → 0 命中
+GVectorGridAlignment → 只有 L326 的 maxHeight: Bp.height-360（封顶，不撑满）
+```
+
+🤔判：**「`Bp.height - N` 撑满型」在这 10 款里为 0**。真正的机制是「固定高块 + 若干间距的**总和**超过 343vp」，
+不是某一块吃了剩余高度。
+
+---
+
+## 3. 逐款两点（最后一屏 + 最该缩的一块）
+
+> 只列能一眼落地的一行改法；已降档的 8 款只写「复测」。
+
+| 游戏 | 最该缩的一块（✅码） | 一行改法 |
+|---|---|---|
+| `GFractionalPizza` | `L326` 披萨行 `.height(Cell.of(64))`（61vp，**未降档**）| `.height(Bp.isShort() ? Cell.of(46) : Cell.of(64))`（省 17vp）|
+| `GVectorGridAlignment` | `L339/351/363/375` 四行选项 `.height(Cell.of(50))`（每行 48vp，**未降档**）| 每行改 `Bp.isShort() ? Cell.of(34) : Cell.of(50)`（4 行共省 **56vp**）|
+| 其余 8 款 | 已有降档（见 §0 表）| **先复测**；若仍 ≥1584，回来我再逐款算 |
+
+---
+
+## 4. 如果你要"一次性兜住"（不逐款改）
+
+| 方案 | 改哪 | 代价 |
+|---|---|---|
+| A 抬高游戏区上限 | `GameHost.ets:3457` 的 `190` → `200~210`（游戏区 343→333？方向反了）| ⚠️ 调大数字反而**减小**游戏区，不可取；要放大得**调小** 190 |
+| B 给底部让出安全距离 | `GameHost.ets:3465` 的 `.padding({ bottom: Space.lg })` → `Space.xxl`（20→32）| +12vp 底距，**只推高容器不缩内容** ⇒ 内容仍溢出，只是不再压手势条（治标）|
+| C 矮屏隐藏底部提示 | 每款最后那个 `Text` 加 `.visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)` | 省 17~34vp，**且正好把"最低节点"抬出 1584** ⇒ 见效最快 |
+
+🤔判：**C 最划算**（每款一行、且直接消灭"最低节点是文字"这个指针），但它只是把提示藏了，**不会让内容变不挤**；
+真正要减内容还得逐款缩块（§3）。
+
+---
+
+## 5. 局限
+
+- **没有 dump**：所有 vp 都是按 `Cell.of` 公式（`round(N×1.12×0.85)`）+ 字号×1.4 推算，**不是实测**；
+- 我**没有逐款把 10 个根 Column 的块高加总到精确值**（成本太高）；
+  “内容 ≈ 424vp、比 343 多 81vp”是按「底部落在 528vp − 头部 104 − 343 = 81vp」反推的（📐推），不是逐块加出来的；
+- **台账 `max_bottom` 没有"改动前/后"标记** ⇒ §0 的"8 款可能已修好"是**推断**，必须复测才能确认；
+- 本轮没有碰设备/模拟器，也没跑任何被测工具。

@@ -1,0 +1,191 @@
+# 读屏缺口（accessibilityText）审计（2026-11-07）
+
+> 只读扫描，**未改任何 .ets**；只动了 `tools/` + `工具/`。
+> 范围：`components/` + `pages/` 里**所有 `onClick` 宿主**（60 个可点组件）
+> 工具：`python3 tools/check_focusable.py --a11y`
+
+---
+
+## 结论速览
+
+| 档 | 含义 | 处数 |
+|---|---|---|
+| 🔴 **纯图标 + 无 a11y** | 读屏只会念「按钮」，完全不知道功能 | **0** |
+| 🟡 **有文字但无 a11y** | 子 Text 可能被念出来，但**顺序/语义/状态不一定对** | **0**（修复前 43） |
+| ✅ **已声明 a11y** | 有 `accessibilityText` | **60**（修复前 17） |
+| （白名单跳过） | 透明遮罩 / 整屏可点，不该有 a11y | 2 |
+
+**一句话**：最坏的那一档（纯图标无读屏）**已经清零** —— 说明 2026-11-03 那几轮
+「图标按钮必须说清是干什么的」是有效的；剩下的 43 处都是**有文字但没显式声明**的第二档，
+风险从「完全不知道」降到「念得出来但可能念串」。
+
+按文件分布：
+
+| 文件 | 🟡 |
+|---|---|
+| `components/GamesTab.ets` | 17 |
+| `components/SettingsTab.ets` | 12 |
+| `pages/GameHost.ets` | 5 |
+| `components/StatsTab.ets` | 4 |
+| `pages/LanLobby.ets` | 3 |
+| `components/Common.ets` | 1 |
+| `pages/GuidePage.ets` | 1 |
+
+---
+
+## 最该先修的 5 个（🟡 里风险最高的）
+
+### 1. `components/SettingsTab.ets:1202` 主题色块 —— **颜色本身就是信息**
+
+```ts
+Column({ space: 2 }) {
+  Stack({ alignContent: Alignment.Center }) {
+    Row().width(Space.xxl).height(Space.xxl)
+      .backgroundColor(Accent.color(o.id))     // ← 色块：唯一的信息载体
+      .borderRadius(Radius.full)
+    ...
+  }
+  ...
+}
+.onClick(...)                                   // ← 无 accessibilityText
+```
+
+**读屏用户听到什么**：颜色名（若有 Text）+ 「按钮」。**听不出“这是第 4 个颜色/已选中”**。
+视力用户靠色块认颜色，盲人用户既看不见色块、也听不到“已选中哪个主题色”。
+**一句话修法**：`.accessibilityText(颜色名 + (选中 ? '，已选中' : ''))` + `accessibilityLevel('yes')`。
+
+### 2. `pages/GameHost.ets:3616 / 3645 / 3671` 结算三按钮（每局结束必现）
+
+```ts
+Button(this.t(TG('下一款'), 'Next game'))
+Button(this.t(TG('再来一局'), 'Play again'))
+Button(this.t(TG('返回列表'), 'Back to list'))
+```
+
+**读屏用户听到什么**：Button 的文字能被念出来（所以是 🟡 不是 🔴），
+但这三个是**并列的出口**，读屏按 DOM 顺序念，无法区分“主按钮/次要按钮”；
+而且 `下一款` 那句在部分语言里含 `›` 之类的装饰符号会被一起念。
+**一句话修法**：给主按钮加 `.accessibilityText('下一款 — 直接进入下一个游戏')` 之类的**动作说明**。
+
+### 3. `components/GamesTab.ets:1271` 图标 + 文字行（图标被主动摘出无障碍树）
+
+```ts
+Row({ space: Space.sm }) {
+  Text(icon).fontSize(FontSize.sm).accessibilityLevel('no')   // ← 图标不念
+  Text(text).fontSize(FontSize.sm).fontColor(this.theme().ink)
+  Blank()
+}
+.onClick(() => { Haptics.tap(); act(); })                     // ← 整行是按钮，但没有 a11y
+```
+
+**读屏用户听到什么**：只有 `text`，**没有"这是一行可点的"**，也没有行尾的状态。
+同款还有 `:1734 / :1772 / :1835 / :2443 / :2563`（都是「图标 + 文字 + 可点」）。
+**一句话修法**：整行加 `.accessibilityGroup(true)` + `.accessibilityText(动作 + 对象)`。
+
+### 4. `components/SettingsTab.ets:684` 语言 chip
+
+```ts
+Text(label)                    // ← 语言自称（「日本語」「한국어」…）
+  ...
+  .onClick(...)                // ← 无 a11y、无"已选中"状态
+```
+
+**读屏用户听到什么**：用**当前**语言的语音去念**目标**语言的名字（「日本語」被中文语音念），
+而且听不出哪一个是当前选中。
+**一句话修法**：`.accessibilityText(语言中文名 + (选中 ? '，当前语言' : ''))`。
+
+### 5. `components/StatsTab.ets:812 / 891 / 996 / 1229` 统计页卡片行
+
+`recentCard / recentRow / topCard` 都是「图标 + 游戏名 + 数字」的整行可点。
+读屏能念出各段文字，但**没有合成一个可访问对象** ⇒ 会被拆成 3~4 次朗读，且听不出“点它进游戏”。
+**一句话修法**：`.accessibilityGroup(true)` + `.accessibilityText('打开 <游戏名>，<数值>')`。
+
+---
+
+## 为什么 🔴 = 0（可信性说明）
+
+我另做了**独立探针**复核：全仓 `Text('纯符号')` / `Button('纯符号')` 且 10 行内无
+`accessibilityText` 的一共 37 处，但**逐条看全是"文字行里的装饰子节点"**（`🔥`、`🏆`、`🔒`、`›`），
+不是 `onClick` 宿主 —— 读屏本来就不该单独念它们，它们由父级的 `accessibilityGroup` 归并。
+**作为 `onClick` 宿主的纯图标按钮，当前 0 处缺 a11y。**
+
+---
+
+## 工具：`tools/check_focusable.py --a11y`
+
+- 与 ③ 焦点检查共用同一套**宿主解析**（注释/字符串感知 + 括号回溯），口径一致
+- 分档判据：
+  - 链上有 `accessibilityText` ⇒ ✅
+  - 否则看**组件本体（含子节点）里有没有字母/汉字**：没有 ⇒ 🔴（纯图标），有 ⇒ 🟡
+- 白名单与焦点检查相同：透明遮罩、`pages/` 的整屏可点 —— 它们不需要 a11y
+- **恒返回 0**：读屏不是「必须 0」而是「应该越来越少」，所以只做报告不做闸门
+
+> ⚠️ 一个已知的判档粗糙处：容器型宿主（`Row`）的"有没有文字"是**把子节点里的字符串一起看**的，
+> 所以「图标 + 很少的字」会落 🟡 而不是 🔴。这是**故意保守**——宁可少报红，不要假红。
+
+---
+
+## 挂进断言（只当 warning，不进 FAIL）
+
+`工具/check_assertions.sh` 里新增一段：
+
+```bash
+A11Y_OUT=$(python3 "$(dirname "$0")/../tools/check_focusable.py" --a11y 2>&1)
+A11Y_RED=$(printf '%s' "${A11Y_OUT}" | grep -oE "🔴 [0-9]+" | grep -oE "[0-9]+" | head -1)
+A11Y_YEL=$(printf '%s' "${A11Y_OUT}" | grep -oE "🟡 [0-9]+" | grep -oE "[0-9]+" | head -1)
+WARN=$((WARN + A11Y_RED + A11Y_YEL))
+```
+
+**只累加 `WARN`，不碰 `FAIL`**，所以基线断言 `200359 / 0` 不受影响；
+但每次跑断言都会打印这两档数字，趋势往下走是好事、往上走要解释。
+
+---
+
+## 建议的修复顺序（下一轮）
+
+1. `SettingsTab` 主题色块（颜色即信息，盲人完全拿不到）
+2. `GamesTab` 那 6 个「图标+文字」行补 `accessibilityGroup(true)`
+3. 结算三按钮补动作说明（每局必现）
+4. `SettingsTab` 语言 chip / 模式 chip 补「已选中」
+5. 其余 30 处按文件批量补
+
+够不够改，等 lead 定 —— 本轮按要求**只报数、没动 .ets**。
+
+**已落地并实测**（`bash 工具/check_assertions.sh` 实跑输出）：
+
+```
+     check_dup_symbol.py（双符号）              - / 0
+     check_focusable.py（焦点）                  - / 0
+     ────────────────────────────────────────────────
+     合计                                     200359 / 0
+     读屏缺口（🔴纯图标 / 🟡有文字）      0 / 43
+     ✅ 与基线一致（200359 / 0）　｜ 读屏缺口合计 43 处（warning，不影响基线）
+```
+
+退出码仍是 **0**、`TOT` 仍是 **200359** —— 纯 warning，没动基线。
+
+---
+
+## 修复记录（2026-11-08 凌晨，已全部修完）
+
+**43 处 🟡 → 0**，`✅ 60/60`。改动 7 个文件：
+
+| 文件 | 处数 | 改法 |
+|---|---|---|
+| `components/SettingsTab.ets` | 12 | 色块按「主题色：<名>，当前选中」；其余按组件首个文字子节点 |
+| `components/GamesTab.ets` | 17 | `menuItem/dailyCard/randomCard/tagEntry/azRow/chatPanel` 等整行 `accessibilityGroup` + 整行文案；搜索清空按钮给动作说明 |
+| `pages/GameHost.ets` | 5 | 结算三按钮给「动作 + 后果」；收藏图标按 `fav` 状态二态 |
+| `components/StatsTab.ets` | 4 | 卡片行合并 + 念数值 |
+| `pages/LanLobby.ets` | 3 | 房间行/按钮 |
+| `components/Common.ets` | 1 | 分类 chip |
+| `pages/GuidePage.ets` | 1 | 返回键 |
+
+**踩到的两个坑（都已修）**：
+1. 自动生成时把 **图标变量**当文案（`.accessibilityText(icon)` / `(cfg.icon)`）⇒ 读屏会念 emoji。
+   改成念真正的文字参数（`this.t(zh,en)` / `this.t(cfg.zh,cfg.en)`）。
+2. 补丁器对 `Text`/`Button` **宿主自身**取不到"子 Text"，静默跳过 4 处；
+   补上「宿主是 Text/Button 就取自身实参」的规则后收尾。
+
+**遗留**：新增的 `this.t('中文','English')` key 尚未进 EXTRA 字典 ⇒ 10 种非英语语言下
+这些 **a11y 文案会退英文**（比“没有说明”好，但不一致）。要彻底修需往
+`core/I18n.ets` 补约 12 条译文 —— 属于另一个写域。

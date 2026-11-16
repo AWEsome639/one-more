@@ -1,0 +1,37 @@
+# 第 ② 项排期结论：**转换器未安装 + 白天不许占机器 ⇒ 排到今晚**
+
+> `2026-11-16 07:10` 实测。
+
+## 一、⇒ 实测：本机没有 MindSpore Lite 转换器
+
+| 检查 | 结果 |
+|---|---|
+| `which converter_lite / mindspore_lite` | **无** |
+| SDK 内搜索 `*mindspore*` | **只有 3 个 `.d.ts` / `.d.ets` 声明文件**（`@ohos.ai.mindSporeLite.d.ts`、`@kit.MindSporeLiteKit.d.ts`）|
+| `python3 -c "import mindspore_lite"` | **`ModuleNotFoundError`** |
+
+**⇒ 也就是说：**设备端运行时能力是 SDK 自带的**（`API 12` 上 `loadModelFromFile`/`Model.predict`/`NNRTDevice` 都可用，已在 `07:05` 用官方 `.d.ts` 核实）；
+   但 `.ms` 模型的**生成工具**（MindSpore Lite 的 `converter_lite`）不在本机，需要单独下载安装。****
+
+## 二、⇒ 加上时段约束
+
+**⇒ 按 AGENTS.md：「他醒着的时候，不许在他机器上跑本地推理/大模型/长时间占 CPU 的活」，判据是单进程 `>50% CPU` 或 `>2 GB RSS` 且持续一两分钟 ⇒ 挪到 `00:00–07:00`。**
+
+**⇒ 「下载 `300 MB` 模型 + ONNX 导出 + `converter_lite` 转换」**完全落在这条里** ⇒ 现在（`07:10`，他醒了）**不该做**。**
+
+## 三、⇒ 所以第 ② 项的正确排期
+
+**今晚 `00:00` 后按这个顺序做（每步都有明确验收）：**
+
+1. **装 MindSpore Lite 工具链**（宿主机 `converter_lite`）—— 验收：`converter_lite --help` 有输出
+2. **下载 `Qwen2.5-0.5B-Instruct`** 并导出 ONNX —— 验收：`.onnx` 文件存在、体积合理
+3. **转 `.ms`**（`Q4` 量化）—— 验收：`.ms` 生成、`< 600 MB`
+4. **接入 App**：放 `rawfile/`、用 `@ohos.ai.mindSporeLite` 加载 —— 验收：真机能 `predict` 出第一个 token
+5. **真机测速**：`token/s`（CPU vs `NNRTDevice`）—— 验收：有具体数字，不是"感觉能用"
+
+**⚠️ 第 4、5 步一定会踩坑（模型格式、量化配置、内存、线程数），所以**必须在机器归我的时段做**，白天只做不占机器的准备（写代码骨架、查文档）。**
+
+## ⇒ 判据（`2792`）
+
+**「技术上可行」与「现在能做」是两个判断。**今天两项都查了：**能力在（API 12）、工具不在（转换器未装）、时段也不在（白天不许占机器）。**
+**⇒ 报进展时要同时报这三层，否则「可行」会被误读成「马上能做」。**

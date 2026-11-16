@@ -1,0 +1,123 @@
+// ============================================================
+// 第 ② 项 · 最长的那根钉子：Qwen2 的 BPE 分词器（ArkTS 草稿）
+// **不要直接放进 entry/src** —— 今晚拿到 tokenizer.json 后按真实数据校准再落库。
+//
+// 依据（判据 2793）：.ms 不含分词器 ⇒ 必须自己实现。
+// Qwen2 的分词 = GPT-2 风格的 byte-level BPE + cl100k 的预切分正则。
+// ============================================================
+
+/** tokenizer.json 里 vocab 的形态：token 字符串 → id */
+export interface VocabJson { [token: string]: number }
+/** merges：每项形如 “Ġ t”（两个待合并的 token，空格分隔），按优先级排列 */
+export type MergesJson = string[];
+
+/**
+ * 字节 → unicode 字符 的映射（GPT-2 的 bytes_to_unicode）
+ * 目的：让任意字节都能变成「可打印字符」参与 BPE 字符串合并。
+ */
+function bytesToUnicode(): Map<number, string> {
+  const bs: number[] = [];
+  for (let i = 33; i <= 126; i++) { bs.push(i); }            // '!' .. '~'
+  for (let i = 161; i <= 172; i++) { bs.push(i); }           // '¡' .. '¬'
+  for (let i = 174; i <= 255; i++) { bs.push(i); }           // '®' .. 'ÿ'
+  const cs: number[] = bs.slice();
+  let n = 0;
+  for (let b = 0; b < 256; b++) {
+    if (bs.indexOf(b) < 0) { bs.push(b); cs.push(256 + n); n++; }
+  }
+  const m = new Map<number, string>();
+  for (let i = 0; i < bs.length; i++) { m.set(bs[i], String.fromCharCode(cs[i])); }
+  return m;
+}
+
+/** cl100k / Qwen2 的预切分正则（必须带 u 标志才支持 \p{L}） */
+const PRE_TOKEN_RE: RegExp = new RegExp(
+  "(?i:'s|'t|'re|'ve|'m|'ll|'d)" +
+  "|[^\\r\\n\\p{L}\\p{N}]?\\p{L}+" +
+  "|\\p{N}{1,3}" +
+  "| ?[^\\s\\p{L}\\p{N}]+[\\r\\n]*" +
+  "|\\s*[\\r\\n]+" +
+  "|\\s+(?!\\S)" +
+  "|\\s+", 'gu');
+
+export class QwenBpeTokenizer {
+  private vocab: VocabJson = {};
+  private ranks: Map<string, number> = new Map();     // “a b” -> 合并优先级
+  private encoder: Map<string, number> = new Map();   // token 字符串 -> id
+  private bytesMap: Map<number, string> = bytesToUnicode();
+
+  /** 从 tokenizer.json 的 vocab 与 merges 初始化 */
+  init(vocab: VocabJson, merges: MergesJson): void {
+    this.vocab = vocab;
+    for (const tok of Object.keys(vocab)) { this.encoder.set(tok, vocab[tok]); }
+    this.ranks.clear();
+    for (let i = 0; i < merges.length; i++) { this.ranks.set(merges[i], i); }
+  }
+
+  /** UTF-8 编码（ArkTS 里可用 util.TextEncoder，这里手写以便离线测试） */
+  private utf8(s: string): number[] {
+    const out: number[] = [];
+    for (let i = 0; i < s.length; i++) {
+      let c = s.charCodeAt(i);
+      if (c < 0x80) { out.push(c); }
+      else if (c < 0x800) { out.push(0xC0 | (c >> 6), 0x80 | (c & 0x3F)); }
+      else if (c >= 0xD800 && c <= 0xDBFF) {           // 代理对
+        const c2 = s.charCodeAt(++i);
+        const cp = 0x10000 + ((c - 0xD800) << 10) + (c2 - 0xDC00);
+        out.push(0xF0 | (cp >> 18), 0x80 | ((cp >> 12) & 0x3F),
+                 0x80 | ((cp >> 6) & 0x3F), 0x80 | (cp & 0x3F));
+      } else { out.push(0xE0 | (c >> 12), 0x80 | ((c >> 6) & 0x3F), 0x80 | (c & 0x3F)); }
+    }
+    return out;
+  }
+
+  /** 把一个预切分片段做 BPE，返回 token id 数组 */
+  private bpe(piece: string): number[] {
+    // ① 字节 → unicode 字符
+    const bytes = this.utf8(piece);
+    let symbols: string[] = bytes.map(b => this.bytesMap.get(b) as string);
+
+    // ② 反复合并「优先级最高」的相邻对（朴素 O(n²)，够用；可后续换成堆）
+    while (symbols.length > 1) {
+      let bestRank = Number.MAX_SAFE_INTEGER;
+      let bestIdx = -1;
+      for (let i = 0; i < symbols.length - 1; i++) {
+        const key = symbols[i] + ' ' + symbols[i + 1];
+        const r = this.ranks.get(key);
+        if (r !== undefined && r < bestRank) { bestRank = r; bestIdx = i; }
+      }
+      if (bestIdx < 0) { break; }
+      const merged = symbols[bestIdx] + symbols[bestIdx + 1];
+      const next: string[] = [];
+      for (let i = 0; i < symbols.length; i++) {
+        if (i === bestIdx) { next.push(merged); i++; }
+        else { next.push(symbols[i]); }
+      }
+      symbols = next;
+    }
+
+    // ③ 查 vocab；查不到则逐字节回退（不应发生，出错要暴露而不是吞掉）
+    const ids: number[] = [];
+    for (const s of symbols) {
+      const id = this.encoder.get(s);
+      if (id === undefined) {
+        console.error('[QwenBpe] vocab miss: ' + JSON.stringify(s));
+        return [];
+      }
+      ids.push(id);
+    }
+    return ids;
+  }
+
+  /** encode：文本 → token id 序列 */
+  encode(text: string): number[] {
+    const ids: number[] = [];
+    const matches = text.match(PRE_TOKEN_RE);
+    if (matches === null) { return ids; }
+    for (const piece of matches) {
+      const part = this.bpe(piece);
+      for (const id of part) { ids.push(id); }
+    }
+    return ids;
+  }
+}

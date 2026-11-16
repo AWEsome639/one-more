@@ -1,0 +1,10 @@
+BalanceScale
+BubbleShooter
+Crossword
+Fillomino
+LockPattern
+Sokoban
+Topology
+塔帕
+填字游戏
+特征回忆

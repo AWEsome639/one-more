@@ -1,0 +1,59 @@
+== 172 款有测量结果，19 款是环境失败（要重测）==
+
+【A 档】blk ≥ 24px（真越界，先看这些）32 款
+  Snake 3D                       blk=96  max=1575  lowest=上层
+  2048                           blk=72  max=1600  lowest=滑动或按方向键
+  Shikaku                        blk=72  max=1600  lowest=提示
+  Matrix Reasoning               blk=72  max=1600  lowest=提示
+  Hitori                         blk=62  max=1600  lowest=2
+  Wordle                         blk=48  max=1600  lowest=换一题
+  Magnets                        blk=48  max=1600  lowest=2＋
+  Fraction Matcher               blk=48  max=1600  lowest=B
+  Pythagorean Triple Builder     blk=48  max=1600  lowest=⌫
+  Calculation Sprint             blk=48  max=1600  lowest=31
+  Gomoku                         blk=48  max=1600  lowest=0
+  Mandelbrot                     blk=48  max=1600  lowest=1/8
+  Simon Says                     blk=48  max=1291  lowest=🐸
+  Crown                          blk=48  max=1600  lowest=0/6
+  Dominosa                       blk=48  max=1467  lowest=3
+  Gokigen Naname                 blk=48  max=1600  lowest=1
+  Heyawake                       blk=48  max=1600  lowest=1
+  Hitori All                     blk=48  max=1499  lowest=2
+  Norinori                       blk=48  max=1487  lowest=4
+  Path Intersect                 blk=48  max=1600  lowest=⬤
+  Pipes                          blk=48  max=1508  lowest=╭
+  Skyscrapers                    blk=48  max=1600  lowest=2
+  Percentage Shopping            blk=48  max=1600  lowest=3
+  Binary Matrix Rank             blk=32  max=1568  lowest=秩 = 0
+  Kakuro Mini                    blk=24  max=1600  lowest=6
+  Pattern Sequence Draw          blk=24  max=1599  lowest=4
+  Factor Finder                  blk=24  max=1600  lowest=提示
+  Mastermind                     blk=24  max=1465  lowest=A
+  Memory                         blk=24  max=1600  lowest=重新开始
+  Schulte Table                  blk=24  max=1439  lowest=4
+  Countdown Math                 blk=24  max=1409  lowest=6
+  Modulo Path                    blk=24  max=1517  lowest=19
+
+【B 档】0 < blk < 24px（轻微）2 款
+  Number Bonds All               blk=22  max=1600 
+  Kakuro                         blk=13  max=1589 
+
+【C 档】blk=0 但 max_bottom ≥ 1584（触到手势区）10 款
+  Base Conversion Run            max=1600  lowest=把进制换算对，答错扣 3 秒
+  Binomial Match                 max=1600  lowest=左边点项、右边点系数，配成一对
+  Modulo Clock                   max=1600  lowest=钟面只有 1~12 点：转满 12 点就回到 1 点
+  Percentage Peak                max=1585  lowest=答对 12 题通关；答错不扣时间，但断连击
+  Collatz                        max=1586  lowest=42
+  Common Denominator             max=1585  lowest=这两个分数的最小公分母是多少？
+  Base Shift                     max=1589  lowest=选出移位后的十进制值
+  Area Perimeter Match           max=1600  lowest=提示：面积看长宽之积，周长看四条边之和 —— 细长条
+  Fractional Pizza               max=1600  lowest=提示：分母 = 一共几片，分子 = 取几片
+  Vector Grid Alignment          max=1592  lowest=按方向键，把 🧭 走到 🎯
+
+【D 档】blk=0 且 max < 1584（看起来干净，仍需扫一眼截图）128 款
+
+【环境失败】要重测 19 款：Binary Matrix Rank All, Visual Search All, Cryptogram All, Word Ladder, Matcher, Path Recall, Distractor Matrix, Cross Section Slice, Visual Search Conjunction, Rotating Maze, Word Snake, Ab Reversal Oddball, Spotlight Track, Block Count 3D, Compound Connect, Connect Four, Continuous Paired Associate, Doodle Jump, Lock Pattern
+
+== 结论 ==
+A+B+C = 44 款需要**优先看截图**；D = 128 款可抽样看。
+⚠️ 但判据 1998：`blk=0` 也可能有横向裁切/同行挤压 ⇒ D 档不能跳过，只能降低优先级。

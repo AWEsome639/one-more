@@ -1,0 +1,158 @@
+# RTL 陷阱扫描 —— 2026-11-08 02:xx
+
+> 执行：verifier-eng2 ｜ **只读** `components/` + `pages/` + `games/`（未改任何 .ets，只写本文件）
+> 配合：code-hunter 正在给页面根容器加 `direction(I18n.isRTL() ? Direction.Rtl : Direction.Ltr)`（已在 `GameHost.ets:3421` 落地）
+> **本文只列「加了 direction 反而会坏」的地方**。按「用户能不能看见」排序。
+
+## S0（最严重）绝对坐标 + 全局 direction 继承 ⇒ 一半镜像、一半不镜像
+
+**根因**：`direction` 是 `CommonMethod`，**会继承给所有子组件**。它会让 Row 顺序、`padding` 的 start/end、`Blank()`、滚动方向镜像 ——
+**但 `position({ x })` / `translate` / `rotate` 用的是物理坐标，永远不会镜像**。
+于是同一个画面里：文字与流式布局镜像了，绝对定位的元素留在原地 ⇒ **错位/重叠**。
+
+| 文件:行 | 游戏 | 绝对定位用来干什么 |
+|---|---|---|
+| `pages/GameHost.ets:3421` | **全部 355 款** | `.direction(...)` 就加在游戏根容器上 ⇒ 下面所有游戏都吃到 RTL |
+| `games/GPong.ets:550/560/569/578` | 乒乓 | `position({ x: PADDLE_X + '%' })`、`AI_X`、球 `this.bx` —— **物理坐标** |
+| `games/GBreakout.ets` | 打砖块 | 同上（球/板） |
+| `games/GKlotski.ets:555` | 华容道 | `position({ x: CAO_TX*100/COLS + '%' })` —— 棋子格子坐标 |
+| `games/GOrbitTap.ets:282` | 轨道点击 | `position({ x: pctOf(slotX(i)) })` —— 槽位坐标 |
+| `games/GSolitaire.ets` / `GSpiderSolitaire.ets` | 纸牌/蜘蛛纸牌 | 牌堆绝对定位 |
+| `games/GSolitaire.ets` / `GFlappy.ets` / `GDoodleJump.ets` / `GVennNumbers.ets` | — | 同上（共 **9 个游戏文件**用 `position({ x:`，29 处） |
+
+**RTL 下会怎样**：进入这几款游戏，HUD/标题镜像到右边，但**球台、棋子、槽位仍在左边**（或反过来）⇒ 元素互相压住；
+乒乓/打砖块这类还会出现「球拍在右、按键提示在左」的割裂感。**这比"没镜像"更难看**。
+
+**修法（二选一，推荐①）**
+1. **给绝对坐标的游戏区做局部反向覆盖**：在游戏根容器（`GameHost.ets:3421` 那个节点**之内**）包一层
+   `.direction(Direction.Ltr)`，只让**文字 chrome**（标题/提示/按钮）走 RTL，**棋盘/物理区保持 LTR**；
+2. 或者在 RTL 下把所有 `x` 换成 `1 - x`（不推荐：物理量全要重算，且动画 `translate` 也得同步改）。
+
+> 判据：**「按位置摆放」的东西不能镜像，「按顺序排列」的东西必须镜像**。棋盘属于前者。
+
+## S1 箭头字形：位置镜像了，箭头没镜像 ⇒ 指向反了
+
+`direction` 会镜像 Row 顺序，但**字形本身不会翻转**。下面每一处都指向读者预期之外的方向。
+
+| 文件:行 | 字形 | 语义 | RTL 下会怎样 | 修法 |
+|---|---|---|---|---|
+| `components/StatsTab.ets:1222` | `›` | 列表行尾「可进入」指示 | 镜像后跑到**左边**，但仍指**右** ⇒ 像「回到上一层」 | RTL 时用 `‹`（或 `I18n.isRTL() ? '‹' : '›'`） |
+| `components/SettingsTab.ets:408` | `›` | 同上 | 同上 | 同上 |
+| `components/SettingsTab.ets:835` | `›` | 同上 | 同上 | 同上 |
+| `components/SettingsTab.ets:1335` | `›` | 同上 | 同上 | 同上 |
+| `components/GamesTab.ets:2612` | `›` | 同上 | 同上 | 同上 |
+| `pages/GameHost.ets:1004` | `‹` | **返回** | 镜像到**右边**但仍指**左** ⇒ 返回键指错方向 | RTL 时用 `›` |
+| `pages/GuidePage.ets:176` | `‹` | 返回 | 同上 | 同上 |
+| `pages/LanLobby.ets:106` | `‹` | 返回 | 同上 | 同上 |
+| `games/GMazeNav3d.ets:498 / 532` | `←` / `→` | 移动方向键 | 按钮位置会镜像，**但游戏内坐标不镜像** ⇒ 按「左」键角色往右走 | 键盘标**不要**镜像（放回 LTR 容器），或按键语义按 isRTL 反转 |
+| `games/GPathFinder.ets:501 / 555` | `←` / `→` | 同上 | 同上 | 同上 |
+| `games/GWordAssociationRecall.ets:336` | `→` | 两个词之间的「指向」连接符 | 词序镜像（A→B 变 B→A），箭头仍指右 ⇒ **关系看起来反了** | 箭头按 `isRTL()` 取 `←` |
+| `games/GContinuousPairedAssociate.ets:397` | `→` | 同上 | 同上 | 同上 |
+
+## S2 单边 / 非对称边距：RTL 下会贴错边（24 处）
+
+全仓 `margin`/`padding` 共 159 处：对称 101 ✅、仅垂直 34 ✅、**单边-right 17 / 单边-left 5 / 非对称 2 = 24 处需要处理**。
+
+### 2-1 角标（`{ right: …, bottom/top: … }`）—— RTL 后应变成左角（**8 处**，最显眼）
+| 文件:行 | 现在 | RTL 下 |
+|---|---|---|
+| `components/Common.ets:1406` | `{ right: Space.xs, bottom: Space.xs }` | `{ left, bottom }` |
+| `components/SettingsTab.ets:675` | `{ right: 6, bottom: 6 }`（语言角标） | `{ left, bottom }` |
+| `components/GamesTab.ets:1928` | `{ right: 6, bottom: 6 }` | `{ left, bottom }` |
+| `pages/LanLobby.ets:206` | `{ right: 6, bottom: 6 }` | `{ left, bottom }` |
+| `games/GGrammarPolice.ets:306` | `{ top: Space.xs, right: Space.xs }` | `{ top, left }` |
+| `games/GVisualSearchConjunction.ets:333` | `{ top: Space.xs, right: Space.xs }` | `{ top, left }` |
+| `components/StatsTab.ets:572` | `{ right: Space.xs, top: Space.xs }` | `{ top, left }` |
+| `components/StatsTab.ets:1121` | `{ right: 6, bottom: 6 }` | `{ left, bottom }` |
+
+**修法**：这些是「贴在角上的小徽章」。用 `I18n.isRTL() ? { left: n, bottom: n } : { right: n, bottom: n }`，
+或干脆改成 **Stack + Alignment**（`Alignment.BottomEnd` 会自动跟随方向），后者更干净。
+
+### 2-2 图标后的左间距（`{ left: n }`）—— RTL 后应该出现在文字的**右边**（5 处）
+| 文件:行 | 属主 | 说明 |
+|---|---|---|
+| `components/Common.ets:628` | Text（等级头卡「LV」旁） | 图标 → 文字的左间距 |
+| `components/Common.ets:677` | Text | 同上 |
+| `components/Common.ets:724` | Text | 同上 |
+| `components/GamesTab.ets:1463` | Text | 页头语言徽章旁 |
+| `pages/GameHost.ets:1070` | Text | 游戏页顶栏 |
+
+**修法**：改用 `Row({ space: n })`（间距跟随方向）或 `.margin({ start: n })`（ArkUI 的 `start/end` 跟随方向）。
+
+### 2-3 行尾留白（`{ right: Space.lg / sm }`）—— 给滚动条/箭头让位，RTL 应改 left（**8 处**）
+`components/StatsTab.ets:762`、`components/Common.ets:567`、`components/Common.ets:576`、`components/Common.ets:1682`、
+`components/GamesTab.ets:2412`、`pages/GameHost.ets:991`、`pages/GameHost.ets:1137`
+**修法**：`.padding({ end: n })`（跟随方向）。
+
+### 2-4 另 2 处（RTL 需要单独判断）
+| 文件:行 | 现在 | 说明 |
+|---|---|---|
+| `components/Common.ets:1326` | `{ right: this.badgePadRight() }` | GameCard 角标留白（HUD 里算过的那 84vp）—— RTL 下应改成 `{ left: … }` |
+| `components/SettingsTab.ets:1104` | `{ right: Space.sm, bottom: Space.xs }` | 行尾图标 —— 应 `{ left, bottom }` |
+
+### 2-5 非对称（2 处，需左右互换）
+| 文件:行 | 现在 | 修法 |
+|---|---|---|
+| `components/GamesTab.ets:2550` | `{ left: Space.md, right: Space.xs }` | `{ start: Space.md, end: Space.xs }` |
+| `pages/LanLobby.ets:144` | `{ left: Space.sm, right: Space.md, top: Space.xl }` | `{ start: … , end: …, top }` |
+
+## S3 ① TextAlign：**没有陷阱，0 处需要改**
+
+全仓 `TextAlign.Left` / `TextAlign.Right` = **0 处**；用的是会自动镜像的相对值：
+`TextAlign.Start` 3 处（`components/GamesTab.ets:2598`、`games/GKenken.ets:580`、`games/GTypoglycemiaDecoder.ets:345`）、
+`TextAlign.End` 7 处（`StatsTab.ets:745`、`GTetris.ets:654`、`GNim.ets:447`、`GWordle.ets:454`、`GGearTrainDirection.ets:335`、
+`GWordPairAssociateMemory.ets:320`、`GWordAssociationRecall.ets:338`）。
+
+两处已经显式按语言切换（`GKenken.ets:580`、`GTypoglycemiaDecoder.ets:345` 用 `I18n.isRTL() ? End : Start`）—— 这两处**加了 direction 之后会变成双重镜像**：
+`direction(RTL)` 已经把 Start 解释成右边，再显式判 `isRTL()` 就等于**翻两次 = 又翻回去**。
+⇒ **这两处应改回纯 `TextAlign.Start`**（交给 direction），否则阿语下会反。
+
+> 这就是本题里最典型的「加了 direction 反而会坏」：**手写的 isRTL 判断与 direction 叠加 ⇒ 双重镜像**。
+
+## S4 其它要留意的（低优先级，不影响可视对错）
+
+- `.translate(` 67 处、`.rotate(` 13 处：都是**动画位移**（x 方向），RTL 下不镜像 ⇒ 飞入/滑出方向与布局方向相反（小瑕疵，可接受）。
+- `Canvas` 只有 1 处（`components/SparkBurst.ets`）—— 是**粒子特效**，RTL 无影响。
+- `position({ x: … })` 里用**百分比**的（Pong 的 `'49.5%'`）同样不镜像，已在 S0 覆盖。
+
+## 怎么验（建议顺序，10 分钟）
+
+1. 设置 → 语言 → **العربية**；
+2. 打开 **乒乓**（或打砖块）⇒ S0：球台/球拍与 HUD 是否割裂；
+3. 返回列表 ⇒ S1：行尾箭头 `›` 是否指左（错）；
+4. 设置页 ⇒ S1：返回 `‹` 是否指右（错）、语言角标是否贴错角（S2-1）；
+5. 打开 **Kenken** 或 **Typoglycemia** ⇒ S3：数字是否**反着对齐**（双重镜像）。
+
+## 边界
+
+- 只读扫描（`grep` + 括号配平的 `margin/padding` 块解析），未运行、未改代码。
+- 「哪些该绝对」是我的判断：**棋盘/物理/槽位**必须保持物理坐标；**文字与列表**必须镜像。若有产品口径不同，以口径为准。
+- 未覆盖：`Scroll` 起始位置、`TextInput` 光标方向、`Tabs` 指示条（这些 ArkUI 一般会自动处理，但没有真机验证过阿语）。
+
+---
+
+## 附：S0 修复记录（2026-11-08 凌晨，写域 `games/`）
+
+**做法**：只给**棋盘/物理区**加 `.direction(Direction.Ltr)`（不加在整个游戏根上），文字 chrome 留在父级、仍然跟随 RTL。
+每个容器都用**反向括号配平**核过「`.clip(true)` 的属主是谁、体内是否包含全部 `position`」，并确认 HUD 容器在它**之前（同级）**。
+
+| 文件 | 棋盘容器 | 加在哪 | HUD 容器位置 |
+|---|---|---|---|
+| `GPong.ets` | `Stack({alignContent: TopStart})` L542（体止 579） | `.clip(true)` 之后 | L502 之前 ✅ |
+| `GBreakout.ets` | `Stack` L579（体止 601） | `.clip(true)` 之后 | L558 之前 ✅ |
+| `GFlappy.ets` | `Stack` L562（体止 631） | `.clip(true)` 之后 | L555 之前 ✅ |
+| `GDoodleJump.ets` | `Stack` L488（体止 528） | `.clip(true)` 之后 | L481 之前 ✅ |
+| `GOrbitTap.ets` | `Stack()` L275（体止 290） | `.borderRadius(Radius.xl).shadow(...)` 之后 | L269/255 之前 ✅ |
+| `GKlotski.ets` | `Stack()` L550（体止 563） | `.shadow(Shadow.card)` 之后 | L543 之前 ✅ |
+| `GVennNumbers.ets` | `Stack()` L306（体止 340） | `}.width('100%').height(150)` 之后 | L299/303 之前 ✅ |
+
+**结论修正（重要）**：
+- `GSolitaire.ets:1146` / `GSpiderSolitaire.ets:1281` 的 `position` 是 **`{ x: 0, y: i*STEP }` = 纯垂直叠牌**（x 恒 0），
+  牌列本身由 flow `Row` 排列、会正常镜像 ⇒ **这两款不需要钉 Ltr**（钉了反而会挡住牌列镜像）。原清单里的这两项作废。
+- `GVennNumbers` 需要改的原因不是棋子，而是**背后两个装饰 `Circle` 用 `position({x: 8 / 78})`**，
+  而 A/B 选项是 Row 流式排列 —— 不钉住就会出现「圆跑到另一个选项底下」。
+
+**双重镜像 2 处**（`GKenken:580` / `GTypoglycemiaDecoder:345`）：排查时已被**另一个会话**改成纯 `TextAlign.Start`
+（`git diff` 显示正是本报告建议的改法），本批未再改动。
+
+**校验**：7 文件括号配平全过 ｜ 每款恰好 1 处 `.direction(Direction.Ltr)` ｜ 改动为**纯新增**（+27 行，0 删除）。

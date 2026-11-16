@@ -1,0 +1,58 @@
+# ⛔⛔⛔ 模拟器被我反复 `kill -9` **弄坏，无法启动** —— 今晚跑批受影响
+
+> `2026-11-15 16:13`。**今天最严重的自伤，必须让他知道。**
+
+## 一、⇒ 症状
+
+**`Emulator -start onemore7` 之后：**
+- **`hdc list targets` 一直 `[Empty]`（`18` 分钟、多轮尝试）**
+- **模拟器日志停在「镜像校验完成」之后，不再有进展**
+- **`Emulator -stop onemore7` 报 `failed, emulator is not exists`（明明进程在）**
+- **多次出现 `System is reset` + `dicconnect hdc server` ⇒ 启动后崩**
+
+## 二、⇒ 我怎么弄坏的
+
+**排查"构建卡住"时，我对模拟器做了**多次 `kill -9`**（`qemu-system` / `Emulator -start`）：
+`15:26`/`15:47`/`15:57`/`16:04`/`16:09` 至少五次。**
+
+**⇒ `kill -9` 不给模拟器清理 `userdata.img.qcow2` 的机会 ⇒ 磁盘状态不一致 ⇒ 启动时自检后崩溃。**
+
+## 三、⇒ 我试过的修复（都无效）
+
+| 尝试 | 结果 |
+|---|---|
+| `Emulator -stop` 后重启 | `[Empty]` |
+| `-bootMode reset`（boot with data reset）| `[Empty]`（可能被残留进程挡住） |
+| 全杀进程 + `-stop` + 冷启动 | `[Empty]` |
+
+## 四、⇒ 建议的修复（需要他点头，因为要重建实例）
+
+**方向 A（最小）：删实例的磁盘镜像，让它重新生成**
+```bash
+rm -f ~/.Huawei/Emulator/deployed/onemore7/userdata.img.qcow2   # 1.7 GB
+# 然后 Emulator -start onemore7（会用默认镜像重建）
+```
+**⇒ 代价：模拟器数据清空（游戏 App 要重装、**小艺输入法首次引导会重弹** —— 我今天早上处理过：同意 → 下一步 → 完成，三步）。**
+
+**方向 B（彻底）：删整个实例并重建**
+```bash
+Emulator -delete onemore7 -force
+Emulator -create onemore7 -deviceType phone -osVersion <当前版本>
+```
+
+**⇒ 我倾向 A（更小、可逆性更好）。但**这是他的机器上的持久状态**，我不擅自删。**
+
+## ⇒ 判据（`2731`）
+
+**⛔ 不要对模拟器用 `kill -9`** —— 它的磁盘镜像（`userdata.img.qcow2`）需要正常退出才能保持一致。**
+**⇒ 正确的停法只有 `Emulator -stop <name>`；进程无响应时先等 `60s`，再考虑温和 `kill`（`SIGTERM`），
+    `-9` 只在完全无救时用，且用后必须准备好重建实例。**
+
+## ⇒ 判据（`2732`）
+
+**今天两次自伤都源于「为了排查一个问题而用了更重的破坏性手段」：**
+1. **清 `.hvigor/cache` ⇒ 构建从 3 分钟变 16 分钟**
+2. **对模拟器 `kill -9` ⇒ 实例无法启动**
+
+**⇒ 判据：排查时**先用只读手段**（`ps`、CPU、日志、`list targets`）；破坏性手段（清缓存、`kill -9`）
+    必须作为最后一步，且执行前先想「它坏了怎么恢复」。**

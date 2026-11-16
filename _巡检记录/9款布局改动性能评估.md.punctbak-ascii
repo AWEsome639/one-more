@@ -1,0 +1,97 @@
+# 9 款布局改动的性能风险评估（纯静态）—— 2026-11-12
+
+> 执行：**perf-hunter**｜**只读 + 只写本 md**（未改 `.ets`、未编译、未碰设备）
+> 对象：`GWordle` `GTapa` `GKurodoko` `GBaseShift` `GNumberBonds` `GMathMaze` `GContextClues` `GPythagoreanTripleBuilder` `GNumericalEstimation`
+
+---
+
+## 0. 结论
+
+**0 种会拖帧的写法。** 你这次加的东西**没有一项落在每帧路径上**：
+
+| 你问的 | 实测 |
+|---|---|
+| ① `Bp.isShort()` 在每帧热路径 | **22 处，全部在 `build()`/`@Builder` 的属性表达式里** ⇒ 只在**组件重建**时求值（ArkUI 的 `build()` 不是每帧跑，只在状态变化时跑）。`isShort()` 本体是 `return Bp.height < 690`（静态比较，纳秒级） |
+| ② 每帧新建对象/数组 | **你新引入的：0 处**。`Math.min/max` 只产生数字、不建对象。仅有的分配在**改造前就有**（见 §2，`rowIdx()`/字面量数组），µs 级 |
+| ③ `Scroll` 套 `Scroll` | **0 例 —— 9 款里连一个 `Scroll` 都没有**（`List`/`Grid`/`Swiper` 也全是 0） |
+
+**⇒ 不需要为性能改任何写法。** 唯一要提醒的是：**不要把 `Bp.isShort()` 提前算成常量**（见 §3，那会**破坏旋转/分屏响应**，是负优化）。
+
+---
+
+## 1. 逐项清单（22 处 `isShort` + 6 处 `Math.min/max`）
+
+### 1.1 分类结果
+| 类别 | 处数 | 影响 | 说明 |
+|---|---|---|---|
+| `build()` 顶层表达式（`Column space`、`visibility`、`width/height`） | 18 | **可忽略** | 每次重建求值 1 次 |
+| `ForEach` **项模板**内（每项各求 1 次） | 4 | **可忽略** | 最多 25 项 × 1 次静态比较 |
+| 事件回调内（`onClick/onTouch/onKeyEvent`） | 0 | — | 你这次没往回调里塞布局计算 |
+| `Math.min/max` 在属性表达式里 | 6 | **可忽略** | 纯数值运算，零分配 |
+
+**逐文件明细（行号 → 位置 → 影响）**
+| 文件 | 行 | 表达式 | 位置 | 影响 |
+|---|---|---|---|---|
+| `GWordle` | 492 | `width(Bp.isShort() ? 120 : 614)` | 双层 `ForEach` 内 | 小（25 项） |
+| `GTapa` | 620 | `Column({ space: Bp.isShort() ? sm : md })` | build 顶层 | 可忽略 |
+| `GTapa` | 715 / 739 | `visibility(Bp.isShort() …)` | build 顶层 | 可忽略 |
+| `GTapa` | 707 | `maxHeight: Math.max(140, Bp.height - 360)` | build 顶层 | 可忽略 |
+| `GKurodoko` | 701 | `width(Math.min(...))` | build 顶层 | 可忽略 |
+| `GKurodoko` | 707 / 713 | `visibility(...)` | build 顶层 | 可忽略 |
+| `GBaseShift` | 499 | `height(Bp.isShort() ? Cell.of(34) : Cell.of(52))` | `ForEach` 项内 | 小（4 项） |
+| `GBaseShift` | 527 | `visibility(...)` | build 顶层 | 可忽略 |
+| `GNumberBonds` | 405 | `height(Bp.isShort() ? Cell.of(28) : Cell.of(36))` | `ForEach` 项内 | 小（4 项） |
+| `GNumberBonds` | 423 / 426 | `if (!Bp.isShort())` + `visibility` | build 顶层 | 可忽略 |
+| `GContextClues` | 352 / 359 / 361 | `height(...)` / `visibility(...)` | build 顶层 | 可忽略 |
+| `GContextClues` | 275 | `Math.min(qi+1, diffTotal)` | build 顶层 | 可忽略 |
+| `GPythagoreanTripleBuilder` | 327 / 347 / 494 | `Math.min(...)` / `visibility(...)` | build 顶层 | 可忽略 |
+| `GNumericalEstimation` | 459 / 477 | `height(...)` / `visibility(...)` | `ForEach` 项内 | 小（4 项） |
+| `GMathMaze` | 630 | `width(Math.min(Bp.width − 2·lg, Math.max(140, Bp.height − 420)))` | build 顶层 | 可忽略 |
+
+## 2. 「每帧新建对象/数组」核查
+
+**你新引入的：0 处**（`Math.min/max` 返回 number，`Cell.of()` 返回 number，`Bp.isShort()` 返回 boolean —— 都不分配）。
+
+**改造前就存在、这次没变的 3 类**（影响全为 **小**，不建议现在动）：
+| # | 位置 | 写法 | 每重建分配 | 影响 |
+|---|---|---|---|---|
+| 1 | `GTapa.ets:672/674`、`GMathMaze.ets:592/594` | `ForEach(this.rowIdx(), …)`，而 `rowIdx()` 内部 `const a: number[] = []; … push` | **每次 build 新建 2 个数组**（行 + 列） | 小（n ≤ 8，µs 级） |
+| 2 | `GWordle.ets:481/483` | `ForEach([0,1,2,3,4], …)` 与嵌套的 `[0,1,2,3,4]` | **每次 build 新建 2 个字面量数组** | 小 |
+| 3 | `GBaseShift.ets:527`-附近 `hearts()` | 每次 build `for (3 次)` 拼字符串 ⇒ 3 个临时字符串 | 3 次小分配 | 可忽略（`LIVES=3`） |
+
+> 统一的"更省"写法（**收益 µs 级，可做可不做**）：
+> `rowIdx()` → 在 `diffTotal` 变化时算一次存字段，`ForEach(this.rowsArr, …)`；`[0,1,2,3,4]` → 模块级 `const R5 = [0,1,2,3,4];`。
+> ⚠️ 别为这个单独出一次包 —— 与本次布局修复一起顺手改才有意义。
+
+## 3. ⚠️ 唯一需要提醒的「负优化」：别把 `Bp.isShort()` 提前算成常量
+
+`Bp.isShort()` 的实现是 `return Bp.height < 690`，而 `Bp.height` **会随旋转 / 分屏 / 窗口缩放变化**（`Bp` 由 `windowSizeChange` 更新）。
+- **内联在 `build()` 里 ⇒ 每次重建自动拿到最新值**（旋转后立刻按新档渲染）✓
+- **若提前算成 `private readonly short = Bp.isShort()`** ⇒ **值在 struct 创建时冻结** ⇒ **旋转后仍按旧档**（矮屏布局被带到大屏上，或反过来）✗
+
+⇒ **内联是正确写法，不是将就。** 你现在这 22 处全部内联 ⇒ **保持**。
+
+## 4. 结构风险核查（拖帧的真凶都不在）
+
+| 结构 | 9 款合计 | 说明 |
+|---|---|---|
+| `Scroll`（含嵌套） | **0** | 全是 `Row`/`Column` 固定网格 |
+| `List` / `Grid` / `Swiper` | **0** | 一律 `ForEach` 铺格 |
+| `onAreaChange` | **0** | 没有"测量→改状态→再测量"的抖动回路 |
+| `.transition(` | 0 | 无插入/删除动画 |
+| `.animation(` | **最多 4（GContextClues）** | 都是单节点属性动画，不是逐格 |
+
+## 5. 若将来真要「更省」，只有这 3 条值得记（现在都不用做）
+
+1. **`ForEach` 数据源别在 build 里现造**（`rowIdx()` / 字面量数组）⇒ 提到字段或模块常量。
+2. **`build()` 里别调 O(n²) 的统计方法**：`GKurodoko` 的 `blackCount()` / `clueTotal()` / `cluesDone()` 各扫 25 格（合计 75 次迭代/重建）——
+   现在是"能用且够快"，但如果以后 N 从 5 涨到 9（81 格），可改成 `@State` 缓存的计数，随点击 +1/−1 维护。
+3. **`visibility(None)` 不销毁节点、仍参与布局计算**（只是不画）—— 9 款里这类门控共 8 处，都作用在**小元素**上（一个提示行/一个按钮），
+   没有"整块棋盘 visibility"的写法 ⇒ **无风险**。（若哪天门控的是整块棋盘，改 `if` 条件渲染更省。）
+
+---
+
+## 6. 一句话回给 lead
+
+**0 种会拖帧的写法** —— 22 处 `Bp.isShort()` 全在构建期（不是每帧），新引入的零分配，9 款里 Scroll/List/Grid/onAreaChange **全是 0**；
+唯一要防的是**把 `isShort()` 提前算成常量**（会破坏旋转响应），你现在全内联 ⇒ **保持原样即可**。

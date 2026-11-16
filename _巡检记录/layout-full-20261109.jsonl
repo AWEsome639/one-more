@@ -1,0 +1,363 @@
+OK           Gomoku                   {'max_bottom': 732, 'lowest': '0', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Hanoi                    {'max_bottom': 1351, 'lowest': '重开', 'count': 2, 'shot': '', 'clip': 3, 'clip_at': '@1164'}
+OK           Kakuro Mini              {'max_bottom': 1179, 'lowest': '0', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Mahjong Solitaire        {'max_bottom': 1531, 'lowest': '1筒', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Mahjong_Solitaire-070311.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Mancala                  {'max_bottom': 1351, 'lowest': '重开', 'count': 1, 'shot': '', 'clip': 13, 'clip_at': '@1337'}
+OK           Mandelbrot               {'max_bottom': 732, 'lowest': '1/8', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Mastermind               {'max_bottom': 1227, 'lowest': '答案', 'count': 2, 'shot': '', 'clip': 2, 'clip_at': '@1600'}
+TIGHT        Match 3                  {'max_bottom': 1572, 'lowest': '🍊', 'count': 11, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Match_3-070440.jpeg', 'clip': 1, 'clip_at': '@1596'}
+OK           Memory                   {'max_bottom': 1351, 'lowest': '重新开始', 'count': 11, 'shot': '', 'clip': 19, 'clip_at': '@1600'}
+OK           Minesweeper              {'max_bottom': 732, 'lowest': '10', 'count': 1, 'shot': '', 'clip': 0, 'clip_at': '@0'}
+PUSHED_OUT   Nim                      {'max_bottom': 1600, 'lowest': '●●●●●●', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Nim-070542.jpeg', 'clip': 2, 'clip_at': '@1600'}
+TIGHT        Phonetic Guess           {'max_bottom': 1578, 'lowest': 'weather', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Phonetic_Guess-070606.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Pong                     {'max_bottom': 894, 'lowest': '准备发球…', 'count': 1, 'shot': '', 'clip': 0, 'clip_at': '@0'}
+OK           Reversi                  {'max_bottom': 846, 'lowest': '3', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Schulte Table            {'max_bottom': 1457, 'lowest': '11', 'count': 1, 'shot': '', 'clip': 29, 'clip_at': '@1600'}
+PUSHED_OUT   Sieve Visualizer         {'max_bottom': 1600, 'lowest': '用 2 划倍数：2×2 起', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sieve_Visualizer-070733.jpeg', 'clip': 2, 'clip_at': '用 2 划倍数：2×2 起@1600'}
+OK           Simon Says               {'max_bottom': 1345, 'lowest': '🐸', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Slide15                  {'max_bottom': 1209, 'lowest': '3', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Snake                    {'max_bottom': 1351, 'lowest': '💥 撞了，得分 10，点「重开」再来', 'count': 4, 'shot': '', 'clip': 0, 'clip_at': '@0'}
+PUSHED_OUT   Sokoban                  {'max_bottom': 1600, 'lowest': '◀', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sokoban-070907.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Solitaire                {'max_bottom': 1586, 'lowest': '点第一张牌，再点能和它连起来的同款牌', 'count': 4, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Solitaire-070928.jpeg', 'clip': 2, 'clip_at': '点第一张牌，再点能和它连起来的同款牌@1586'}
+OK           Sorting Visualizer       {'max_bottom': 1351, 'lowest': '开始', 'count': 2, 'shot': '', 'clip': 2, 'clip_at': '74@1133'}
+OK           Spider Solitaire         {'max_bottom': 1351, 'lowest': '单花色（全黑桃）· 集齐 K→A 收一组 · 空列时可放任意', 'count': 1, 'shot': '', 'clip': 0, 'clip_at': '@0'}
+PUSHED_OUT   Sudoku Hex               {'max_bottom': 1600, 'lowest': '✕ 擦除', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sudoku_Hex-071031.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Tetris                   {'max_bottom': 1600, 'lowest': '←', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Tetris-071056.jpeg', 'clip': 2, 'clip_at': '@1600'}
+TIGHT        Tic-Tac-Toe              {'max_bottom': 1559, 'lowest': '轮到你，点一格落 ✕', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Tic_Tac_Toe-071122.jpeg', 'clip': 2, 'clip_at': '轮到你，点一格落 ✕@1559'}
+OK           Wordle                   {'max_bottom': 732, 'lowest': '5', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Alphabet Sudoku          {'max_bottom': 1600, 'lowest': '提示', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Alphabet_Sudoku-102621.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Binary Puzzle            {'max_bottom': 1600, 'lowest': '提示', 'count': 5, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Binary_Puzzle-102645.jpeg', 'clip': 2, 'clip_at': '@1600'}
+NOT_IN_GAME  Block Escape             {'texts': ['', '', '', '', '']}
+PUSHED_OUT   Bridges                  {'max_bottom': 1600, 'lowest': '拆光重来', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Bridges-102734.jpeg', 'clip': 2, 'clip_at': '@1600'}
+SKIP        Bridges All
+NOT_HOME     Color Flood              {}
+NOT_HOME     Crown                    {}
+NOT_HOME     Dominosa                 {}
+NOT_HOME     Futoshiki                {}
+NOT_HOME     Gokigen Naname           {}
+NOT_HOME     Heyawake                 {}
+NOT_HOME     Hitori                   {}
+NOT_HOME     Hitori All               {}
+NOT_HOME     Kakurasu Sums            {}
+NOT_HOME     Kakuro                   {}
+NOT_HOME     KenKen                   {}
+NOT_HOME     Kurodoko                 {}
+NOT_HOME     Lighthouses              {}
+NOT_HOME     Lights Out               {}
+NOT_HOME     Magnets                  {}
+NOT_HOME     Masyu                    {}
+NOT_HOME     Math Maze                {}
+NOT_HOME     Math Path                {}
+NOT_HOME     Nonogram                 {}
+NOT_HOME     Nurikabe                 {}
+NOT_HOME     Path Finder              {}
+NOT_HOME     Path Intersect           {}
+NOT_HOME     Pipes                    {}
+NOT_HOME     Shikaku                  {}
+NOT_HOME     Skyscrapers              {}
+NOT_HOME     Slide Puzzle             {}
+NOT_HOME     Slitherlink              {}
+NOT_HOME     Sum Snake                {}
+PUSHED_OUT   Tangle Fix               {'max_bottom': 1592, 'lowest': 'B', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Tangle_Fix-114233.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Tapa                     {'max_bottom': 1562, 'lowest': '点格子涂黑/擦白；数字 = 8 邻域里连续黑格的段长', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Tapa-114337.jpeg', 'clip': 2, 'clip_at': '点格子涂黑/擦白；数字 = 8 邻域里连续黑格的段长@1562'}
+NOT_IN_GAME  Tenner Grid              {'texts': ['', '', '', '', '']}
+PUSHED_OUT   Tents And Trees          {'max_bottom': 1592, 'lowest': '1', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Tents_And_Trees-114542.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Water Sort               {'max_bottom': 1351, 'lowest': '倒水规则：只有颜色相同、或目标管是空的才能倒；倒的量受目标管', 'count': 1, 'shot': '', 'clip': 0, 'clip_at': '@0'}
+OK           Yajilin                  {'max_bottom': 1454, 'lowest': '提示 (-5)', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '@1568'}
+PUSHED_OUT   Algebraic Balance        {'max_bottom': 1589, 'lowest': 'x = 1', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Algebraic_Balance-114659.jpeg', 'clip': 2, 'clip_at': '@1600'}
+OK           Arithmetic Chain         {'max_bottom': 1484, 'lowest': '提示', 'count': 4, 'shot': '', 'clip': 1, 'clip_at': '@1484'}
+PUSHED_OUT   Balance Scale            {'max_bottom': 1600, 'lowest': 'x = 3', 'count': 4, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Balance_Scale-114840.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Base Conversion Run      {'max_bottom': 1495, 'lowest': '1001010', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Base Shift               {'max_bottom': 1495, 'lowest': '206', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Binary Code              {'max_bottom': 1600, 'lowest': '提示', 'count': 5, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Binary_Code-115027.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Binary Matrix Rank       {'max_bottom': 1600, 'lowest': '清空', 'count': 5, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Binary_Matrix_Rank-115049.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Binary Scale Balance     {'max_bottom': 1600, 'lowest': '清空', 'count': 5, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Binary_Scale_Balance-115110.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Binomial Match           {'max_bottom': 1593, 'lowest': 'a⁴', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-115140.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Collatz                  {'max_bottom': 1576, 'lowest': '101', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Collatz-115202.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Common Denominator       {'max_bottom': 1556, 'lowest': '公分母 = 77', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Common_Denominator-115230.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Countdown Math           {'max_bottom': 1409, 'lowest': '3', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Crypto Arithmetic        {'max_bottom': 1600, 'lowest': '0', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Crypto_Arithmetic-115353.jpeg', 'clip': 3, 'clip_at': '@1600'}
+OK           Digit Swap Eq            {'max_bottom': 1414, 'lowest': '重开', 'count': 4, 'shot': '', 'clip': 1, 'clip_at': '@1529'}
+TIGHT        Divisibility Dash        {'max_bottom': 1557, 'lowest': '能整除', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Divisibility_Dash-115525.jpeg', 'clip': 1, 'clip_at': '@1557'}
+OK           Exponent Tower           {'max_bottom': 1230, 'lowest': '先算塔顶 (b^c)，拿它当指数', 'count': 1, 'shot': '', 'clip': 0, 'clip_at': '@0'}
+OK           Factor Finder            {'max_bottom': 1452, 'lowest': '34', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Fraction Match           {'max_bottom': 1139, 'lowest': '?', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Exponent Tower           {'max_bottom': 1230, 'lowest': '先算塔顶 (b^c)，拿它当指数', 'count': 1, 'shot': '', 'clip': 0, 'clip_at': '@0'}
+OK           Factor Finder            {'max_bottom': 1452, 'lowest': '2', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Fraction Match           {'max_bottom': 1139, 'lowest': '?', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Exponent Tower           {'max_bottom': 1230, 'lowest': '先算塔顶 (b^c)，拿它当指数', 'count': 1, 'shot': '', 'clip': 0, 'clip_at': '@0'}
+NOT_HOME     Fraction Matcher         {}
+TIGHT        Fractional Pizza         {'max_bottom': 1571, 'lowest': '确认', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Fractional_Pizza-151149.jpeg', 'clip': 2, 'clip_at': '确认@1600'}
+NO_CARD      Inequality Balance Ops   {}
+NOT_IN_GAME  Inequality Dash          {'texts': ['', '', '', '', '']}
+NOT_HOME     Magic Squares            {}
+OK           Matrix Multiplier        {'max_bottom': 1505, 'lowest': '秩 = 2', 'count': None, 'shot': '', 'clip': 2, 'clip_at': '@1600'}
+OK           Matrix Multiplier Match  {'max_bottom': 1505, 'lowest': '秩 = 3', 'count': None, 'shot': '', 'clip': 2, 'clip_at': '@1600'}
+NOT_IN_GAME  Mental Abacus            {'texts': ['', '', '', '', '']}
+PUSHED_OUT   Mental Calendar          {'max_bottom': 1600, 'lowest': '提示', 'count': 4, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Mental_Calendar-151704.jpeg', 'clip': 2, 'clip_at': '@1600'}
+OK           Missing Operator         {'max_bottom': 1226, 'lowest': '把问号换成一个运算符，让等式成立', 'count': 2, 'shot': '', 'clip': 0, 'clip_at': '@0'}
+TIGHT        Modular Clock Arithmetic {'max_bottom': 1583, 'lowest': '提示', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Modular_Clock_Arithmetic-151749.jpeg', 'clip': 2, 'clip_at': '@1600'}
+TIGHT        Modulo Clock             {'max_bottom': 1581, 'lowest': '4 点', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Modulo_Clock-151811.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Modulo Path              {'max_bottom': 1600, 'lowest': '3', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Modulo_Path-151833.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Number Bonds             {'max_bottom': 1600, 'lowest': '12', 'count': 5, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds-151858.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Number Bonds All         {'max_bottom': 1600, 'lowest': '4', 'count': 5, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Number_Bonds_All-151919.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Pattern Sequence Draw    {'max_bottom': 870, 'lowest': '1/5', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Percentage Peak          {'max_bottom': 1589, 'lowest': '345', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Percentage_Peak-162804.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Percentage Shopping      {'max_bottom': 1552, 'lowest': '¥810', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-162825.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Prime Factor Trees       {'max_bottom': 1556, 'lowest': '2', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Prime_Factor_Trees-162847.jpeg', 'clip': 2, 'clip_at': '@1556'}
+PUSHED_OUT   Prime Gap Hunt           {'max_bottom': 1586, 'lowest': '重开', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Prime_Gap_Hunt-162909.jpeg', 'clip': 3, 'clip_at': '@1600'}
+OK           Prime Hunter             {'max_bottom': 1182, 'lowest': '86', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Pythagorean Triple Builder {'max_bottom': 1582, 'lowest': '7', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-162953.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Quick Math               {'max_bottom': 1577, 'lowest': '80', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Quick_Math-163014.jpeg', 'clip': 2, 'clip_at': '@1577'}
+TIGHT        Roman Arithmetic         {'max_bottom': 1550, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Roman_Arithmetic-163034.jpeg', 'clip': 3, 'clip_at': '@1600'}
+TIGHT        Sequence Sleuth          {'max_bottom': 1535, 'lowest': '提示', 'count': 6, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sequence_Sleuth-163054.jpeg', 'clip': 2, 'clip_at': '@1600'}
+NOT_IN_GAME  Sequence Stack           {'texts': ['', '', '', '', '']}
+PUSHED_OUT   Set Theory Venn          {'max_bottom': 1600, 'lowest': '只在 A', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Set_Theory_Venn-163135.jpeg', 'clip': 3, 'clip_at': '@1600'}
+NOT_IN_GAME  Sum Pyramid              {'texts': ['', '', '', '', '']}
+OK           Target 10                {'max_bottom': 1142, 'lowest': '1', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Target Number            {'max_bottom': 1600, 'lowest': '(4 + 9) × 8', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Target_Number-163237.jpeg', 'clip': 2, 'clip_at': '(4 + 9) × 8@1600'}
+PUSHED_OUT   Unit Converter Pro       {'max_bottom': 1591, 'lowest': '1200', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Unit_Converter_Pro-163257.jpeg', 'clip': 2, 'clip_at': '@1591'}
+TIGHT        Vector Grid Alignment    {'max_bottom': 1519, 'lowest': '(dx, dy)：+ 列向右、+ 行向下', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Vector_Grid_Alignment-163318.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Vektor Vector            {'max_bottom': 1587, 'lowest': '(0, −5)', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Vektor_Vector-163339.jpeg', 'clip': 2, 'clip_at': '@1587'}
+PUSHED_OUT   Venn Numbers             {'max_bottom': 1590, 'lowest': '·', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Venn_Numbers-163359.jpeg', 'clip': 2, 'clip_at': '@1600'}
+TIGHT        Associative Pairs        {'max_bottom': 1581, 'lowest': '🔥 火苗', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Associative_Pairs-163421.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Attentional Blink        {'max_bottom': 1600, 'lowest': '4', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Attentional_Blink-163442.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Attentional Blink Probe  {'max_bottom': 1600, 'lowest': '2', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Attentional_Blink_Probe-163502.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Card Counting Memory     {'max_bottom': 1591, 'lowest': '4♦️', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Card_Counting_Memory-163523.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Change Blindness         {'max_bottom': 1467, 'lowest': '🍒', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1588'}
+OK           Color Word Match Up      {'max_bottom': 1375, 'lowest': '答满 24 题且答对 ≥ 16 即通关', 'count': 4, 'shot': '', 'clip': 2, 'clip_at': '答满 24 题且答对 ≥ 16 即通关@1489'}
+PUSHED_OUT   Conjunction Search       {'max_bottom': 1600, 'lowest': '重开', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Conjunction_Search-163625.jpeg', 'clip': 3, 'clip_at': '重开@1600'}
+OK           Continuous Recognition   {'max_bottom': 1375, 'lowest': '答满 24 题且答对 ≥ 17 即通关', 'count': 2, 'shot': '', 'clip': 2, 'clip_at': '答满 24 题且答对 ≥ 17 即通关@1489'}
+OK           Corsi Backward Span      {'max_bottom': 1351, 'lowest': '倒背：长度升到 5 即通关；倒着点，别顺着点', 'count': 2, 'shot': '', 'clip': 8, 'clip_at': '@1271'}
+PUSHED_OUT   Corsi Blocks             {'max_bottom': 1600, 'lowest': '重开', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Corsi_Blocks-163727.jpeg', 'clip': 3, 'clip_at': '重开@1600'}
+PUSHED_OUT   Counting Span            {'max_bottom': 1600, 'lowest': '数好了，下一张（2 / 2）', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Counting_Span-163747.jpeg', 'clip': 2, 'clip_at': '数好了，下一张（2 / 2）@1600'}
+PUSHED_OUT   d2 Attention             {'max_bottom': 1591, 'lowest': '✅ 命中 1 / 6', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-d2_Attention-163808.jpeg', 'clip': 34, 'clip_at': '✅ 命中 1 / 6@1591'}
+PUSHED_OUT   Percentage Peak          {'max_bottom': 1589, 'lowest': '9', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Percentage_Peak-164907.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Percentage Shopping      {'max_bottom': 1552, 'lowest': '¥108', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-164929.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Percentage Peak          {'max_bottom': 1600, 'lowest': '3', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Percentage_Peak-170529.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Percentage Shopping      {'max_bottom': 1552, 'lowest': '¥130', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Percentage_Shopping-170551.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Prime Factor Trees       {'max_bottom': 1600, 'lowest': '提示', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Prime_Factor_Trees-170612.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Prime Gap Hunt           {'max_bottom': 1586, 'lowest': '重开', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Prime_Gap_Hunt-170632.jpeg', 'clip': 3, 'clip_at': '@1600'}
+OK           Prime Hunter             {'max_bottom': 1182, 'lowest': '31', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Pythagorean Triple Builder {'max_bottom': 1582, 'lowest': '7', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Pythagorean_Triple_Builder-170713.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Quick Math               {'max_bottom': 1577, 'lowest': '163', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Quick_Math-170734.jpeg', 'clip': 2, 'clip_at': '@1577'}
+TIGHT        Roman Arithmetic         {'max_bottom': 1550, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Roman_Arithmetic-170754.jpeg', 'clip': 3, 'clip_at': '@1600'}
+TIGHT        Sequence Sleuth          {'max_bottom': 1535, 'lowest': '提示', 'count': 6, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sequence_Sleuth-170814.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Sequence Stack           {'max_bottom': 1600, 'lowest': '17', 'count': 6, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sequence_Stack-170836.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Set Theory Venn          {'max_bottom': 1600, 'lowest': '只在 A', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Set_Theory_Venn-170856.jpeg', 'clip': 3, 'clip_at': '@1600'}
+NOT_IN_GAME  Sum Pyramid              {'texts': ['', '', '', '', '']}
+NOT_IN_GAME  Delayed Match Sample     {'texts': ['', '', '', '', '']}
+NOT_IN_GAME  Divided Attention        {'texts': ['', '', '', '', '']}
+PUSHED_OUT   Dnms                     {'max_bottom': 1600, 'lowest': '·', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dnms-212028.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Double N Back            {'max_bottom': 1558, 'lowest': 'X', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Double_N_Back-212103.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Dual Coding              {'max_bottom': 1545, 'lowest': '苹果', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dual_Coding-212155.jpeg', 'clip': 1, 'clip_at': '@1575'}
+PUSHED_OUT   Delayed Match Sample     {'max_bottom': 1600, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Delayed_Match_Sample-212245.jpeg', 'clip': 3, 'clip_at': '重开@1600'}
+NOT_IN_GAME  Divided Attention        {'texts': ['', '', '', '', '']}
+PUSHED_OUT   Dnms                     {'max_bottom': 1600, 'lowest': '📷', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dnms-212348.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Double N Back            {'max_bottom': 1444, 'lowest': 'D', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Dual Coding              {'max_bottom': 1558, 'lowest': '看图记词，两条通道一起用', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dual_Coding-212435.jpeg', 'clip': 2, 'clip_at': '看图记词，两条通道一起用@1558'}
+PUSHED_OUT   Delayed Match Sample     {'max_bottom': 1600, 'lowest': '样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 6', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Delayed_Match_Sample-212510.jpeg', 'clip': 3, 'clip_at': '样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 6@1600'}
+OK           Divided Attention        {'max_bottom': 1328, 'lowest': '⚡', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Dnms                     {'max_bottom': 1600, 'lowest': '🧊', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dnms-212601.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Double N Back            {'max_bottom': 1600, 'lowest': '●', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Double_N_Back-212625.jpeg', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Dual Coding              {'max_bottom': 1558, 'lowest': '看图记词，两条通道一起用', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dual_Coding-212647.jpeg', 'clip': 2, 'clip_at': '看图记词，两条通道一起用@1558'}
+PUSHED_OUT   Dual Task Memory         {'max_bottom': 1597, 'lowest': '重开', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dual_Task_Memory-212715.jpeg', 'clip': 2, 'clip_at': '重开@1600'}
+TIGHT        Dynamic Salience         {'max_bottom': 1576, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dynamic_Salience-212743.jpeg', 'clip': 2, 'clip_at': '重开@1576'}
+TIGHT        Event Timeline Memory    {'max_bottom': 1565, 'lowest': '按刚才的顺序依次点这 4 张牌', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Event_Timeline_Memory-212809.jpeg', 'clip': 3, 'clip_at': '打乱作答 ▶@1600'}
+OK           Face Name Association    {'max_bottom': 1487, 'lowest': '林拓', 'count': 2, 'shot': '', 'clip': 3, 'clip_at': '重开@1600'}
+PUSHED_OUT   Feature Matrix Recall    {'max_bottom': 1600, 'lowest': '提交', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall-212859.jpeg', 'clip': 2, 'clip_at': '提交@1600'}
+PUSHED_OUT   Feature Matrix Recall All {'max_bottom': 1600, 'lowest': '提交', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall_All-212925.jpeg', 'clip': 2, 'clip_at': '提交@1600'}
+TIGHT        Flanker Test             {'max_bottom': 1566, 'lowest': '判定：答对 ≥ 11/12 且平均 < 900 ms', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Flanker_Test-212952.jpeg', 'clip': 2, 'clip_at': '判定：答对 ≥ 11/12 且平均 < 900 ms@1566'}
+OK           Frequency Tap            {'max_bottom': 851, 'lowest': '4/20', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Ghost Tap                {'max_bottom': 1553, 'lowest': '👻 出现了！', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Ghost_Tap-213050.jpeg', 'clip': 2, 'clip_at': '重开@1600'}
+NO_CARD      Go / No-Go               {'want': '去或停'}
+OK           Grocery List             {'max_bottom': 1351, 'lowest': '提示：每轮清单更长，答对 75% 即通关', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '在清单里吗？@857'}
+PUSHED_OUT   Mandala Recall           {'max_bottom': 1600, 'lowest': '提示：只看位置，颜色只是帮你分组；点满即自动判定', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Mandala_Recall-213154.jpeg', 'clip': 3, 'clip_at': '提示：只看位置，颜色只是帮你分组；点满即自动判定@1600'}
+NO_CARD      Memory Palace            {'want': '记忆宫殿'}
+PUSHED_OUT   Multiple Object Tracking {'max_bottom': 1600, 'lowest': '提示：先扫全场再锁定目标；目标数 3/4/5 递增', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Multiple_Object_Tracking-213234.jpeg', 'clip': 3, 'clip_at': '提示：先扫全场再锁定目标；目标数 3/4/5 递增@1600'}
+OK           N-Back                   {'max_bottom': 1444, 'lowest': 'F', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Narrative Recall         {'max_bottom': 1388, 'lowest': '提示：不用背原文，抓住时间、地点、数字与人名', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '提示：不用背原文，抓住时间、地点、数字与人名@1388'}
+PUSHED_OUT   Negative Space Detection {'max_bottom': 1600, 'lowest': '🔶 菱形', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Negative_Space_Detection-213351.jpeg', 'clip': 3, 'clip_at': '@1600'}
+PUSHED_OUT   Object Displacement      {'max_bottom': 1600, 'lowest': '重开', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Object_Displacement-213418.jpeg', 'clip': 3, 'clip_at': '重开@1600'}
+OK           Object Shuffle           {'max_bottom': 1351, 'lowest': '提示：洗牌时高亮的一对盒子正在互换，跟着 💎 走', 'count': 3, 'shot': '', 'clip': 4, 'clip_at': '@1267'}
+OK           Odd Even Flash           {'max_bottom': 1403, 'lowest': '提示：数字消失后才能作答，答满 18 题对 13 题即通关', 'count': 5, 'shot': '', 'clip': 1, 'clip_at': '提示：数字消失后才能作答，答满 18 题对 13 题即通关@1403'}
+PUSHED_OUT   Peripheral Focus         {'max_bottom': 1600, 'lowest': '🎵', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Peripheral_Focus-213552.jpeg', 'clip': 2, 'clip_at': '@1600'}
+OK           Posner Spatial Cueing    {'max_bottom': 1396, 'lowest': '提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点', 'count': 1, 'shot': '', 'clip': 3, 'clip_at': '提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点@1396'}
+PUSHED_OUT   Probe Digit Span         {'max_bottom': 1600, 'lowest': '第 3 位是几？（从左数）', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Probe_Digit_Span-213653.jpeg', 'clip': 2, 'clip_at': '第 3 位是几？（从左数）@1600'}
+PUSHED_OUT   Reading Span             {'max_bottom': 1600, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Reading_Span-213719.jpeg', 'clip': 3, 'clip_at': '重开@1600'}
+TIGHT        Reflex Tap               {'max_bottom': 1560, 'lowest': '⚡ 亮起就点它', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Reflex_Tap-213750.jpeg', 'clip': 2, 'clip_at': '重开@1600'}
+PUSHED_OUT   Relational Memory        {'max_bottom': 1600, 'lowest': '🪁', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-213840.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Reverse Stroop           {'max_bottom': 1600, 'lowest': '点「字义」，别看墨色', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Reverse_Stroop-213914.jpeg', 'clip': 2, 'clip_at': '点「字义」，别看墨色@1600'}
+PUSHED_OUT   Rhythm Master            {'max_bottom': 1600, 'lowest': '轮到你了：照刚才的间隔敲 4 下', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Rhythm_Master-213945.jpeg', 'clip': 2, 'clip_at': '轮到你了：照刚才的间隔敲 4 下@1600'}
+PUSHED_OUT   Running Memory Span      {'max_bottom': 1596, 'lowest': '6', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Running_Memory_Span-214016.jpeg', 'clip': 2, 'clip_at': '@1596'}
+PUSHED_OUT   Sdmt                     {'max_bottom': 1600, 'lowest': '4', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sdmt-214042.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Shell Game               {'max_bottom': 1586, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Shell_Game-214108.jpeg', 'clip': 2, 'clip_at': '重开@1586'}
+TIGHT        Sopt                     {'max_bottom': 1552, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sopt-214135.jpeg', 'clip': 2, 'clip_at': '重开@1552'}
+OK           Spatial Cabinet Memory   {'max_bottom': 1476, 'lowest': '重开', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '重开@1476'}
+OK           Spotlight Track          {'max_bottom': 670, 'lowest': '轮次 1/8', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Staircase Memory         {'max_bottom': 1558, 'lowest': '6', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Staircase_Memory-214300.jpeg', 'clip': 2, 'clip_at': '照着顺序点回来（从最低一级起）@1571'}
+PUSHED_OUT   Stop Signal              {'max_bottom': 1600, 'lowest': '判定：正确 ≥ 10/12 且冲均值 < 800 ms（该按', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Stop_Signal-214333.jpeg', 'clip': 2, 'clip_at': '判定：正确 ≥ 10/12 且冲均值 < 800 ms（该按@1600'}
+PUSHED_OUT   Stroop Test              {'max_bottom': 1600, 'lowest': '点「字义」，别看墨色', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-214359.jpeg', 'clip': 2, 'clip_at': '点「字义」，别看墨色@1600'}
+TIGHT        Subitizing Rush          {'max_bottom': 1579, 'lowest': '2', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Subitizing_Rush-214427.jpeg', 'clip': 2, 'clip_at': '@1579'}
+TIGHT        Switch Task              {'max_bottom': 1576, 'lowest': '>5 算大', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Switch_Task-214455.jpeg', 'clip': 1, 'clip_at': '@1576'}
+PUSHED_OUT   Symbol Digit Assoc       {'max_bottom': 1600, 'lowest': '1', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Symbol_Digit_Assoc-214522.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Symbol Logic             {'max_bottom': 1600, 'lowest': '重开', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Symbol_Logic-214549.jpeg', 'clip': 2, 'clip_at': '重开@1600'}
+PUSHED_OUT   Symbolic Flanker         {'max_bottom': 1600, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Symbolic_Flanker-214617.jpeg', 'clip': 2, 'clip_at': '重开@1600'}
+PUSHED_OUT   Task Switching           {'max_bottom': 1600, 'lowest': '重复 0ms · 切换 0ms · 代价 0毫秒', 'count': 5, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Task_Switching-214648.jpeg', 'clip': 2, 'clip_at': '重复 0ms · 切换 0ms · 代价 0毫秒@1600'}
+OK           Delayed Match Sample     {'max_bottom': 1469, 'lowest': '样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 6', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 6@1469'}
+OK           Divided Attention        {'max_bottom': 1328, 'lowest': '🔷', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Dnms                     {'max_bottom': 1600, 'lowest': '🌻', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dnms-220704.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Double N Back            {'max_bottom': 1444, 'lowest': 'T', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Dual Coding              {'max_bottom': 1545, 'lowest': '苹果', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dual_Coding-220750.jpeg', 'clip': 2, 'clip_at': '看图记词，两条通道一起用@1558'}
+OK           Dual Task Memory         {'max_bottom': 1426, 'lowest': '42', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1426'}
+TIGHT        Dynamic Salience         {'max_bottom': 1576, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dynamic_Salience-220836.jpeg', 'clip': 2, 'clip_at': '重开@1576'}
+TIGHT        Event Timeline Memory    {'max_bottom': 1565, 'lowest': '按刚才的顺序依次点这 4 张牌', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Event_Timeline_Memory-220900.jpeg', 'clip': 3, 'clip_at': '打乱作答 ▶@1600'}
+OK           Face Name Association    {'max_bottom': 1487, 'lowest': '阿航', 'count': 2, 'shot': '', 'clip': 3, 'clip_at': '重开@1600'}
+PUSHED_OUT   Feature Matrix Recall    {'max_bottom': 1600, 'lowest': '提交', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall-220947.jpeg', 'clip': 2, 'clip_at': '提交@1600'}
+PUSHED_OUT   Feature Matrix Recall All {'max_bottom': 1600, 'lowest': '提交', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall_All-221012.jpeg', 'clip': 2, 'clip_at': '提交@1600'}
+TIGHT        Flanker Test             {'max_bottom': 1566, 'lowest': '判定：答对 ≥ 11/12 且平均 < 900 ms', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Flanker_Test-221037.jpeg', 'clip': 2, 'clip_at': '判定：答对 ≥ 11/12 且平均 < 900 ms@1566'}
+OK           Frequency Tap            {'max_bottom': 851, 'lowest': '5/20', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Ghost Tap                {'max_bottom': 1553, 'lowest': '👻 出现了！', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Ghost_Tap-221129.jpeg', 'clip': 2, 'clip_at': '重开@1600'}
+NO_CARD      Go / No-Go               {'want': '去或停'}
+OK           Grocery List             {'max_bottom': 1351, 'lowest': '提示：每轮清单更长，答对 75% 即通关', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '在清单里吗？@857'}
+OK           Mandala Recall           {'max_bottom': 1452, 'lowest': '提示：只看位置，颜色只是帮你分组；点满即自动判定', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '提示：只看位置，颜色只是帮你分组；点满即自动判定@1452'}
+NO_CARD      Memory Palace            {'want': '记忆宫殿'}
+OK           Multiple Object Tracking {'max_bottom': 1452, 'lowest': '提示：先扫全场再锁定目标；目标数 3/4/5 递增', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '提示：先扫全场再锁定目标；目标数 3/4/5 递增@1452'}
+PUSHED_OUT   N-Back                   {'max_bottom': 1600, 'lowest': '●', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-N_Back-221329.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Narrative Recall         {'max_bottom': 1388, 'lowest': '提示：不用背原文，抓住时间、地点、数字与人名', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '提示：不用背原文，抓住时间、地点、数字与人名@1388'}
+PUSHED_OUT   Negative Space Detection {'max_bottom': 1600, 'lowest': '⬛ 实心块', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Negative_Space_Detection-221423.jpeg', 'clip': 3, 'clip_at': '@1600'}
+TIGHT        Object Displacement      {'max_bottom': 1576, 'lowest': '提示：遮罩后只有一个物件换格，点它（点它原来的位置也算对）', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Object_Displacement-221455.jpeg', 'clip': 3, 'clip_at': '提示：遮罩后只有一个物件换格，点它（点它原来的位置也算对）@1576'}
+OK           Object Shuffle           {'max_bottom': 1351, 'lowest': '提示：洗牌时高亮的一对盒子正在互换，跟着 💎 走', 'count': 3, 'shot': '', 'clip': 4, 'clip_at': '@1267'}
+OK           Odd Even Flash           {'max_bottom': 1403, 'lowest': '提示：数字消失后才能作答，答满 18 题对 13 题即通关', 'count': 5, 'shot': '', 'clip': 1, 'clip_at': '提示：数字消失后才能作答，答满 18 题对 13 题即通关@1403'}
+PUSHED_OUT   Peripheral Focus         {'max_bottom': 1600, 'lowest': '🍎', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Peripheral_Focus-221613.jpeg', 'clip': 2, 'clip_at': '@1600'}
+OK           Posner Spatial Cueing    {'max_bottom': 1396, 'lowest': '提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点', 'count': 1, 'shot': '', 'clip': 3, 'clip_at': '提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点@1396'}
+PUSHED_OUT   Probe Digit Span         {'max_bottom': 1600, 'lowest': '第 3 位是几？（从左数）', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Probe_Digit_Span-221706.jpeg', 'clip': 2, 'clip_at': '第 3 位是几？（从左数）@1600'}
+PUSHED_OUT   Reading Span             {'max_bottom': 1600, 'lowest': '提示：先判断通不通顺，整组读完再按顺序回忆关键词', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Reading_Span-221733.jpeg', 'clip': 3, 'clip_at': '提示：先判断通不通顺，整组读完再按顺序回忆关键词@1600'}
+TIGHT        Reflex Tap               {'max_bottom': 1560, 'lowest': '点！', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Reflex_Tap-221758.jpeg', 'clip': 2, 'clip_at': '重开@1600'}
+PUSHED_OUT   Relational Memory        {'max_bottom': 1600, 'lowest': '🐳', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-221825.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Reverse Stroop           {'max_bottom': 1600, 'lowest': '点「字义」，别看墨色', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Reverse_Stroop-221853.jpeg', 'clip': 2, 'clip_at': '点「字义」，别看墨色@1600'}
+PUSHED_OUT   Rhythm Master            {'max_bottom': 1600, 'lowest': '轮到你了：照刚才的间隔敲 4 下', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Rhythm_Master-221921.jpeg', 'clip': 2, 'clip_at': '轮到你了：照刚才的间隔敲 4 下@1600'}
+PUSHED_OUT   Running Memory Span      {'max_bottom': 1596, 'lowest': '6', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Running_Memory_Span-221949.jpeg', 'clip': 2, 'clip_at': '@1596'}
+PUSHED_OUT   Sdmt                     {'max_bottom': 1600, 'lowest': '4', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sdmt-222023.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Shell Game               {'max_bottom': 1496, 'lowest': '判定：连中 5 关通关；每过一关多洗 2 次', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '判定：连中 5 关通关；每过一关多洗 2 次@1496'}
+OK           Delayed Match Sample     {'max_bottom': 1469, 'lowest': '样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 6', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 6@1469'}
+OK           Divided Attention        {'max_bottom': 1328, 'lowest': '🎯', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Dnms                     {'max_bottom': 1600, 'lowest': '🎲', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dnms-224134.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Double N Back            {'max_bottom': 1444, 'lowest': 'E', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Dual Coding              {'max_bottom': 1545, 'lowest': '钥匙', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dual_Coding-224241.jpeg', 'clip': 2, 'clip_at': '看图记词，两条通道一起用@1558'}
+OK           Dual Task Memory         {'max_bottom': 1219, 'lowest': '第 1 轮：记住这 4 个数字', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1426'}
+TIGHT        Dynamic Salience         {'max_bottom': 1576, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dynamic_Salience-224353.jpeg', 'clip': 2, 'clip_at': '重开@1576'}
+TIGHT        Event Timeline Memory    {'max_bottom': 1565, 'lowest': '按刚才的顺序依次点这 4 张牌', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Event_Timeline_Memory-224423.jpeg', 'clip': 3, 'clip_at': '打乱作答 ▶@1600'}
+OK           Face Name Association    {'max_bottom': 1487, 'lowest': '石敢', 'count': 2, 'shot': '', 'clip': 3, 'clip_at': '重开@1600'}
+PUSHED_OUT   Feature Matrix Recall    {'max_bottom': 1600, 'lowest': '提交', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall-224515.jpeg', 'clip': 2, 'clip_at': '提交@1600'}
+PUSHED_OUT   Feature Matrix Recall All {'max_bottom': 1600, 'lowest': '提交', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall_All-224543.jpeg', 'clip': 2, 'clip_at': '提交@1600'}
+TIGHT        Flanker Test             {'max_bottom': 1566, 'lowest': '判定：答对 ≥ 11/12 且平均 < 900 ms', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Flanker_Test-224610.jpeg', 'clip': 2, 'clip_at': '判定：答对 ≥ 11/12 且平均 < 900 ms@1566'}
+OK           Frequency Tap            {'max_bottom': 851, 'lowest': '6/20', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Ghost Tap                {'max_bottom': 1553, 'lowest': '👻 出现了！', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Ghost_Tap-224709.jpeg', 'clip': 2, 'clip_at': '重开@1600'}
+NO_CARD      Go / No-Go               {'want': '去或停'}
+OK           Grocery List             {'max_bottom': 1351, 'lowest': '提示：每轮清单更长，答对 75% 即通关', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '在清单里吗？@857'}
+OK           Mandala Recall           {'max_bottom': 1452, 'lowest': '提示：只看位置，颜色只是帮你分组；点满即自动判定', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '提示：只看位置，颜色只是帮你分组；点满即自动判定@1452'}
+NO_CARD      Memory Palace            {'want': '记忆宫殿'}
+OK           Multiple Object Tracking {'max_bottom': 1452, 'lowest': '提示：先扫全场再锁定目标；目标数 3/4/5 递增', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '提示：先扫全场再锁定目标；目标数 3/4/5 递增@1452'}
+OK           N-Back                   {'max_bottom': 1444, 'lowest': 'K', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+OK           Narrative Recall         {'max_bottom': 1388, 'lowest': '提示：不用背原文，抓住时间、地点、数字与人名', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '提示：不用背原文，抓住时间、地点、数字与人名@1388'}
+PUSHED_OUT   Negative Space Detection {'max_bottom': 1600, 'lowest': '⬜ 方框', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Negative_Space_Detection-225033.jpeg', 'clip': 3, 'clip_at': '@1600'}
+TIGHT        Object Displacement      {'max_bottom': 1576, 'lowest': '提示：遮罩后只有一个物件换格，点它（点它原来的位置也算对）', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Object_Displacement-225104.jpeg', 'clip': 3, 'clip_at': '提示：遮罩后只有一个物件换格，点它（点它原来的位置也算对）@1576'}
+OK           Object Shuffle           {'max_bottom': 1351, 'lowest': '提示：洗牌时高亮的一对盒子正在互换，跟着 💎 走', 'count': 3, 'shot': '', 'clip': 4, 'clip_at': '@1267'}
+OK           Odd Even Flash           {'max_bottom': 1403, 'lowest': '提示：数字消失后才能作答，答满 18 题对 13 题即通关', 'count': 5, 'shot': '', 'clip': 1, 'clip_at': '提示：数字消失后才能作答，答满 18 题对 13 题即通关@1403'}
+PUSHED_OUT   Peripheral Focus         {'max_bottom': 1600, 'lowest': '🍎', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Peripheral_Focus-225226.jpeg', 'clip': 2, 'clip_at': '@1600'}
+OK           Posner Spatial Cueing    {'max_bottom': 1396, 'lowest': '提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点', 'count': 1, 'shot': '', 'clip': 3, 'clip_at': '提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点@1396'}
+PUSHED_OUT   Probe Digit Span         {'max_bottom': 1600, 'lowest': '第 3 位是几？（从左数）', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Probe_Digit_Span-225320.jpeg', 'clip': 2, 'clip_at': '第 3 位是几？（从左数）@1600'}
+PUSHED_OUT   Reading Span             {'max_bottom': 1600, 'lowest': '提示：先判断通不通顺，整组读完再按顺序回忆关键词', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Reading_Span-225354.jpeg', 'clip': 3, 'clip_at': '提示：先判断通不通顺，整组读完再按顺序回忆关键词@1600'}
+TIGHT        Reflex Tap               {'max_bottom': 1560, 'lowest': '⚡ 亮起就点它', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Reflex_Tap-225425.jpeg', 'clip': 2, 'clip_at': '重开@1600'}
+PUSHED_OUT   Relational Memory        {'max_bottom': 1600, 'lowest': '⚽', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Relational_Memory-225452.jpeg', 'clip': 1, 'clip_at': '@1600'}
+PUSHED_OUT   Reverse Stroop           {'max_bottom': 1600, 'lowest': '点「字义」，别看墨色', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Reverse_Stroop-225518.jpeg', 'clip': 2, 'clip_at': '点「字义」，别看墨色@1600'}
+PUSHED_OUT   Rhythm Master            {'max_bottom': 1600, 'lowest': '轮到你了：照刚才的间隔敲 4 下', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Rhythm_Master-225546.jpeg', 'clip': 2, 'clip_at': '轮到你了：照刚才的间隔敲 4 下@1600'}
+PUSHED_OUT   Running Memory Span      {'max_bottom': 1596, 'lowest': '6', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Running_Memory_Span-225615.jpeg', 'clip': 2, 'clip_at': '@1596'}
+PUSHED_OUT   Sdmt                     {'max_bottom': 1600, 'lowest': '4', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sdmt-225638.jpeg', 'clip': 1, 'clip_at': '@1600'}
+OK           Shell Game               {'max_bottom': 1496, 'lowest': '判定：连中 5 关通关；每过一关多洗 2 次', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '判定：连中 5 关通关；每过一关多洗 2 次@1496'}
+TIGHT        Sopt                     {'max_bottom': 1552, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sopt-225731.jpeg', 'clip': 2, 'clip_at': '重开@1552'}
+OK           Spatial Cabinet Memory   {'max_bottom': 1476, 'lowest': '重开', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '重开@1476'}
+OK           Spotlight Track          {'max_bottom': 670, 'lowest': '轮次 1/8', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600'}
+TIGHT        Staircase Memory         {'max_bottom': 1558, 'lowest': '6', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Staircase_Memory-225856.jpeg', 'clip': 2, 'clip_at': '照着顺序点回来（从最低一级起）@1571'}
+PUSHED_OUT   Stop Signal              {'max_bottom': 1600, 'lowest': '判定：正确 ≥ 10/12 且冲均值 < 800 ms（该按', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Stop_Signal-225926.jpeg', 'clip': 2, 'clip_at': '判定：正确 ≥ 10/12 且冲均值 < 800 ms（该按@1600'}
+PUSHED_OUT   Stroop Test              {'max_bottom': 1600, 'lowest': '点「字义」，别看墨色', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Stroop_Test-225948.jpeg', 'clip': 2, 'clip_at': '点「字义」，别看墨色@1600'}
+TIGHT        Subitizing Rush          {'max_bottom': 1579, 'lowest': '2', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Subitizing_Rush-230017.jpeg', 'clip': 2, 'clip_at': '@1579'}
+TIGHT        Switch Task              {'max_bottom': 1576, 'lowest': '>5 算大', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Switch_Task-230046.jpeg', 'clip': 1, 'clip_at': '@1576'}
+PUSHED_OUT   Symbol Digit Assoc       {'max_bottom': 1600, 'lowest': '1', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Symbol_Digit_Assoc-230117.jpeg', 'clip': 2, 'clip_at': '@1600'}
+PUSHED_OUT   Symbol Logic             {'max_bottom': 1600, 'lowest': '提示：先算第二个符号，再回代求第一个', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Symbol_Logic-230147.jpeg', 'clip': 2, 'clip_at': '提示：先算第二个符号，再回代求第一个@1600'}
+TIGHT        Symbolic Flanker         {'max_bottom': 1519, 'lowest': '提示：两侧反向时会被明显拖慢 —— 那就是侧抑制', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Symbolic_Flanker-230214.jpeg', 'clip': 2, 'clip_at': '提示：两侧反向时会被明显拖慢 —— 那就是侧抑制@1519'}
+PUSHED_OUT   Task Switching           {'max_bottom': 1600, 'lowest': '重复 0ms · 切换 0ms · 代价 0毫秒', 'count': 5, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Task_Switching-230244.jpeg', 'clip': 2, 'clip_at': '重复 0ms · 切换 0ms · 代价 0毫秒@1600'}
+OK           Delayed Match Sample     {'max_bottom': 1469, 'lowest': '样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 6', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 6@1469', 'lowest_click': 'false'}
+OK           Divided Attention        {'max_bottom': 1328, 'lowest': '⚡', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Dnms                     {'max_bottom': 1600, 'lowest': '🍰', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dnms-230655.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+OK           Double N Back            {'max_bottom': 1444, 'lowest': 'E', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'false'}
+TIGHT        Dual Coding              {'max_bottom': 1558, 'lowest': '看图记词，两条通道一起用', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dual_Coding-230743.jpeg', 'clip': 2, 'clip_at': '看图记词，两条通道一起用@1558', 'lowest_click': 'false'}
+OK           Dual Task Memory         {'max_bottom': 1426, 'lowest': '28', 'count': 3, 'shot': '', 'clip': 1, 'clip_at': '@1426', 'lowest_click': 'true'}
+TIGHT        Dynamic Salience         {'max_bottom': 1576, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Dynamic_Salience-230829.jpeg', 'clip': 2, 'clip_at': '重开@1576', 'lowest_click': 'true'}
+PUSHED_OUT   Event Timeline Memory    {'max_bottom': 1600, 'lowest': '打乱作答 ▶', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Event_Timeline_Memory-230852.jpeg', 'clip': 3, 'clip_at': '打乱作答 ▶@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Face Name Association    {'max_bottom': 1600, 'lowest': '重开', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Face_Name_Association-230915.jpeg', 'clip': 3, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Feature Matrix Recall    {'max_bottom': 1600, 'lowest': '提交', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall-230939.jpeg', 'clip': 2, 'clip_at': '提交@1600', 'lowest_click': 'false'}
+PUSHED_OUT   Feature Matrix Recall All {'max_bottom': 1600, 'lowest': '提交', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Feature_Matrix_Recall_All-231003.jpeg', 'clip': 2, 'clip_at': '提交@1600', 'lowest_click': 'false'}
+TIGHT        Flanker Test             {'max_bottom': 1566, 'lowest': '判定：答对 ≥ 11/12 且平均 < 900 ms', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Flanker_Test-231027.jpeg', 'clip': 2, 'clip_at': '判定：答对 ≥ 11/12 且平均 < 900 ms@1566', 'lowest_click': 'false'}
+PUSHED_OUT   Frequency Tap            {'max_bottom': 1600, 'lowest': '▶️', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Frequency_Tap-231049.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Ghost Tap                {'max_bottom': 1600, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Ghost_Tap-231112.jpeg', 'clip': 2, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+NO_CARD      Go / No-Go               {'want': '去或停'}
+OK           Grocery List             {'max_bottom': 1351, 'lowest': '提示：每轮清单更长，答对 75% 即通关', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '在清单里吗？@857', 'lowest_click': 'false'}
+OK           Mandala Recall           {'max_bottom': 1452, 'lowest': '提示：只看位置，颜色只是帮你分组；点满即自动判定', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '提示：只看位置，颜色只是帮你分组；点满即自动判定@1452', 'lowest_click': 'false'}
+NO_CARD      Memory Palace            {'want': '记忆宫殿'}
+OK           Multiple Object Tracking {'max_bottom': 1452, 'lowest': '提示：先扫全场再锁定目标；目标数 3/4/5 递增', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '提示：先扫全场再锁定目标；目标数 3/4/5 递增@1452', 'lowest_click': 'false'}
+OK           N-Back                   {'max_bottom': 1444, 'lowest': 'H', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'false'}
+OK           Narrative Recall         {'max_bottom': 1388, 'lowest': '提示：不用背原文，抓住时间、地点、数字与人名', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '提示：不用背原文，抓住时间、地点、数字与人名@1388', 'lowest_click': 'false'}
+PUSHED_OUT   Negative Space Detection {'max_bottom': 1600, 'lowest': '⬜ 方框', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Negative_Space_Detection-231355.jpeg', 'clip': 3, 'clip_at': '@1600', 'lowest_click': 'true'}
+NOT_IN_GAME  Object Displacement      {'texts': ['', '', '', '', '']}
+OK           Object Shuffle           {'max_bottom': 1351, 'lowest': '提示：洗牌时高亮的一对盒子正在互换，跟着 💎 走', 'count': 3, 'shot': '', 'clip': 4, 'clip_at': '@1267', 'lowest_click': 'false'}
+OK           Odd Even Flash           {'max_bottom': 1403, 'lowest': '提示：数字消失后才能作答，答满 18 题对 13 题即通关', 'count': 5, 'shot': '', 'clip': 1, 'clip_at': '提示：数字消失后才能作答，答满 18 题对 13 题即通关@1403', 'lowest_click': 'false'}
+PUSHED_OUT   Peripheral Focus         {'max_bottom': 1600, 'lowest': '🍄', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Peripheral_Focus-231533.jpeg', 'clip': 2, 'clip_at': '@1600', 'lowest_click': 'true'}
+OK           Posner Spatial Cueing    {'max_bottom': 1396, 'lowest': '提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点', 'count': 1, 'shot': '', 'clip': 3, 'clip_at': '提示：提示有 1/4 是错的，别抢答，等 🎯 出来再点@1396', 'lowest_click': 'false'}
+PUSHED_OUT   Trail Making             {'max_bottom': 1600, 'lowest': '10', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Trail_Making-234444.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Visual Crowding Acuity   {'max_bottom': 1600, 'lowest': 'Z', 'count': 7, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Visual_Crowding_Acuity-234512.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Visual Search            {'max_bottom': 1600, 'lowest': '🌟', 'count': 7, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Visual_Search-234544.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+NO_CARD      Visual Search Conjunction {'want': '联合搜索'}
+TIGHT        Wisconsin Card Sorting   {'max_bottom': 1565, 'lowest': '✅ 放对了 +50', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Wisconsin_Card_Sorting-234627.jpeg', 'clip': 2, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Word Pair Associate Memory {'max_bottom': 1600, 'lowest': '记住这 6 组词对', 'count': 15, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Word_Pair_Associate_Memory-234651.jpeg', 'clip': 3, 'clip_at': '记住这 6 组词对@1600', 'lowest_click': 'false'}
+PUSHED_OUT   Affix Factory            {'max_bottom': 1598, 'lowest': '-ly', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Affix_Factory-234717.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Anagram Definition       {'max_bottom': 1600, 'lowest': '退一格', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Anagram_Definition-234744.jpeg', 'clip': 2, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Category Fluency         {'max_bottom': 1600, 'lowest': '换下一类', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Category_Fluency-234811.jpeg', 'clip': 2, 'clip_at': '@1600', 'lowest_click': 'true'}
+OK           Chimp Test               {'max_bottom': 1189, 'lowest': '1', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Cognate Catch            {'max_bottom': 1595, 'lowest': '下一题 →', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Cognate_Catch-234905.jpeg', 'clip': 2, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Consonant Reconstruct    {'max_bottom': 1598, 'lowest': '跳过（-1 命）', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Consonant_Reconstruct-234932.jpeg', 'clip': 2, 'clip_at': '@1598', 'lowest_click': 'true'}
+PUSHED_OUT   Context Clues            {'max_bottom': 1600, 'lowest': '悲伤的', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Context_Clues-234959.jpeg', 'clip': 3, 'clip_at': '悲伤的@1600', 'lowest_click': 'true'}
+TIGHT        Conundrum Anagram        {'max_bottom': 1552, 'lowest': '✅ 正是 COIN！', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Conundrum_Anagram-235027.jpeg', 'clip': 2, 'clip_at': '@1600', 'lowest_click': 'true'}
+OK           Crossword                {'max_bottom': 677, 'lowest': '0/5', 'count': 1, 'shot': '', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'false'}
+TIGHT        Cryptogram               {'max_bottom': 1580, 'lowest': '每个字母都被向后推了同样的位数 —— 破解它', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Cryptogram-235123.jpeg', 'clip': 3, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Definition Dash          {'max_bottom': 1600, 'lowest': '潮湿的', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Definition_Dash-235153.jpeg', 'clip': 2, 'clip_at': '潮湿的@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Etymon Oddball           {'max_bottom': 1600, 'lowest': '哪个词的词根不属于同一族？', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Etymon_Oddball-235224.jpeg', 'clip': 2, 'clip_at': '哪个词的词根不属于同一族？@1600', 'lowest_click': 'false'}
+PUSHED_OUT   Find Word                {'max_bottom': 1600, 'lowest': 'R', 'count': 4, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Find_Word-235251.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+OK           Grammar Police           {'max_bottom': 1430, 'lowest': '每题 15 秒，点错罚 3 秒；答对 ≥5 通关', 'count': 2, 'shot': '', 'clip': 1, 'clip_at': '每题 15 秒，点错罚 3 秒；答对 ≥5 通关@1430', 'lowest_click': 'false'}
+PUSHED_OUT   Grammar Sort             {'max_bottom': 1600, 'lowest': '重开', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Grammar_Sort-235349.jpeg', 'clip': 3, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+TIGHT        Homophone Hunt           {'max_bottom': 1558, 'lowest': '哪个词是这个读音？', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Homophone_Hunt-235417.jpeg', 'clip': 2, 'clip_at': '哪个词是这个读音？@1558', 'lowest_click': 'false'}
+PUSHED_OUT   Letter Bridge            {'max_bottom': 1600, 'lowest': '重开', 'count': 6, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Letter_Bridge-235445.jpeg', 'clip': 3, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Letter Cancellation      {'max_bottom': 1600, 'lowest': 'J', 'count': 6, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Letter_Cancellation-235512.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+TIGHT        Letter Frequency Scan    {'max_bottom': 1577, 'lowest': '重开', 'count': 6, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Letter_Frequency_Scan-235539.jpeg', 'clip': 2, 'clip_at': '重开@1577', 'lowest_click': 'true'}
+TIGHT        Missing Vowels           {'max_bottom': 1571, 'lowest': '退一格', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Missing_Vowels-235606.jpeg', 'clip': 2, 'clip_at': '@1571', 'lowest_click': 'true'}
+TIGHT        One Letter Shift         {'max_bottom': 1582, 'lowest': '点出左边要换掉的那个字母', 'count': 6, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-One_Letter_Shift-235633.jpeg', 'clip': 3, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Oxymoron Hunt            {'max_bottom': 1600, 'lowest': '哪一个搭配自相矛盾？', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Oxymoron_Hunt-235700.jpeg', 'clip': 2, 'clip_at': '哪一个搭配自相矛盾？@1600', 'lowest_click': 'false'}
+PUSHED_OUT   Palindrome Builder       {'max_bottom': 1600, 'lowest': '按顺序点字母，摆出一个回文', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Palindrome_Builder-235731.jpeg', 'clip': 2, 'clip_at': '按顺序点字母，摆出一个回文@1600', 'lowest_click': 'false'}
+TIGHT        Pangram Sprint           {'max_bottom': 1557, 'lowest': 'J', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Pangram_Sprint-235758.jpeg', 'clip': 2, 'clip_at': '@1600', 'lowest_click': 'true'}
+TIGHT        Portmanteau Split        {'max_bottom': 1580, 'lowest': 'BREAKFAST', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Portmanteau_Split-235824.jpeg', 'clip': 2, 'clip_at': '@1580', 'lowest_click': 'true'}
+PUSHED_OUT   Rhyme Master             {'max_bottom': 1600, 'lowest': '哪个词和它押韵？', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Rhyme_Master-235851.jpeg', 'clip': 2, 'clip_at': '哪个词和它押韵？@1600', 'lowest_click': 'false'}
+PUSHED_OUT   Semantic Association     {'max_bottom': 1600, 'lowest': '提到「鞋」，最先想到哪个？', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Semantic_Association-235918.jpeg', 'clip': 2, 'clip_at': '提到「鞋」，最先想到哪个？@1600', 'lowest_click': 'false'}
+TIGHT        Semantic Link            {'max_bottom': 1554, 'lowest': '「面包」后面接哪个？', 'count': 3, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Semantic_Link-235945.jpeg', 'clip': 3, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Sentence Unscramble      {'max_bottom': 1600, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Sentence_Unscramble-000014.jpeg', 'clip': 3, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+TIGHT        Silent Letter Search     {'max_bottom': 1528, 'lowest': '10 题，答对 ≥7 通关：点错扣一条命', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Silent_Letter_Search-000046.jpeg', 'clip': 2, 'clip_at': '10 题，答对 ≥7 通关：点错扣一条命@1528', 'lowest_click': 'false'}
+PUSHED_OUT   Spelling Sprint          {'max_bottom': 1600, 'lowest': '重开', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Spelling_Sprint-000116.jpeg', 'clip': 2, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Trail Making             {'max_bottom': 1600, 'lowest': '9', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Trail_Making-010915.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Visual Crowding Acuity   {'max_bottom': 1600, 'lowest': 'H', 'count': 7, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Visual_Crowding_Acuity-010946.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Visual Search            {'max_bottom': 1600, 'lowest': '🌰', 'count': 7, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Visual_Search-011017.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+SKIP        Visual Search Conjunction
+TIGHT        Wisconsin Card Sorting   {'max_bottom': 1565, 'lowest': '✅ 放对了 +50', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Wisconsin_Card_Sorting-011051.jpeg', 'clip': 2, 'clip_at': '重开@1600', 'lowest_click': 'true'}
+PUSHED_OUT   Word Pair Associate Memory {'max_bottom': 1600, 'lowest': '记住这 6 组词对', 'count': 15, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Word_Pair_Associate_Memory-011115.jpeg', 'clip': 3, 'clip_at': '记住这 6 组词对@1600', 'lowest_click': 'false'}
+PUSHED_OUT   Affix Factory            {'max_bottom': 1598, 'lowest': '-ness', 'count': 1, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Affix_Factory-011143.jpeg', 'clip': 1, 'clip_at': '@1600', 'lowest_click': 'true'}
+TIGHT        Anagram Definition       {'max_bottom': 1545, 'lowest': '把字母拼回这个单词', 'count': 2, 'shot': '/Users/a0000/dev/One More/_巡检记录/截图-Anagram_Definition-011213.jpeg', 'clip': 2, 'clip_at': '把字母拼回这个单词@1545', 'lowest_click': 'false'}
+OK           Category Fluency         {'max_bottom': 1417, 'lowest': '提示：每类 25 秒，共列 8 个有效词即通关（词库有限，常', 'count': 1, 'shot': '', 'clip': 2, 'clip_at': '提示：每类 25 秒，共列 8 个有效词即通关（词库有限，常@1417', 'lowest_click': 'false'}

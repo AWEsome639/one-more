@@ -1,0 +1,583 @@
+# 三页面布局静态扫描 · 2026-11-07
+
+> 只读审计。**未改任何 `.ets`、未编译、未碰 hdc/模拟器**。
+> 扫描对象：`components/{GamesTab,StatsTab,SettingsTab,Common}.ets` + 尺寸来源 `core/{Design,Bp,UiMode,I18n}.ets`
+> 方法：读代码取真实尺寸 → 按 vp 记账（CJK 字宽 ≈ 1.0×字号、拉丁 ≈ 0.55×字号、按钮间 gap 取 `Space` 常量）
+> → 再用 **12 语言字典里的实际译文** 复算，找「超出可用宽度」与「结构错位」两类。
+> ⚠️ 没有真机图：数值全部是**代码推算**。标「必然」的是几何上一定发生；标「临界」的是差 0~20vp，需真机确认。
+> ⚠️ **扫描期间有人在改同一个文件**：`components/Common.ets` 于 **21:03 被 verifier-eng2 改动**
+> （`badgePadRight` 上限 72→**84**、副标题 `maxLines` 改成「长 tagline 3 行 / 短 2 行」、`visibility` 条件改用 `badgePadRight() > 48`）。
+> 本报告 **S-07 / S-07b 已按改动后的代码重算**；其它条目所引文件当时未被改动（GamesTab 17:20 / StatsTab 18:14 / SettingsTab 00:07）。
+> 行号可能随后继续漂移 —— 每个条目都附了**代码原文**，复核时按原文 grep，别只信行号。
+
+---
+
+## 1. 摘要（按用户可见度排序）
+
+| # | 位置 | 问题 | 触发条件 | 严重度 |
+|---|---|---|---|---|
+| **S-01** | `SettingsTab.ets:907-989` | 「主题色」卡头部**结构错位**：🎨 图标单独一行，标题块掉到「界面模式」卡下面 | **中文也必现**（每次打开设置页） | 🔴 高 |
+| **S-02** | `SettingsTab.ets:679-806` | 「外观模式」三按钮用 `Row` 不换行 + 每格 `layoutWeight(1)` + 文字无截断 ⇒ 长语言**折成两行、三个胶囊不等高** | de/es/fr/pt/ru/ja/ko/it（11/12 语言） | 🔴 高 |
+| **S-03** | `GamesTab.ets:1327-1444` | 顶栏**四个**圆按钮吃掉 200vp，标题列只剩 120vp ⇒ 副标题折行；大字模式只剩 84vp ⇒ 标题也折行 | 360vp 宽；elder 模式必现 | 🟠 中高 |
+| **S-04** | `GamesTab.ets:1576-1585` | 「今天这一局 + 通关 +50 经验」头部行**没有收缩策略**，中文已溢出 12vp、德语溢出 51vp ⇒ 压到「开始 ›」按钮上 | 360vp 宽（中文就溢出）；任何 ≥420 宽的长语言 | 🟠 中高 |
+| **S-05** | `Common.ets:645-660` | 等级头卡标题 / 「通关 {n} 局」只有 `maxLines(1)` **没有 `textOverflow`** ⇒ 超出被硬切；大字模式 + 360vp 文字列只剩 ~47vp | elder 模式 + 窄屏 | 🟠 中高 |
+| **S-06** | `GamesTab.ets:1908-1925` | 计数行（分类数 + 网格/A-Z + 通关数 + 收起）预算 **348vp > 可用 320vp** ⇒ 挤/换行 | 360vp 宽 | 🟡 中 |
+| **S-07b** | `Common.ets:1174-1181` + `GamesTab.ets:1901` | 副标题长 tagline 改成 **3 行**，但卡片高度 `cardH()` 在 690–800 档仍写死 **84vp** ⇒ 内容需 ~99vp，**溢出 ~15vp**（第 3 行压出卡片/被下一行盖住） | 440×744 这类手机 + 英文/拉丁语言（226/355 款 tagline >24 字符） | 🟠 中高 |
+| **S-07** | `Common.ets:1037-1050` + `1161-1189` | 三枚角标（🏆/最高分/🔥）实际 ~87.5+6=**93.5vp**，副标题预留上限 **84vp**（21:03 刚从 72 提到 84）⇒ 仍差 ~10vp | 420~460vp 且有 3 枚角标 | 🟡 中 |
+| **S-08** | `StatsTab.ets:779-806` | 「近期」三行里标签 `Text(layoutWeight(1))` **没有 `maxLines`** ⇒ 长语言折两行，这一行比另两行高 | de `Am meisten gespielt` 等 | 🟡 中低 |
+| **S-09** | `StatsTab.ets:474-483 + 532-640` | 统计页**两张等级卡**（`LevelHeader()` 与 `heroCard()` 都在跑），中间隔着成就墙 | 任何时候 | ⚪ 低（但很显眼） |
+
+**已核对、确认没问题**（附证据，别再重复查）：分类芯片横滑 ✅ ｜ 语言选择器 12 芯片 Flex 换行 ✅ ｜
+界面模式三按钮 Flex 换行 ✅ ｜ 成就墙 `25 / 53` 数字 ✅ ｜ 四宫格数字 ✅ ｜ 主题色 12 色块 Flex ✅（详见 §4）。
+
+---
+
+## 2. 详细条目
+
+### S-01 【高 · 结构错位】设置页「主题色」卡片头部：图标与标题被拆散
+
+**文件**：`components/SettingsTab.ets:905-1015`（`accentPicker()`）
+
+```ts
+ 905:  accentPicker() {
+ 906:    Column({ space: Space.sm }) {          // ← 整张「主题色」卡
+ 907:      Row({ space: Space.md }) {
+ 908:        Text('🎨')                          // ← 这一行**只有图标**，右侧全空
+ 909:          .accessibilityLevel('no')
+ 910:          .fontSize(FontSize.xl)
+ 911:          .width(Space.xxl)
+ 912:          .textAlign(TextAlign.Center)
+ 913:      }
+ 914:      .width('100%')
+ ...
+ 916:      Column({ space: Space.sm }) {         // ← 「界面模式」整块卡（有底色/圆角/margin）
+ ...
+ 977:      .margin({ bottom: Space.md })
+ 978:
+ 979:      Column({ space: Space.xs }) {         // ← 「主题色」标题块：**直接挂在竖向 Column 下**
+ 980:        Text(this.t('主题色', 'Accent colour')) ...
+ 984:        Text(this.t('按钮和高亮都跟着换成这个颜色', ...)) ...
+ 987:      }
+ 988:      .alignItems(HorizontalAlign.Start)
+ 989:      .layoutWeight(1)                      // ← 竖向 Column 里用 layoutWeight = 抢「剩余高度」
+ 990:
+ 991:      Flex({ wrap: FlexWrap.Wrap, ... }) {  // ← 色块
+```
+
+**什么情况下错位**：**每次打开设置页都会看到**（与屏幕宽度、语言无关）。渲染顺序变成：
+
+```
+┌─ 主题色卡 ──────────────────────────┐
+│ 🎨                                   │ ← 孤零零一枚调色盘（S-01 的「图标」）
+│ ┌─ 界面模式卡 ────────────────────┐ │
+│ │ 🔠 界面模式  三个按钮           │ │ ← 这张卡插在图标与标题之间
+│ └─────────────────────────────────┘ │
+│ 主题色                               │ ← 标题这时才出现（本该在 🎨 右边）
+│ 按钮和高亮都跟着换成这个颜色          │
+│ ● ● ● ● ● ● ● ● ● ● ● ●            │
+└─────────────────────────────────────┘
+```
+
+同一文件里 **BUG #32** 的注释（`~690` 行）写的就是这个病：*「这段原来被【误插】在标签行 Row 里面 ⇒ 🎨 孤零零 + 「外观模式」标题被挤没 + 反馈卡错位」*。
+这次是**反向**：标题块从 Row 里掉了出去，只剩图标待在 Row 里。
+
+另外 `.layoutWeight(1)` 用在**竖向** Column 的子节点上，含义是「占满剩余高度」（横向才是常态用法）。
+外层 Column 若是内容自适应高度，它不会额外长高；**一旦外层被约束出确定高度**（例如系统字体/键盘/横屏把内容区压住），
+这块标题会把剩余高度全吃掉，**色块与预览行被推到卡片最底部**，中间留一大片空白 —— 这是同一处代码的第二重风险。
+
+**一句话修法**：把 979-989 的 `Column` 移回 907 的 `Row` 里（`Row { Text('🎨'); Column{标题+副标题} }`），
+并删掉 989 的 `.layoutWeight(1)`（若保留，Row 内应放在 Column 上——现在位置错了）。
+
+---
+
+### S-02 【高 · 长语言必折行】「外观模式」三按钮：`Row` 不换行 + 每格等分 + 文字无截断
+
+**文件**：`components/SettingsTab.ets:679-684`（排布）与 `787-806`（单个按钮）
+
+```ts
+ 679:      Row({ space: Space.sm }) {
+ 680:        this.modeChip('light', '☀️', '浅色', 'Light')
+ 681:        this.modeChip('dark', '🌙', '深色', 'Dark')
+ 682:        this.modeChip('system', '🔄', '跟随系统', 'System')
+ 683:      }
+ 684:      .width('100%')
+
+ 787:  modeChip(m: string, icon: string, zh: string, en: string) {
+ 788:    Row({ space: 4 }) {
+ 789:      Text(icon).fontSize(FontSize.xs)
+ 790:      Text(this.t(zh, en)).fontSize(FontSize.xs)     // ← 无 maxLines / 无 textOverflow
+ 792:    }
+ 793:    .layoutWeight(1)                                 // ← 三等分，宽度写死约 89vp
+ 794:    .justifyContent(FlexAlign.Center)
+ 795:    .padding({ top: 8, bottom: 8 })                  // ← 左右没有 padding，文字可到边
+```
+
+**算账**（360vp 手机，normal 档）：
+设置页卡片 = 360 − 40（页边距 `Space.lg`×2）− 32（卡内 `Space.md`×2）= **288vp**；
+每格 = (288 − 2×10 gap) / 3 ≈ **89vp**；减去图标 13 + 间距 4 ⇒ **文字可用 ≈ 72vp**。
+
+把 12 语言字典里这三项的实际译文按 `FontSize.xs = 13` 折算：
+
+| 语言 | 「跟随系统」译文 | 估算宽 | 72vp 够吗 |
+|---|---|---|---|
+| zh | 跟随系统 | 52 | ✅ |
+| en | System | 41 | ✅ |
+| de | **System folgen** | ~82 | ❌ 折 2 行 |
+| es | **Seguir al sistema** | ~105 | ❌ 折 2 行 |
+| fr | **Suivre le système** | ~105 | ❌ |
+| pt | Seguir o sistema | ~100 | ❌ |
+| ru | Как в системе | ~82 | ❌ |
+| ja | システムに従う | ~91 | ❌ |
+| ko | 시스템 설정 | ~78 | ❌ |
+| it | Segui sistema | ~85 | ❌ |
+| ar | حسب النظام | ~61 | ✅（临界） |
+
+> ⚠️ 领任务时猜的德语是 `Systemeinstellung` —— 仓库里德国译文实际是 **`System folgen`**（`I18n.ets:1589`）。
+> 它确实超了 72vp，只是没有 17 个字母那么夸张；最宽的是**西/法/葡**（~100~105vp，超 45%）。
+
+**什么情况下错位**：切到上述任一语言，第 3 枚按钮的文字折成 **2 行** ⇒ 它比前两枚高一行，
+而 `Row` 交叉轴默认居中 ⇒ **三枚胶囊高低不齐**（第一二枚浮在中间、第三枚上下都占），整张卡也被撑高。
+大字模式更糟：`FontSize.xs = 18`、卡内只剩 252vp、每格 73vp、文字可用 **51vp** —— 连「浅色/深色」之外的多语言都会折。
+
+**一句话修法**：`Row` 改成 `Flex({ wrap: FlexWrap.Wrap })`（**同页 `933` 行的「界面模式」已经是这个写法**，直接抄），
+或给 `Text` 补 `.maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })` + `.minFontSize(9)`。
+
+---
+
+### S-03 【中高 · 顶栏挤】四个圆按钮把标题列压到 120vp（大字模式 84vp）
+
+**文件**：`components/GamesTab.ets:1327-1444`（`topBar()`）
+
+```ts
+1330:      Column({ space: 2 }) { ... 'One More' ... 副标题 ... }
+1343:      .layoutWeight(1)                         // ← 左列吃「剩下多少算多少」
+1354:      Row({ space: Space.xs }) {               // ← 四个圆按钮，Space.xs = 6
+1355:        Text(this.dark ? '🌙' : '☀️') ... .width(Layout.touchMin) ...   // 44
+1374:        Text(this.langBadge()) ... .width(Layout.touchMin) ... .margin({ left: Space.xs })  // 44 + 6
+1402:        Text('🔍') ... .width(Layout.touchMin) ...                     // 44
+1426:        Text('💬') ... .width(Layout.touchMin) ...                     // 44
+```
+
+**算账**：
+
+| 档位 | 右簇宽 | 360vp 上左列宽 | 标题（One More）需要 | 副标题需要 |
+|---|---|---|---|---|
+| normal | 4×44 + 3×6 + 6 = **200vp** | 320 − 200 = **120vp** | ~105–115 ✅（贴边） | ~190 ❌ **折 2 行** |
+| elder | 176 + 3×10 + 10 = **216vp** | 300 − 216 = **84vp** | xxl=30 时 ~135 ❌ **折行** | xxs=17 时 ~238 ❌ **折 3 行** |
+
+> 代码里 1332-1338 行还留着旧账：*「完整文案约 190vp，而左侧文字列只有 168vp（右边三个图标占 160vp）」*
+> —— 那是 `💬` 加进来**之前**的算法。现在右边是**四个**按钮 200vp，左列从 168 掉到 **120vp**，
+> 所以「窄屏不拼版本号」那半句修不动根：**副标题本身 190vp 就比 120vp 宽**，仍旧折行。
+> 领任务时说的「🔍 和 💬 相邻只有 18vp 间隙」在代码里是 `Row(space: Space.xs) = 6vp`；
+> 视觉上更宽是因为按钮是 44vp 方框、字形只有 ~18vp（两侧各留 13vp 空白）—— 真正的问题是**四个 44vp 方框的横向预算**，不是间隙。
+
+**什么情况下错位**：360/375vp 宽的手机（现实主流）上，副标题折成 2 行，顶栏比按钮高一行 ⇒ 标题区看起来「上下不齐」；
+大字模式（elder）下标题「One More」也折行 ⇒ 顶栏高度翻倍，把下面的分类条与网格往下推。
+（`topBar` 在 `Bp.height < 340` 才换成 `watchHeader`，与**宽度**无关 ⇒ 窄而高的手机走不到降级分支。）
+
+**一句话修法**：窄屏（`Bp.width < 400`）把 `💬` 收进一个「更多」入口/与 🔍 合并；同时给标题 `.maxLines(1)` + `minFontSize(16)`、
+副标题 `.maxLines(1)` + `Ellipsis`（现在两者都没有任何截断策略）。
+
+---
+
+### S-04 【中高 · 溢出压按钮】「今天这一局」头部行没有收缩策略
+
+**文件**：`components/GamesTab.ets:1567-1626`（`dailyCard()`），关键行 `1576-1585`
+
+```ts
+1576:        Column({ space: 3 }) {
+1577:          Row({ space: 6 }) {
+1578:            Text(this.t('今天这一局', 'Today\'s pick')).fontSize(FontSize.xxs) ...   // ← 无 maxLines
+1579:            Text(this.dailyDone ? this.t('今天已完成', 'Done today')
+                                   : this.t('通关 +50 经验', 'Clear it: +50 XP'))       // ← 无 maxLines
+1581:              .padding({ left: 6, right: 6, top: 1, bottom: 1 })                     // ← 胶囊还加宽
+1584:          }
+```
+
+**算账**（360vp）：
+卡片内容宽 = 360 − 40（页边距）− 32（卡内 padding `Space.md`）= 288vp；
+减去 🎯 图标 46 + 间距 16 + 「开始 ›」按钮 ~70 + 间距 16 ⇒ 中间文字列 **≈ 140vp**。
+
+| 语言 | 「今天这一局」 | 「通关 +50 经验」 | 合计 | 140vp 够吗 |
+|---|---|---|---|---|
+| zh | 60 | 74 + padding 12 = 86 | **152** | ❌ 溢 12vp |
+| de | Heutige Runde ≈ 80 | Schaffen: +50 XP ≈ 99+12 = 111 | **191** | ❌ 溢 51vp |
+| ru | Игра дня ≈ 62 | Пройти: +50 XP ≈ 112 | **174** | ❌ 溢 34vp |
+
+**什么情况下错位**：`Row` 不换行、两个 `Text` 都没有 `maxLines`/`layoutWeight`/`Ellipsis` ⇒ 子项按**自然宽**排，
+超出部分直接出界。而右边的「开始 ›」是后一个兄弟节点 ⇒ 那个黄色/绿色胶囊的右端会**压到按钮上**（中文 12vp ≈ 一个字；德语 51vp ≈ 四五个字）。
+第二行「游戏名」有 `maxLines(1)+Ellipsis`（`1587-1597`），所以**游戏名再长也不会挤掉按钮** —— 挤掉/盖住按钮的是**这一行标签**。
+
+**一句话修法**：给第一个 `Text` 加 `.layoutWeight(1).maxLines(1).textOverflow(Ellipsis)`；
+「+50 经验」胶囊在窄屏（`< 420`）隐藏，或整行改 `Flex({ wrap: Wrap })`。
+
+---
+
+### S-05 【中高 · 硬切】等级头卡：标题与「通关 {n} 局」缺 `textOverflow`
+
+**文件**：`components/Common.ets:645-660`（`LevelHeader` 常规横排分支）
+
+```ts
+ 647:              Text(this.titleForLevel())
+ 648:                .fontSize(FontSize.lg)
+ 652:                .maxLines(1)                      // ← 只有 maxLines，没有 textOverflow ⇒ 默认 Clip 硬切
+ 653:              Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))   // ← 5 位数就是「通关 12,345 局」
+ 657:                .maxLines(1)                      // ← 同样硬切
+```
+
+**算账**：左列可用宽 = 卡内宽 − 徽章 − margin − 火焰：
+
+| 档位 / 屏宽 | 卡内宽 | 徽章 `Cell.of(56)` | margin | StreakFlame | 左列 | 标题需要 | 通关数需要 |
+|---|---|---|---|---|---|---|---|
+| normal 360 | 280 | 56 | 16 | ~66 | **142** | 72 ✅ | 60 ✅ |
+| normal 440 | 360 | 56 | 16 | ~66 | **222** | 72 ✅ | 60 ✅ |
+| **elder 360** | 240 | **74**（×1.33） | 24 | **~95** | **≈47** | **96** ❌ | **85** ❌ |
+| elder 440 | 320 | 74 | 24 | ~95 | 127 | 96 ✅ | 85 ✅（临界） |
+
+**什么情况下错位**：**大字模式 + 360vp 手机**。左列只剩 ~47vp，4 个汉字的标题（24vp×4 = 96）只放得下 1~2 个字，
+而且是 **硬切**（不是「新…」），看起来像「标题坏了」；「通关 571 局」同理被切。
+这与 `Common.ets:511-544` 里记录的 **233×233 那轮病根完全同源**（徽章+火焰把文字列抢光），只是当时只修了手表分支，没验过「手机上开大字模式」。
+
+**一句话修法**：两处 `.maxLines(1)` 补 `.textOverflow({ overflow: TextOverflow.Ellipsis })`（一行）；
+窄屏（`Bp.width < 420` 或 elder）把 `StreakFlame` 挪到下一行 —— 抄 1257 轮在 233 上做过的写法即可。
+
+#### S-05 复核（2026-11-07 21:55）：Ellipsis 已补上，但**只够“体面”，elder+窄屏仍是信息丢失**
+
+**现状**：code-hunter 已在 `Common.ets` 的三处分支（`tinyWatch` / `isWatch||tinyScreen` / 常规）都补了
+`.textOverflow({ overflow: TextOverflow.Ellipsis })`（见 `git diff` 的 3 处 `+` 行）。**硬切问题已解决** —— 这一条前半句达成。
+
+**重新量了 elder + 360 的真实值（比我 10:xx 那版更准，按 `UiMode.elder()` 实际数字）**：
+
+| 项 | 值 | 来源 |
+|---|---|---|
+| 页面边距 `Space.lg`×2 | 60（每边 30） | `StatsTab` 的 Column padding |
+| 卡片 padding `Space.lg`×2 | 60 | `LevelHeader` 的 `.padding(Space.lg)` |
+| 卡内可用 | **240** | 360 − 60 − 60 |
+| 徽章 | **74** | `Cell.of(56)` = round(56 × 1.33) |
+| 徽章右间距 `Space.md` | 24 | |
+| StreakFlame | **≈101.5** | 🔥(24) + `Space.xs`(10) + 「{n} 天」(≈34.5) + padding `Space.sm`×2(32) |
+| **文字列剩余** | **≈40.5vp** | 240 − 74 − 24 − 101.5 |
+
+⇒ 标题（`lg=24`，4 汉字 **96vp**）在 40.5vp 里只能画「新…」；「通关 571 局」（`xs=18`，≈85vp）只能画「通…」。
+**Ellipsis 让它“好看”了，但信息只剩一个字** —— 用户看到的不是“等级卡”，是“新… / 通…”。
+
+**要不要缩字号？我的判断：不要。**
+- 塞进 40.5vp 需要每字 ≤10vp，比 normal 档的 18vp 还小 —— 这和大字模式「把字放大 25~42%」的目的**直接矛盾**；
+- 本工程里 `minFontSize/maxFontSize` 还有测量坑（`GamesTab.topBar` 的注释：`maxFontSize` 需要确定宽度约束才测得出，`layoutWeight` 列上会异常）；
+- 缩字号只治这一屏，换个更长的语言（俄语段位名 18 字符）照样破。
+
+**推荐的结构修法（零缩字号，一次到位）**：把 `StreakFlame` 在**窄屏**时挪到下一行。
+这个写法**仓库里已经有**（`Common.ets:635-642`，`isWatch() || tinyScreen()` 分支就是 `Row { Blank(); StreakFlame }` 另起一行）。
+建议把常规分支的条件从「永远同行」改成：
+
+```ts
+// LevelHeader 需要新增一个观察源（现在没有 uiMode 依赖）：
+//   @StorageProp('uiMode') uiMode: string = 'normal';
+// 火焰换行的条件：
+if (Bp.isWatch() || Bp.tinyScreen() || (this.uiMode === 'elder' && Bp.width < 440)) { …另起一行… }
+```
+
+**算账**：火焰换行后文字列 = 240 − 74 − 24 = **142vp** ⇒ 标题 96 ✅、「通关 571 局」85 ✅、5 位数「通关 12,345 局」107 ✅，**全部不需要缩字号**。
+（代价：卡片高度 +~44vp。统计页是滚动页，可接受。）
+
+> 若不想给 `LevelHeader` 加 `uiMode` 依赖，可退化用纯宽度条件 `Bp.width < 400`（不看模式）——
+> 代价是 360~399vp 的正常档也会多占一行（约 44vp），需产品拍板。
+
+---
+
+
+### S-06 【中 · 超预算】首页计数行：348vp 塞进 320vp
+
+**文件**：`components/GamesTab.ets:1908-1925`（`countRow()`）
+
+```ts
+1909:    Row({ space: Space.sm }) {                    // space = 10
+1910:      Text(this.countLabel())                      // 「全部 355」≈ 48
+1911:        .fontSize(FontSize.xxs) ...
+1912:      Blank()
+1913:      this.viewPill(ViewMode.GRID, '▦', TG('网格'), 'Grid')   // 图标+2字 + 20 padding ≈ 60
+1914:      this.viewPill(ViewMode.AZ, '🔤', 'A-Z', 'A-Z')          // ≈ 58
+1915:      Text(this.tn('通关 {n} 局', 'Cleared {n}', this.totalSolved))  // ≈ 60
+1920:      this.collapseToggle()                       // 「收起 ⌄」+ 32 padding ≈ 72
+```
+
+**算账**：48 + 60 + 58 + 60 + 72 + 5×10 = **348vp > 可用 320vp（Blank 已经是 0）**。
+德语/俄语标签更长（`Bestanden 571` ≈ 95、`Собрано` 更宽）⇒ 缺口更大。
+
+**什么情况下错位**：360~390vp 手机。`Blank()` 归零后 `Row` 仍差 28vp ⇒ 要么溢出出界，要么 `Text` 被压到换行
+⇒ 这一行变成两行，把网格再往下推（本来矮屏就缺 11vp 才放得下第二行卡，见 `cardH` 注释）。
+
+**一句话修法**：窄屏隐藏「通关 {n} 局」（它与统计页重复），或把「网格/A-Z」两个胶囊合并成一个切换按钮。
+
+---
+
+#### S-06 修复记录（2026-11-07 21:58，已改 `GamesTab.ets`）
+
+**最坏语言实算（normal 360，可用 320vp；每项按 `FontSize.xxs=12`、拉丁 0.55×、CJK 1.0× 估）**
+
+| 行内项 | 中文 | 德语 | 俄语 | 西语 | 来源 |
+|---|---|---|---|---|---|
+| 计数 `countLabel()` | 48 | **152**「Klassiker · 355 Spiele」 | 130「Классика · 355 игр」 | **160**「Clásicos · 355 juegos」 | `countLabel()` 三分支 |
+| 胶囊 ▦ 网格/Grid | 60 | 76「Raster」 | 68「Сетка」 | **102**「Cuadrícula」 | `I18n.ets:1534` |
+| 胶囊 A-Z | 58 | 58 | 58 | 58 | — |
+| 通关 N 局 | 60 | **132**「571 Runden geschafft」 | 112 | **139**「571 partidas superadas」 | `I18n.ets:1865` |
+| 收起/展开 | 72 | 108（改后 94） | 82 | 80 | `I18n.ets:1603` |
+| 间距 5×10 | 50 | 50 | 50 | 50 | `Space.sm` |
+| **合计（修前）** | **348** ❌ | **576** ❌ | **500** ❌ | **589** ❌ | |
+
+⇒ 不只是“中文差 28vp”：**欧洲语言最坏是可用宽度的 1.8 倍**，单行硬排根本放不下。
+
+**改了什么（三处，`GamesTab.ets`）**
+
+1. `countRow()` 的计数 `Text` 变成**唯一可伸缩项**：`.layoutWeight(1) + .maxLines(1) + .textOverflow(Ellipsis)`
+   ⇒ 按钮永远先拿到自己的宽度，压力全部由“计数文字”吸收（判据：**可点区域 > 文案完整**）。
+   （原来的 `Blank()` 随之删掉 —— layoutWeight 已经起"把右侧推到最右"的作用。）
+2. 「通关 {n} 局」只在 `Bp.width === 0 || Bp.width >= Bp.SM`（≥600vp）时显示：
+   ① 它与统计页四宫格重复；② 它是本行最长可选项（de 132 / es 139）。
+   `Bp.width===0` 按"显示"处理（`EntryAbility.ets:134` 在 `loadContent`(148) 之前就 `Bp.update`，正常不会为 0；兜底避免闪烁）。
+3. 新增 `collapseLabel()`：**剥掉字典自带的尾部 ▲/▼**。
+   实测字典 12 语言的「收起/展开」全部自带箭头（de「Weniger ▲」、ja「閉じる ▲」、ru「Свернуть ▲」…），
+   而组件旁边又画了一个会旋转的 `⌄` ⇒ 德语/日语变成「Weniger ▲ ⌄」：**两个箭头、多占 12vp、指向还可能相反**。
+
+**修后预算（360 中文）**：计数最多 130（内容 48，不需截断）｜胶囊 60+58｜收起 72｜间距 30 = **268 ≤ 320** ✅
+**修后预算（360 德语）**：计数只剩 62（省略号）｜胶囊 76+58｜收起 94｜间距 30 = **320 ✅**（按钮全在，只截断计数）
+
+**代价（已记录）**：窄屏欧洲语言下“计数”会被省略（如「Klassiker · 3…」）；「通关 N 局」在手机上不再显示（统计页仍可见）。
+**未做**：环境里没有 DevEco/node，`arkts_check` 不可用（也就无法静态类型检查），只做了括号配平自检（全 file 492/492）。
+**未碰**：`Common.ets`（lead 写域）、`SettingsTab.ets`（lead 写域）、`cardH()`（lead 说他自己修）。
+
+---
+
+### S-07 【中 · 角标与副标题预留仍差 ~10vp】上限 84，实际角标 ~93.5
+
+**文件**：`components/Common.ets:1037-1050`（`badgePadRight()`）+ `1161-1189`（副标题）
+
+```ts
+1037:  private badgePadRight(): number {
+1038:    let p: number = this.streak > 0 ? 48 : Space.xs;   // ← 无连胜时只留 6，不是 0
+1039:    if (this.showCrown()) { p += 18; }                 // 🏆
+1041:    if (this.bestText().length > 0) {
+1042:      p += Bp.width < 420 ? 28 : 42;                   // 最高分
+1043:    }
+1050:    return p > 84 ? 84 : p;                            // ← 21:03 由 72 提到 84
+```
+
+同一处的注释（`1045-1049`，verifier-eng2 写）自己算过真实占用：
+**🏆11 + 分数 24.5 + 🔥11 + 天数 18 + 间距 9 + 内边距 14 ≈ 87.5**，再加右边距 6 ⇒ **需要 ≈93.5vp**；
+而上限现在是 **84** ⇒ **仍差约 10vp**。也就是说：420~460vp 宽的卡片上（卡内 172、文字列 124），
+副标题右端最后 ~10vp 仍会落到角标胶囊下面 —— 只是比改动前的 72（差 21vp）轻了一大截。
+
+**什么情况下错位**：宽 420~460vp（含分屏窄窗）+ 这款**既有 🏆 又有最高分又有 🔥**（老玩家几乎每张都是）。
+
+**一句话修法**：把 `1050` 的封顶换成「按角标内容逐项累加、不再封顶」并同步核 `text` 端的 `minFontSize(8)` 够不够
+（若封顶必须保留，则 ≥3 枚角标时只画 🏆+🔥，把最高分让给副标题）。
+
+---
+
+### S-07b 【中高 · 卡片高度不够了】长 tagline 改 3 行，但 `cardH()` 还按 2 行算
+
+**文件**：`components/Common.ets:1174-1181`（副标题）+ `components/GamesTab.ets:1901-1903`（卡高）
+
+```ts
+// Common.ets（21:03 之后）
+1174:          // ★★★ 2026-11-07 verifier-eng2 量化：355 款 enTagline 中位 28 字符、>24 字符 226 款
+1177:          //   ⇒ **长 tagline 给 3 行，短的给 2 行**（中文 9 字仍 2 行，竖排不复发）。
+1179:          .maxLines(this.taglineText().length > 24 ? 3 : 2)
+
+// GamesTab.ets（未同步改）
+1901:    if (Bp.height >= 690 && Bp.height < 800) {
+1902:      return 84;                       // ← 690~800 这一档的卡高仍是 84
+1903:    }
+```
+
+**算账**（normal 档，`Space.sm=10` 内边距、标题 `FontSize.md=16`、副标题 `FontSize.xxs=12`、行高 1.4）：
+
+| 内容 | 高度 |
+|---|---|
+| 上下 padding `Space.sm`×2 | 20 |
+| 标题 1 行 | 22.4 |
+| 标题↔副标题间距 `Space.xs` | 6 |
+| 副标题 **3 行** | 50.4 |
+| **合计** | **98.8vp** |
+
+`cardH()` 在 690–800 档给 **84vp** ⇒ **溢出 14.8vp**（2 行时才 82，刚好）。
+（elder 档 180 / simple 档 118 / ≥800 的 126 档都还够。）
+
+**什么情况下错位**：`440×744`（本项目真机验证最常用的一档）+ 非中文（`taglineText()` 走 `displayTagline`，
+英文 226/355 款 >24 字符 ⇒ 走 3 行）⇒ 第 3 行**压出卡片下沿**（卡片根 `.height('100%')` 固定 = 84，
+`GridItem` 也固定高，缺省不 `clip` ⇒ 会画到行距里、贴着下一行卡片）。中文 9 字仍是 2 行 ⇒ 中文用户看不到。
+
+**一句话修法**：把 `GamesTab.cardH()` 690–800 档的 84 改成**按「本语言 tagline 是否 >24 字符」分档**（96 / 84），
+或直接给这一档 96（`84 + 12`，仍比 126 省 30vp，矮屏两行卡大概率还放得下 —— 需按 `1901` 注释里的 157.3vp 预算复核）。
+
+---
+
+### S-08 【中低 · 单行变高】「近期」三行的标签没有 `maxLines`
+
+**文件**：`components/StatsTab.ets:738-806`（`recentStats()` / `recentRow()`）
+
+```ts
+ 782:      Text(this.t(labelZh, labelEn))
+ 783:        .fontSize(FontSize.xs)
+ 784:        .fontColor(this.theme().inkSoft)
+ 785:        .layoutWeight(1)                       // ← 没有 maxLines / textOverflow
+ ...
+ 787:      Text(value)
+ 788:        .fontSize(FontSize.xs).fontWeight(FontWeight.Bold)
+ 791:        .maxLines(1)
+ 792:        .textOverflow({ overflow: TextOverflow.Ellipsis })
+ 793:        .constraintSize({ maxWidth: '58%' })   // ← 值这端做得对，标签那端没做
+```
+
+**算账**：卡内 288vp；图标 22 + 两个间距 10 ⇒ 标签可用 = 288 − 42 − 值宽（≤58% ⇒ ≤167）= **≥79vp**。
+「最常玩」39 ✅；de `Am meisten gespielt` ≈ **122**、es `Más jugado` ≈ 70（临界）、fr `Le plus joué` ≈ 72（临界）。
+**什么情况下错位**：德语 + 值较长（游戏名长 ⇒ 值吃满 58% 上限）时，「最常玩」这一行标签折成 2 行 ⇒ 该行比其他两行高，
+三行之间出现「一行两行高、两行一行高」的参差。
+
+**一句话修法**：`782` 处补 `.maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })`。
+
+---
+
+### S-09 【低 · 重复】统计页有两张等级卡
+
+**文件**：`components/StatsTab.ets:474-483`（调用处）+ `532-640`（`heroCard()`）
+
+```ts
+ 477:        LevelHeader()        // ← 共用组件的「LV + 称号 + 通关数 + XP 条 + 打卡 + 🔥」
+ 478:        this.achvWall()
+ 479:        this.badgeWall()
+ 480:        this.heroCard()      // ← 本页自己的「LV + 称号 + 打卡 + XP 条 + 四枚统计 chip」
+ 481:        this.statGrid()
+```
+
+**为什么算布局问题**：同一页上下出现**两次「LV + 称号 + XP 进度」**，中间隔着成就墙与徽章墙 ⇒
+第一次以为是「等级」，滚动后又看到一张几乎一样的卡，用户会以为「页面重复了一段」。
+（`485` 行注释也承认 DOM 顺序是「LevelHeader → 成就墙 → 徽章墙 → 等级头卡 → 四宫格」。）
+
+**一句话修法**：二选一 —— 留 `LevelHeader` 并让 `heroCard` 只保留四枚 chip（连胜/最长/今日/收藏）；
+或去掉 `LevelHeader`，把「通关数」并进 `heroCard`。
+
+#### S-05 已落地（2026-11-07 22:00，`Common.ets`，lead 授权）
+
+**改了什么**（三处，均在 `LevelHeader` 内；**未覆盖** lead 同期的图标 56→64 与 textOverflow 改动）：
+
+1. 新增观察源 `@StorageProp('uiMode') uiMode: string = 'normal';` —— 此前本组件没有 uiMode 依赖，
+   只按宽度判断会把**正常档** 360vp 也换成两行（正常档文字列还有 137vp，够用）。
+2. 新增 `flamesBelow()`：`Bp.isWatch() || Bp.tinyScreen() || (uiMode==='elder' && Bp.width < 440)`。
+3. 常规分支改成「火焰按条件留在本行 / 另起一行」：
+   `if (!this.flamesBelow()) { StreakFlame(...) }` + 行后再 `if (this.flamesBelow()) { Row { Blank(); StreakFlame } }`
+   （另起一行的写法照抄 1257 轮 `isWatch() || tinyScreen()` 分支）。
+
+**效果**：elder + 360vp 时文字列从 ≈40.5vp 回到 **142vp** ⇒ 标题 96、通关数 85、5 位数 107 全部完整显示，
+**零缩字号**（缩字号会与大字模式的目的自相矛盾）。代价：卡片高度 +≈44vp（统计页可滚动，可接受）。
+
+**阈值为什么是 440**：elder 下 440vp 时文字列 ≈120.5vp，标题/通关数/5 位数都放得下，所以 ≥440 不换行。
+
+---
+
+**（S-09 见下）**
+
+#### S-09 判定（2026-11-07 21:50，只读复核）：**该删的是 `heroCard()`，保留顶部 `LevelHeader()`**
+
+**证据一：两张卡都只服务统计页，不存在“别的页面还在用”的顾虑**
+
+```
+$ grep -rn "LevelHeader" components/ pages/
+components/StatsTab.ets:27   import ...
+components/StatsTab.ets:478  LevelHeader()            ← 全仓唯一使用点
+$ grep -rn "heroCard" components/ pages/
+components/StatsTab.ets:481  this.heroCard()          ← 全仓唯一使用点
+components/StatsTab.ets:533  heroCard() { ... }
+```
+
+（`Common.ets:512-514` 那句"和首页同一套数据源"是**旧认知**：首页 `GamesTab` 用的是它自己的 `levelStrip()`，
+并不用 `LevelHeader`。所以「保留共用组件少一事」这个理由不成立 —— 真正决定去留的是**位置与信息**。）
+
+**证据二：内容差集（读了两个 `build()` 的每一项）**
+
+| 信息 | `LevelHeader`（Common，顶部） | `heroCard`（StatsTab，第三张） |
+|---|---|---|
+| LV 圆章 + 等级数字 | ✅ | ✅ |
+| 称号（titleForLevel） | ✅ | ✅ |
+| XP 进度条 + 百分比 | ✅ | ✅ |
+| 今日打卡行 | ✅ | ✅（允许 2 行） |
+| **通关 {n} 局** | ✅ | ❌ |
+| **🔥 当前连胜** | ✅（StreakFlame） | ❌（只有「连胜」chip 里的 `superStreak`） |
+| 一共攒了 {n} 点经验 / 还差 {n} | ❌ | ✅ |
+| 4 枚 chip：连胜 / 最长 / 今天玩几局 / 收藏 | ❌ | ✅ |
+
+⇒ `heroCard` 的**独有信息**只有「累计 XP 那两行」+「4 枚 chip」，其余四项与 `LevelHeader` 完全重复。
+
+**证据三：位置决定了哪张是“重复”**。页面顺序是
+`LevelHeader → 成就墙 → 徽章墙 → heroCard → 四宫格 → 近期 → …`。
+顶部那张承担「我是谁（等级/称号/进度）」，符合「身份 → 累计 → 近期」的层级；
+`heroCard` 出现在**成就墙与徽章墙之后**，用户读到的是「怎么又来一张等级卡」。
+`Common.ets:512-514` 的排查记录也写着：*「统计页顶部的 LV 卡其实是本组件的 `LevelHeader()`，
+而 `heroCard` 在它下面、屏幕上根本看不到」* —— 说明 `heroCard` 是后补的重复体。
+
+**证据四（反向方案为什么不推荐）**：若删 `LevelHeader` 而留 `heroCard`，则统计页第一张卡变成「🏅 成就」，
+等级信息被推到第三张（成就/徽章之后）⇒ 与「身份 → 累计 → 近期」相反；且还要把「通关 N 局」「🔥 N 天」补进 `heroCard`（改动更多、收益更小）。
+
+**建议落法（待 lead 确认后执行；不删任何代码，本次只出结论）**
+
+1. 删 `StatsTab.ets:481` 的 `this.heroCard()` 调用（并删 `533-658` 的 `heroCard()` 定义）；
+2. 把它独有的 4 枚 chip + 累计 XP 两行**提成独立的一个 builder**（如 `statsChips()`），放在 `statGrid()` 之前
+   ⇒ 信息一点不丢，只是不再重复画 LV/称号/进度条；
+3. `LevelHeader` 保持不动（它在 `Common.ets`，属 lead 的写域）。
+
+> 一句话：**删的是"第三张卡"`heroCard`，保留页面顶部的 `LevelHeader`；删之前先把它的 4 枚 chip 搬到 `statGrid` 上方。**
+
+#### S-09 已落地（2026-11-07 21:52，`StatsTab.ets`）
+
+- 删 `this.heroCard()` 调用与 `heroCard()` 定义（约 113 行：LV 圆章 / 称号 / XP 进度条 / 今日打卡 —— 与 `LevelHeader` 逐项重复）。
+- 新增 `statsChips()` 放在 `badgeWall()` 与 `statGrid()` 之间：**只保留 heroCard 独有的信息** ——
+  累计经验「一共攒了 {n} 点经验」+ 下一等级「LV 9 → LV 10」+ 4 枚 chip（连胜/最长/今天玩几局/收藏，`Flex(Wrap)` 防挤）。
+- 删掉三个**只被 heroCard 调用**的死 helper：`titleForLevel()`（Common 里已有同名等价实现）、`levelPct()`、`xpLeftText()`；
+  `nextLevelText()` 保留（`statsChips` 在用）。grep 确认删后全文件 0 引用。
+- 偏差说明：heroCard 原来第二行「再攒 {n} 点经验就升级」与 `LevelHeader` 的进度行**逐字相同**，
+  照搬等于把刚删的重复搬回来 ⇒ 换成 `nextLevelText()`（heroCard 独有）。
+- 净效果：`StatsTab.ets` **43 插入 / 128 删除（净 -85 行）**，统计页不再出现第二张等级卡。
+
+---
+
+## 3. 按「怎么修最划算」的排序（建议）
+
+1. **S-01**（1 行缩进级改动，中文必现）：把标题 Column 移回 Row，删掉错位的 `layoutWeight`。
+2. **S-02**（同文件 15 行外已有正确写法可抄）：`Row` → `Flex({wrap})`。
+3. **S-07b**（两行）：`cardH()` 690–800 档按 tagline 行数分档（96/84），否则英文卡第 3 行会画出卡片。
+4. **S-05**（两行）：补 `textOverflow`；窄屏挪火焰。
+5. **S-04 / S-08**（各 1~2 行）：补 `maxLines + Ellipsis + layoutWeight`。
+6. **S-03 / S-06**（要定产品口径）：窄屏收掉一个圆按钮 / 隐藏「通关 N 局」。
+7. **S-07**（要定角标优先级）：封顶值联动真实角标宽。
+8. **S-09**（要定信息层级）：删一张等级卡。
+
+---
+
+## 4. 已核对、确认没问题（附证据，避免下次重复扫）
+
+| 项 | 结论 | 依据 |
+|---|---|---|
+| **分类芯片**（`Common.ets:1485-1580`） | ✅ 不会撑破 | 外层 `Scroll` 横向滚动 + 每枚 `constraintSize({minWidth:112})` + 左右 16 padding；长分类名只会让该枚变宽（仍单行），右端有 12vp 渐隐提示可滑（`1527-1539`） |
+| **语言选择器 12 芯片**（`SettingsTab.ets:636-660`） | ✅ 自动换行不截断 | `Flex({ wrap: FlexWrap.Wrap })` + 每枚 `margin(right,bottom)`；标签用各语言原生名（最长 `Português`/`العربية`） |
+| **界面模式三按钮**（`SettingsTab.ets:933-971`） | ✅ 已用 `Flex` 换行 | 与 S-02 的「外观模式」形成对照：同页一处改对、一处没改 |
+| **成就墙 `25 / 53`**（`StatsTab.ets:1000-1010`） | ✅ 宽度充足 | `Row { 标题; Blank(); 计数 }`，计数最多「53 / 53」≈ 42vp；缩略网格是 `columnsTemplate('1fr 1fr')`（`1078`），每格文字 `maxLines(1)+Ellipsis` |
+| **四宫格数字**（`StatsTab.ets:678-737`） | ✅ 5 位数不撑破 | 值 `maxLines(1)+textOverflow(Ellipsis)`；每格 (288−16)/2 = 136vp，`12,345` ≈ 66vp + 单位 |
+| **主题色 12 色块**（`SettingsTab.ets:991-996`） | ✅ 换行 | `Flex({ wrap: FlexWrap.Wrap, justifyContent: SpaceBetween })` |
+| **今日横幅的游戏名**（`GamesTab.ets:1587-1597`、`1538-1565`） | ✅ 会被省略号截断，不会挤掉按钮 | `maxLines(1)` + `textOverflow(Ellipsis)` + 所在列 `layoutWeight(1)`；紧凑版 `dailyStrip` 同样 |
+| **`cardH()` 与卡片内容**（`GamesTab.ets:1849-1906`） | ⚠️ **只有 2 行 tagline 时才够** → 见 S-07b | normal 内容 = padding 20 + 标题 22.4 + 间距 6 + 副标题 2 行 33.6 = **82 ≤ 84**；elder 148 ≤ 180；simple 66 ≤ 118。21:03 起长 tagline 改 3 行（98.8）⇒ **84 档不够** |
+
+---
+
+## 5. 方法学与假设（供复核）
+
+- **宽度记账**：`Bp.width`（360/440 为主）+ 各页 `padding/margin`（`Space.lg = 20`、`Space.md = 16`、`Space.sm = 10`、`Space.xs = 6；elder 档 = 30/24/16/10`）。
+- **文字宽度**：CJK ≈ 1.0×字号；拉丁小写 ≈ 0.55×字号；数字 ≈ 0.55×字号；emoji ≈ 1.1×字号。**这是估算**，
+  所以每条都给了「差多少 vp」，差得多的（S-01/S-02/S-03/S-04）几何上必然发生；差 0~20vp 的（S-06/S-07/S-08）标了「临界」。
+- **译文**取自仓库字典 `core/I18n.ets`（12 语言），不是猜的；德语的「跟随系统」= `System folgen`（`1589`），
+  不是 `Systemeinstellung` —— 报告按仓库实际译文算。
+- **没扫到**：运行时字体（系统 emoji/字体回退）、真机 DPI 缩放、横屏/分屏、`safeArea` 内切、键盘弹起挤压 ——
+  这些只能在真机截图上看（`dumpLayout` 的 bounds 是 px，要 ÷ `Bp.scale()`）。
+
+---
+
+*扫描时间 2026-11-07 ｜ 只读审计，产物仅本文件 ｜ 建议验证组合：360×800 + 德语 + elder 模式，逐页截图对比 §2 的 9 条*

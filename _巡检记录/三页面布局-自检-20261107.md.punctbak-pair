@@ -1,0 +1,211 @@
+# 三页面布局·改动自检 · 2026-11-07
+
+> 只读审计 + 代码事实核对。**本轮没有改任何 `.ets`**（③ 按 lead 要求只出报告）。
+> 自检对象：今天落地的两处改动 —— S-09（删 `heroCard` → `statsChips`）、S-05（`LevelHeader` 火焰换行）。
+> 另附 ③：`collapseLabel()` 同类问题全项目扫描。
+> 对照基准：S-09/S-05 改动前的提交 `f8c20d32`（改动已由 lead 提交进 `6027a78e`）。
+
+---
+
+## 0. 一页结论
+
+| # | 检查项 | 结论 | 证据强度 |
+|---|---|---|---|
+| ① | S-09 删 `heroCard` 后信息有没有丢 | **不丢**（9 类信息逐项有承接；4 枚 chip 数据源逐字相同） | 逐项对照 + `md5` 比对 |
+| ② | S-05 火焰换行有没有误伤 normal 档 | **未误伤**（normal 任何宽度都走「火焰同一行」；439×normal 也不换行） | 真值表 + 分支条件 |
+| ③ | `collapseLabel()` 同类问题（字典自带符号 + 组件又画一个） | **另有 2 处真问题**（`收起/▲`、`今日打卡/✅`），其余 9 处核对无问题 | 全字典 + 全组件双向扫 |
+
+**几项通过、几个有问题**：①② 通过；③ 发现 **2 个新问题**（均不在已修点，也不是我今天改动引入的）。
+
+---
+
+## ① S-09 信息完整性：**通过（无信息丢失）**
+
+### 1.1 旧 `heroCard()` 的每一项信息 → 现在由谁承接
+
+从 `f8c20d32` 提取旧 `heroCard()` 全部可见元素（104 行），逐项对到当前代码：
+
+| 旧 heroCard 的信息 | 现在由谁提供 | 证据 |
+|---|---|---|
+| LV 圆章 + 等级数字 | `LevelHeader` 顶部徽章 | `Common.ets:686`（`.width(Cell.of(56))`） |
+| 称号（titleForLevel） | `LevelHeader` | `Common.ets:689` 调 `this.titleForLevel()`（Common 自带一份） |
+| 今日打卡行 | `LevelHeader` | `Common.ets:766-771` |
+| 下一等级「LV 9 → LV 10」 | **`statsChips`** | `StatsTab.ets:523` 调 `nextLevelText()` |
+| XP 进度条 + 百分比 | `LevelHeader` | `Common.ets:741`（`%`）+ `Common.ets:754`（进度条宽度） |
+| 累计「一共攒了 {n} 点经验」 | **`statsChips`** | `StatsTab.ets:517` |
+| 「再攒 {n} 点经验就升级」 | `LevelHeader`（**同一字典键**） | `Common.ets:735` 与旧 `xpLeftText()` 用的是同一条 `tn('再攒 {n} 点经验就升级', …)` |
+| 通关 {n} 局 | `LevelHeader` | `Common.ets:601/651/698`（三分支各一处） |
+| 4 枚 chip（连胜/最长/今天/收藏） | **`statsChips`** | `StatsTab.ets:531-534` |
+
+⇒ **没有一条只活在 heroCard 里而被丢掉。** `StatsTab` 里那句"删 heroCard 前先把 4 枚 chip 搬到 statGrid 上方"的要求已兑现（`statsChips()` 在 `statGrid()` 前调用）。
+
+### 1.2 4 枚 chip 的数据源：**与原版逐字相同**
+
+```
+旧（f8c20d32）StatsTab.ets:623-626
+  this.chip('🔥', TG('连胜 {n} 天'),     'Streak {n} days',  this.superStreak,                    Palette.orange)
+  this.chip('🏅', TG('最长连了 {n} 天'), 'Longest {n} days', this.bestStreak,                     Palette.amber)
+  this.chip('📅', TG('今天玩了 {n} 局'), 'Today {n} rounds', this.dailyCount,                     Palette.sky)
+  this.chip('⭐', TG('收藏 {n} 款'),     'Saved {n}',       ProgressStore.favorites().length,    Palette.berry)
+
+现在 StatsTab.ets:531-534
+  （四行与上面**完全相同**：同一组字段、同一组文案键、同一组配色）
+```
+
+`nextLevelText()` 也做了 `md5` 比对：改动前/后 **完全相同**（`2732aadb39d63e04d012e818ccbb5978`），只是调用点从 heroCard 换到了 statsChips。
+
+### 1.3 一处需要 lead 知道的信息差异（不算丢失，但要记）
+
+旧 `heroCard` 的「今日打卡」用的是 **带 emoji 的字典键**（`TG('✅ 今日已打卡')`），
+而 `LevelHeader` 是 **「单独一个 emoji Text + 不带 emoji 的键」**。
+由于 `I18n.ets` 里 `"今日已打卡"` 的**非中英译文自带 ✅**（`ja: "✅ 今日チェックイン済み"`、`de: "✅ Heute erledigt"`…），
+`LevelHeader` 在 10 种语言 + 繁体下会显示 **两个 ✅**（详见 ③ 的 C-2）。这不是删 heroCard 造成的，是 `LevelHeader` 原有写法。
+
+---
+
+## ② S-05 火焰换行：**normal 档未被误伤（通过）**
+
+### 2.1 当前代码事实
+
+```ts
+// Common.ets:530-536
+private flamesBelow(): boolean {
+  if (Bp.isWatch() || Bp.tinyScreen()) { return true; }
+  return this.uiMode === 'elder' && Bp.width < 440;
+}
+```
+
+分支入口（`Common.ets:573 / 624 / 671`）：
+
+```
+if (Bp.tinyWatch())                     // 高 < 210（195 手表）
+else if (Bp.isWatch() || Bp.tinyScreen())  // 手表 / 高 < 340 —— 这一段**本来**就把火焰放下一行
+else                                       // 常规手机：由 flamesBelow() 决定
+```
+
+常规分支内：
+
+```ts
+Row() {
+  badge
+  Column { 称号; 通关 N 局 }
+  if (!this.flamesBelow()) { StreakFlame(...) }      // ← normal 时命中这里（同一行）
+}
+.width('100%')
+if (this.flamesBelow()) { Row(){ Blank(); StreakFlame(...) } }   // ← normal 时跳过
+```
+
+### 2.2 真值表（按代码条件逐项展开）
+
+| 场景 | isWatch | tinyScreen(高<340) | uiMode | Bp.width | flamesBelow | 火焰位置 |
+|---|---|---|---|---|---|---|
+| 360×780 手机 · normal | false | false（780） | normal | 360 | **false** | ✅ 同一行（一次） |
+| **439×780 手机 · normal（临界）** | false | false | normal | 439 | **false** | ✅ **仍同一行** |
+| 440×780 · normal | false | false | normal | 440 | false | ✅ 同一行 |
+| 439×780 · elder（S-05 要修的） | false | false | elder | 439 | **true** | 另起一行 |
+| 440×780 · elder | false | false | elder | 440 | false | 同一行（阈值边界，符合设计） |
+| 439×780 · simple | false | false | simple | 439 | false | ✅ 同一行 |
+| 233×233 极小屏 | false（手机形态设备） | **true**（高<340） | 任意 | 233 | true | 走 `else if` 分支（**本来**就另起一行，与本函数无关） |
+| 首帧 width=0 · elder | false | false | elder | 0 | true | 另起一行（保守，安全方向） |
+
+**关键点**：`uiMode === 'elder'` 是 `&&` 的**第一项**，normal/simple 直接短路上返回 false，
+所以 `Bp.width < 440` 对 normal 完全不生效 —— 439 宽 normal **不会**换行。
+
+### 2.3 normal 档宽度够不够（证明“不换行”不会导致截断）
+
+normal 360vp：卡内 280（360 − 页边距 40 − 卡 padding 40）− 徽章 56 − 间距 16 − 火焰 ≈71 = **137vp**
+⇒ 称号 4 汉字 72 ✅、通关数 60 ✅、5 位数「通关 12,345 局」107 ✅。
+⇒ 换行只是 elder 窄屏的补救，normal 保持原布局（火焰贴右）。
+
+---
+
+## ③ `collapseLabel()` 同类问题全项目扫描：**2 个真问题、9 处排除**
+
+### 3.1 扫描口径
+
+1. 解析 `I18n.ets` 的 EXTRA 字典（**752 条**）→ 找**值里带箭头/符号**的键（`↑↓←→▲▼◀▶◄►▸▾‹›«»↗↘…`）：命中 15 条。
+2. 解析 `GameI18n.ets` 的 DICT（**4043 条**）→ 找**键无箭头、但某语言译文加了箭头**的：命中 **3 条**。
+3. 扫 `components/*.ets` + `pages/*.ets` 里组件自己画的符号字面量（`Text('›')`、`Text('▲'/'▼')`…）：**13 处**。
+4. 扫 `games/*.ets` 里的箭头字面量（**140 处**）逐一判断是玩法符号还是"重复标注"。
+5. 双向匹配：**同一行/相邻行既读字典又画符号**才算命中。
+
+### 3.2 真问题（2 处）
+
+#### C-1 【中】`StatsTab.ets:938-941` 成就墙「收起 ▲」变双箭头
+
+```ts
+ 938:        Text(this.achvExpanded ? this.t('收起', 'Less')
+ 939:            : this.tn(TG('看全部 {n} 个'), 'See all {n}', ...))
+ 940:          .fontSize(FontSize.xxs) ...
+ 941:        Text(this.achvExpanded ? '▲' : '▼').fontSize(FontSize.micro)   // ← 又画一个
+```
+
+**证据**：字典 `"收起"` 的非中英译文**自带 ▲** —— `ja: "閉じる ▲"`、`ko: "접기 ▲"`、`es: "Menos ▲"`、
+`fr: "Reduire ▲"`、`de: "Weniger ▲"`、`pt: "Menos ▲"`、`ru: "Свернуть ▲"`、`it: "Meno ▲"`、`ar: "أقل ▲"`、`zh-Hant: "收起 ▲"`。
+⇒ 展开态下这 **11 种语言全部显示「閉じる ▲ ▲」**（中文/英文正常：zh 返回原词、en 走 `Less`，都不带箭头）。
+**修法**（一行级）：与 `GamesTab.collapseLabel()` 同法 —— 读出来剥掉尾部 ▲/▼ 再显示；
+或直接复用「收起 ▲」键并删掉 `Text('▲'/'▼')`（见 3.3 的写法对照）。
+
+#### C-2 【中】`Common.ets:766-769` 等级头卡「打卡」变双 emoji
+
+```ts
+ 766:        Text(this.solvedToday ? '✅' : '⭕')       // ← 先画一个
+ 768:        Text(this.solvedToday ? this.t(TG('今日已打卡'), 'Checked in today')
+ 769:                              : this.t(TG('还没玩 · 来一局就打卡'), 'Not yet — play one round'))  // ← 译文里又带一个
+```
+
+**证据**：`I18n.ets:1618-1619` —— `"今日已打卡"` 的 10 种语言值都以 **✅** 开头（`ja "✅ 今日チェックイン済み"`…
+`zh-Hant "✅ 今日已打卡"`）；`"还没玩 · 来一局就打卡"` 的 11 个值都以 **⭕** 开头。
+⇒ 这 **11 种语言显示「✅ ✅ Heute erledigt」**。zh/en 正常。
+**修法**（一行级）：`LevelHeader` 里删掉那个独立的 `Text('✅'/'⭕')`（让译文自带的那个当图标），
+或删掉译文里的 emoji（但那要动 10 行字典，不划算）。
+
+> 说明：这 2 处**都不是今天改动引入的**（C-1 在 10-19 就存在；C-2 与 heroCard 无关，是 LevelHeader 原有写法）。
+> 它们属于我 S-06 `collapseLabel()` 抓到的**同一类**：**字典值自带符号 + 组件又画一个**。
+
+### 3.3 核对后“没问题”的同类点（9 处，附理由）
+
+| 位置 | 写法 | 为什么没问题 |
+|---|---|---|
+| `GamesTab.ets:1297` + `collapseLabel()` | 剥掉箭头后画 `⌄` | 已修（S-06），剥完再画，单箭头 |
+| `GamesTab.ets:1713`（按特征挑游戏） | `this.t('收起 ▲','Less ▲')` / `this.t('展开 ▼','More ▼')` | **箭头在字典键里**且组件**没有再画** ⇒ 单箭头 ✓（与 C-1 恰好相反：这里是"键带箭头"，正确的是别再加） |
+| `GamesTab.ets:1574 / 1621`、`SettingsTab.ets:1048` | `this.t('开始 ›','Play ›')` | 箭头在键里，无额外 `Text('›')` ⇒ 单箭头 ✓ |
+| `GamesTab.ets:2350`、`StatsTab.ets:1162` | `Text('›')` 跟在**游戏名/副标题**后 | 游戏名/`displayTagline` 不来自箭头字典 ⇒ ✓ |
+| `SettingsTab.ets:395 / 779 / 1204` | `Text('›')` 跟在**功能行标签**后（局域网对战 / 隐私政策 / navRow） | 这些键的译文不含箭头 ⇒ ✓ |
+| `GameHost.ets:978`、`GuidePage.ets:173`、`LanLobby.ets:94` | `Text('‹')` 纯图标 + `accessibilityText('返回')` | 图标本身就是按钮，标签只在读屏用 ⇒ ✓ |
+| `GuidePage.ets:315` | `kv(TG('‹ 左上角'), '‹ top left', …)` | 「‹ 左上角」整体是一条**说明文字**（讲返回键在哪），箭头在键里、不叠加 ⇒ ✓ |
+| `pages/Index.ets:403-407` | `▶️ 演示 — …` / `🔍 搜索…` | 每条都是完整一句话（emoji 在键里），无额外符号 ⇒ ✓ |
+| `GameI18n` 4043 条 | 仅 3 条译文加箭头（`점수↑`、`Point {0} → step {1}`、`大→小は…`）| 全是规则/进度**说明文本**，且不在"标签 + 自绘箭头"结构里（`GDistractorMatrix:336`、`GStaircaseMemory:212`、`GUnitConverterPro:315`）⇒ ✓ |
+
+**games/ 的 140 处箭头**（`Button('↑')`、`ARROW[]` 方向表、`chain.join(' → ')` 等）都是**玩法符号本身**，
+不是“字典 + 组件”的重复标注 ⇒ 无同类问题。
+
+### 3.4 建议（按性价比）
+
+1. **C-1**（1 处，11 语言可见）：`StatsTab.achvWall` 剥箭头或删自绘 `▲/▼`。
+2. **C-2**（1 处，11 语言可见）：`LevelHeader` 删独立 emoji，用译文自带的那一个。
+3. **规则化**（防止再长出来）：新增一条判据 —— *「字典键/译文里已有符号（箭头/emoji）时，组件不得再画同一个符号」*；
+   并在 `collapseLabel()` 旁写清"字典自带箭头"的事实，供后来者照抄。
+
+---
+
+## 4. 复核用的最小命令（可重跑）
+
+```bash
+# ① 旧 heroCard 的信息清单（对照提交）
+git show f8c20d32:entry/src/main/ets/components/StatsTab.ets | sed -n '/heroCard() {/,/@Builder/p'
+
+# ① chip 数据源一致性
+grep -n "this.chip('🔥'" /tmp/StatsTab_old.ets entry/src/main/ets/components/StatsTab.ets
+
+# ② 火焰换行的条件与分支
+sed -n '/private flamesBelow/,/^  }/p' entry/src/main/ets/components/Common.ets
+grep -n "if (Bp.tinyWatch())\|} else if (Bp.isWatch() || Bp.tinyScreen())\|} else {" entry/src/main/ets/components/Common.ets
+
+# ③ 字典里带箭头的键（本轮命中 15 条）
+grep -nE '^\s+"[^"]+": \{.*[▲▼›‹→←↑↓]' entry/src/main/ets/core/I18n.ets
+```
+
+---
+
+*自检时间 2026-11-07 22:20 ｜ 只读，未改代码 ｜ 结论：① 通过、② 通过、③ 另有 2 处同类问题（C-1/C-2）*

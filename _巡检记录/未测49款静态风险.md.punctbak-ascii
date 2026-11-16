@@ -1,0 +1,105 @@
+# 未测 49 款静态风险审计 —— 2026-11-13 白天（不占机器）
+
+> 执行：verifier-eng2 ｜ ⛔ 未改 `.ets`、未改 `工具/*.py`、未编译、未碰设备、未 commit
+> 方法：`strip_comments` 去注释 → 认「两层 `ForEach` + 行 `Row` + 棋盘 `Column` 收尾」结构 → 看宽度来源/封顶/固定高度
+> 尺子：游戏区预算 **343vp = 1029px**（起点约 381px）；`Cell.of(N)` 在 533 矮屏 = `N × 0.85`
+
+## 0. 结论（先看这段）
+
+| 档 | 数量 | 说明 |
+|---|---:|---|
+| 🔴 **高** | **16 款** | 13 款**固定大块 150~180vp**（占预算 44~52%）+ 3 款**方形盘面无封顶**（≈813vp）|
+| 🟡 中 | 65 款 | 固定块 100~149vp（16）+ 方形格待查（49）|
+| ⚪ 低 | 222 款 | 已有 `Math.min`/`constraintSize`，或无方形盘面/大固定块 |
+| — | 303 款 | **本报告审计的全体**＝「账本里没有可信测量」的全部游戏 |
+
+**为什么是 303 而不是 49**：账本 `layout-canonical.tsv`（337 行）里「没有值」的记录只有 **10 个游戏名**
+（`Distractor Matrix`/`Factor Finder`/`Fraction Match`/`Matcher`/`Modular Clock Arithmetic`/`Nothing`/`Path Recall`/`Rotating Maze`/`Visual Search Conjunction`/`Word Snake`），
+其余失败记录的 `game` 字段被扫描器写成了 **`Nothing`/`__nope__`**（认不出标题）⇒ **那 49 款的身份在账本里丢失了**。
+所以我审了**全部 303 款没有可信测量的游戏**，这个集合**必然覆盖**那 49 款。
+> 🎯 巧合但有用：我的扫描里「**方形格但宽度来源不明**」正好也是 **49 款**（见 §2），可能就是你那个 49 的口径。
+
+---
+
+## 1. 高风险 16 款（建议按顺序看）
+
+### 1.1 固定大块 150~180vp（13 款）—— 和 `Stroop` 同一类病
+
+| 类名 | 风险 | 依据（行号 + 原文） | 建议第一刀 |
+|---|---|---|---|
+| `GSpatialConflict`空间冲突 | 🔴 高 | `GSpatialConflict.ets:291` `.width('100%').height(180)`（=540px，**52%** 预算） | `.height(Bp.isShort() ? 140 : 180)`（省 40vp=120px） |
+| `GStroopNumberSize`数字大小 | 🔴 高 | `GStroopNumberSize.ets:268` `.width('100%').height(180)`（52%） | 同上 |
+| `GTemporalOrderJudgment`时序判断 | 🔴 高 | `GTemporalOrderJudgment.ets:323` `.width('100%').height(180)`（52%） | 同上 |
+| `GBlinkDetector`眨眼检测 | 🔴 高 | `GBlinkDetector.ets:361` `height(170)`（=510px，50%） | `.height(Bp.isShort() ? 132 : 170)` |
+| `GChoiceReactionTime`选择反应 | 🔴 高 | `GChoiceReactionTime.ets:300` `height(170)`（50%） | 同上 |
+| `GStopSignal`停止信号 | 🔴 高 | `GStopSignal.ets:334` `height(170)`（50%） | 同上 |
+| `GTopology`拓扑 | 🔴 高 | `GTopology.ets:290` `}.width('100%').height(170)`（50%） | 同上 |
+| `GAbReversalOddball`AB 反转 | 🔴 高 | `GAbReversalOddball.ets:327` `height(160)`（47%） | `.height(Bp.isShort() ? 124 : 160)` |
+| `GShellGame`猜球 | 🔴 高 | `GShellGame.ets:318` `.layoutWeight(1).height(160)`（47%）| 同上 |
+| `GActionSequenceRecall`动作序列 | 🔴 高 | `GActionSequenceRecall.ets:318` `height(150)`（44%） | `.height(Bp.isShort() ? 116 : 150)` |
+| `GCardCountingMemory`数牌记忆 | 🔴 高 | `GCardCountingMemory.ets:375` `.width('100%').height(150)`（44%） | 同上 |
+| `GPosnerSpatialCueing`空间提示 | 🔴 高 | `GPosnerSpatialCueing.ets:297` `.layoutWeight(1).height(150)`（44%） | 同上 |
+| `GVennNumbers`数字文氏图 | 🔴 高 | `GVennNumbers.ets:344` `.width('100%').height(150)`（44%） | 同上 |
+
+> ⚠️ 这一类**不是"必然溢出"**，是"**一块就吃掉 44~52% 预算**" —— 同页只要再有统计卡(60)+按钮(44)+两个选项(88)+间距(30) ≈ 222，就会顶到 343 上限。
+> 真机验证法：dump 里看这块的 `bounds` 底 + 后面还剩多少（`max_bottom ≥ 1584` 就是触底）。
+
+### 1.2 方形盘面无封顶（3 款）
+
+| 类名 | 风险 | 依据（行号 + 原文） | 建议第一刀 |
+|---|---|---|---|
+| `GCubeNetFold`立方体展开 | 🔴 高 | `GCubeNetFold.ets:364` `}.width('100%')`（B 型棋盘，外层无 `constraintSize`/`Math.min`） | `.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))` |
+| `GSpotlightTrack`聚光追踪 | 🔴 高 | `GSpotlightTrack.ets:322` `.width('100%').padding(Space.xs)`（同上） | 同上 |
+| `GGeometricVision`几何直觉 | 🔴 高 | `GGeometricVision.ets:350`/`:344` 两个 `@Builder` 棋盘各在 `Column().layoutWeight(1)` 里并排 ⇒ **每块宽 ≈ 410vp**（高也 410） | 两个棋盘各加 `.constraintSize({ maxWidth: Bp.isShort() ? 150 : 9999 })` |
+
+---
+
+## 2. 中风险 65 款（分布 + 怎么继续判）
+
+### 2.1 固定块 100~149vp（16 款）
+
+`警觉任务(148)`、`拥挤视力(148)`、`任务切换(146)`、`阅读广度(140)`、`节奏大师(140)`、`规则切换器(140)`、`切换代价(136)`、`运算广度(130)`、`倒背数字(110)`、`非匹配延迟(110)`、`数方块(112)`、`注意瞬脱(120)`、`瞬脱探针(120)`、`数字探针`、`记忆广度`、`周边视野`
+⇒ 单块 29~43% 预算，**只有在同页还有 ≥3 个块时才溢出**；先别动，等真机。
+
+### 2.2 方形格 49 款 —— 按宽度来源再分三档
+
+| 档 | 款数 | 含义 | 举例 |
+|---|---:|---|---|
+| 已封顶 | **14** | 文件里有 `Math.min(...)` / `constraintSize` / `boardPx()` ⇒ 大概率已安全 | `明灯`、`字母数独`、`二进制`、`桥梁`、`桥梁进阶`、`复合连线`、`双镜像`、`黑白棋`、`筛法可视化`、`数字华容道`… |
+| **layoutWeight 型** | **33** | 棋盘容器自己有 `.layoutWeight(1)` ⇒ 只吃剩余空间，**不把兄弟推出屏**；但格子按宽度撑 ⇒ **视觉上会溢出容器**（盖住下面按钮） | `字谜定义`、`黑猩猩测验`、`填字游戏`、`皇冠`、`分配注意`、`多米诺拼盘`、`空当接龙`… |
+| 待确认 | **2** | 既没封顶、也没在棋盘上看到 `layoutWeight` | `变化盲视`、`五子棋` |
+
+> ⚠️ 这 49 款**不能只看"有没有封顶"**：`layoutWeight` 型（33 款）不会推走按钮，但会**视觉溢出** ⇒ 修法应是给棋盘加 `maxWidth`（判据 1966：`maxHeight` 对「格子按父宽分配」无效）。
+> 「已封顶 14 款」也可能封在**别的节点**上（判据 1964：要看目标节点自己的尺寸）—— 需要真机 dump 才能定。
+
+---
+
+## 3. 我最建议先改的三款（改法完全一样，可一次改完）
+
+| 顺序 | 款 | 为什么先它 |
+|---|---|---|
+| **1** | `GSpatialConflict`（`GStroopNumberSize` 同族） | 180vp = **52%** 预算，和 `Stroop` 的问题结构一致（一张大卡 + 选项 + 按钮）；改法一行、风险最低 |
+| **2** | `GStroopNumberSize` | 同上；而且它和 `Stroop Test` 是"同族题"（都是颜色/大小冲突），一起改便于对比验收 |
+| **3** | `GTemporalOrderJudgment` | 同上；三款都在 533 下用 `height(180)` |
+
+**统一改法**（三款都一样）：
+```ts
+-  .width('100%').height(180)
++  .width('100%').height(Bp.isShort() ? 140 : 180)
+```
+⇒ 533 下每款省 **40vp = 120px**；竖屏不变（`Bp.isShort()` 只在高 < 690 时真）。
+
+---
+
+## 4. 方法与可复现
+
+1. `工具/ets_parse.py` 的 `strip_comments` 去注释（否则会把「原来是 `.width('86%')`」这种**已修记录**误判成现状 —— 我第一版扫描就是这样多出 40+ 假阳性）；
+2. 认棋盘：`}, (x: number) => …)` 收尾 + 下一行 `}.width(…)` ⇒ 这是「两层 ForEach」的棋盘容器；
+3. 看它的**同链修饰**是否含 `constraintSize`/`layoutWeight`，以及全文件有没有 `Math.min`/`boardPx()`；
+4. 固定块：`.height(N)`（N ≥ 100）按 **vp** 算（`height(180)` = **180vp = 540px**，不是 px —— 今晚的教训之一）。
+
+## 5. 边界
+
+- **只读**：未改 .ets / 工具，未编译、未碰设备、未 commit；所有行号取自当前工作树，并附原文便于全文匹配。
+- **静态只能给候选**：`height(180)` 是否真溢出取决于同页还有多少块；真机 `dump` 的 `max_bottom`/`blk` 才是判据（1980/1981）。
+- **「49」无法一一对应**：账本失败记录不存游戏名（写成 `Nothing`），我只能审"全部 303 款无可信测量"的集合；如果你手上有那 49 款的名字清单，我可以按名字重扫一遍（同样只读）。

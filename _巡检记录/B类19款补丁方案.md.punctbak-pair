@@ -1,0 +1,94 @@
+# B 类 19 款补丁方案（棋盘 100% 宽 + 方形格）—— 只读，未改 .ets
+
+> 执行：verifier-eng2 ｜ ⛔ 未改 `.ets`、未编译、未碰设备、未 commit
+> 输入：`_巡检记录/横向撑高棋盘清单.md` 的 B 类 19 款
+> 预算：853×533 时游戏区 **343vp**（`Bp.height − 190`），屏宽 853 ⇒ 100% 宽的方形盘 ≈ **813vp** ⇒ 超 2.4 倍
+
+## 0. 一句话结论
+
+**19 款里 12 款真的需要改；7 款不需要**（2 款已修、1 款已有约束、2 款是平铺小格、2 款盘面带 `layoutWeight` 不推走兄弟）。
+
+## 1. ⚠️ 先修正模板：`maxHeight` 只裁不缩，不是有效修法
+
+你给的模板：
+```ts
+.constraintSize({ maxHeight: Math.max(120, Bp.height - 400) })
+```
+**对这 19 款无效**：它们的格子是 `layoutWeight(1) + aspectRatio(1)`，**高度由宽度决定**。
+给容器加 `maxHeight` 只会把容器压矮，格子仍按**宽度**算 ⇒ **下半截被裁掉**（判据 1928 已在仓库里写下这个坑，
+`GNumberBondsAll.ets:397-399` 就是照它改的：**同时给 maxHeight + maxWidth**）。
+
+**首选写法（限宽即限高，项目里已验过 9 款）**：
+```ts
+.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+```
+**等价的安全写法（只加约束、不改宽度语义）**：
+```ts
+.constraintSize({ maxWidth: Bp.isShort() ? Math.max(140, Bp.height - 360) : 9999 })
+```
+533 下两者都 ⇒ **173vp**；竖屏 744 下 `min(817, 384) = 384` ⇒ 更大，合理。
+
+## 2. 表（19 款）
+
+| # | 类名 | 文件 | 补丁行号 | 是否已有约束 | 建议（原串的 `.width('100%')` 换成右边） | 需要改吗 |
+|---|---|---|---:|---|---|---|
+| 1 | `GCountingSheep` | `GCountingSheep.ets` | **L337** | ❌ 无 | `.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))` | ✅ **要** |
+| 2 | `GCrossSectionSlice` | `GCrossSectionSlice.ets` | **L299** | ❌ 无 | 同上 | ✅ **要** |
+| 3 | `GDistractorMatrix` | `GDistractorMatrix.ets` | **L333** | ❌ 无 | 同上 | ✅ **要** |
+| 4 | `GFactorFinder` | `GFactorFinder.ets` | **L334** | ❌ 无 | 同上 | ✅ **要** |
+| 5 | `GFindWord` | `GFindWord.ets` | **L339** | ❌ 无 | 同上 | ✅ **要** |
+| 6 | `GFractionMatch` | `GFractionMatch.ets` | **L419** | ❌ 无 | 同上 | ✅ **要** |
+| 7 | `GPixelMimic` | `GPixelMimic.ets` | **L325 ＋ L349**（双盘，各 8×8） | ❌ 无 | 两行都换：`.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))` | ✅ **要（2 处）** |
+| 8 | `GPrimeHunter` | `GPrimeHunter.ets` | **L337** | ❌ 无 | 只换行首的 `.width('100%')`，其余 `.padding(Space.sm)…` 保留 | ✅ **要** |
+| 9 | `GRotatingMaze` | `GRotatingMaze.ets` | **L396** | ❌ 无 | 同上（保留 `.padding(Space.xs)…`） | ✅ **要** |
+| 10 | `GTarget10` | `GTarget10.ets` | **L348** | ❌ 无 | 同上（保留 `.padding(Space.sm)…`） | ✅ **要** |
+| 11 | `GVisualSearchConjunction` | `GVisualSearchConjunction.ets` | **L352** | ❌ 无 | 同上（保留 `.padding(Space.sm)…`） | ✅ **要** |
+| 12 | `GWordSearch` | `GWordSearch.ets` | **L382** | ❌ 无 | `.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))` | ✅ **要** |
+| 13 | `GLetterCancellation` | `GLetterCancellation.ets` | L342（棋盘）/ L340（行） | ✅ **内层 Row 已封顶**（L340 就是 `Math.min(...)`） | 无需改；可选：把棋盘也换成同一式，让外框贴合 | ❌ **不要** |
+| 14 | `GWordSnakeTrail` | `GWordSnakeTrail.ets` | L363（棋盘）/ L361（行） | ✅ **内层 Row 已封顶**（L361） | 同上 | ❌ **不要** |
+| 15 | `GNumberBondsAll` | `GNumberBondsAll.ets` | L394 | ✅ **已有** `constraintSize({ maxHeight, maxWidth })`（L399，判据 1928） | — | ❌ **不要** |
+| 16 | `GModuloPath` | `GModuloPath.ets` | L431 | ⚠️ 盘面自身 `.layoutWeight(1)`（纵向权重） | 低优先：`.constraintSize({ maxWidth: Bp.isShort() ? Math.max(140, Bp.height - 360) : 9999 })` | ⚠️ **不必需** |
+| 17 | `GPatternSequenceDraw` | `GPatternSequenceDraw.ets` | L328 | ⚠️ 盘面自身 `.layoutWeight(1)` | 同上 | ⚠️ **不必需** |
+| 18 | `GShapeShifter` | `GShapeShifter.ets` | L323（外层 78%，tile `.layoutWeight(1)` L325） | ✅ 平铺小格：tile 宽 ≈ 853/4×0.78 ≈ **166vp** ⇒ 高 166 | — | ❌ **不要** |
+| 19 | `GSilhouetteMatchOrtho` | `GSilhouetteMatchOrtho.ets` | L284（外层 74%，tile `.layoutWeight(1)` L286） | ✅ 同上：tile 74% ≈ **158vp** | — | ❌ **不要** |
+
+## 3. 为什么这 7 款不需要改（逐条依据）
+
+| 款 | 依据 |
+|---|---|
+| `GLetterCancellation` / `GWordSnakeTrail` | **内层 `Row` 已经是封顶写法**：`}.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))`（L340 / L361）⇒ 每行宽 173、格子 173/N、行高 = 173/N ⇒ 整盘高 ≈ 173 ✓。它们的棋盘外层还写 `100%`，但**高度已经被行宽决定**，不需要再改（若想外框贴合可顺手把外层也换成同一式）。 |
+| `GNumberBondsAll` | L399 已同时有 `maxHeight` **和** `maxWidth`（判据 1928 的正确写法）✓ |
+| `GShapeShifter` / `GSilhouetteMatchOrtho` | 盘面在一个 **4 格平铺 Row** 里，每个 tile `.layoutWeight(1)`（L325 / L286）⇒ tile 宽只有屏宽/4，再乘 78% / 74% ⇒ 盘面 **166 / 158vp**，**远低于 343**。这正是你提醒的「格子按父格 layoutWeight 分配」⇒ 不需要改。 |
+| `GModuloPath` / `GPatternSequenceDraw` | 盘面容器自身 `.layoutWeight(1)`（**纵向**权重）⇒ 它只吃掉「剩余高度」，**不会把兄弟节点推出屏**；格子仍按宽度撑到 813 ⇒ 视觉上会溢出容器、盖住下面的按钮，但**不改变布局位置** ⇒ 不是本次"横向撑高"问题；低优先可加 `maxWidth` 收掉视觉溢出。 |
+
+## 4. 改完后的格子边长（估算，按 173vp 盘面）
+
+| 棋盘 | 格数 | 改后单格 | 判断 |
+|---|---|---|---|
+| `GCountingSheep` | 4×4 | **≈43vp** | ✓ 宽松 |
+| `GCrossSectionSlice` | 5×5 | ≈34.6vp | ✓ |
+| `GDistractorMatrix` | 4×4 | ≈43vp | ✓ |
+| `GFactorFinder` | 3×N | ≈43~57vp | ✓ |
+| `GFindWord` | 6×6 | ≈28.8vp | ✓ |
+| `GFractionMatch` | 2×4 | ≈43vp | ✓ |
+| `GPixelMimic` | 8×8（半宽盘） | ≈21.6vp | ○ 偏小但项目内有同级（`GTennerGrid` 10×10 = 20vp）|
+| `GPrimeHunter` | 5×5 | ≈34.6vp | ✓ |
+| `GRotatingMaze` | 7×7 | ≈24.7vp | ○ 可接受 |
+| `GTarget10` | 4×4 | ≈43vp | ✓ |
+| `GVisualSearchConjunction` | 5×5 | ≈34.6vp | ✓ |
+| `GWordSearch` | 8×8 | ≈21.6vp | ○ 偏小但可点（同 PixelMimic）|
+
+## 5. 落地顺序建议
+
+1. **先改 4 款格数小的**（`GCountingSheep` 4×4、`GDistractorMatrix` 4×4、`GTarget10` 4×4、`GFractionMatch` 2×4）—— 收益立竿见影、每格仍 ≥43vp
+2. **再改 5×5 的 3 款**（`GCrossSectionSlice`、`GPrimeHunter`、`GVisualSearchConjunction`）
+3. **最后改 6~8×8 的 4 款**（`GFindWord` 6×6、`GRotatingMaze` 7×7、`GWordSearch` 8×8、`GPixelMimic` 8×8×2 处）—— 单格会到 21~29vp，
+   若嫌小可改成 `Bp.height - 380`（=153vp）或给 8×8 单独用 `Bp.height - 420`（=113vp ⇒ 14vp/格，太小）——**不建议再小**，21vp 已是可点下限附近
+
+## 6. 边界
+
+- **只读**：未改任何 `.ets`、未编译、未碰设备、未 commit。
+- 「是否已有约束」这次是**逐款看棋盘收尾链**（不是文件级 grep），比队友那份清单更细：
+  因此 `GLetterCancellation` / `GWordSnakeTrail` 从「需要看」降级为 **已修**，`GPixelMimic` 从 1 处升为 **2 处**。
+- 行号取自当前工作树（今日有人改过上述两款 ⇒ 行号已按现版核对）。
+- 未做真机 dump；`GPixelMimic` 是「Row 内两个 layoutWeight 面板」的横向布局，改的是**每个盘面**的宽度，两个面板会同时变窄，真机需确认是否还看得清（8×8 双盘在 533 横屏下本来就挤）。

@@ -1,0 +1,115 @@
+# RTL 根因：`direction` 的适用范围（2026-11-08 03:40）
+
+> 起因：v1（Index 根 Stack）、v2（三个 Tab 根 Stack/Scroll）两版 `direction` 真机都**完全无效**。
+> 本轮查 SDK 与官方 FAQ，结论：**不是加载位置错，是用法本身不对**。
+
+---
+
+## 一、SDK 原文（决定性证据）
+
+`sdk/default/openharmony/ets/component/common.d.ts:20243-20260`
+
+```ts
+/**
+ * Sets how elements are laid out **along the main axis of the container**.
+ * @param { Direction } value - How elements are laid out along the main axis of the container.
+ *     If this parameter is set to **auto**, the layout is subject to the system language.
+ *     **The setting does not take effect in the `Column` component.**
+ */
+direction(value: Direction): T;
+```
+
+两句话各自否掉一个方案：
+
+| 事实 | 影响 |
+|---|---|
+| 「along the **main axis** of the container」 | 只对**主轴容器**有意义 ⇒ **`Row` / 横排 `Flex`**。`Column` 是纵轴，`Stack`/`Scroll` 没有主轴概念 |
+| 「**does not take effect in the `Column` component**」 | ⇒ **方案①（把 direction 挪到 Scroll 里的 Column）文档层面就是无效的** |
+
+**所以我上一轮建议的“移到 Column”是错的** —— 我在报告里写“最可能生效”，实际 SDK 明写了不生效。
+这一条我现在才查到，之前是凭推理。
+
+---
+
+## 二、官方 FAQ 的正确姿势
+
+`hms_docs` → `FAQ/UI框架/组件使用/如何实现镜像语言功能/faqs-arkui-556`
+
+官方给的四步：
+
+1. `resources` 里加语言资源（`ug/element/string.json`）
+2. **`i18n.System.setAppPreferredLanguage('ug')`** —— 设置应用偏好语言
+3. **`direction`** —— 但官方示例是挂在 **`Row`** 上：
+   ```ts
+   Row() { Image(...).matchTextDirection(true); Text(...) }
+     .justifyContent(FlexAlign.SpaceBetween)
+     .direction(Direction.Auto)   // ← 注意是 Auto，不是 Rtl
+   ```
+4. **`matchTextDirection(true)`** —— 图片跟随语言方向镜像翻转
+
+另一篇 FAQ（`faqs-arkui-314`）补充：`LocalizedMargin`/`LocalizedPadding` 提供
+`start/end` 类型，"在 RTL 语言环境下，start/end 将自动映射为 right/left"
+—— **这正是你改 `margin({start/end})` 编译失败的原因：它不是 number，是 `LengthMetrics` 类型。**
+
+---
+
+## 三、本项目的真正缺口（三层，缺一不可）
+
+| 层 | 现状 | 需要 |
+|---|---|---|
+| **① 告诉平台「我现在是阿语」** | `setAppPreferredLanguage` **从未调用**（全仓 0 处） | 切语言时同步调用 |
+| **② 容器方向** | `direction` 只加在 `Stack/Scroll/Column` 上（全部无效） | 加在 **`Row`** 上，或根级用 `Direction.Auto` |
+| **③ 图片镜像** | `matchTextDirection` **从未使用**（0 处） | 图标类图片加 `matchTextDirection(true)` |
+
+**①是最要命的**：app 只在**自己的状态**里换语言（`I18n.cached` + AppStorage + preferences），
+系统侧语言一直是 `zh-CN`。所以：
+- `Direction.Auto` 永远解析成 LTR（系统说中文）
+- 显式 `Direction.Rtl` 只影响**被标注的那个 Row 的主轴**
+
+⇒ 这才是“两版 direction 全无效果”的完整解释：**既挂错了容器，也没告诉平台**。
+
+```ts
+// 签名（@ohos.i18n.d.ts:314）
+static setAppPreferredLanguage(language: string): void;
+```
+
+---
+
+## 四、本轮做的实验（一次编译验两个假设）
+
+只改 `SettingsTab.ets`，两处并存 —— 编译后**同一屏能同时读出两个结论**：
+
+| 实验 | 位置 | 预期（按文档） |
+|---|---|---|
+| **A**（你要求的方案①） | `SettingsTab.ets:539`，`Scroll` 内层 `Column` 的链尾 | **无效** |
+| **B**（文档指出的正解） | `SettingsTab.ets:746`，三个外观胶囊所在的 **`Row`** | **有效**（三个胶囊顺序反转） |
+
+判据：
+- **胶囊反转、其余不动** ⇒ B 对、A 错 ⇒ 修复方向是"按 Row 批量加"或"改用 `Direction.Auto` + `setAppPreferredLanguage`
+- **两个都不动** ⇒ `direction` 在本机 ArkUI 版本上整体不灵 ⇒ 只能按 `isRTL()` 手写 `FlexAlign`/`justifyContent`
+- **两个都动** ⇒ 文档不准（可能性低）
+
+---
+
+## 五、修正我之前的错判（这条要写进判据）
+
+我上一轮报告里写过「`direction` 是 CommonMethod 且**会继承给子组件**」。
+
+- **「是 CommonMethod」✅ 对** —— 所以每个组件都能 `.direction(...)` 编译通过（这给了我"哪都能加"的错觉）
+- **「会继承给子组件」❌ 错** —— 它只影响**该容器自己的主轴排布**，不改变子容器的排布方向
+
+**正确的判据应该写成**：
+> `direction` 在 `CommonMethod` 里（任何组件可调用），但**语义只对容器主轴生效**：
+> `Row`/横排 `Flex` 有效；`Column` 文档明写**不生效**；`Stack`/`Scroll` 无主轴概念、实测无效。
+> **不要指望它在根容器上一挂就整页镜像。**
+
+---
+
+## 六、建议的完整修法（三步，各自可独立编译）
+
+1. **`core/I18n.ets` 的 `set()` 里加** `i18n.System.setAppPreferredLanguage(lang)`
+   （`core/` 是 verifier-dev 的写域，需他配合；`i18n` 已在该文件 import 过，无新依赖）
+2. 根容器 `.direction(Direction.Auto)`（**Auto 才会跟随①设置的语言**，写死 `Rtl` 反而不跟系统）
+3. `Row` 类容器按需补 `.direction(Direction.Auto)`；图标图片补 `.matchTextDirection(true)`
+
+**本轮没改 `core/`**，也没动另外两个 Tab —— 等 A/B 实验结果出来再决定批量范围。

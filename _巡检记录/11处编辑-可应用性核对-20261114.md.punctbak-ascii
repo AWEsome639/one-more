@@ -1,0 +1,123 @@
+# 11 处编辑 · 可应用性核对（编译前逐行验证）—— 2026-11-14
+
+> 执行：verifier-eng2 ｜ **只读**：未改任何 `.ets`、未编译、未碰设备、未 commit
+> 口径：**行号全部用 `sed -n 'Np'`/`grep -nF` 实印**（不采信计划表里的原文）｜11/11 行号命中（未漂移）
+
+## 0. 一句话
+
+**11 处全部「能编译」**（括号/表达式位置/类型都成立、`Bp`/`Space`/`Cell`/`KEY_H` 全部已定义、`Visibility` 是 ArkUI 内建枚举无需 import）。
+**但有 4 处应用方式要改**：`#1 #2 #7` **不能整串替换**（同文件有同名串会被误伤），`#6` 的插入点是 **L539 之后**而不是 L536；
+另有 **1 处语义风险**（`#8–11` 把**可点 Button** 从 48vp 压到 **32vp，低于项目自己的 44 触控下限**）。
+
+---
+
+## 1. 总表（11 行，原文实印）
+
+| # | 文件:行 | 该行原文（实印） | 判定 |
+|---|---|---|---|
+| 1 | `GMagnets.ets:703` | `.width('100%')` | ✅ **可直接替换**（⚠️ 必须**按行号**改：同文件 `.width('100%')` 共 **4 处**） |
+| 2 | `GMandelbrot.ets:402` | `.width('100%')` | ✅ **可直接替换**（⚠️ 必须**按行号**：同文件共 **7 处**） |
+| 3 | `GWordle.ets:462` | `Column({ space: Bp.isShort() ? Space.sm : Space.md }) {` | ✅ 可直接替换（`Space.xxs` 存在 = 2） |
+| 4 | `GWordle.ets:518` | `.height(KEY_H)` | ✅ 可直接替换（该串**仅 2 处**：518 与 594，两处都是目标） |
+| 5 | `GWordle.ets:594` | `.height(KEY_H)` | ✅ 同上 |
+| 6 | `GWordle.ets:536` 的 `Text(TG('提示：5 个字母…'))` **块** | `Text(TG('提示：5 个字母的常用英文单词；重复字母会按剩余次数判定'))`<br>→ `.fontSize(FontSize.xxs)` → `.fontColor(this.theme.inkFaint)` → **`.width('100%')`（L539）** | ⚠️ **需调整**：`.visibility(...)` 要追加在 **L539 `.width('100%')` 之后**，不是在 L536 行尾（否则会插进 `Text(...)` 的**参数**里 ⇒ 语法错） |
+| 7 | `GFractionalPizza.ets:326` | `      }.width('100%').height(Cell.of(64))` | ⚠️ **需调整**：同文件 **L317** 也有 `.height(Cell.of(64))`（切片），**只改 326 会让切片(61vp)溢出容器(44vp)** ⇒ 建议**两处一起改** |
+| 8 | `GVectorGridAlignment.ets:339` | `.borderRadius(Radius.md).layoutWeight(1).height(Cell.of(50)).animation(…)` | ✅ 可替换（4 处全同串、全是目标 ⇒ 可整串替换 4 次）但 ⚠️ 见 §2.4（触控下限） |
+| 9 | `GVectorGridAlignment.ets:351` | 同上 | 同上 |
+| 10 | `GVectorGridAlignment.ets:363` | 同上 | 同上 |
+| 11 | `GVectorGridAlignment.ets:375` | 同上 | 同上 |
+
+---
+
+## 2. ⚠️ 逐条说明（怎么改才对）
+
+### 2.1 `#1` GMagnets L703 —— 按行号，别整串替换
+- 同一句 `.width('100%')` 在该文件出现 **4 次**（L679 的网格行、L703 的棋盘 Column 等）。**只有 L703 是棋盘容器**；
+- 改法（行号精确替换）：
+```ts
+// L703
+-      .width('100%')
++      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+```
+- ✅ 语义核对：`N = 4`（4×4）+ 右侧 `CLUE_W = 44` 的线索列 ⇒ 封顶 173vp 后单格 ≈ 38vp、棋盘高 ≈ 200vp ✓ 装得进 343 预算。
+- ✅ 该文件 `Bp`（L14）、`Space`（L11）都已 import。
+
+### 2.2 `#2` GMandelbrot L402 —— 按行号；公式已核对正确
+- 同文件 `.width('100%')` **7 处** ⇒ 必须按行号；
+- ✅ **网格尺寸核实**：`ForEach([0..11])` × `ForEach([0..15])` = **12 行 × 16 列**（`GW=16`、`GH=12`，L23-24），格子 `.layoutWeight(1).aspectRatio(1)` ⇒ **高 = 12/16 = 0.75 × 宽** ⇒ 反解宽度 **W = H × 4/3** ✓ 与你的公式一致；
+- 改法：
+```ts
+// L402
+-      .width('100%')
++      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, (Bp.height - 360) * 4 / 3)))
+```
+- 数值：533 下 `(533−360)×4/3 ≈ 230.7` ⇒ 棋盘高 ≈ **173vp** ✓（余量足够）。
+- ⚠️ 小提醒：`Bp.height < 360` 时该值是**负数**，被 `Math.max(140, …)` 兜住 ⇒ 不会出现负宽度（手表/极小屏安全）。
+
+### 2.3 `#6` GWordle 提示行 —— 插入点在 **L539 之后**
+- 该 `Text` 块的链是 L536-539（L539 是 `.width('100%')`），**L540 是 `}`**；
+- 改法（新增一行，不动 L536）：
+```ts
+// 在 L539 之后插入
+      .width('100%')
++       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+```
+- ✅ `Visibility` 是 ArkUI 内建枚举，**无需 import**（同仓库 `GMandelbrot:473`、`GFractionalPizza`、`GVectorGridAlignment` 都在用 `Bp.isShort() ? Visibility.None : Visibility.Visible` 同款写法）；
+- ✅ 追加一行不改变大括号配对。
+
+### 2.4 `#8–11` GVectorGridAlignment —— 能编译，但**会把可点按钮压到触控下限以下**
+- 这四行是 **`Button(('←'))` 等四个方向按钮**（L337 起 `Row({ space: Space.sm })` + 4 个 `Button`，各自 `.layoutWeight(1).height(Cell.of(50))`，且都有 `.onClick(...)`）；
+- `Cell.of` 实算（`× 1.12 × 0.85`）：`Cell.of(50) = **48vp**`（≥ 44 ✓）→ `Cell.of(34) = **32vp**`（**< 44 ✗**）；
+- ⇒ 与项目自己的判据冲突（`core/Design.ets` 注释：「**可点**的格子用 `Cell.tap(44)`，纯装饰仍用 `Cell.of()`」）。32vp 的按钮**手指按边缘会落空**；
+- 三个选择：
+  1. **接受**（你点头）：32vp 省 16vp/行，但触控变差 —— 如果这四键只是"方向微调"、还有滑动手势兜底，可接受；
+  2. 改 `Cell.tap(34)`（= `max(32,44)=44`）⇒ **一点也没省**，这刀白改；
+  3. 改 `Bp.isShort() ? 40 : Cell.of(50)`（40vp 仍 < 44，但比 32 好；只省 8vp）。
+- ✅ 语法上三种都能编译；**建议选 1 或 3，别选 2**。
+
+### 2.5 `#7` GFractionalPizza —— 建议两处一起改
+- L317（切片）：`.layoutWeight(1).height(Cell.of(64))`（=**61vp**）｜ L326（容器）：`.width('100%').height(Cell.of(64))`（=61vp）
+- 只改 L326 ⇒ 容器 61→**44vp**，而切片仍是 61vp ⇒ **溢出 17vp**；容器**没有 `.clip()`**（grep = 0）⇒ 切片会**画到下面「确认」按钮上**；
+- 改法：**两处一起**替换（整串替换 2 次即可，正好都是目标）：
+```ts
+- .height(Cell.of(64))
++ .height(Bp.isShort() ? Cell.of(46) : Cell.of(64))
+```
+- ✅ `Cell.of(46) = 44vp` ⇒ 正好卡在触控下限上（切片可点也不会掉到线下）。
+
+---
+
+## 3. import / 符号检查小结
+
+| 符号 | 需要的文件 | 结论 |
+|---|---|---|
+| **`Bp`** | 5 个文件全要（`isShort()`/`width`/`height`） | ✅ **全部已 import**：`GMagnets:14`、`GMandelbrot:11`、`GWordle:11`、`GFractionalPizza:7`、`GVectorGridAlignment:10` |
+| **`Space`** | `#1 #2`（`Space.lg`）+ `#3`（`Space.xxs`） | ✅ 全部已从 `../core/Design` import；`Space.xxs = 2` 存在 |
+| **`Cell`** | `#7 #8–11` | ✅ 两文件均已 import（且已在用 `Cell.of`） |
+| **`KEY_H`** | `#4 #5` | ✅ `GWordle.ets:28` `const KEY_H: number = 40;` |
+| **`Visibility`** | `#6` | ✅ **ArkUI 内建枚举，无需 import** —— 同仓库三处已在用（`GMandelbrot:473` 等） |
+| 重名/遮蔽 | 全部 | ✅ 没有同名局部变量遮住 `Bp`/`Space`/`Visibility`/`KEY_H` |
+
+**类型核对**（你问的第 3 条）：这 11 处的目标方法都吃 `number | string | Resource`（`width/height`）或 `Visibility`（`visibility`），
+**三元表达式返回 `number` / `Visibility` 枚举 ⇒ 类型全部成立**，不存在"只吃字符串"的位置。
+
+---
+
+## 4. 结论（一次能不能全上）
+
+**能一次全上，11/11 可编译**；但按下面 4 条"落刀方式"执行，别按计划表字面整串替换：
+
+| # | 落刀方式 | 原因 |
+|---|---|---|
+| 1、2 | **按行号**替换 | 同文件各有 4 / 7 处 `.width('100%')` |
+| 6 | 在 **L539 之后**新增一行 | 追加到链尾；追加在 L536 会破坏 `Text(...)` 参数 |
+| 7 | **两处一起**改（317 + 326） | 只改容器会让切片溢出 17vp（容器无 clip） |
+| 8–11 | 先决定触控口径（32vp 接受 / 40vp 折中） | `Cell.of(34)=32vp < 44` 触控下限；`Cell.tap(34)` 等于没改 |
+
+**唯一"语义级"待你拍板的只有一处：`#8–11` 的 32vp。** 其余 10 处按 §2 的方式落刀即可。
+
+## 边界
+
+- 只读核对：未改任何 `.ets`、未编译、未碰设备、未 commit。
+- 行号取自当前工作树；11/11 实印命中，无漂移。
+- 「能否编译」是**静态判定**（语法/类型/import），真正的编译仍需明晚窗口；`Cell.of` 数值按 `Design.ets` 的 `× Cell.k(1) × Bp.scale(1.12) × shrink(0.85)` 实算。

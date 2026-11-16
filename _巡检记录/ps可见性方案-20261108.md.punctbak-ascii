@@ -1,0 +1,245 @@
+# `ps_*` 标签的「筛选可见性」方案 —— 细类只用来打分，不占筛选面板
+
+> 2026-11-08 12:52–13:1x ｜ 执行：game-balancer ｜ **只出方案：未改仓库任何文件**
+> 预演方式：把 `gen_tags.py` + `GameRegistry.ets` 复制到 `/tmp/gt/` 沙盒，改完**真跑一遍生成器**，再 diff 生成的 `GameTags.ets`
+> ⇒ 下面第 3 节的 diff 是**生成器真实产物**，不是我手写的
+> 沙盒跑完核对过：`/tmp/game_tags.json` 与仓库现用版**字节一致**（无副作用）
+
+---
+
+## 0 一页结论
+
+| 问 | 答 |
+|---|---|
+| **怎么做** | `GameTag` 加 `hidden?: boolean`；**隐藏只发生在 UI 侧的两个查询函数**（`tagsIn` / `tagsByGroup`），数据里的 `tags` **一个字不动** |
+| **改了哪些文件** | `tools/gen_tags.py`（5 处：接口模板、发射器、2 个函数模板、`HIDDEN_TAGS` 常量）→ 生成物 `core/GameTags.ets` |
+| **UI 要改吗** | **零改动** —— `GamesTab` 只调 `tagsByGroup()` / `tagsIn()`，它们自己会过滤 |
+| **`ChatFinder` 要改吗** | **零改动** —— 它扫的是 `g.tags`（`ps_` 前缀），不经过 `GameTag` |
+| **效果** | 玩法组芯片 **15 → 12**（隐藏 `ps_merge` 3 / `ps_match` 6 / `ps_run` 7） |
+| **⚠️ 必须先确认** | **按「<10」这条线会切到 5 个 tag，不是 3 个** —— `ps_other`(7) 和 `ps_board`(8) 也在 10 以下。我的建议是**这两个不隐藏**（理由见 §4），但这是**与你给的规则不完全一致的地方**，请确认 |
+
+---
+
+## 1 问题
+
+`ps_merge` 收窄后只剩 **3 款**（`g2048` / `sum_snake` / `fibonacci_merge`）。
+作为**筛选项**它没有意义（点一下只剩 3 个游戏），但作为**打分维度**它很关键 —— 「像 2048」正是靠它把 10 个数字计算类挡在外面（`_巡检记录/playStyle方案-20261108.md` §12.3）。
+
+⇒ 需要把**「数据里的归类」**和**「UI 里能不能选」**拆开：数据保留全部 15 类，UI 只展示够宽的 12 类。
+
+---
+
+## 2 设计
+
+### 2.1 只在「查询函数」处过滤，不动数据
+
+```
+GameMeta.tags   ← 仍然是 ['...', 'ps_merge', '...']   ← 不动（打分要用）
+GameTags.TAGS[] ← 新增 hidden: true 标记               ← 只是"UI 不许选"
+tagsIn()/tagsByGroup() ← 跳过 hidden                    ← 唯一的过滤点
+```
+
+**为什么不在数据里删**：删了 `ChatFinder.styleOf()` 就查不到，等于废掉「像 2048」。
+
+### 2.2 接口
+
+```ts
+export interface GameTag {
+  group: string; id: string; icon: string; label: string; enLabel: string; enGroup: string;
+  /** 款数 <10 的细类只用于「像 XX」打分，筛选面板不显示（缺省不写 = 显示） */
+  hidden?: boolean;
+}
+```
+
+---
+
+## 3 diff 预览（**生成器真实产物**）
+
+### 3.1 `tools/gen_tags.py`（5 处）
+
+```diff
+@@ 1) 新增常量（放在 `# ── 打标规则 ──` 之前）
++# ★ 2026-11-08：**款数 <10、只服务于「像 XX」打分的细类** —— 筛选面板不显示（hidden: true）。
++#   ps_merge 3 款 / ps_match 6 款 / ps_run 7 款。
++#   ⚠️ ps_other(7) 与 ps_board(8) 也在 10 以下，但**故意不隐藏**：
++#      ps_other 是兜底桶（藏了那 7 款就再也筛不出来）；ps_board 是「下棋」这种高辨识度意图。
++HIDDEN_TAGS = {'ps_merge', 'ps_match', 'ps_run'}
++
+ # ── 打标规则 ──
+
+@@ 2) 接口模板（emit GameTags.ets 的那段字符串）
+   enLabel: string;
+   enGroup: string;
++  /** ★ 2026-11-08：款数 <10 的细类只用于「像 XX」打分，筛选面板不显示（缺省不写 = 显示） */
++  hidden?: boolean;
+ }
+
+@@ 3) 发射器
+     for grp, tid, icon, label in TAGS:
++        hid = ', hidden: true' if tid in HIDDEN_TAGS else ''
+         out.append(f"  {{ group: '{grp}', id: '{tid}', icon: '{icon}', label: '{label}', "
+-                   f"enLabel: '{EN.get(tid, label)}', enGroup: '{GRP_EN.get(grp, grp)}' }},\n")
++                   f"enLabel: '{EN.get(tid, label)}', enGroup: '{GRP_EN.get(grp, grp)}'{hid} }},\n")
+
+@@ 4) tagsByGroup() 模板
+-/** 分组清单（按出现顺序） */
++/** 分组清单（按出现顺序）—— 只收「至少有一个可见 tag」的组 */
+ export function tagsByGroup(): string[] {
+   const out: string[] = [];
+   for (let i = 0; i < TAGS.length; i++) {
+     const g: string = TAGS[i].group;
+-    if (out.indexOf(g) < 0) {
++    if (out.indexOf(g) < 0 && TAGS[i].hidden !== true) {
+       out.push(g);
+     }
+   }
+
+@@ 5) tagsIn() 模板
+   for (let i = 0; i < TAGS.length; i++) {
+-    if (TAGS[i].group === group) {
++    if (TAGS[i].group === group && TAGS[i].hidden !== true) {
+       out.push(TAGS[i]);
+     }
+```
+
+### 3.2 生成物 `entry/src/main/ets/core/GameTags.ets`（沙盒实跑 diff）
+
+```diff
+@@ 接口
+   enLabel: string;
+   enGroup: string;
++  /** ★ 2026-11-08：款数 <10 的细类只用于「像 XX」打分，筛选面板不显示（缺省不写 = 显示） */
++  hidden?: boolean;
+ }
+
+@@ 三条加 hidden
+-  { group: '玩法', id: 'ps_match', icon: '💥', label: '消除配对', enLabel: 'Match', enGroup: 'Playstyle' },
+-  { group: '玩法', id: 'ps_merge', icon: '🔢', label: '合并滚雪球', enLabel: 'Merge', enGroup: 'Playstyle' },
++  { group: '玩法', id: 'ps_match', icon: '💥', label: '消除配对', enLabel: 'Match', enGroup: 'Playstyle', hidden: true },
++  { group: '玩法', id: 'ps_merge', icon: '🔢', label: '合并滚雪球', enLabel: 'Merge', enGroup: 'Playstyle', hidden: true },
+ …
+-  { group: '玩法', id: 'ps_run', icon: '🏃', label: '跑分局', enLabel: 'Run', enGroup: 'Playstyle' },
++  { group: '玩法', id: 'ps_run', icon: '🏃', label: '跑分局', enLabel: 'Run', enGroup: 'Playstyle', hidden: true },
+
+@@ 两个查询函数
+-/** 分组清单（按出现顺序） */
++/** 分组清单（按出现顺序）—— 只收「至少有一个可见 tag」的组 */
+ …
+-    if (out.indexOf(g) < 0) {
++    if (out.indexOf(g) < 0 && TAGS[i].hidden !== true) {
+ …
+-    if (TAGS[i].group === group) {
++    if (TAGS[i].group === group && TAGS[i].hidden !== true) {
+```
+
+**改动量**：接口 +1 行注释 +1 行字段；TAGS 里 **3 行**；两个函数各 1 行。共 **8 行**（+1 处常量）。
+
+---
+
+## 4 ⚠️ 「<10」这条线会切到 **5 个** tag，不是 3 个
+
+我把当前所有 <20 款的 tag 列了一遍：
+
+| tag | 款数 | 你列的要隐藏？ | 我的建议 |
+|---|---|---|---|
+| `ps_merge` | **3** | ✅ 隐藏 | 隐藏（只为「像 2048」服务） |
+| `ps_match` | **6** | ✅ 隐藏 | 隐藏 |
+| `ps_run` | **7** | ✅ 隐藏 | 隐藏 |
+| **`ps_other`** | **7** | — | **不隐藏** ⚠️ 它是**兜底桶**：藏了之后那 7 款（4 可视化 + 3 纸牌）**再也筛不出来**（它们在别的维度上也没有特征） |
+| **`ps_board`** | **8** | — | **不隐藏** ⚠️「下棋」是**高辨识度意图**，用户最可能主动找的一类；藏了等于下棋类不可筛 |
+| `onehand` | 13 | — | 保持可见（>10） |
+
+⇒ **规则建议写成**：`hidden = 款数 < 10 且 不是兜底桶 且 不是高辨识度意图`，而不是纯粹的 `< 10`。
+本方案按你的 3 个执行；如果你要**严格按 <10**（即把 `ps_other`/`ps_board` 也藏），把 `HIDDEN_TAGS` 改成 5 个元素即可，**其余代码不用动**：
+
+```python
+HIDDEN_TAGS = {'ps_merge', 'ps_match', 'ps_run', 'ps_other', 'ps_board'}   # 严格 <10 版
+```
+
+---
+
+## 5 影响面分析（为什么是"安全的小改"）
+
+| 位置 | 会不会受影响 | 依据 |
+|---|---|---|
+| `GamesTab.tagPanel()` 渲染芯片 | **零改动**，自动少 3 个 | `ForEach(tagsByGroup())` + `ForEach(tagsIn(grp))`，过滤在函数里 |
+| `GamesTab.tagCountIn()` 计数 | **不受影响** | 它遍历 `ALL_TAGS`（含 hidden），只是 hidden 的芯片不渲染，没人会去看它的数字 |
+| `GamesTab.picked`（已选） | **不会卡住** | `@State picked: string[] = []` **只在内存**（`grep persist/AppStorage` 无命中），刷新页面即清空，不可能留下"选了但看不见"的死状态 |
+| `ChatFinder.styleOf()` | **零影响** | 它扫 `GameMeta.tags`（数据），不经过 `GameTags.TAGS` |
+| 其它 25 个旧 tag | **零影响** | 没有一个在 `HIDDEN_TAGS` 里 |
+| 持久化/迁移 | **不需要** | `hidden` 是生成期常量，不存用户数据 |
+
+**唯一的行为变化**：筛选面板「玩法」组从 **15 个芯片 → 12 个**；被隐藏的 3 个在**任何筛选路径里都选不到**（包括搜索框按标签搜 —— 目前没有这个入口）。
+
+---
+
+## 6 风险
+
+| 风险 | 等级 | 处置 |
+|---|---|---|
+| ArkTS 对接口可选字段（`hidden?:`）的严格检查 | 低 | 仓内已有可选字段先例（`GameMeta` 里 `levelReached?`、`GameResult` 的 `levelReached?`）；读法统一用 `!== true` 而不是 `!x`，避免 `undefined` 语义歧义 |
+| `tagsByGroup()` 的组头：若某组全 hidden 会渲染空段 | 低 | 已处理（只在遇到**非 hidden** 成员时 push 组名）；本次「玩法」组还有 12 个可见，不会空 |
+| 生成器是「唯一真源」：手改 `GameTags.ets` 会被下次重跑覆盖 | 中 | 改动**只写进 `gen_tags.py` 的模板**，不手改生成物；重跑验证用 `apply_tags.py` 那套流程 |
+| 沙盒预演污染 `/tmp/game_tags.json` | 已消除 | 预演后 `cmp` 校验过与仓库现用版**字节一致** |
+
+---
+
+## 7 验收（落地后跑这 5 条）
+
+1. `python3 tools/gen_tags.py` → `diff` 生成物应**正好 8 行变化**（见 §3.2）
+2. `python3 tools/apply_tags.py` → **需改 0 行**（`hidden` 不进 `GameMeta.tags`，数据不该变）← **这条是关键：证明筛选可见性和数据完全解耦**
+3. 断言基线仍 `200359 / 0`
+4. 真机：筛选面板「玩法」组**只有 12 个芯片**，`消除配对/合并滚雪球/跑分局` 不出现
+5. 真机：`ChatFinder`「像 2048」仍返回 **数字蛇 / 斐波那契合并**（证明打分没被影响）
+
+**回退**：把 `HIDDEN_TAGS` 改成 `set()` 重跑生成器即可（一行），或 `git checkout entry/src/main/ets/core/GameTags.ets`。
+
+---
+
+## 8 复现
+
+- 沙盒：`/tmp/gt/tools/gen_tags.py`（改动版）+ `/tmp/gt/entry/src/main/ets/core/GameRegistry.ets`（拷贝）⇒ 跑出来 `/tmp/gt/…/GameTags.ets` 与仓库版 `diff -u` 得到 §3.2
+- 款数统计：从 `GameRegistry.ets` 的 355 条 `tags: [...]` 计数
+- **本次未修改仓库任何文件**（`git status` 里的改动都属于别的 agent）
+
+---
+
+## 9 落地记录（2026-11-08 12:53 · Lead 批「按 3 个」）
+
+```
+ tools/gen_tags.py                        | 92 ++++++++++++++++++++++++-----
+ entry/src/main/ets/core/GameTags.ets     | 15 +++++----   ← 生成物
+ entry/src/main/ets/core/GameRegistry.ets | 16 +++----      ← 8 行 × +1/-1（PIN + ps_card，见下）
+```
+**基线 `200359 / 0` ✅**（未编译）
+
+### 9.1 按你要求先做「纯可见性」验证解耦
+
+| 步骤 | 结果 |
+|---|---|
+| 只加可见性（5 处）后跑 `gen_tags.py` | 生成物 `GameTags.ets` **+8 −6**（不是我方案里写的 "8 行" —— 那是我数的"逻辑改动"，实际行数是 8 增 6 删） |
+| **跑 `apply_tags.py`** | **`命中 355 / 355 ｜ 需改 0 行 ｜ 异常 0`** ✅ **解耦证明成立** |
+
+### 9.2 然后做 4 条 PIN + `ps_card`（同批）
+
+- 4 条 PIN：`spatial_conflict→attention`、`counting_sheep→attention`、`dynamic_salience→reaction`、`polyomino_tiling→fill`
+  （判据按 code-hunter 的：**看玩家实际在做什么操作，不看游戏名像什么**）
+- **`ps_card` 决定：加**（你预授权的可选件）。理由：麻将连连看原来在 `ps_match`、三款接龙在 `ps_other`，**同一族被拆两处**；加了之后 `ps_other` 只剩 4 款算法可视化，语义干净。
+- ⚠️ 落地时撞到一个坑：`peg_solitaire`（**孔明棋**，不是纸牌）被 `solitaire` 关键词抢进 `ps_card` ⇒ **加一条 PIN 钉回 `ps_push`**（`ps_card` 4 款只有真纸牌）
+- `ps_card`(4 款) 同属「细类」⇒ **一并进 `HIDDEN_TAGS`**，筛选面板不显示
+
+### 9.3 最终 `HIDDEN_TAGS`
+
+```python
+HIDDEN_TAGS = {'ps_merge', 'ps_match', 'ps_run', 'ps_card'}
+# 规则：hidden = 款数 <10 且 不是兜底桶(ps_other) 且 不是高辨识度意图(ps_board)
+```
+
+**筛选面板「玩法」组：16 个 tag → 可见 12 个**（隐藏 merge 3 / match 5 / run 7 / card 4）。
+
+### 9.4 最终分布（355，每款恰好 1 个 `ps_*`）
+
+`quiz 66 ｜ word 57 ｜ memory 46 ｜ fill 38 ｜ attention 26 ｜ search 22 ｜ maze 20 ｜ spatial 19 ｜ push 15 ｜ reaction 15 ｜ board 8 ｜ run 7 ｜ match 6→5 ｜ card 4 ｜ other 30→4 ｜ merge 3`
+
+> 注：`ps_match` 5、`ps_run` 7、`ps_card` 4、`ps_merge` 3 —— 这 4 个都 <10，其中前三个 + card 已隐藏；`ps_board` 8 与 `ps_other` 4 按你的决定**保持可见**。
+

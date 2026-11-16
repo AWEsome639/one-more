@@ -1,0 +1,130 @@
+# 设置页「主题色」色板 —— 查清 + 修复 · 2026-11-08
+
+> **断言基线**：`bash 工具/check_assertions.sh` ⇒ **200359 / 0** ✅（改动前后各一次）
+> **未编译、未上真机**。
+
+---
+
+## 0. 结论先说：**色板没丢，是「界面模式」整卡把它顶到下面去了**
+
+| Lead 的线索 | 实际情况 |
+|---|---|
+| `accentPicker()` 里**没有** `Accent.options` 的 `ForEach` | ❌ **不成立** —— `ForEach(ACCENTS, o => this.accentChip(o))` **一直在**（原 `SettingsTab.ets:1173-1174`，`ACCENTS = Accent.options` 由 `:64` 定义）|
+| 「描述后直接是界面模式」 | ✅ **成立**，但根因不是"少了一段渲染"，而是**「界面模式」整块卡片是嵌在 `accentPicker()` 里面的** |
+| 「色板整个没了」 | 色板代码在、`accentChip` 的点击/落盘/读屏/TV 焦点全都在；**用户看不见是因为它排在「界面模式整卡」之后** |
+
+### 真实结构（修复前）
+
+```
+@Builder accentPicker() {
+  Column(主题色卡) {
+    Row { 🎨 + 「主题色」标题 }            ← 2026-11-07 补回来的
+    Column(界面模式整卡) { 🔠 + 三个模式按钮 }   ← ★ 被嵌进来的（两层缩进）
+      .padding(md) .backgroundColor(surface) .borderRadius(lg) .margin(bottom)
+    Column { 「主题色」标题（**重复第二次**） } .layoutWeight(1)   ← ★ 旧标题没删
+    Flex { ForEach(ACCENTS) 12 个色块 }      ← ★ 色板在这里
+    Row { 实时预览「开始 ›」 }
+  }
+}
+```
+
+⇒ 用户视角：**「🎨 主题色」+ 说明 → （整张）界面模式卡 → 「主题色」标题（重复）→ 色板**。
+vision 上"主题色这一块说完就是界面模式"，色板被一整张卡片隔开，落到屏幕外 ⇒ 被报成"色板丢失"。
+
+### 另一个隐蔽的坑：`.layoutWeight(1)`
+
+那个重复的标题 `Column` 上挂着 `.layoutWeight(1)` —— 它是**当年在 `Row` 里跟 🎨 并排时的遗留**，
+现在它是 `Column` 的直接子节点 ⇒ 语义变成"**吃掉主轴剩余空间**"。在可滚动页里
+`layoutWeight` 会按**父级可用高度**分配 ⇒ 这个标题块会被拉高，把色板继续往下推。
+
+> ⚠️ 这条是**代码推断**，没在真机上量"到底拉高了多少"。但它必然是错的（`Column` 里的标题不需要权重）。
+
+---
+
+## 1. 值不值得修？—— **值得，功能是真的**
+
+Lead 的前提是"如果 `Accent.set()` 从来没被调用过，那补色板 = 补假功能"。查下来**完全相反**：
+
+| 环节 | 证据 |
+|---|---|
+| **`Accent.set()` 有调用点** | `SettingsTab.ets:1266`（色块 onClick / onKeyEvent，带 `Haptics.tap()`）<br>`ProgressStore.ets:290`（启动时恢复上次选的颜色）|
+| **会落盘** | 色块点击后紧跟 `ProgressStore.saveAccent(o.id)` → `putString('accent', id)`（`ProgressStore:1382`）|
+| **会写 AppStorage** | `Accent.set()` = `AppStorage.setOrCreate('accent', id)` + `Accent.apply(id)` |
+| **真的改颜色** | `Accent.apply()` 改写 `Palette.primary` / `Palette.primaryDeep`（**不是 readonly**）|
+| **影响面** | `Palette.primary` 全库 **507 处**引用 |
+| **会重建界面** | **10 个组件**订阅 `@StorageProp('accent')`：`Index` `GameHost` `GamesTab` `SettingsTab` `GuidePage` `LanLobby` `StatsTab` `Common`×3 |
+| **`Accent.options` 档数** | **12 档**：跟随系统 · 靛蓝 · 红 · 橙 · 黄 · 绿 · 青 · 蓝 · 紫 · 品红 · 天蓝 · 石墨 |
+
+⇒ **这是一条从"点色块"到"全 App 换色 + 重启还记得"的完整链路，只是渲染顺序被改坏了。**
+（顺带：`Design.ets:192` 那句「用户可选的主题色（`Accent.options`）是另一个列表，本次未动」指的是
+2026-10-13 那次**只**让 `Palette.primary` 可变、**没有动色板本身** —— 不是"色板没实现"。）
+
+---
+
+## 2. `git log -p` 查历史：色板是什么时候"消失"的
+
+```bash
+git log --oneline -S"accentChip" -- entry/src/main/ets/components/SettingsTab.ets
+# → ba1934cc One More: 355 mini-games for HarmonyOS     （唯一一条）
+```
+
+- `accentChip`（色块本体）**从导入仓库那次就在**，之后没有任何提交删过它。
+- 也就是说：**从来没有"色板消失"这件事**，只有"**界面模式卡被塞进主题色卡**"这一次结构事故，
+  而 2026-11-07 的修复（verifier-dev S-01「这一卡只剩一枚 🎨」）**只补回了标题块，没拆嵌套**
+  ——于是变成了「标题有、色板也在，但中间隔着一整张卡」。
+- 代码里还留着那次修复的注释（原文：「本该在它右边的标题块**整块丢了** —— 而且下面还紧跟着
+  「界面模式」整块卡，视觉上成了「🎨 孤零零 → 界面模式 → 色块」」）——
+  **上一个修的人其实已经看见了这个顺序问题**，只是选择了"补标题"这条更小的改动。
+
+---
+
+## 3. 修了什么
+
+| # | 改动 | 说明 |
+|---|---|---|
+| 1 | **拆卡**：「界面模式」整块从 `accentPicker()` 里搬出来，成为独立的 `@Builder uiModePicker()` | 20 行注释 + 75 行布局原样迁移，样式（`.padding/.backgroundColor/.borderRadius(Radius.lg)/.margin`）跟着它走 |
+| 2 | **调用点**：`this.accentPicker()` 下面加 `this.uiModePicker()` | 视觉顺序仍是「主题色 → 界面模式」，与用户预期一致 |
+| 3 | **删掉重复的「主题色」标题块**（连带那个错误的 `.layoutWeight(1)`）| 标题只留 🎨 行里那一份 |
+| 4 | **判据 1829**：`accentChip` 根 `.width('23%')` 后加 **`.flexShrink(0)`**；色圆 `Row` 也加 `.flexShrink(0)` | 色块是"固定尺寸"的视觉元素，`Flex` 换行时绝不能被压成椭圆/细条（判据 1829 的原始事故是 `SymbolGlyph` 在 Row 里被拉成一片紫）|
+| 5 | 更新陈旧注释 | 把 2026-11-07 那条"补回标题块"的注释改成说明**根因是嵌套**，避免下一个人再按旧注释判断 |
+
+**修复后结构**：
+
+```
+this.accentPicker()      → 「🎨 主题色 + 说明」+ 12 个色块（Flex wrap）+ 「开始 ›」实时预览
+this.uiModePicker()      → 「🔠 界面模式」+ 三个模式按钮（独立卡）
+```
+
+**diff**：`components/SettingsTab.ets` **+62 / −48**（一个文件）。
+
+---
+
+## 4. 判据 1829 的落地细节
+
+```
+色块根    .width('23%') .flexShrink(0)        ← 四列一行；占 92%，SpaceBetween 分剩下的 8%
+色圆 Row  .width(Space.xxl) .height(Space.xxl) .flexShrink(0)   ← 32×32 固定，不许被压
+```
+
+为什么不是"正方形固定 4 个"：`23%` 是现有四列布局的宽度基准（换行时自动两列），
+`flexShrink(0)` 已经把"被压缩"这条路堵死 —— 这是**最小改动 + 满足判据**的组合。
+
+---
+
+## 5. 没验 / 待真机
+
+1. **没上真机**：设置页现在是否"🎨 主题色 → 色板 → 开始 › → 🔠 界面模式"一条直线，要截图确认。
+   （判据 1814：上真机先 dump 确认语言/页面。）
+2. **`.layoutWeight(1)` 到底造成了多少位移**：我只知道它语义错了；具体"拉高多少 vp"没量。
+3. **12 个色块在窄屏的换行**：`23%` × 4 = 92%，理论上 4 列；换语言后色名变长（俄语/德语）会走
+   `maxLines(1)+Ellipsis`，不会撑宽（`.width('23%')` 钉死）—— 但**没实测**。
+4. **`Accent.set()` 之后整页会不会立刻变色**：`SettingsTab` 自己有 `@StorageProp('accent')`（:136）
+   ⇒ 应该会重建；其它 9 个组件同理。**没实测**"点一下色块，设置页的按钮/高亮是否当场变色"。
+
+---
+
+## 6. 一句话给 Lead
+
+**不用补色板** —— 色板、点击、落盘、读屏、TV 焦点、10 个观察者全在；
+**要修的是「界面模式卡被嵌进主题色卡」这个结构事故**（+ 一个重复标题 + 一个错误的 `layoutWeight`）。
+本轮已拆开，并把色块按判据 1829 钉死成"固定尺寸 + `flexShrink(0)`"。

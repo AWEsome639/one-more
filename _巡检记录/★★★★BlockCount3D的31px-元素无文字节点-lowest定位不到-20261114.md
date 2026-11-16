@@ -11,7 +11,7 @@
 
 **⇒ 判据 `2624` 的信号再次出现：`lowest` 坐标不变 = 改的不是那个元素。**
 
-## 二、⇒ 为什么这次连"改的是谁"都不知道
+## 二、⇒ 为什么这次连“改的是谁”都不知道
 
 **`lowest` 只统计**文字节点**里 `y2` 最大的那个。**
 
@@ -25,7 +25,7 @@
 2. **找 `y2 > 1576` 的节点，看它的 `type` 与父链** —— 那就是第三行的容器
 3. **再决定改哪个尺寸**
 
-**⚠️ 我今天试过给 `shot_game.py` 加"打印底部节点"的诊断，但 `Factor Finder`/`Block Count 3D` 这类在冷启后 `NO_CARD` ⇒ 诊断跑不到那一步。
+**⚠️ 我今天试过给 `shot_game.py` 加“打印底部节点”的诊断，但 `Factor Finder`/`Block Count 3D` 这类在冷启后 `NO_CARD` ⇒ 诊断跑不到那一步。
 ⇒ 明天可以先把模拟器跑热（先测一款能测的），再跑诊断。**
 
 ## ⇒ 判据（`2628`）
@@ -43,7 +43,7 @@
 
 ## 五、⇒ 补正：不是大小写问题（我一度误判）
 
-**我发现 `git checkout entry/.../GBlockCount3D.ets` 报 "pathspec did not match"，一度以为是
+**我发现 `git checkout entry/.../GBlockCount3D.ets` 报 “pathspec did not match”，一度以为是
 「真文件是 `GBlockCount3d.ets`（小写 d）、我改的是另一个大写 D 的文件、所以改动没进编译」。**
 
 **⚠️ 核实后**这个推论是错的**：macOS 文件系统不区分大小写 ⇒ 两个名字指向**同一个文件**（大小都 `18992` bytes），

@@ -1,0 +1,33 @@
+# 分词器验收方案（**必须有"同一把尺子"**，判据源自 `2026-11-15` 三条教训）
+
+## 为什么单独写这一份
+
+**⇒ 判据 `2026-11-15`：「我验证过了」只有在验证工具与被验证的门是同一把尺子时才算数。**
+**⇒ 分词器最容易出的错是「我的 `encode` 跑通了、但 token 序列和 HF 的不一样」⇒ 模型输出全是垃圾却看不出原因。**
+
+## 验收（三条，缺一不可）
+
+1. **与 Python 参考实现对拍**
+   ```python
+   from transformers import AutoTokenizer
+   tk = AutoTokenizer.from_pretrained('Qwen/Qwen2.5-0.5B-Instruct')
+   for s in ["你好", "One More 有 355 款游戏", "嗯，今天做点什么？"]:
+       print(s, tk.encode(s))
+   ```
+   **⇒ 用同一批句子（含中文、英文、数字、emoji、空格边界）跑我的 ArkTS 实现，逐 id 比对。**
+
+2. **边界用例清单**（必须全过）
+   - 纯中文、纯英文、中英混排
+   - 前后空格、连续空格、换行
+   - 数字（`1`、`123`、`3.14`）
+   - emoji（`🐳`、`❤️`）、代理对
+   - 空字符串（应返回 `[]`）
+   - 超长文本（`> 1024` 字符，测性能）
+
+3. **decode 往返**：`decode(encode(s)) == s`（BPE 的 decode 是拼接 + 字节还原，中文要能还原）
+
+## 已知风险
+
+- **ArkTS 的 `\p{L}` 支持**：需实测 `RegExp` 带 `u` 标志是否支持 Unicode property escapes
+- **性能**：朴素 `O(n²)` 合并对上千字文本可能慢 ⇒ 先测，超 `50ms` 再换优化
+- **词表来源**：`tokenizer.json` 的 `model.vocab` 与 `model.merges` 字段名固定，但**必须先打印真实结构**再写解析

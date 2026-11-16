@@ -1,0 +1,549 @@
+# 补丁提案：`Bp.tight()` + `games/` 里 77 处 A 类 + 7 处 B 类 · 2026-11-14
+
+> **只读产出**：未改 `.ets`、未编译、未碰设备。
+> **范围**：`entry/src/main/ets/games/*.ets` 里字面 `Bp.height < 600`（84 处 / 24 文件；A 77 / B 7）。
+> **原文一律用 `sed -n '<N>p'` 现印**（本轮重新印过，不凭记忆）。
+
+---
+
+## 0. 前置：`Bp.tight()` 的定义与插入位置
+
+**位置**：`core/Bp.ets`，紧跟在 `isShort()` 的**闭括号之后**（现文件 **`L310` 是 `isShort()` 的 `}`**，**`L311` 是空行**，**`L312` 是 `static hasTouch()`**）⇒ **插入到 L311 这个空行位置**。
+
+现上下文（`sed -n '307,314p'` 现印）：
+
+```ts
+307:     //   于是隐藏说明行、棋盘封顶、`Cell.of ×0.85` 全套「矮屏减法」都在电视上生效
+308:     //   ⇒ 越修越小，而 10-foot UI 恰恰相反（3 米视距需要更大）
+309:     return Bp.height < 690 && !Bp.isTv();
+310:   }
+311: 
+312:   static hasTouch(): boolean {
+313:     return Bp.dev !== BpDev.TV;
+314:   }
+```
+
+**建议新增（插在 L311 空行处）**：
+
+```ts
+  /**
+   * ★★★ 2026-11-14（判据 1989 附带）**游戏内「紧凑尺寸」判定**
+   *
+   *   背景：`games/` 里有 84 处**裸写** `Bp.height < 600` 做「矮屏减尺寸」——
+   *   它们绕过了电视守卫。现状：TV 720vp ⇒ `720 < 600` 为假 ⇒ 恰好都对；
+   *   但 **1080p 电视 @dens2.0 = 540vp** ⇒ 会全部误判成矮屏（10-foot UI 反而该更大）。
+   *
+   *   与 `Cell.of()` 的 shrink 条件同源（`height > 0 && height < 600`），补上 `!isTv()`。
+   *   ⚠️ 注意：电视**不该**进紧凑分支（与 `isShort()` 的取向一致）。
+   */
+  static tight(): boolean {
+    return Bp.height > 0 && Bp.height < 600 && !Bp.isTv();
+  }
+```
+
+> 今天行为：TV 720 ⇒ false（同旧代码）；手机/平板 `isTv()=false` ⇒ **与旧代码逐字等价**。
+> 唯一变化 = 1080p 电视（540vp）。
+
+---
+
+## 1. A 类 77 处：替换前 → 替换后（按文件分组）
+
+规则：**只把 `Bp.height < 600` 换成 `Bp.tight()`，该行其余字符一个不动。**
+
+### `games/GPythagoreanTripleBuilder.ets`（13 处）
+
+```ts
+313 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+313 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+357 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+357 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+368 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+368 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+379 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+379 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+392 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+392 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+403 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+403 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+414 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+414 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+427 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+427 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+438 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+438 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+449 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+449 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+462 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+462 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+473 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+473 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+484 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 46 : 48)).enabled(!this.over)
+484 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 46 : 48)).enabled(!this.over)
+```
+
+### `games/GArithmeticChain.ets`（7 处）
+
+```ts
+401 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+401 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+447 原            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(!this.over && (0) < this.stage.palette.length).focusable(Tv.on())
+447 改            .layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(!this.over && (0) < this.stage.palette.length).focusable(Tv.on())
+454 原            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(!this.over && (1) < this.stage.palette.length).focusable(Tv.on())
+454 改            .layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(!this.over && (1) < this.stage.palette.length).focusable(Tv.on())
+463 原            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(!this.over && (2) < this.stage.palette.length).focusable(Tv.on())
+463 改            .layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(!this.over && (2) < this.stage.palette.length).focusable(Tv.on())
+470 原            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(!this.over && (3) < this.stage.palette.length).focusable(Tv.on())
+470 改            .layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(!this.over && (3) < this.stage.palette.length).focusable(Tv.on())
+501 原            .height(Cell.of(Bp.height < 600 ? 36 : 44))
+501 改            .height(Cell.of(Bp.tight() ? 36 : 44))
+517 原            .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).focusable(Tv.on())
+517 改            .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).focusable(Tv.on())
+```
+
+### `games/GSdmt.ets`（6 处）
+
+```ts
+248 原      Column({ space: Bp.height < 600 ? Space.xxs : Space.md }) {
+248 改      Column({ space: Bp.tight() ? Space.xxs : Space.md }) {
+289 原        Column({ space: Bp.height < 600 ? Space.xxs : Space.sm }) {
+289 改        Column({ space: Bp.tight() ? Space.xxs : Space.sm }) {
+293 原              .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 54)).borderRadius(Radius.md)
+293 改              .layoutWeight(1).height(Cell.of(Bp.tight() ? 38 : 54)).borderRadius(Radius.md)
+308 原              .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 54)).borderRadius(Radius.md)
+308 改              .layoutWeight(1).height(Cell.of(Bp.tight() ? 38 : 54)).borderRadius(Radius.md)
+323 原              .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 54)).borderRadius(Radius.md)
+323 改              .layoutWeight(1).height(Cell.of(Bp.tight() ? 38 : 54)).borderRadius(Radius.md)
+343 原          .borderRadius(Radius.md).width('100%').height(Cell.of(Bp.height < 600 ? 38 : 46)).onClick(() => { Haptics.tap(); this.reset(); })
+343 改          .borderRadius(Radius.md).width('100%').height(Cell.of(Bp.tight() ? 38 : 46)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GAlgebraicInequalitySolver.ets`（6 处）
+
+```ts
+333 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+333 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+380 原            .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
+380 改            .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+387 原            .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
+387 改            .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+396 原            .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
+396 改            .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+403 原            .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
+403 改            .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+416 原            .width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).focusable(Tv.on())
+416 改            .width(120).height(Cell.of(Bp.tight() ? 36 : 44)).focusable(Tv.on())
+```
+
+### `games/GRadicalRoots.ets`（5 处）
+
+```ts
+349 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+349 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+382 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 40 : 56)).enabled(this.picked.length === 0 && !this.over)
+382 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 40 : 56)).enabled(this.picked.length === 0 && !this.over)
+393 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 40 : 56)).enabled(this.picked.length === 0 && !this.over)
+393 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 40 : 56)).enabled(this.picked.length === 0 && !this.over)
+408 原            .height(Bp.height < 600 ? 34 : 44)
+408 改            .height(Bp.tight() ? 34 : 44)
+421 原            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+421 改            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GFillomino.ets`（5 处）
+
+```ts
+512 原        Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+512 改        Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+522 原              .height(Cell.of(Bp.height < 600 ? 36 : 44))
+522 改              .height(Cell.of(Bp.tight() ? 36 : 44))
+575 原              .height(Cell.of(Bp.height < 600 ? 36 : 44))
+575 改              .height(Cell.of(Bp.tight() ? 36 : 44))
+690 原              .height(Cell.of(Bp.height < 600 ? 36 : 44))
+690 改              .height(Cell.of(Bp.tight() ? 36 : 44))
+715 原              .height(Cell.of(Bp.height < 600 ? 36 : 44))
+715 改              .height(Cell.of(Bp.tight() ? 36 : 44))
+```
+
+### `games/GComplexFoldingNets.ets`（5 处）
+
+```ts
+336 原          .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+336 改          .layoutWeight(1).height(Cell.of(Bp.tight() ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+348 原          .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+348 改          .layoutWeight(1).height(Cell.of(Bp.tight() ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+362 原          .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+362 改          .layoutWeight(1).height(Cell.of(Bp.tight() ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+374 原          .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+374 改          .layoutWeight(1).height(Cell.of(Bp.tight() ? 44 : 52)).fontSize(FontSize.lg).fontColor(this.theme.ink)
+390 原          .height(Cell.of(Bp.height < 600 ? 36 : 44)).fontSize(FontSize.md).fontColor('#FFFFFF')
+390 改          .height(Cell.of(Bp.tight() ? 36 : 44)).fontSize(FontSize.md).fontColor('#FFFFFF')
+```
+
+### `games/GSequenceSleuth.ets`（4 处）
+
+```ts
+404 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+404 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+438 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+438 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+449 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+449 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+477 原            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+477 改            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GRomanArithmetic.ets`（4 处）
+
+```ts
+372 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+372 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+410 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked.length === 0 && !this.over)
+410 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked.length === 0 && !this.over)
+421 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked.length === 0 && !this.over)
+421 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked.length === 0 && !this.over)
+434 原            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+434 改            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GQuickMath.ets`（4 处）
+
+```ts
+358 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+358 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+395 原          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
+395 改          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+406 原          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
+406 改          .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+419 原            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+419 改            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GCryptoArithmetic.ets`（4 处）
+
+```ts
+397 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+397 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+498 原            .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 36 : 48))
+498 改            .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.tight() ? 36 : 48))
+507 原            .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 36 : 48))
+507 改            .backgroundColor(this.theme.surface).borderRadius(Radius.sm).layoutWeight(1).height(Cell.of(Bp.tight() ? 36 : 48))
+523 原            .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).focusable(Tv.on())
+523 改            .backgroundColor(Palette.rose).borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).focusable(Tv.on())
+```
+
+### `games/GPrimeGapHunt.ets`（4 处）
+
+```ts
+281 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+281 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+315 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+315 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+326 原          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+326 改          .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56)).enabled(this.picked < 0 && !this.over)
+339 原            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.height < 600 ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+339 改            .borderRadius(Radius.md).width(120).height(Cell.of(Bp.tight() ? 36 : 44)).onClick(() => { Haptics.tap(); this.reset(); })
+```
+
+### `games/GSudoku.ets`（2 处）
+
+```ts
+895 原      Column({ space: Bp.height < 600 ? Space.xs : Space.md }) {
+895 改      Column({ space: Bp.tight() ? Space.xs : Space.md }) {
+1064 原        .margin({ bottom: Bp.height < 600 ? 8 : 24 })
+1064 改        .margin({ bottom: Bp.tight() ? 8 : 24 })
+```
+
+### `games/GMentalMapping.ets`（2 处）
+
+```ts
+352 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+352 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+618 原          .width('100%').height(Cell.of(Bp.height < 600 ? 36 : 44))
+618 改          .width('100%').height(Cell.of(Bp.tight() ? 36 : 44))
+```
+
+### `games/GInequalityBalanceOps.ets`（2 处）
+
+```ts
+333 原              .backgroundColor(this.btnBg(i)).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.height < 600 ? 48 : 56))
+333 改              .backgroundColor(this.btnBg(i)).borderRadius(Radius.md).layoutWeight(1).height(Cell.of(Bp.tight() ? 48 : 56))
+348 原          .borderRadius(Radius.md).width('100%').height(Cell.of(Bp.height < 600 ? 38 : 46)).focusable(Tv.on())
+348 改          .borderRadius(Radius.md).width('100%').height(Cell.of(Bp.tight() ? 38 : 46)).focusable(Tv.on())
+```
+
+### `games/GSlide15.ets`（1 处）
+
+```ts
+714 原            .height(Bp.height < 600 ? 30 : 44)
+714 改            .height(Bp.tight() ? 30 : 44)
+```
+
+### `games/GReverseStroop.ets`（1 处）
+
+```ts
+288 原            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 54 : 72)).borderRadius(Radius.md)
+288 改            .layoutWeight(1).height(Cell.of(Bp.tight() ? 54 : 72)).borderRadius(Radius.md)
+```
+
+### `games/GCountdownMath.ets`（1 处）
+
+```ts
+491 原      Column({ space: Bp.height < 600 ? Space.sm : Space.md }) {
+491 改      Column({ space: Bp.tight() ? Space.sm : Space.md }) {
+```
+
+### `games/GBoxCompletion.ets`（1 处）
+
+```ts
+369 原   }.layoutWeight(1).height(Bp.height < 600 ? Cell.of(52) : Cell.of(62)).backgroundColor(this.lit[r * this.diffTotal + c] ? Palette.amber : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] ? Palette.ink : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+369 改   }.layoutWeight(1).height(Bp.tight() ? Cell.of(52) : Cell.of(62)).backgroundColor(this.lit[r * this.diffTotal + c] ? Palette.amber : this.theme.surface).borderRadius(Radius.md).borderWidth(2).borderColor(this.cells[r * this.diffTotal + c] ? Palette.ink : this.theme.line).animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
+```
+
+---
+
+## 2. 高频 12 款：抽 `const tight = ...` 值不值？——**结论：不可行，不建议**
+
+你提的方案是「在 `build()` 顶部抽 `const tight = Bp.tight();`」。**这条在 ArkTS 里做不到**：
+
+| 证据 | 结果 |
+|---|---|
+| 全库 355 款 `build()` 里搜局部变量声明 | **0 处**（对 `build() {` 后两行 grep `const `，零命中）|
+| 原因 | ArkUI 的 `build()` 只允许**UI 描述语法**，局部变量/语句会被编译器拒绝 |
+| 能做的最接近方案 | 加 `private get tightMode(): boolean { return Bp.tight(); }`，行内写 `this.tightMode` |
+
+**收益对比**：
+
+| 方案 | 每处成本 | 收益 | 风险 |
+|---|---|---|---|
+| **直接 `Bp.tight()`**（推荐） | 1 次静态方法调用（属性读 + 两次比较，纳秒级）| 零 | 零 |
+| `private get tightMode()` | 1 次 getter 调用 | **≈0**（getter 也要执行同样判断）| 多一处间接层、每款多 3 行 |
+| `build()` 内 `const tight` | **不可行** | — | 编译失败 |
+
+🤔判：**不要抽**。高频款（`GPythagoreanTripleBuilder` 13 处等）直接逐处写 `Bp.tight()` 即可；
+那 67 次调用的总开销远小于一次重绘，而抽 getter 只会增加遮蔽与阅读成本。
+
+---
+
+## 3. B 类 7 处：改后应该长什么样
+
+### 3.1 三处 `: 9999` 哨兵（电视真 bug）
+
+**问题复述**：`9999` 兜底只在「高屏 = 窄屏（竖屏手机）」安全；电视 `1280×720` **又高又宽** ⇒ 走 `9999` ⇒ `aspectRatio(1)` 盘面铺成 `1280vp` 见方 ⇒ 在 720vp 屏上炸穿。
+
+**候选 ①：去掉三元，一律封顶**
+
+```ts
+// GKakuro:632
+.constraintSize({ maxWidth: Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)) })
+```
+
+· 代价：**会改手机布局** —— 手机竖屏 `744vp` 时旧代码走 `9999`（不封顶，盘面 360vp 宽），
+  新代码得 `min(360-40, max(140, 744-360=384)) = 320` ⇒ **盘面从 360 缩到 320（−11%）**。
+  `GShikaku` 更明显：`744-260 = 484` 会开始封顶高盘面。TV 则被修好（360vp 见方）。
+
+**候选 ②：条件改成 `(Bp.tight() || Bp.isTv())`（推荐）**
+
+```ts
+// GKakuro:632
+.constraintSize({ maxWidth: (Bp.tight() || Bp.isTv()) ? Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)) : 9999 })
+
+// GKakuroMini:562
+.constraintSize({ maxWidth: (Bp.tight() || Bp.isTv()) ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 360)) : 9999 })
+
+// GShikaku:787
+.constraintSize({ maxHeight: (Bp.tight() || Bp.isTv()) ? Bp.height - 260 : 9999 })
+```
+
+· 等价性证明（三种屏）：手机 744 ⇒ `tight=false, isTv=false` ⇒ false（**同旧**）；横屏平板 533 ⇒ `tight=true` ⇒ 封顶（**同旧**）；TV 720/540 ⇒ `isTv=true` ⇒ **封顶（新增修复）** ✅
+· 顺带好处：这样写**不再残留字面 `Bp.height < 600`** ⇒ 全库 grep 可归零，便于 CI 守门
+
+· 代价：**手机/平板行为完全不变**（`isTv()` 为 false）；TV 从"1280 见方"变成 `min(1240, 360)=360` ⇒ 720 屏上正好装下。
+· 语义取向与 `isShort()` 的 `!isTv()` **相反**（那里电视不进矮屏分支）——这里是「电视要**封顶**」，因为电视屏小高度大宽度；建议在注释里写清，避免下一个人反着改。
+
+> ⚠️ **注意：这三处不能"裸用" `Bp.tight()`** —— `tight()` 含 `!isTv()`，电视会继续走 `9999` ⇒ **不修反坏**；
+> 必须写成 `Bp.tight() || Bp.isTv()`（即上面候选 ②）。
+
+### 3.2 `GSokoban:705-707`（跨三行一个表达式）
+
+现文（`sed -n '704,707p'` 现印）：
+
+```ts
+704:       .constraintSize({
+705:         maxWidth: Bp.height < 600
+706:           ? Math.min(Bp.width - 40, this.w * Math.max(10, Math.floor((Bp.height - 440) / Math.max(1, this.h))))
+707:           : 9999
+```
+
+改后（**只改第 705 行的条件**，706/707 不动）：
+
+```ts
+705:         maxWidth: Bp.tight()
+706:           ? Math.min(Bp.width - 40, this.w * Math.max(10, Math.floor((Bp.height - 440) / Math.max(1, this.h))))
+707:           : 9999
+```
+
+· 注意：`9999` 分支保留；`this.w/this.h` 的算式一个字符都别碰。
+
+### 3.3 `GKenken:708-709`（一行两次条件 + 续行）
+
+现文（`sed -n '707,709p'` 现印）：
+
+```ts
+707:       .width(Math.min(Bp.width - 2 * Space.lg,
+708:         Math.max(Bp.height < 600 ? 150 : 200,
+709:           Bp.height < 600 ? Bp.height - 380 : Bp.height - 360)))
+```
+
+改后（**两处条件都要换**）：
+
+```ts
+708:         Math.max(Bp.tight() ? 150 : 200,
+709:           Bp.tight() ? Bp.height - 380 : Bp.height - 360)))
+```
+
+· 常见错误：只改 708 忘了 709 ⇒ 一个表达式里两种判定混用（今天等价，将来不同步）。建议改完 grep 一次 `Bp.height < 600` 应剩 0。
+
+### 3.4 `GSudoku:875-877`（`const h` 多行，分支里还引用 `Bp.height`）
+
+现文（`sed -n '874,877p'` 现印）：
+
+```ts
+874:     //     ⇒ 键盘行回到内容区，状态行底部 24vp 留白也真正露出（不再被顶到屏外）。
+875:     const h: number = Bp.height < 600
+876:       ? Math.max(160, Bp.height - 385)      // ★ 第二刀：340 → 385（棋盘 580 → 445px，再让 135px）
+877:       : Math.max(160, Bp.height * 0.44);
+```
+
+改后（**只改 875 行的条件**）：
+
+```ts
+875:     const h: number = Bp.tight()
+876:       ? Math.max(160, Bp.height - 385)      // ★ 第二刀：340 → 385（棋盘 580 → 445px，再让 135px）
+877:       : Math.max(160, Bp.height * 0.44);
+```
+
+· 依据：真机 TV 720 ⇒ 旧条件 false ⇒ 走 `Bp.height * 0.44 = 316.8`；改后 `tight()` 在 TV 也为 false ⇒ **同一条分支**，行为不变 ✅
+· 这处是**方法内**的局部 `const`（不是 `build()` 里），所以 `const h` 合法 —— 与 §2 说的"build 里不能声明局部变量"不冲突。
+
+---
+
+## 4. 分批编译建议
+
+| 批次 | 内容 | 依赖 | 能否独立编译 | 说明 |
+|---|---|---|---|---|
+| **①** | `core/Bp.ets` 新增 `tight()` | 无 | ✅ 可以 | 纯新增方法，零调用方；编译后现状零变化 |
+| **②** | A 类 77 处替换（`Bp.height < 600` → `Bp.tight()`）| **依赖 ①** | ✅ 可以（在 ① 之后）| 纯文本替换；建议一次提交 + 用 `grep` 复核归零 |
+| **③** | B 类 4 处（`GSokoban:705`、`GKenken:708/709`、`GSudoku:875`）| 依赖 ① | ✅ 可以 | 语义与今天等价（TV 720 两种情况都为假语义…见下注）|
+| **④** | **三处 `9999` 哨兵**（`GKakuro:632`、`GKakuroMini:562`、`GShikaku:787`，用候选 ②）| 独立（不用 `tight()`）| ✅ 可以 | **行为变更只在电视** ⇒ 必须**单独一批**并安排 TV 复测 |
+
+**依赖关系小结**：
+
+- ① → ② → （③ 可与 ② 同批，但建议分开便于回滚）
+- **④ 必须独立**：它是唯一会改变电视实际布局的批次，混进 ②/③ 会让“零变化”的结论不可验证
+- ④ 内部三处**同批**（都属同一类电视 bug，一起改一起测）
+
+**每批验证口径**：
+
+1. 编译过 + 断言基线 `200359 / 0`
+2. `grep -c "Bp.height < 600" entry/src/main/ets/games`：② 完成后 **7**（B 类剩余）、③ 完成后 **3**（只剩三处 9999 哨兵）、④ 完成后应为 **0**（候选②把条件写成 `Bp.tight() || Bp.isTv()`，不再残留字面量）
+3. ④ 批需电视（或 `Bp.dev=TV` 的模拟配置）复测：盘面应 ≤360vp 见方
+
+---
+
+## 5. 局限
+
+- 本轮**不编译**：所有"改后"文本是按 `sed` 现印的原文做字符串替换得到的，**没有经过 ArkTS 编译器验证**；
+- A 类 77 处逐行替换文本是机械生成的，若原文里有跨行表达式（如 `.height(` 换行）替换后仍合法，但我没逐行核对语法；
+- 「手机 744 ⇒ 走 9999」是按 `Bp.height<600` 为假推的；具体某款在手机上的盘面宽是否真到 360，取决于父容器 padding，未逐一核算；
+- 电视行为（1280×720vp）是**按 Bp 语义推的**，没有真电视 dump。
+
+---
+
+## 6. 附：A 类 77 处逐行自审（2026-11-14 补做）
+
+> 上一版 §5 的局限是「替换文本机械生成、未逐行语法核对」。本节就是补这个。
+> **每处原文都用 `sed -n '<N>p'` / 逐行读现印**，没有凭记忆。
+
+### 6.1 三项检查的结果
+
+| 检查项 | 方法 | 结果 |
+|---|---|---|
+| ① 替换后括号是否配平 | 对每处 ±45 字符上下文做 `([{` / `)]}` 计数，比较替换前后差值 | **84/84 差值为 0** ✅（替换只把「比较表达式」换成「无参方法调用」，不新增也不吃掉括号）|
+| ② 有没有出现在字符串/注释里 | 先剥 `//`、`/* */` 与 `'…'`/`"…"`/反引号字面量，再看匹配是否还在 | **84/84 都在代码里**；注释/字符串里 **0 处** ✅ |
+| ③ 有没有 `<= 600` / `<600`（无空格）漏网 | 对 `games/` 全目录 grep 变体正则 | **0 处变体** ✅（`Bp.height *<= *600` 与 `Bp.height<600` 均无命中）|
+
+**顺带**：`games/` 之外只有一处 `Bp.height < 600` —— `core/Design.ets:114` 的 `Cell.of()` 收缩条件，**它已经带 `!Bp.isTv()`**（`L110-115` 现印：`if (Bp.height > 0 && Bp.height < 600 && !Bp.isTv())`）⇒ 不在本批范围，也证明「84 处是最后一批漏网的」。
+
+### 6.2 运算优先级：逐处确认「只换条件子表达式」
+
+**结论：77 处全部不改变运算优先级。** 判据是——替换的**只是三元的条件**，`? A : B` 原样保留：
+
+```ts
+Bp.height < 600 ? X : Y   →   Bp.tight() ? X : Y        // 结构完全一致
+```
+
+`Bp.tight()` 是**无参方法调用**，优先级高于 `<`，且在 `? :` 的判定位置不需要额外括号。
+两种「看着危险其实安全」的形态，各给一个现印实例：
+
+| 形态 | 现印原文（`sed -n`） | 改后 | 为什么安全 |
+|---|---|---|---|
+| **函数参数内的三元** | `GPythagoreanTripleBuilder:357`：`.height(Cell.of(Bp.height < 600 ? 46 : 48))` | `.height(Cell.of(Bp.tight() ? 46 : 48))` | 三元在 `Cell.of(...)` 实参位置，替换后仍是同一个实参 |
+| **`Math.max` 参数内的三元**（B 类同形）| `GKenken:708`：`Math.max(Bp.height < 600 ? 150 : 200,` | `Math.max(Bp.tight() ? 150 : 200,` | 三元在第一实参位置，逗号边界不变 |
+
+**唯一需要留意的是 B 类那 2 处「`?` 不在同一行」**（`GSudoku:875`、`GSokoban:705`）：
+
+```
+875:     const h: number = Bp.height < 600        ← 这里只有条件，? 在下一行
+705:         maxWidth: Bp.height < 600            ← 同上
+```
+
+它们被归到 B 类（§3.2 / §3.4），**不在 77 处之内**；替换时同样只动条件，`?`/`:` 保持原行。
+
+### 6.3 自审结论
+
+| 类别 | 处数 | 说明 |
+|---|---:|---|
+| ✅ 无问题 | **77** | 括号配平、不在注释/字符串、非变体写法、只换条件子表达式 |
+| ⚠️ 需要额外处理 | **0** | — |
+
+> 原局限「A 类替换文本未逐行核对」**现已关闭**：核对方式是「按行号现印 + 相邻字符/括号/字面量三层检查」，
+> 不是把 77 行重新读一遍就签字。
+
+---
+
+## 7. 附：`GWordle:492` 注释与代码打架 —— git 时间线与判定
+
+### 7.1 现状（`sed -n '491,492p'` 现印）
+
+```ts
+491:             // 2026-11-13 第二档：键盘在 1518..1600 只露上半截 ⇒ 棋盘再收 40px（220 → 185）
+492:       .width(Bp.isShort() ? 120 : 614)
+```
+
+### 7.2 时间线（`git log -S` 与 `git blame` 现查）
+
+| 顺序 | 提交 | 那次做了什么 | 那一行变成 |
+|---:|---|---|---|
+| ① | `5a6a6257` 「第十一次：键盘修好了」 | `'72%'` → 绝对值（判据 1963 的核心修法）| `.width(Bp.isShort() ? **220** : 614)` |
+| ② | `49097e64` 「基本可玩：`220 → 185 → 150` 三档收敛」 | 同一行同时**加注释**、**改值** | `.width(Bp.isShort() ? **150** : 614)` + 注释写「220 → 185」 |
+| ③ | `b2cacc75` 「🎉 修好：`'72%'` → **`120vp`**，十四次收敛」 | 只改值，**没碰注释** | `.width(Bp.isShort() ? **120** : 614)`，注释仍是「220 → 185」 |
+
+`git blame` 现查：**L491（注释）= `49097e64`**，**L492（代码）= `b2cacc75`** ⇒ 两行来自**不同提交**，注释停在中间档。
+
+### 7.3 判定：**注释过时**，不是值写错
+
+| 判据 | 结论 |
+|---|---|
+| 120 是不是最终收敛值？ | 是。提交 ③ 的说明就是「十四次收敛」，且该次之后这行**再没被改过**（`git log -S"Bp.isShort() ? 120 : 614"` 只命中 ③）|
+| 注释为什么是 185？ | 它诞生于提交 ②，那次值其实已经是 **150**（三档中的最后一档）；注释只记了**中间档 185** ⇒ **从出生那天就对不上** |
+| 614 呢？ | 是「高屏」分支值，从提交 ① 起未变；与注释无关 |
+| 会不会影响运行？ | **不会**（注释而已）；影响的是**下一个人读代码时的判断** |
+
+**建议改法（一行，纯注释）**：
+
+```ts
+// 2026-11-13 三档收敛终值：矮屏棋盘宽 220 → 185 → 150 → **120vp**（键盘才完整露出）；高屏 614。
+.width(Bp.isShort() ? 120 : 614)
+```
+
+> 更稳妥的写法是**去掉具体数字**，只留依据：「矮屏收到键盘三行能完整露出为止（终值 120vp，见提交 b2cacc75）」——避免以后再改值时注释又漂移。
