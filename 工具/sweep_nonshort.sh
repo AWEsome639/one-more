@@ -29,7 +29,10 @@ SCREEN='2224x2496'
 #   若不传，1600–2496 之间的正常节点全被算成溢出（实测三款都报 blk=10~±5000-7000px，手工 dump 却是 0）。
 export SHOT_SCREEN_H=2496
 export SHOT_GAME_BOTTOM=2412   # 2496 - 84（手机上 1600-84=1516）
-export SHOT_PX_PER_VP=3.125    # 500dpi / 160（手机 480/160=3）
+export SHOT_PX_PER_VP=3.125
+# ★ 2026-11-16（判据 2827）：**不写手机台账**。名字叫手机台账就该只收手机数据；
+#   折叠屏数据写进去会让 triage.py 把它当成手机的数（实测已污染 65 行，已清洗）。
+export SHOT_NO_LEDGER=1    # 500dpi / 160（手机 480/160=3）
 OUT='_巡检记录/layout-nonshort.tsv'
 LOG='/tmp/sweep_nonshort.log'
 FORCE=0

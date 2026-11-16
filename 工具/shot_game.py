@@ -599,9 +599,13 @@ def finish(name, outcome, t0, mb=None, extra=''):
     # ★ 2026-11-12（判据 1945）：**每次测量都追加到唯一一份正式台账** ——
     #   我之前只在终端打印，聚合时只能退回「文件 mtime」，**差点被自己的表骗了**
     #   （已修好的 `Math Path 1450` / `Kakurasu 1464` 在聚合表里仍显示 `1600`）。
+    # ★ 2026-11-16（判据 2827）：**非手机屏的测量不写这份台账**。
+    #   名字叫「手机台账」就该只收手机数据；折叠屏数据写进去后，
+    #   `triage.py` 取「每款最新一行」会把它当成手机的数 —— 实测已污染 65 行。
     try:
-        with io.open(os.path.join(ROOT, '_巡检记录', 'layout-canonical.tsv'), 'a', encoding='utf-8') as fh:
-            fh.write('%s\t%s\n' % (time.strftime('%Y-%m-%dT%H:%M:%S'), line))
+        if os.environ.get('SHOT_NO_LEDGER') != '1':
+            with io.open(os.path.join(ROOT, '_巡检记录', 'layout-canonical.tsv'), 'a', encoding='utf-8') as fh:
+                fh.write('%s\t%s\n' % (time.strftime('%Y-%m-%dT%H:%M:%S'), line))
     except Exception:
         pass
 
