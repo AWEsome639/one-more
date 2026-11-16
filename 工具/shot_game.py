@@ -225,7 +225,10 @@ def covered_count_tree(tree):
     try:
         try:
             SCREEN_W = int(os.environ.get('SHOT_SCREEN_W', '2560'))
-            SCREEN_H = int(os.environ.get('SHOT_SCREEN_H', '1600'))
+            # ★ ★ 2026-11-16（判据 2824）：**阈值必须跟屏幕高度走**。
+            #   原来写死默认 1600，而折叠屏屏高是 2496 ⇒ 它把 1600–2496 之间的
+            #   **正常节点**全算成溢出 ⇒ 三款游戏都报 blk=10~±5000-7000px，而手工 dump 是 0 个。
+            SCREEN_H = int(os.environ.get('SHOT_SCREEN_H', '0')) or _screen()[1]
         except Exception:
             SCREEN_W, SCREEN_H = 2560, 1600
         flat = []          # (idx, text, rect, ancestor_ids)
@@ -299,7 +302,10 @@ def covered_count(items):
         # 2026-11-14：屏幕尺寸（px）—— 用于排除「根/全屏容器」这个假覆盖者
         try:
             SCREEN_W = int(os.environ.get('SHOT_SCREEN_W', '2560'))
-            SCREEN_H = int(os.environ.get('SHOT_SCREEN_H', '1600'))
+            # ★ ★ 2026-11-16（判据 2824）：**阈值必须跟屏幕高度走**。
+            #   原来写死默认 1600，而折叠屏屏高是 2496 ⇒ 它把 1600–2496 之间的
+            #   **正常节点**全算成溢出 ⇒ 三款游戏都报 blk=10~±5000-7000px，而手工 dump 是 0 个。
+            SCREEN_H = int(os.environ.get('SHOT_SCREEN_H', '0')) or _screen()[1]
         except Exception:
             SCREEN_W, SCREEN_H = 2560, 1600
         for i, (_t1, r1) in enumerate(items):
