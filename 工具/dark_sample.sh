@@ -48,8 +48,16 @@ state() { icon_center | awk '{print $3}'; }
 echo "════ 深色抽样 $(date '+%H:%M') ════"
 
 # 确保在首页
-"$HC" shell "aa start -a EntryAbility -b com.andrewoscar.onemore" >/dev/null 2>&1
-sleep 6
+# ★ 2026-11-16（判据 2817）：原来只 `aa start` + `sleep 6`，而 App 已在运行时
+#   `aa start` 不会回首页（可能停在游戏里）⇒ 找不到日月图标。改成强制重启 + 验证 + 重试。
+for _try in 1 2 3; do
+  "$HC" shell "aa force-stop com.andrewoscar.onemore" >/dev/null 2>&1
+  sleep 2
+  "$HC" shell "aa start -a EntryAbility -b com.andrewoscar.onemore" >/dev/null 2>&1
+  sleep 9
+  dump | grep -q "355 款小游戏" && { echo "→ 已回首页（第 $_try 次）"; break; }
+  echo "→ 第 $_try 次没回首页，重试"
+done
 
 CUR=$(state)
 if [ -z "$CUR" ]; then
