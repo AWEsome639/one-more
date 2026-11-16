@@ -335,6 +335,26 @@ def covered_count(items):
 _TITLE_CACHE = None
 
 
+def _screen():
+    """当前屏幕尺寸 (w, h)。默认手机横屏 2560x1600；换屏时用 ONEMORE_SCREEN=宽x高 覆盖。
+
+    ★ 2026-11-16（判据 2813）：原来搜索框坐标写死为 (2276,264)/(1280,435)，
+      只适合 2560x1600 横屏。折叠屏 2224x2496 竖屏上点不中 ⇒ 改成按比例算。
+    """
+    s = os.environ.get('ONEMORE_SCREEN', '2560x1600')
+    try:
+        w, h = s.lower().split('x')
+        return max(1, int(w)), max(1, int(h))
+    except Exception:
+        return 2560, 1600
+
+
+def _tap_props(fx, fy):
+    """按屏幕比例计算点击坐标（fx/fy 是相对宽高的分数）。"""
+    w, h = _screen()
+    return int(round(fx * w)), int(round(fy * h))
+
+
 def _find_text_node(tree, want):
     """在 dump 树里找 text==want 的节点，返回其中心 (x, y)；找不到返回 None。"""
     hit = []
@@ -662,14 +682,18 @@ def _body(name, t0):
         if _hit:
             sh('uitest uiInput click %d %d' % (_hit[0], _hit[1]))
             time.sleep(0.6)
-        sh('uitest uiInput click 2276 264')
+        # ★ 判据 2813：按屏幕比例算（手机 2560x1600 时与原坐标一致）
+        _ix, _iy = _tap_props(2276 / 2560.0, 264 / 1600.0)
+        sh('uitest uiInput click %d %d' % (_ix, _iy))
         time.sleep(1.2)
-        sh('uitest uiInput click 1280 435')
+        _bx, _by = _tap_props(1280 / 2560.0, 435 / 1600.0)
+        sh('uitest uiInput click %d %d' % (_bx, _by))
         time.sleep(0.8)
         # ★ 2026-11-14 白天实测：`uinput -K -t` **打不进中文**（IME 层）⇒ 像 `磁铁`/`分数匹配`
         #   这类纯中文名搜索永远不过滤 ⇒ 卡片不在首屏 ⇒ `NO_CARD`。
         #   而 `uitest uiInput inputText <x> <y> <text>` 能打中文（实测「磁铁」⇒ 过滤成「1 款」）。
-        sh("uitest uiInput inputText 1280 435 '%s'" % tok)
+        _tx, _ty = _tap_props(1280 / 2560.0, 435 / 1600.0)
+        sh("uitest uiInput inputText %d %d '%s'" % (_tx, _ty, tok))
         time.sleep(2.4)
         d = dump('r')
         if not d:
