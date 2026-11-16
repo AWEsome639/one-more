@@ -71,8 +71,10 @@ PY
 # ② 已测过的（续跑用）
 DONE=/tmp/ns_done.txt
 : > "$DONE"
+# ★ 2026-11-16（判据 2828）：**只跳过「成功」的**。
+#   原来 `cut -f2` 把所有出现过的款都当已完成 ⇒ DUMP_FAIL/WRONG_GAME 的款永远不会重试（实测 22% 失败）。
 if [ "$FORCE" -eq 0 ] && [ -f "$OUT" ]; then
-  cut -f2 "$OUT" | sort -u > "$DONE"
+  awk -F'\t' '$3 == "OK" {print $2}' "$OUT" | sort -u > "$DONE"
 fi
 
 # ③ 待测清单

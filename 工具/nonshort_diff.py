@@ -20,12 +20,30 @@ def parse(path, with_header=True):
         game = p[1]
         status = p[2] if len(p) > 2 else ''
         body = p[4] if len(p) > 4 else ''
-        m = re.search(r"lowest='([^']*)'\s*\[(\d+),(\d+)\]\[(\d+),(\d+)\]", body)
-        lowh = (int(m.group(5)) - int(m.group(3))) if m else -1
-        text = m.group(1) if m else ''
+        # ★ 两种格式：
+        #   手机（5 列）：第 5 列是整串「68.6s lowest='x' [..][..] blk=..」⇒ 用正则算
+        #   折叠屏（7 列）：第 5 列是文字、第 6 列就是 lowh、第 7 列是 blk ⇒ 直接取
+        if len(p) >= 7:
+            try:
+                lowh = int(p[5])
+            except Exception:
+                lowh = -1
+            text = p[4]
+            try:
+                blk = int(p[6].split('/')[1].replace('px', '')) if '/' in p[6] else -1
+            except Exception:
+                blk = -1
+            m = lowh >= 0
+        else:
+            m = re.search(r"lowest='([^']*)'\s*\[(\d+),(\d+)\]\[(\d+),(\d+)\]", body)
+            lowh = (int(m.group(5)) - int(m.group(3))) if m else -1
+            text = m.group(1) if m else ''
         b = re.search(r'blk=(\d+)/(\d+)px', body)
         blk = int(b.group(2)) if b else -1
-        if status == 'OK':
+        # ★ 2026-11-16（判据 2826）：**只收「带 bounds」的行**。
+        #   旧格式的手机行只有文字、没有 [x1,y1][x2,y2] ⇒ 拿不到高度。
+        #   若取「最新一行」就可能取到没 bounds 的 ⇒ 整条比较失效。
+        if status == 'OK' and m:
             out[game] = (lowh, text, blk)
     return out
 
