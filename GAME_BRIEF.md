@@ -43,7 +43,7 @@ this.onFinish(r);
   主题取色用 `this.theme.ink / inkSoft / inkFaint / surface / surfaceAlt / line / bg`（`theme.isDark` 判断深浅）
 - **动效时长** `Motion.fast=160 base=220 slow=260 sheet=300`，`Motion.pressScale=0.96`
 
-## 四、体验铁律（"流畅"就靠这几条）
+## 四、体验铁律（“流畅”就靠这几条）
 1. **点击必有反馈**：`.onTouch` 里 Down 时 `pressed=true`，Up/Cancel 时 false；`.scale({x: pressed?0.96:1, y:...})`
 2. **状态变化都要有动画**：`.animation({ duration: Motion.fast, curve: Curve.EaseOut })`
 3. **进场动效**：卡片/元素从小到大或从上往下淡入
