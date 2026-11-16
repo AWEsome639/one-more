@@ -24,7 +24,8 @@ cleanup() {
   echo "→ 优雅停止 $INST"
   "$EMU" -stop "$INST" >/dev/null 2>&1
   sleep 4
-  echo "→ 残留: $(pgrep -f "Emulator -start" | wc -l | tr -d ' ')"
+  # ★ 自排除：`pgrep -f "…"` 的子 shell 命令行里也带这个字符串
+  echo "→ 残留: $(ps -eo command | grep -c "[E]mulator -start")"
 }
 trap cleanup EXIT INT TERM
 
@@ -39,7 +40,7 @@ if pgrep -f "Emulator -start" >/dev/null 2>&1; then
 fi
 
 echo y > /tmp/yes.txt
-echo "→ 启动 $INST（$SCREEN）"
+echo "→ 启动 ${INST} (${SCREEN})"
 (nohup "$EMU" -start "$INST" < /tmp/yes.txt > /tmp/test_nonshort.log 2>&1 &)
 for i in $(seq 1 40); do
   n=$("$HC" list targets 2>/dev/null | grep -cE '^[0-9A-Za-z]')
@@ -54,9 +55,17 @@ echo "→ 屏幕信息"
 echo "→ 装包"
 timeout 300 "$HC" install -r entry/build/default/outputs/default/entry-default-signed.hap 2>&1 | tail -1 | sed 's/^/   /'
 
-echo "→ 启动 App"
-"$HC" shell "aa start -a EntryAbility -b com.andrewoscar.onemore" >/dev/null 2>&1
-sleep 10
+echo "→ 启动 App（尝试最多 3 次，每次验证）"
+for _try in 1 2 3; do
+  "$HC" shell "aa start -a EntryAbility -b com.andrewoscar.onemore" >/dev/null 2>&1
+  sleep 9
+  "$HC" shell "uitest dumpLayout -p /data/local/tmp/ns0.json" >/dev/null 2>&1
+  if "$HC" shell "cat /data/local/tmp/ns0.json" 2>/dev/null | grep -q "355 款小游戏"; then
+    echo "   第 $_try 次启动成功"
+    break
+  fi
+  echo "   第 $_try 次没起来，重试"
+done
 
 # ⚠️ 新实例第一次有「隐私说明」弹窗（判据 2812）：不点掉会吃掉所有点击
 echo "→ 检查隐私弹窗"
