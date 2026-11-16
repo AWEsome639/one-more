@@ -33,9 +33,10 @@ def analyze(path):
         n = 0
         for x in range(0, W, 2):
             r, g, b = px[x, y]
-            if abs(r - bg[0]) + abs(g - bg[1]) + abs(b - bg[2]) > 18:
+            # ★ 判据 2831：阈值 18 太高 ⇒ 淡色元素（如 Path Recall 的淡黄格子）被当成空白。
+            if abs(r - bg[0]) + abs(g - bg[1]) + abs(b - bg[2]) > 8:
                 n += 1
-        rows.append(n / (W / 2.0) > 0.015)
+        rows.append(n / (W / 2.0) > 0.010)
     # 内容底：最后一个有内容的行
     last = max((i for i, v in enumerate(rows) if v), default=-1)
     # 最大的内部空白段（在首个内容行与 last 之间）
