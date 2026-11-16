@@ -119,7 +119,7 @@ say "装包"
 timeout 300 "$HC" install -r entry/build/default/outputs/default/entry-default-signed.hap 2>&1 | tail -1 | tee -a "$LOG"
 sleep 3
 
-[ -f "$OUT" ] || printf 'ts\tgame\tstatus\twall_s\tlowest\n' > "$OUT"
+[ -f "$OUT" ] || printf 'ts\tgame\tstatus\twall_s\tlowest\tlowh\tblk\n' > "$OUT"
 
 # ⑥ 逐款测
 i=0
@@ -130,9 +130,20 @@ while IFS= read -r g; do
   line=$(ONEMORE_SCREEN="$SCREEN" timeout 300 python3 工具/shot_game.py "$g" 2>&1 | tail -1)
   st=$(echo "$line" | awk -F'\t' '{print $2}')
   wall=$(echo "$line" | awk -F'\t' '{print $4}')
-  low=$(echo "$line" | sed -n "s/.*lowest='\([^']*\)'.*/\1/p" | cut -c1-40)
-  printf '%s\t%s\t%s\t%s\t%s\n' "$(date '+%Y-%m-%dT%H:%M:%S')" "$g" "${st:-?}" "${wall:-?}" "$low" >> "$OUT"
-  echo "$line" | cut -c1-130 >> "$LOG"
+  # ★ 2026-11-16（判据 2825）：**必须记 lowest 的高度**。
+  #   大屏缺陷的信号是「lowest 被切成几 px」（如 Mental Mapping 被切到 8px），
+  #   而不是 blk的像素数（阈值修正后只剩 24px、看着像没事）。
+  #   只记文字会把这个信号丢掉 ⇒ 整轮跑批白跑。
+  low=$(echo "$line" | sed -n "s/.*lowest='\([^']*\)'.*/\1/p" | cut -c1-30)
+  lowh=$(echo "$line" | python3 -c "
+import sys, re
+ln = sys.stdin.read()
+m = re.search(r\"lowest='.*?'\s*\[(\d+),(\d+)\]\[(\d+),(\d+)\]\", ln)
+print((int(m.group(4)) - int(m.group(2))) if m else -1)
+" 2>/dev/null)
+  blk=$(echo "$line" | sed -n 's/.*blk=\([0-9]*\/\)\([0-9]*\)px.*/\1\2/p' | head -1)
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(date '+%Y-%m-%dT%H:%M:%S')" "$g" "${st:-?}" "${wall:-?}" "$low" "${lowh:--1}" "${blk:-?}" >> "$OUT"
+  printf '[%s] %s %s lowh=%s blk=%s\n' "$(date +%H:%M:%S)" "$g" "${st:-?}" "${lowh:--1}" "${blk:-?}" >> "$LOG"
 done < /tmp/ns_todo.txt
 
 say "跑批结束：本轮 $i 款"

@@ -1,10 +1,3 @@
-ts	game	status	wall_s	lowest
-2026-11-16T11:44:12	Nonogram	OK	70.6s lowest='提示' [1612,2144][1812,2291] blk=10/5632px cov=5 board=2224x2496@0,0 max=833 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-114411.jpeg @2026-11-16T11:44:11	提示
-2026-11-16T11:45:25	Nurikabe	OK	73.7s lowest='重开' [1862,2231][2162,2378] blk=10/6148px cov=5 board=2224x2496@0,0 max=833 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-114525.jpeg @2026-11-16T11:45:25	重开
-2026-11-16T11:46:38	Masyu	OK	73.0s lowest='退一步' [62,2303][729,2450] blk=11/7160px cov=5 board=2224x2496@0,0 max=874 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-114638.jpeg @2026-11-16T11:46:38	退一步
-2026-11-16T11:49:46	Nonogram	OK	72.7s lowest='提示' [1612,2144][1812,2291] blk=10/5632px cov=5 board=2224x2496@0,0 max=833 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-114946.jpeg @2026-11-16T11:49:46	提示
-2026-11-16T11:50:56	Nurikabe	OK	70.0s lowest='重开' [1862,2231][2162,2378] blk=10/6148px cov=5 board=2224x2496@0,0 max=833 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-115056.jpeg @2026-11-16T11:50:56	重开
-2026-11-16T11:52:07	Masyu	OK	70.5s lowest='退一步' [62,2303][729,2450] blk=11/7160px cov=5 board=2224x2496@0,0 max=874 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-115207.jpeg @2026-11-16T11:52:07	退一步
-2026-11-16T11:55:14	Nonogram	OK	74.5s lowest='提示' [1612,2144][1812,2291] blk=0/0px cov=5 board=2224x2496@0,0 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-115514.jpeg @2026-11-16T11:55:14	提示
-2026-11-16T11:56:26	Nurikabe	OK	71.4s lowest='重开' [1862,2231][2162,2378] blk=0/0px cov=5 board=2224x2496@0,0 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-115625.jpeg @2026-11-16T11:56:26	重开
-2026-11-16T11:57:36	Masyu	OK	69.9s lowest='退一步' [62,2303][729,2450] blk=0/0px cov=5 board=2224x2496@0,0 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Masyu-115736.jpeg @2026-11-16T11:57:36	退一步
+2026-11-16T12:33:59	Modular Clock Arithmetic	DUMP_FAIL	60.0s no in-game dump	
+2026-11-16T12:36:47	Nonogram	OK	98.1s lowest='提示' [1612,2144][1812,2291] blk=0/0px cov=5 board=2224x2496@0,0 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-123646.jpeg @2026-11-16T12:36:47	提示	147	0/0
+2026-11-16T12:37:55	Nurikabe	OK	68.2s lowest='重开' [1862,2231][2162,2378] blk=0/0px cov=5 board=2224x2496@0,0 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-123755.jpeg @2026-11-16T12:37:55	重开	147	0/0
