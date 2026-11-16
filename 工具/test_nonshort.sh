@@ -22,7 +22,8 @@ SCREEN='2224x2496'
 #   若不传，1600–2496 之间的正常节点全被算成溢出（实测三款都报 blk=10~±5000-7000px，手工 dump 却是 0）。
 export SHOT_SCREEN_H=2496
 export SHOT_GAME_BOTTOM=2412   # 2496 - 84（手机上 1600-84=1516）
-export SHOT_PX_PER_VP=3.125    # 500dpi / 160（手机 480/160=3）
+export SHOT_PX_PER_VP=3.125
+export SHOT_BUDGET_S=420   # 大屏每步更慢，预算从 260s 放宽到 420s（手机不受影响）    # 500dpi / 160（手机 480/160=3）
 
 echo "════ isShort==false 测试 $(date '+%H:%M') ════"
 

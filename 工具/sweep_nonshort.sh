@@ -32,7 +32,8 @@ export SHOT_GAME_BOTTOM=2412   # 2496 - 84（手机上 1600-84=1516）
 export SHOT_PX_PER_VP=3.125
 # ★ 2026-11-16（判据 2827）：**不写手机台账**。名字叫手机台账就该只收手机数据；
 #   折叠屏数据写进去会让 triage.py 把它当成手机的数（实测已污染 65 行，已清洗）。
-export SHOT_NO_LEDGER=1    # 500dpi / 160（手机 480/160=3）
+export SHOT_NO_LEDGER=1
+export SHOT_BUDGET_S=420   # 大屏每步更慢，预算从 260s 放宽到 420s（手机不受影响）    # 500dpi / 160（手机 480/160=3）
 OUT='_巡检记录/layout-nonshort.tsv'
 LOG='/tmp/sweep_nonshort.log'
 FORCE=0

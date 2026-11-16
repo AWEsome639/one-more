@@ -20,7 +20,8 @@ import io, os, re, signal, subprocess, sys, time, json, traceback
 HC = '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
 DEV = '127.0.0.1:5557'   # ⚠️ 已被 _target() 取代（保留仅为兼容老引用；实际调用都走 _target()）
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BUDGET_S = 260.0          # ③ 单款硬预算（2026-11-11：机器负载高时单次 dump 可达 20s，150 会把正常款判成 TIMEOUT）
+# ★ 2026-11-16（判据 2832）：大屏每步更慢（渲染多、尺寸大）⇒ 预算可用环境变量放宽。
+BUDGET_S = float(os.environ.get('SHOT_BUDGET_S', '260'))          # ③ 单款硬预算（2026-11-11：机器负载高时单次 dump 可达 20s，150 会把正常款判成 TIMEOUT）
 DEADLINE = 0.0            # main() 里初始化
 
 
@@ -927,6 +928,14 @@ def _body(name, t0):
         if '演示中' not in _jt:
             break
         time.sleep(3.0)
+    if not d2:
+        # ★ 2026-11-16（判据 2832）：折叠屏上进游戏后的 dump 偶尔拿不到（实测 DUMP_FAIL 12/68）。
+        #   直接判死太亏 ⇒ 再试 2 次、每次等 4s。
+        for _dr in range(2):
+            time.sleep(4.0)
+            d2 = dump('g')
+            if d2:
+                break
     if not d2:
         finish(name, 'DUMP_FAIL', t0, None, 'no in-game dump')
         return
