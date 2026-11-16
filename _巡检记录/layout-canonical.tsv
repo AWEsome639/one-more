@@ -1245,3 +1245,5 @@
 2026-11-16T08:05:10	Color Match	WRONG_GAME	-	75.9s title '颜色匹配' not found; first texts=['One More', '🌙', '中', '🔍', '💬', '🔍']
 2026-11-16T09:41:13	Verbal Analogies	OK	1572	72.5s lowest='提示：先想「前者是后者的什么」，再去套第三个词' [866,1530][1695,1572] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Verbal_Analogies-094113.jpeg @2026-11-16T09:41:13
 2026-11-16T09:42:27	Color Match	OK	1562	69.6s lowest='同色两格以上就能消 🎨' [60,1513][2500,1562] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Color_Match-094227.jpeg @2026-11-16T09:42:27
+2026-11-16T09:45:26	Kakuro Mini	OK	1576	67.9s lowest='6' [60,1444][534,1576] blk=0/0px cov=5 board=496x496@1032,756 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-094526.jpeg @2026-11-16T09:45:26
+2026-11-16T09:46:39	Matrix Reasoning	OK	1556	68.8s lowest='提示' [60,1442][1265,1556] blk=0/0px cov=5 board=436x436@1062,612 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Matrix_Reasoning-094639.jpeg @2026-11-16T09:46:39
