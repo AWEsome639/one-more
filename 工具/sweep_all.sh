@@ -195,4 +195,7 @@ say "本轮跑到: $(date '+%H:%M')   剩下未测: ${TOTAL:-?} 款"
 say "有效: $OKN 款   环境失败: $BAD 款   （合计 $((OKN+BAD)) 款）"
 say "明细: $LOG"
 say "下一步: python3 工具/triage.py  看五档；python3 工具/fixed_audit.py 算逐款 X"
+# ★ 2026-11-16：收工前跑一次晨检，把全库状态进日志
+echo "=== 晨检（nightly_report.sh）===" >> "$LOG"
+bash 工具/nightly_report.sh >> "$LOG" 2>&1 || true
 say "sweep_all 结束"
