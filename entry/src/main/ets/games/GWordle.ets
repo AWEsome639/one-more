@@ -493,7 +493,14 @@ export struct GWordle {
         }, (r: number) => 'r' + r)
       }
             // 2026-11-13 第二档：键盘在 1518..1600 只露上半截 ⇒ 棋盘再收 40px（220 → 185）
-      .width(Bp.isShort() ? 120 : 614)
+      // ★ 2026-11-16（判据 2833）：原来非矮屏分支写死 614vp —— 那是按**平板横屏**标定的。
+      //   折叠屏竖屏 711×798 上，614vp 宽 ⇒ 棋盘≈590vp 高，加头部 85 + 统计 50 + 键盘 140 = 865vp > 798vp
+      //   ⇒ **键盘被挤出屏幕、游戏无法输入**（实测截图：整屏字母格、下方无键盘）。
+      //   改用与 `GGo9.boardMax()` 同一条实测收敛的规则：**高度永远是瓶颈** ——
+      //   横屏 h-360、竖屏 min(w-40, h-400)；手机（矮屏）仍走 120，零回归。
+      .width(Bp.isShort() ? 120 : Math.min(614, Bp.width > Bp.height
+        ? Math.max(140, Bp.height - 360)
+        : Math.min(Math.max(160, Bp.width - 40), Math.max(120, Bp.height - 400))))
 
       Column({ space: Space.xs }) {
         ForEach(KEY_CHARS, (row: string[], ri: number) => {
