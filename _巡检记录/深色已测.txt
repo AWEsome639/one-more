@@ -352,3 +352,6 @@ Word Surge
 Word Wheel
 Wordle
 Yajilin
+d2 Attention
+fraction_matcher
+matrix_multiplier_match
