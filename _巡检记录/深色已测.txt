@@ -166,3 +166,11 @@ Letter Frequency Scan
 Letter Grid Swapper
 Lighthouses
 Lights Out
+Lock Pattern
+Logical Syllogisms
+Magic Squares
+Mahjong Solitaire
+Mancala
+Mandala Recall
+Mandelbrot
+Mastermind
