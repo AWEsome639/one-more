@@ -307,7 +307,14 @@ Target 10
 Target Number
 Task Switching
 Temporal Order
+Temporal Order Judgment
+Tenner Grid
+Tents And Trees
 Tetris
+Tic-Tac-Toe
+Tower of Hanoi
+Tower of London
+Trace Path
 Triplets Logic
 Verbal Analogies
 Wordle
