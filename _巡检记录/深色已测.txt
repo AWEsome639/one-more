@@ -94,3 +94,11 @@ Cryptogram All
 Cube Net Fold
 Definition Dash
 Delayed Match Sample
+Digit Span Reverse
+Digit Swap Eq
+Directions Recall
+Distractor Matrix
+Divided Attention
+Divisibility Dash
+Dnms
+Dominosa
