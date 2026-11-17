@@ -158,3 +158,11 @@ Interlock Puzzle
 Kakurasu Sums
 Klotski
 Kurodoko
+Laser Link
+Laser Reflect
+Letter Bridge
+Letter Cancellation
+Letter Frequency Scan
+Letter Grid Swapper
+Lighthouses
+Lights Out
