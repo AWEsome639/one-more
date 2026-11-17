@@ -312,9 +312,13 @@ Tenner Grid
 Tents And Trees
 Tetris
 Tic-Tac-Toe
+Topology
 Tower of Hanoi
 Tower of London
 Trace Path
+Trail Making
+Triple Sequence
 Triplets Logic
+Typing Speed
 Verbal Analogies
 Wordle
