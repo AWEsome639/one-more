@@ -33,6 +33,7 @@ import { SudokuDifficulty } from '../ai/SudokuDifficulty';
 // ★★★ 2026-10-23 路线 C：2048 价值网络（24→24→1，权重 9.5 KB）
 import { G2048Value } from '../ai/G2048Value';
 import { gamePlayer } from '@kit.GameServiceKit';
+import { QwenBpeSelfTest } from '../core/QwenBpeSelfTest';
 
 const DOMAIN = 0x0000;
 /** 与 ProgressStore / StatsCardAbility 同一个 preferences 库 */
@@ -70,6 +71,18 @@ export default class EntryAbility extends UIAbility {
       }
     } catch (err) {
       hilog.error(0x0001, 'LLMTEST', 'fail step=want-param');
+    }
+
+    // ★ 2026-11-17（第 ② 项第二步）：**分词器自检**。`aa start ... --ps tokTest true` 才跑。
+    //   结果只进 hilog（tag `TOKTEST`），判据是 `TOKTEST RESULT 16/16`。
+    try {
+      const td: string = ((want.parameters ?? {}) as Record<string, Object>)['tokTest'] as string
+      if (td === 'true') {
+        // ★ 2026-11-17：改**静态 import** —— 动态 `import()` 实测报 `fail step=import {}`（模块加载失败）。
+        QwenBpeSelfTest.run(this.context);
+      }
+    } catch (err) {
+      hilog.error(0x0001, 'TOKTEST', 'fail step=want-param');
     }
     // ★ 2026-11-08：把「落盘通道」注册给 UiModeMgr —— 设置页一点模式就写盘，
     //   不再依赖"用户有没有切过后台"（原来只在 onBackground 写，切完直接强杀就丢）。

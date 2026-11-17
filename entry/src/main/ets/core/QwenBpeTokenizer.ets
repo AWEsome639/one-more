@@ -6,8 +6,10 @@
 // Qwen2 的分词 = GPT-2 风格的 byte-level BPE + cl100k 的预切分正则。
 // ============================================================
 
-/** tokenizer.json 里 vocab 的形态：token 字符串 → id */
-export interface VocabJson { [token: string]: number }
+/** tokenizer.json 里 vocab 的形态：token 字符串 → id
+ *  ★ 2026-11-17（判据 2843）：**ArkTS strict 禁止索引签名**（`arkts-no-indexed-signatures`），
+ *   而 tokenizer.json 的 vocab 天然就是个字典 ⇒ 用 ArkTS 的互操作型 `ESObject`。*/
+export type VocabJson = ESObject
 /** merges：每项形如 “Ġ t”（两个待合并的 token，空格分隔），按优先级排列 */
 export type MergesJson = string[];
 
@@ -31,14 +33,31 @@ function bytesToUnicode(): Map<number, string> {
 }
 
 /** cl100k / Qwen2 的预切分正则（必须带 u 标志才支持 \p{L}） */
-const PRE_TOKEN_RE: RegExp = new RegExp(
-  “(?i:'s|'t|'re|'ve|'m|'ll|'d)” +
-  “|[^\\r\\n\\p{L}\\p{N}]?\\p{L}+” +
-  “|\\p{N}{1,3}” +
-  “| ?[^\\s\\p{L}\\p{N}]+[\\r\\n]*” +
-  “|\\s*[\\r\\n]+” +
-  “|\\s+(?!\\S)” +
-  “|\\s+”, 'gu');
+// ★ 2026-11-17（判据 2844）：**ArkTS 的 RegExp 引擎不支持 cl100k 那条预切分正则**。
+//   实测：模块加载时 `new RegExp("(?i:'s|…|\\p{L}+", 'gu')` 抛 `SyntaxError`，
+//   而我把它改成静态 import 后 ⇒ **App 每次启动都崩**（jscrash，栈在 QwenBpeTokenizer.ts:45）。
+//   所以：① 改成**惰性 + try/catch**，构不出来就返回 null，App 绝不因它崩；
+//   ② 分词能力上限也就此明确：**要上真机必须自写预切分扫描器**（不能靠这条正则）。
+let PRE_TOKEN_RE: RegExp | null = null;
+let PRE_TOKEN_RE_TRIED: boolean = false;
+/** 取预切分正则；引擎不支持时返回 null（不抛） */
+export function preTokenRe(): RegExp | null {
+  if (PRE_TOKEN_RE_TRIED) { return PRE_TOKEN_RE; }
+  PRE_TOKEN_RE_TRIED = true;
+  try {
+    PRE_TOKEN_RE = new RegExp(
+      "(?i:'s|'t|'re|'ve|'m|'ll|'d)" +
+      "|[^\\r\\n\\p{L}\\p{N}]?\\p{L}+" +
+      "|\\p{N}{1,3}" +
+      "| ?[^\\s\\p{L}\\p{N}]+[\\r\\n]*" +
+      "|\\s*[\\r\\n]+" +
+      "|\\s+(?!\\S)" +
+      "|\\s+", 'gu');
+  } catch (_e) {
+    PRE_TOKEN_RE = null;   // 引擎不支持 ⇒ 让调用方知道
+  }
+  return PRE_TOKEN_RE;
+}
 
 export class QwenBpeTokenizer {
   private vocab: VocabJson = {};
@@ -49,7 +68,8 @@ export class QwenBpeTokenizer {
   /** 从 tokenizer.json 的 vocab 与 merges 初始化 */
   init(vocab: VocabJson, merges: MergesJson): void {
     this.vocab = vocab;
-    for (const tok of Object.keys(vocab)) { this.encoder.set(tok, vocab[tok]); }
+    const v: ESObject = vocab;
+    for (const tok of Object.keys(v)) { this.encoder.set(tok, v[tok] as number); }
     this.ranks.clear();
     for (let i = 0; i < merges.length; i++) { this.ranks.set(merges[i], i); }
   }
@@ -112,7 +132,10 @@ export class QwenBpeTokenizer {
   /** encode：文本 → token id 序列 */
   encode(text: string): number[] {
     const ids: number[] = [];
-    const matches = text.match(PRE_TOKEN_RE);
+    const re = preTokenRe();
+    // 引擎不支持那条正则 ⇒ 退化为「整段当一个 piece」（不伪装成对）
+    if (re === null) { return this.bpe(text); }
+    const matches = text.match(re);
     if (matches === null) { return ids; }
     for (const piece of matches) {
       const part = this.bpe(piece);
