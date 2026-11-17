@@ -1772,3 +1772,5 @@
 2026-11-17T08:36:02	Sudoku Hex	OK	1547	69.6s lowest='点一个空格，再点数字填入' [60,1498][2500,1547] blk=0/0px cov=5 board=580x580@990,588 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Sudoku_Hex-083601.jpeg @2026-11-17T08:36:02
 2026-11-17T08:37:10	Nurikabe	OK	1407	65.1s lowest='提示' [1304,1275][2500,1407] blk=0/0px cov=5 board=520x520@1020,725 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nurikabe-083709.jpeg @2026-11-17T08:37:10
 2026-11-17T08:38:30	Nonogram	OK	1323	76.8s lowest='提示' [2308,1191][2500,1323] blk=0/0px cov=5 board=520x436@1020,725 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Nonogram-083829.jpeg @2026-11-17T08:38:30
+2026-11-17T08:45:55	Math Path	OK	1450	102.0s lowest='步数 0/30 · 相邻成路、数字与运算符交替、从左往右算（不区分优先级）' [697,1408][1864,1450] blk=0/0px cov=5 board=520x520@1020,720 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-084554.jpeg @2026-11-17T08:45:55
+2026-11-17T08:47:57	Collatz	OK	1600	117.4s lowest='换个数' [60,1520][2500,1600] blk=1/24px cov=5 board=145x132@2193,201 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-084756.jpeg @2026-11-17T08:47:57
