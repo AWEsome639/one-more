@@ -134,3 +134,11 @@ Futoshiki
 Game24
 Gear Rotation
 Gear Train Direction
+Geometric Vision
+Ghost Tap
+Go (9x9)
+Go / No-Go
+Gokigen Naname
+Gomoku
+Grammar Police
+Grammar Sort
