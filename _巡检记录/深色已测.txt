@@ -142,3 +142,11 @@ Gokigen Naname
 Gomoku
 Grammar Police
 Grammar Sort
+Graph Coordinate Plot
+Gravity Sort
+Grid Displacement
+Grocery List
+Hanoi
+Heyawake
+Hitori
+Hitori All
