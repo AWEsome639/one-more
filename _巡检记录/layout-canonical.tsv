@@ -2133,3 +2133,5 @@
 2026-11-17T22:19:26	Binomial Match	OK	1600	69.4s lowest='左边点项、右边点系数，配成一对' [60,1557][2500,1600] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Binomial_Match-221926.jpeg @2026-11-17T22:19:26
 2026-11-17T22:20:31	Snake 3D	OK	1597	65.0s lowest='开始' [60,1465][1256,1597] blk=3/63px cov=5 board=288x336@830,756 max=21 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-222031.jpeg @2026-11-17T22:20:31
 2026-11-17T22:21:45	Cross Section Slice	OK	1530	73.5s lowest='5 个' [60,1386][1265,1530] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Cross_Section_Slice-222145.jpeg @2026-11-17T22:21:45
+2026-11-17T23:06:50	Snake 3D	OK	1597	91.3s lowest='开始' [60,1465][1256,1597] blk=3/63px cov=5 board=288x336@830,756 max=21 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-230649.jpeg @2026-11-17T23:06:50
+2026-11-17T23:10:31	Gear Train Direction	OK_NOSHOT	1303	220.7s lowest='↻ 顺时针' [60,1165][1265,1303] recv failed @2026-11-17T23:10:31
