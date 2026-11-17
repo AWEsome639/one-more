@@ -148,7 +148,10 @@ m = re.search(r\"lowest='.*?'\s*\[(\d+),(\d+)\]\[(\d+),(\d+)\]\", ln)
 print((int(m.group(4)) - int(m.group(2))) if m else -1)
 " 2>/dev/null)
   blk=$(echo "$line" | sed -n 's/.*blk=\([0-9]*\/\)\([0-9]*\)px.*/\1\2/p' | head -1)
-  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(date '+%Y-%m-%dT%H:%M:%S')" "$g" "${st:-?}" "${wall:-?}" "$low" "${lowh:--1}" "${blk:-?}" >> "$OUT"
+  # ★ 2026-11-17（判据 2842）：**备注不能丢**。shot_game.py 会打印
+  #   「title %r not found; first texts=[...]」这类诊断，而原来只取前 7 列 ⇒ 28 个 WRONG_GAME 在台账里全是空白。
+  note=$(echo "$line" | cut -f5- | cut -c1-120)
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(date '+%Y-%m-%dT%H:%M:%S')" "$g" "${st:-?}" "${wall:-?}" "$low" "${lowh:--1}" "${blk:-?}" >> "$OUT" "$note"
   printf '[%s] %s %s lowh=%s blk=%s\n' "$(date +%H:%M:%S)" "$g" "${st:-?}" "${lowh:--1}" "${blk:-?}" >> "$LOG"
 done < /tmp/ns_todo.txt
 
