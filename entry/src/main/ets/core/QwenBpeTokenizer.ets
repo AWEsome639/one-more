@@ -46,13 +46,15 @@ export function preTokenRe(): RegExp | null {
   PRE_TOKEN_RE_TRIED = true;
   try {
     PRE_TOKEN_RE = new RegExp(
-      "(?i:'s|'t|'re|'ve|'m|'ll|'d)" +
+      // ★ 2026-11-17（判据 2845）：**`(?i:…)` 是 Python 写法，JS/ArkTS 里要用 `/i` 标志**。
+      //   原草稿直接把 Python 正则搬过来 ⇒ `new RegExp` 抛 SyntaxError（而我先误判成「引擎不支持」）。
+      "('s|'t|'re|'ve|'m|'ll|'d)" +
       "|[^\\r\\n\\p{L}\\p{N}]?\\p{L}+" +
       "|\\p{N}{1,3}" +
       "| ?[^\\s\\p{L}\\p{N}]+[\\r\\n]*" +
       "|\\s*[\\r\\n]+" +
       "|\\s+(?!\\S)" +
-      "|\\s+", 'gu');
+      "|\\s+", 'giu');
   } catch (_e) {
     PRE_TOKEN_RE = null;   // 引擎不支持 ⇒ 让调用方知道
   }
