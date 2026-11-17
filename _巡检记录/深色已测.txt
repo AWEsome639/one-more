@@ -336,4 +336,19 @@ Visual Statistical Learning
 Vocabulary Builder
 Vowel Reconstruct
 Water Sort
+Wireframe 3D Rotation
+Wisconsin Card Sorting
+Word Association Recall
+Word Grid Connection
+Word Ladder
+Word Ladder Step
+Word Mastermind
+Word Pair Associate Memory
+Word Scramble
+Word Search
+Word Snake
+Word Snake Trail
+Word Surge
+Word Wheel
 Wordle
+Yajilin
