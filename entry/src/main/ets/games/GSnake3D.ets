@@ -533,7 +533,9 @@ export struct GSnake3D {
       // ★ 2026-11-15（判据 2710/2716）：`-180` 时底部「开始」按钮只剩 82px（应 132px、缺 50px）。
       //   实测 `-200` 只给了 +20px（82→102px）⇒ 再压 `-230`，按线性关系再得 +30px。
       //   ^a^ 棋盘是**显示用**（靠方向键操作），缩小不影响可玩性。
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(300, Bp.height - 230)))
+      // ★ 2026-11-17（判据 2857 续）：`-230` 仍不够 —— 本轮实测底部「开始/重新开始」两个按钮底边被切（`blk=3/72px`、
+      //   `lowest=开始` 的 `y2=1600` 正压屏底）。按作者自己的线性关系（`-20` 换 `+20px`）再压 `70`。
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(300, Bp.height - 300)))
       // ★ P9：手指直接在棋盘上滑 = 转方向（不用去够下面那排小按钮）
       .gesture(
         PanGesture({ fingers: 1, direction: PanDirection.All, distance: 8 })
