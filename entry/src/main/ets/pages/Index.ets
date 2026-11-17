@@ -593,6 +593,9 @@ build() {
     //   ⚠️ 用 this.rtl() 而不是裸 I18n.isRTL()：后者读静态缓存，ArkUI 看不到依赖。
     }
     .direction(this.rtl() ? Direction.Rtl : Direction.Ltr)
+    // ★ 2026-11-17（判据 2855）：同 GameHost —— 画到导航条下 + 底部内边距。
+    .padding({ bottom: 24 })
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 
   /**

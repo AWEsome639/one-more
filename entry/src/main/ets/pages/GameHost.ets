@@ -3922,6 +3922,10 @@ struct GameHost {
       curve: Curve.Friction,
       type: SharedTransitionEffectType.Static
     })
+    // ★ 2026-11-17（判据 2855）：全屏下让页面画到导航条下（消白条），
+    //   并用底部内边距把内容抬回手势条上方（否则被切。两者缺一不可）。
+    .padding({ bottom: 24 })
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 
   @Builder

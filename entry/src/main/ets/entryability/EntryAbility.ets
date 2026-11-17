@@ -141,6 +141,11 @@ export default class EntryAbility extends UIAbility {
       //   全库从来没调过 setWindowSystemBarProperties ⇒ 深色下底部露一条系统浅色底（底部有内容的款全中招）。
       //   只绑窗口、不改状态栏（状态栏是系统画的白底黑字，见下方 2026-11-01 那段）。
       ThemeBars.bind(win, AppStorage.get<boolean>('themeDark') ?? false);
+      // ★ 2026-11-17（判据 2855）：**全屏 + 根容器底部内边距**一起才是对的。
+      //   单全屏 ⇒ 白条消失但内容被手势条切（实测：`dis-` 只剩上半、提示行没了）。
+      win.setWindowLayoutFullScreen(true).catch((e: Error) => {
+        hilog.warn(DOMAIN, 'testTag', 'setWindowLayoutFullScreen 失败：%{public}s', e.message);
+      });
       // ★★ 2026-11-01 查证（**没有改**，只留结论）：
       //   一度以为"状态栏文字在深色开屏上看不见"，准备把 statusBarContentColor 设成 #FFFFFF。
       //   查日志发现：系统（com.ohos.sceneboard）会把状态栏设成
