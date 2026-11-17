@@ -48,7 +48,7 @@ CHECKS = [
     ('GHitori', 'Bp.height - 360', '限宽'),
     ('GHitoriAll', 'Bp.height - 360', '限宽'),
     ('GMastermind', 'Math.max(200, Bp.height - 260)', '三行圆点限宽'),
-    ('GMatrixReasoning', 'Bp.height - 388', '限宽'),
+    ('GMatrixReasoning', 'Bp.height - 520', '限宽'),
     ('GMemory', 'Bp.height - 360', '限宽'),
     ('GModuloClock', 'Bp.isShort() ? FontSize.xl : FontSize.hero', '题卡降档'),
     ('GModuloPath', 'Bp.height - 360', '限宽'),
@@ -61,7 +61,7 @@ CHECKS = [
     ('GShikaku', 'Bp.height - 360', '限宽'),
     ('GSimonSays', '2 * Math.max(140, Bp.height - 200)', '限行宽'),   # ★ 2026-11-14：原特征串落在注释上，改成**代码行**
     ('GSkyscrapers', 'Bp.height - 360', '限宽'),
-    ('GSnake3D', 'Bp.height - 230', '限整行宽'),
+    ('GSnake3D', 'Bp.height - 300', '限整行宽'),
     ('GTargetNumber', 'Bp.isShort() ? FontSize.xl : FontSize.xxxl', '题卡降档'),
     ('GVisualSearchAll', 'Bp.height - 240', '限宽'),
     ('GWordLadder', 'Bp.isShort() ? 48 : 60', '词格降档'),
