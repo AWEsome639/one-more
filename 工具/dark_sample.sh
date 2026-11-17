@@ -18,6 +18,13 @@ HC='/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/
 #   会把 $@ 覆盖成日月图标的坐标 ⇒ 实测把「1966 / 267 / ☀️」当成款名去测。
 GAMES=("$@")
 
+# ★ 2026-11-17（判据 2848）：**设备不在就别空跑**。
+#   实测：磁盘低于 14GiB 时模拟器拒启动，而脚本照样打印「逐款测量」、最后一行结果都没有 ⇒ 静默失败。
+if ! "$HC" list targets 2>/dev/null | grep -qE '^[0-9A-Za-z]'; then
+  echo "❌ 没有在线设备（模拟器可能没起来 / 磁盘不足）—— 先确认 hdc list targets" >&2
+  exit 1
+fi
+
 dump() {
   "$HC" shell "uitest dumpLayout -p /data/local/tmp/ds.json" >/dev/null 2>&1
   "$HC" shell "cat /data/local/tmp/ds.json" 2>/dev/null
