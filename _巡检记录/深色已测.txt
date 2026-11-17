@@ -126,3 +126,11 @@ Flanker Test
 Flappy
 Focus Tunnel
 Fraction Match
+Fraction Matcher
+Fractional Pizza
+FreeCell
+Frequency Tap
+Futoshiki
+Game24
+Gear Rotation
+Gear Train Direction
