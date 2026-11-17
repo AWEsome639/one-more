@@ -263,6 +263,14 @@ Silent Letter Search
 Silhouette Match
 Silhouette Match Ortho
 Simon Command
+Simon Says
+Simon Sequence
+Skyscrapers
+Slide Puzzle
+Slide15
+Slitherlink
+Snake
+Snake 3D
 Sokoban
 Story Builder
 Subitizing Rush
