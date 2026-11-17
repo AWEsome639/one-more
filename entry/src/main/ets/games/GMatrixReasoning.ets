@@ -391,13 +391,15 @@ export struct GMatrixReasoning {
           }.width('100%')
         }, (r: number) => 'rr' + r)
       }
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(145, Bp.height - 440))).aspectRatio(1).padding(Space.sm)
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(145, Bp.height - 520))).aspectRatio(1).padding(Space.sm)
       // ★ 2026-11-17（判据 2836）：388 → 440。折叠屏竖屏 798vp 上，棋盘 410vp + 头部三统计 + 选项行
       //   + 提示行 ⇒ 底部那个紫色按钮只露一条边（实测截图 Matrix_Reasoning-184810）。
       //   同族五款都是差 ~40vp。
+      // ★ 2026-11-17 第二轮：440 → 520。上一轮把「重开」从「根本没被认出」带到了「露一条边」（高 24px），
+      //   还差 ~80vp 才能让它完整显示（应约 100px）。
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 440) })
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - 520) })
       .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.lg).shadow(Shadow.card)
 
       Text(this.msg).fontSize(FontSize.sm).width('100%')
