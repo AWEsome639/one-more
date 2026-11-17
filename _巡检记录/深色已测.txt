@@ -255,6 +255,14 @@ Sequence Sleuth
 Sequence Stack
 Set Theory Venn
 Shadow Pivot
+Shape Shifter
+Shell Game
+Shikaku
+Sieve Visualizer
+Silent Letter Search
+Silhouette Match
+Silhouette Match Ortho
+Simon Command
 Sokoban
 Story Builder
 Subitizing Rush
