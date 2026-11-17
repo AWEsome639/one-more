@@ -1,0 +1,48 @@
+Wordle
+Kakuro Mini
+Kakuro
+Tetris
+Minesweeper
+Nonogram
+Akari (Light Up)
+Bridges
+KenKen
+Sudoku Hex
+Nurikabe
+Magnets
+2048
+Math Path
+Collatz
+Number Bonds All
+Fillomino
+Sokoban
+Matrix Reasoning
+Mental Mapping
+Story Builder
+Verbal Analogies
+Color Match
+Triplets Logic
+Base Conversion Run
+Subitizing Rush
+Ab Reversal Oddball
+Action Sequence Recall
+Affix Factory
+Algebraic Balance
+Algebraic Inequality Solver
+Alphabet Sudoku
+Anagram Definition
+Angle Finder
+Area Perimeter Match
+Arithmetic Chain
+Associative Pairs
+Attentional Blink
+Attentional Blink Probe
+Balance Scale
+Base Shift
+Bejeweled
+Binary Code
+Binary Matrix Rank
+Binary Matrix Rank All
+Binary Puzzle
+Binary Scale Balance
+Binomial Match
