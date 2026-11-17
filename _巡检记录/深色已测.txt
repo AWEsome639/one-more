@@ -243,6 +243,18 @@ Rhythm Master
 Roman Arithmetic
 Room Inspector
 Rotating Maze
+Rule Switcher
+Running Memory Span
+Schulte Table
+Sdmt
+Semantic Association
+Semantic Distance
+Semantic Link
+Sentence Unscramble
+Sequence Sleuth
+Sequence Stack
+Set Theory Venn
+Shadow Pivot
 Sokoban
 Story Builder
 Subitizing Rush
