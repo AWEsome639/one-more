@@ -340,7 +340,7 @@ export struct GGearTrainDirection {
     // ★ 2026-11-17（判据 2857 续）：8 个齿轮行（每行 107px）+ 7 个连接行 + 头部 + 提示 + 按钮
     //   总高约 1717px ⇒ 超出 117px：实测提示行被挤成 14px、**下面两个方向按钮整个在屏外**。
     //   矮屏压缩齿轮行：36→26 ⇒ 每行省 30px、8 行省 240px。
-    .width('100%').height(Bp.isShort() ? Cell.of(22) : Cell.of(36))
+    .width('100%').height(Bp.isShort() ? Cell.of(18) : Cell.of(36))
     .animation({ duration: Motion.fast, curve: Motion.snap() })
   }
 
