@@ -46,3 +46,11 @@ Binary Matrix Rank All
 Binary Puzzle
 Binary Scale Balance
 Binomial Match
+Blink Detector
+Block Count 3D
+Block Escape
+Block Stacking Physics
+Box Completion
+Breakout
+Bridges All
+Bubble Shooter
