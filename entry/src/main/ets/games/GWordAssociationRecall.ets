@@ -348,7 +348,7 @@ export struct GWordAssociationRecall {
           }.width('100%')
         }
       } else {
-        Column({ space: Space.sm }) {
+        Column({ space: Space.xs }) {
           ForEach(this.opts, (o: Opt, i: number) => { this.option(o, i) }, (o: Opt, i: number) => 'w' + i + o.text)
         }.width('100%')
       }
@@ -396,7 +396,7 @@ export struct GWordAssociationRecall {
   option(o: Opt, i: number) {
     Text(o.text).fontSize(FontSize.md).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
       .fontColor(this.locked && (this.picked === i || o.ok) ? '#FFFFFF' : this.theme.ink)
-      .width('100%').height(Cell.of(48)).borderRadius(Radius.md).shadow(Shadow.card)
+      .width('100%').height(Bp.isShort() ? Cell.of(42) : Cell.of(48)).borderRadius(Radius.md).shadow(Shadow.card)
       .backgroundColor(this.locked && o.ok
         ? Palette.emerald : (this.locked && this.picked === i ? Palette.rose : this.theme.surface))
       .scale({ x: this.picked === i ? Motion.pressScale : 1, y: this.picked === i ? Motion.pressScale : 1 })
