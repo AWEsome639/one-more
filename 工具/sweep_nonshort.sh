@@ -120,6 +120,10 @@ for i in $(seq 1 40); do
   sleep 10
 done
 sleep 22
+# ★ 2026-11-17（判据 2869）：模拟器会自己锁屏，锁屏时测量静默失败（shot_game 无输出、dump 还是首页）
+#   ⇒ 装包前先唤醒一次（幂等、无害）
+"$HC" shell "power-shell wakeup" >/dev/null 2>&1
+sleep 1
 say "屏幕: $("$HC" shell "hidumper -s RenderService -a screen" 2>/dev/null | grep -oE 'render resolution=[0-9]+x[0-9]+' | head -1)"
 say "装包"
 timeout 300 "$HC" install -r entry/build/default/outputs/default/entry-default-signed.hap 2>&1 | tail -1 | tee -a "$LOG"
