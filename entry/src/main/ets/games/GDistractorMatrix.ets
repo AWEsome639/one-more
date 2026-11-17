@@ -330,7 +330,10 @@ export struct GDistractorMatrix {
             }, (c: number) => 'c' + c)
           }.width(Math.min(Bp.width - 2 * Space.lg, // ★ 2026-11-15（判据 2734/2743）：底部第二行选项被切（只露 23px、设计 123px ⇒ 缺 ~100px）。
       //   矩阵格子是 aspectRatio(1) ⇒ 限宽即限高；-360→-400（矩阵 173→133vp）让出 40vp=120px。
-      Math.max(140, Bp.height - 400)))
+      // ★ 2026-11-17（判据 2857/2858 续）：与 Cross Section Slice 同形 —— 下排选项被切（`blk=3/72px`、
+      //   `lowest='2'` 的 `y2=1600`）。**下限 140 是生效值**（533-400=133 < 140）⇒ 光改减数无效。
+      //   同时降下限与加减数：140→110、-400→-430 ⇒ 网格 140→110vp。
+      Math.max(110, Bp.height - 430)))
         }, (r: number) => 'r' + r)
       }.width('100%')
       .padding(Space.sm)
