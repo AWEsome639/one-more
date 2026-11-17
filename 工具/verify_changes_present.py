@@ -28,7 +28,10 @@ GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 CHECKS = [
     ('GFractionMatcher', "padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg)", '题卡 padding md→sm（配 2×2 收 36px）'),
     ('GShikaku', 'Math.max(200, Bp.height - 360)', '白天·下限 240→200（blk 72→0）'),
-    ('GMagnets', 'Bp.height - 375', 'A①盘面 173→158vp'),
+    # ⏸⏸ 2026-11-17（判据 2871）：这条**作废**。原计划（2026-11-14「六处改动清单」）指的 `GMagnets.ets L701
+    #   Math.max(140, Bp.height - 360)` 在当前文件里**不存在**（全文 `Bp.height/width` 出现 0 次 ⇒ 文件已重写）。
+    #   若盘面仍需缩小，应**重新计划**，而不是按旧行号补。
+    # ('GMagnets', 'Bp.height - 375', 'A①盘面 173→158vp（计划已过时，见上）'),
     ('GPythagoreanTripleBuilder', '? Space.xs : Space.md', 'A③外层间距 sm→xs（省 72px）'),
     # ⛔⛔ 2026-11-14 作废：`GWordle` 套 `Scroll` 后**中间全黑、棋盘与键盘都没渲染**
     #   （`.height('100%')` 被注释掉之后，`Scroll` 里的内容没有内在高度 ⇒ 高度 0）。
