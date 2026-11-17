@@ -26,6 +26,7 @@ import { LevelCurve } from './LevelCurve';
 import { preferences } from '@kit.ArkData';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { common } from '@kit.AbilityKit';
+import { ThemeBars } from './ThemeBars';
 
 const STORE_NAME: string = 'onemore_progress';
 /** ★ 2026-10-25 旧库名。只用于**一次性迁移**：开机时把旧库整库搬到新库，搬完删旧库。
@@ -1575,16 +1576,21 @@ export class ProgressStore {
 
   /** 把三态解析成实际深浅，写进 themeDark（UI 只读 themeDark） */
   static applyThemeMode(mode: string): void {
+    // ★ 2026-11-17（判据 2851）：主题一生效，**导航条也要跟着刷**（否则深色下底部露白）
     if (mode === 'dark') {
       AppStorage.setOrCreate(Keys.themeDark, true);
+      ThemeBars.apply(true);
       return;
     }
     if (mode === 'light') {
       AppStorage.setOrCreate(Keys.themeDark, false);
+      ThemeBars.apply(false);
       return;
     }
     // system：读系统当前深浅
-    AppStorage.setOrCreate(Keys.themeDark, ProgressStore.systemIsDark());
+    const sysDark: boolean = ProgressStore.systemIsDark();
+    AppStorage.setOrCreate(Keys.themeDark, sysDark);
+    ThemeBars.apply(sysDark);
   }
 
   /** 系统当前是不是深色 */

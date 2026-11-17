@@ -34,6 +34,7 @@ import { SudokuDifficulty } from '../ai/SudokuDifficulty';
 import { G2048Value } from '../ai/G2048Value';
 import { gamePlayer } from '@kit.GameServiceKit';
 import { QwenBpeSelfTest } from '../core/QwenBpeSelfTest';
+import { ThemeBars } from '../core/ThemeBars';
 
 const DOMAIN = 0x0000;
 /** 与 ProgressStore / StatsCardAbility 同一个 preferences 库 */
@@ -136,6 +137,10 @@ export default class EntryAbility extends UIAbility {
       const win: window.Window = windowStage.getMainWindowSync();
       // #0D1320 = Splash.ets 的 OM_INK，与开屏、图标底色完全一致
       win.setWindowBackgroundColor('#0D1320');
+      // ★ 2026-11-17（判据 2851）：**让系统导航条跟随主题**。
+      //   全库从来没调过 setWindowSystemBarProperties ⇒ 深色下底部露一条系统浅色底（底部有内容的款全中招）。
+      //   只绑窗口、不改状态栏（状态栏是系统画的白底黑字，见下方 2026-11-01 那段）。
+      ThemeBars.bind(win, AppStorage.get<boolean>('themeDark') ?? false);
       // ★★ 2026-11-01 查证（**没有改**，只留结论）：
       //   一度以为"状态栏文字在深色开屏上看不见"，准备把 statusBarContentColor 设成 #FFFFFF。
       //   查日志发现：系统（com.ohos.sceneboard）会把状态栏设成
