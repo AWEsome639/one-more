@@ -291,6 +291,14 @@ Stroop Test
 Subitizing Rush
 Sudoku
 Sudoku Hex
+Sum Pyramid
+Sum Snake
+Switch Task
+Syllable Stack
+Symbol Digit Assoc
+Symbol Logic
+Symbolic Flanker
+Symmetry
 Tetris
 Triplets Logic
 Verbal Analogies
