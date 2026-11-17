@@ -1850,3 +1850,4 @@
 2026-11-17T12:59:43	Snake 3D	OK	1597	64.5s lowest='开始' [60,1465][1256,1597] blk=3/63px cov=5 board=288x336@830,756 max=21 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Snake_3D-125943.jpeg @2026-11-17T12:59:43
 2026-11-17T13:12:47	Cross Section Slice	OK	1600	70.3s lowest='5 个' [60,1476][1265,1600] blk=3/72px cov=5 board=145x132@2193,201 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Cross_Section_Slice-131247.jpeg @2026-11-17T13:12:47
 2026-11-17T13:23:05	Cross Section Slice	OK	1530	70.4s lowest='5 个' [60,1386][1265,1530] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Cross_Section_Slice-132305.jpeg @2026-11-17T13:23:05
+2026-11-17T13:35:30	Distractor Matrix	OK	1525	69.3s lowest='2' [60,1387][1265,1525] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Distractor_Matrix-133530.jpeg @2026-11-17T13:35:30
