@@ -180,9 +180,25 @@ Mirror Image
 Mirror Maze
 Mirror Tracing
 Missing Operator
+Missing Vowels
+Modular Clock Arithmetic
+Modulo Clock
+Modulo Path
+Multi Track Counter
+Multiple Object Tracking
+N-Back
+Narrative Recall
+Navon Hierarchical
+Negative Space Detection
+Nim
 Nonogram
+Norinori
+Number Bonds
 Number Bonds All
+Numerical Estimation
 Nurikabe
+Object Displacement
+Object Shuffle
 Sokoban
 Story Builder
 Subitizing Rush
