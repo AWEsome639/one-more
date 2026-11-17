@@ -850,7 +850,17 @@ def _body(name, t0):
         if _ti:
             _bx, _by = _ti
         else:
-            _bx, _by = _tap_props(1280 / 2560.0, 435 / 1600.0)
+            # ★ 2026-11-18（判据 2882）：首页有时会多一条「今天这一局」（如「数量直觉·一眼数数」），
+            #   把搜索框整体下移 ⇒ 硬编码的 y=435 点空 ⇒ 搜索页不开 ⇒ 卡片永远找不到。
+            #   改成先在 dump 里找占位文字（搜游戏名 / 搜索 / Search），点它的中心。
+            _sb = None
+            if _dbox:
+                for _t, _r in texts(_dbox):
+                    _t = _t or ''
+                    if ('搜游戏名' in _t) or ('搜索' in _t) or ('Search' in _t):
+                        _sb = ((_r[0] + _r[2]) // 2, (_r[1] + _r[3]) // 2)
+                        break
+            _bx, _by = _sb if _sb else _tap_props(1280 / 2560.0, 435 / 1600.0)
         sh('uitest uiInput click %d %d' % (_bx, _by))
         time.sleep(0.8)
         # ★ 2026-11-14 白天实测：`uinput -K -t` **打不进中文**（IME 层）⇒ 像 `磁铁`/`分数匹配`
@@ -865,6 +875,16 @@ def _body(name, t0):
         hit = any(((want_zh and want_zh in (t or '')) or (name in (t or ''))) for t, _ in texts(d))
         if hit:
             break
+        # ★ 2026-11-18（判据 2882）：搜索页没打开会退回首页 ⇒ 卡片在折叠线下时永远找不到。
+        #   旧版没有任何滚动（`grep swipe|scroll` 零命中）⇒ 今夜连续 7 次没进去、历史上大量 NO_CARD。
+        #   在这里上滑两次再找（无害、幂等）。
+        for _sw in range(2):
+            sh('uitest uiInput swipe 1280 1200 1280 500 300')
+            time.sleep(0.9)
+            d2 = dump('r')
+            if d2 and any(((want_zh and want_zh in (t or '')) or (name in (t or ''))) for t, _ in texts(d2)):
+                d = d2
+                break
         sh('uitest uiInput keyEvent Back')
         time.sleep(0.8)
     if not d:
