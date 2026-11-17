@@ -57,3 +57,6 @@ __pycache__/
 # 备份文件不进仓库（2026-10-20）：260 个 .bak / 57,604 行 / 2.5 MB，没有代码价值
 entry/src/main/ets/games/*.bak*
 工具/models/
+
+# 归档的已签名发布包（29.5MB，不进 git；构建目录里的同名文件会被后续 debug 编译覆盖）
+release/
