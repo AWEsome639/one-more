@@ -199,6 +199,22 @@ Numerical Estimation
 Nurikabe
 Object Displacement
 Object Shuffle
+Odd Even Flash
+Odd One Out
+Odd Rotation
+One Letter Shift
+Operation Span
+Orbit Tap
+Oxymoron Hunt
+Palindrome Builder
+Pangram Sprint
+Paper Folding
+Path Finder
+Path Intersect
+Path Recall
+Pattern Sequence Draw
+Peg Solitaire
+Percentage Peak
 Sokoban
 Story Builder
 Subitizing Rush
