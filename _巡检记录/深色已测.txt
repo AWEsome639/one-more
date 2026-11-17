@@ -177,6 +177,9 @@ Mental Mapping
 Mental Rotation
 Minesweeper
 Mirror Image
+Mirror Maze
+Mirror Tracing
+Missing Operator
 Nonogram
 Number Bonds All
 Nurikabe

@@ -1955,3 +1955,7 @@
 2026-11-17T16:33:57	Mental Calendar	OK	1543	72.0s lowest='提示：一三五七八十腊，三十一天永不差；闰年二月二十九天' [794,1501][1767,1543] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Calendar-163356.jpeg @2026-11-17T16:33:57
 2026-11-17T16:35:13	Mental Rotation	OK	1510	71.7s lowest='判定：10 题答对 ≥ 8 题 · 提示：不对称图形转过 90/180/270° 的样子' [60,1468][2500,1510] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Mental_Rotation-163513.jpeg @2026-11-17T16:35:13
 2026-11-17T16:36:30	Mirror Image	OK	1438	73.7s lowest='是镜像' [60,1267][1256,1438] blk=0/0px cov=5 board=145x132@2193,201 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Mirror_Image-163630.jpeg @2026-11-17T16:36:30
+2026-11-17T16:39:05	Mirror Maze	NOT_HOME	-	150.5s could not reach home; last texts=[]
+2026-11-17T16:42:26	Mirror Maze	OK	1535	81.3s lowest='判定：走到 🏁 通关 · 步数上限 = 最短路径 + 7' [60,1493][2500,1535] blk=0/0px cov=5 board=520x520@1020,732 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Mirror_Maze-164224.jpeg @2026-11-17T16:42:26
+2026-11-17T16:43:52	Mirror Tracing	OK	1351	79.7s lowest='1' [1101,1328][1122,1351] blk=0/0px cov=5 board=480x480@1040,744 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Mirror_Tracing-164350.jpeg @2026-11-17T16:43:52
+2026-11-17T16:45:22	Missing Operator	DUMP_FAIL	-	85.0s no in-game dump
