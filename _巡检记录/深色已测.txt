@@ -299,6 +299,14 @@ Symbol Digit Assoc
 Symbol Logic
 Symbolic Flanker
 Symmetry
+Symmetry Span
+Tangle Fix
+Tangram
+Tapa
+Target 10
+Target Number
+Task Switching
+Temporal Order
 Tetris
 Triplets Logic
 Verbal Analogies
