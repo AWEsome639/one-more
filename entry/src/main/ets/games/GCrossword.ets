@@ -100,6 +100,7 @@ export struct GCrossword {
       const t: string = arr[i]; arr[i] = arr[j]; arr[j] = t;
     }
     this.bank = arr;
+    this.keepAnswerVisible();
   }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
   // ═══════════ 演示动画（项目 C）═══════════
@@ -247,9 +248,24 @@ export struct GCrossword {
     this.used = this.used.concat([w]);
     this.score = this.score + 100;
     this.cur = this.cur + 1;
+    this.keepAnswerVisible();
     if (this.cur >= this.diffTotal) { this.end(true); return; }
     this.msg = TG2("✅ 第 {0} 行填好了，接着下一行", this.cur);
   }
+  /** ★ 2026-11-17（判据 2860）：矮屏只显示前 4 个词（第二行整个在屏外）
+   *   ⇒ 保证当前行的正确答案一定在可见的前 4 个里，否则这一局无解。
+   *   只换位置、不增删（`used` 按词面字符串记，不受影响）。 */
+  private keepAnswerVisible(): void {
+    if (this.cur >= WORDS.length) { return; }
+    const want: string = WORDS[this.cur];
+    const wi: number = this.bank.indexOf(want);
+    if (wi < 0 || wi < 4) { return; }
+    const si: number = Math.floor(Math.random() * 4);
+    const arr: string[] = this.bank.slice();
+    const t: string = arr[si]; arr[si] = arr[wi]; arr[wi] = t;
+    this.bank = arr;
+  }
+
   private end(solved: boolean): void {
     this.over = true; this.won = solved;
     this.msg = solved ? TG("🎉 通关！5 个词横竖同词")
