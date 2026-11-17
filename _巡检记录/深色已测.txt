@@ -150,3 +150,11 @@ Hanoi
 Heyawake
 Hitori
 Hitori All
+Homophone Hunt
+Hue Sort
+Inequality Balance Ops
+Inequality Dash
+Interlock Puzzle
+Kakurasu Sums
+Klotski
+Kurodoko
