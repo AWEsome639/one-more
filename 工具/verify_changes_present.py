@@ -33,6 +33,10 @@ CHECKS = [
     #   若盘面仍需缩小，应**重新计划**，而不是按旧行号补。
     # ('GMagnets', 'Bp.height - 375', 'A①盘面 173→158vp（计划已过时，见上）'),
     ('GPythagoreanTripleBuilder', '? Space.xs : Space.md', 'A③外层间距 sm→xs（省 72px）'),
+    # ★ 2026-11-18（今夜）：两处新修复，登记在案以防被改回去
+    ('GGearTrainDirection', 'Cell.of(18) : Cell.of(36)', '矮屏齿轮行 22→18（两局 y2 一致 1406、裁图完整）'),
+    ('GWordAssociationRecall', 'Bp.isShort() ? Cell.of(42) : Cell.of(48)', '答题选项 48→42（blk 48→0、第4项不裁）'),
+    ('GWordAssociationRecall', 'pairRowHalf', '记忆阶段两列（6/6 组全可见）'),
     # ⛔⛔ 2026-11-14 作废：`GWordle` 套 `Scroll` 后**中间全黑、棋盘与键盘都没渲染**
     #   （`.height('100%')` 被注释掉之后，`Scroll` 里的内容没有内在高度 ⇒ 高度 0）。
     #   已在 `68bc832a` 回滚到 `b2cacc75` 那个「十四次收敛」的修好版本。
