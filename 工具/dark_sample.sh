@@ -95,6 +95,9 @@ if [ "${#GAMES[@]}" -gt 0 ]; then
   echo
   echo "── 逐款测量（深色）──"
   for g in "${GAMES[@]}"; do
+    # ★ 判据 2840：**每款前验证主题仍是深色**（跑到一半被切回浅色也能发现）
+    _st=$(state)
+    [ "$_st" != "🌙" ] && echo "   ⚠️ 主题已不是深色（当前 ${_st:-未知}），本批结果不可信" >&2
     echo "→ $g"
     timeout 240 python3 工具/shot_game.py "$g" 2>&1 | tail -1 | cut -c1-118
     sleep 3
