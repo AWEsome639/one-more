@@ -876,8 +876,12 @@ def _body(name, t0):
     card = None
     fallback = None
     exact = None
+    # ★ 2026-11-17（判据 2865）：这个 y 范围原来硬编码成手机的 `560..1000`，
+    #   折叠屏（2496 高）搜索结果落在 y>1000 ⇒ 全被排除 ⇒ 整批 `NO_CARD`。
+    #   改成按屏高等比：`0.35H .. 0.625H`。H=1600 时就是 `560..1000`（与原来逐像素一致）。
+    _H = int(os.environ.get('SHOT_SCREEN_H') or 1600)
     for t, (x1, y1, x2, y2) in texts(d):
-        if 560 < y1 < 1000 and x2 > x1 + 100:
+        if 0.35 * _H < y1 < 0.625 * _H and x2 > x1 + 100:
             cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
             if fallback is None:
                 fallback = (cx, cy)
