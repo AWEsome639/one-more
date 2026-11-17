@@ -215,6 +215,22 @@ Path Recall
 Pattern Sequence Draw
 Peg Solitaire
 Percentage Peak
+Percentage Shopping
+Peripheral Focus
+Perspective Shift View
+Perspective Taking
+Phonetic Guess
+Pipes
+Pixel Mimic
+Polyomino Tiling
+Pong
+Portmanteau Split
+Posner Spatial Cueing
+Prime Factor Trees
+Prime Gap Hunt
+Prime Hunter
+Probe Digit Span
+Pythagorean Triple Builder
 Sokoban
 Story Builder
 Subitizing Rush
