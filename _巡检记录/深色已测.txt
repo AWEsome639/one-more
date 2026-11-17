@@ -78,3 +78,11 @@ Connect Four
 Consonant Reconstruct
 Context Clues
 Continuous Paired Associate
+Continuous Recognition
+Conundrum Anagram
+Corsi Backward Span
+Corsi Blocks
+Countdown Math
+Counting Sheep
+Counting Span
+Cross Section Slice
