@@ -272,6 +272,14 @@ Slitherlink
 Snake
 Snake 3D
 Sokoban
+Solitaire
+Sopt
+Sorting Visualizer
+Source Monitoring
+Spatial Cabinet Memory
+Spatial Conflict
+Spelling Sprint
+Spider Solitaire
 Story Builder
 Subitizing Rush
 Sudoku Hex
