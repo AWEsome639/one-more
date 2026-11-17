@@ -1,0 +1,66 @@
+Crossword
+Block Count 3D
+Gomoku
+Crown
+Chimp Test
+Snake 3D
+Magnets
+Odd One Out
+Double N Back
+Gear Train Direction
+Heyawake
+Lighthouses
+Pythagorean Triple Builder
+Wordle
+Kakuro Mini
+Pipes
+Number Bonds All
+Percentage Shopping
+Binomial Match
+Fraction Matcher
+Pattern Sequence Draw
+Skyscrapers
+Pixel Mimic
+Match 3
+Countdown Math
+Distractor Matrix
+Cross Section Slice
+Card Counting Memory
+2048
+Hitori
+Norinori
+Shikaku
+Matrix Reasoning
+Cube Net Fold
+Mental Rotation
+Stroop Number Size
+Calculation Sprint
+Tenner Grid
+Gokigen Naname
+Triplets Logic
+Word Ladder
+Shape Shifter
+Path Intersect
+Word Snake Trail
+Base Conversion Run
+Mastermind
+Visual Search All
+Kakuro
+Area Perimeter Match
+Binary Matrix Rank
+Fractional Pizza
+Action Sequence Recall
+Dominosa
+Word Surge
+Mirror Maze
+Flappy
+Doodle Jump
+Modulo Path
+Temporal Order Judgment
+Spatial Conflict
+Schulte Table
+Dual Coding
+Find Word
+Stroop Test
+Modulo Clock
+Story Builder
