@@ -280,8 +280,16 @@ Spatial Cabinet Memory
 Spatial Conflict
 Spelling Sprint
 Spider Solitaire
+Spoonerism Solver
+Spotlight Track
+Staircase Memory
+Sternberg Task
+Stop Signal
 Story Builder
+Stroop Number Size
+Stroop Test
 Subitizing Rush
+Sudoku
 Sudoku Hex
 Tetris
 Triplets Logic
