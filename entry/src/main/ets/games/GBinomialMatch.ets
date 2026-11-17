@@ -492,6 +492,9 @@ export struct GBinomialMatch {
         .animation({ duration: Motion.slow, curve: Motion.spring() })
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
         .width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        // ★ 2026-11-17（判据 2856）：提示行原来贴在容器底 ⇒ 实测 y2=1600（正压屏底）、
+        //   且被手势条盖住。加一个底部外边距把它抬到手势条上方（目标 y2 ≤ 1576）。
+        .margin({ bottom: Space.md })
 
       Button(this.over ? (this.won ? TG('已通关 🎉') : TG('再来一局')) : TG('换一组'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
