@@ -1,32 +1,8 @@
-Wordle
-Kakuro Mini
-Kakuro
-Tetris
-Minesweeper
-Nonogram
-Akari (Light Up)
-Bridges
-KenKen
-Sudoku Hex
-Nurikabe
-Magnets
 2048
-Math Path
-Collatz
-Number Bonds All
-Fillomino
-Sokoban
-Matrix Reasoning
-Mental Mapping
-Story Builder
-Verbal Analogies
-Color Match
-Triplets Logic
-Base Conversion Run
-Subitizing Rush
 Ab Reversal Oddball
 Action Sequence Recall
 Affix Factory
+Akari (Light Up)
 Algebraic Balance
 Algebraic Inequality Solver
 Alphabet Sudoku
@@ -38,6 +14,7 @@ Associative Pairs
 Attentional Blink
 Attentional Blink Probe
 Balance Scale
+Base Conversion Run
 Base Shift
 Bejeweled
 Binary Code
@@ -52,6 +29,7 @@ Block Escape
 Block Stacking Physics
 Box Completion
 Breakout
+Bridges
 Bridges All
 Bubble Shooter
 Calculation Sprint
@@ -66,7 +44,9 @@ Choice Reaction Time
 Circuit Connect
 Classic Maze
 Cognate Catch
+Collatz
 Color Flood
+Color Match
 Color Maze Nav
 Color Word Match Up
 Common Denominator
@@ -121,6 +101,7 @@ Factor Finder
 Feature Matrix Recall
 Feature Matrix Recall All
 Fibonacci Merge
+Fillomino
 Find Word
 Flanker Test
 Flappy
@@ -156,6 +137,9 @@ Inequality Balance Ops
 Inequality Dash
 Interlock Puzzle
 Kakurasu Sums
+Kakuro
+Kakuro Mini
+KenKen
 Klotski
 Kurodoko
 Laser Link
@@ -169,6 +153,7 @@ Lights Out
 Lock Pattern
 Logical Syllogisms
 Magic Squares
+Magnets
 Mahjong Solitaire
 Mancala
 Mandala Recall
@@ -178,7 +163,28 @@ Masyu
 Match 3
 Math Guess
 Math Maze
+Math Path
 Matrix Multiplier
 Matrix Multiplier Match
+Matrix Reasoning
 Maze Nav 3D
 Memory
+Memory Matrix
+Memory Palace
+Mental Abacus
+Mental Calendar
+Mental Mapping
+Mental Rotation
+Minesweeper
+Mirror Image
+Nonogram
+Number Bonds All
+Nurikabe
+Sokoban
+Story Builder
+Subitizing Rush
+Sudoku Hex
+Tetris
+Triplets Logic
+Verbal Analogies
+Wordle
