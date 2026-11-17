@@ -118,3 +118,11 @@ Face Name Association
 Face Trait Association
 Fact Binder
 Factor Finder
+Feature Matrix Recall
+Feature Matrix Recall All
+Fibonacci Merge
+Find Word
+Flanker Test
+Flappy
+Focus Tunnel
+Fraction Match
