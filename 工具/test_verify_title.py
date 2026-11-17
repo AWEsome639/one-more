@@ -41,13 +41,18 @@ CASES = [
     #   ⇒ 全库 `355` 款在英文界面下都会被判 WRONG_GAME。今晚跑批是中文，不影响；
     #     但要「换一台设备/换一种语言也成立」，这条迟早得补（给 map 加英文名）。
     ('英文游戏内（已知局限）', ['‹', 'Matrix Reasoning', 'Find the pattern', 'Hint'], False),
+    # ★ 2026-11-17（判据 2867）：游戏内文案含「全部」与 🎯、以前被误判成首页
+    #   （Mirror Tracing 实测就是这个）⇒ 有 ‹ 就不算首页
+    ('游戏内+首页标记同时出现', ['‹', '镜像描线', '镜面对着描', '☆', '?', '全部', '🎯'], True, 'Mirror Tracing'),
 ]
 
 
 def main():
     bad = 0
-    for name, texts, expect in CASES:
-        ok, _ = sg.verify_title(tree(texts), 'Matrix Reasoning')
+    for _case in CASES:
+        name, texts, expect = _case[0], _case[1], _case[2]
+        _en = _case[3] if len(_case) > 3 else 'Matrix Reasoning'
+        ok, _ = sg.verify_title(tree(texts), _en)
         good = (ok == expect)
         bad += 0 if good else 1
         print('%-18s ok=%-5s 期望=%-5s %s' % (name, ok, expect, '✅' if good else '❌'))

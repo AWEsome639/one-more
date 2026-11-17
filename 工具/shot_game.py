@@ -557,8 +557,11 @@ def verify_title(tree, en_name):
     #   ⇒ 必须同时「没有首页标记」（底部 tab「今天这一局 / 全部」与搜索框）
     # ★ 2026-11-10：**首页标记不可靠**（换 tab 就没有「今天这一局」）⇒ 改成「必须有游戏内元素」
     # ★ 2026-11-13（判据 1999）：App 能切语言 ⇒ 首页/游戏内标记必须**中英双语**
-    on_home = ('今天这一局' in joined or 'Today' in joined) or \
-              (('全部' in joined or 'All' in joined) and '🎯' in joined)
+    # ★ 2026-11-17（判据 2867）：有返回箭头 ‹ 就一定不是首页（‹ 只在游戏内）。
+    #   Mirror Tracing 的游戏内文案含「全部」与 🎯 ⇒ 旧判据把它当首页 ⇒ 误报 WRONG_GAME。
+    on_home = ('‹' not in joined) and (
+        ('今天这一局' in joined or 'Today' in joined) or
+        (('全部' in joined or 'All' in joined) and '🎯' in joined))
     # ★ 2026-11-14：**`in_game` 不能只认「提示/`AI 代打`」** ——
     #   它们是 `HintBar`/`DemoBar` 上的文字，而 `uitest dumpLayout` **只报可见节点**；
     #   一旦给游戏套了 `Scroll`，`HintBar` 会被滚出视野 ⇒ `in_game=False` ⇒ 误判 `WRONG_GAME`
