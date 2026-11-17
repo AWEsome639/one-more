@@ -332,9 +332,21 @@ export struct GWordAssociationRecall {
           .fontWeight(FontWeight.Bold).fontColor(Palette.berry)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       if (this.phase !== 1) {
-        Column({ space: Space.xs }) {
-          ForEach(this.study, (p: number) => { this.pairRow(p) }, (p: number) => 's' + p)
-        }.width('100%')
+        if (Bp.isShort()) {
+          // ★ 2026-11-18（判据 2880）：矮屏 6 组配对放不进一屏 ⇒ 两列 × 3 行（高度砍半）
+          Column({ space: Space.xs }) {
+            ForEach([0, 1, 2], (r: number) => {
+              Row({ space: Space.xs }) {
+                if (r < this.study.length) { this.pairRowHalf(this.study[r]) }
+                if (r + 3 < this.study.length) { this.pairRowHalf(this.study[r + 3]) }
+              }.width('100%')
+            }, (r: number) => 'row' + r)
+          }.width('100%')
+        } else {
+          Column({ space: Space.xs }) {
+            ForEach(this.study, (p: number) => { this.pairRow(p) }, (p: number) => 's' + p)
+          }.width('100%')
+        }
       } else {
         Column({ space: Space.sm }) {
           ForEach(this.opts, (o: Opt, i: number) => { this.option(o, i) }, (o: Opt, i: number) => 'w' + i + o.text)
@@ -369,6 +381,16 @@ export struct GWordAssociationRecall {
         .accessibilityLevel('no')
       Text(PAIRS[p].mate).fontSize(FontSize.md).layoutWeight(1).textAlign(TextAlign.End).fontColor(Palette.berry)
     }.width('100%').padding(Bp.isShort() ? Space.xs : Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
+  }
+  /** ★ 判据 2880：两列用的半宽版（内容与 pairRow 一致，只改宽度） */
+  @Builder
+  pairRowHalf(p: number) {
+    Row({ space: Space.xs }) {
+      Text(PAIRS[p].cue).fontSize(FontSize.sm).layoutWeight(1).fontColor(this.theme.ink)
+      Text('→').accessibilityText(TG('指向')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
+        .accessibilityLevel('no')
+      Text(PAIRS[p].mate).fontSize(FontSize.sm).layoutWeight(1).textAlign(TextAlign.End).fontColor(Palette.berry)
+    }.width('48%').padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
   }
   @Builder
   option(o: Opt, i: number) {
