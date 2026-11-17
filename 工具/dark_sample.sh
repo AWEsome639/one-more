@@ -13,6 +13,10 @@
 set -u
 cd "$(dirname "$0")/.." || exit 1
 HC='/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
+# ★ 2026-11-17（判据 2839）：**先把款名存起来**。
+#   原来直接 `for g in "$@"`，而 `restore_light()` 里的 `set -- $c`
+#   会把 $@ 覆盖成日月图标的坐标 ⇒ 实测把「1966 / 267 / ☀️」当成款名去测。
+GAMES=("$@")
 
 dump() {
   "$HC" shell "uitest dumpLayout -p /data/local/tmp/ds.json" >/dev/null 2>&1
@@ -87,10 +91,10 @@ if [ "$CUR" != "🌙" ]; then
 fi
 echo "切换后图标: $(state)（🌙 = 深色）"
 
-if [ "$#" -gt 0 ]; then
+if [ "${#GAMES[@]}" -gt 0 ]; then
   echo
   echo "── 逐款测量（深色）──"
-  for g in "$@"; do
+  for g in "${GAMES[@]}"; do
     echo "→ $g"
     timeout 240 python3 工具/shot_game.py "$g" 2>&1 | tail -1 | cut -c1-118
     sleep 3
