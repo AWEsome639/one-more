@@ -174,3 +174,11 @@ Mancala
 Mandala Recall
 Mandelbrot
 Mastermind
+Masyu
+Match 3
+Math Guess
+Math Maze
+Matrix Multiplier
+Matrix Multiplier Match
+Maze Nav 3D
+Memory
