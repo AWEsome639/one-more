@@ -231,6 +231,18 @@ Prime Gap Hunt
 Prime Hunter
 Probe Digit Span
 Pythagorean Triple Builder
+Quick Math
+Radical Roots
+Reading Span
+Reflex Tap
+Relational Memory
+Reverse Stroop
+Reversi
+Rhyme Master
+Rhythm Master
+Roman Arithmetic
+Room Inspector
+Rotating Maze
 Sokoban
 Story Builder
 Subitizing Rush
