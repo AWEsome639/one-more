@@ -251,7 +251,9 @@ export struct GChimpTest {
   }
   /** ★ 2026-11-18（判据 2907）：格子尺寸由算式保证（宽度驱动格子在矮屏上会溢出）。*/
   private gs(): number {
-    return Math.max(16, Math.floor((Bp.height - 440) / Math.max(2, N)));
+    const byH: number = Math.floor((Bp.height - 440) / Math.max(2, N));
+    const byW: number = Math.floor((Bp.width - 80) / Math.max(2, N));
+    return Math.max(16, Math.min(byH, byW));
   }
 
   build() {

@@ -265,13 +265,19 @@ export struct GSilhouetteMatch {
    *   病因：4 个选项网格 .width('72%') ⇒ 每个约 920px 高、两行 1840px ⇒ 第二行选项整个在屏外。
    *   格数随难度变 (diffTotal, 最大 7)；Bp.height=533 时 diffTotal=5 ⇒ 26vp=78px。*/
   private gs(): number {
-    return Math.max(14, Math.floor((Bp.height - 470) / Math.max(2, this.diffTotal)));
+    const n2: number = Math.max(2, this.diffTotal);
+    const byH: number = Math.floor((Bp.height - 470) / n2);
+    const byW: number = Math.floor((Bp.width - 80) / n2);
+    return Math.max(14, Math.min(byH, byW));
   }
   /** ★ 2026-11-18（判据 2912）：**选项网格**单独一个尺寸 ——
    *   实测选项从 `y≈1350`（距顶 450vp）才开始，只剩约 250px，
    *   与目标网格（y≈680）的可用高完全不同 ⇒ 不能共用一个算式。*/
   private go(): number {
-    return Math.max(10, Math.floor((Bp.height - 480) / Math.max(2, this.diffTotal)));
+    const n3: number = Math.max(2, this.diffTotal);
+    const byH2: number = Math.floor((Bp.height - 480) / n3);
+    const byW2: number = Math.floor((Bp.width - 80) / n3);
+    return Math.max(10, Math.min(byH2, byW2));
   }
 
   build() {

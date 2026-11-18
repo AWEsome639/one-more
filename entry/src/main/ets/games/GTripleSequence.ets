@@ -340,7 +340,12 @@ export struct GTripleSequence {
   /** ★ 2026-11-18（判据 2907）：格子尺寸**由算式保证**，不靠 layoutWeight/aspectRatio 分配。
    *   原因：宽度驱动的格子在矮屏上高度也跟着满宽推算 ⇒ 底行溢出 48px。*/
   private cp(): number {
-    return Math.max(36, Math.floor((Bp.height - 280) / ROWS.length));
+    // ★ 2026-11-18（判据 2925）：**只按高度算会在宽屏上横向溢出**。
+    //   实测：折叠屏 2224 宽、Bp.height≈832 ⇒ 原式得 184vp=552px × 6 列 = 3312px > 2224 ⇒ 横向爆掉。
+    //   ⇒ 取「高度预算」与「宽度预算」的**较小者**。
+    const byH: number = Math.floor((Bp.height - 280) / ROWS.length);
+    const byW: number = Math.floor((Bp.width - 80) / CELLS.length);
+    return Math.max(36, Math.min(byH, byW));
   }
   @Builder
   cell(i: number, c: number) {
