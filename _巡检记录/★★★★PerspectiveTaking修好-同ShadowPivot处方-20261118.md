@@ -35,3 +35,20 @@
 | `Silhouette Match` | 一个网格 `Column` + 一个带 `layoutWeight` 的 `Text` | 同上 | ❌ |
 
 **⇒ 所以 `2902` 的分支判据成立：**行里只有「都带 `layoutWeight` 的块」时才加得动；混了文字就失效。****
+
+---
+
+## 【`09:40`】`Silhouette Match Ortho` 同处方**变差**（已回滚）
+
+**⇒ 给它 `L289` 的面板 `Row` 加 `.layoutWeight(1)`：**
+
+**⇒ 结果：**面板被推到 `y≈1360` 才开始、大半在屏外** ⇒ **比修前更糟**（修前面板从 `y≈1150` 开始）。**
+**⇒ 已回滚。**
+
+### ⇒ 为什么这款会变差（与 `ShadowPivot` 结构差别）
+
+**⇒ `GShadowPivot` 的面板行 = **固定两个** `Column`；
+**⇒ `Silhouette Match Ortho` 的面板行 = **`ForEach` 生成的 N 个 `Column`**（每个 `.layoutWeight(1)` 且内含网格 + 下层名 `Text`）。**
+**⇒ 给 `ForEach` 外层行加 `layoutWeight` 后，N 个面板先按「行拿到的剩余空间」分配，而**每个面板内部还有 `Text` 要占高** ⇒ 网格被挤到下面、行本身反而缩了。**
+
+**⇒ 判据 `2903`：`layoutWeight(1)` 处方只对**「行内是固定个数、纯 `layoutWeight` 块」**的行有效；行内是 **`ForEach` 生成**（块数随数据变）时要另想办法 —— 因为「行拿多少高」和「每块内部还要分多少高」会打架。**
