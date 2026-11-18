@@ -254,6 +254,12 @@ export struct GSilhouetteMatchOrtho {
     return this.picked >= 0 && mode === this.answerAt ? Palette.emerald : (this.theme.isDark ? '#E2E8F0' : '#334155');
   }
 
+  /** ★ 2026-11-18（判据 2907）：格子尺寸由算式保证；格数随难度变（diffTotal，最大 7）。
+   *   病因与 GSilhouetteMatch 同源：选项网格无上限 ⇒ 第二行选项整个在屏外。*/
+  private gs(): number {
+    return Math.max(18, Math.floor((Bp.height - 400) / Math.max(2, this.diffTotal)));
+  }
+
   build() {
     Column({ space: Space.sm }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
@@ -276,7 +282,7 @@ export struct GSilhouetteMatchOrtho {
             ForEach(ROWS, (r: number) => {
             Row({ space: 2 }) {
             ForEach(ROWS, (c: number) => {
-            Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+            Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
             .backgroundColor(this.cellColor((this.layers[l]), (-1), r * M + c))
             }, (c: number) => 'gc' + c)
             }.width('100%')
@@ -295,7 +301,7 @@ export struct GSilhouetteMatchOrtho {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(0)]), ((0)), r * M + c))
         }, (c: number) => 'gc' + c)
         }.width('100%')
@@ -318,7 +324,7 @@ export struct GSilhouetteMatchOrtho {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(1)]), ((1)), r * M + c))
         }, (c: number) => 'gc' + c)
         }.width('100%')
@@ -343,7 +349,7 @@ export struct GSilhouetteMatchOrtho {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(2)]), ((2)), r * M + c))
         }, (c: number) => 'gc' + c)
         }.width('100%')
@@ -366,7 +372,7 @@ export struct GSilhouetteMatchOrtho {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(3)]), ((3)), r * M + c))
         }, (c: number) => 'gc' + c)
         }.width('100%')

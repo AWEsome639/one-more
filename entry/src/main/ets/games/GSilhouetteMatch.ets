@@ -261,6 +261,13 @@ export struct GSilhouetteMatch {
     return this.picked >= 0 && mode === this.answerAt ? Palette.emerald : (this.theme.isDark ? '#E2E8F0' : '#334155');
   }
 
+  /** ★ 2026-11-18（判据 2907）：格子尺寸由算式保证。
+   *   病因：4 个选项网格 .width('72%') ⇒ 每个约 920px 高、两行 1840px ⇒ 第二行选项整个在屏外。
+   *   格数随难度变 (diffTotal, 最大 7)；Bp.height=533 时 diffTotal=5 ⇒ 26vp=78px。*/
+  private gs(): number {
+    return Math.max(18, Math.floor((Bp.height - 400) / Math.max(2, this.diffTotal)));
+  }
+
   build() {
     Column({ space: Space.sm }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
@@ -282,10 +289,10 @@ export struct GSilhouetteMatch {
           ForEach(ROWS, (r: number) => {
           Row({ space: 2 }) {
           ForEach(ROWS, (c: number) => {
-          Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+          Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
           .backgroundColor(this.cellColor((this.target), (-1), r * this.diffTotal + c))
           }, (c: number) => 'gc' + c)
-          }.width('100%')
+          }.width('100%').justifyContent(FlexAlign.Center)
           }, (r: number) => 'gr' + r)
           }.width('100%') }.width(104)
         }.layoutWeight(1)
@@ -298,10 +305,10 @@ export struct GSilhouetteMatch {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(0)]), ((0)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
-        }.width('100%')
+        }.width('100%').justifyContent(FlexAlign.Center)
         }, (r: number) => 'gr' + r)
         }.width('100%') }.width('72%')
         }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.sm)
@@ -321,10 +328,10 @@ export struct GSilhouetteMatch {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(1)]), ((1)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
-        }.width('100%')
+        }.width('100%').justifyContent(FlexAlign.Center)
         }, (r: number) => 'gr' + r)
         }.width('100%') }.width('72%')
         }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.sm)
@@ -346,10 +353,10 @@ export struct GSilhouetteMatch {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(2)]), ((2)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
-        }.width('100%')
+        }.width('100%').justifyContent(FlexAlign.Center)
         }, (r: number) => 'gr' + r)
         }.width('100%') }.width('72%')
         }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.sm)
@@ -369,10 +376,10 @@ export struct GSilhouetteMatch {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(3)]), ((3)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
-        }.width('100%')
+        }.width('100%').justifyContent(FlexAlign.Center)
         }, (r: number) => 'gr' + r)
         }.width('100%') }.width('72%')
         }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.sm)
