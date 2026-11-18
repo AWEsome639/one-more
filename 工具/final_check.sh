@@ -118,14 +118,19 @@ else
 fi
 
 step "⑧ 扫描器 dry-run（不起设备）"
+# ★ 2026-11-19（判据 2997）：原来只在 dry-run **之后**数一次模拟器进程，
+#   `!= 0` 就判失败 ⇒ **模拟器本来就开着时必然误报**（今晚 02:02 实测：
+#   我手动把模拟器拉起来救跑批，预检反而报「dry-run 起了模拟器」）。
+#   ⇒ 改成**前后对比**：只有 dry-run 期间**新增**了模拟器才算失败。
+EMU_BEFORE=$(pgrep -f 'tools/emulator/Emulator' | wc -l | tr -d ' ')
 timeout 120 bash 工具/sweep_all.sh --dry > /tmp/fc7.log 2>&1
 grep -E "优先|待测" /tmp/fc7.log | head -2 | sed 's/^/  /'
 EMU=$(pgrep -f 'tools/emulator/Emulator' | wc -l | tr -d ' ')
 # ⚠️ 2026-11-14：这里原来写 `echo "  模拟器进程: $EMU（必须 0）"`，
 #   而某些 locale 下中文全角括号 + 变量会输出成乱码（实测 `��必须 0）`）。
 #   ⇒ 诊断脚本里**只用 ASCII**，避免「检查结果本身好看但读不出」。
-echo "  emulator procs: $EMU  (must be 0)"
-[ "$EMU" != "0" ] && fail "dry-run 起了模拟器"
+echo "  emulator procs: before=$EMU_BEFORE after=$EMU  (after 不得大于 before)"
+[ "$EMU" -gt "$EMU_BEFORE" ] && fail "dry-run 起了模拟器（$EMU_BEFORE -> $EMU）"
 
 echo
 # ★ 2026-11-14 判据 2198：开窗前必须查磁盘 —— 今晚 1.2GiB 时差点跑到一半崩
