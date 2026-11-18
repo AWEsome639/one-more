@@ -15,6 +15,8 @@ set -u
 MODE="up"
 if [ "${1:-}" = "--status" ]; then MODE="status"; fi
 DEV="onemore7"
+# ★ 2026-11-18：支持指定实例（如 `emu_up.sh --dev onemore_fold`），供「换台设备」验证用。
+if [ "${1:-}" = "--dev" ] && [ -n "${2:-}" ]; then DEV="$2"; fi
 EMU="/Applications/DevEco-Studio.app/Contents/tools/emulator/Emulator"
 HC="/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc"
 
