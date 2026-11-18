@@ -547,7 +547,8 @@ export struct GCountdownMath {
         Button(('+'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.opSign === ('+') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.opSign === ('+') ? Palette.violet : this.theme.surface).borderRadius(Radius.md)
-        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).focusable(Tv.on())
+        .layoutWeight(1).height(Bp.isShort() ? Cell.of(30) : Cell.of(52))   // ★ 2026-11-18（判据 2907/2916）：矮屏下 44vp→25vp，让出约 57px
+        //   给底部操作条（实测占 y=1501..1600、提示按钮被手势条盖）。.enabled(!this.over).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L535'; })
         .onBlur(() => { if (this.tvFocus === 'L535') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L535')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.sel < 0) { this.tip = TG('先点一个数字'); return; } this.opSign = ('+'); this.tip = TG2('运算符 {0}，再点一个数字', ('+')); }); }).onClick(() => {
@@ -562,7 +563,7 @@ export struct GCountdownMath {
         Button(('-'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.opSign === ('-') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.opSign === ('-') ? Palette.violet : this.theme.surface).borderRadius(Radius.md)
-        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).focusable(Tv.on())
+        .layoutWeight(1).height(Bp.isShort() ? Cell.of(30) : Cell.of(52)).enabled(!this.over).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L547'; })
         .onBlur(() => { if (this.tvFocus === 'L547') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L547')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.sel < 0) { this.tip = TG('先点一个数字'); return; } this.opSign = ('-'); this.tip = TG2('运算符 {0}，再点一个数字', ('-')); }); }).onClick(() => {
@@ -577,7 +578,7 @@ export struct GCountdownMath {
         Button(('x'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.opSign === ('x') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.opSign === ('x') ? Palette.violet : this.theme.surface).borderRadius(Radius.md)
-        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).focusable(Tv.on())
+        .layoutWeight(1).height(Bp.isShort() ? Cell.of(30) : Cell.of(52)).enabled(!this.over).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L559'; })
         .onBlur(() => { if (this.tvFocus === 'L559') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L559')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.sel < 0) { this.tip = TG('先点一个数字'); return; } this.opSign = ('x'); this.tip = TG2('运算符 {0}，再点一个数字', ('x')); }); }).onClick(() => {
@@ -592,7 +593,7 @@ export struct GCountdownMath {
         Button(('/'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xl).fontColor(this.opSign === ('/') ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.opSign === ('/') ? Palette.violet : this.theme.surface).borderRadius(Radius.md)
-        .layoutWeight(1).height(Cell.of(52)).enabled(!this.over).focusable(Tv.on())
+        .layoutWeight(1).height(Bp.isShort() ? Cell.of(30) : Cell.of(52)).enabled(!this.over).focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L571'; })
         .onBlur(() => { if (this.tvFocus === 'L571') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L571')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.sel < 0) { this.tip = TG('先点一个数字'); return; } this.opSign = ('/'); this.tip = TG2('运算符 {0}，再点一个数字', ('/')); }); }).onClick(() => {
