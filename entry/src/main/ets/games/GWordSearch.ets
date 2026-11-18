@@ -377,7 +377,9 @@ export struct GWordSearch {
             .onBlur(() => { if (this.tvFocus === 'L368') { this.tvFocus = ''; } })
             .outline(Tv.focusOutline(this.tvFocus === 'L368', Radius.xs))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tap((r * N + c)); }); }) }, (c: number) => 'c' + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - (Bp.isShort() ? 360 : 440))))
+        // ★ 2026-11-18（判据 2929/2930）：折叠屏上 `-360` 不够 ⇒ 底部 `重开` 按钮只露 46px、下半截在屏外（截图实证）。
+        //   矮屏（手机）保持 `-360` 不动；非矮屏用 `-440` ⇒ 8 行网格窄一点、给底部按钮让出约 240px。
         }, (r: number) => 'r' + r)
       }.width('100%')
       Text(TG2('藏词：{0}', this.words.join(' · '))).fontSize(FontSize.xs).fontColor(this.theme.inkSoft).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
