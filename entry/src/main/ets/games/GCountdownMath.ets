@@ -539,7 +539,7 @@ export struct GCountdownMath {
       }
       // 2026-11-14 真机截图：**四张数字卡底部被切**（每张 ~350px 高，是宽度撑的）
       //   卡片按宽度分配 ⇒ 限宽即限高（判据 1966）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 400)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 440)))
       // ★ 2026-11-18（判据 2911）：原 -360 ⇒ 键盘 173vp=519px，底部提示被压到 y=1531–1600（恰好贴底被切，blk=48px）。
       //   改 -400 ⇒ 133vp=399px ⇒ 约让出 120px 给下方提示。
 
