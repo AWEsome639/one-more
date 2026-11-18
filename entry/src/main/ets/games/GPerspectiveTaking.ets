@@ -353,7 +353,9 @@ export struct GPerspectiveTaking {
             .fontColor(Palette.emerald)
           Text(TG2('{0}的是哪一件？', ASK[this.ask])).fontSize(FontSize.md).fontColor(this.theme.ink)
         }.layoutWeight(1).alignItems(HorizontalAlign.Start)
-      }.width('100%').alignItems(VerticalAlign.Center)
+      }.width('100%').alignItems(VerticalAlign.Center).layoutWeight(1)
+        // ★ 2026-11-18（判据 2901，同 GShadowPivot）：根列 height('100%')+Start、
+        //   而这个 Row 没有高度 ⇒ 按内容撑高 ⇒ 网格底行被屏沿切。加 layoutWeight(1) 取剩余空间。
       Row({ space: Space.sm }) {
         ForEach(this.rowIdx(), (k: number) => { Column({ space: 2 }) {
         Text(EMO[(k)]).fontSize(FontSize.xxl)
