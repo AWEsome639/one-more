@@ -127,10 +127,20 @@ def dump(tag='d', timeout=60):
     #   32886 个文件 / 2.6GB，把模拟器磁盘撑到 95%，`hdc install` 开始静默失败，
     #   导致我几小时的改动全都没进包（判据 1989）。
     sh('rm -f ' + p, 8)
+    # ★ 2026-11-18（判据 2922）：`SHOT_VERBOSE=1` 时打出每次 dump 的字节数。
+    #   用途：「工具在某台设备上卡住」时，空树 / 小树会立刻现形。
+    _vb = bool(os.environ.get('SHOT_VERBOSE'))
     try:
-        return json.loads(txt)
+        _tree = json.loads(txt)
     except Exception:
+        if _vb:
+            print('  [dump %s] ❌ 解析失败（%d 字节）' % (tag, len(txt)))
         return None                               # 解析失败 = 本次无效（不会拿旧文件）
+    if _vb:
+        def _cnt(n):
+            return 1 + sum(_cnt(c) for c in (n.get('children') or [])) if isinstance(n, dict) else 0
+        print('  [dump %s] %d 字节 / %d 节点' % (tag, len(txt), _cnt(_tree)))
+    return _tree
 
 
 def texts(tree, pred=lambda t: True):
