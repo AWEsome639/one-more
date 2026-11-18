@@ -306,7 +306,7 @@ export struct GTracePath {
               this.cell(r * M + c)
             }, (c: number) => 'gc' + c)
           }
-          .width('100%')
+          .width('100%').justifyContent(FlexAlign.Center)
         }, (r: number) => 'gr' + r)
       }
       .width('100%').padding(Space.sm).backgroundColor(this.theme.surfaceAlt)
@@ -335,12 +335,18 @@ export struct GTracePath {
     })
     .width('100%').height('100%').justifyContent(FlexAlign.Start)
   }
+  /** ★ 2026-11-18（判据 2907）：格子尺寸**由算式保证**。
+   *   原因：宽度驱动格子（layoutWeight+aspectRatio）在矮屏上高度也满宽推算 ⇒ 底行溢出。
+   *   与收窄百分比不同：算出来写死不会被 layoutWeight 重分配（2904）。*/
+  private cp(): number {
+    return Math.max(36, Math.floor((Bp.height - 300) / RX.length));
+  }
   @Builder
   cell(i: number) {
     Stack() {
       Text(this.mark(i)).fontSize(FontSize.md)
     }
-    .layoutWeight(1).aspectRatio(1).backgroundColor(this.cellColor(i)).borderRadius(Radius.sm)
+    .width(this.cp()).height(this.cp()).backgroundColor(this.cellColor(i)).borderRadius(Radius.sm)
     .animation({ duration: Motion.fast, curve: Motion.snap() })
     .onClick(() => { Haptics.tick(); this.tap(i); })
     .focusable(Tv.on())
