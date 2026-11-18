@@ -33,6 +33,9 @@ def parse(since=None):
         #   ⇒ 缺数据 ≠ 干净；这类必须重测。
         has_blk = False
         m = re.search(r'blk=(\d+)/(\d+)px', ln)
+        # ★ 判据 3005：`blkh` = 溢出最多那一块**自身的高度**（2026-11-19 起 shot_game 才写）
+        mb2 = re.search(r'blkh=(\d+)px', ln)
+        blkh = int(mb2.group(1)) if mb2 else -1
         # 2026-11-14（判据 2001）：**被遮挡文字节点数** —— 抓「内容太高把上方元素盖住」
         cm = re.search(r'cov=(-?\d+)', ln)
         if m:
@@ -64,7 +67,7 @@ def parse(since=None):
                 continue          # 垃圾名直接丢，不污染分母
         except Exception:
             _k = name
-        rows.append(dict(ts=ts, name=name, key=_k, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, lowh=lowh, lowgap=lowgap, cov=(int(cm.group(1)) if cm else None), over=over, sumover=sumover, has_over=has_over))
+        rows.append(dict(ts=ts, name=name, key=_k, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, lowh=lowh, lowgap=lowgap, cov=(int(cm.group(1)) if cm else None), over=over, sumover=sumover, has_over=has_over, blkh=blkh))
     return rows
 
 def _key(r):
@@ -101,8 +104,15 @@ def main():
         #   ⇒ 数值大一倍的那款反而**轻 27 倍**。
         #   `lowh` 是「最低元素的高度」（`low=` 的 y2-y1），量不到时为 -1。
         #   ⇒ `sev = blk / lowh`，用它排序与显示。
-        _lh = r.get('lowh', -1)
-        r['sev'] = (r.get('blk', 0) / _lh) if (_lh and _lh > 0 and r.get('blk', 0) > 0) else 0.0
+        # ★ 判据 3005：**优先用 `blkh`（溢出块自身高度）算真比例**；
+        #   老行没有 `blkh` 时退回 `lowh`（最低文字节点高）—— 那是粗代理，量的不是同一对象。
+        _denom = r.get('blkh', -1)
+        r['sev_exact'] = True
+        if not (_denom and _denom > 0):
+            _denom = r.get('lowh', -1)
+            r['sev_exact'] = False
+        r['sev_den'] = _denom if (_denom and _denom > 0) else -1
+        r['sev'] = (r.get('blk', 0) / _denom) if (r.get('sev_den', -1) > 0 and r.get('blk', 0) > 0) else 0.0
 
     env = [r for r in rows if r['outcome'] in ('NOT_HOME', 'NO_CARD', 'DUMP_FAIL', 'TIMEOUT')]
     got = [r for r in rows if r not in env]
@@ -170,20 +180,19 @@ def main():
             print('  %-30s max=%-5s 测于 %s' % (r['name'], r['mb'], r['ts'][:10]))
         print('  ⇒ 判据 2003：**缺数据 ≠ 干净**。这 %d 款不算在 D 档里。' % len(NOBLK))
 
-    print('\n【A 档】blk ≥ 24px（真越界）%d 款 —— 按 `溢出/文字高` 粗排（判据 3005）' % len(A))
-    print('   ⚠️ **这是粗代理，不是真比例**：`blk` 是**多块累计**溢出，而 `文字高` 是**最低文字节点**的高，')
-    print('      两者量的不是同一个对象（`Simon Says` 溢出的是 281vp 的方块，但最低文字只有 99px 高）。')
-    print('   ⇒ 用途只有一个：**把「48px 落在大方块上」和「24px 落在小按钮上」区分开**，别用它算精确百分比。')
-    print('   ⇒ 真要精确，得让 `shot_game.py` 记录「溢出那一块自己的高度」——那是下一步。')
+    print('\n【A 档】blk ≥ 24px（真越界）%d 款 —— 按 `溢出/块高` 排序（判据 3005）' % len(A))
+    print('   分母 `✓` = `blkh`（溢出块**自身**高度，真比例）；`~` = `lowh`（最低文字高，**粗代理**，老行没 blkh 时用）')
+    print('   ⚠️ 粗代理的分子分母量的不是同一对象，只能用来排序，不能当「被切百分比」。')
     for r in A:
-        print('  %-30s blk=%-3d 文字高=%-5s 溢出/字高=%5.2f  max=%-5s lowest=%s'
-              % (r['name'], r['blk'], (r.get('lowh') if r.get('lowh', -1) > 0 else '-'),
-                 r.get('sev', 0) * 100, r['mb'], r['low'][:22]))
+        print('  %-30s blk=%-3d blkh=%-5s %s 切%5.1f%%  max=%-5s lowest=%s'
+              % (r['name'], r['blk'], (r.get('blkh') if r.get('blkh', -1) > 0 else '-'),
+                 ('✓' if r.get('sev_exact') else '~'), r.get('sev', 0) * 100,
+                 r['mb'], r['low'][:20]))
     print('\n【B 档】0 < blk < 24px（轻微）%d 款' % len(B))
     for r in B:
-        print('  %-30s blk=%-3d 文字高=%-5s 溢出/字高=%5.2f  max=%-5s'
-              % (r['name'], r['blk'], (r.get('lowh') if r.get('lowh', -1) > 0 else '-'),
-                 r.get('sev', 0) * 100, r['mb']))
+        print('  %-30s blk=%-3d blkh=%-5s %s 切%5.1f%%  max=%-5s'
+              % (r['name'], r['blk'], (r.get('blkh') if r.get('blkh', -1) > 0 else '-'),
+                 ('✓' if r.get('sev_exact') else '~'), r.get('sev', 0) * 100, r['mb']))
     # ★ 2026-11-14 补（判据 2062）：**C 档是「嫌疑名单」，不是「待办名单」**
     #   实证：`7` 款 C 档全部早已有矮屏降档，`blk=0` 是硬指标；
     #   而 `max_bottom` 只统计**有文字**的节点（`shot_game.py:134 texts()`），

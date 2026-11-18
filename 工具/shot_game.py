@@ -1138,6 +1138,12 @@ def _body(name, t0):
     block_over_n = 0
     block_over_px = 0
     block_over_max = 0
+    # ★ 2026-11-19（判据 3005）：**`blk` 只有「几个块 / 累计多少 px」，不记「那一块自己多高」**
+    #   ⇒ 严重度算不出来：实测 `Simon Says` `blk=48px` 落在 `843px` 的方块上（切 `0.8%`、可忽略），
+    #     而 `Crossword` `blk=24px` 落在 `120px` 的按钮上（切 `22%`、且压在系统手势条下）。
+    #   **绝对值大一倍的那款反而轻 27 倍。**
+    #   ⇒ 这里记下「溢出最多的那一块自身的高度」⇒ 之后 `over / blkh` 才是真比例。
+    block_over_h = 0
     root_desc = ''
     try:
         root = _kids_root(d2)
@@ -1150,7 +1156,7 @@ def _body(name, t0):
             SKIP = ('root', 'WindowScene', 'EffectComponent', 'Flex', 'Text', 'Image', 'Path', 'Stack')
 
             def _scan(x, depth):
-                nonlocal block_over_n, block_over_px, block_over_max
+                nonlocal block_over_n, block_over_px, block_over_max, block_over_h
                 if not isinstance(x, dict) or depth > 4:
                     return
                 a = x.get('attributes', {}) or {}
@@ -1164,6 +1170,8 @@ def _body(name, t0):
                         block_over_px += over
                         if over > block_over_max:
                             block_over_max = over
+                            # 判据 3005：这一块自己的高度（bounds 是 x1,y1,x2,y2）
+                            block_over_h = nums[3] - nums[1] if nums[3] > nums[1] else 0
                 for c in (x.get('children') or []):
                     _scan(c, depth + 1)
 
@@ -1301,7 +1309,7 @@ def _body(name, t0):
             except Exception as _e:
                 print('节点 dump 失败: %r' % _e)
         finish(name, 'OK', t0, mb,
-               'lowest=%r %s blk=%d/%dpx cov=%d board=%s max=%d over=%dpx sumover=%dpx -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, _cov, _board, block_over_max, _over, _sumover, out, _ts))
+               'lowest=%r %s blk=%d/%dpx blkh=%dpx cov=%d board=%s max=%d over=%dpx sumover=%dpx -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, block_over_h, _cov, _board, block_over_max, _over, _sumover, out, _ts))
     else:
         finish(name, 'OK_NOSHOT', t0, mb,
                'lowest=%r %s recv failed @%s' % (lo, lo_bounds, _ts))
