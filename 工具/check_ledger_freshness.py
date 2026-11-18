@@ -28,26 +28,27 @@ GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 
 # 台账里出现、但与「显示名 → G<名>.ets」规则对不上的真游戏。
 # 来历：首次跑工具时报「找不到 .ets」的 8 款里，只有这几个是真游戏。
-ALIAS = {
-    'Word Snake': 'GWordSnakeTrail',   # 真类是 GWordSnakeTrail.ets
-    'Go (9x9)':   'GGo9',              # 真类是 GGo9.ets
-    'Schulte Table': 'GSchulte',        # 真类是 GSchulte.ets
-    'Akari (Light Up)': 'GAkari',       # 真类是 GAkari.ets
-}
+# ★ 2026-11-19（判据 2964）：别名与垃圾名单**统一到 `工具/ledger_names.py`**。
+#   本文件原来自己维护 ALIAS(4 条)/SKIP(4 条)，但缺 N-Back / Go / No-Go /
+#   Tic-Tac-Toe / 2048 这几个 ⇒ 与别的工具口径不一致。现在共用一份。
+import sys as _sys
+_sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from ledger_names import canon as _canon, is_junk as _is_junk
 
-# 不是游戏、只是台账里出现过的测试/异常条目 ⇒ 跳过，别计入新鲜度统计
-SKIP = {
-    'Nothing',       # NOT_HOME 探针
-    '__selftest__',  # 自检
-    '__nope__',      # 故意不存在的名字
-    'Matcher',       # NO_CARD：某个被截断的名字，不是真游戏
+# 台账展示名 → .ets 类名（只补 与 canon 不同的那几个；
+# canon 给的是注册表 id 风格如 g2048/akari，这里要类名风格 G2048/GAkari）
+CLASS_OVERRIDE = {
+    'g2048': 'G2048', 'akari': 'GAkari', 'go9': 'GGo9',
+    'schulte': 'GSchulte', 'word_snake_trail': 'GWordSnakeTrail',
+    'tic_tac_toe': 'GTicTacToe', 'n_back': 'GNBack', 'go_no_go': 'GGoNoGo',
 }
 
 
 def class_name(game):
     """游戏显示名 → .ets 类名。'Matrix Reasoning' → 'GMatrixReasoning'。"""
-    if game in ALIAS:
-        return ALIAS[game]
+    cid = _canon(game)
+    if cid in CLASS_OVERRIDE:
+        return CLASS_OVERRIDE[cid]
     return 'G' + re.sub(r'[^0-9A-Za-z\u4e00-\u9fff]', '', game)
 
 
@@ -77,7 +78,7 @@ def main():
 
     last = parse_ledger()
     for _g in list(last.keys()):
-        if _g in SKIP:
+        if _is_junk(_g):
             del last[_g]
     rows = []
     no_file = []
