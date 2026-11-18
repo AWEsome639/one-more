@@ -116,13 +116,27 @@ def dump(tag='d', timeout=60):
     global _SEQ
     _SEQ += 1
     p = '/data/local/tmp/shot_%d_%d_%s.json' % (os.getpid(), _SEQ, tag)
-    sh('rm -f ' + p, 10)                          # 先清，确保"读到的不是旧的"
-    ok, _ = sh('uitest dumpLayout -p ' + p, timeout)
-    if not ok:
-        return None                               # dump 本身失败 ⇒ 本次无效
-    ok2, txt = sh('cat ' + p, 15)
-    if not ok2 or not txt.strip():
-        return None                               # 文件不存在/空 ⇒ 本次无效
+    # ★ 2026-11-19（判据 3000）：**dump 没有重试** ——
+    #   台账 66 条 `NOT_HOME` 里 **29 条（44%）的 `last texts` 是空列表**，
+    #   即「一次都没抓到树」，而 `is_home()` 把空树当「不在首页」⇒ 假 `NOT_HOME`。
+    #   `1953` 只放宽了超时（25s→60s），没加**重试**；
+    #   实测单次 `dumpLayout` 在高负载下会偶发失败，**再抓一次通常就有**。
+    #   ⇒ 最多试 3 次，任一次拿到非空树就用。
+    #   ⚠️ 重试只加在「没抓到」上，**NOT 加在「抓到了但不是首页」** ——
+    #   后者是真不在首页，重试只会浪费时间（那是 `is_home` 之外的事）。
+    txt = ''
+    for _attempt in range(3):
+        sh('rm -f ' + p, 10)                      # 先清，确保"读到的不是旧的"
+        ok, _ = sh('uitest dumpLayout -p ' + p, timeout)
+        if ok:
+            ok2, _txt = sh('cat ' + p, 15)
+            if ok2 and _txt.strip():
+                txt = _txt
+                break
+        if _attempt < 2:
+            time.sleep(1.5)                       # 给设备一点空隙再抓
+    if not txt.strip():
+        return None                               # 三次都没抓到 ⇒ 本次无效
     # 2026-11-13（判据 1990）：**dump 用完即删** —— 今晚 `/data/local/tmp` 累积了
     #   32886 个文件 / 2.6GB，把模拟器磁盘撑到 95%，`hdc install` 开始静默失败，
     #   导致我几小时的改动全都没进包（判据 1989）。
