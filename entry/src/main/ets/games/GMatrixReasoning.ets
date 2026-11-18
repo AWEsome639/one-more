@@ -391,7 +391,7 @@ export struct GMatrixReasoning {
           }.width('100%')
         }, (r: number) => 'rr' + r)
       }
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(145, Bp.height - 520))).aspectRatio(1).padding(Space.sm)
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(145, Bp.height - (Bp.isShort() ? 520 : 550)))).aspectRatio(1).padding(Space.sm)
       // ★ 2026-11-17（判据 2836）：388 → 440。折叠屏竖屏 798vp 上，棋盘 410vp + 头部三统计 + 选项行
       //   + 提示行 ⇒ 底部那个紫色按钮只露一条边（实测截图 Matrix_Reasoning-184810）。
       //   同族五款都是差 ~40vp。

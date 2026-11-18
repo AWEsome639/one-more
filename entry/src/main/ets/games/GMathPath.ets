@@ -654,7 +654,7 @@ export struct GMathPath {
           .width('100%')
         }, (r: number) => 'pr' + r)
       }
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - (Bp.isShort() ? 360 : 410))))
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

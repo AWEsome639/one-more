@@ -501,7 +501,7 @@ export struct GSimonSays {
         //   两块是 `layoutWeight(1).aspectRatio(1)` ⇒ 宽 = 行宽的一半 ⇒ 高也一半
         //   `2500px` 行宽 ⇒ 每块 `1250px` 高 ≫ 可用 ⇒ 溢出并盖住上方
         //   ⇒ 限行宽（判据 1966：限宽即限高）：`2 × (Bp.height - 200)` = `666vp`
-        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(140, Bp.height - 200)))
+        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(140, Bp.height - (Bp.isShort() ? 200 : 230))))
         Row({ space: Space.sm }) {
           Stack() {
           Text(PAD_ICON[(2)]).fontSize(FontSize.xxxl)
