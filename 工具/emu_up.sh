@@ -34,11 +34,11 @@ else
   echo "⇒ 无实例，启动 $DEV"
   echo y > /tmp/emu_yes.txt
   ( nohup "$EMU" -start "$DEV" < /tmp/emu_yes.txt > "/tmp/emu_$DEV.log" 2>&1 & )
-  for i in $(seq 1 18); do
+  for i in $(seq 1 30); do   # 判据 2905 补：冷启动实测可超 180s，放宽到 300s
     sleep 10
     device_ok && { echo "⇒ 设备就绪（$((i*10))s）"; break; }
   done
-  device_ok || { echo "❌ ${i}0s 内设备未就绪，看 /tmp/emu_$DEV.log"; exit 1; }
+  device_ok || { echo "❌ 300s 内设备未就绪，看 /tmp/emu_$DEV.log"; exit 1; }
   sleep 20
 fi
 
