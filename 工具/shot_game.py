@@ -143,6 +143,14 @@ def dump(tag='d', timeout=60):
         if _vb:
             print('  [dump %s] ❌ 解析失败（%d 字节）' % (tag, len(txt)))
         return None                               # 解析失败 = 本次无效（不会拿旧文件）
+    try:
+        _b = ((_tree.get('attributes') or {}).get('bounds') or '').strip()
+        _nums = [int(x) for x in re.findall(r'-?\d+', _b)] if _b else []
+        if len(_nums) == 4 and _nums[2] > 0 and _nums[3] > 0:
+            _SCREEN_CACHE[0] = _nums[2] - _nums[0]
+            _SCREEN_CACHE[1] = _nums[3] - _nums[1]
+    except Exception:
+        pass
     if _vb:
         def _cnt(n):
             return 1 + sum(_cnt(c) for c in (n.get('children') or [])) if isinstance(n, dict) else 0
@@ -365,12 +373,21 @@ def covered_count(items):
 _TITLE_CACHE = None
 
 
+_SCREEN_CACHE = [None, None]   # ★ 2026-11-18（判据 2924）：从 dump 根节点自动读到的真实屏幕尺寸。
+
+
 def _screen():
-    """当前屏幕尺寸 (w, h)。默认手机横屏 2560x1600；换屏时用 ONEMORE_SCREEN=宽x高 覆盖。
+    """当前屏幕尺寸 (w, h)。**优先用从 dump 自动读到的真实尺寸**；读不到才退回环境变量/手机默认。
+
+    ★ 2026-11-18（判据 2924）：**原来默认写死 `2560x1600`** ⇒ 折叠屏 `2224x2496` 上
+      兵底坐标 `(2276,264)` **超出屏宽 2224** ⇒ 点在屏幕外 ⇒ 搜索页永远不开。
+      ⇒ 改成**从每次 dump 的根节点 bounds 自动更新**。
 
     ★ 2026-11-16（判据 2813）：原来搜索框坐标写死为 (2276,264)/(1280,435)，
       只适合 2560x1600 横屏。折叠屏 2224x2496 竖屏上点不中 ⇒ 改成按比例算。
     """
+    if _SCREEN_CACHE[0] and _SCREEN_CACHE[1]:
+        return int(_SCREEN_CACHE[0]), int(_SCREEN_CACHE[1])
     s = os.environ.get('ONEMORE_SCREEN', '2560x1600')
     try:
         w, h = s.lower().split('x')
@@ -853,10 +870,17 @@ def _body(name, t0):
                 _ix, _iy = _tap_props(2276 / 2560.0, 264 / 1600.0)
                 _cand = [(_ix, _iy)]
         _sig0 = _node_count(_d0) if _d0 else 0
+        if os.environ.get('SHOT_VERBOSE'):
+            print('  [search] 候选 %d 个: %r  点击前节点数=%d' % (len(_cand), _cand[:3], _sig0))
         for _cx, _cy in _cand[:3]:
             sh('uitest uiInput click %d %d' % (_cx, _cy))
             time.sleep(1.2)
             _d1 = dump()
+            if os.environ.get('SHOT_VERBOSE'):
+                print('  [search] 点了 (%d,%d) ⇒ 节点数=%s %s' % (
+                    _cx, _cy,
+                    _node_count(_d1) if _d1 else 'None',
+                    '(已变化)' if (_d1 and _node_count(_d1) != _sig0) else '(未变)'))
             if _d1 and _node_count(_d1) != _sig0:
                 break
         # ★ 判据 2819/2822：**点完要轮询等 `TextInput` 出现**。
