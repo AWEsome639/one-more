@@ -95,6 +95,14 @@ def main():
         r['max_blk'] = max([x.get('blk', -1) for x in recs if x['outcome'] == 'OK'], default=-1)
         if r['outcome'] != 'OK' and r['ok_count'] > 0:
             _pseudo.append(r)
+        # ★ 2026-11-19（判据 3005）：**`blk` 的绝对值不反映严重程度** ——
+        #   实测同一天：`Simon Says` `blk=48px` 但元素高 `843px` ⇒ 只切 `0.8%`（可忽略）；
+        #   `Crossword` `blk=24px` 但元素是 `120px` 的按钮 ⇒ 切 `26px = 22%`，且 `16px` 压在手势条下。
+        #   ⇒ 数值大一倍的那款反而**轻 27 倍**。
+        #   `lowh` 是「最低元素的高度」（`low=` 的 y2-y1），量不到时为 -1。
+        #   ⇒ `sev = blk / lowh`，用它排序与显示。
+        _lh = r.get('lowh', -1)
+        r['sev'] = (r.get('blk', 0) / _lh) if (_lh and _lh > 0 and r.get('blk', 0) > 0) else 0.0
 
     env = [r for r in rows if r['outcome'] in ('NOT_HOME', 'NO_CARD', 'DUMP_FAIL', 'TIMEOUT')]
     got = [r for r in rows if r not in env]
@@ -123,7 +131,10 @@ def main():
     _noblk = [r for r in got if r['outcome'] in ('OK','TIGHT','OVER','NEAR') and not r.get('has_blk')]
     D = [r for r in got if r['blk'] == 0 and r['mb'] not in ('-',) and int(r['mb']) < GESTURE
          and r['name'] not in {x['name'] for x in _noblk}]
-    for lst in (A, B, C, D):
+    # ★ 判据 3005：A/B 按**严重度比**排（`blk / 元素高`），C/D 仍按 blk（它们本来就是 0 或无需比）
+    A.sort(key=lambda r: -r.get('sev', 0))
+    B.sort(key=lambda r: -r.get('sev', 0))
+    for lst in (C, D):
         lst.sort(key=lambda r: -r['blk'] if 'blk' in r else 0)
 
     print('== %d 款有测量结果，%d 款是环境失败（要重测）==' % (len(got), len(env)))
@@ -159,12 +170,20 @@ def main():
             print('  %-30s max=%-5s 测于 %s' % (r['name'], r['mb'], r['ts'][:10]))
         print('  ⇒ 判据 2003：**缺数据 ≠ 干净**。这 %d 款不算在 D 档里。' % len(NOBLK))
 
-    print('\n【A 档】blk ≥ 24px（真越界，先看这些）%d 款' % len(A))
+    print('\n【A 档】blk ≥ 24px（真越界）%d 款 —— 按 `溢出/文字高` 粗排（判据 3005）' % len(A))
+    print('   ⚠️ **这是粗代理，不是真比例**：`blk` 是**多块累计**溢出，而 `文字高` 是**最低文字节点**的高，')
+    print('      两者量的不是同一个对象（`Simon Says` 溢出的是 281vp 的方块，但最低文字只有 99px 高）。')
+    print('   ⇒ 用途只有一个：**把「48px 落在大方块上」和「24px 落在小按钮上」区分开**，别用它算精确百分比。')
+    print('   ⇒ 真要精确，得让 `shot_game.py` 记录「溢出那一块自己的高度」——那是下一步。')
     for r in A:
-        print('  %-30s blk=%-3d max=%-5s lowest=%s' % (r['name'], r['blk'], r['mb'], r['low'][:26]))
+        print('  %-30s blk=%-3d 文字高=%-5s 溢出/字高=%5.2f  max=%-5s lowest=%s'
+              % (r['name'], r['blk'], (r.get('lowh') if r.get('lowh', -1) > 0 else '-'),
+                 r.get('sev', 0) * 100, r['mb'], r['low'][:22]))
     print('\n【B 档】0 < blk < 24px（轻微）%d 款' % len(B))
     for r in B:
-        print('  %-30s blk=%-3d max=%-5s' % (r['name'], r['blk'], r['mb']))
+        print('  %-30s blk=%-3d 文字高=%-5s 溢出/字高=%5.2f  max=%-5s'
+              % (r['name'], r['blk'], (r.get('lowh') if r.get('lowh', -1) > 0 else '-'),
+                 r.get('sev', 0) * 100, r['mb']))
     # ★ 2026-11-14 补（判据 2062）：**C 档是「嫌疑名单」，不是「待办名单」**
     #   实证：`7` 款 C 档全部早已有矮屏降档，`blk=0` 是硬指标；
     #   而 `max_bottom` 只统计**有文字**的节点（`shot_game.py:134 texts()`），
