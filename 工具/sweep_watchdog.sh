@@ -17,13 +17,37 @@ restarts=0
 LEDGER="_巡检记录/layout-canonical.tsv"
 PROG=/tmp/sweep_wd_progress
 progress_count() { wc -l < "$LEDGER" 2>/dev/null | tr -d ' ' || echo 0; }
+# ★ 2026-11-19（判据 3012）：**`pgrep -f 'sweep_all.sh'` 会匹配到「运行这条 pgrep 的 shell 自己」**
+#   —— 任何命令行里含 `sweep_all.sh` 的 `bash -c`（包括我自己的巡检命令）都会被算成「跑批活着」。
+#   实测：`06:46` 跑批已死，`07:04` 看门狗仍记「台账无新增 ⇒ 开始计时」（走的是「活着但空转」分支）。
+#   ⇒ 改成**读单实例锁里的 PID 再 `kill -0`** —— 那是唯一的权威来源（`sweep_all.sh` 自己写的）。
+sweep_alive() {
+  local lk="/tmp/sweep_all.lock"
+  [ -f "$lk" ] || return 1
+  local pid
+  pid=$(tr -d ' \n' < "$lk" 2>/dev/null)
+  [ -n "$pid" ] || return 1
+  kill -0 "$pid" 2>/dev/null || return 1
+  # 再确认那个 PID 确实是 sweep_all.sh（防 PID 复用）
+  ps -o command= -p "$pid" 2>/dev/null | grep -q 'sweep_all\.sh'
+}
+# ★ 判据 3012：**窗口检查必须两个分支都有** —— 原来只有「跑批已死」分支有，
+#   而「活着但空转」分支会在早上重启跑批（实测 `07:04` 进入该分支，若不管，
+#   `07:19` 就会 `nohup bash 工具/sweep_all.sh` 把重活开到奥森起床后）。
+past_window() {
+  local h m
+  h=$(date +%H); m=$(date +%M)
+  [ "$h" -ge 7 ] && return 0
+  [ "$h" -eq 6 ] && [ "$m" -ge 45 ] && return 0
+  return 1
+}
 LAST=$(progress_count); echo "$LAST" > "$PROG"
 while :; do
   ts=$(date '+%m-%d %H:%M')
   if [ -f /tmp/onemore_sweep_done ]; then
     echo "[$ts] 跑批已正常结束（done 标记）⇒ 看门狗退出" >> "$LOG"; exit 0
   fi
-  if pgrep -f 'sweep_all.sh' >/dev/null 2>&1; then
+  if sweep_alive; then
     NOW=$(progress_count)
     if [ "$NOW" != "$LAST" ]; then
       LAST=$NOW; echo "$NOW" > "$PROG"
@@ -37,6 +61,9 @@ while :; do
         echo "[$ts] ⏳ 台账无新增，开始计时（$NOW 行）" >> "$LOG"
         date +%s > "$PROG.ts"
       elif [ "$idle" -ge 900 ]; then
+        if past_window; then
+          echo "[$ts] ⏹ 空转 ${idle}s 但已过运行窗口（$(date +%H:%M)）⇒ 不续跑，退出" >> "$LOG"; exit 0
+        fi
         echo "[$ts] ❌ 空转 ${idle}s（台账停在 $NOW 行）⇒ 杀掉续跑" >> "$LOG"
         # ★ 2026-11-19（判据 3001）：**只杀 sweep_all.sh 会漏下子进程** ——
         #   `sweep_all.sh` 派 `verify_layout.py`，后者再派 `shot_game.py`。
