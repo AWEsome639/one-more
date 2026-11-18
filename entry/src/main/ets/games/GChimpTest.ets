@@ -249,6 +249,11 @@ export struct GChimpTest {
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.onFinish(r);
   }
+  /** ★ 2026-11-18（判据 2907）：格子尺寸由算式保证（宽度驱动格子在矮屏上会溢出）。*/
+  private gs(): number {
+    return Math.max(20, Math.floor((Bp.height - 380) / Math.max(2, N)));
+  }
+
   build() {
     Column({ space: Bp.isShort() ? Space.sm : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
@@ -297,7 +302,7 @@ export struct GChimpTest {
               .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
               .fontColor((this.cells[r * N + c]) < 0 ? '#FFFFFF' : this.theme.ink)
               }
-              .layoutWeight(1).aspectRatio(1).borderRadius(Radius.sm)
+              .width(this.gs()).height(this.gs()).borderRadius(Radius.sm)
               .backgroundColor((this.cells[r * N + c]) < 0 ? Palette.emerald : ((this.cells[r * N + c]) === 0 ? this.theme.surfaceAlt : this.theme.surface))
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）
