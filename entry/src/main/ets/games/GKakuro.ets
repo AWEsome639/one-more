@@ -632,7 +632,7 @@ export struct GKakuro {
       // ★ 2026-11-15（判据 2710/2715）：`-360` 时棋盘 `173vp`、底部「重开一题」按钮只剩 `60px`（应 132px）。
       //   作者 11-12 已用同一手法压过一次（230→173vp，按钮从完全出屏到露 60px）。
       //   再压一档 `-390`（棋盘 ≈143vp）⇒ 按钮多出 ~30vp = 90px，足够完整。
-      .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 390)) : 9999 })   // ★ 2026-11-12（判据 1928）：`aspectRatio(1)` 的棋盘 **`maxHeight` 只裁不缩**，必须用 `maxWidth` 才能真缩小
+      .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - (Bp.isShort() ? 450 : 480))) : 9999 })   // ★ 2026-11-12（判据 1928）：`aspectRatio(1)` 的棋盘 **`maxHeight` 只裁不缩**，必须用 `maxWidth` 才能真缩小
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)

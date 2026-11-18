@@ -333,7 +333,7 @@ export struct GDistractorMatrix {
       // ★ 2026-11-17（判据 2857/2858 续）：与 Cross Section Slice 同形 —— 下排选项被切（`blk=3/72px`、
       //   `lowest='2'` 的 `y2=1600`）。**下限 140 是生效值**（533-400=133 < 140）⇒ 光改减数无效。
       //   同时降下限与加减数：140→110、-400→-430 ⇒ 网格 140→110vp。
-      Math.max(110, Bp.height - 430)))
+      Math.max(110, Bp.height - (Bp.isShort() ? 430 : 460))))
         }, (r: number) => 'r' + r)
       }.width('100%')
       .padding(Space.sm)

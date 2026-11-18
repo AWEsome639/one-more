@@ -319,7 +319,7 @@ export struct GSubitizingRush {
       .width('100%').aspectRatio(1).padding(Space.sm)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 400 : 430)) })
       .backgroundColor(this.theme.isDark ? '#141414' : '#E2E8F0').borderRadius(Radius.lg)
       Text(this.msg)
         .fontSize(FontSize.md).fontColor(this.pick >= 0 ? Palette.violet : this.theme.inkSoft)

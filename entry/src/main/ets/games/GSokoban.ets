@@ -707,7 +707,7 @@ export struct GSokoban {
         //   方向键被切、下面一行几乎看不见；dump 里 lowest=5px 的「上一关」就是被切的那个）。
         //   这个公式（按可用高度算能装几格）**本来就对所有屏高成立** ⇒ 去掉条件，手机路径行为不变。
         maxWidth: Math.min(Bp.width - 40,
-          this.w * Math.max(10, Math.floor((Bp.height - 440) / Math.max(1, this.h))))
+          this.w * Math.max(10, Math.floor((Bp.height - (Bp.isShort() ? 440 : 470)) / Math.max(1, this.h))))
       })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
