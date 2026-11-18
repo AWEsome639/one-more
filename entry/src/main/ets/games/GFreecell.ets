@@ -77,6 +77,23 @@ export struct GFreecell {
   onFinish: (r: GameResult) => void = () => {};
 
   @State private cols: Card[][] = [];
+  /**
+   * ★ 2026-11-19（判据 2987）：**牌高原来固定 `Cell.of(30)=26vp`**，而一列最多 `13` 张
+   *   ⇒ `13×26 + 12×2 = 362vp`。牌桌只分到 `63vp`（横屏）⇒ 溢出 `5.8` 倍，
+   *   而牌桌 `Row` 没有 `.clip(true)` ⇒ 牌直接画到按钮行下面（看起来像「浮层压住牌桌」，判据 `2977`）。
+   *   ⇒ 改成按「当前最长那一列」算牌高：装得下就用满 `26vp`，装不下就压到能装下。
+   *   竖屏 `853` 高时 `avail ≈ 384vp`、`13` 张仍可用 `26vp`；横屏 `533` 时压到约 `16vp`、全部可见。
+   */
+  private cardH(): number {
+    let n: number = 1;
+    for (let i = 0; i < this.cols.length; i++) {
+      if (this.cols[i].length > n) { n = this.cols[i].length; }
+    }
+    const avail: number = Math.max(120, Bp.height * (Bp.isShort() ? 0.42 : 0.50));
+    const fit: number = Math.floor((avail - (n - 1) * 2 - 8) / n);
+    return Math.max(Cell.of(14), Math.min(Cell.of(30), fit));
+  }
+
   @State private frees: Card[] = [];
   @State private found: number[] = [0, 0];
   @State private moves: number = 0;
@@ -856,7 +873,7 @@ export struct GFreecell {
           .fontColor((c).suit === 0 ? this.theme.ink : Palette.rose)
           }
           .width('100%')
-          .height(Cell.of(30))
+          .height(this.cardH())
           .justifyContent(FlexAlign.Center)
           .backgroundColor(this.theme.surface)
           .borderRadius(Radius.xs)
