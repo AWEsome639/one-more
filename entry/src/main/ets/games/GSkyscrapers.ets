@@ -747,7 +747,9 @@ export struct GSkyscrapers {
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.skyTap((gr), (gc)); }); })
             }, (gc: number) => 'g' + gc)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
+          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - (Bp.isShort() ? 360 : 440))))
+          // ★ 2026-11-18（判据 2929/2932）：折叠屏上 `-360` 不够 ⇒ 底部「提示」框被压成 6px（实测）。
+          //   矮屏（手机）保持 `-360` 不动；非矮屏用 `-440` ⇒ 网格窄一点、给底部按钮让位。
         }, (gr: number) => 'gr' + gr)
       }
       .width('100%')
