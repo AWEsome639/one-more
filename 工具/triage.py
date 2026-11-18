@@ -196,17 +196,26 @@ def main():
 
     print('\n【A 档】blk > 24px（真出屏，判据 3009）%d 款 —— 按 `溢出/块高` 排序（判据 3005）' % len(A))
     print('   `=` 精确（max/blkh，同一块）｜`≤` 上界（blk/blkh，累计块）｜`~` 粗代理（blk/lowh，量的不是同一对象）')
-    print('   ⚠️ 粗代理的分子分母量的不是同一对象，只能用来排序，不能当「被切百分比」。')
+    print('   ⚠️ 判据 3010 实测：用 `lowh` 当分母连错三次且方向一致（`Magnets` 114%→2.7%、')
+    print('      `Simon Says` 48%→0.8%、`Divided Attention` 171%→2.7%，倍数 42~63×）')
+    print('      ⇒ **`~` 行不再显示百分比，只标「未测」。错 40 倍的数比不显示更危险。**')
     for r in A:
-        print('  %-28s blk=%-3d 出屏%4.0fvp  blkh=%-5s %s切%5.1f%%  lowest=%s'
+        # ★ 判据 3010：**`~`（粗代理）不显示百分比** ——
+        #   实测同一晚连错三次、方向一致、倍数 42~63×
+        #   （`Magnets` 114.3%→2.7%、`Simon Says` 48.5%→0.8%、`Divided Attention` 171.4%→2.7%）：
+        #   分母 `lowh` 是一行字（40~50px），真实溢出块是 800~900px ⇒ 除完虚高两个数量级。
+        #   **显示一个错 40 倍的数，比不显示更危险。**
+        _tag = r.get('sev_tag', '~')
+        _sev = ('切%5.1f%%' % (r.get('sev', 0) * 100)) if _tag in ('=', '≤') else '  未测  '
+        print('  %-28s blk=%-3d 出屏%4.0fvp  blkh=%-5s %s %s  lowest=%s'
               % (r['name'], r['blk'], (r['blk'] - 24) / 3.0,
-                 (r.get('blkh') if r.get('blkh', -1) > 0 else '-'),
-                 r.get('sev_tag', '~'), r.get('sev', 0) * 100, r['low'][:18]))
+                 (r.get('blkh') if r.get('blkh', -1) > 0 else '-'), _tag, _sev, r['low'][:18]))
     print('\n【B 档】0 < blk < 24px（轻微）%d 款' % len(B))
     for r in B:
-        print('  %-30s blk=%-3d blkh=%-5s %s 切%5.1f%%  max=%-5s'
-              % (r['name'], r['blk'], (r.get('blkh') if r.get('blkh', -1) > 0 else '-'),
-                 r.get('sev_tag', '~'), r.get('sev', 0) * 100, r['mb']))
+        _tag2 = r.get('sev_tag', '~')
+        _sev2 = ('切%5.1f%%' % (r.get('sev', 0) * 100)) if _tag2 in ('=', '≤') else ' 未测  '
+        print('  %-30s blk=%-3d blkh=%-5s %s %s' % (r['name'], r['blk'],
+              (r.get('blkh') if r.get('blkh', -1) > 0 else '-'), _tag2, _sev2))
     # ★ 2026-11-14 补（判据 2062）：**C 档是「嫌疑名单」，不是「待办名单」**
     #   实证：`7` 款 C 档全部早已有矮屏降档，`blk=0` 是硬指标；
     #   而 `max_bottom` 只统计**有文字**的节点（`shot_game.py:134 texts()`），
