@@ -335,14 +335,19 @@ export struct GTripleSequence {
         this.cell(i, c)
       }, (c: number) => 'tc' + i + '_' + c)
     }
-    .width('100%')
+    .width('100%').justifyContent(FlexAlign.Center)
+  }
+  /** ★ 2026-11-18（判据 2907）：格子尺寸**由算式保证**，不靠 layoutWeight/aspectRatio 分配。
+   *   原因：宽度驱动的格子在矮屏上高度也跟着满宽推算 ⇒ 底行溢出 48px。*/
+  private cp(): number {
+    return Math.max(36, Math.floor((Bp.height - 280) / ROWS.length));
   }
   @Builder
   cell(i: number, c: number) {
     Stack() {
       Text(c === this.beacon(i) ? '●' : '').fontSize(FontSize.xxs).fontColor('#FFFFFF')
     }
-    .layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
+    .width(this.cp()).height(this.cp()).borderRadius(Radius.xs)
     .backgroundColor(c === this.beacon(i) ? Palette.primary : this.theme.surface)
     .borderWidth(this.shown(i) === c ? 3 : 0).borderColor(this.markColor(i))
     .animation({ duration: Motion.fast, curve: Motion.snap() })
