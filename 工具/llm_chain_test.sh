@@ -32,7 +32,7 @@ T=$(target)
 if [ -z "$T" ] || echo "$T" | grep -q Empty; then
   for inst in onemore3 onemore4 onemore5 onemore6; do
     say "· 起 $inst"
-    (nohup "$EMU" -start "$inst" -noWindow > "/tmp/emu_$inst.log" 2>&1 &)
+    bash 工具/emu_guard.sh || (nohup "$EMU" -start "$inst" -noWindow > "/tmp/emu_$inst.log" 2>&1 &)
     sleep 300
     T=$(target)
     if [ -n "$T" ] && ! echo "$T" | grep -q Empty; then break; fi

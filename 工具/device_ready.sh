@@ -28,7 +28,7 @@ if [ "${1:-}" = "--restart" ]; then
     kill "${pid}" 2>/dev/null
   done
   sleep 12
-  nohup "${EMU}" -start onemore2 -instancePath "${HOME}/.Huawei/Emulator/deployed" \
+  bash 工具/emu_guard.sh || nohup "${EMU}" -start onemore2 -instancePath "${HOME}/.Huawei/Emulator/deployed" \
     > /tmp/emu_ready.log 2>&1 &
   sleep 128
 fi

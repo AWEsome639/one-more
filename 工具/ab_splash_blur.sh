@@ -93,7 +93,7 @@ echo "  备份: ${BAK}（$(wc -c < "$BAK" | tr -d ' ') 字节）"
 for X in onemore onemore2 onemore3 onemore4 onemore5 onemore6; do timeout 20 "$EMU" -stop "$X" >/dev/null 2>&1; done
 sleep 20
 printf 'y\ny\ny\ny\ny\ny\n' > /tmp/yes_ab.txt
-nohup bash -c "\"$EMU\" -start \"$DEV\" < /tmp/yes_ab.txt" > /tmp/ab_boot.log 2>&1 &
+bash 工具/emu_guard.sh || nohup bash -c "\"$EMU\" -start \"$DEV\" < /tmp/yes_ab.txt" > /tmp/ab_boot.log 2>&1 &
 for i in $(seq 1 60); do sleep 10; ONLINE && { echo "  在线 @ $((i*10))s"; break; }; done
 timeout 6 "$HC" tconn 127.0.0.1:5555 >/dev/null 2>&1
 for k in $(seq 1 12); do

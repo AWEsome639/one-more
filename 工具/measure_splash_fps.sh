@@ -62,7 +62,7 @@ echo "════════ $DEV · 开屏帧率 n=$N 复测 ═════�
 for X in onemore onemore2 onemore3 onemore4 onemore5 onemore6; do timeout 20 "$EMU" -stop "$X" >/dev/null 2>&1; done
 sleep 20
 printf 'y\ny\ny\ny\ny\ny\n' > /tmp/yes_fps.txt
-nohup bash -c "\"$EMU\" -start \"$DEV\" < /tmp/yes_fps.txt" > /tmp/fps_boot.log 2>&1 &
+bash 工具/emu_guard.sh || nohup bash -c "\"$EMU\" -start \"$DEV\" < /tmp/yes_fps.txt" > /tmp/fps_boot.log 2>&1 &
 ON=0
 for i in $(seq 1 60); do
   sleep 10
