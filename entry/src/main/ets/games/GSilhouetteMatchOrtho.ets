@@ -257,7 +257,7 @@ export struct GSilhouetteMatchOrtho {
   /** ★ 2026-11-18（判据 2907）：格子尺寸由算式保证；格数随难度变（diffTotal，最大 7）。
    *   病因与 GSilhouetteMatch 同源：选项网格无上限 ⇒ 第二行选项整个在屏外。*/
   private gs(): number {
-    return Math.max(18, Math.floor((Bp.height - 400) / Math.max(2, this.diffTotal)));
+    return Math.max(14, Math.floor((Bp.height - 470) / Math.max(2, this.diffTotal)));
   }
 
   build() {
