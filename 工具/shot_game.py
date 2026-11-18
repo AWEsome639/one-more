@@ -130,6 +130,13 @@ def dump(tag='d', timeout=60):
     # ★ 2026-11-18（判据 2922）：`SHOT_VERBOSE=1` 时打出每次 dump 的字节数。
     #   用途：「工具在某台设备上卡住」时，空树 / 小树会立刻现形。
     _vb = bool(os.environ.get('SHOT_VERBOSE'))
+    if _vb:
+        # ★ 自动带上调用行号 ⇒ 一眼看出是哪一段在循环。
+        try:
+            import inspect as _ins
+            tag = '%s@L%d' % (tag, _ins.currentframe().f_back.f_lineno)
+        except Exception:
+            pass
     try:
         _tree = json.loads(txt)
     except Exception:
