@@ -389,7 +389,10 @@ export struct GPerspectiveShiftView {
       }, (r: number) => 'r' + r)
     }.width('100%').aspectRatio(1).padding(Space.xs)
     // ★ 2026-10-31 真机：宽驱动 aspectRatio 无上限 ⇒ 矮屏（横屏 533）棋盘撑爆、下方按钮在窗外。
-    .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+    .constraintSize({ maxHeight: Math.max(100, Bp.height - 440) })
+    // ★ 2026-11-18（判据 2911）：原来是 `Bp.height - 360`（173vp=519px），
+    //   但实测 A/B/C 三个选项面板从 y≈1290 才开始（距顶 430vp）⇒ 1290+519=1809 > 1600，必被切。
+    //   改 -440 ⇒ 93vp=279px ⇒ 1290+279=1569 ⇒ 装得下。
     .backgroundColor(this.theme.surface).borderRadius(Radius.md)
     .borderWidth(2).borderColor(this.borderOf(kind))
     .animation({ duration: Motion.fast, curve: Motion.snap() })
