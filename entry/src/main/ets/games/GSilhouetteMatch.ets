@@ -265,7 +265,7 @@ export struct GSilhouetteMatch {
    *   病因：4 个选项网格 .width('72%') ⇒ 每个约 920px 高、两行 1840px ⇒ 第二行选项整个在屏外。
    *   格数随难度变 (diffTotal, 最大 7)；Bp.height=533 时 diffTotal=5 ⇒ 26vp=78px。*/
   private gs(): number {
-    return Math.max(18, Math.floor((Bp.height - 400) / Math.max(2, this.diffTotal)));
+    return Math.max(14, Math.floor((Bp.height - 470) / Math.max(2, this.diffTotal)));
   }
   /** ★ 2026-11-18（判据 2912）：**选项网格**单独一个尺寸 ——
    *   实测选项从 `y≈1350`（距顶 450vp）才开始，只剩约 250px，
