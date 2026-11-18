@@ -50,7 +50,7 @@ CHECKS = [
     ('GDominosa', 'Bp.height - 360', '限宽'),
     ('GFractionMatcher', 'Bp.isShort() ? FontSize.xxl', '题卡降档'),
     ('GGokigenNaname', 'Bp.height - 360', '限宽'),
-    ('GGomoku', 'Bp.height - 360', '限宽'),
+    ('GGomoku', 'Bp.height - (Bp.isShort() ? 360 : 390)', '限宽（折叠屏收 30vp）'),
     ('GHeyawake', 'Bp.height - 360', '限宽'),
     ('GHitori', 'Bp.height - 360', '限宽'),
     ('GHitoriAll', 'Bp.height - 360', '限宽'),
@@ -66,8 +66,8 @@ CHECKS = [
     ('GPipes', 'Bp.height - 360', '限宽'),
     ('GPythagoreanTripleBuilder', 'Bp.isShort() ? FontSize.xxl : FontSize.hero', '题卡降档'),
     ('GShikaku', 'Bp.height - 360', '限宽'),
-    ('GSimonSays', '2 * Math.max(140, Bp.height - 200)', '限行宽'),   # ★ 2026-11-14：原特征串落在注释上，改成**代码行**
-    ('GSkyscrapers', 'Bp.height - 360', '限宽'),
+    ('GSimonSays', 'Math.max(140, Bp.height - (Bp.isShort() ? 200 : 230))', '限行宽（折叠屏收 30vp）'),   # ★ 2026-11-14：原特征串落在注释上，改成**代码行**
+    ('GSkyscrapers', 'Bp.height - (Bp.isShort() ? 360 : 440)', '限宽（折叠屏收 80vp）'),
     ('GSnake3D', 'Bp.height - 300', '限整行宽'),
     ('GTargetNumber', 'Bp.isShort() ? FontSize.xl : FontSize.xxxl', '题卡降档'),
     ('GVisualSearchAll', 'Bp.height - 240', '限宽'),
@@ -76,7 +76,7 @@ CHECKS = [
     ('GKakuroMini', 'maxWidth: Bp.height < 600', '盘面再收'),   # ★ 同上：原来会匹配注释
     ('GKakuro', '!Bp.isShort() || this.over', '提示行隐藏'),
     ('GSchulte', 'Bp.height - 360', '限宽'),
-    ('GCountdownMath', 'Bp.height - 360', '限宽'),
+    ('GCountdownMath', 'Bp.height - 440', '限宽（已为 440）'),
     ('GFactorFinder', 'Bp.height - 360', '限宽'),
     ('GPercentageShopping', 'Bp.isShort() ? FontSize.xxl : FontSize.hero', '题卡降档'),
     ('GBinaryMatrixRank', 'Cell.of(28)', '矩阵格降档'),
