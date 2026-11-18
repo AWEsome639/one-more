@@ -12,6 +12,31 @@ set +u
 #   ⇒ `dirname "$0"` 在没有 UTF-8 locale 的 bash 3.2 里会产出非法字节 ⇒ 整脚本挂掉
 #   ⇒ 直接用绝对路径（项目位置固定）
 cd "/Users/a0000/dev/One More" || exit 1
+
+# ★ 2026-11-19（判据 3001）：**单实例锁** ——
+#   今晚 02:30 实测有 **3 个 `verify_layout.py` 同时抢一台模拟器**
+#   （`55:50` / `27:33` / `20:47`），台账里大量 `NO_CARD`/`NOT_HOME`/`TIMEOUT`
+#   是它们互相打断造成的。根因：看门狗只 `pkill sweep_all.sh`，子进程成孤儿后
+#   又被续跑出一个新的。
+#   ⇒ 看门狗已改成整条链一起杀；这里再加一道锁，**锁在就不许起第二个跑批**。
+#   ⚠️ 锁按租约（lease）判活：进程在且超过 `LEASE_H` 时才清，避免误删活锁。
+LOCK="/tmp/sweep_all.lock"
+LEASE_H=6
+if [ -f "$LOCK" ]; then
+  _old=$(cat "$LOCK" 2>/dev/null | tr -d ' ')
+  if [ -n "$_old" ] && kill -0 "$_old" 2>/dev/null; then
+    _age=$(( ( $(date +%s) - $(stat -f %m "$LOCK" 2>/dev/null || echo 0) ) / 3600 ))
+    if [ "$_age" -lt "$LEASE_H" ]; then
+      echo "❌ 已有跑批在跑（PID $_old，锁龄 ${_age}h < ${LEASE_H}h）⇒ 本实例退出，绝不并行抢模拟器"
+      exit 0
+    fi
+    echo "⚠️ 锁龄 ${_age}h ≥ ${LEASE_H}h，判定为僵锁 ⇒ 覆盖"
+  else
+    echo "⚠️ 发现残留锁（PID ${_old:-空} 已不在）⇒ 清掉"
+  fi
+fi
+echo $$ > "$LOCK"
+trap 'rm -f "$LOCK"' EXIT INT TERM
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 LOG=/tmp/sweep_all.log
 : > "$LOG"

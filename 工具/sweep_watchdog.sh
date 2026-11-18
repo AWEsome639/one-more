@@ -38,8 +38,25 @@ while :; do
         date +%s > "$PROG.ts"
       elif [ "$idle" -ge 900 ]; then
         echo "[$ts] ❌ 空转 ${idle}s（台账停在 $NOW 行）⇒ 杀掉续跑" >> "$LOG"
+        # ★ 2026-11-19（判据 3001）：**只杀 sweep_all.sh 会漏下子进程** ——
+        #   `sweep_all.sh` 派 `verify_layout.py`，后者再派 `shot_game.py`。
+        #   `pkill -f 'sweep_all.sh'` 杀掉父进程后，`verify_layout.py` 变成**孤儿**（父进程变 PID 1）
+        #   继续抢模拟器；而这里随后又 `nohup` 起一个新的 ⇒ **两三个跑批同时抢一台机器**。
+        #   实测：02:30 有 3 个 `verify_layout.py`（55:50 / 27:33 / 20:47），
+        #   台账里大量 `NO_CARD`/`NOT_HOME`/`TIMEOUT` 是它们互相打断造成的。
+        #   ⇒ 必须**整条链**都杀，从下往上。
+        pkill -f 'shot_game.py' 2>/dev/null
+        pkill -f 'verify_layout.py' 2>/dev/null
         pkill -f 'sweep_all.sh' 2>/dev/null
         sleep 3
+        # 复查：真死透了才续跑（否则会越攒越多）
+        _left=$(pgrep -f 'verify_layout.py' | wc -l | tr -d ' ')
+        if [ "$_left" != "0" ]; then
+          echo "[$ts] ⚠️ 杀后仍有 $_left 个 verify_layout ⇒ 强杀" >> "$LOG"
+          pkill -9 -f 'verify_layout.py' 2>/dev/null
+          pkill -9 -f 'shot_game.py' 2>/dev/null
+          sleep 2
+        fi
         rm -f "$PROG.ts"
         if [ "$restarts" -lt "$MAX_RESTART" ]; then
           restarts=$((restarts+1))
@@ -62,6 +79,19 @@ while :; do
       echo "[$ts] ❌ 已重启 $restarts 次仍死 ⇒ 放弃并留记录" >> "$LOG"; exit 1
     fi
     restarts=$((restarts+1))
+    # ★ 2026-11-19（判据 3001）：「sweep_all.sh 不在了」**不等于**它的子进程也没了 ——
+    #   父进程死掉后 `verify_layout.py` 会成孤儿继续抢模拟器（实测父进程变 PID 1）。
+    #   ⇒ 续跑前先把残留的整条链清掉，否则又攒出第二个跑批。
+    _stray=$(pgrep -f 'verify_layout.py' | wc -l | tr -d ' ')
+    if [ "$_stray" != "0" ]; then
+      echo "[$ts] ⚠️ 跑批已亡但残留 $_stray 个 verify_layout ⇒ 先清" >> "$LOG"
+      pkill -f 'shot_game.py' 2>/dev/null
+      pkill -f 'verify_layout.py' 2>/dev/null
+      sleep 3
+      pkill -9 -f 'verify_layout.py' 2>/dev/null
+      pkill -9 -f 'shot_game.py' 2>/dev/null
+      sleep 2
+    fi
     echo "[$ts] ⚠️ 跑批不在了 ⇒ 第 $restarts 次尝试续跑" >> "$LOG"
     nohup bash 工具/run_tonight.sh >> /tmp/tonight.log 2>&1 &
   fi
