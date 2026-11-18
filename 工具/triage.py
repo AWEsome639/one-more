@@ -56,8 +56,20 @@ def parse(since=None):
         has_over = bool(om)
         over = int(om.group(1)) if om else 0
         sumover = int(sm.group(1)) if sm else 0
-        rows.append(dict(ts=ts, name=name, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, lowh=lowh, lowgap=lowgap, cov=(int(cm.group(1)) if cm else None), over=over, sumover=sumover, has_over=has_over))
+        # ★ 2026-11-19（判据 2964）：预先算好分组键（别名/驼峰写法合并），显示仍用原名
+        try:
+            from ledger_names import canon as _canon, is_junk as _isj
+            _k = _canon(name)
+            if _isj(name):
+                continue          # 垃圾名直接丢，不污染分母
+        except Exception:
+            _k = name
+        rows.append(dict(ts=ts, name=name, key=_k, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, lowh=lowh, lowgap=lowgap, cov=(int(cm.group(1)) if cm else None), over=over, sumover=sumover, has_over=has_over))
     return rows
+
+def _key(r):
+    """分组键：用规范化名（判据 2964）—— 别名与驼峰写法合并成同一款。"""
+    return r.get('key') or r['name']
 
 def main():
     since = None
@@ -67,7 +79,7 @@ def main():
     # 同一款取最后一次
     last = {}
     for r in rows:
-        last[r['name']] = r
+        last[_key(r)] = r
     rows = list(last.values())
     # ★ 2026-11-19（判据 2963）：**别只看最后一条**。
     #   今天我只读每款最后一行就断定「10 款从未测过、可能坏了」，
@@ -75,10 +87,10 @@ def main():
     #   ⇒ 这里给每款补上「OK 次数 / 历史最大 blk」，最后一条失败但历史 OK 的单独列。
     _all = {}
     for r in parse(since):
-        _all.setdefault(r['name'], []).append(r)
+        _all.setdefault(_key(r), []).append(r)
     _pseudo = []
     for r in rows:
-        recs = _all.get(r['name'], [])
+        recs = _all.get(_key(r), [])
         r['ok_count'] = sum(1 for x in recs if x['outcome'] == 'OK')
         r['max_blk'] = max([x.get('blk', -1) for x in recs if x['outcome'] == 'OK'], default=-1)
         if r['outcome'] != 'OK' and r['ok_count'] > 0:
