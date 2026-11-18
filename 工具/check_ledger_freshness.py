@@ -41,6 +41,12 @@ CLASS_OVERRIDE = {
     'g2048': 'G2048', 'akari': 'GAkari', 'go9': 'GGo9',
     'schulte': 'GSchulte', 'word_snake_trail': 'GWordSnakeTrail',
     'tic_tac_toe': 'GTicTacToe', 'n_back': 'GNBack', 'go_no_go': 'GGoNoGo',
+    # ★ 2026-11-19（判据 3002）：**台账里有一条名字被截断的历史脏数据** ——
+    #   第 1265 行是 `odular Clock Arithmetic`（少了首字母 `M`，11-16 12:38 TIMEOUT），
+    #   来自当时 `--names-file` 里被切坏的一行。真名 `Modular Clock Arithmetic` 另有正常记录。
+    #   不映射的话，报告永远显示「1 款类名映射失败」，会让人以为工具坏了。
+    #   ⇒ 映射到同一个 .ets，让它参与新鲜度统计（而不是被当成不存在）。
+    'odular_clock_arithmetic': 'GModularClockArithmetic',
 }
 
 
