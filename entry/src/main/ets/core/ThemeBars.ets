@@ -41,10 +41,16 @@ export class ThemeBars {
     }
     try {
       const props: window.SystemBarProperties = {
-        // ★ 只碰导航条；状态栏保持系统原样（见文件头）
+        // 底部导航条
         navigationBarColor: dark ? DARK_BAR : LIGHT_BAR,
-        // 深底配亮图标、浅底配暗图标
-        isNavigationBarLightIcon: dark
+        isNavigationBarLightIcon: dark,
+        // ★★★ 2026-11-18（判据 2895）：**状态栏也要跟着主题**。
+        //   文件头原写「不动状态栏、因为它是系统画的白底黑字、改白会看不见文字」——
+        //   那个担心针对的是「把状态栏改成白色」；而实测问题是**深色 App + 白状态栏** ⇒
+        //   截图里顶部一条 117px 白带（三张跨 8 小时的截图完全一致 ⇒ 一直存在、不是我改坏的）。
+        //   ⇒ 正解不是「改白」，而是**深底配亮图标**：
+        statusBarColor: dark ? DARK_BAR : LIGHT_BAR,
+        statusBarContentColor: dark ? '#FFFFFF' : '#000000'
       };
       w.setWindowSystemBarProperties(props).catch((e: Error) => {
         hilog.warn(DOM, TAG, 'setWindowSystemBarProperties 失败（不影响使用）: %{public}s', e.message);
