@@ -333,7 +333,10 @@ export struct GCrossword {
       // ★ 2026-11-15（判据 2759/2762）：格子是 `layoutWeight(1)+aspectRatio(1)`、容器 `.width('100%')`
       //   ⇒ 五列各 ~480px、五行需 ~2400px ≫ 屏高 ⇒ **只显示第一行五个巨大橙块、线索与输入区全被挤出屏外**（截图实证）。
       //   ⇒ 按可用高度限宽（aspectRatio 会让格子高度跟着降）。
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360))).padding(Space.sm).backgroundColor(this.theme.surfaceAlt)
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - (Bp.isShort() ? 360 : 500))))
+      // ★ 2026-11-18（判据 2911/2926）：折叠屏上 `-360` 不够 ⇒ 下方两行选项被切（截图实证）。
+      //   矮屏（手机 533）保持 `-360`（它已经 blk=24 勉强通过、不动它）；
+      //   非矮屏（折叠屏 832）用 `-500` ⇒ 网格窄一点、给下方两行选项让出空间。.padding(Space.sm).backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
       Text(this.over ? this.msg : CLUES[this.cur]).fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
         .width('100%').textAlign(TextAlign.Center)
