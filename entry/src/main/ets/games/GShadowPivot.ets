@@ -299,7 +299,10 @@ export struct GShadowPivot {
           Text('🔄').accessibilityLevel('no').fontSize(FontSize.xxl).rotate({ angle: this.angle }).animation({ duration: Motion.base, curve: Motion.snap() })
           Text(TG2('顺时针 {0}°', this.angle)).fontSize(FontSize.xs).fontColor(Palette.rose)
         }.layoutWeight(1)
-      }.width('100%')
+      }.width('100%').layoutWeight(1)
+        // ★ 2026-11-18（判据 2900）：根列是 height('100%')+FlexAlign.Start、
+        //   而这个 Row 只有 width 没有高度 ⇒ 按内容撑高 ⇒ 面板底行溢出。
+        //   加 layoutWeight(1) 让它取「剩余空间」。
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
