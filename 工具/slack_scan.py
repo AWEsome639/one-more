@@ -48,7 +48,24 @@ def scan(paths):
         if not b:
             continue
         _, w, h, x1, y1, x2, y2 = b
-        slack_px = SCR_H_PX - y2
+        # ★ 2026-11-19 修（判据 2982）：原来用 `屏底 − 棋底` ⇒ **把键盘/按钮行也算成空白**。
+        #   实例：Kakuro 量到 189vp「空白」，实际里面是 `6/7/8/9/⌫` 键盘 + 「重开一题」按钮。
+        #   正确口径：找棋盘下方**最近的**有实体块（宽度 ≥ 100px）⇒ slack 只算到它为止。
+        next_top = SCR_H_PX
+        for r2 in rows:
+            try:
+                ny1, ny2, nx1, nx2 = int(r2['y1']), int(r2['y2']), int(r2['x1']), int(r2['x2'])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if ny1 < y2:                      # 不在棋盘下方
+                continue
+            if nx2 - nx1 < 100:               # 太窄，不像一整行控件
+                continue
+            if ny2 - ny1 < 8:                 # 太薄，像分隔线
+                continue
+            if ny1 < next_top:
+                next_top = ny1
+        slack_px = next_top - y2
         out.append({
             'name': os.path.basename(p).replace('nodes-', '').replace('.tsv', '').replace('.stale', ''),
             'board_vp': round(w / PX_PER_VP),
