@@ -18,7 +18,7 @@
   python3 工具/check_ledger_freshness.py --stale-only
 退出码恒为 0（这是报告器，不是闸门）。
 """
-import os, sys, io, datetime, re
+import os, subprocess, sys, io, datetime, re
 from collections import OrderedDict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -48,6 +48,23 @@ CLASS_OVERRIDE = {
     #   ⇒ 映射到同一个 .ets，让它参与新鲜度统计（而不是被当成不存在）。
     'odular_clock_arithmetic': 'GModularClockArithmetic',
 }
+
+
+_gt_cache = {}
+def _git_time(path):
+    """文件最后一次 git 提交时间；没有提交记录时退回 mtime（新文件/未跟踪）。"""
+    if path in _gt_cache:
+        return _gt_cache[path]
+    try:
+        out = subprocess.run(['git', 'log', '-1', '--format=%ct', '--', path],
+                             capture_output=True, text=True, timeout=15).stdout.strip()
+        m = datetime.datetime.fromtimestamp(int(out)) if out else None
+    except Exception:
+        m = None
+    if m is None:
+        m = datetime.datetime.fromtimestamp(os.path.getmtime(path))
+    _gt_cache[path] = m
+    return m
 
 
 def class_name(game):
@@ -93,7 +110,13 @@ def main():
         if not os.path.exists(p):
             no_file.append(game)
             continue
-        code_m = datetime.datetime.fromtimestamp(os.path.getmtime(p))
+        # ★ 2026-11-19（判据 3015）：**用 git 最后一次提交时间，不用 mtime**。
+        #   实测 `302 / 355` 款文件的 mtime 与 git 提交时间差 >10 分钟 ——
+        #   mtime 会被 checkout / stash / 批量脚本无内容变化地改掉。
+        #   判例：`GOddRotation.ets` mtime=`11-19 00:12`（假的），
+        #         git 最后提交=`11-13 01:49`（真的）⇒ 工具误报它「过期 31h」。
+        #   ⇒ 「代码改过没有」是**内容**问题，只有 git 能回答。
+        code_m = _git_time(p)
         delta = (code_m - t).total_seconds()
         rows.append((game, t, code_m, delta, status))
 
