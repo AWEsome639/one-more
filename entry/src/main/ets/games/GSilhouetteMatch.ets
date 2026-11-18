@@ -267,6 +267,12 @@ export struct GSilhouetteMatch {
   private gs(): number {
     return Math.max(18, Math.floor((Bp.height - 400) / Math.max(2, this.diffTotal)));
   }
+  /** ★ 2026-11-18（判据 2912）：**选项网格**单独一个尺寸 ——
+   *   实测选项从 `y≈1350`（距顶 450vp）才开始，只剩约 250px，
+   *   与目标网格（y≈680）的可用高完全不同 ⇒ 不能共用一个算式。*/
+  private go(): number {
+    return Math.max(10, Math.floor((Bp.height - 480) / Math.max(2, this.diffTotal)));
+  }
 
   build() {
     Column({ space: Space.sm }) {
@@ -305,7 +311,7 @@ export struct GSilhouetteMatch {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
+        Stack().width(this.go()).height(this.go()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(0)]), ((0)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
         }.width('100%').justifyContent(FlexAlign.Center)
@@ -328,7 +334,7 @@ export struct GSilhouetteMatch {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
+        Stack().width(this.go()).height(this.go()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(1)]), ((1)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
         }.width('100%').justifyContent(FlexAlign.Center)
@@ -353,7 +359,7 @@ export struct GSilhouetteMatch {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
+        Stack().width(this.go()).height(this.go()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(2)]), ((2)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
         }.width('100%').justifyContent(FlexAlign.Center)
@@ -376,7 +382,7 @@ export struct GSilhouetteMatch {
         ForEach(ROWS, (r: number) => {
         Row({ space: 2 }) {
         ForEach(ROWS, (c: number) => {
-        Stack().width(this.gs()).height(this.gs()).borderRadius(Radius.xs)
+        Stack().width(this.go()).height(this.go()).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(3)]), ((3)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
         }.width('100%').justifyContent(FlexAlign.Center)
