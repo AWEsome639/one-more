@@ -151,6 +151,15 @@ def dump(tag='d', timeout=60):
             _SCREEN_CACHE[1] = _nums[3] - _nums[1]
     except Exception:
         pass
+    # ★ 2026-11-18（判据 2931）：`SHOT_SAVE_DUMP=/path` 时把本次 树原样存下。
+    #   用途：需要分析「游戏内真实布局」（如 chrome 高度）时，不必手工进游戏。
+    _sp = os.environ.get('SHOT_SAVE_DUMP')
+    if _sp:
+        try:
+            with open(_sp, 'w', encoding='utf-8') as _fh:
+                _fh.write(txt)
+        except Exception:
+            pass
     if _vb:
         def _cnt(n):
             return 1 + sum(_cnt(c) for c in (n.get('children') or [])) if isinstance(n, dict) else 0
