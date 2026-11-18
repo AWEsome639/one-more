@@ -69,6 +69,20 @@ def main():
     for r in rows:
         last[r['name']] = r
     rows = list(last.values())
+    # ★ 2026-11-19（判据 2963）：**别只看最后一条**。
+    #   今天我只读每款最后一行就断定「10 款从未测过、可能坏了」，
+    #   实际每款都至少有一次 OK 且 blk=0（Hanoi/FreeCell 各 2 次）。
+    #   ⇒ 这里给每款补上「OK 次数 / 历史最大 blk」，最后一条失败但历史 OK 的单独列。
+    _all = {}
+    for r in parse(since):
+        _all.setdefault(r['name'], []).append(r)
+    _pseudo = []
+    for r in rows:
+        recs = _all.get(r['name'], [])
+        r['ok_count'] = sum(1 for x in recs if x['outcome'] == 'OK')
+        r['max_blk'] = max([x.get('blk', -1) for x in recs if x['outcome'] == 'OK'], default=-1)
+        if r['outcome'] != 'OK' and r['ok_count'] > 0:
+            _pseudo.append(r)
 
     env = [r for r in rows if r['outcome'] in ('NOT_HOME', 'NO_CARD', 'DUMP_FAIL', 'TIMEOUT')]
     got = [r for r in rows if r not in env]
@@ -174,6 +188,15 @@ def main():
         print('  %-28s lowest_h=%-4d gap=%-4d blk=%-2d %s%s'
               % (r['name'], r['lowh'], r['lowgap'], r.get('blk', 0), (r.get('low') or '')[:20], tag))
     print('  共 %d 款（排序：贴底程度 → 高度）' % len(watch))
+    # ★ 2026-11-19（判据 2963）：**伪失败** —— 最后一条失败、但历史上量到过 OK。
+    if _pseudo:
+        print('')
+        print('== ⚠️ 伪失败清单（最后一条失败，但历史上测成功过；判据 2963）==')
+        for r in sorted(_pseudo, key=lambda x: -x['ok_count']):
+            print('  %-28s 最后=%s  OK %d 次  历史最大 blk=%s'
+                  % (r['name'], r['outcome'], r['ok_count'],
+                     r['max_blk'] if r['max_blk'] >= 0 else '—'))
+        print('  ⇒ 这些**不是「从未测过」**：先看历史 blk，别当新问题去修。')
 
 if __name__ == '__main__':
     main()
