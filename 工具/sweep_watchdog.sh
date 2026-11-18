@@ -97,10 +97,12 @@ while :; do
       fi
     fi
   else
-    # 时间窗内才重启（00:00–06:40），避免早上把人吵醒
-    h=$(date +%H)
-    if [ "$h" -ge 7 ] || [ "$h" -eq 6 ] && [ "$(date +%M)" -ge 45 ]; then
-      echo "[$ts] ⏹ 已过运行窗口（h=$h）⇒ 不重启" >> "$LOG"; exit 0
+    # 时间窗内才重启（00:00–06:45），避免早上把人吵醒
+    # ★ 2026-11-19（判据 3012 第③条）：**改用 `past_window()` 函数，不再内联** ——
+    #   原来这里是内联判断、空转分支没有判断，同一规则两个实现必然漏一个（今晚就漏了）。
+    #   现在两个出口都调同一个函数，规则只有一处。
+    if past_window; then
+      echo "[$ts] ⏹ 已过运行窗口（$(date +%H:%M)）⇒ 不重启" >> "$LOG"; exit 0
     fi
     if [ "$restarts" -ge "$MAX_RESTART" ]; then
       echo "[$ts] ❌ 已重启 $restarts 次仍死 ⇒ 放弃并留记录" >> "$LOG"; exit 1
@@ -122,5 +124,9 @@ while :; do
     echo "[$ts] ⚠️ 跑批不在了 ⇒ 第 $restarts 次尝试续跑" >> "$LOG"
     nohup bash 工具/run_tonight.sh >> /tmp/tonight.log 2>&1 &
   fi
-  sleep 900
+  # ★ 2026-11-19（判据 3012 的配套）：**tick 间隔可覆盖** —— 原来写死 `sleep 900`，
+  #   导致「看门狗会不会在窗口外重启跑批」这件事**只能靠等 15 分钟去观察**，
+  #   没法做集成测试。加 `WD_INTERVAL` 后可以把间隔压到 2 秒真跑一遍验证退出路径。
+  #   生产仍用默认 `900`（launchd 起它时不设这个变量）。
+  sleep "${WD_INTERVAL:-900}"
 done
