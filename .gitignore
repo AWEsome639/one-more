@@ -60,3 +60,6 @@ entry/src/main/ets/games/*.bak*
 
 # 归档的已签名发布包（29.5MB，不进 git；构建目录里的同名文件会被后续 debug 编译覆盖）
 release/
+
+# 跑批生成的临时 dump（每次测量重写，属生成物，不入库）
+_巡检记录/dumps/
