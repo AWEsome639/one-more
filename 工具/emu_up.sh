@@ -22,8 +22,30 @@ count_emu() { ps axo comm 2>/dev/null | grep -i '/emulator/Emulator' | grep -v g
 device_ok() { "$HC" list targets 2>/dev/null | grep -qE '^[0-9A-Za-z]'; }
 
 N=$(count_emu)
+
+# ★★★ 2026-11-18（判据 2908）：**有编译在跑就不启模拟器**。
+#   实证：`~/.Huawei/Emulator/deployed/onemore7/Log/crash_server.log` 在崩前写的是
+#   `[Warning] memory is low, freeMem: 791 / 691 / 524 / 424 ...`；
+#   今天两个崩溃包（`10:37`、`11:36`）正是「边编译边跑设备」那两次。
+#   ⇒ **建编译/构建进程在跑时，拒绝启动模拟器**（宁可不跑，不要崩）。
+#   注：不能用「空闲内存」做闸门 —— macOS 平时就把内存拿去做缓存，
+#   本机空闲页常年只有百多 MB，按它判会永远拒绝。
+# ★ 实测：**hvigor 守护进程常驻不退（跑了 3h+ 、RSS 仅 0.01G）** ⇒ 用 pgrep 判会永远误判。
+#   ⇒ 改用「占 CPU 的真编译」判据：任一 hvigor/java/node 子进程 CPU > 20% 即视为在编译。
+building() {
+  ps axo pcpu,command 2>/dev/null \
+    | grep -E "hvigor|ArkTSCompile|ets-loader" | grep -v grep \
+    | awk '{ if ($1 > 20) { found=1 } } END { exit(found ? 0 : 1) }'
+}
+if building && [ "$MODE" != "status" ]; then
+  echo "❌ 有编译/构建进程在跑 ⇒ 不启动模拟器（判据 2908）"
+  echo "   原因：实证崩前 freeMem 降到 424–800MB；今天两次崩溃都是边编译边跑设备。"
+  exit 1
+fi
+
 if [ "$MODE" = "status" ]; then
-  echo "emulator 进程 $N 个 / 设备 $([ "$(device_ok && echo 1 || echo 0)" = 1 ] && echo 在线 || echo 不在)"
+  if building; then BS="有编译在跑（启动会被拒）"; else BS="无编译"; fi
+  echo "emulator 进程 $N 个 / 设备 $([ "$(device_ok && echo 1 || echo 0)" = 1 ] && echo 在线 || echo 不在) / $BS"
   exit 0
 fi
 
