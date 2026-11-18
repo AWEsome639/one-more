@@ -39,3 +39,27 @@
 **⇒ `Silhouette Match` / `Silhouette Match Ortho` / `Triple Sequence` / `Trace Path` / `Perspective Taking`。**
 **⇒ 它们**没有**与 `GShadowPivot` 相同的 `Row` 结构（`grep` 同一模式零命中）⇒ **要各自找「包住网格、却没有高度」的那层容器**，然后同样加 `.layoutWeight(1)`。**
 **⇒ 每款的步骤：① 找网格的父容器 ② 看它有没有高度 ③ 没有就加 `layoutWeight(1)` ④ 编译+裁图。**
+
+---
+
+## 【`09:19`】`Silhouette Match` 用同一处方**无效**（已回滚）
+
+**⇒ 给它 `L278 Row({ space: Space.md })` 的收尾（`L293`）加了同样的 `.layoutWeight(1)`：**
+
+**⇒ 编译通过（`4m48s`）、装机、测、裁 `y=1280–1600`：**底部仍有格子延续到屏沿 ⇒ 没修好。****
+**⇒ 已 `git checkout` 回滚。**
+
+### ⇒ 为什么同族同病、同一个处方却不灵
+
+**⇒ 两款的面板行结构不同：**
+- `GShadowPivot` 的面板行 = **两个 `Column`**（各 `layoutWeight(1)`）⇒ 行本身加 `layoutWeight` 就能压缩它们；
+- `Silhouette Match` 的面板行 = **一个 `Column`（网格）+ 一个 `Text`（`🕯️ ➜ 剪影`，也带 `layoutWeight(1)`）** ⇒ 行加 `layoutWeight` 后，那块**文字**也一起吃高度，网格反而没被压下去。
+
+### ⇒ 所以剩下五款要各自看「面板行里有没有非网格的 `layoutWeight` 元素」
+
+**⇒ 判断规则（写死，别再猜）：**
+1. 面板行里**只有网格**（`Column`/`Canvas`）⇒ 给**行**加 `layoutWeight(1)` ✅（`GShadowPivot` 已验证）；
+2. 面板行里**除网格还有带 `layoutWeight` 的文字/按钮** ⇒ 给**行**加没用 ⇒ 改为**只给网格那层加 `layoutWeight(1)` 或 `constraintSize`**；
+3. 加完**必须裁图数行** —— `blk` 对这族无效（`2899`）。
+
+**⇒ 判据 `2902`：同一处方在「同族」里也会失效 —— 要看**那一行里除了目标还有谁在 `layoutWeight`**。**
