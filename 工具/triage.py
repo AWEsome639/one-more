@@ -143,7 +143,11 @@ def main():
         print('=== 真溢出：**无数据** —— 这批测量没有 over=/sumover= 字段（旧 HAP 或旧脚本）===\n')
 
     # 分档：越可疑越靠前
-    A = [r for r in got if r['blk'] >= 24]                       # 真越界 ≥ 8vp
+    # ★ 判据 3009：`over = y2 - 1576`，屏幕底 `1600` ⇒ **出屏 vp = (blk_px - 24) / 3**。
+    #   ⇒ `blk == 24` 是「块底正好落在屏幕边」= **出屏 0vp**，不是越界 ⇒ A 档改成 `> 24`。
+    #   实测影响：`359` 款里 `24` 款有 `blk>0`，其中 `4` 款是 `blk=1/24px`（Collatz/Crossword/Memory/Word Surge）
+    #   ⇒ 它们一点没出屏，原来被算进 A 档是误报。
+    A = [r for r in got if r['blk'] > 24]                        # 真出屏（blk>24 ⇒ 出屏 ≥1vp）
     B = [r for r in got if 0 < r['blk'] < 24]                    # 轻微越界
     C = [r for r in got if r['blk'] == 0 and r['mb'] not in ('-',) and int(r['mb']) >= GESTURE]  # 触到手势区
     # ★ 2026-11-14（判据 2003）：D 档必须**排除「无 blk 数据」**的
@@ -190,14 +194,14 @@ def main():
             print('  %-30s max=%-5s 测于 %s' % (r['name'], r['mb'], r['ts'][:10]))
         print('  ⇒ 判据 2003：**缺数据 ≠ 干净**。这 %d 款不算在 D 档里。' % len(NOBLK))
 
-    print('\n【A 档】blk ≥ 24px（真越界）%d 款 —— 按 `溢出/块高` 排序（判据 3005）' % len(A))
+    print('\n【A 档】blk > 24px（真出屏，判据 3009）%d 款 —— 按 `溢出/块高` 排序（判据 3005）' % len(A))
     print('   `=` 精确（max/blkh，同一块）｜`≤` 上界（blk/blkh，累计块）｜`~` 粗代理（blk/lowh，量的不是同一对象）')
     print('   ⚠️ 粗代理的分子分母量的不是同一对象，只能用来排序，不能当「被切百分比」。')
     for r in A:
-        print('  %-30s blk=%-3d blkh=%-5s %s 切%5.1f%%  max=%-5s lowest=%s'
-              % (r['name'], r['blk'], (r.get('blkh') if r.get('blkh', -1) > 0 else '-'),
-                 r.get('sev_tag', '~'), r.get('sev', 0) * 100,
-                 r['mb'], r['low'][:20]))
+        print('  %-28s blk=%-3d 出屏%4.0fvp  blkh=%-5s %s切%5.1f%%  lowest=%s'
+              % (r['name'], r['blk'], (r['blk'] - 24) / 3.0,
+                 (r.get('blkh') if r.get('blkh', -1) > 0 else '-'),
+                 r.get('sev_tag', '~'), r.get('sev', 0) * 100, r['low'][:18]))
     print('\n【B 档】0 < blk < 24px（轻微）%d 款' % len(B))
     for r in B:
         print('  %-30s blk=%-3d blkh=%-5s %s 切%5.1f%%  max=%-5s'
