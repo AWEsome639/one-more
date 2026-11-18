@@ -227,4 +227,14 @@ say "下一步: python3 工具/triage.py  看五档；python3 工具/fixed_audit
 # ★ 2026-11-16：收工前跑一次晨检，把全库状态进日志
 echo "=== 晨检（nightly_report.sh）===" >> "$LOG"
 bash 工具/nightly_report.sh >> "$LOG" 2>&1 || true
+# ★ 2026-11-19（判据 3013）：**收工前审计早报** —— 早报里每个数都必须能从台账重算出来。
+#   退出码 0=全部相符或当日还没断言表；1=有不符项（说明早报抄错了，要回去改）。
+echo "=== 早报审计（audit_report.py）===" >> "$LOG"
+python3 工具/audit_report.py >> "$LOG" 2>&1
+_audit_rc=$?
+if [ "$_audit_rc" -eq 0 ]; then
+  say "早报审计: ✅ 台账能重算出来（或当日还没断言表）"
+else
+  say "早报审计: ❌ 有不符项 ⇒ 看 $LOG 末段，早报要改"
+fi
 say "sweep_all 结束"

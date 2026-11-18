@@ -47,7 +47,10 @@ def main():
     rows = load()
     day = sys.argv[1] if len(sys.argv) > 1 else max(r[0][:10] for r in rows)
     if day not in CLAIMS:
-        sys.exit('没有 %s 的断言表（请在 CLAIMS 里补）' % day)
+        # ★ 判据 3013：**没有当日断言表不是失败** —— 那是「还没写早报」。
+        #   跑批收尾会调它，所以这里必须退出 0，否则每晚都报一次假失败。
+        print('跳过：%s 还没有断言表（写早报时在 CLAIMS 里补）' % day)
+        return 0
     C = CLAIMS[day]
     bound = C['bounds'][0]
     day_rows = [r for r in rows if r[0][:10] == day]
