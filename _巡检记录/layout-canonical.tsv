@@ -2562,3 +2562,15 @@
 2026-11-19T13:10:56	Memory	OK	1600	73.7s lowest='重新开始' [60,1219][2500,1351] blk=1/24px blkh=88px cov=6 board=158x192@920,846 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-131056.jpeg @2026-11-19T13:10:56
 2026-11-19T13:12:20	Memory	OK	1600	71.2s lowest='重新开始' [60,1219][2500,1351] blk=1/24px blkh=88px cov=6 board=158x192@920,846 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-131220.jpeg @2026-11-19T13:12:20
 2026-11-19T13:15:10	Kakuro Mini	OK	1576	73.0s lowest='6' [60,1444][534,1576] blk=0/0px blkh=0px cov=5 board=496x496@1032,756 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-131509.jpeg @2026-11-19T13:15:10
+2026-11-19T13:21:12	Bejeweled	NOT_HOME	-	130.0s no budget for recovery path
+2026-11-19T13:22:51	Breakout	NOT_HOME	-	99.4s no budget for recovery path
+2026-11-19T13:27:25	Bubble Shooter	TIMEOUT	-	193.1s budget exhausted at search:Shooter
+2026-11-19T13:28:57	Bejeweled	NOT_HOME	-	143.1s no budget for recovery path
+2026-11-19T13:34:35	Breakout	NOT_HOME	-	118.7s no budget for recovery path
+2026-11-19T13:39:37	Bubble Shooter	TIMEOUT	-	248.1s budget exhausted at home-loop
+2026-11-19T13:39:58	Checkers	TIMEOUT	-	272.4s budget exhausted at home-loop
+2026-11-19T13:42:24	Checkers	OK	2236	85.7s lowest='重开' [62,2210][2162,2236] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Checkers-134223.jpeg @2026-11-19T13:42:24
+2026-11-19T13:42:28	Compound Connect	NOT_HOME	-	84.4s no budget for recovery path
+2026-11-19T13:44:09	Compound Connect	NOT_HOME	-	104.3s no budget for recovery path
+2026-11-19T13:48:53	Connect Four	TIMEOUT	-	240.4s budget exhausted at home-loop
+2026-11-19T13:49:34	Connect Four	TIMEOUT	-	284.5s budget exhausted at home-loop
