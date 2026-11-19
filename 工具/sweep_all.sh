@@ -158,10 +158,42 @@ SNAP="_巡检记录/基线快照-$(date +%Y%m%d-%H%M).md"
   echo "差异只应来自环境失败（\`NO_CARD\`/\`NOT_HOME\`），那些要重测。"
 } > "$SNAP" 2>/dev/null
 say "基线快照 → $SNAP"
+# ★ 2026-11-14：**`--dry` 只生成待办，绝不碰设备**
+#   教训：这脚本没有 dry-run 之前，我为了「验证 todo 生成」跑了一次它，
+#   结果它真的去起了模拟器（他当时醒着）。白天测试必须走这条分支。
+if [ "${1:-}" = "--dry" ]; then
+  echo "===== --dry：前 12 款（不会起设备）=====" | tee -a "$LOG"
+  head -12 "$TODO" | nl -ba | sed 's/^/  /' | tee -a "$LOG"
+  echo "===== --dry 结束，共 $(wc -l < "$TODO" | tr -d ' ') 款 =====" | tee -a "$LOG"
+  exit 0
+fi
+
+# ★ 2026-11-19（判据 3069/3070）：**真实跑之前的三道闸** —— 今晚三次失败全是因为缺它们
+#   ① 磁盘：模拟器硬要求 13.20 GiB，实测 13.06 时直接报 00801002 起不来
+#   ② 内存：起不来的另一个原因是内存（日志 `Host Current Free Memory`）
+#   ③ 设备：`hdc list targets` 空 / shell 不通 ⇒ 脚本会静默卡死 40 分钟（实测）
+HC_BIN='/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
+DISK_GIB=$(df -k / | tail -1 | awk '{printf "%.2f", $4/1048576}')
+if awk -v d="$DISK_GIB" 'BEGIN{exit !(d+0 < 13.5)}'; then
+  say "❌ 磁盘只剩 ${DISK_GIB} GiB（模拟器要 13.20、闸 13.5）⇒ 拒绝开跑"
+  say "   清理：entry/build（可重编）、/tmp 大图；⚠️ 不要删 _巡检记录 的截图（证据）"
+  exit 4
+fi
+say "✅ 磁盘 ${DISK_GIB} GiB"
+MEM_FREE=$(memory_pressure 2>/dev/null | tail -1 | grep -oE '[0-9]+%' | tr -d '%')
+[ -n "${MEM_FREE:-}" ] && [ "$MEM_FREE" -lt 20 ] && say "⚠️ 内存只剩 ${MEM_FREE}%：模拟器可能起不来（不是磁盘问题）"
+if ! $HC_BIN list targets 2>/dev/null | grep -q ':' || ! $HC_BIN shell 'echo ok' 2>/dev/null | grep -q ok; then
+  say "❌ 设备不可用（hdc list targets 空或 shell 不通）⇒ 拒绝开跑"
+  say "   排查：模拟器进程 $(pgrep -f 'mulator -start' | wc -l | tr -d ' ') 个；重起后再跑"
+  exit 5
+fi
+say "✅ 设备就绪"
+
+bash 工具/pin_theme.sh light 2>&1 | sed "s/^/[theme] /" | tee -a "$LOG"
+
 # ★ 2026-11-16（判据 2809）：**跑批前锁主题**。
 #   今天实测同一批 4 次测量里主题从浅漂到深（截图亮度 95→46→52），
 #   而台账没有主题列 ⇒ 事后分不清。锁浅色，至少保证一批之内同主题。
-bash 工具/pin_theme.sh light 2>&1 | sed "s/^/[theme] /" | tee -a "$LOG"
 
 # ★ 2026-11-14：**`--dry` 只生成待办，绝不碰设备**
 #   教训：这脚本没有 dry-run 之前，我为了「验证 todo 生成」跑了一次它，
