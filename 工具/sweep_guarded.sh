@@ -28,6 +28,24 @@ fi
 
 say() { echo "[$(date '+%H:%M:%S')] $*"; }
 
+# ── ⓪ 资源前置（判据 3069：今晚三次失败全是因为缺这些检查）─────────────────
+#   磁盘：模拟器硬要求 13.20（GiB 口径）⇒ 闸设 13.5 留余量
+#   内存：模拟器起不来的真正原因常常是内存（日志 `Host Current Free Memory`）
+DISK_GIB=$(df -k / | tail -1 | awk '{printf "%.2f", $4/1048576}')
+DISK_OK=$(awk -v d="$DISK_GIB" 'BEGIN{print (d+0 >= 13.5) ? 1 : 0}')
+if [ "$DISK_OK" != '1' ]; then
+  say "❌ 磁盘只有 ${DISK_GIB} GiB，模拟器要 13.20 GiB（闸 13.5）⇒ 拒绝开跑"
+  say "   清理建议：entry/build（可重编）、/tmp 里的大图；⚠️ 不要删 _巡检记录 的截图（那是证据）"
+  exit 4
+fi
+say "✅ 磁盘 ${DISK_GIB} GiB"
+
+MEM_FREE=$(memory_pressure 2>/dev/null | tail -1 | grep -oE '[0-9]+%' | tr -d '%')
+if [ -n "${MEM_FREE:-}" ] && [ "$MEM_FREE" -lt 20 ]; then
+  say "⚠️ 内存只剩 ${MEM_FREE}%，模拟器可能起不来（不是磁盘问题）"
+  say "   若模拟器已在跑可继续；若没在跑，先等内存释放"
+fi
+
 # ── ① 设备就绪（三态检查：targets 有、shell 通、能起 ability）───────────────
 device_ready() {
   ${HC} list targets 2>/dev/null | grep -q ':' || return 1
