@@ -2556,3 +2556,8 @@
 2026-11-19T12:55:29	Word Surge	OK	1600	68.3s lowest='MARKET' [60,1453][2500,1600] blk=1/24px blkh=507px cov=5 board=145x132@2193,201 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Surge-125529.jpeg @2026-11-19T12:55:29
 2026-11-19T12:56:37	Collatz	OK	1600	68.1s lowest='换个数' [60,1520][2500,1600] blk=1/24px blkh=80px cov=5 board=145x132@2193,201 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-125637.jpeg @2026-11-19T12:56:37
 2026-11-19T13:06:17	Collatz	OK	1600	82.3s lowest='换个数' [60,1520][2500,1600] blk=1/24px blkh=80px cov=5 board=145x132@2193,201 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-130617.jpeg @2026-11-19T13:06:17
+2026-11-19T13:07:18	Shadow Pivot	NOT_HOME	-	141.5s no budget for recovery path
+2026-11-19T13:08:28	Shadow Pivot	OK	1600	70.2s lowest='题号 1/6' [60,555][2500,604] blk=3/72px blkh=20px cov=5 board=821x820@252,697 scr=2560x1600 max=24 over=58px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-130828.jpeg @2026-11-19T13:08:28
+2026-11-19T13:09:43	Memory	NOT_HOME	-	130.4s no budget for recovery path
+2026-11-19T13:10:56	Memory	OK	1600	73.7s lowest='重新开始' [60,1219][2500,1351] blk=1/24px blkh=88px cov=6 board=158x192@920,846 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-131056.jpeg @2026-11-19T13:10:56
+2026-11-19T13:12:20	Memory	OK	1600	71.2s lowest='重新开始' [60,1219][2500,1351] blk=1/24px blkh=88px cov=6 board=158x192@920,846 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-131220.jpeg @2026-11-19T13:12:20
