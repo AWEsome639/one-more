@@ -2709,3 +2709,12 @@
 2026-11-20T01:29:07	Target 10	TIMEOUT	-	288.0s budget exhausted at home-loop
 2026-11-20T01:35:51	Visual Search Conjunction	NOT_HOME	-	186.1s could not reach home; last texts=[]
 2026-11-20T01:42:58	Skyscrapers	WRONG_GAME	-	196.7s title '数楼' not found; first texts=[]
+2026-11-20T01:49:08	Collatz	NOT_HOME	-	153.9s could not reach home; last texts=[]
+2026-11-20T01:53:49	去或停	NOT_HOME	-	160.5s could not reach home; last texts=[]
+2026-11-20T01:55:47	Counting Sheep	NOT_HOME	-	188.1s could not reach home; last texts=[]
+2026-11-20T01:55:47	Silhouette Match Ortho	NOT_HOME	-	188.2s could not reach home; last texts=[]
+2026-11-20T02:03:01	Path Finder	NOT_HOME	-	250.2s no budget for recovery path
+2026-11-20T02:03:01	Word Mastermind	NOT_HOME	-	250.2s no budget for recovery path
+2026-11-20T02:08:07	Kakuro	DUMP_FAIL	-	207.4s no in-game dump
+2026-11-20T02:08:43	去或停	NOT_HOME	-	206.2s no budget for recovery path
+2026-11-20T02:09:11	Rotating Maze	TIMEOUT	-	272.0s budget exhausted at home-loop
