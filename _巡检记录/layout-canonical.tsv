@@ -2589,3 +2589,4 @@
 2026-11-19T16:19:35	Crossword	OK	1600	192.6s lowest='RESIN' [60,1576][861,1600] blk=1/24px blkh=24px cov=5 board=520x520@1020,725 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Crossword-161934.jpeg @2026-11-19T16:19:35
 2026-11-19T16:29:11	Crossword	NOT_HOME	-	190.4s no budget for recovery path
 2026-11-19T16:32:16	Crossword	OK	1600	83.3s lowest='EMBER' [60,1525][861,1600] blk=1/24px blkh=75px cov=5 board=469x469@1046,725 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Crossword-163213.jpeg @2026-11-19T16:32:16
+2026-11-19T16:58:22	Crossword	TIMEOUT	-	279.7s budget exhausted at search:Crossword
