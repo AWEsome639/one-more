@@ -501,7 +501,7 @@ export struct GSimonSays {
         //   两块是 `layoutWeight(1).aspectRatio(1)` ⇒ 宽 = 行宽的一半 ⇒ 高也一半
         //   `2500px` 行宽 ⇒ 每块 `1250px` 高 ≫ 可用 ⇒ 溢出并盖住上方
         //   ⇒ 限行宽（判据 1966：限宽即限高）：`2 × (Bp.height - 200)` = `666vp`
-        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(140, Bp.height - (Bp.isShort() ? 200 : 230))))
+        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(125, Bp.height - (Bp.isShort() ? 410 : 230))))
         Row({ space: Space.sm }) {
           Stack() {
           Text(PAD_ICON[(2)]).fontSize(FontSize.xxxl)
@@ -566,7 +566,9 @@ export struct GSimonSays {
           .outline(Tv.focusOutline(this.tvFocus === 'L542', Radius.lg))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.tapPad((3)); }); })
         }
-        .width('100%')
+        // ★ 2026-11-19（判据 3057）：**第二行原本没有宽度约束** ⇒ 整行在屏外（`4` 块只见 `2` 块）。
+        //   与第一行同一个算式（`1966`：限宽即限高）。横屏 `2×(533−398)=270vp` ⇒ 每块 130vp ⇒ 两行 260vp ≈ 可用 273vp。
+        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(125, Bp.height - (Bp.isShort() ? 410 : 230))))
       }
       .width('100%')
 
