@@ -322,7 +322,13 @@ export struct GGravitySort {
       .width('100%').aspectRatio(1).padding(Space.sm)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 390)) })
+      // ★ 2026-11-19（判据 3034）：**竖屏 `390` 给多了** —— 上面那条注释只验了横屏。
+      //   实测（`onemore_fold` 741×832vp）：`lowest='重开'` 的 `y2=2496` = 屏幕最底边、
+      //   `blk=2/48px`、`blkh=109px` ⇒ 出屏 `8vp`；截图确认「重开」按钮圆角被切。
+      //   横屏 `533−360=173vp` ✅ 当时修好了；竖屏 `832−390=442vp` ❌ 太宽 ⇒ 溢出 `48px`。
+      //   ⇒ 非矮屏分支 `390 → 410`（多留 `20vp=60px` > 需 `48px`）。
+      //   代价：手机 `780` 与平板（均 `isShort()=false`）棋盘小 `20vp`（仍远大于下限 `140`）。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 410)) })
       .backgroundColor(this.theme.isDark ? '#141414' : '#EEF2F7').borderRadius(Radius.lg)
       Row({ space: Space.xs }) {
         ForEach(R5, (c: number) => {
