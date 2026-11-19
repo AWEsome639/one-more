@@ -95,3 +95,103 @@ feedback(context, FeedbackInfo)
 1. **`param get const.product.syscap` 在模拟器上不可靠**（`errNum 106`）⇒ **用 `/system/etc/syscap.json`**
 2. **先分清有两条 AI 路径**（`localChatModel` vs `mindSporeLite`）⇒ 别接到错的那条上
 3. **RAG 只加一层、不替换降级链** —— `LocalLLM` 已有的四级回落一条都不能删
+
+---
+
+## 七、★ 官方完整示例已拿到（`21:2x`）—— Step 1 现在是可执行的
+
+来源：`开发指南/Data_Augmentation_Kit_数据增强服务/RAG/完整示例代码/data-augmentation-rag-demo`
+（`hms_docs action=read`）
+
+### ① schema 文件的**准确位置**（这是之前唯一缺的东西）
+
+```
+src/main/resources/rawfile/arkdata/knowledge/knowledge_schema.json
+```
+
+```json
+{
+  "knowledgeSource": [{
+    "version": 1,
+    "dbName": "onemore_kb.db",
+    "tables": [{
+      "tableName": "game_rule",
+      "referenceFields": ["id"],
+      "knowledgeFields": [
+        { "columnName": "name", "type": ["Text"] },
+        { "columnName": "rule", "type": ["Text"] },
+        { "columnName": "slug", "type": ["Scalar"], "description": "slug" }
+      ]
+    }]
+  }]
+}
+```
+
+⇒ `dbName` / `tableName` / `columnName` **必须与 `StoreConfig.name` 和建表语句逐字一致**（文档原话）。
+
+### ② 最小流程（只建倒排、不用向量）
+
+```typescript
+// 1. 开库（enableSemanticIndex 必须 true，tokenizer 必须 CUSTOM_TOKENIZER）
+const storeConfig: relationalStore.StoreConfig = {
+  name: 'onemore_kb.db', securityLevel: relationalStore.SecurityLevel.S1,
+  vector: false, tokenizer: relationalStore.Tokenizer.CUSTOM_TOKENIZER,
+  enableSemanticIndex: true,
+};
+const store = await relationalStore.getRdbStore(ctx, storeConfig);
+await store.executeSql('CREATE TABLE IF NOT EXISTS game_rule (' +
+  'id INTEGER PRIMARY KEY, slug TEXT, name TEXT, rule TEXT);');
+await store.execute(insertSql);          // 灌 355 款的规则
+
+// 2. 加工（只倒排）
+const proc = await knowledgeProcessor.getKnowledgeProcessor(ctx, {
+  sourceConfig: { rdbSource: storeConfig }, llm: new LocalChatLLM(),
+});
+await proc.startProcess({ mode: knowledgeProcessor.KnowledgeProcessMode.INVERTED_INDEX });
+
+// 3. 检索
+const retrievalConfig: retrieval.RetrievalConfig = { channelConfigs: [{
+  channelType: retrieval.ChannelType.INVERTED_INDEX_DATABASE, context: ctx,
+  dbConfig: { name: 'onemore_kb.db', securityLevel: relationalStore.SecurityLevel.S1,
+              tokenizer: relationalStore.Tokenizer.CUSTOM_TOKENIZER },
+}] };
+const retrievalCondition: retrieval.RetrievalCondition = {
+  recallConditions: [{
+    ftsTableName: 'game_rule_inverted',
+    fromClause: 'game_rule_inverted',
+    primaryKey: ['chunk_id'],
+    responseColumns: ['reference_id', 'chunk_id', 'chunk_source', 'chunk_text'],
+    deepSize: 500, recallName: 'inv',
+  }],
+);
+```
+
+⇒ `ftsTableName` 的规律：**表名 + `_inverted`**（示例里 `email` → `email_inverted`）。
+
+### ③ ★ 两个必须改掉的地方（示例工程不能直接用）
+
+| 示例里的做法 | 为什么不能照抄 | 我们怎么做 |
+|---|---|---|
+| `MyChatLlm` 用 **`http.createHttp()` 调远端 qwen3-32b** | ⚠️ **直接违反「不联网」条款** | 换成 `localChatModel`（见下方）|
+| 同时建**向量库**（`_vector.db`）| 需要 embedding 模型，重且慢 | **只建倒排索引**（`INVERTED_INDEX`）|
+
+### ④ `rag.ChatLLM` 的正确实现（用 `localChatModel`，全程端侧）
+
+`rag.ChatLLM` 要求的是**流式**接口：
+```typescript
+abstract class ChatLLM {
+  abstract streamChat(query: string, callback: Callback<rag.LLMStreamAnswer>): Promise<rag.LLMRequestInfo>;
+  abstract cancel(chatId: number): void;
+}
+interface LLMStreamAnswer { isFinished: boolean; chunk: string; }
+interface LLMRequestInfo { chatId: number; status: LLMRequestStatus; }
+```
+⇒ 实现：把 `localChatModel` 的流式回调转成 `LLMStreamAnswer{isFinished, chunk}`，
+   失败时返回 `LLMRequestStatus.LLM_REQUEST_ERROR`（**不要抛异常**，否则会话挂住）。
+
+### ⑤ 剩下唯一的未知
+
+`LocalChatLLM` 的具体流式适配还没写；`localChatModel.chat(questionInfo, {isStream:true}, cb)`
+的回调签名要照着 `core/LocalLLM.ets` 现有的流式用法写（那里已经有可用的调用样例）。
+
+⇒ **Step 1 的验收不变**：检索结果里能命中灌进去的规则原文（`hilog` 打印出来看）。
