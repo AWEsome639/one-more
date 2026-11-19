@@ -337,7 +337,7 @@ export struct GCrossword {
       //   比算式想给的 `173vp` 大 ⇒ 网格偏宽 ⇒ 底部仍贴屏（`blk=24px`，作者 `2911/2926` 当时接受的那个）。
       //   奥森要求全修 ⇒ 下限降到 `150` 让 `173vp` 生效。
       //   竖屏 `Math.max(150, 832−500=332) = 332vp` ⇒ **与改前完全一致 ⇒ 竖屏不受影响**。
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(150, Bp.height - (Bp.isShort() ? 360 : 500))))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(150, Bp.height - (Bp.isShort() ? 377 : 500))))
       // ★ 2026-11-18（判据 2911/2926）：折叠屏上 `-360` 不够 ⇒ 下方两行选项被切（截图实证）。
       //   矮屏（手机 533）保持 `-360`（它已经 blk=24 勉强通过、不动它）；
       //   非矮屏（折叠屏 832）用 `-500` ⇒ 网格窄一点、给下方两行选项让出空间。.padding(Space.sm).backgroundColor(this.theme.surfaceAlt)

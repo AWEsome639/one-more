@@ -2587,3 +2587,5 @@
 2026-11-19T16:04:15	Memory	OK	1429	76.3s lowest='重新开始' [60,1219][2500,1351] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-160414.jpeg @2026-11-19T16:04:15
 2026-11-19T16:15:51	Crossword	OK_NOSHOT	1600	124.6s lowest='FLAME' [60,1506][657,1600] recv failed @2026-11-19T16:15:51
 2026-11-19T16:19:35	Crossword	OK	1600	192.6s lowest='RESIN' [60,1576][861,1600] blk=1/24px blkh=24px cov=5 board=520x520@1020,725 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Crossword-161934.jpeg @2026-11-19T16:19:35
+2026-11-19T16:29:11	Crossword	NOT_HOME	-	190.4s no budget for recovery path
+2026-11-19T16:32:16	Crossword	OK	1600	83.3s lowest='EMBER' [60,1525][861,1600] blk=1/24px blkh=75px cov=5 board=469x469@1046,725 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Crossword-163213.jpeg @2026-11-19T16:32:16
