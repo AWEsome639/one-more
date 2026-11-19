@@ -389,7 +389,20 @@ export struct GPerspectiveShiftView {
       }, (r: number) => 'r' + r)
     }.width('100%').aspectRatio(1).padding(Space.xs)
     // ★ 2026-10-31 真机：宽驱动 aspectRatio 无上限 ⇒ 矮屏（横屏 533）棋盘撑爆、下方按钮在窗外。
-    .constraintSize({ maxHeight: Math.max(100, Bp.height - 440) })
+    // ★ 2026-11-19（判据 3037）：**限高不管用，要限宽** —— `mini` 是 `.width('100%').aspectRatio(1)`，
+    //   高度由**宽度**决定，`maxHeight` 只有在「宽度 > 上限」时才会被触发。
+    //   真机版面树（`SHOT_SAVE_DUMP`，`onemore_fold` 741×832vp）：
+    //     俯视图 `mini(-1)`  →  w=1025px(342vp) h=1088px  ⇒ `maxHeight 392vp`(1176px) **碰不到**
+    //     三选项 `mini(k)`   →  w= 679px(226vp) h= 642px  ⇒ 同上
+    //     三选项那行终点 `2496`（屏幕最底边），比父列底边 `2236` **超出 260px**
+    //   ⚠️ 第一版取 `276vp`（省 `260px`）**只够让面板装下**，但「重开」按钮被压成 `9px`
+    //      （实测 `blkh=9px`）⇒ 总缺口其实是 `260+114=374px`。
+    //   ⇒ 第二版 `N=600` ⇒ 宽度 `232vp`（`696px`），省 `392px` > `374px`。选项只有 `226vp < 232` ⇒ **刚好不受影响**；
+    //     横屏已被 `maxHeight Math.max(100, 533−440)=100vp` 压住 ⇒ 同样不受影响。
+    .constraintSize({
+      maxHeight: Math.max(100, Bp.height - 440),
+      maxWidth: Math.max(100, Bp.height - (Bp.isShort() ? 200 : 600))
+    })
     // ★ 2026-11-18（判据 2911）：原来是 `Bp.height - 360`（173vp=519px），
     //   但实测 A/B/C 三个选项面板从 y≈1290 才开始（距顶 430vp）⇒ 1290+519=1809 > 1600，必被切。
     //   改 -440 ⇒ 93vp=279px ⇒ 1290+279=1569 ⇒ 装得下。
