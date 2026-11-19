@@ -1185,12 +1185,23 @@ def _body(name, t0):
     remote = '/data/local/tmp/shot_%s_%s.jpeg' % (safe, ts)
     sh('snapshot_display -f ' + remote)
 
+    # ★ 2026-11-19（判据 3032）：**`recv failed` 要重试** —— 与判据 `3000`（空 `dump` 重试）同型。
+    #   实测：`2048` 竖屏一次测量 → 布局量到了、截图传输失败 ⇒ 整条记成 `OK_NOSHOT`，
+    #   那条数据的「图」永久丢了（`recv_ok=False` 直接落盘）。
+    #   ⇒ 重试 3 次；并且**校验文件大小 >1KB**（截断文件与没有文件一样坏）。
+    #   ⚠️ 关键：`rm -f remote` 必须移到**重试之后** —— 原来它紧跟在这里，
+    #      一失败就把设备上的原图删了，第二次尝试根本没东西可取。
     recv_ok = False
-    try:
-        rc, _o, _e = run([HC, '-t', _target(), 'file', 'recv', remote, out], 60)
-        recv_ok = (rc == 0 and os.path.exists(out))
-    except Timeout:
-        recv_ok = False
+    for _attempt in range(3):
+        try:
+            rc, _o, _e = run([HC, '-t', _target(), 'file', 'recv', remote, out], 60)
+            recv_ok = (rc == 0 and os.path.exists(out) and os.path.getsize(out) > 1024)
+        except Timeout:
+            recv_ok = False
+        if recv_ok:
+            break
+        if _attempt < 2:
+            time.sleep(1.5)
     # 2026-11-13（判据 1990）：**截图也从设备删掉** —— 别在模拟器上堆文件（今晚堆到 2.6GB 把盘撑满）
     sh('rm -f ' + remote, 8)
 

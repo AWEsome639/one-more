@@ -2483,3 +2483,6 @@
 2026-11-19T09:12:09	Shadow Pivot	OK	2496	88.8s lowest='重开' [62,2363][2162,2496] blk=1/24px blkh=133px cov=5 board=2224x2496@0,0 scr=2224x2496 max=24 over=60px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-091208.jpeg @2026-11-19T09:12:09
 2026-11-19T09:22:06	Shadow Pivot	OK	2496	86.6s lowest='重开' [62,2363][2162,2496] blk=1/24px blkh=133px cov=5 board=2224x2496@0,0 scr=2224x2496 max=24 over=60px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-092205.jpeg @2026-11-19T09:22:06
 2026-11-19T09:27:30	Shadow Pivot	OK	2496	107.4s lowest='重开' [62,2363][2162,2496] blk=1/24px blkh=133px cov=5 board=2224x2496@0,0 scr=2224x2496 max=24 over=60px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-092728.jpeg @2026-11-19T09:27:30
+2026-11-19T09:33:04	Magnets	TIMEOUT	-	214.9s budget exhausted at home-loop
+2026-11-19T09:34:20	Magnets	OK	2483	76.2s lowest='每块磁铁（横向两格）必须一正一负；右侧/下方数字是该行该列 ＋ 的个数' [495,2439][1730,2483] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Magnets-093419.jpeg @2026-11-19T09:34:20
+2026-11-19T09:35:40	Wordle	OK	2477	75.2s lowest='Z' [62,2377][239,2477] blk=2/10px blkh=338px cov=5 board=2224x2496@0,0 scr=2224x2496 max=5 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Wordle-093539.jpeg @2026-11-19T09:35:40
