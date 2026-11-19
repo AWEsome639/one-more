@@ -435,18 +435,32 @@ export struct GMemory {
       // 2026-11-14 真机截图：**翻牌格子巨大（~550px），「重新开始」浮在牌面上，底部整排被切**
       //   卡片 layoutWeight(1).aspectRatio(0.82) ⇒ 4 列 × ~625px 宽 ⇒ 每张高 ~762px ⇒ 4 行 = 3048px
       //   ⇒ 限容器宽度（判据 1966：限宽即限高）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
+      // ★ 2026-11-19（判据 3053/3054/3058）：**下限 `240` 把算式吃掉了** —— 横屏应得 `533−360=173vp`，
+      //   却被 `Math.max(240, …)` 抬到 `240vp` ⇒ 网格偏宽 ⇒ 4 行 `192px` 共 `858px` > 可用 `730px`
+      //   ⇒ 最后一行只剩 `88px`（被切 `104px` = 54%）。降到 `160` 让 `173vp` 生效。
+      //   竖屏 `832−360=472vp > 160` ⇒ 下限本来没生效 ⇒ **竖屏不受影响**。
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(160, Bp.height - 360)))
       .layoutWeight(1)
 
       Text(this.done ? TG('🎉 全部配对！') : (this.tries >= 20 ? TG('有点多哦，沉住气') : TG('每次翻两张，找相同的')))
         .fontSize(FontSize.sm)
         .fontColor(this.done ? Palette.emerald : this.theme.inkFaint)
+        // ★ 2026-11-19（判据 3058）：网格是 `layoutWeight(1)`，它的内容比分配空间高 `152px`
+        //   ⇒ 溢出到这行文字上（截图实证）。矮屏这行**不渲染** —— 页头副标题「成对翻出，考的就是记性」
+        //   已经把这句话说完了。竖屏照常渲染。
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
 
       Button(TG('重新开始'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
         .fontSize(FontSize.md).fontColor(Color.White)
         .backgroundColor(Palette.primary).borderRadius(Radius.md)
         .width('100%').height(Cell.of(46))
+        // ★ 2026-11-19（判据 3058）：**矮屏不渲染这个按钮** —— 页头的 ↻ 是同一个动作
+        //   （`Shadow Pivot:405` 已有先例：「矮屏不渲染『重开』（页头 ↻ 同动作）」）。
+        //   两种改法各失败一次：只缩宽 ⇒ 按钮压在卡片上；去掉 `layoutWeight` ⇒ 按钮掉出裁剪区。
+        //   ⇒ 第三条路：**让按钮不占正文空间**。横屏省 `133px`+间距 ⇒ 网格 4 行装得下。
+        //   竖屏（`Bp.isShort()` 为假）**照常渲染** ⇒ 不受影响。
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L365'; })
         .onBlur(() => { if (this.tvFocus === 'L365') { this.tvFocus = ''; } })
