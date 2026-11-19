@@ -257,7 +257,11 @@ export struct GSilhouetteMatchOrtho {
   /** ★ 2026-11-18（判据 2907）：格子尺寸由算式保证；格数随难度变（diffTotal，最大 7）。
    *   病因与 GSilhouetteMatch 同源：选项网格无上限 ⇒ 第二行选项整个在屏外。*/
   private gs(): number {
-    return Math.max(14, Math.floor((Bp.height - 470) / Math.max(2, this.diffTotal)));
+    // ★ 2026-11-19（判据 3065/3066）：竖屏实测 `blk=3/72px`、`blkh=500px` ——
+    //   截图里**第三个选项的方格底边越过手势线**。选项卡是 `layoutWeight(1)`，
+    //   真正能调的是作者给的这个「格子尺寸」算式 ⇒ 缺口 `24px` ÷ 格数 `7` ≈ `3.4px/格`
+    //   ⇒ `-470` 加到 `-494`（每格 `51 → 48px`，五块网格同比缩小）。
+    return Math.max(14, Math.floor((Bp.height - 494) / Math.max(2, this.diffTotal)));
   }
 
   build() {
