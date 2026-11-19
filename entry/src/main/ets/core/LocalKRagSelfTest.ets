@@ -17,6 +17,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { relationalStore } from '@kit.ArkData';
 import { knowledgeProcessor, retrieval, rag } from '@kit.DataAugmentationKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { LocalLLM } from './LocalLLM';
 
 const TAG: string = 'RAGTEST';
 const DB_NAME: string = 'onemore_kb.db';
@@ -32,6 +33,14 @@ const SEED: string[] = [
 export class LocalKRagSelfTest {
   static async run(ctx: common.UIAbilityContext): Promise<boolean> {
     hilog.info(0x0001, TAG, 'RESULT start db=%{public}s table=%{public}s', DB_NAME, TABLE);
+    // ★ 顺带报一下「本地对话模型」的真实可用性（判据 3062：声明 ≠ 能用）
+    try {
+      const llmOk: boolean = LocalLLM.available();
+      hilog.info(0x0001, TAG, 'DIAG localChatModel available=%{public}s stat=%{public}s',
+        String(llmOk), JSON.stringify(LocalLLM.stat));
+    } catch (e) {
+      hilog.warn(0x0001, TAG, 'DIAG localChatModel probe threw');
+    }
     try {
       // ① 开库：enableSemanticIndex 必须 true、tokenizer 必须 CUSTOM_TOKENIZER（否则不触发加工）
       const storeConfig: relationalStore.StoreConfig = {

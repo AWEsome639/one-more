@@ -89,10 +89,34 @@ export class LocalLLM {
     LocalLLM.sync();
   }
 
-  /** 设备是否具备该系统能力（canIUse 自身不抛，仍包一层） */
+  /**
+   * 设备是否具备该系统能力。
+   *
+   * ★★★ 2026-11-19（判据 3062）：**`canIUse` 只是「声明」，不等于「能用」**。
+   *   同一天在 `knowledgeProcessor` 上实测到：`/system/etc/syscap.json` 声明了
+   *   `SystemCapability.DataAugmentation.KnowledgeProcessor`，但运行时
+   *   `import { knowledgeProcessor } from '@kit.DataAugmentationKit'` 拿到的是 **`undefined`**
+   *   ⇒ 访问任何属性都抛 `Cannot read property … of undefined`。
+   *
+   *   ⇒ 所以在 `canIUse` 之后**再加一道运行时存在性检查**：
+   *     声明为真、实现缺失时，直接返回 false ⇒ 走 `reason='no-syscap'` 的干净降级，
+   *     而不是「以为有、一调就炸」。
+   *
+   *   `canIUse` 自身不抛；属性访问在命名空间为 `undefined` 时也只是**返回** `undefined`
+   *   （`x.foo` 抛，但 `x.foo === undefined` 里的 `x` 若是 undefined 就会抛）⇒ 仍包一层 try。
+   */
   static available(): boolean {
     try {
-      return canIUse(SYS_CAP);
+      if (!canIUse(SYS_CAP)) {
+        return false;
+      }
+      // 运行时存在性：命名空间与方法都得真在
+      // ⚠️ ArkTS 禁止把命名空间当对象比较（`arkts-no-ns-as-obj`）⇒ 只能做**属性**访问。
+      //   命名空间本身为 `undefined` 时，属性访问会抛 ⇒ 由外层 try 接住 ⇒ 同样是 false。
+      if (localChatModel.init === undefined) {
+        return false;
+      }
+      return true;
     } catch (e) {
       return false;
     }
