@@ -696,8 +696,9 @@ export struct GBejeweled {
                 //
                 //   🔑 **真正的解法是版本问题，不是写法问题**：
                 //     · `tabStop` since API 14　· `nextFocus` since API 18
-                //     · 项目 `compatibleSdkVersion = 5.0.0(12)`
-                //     ⇒ **升到 API 18+ 后，`nextFocus` 一行就能给出方向键导航**，
+                //     · 项目 `compatibleSdkVersion` 在 2026-11-19 已从 `5.0.0(12)` 升到 `6.0.0(20)`
+                //       （为端侧 AI 的 `DataAugmentationKit`；见判据 3051）
+                //     ⇒ **现在已经到 API 20、`nextFocus`(API 18) 可用**，
                 //        不需要给 1166 处加 id、也不需要显式 requestFocus。
                 //     ⇒ 但升 compatibleSdkVersion 会缩小支持的设备范围 ——
                 //        **这是产品决策，需要奥森点头**，不该我替他定。
@@ -717,7 +718,7 @@ export struct GBejeweled {
                 //     ① 去根 defaultFocus ② 根 focusable(false) ③ 上下键不吃掉
                 //     ④ 显式 requestFocus ⑤ GameHost 外包层 focusScopeId
                 //     ⑥ 游戏组件根 focusScopeId ⑦ 游戏组件根 focusable
-                //     ⑧ nextFocus（API 12 下编译过但运行时无效）
+                //     ⑧ nextFocus（API 12 下编译过但运行时无效；项目现在已是 API 20，**可用**）
                 //     ⑨ **升 compatibleSdkVersion 到 5.1.0(18) 后再试 nextFocus**
                 //        —— 能编译、能装、能跑，但 **TAB 路径一字未变**
                 //        ⇒ 已回退（升 API 不影响设备范围之外的东西，没必要）

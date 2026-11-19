@@ -290,14 +290,37 @@ export struct GSimonCommand {
         }
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
+      // ★ 2026-11-19（判据 3048/3049）：**限容器宽度，不限格子**。
+      //   `pad()` 是 `.layoutWeight(1).aspectRatio(1.4)` ⇒ 宽由 Row 分配、高 = 宽/1.4。
+      //   实测（`3017`）：横屏每块 ~420vp ⇒ 高 300vp ⇒ 两行 600vp，而游戏区只有 377vp
+      //   ⇒ **第二行整行屏外**（`4` 块只够得着 `2` 块，功能性损坏）。
+      //   作者在 `GCrossword.ets:334-341` 给了配方：按可用高度限宽、`aspectRatio` 让高跟着降。
+      //   横屏 `1.4 × (533−156) = 528vp` ⇒ 每块 259vp ⇒ 高 185vp ⇒ 两行 370vp ≤ 377vp 装下。
+      //   竖屏 `1.4 × (832−200) = 885vp`，被 `Bp.width(741)` 兜住 ⇒ **竖屏原样不动**。
       Row({ space: Space.sm }) {
         this.pad(0)
         this.pad(1)
-      }.width('100%')
+      }.width(Bp.isShort()
+        // ★ 2026-11-19（判据 3037/3047）：**第一次算式按 `377vp` 估，实际只有 `214vp`** ——
+        //   版面树实测（`SHOT_SAVE_DUMP`，横屏 1600px/533vp）：pads 从 `y=956`(319vp) 才开始、
+        //   第一行 `h=555px`(185vp) 正常、第二行只剩 `59px` 被切。
+        //   ⇒ 可用 = `533 − 319 = 214vp`；两行 + 间距 ⇒ 每行 `(214−10)/2 = 102vp`；
+        //     每块宽 = `1.4 × 102 = 143vp` ⇒ 行宽 = `2×143 + 10 = 296vp`。
+        //   竖屏**原样用 `Bp.width`**（它本来只压 `4.0%`，不冒进）。
+        ? Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 400) + 10))
+        : '100%')   // ← 竖屏分支与改动前**逐字相同**（原来就是 width('100%')）⇒ 按构造不变
       Row({ space: Space.sm }) {
         this.pad(2)
         this.pad(3)
-      }.width('100%')
+      }.width(Bp.isShort()
+        // ★ 2026-11-19（判据 3037/3047）：**第一次算式按 `377vp` 估，实际只有 `214vp`** ——
+        //   版面树实测（`SHOT_SAVE_DUMP`，横屏 1600px/533vp）：pads 从 `y=956`(319vp) 才开始、
+        //   第一行 `h=555px`(185vp) 正常、第二行只剩 `59px` 被切。
+        //   ⇒ 可用 = `533 − 319 = 214vp`；两行 + 间距 ⇒ 每行 `(214−10)/2 = 102vp`；
+        //     每块宽 = `1.4 × 102 = 143vp` ⇒ 行宽 = `2×143 + 10 = 296vp`。
+        //   竖屏**原样用 `Bp.width`**（它本来只压 `4.0%`，不冒进）。
+        ? Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 400) + 10))
+        : '100%')   // ← 竖屏分支与改动前**逐字相同**（原来就是 width('100%')）⇒ 按构造不变
       Button(TG('不做动作 ✋'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width('100%').height(Cell.of(48))

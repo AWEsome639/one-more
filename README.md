@@ -47,7 +47,7 @@
 
 ## 技术栈
 
-- **HarmonyOS Next**（minAPIVersion `50000012` / API 12）
+- **HarmonyOS Next**（minAPIVersion `60000020` / API 20，即鸿蒙 6.0 及以上）
 - **ArkTS + ArkUI**（Stage 模型，声明式 UI）
 - **纯原生**，无第三方 UI 框架
 - **Game Service Kit**（华为游戏服务：初始化 + 防沉迷合规）
