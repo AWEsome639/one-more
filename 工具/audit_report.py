@@ -17,7 +17,7 @@ LEDGER = '_巡检记录/layout-canonical.tsv'
 # ── 早报里写死的断言（改早报时必须同步改这里，否则审计会报不符）─────────────
 CLAIMS = {
     '2026-11-19': {
-        'bounds': ('02:33', '早报取的单实例分界'),
+        'bounds': ('02:33', '06:46'),   # 早报那组数说的是「02:33–06:46 那一轮跑批」
         'pre':  (63, 40, 63.5),      # (条数, OK, 通过率%)  三跑批期
         'post': (174, 168, 96.6),    # 单实例后
         'blk_gt0': 18,
@@ -53,7 +53,13 @@ def main():
         return 0
     C = CLAIMS[day]
     bound = C['bounds'][0]
-    day_rows = [r for r in rows if r[0][:10] == day]
+    upper = C['bounds'][1]
+    # ★ 2026-11-19（判据 3033）：**必须带上界**。
+    #   早报那组数（174 条 / 96.6%）说的是「02:33–06:46 那一轮跑批」；
+    #   而我后来追加的竖屏测量（约 40 条）落在同一台账里 ⇒ 不带界会让
+    #   「条数 174→216、通过率 96.6%→93.1%、blk>0 18→29」全部漂掉。
+    #   ⇒ 报告写的是哪一段，审计就必须按哪一段算。
+    day_rows = [r for r in rows if r[0][:10] == day and r[0][11:16] <= upper]
     pre = [r for r in day_rows if r[0][11:16] < bound]
     post = [r for r in day_rows if r[0][11:16] >= bound]
 
@@ -79,7 +85,8 @@ def main():
 
     print('\n[③ 回滚款末次状态]')
     for g, want in C['returns'].items():
-        rec = [r for r in rows if r[1] == g]
+        # ★ 用 `day_rows`（已含时间上界）而不是全台账 —— 否则窗口外的 `OK_NOSHOT` 会把断言顶掉
+        rec = [r for r in day_rows if r[1] == g]
         if not rec:
             print('  %-34s ❌ 台账里没有这款' % g); bad += 1; continue
         got = rec[-1][2]
