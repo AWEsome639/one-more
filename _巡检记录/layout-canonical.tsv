@@ -2505,3 +2505,11 @@
 2026-11-19T10:11:03	Mirror Image	NOT_HOME	-	108.1s no budget for recovery path
 2026-11-19T10:16:35	N-Back	OK	2236	81.8s lowest='提示：前 2 个字母只是热身，从第 3 个起才计分' [62,2192][2162,2236] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-N_Back-101634.jpeg @2026-11-19T10:16:35
 2026-11-19T10:18:19	Gravity Sort	OK	2472	76.2s lowest='重开' [1862,2325][2162,2472] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Gravity_Sort-101818.jpeg @2026-11-19T10:18:19
+2026-11-19T10:30:39	Shadow Pivot	WRONG_GAME	-	86.1s title '影子旋转' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-19T10:32:36	Shadow Pivot	OK	2496	116.8s lowest='重开' [62,2363][2162,2496] blk=1/24px blkh=133px cov=5 board=2224x2496@0,0 scr=2224x2496 max=24 over=60px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-103234.jpeg @2026-11-19T10:32:36
+2026-11-19T10:34:08	Shadow Pivot	OK	2496	87.4s lowest='重开' [62,2363][2162,2496] blk=1/24px blkh=133px cov=5 board=2224x2496@0,0 scr=2224x2496 max=24 over=60px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-103407.jpeg @2026-11-19T10:34:08
+2026-11-19T10:48:25	Shadow Pivot	TIMEOUT	-	234.3s budget exhausted at home-loop
+2026-11-19T10:55:48	Shadow Pivot	NOT_HOME	-	151.4s no budget for recovery path
+2026-11-19T11:08:43	Shadow Pivot	OK	2284	77.6s lowest='重开' [62,2083][2162,2236] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-110842.jpeg @2026-11-19T11:08:43
+2026-11-19T11:18:38	Shadow Pivot	OK	2496	75.8s lowest='重开' [62,2363][2162,2496] blk=1/24px blkh=133px cov=5 board=2224x2496@0,0 scr=2224x2496 max=24 over=60px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-111838.jpeg @2026-11-19T11:18:38
+2026-11-19T11:20:51	Gravity Sort	OK	2472	73.3s lowest='重开' [1862,2325][2162,2472] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Gravity_Sort-112051.jpeg @2026-11-19T11:20:51
