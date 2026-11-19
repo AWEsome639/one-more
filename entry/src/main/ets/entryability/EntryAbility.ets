@@ -74,6 +74,21 @@ export default class EntryAbility extends UIAbility {
       hilog.error(0x0001, 'LLMTEST', 'fail step=want-param');
     }
 
+    // ★ 2026-11-19（判据 3062）：**本地知识库（倒排索引）自检** —— `--ps ragTest true` 才跑，
+    //   结果只进 hilog（tag `RAGTEST`）。默认不触发、不影响启动。
+    try {
+      const rd: string = ((want.parameters ?? {}) as Record<string, Object>)['ragTest'] as string
+      if (rd === 'true') {
+        import('../core/LocalKRagSelfTest').then((m) => {
+          m.LocalKRagSelfTest.run(this.context);
+        }).catch((e: Error) => {
+          hilog.error(0x0001, 'RAGTEST', 'fail step=import %{public}s', JSON.stringify(e));
+        });
+      }
+    } catch (err) {
+      hilog.error(0x0001, 'RAGTEST', 'fail step=want-param');
+    }
+
     // ★ 2026-11-17（第 ② 项第二步）：**分词器自检**。`aa start ... --ps tokTest true` 才跑。
     //   结果只进 hilog（tag `TOKTEST`），判据是 `TOKTEST RESULT 16/16`。
     try {

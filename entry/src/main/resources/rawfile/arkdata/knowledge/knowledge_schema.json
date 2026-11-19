@@ -1,0 +1,19 @@
+{
+  "knowledgeSource": [
+    {
+      "version": 1,
+      "dbName": "onemore_kb.db",
+      "tables": [
+        {
+          "tableName": "game_rule",
+          "referenceFields": ["id"],
+          "knowledgeFields": [
+            { "columnName": "name", "type": ["Text"] },
+            { "columnName": "rule", "type": ["Text"] },
+            { "columnName": "slug", "type": ["Scalar"], "description": "slug" }
+          ]
+        }
+      ]
+    }
+  ]
+}
