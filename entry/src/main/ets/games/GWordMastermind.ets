@@ -374,7 +374,10 @@ export struct GWordMastermind {
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).animation({ duration: Motion.fast, curve: Motion.snap() }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      Column({ space: Space.xs }) {
+      // ★ 2026-11-19（判据 3065）：**竖屏底部「重开」被屏底切**（实测 `blk=3/72px`、`blkh=135px`，
+      //   按钮自身完整、是整块压在屏底）⇒ 与 `Kakuro` 同一类：**要整体上移，不是给按钮加边距**。
+      //   键盘是 4 行 + 3 个间距（`Space.xs=6vp`）⇒ 收到 `2` 可省 `12vp = 36px`，足够抬那 `24px`。
+      Column({ space: 2 }) {
         ForEach([0, 1, 2, 3], (r: number) => {
           Row({ space: Space.xs }) {
             ForEach([0, 1, 2, 3, 4, 5, 6], (c: number) => {
