@@ -2718,3 +2718,5 @@
 2026-11-20T02:08:07	Kakuro	DUMP_FAIL	-	207.4s no in-game dump
 2026-11-20T02:08:43	去或停	NOT_HOME	-	206.2s no budget for recovery path
 2026-11-20T02:09:11	Rotating Maze	TIMEOUT	-	272.0s budget exhausted at home-loop
+2026-11-20T02:22:28	Shadow Pivot	NOT_HOME	-	275.5s could not reach home; last texts=['‹', '找单词', '字母阵里找词', '☆', '?', '普通']
+2026-11-20T02:22:45	Word Search	DUMP_FAIL	-	224.6s no in-game dump
