@@ -2660,3 +2660,52 @@
 2026-11-19T23:40:48	Silhouette Match Ortho	OK	1370	76.6s lowest='三层压在一起，俯视剪影是哪个？' [965,886][1596,935] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Silhouette_Match_Ortho-234047.jpeg @2026-11-19T23:40:48
 2026-11-19T23:43:35	Silhouette Match Ortho	OK	1370	77.9s lowest='三层压在一起，俯视剪影是哪个？' [965,886][1596,935] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Silhouette_Match_Ortho-234334.jpeg @2026-11-19T23:43:35
 2026-11-19T23:45:01	Word Mastermind	OK	1600	86.1s lowest='凑满 5 个字母后按 ⏎ 提交' [60,1554][2500,1600] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Mastermind-234459.jpeg @2026-11-19T23:45:01
+2026-11-19T23:48:11	Kakuro	NOT_HOME	-	189.3s no budget for recovery path
+2026-11-19T23:51:42	Shadow Pivot	NOT_HOME	-	211.1s could not reach home; last texts=[]
+2026-11-19T23:55:19	Collatz	OK	1600	82.0s lowest='提示：考拉兹猜想 —— 任何正整数这样算下去最终都会落到 1' [60,1580][2500,1600] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-235518.jpeg @2026-11-19T23:55:19
+2026-11-19T23:56:07	Collatz	OK	1600	180.6s lowest='提示：考拉兹猜想 —— 任何正整数这样算下去最终都会落到 1' [60,1580][2500,1600] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Collatz-235606.jpeg @2026-11-19T23:56:07
+2026-11-19T23:57:24	Silhouette Match Ortho	OK	1370	125.4s lowest='三层压在一起，俯视剪影是哪个？' [965,886][1596,935] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Silhouette_Match_Ortho-235724.jpeg @2026-11-19T23:57:24
+2026-11-19T23:58:07	Crossword	OK	1576	119.8s lowest='RESIN' [60,1456][861,1576] blk=0/0px blkh=0px cov=5 board=400x400@1080,725 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Crossword-235806.jpeg @2026-11-19T23:58:07
+2026-11-19T23:58:49	Word Mastermind	OK	1600	85.0s lowest='凑满 5 个字母后按 ⏎ 提交' [60,1554][2500,1600] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Mastermind-235849.jpeg @2026-11-19T23:58:49
+2026-11-20T00:00:08	Kakuro	OK	1600	78.1s lowest='迷你数谜, 小盘数谜' [60,627][634,934] blk=0/0px blkh=0px cov=21 board=249x201@0,1399 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-000005.jpeg @2026-11-20T00:00:08
+2026-11-20T00:02:38	Memory	TIMEOUT	-	270.6s budget exhausted at enter-game
+2026-11-20T00:04:44	Shadow Pivot	TIMEOUT	-	276.4s budget exhausted at enter-game
+2026-11-20T00:06:40	Simon Says	DUMP_FAIL	-	242.5s no in-game dump
+2026-11-20T00:07:34	Crossword	NOT_HOME	-	168.9s could not reach home; last texts=[]
+2026-11-20T00:15:17	Memory	TIMEOUT	-	307.7s budget exhausted at search:Memory
+2026-11-20T00:16:10	Bejeweled	TIMEOUT	-	351.6s budget exhausted at home-loop
+2026-11-20T00:20:00	Simon Says	OK	1592	77.8s lowest='轮到你了，按顺序点 1 下' [1013,1536][1548,1592] blk=0/0px blkh=0px cov=9 board=360x360@905,756 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Says-001959.jpeg @2026-11-20T00:20:00
+2026-11-20T00:20:41	Simon Command	OK	1600	115.1s lowest='✅ 忍住没动，正确' [1101,1591][1459,1600] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Command-002041.jpeg @2026-11-20T00:20:41
+2026-11-20T00:21:48	Bejeweled	OK	1351	107.8s lowest='🔮' [948,1329][1027,1351] blk=0/0px blkh=0px cov=5 board=700x625@930,726 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-002147.jpeg @2026-11-20T00:21:47
+2026-11-20T00:22:58	Perspective Shift View	WRONG_GAME	-	135.9s title '视角切换' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-20T00:24:04	Simon Command	OK	1600	136.3s lowest='✅ 忍住没动，正确' [1101,1591][1459,1600] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Command-002402.jpeg @2026-11-20T00:24:04
+2026-11-20T00:25:49	Gravity Sort	OK	1516	171.6s lowest='点任意一列，它顶端那种颜色会被吸走' [60,1467][2500,1516] blk=0/0px blkh=0px cov=5 board=520x520@1020,773 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Gravity_Sort-002547.jpeg @2026-11-20T00:25:49
+2026-11-20T00:27:18	Perspective Shift View	OK	1470	193.5s lowest='看清俯视图，再想想从那一侧看会是什么样' [60,1421][2500,1470] blk=0/0px blkh=0px cov=5 board=300x300@508,694 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Perspective_Shift_View-002717.jpeg @2026-11-20T00:27:18
+2026-11-20T00:28:25	Kakuro	OK	1572	154.7s lowest='重开一题' [60,1440][2500,1572] blk=0/0px blkh=0px cov=5 board=420x420@1070,612 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro-002824.jpeg @2026-11-20T00:28:25
+2026-11-20T00:29:46	Gravity Sort	OK	1516	148.7s lowest='点任意一列，它顶端那种颜色会被吸走' [60,1467][2500,1516] blk=0/0px blkh=0px cov=5 board=520x520@1020,773 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Gravity_Sort-002945.jpeg @2026-11-20T00:29:46
+2026-11-20T00:31:24	Shadow Pivot	OK	1600	178.7s lowest='光源顺时针转 90°，哪张是它的影子？' [929,1585][1631,1600] blk=0/0px blkh=0px cov=5 board=365x364@480,697 scr=2560x1600 max=0 over=58px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-003122.jpeg @2026-11-20T00:31:23
+2026-11-20T00:32:50	Shadow Pivot	OK	1600	183.4s lowest='光源顺时针转 90°，哪张是它的影子？' [929,1585][1631,1600] blk=0/0px blkh=0px cov=5 board=365x364@480,697 scr=2560x1600 max=0 over=58px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Shadow_Pivot-003250.jpeg @2026-11-20T00:32:50
+2026-11-20T00:34:09	Memory	OK	1429	165.5s lowest='0' [642,693][675,756] blk=0/0px blkh=0px cov=5 board=520x505@1020,846 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-003409.jpeg @2026-11-20T00:34:09
+2026-11-20T00:35:29	Crossword	OK	1576	158.5s lowest='STONE' [60,1456][861,1576] blk=0/0px blkh=0px cov=5 board=400x400@1080,725 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Crossword-003527.jpeg @2026-11-20T00:35:29
+2026-11-20T00:37:39	Simon Says	NOT_HOME	-	209.0s no budget for recovery path
+2026-11-20T00:38:57	Memory	WRONG_GAME	-	207.6s title '记忆翻牌' not found; first texts=['12, :, 38', '12', ':', '38', '100']
+2026-11-20T00:42:02	Bejeweled	TIMEOUT	-	263.5s budget exhausted at home-loop
+2026-11-20T00:43:28	FreeCell	OK_NOSHOT	1435	255.8s lowest='♠1' [319,1386][397,1435] recv failed @2026-11-20T00:43:28
+2026-11-20T00:44:29	Perspective Shift View	OK	1470	146.4s lowest='看清俯视图，再想想从那一侧看会是什么样' [60,1421][2500,1470] blk=0/0px blkh=0px cov=5 board=300x300@508,694 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Perspective_Shift_View-004428.jpeg @2026-11-20T00:44:29
+2026-11-20T00:47:03	Cross Section Slice	OK	1530	215.1s lowest='5 个' [60,1386][1265,1530] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Cross_Section_Slice-004703.jpeg @2026-11-20T00:47:03
+2026-11-20T00:48:23	Distractor Matrix	OK	1525	79.3s lowest='2' [60,1387][1265,1525] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Distractor_Matrix-004822.jpeg @2026-11-20T00:48:23
+2026-11-20T00:49:41	Lock Pattern	OK	1566	77.8s lowest='再看一次' [60,1434][2452,1566] blk=0/0px blkh=0px cov=5 board=472x472@1044,810 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Lock_Pattern-004940.jpeg @2026-11-20T00:49:41
+2026-11-20T00:50:58	Sokoban	OK	1340	77.1s lowest='上一关' [60,1220][843,1340] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Sokoban-005058.jpeg @2026-11-20T00:50:58
+2026-11-20T00:52:38	Subitizing Rush	OK	1461	99.3s lowest='判定：10 题答对 ≥ 8 题；≤ 4 个靠直觉，≥ 5 个得靠分组' [60,1419][2500,1461] blk=0/0px blkh=0px cov=5 board=420x420@1070,694 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Subitizing_Rush-005236.jpeg @2026-11-20T00:52:37
+2026-11-20T00:54:25	Wordle	WRONG_GAME	-	107.5s title '猜词游戏' not found; first texts=['联系人', 'One More', '12, :, 54', '12', ':', '54']
+2026-11-20T00:56:28	Find Word	OK_NOSHOT	1570	122.8s lowest='提示：横竖相邻即可，拼 3 个字母；5 个通关' [60,1528][2500,1570] recv failed @2026-11-20T00:56:28
+2026-11-20T00:57:59	Gomoku	OK	1591	90.0s lowest='轮到你落子（黑先）' [1091,1542][1470,1591] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Gomoku-005758.jpeg @2026-11-20T00:57:59
+2026-11-20T00:59:33	Math Path	OK	1450	93.8s lowest='步数 0/30 · 相邻成路、数字与运算符交替、从左往右算（不区分优先级）' [697,1408][1864,1450] blk=0/0px blkh=0px cov=5 board=520x520@1020,720 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Math_Path-005932.jpeg @2026-11-20T00:59:33
+2026-11-20T01:02:11	Matrix Reasoning	WRONG_GAME	-	157.6s title '矩阵推理' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-20T01:05:51	Prime Hunter	NOT_HOME	-	219.4s no budget for recovery path
+2026-11-20T01:09:51	Wordle	DUMP_FAIL	-	239.0s no in-game dump
+2026-11-20T01:17:08	Matrix Reasoning	NOT_HOME	-	252.3s no budget for recovery path
+2026-11-20T01:24:15	Prime Hunter	NOT_HOME	-	233.0s no budget for recovery path
+2026-11-20T01:29:07	Target 10	TIMEOUT	-	288.0s budget exhausted at home-loop
+2026-11-20T01:35:51	Visual Search Conjunction	NOT_HOME	-	186.1s could not reach home; last texts=[]
+2026-11-20T01:42:58	Skyscrapers	WRONG_GAME	-	196.7s title '数楼' not found; first texts=[]
