@@ -83,7 +83,10 @@ export class About {
    * ⚠️ 发版时必须和 AppScope/app.json5 的 versionName **同时改**，
    *    两边不一致 ⇒ 设置页显示的版本和商店里的对不上 ⇒ `tools/audit.py` 的 A11 会报
    */
-  static readonly VERSION: string = '1.0.1';
+  // ★ 2026-11-19：**跟着 `app.json5` 走** —— 2.0.0（最低系统抬到鸿蒙 6.0 / API 20）。
+  //   `GameLog` 里那条注释说过原来有「`app.json5` / `About.VERSION` / 硬写」三处并存，
+  //   现在只允许两处、且必须同步。
+  static readonly VERSION: string = '2.0.0';
 
   /** 版权行 */
   static readonly YEAR: string = '2026';

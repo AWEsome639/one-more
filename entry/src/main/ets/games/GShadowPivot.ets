@@ -314,7 +314,10 @@ export struct GShadowPivot {
         }, (c: number) => 'gc' + c)
         }.width('100%')
         }, (r: number) => 'gr' + r)
-        }.width('100%') }.width('72%')
+        }.width('100%') }.width(Bp.isShort() ? '72%' : Math.max(100, Bp.height - 643))
+        // ★ 2026-11-19（判据 3048/3053/3055）：**限「分配宽度的容器」，不是限 `Stack`** ——
+        //   格子是 `layoutWeight(1).aspectRatio(1)`，宽由这个容器分配；前 5 次改 `Stack` 全被忽略。
+        //   竖屏 `832−643=189vp` ⇒ 格子 `232→189vp` ⇒ 两行省 `43vp×2=258px` ≈ 缺口 260px；横屏仍 `72%`。
         }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .borderWidth(this.picked >= 0 || this.over ? 3 : 1)
@@ -337,7 +340,10 @@ export struct GShadowPivot {
         }, (c: number) => 'gc' + c)
         }.width('100%')
         }, (r: number) => 'gr' + r)
-        }.width('100%') }.width('72%')
+        }.width('100%') }.width(Bp.isShort() ? '72%' : Math.max(100, Bp.height - 643))
+        // ★ 2026-11-19（判据 3048/3053/3055）：**限「分配宽度的容器」，不是限 `Stack`** ——
+        //   格子是 `layoutWeight(1).aspectRatio(1)`，宽由这个容器分配；前 5 次改 `Stack` 全被忽略。
+        //   竖屏 `832−643=189vp` ⇒ 格子 `232→189vp` ⇒ 两行省 `43vp×2=258px` ≈ 缺口 260px；横屏仍 `72%`。
         }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .borderWidth(this.picked >= 0 || this.over ? 3 : 1)
@@ -362,7 +368,10 @@ export struct GShadowPivot {
         }, (c: number) => 'gc' + c)
         }.width('100%')
         }, (r: number) => 'gr' + r)
-        }.width('100%') }.width('72%')
+        }.width('100%') }.width(Bp.isShort() ? '72%' : Math.max(100, Bp.height - 643))
+        // ★ 2026-11-19（判据 3048/3053/3055）：**限「分配宽度的容器」，不是限 `Stack`** ——
+        //   格子是 `layoutWeight(1).aspectRatio(1)`，宽由这个容器分配；前 5 次改 `Stack` 全被忽略。
+        //   竖屏 `832−643=189vp` ⇒ 格子 `232→189vp` ⇒ 两行省 `43vp×2=258px` ≈ 缺口 260px；横屏仍 `72%`。
         }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .borderWidth(this.picked >= 0 || this.over ? 3 : 1)
@@ -385,7 +394,10 @@ export struct GShadowPivot {
         }, (c: number) => 'gc' + c)
         }.width('100%')
         }, (r: number) => 'gr' + r)
-        }.width('100%') }.width('72%')
+        }.width('100%') }.width(Bp.isShort() ? '72%' : Math.max(100, Bp.height - 643))
+        // ★ 2026-11-19（判据 3048/3053/3055）：**限「分配宽度的容器」，不是限 `Stack`** ——
+        //   格子是 `layoutWeight(1).aspectRatio(1)`，宽由这个容器分配；前 5 次改 `Stack` 全被忽略。
+        //   竖屏 `832−643=189vp` ⇒ 格子 `232→189vp` ⇒ 两行省 `43vp×2=258px` ≈ 缺口 260px；横屏仍 `72%`。
         }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .borderWidth(this.picked >= 0 || this.over ? 3 : 1)
