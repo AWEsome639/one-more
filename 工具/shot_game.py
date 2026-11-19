@@ -1309,7 +1309,14 @@ def _body(name, t0):
             except Exception as _e:
                 print('节点 dump 失败: %r' % _e)
         finish(name, 'OK', t0, mb,
-               'lowest=%r %s blk=%d/%dpx blkh=%dpx cov=%d board=%s max=%d over=%dpx sumover=%dpx -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, block_over_h, _cov, _board, block_over_max, _over, _sumover, out, _ts))
+               # ★ 2026-11-19（判据 3031）：**台账必须自己记屏幕尺寸** —— 横屏与竖屏的 `blk` 不可比
+               #   （阈值 `GAME_BOTTOM` 横屏 `1516`、竖屏 `2412`），而 `board=` 是**棋盘**尺寸不是屏幕。
+               #   今晚加了竖屏测量后，`triage` 取末次记录把横屏发现盖掉了（`Shadow Pivot` 72px→24px）。
+               #   ⇒ 加 `scr=WxH`，下游按它分组。
+               'lowest=%r %s blk=%d/%dpx blkh=%dpx cov=%d board=%s scr=%dx%d max=%d over=%dpx sumover=%dpx -> %s @%s' % (lo, lo_bounds, block_over_n, block_over_px, block_over_h, _cov, _board,
+                 # ⚠️ 不能直接写 `SCREEN_W` —— 它只在那两个函数内部赋过值（`L282-288`/`L359-365`），
+                 #   `_walk` 的作用域里没有 ⇒ 会 `NameError`、每次测量都炸。改成从 env 现读（与测量配置同源）。
+                 int(os.environ.get('SHOT_SCREEN_W', '2560')), int(os.environ.get('SHOT_SCREEN_H', '1600')), block_over_max, _over, _sumover, out, _ts))
     else:
         finish(name, 'OK_NOSHOT', t0, mb,
                'lowest=%r %s recv failed @%s' % (lo, lo_bounds, _ts))

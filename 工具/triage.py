@@ -14,6 +14,36 @@ TSV = '_巡检记录/layout-canonical.tsv'
 GAME_AREA_BOTTOM = 1516   # 游戏区底（px）
 GESTURE = 1584            # 手势区起点
 
+def _cfg(ln):
+    """记录属于哪个屏配置：'L' = 横屏 2560x1600、'P' = 竖屏 2224x2496、'?' = 判不出。
+
+    ★ 2026-11-19（判据 3031）：**两种形态的 `blk` 不可比** ——
+      `blk` 的阈值是「`y2 > GAME_BOTTOM + SLACK`」，横屏 `GAME_BOTTOM=1516`、竖屏 `2412`。
+      今晚加了一批竖屏测量后，`last[game]` 一覆盖就把横屏发现盖掉了：
+      `Shadow Pivot` 横屏 `blk=72px`（`120%`）被竖屏 `blk=24px`（`18%`）顶替、直接从 A 档消失。
+
+    ⚠️ **判法要注意**：`board=WxH` 是**棋盘**尺寸、不是屏幕尺寸（我第一次就写错了，
+       按它分形态把 `Snake 3D` 的 `blk` 从 `63` 变成了 `96`）。
+       正确判法是**看坐标量级**：横屏最高 `1600`，任何 `> 1600` 的 y 坐标/`max` 只可能来自竖屏。
+    """
+    # ① 首选：台账自己记的 `scr=WxH`（2026-11-19 起才有）
+    ms = re.search(r'scr=(\d+)x(\d+)', ln)
+    if ms:
+        w, h = int(ms.group(1)), int(ms.group(2))
+        return 'L' if w > h else 'P'
+    # ② 退回坐标量级（有缺口：`Odd Rotation` 竖屏的 `lowest` 坐标 < 1600 会被误判成横屏）
+    ys = []
+    m = re.search(r"lowest='[^']*'\s*\[\d+,(\d+)\]\[\d+,(\d+)\]", ln)
+    if m:
+        ys.append(int(m.group(1))); ys.append(int(m.group(2)))
+    mm = re.search(r'(?:^|\s)max=(\d+)', ln)
+    if mm:
+        ys.append(int(mm.group(1)))
+    if not ys:
+        return '?'
+    return 'P' if max(ys) > 1600 else 'L'
+
+
 def parse(since=None):
     rows = []
     for ln in io.open(TSV, encoding='utf-8'):
@@ -71,7 +101,7 @@ def parse(since=None):
                 continue          # 垃圾名直接丢，不污染分母
         except Exception:
             _k = name
-        rows.append(dict(ts=ts, name=name, key=_k, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, lowh=lowh, lowgap=lowgap, cov=(int(cm.group(1)) if cm else None), over=over, sumover=sumover, has_over=has_over, blkh=blkh, maxov=maxov))
+        rows.append(dict(ts=ts, name=name, key=_k, outcome=outcome, mb=mb, blk=blk, has_blk=has_blk, low=low, lowh=lowh, lowgap=lowgap, cov=(int(cm.group(1)) if cm else None), over=over, sumover=sumover, has_over=has_over, blkh=blkh, maxov=maxov, cfg=_cfg(ln)))
     return rows
 
 def _key(r):
@@ -83,11 +113,31 @@ def main():
     if '--since' in sys.argv:
         since = sys.argv[sys.argv.index('--since') + 1]
     rows = parse(since)
-    # 同一款取最后一次
+    # 同一款**同一屏配置**取最后一次（判据 3031：横竖屏的 blk 不可比，不能互相覆盖）
+    want_cfg = 'P' if '--portrait' in sys.argv else 'L'
     last = {}
     for r in rows:
-        last[_key(r)] = r
+        if r.get('cfg') == '?':
+            r['cfg'] = 'L'              # 老行一律当横屏（历史口径）
+        if r['cfg'] != want_cfg:
+            continue                    # 另一种形态的记录不进本次统计
+        # ★ 2026-11-19（判据 3031）：**布局分析取「最后一次成功」的记录**。
+        #   失败记录（NO_CARD/WRONG_GAME/TIMEOUT）只是「这次没测到」，不代表版面状态；
+        #   今晚我两次失败的补丁验证（`Shadow Pivot` 08:48 NO_CARD / 08:49 WRONG_GAME）落进台账后，
+        #   就把它的横屏 `blk=72px` 顶掉、直接从 A 档消失。
+        _k = _key(r)
+        _prev = last.get(_k)
+        if _prev is None:
+            last[_k] = r
+        elif r.get('outcome') == 'OK':
+            last[_k] = r               # 成功总是覆盖
+        elif _prev.get('outcome') != 'OK':
+            last[_k] = r               # 前一条也失败 ⇒ 用更近的失败（唯一信息）
     rows = list(last.values())
+    if '--portrait' not in sys.argv:
+        pass
+    else:
+        print('【形态：竖屏 2224x2496】')
     # ★ 2026-11-19（判据 2963）：**别只看最后一条**。
     #   今天我只读每款最后一行就断定「10 款从未测过、可能坏了」，
     #   实际每款都至少有一次 OK 且 blk=0（Hanoi/FreeCell 各 2 次）。
