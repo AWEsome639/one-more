@@ -2561,3 +2561,4 @@
 2026-11-19T13:09:43	Memory	NOT_HOME	-	130.4s no budget for recovery path
 2026-11-19T13:10:56	Memory	OK	1600	73.7s lowest='重新开始' [60,1219][2500,1351] blk=1/24px blkh=88px cov=6 board=158x192@920,846 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-131056.jpeg @2026-11-19T13:10:56
 2026-11-19T13:12:20	Memory	OK	1600	71.2s lowest='重新开始' [60,1219][2500,1351] blk=1/24px blkh=88px cov=6 board=158x192@920,846 scr=2560x1600 max=24 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-131220.jpeg @2026-11-19T13:12:20
+2026-11-19T13:15:10	Kakuro Mini	OK	1576	73.0s lowest='6' [60,1444][534,1576] blk=0/0px blkh=0px cov=5 board=496x496@1032,756 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Kakuro_Mini-131509.jpeg @2026-11-19T13:15:10
