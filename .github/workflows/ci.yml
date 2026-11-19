@@ -45,9 +45,20 @@ jobs:
       - name: Verify no secrets committed
         run: |
           echo "::group::Secret scan"
-          if grep -rlE "storePassword|keyPassword|BEGIN.*PRIVATE KEY" --include="*.json5" --include="*.json" --include="*.p12" . 2>/dev/null | grep -v example; then
-            echo "❌ secrets found!"
+          # DevEco 把签名口令存在 build-profile.json5 里，形式是 "0000001B<hex>"（本地密钥材料加密后的密文，
+          # 离开本机 keystore 无法复用）⇒ 这类不算明文泄漏，只拦非该格式的口令。
+          bad=$(grep -rhoE '"(storePassword|keyPassword)"[[:space:]]*:[[:space:]]*"[^"]*"' \
+                  --include="*.json5" --include="*.json" . 2>/dev/null \
+                | grep -vE ':[[:space:]]*"0000001B[0-9A-Fa-f]{16,}"' || true)
+          if [ -n "$bad" ]; then
+            echo "❌ plaintext signing credentials found:"
+            echo "$bad" | sed -E 's/(:[[:space:]]*")[^"]*"/\1<redacted>"/'
             exit 1
           fi
-          echo "✅ no secrets found"
+          if grep -rlE "BEGIN [A-Z ]*PRIVATE KEY" --include="*.json5" --include="*.json" \
+               --include="*.p12" --include="*.pem" --include="*.key" . 2>/dev/null | grep -v example; then
+            echo "❌ private key material found!"
+            exit 1
+          fi
+          echo "✅ no plaintext secrets found"
           echo "::endgroup::"
