@@ -18,7 +18,8 @@
   python3 工具/check_ledger_freshness.py --stale-only
 退出码恒为 0（这是报告器，不是闸门）。
 """
-import os, subprocess, sys, io, datetime, re
+import os
+import re, subprocess, sys, io, datetime, re
 from collections import OrderedDict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,9 +27,19 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #   起因：这个工具原来只读横屏台账，而**竖屏台账 `layout-nonshort.tsv` 完全不受监控** ——
 #   实测它有 `456` 条 OK、其中 `409` 条来自 `11-16`（两三天前）。
 #   我差点拿它做「预测器在竖屏是否成立」的验证，而那批数据早被修过、全都过时。
-LEDGER = os.path.join(ROOT, '_巡检记录',
-                      'layout-nonshort.tsv' if '--nonshort' in sys.argv
-                      else 'layout-canonical.tsv')
+# ★ 2026-11-20（判据 3087）：`shot_game` 的 `finish()` **只写 `layout-canonical.tsv`**，
+#   竖屏记录也写进去（靠行内 `scr=2224x2496` 区分）。而 `layout-nonshort.tsv` 是 `11-16` 的
+#   旧文件、**再也没有新数据** ⇒ `--nonshort` 读它必然把今天刚量过的款全报成「陈旧」。
+#   ⇒ 改成：读同一个 canonical，**按 `scr=` 的宽高关系筛竖屏行**。
+_CANON = os.path.join(ROOT, '_巡检记录', 'layout-canonical.tsv')
+LEDGER = _CANON
+NONSHORT_MODE = '--nonshort' in sys.argv
+
+
+def _is_portrait_row(line):
+    """行内 `scr=<w>x<h>`，高 > 宽 即竖屏；没有 scr 字段的旧行按 False 处理。"""
+    m = re.search(r'scr=(\d+)x(\d+)', line)
+    return bool(m) and int(m.group(2)) > int(m.group(1))
 GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 
 
@@ -95,6 +106,9 @@ def parse_ledger():
     #   ⇒ 必须 `errors='replace'`，否则 `--nonshort` 直接抛 UnicodeDecodeError。
     with io.open(LEDGER, encoding='utf-8', errors='replace') as f:
         for n, line in enumerate(f, 1):
+            # ★ 2026-11-20（判据 3087）：`--nonshort` 时只保留竖屏行（`scr=` 高>宽）。
+            if NONSHORT_MODE and not _is_portrait_row(line):
+                continue
             parts = line.rstrip('\n').split('\t')
             if len(parts) < 3:
                 continue
