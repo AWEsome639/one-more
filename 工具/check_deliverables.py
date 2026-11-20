@@ -14,6 +14,9 @@ cherry-pick」静默抹掉，而台账不会告诉你（台账只记「量过什
 """
 import io, os, sys
 
+# ★ 2026-11-20（判据 3085）：版本号只在这一处维护，升版本时改这里就行。
+EXPECT_VER: str = '2.0.1'
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VERBOSE = '-v' in sys.argv or '--verbose' in sys.argv
 
@@ -49,8 +52,8 @@ CHECKS = [
     # ★ 2026-11-20（判据 3077）：**出包用的那份配置也要查** ——
     #   它当时还是 `5.0.0(12)`，导致第一个 release 包 `minAPIVersion=50000012`。
     ('API 20 下限（release 配置）', 'build-profile.json5.release-signed', '6.0.0(20)', '3077'),
-    ('版本 2.0.0（About）', 'entry/src/main/ets/core/About.ets', "'2.0.0'", '3051'),
-    ('版本 2.0.0（app.json5）', 'AppScope/app.json5', '"versionName": "2.0.0"', '3051'),
+    ('版本 %s（About）' % EXPECT_VER, 'entry/src/main/ets/core/About.ets', "'%s'" % EXPECT_VER, '3051'),
+    ('版本 %s（app.json5）' % EXPECT_VER, 'AppScope/app.json5', '"versionName": "%s"' % EXPECT_VER, '3051'),
     # ── 端侧 AI ────────────────────────────────────────────────────────────
     ('LocalLLM 运行时存在性检查', 'entry/src/main/ets/core/LocalLLM.ets',
      'localChatModel.init === undefined', '3062'),
@@ -114,8 +117,8 @@ def check_release_hap():
     name = os.path.basename(hap)
     if api is not None and api != 60000020:
         return False, '%s 的 minAPIVersion=%s（期望 %s）' % (name, api, 60000020)
-    if ver != '2.0.0':
-        return False, '%s 的 versionName=%s（期望 2.0.0）' % (name, ver)
+    if ver != EXPECT_VER:
+        return False, '%s 的 versionName=%s（期望 %s）' % (name, ver, EXPECT_VER)
     return True, '%s · minAPIVersion %s · %s' % (name[-32:], api, ver)
 
 

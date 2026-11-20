@@ -86,7 +86,7 @@ export class About {
   // ★ 2026-11-19：**跟着 `app.json5` 走** —— 2.0.0（最低系统抬到鸿蒙 6.0 / API 20）。
   //   `GameLog` 里那条注释说过原来有「`app.json5` / `About.VERSION` / 硬写」三处并存，
   //   现在只允许两处、且必须同步。
-  static readonly VERSION: string = '2.0.0';
+  static readonly VERSION: string = '2.0.1';
 
   /** 版权行 */
   static readonly YEAR: string = '2026';

@@ -5,8 +5,8 @@
     // ★ 2026-11-19：**2.0.0** —— 最低系统从鸿蒙 5.0(API 12) 抬到 6.0(API 20)
     //   （端侧 AI 的 `DataAugmentationKit` 是 @since 6.0.0(20)）。
     //   按语义化版本走大版本：**5.x 的机器从此装不上**，这是不兼容变化，不是小改。
-    "versionCode": 2000000,
-    "versionName": "2.0.0",
+    "versionCode": 2000001,
+    "versionName": "2.0.1",
     "icon": "$media:layered_image",
     "label": "$string:app_name"
   }
