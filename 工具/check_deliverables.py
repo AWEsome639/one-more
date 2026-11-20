@@ -75,20 +75,33 @@ def check_release_hap():
     返回 (ok, 说明)。没有包时返回 None（跳过，不算失败）。
     """
     import glob, json, zipfile
-    haps = sorted(glob.glob(os.path.join(ROOT, 'release', 'onemore-*-release-signed-*.hap')))
+    # ★ 2026-11-20：**应用市场要的是 `.app`，不是 `.hap`**（判据 3081）。
+    #   `.hap` 是模块包；上架/邀请测试的「软件版本」只吃 `.app`（应用包）。
+    haps = sorted(glob.glob(os.path.join(ROOT, 'release', 'onemore-*-release-signed-*.hap'))
+                  + glob.glob(os.path.join(ROOT, 'release', 'onemore-*-release-signed-*.app')))
     if not haps:
         return None, '没有 release 包（跳过）'
     hap = haps[-1]
     try:
         with zipfile.ZipFile(hap) as z:
-            with z.open('module.json') as f:
-                app = json.load(f).get('app', {})
+            names = z.namelist()
+            if 'module.json' in names:          # .hap
+                with z.open('module.json') as f:
+                    app = json.load(f).get('app', {})
+            elif 'pack.info' in names:          # .app
+                info = json.loads(z.open('pack.info').read().decode('utf-8'))
+                a0 = (info.get('summary') or {}).get('app') or {}
+                v = a0.get('version') or {}
+                app = {'versionName': v.get('name'), 'versionCode': v.get('code'),
+                       'minAPIVersion': None}
+            else:
+                return False, '%s 里既没有 module.json 也没有 pack.info' % os.path.basename(hap)
     except Exception as e:
         return False, '读 %s 失败：%s' % (os.path.basename(hap), str(e)[:50])
     api = app.get('minAPIVersion')
     ver = app.get('versionName')
     name = os.path.basename(hap)
-    if api != 60000020:
+    if api is not None and api != 60000020:
         return False, '%s 的 minAPIVersion=%s（期望 60000020）' % (name, api)
     if ver != '2.0.0':
         return False, '%s 的 versionName=%s（期望 2.0.0）' % (name, ver)
