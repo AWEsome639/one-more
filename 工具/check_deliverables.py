@@ -94,6 +94,17 @@ def check_release_hap():
                 v = a0.get('version') or {}
                 app = {'versionName': v.get('name'), 'versionCode': v.get('code'),
                        'minAPIVersion': None}
+                # ★ 2026-11-20（判据 3081）：`.app` 的 minAPIVersion 不在 pack.info 里，
+                #   必须把内层 hap 抽出来再读 module.json —— 否则这个字段永远是 None、等于没查。
+                inner = [n for n in names if n.endswith('.hap')]
+                if inner:
+                    import tempfile, os as _os
+                    with tempfile.TemporaryDirectory() as td:
+                        hap_path = z.extract(inner[0], td)
+                        with zipfile.ZipFile(hap_path) as z2:
+                            if 'module.json' in z2.namelist():
+                                app['minAPIVersion'] = json.load(
+                                    z2.open('module.json')).get('app', {}).get('minAPIVersion')
             else:
                 return False, '%s 里既没有 module.json 也没有 pack.info' % os.path.basename(hap)
     except Exception as e:
@@ -102,7 +113,7 @@ def check_release_hap():
     ver = app.get('versionName')
     name = os.path.basename(hap)
     if api is not None and api != 60000020:
-        return False, '%s 的 minAPIVersion=%s（期望 60000020）' % (name, api)
+        return False, '%s 的 minAPIVersion=%s（期望 %s）' % (name, api, 60000020)
     if ver != '2.0.0':
         return False, '%s 的 versionName=%s（期望 2.0.0）' % (name, ver)
     return True, '%s · minAPIVersion %s · %s' % (name[-32:], api, ver)
