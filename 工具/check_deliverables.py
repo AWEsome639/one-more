@@ -65,6 +65,36 @@ CHECKS = [
      "@kit.NetworkKit", '3051'),
 ]
 
+def check_release_hap():
+    """★ 2026-11-20（判据 3077）：**检查已构建的 release 包声明与实际一致**。
+
+    为什么单列一个函数：特征串检查只能看源码，看不出「出包时用的配置对不对」。
+    今天真的出过一个 `minAPIVersion=50000012` 的错包（release-signed 配置停在 API 12），
+    而源码里 `build-profile.json5` 是对的 —— 光查源码永远发现不了。
+
+    返回 (ok, 说明)。没有包时返回 None（跳过，不算失败）。
+    """
+    import glob, json, zipfile
+    haps = sorted(glob.glob(os.path.join(ROOT, 'release', 'onemore-*-release-signed-*.hap')))
+    if not haps:
+        return None, '没有 release 包（跳过）'
+    hap = haps[-1]
+    try:
+        with zipfile.ZipFile(hap) as z:
+            with z.open('module.json') as f:
+                app = json.load(f).get('app', {})
+    except Exception as e:
+        return False, '读 %s 失败：%s' % (os.path.basename(hap), str(e)[:50])
+    api = app.get('minAPIVersion')
+    ver = app.get('versionName')
+    name = os.path.basename(hap)
+    if api != 60000020:
+        return False, '%s 的 minAPIVersion=%s（期望 60000020）' % (name, api)
+    if ver != '2.0.0':
+        return False, '%s 的 versionName=%s（期望 2.0.0）' % (name, ver)
+    return True, '%s · minAPIVersion %s · %s' % (name[-32:], api, ver)
+
+
 def main():
     bad = []
     for label, rel, needle, judge in CHECKS:
@@ -79,6 +109,14 @@ def main():
             print('  ❌ %-28s 缺失 <%s>  (判据 %s)' % (label, needle[:28], judge))
         elif VERBOSE:
             print('  ✅ %-28s (判据 %s)' % (label, judge))
+    # ── release 包校验（判据 3077）────────────────────────────────────────
+    hap_ok, hap_msg = check_release_hap()
+    if hap_ok is False:
+        bad.append(('release 包声明', 'release/*.hap', hap_msg, '3077'))
+        print('  ❌ release 包：%s' % hap_msg)
+    elif VERBOSE:
+        print('  %s release 包：%s' % ('✅' if hap_ok else '⏭ ', hap_msg))
+
     print()
     if bad:
         print('❌ 交付完整性：%d/%d 项缺失 —— 有改动被回滚或替换掉了' % (len(bad), len(CHECKS)))
