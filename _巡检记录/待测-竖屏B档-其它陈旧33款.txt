@@ -1,0 +1,33 @@
+Bejeweled
+Wordle
+Gravity Sort
+Math Path
+Target 10
+Cross Section Slice
+FreeCell
+Visual Search Conjunction
+Find Word
+Path Finder
+Rotating Maze
+Word Search
+Lock Pattern
+Gomoku
+Skyscrapers
+Perspective Shift View
+Matrix Reasoning
+Subitizing Rush
+Distractor Matrix
+Sokoban
+Prime Hunter
+Counting Sheep
+Countdown Math
+Chimp Test
+Triple Sequence
+Trace Path
+Silhouette Match
+Binomial Match
+Perspective Taking
+Snake 3D
+Word Association Recall
+Gear Train Direction
+Kakuro Mini

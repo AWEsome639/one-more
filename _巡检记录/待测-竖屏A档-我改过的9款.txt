@@ -1,0 +1,9 @@
+Collatz
+Kakuro
+Memory
+Simon Says
+Crossword
+Word Mastermind
+Silhouette Match Ortho
+Shadow Pivot
+Simon Command
