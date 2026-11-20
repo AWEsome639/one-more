@@ -443,7 +443,10 @@ export struct GLifeGame {
       .aspectRatio(1)
       // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
       //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      // ★ 2026-11-20（判据 3086）：`- 360` 是按横屏 533 推的，竖屏 832 下场地太高，
+      //   把底部**两排**按钮（开始/单步、随机一局/清空）挤出屏幕（实测 blk=3/72px）。
+      //   竖屏扣 432（实测拟合：384→448、408→424 两版第二排仍出屏，432→400 才装下），横屏保持 360 不动。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 432)) })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
