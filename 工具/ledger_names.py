@@ -22,6 +22,12 @@ ALIAS = {
     'akari (light up)': 'akari',
     'go (9x9)': 'go9',
     'go / no-go': 'go_no_go',
+    # ★ 2026-11-20（判据 3075）：**注册表的中文 `name` 也要能映射**。
+    #   新鲜度工具会拿注册表的中文名去推类名 ⇒ `canon('去或停')` 原样返回
+    #   ⇒ 推出 `G去或停`（不存在）⇒ 报告里永远挂一条「找不到 .ets」。
+    #   台账本身用的是英文 `enName`（实测台账里含中文的款名 **0 个**），
+    #   所以这里补的是「中文名 → id」，不是「台账名 → id」。
+    '去或停': 'go_no_go',
     'n-back': 'n_back',
     'schulte table': 'schulte',
     'tic-tac-toe': 'tic_tac_toe',
