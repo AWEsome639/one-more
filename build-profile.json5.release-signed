@@ -1,0 +1,56 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/a0000/.ohos/config/onemore_release.cer",
+          "keyAlias": "onemorerelease",
+          "keyPassword": "0000003A37FB2291DEF1F49AF893A1C41076DB9AECE685A7DE57D36F8D96D57BA5EC1E82A1065488F84022BD8C15EB216C5F8849F994C6C738BF8FCF716A8F444BFE0FC90F60469DC330",
+          "profile": "/Users/a0000/.ohos/config/onemore_release.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/a0000/.ohos/config/onemore.p12",
+          "storePassword": "0000003AB0A3B626F558EA6F4E5180B41A37225B80B5045F2330A4C0746545906EAD74D3B7A23BBA1F75A232B4C3AA9F7F3CD94A7CBF6090A449BA46BB65A3F0F6576CD551428A533B7F"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "targetSdkVersion": "26.0.0",
+        "compatibleSdkVersion": "6.0.0(20)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

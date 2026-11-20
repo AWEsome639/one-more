@@ -45,7 +45,10 @@ CHECKS = [
     ('Silhouette Match Ortho gs -494', 'entry/src/main/ets/games/GSilhouetteMatchOrtho.ets',
      'Bp.height - 494', '3066'),
     # ── 迁移与版本 ─────────────────────────────────────────────────────────
-    ('API 20 下限', 'build-profile.json5', '6.0.0(20)', '3051'),
+    ('API 20 下限（debug 配置）', 'build-profile.json5', '6.0.0(20)', '3051'),
+    # ★ 2026-11-20（判据 3077）：**出包用的那份配置也要查** ——
+    #   它当时还是 `5.0.0(12)`，导致第一个 release 包 `minAPIVersion=50000012`。
+    ('API 20 下限（release 配置）', 'build-profile.json5.release-signed', '6.0.0(20)', '3077'),
     ('版本 2.0.0（About）', 'entry/src/main/ets/core/About.ets', "'2.0.0'", '3051'),
     ('版本 2.0.0（app.json5）', 'AppScope/app.json5', '"versionName": "2.0.0"', '3051'),
     # ── 端侧 AI ────────────────────────────────────────────────────────────
