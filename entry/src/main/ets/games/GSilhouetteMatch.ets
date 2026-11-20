@@ -267,7 +267,10 @@ export struct GSilhouetteMatch {
   private gs(): number {
     const n2: number = Math.max(2, this.diffTotal);
     const byH: number = Math.floor((Bp.height - 470) / n2);
-    const byW: number = Math.floor((Bp.width - 80) / n2);
+    // ★ 2026-11-20（判据 3084）：预览格的容器**固定 104vp**（下方 `.width(104)`），
+    //   原来按 `Bp.width` 算 ⇒ 竖屏 741 时 gs=120vp、远超 104 ⇒ 每行横向溢出，
+    //   并把纵向也撑高（实测竖屏 blk=3/72px）。横屏 Bp.height=533 时 gs 只有 21vp 故从没暴露。
+    const byW: number = Math.floor((104 - (n2 - 1) * 2) / n2);
     return Math.max(14, Math.min(byH, byW));
   }
   /** ★ 2026-11-18（判据 2912）：**选项网格**单独一个尺寸 ——
@@ -275,8 +278,16 @@ export struct GSilhouetteMatch {
    *   与目标网格（y≈680）的可用高完全不同 ⇒ 不能共用一个算式。*/
   private go(): number {
     const n3: number = Math.max(2, this.diffTotal);
-    const byH2: number = Math.floor((Bp.height - 480) / n3);
-    const byW2: number = Math.floor((Bp.width - 80) / n3);
+    // ★ 2026-11-20（判据 3084）：**竖屏是两排选项卡片**（每排 2 个、共 4 个），
+    //   而 `(Bp.height - 480)` 只扣了「一排」的预算 ⇒ 第二排整排出屏（实测 blk=3/72px）。
+    //   横屏 `isShort()` 时仍按一排算，行为与改动前完全一致。
+    const cardRows: number = Bp.isShort() ? 1 : 2;
+    const byH2: number = Math.floor((Bp.height - 480) / (cardRows * n3));
+    // ★ 2026-11-20（判据 3084）：选项格真实的容器是「半屏 × 72%」（见下方 `.width('72%')`
+    //   嵌在 `.layoutWeight(1)` 里），原来按 `Bp.width` 算 ⇒ 竖屏给 132vp/格、
+    //   5 格要 660vp 却只有 248vp 可用 ⇒ 横向撑爆、纵向连带超高（实测 blk=3/72px、第二排选项出屏）。
+    const cw: number = Math.floor(((Bp.width - Space.sm) / 2 - Space.sm * 2) * 0.72);
+    const byW2: number = Math.floor((cw - (n3 - 1) * 2) / n3);
     return Math.max(10, Math.min(byH2, byW2));
   }
 
