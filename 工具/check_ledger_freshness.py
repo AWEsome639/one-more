@@ -22,7 +22,13 @@ import os, subprocess, sys, io, datetime, re
 from collections import OrderedDict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LEDGER = os.path.join(ROOT, '_巡检记录', 'layout-canonical.tsv')
+# ★ 2026-11-20（判据 3074）：**默认仍是横屏台账，但可以用 `--nonshort` 切到竖屏台账**。
+#   起因：这个工具原来只读横屏台账，而**竖屏台账 `layout-nonshort.tsv` 完全不受监控** ——
+#   实测它有 `456` 条 OK、其中 `409` 条来自 `11-16`（两三天前）。
+#   我差点拿它做「预测器在竖屏是否成立」的验证，而那批数据早被修过、全都过时。
+LEDGER = os.path.join(ROOT, '_巡检记录',
+                      'layout-nonshort.tsv' if '--nonshort' in sys.argv
+                      else 'layout-canonical.tsv')
 GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 
 
@@ -76,9 +82,18 @@ def class_name(game):
 
 
 def parse_ledger():
-    """返回 OrderedDict: game -> (last_ts, last_line_no, status)"""
+    """返回 OrderedDict: game -> (last_ts, last_line_no, status)
+
+    ★ 2026-11-20（判据 3074）：**同时记下整份台账的时间跨度** —— 只看「多少款有效」
+      会掩盖「数据其实是三天前的」这件事。今天我就差点被它误导。
+    """
     last = OrderedDict()
-    with io.open(LEDGER, encoding='utf-8') as f:
+    global OLDEST, NEWEST, N_ROWS
+    OLDEST = NEWEST = None
+    N_ROWS = 0
+    # ★ 2026-11-20（判据 3074）：`layout-nonshort.tsv` **不是纯 UTF-8**（含 0xe9 孤立字节）
+    #   ⇒ 必须 `errors='replace'`，否则 `--nonshort` 直接抛 UnicodeDecodeError。
+    with io.open(LEDGER, encoding='utf-8', errors='replace') as f:
         for n, line in enumerate(f, 1):
             parts = line.rstrip('\n').split('\t')
             if len(parts) < 3:
@@ -89,6 +104,9 @@ def parse_ledger():
             except ValueError:
                 continue
             last[game] = (t, n, status)     # 后者覆盖前者 ⇒ 天然取最后一次
+            N_ROWS += 1
+            if OLDEST is None or t < OLDEST: OLDEST = t
+            if NEWEST is None or t > NEWEST: NEWEST = t
     return last
 
 
@@ -124,7 +142,22 @@ def main():
     fresh = [r for r in rows if r[3] <= 0]
     stale.sort(key=lambda r: -r[3])
 
+    # ★ 2026-11-20（判据 3074）：**先把「这份台账是哪份、数据有多旧」打在最前面**。
+    #   只报「多少款有效」会掩盖「数据是三天前的」—— 今天我差点拿竖屏旧数据做验证。
+    _name = os.path.basename(LEDGER)
+    _span = ''
+    if OLDEST is not None and NEWEST is not None:
+        _days = (NEWEST - OLDEST).days
+        _span = '｜记录 %d 条 · %s → %s（跨 %d 天）' % (
+            N_ROWS, OLDEST.strftime('%m-%d %H:%M'), NEWEST.strftime('%m-%d %H:%M'), _days)
+        _warn = ''
+        if _days >= 2:
+            _warn = ('\n   ⚠️ **这份台账跨 %d 天**：靠前的记录可能已被之后的改动作废（判据 2613）'
+                     '\n      拿它做「某特征能否预测缺陷」这类统计前，先确认数据新鲜度' % _days)
+        else:
+            _warn = ''
     print('== 台账新鲜度：%d 款有测量记录 ==' % len(rows))
+    print('   📄 %s%s%s' % (_name, _span, _warn))
     print('   ✅ 有效（量过之后代码没动）：%d 款' % len(fresh))
     print('   ⚠️ 过期（代码改了、之后没再量）：%d 款' % len(stale))
     if no_file:
