@@ -308,7 +308,12 @@ export struct GSimonCommand {
         //     每块宽 = `1.4 × 102 = 143vp` ⇒ 行宽 = `2×143 + 10 = 296vp`。
         //   竖屏**原样用 `Bp.width`**（它本来只压 `4.0%`，不冒进）。
         ? Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 400) + 10))
-        : '100%')   // ← 竖屏分支与改动前**逐字相同**（原来就是 width('100%')）⇒ 按构造不变
+        // ★ 2026-11-20（判据 3089）：竖屏原来是 `'100%'`（= `741vp`），每块 `261vp` 高、
+        //   两行 `522vp` ⇒ 底部「绿/黄」两块被切掉一半（实测 `blk=3/72px`、截图确认）。
+        //   原注释「竖屏原样不动」的依据是「`1.4×(832−200)=885` 被 `741` 兜住」——
+        //   但那个算式算的是**宽度**是否被兜住，没算两行**高度**加起来会不会超屏。
+        //   ⇒ 竖屏也走同一套高度反推。
+        : Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 424) + 10)))
       Row({ space: Space.sm }) {
         this.pad(2)
         this.pad(3)
@@ -320,7 +325,12 @@ export struct GSimonCommand {
         //     每块宽 = `1.4 × 102 = 143vp` ⇒ 行宽 = `2×143 + 10 = 296vp`。
         //   竖屏**原样用 `Bp.width`**（它本来只压 `4.0%`，不冒进）。
         ? Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 400) + 10))
-        : '100%')   // ← 竖屏分支与改动前**逐字相同**（原来就是 width('100%')）⇒ 按构造不变
+        // ★ 2026-11-20（判据 3089）：竖屏原来是 `'100%'`（= `741vp`），每块 `261vp` 高、
+        //   两行 `522vp` ⇒ 底部「绿/黄」两块被切掉一半（实测 `blk=3/72px`、截图确认）。
+        //   原注释「竖屏原样不动」的依据是「`1.4×(832−200)=885` 被 `741` 兜住」——
+        //   但那个算式算的是**宽度**是否被兜住，没算两行**高度**加起来会不会超屏。
+        //   ⇒ 竖屏也走同一套高度反推。
+        : Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 424) + 10)))
       Button(TG('不做动作 ✋'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width('100%').height(Cell.of(48))
