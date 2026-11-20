@@ -25,8 +25,10 @@ CHECKS = [
     # ── 2026-11-19 修好的 9 款 ──────────────────────────────────────────────
     ('Simon Command 横屏限宽', 'entry/src/main/ets/games/GSimonCommand.ets',
      '1.4 * (Bp.height - 400) + 10', '3052'),
-    ('Simon Command 竖屏逐字不变', 'entry/src/main/ets/games/GSimonCommand.ets',
-     ": '100%')", '3052'),
+    # ★ 2026-11-20（判据 3089）：竖屏分支**不再逐字不变**了 —— 原来 `'100%'` 会让
+    #   两行四色面板竖向超屏（底部绿/黄各切一半）。改成与横屏同一套高度反推、扣 424。
+    ('Simon Command 竖屏高度反推', 'entry/src/main/ets/games/GSimonCommand.ets',
+     'Bp.height - 424', '3089'),
     ('Shadow Pivot 竖屏容器', 'entry/src/main/ets/games/GShadowPivot.ets',
      'Bp.height - 643', '3048/3053'),
     ('Shadow Pivot 横屏 32%', 'entry/src/main/ets/games/GShadowPivot.ets',
