@@ -2720,3 +2720,60 @@
 2026-11-20T02:09:11	Rotating Maze	TIMEOUT	-	272.0s budget exhausted at home-loop
 2026-11-20T02:22:28	Shadow Pivot	NOT_HOME	-	275.5s could not reach home; last texts=['‹', '找单词', '字母阵里找词', '☆', '?', '普通']
 2026-11-20T02:22:45	Word Search	DUMP_FAIL	-	224.6s no in-game dump
+2026-11-20T02:24:24	Collatz	TIMEOUT	-	279.4s budget exhausted at search:Collatz
+2026-11-20T02:29:58	Chimp Test	OK	1447	243.8s lowest='提示：点下 1 之后数字全部消失，全靠脑内地图；点错会重新显示但扣一条命' [666,1405][1894,1447] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Chimp_Test-022957.jpeg @2026-11-20T02:29:58
+2026-11-20T02:30:27	Silhouette Match Ortho	TIMEOUT	-	260.8s budget exhausted at demo-wait
+2026-11-20T02:30:28	Crossword	TIMEOUT	-	261.1s budget exhausted at home-loop
+2026-11-20T02:32:29	Silhouette Match	NOT_HOME	-	150.9s could not reach home; last texts=[]
+2026-11-20T02:37:19	Trace Path	WRONG_GAME	-	116.9s title '描路径' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-20T02:37:32	Memory	DUMP_FAIL	-	128.0s no in-game dump
+2026-11-20T02:37:35	Word Mastermind	NOT_HOME	-	131.0s could not reach home; last texts=[]
+2026-11-20T02:41:12	Kakuro	WRONG_GAME	-	122.1s title '数谜' not found; first texts=['联系人', 'One More', '02, :, 41', '02', ':', '41']
+2026-11-20T02:42:04	Simon Says	NOT_HOME	-	176.2s could not reach home; last texts=[]
+2026-11-20T02:42:04	Triple Sequence	NOT_HOME	-	171.7s no budget for recovery path
+2026-11-20T02:45:32	Countdown Math	WRONG_GAME	-	112.2s title '倒计时数学' not found; first texts=['‹', '宝石迷阵', '交换消宝石', '☆', '?', '普通']
+2026-11-20T02:46:02	Bejeweled	WRONG_GAME	-	141.4s title '宝石迷阵' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-20T02:48:03	Target 10	NOT_HOME	-	150.6s could not reach home; last texts=[]
+2026-11-20T02:48:14	Shadow Pivot	TIMEOUT	-	279.7s budget exhausted at search:Shadow Pivot
+2026-11-20T02:53:08	Visual Search Conjunction	OK	1537	143.5s lowest='★' [1028,1453][1101,1537] blk=0/0px blkh=0px cov=55 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Visual_Search_Conjunction-025307.jpeg @2026-11-20T02:53:08
+2026-11-20T02:53:11	Simon Command	WRONG_GAME	-	150.4s title '西蒙指令' not found; first texts=['联系人', 'One More', '02, :, 53', '02', ':', '53']
+2026-11-20T02:53:16	Crossword	NOT_HOME	-	157.9s could not reach home; last texts=[]
+2026-11-20T02:55:40	Skyscrapers	NOT_HOME	-	151.3s could not reach home; last texts=[]
+2026-11-20T03:01:54	Counting Sheep	NOT_HOME	-	232.3s no budget for recovery path
+2026-11-20T03:02:19	Memory	TIMEOUT	-	266.5s budget exhausted at home-loop
+2026-11-20T03:02:29	Perspective Shift View	NOT_HOME	-	261.5s no budget for recovery path
+2026-11-20T03:04:25	Path Finder	NOT_HOME	-	150.9s could not reach home; last texts=[]
+2026-11-20T03:07:18	Rotating Maze	OK	1533	82.3s lowest='←' [60,1413][657,1533] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Rotating_Maze-030717.jpeg @2026-11-20T03:07:18
+2026-11-20T03:10:25	Simon Says	TIMEOUT	-	267.8s budget exhausted at home-loop
+2026-11-20T03:10:28	Gravity Sort	TIMEOUT	-	262.7s budget exhausted at home-loop
+2026-11-20T03:10:46	Word Search	NOT_HOME	-	207.1s no budget for recovery path
+2026-11-20T03:13:31	Bejeweled	WRONG_GAME	-	73.7s title '宝石迷阵' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-20T03:14:24	Silhouette Match	NOT_HOME	-	126.9s could not reach home; last texts=[]
+2026-11-20T03:14:30	Collatz	NOT_HOME	-	140.2s could not reach home; last texts=[]
+2026-11-20T03:20:21	Trace Path	NOT_HOME	-	149.7s could not reach home; last texts=[]
+2026-11-20T03:20:27	Silhouette Match Ortho	NOT_HOME	-	149.2s could not reach home; last texts=[]
+2026-11-20T03:23:19	Simon Command	OK	1600	78.6s lowest='✅ 忍住没动，正确' [1101,1591][1459,1600] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Command-032318.jpeg @2026-11-20T03:23:19
+2026-11-20T03:24:04	Word Mastermind	OK	1600	126.3s lowest='凑满 5 个字母后按 ⏎ 提交' [60,1554][2500,1600] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Word_Mastermind-032403.jpeg @2026-11-20T03:24:04
+2026-11-20T03:25:57	Perspective Shift View	WRONG_GAME	-	158.6s title '视角切换' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '🔍']
+2026-11-20T03:26:26	Triple Sequence	TIMEOUT	-	263.9s budget exhausted at home-loop
+2026-11-20T03:28:27	Kakuro	TIMEOUT	-	262.6s budget exhausted at home-loop
+2026-11-20T03:30:32	Countdown Math	NOT_HOME	-	245.4s no budget for recovery path
+2026-11-20T03:31:00	Gravity Sort	TIMEOUT	-	301.5s budget exhausted at home-loop
+2026-11-20T03:32:03	Shadow Pivot	NOT_HOME	-	216.0s could not reach home; last texts=[]
+2026-11-20T03:39:07	Crossword	NOT_HOME	-	212.4s no budget for recovery path
+2026-11-20T03:40:13	Collatz	NOT_HOME	-	179.2s no budget for recovery path
+2026-11-20T03:43:07	Memory	OK	1429	76.9s lowest='0' [642,693][675,756] blk=0/0px blkh=0px cov=5 board=520x505@1020,846 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Memory-034306.jpeg @2026-11-20T03:43:07
+2026-11-20T03:44:01	Silhouette Match Ortho	OK	1370	126.6s lowest='三层压在一起，俯视剪影是哪个？' [965,886][1596,935] blk=0/0px blkh=0px cov=5 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Silhouette_Match_Ortho-034400.jpeg @2026-11-20T03:44:01
+2026-11-20T03:45:02	Simon Says	OK	1592	114.9s lowest='轮到你了，按顺序点 1 下' [1013,1536][1548,1592] blk=0/0px blkh=0px cov=9 board=360x360@905,756 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Says-034501.jpeg @2026-11-20T03:45:02
+2026-11-20T03:46:51	Word Mastermind	WRONG_GAME	-	170.0s title '猜词大师' not found; first texts=['联系人', 'One More', '03, :, 46', '03', ':', '46']
+2026-11-20T03:48:41	Kakuro	WRONG_GAME	-	109.8s title '数谜' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '355 款']
+2026-11-20T03:49:00	Bejeweled	WRONG_GAME	-	237.7s title '宝石迷阵' not found; first texts=['One More', '☀️', '中', '🔍', '💬', '全部']
+2026-11-20T03:54:43	Shadow Pivot	TIMEOUT	-	361.4s budget exhausted at search:Shadow
+2026-11-20T03:59:06	Crossword	TIMEOUT	-	262.3s budget exhausted at home-loop
+2026-11-20T03:59:47	Perspective Shift View	NOT_HOME	-	247.1s no budget for recovery path
+2026-11-20T04:03:30	Gravity Sort	DUMP_FAIL	-	222.1s no in-game dump
+2026-11-20T04:04:15	Memory	TIMEOUT	-	308.9s budget exhausted at home-loop
+2026-11-20T04:08:07	Simon Says	OK	1592	88.5s lowest='看好了… 第 1 关' [1102,1536][1458,1592] blk=0/0px blkh=0px cov=9 board=381x381@894,745 scr=2560x1600 max=0 over=21px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Simon_Says-040807.jpeg @2026-11-20T04:08:07
+2026-11-20T04:09:23	Bejeweled	OK	1351	75.7s lowest='🍀' [948,1329][1027,1351] blk=0/0px blkh=0px cov=5 board=700x625@930,726 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-040923.jpeg @2026-11-20T04:09:23
+2026-11-20T04:10:54	Perspective Shift View	OK	1470	90.1s lowest='看清俯视图，再想想从那一侧看会是什么样' [60,1421][2500,1470] blk=0/0px blkh=0px cov=5 board=300x300@508,694 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Perspective_Shift_View-041051.jpeg @2026-11-20T04:10:53
+2026-11-20T04:12:40	Gravity Sort	OK	1516	105.4s lowest='点任意一列，它顶端那种颜色会被吸走' [60,1467][2500,1516] blk=0/0px blkh=0px cov=5 board=520x520@1020,773 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Gravity_Sort-041237.jpeg @2026-11-20T04:12:40
