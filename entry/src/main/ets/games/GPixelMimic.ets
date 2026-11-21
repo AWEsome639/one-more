@@ -320,7 +320,13 @@ export struct GPixelMimic {
           .outline(Tv.focusOutline(this.tvFocus === 'L314'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (false) { this.paint(r * this.diffTotal + c); } }); })
           }, (c: number) => (true ? 'gc' : 'pc') + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+          }.width(Bp.isShort()
+            ? Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360))
+            // ★ 2026-11-22（判据 3118）：竖屏「重开」被切掉一半（实测 blk=1/24px、blkh=65px 而完整应 137px）。
+            //   本页有**两块**棋盘（:323 与 :347），原来各按整屏高算 ⇒ 各 438.7vp，叠起来 877 ≫ 798.7。
+            //   ⇒ 竖屏每块只能分一半：(Bp.height − 366) / 2 ≈ 216vp（366 = 上方 chrome + 下方提示与按钮 + 间隙）。
+            //   横屏（isShort）保持原式逐字不变。
+            : Math.max(140, Math.floor((Bp.height - 366) / 2)))
           }, (r: number) => (true ? 'gr' : 'pr') + r)
           }.width('100%').padding(Space.xs)
           .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
@@ -344,7 +350,13 @@ export struct GPixelMimic {
           .outline(Tv.focusOutline(this.tvFocus === 'L336'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); if (true) { this.paint(r * this.diffTotal + c); } }); })
           }, (c: number) => (false ? 'gc' : 'pc') + c)
-          }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+          }.width(Bp.isShort()
+            ? Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360))
+            // ★ 2026-11-22（判据 3118）：竖屏「重开」被切掉一半（实测 blk=1/24px、blkh=65px 而完整应 137px）。
+            //   本页有**两块**棋盘（:323 与 :347），原来各按整屏高算 ⇒ 各 438.7vp，叠起来 877 ≫ 798.7。
+            //   ⇒ 竖屏每块只能分一半：(Bp.height − 366) / 2 ≈ 216vp（366 = 上方 chrome + 下方提示与按钮 + 间隙）。
+            //   横屏（isShort）保持原式逐字不变。
+            : Math.max(140, Math.floor((Bp.height - 366) / 2)))
           }, (r: number) => (false ? 'gr' : 'pr') + r)
           }.width('100%').padding(Space.xs)
           .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
