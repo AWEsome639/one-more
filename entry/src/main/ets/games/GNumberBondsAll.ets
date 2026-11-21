@@ -393,14 +393,36 @@ export struct GNumberBondsAll {
       // 2026-11-14 真机截图：**统计行（目标 12 / 已拆 0/6 / 失误 0/3）被四张卡盖住**，
       //   说明文字也浮在卡面上，四张卡还超出屏底（blk=22px）
       //   卡片是 aspectRatio(1) ⇒ 4 列按宽度分 ⇒ 限宽即限高（判据 1966）
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 300)))
+      // ★ 2026-11-21（判据 3111，第二版）：上一版改 \ 无效 ——
+      //   因为这里已经给了**显式宽度**，兄弟层的 maxWidth 收不动它。
+      //   正解在这里按「行数」算宽度：高度 = (行数/4) × 宽 ⇒ 要 ≤ (Bp.height − 380)，
+      //   宽必须 ≤ (Bp.height − 380) × 4 / 行数。行数是 ceil(tiles/4)，题量不同行数就不同
+      //   （实测 5 行、7 行都出现过，所以不能写死常数）。
+      .width(Bp.isShort()
+        ? Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 300))
+        : Math.max(200, Math.min(Bp.width - 2 * Space.lg,
+            Math.floor((Bp.height - 380) * COLS / Math.max(1, Math.ceil(this.tiles.length / COLS))))))
         }, (r: number) => 'r' + r)
       }.width('100%').layoutWeight(1)
       // ★ 2026-11-09：格子区是 `layoutWeight` 型 —— 删「重开」只会让它更大（判据 1851）。
       //   真机：`max_bottom=1600`、`lowest='2'`（格子里数字贴屏底）⇒ 给它「上限」才真的省高度。
       // ★ 2026-11-12（判据 1928）：格子是 `aspectRatio(1)` + 宽度驱动 ⇒ **`maxHeight` 只裁不缩**，
       //   必须同时给 `maxWidth`（限宽即限高，`GGo9.boardMax()` 同款范式）。
-      .constraintSize({ maxHeight: Math.max(120, Bp.height - 380), maxWidth: Bp.isShort() ? Math.max(140, Bp.width - 2 * Space.lg) : 9999 })
+      // ★ 2026-11-21（判据 3111）：竖屏第 4 排格子被下方提示文字与「重开」按钮**盖住**
+      //   （截图确认：第 4 排卡片只露上半，且提示文字与卡片内容重叠出现重影）。
+      //   而 、 双双判干净 —— 视觉模型才发现。
+      //   原因：:396 的宽度算式给竖屏 498.7（宽度驱动高度 ⇒ 高也是 498.7），
+      //   而这里的 ，并且竖屏 （不限宽）
+      //   ⇒ 按 :401 注释说的「 只裁不缩」，多出的 80vp 溢出并被后续兄弟元素盖住。
+      //   修法：竖屏  也收到 （= 498.7 → 418.7）⇒ 宽度驱动高度正好等于上限，不裁不溢。
+      //   横屏（isShort）保持原来的  逐字不变。
+      .constraintSize({ maxHeight: Math.max(120, Bp.height - 380), maxWidth: Bp.isShort()
+        ? Math.max(140, Bp.width - 2 * Space.lg)
+        // ★ 竖屏：行数是动态的（ceil(tiles/4)，常见 5 行）⇒ 高度 = (行数/4) × 宽
+        //   ⇒ 要让「高度 ≤ maxHeight」，宽度必须 ≤ maxHeight × 4 / 行数。
+        //   原来竖屏 maxWidth = 9999（不限）⇒ 宽度 498.7、高度 (5/4)×498.7 = 623 ≫ 418.7
+        //   ⇒ 按注释说的「maxHeight 只裁不缩」，多出来的部分溢出并被下面的提示文字和重开按钮盖住。
+        : Math.max(140, Math.floor((Bp.height - 380) * COLS / Math.max(1, Math.ceil(this.tiles.length / COLS)))) })
 
       Text(this.found.length > 0 ? TG2('已拆出：{0}', this.found.join('  ')) : TG('还没拆出任何一组')).fontSize(FontSize.xs).fontColor(Palette.violet).width('100%')
 
