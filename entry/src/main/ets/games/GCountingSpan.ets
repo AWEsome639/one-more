@@ -372,7 +372,13 @@ export struct GCountingSpan {
       }.width('100%').aspectRatio(1).padding(Space.md)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      // ★ 2026-11-21（判据 3105）：竖屏底部  被切（像素检测器 cov=0.94、截图确认只露文字上半）。
+      //   实测：棋盘上沿 235vp；棋盘下方「数好了下一张」46 + 间距 6 + 提示 20 + 间距 6
+      //   + 重开 44 + 留边 10 = 132vp ⇒ 棋盘可用 431.7 ⇒ reserve 367。
+      //   但判据 3104 的经验是「按截图算出的 reserve 会偏小约 33」（幻方：算 377、实际要 410），
+      //   所以这里取 406（= 367 + 39）留足余量。
+      //   横屏（isShort）仍走 360，逐字不变 ⇒ 零风险。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 430)) })
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
       if (this.phase === 0) {
