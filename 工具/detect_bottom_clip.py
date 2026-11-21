@@ -16,6 +16,12 @@
 ⇒ 指标 `edge_cov`：最底 `k` 行里，非背景像素的**横向覆盖率**（每行先算 x 方向 span，
    再取这些行的最大值）。取「最大」而不是「平均」，是因为只要有一行被铺满就说明切了。
 
+
+⚠️⚠️ **必须只扫「当前构建拍的截图」**（判据 `3102`）：
+   全库 `356` 张「每款最新一张」里 `277` 张被标 `cov ≥ 0.60` —— **全是陈旧截图**
+   （旧版本 UI、搜索页、首页、键盘盖屏）。而**今天新拍的 `19` 张里 `0` 张被标**。
+   ⇒ 拿旧截图跑这个工具，得到的是一堆与当前代码无关的误报。
+
 ⚠️ 只作为「值得看一眼」的筛子，**不能当结论**（判据 3088/3100 的同构教训）。
 
 用法：
@@ -25,6 +31,7 @@
 """
 import io
 import os
+import re
 import sys
 
 
@@ -94,6 +101,38 @@ def main():
     if not args or args[0] == '--selftest':
         return selftest()
     threshold = 0.60
+
+    if args and args[0] == '--today':
+        import time as _t
+        d = args[1] if len(args) > 1 else '_巡检记录'
+        today = _t.strftime('%Y-%m-%d')
+        latest = {}
+        for n in sorted(os.listdir(d)):
+            if not (n.startswith('截图-') and n.endswith('.jpeg')):
+                continue
+            p = os.path.join(d, n)
+            if _t.strftime('%Y-%m-%d', _t.localtime(os.path.getmtime(p))) != today:
+                continue
+            m = re.match(r'截图-(.+)-(\d{6})\.jpeg$', n)
+            if not m:
+                continue
+            g, ts = m.group(1), m.group(2)
+            if g not in latest or ts > latest[g][0]:
+                latest[g] = (ts, p)
+        print('  --today：今天拍过截图的 %d 款（每款取最新）' % len(latest))
+        flag = []
+        for g, (ts, p) in sorted(latest.items()):
+            try:
+                r = analyze(p)
+            except Exception as e:
+                print('  ! %s: %s' % (g, e)); continue
+            if r['bottom_cov'] >= threshold:
+                flag.append((g, ts, r['bottom_cov']))
+        for g, ts, c in sorted(flag, key=lambda x: -x[2]):
+            print('  ⚠️ %-28s %s cov=%.2f' % (g, ts, c))
+        print()
+        print('  cov ≥ %.2f: %d / %d' % (threshold, len(flag), len(latest)))
+        return 0
     paths = []
     if args and args[0] == '--dir':
         d = args[1]
