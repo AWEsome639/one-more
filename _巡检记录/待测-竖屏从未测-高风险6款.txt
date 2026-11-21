@@ -1,0 +1,6 @@
+Color Flood
+Dual Mirror
+Mirror Tracing
+Navon Hierarchical
+Shape Shifter
+Sudoku Hex
