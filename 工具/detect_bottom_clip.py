@@ -1,122 +1,128 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# ⛔⛔⛔ **本脚本未校准，不要用它下结论（判据 3018）** ⛔⛔⛔
-#
-# 2026-11-19 首次运行结果：**190 / 355 张（54%）被判「底部被切」** —— 明显误报：
-#   · `Mandelbrot` 被判 52.8%，但它精确严重度只有 `2.8%`、截图看过是好的
-#   · `Wordle` 20.8% 也上了榜（历史 7 次稳定、已验证）
-#   · `Magnets` 2.7% 同样
-#
-# 根因：它把「**满屏设计的背景面板延伸到下边**」当成了「卡片被切」。
-# 区分这两者需要**形状感知**（有没有可见的底边圆角/描边），单靠颜色做不到。
-#
-# ⇒ **54% 的误报率比没有检测器更糟**（报警疲劳，判据 3010）。
-#   要修：加「底边是否有圆角/描边」的判据，或直接人工看截图。
-#   在那之前，本文件只作为「试过、失败」的记录保留，不进任何流程。
-"""
-在**截图**上检测「底部被切」—— 判据 3017 的配套尺子。
+"""detect_bottom_clip.py —— 用**截图本身**判断「底部内容是否被切」
 
-为什么需要它：`blk` 量不出「元素本该多高」（`3011`/`3017`），
-`Simon Command` 的色块实际被切 `71vp` 而 `blk` 只报 `8vp`（差 9 倍）。
-⇒ 直接在截图上找「有一块颜色一直延伸到屏幕最底行」的签名。
+════ 为什么需要它（判据 3100 的教训）════
+`blk` 在竖屏上被证明**不可靠**：`Sudoku Hex blk=12468px`、`Bridges blk=7078px`、
+`Peg Solitaire blk=3133px` 三款打开截图后**视觉全部完好**（`3/3` 伪影）。
+⇒ 「底部有没有被切」这件事，`blk` 答不了，只有像素能答。
 
-判据：最后一行（y=h-1）上若有 **连续 ≥60px、颜色≠背景、且该颜色连通面积 ≥5000px** 的像素段，
-      就判「有一块面板/卡片被下沿切了」。背景色大面积铺底不算。
+════ 判据 ════
+一张**没被切**的截图，底部通常有两类安全形态：
+  (a) 留白：最底若干行的非背景像素占比很低
+  (b) 细文字：只有一行窄文字（提示语），横向覆盖率也不高
+而**被切**的截图特征是：**最底一行被一整块内容横向铺满**（面板/按钮/网格被屏沿切断）。
+
+⇒ 指标 `edge_cov`：最底 `k` 行里，非背景像素的**横向覆盖率**（每行先算 x 方向 span，
+   再取这些行的最大值）。取「最大」而不是「平均」，是因为只要有一行被铺满就说明切了。
+
+⚠️ 只作为「值得看一眼」的筛子，**不能当结论**（判据 3088/3100 的同构教训）。
 
 用法：
-  python3 工具/detect_bottom_clip.py [--all] [--top N]
-  默认只查台账每个游戏**末次**引用的截图；--all 查全部截图。
+  python3 工具/detect_bottom_clip.py 截图1.jpeg [截图2 ...]
+  python3 工具/detect_bottom_clip.py --dir _巡检记录 --limit 40
+  python3 工具/detect_bottom_clip.py --selftest     # 用已知案例做回归
 """
-import sys, os, io, re, glob
-from collections import Counter
-try:
+import io
+import os
+import sys
+
+
+def analyze(path, bottom_rows=6, bg_tol=18):
+    """返回 dict：bottom_cov（最底若干行的最大横向覆盖率 0~1）、height、width。"""
     from PIL import Image
-    import numpy as np
-except ImportError:
-    sys.exit('需要 Pillow + numpy')
+    im = Image.open(path).convert('RGB')
+    w, h = im.size
+    px = im.load()
 
-LEDGER = '_巡检记录/layout-canonical.tsv'
-SIZE = (2560, 1600)           # 只查本机横屏截图；别的尺寸常量不同，判不了
-RUN_MIN = 60                  # 连续段最短像素
-AREA_MIN = 5000               # 该颜色连通面积下限（滤掉细线与手势条）
-ROW_BAND = 3                  # 允许最后几行（JPEG 边缘噪声）
+    # 用四角的中位色估「背景色」
+    corners = [px[2, 2], px[w - 3, 2], px[2, h - 3], px[w - 3, h - 3]]
+    corners.sort(key=lambda c: sum(c))
+    bg = corners[len(corners) // 2]
 
-def clip_ratio(a):
-    """返回 (被切比例 0~1, 细节)。0 表示没测到底部被切。"""
-    h, w, _ = a.shape
-    # 手势条区域（最底 ~20px、中间 40% 宽）会被系统画成浅色 ⇒ 排除
-    m = a.copy()
-    m[h-22:h, int(w*0.28):int(w*0.72)] = 255
-    # 背景色 = 全图最常见颜色
-    small = m[::4, ::4].reshape(-1, 3)
-    bg = Counter(map(tuple, small)).most_common(1)[0][0]
-    bgv = np.array(bg)
-    # 每个候选颜色：全图连通面积（用出现的总像素数近似）
-    flat = m.reshape(-1, 3)
-    cnt = Counter(map(tuple, flat[::3]))
-    big = {c for c, n in cnt.items() if n*9 >= AREA_MIN and max(abs(np.array(c)-bgv)) > 25}
-    if not big:
-        return 0.0, None
-    # 看最后几行
-    for y in range(h-1, h-1-ROW_BAND, -1):
-        row = m[y]
-        best = None; run = 0; prev = None
-        for x in range(w):
-            c = tuple(row[x])
-            if any(abs(c[i]-bgv[i]) <= 25 for i in range(3)):
-                run = 0; prev = None; continue
-            if prev is not None and all(abs(c[i]-prev[i]) <= 18 for i in range(3)):
-                run += 1
-            else:
-                run = 1; prev = c
-            if run >= RUN_MIN and c in big:
-                best = (c, run, x); break
-        if best:
-            # 量这块颜色从底部往上连续多少行
-            c = np.array(best[0])
-            hh = 0
-            for yy in range(h-1, max(0, h-900), -1):
-                if np.abs(m[yy]-c).max(axis=1).min() <= 18: hh += 1
-                else: break
-            return min(1.0, hh/float(h)), (best[0], best[1], hh)
-    return 0.0, None
+    def is_fg(c):
+        return (abs(c[0] - bg[0]) + abs(c[1] - bg[1]) + abs(c[2] - bg[2])) > bg_tol * 3
+
+    worst = 0.0
+    for dy in range(1, bottom_rows + 1):
+        y = h - dy
+        if y < 0:
+            break
+        left, right = None, None
+        # 每 4 像素采一次，够快也够准
+        for x in range(0, w, 4):
+            if is_fg(px[x, y]):
+                if left is None:
+                    left = x
+                right = x
+        if left is not None:
+            span = (right - left + 1) / float(w)
+            worst = max(worst, span)
+    return {'bottom_cov': worst, 'w': w, 'h': h, 'bg': bg}
+
+
+def selftest():
+    """用已知案例做回归：两款修好后正常、一款本来就正常、一款修前被切。"""
+    cases = [
+        ('_巡检记录/截图-Simon_Says-224823.jpeg', True,  '西蒙说 修前（C/D 被切）'),
+        ('_巡检记录/截图-Simon_Says-103213.jpeg', False, '西蒙说 修后（四块完整）'),
+        ('_巡检记录/截图-Sudoku_Hex-104914.jpeg', False, '六宫数独（视觉完好）'),
+        ('_巡检记录/截图-Peg_Solitaire-104806.jpeg', False, '孔明棋（视觉完好）'),
+        ('_巡检记录/截图-Bridges-105133.jpeg', False, '桥梁（视觉完好）'),
+    ]
+    print('== 自检（阈值 0.60）==')
+    ok = 0
+    n = 0
+    for p, expect_clip, label in cases:
+        if not os.path.exists(p):
+            print('  ? 缺文件:', p); continue
+        r = analyze(p)
+        got = r['bottom_cov'] >= 0.60
+        n += 1
+        hit = (got == expect_clip)
+        ok += hit
+        print('  %s %-26s cov=%.2f 期望%s 实际%s' % (
+            '✅' if hit else '❌', label, r['bottom_cov'],
+            '被切' if expect_clip else '正常', '被切' if got else '正常'))
+    print()
+    print('  回归 %d/%d' % (ok, n))
+    return 0 if ok == n else 1
+
 
 def main():
-    want_all = '--all' in sys.argv
-    top = 30
-    if '--top' in sys.argv:
-        top = int(sys.argv[sys.argv.index('--top')+1])
-    want = {}
-    if not want_all:
-        rows=[l.rstrip('\n').split('\t') for l in io.open(LEDGER, encoding='utf-8') if len(l.split('\t'))>=5]
-        last={}
-        for r in rows: last[r[1]]=r
-        for g, r in last.items():
-            mm = re.search(r'(_巡检记录/截图-\S+?\.jpeg)', r[4])
-            if mm: want[mm.group(1)] = g
-        files = sorted(want)
+    args = sys.argv[1:]
+    if not args or args[0] == '--selftest':
+        return selftest()
+    threshold = 0.60
+    paths = []
+    if args and args[0] == '--dir':
+        d = args[1]
+        limit = 60
+        if '--limit' in args:
+            limit = int(args[args.index('--limit') + 1])
+        files = []
+        for n in sorted(os.listdir(d)):
+            if n.startswith('截图-') and n.endswith('.jpeg'):
+                files.append(os.path.join(d, n))
+        files.sort(key=lambda p: -os.path.getmtime(p))
+        paths = files[:limit]
     else:
-        files = sorted(glob.glob('_巡检记录/截图-*.jpeg'))
-    hits = []
-    checked = 0
-    for p in files:
-        if not os.path.exists(p): continue
+        paths = args
+    flagged = []
+    for p in paths:
         try:
-            im = Image.open(p).convert('RGB')
-        except Exception:
+            r = analyze(p)
+        except Exception as e:
+            print('  ! %s: %s' % (os.path.basename(p), e))
             continue
-        if im.size != SIZE: continue
-        checked += 1
-        ratio, info = clip_ratio(np.asarray(im).astype(int))
-        if ratio > 0:
-            hits.append((ratio, want.get(p, os.path.basename(p)), os.path.basename(p), info))
-    hits.sort(reverse=True)
-    print('检查 %d 张 %dx%d 截图，判「底部被切」%d 张' % (checked, SIZE[0], SIZE[1], len(hits)))
-    print('\n%-6s %-30s %-13s %s' % ('占比', '游戏', '截图', '被切高度'))
-    for ratio, g, f, info in hits[:top]:
-        print('%-6.1f%% %-30s %-13s %dpx (%.0fvp)' % (ratio*100, g[:30], f[-10:-5], info[2], info[2]/3))
-    if len(hits) > top:
-        print('… 另有 %d 张' % (len(hits)-top))
+        tag = '⚠️' if r['bottom_cov'] >= threshold else '  '
+        print('%s %-46s cov=%.2f' % (tag, os.path.basename(p)[:46], r['bottom_cov']))
+        if r['bottom_cov'] >= threshold:
+            flagged.append(p)
+    print()
+    print('  共 %d 张，疑似底部被切 %d 张（阈值 %.2f）' % (len(paths), len(flagged), threshold))
+    return 0
+
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
