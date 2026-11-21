@@ -32,6 +32,7 @@
 import io
 import os
 import re
+import time
 import sys
 
 
@@ -105,21 +106,27 @@ def main():
     if args and args[0] == '--today':
         import time as _t
         d = args[1] if len(args) > 1 else '_巡检记录'
-        today = _t.strftime('%Y-%m-%d')
+        # ★ 2026-11-22（判据 3112）：改成**滚动窗口**。原来按「今天」筛，跨零点后
+        #   昨天拍的截图全部不算数 ⇒ 零点之后这个模式会认为「今天没有截图」，扫不出任何东西。
+        win_h = int(os.environ.get('SCREENSHOT_WINDOW_H', '36'))
+        cutoff = _t.time() - win_h * 3600
         latest = {}
         for n in sorted(os.listdir(d)):
             if not (n.startswith('截图-') and n.endswith('.jpeg')):
                 continue
             p = os.path.join(d, n)
-            if _t.strftime('%Y-%m-%d', _t.localtime(os.path.getmtime(p))) != today:
+            mt = os.path.getmtime(p)
+            if mt < cutoff:
                 continue
             m = re.match(r'截图-(.+)-(\d{6})\.jpeg$', n)
             if not m:
                 continue
-            g, ts = m.group(1), m.group(2)
-            if g not in latest or ts > latest[g][0]:
-                latest[g] = (ts, p)
-        print('  --today：今天拍过截图的 %d 款（每款取最新）' % len(latest))
+            # ★ 判据 3113：按 **mtime** 取最新，不要按文件名里的 HHMMSS ——
+            #   文件名只有 6 位时间、没有日期，`202127`(11-20) 会盖掉 `111701`(11-21)。
+            g = m.group(1)
+            if g not in latest or mt > latest[g][0]:
+                latest[g] = (mt, p)
+        print('  --today：窗口内拍过截图的 %d 款（每款取最新）' % len(latest))
         flag = []
         for g, (ts, p) in sorted(latest.items()):
             try:
@@ -129,7 +136,8 @@ def main():
             if r['bottom_cov'] >= threshold:
                 flag.append((g, ts, r['bottom_cov']))
         for g, ts, c in sorted(flag, key=lambda x: -x[2]):
-            print('  ⚠️ %-28s %s cov=%.2f' % (g, ts, c))
+            stamp = time.strftime('%m-%d %H:%M', time.localtime(ts)) if isinstance(ts, float) else str(ts)
+            print('  ⚠️ %-28s %s cov=%.2f' % (g, stamp, c))
         print()
         print('  cov ≥ %.2f: %d / %d' % (threshold, len(flag), len(latest)))
         return 0

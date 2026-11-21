@@ -62,22 +62,26 @@ def ask(path):
 
 
 def pick(limit):
-    today = time.strftime('%Y-%m-%d')
+    # ★ 判据 3112/3113：① 用**滚动窗口**（不用「今天」，跨零点会清零）
+    #                  ② 取最新按 **mtime**，不按文件名里的 HHMMSS（它无日期，202127 会盖掉次日的 111701）
+    win_h = int(os.environ.get('SCREENSHOT_WINDOW_H', '36'))
+    cutoff = time.time() - win_h * 3600
     newest = {}
     for n in os.listdir(D):
         if not (n.startswith('截图-') and n.endswith('.jpeg')):
             continue
         p = os.path.join(D, n)
-        if time.strftime('%Y-%m-%d', time.localtime(os.path.getmtime(p))) != today:
+        mt = os.path.getmtime(p)
+        if mt < cutoff:
             continue
         m = re.match(r'截图-(.+)-(\d{6})\.jpeg$', n)
         if not m:
             continue
-        g, ts = m.group(1), m.group(2)
-        if g not in newest or ts > newest[g][0]:
-            newest[g] = (ts, p)
-    items = sorted(newest.items(), key=lambda kv: -int(kv[1][0]))
-    return [(g, p) for g, (ts, p) in items[:limit]]
+        g = m.group(1)
+        if g not in newest or mt > newest[g][0]:
+            newest[g] = (mt, p)
+    items = sorted(newest.items(), key=lambda kv: -kv[1][0])
+    return [(g, p) for g, (mt, p) in items[:limit]]
 
 
 def main():
