@@ -501,7 +501,15 @@ export struct GSimonSays {
         //   两块是 `layoutWeight(1).aspectRatio(1)` ⇒ 宽 = 行宽的一半 ⇒ 高也一半
         //   `2500px` 行宽 ⇒ 每块 `1250px` 高 ≫ 可用 ⇒ 溢出并盖住上方
         //   ⇒ 限行宽（判据 1966：限宽即限高）：`2 × (Bp.height - 200)` = `666vp`
-        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(125, Bp.height - (Bp.isShort() ? 410 : 230))))
+        // ★ 2026-11-21（判据 3097）：竖屏原来扣 `230` ⇒ 行宽 `701`、每块 `345` 高、两行 `690vp`
+        //   + 上方 chrome ≈ `272vp` ⇒ 远超 `Bp.height(798.7)` ⇒ 底部 C/D 两块被切掉大半
+        //   （实测 `blk=2/48px`、截图确认）。
+        //   实测拟合三档（每档都看截图）：
+        //     230 → C/D 各切一半；471 → 只缩了一点、C/D 仍切；536 → **A/B/C/D 四块全完整**（blk 48→26px）
+        //   536 的来历：上方 chrome 实测 ≈272vp ⇒ 两行可用 527vp ⇒ 每块 258.5 ⇒ 行宽 527
+        //   ⇒ 2×(798.7−N)=527 ⇒ N≈535，取 536。
+        //   ⚠️ 横屏（`isShort()`）走 `410` 逐字不变 ⇒ 横屏零风险（且横屏截图已验四块完整）。
+        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(125, Bp.height - (Bp.isShort() ? 410 : 536))))
         Row({ space: Space.sm }) {
           Stack() {
           Text(PAD_ICON[(2)]).fontSize(FontSize.xxxl)
@@ -568,7 +576,15 @@ export struct GSimonSays {
         }
         // ★ 2026-11-19（判据 3057）：**第二行原本没有宽度约束** ⇒ 整行在屏外（`4` 块只见 `2` 块）。
         //   与第一行同一个算式（`1966`：限宽即限高）。横屏 `2×(533−398)=270vp` ⇒ 每块 130vp ⇒ 两行 260vp ≈ 可用 273vp。
-        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(125, Bp.height - (Bp.isShort() ? 410 : 230))))
+        // ★ 2026-11-21（判据 3097）：竖屏原来扣 `230` ⇒ 行宽 `701`、每块 `345` 高、两行 `690vp`
+        //   + 上方 chrome ≈ `272vp` ⇒ 远超 `Bp.height(798.7)` ⇒ 底部 C/D 两块被切掉大半
+        //   （实测 `blk=2/48px`、截图确认）。
+        //   实测拟合三档（每档都看截图）：
+        //     230 → C/D 各切一半；471 → 只缩了一点、C/D 仍切；536 → **A/B/C/D 四块全完整**（blk 48→26px）
+        //   536 的来历：上方 chrome 实测 ≈272vp ⇒ 两行可用 527vp ⇒ 每块 258.5 ⇒ 行宽 527
+        //   ⇒ 2×(798.7−N)=527 ⇒ N≈535，取 536。
+        //   ⚠️ 横屏（`isShort()`）走 `410` 逐字不变 ⇒ 横屏零风险（且横屏截图已验四块完整）。
+        .width(Math.min(Bp.width - 2 * Space.lg, 2 * Math.max(125, Bp.height - (Bp.isShort() ? 410 : 536))))
       }
       .width('100%')
 
