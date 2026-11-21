@@ -373,7 +373,7 @@ export struct GMemoryMatrix {
       //   = 801.7 > 798.7 ⇒ 差 13vp。
       //   按判据 3086 的教训（`-const` 必须分形态），只改竖屏侧：360 → 378（多留 15vp 余量）。
       //   横屏（isShort）仍走 360，逐字不变 ⇒ 零风险。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 378)) })
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 388)) })
       .backgroundColor(this.theme.isDark ? '#141414' : '#E2E8F0').borderRadius(Radius.lg)
 
       Text(this.msg).fontSize(FontSize.sm)
