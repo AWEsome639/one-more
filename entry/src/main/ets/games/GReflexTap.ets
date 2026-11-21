@@ -296,7 +296,15 @@ export struct GReflexTap {
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
-      }.width('100%').aspectRatio(1).padding(Space.sm)
+      }
+      // ★ 2026-11-22（判据 3114，同 Ghost_Tap 一族）：竖屏「重开」文字被切
+      //   （实测 blk=1/24px、blkh=110px 而完整应约 137px ⇒ 缺 27px ≈ 8.6vp）。
+      //   本文件 :299 是 `width('100%') + aspectRatio(1)` ⇒ **宽度驱动高度**，
+      //   下面 :302 的 `maxHeight` 只裁不缩 ⇒ 改它的数字无效（Ghost_Tap 已实测验证过）。
+      //   ⇒ 正解：给显式宽度。缺 8.6vp + 留 10vp 边距 ⇒ 板子宽收到 Bp.height − 378.6，取 379。
+      //   横屏（isShort）保持 '100%' 逐字不变 ⇒ 零风险。
+      .width(Bp.isShort() ? '100%' : Math.min(Bp.width, Math.max(200, Bp.height - 379)))
+      .aspectRatio(1).padding(Space.sm)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
       .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
