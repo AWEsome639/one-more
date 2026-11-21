@@ -105,7 +105,7 @@ def main():
                 q = line.split(':', 1)[-1].strip()
         rows.append((g, verdict, q, round(time.time() - t0, 1)))
         print('  %-28s %-4s %5.1fs  %s' % (g[:28], verdict, time.time() - t0, q[:52]))
-    out = os.path.join(D, '★★★-VLM审查-%s.md' % time.strftime('%m%d-%H%M'))
+    out = os.path.join(D, '★★★-VLM审查-%s.md' % time.strftime('%m%d-%H%M%S'))
     with io.open(out, 'w', encoding='utf-8') as f:
         f.write('# VLM 视觉审查（%s，模型 `%s`）\n\n' % (time.strftime('%Y-%m-%d %H:%M'), MODEL))
         f.write('| 游戏 | 判定 | 问题 | 耗时 |\n|---|---|---|---|\n')
