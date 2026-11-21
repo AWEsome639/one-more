@@ -10,6 +10,8 @@
  */
 
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
+// ★ 2026-11-21（判据 3109）：本文件原来没导 Bp，加竖屏宽限时要用
+import { Bp } from '../core/Bp';
 import { DemoBar } from '../components/DemoBar';
 import { Demo } from '../core/Demo';
 import { Haptics } from '../core/Haptics';
@@ -648,7 +650,12 @@ export struct GLighthouses {
           .width('100%')
         }, (r: number) => 'lr' + r)
       }
-      .width('100%')
+      // ★ 2026-11-21（判据 3109）：竖屏第 5 行网格被屏底切断、且底部提示/说明整体被挤下去
+      //   （截图确认；而 blk=0/0px、cov=0.00 双双判干净 —— 视觉模型才看得出来）。
+      //   原因：网格是 5×5 正方形格、宽度按整屏算 ⇒ 总高 ≈ 行宽（≈671）而可用只有 464.7。
+      //   按判据 3099 的 GridFit：above 264 + below 70 + 网格 464.7 = 798.7 正好装下
+      //   ⇒ 竖屏宽限 Bp.height − 334（= 464.7）；横屏（isShort）保持 '100%' 逐字不变。
+      .width(Bp.isShort() ? '100%' : Math.min(Bp.width, Math.max(240, Bp.height - 334)))
       .padding(Space.sm)
       .backgroundColor(this.theme.isDark ? '#0B1220' : '#E6F1FB')
       .borderRadius(Radius.md)
