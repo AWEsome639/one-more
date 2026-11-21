@@ -3331,3 +3331,7 @@
 2026-11-22T05:19:30	Tic-Tac-Toe	OK	2434	74.1s lowest='电脑会贪心，但也会看漏，试试能不能赢' [62,2390][2162,2434] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Tic_Tac_Toe-051929.jpeg @2026-11-22T05:19:30
 2026-11-22T05:20:47	Akari (Light Up)	OK	2421	76.9s lowest='点空格放灯，点灯撤掉' [62,2370][2162,2421] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Akari__Light_Up_-052046.jpeg @2026-11-22T05:20:47
 2026-11-22T05:21:59	Go / No-Go	OK	1800	71.9s lowest='判定：正确 ≥ 17/20 且误点 ≤ 1 次 · 红灯约四分之一' [62,1756][2162,1800] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Go___No_Go-052158.jpeg @2026-11-22T05:21:59
+2026-11-22T06:19:27	9 路围棋	NOT_HOME	-	150.9s could not reach home; last texts=[]
+2026-11-22T06:25:25	井字棋	NOT_HOME	-	149.5s could not reach home; last texts=[]
+2026-11-22T06:37:32	明灯	NOT_HOME	-	150.4s could not reach home; last texts=[]
+2026-11-22T06:49:44	9 路围棋	NOT_HOME	-	149.1s could not reach home; last texts=[]
