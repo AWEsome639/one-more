@@ -9,3 +9,18 @@ Mirror Tracing
 Navon Hierarchical
 Shape Shifter
 Simon Sequence
+
+# ── 可直接跑的命令（`2026-11-21` 备好）─────────────────
+# 前置：模拟器已起、hdc 通、debug HAP 已装
+#   EMU=/Applications/DevEco-Studio.app/Contents/tools/emulator/Emulator
+#   $EMU -start onemore_fold -noWindow
+# 命令（约 13 分钟，11 款 × ~70 秒）：
+#   cd "/Users/a0000/dev/One More"
+#   DSH_EMU_INST=onemore_fold SHOT_SCREEN_W=2224 SHOT_SCREEN_H=2496 \
+#   SHOT_GAME_BOTTOM=2412 SHOT_GESTURE=2480 \
+#     python3 工具/verify_layout.py --names-file "_巡检记录/待测-竖屏从未测-A层11款-中文名.txt"
+#
+# 逐款：双镜像 / 9 路围棋 / 孔明棋 / 六宫数独 / 华容道逃脱 / 桥梁 /
+#       色彩洪水 / 镜像描线 / 整体局部 / 变形者 / 西蒙序列
+#
+# ⚠️ 跑完必须逐张看截图（判据 2605/3088）：`blk>0` 不代表坏，`blk=0` 也不代表好。
