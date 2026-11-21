@@ -34,7 +34,8 @@ CHECKS = [
     ('Shadow Pivot 横屏 32%', 'entry/src/main/ets/games/GShadowPivot.ets',
      "? '32%'", '3060'),
     ('Simon Says 两行都限宽', 'entry/src/main/ets/games/GSimonSays.ets',
-     'Bp.height - (Bp.isShort() ? 410 : 230)', '3057'),
+     # ★ 2026-11-21（判据 3097）：竖屏常数从 230 改成 536（四块全完整），横屏 410 不动。
+     'Bp.height - (Bp.isShort() ? 410 : 536)', '3097'),
     ('Memory 下限 160', 'entry/src/main/ets/games/GMemory.ets',
      'Math.max(160, Bp.height - 360)', '3058'),
     ('Memory 矮屏隐藏重复控件', 'entry/src/main/ets/games/GMemory.ets',
