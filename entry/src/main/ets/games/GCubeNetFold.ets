@@ -314,7 +314,13 @@ export struct GCubeNetFold {
         .fontWeight(FontWeight.Bold)
         .fontColor(this.slots[i].length === 0 ? this.theme.inkFaint : '#FFFFFF')
     }
-    .layoutWeight(1).aspectRatio(1)
+    // ★ 2026-11-21（判据 3110）：原来这里是 `.layoutWeight(1).aspectRatio(1)` —— 但
+    //   `layoutWeight` 只对 Row/Column/Flex 的**直接子节点**生效，而本 Stack 的父是外层 Stack
+    //   ⇒ layoutWeight 完全失效，内层按内容（一个 `·`，FontSize.lg=18）收缩成 ~24vp 小点；
+    //   外层透明 Stack 仍被撑成 128.9×128.9 ⇒ 真机表现为「展开图几乎不可见、只剩几个 `.`」。
+    //   对照：GMemoryMatrix:413 / GMagicSquares:444 都是**单层格子直接挂 Row**，没有这个问题。
+    //   修法：内层改为填满父容器（全库填充 Stack 父容器的惯用写法）。
+    .width('100%').height('100%')
     .backgroundColor(this.slots[i].length === 0 ? this.theme.surface : Palette.sky).animation({ duration: Motion.fast, curve: Motion.snap() })
     .borderRadius(Radius.sm)
     .shadow(Shadow.card)
