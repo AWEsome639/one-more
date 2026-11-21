@@ -322,7 +322,12 @@ export struct GBlockCount3d {
               // ★ 2026-11-14 真机：题面棋盘 3 行各 88vp ⇒ 第三行被切 31px（2/31px）；
               //   而截图里被切的「第三行」是**题面**、不是选项（选项是 L336 那一行 Row）。
               //   ⇒ 矮屏 88 → 76（3 行省 36vp = 108px > 31px）；高屏 112 不动。
-              .height(Bp.isShort() ? 76 : 112).justifyContent(FlexAlign.End).padding(Space.xs)
+              // ★ 2026-11-22（判据 3115）：竖屏「重开」按钮被切掉大半
+              //   （实测 blk=1/24px、blkh=57px 而完整应约 137px ⇒ 缺 80px ≈ 25.6vp；截图确认）。
+              //   本文件格子是**固定行高**、3 行 × 112 = 336 ⇒ 竖屏装不下。
+              //   按 blkh 缺口法：缺 25.6vp 分到 3 行 ⇒ 每行减 9 ⇒ 行高 112 → 100（略留余量）。
+              //   横屏（isShort）保持 76 逐字不变 ⇒ 零风险。
+              .height(Bp.isShort() ? 76 : 100).justifyContent(FlexAlign.End).padding(Space.xs)
               .backgroundColor(this.theme.surface).borderRadius(Radius.xs)
             }, (c: number) => 'bc' + r + '-' + c)
           }
