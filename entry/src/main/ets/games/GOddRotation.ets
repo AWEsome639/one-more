@@ -374,7 +374,12 @@ export struct GOddRotation {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width('100%')
+      // ★ 2026-11-21（判据 3094）：竖屏 3×3 正方形卡按整屏宽算 ⇒ 三行装不下、第三排被切
+      //   （实测 blk=1/48px、截图确认前两排完整第三排只露一条）。
+      //   按实测 chrome 反推：上方 ≈201.6vp、下方 msg+重开+间距 ≈86vp ⇒ 网格可用 ≈511vp
+      //   ⇒ 每张卡 163.7 ⇒ 网格宽 511.1 ⇒ Bp.height − 287.6，取 288。
+      //   横屏（isShort）保持 `'100%'` 逐字不变 —— 横屏隐藏了重开按钮、可用高只有 533，公式不适用。
+      .width(Bp.isShort() ? '100%' : Math.min(Bp.width, Bp.height - 288))
       Text(this.msg)
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
