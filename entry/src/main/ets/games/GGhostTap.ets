@@ -332,10 +332,23 @@ export struct GGhostTap {
             }, (col: number) => 'c' + col + this.cellColor(row * SIZE + col))
           }.width('100%')
         }, (row: number) => 'r' + row)
-      }.width('100%').aspectRatio(1).padding(Space.sm)
+      }
+      // ★ 2026-11-22（判据 3114）：板子是 `width('100%') + aspectRatio(1)` ⇒ **宽度驱动高度**，
+      //   而下面的 `constraintSize.maxHeight` 只「裁」不「缩」（本文件 :337 注释自己写着）
+      //   ⇒ 改 maxHeight 的数字**毫无作用**（实测 360→378 后 blkh 仍是 118px、位置一字不动）。
+      //   正解：给**显式宽度**，让高度自然落进可用区。按判据 3105 的量块高法：
+      //   缺 19px ≈ 6.1vp + 留 10vp 边距 ⇒ 板子宽从「满宽裁剪后的 438.7」收到 422.7
+      //   ⇒ 竖屏宽限 `Bp.height − 376`；横屏（isShort）保持 '100%' 逐字不变。
+      .width(Bp.isShort() ? '100%' : Math.min(Bp.width, Math.max(200, Bp.height - 376)))
+      .aspectRatio(1).padding(Space.sm)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      // ★ 2026-11-22（判据 3114）：竖屏「重开」按钮底部被切（实测 blk=1/24px、
+      //   blkh=118px 而完整按钮应约 137px ⇒ 缺 19px ≈ 6.1vp；截图确认按钮贴着屏沿）。
+      //   这是 `- 360` 家族在竖屏上的又一次不准。按判据 3105 的量块高法：
+      //   缺 6.1vp + 留 10vp 边距 ⇒ 竖屏 reserve 360 → 378。
+      //   横屏（isShort）仍走 360，逐字不变 ⇒ 零风险。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 378)) })
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
 
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
