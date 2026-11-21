@@ -345,7 +345,12 @@ export struct GOddOneOut {
       //   按**行宽 1/3** 定尺寸（实测每格 ~793px）⇒ 3 行需 ~2379px ≫ 屏高 ⇒ **只有第一行挤进来、
       //   底部提示整块消失**（截图实证）。
       //   ⇒ 按可用高度限宽（与 GGo9 同款）：限宽后 aspectRatio 会让高度跟着降。
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(220, Bp.height - 360)))
+      // ★ 2026-11-22（判据 3114 同族）：竖屏「重开」底部被切一点点
+      //   （实测 blk=1/24px、blkh=118px 而完整应约 137px ⇒ 缺 19px ≈ 6.1vp）。
+      //   缺 6.1vp + 留 10vp 边距 ⇒ 竖屏 reserve 360 → 376。横屏（isShort）保持原式逐字不变。
+      .width(Bp.isShort()
+        ? Math.min(Bp.width - 2 * Space.lg, Math.max(220, Bp.height - 360))
+        : Math.min(Bp.width - 2 * Space.lg, Math.max(220, Bp.height - 376)))
       Text(this.msg)
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
