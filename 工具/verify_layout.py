@@ -27,6 +27,9 @@ AMBIG = ['Binary Matrix Rank All', 'Visual Search All', 'Cryptogram All', 'Word 
 # ★ 2026-11-13：默认实例改成 **`onemore7`**（新建的专用测量实例，`853x533 vp` 与台账一致）；
 #   `onemore` 跑了上百轮已不稳。端口也不写死（新实例是 5555，旧的是 5557）⇒ 用 list targets 探测。
 EMU_INST = os.environ.get('DSH_EMU_INST', 'onemore7')
+# ★ 2026-11-21（判据 3108）：单款预算可配。正常款 ~70s，失败的款原来烧 400s（TIMEOUT 400.1s 实测）
+#   ⇒ 一轮 12 款里有 2-3 个失败就白烧 10 分钟，吞吐掉一半。默认降到 150s。
+SHOT_BUDGET = int(os.environ.get('SHOT_BUDGET', '150'))
 
 def _dev():
     r = subprocess.run('%s list targets' % HC, shell=True, capture_output=True, text=True, timeout=20)
@@ -122,7 +125,7 @@ def main():
         t0 = time.time()
         try:
             r = subprocess.run(['python3', os.path.join(ROOT, '工具', 'shot_game.py'), g],
-                               capture_output=True, text=True, timeout=400, cwd=ROOT)
+                               capture_output=True, text=True, timeout=SHOT_BUDGET, cwd=ROOT)
             line = (r.stdout or '').strip().split('\n')[-1]
         except subprocess.TimeoutExpired:
             line = '%s\tTIMEOUT\t-\t%.1fs shot_game 超时' % (g, time.time() - t0)
@@ -140,7 +143,7 @@ def main():
             t0 = time.time()
             try:
                 r = subprocess.run(['python3', os.path.join(ROOT, '工具', 'shot_game.py'), g],
-                                   capture_output=True, text=True, timeout=400, cwd=ROOT)
+                                   capture_output=True, text=True, timeout=SHOT_BUDGET, cwd=ROOT)
                 line = (r.stdout or '').strip().split('\n')[-1]
             except subprocess.TimeoutExpired:
                 line = '%s\tTIMEOUT\t-\t%.1fs 重试超时' % (g, time.time() - t0)
