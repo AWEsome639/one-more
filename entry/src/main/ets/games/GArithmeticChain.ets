@@ -480,7 +480,12 @@ export struct GArithmeticChain {
           .fontColor('#FFFFFF')
           .backgroundColor(Palette.cyan)
           .borderRadius(Radius.md)
-          .width('100%')
+          // ★ 2026-11-21（判据 3109）：竖屏横向溢出 —— 这一行是「提示 + AI 代打(96) + 重开(120)」，
+          //   而「提示」原来是 '.width('''100%''')' ⇒ 100% + 96 + 120 必然撑出屏右
+          //   （截图确认：屏右缘露出一条紫色边，是重开被挤出去）。
+          //   横屏时重开被 isShort() 隐藏 ⇒ 从不溢出 ⇒ 纯竖屏 bug。
+          //   改成 layoutWeight(1)：吃掉剩余宽度 ⇒ 三个按钮都在屏内。
+          .layoutWeight(1)
           .height(Cell.of(42))
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'L451'; })
