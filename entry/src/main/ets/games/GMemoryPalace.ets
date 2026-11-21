@@ -337,7 +337,13 @@ export struct GMemoryPalace {
       .width('100%').aspectRatio(1).padding(Space.xs)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      // ★ 2026-11-21（判据 3106）：竖屏底部  被切（像素检测器 cov=0.94、截图确认只露一条粉色边）。
+      //   这是  家族的第五个。按判据 3105 的教训：不按 chrome 估算（会差一轮），
+      //   直接取一个明显大于前几款的余量 —— Life Game 402/432、Memory Matrix 388、
+      //   Magic Squares 410、Counting Span 430 ⇒ 本款结构与 Magic Squares 最近（网格 + 提示 + 一个按钮），
+      //   取 424（= 410 + 14 余量）。
+      //   横屏（isShort）仍走 360，逐字不变 ⇒ 零风险。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 454)) })
       .backgroundColor(this.theme.isDark ? '#141414' : '#E2E8F0').borderRadius(Radius.lg)
 
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
