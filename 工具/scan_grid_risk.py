@@ -26,7 +26,13 @@ LEDGER = os.path.join(ROOT, '_巡检记录', 'layout-canonical.tsv')
 REGISTRY = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'core', 'GameRegistry.ets')
 
 AR1 = re.compile(r'\.aspectRatio\(\s*1\s*\)')
-HEIGHT_CAP = re.compile(r'(?:\.width|\.constraintSize)\([^\n]{0,120}Bp\.height')
+# ★ 2026-11-21（判据 3100 第八/九节）：原判据只扫 `width(`/`constraintSize(` **行内**，
+#   于是「把高度约束写在辅助函数里」的写法（`Sudoku Hex` 的 `boardPx()`）被判成风险 ⇒ 误报。
+#   ⇒ 拆成两级：
+#     INLINE_CAP  行内限高（强证据，我修的那几款都是这种）
+#     HELPER_CAP  文件里任何地方用 `Bp.height` 参与算术（弱证据，可能是辅助函数里限高）
+INLINE_CAP = re.compile(r'(?:\.width|\.constraintSize)\([^\n]{0,120}Bp\.height')
+HELPER_CAP = re.compile(r'Bp\.height\s*[-*/]')
 
 
 def load_measured():
@@ -78,11 +84,14 @@ def scan():
         if ar < 2:
             continue
         rows_total = len(re.findall(r'ForEach\(\s*(?:\[0,\s*1,\s*2\]|ROWS)', s))
-        capped = bool(HEIGHT_CAP.search(s))
+        inline = bool(INLINE_CAP.search(s))
+        helper = bool(HELPER_CAP.search(s))
+        capped = inline or helper
         comp = name[:-4]
         en = comp2en.get(comp, '')
         rows.append({
             'comp': comp, 'en': en, 'ar': ar, 'rows': rows_total, 'capped': capped,
+            'inline': inline, 'helper': helper,
             'port': (en in measured['port']) if en else False,
             'land': (en in measured['land']) if en else False,
         })
@@ -102,9 +111,10 @@ def main():
     print('  %-30s %-26s AR 行 限高 竖屏测过' % ('组件', '游戏(enName)'))
     for r in sorted(rows, key=lambda x: (x['capped'], x['port'], -x['ar'])):
         warn = '  ' if r['capped'] else '⚠️'
+        how = '行内' if r.get('inline') else ('函数' if r.get('helper') else '**无**')
         print('%s %-30s %-26s %2d %2d %-4s %s' % (
             warn, r['comp'], r['en'][:26] or '?', r['ar'], r['rows'],
-            '是' if r['capped'] else '否', '是' if r['port'] else '**否**'))
+            how, '是' if r['port'] else '**否**'))
     print()
     never = [r for r in risky if not r['port']]
     print('== ⚠️ 未限高 且 竖屏从未测过（最该先测）: %d 款 ==' % len(never))
