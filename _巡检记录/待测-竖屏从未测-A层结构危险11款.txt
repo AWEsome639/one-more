@@ -1,0 +1,11 @@
+Dual Mirror
+Go (9x9)
+Peg Solitaire
+Sudoku Hex
+Block Escape
+Bridges
+Color Flood
+Mirror Tracing
+Navon Hierarchical
+Shape Shifter
+Simon Sequence
