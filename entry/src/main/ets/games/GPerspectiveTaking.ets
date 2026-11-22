@@ -346,7 +346,14 @@ export struct GPerspectiveTaking {
               .animation({ duration: Motion.fast, curve: Motion.snap() }) }, (c: number) => 'c' + c)
             }.width('100%')
           }, (r: number) => 'r' + r)
-        }.layoutWeight(1)
+        }
+        // ★ 2026-11-22（判据 3126）：**横屏**底部「重开」被切在屏沿（实测最低点底 1600）。
+        //   根因：网格格子是 `layoutWeight(1).aspectRatio(1)`、宽由这列分配，
+        //   而横屏这列吃满半个屏宽（≈426vp）⇒ 每格 ≈142 ⇒ 3 行 = 426 ≫ 可用 377。
+        //   ⇒ 横屏给这列**固定宽度**（3 格 × ~83 = 250vp，每格 83vp 仍远大于 44vp 可点）；
+        //     竖屏保持 `layoutWeight(1)` 逐字不变。
+        .width(Bp.isShort() ? Math.min(Bp.width / 2, 250) : undefined)
+        .layoutWeight(Bp.isShort() ? 0 : 1)
         Column({ space: Space.xs }) {
           Text(TG('他在哪')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           Text(TG2('面朝 {0}', FACING[this.face])).fontSize(FontSize.lg).fontWeight(FontWeight.Bold)
