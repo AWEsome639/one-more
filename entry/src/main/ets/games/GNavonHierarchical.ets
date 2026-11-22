@@ -440,8 +440,8 @@ export struct GNavonHierarchical {
           }, (r: number) => 'r' + r)
         }
         // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
-        .width(this.boardPx(439))
-        .height(this.boardPx(439))
+        .width(this.boardPx(Bp.isShort() ? 439 : 479))
+        .height(this.boardPx(Bp.isShort() ? 439 : 479))
         .alignSelf(ItemAlign.Center)
         .padding(Space.xs)
         .backgroundColor(this.theme.surfaceAlt)
