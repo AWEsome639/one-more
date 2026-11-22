@@ -866,7 +866,10 @@ export struct GCheckers {
     //      竖屏 (1280-260)*0.70 = 714vp（受宽度限，仍比旧 704 大）
     const FIXED: number = 200;   // ★ 第 1020 轮：与 GBejeweled 同步（算式逐字相同 ⇒ 可套同值）   // ★ 第五版：实测黑白棋固定部分更大，取 300 覆盖所有款
     const w: number = Math.max(160, Bp.width - 40);
-    const h: number = Math.max(120, (Bp.height - FIXED) * 0.70);
+    // ★ 2026-11-22（判据 3123）：**横屏**棋盘最下面一排棋子被屏底切掉（截图确认真缺陷）。
+    //   横屏 h=(533−200)×0.70=233，留 100 给下方按钮与说明 ⇒ 不够。
+    //   竖屏保持 0.70 逐字不变；横屏降到 0.60（=200，省 33vp）。
+    const h: number = Math.max(120, (Bp.height - FIXED) * (Bp.isShort() ? 0.60 : 0.70));
     return Math.min(w, h);
   }
 

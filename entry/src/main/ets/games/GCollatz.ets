@@ -505,6 +505,10 @@ export struct GCollatz {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         .width('100%')
+        // ★ 2026-11-22（判据 3123）：**横屏**这行提示被屏底切掉（截图确认真缺陷）。
+        //   横屏只有 533vp，这行属于「次要说明」⇒ 按仓库既有做法在矮屏隐藏；
+        //   竖屏（798.7vp）空间充足，逐字不变。
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
