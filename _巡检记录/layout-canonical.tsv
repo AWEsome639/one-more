@@ -3401,3 +3401,10 @@
 2026-11-22T18:26:55	Block Escape	OK	2236	86.6s lowest='重开' [62,2102][1096,2236] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Escape-182654.jpeg @2026-11-22T18:26:55
 2026-11-22T18:52:57	Checkers	OK	1338	76.8s lowest='0' [440,633][473,696] blk=0/0px blkh=0px cov=5 board=600x595@980,756 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Checkers-185257.jpeg @2026-11-22T18:52:57
 2026-11-22T19:22:58	考拉兹	NOT_HOME	-	165.4s could not reach home; last texts=[]
+2026-11-22T19:48:31	舒尔特方格	NOT_HOME	-	170.2s no budget for recovery path
+2026-11-22T19:49:49	Schulte Table	OK	1379	78.1s lowest='5' [962,1309][998,1379] blk=0/0px blkh=0px cov=6 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Schulte_Table-194948.jpeg @2026-11-22T19:49:49
+2026-11-22T19:55:44	舒尔特方格	NOT_HOME	-	320.8s could not reach home; last texts=[]
+2026-11-22T19:59:04	Schulte Table	OK	1379	200.0s lowest='17' [944,1309][1016,1379] blk=0/0px blkh=0px cov=6 board=145x132@2193,201 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Schulte_Table-195903.jpeg @2026-11-22T19:59:04
+2026-11-22T20:27:46	舒尔特方格	NOT_HOME	-	205.7s no budget for recovery path
+2026-11-22T20:32:09	Schulte Table	TIMEOUT	-	263.1s budget exhausted at search-home:Schulte
+2026-11-22T20:36:20	Schulte Table	OK	2236	78.6s lowest='重新开始' [62,2083][2162,2236] blk=0/0px blkh=0px cov=6 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Schulte_Table-203619.jpeg @2026-11-22T20:36:20

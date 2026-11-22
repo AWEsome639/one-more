@@ -341,7 +341,14 @@ export struct GSchulte {
       .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360)))
         }, (r: number) => 'r' + r)
       }
-      .width('100%')
+      // ★ 2026-11-22（判据 3126）：**横屏**「重新开始」按钮压在数字格上，最后两排点不到
+      //   （onemore7 真机截屏铁证）。根因：这行的 `.width('100%')` 把上面 :341 的限宽**覆盖**了
+      //   ⇒ 网格撑满 853vp 宽 ⇒ 5 列每格 ~426/5，5 行高 ≈ 426 ≫ 可用高度 ⇒ 后面的按钮被挤上来盖住。
+      //   与判据 3110（Cube_Net_Fold）同一类：限宽被外层 width 覆盖。
+      //   ⇒ 横屏改为走限宽；竖屏（798.7 高，空间充足）保持原样逐字不变。
+      .width(Bp.isShort()
+        ? Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360))
+        : '100%')
       .layoutWeight(1)
 
       Text(this.done ? TG('🎉 完成！') : TG2('按顺序点：{0}', this.next))
