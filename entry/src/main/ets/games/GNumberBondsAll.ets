@@ -398,10 +398,12 @@ export struct GNumberBondsAll {
       //   正解在这里按「行数」算宽度：高度 = (行数/4) × 宽 ⇒ 要 ≤ (Bp.height − 380)，
       //   宽必须 ≤ (Bp.height − 380) × 4 / 行数。行数是 ceil(tiles/4)，题量不同行数就不同
       //   （实测 5 行、7 行都出现过，所以不能写死常数）。
-      .width(Bp.isShort()
-        ? Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 300))
-        : Math.max(200, Math.min(Bp.width - 2 * Space.lg,
-            Math.floor((Bp.height - 380) * COLS / Math.max(1, Math.ceil(this.tiles.length / COLS))))))
+      // ★ 2026-11-22（判据 3126）：**横屏**底部「重开」被切（实测最低点底 1600 = 屏沿、blk=1/24px blkh=14px）。
+      //   根因：横屏分支**没按行数算**（竖屏分支早就算过了）⇒ 横屏给了 233 宽的板子，
+      //   而高度 = (行数/4) × 宽，5 行时 = 291 ⇒ 超了。横屏也按行数算，reserve 取 300。
+      .width(Math.max(160, Math.min(Bp.width - 2 * Space.lg,
+          Math.floor((Bp.height - (Bp.isShort() ? 300 : 380)) * COLS
+            / Math.max(1, Math.ceil(this.tiles.length / COLS))))))
         }, (r: number) => 'r' + r)
       }.width('100%').layoutWeight(1)
       // ★ 2026-11-09：格子区是 `layoutWeight` 型 —— 删「重开」只会让它更大（判据 1851）。
