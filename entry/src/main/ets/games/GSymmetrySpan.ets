@@ -342,7 +342,9 @@ export struct GSymmetrySpan {
       }.width('100%').aspectRatio(1).padding(Space.sm).backgroundColor(this.theme.surface)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      // ★ 2026-11-22（判据 3114 同族）：竖屏「重开」底部被切（blkh=118px 而完整应 137px ⇒ 缺 19px ≈ 6.1vp）
+      //   缺 6.1 + 留 10 ⇒ 竖屏 reserve 360 → 376；横屏（isShort）保持 360 逐字不变。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 376)) })
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm).width('100%').textAlign(TextAlign.Center)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
