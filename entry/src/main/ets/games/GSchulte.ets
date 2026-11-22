@@ -347,9 +347,18 @@ export struct GSchulte {
       //   与判据 3110（Cube_Net_Fold）同一类：限宽被外层 width 覆盖。
       //   ⇒ 横屏改为走限宽；竖屏（798.7 高，空间充足）保持原样逐字不变。
       .width(Bp.isShort()
-        ? Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - 360))
+        // ★ 2026-11-22（判据 3126 第二版）：第一版把外层 `100%` 换成限宽后，网格确实从 426 收到 240，
+        //   但**还是盖住最后两排** —— 因为 `max(240, 173)` 的**下限 240** 把算出来的 173 抬回去了，
+        //   而上方 chrome 已占约 380vp ⇒ 380 + 240 = 620 > 533。
+        //   ⇒ 横屏下限降到 120、reserve 加到 400（=133vp）⇒ 380 + 133 = 513 ≤ 533。
+        ? Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 400))
         : '100%')
-      .layoutWeight(1)
+      // ★ 2026-11-22（判据 3126 第三版）：**光改 width 没用** —— 紧跟着的 `layoutWeight(1)`
+      //   会把宽度盖掉（`layoutWeight` 优先于 `width`）。前两版都栽在这里：
+      //   第一版把外层 `100%` 换限宽（无效）、第二版把下限 240 降到 120（仍无效），
+      //   两次量出来的网格宽度都没变 ⇒ 说明改的不是真正生效的那一处。
+      //   ⇒ 横屏同时把 `layoutWeight` 归零，宽度才真正生效；竖屏保持 `1` 逐字不变。
+      .layoutWeight(Bp.isShort() ? 0 : 1)
 
       Text(this.done ? TG('🎉 完成！') : TG2('按顺序点：{0}', this.next))
         .fontSize(FontSize.lg)
