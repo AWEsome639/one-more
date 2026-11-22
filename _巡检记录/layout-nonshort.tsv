@@ -764,3 +764,5 @@
 22:48	Modulo Clock	OK	73.3	重开	153	0/0
 2026-11-19T16:40:10	Mirror Tracing	OK	105.0s lowest='判定：3 关全部对齐通关 · 每关 8 笔（擦掉也算一笔）' [62,2153][2162,2197] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2560x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Mirror_Tracing-164007.jpeg @2026-11-19T16:40:09	判定：3 关全部对齐通�	44	0/0	
 2026-11-19T16:45:10	☀️	?	?		-1	?	
+2026-11-22T10:08:36	☀️	NOT_HOME	151.0s could not reach home; last texts=[]		-1	?	
+2026-11-22T10:11:07	生命游戏	NOT_HOME	151.2s could not reach home; last texts=[]		-1	?	
