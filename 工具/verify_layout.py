@@ -161,15 +161,19 @@ def main():
             results.append(line)
     ok = tight = bad = fail = 0
     overs = []
+    # ★ Windows 迁移（2026-11-23）：判定阈值跟随屏幕高度，不再写死手机值。
+    #   手机 1600: OK<=1516 / TIGHT<=1584；折叠 2496: OK<=2412 / TIGHT<=2480。
+    _bottom = int(os.environ.get('SHOT_GAME_BOTTOM', '1516'))
+    _tight = int(os.environ.get('SHOT_SCREEN_H', '1600')) - 16
     for ln in results:
         p = ln.split('\t')
         if len(p) < 3 or p[2] == '-':
             fail += 1
             continue
         v = int(p[2])
-        if v <= 1516:
+        if v <= _bottom:
             ok += 1
-        elif v <= 1584:
+        elif v <= _tight:
             tight += 1
         else:
             bad += 1
