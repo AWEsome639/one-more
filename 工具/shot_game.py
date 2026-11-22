@@ -15,9 +15,13 @@ import re
   ③ **单款硬预算 150s**：超预算立刻收尾并记 `TIMEOUT`（所有外部调用都按剩余预算封顶）
   ④ **所有出口都打一行**：`finish()` 统一出口，永不静默
 """
-import io, os, re, signal, subprocess, sys, time, json, traceback
+import io, os, re, signal, subprocess, sys, time, json, traceback, tempfile
 
-HC = '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
+WIN = (os.name == 'nt')
+_DEV_HOME = os.environ.get('DEVECO_HOME', 'C:/Program Files/Huawei/DevEco Studio')
+HC = (os.environ.get('DSH_HC') or
+      (os.path.join(_DEV_HOME, 'sdk', 'default', 'openharmony', 'toolchains', 'hdc.exe') if WIN
+       else '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'))
 DEV = '127.0.0.1:5557'   # ⚠️ 已被 _target() 取代（保留仅为兼容老引用；实际调用都走 _target()）
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # ★ 2026-11-16（判据 2832）：大屏每步更慢（渲染多、尺寸大）⇒ 预算可用环境变量放宽。
@@ -50,7 +54,7 @@ def run(argv, timeout):
     """
     try:
         p = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             text=True, start_new_session=True)
+                             text=True, **({} if WIN else {'start_new_session': True}))
     except Exception as e:                       # hdc 不存在 / 权限等
         raise Timeout('spawn-failed: %r' % (e,))
     try:
@@ -58,7 +62,11 @@ def run(argv, timeout):
         return p.returncode, (out or ''), (err or '')
     except subprocess.TimeoutExpired:
         try:
-            os.killpg(os.getpgid(p.pid), signal.SIGKILL)   # ← 连子进程一起杀
+            if WIN:
+                subprocess.run(['taskkill', '/F', '/T', '/PID', str(p.pid)],
+                               capture_output=True)
+            else:
+                os.killpg(os.getpgid(p.pid), signal.SIGKILL)   # ← 连子进程一起杀
         except Exception:
             pass
         try:
@@ -82,7 +90,7 @@ def _target():
     try:
         # ★ 2026-11-12：**必须用绝对路径 `HC`** —— 裸 `hdc` 在 subprocess 里常常不在 PATH，
         #   失败后回落到硬编码 5557，反而把「端口变了」伪装成「设备不在」。
-        out = subprocess.run('%s list targets' % HC, shell=True, capture_output=True, text=True, timeout=20).stdout
+        out = subprocess.run([HC, 'list', 'targets'], capture_output=True, text=True, timeout=20).stdout
     except Exception:
         out = ''
     for line in (out or '').splitlines():
@@ -1310,7 +1318,7 @@ def _body(name, t0):
                         _walk(c, depth + 1, path + '/' + str(idx))
                 _walk(d2)
                 rows.sort(key=lambda r: -r[0])
-                outp = '/tmp/nodes-%s.tsv' % re.sub(r'[^0-9A-Za-z]+', '_', name)
+                outp = os.path.join(tempfile.gettempdir(), 'nodes-%s.tsv' % re.sub(r'[^0-9A-Za-z]+', '_', name))
                 with io.open(outp, 'w', encoding='utf-8') as f:
                     f.write('y2\tdepth\ttype\tx1\ty1\tx2\ty2\ttext\tpath\n')
                     for y2, depth, path, ty, r, tx in rows:

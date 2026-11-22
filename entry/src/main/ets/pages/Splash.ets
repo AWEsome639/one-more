@@ -111,6 +111,7 @@
  * ════════════════════════════════════════════════════════════════════════
  */
 import { TG } from '../core/GameI18n';
+import { Tv } from '../core/Tv';
 import { router, curves } from '@kit.ArkUI';
 import { PathShape } from '@ohos.arkui.shape';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -1360,6 +1361,7 @@ struct Splash {
         this.ultraTiny = isUltra;
       }
     })
+    .focusable(Tv.on())
     .onClick(() => {
       this.boost();
     })

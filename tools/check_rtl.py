@@ -128,7 +128,7 @@ def top_keys(obj_inner):
 
 
 def scan_file(path):
-    rel = os.path.relpath(path, ROOT)
+    rel = os.path.relpath(path, ROOT).replace(os.sep, '/')
     src = io.open(path, encoding='utf-8').read()
     mk = mask_comments(src)          # 只抹注释、保留字符串（①需要读字面量）
     lines = mk.split('\n')

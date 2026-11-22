@@ -12,10 +12,14 @@
 · **结果自动进 `_巡检记录/layout-canonical.tsv`**（由 shot_game 的 finish() 写入）
 · **结束时打印「本轮 N 款：OK/TIGHT/溢出」**，并直接给出溢出清单
 """
-import io, os, subprocess, sys, time
+import io, os, subprocess, sys, time, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-EMU = '/Applications/DevEco-Studio.app/Contents/tools/emulator/Emulator'
+WIN = (os.name == 'nt')
+_DEV_HOME = os.environ.get('DEVECO_HOME', 'C:/Program Files/Huawei/DevEco Studio')
+EMU = (os.environ.get('DSH_EMU') or
+       (os.path.join(_DEV_HOME, 'tools', 'emulator', 'Emulator.exe') if WIN
+        else '/Applications/DevEco-Studio.app/Contents/tools/emulator/Emulator'))
 
 FIXED = ['Nonogram', 'Nurikabe', 'Masyu', 'Relational Memory', 'Math Path', 'Kakurasu Sums']
 SUSPECT = ['Wordle', 'Kakuro Mini', 'Magnets', 'Path Finder', 'Base Conversion Run', 'Binomial Match',
@@ -32,15 +36,16 @@ EMU_INST = os.environ.get('DSH_EMU_INST', 'onemore7')
 SHOT_BUDGET = int(os.environ.get('SHOT_BUDGET', '150'))
 
 def _dev():
-    r = subprocess.run('%s list targets' % HC, shell=True, capture_output=True, text=True, timeout=20)
+    r = subprocess.run([HC, 'list', 'targets'], capture_output=True, text=True, timeout=20)
     line = (r.stdout or '').strip().split('\n')[0].strip()
     return '' if ('Empty' in line or not line) else line
 
 def restart_emu():
     print('  · 重启模拟器 %s…' % EMU_INST, flush=True)
-    subprocess.run('%s -stop %s' % (EMU, EMU_INST), shell=True, capture_output=True, timeout=90)
+    subprocess.run([EMU, '-stop', EMU_INST], capture_output=True, timeout=90)
     time.sleep(5)
-    subprocess.Popen('%s -start %s -noWindow > /tmp/emu_verify.log 2>&1' % (EMU, EMU_INST), shell=True)
+    _log = open(os.path.join(tempfile.gettempdir(), 'emu_verify.log'), 'w')
+    subprocess.Popen([EMU, '-start', EMU_INST, '-noWindow'], stdout=_log, stderr=_log)
     for _ in range(24):
         time.sleep(15)
         t = _dev()
@@ -50,7 +55,9 @@ def restart_emu():
     print('  · ⚠️ 设备未就绪', flush=True)
 
 
-HC = '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'
+HC = (os.environ.get('DSH_HC') or
+      (os.path.join(_DEV_HOME, 'sdk', 'default', 'openharmony', 'toolchains', 'hdc.exe') if WIN
+       else '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'))
 
 
 def device_alive():
@@ -58,7 +65,7 @@ def device_alive():
     单纯「每 15 款重启」不够 —— 必须在**每款之前**探活，没了就立刻拉起并等它回来。
     """
     try:
-        out = subprocess.run('%s list targets' % HC, shell=True, capture_output=True,
+        out = subprocess.run([HC, 'list', 'targets'], capture_output=True,
                              text=True, timeout=25).stdout or ''
     except Exception:
         return False
@@ -70,23 +77,26 @@ def ensure_device(wait_s=200):
     if device_alive():
         return True
     print('  · 设备不在 ⇒ 冷启动模拟器…', flush=True)
-    subprocess.run('pkill -9 -f "Emulator -start"', shell=True, capture_output=True, timeout=30)
+    if WIN:
+        subprocess.run(['taskkill', '/F', '/IM', 'Emulator.exe'], capture_output=True, timeout=30)
+    else:
+        subprocess.run('pkill -9 -f "Emulator -start"', shell=True, capture_output=True, timeout=30)
     time.sleep(3)
     # ★ 2026-11-14 修（队友异常路径审计）：这里原来写死 `onemore` + 端口 `5557`，
     #   与文件头 L27-28 的设计注释（「默认实例改成 onemore7…端口也不写死」）自相矛盾。
     #   ⇒ onemore7 一掉线，冷启动会拉起**另一台**（不稳定、配置可能是别的分辨率），
     #     而 shot_game 的 `_target()` 是动态探测 ⇒ 后续测量静默切过去，台账分辨不出来。
-    subprocess.Popen('%s -stop %s' % (EMU, EMU_INST), shell=True,
-                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run([EMU, '-stop', EMU_INST], capture_output=True, timeout=90)
     time.sleep(4)
-    subprocess.Popen('%s -start %s -noWindow > /tmp/emu_wd.log 2>&1' % (EMU, EMU_INST), shell=True)
+    _log = open(os.path.join(tempfile.gettempdir(), 'emu_wd.log'), 'w')
+    subprocess.Popen([EMU, '-start', EMU_INST, '-noWindow'], stdout=_log, stderr=_log)
     t0 = time.time()
     while time.time() - t0 < wait_s:
         time.sleep(10)
         if device_alive():
             # 端口也不写死：新实例 5555、旧实例 5557，两个都试一次
             for _port in ('5555', '5557'):
-                subprocess.run('%s tconn 127.0.0.1:%s' % (HC, _port), shell=True,
+                subprocess.run([HC, 'tconn', '127.0.0.1:%s' % _port],
                                capture_output=True, timeout=25)
             time.sleep(3)
             return True
@@ -124,7 +134,7 @@ def main():
         ensure_device()
         t0 = time.time()
         try:
-            r = subprocess.run(['python3', os.path.join(ROOT, '工具', 'shot_game.py'), g],
+            r = subprocess.run([sys.executable, os.path.join(ROOT, '工具', 'shot_game.py'), g],
                                capture_output=True, text=True, timeout=SHOT_BUDGET, cwd=ROOT)
             line = (r.stdout or '').strip().split('\n')[-1]
         except subprocess.TimeoutExpired:
@@ -142,7 +152,7 @@ def main():
             ensure_device()
             t0 = time.time()
             try:
-                r = subprocess.run(['python3', os.path.join(ROOT, '工具', 'shot_game.py'), g],
+                r = subprocess.run([sys.executable, os.path.join(ROOT, '工具', 'shot_game.py'), g],
                                    capture_output=True, text=True, timeout=SHOT_BUDGET, cwd=ROOT)
                 line = (r.stdout or '').strip().split('\n')[-1]
             except subprocess.TimeoutExpired:
