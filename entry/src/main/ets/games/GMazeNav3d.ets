@@ -499,7 +499,11 @@ export struct GMazeNav3d {
       .aspectRatio(1)
       // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
       //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: '70%' })
+      // ★ 2026-11-22（判据 3120）：竖屏「重开」被切（blkh=71px 而完整应 137px ⇒ 缺 66px ≈ 21vp）
+      //   本处 `maxHeight: '70%'` 对 `aspectRatio(1)` 宽度驱动的场地**只裁不缩**（判据 3114），
+      //   所以收百分比只是让裁剪线更早 —— 但那正好能把下方让出来。
+      //   竖屏 70% → 66%（798.7 × 66% = 527，省 32vp > 缺的 21vp）；横屏保持 70% 逐字不变。
+      .constraintSize({ maxHeight: Bp.isShort() ? '70%' : '66%' })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
