@@ -3394,3 +3394,8 @@
 2026-11-22T08:54:57	Maze Nav 3D	OK	2494	73.1s lowest='重开' [477,2356][1748,2494] blk=1/22px blkh=138px cov=5 board=2224x2496@0,0 scr=2224x2496 max=22 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Maze_Nav_3D-085457.jpeg @2026-11-22T08:54:57
 2026-11-22T11:03:28	镜像迷宫	TIMEOUT	-	323.2s budget exhausted at home-loop
 2026-11-22T13:32:01	Mirror Image	OK	1893	82.5s lowest='判定：10 题答对 ≥ 8 题 · 干扰项是「上下翻转」，别与左右镜像混了' [62,1849][2162,1893] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Mirror_Image-133200.jpeg @2026-11-22T13:32:01
+2026-11-22T17:48:20	整体局部	NOT_HOME	-	235.4s could not reach home; last texts=['联系人', 'One More', '05, :, 48', '05', ':', '48']
+2026-11-22T17:50:02	Block Escape	OK	2236	101.4s lowest='重开' [62,2227][1096,2236] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Escape-174956.jpeg @2026-11-22T17:50:02
+2026-11-22T17:51:31	Navon Hierarchical	OK	2225	88.6s lowest='A' [368,2084][945,2225] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Navon_Hierarchical-175131.jpeg @2026-11-22T17:51:31
+2026-11-22T18:16:01	Block Escape	OK	2236	90.5s lowest='重开' [62,2227][1096,2236] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Escape-181601.jpeg @2026-11-22T18:16:01
+2026-11-22T18:26:55	Block Escape	OK	2236	86.6s lowest='重开' [62,2102][1096,2236] blk=0/0px blkh=0px cov=5 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Block_Escape-182654.jpeg @2026-11-22T18:26:55

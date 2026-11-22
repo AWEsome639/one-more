@@ -707,8 +707,8 @@ export struct GBlockEscape {
           }, (r: number) => 'r' + r)
         }
         // ★ 2026-10-30：宽高都从「可用高度」反推（见 boardPx 注释），不再让 aspectRatio 决定高度
-        .width(this.boardPx(Bp.isShort() ? 394 : 434))
-        .height(this.boardPx(Bp.isShort() ? 394 : 434))
+        .width(this.boardPx(Bp.isShort() ? 394 : 474))
+        .height(this.boardPx(Bp.isShort() ? 394 : 474))
         .alignSelf(ItemAlign.Center)
         .padding(Space.xs)
         .backgroundColor(Palette.tint('1A'))
