@@ -571,7 +571,10 @@ export struct GBejeweled {
     //   ⇒ 先降到 200 试（给棋盘 238vp = 714px，够 8×8 且留余量）。
     const FIXED: number = 200;
     const w: number = Math.max(160, Bp.width - 40);
-    const h: number = Math.max(120, (Bp.height - FIXED) * 0.70);
+    // ★ 2026-11-22（判据 3126 / 同 Checkers）：**横屏**棋盘最下面一行宝石被屏底切掉
+    //   （截图确认）。本式与 `GCheckers` 逐字相同（`FIXED=200`、系数 `0.70`），
+    //   `Checkers` 横屏降到 `0.60` 后棋盘完整 ⇒ 这里套同款：横屏 `0.60`、竖屏 `0.70` 逐字不变。
+    const h: number = Math.max(120, (Bp.height - FIXED) * (Bp.isShort() ? 0.60 : 0.70));
     return Math.min(w, h);
   }
 

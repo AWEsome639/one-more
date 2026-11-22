@@ -3408,3 +3408,4 @@
 2026-11-22T20:27:46	舒尔特方格	NOT_HOME	-	205.7s no budget for recovery path
 2026-11-22T20:32:09	Schulte Table	TIMEOUT	-	263.1s budget exhausted at search-home:Schulte
 2026-11-22T20:36:20	Schulte Table	OK	2236	78.6s lowest='重新开始' [62,2083][2162,2236] blk=0/0px blkh=0px cov=6 board=2224x2496@0,0 scr=2224x2496 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Schulte_Table-203619.jpeg @2026-11-22T20:36:20
+2026-11-22T20:58:07	Bejeweled	OK	1308	73.8s lowest='💎' [998,1243][1063,1308] blk=0/0px blkh=0px cov=5 board=600x600@980,726 scr=2560x1600 max=0 over=0px sumover=0px -> /Users/a0000/dev/One More/_巡检记录/截图-Bejeweled-205804.jpeg @2026-11-22T20:58:07
