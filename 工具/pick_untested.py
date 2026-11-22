@@ -22,6 +22,13 @@ reg = io.open(os.path.join(ROOT, 'entry/src/main/ets/core/GameRegistry.ets'),
 pairs = [(m.group(1), m.group(2)) for m in
          re.finditer(r"\{[^}]*?name: '([^']+)'[^}]*?enName: '([^']+)'", reg)]
 
+def sanitize(s):
+    # ★ 判据 3117：文件名的真实规则是「**非字母数字一律变下划线**」，不是「空格→下划线」。
+    #   原来只替换空格 ⇒ `Go No Go` 变成 `Go_No_Go` 而实际文件是 `Go___No_Go`
+    #   ⇒ 52 款被误判成「从未测过」，我据此反复重测了它们（全部 NOT_HOME）。
+    return re.sub(r'[^0-9A-Za-z]', '_', s)
+
+
 D = os.path.join(ROOT, '_巡检记录')
 WINDOW_H = int(os.environ.get('SCREENSHOT_WINDOW_H', '36'))
 cutoff = time.time() - WINDOW_H * 3600
@@ -62,7 +69,7 @@ if os.path.exists(ledger):
 chronic = {n for n, c in fail_cnt.items() if c >= 2 and n not in ok_seen}
 
 todo = [(zh, en) for zh, en in pairs
-        if en.replace(' ', '_') not in done and zh not in chronic]
+        if sanitize(en) not in done and zh not in chronic]
 print('  窗口 %dh 内已测 %d 款，慢性失败 %d 款，剩 %d 款 / 共 %d'
       % (WINDOW_H, len(done), len(chronic), len(todo), len(pairs)))
 n = int(sys.argv[1]) if len(sys.argv) > 1 else 10
