@@ -464,7 +464,12 @@ export struct GMirrorMaze {
       .aspectRatio(1)
       // ★ 2026-10-30 平板横屏：正方形场地被宽度锁死（1280vp 宽 ⇒ 1280vp 高），
       //   超出 533vp 的屏高 ⇒ 场地被裁。限高让 aspectRatio 反推能装下的最大正方形。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      // ★ 2026-11-22（判据 3121）：竖屏底部四个方向按钮（◀ ▲ ▼ ▶）只露出顶部一条
+      //   （实测 blk=1/24px、blkh=118px；截图确认四个按钮被屏底切掉大半）。
+      //   本处 `- 360` 是「棋盘按整屏高」的老写法，竖屏下方还有提示 + 两行按钮 ⇒ 不够。
+      //   按 blkh 缺口法：缺 ≈ 10vp + 留 10vp 边距 ⇒ 竖屏 reserve 360 → 380。
+      //   横屏（isShort）保持 360 逐字不变。
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 380)) })
       .padding(Space.xs)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
