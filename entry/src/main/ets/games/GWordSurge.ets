@@ -336,7 +336,7 @@ export struct GWordSurge {
       Column({ space: Space.xs }) {
         Text('「' + this.hint + '」').fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         Text(TG('选出对应的英文单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-      }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
+      }.width('100%').padding(Bp.isShort() ? Space.sm : Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
@@ -345,8 +345,11 @@ export struct GWordSurge {
       Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
         .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
         .width('100%').textAlign(TextAlign.Center)
-      Column({ space: Space.sm }) {
-        ForEach([0, 1, 2, 3], (i: number) => { Text(this.opts.length > (i) ? this.opts[(i)] : '').fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkAt((i))).width('100%').constraintSize({ minHeight: Cell.of(52) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis }).backgroundColor(this.toneAt((i))).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((i)); })
+      // ★ 2026-11-23（Windows 实测）：short 屏 4 个选项 × minHeight 52vp + 提示卡 padding
+      //   超出 533vp ⇒ 第 4 个选项整块出屏（截图 Word Surge 底部 TEMPLE 被切）。
+      //   short 下降 minHeight 到 40、选项间距 sm→xs；高屏逐字不变。
+      Column({ space: Bp.isShort() ? Space.xs : Space.sm }) {
+        ForEach([0, 1, 2, 3], (i: number) => { Text(this.opts.length > (i) ? this.opts[(i)] : '').fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.inkAt((i))).width('100%').constraintSize({ minHeight: Cell.of(Bp.isShort() ? 40 : 52) }).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis }).backgroundColor(this.toneAt((i))).borderRadius(Radius.md).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((i)); })
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L328'; })
         .onBlur(() => { if (this.tvFocus === 'L328') { this.tvFocus = ''; } })
@@ -362,7 +365,10 @@ export struct GWordSurge {
       .onBlur(() => { if (this.tvFocus === 'L338') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L338'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
+      // ★ 2026-11-23（Windows 实测）：short 屏这行页脚会被屏底切掉一半 ⇒ 矮屏不渲染
+      //   （分数/最高连击都是本局统计，页头已有答对/连击/剩余，不丢信息）。
       Text(TG2("得分 {0}｜最好连击 {1}｜答错扣 3 秒",Digits(String(this.score), this.langCode),Digits(String(this.best), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
