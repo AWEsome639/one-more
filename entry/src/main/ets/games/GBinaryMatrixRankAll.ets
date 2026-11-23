@@ -298,10 +298,13 @@ export struct GBinaryMatrixRankAll {
         .justifyContent(FlexAlign.SpaceBetween)
       }
       .width('100%')
-      Row({ space: Space.xs }) {
-        ForEach(this.rows, (r: number) => {
+      // ★ 2026-11-23（Windows 截图+dump 发现）：这里原本是 Row ⇒ 6 个「行」被横着并排，
+      //   只有第一行落在屏内、其余行被推到右边（dump 里矩阵只看到一行、第 7 格在 x=2500..2560 被切）。
+      //   矩阵行必须纵向堆叠 ⇒ Column。
+      Column({ space: Space.xs }) {
+        ForEach(this.rowIdx(), (r: number) => {
           Row({ space: Space.xs }) {
-          ForEach(this.rows, (c: number) => {
+          ForEach(this.rowIdx(), (c: number) => {
           Text(String(this.m[((r)) * this.diffTotal + (c)])).fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center).layoutWeight(1).height(Cell.of(30))
           .fontColor(this.m[((r)) * this.diffTotal + (c)] === 1 ? '#FFFFFF' : this.theme.inkFaint)
