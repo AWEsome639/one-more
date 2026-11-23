@@ -36,7 +36,12 @@ EMU_INST = os.environ.get('DSH_EMU_INST', 'onemore7')
 SHOT_BUDGET = int(os.environ.get('SHOT_BUDGET', '150'))
 
 def _dev():
-    r = subprocess.run([HC, 'list', 'targets'], capture_output=True, text=True, timeout=20)
+    # ★ 2026-11-23（Windows 实测）：hdc server 在模拟器重启后会短暂卡死，
+    #   `hdc list targets` 曾直接抛 TimeoutExpired 把整批打崩 ⇒ 这里必须容错返回空。
+    try:
+        r = subprocess.run([HC, 'list', 'targets'], capture_output=True, text=True, timeout=20)
+    except subprocess.TimeoutExpired:
+        return ''
     line = (r.stdout or '').strip().split('\n')[0].strip()
     return '' if ('Empty' in line or not line) else line
 
