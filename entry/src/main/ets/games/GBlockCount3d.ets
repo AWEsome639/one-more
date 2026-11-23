@@ -369,7 +369,7 @@ export struct GBlockCount3d {
         .onFocus(() => { this.tvFocus = 'L319'; })
         .onBlur(() => { if (this.tvFocus === 'L319') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L319')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
-      Text(TG('提示：每格从下往上数高度，全部加起来才是总块数；空格是 0'))
+      Text(TG('提示：每格从下往上数高度，全部加起来才是总块数；空格是 0')).visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {

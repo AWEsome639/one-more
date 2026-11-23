@@ -386,7 +386,7 @@ export struct GWordScramble {
       .outline(Tv.focusOutline(this.tvFocus === 'L340'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }.width('100%')
-      Text(TG2('提示：拼错会自动清空重来；共 {0} 个词，慢慢想 🐳', this.diffTotal)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+      Text(TG2('提示：拼错会自动清空重来；共 {0} 个词，慢慢想 🐳', this.diffTotal)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center).visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
