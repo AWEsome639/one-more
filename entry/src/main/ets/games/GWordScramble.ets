@@ -352,14 +352,14 @@ export struct GWordScramble {
         Text('「' + this.hint() + '」').fontSize(FontSize.xl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         Text(this.typed.length > 0 ? this.typed.join(' ') : '· · ·').fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.primary)
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
-      Text(this.msg).fontSize(FontSize.sm)
+      Text(this.msg).fontSize(FontSize.sm) .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() }).fontWeight(FontWeight.Bold).width('100%').textAlign(TextAlign.Center).fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       // ★ 常驻结果行：答过之后固定显示上一次对错（用全角空格占位，避免布局跳动）
       Text(this.lastFb.length > 0 && this.lastFb !== this.msg ? this.lastFb : '　')
         .fontSize(FontSize.xxs).fontColor(this.lastOk ? Palette.emerald : Palette.rose)
-        .width('100%').textAlign(TextAlign.Center)
+        .width('100%').textAlign(TextAlign.Center) .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       Row({ space: Space.xs }) {
         ForEach(this.tiles, (c: string, i: number) => { Text((c)).fontSize(FontSize.xl).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).aspectRatio(1).backgroundColor(this.tileTone((i))).borderRadius(Radius.sm).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() }).onClick(() => { Haptics.tick(); this.tap((i)); })
         .focusable(Tv.on())

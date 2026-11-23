@@ -486,7 +486,7 @@ export struct GBinomialMatch {
       .alignItems(VerticalAlign.Top)
 
       Text(this.msg)
-        .fontSize(FontSize.sm)
+        .fontSize(FontSize.sm) .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
         .animation({ duration: Motion.slow, curve: Motion.spring() })
