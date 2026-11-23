@@ -363,23 +363,15 @@ export struct GWordMastermind {
         Text(Digits(String(this.score), this.langCode)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.amber))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')
-      // ★ 2026-11-24（Windows dump）：short 屏 7 行猜词 + 4 行键盘 + 按钮行超出 533vp，
-      //   键盘整块在屏外（dump 最底部只有 msg「凑满 5 个字母后按 ⏎ 提交」）⇒ 猜词区改可滚动，
-      //   键盘与按钮固定，保证输入区永远可见（纯画布用 Scroll 是允许的形态）。
-      Scroll() {
+      // ★ 2026-11-24（Windows dump 实测）：short 屏 7 行猜词会把键盘整块挤到屏外。
+      //   矮屏专用版式：只显示最近 3 行（4/5/6），去掉 Scroll；键盘与按钮固定可见。
       Column({ space: Space.xs }) {
-        ForEach([0, 1, 2, 3, 4, 5, 6], (r: number) => {
+        ForEach(Bp.isShort() ? [4, 5, 6] : [0, 1, 2, 3, 4, 5, 6], (r: number) => {
           Row({ space: Space.xs }) {
-            ForEach([0, 1, 2, 3, 4], (c: number) => { Text(this.letterAt((r), (c))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(34)).backgroundColor(this.toneAt((r), (c))).borderRadius(Radius.xs).animation({ duration: Motion.fast, curve: Motion.snap() }) }, (c: number) => 'c' + c)
+            ForEach([0, 1, 2, 3, 4], (c: number) => { Text(this.letterAt((r), (c))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(Bp.isShort() ? 30 : 34)).backgroundColor(this.toneAt((r), (c))).borderRadius(Radius.xs).animation({ duration: Motion.fast, curve: Motion.snap() }) }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
       }.width('100%')
-      }
-      .width('100%')
-      // ★ 2026-11-24：short 屏固定 240px 可滚区域（约 2.5 行），键盘永远可见；
-      //   layoutWeight 在「固定子元素已超屏」时会拿到 0 高度（本轮实测：猜词区整块消失）。
-      .height(Bp.isShort() ? 240 : 640)
-      .scrollBar(BarState.Off)
       Text(this.msg).fontSize(FontSize.sm)
         .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         // ★ 通关庆祝
