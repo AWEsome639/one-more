@@ -484,7 +484,7 @@ export struct GCommonDenominator {
       Text(TG('提示：最小公分母 = 两分母的最小公倍数 = b×d ÷ gcd(b, d)'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
-        .width('100%')
+        .width('100%').visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

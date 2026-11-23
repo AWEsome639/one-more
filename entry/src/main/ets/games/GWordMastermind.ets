@@ -413,7 +413,7 @@ export struct GWordMastermind {
       .outline(Tv.focusOutline(this.tvFocus === 'L327'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.press(26); }); })
       }.width('100%')
-      Text(TG('提示：🟩 字母与位置都对｜🟨 字母在词里但位置错｜⬜ 词里没有')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+      Text(TG('提示：🟩 字母与位置都对｜🟨 字母在词里但位置错｜⬜ 词里没有')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center).visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

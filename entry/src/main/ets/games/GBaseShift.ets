@@ -545,7 +545,7 @@ export struct GBaseShift {
       Text(TG2('规则：末尾添 0 就是左移一位；添 {0} 个 0 就是 ×{1}（以二进制为例）', String(2), String(4)))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
-        .width('100%')
+        .width('100%').visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
