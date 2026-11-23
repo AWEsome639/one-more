@@ -605,7 +605,7 @@ export struct GCrown {
           }
           .width(Math.min(Bp.width - 2 * Space.lg, // ★ 2026-11-15（判据 2716/2762/2765）：底部「放皇冠/撤销/提示」那行被切（blk=2/48px）。
           //   533-360=173 < 240 ⇒ **起决定作用的是下限 240**；下限 240→220 让出 20vp=60px ≥ 缺口 48px。
-          Math.max(210, Bp.height - 360)))
+          Math.max(Bp.isShort() ? 190 : 210, Bp.height - (Bp.isShort() ? 380 : 360))))
         }, (r: number) => 'crw' + r)
       }
       .width('100%')
@@ -691,6 +691,7 @@ export struct GCrown {
         TG('同色 = 同一分区；行/列/分区各一个皇冠，且互不相邻'))
         .fontSize(FontSize.xs)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkFaint)
+        .visibility(Bp.isShort() && !this.over ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
