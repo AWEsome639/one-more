@@ -402,7 +402,10 @@ export struct GMandelbrot {
       // ★ 2026-11-15（判据 2759/2762）：12行×16列的方格网格，容器 `.width('100%')` 无上限
       //   ⇒ 每格 ~156px、近 12 行需 ~1872px ≫ 屏高 ⇒ **分形下部 4 行被切掉**（截图实证）。
       //   ⇒ 限宽到 1260px：每格 ~78px、近 12 行约 969px，装得下。
-      .width(Math.min(Bp.width - 2 * Space.lg, 420))
+      // ★ 2026-11-23（Windows 复测）：420vp 上限只算了「12 行方格」本身（315vp），
+      //   漏了上方 3 个统计卡 + 按钮行的 ~250vp ⇒ 棋盘底边 1600 被切（blk=2/48px，截图确认）。
+      //   short 屏按剩余高度反推：约 330vp（12 行 ≈ 247vp，加头部 252vp ≈ 499vp < 533）。高屏不变。
+      .width(Math.min(Bp.width - 2 * Space.lg, Bp.isShort() ? 330 : 420))
       .padding(Space.xs)
       .backgroundColor('#0B0B14')
       .borderRadius(Radius.md)
