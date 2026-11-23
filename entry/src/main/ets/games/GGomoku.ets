@@ -1057,10 +1057,10 @@ export struct GGomoku {
               })
             }, (c: number) => 'gk' + r + '-' + c)
           }
-          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(240, Bp.height - (Bp.isShort() ? 360 : 425))))
+          .width(Math.min(Bp.width - 2 * Space.lg, Math.max(Bp.isShort() ? 180 : 240, Bp.height - (Bp.isShort() ? 420 : 425))))
         }, (r: number) => 'gkr' + r)
       }
-      .width('100%')
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(Bp.isShort() ? 180 : 240, Bp.height - (Bp.isShort() ? 420 : 425))))
       .padding(Space.xs)
       // ★ 棋盘底色：木色（围棋/五子棋盘的样子），不再用页面底色
       .backgroundColor(this.theme.isDark ? '#3A2E22' : '#E8C99B')
@@ -1121,6 +1121,7 @@ export struct GGomoku {
         : TG('你执黑先行；电脑用启发式评分抢攻与堵截，连成五子即胜'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
+        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
