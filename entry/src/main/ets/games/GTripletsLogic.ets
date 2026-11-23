@@ -283,7 +283,7 @@ export struct GTripletsLogic {
       ForEach(SLOTS, (i: number) => {
         this.option(i)
       }, (i: number) => 'op' + i)
-      Text(this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+      Text(this.note).fontSize(FontSize.sm).fontColor(this.theme.inkSoft) .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .textAlign(TextAlign.Center).width('100%')
       Button(this.over ? (this.won ? TG('再来一局 🎉') : TG('再试一次')) : TG('重开'))
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
@@ -310,7 +310,7 @@ export struct GTripletsLogic {
       .fontSize(FontSize.xl).fontColor(this.theme.ink).textAlign(TextAlign.Center)
       .width('100%')// ★ 2026-11-16（判据 2782/2785）：dump：三个选项各 150px、间隔 30px ⇒ 第三个被切 13px。
       //   Cell.of(52)=150px ⇒ Cell.of(50)=144px（仍 ≥ 132 触控下限）、三项省 18px。
-      .height(Cell.of(Bp.isShort() ? 40 : 50)).backgroundColor(this.theme.surface).borderRadius(Radius.md)
+      .height(Cell.of(Bp.isShort() ? 34 : 50)).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       .borderWidth(2)
       .borderColor(this.picked < 0 ? this.theme.line :
         (i === this.ans ? Palette.emerald : (i === this.picked ? Palette.rose : this.theme.line)))
