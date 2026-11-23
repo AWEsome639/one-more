@@ -382,7 +382,9 @@ export struct GWordMastermind {
           Row({ space: Space.xs }) {
             ForEach([0, 1, 2, 3, 4, 5, 6], (c: number) => {
               if (r * 7 + c < KEYS) {
-                Text(this.keyLabel((r * 7 + c))).fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(36)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).shadow(Shadow.card).onClick(() => { Haptics.tick(); this.press((r * 7 + c)); })
+                // ★ 2026-11-23（Windows 复测）：底部图例行被屏底切（bottom=1600、截图上只剩上半截）。
+                //   键盘 4 行 36vp → short 32vp（每行 ~10px，共 ~40px）足够抬起来；键仍 ~96px 可点。
+                Text(this.keyLabel((r * 7 + c))).fontSize(FontSize.xs).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center).fontColor(this.theme.ink).layoutWeight(1).height(Cell.of(Bp.isShort() ? 32 : 36)).backgroundColor(this.theme.surface).borderRadius(Radius.xs).shadow(Shadow.card).onClick(() => { Haptics.tick(); this.press((r * 7 + c)); })
                 .focusable(Tv.on())
                 .onFocus(() => { this.tvFocus = 'L311'; })
                 .onBlur(() => { if (this.tvFocus === 'L311') { this.tvFocus = ''; } })

@@ -248,7 +248,7 @@ export struct GOrbitTap {
   build() {
     // ★ 2026-11-16（判据 2782/2785）：棋盘 ARENA(280vp=840px) 从 y=725 到 1565，把底部提示顶到 y=1595（只露 5px）。
     //   ⇒ 矮屏间距 sm→xs（约 5 个间隙共省 60px）。
-    Column({ space: Bp.isShort() ? Space.xs : Space.md }) {
+    Column({ space: Bp.isShort() ? 2 : Space.md }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({

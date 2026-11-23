@@ -283,7 +283,7 @@ export struct GTracePath {
     return i === this.path[this.path.length - 1] ? '🏁' : '';
   }
   build() {
-    Column({ space: Space.sm }) {
+    Column({ space: Bp.isShort() ? Space.xs : Space.sm }) {
       // ★ 演示条（共用组件；未演示时高度为 0，不占位）
       DemoBar({ on: this.demoId >= 0, msg: this.demoMsg })
       HintBar({
