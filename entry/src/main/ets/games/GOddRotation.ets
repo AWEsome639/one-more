@@ -379,7 +379,10 @@ export struct GOddRotation {
       //   按实测 chrome 反推：上方 ≈201.6vp、下方 msg+重开+间距 ≈86vp ⇒ 网格可用 ≈511vp
       //   ⇒ 每张卡 163.7 ⇒ 网格宽 511.1 ⇒ Bp.height − 287.6，取 288。
       //   横屏（isShort）保持 `'100%'` 逐字不变 —— 横屏隐藏了重开按钮、可用高只有 533，公式不适用。
-      .width(Bp.isShort() ? '100%' : Math.min(Bp.width, Bp.height - 288))
+      // ★ 2026-11-23（Windows 复测）：short 屏原来 `'100%'` ⇒ 每张卡 ~278vp 见方、三行要 834vp，
+      //   实际只有第一排可见（截图 Odd_Rotation-210313：下面两排整排出屏，bottom=1600、blk=2/48px）。
+      //   公式 `height-288` 在 short 上同样成立（533-288=245vp，三行 245vp + 头部 256vp ≈ 501vp）。
+      .width(Math.min(Bp.width, Bp.height - 288))
       Text(this.msg)
         .fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft)
