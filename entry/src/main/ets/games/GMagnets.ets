@@ -712,11 +712,16 @@ export struct GMagnets {
         .width(4 * MAG_CELL + CLUE_W + 4 * Space.xs)
         // ★ 2026-11-15 dump：Row 宽对了（276vp）但**高度没设**⇒ 只拿到 154px（一个格子高），
         //   4 个格子竖向需 4×52=208vp ⇒ 纵向溢出。补上高度。
-        .height(4 * MAG_CELL + 3)   // ★ 2026-11-15：每个 Column 除了 4 个格子，**上面还有两行线索文字**
+        // ★ 2026-11-15：每个 Column 除了 4 个格子，**上面还有两行线索文字**
         //   （`Text(colClue+'＋')` + `Text('现 N')`）⇒ 原来只算 4 格的高度少了这两行、内容在 Row 内部溢出。
         //   4×52+3+24 = 235vp < 可用 293vp ✅ ⇒ 格子还能用回作者原本的 52。
+        //   ⚠️ 2026-11-23：底部这行列线索在 phone 横屏仍看不到（截图 08:07/08:49 均无），单列为待查缺陷。
+        .height(4 * MAG_CELL + 3)
       }
-      .width('100%')
+      // ★ 2026-11-23（Windows 复测）：原来这里 width('100%') ⇒ 棋盘行各自铺满整宽、
+      //   格子靠左排，右侧留一大片空；作者注释写着「水平居中」但从未生效。
+      //   改成与棋盘同宽的固定宽，让父级 Column 的 alignItems(Center) 真正居中。
+      .width(4 * MAG_CELL + CLUE_W + 4 * Space.xs)
       // ★ 2026-11-15：显式尺寸后棋盘只占左侧（宽 4×40+44+24=228vp / 可用 813vp）⇒ 水平居中。
       .alignItems(HorizontalAlign.Center)
       .padding(Space.sm)
