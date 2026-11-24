@@ -321,7 +321,7 @@ export struct GSimonCommand {
         //   原注释「竖屏原样不动」的依据是「`1.4×(832−200)=885` 被 `741` 兜住」——
         //   但那个算式算的是**宽度**是否被兜住，没算两行**高度**加起来会不会超屏。
         //   ⇒ 竖屏也走同一套高度反推。
-        : Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 424) + 10)))
+        : Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 476) + 10)))
       Row({ space: Space.sm }) {
         this.pad(2)
         this.pad(3)
@@ -346,7 +346,7 @@ export struct GSimonCommand {
         //   原注释「竖屏原样不动」的依据是「`1.4×(832−200)=885` 被 `741` 兜住」——
         //   但那个算式算的是**宽度**是否被兜住，没算两行**高度**加起来会不会超屏。
         //   ⇒ 竖屏也走同一套高度反推。
-        : Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 424) + 10)))
+        : Math.min(Bp.width, Math.max(200, 1.4 * (Bp.height - 476) + 10)))
       Button(TG('不做动作 ✋'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor(this.theme.ink)
         .backgroundColor(this.theme.surfaceAlt).borderRadius(Radius.md).width('100%').height(Cell.of(48))
