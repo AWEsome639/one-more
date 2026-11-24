@@ -468,7 +468,9 @@ build() {
       Column({ space: Space.lg }) {
         // ★ 2026-10-13 巡检发现：统计页缺等级展示（首页有 LV/经验/火焰，这里直接跳到成就）
         //   ⇒ 复用 Common 里现成的 LevelHeader（和首页同一套数据源，不重复实现）
-        LevelHeader()
+        // ★ 2026-11-24：这里原来不传 theme ⇒ LevelHeader 用默认 Theme.light()，
+        //   深色模式下统计页顶部等级卡仍是白卡（实测 dark_stats.jpeg 整块发白）。
+        LevelHeader({ theme: this.theme() })
         this.achvWall()
         this.badgeWall()
         // ★★★ 2026-11-07（S-09）：这里原来是 `this.heroCard()` —— 与顶部 `LevelHeader()` 是同一张
