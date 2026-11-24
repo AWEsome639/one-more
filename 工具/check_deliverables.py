@@ -27,8 +27,11 @@ CHECKS = [
      '1.15 * (Bp.height - 400) + 10', '3052'),
     # ★ 2026-11-20（判据 3089）：竖屏分支**不再逐字不变**了 —— 原来 `'100%'` 会让
     #   两行四色面板竖向超屏（底部绿/黄各切一半）。改成与横屏同一套高度反推、扣 424。
+    # ★ 2026-11-24 更新：424 在 fold 2224x2496 上仍让「不做动作」压手势条（bottom=2496），
+    #   实测 476 后 bottom 2496→2477、blk=0、按钮与提示行完整（截图-Simon_Command-185601.jpeg）
+    #   ⇒ 期望值改为 476（原 424 的历史见 3089）。
     ('Simon Command 竖屏高度反推', 'entry/src/main/ets/games/GSimonCommand.ets',
-     'Bp.height - 424', '3089'),
+     'Bp.height - 476', '3089'),
     ('Shadow Pivot 竖屏容器', 'entry/src/main/ets/games/GShadowPivot.ets',
      'Bp.height - 643', '3048/3053'),
     ('Shadow Pivot 横屏 32%', 'entry/src/main/ets/games/GShadowPivot.ets',
