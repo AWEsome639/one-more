@@ -201,6 +201,16 @@ export default class EntryAbility extends UIAbility {
         dev = BpDev.TV;
       }
       Bp.update(wVp, hVp, dev);
+      // ★ 2026-11-24（TV 实测）：manifest 的 "orientation": "portrait" 让 TV 打开成竖屏兼容窗
+      //   （3840×2160 上只占中间 1024×2160）。TV 上运行时请求横屏，窗口变宽后 windowSizeChange 会交给 Bp；
+      //   手机/平板/手表一律不动。
+      if (dev === BpDev.TV) {
+        mainWin.setPreferredOrientation(window.Orientation.LANDSCAPE).then(() => {
+          hilog.info(DOMAIN, 'testTag', 'TV: setPreferredOrientation(LANDSCAPE) ok');
+        }).catch((e: Error) => {
+          hilog.warn(DOMAIN, 'testTag', 'TV: setPreferredOrientation 失败: %{public}s', e.message);
+        });
+      }
       try {
         mainWin.on('windowSizeChange', (sz: window.Size) => {
           Bp.update(px2vp(sz.width), px2vp(sz.height));
