@@ -213,7 +213,10 @@ export default class EntryAbility extends UIAbility {
       }
       try {
         mainWin.on('windowSizeChange', (sz: window.Size) => {
-          Bp.update(px2vp(sz.width), px2vp(sz.height));
+          // ★ 2026-11-24（TV 焦点不出现）：原来这里不传 dev ⇒ Bp.update 在宽度 >=1080vp 时
+          //   把设备保守推断成 PC ⇒ isTv() 变 false ⇒ .focusable(Tv.on()) 全关、遥控器点不到。
+          //   ⇒ 把首次读到的 dev 一起传回去（拿不到才退回推断）。
+          Bp.update(px2vp(sz.width), px2vp(sz.height), dev.length > 0 ? dev : undefined);
         });
       } catch (e2) {
         hilog.warn(DOMAIN, 'testTag', 'windowSizeChange 监听失败（不影响使用）: %{public}s', JSON.stringify(e2));
