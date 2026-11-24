@@ -530,7 +530,7 @@ export struct GBubbleShooter {
           .width('100%')
         }, (r: number) => 'r' + r)
       }
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - (Bp.isShort() ? 290 : 360))))
       // 容器按内容高度（不再 layoutWeight ⇒ 不会把行压扁）
       .clip(true)
       .padding(Space.xs)
