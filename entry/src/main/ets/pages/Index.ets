@@ -203,9 +203,10 @@ struct Index {
     };
     setTimeout(kick, 1600);
     // 监听后续切换 ⇒ 强制重建（见 uiRev 的注释）   // 启动时把常量设成当前档（落盘恢复由 ProgressStore 负责）
-    setTimeout(() => {
-      this.entered = true;
-    }, 30);
+    // ★ 2026-11-24（实测）：原来用 setTimeout(30ms) 置位 ⇒ 主线程被冷启动压住时会晚触发，
+    //   首页长时间停在 opacity 0（截图实测：整屏发白、内容几乎不可见，约 5s 后才恢复）。
+    //   直接置位：首帧即全亮，绝不出现"白屏幽灵"；入场过渡交给页面转场。
+    this.entered = true;
   }
 
   private theme(): Theme {
