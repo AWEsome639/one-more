@@ -210,7 +210,7 @@ struct LanLobby {
               .focusable(Tv.on())
               .onFocus(() => { this.tvFocus = 'LL201-' + gid; })
               .onBlur(() => { if (this.tvFocus === 'LL201-' + gid) { this.tvFocus = ''; } })
-              .outline(Tv.focusOutline(this.tvFocus === 'LL201-' + gid))
+              .outline(Tv.focusOutline(this.tvFocus === 'LL201-' + gid, Radius.full))
               .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                                 Haptics.tap();
                 this.picked = gid;

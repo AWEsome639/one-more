@@ -1959,7 +1959,7 @@ export struct CategoryBar {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'CT1722'; })
             .onBlur(() => { if (this.tvFocus === 'CT1722') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'CT1722'))
+            .outline(Tv.focusOutline(this.tvFocus === 'CT1722', Radius.full))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                             Haptics.tap();   // ★ 2026-10-19 按压反馈
               this.onPick(it.cat);

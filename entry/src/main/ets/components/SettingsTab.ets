@@ -723,7 +723,7 @@ build() {
       .focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'S653-' + code; })
       .onBlur(() => { if (this.tvFocus === 'S653-' + code) { this.tvFocus = ''; } })
-      .outline(Tv.focusOutline(this.tvFocus === 'S653-' + code))
+      .outline(Tv.focusOutline(this.tvFocus === 'S653-' + code, Radius.full))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
         Haptics.tap();   // ★ 2026-10-19 按压反馈
         // ★ 语言切换不能包在 animateTo 里 —— 它不是动画属性，
@@ -825,7 +825,7 @@ build() {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'S720'; })
             .onBlur(() => { if (this.tvFocus === 'S720') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'S720'))
+            .outline(Tv.focusOutline(this.tvFocus === 'S720', Radius.full))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
               Haptics.tap();
               this.copyEmail(About.SHAJIA_EMAIL);
@@ -856,7 +856,7 @@ build() {
             .focusable(Tv.on())
             .onFocus(() => { this.tvFocus = 'S740'; })
             .onBlur(() => { if (this.tvFocus === 'S740') { this.tvFocus = ''; } })
-            .outline(Tv.focusOutline(this.tvFocus === 'S740'))
+            .outline(Tv.focusOutline(this.tvFocus === 'S740', Radius.full))
             .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
               Haptics.tap();
               this.copyEmail(About.FEEDBACK_EMAIL);
@@ -891,7 +891,7 @@ build() {
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'S764'; })
         .onBlur(() => { if (this.tvFocus === 'S764') { this.tvFocus = ''; } })
-        .outline(Tv.focusOutline(this.tvFocus === 'S764'))
+        .outline(Tv.focusOutline(this.tvFocus === 'S764', Radius.full))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
           Haptics.tap();
           this.openPrivacyUrl();
@@ -1480,7 +1480,7 @@ build() {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'S1226'; })
           .onBlur(() => { if (this.tvFocus === 'S1226') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'S1226'))
+          .outline(Tv.focusOutline(this.tvFocus === 'S1226', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
             Haptics.tap();   // ★ 2026-10-19 按压反馈
             this.confirming = false;
@@ -1505,7 +1505,7 @@ build() {
           .focusable(Tv.on())
           .onFocus(() => { this.tvFocus = 'S1240'; })
           .onBlur(() => { if (this.tvFocus === 'S1240') { this.tvFocus = ''; } })
-          .outline(Tv.focusOutline(this.tvFocus === 'S1240'))
+          .outline(Tv.focusOutline(this.tvFocus === 'S1240', Radius.sm))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
             this.doReset();
            }); })
