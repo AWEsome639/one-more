@@ -295,7 +295,7 @@ export struct GFractionMatcher {
     Row({ space: Space.sm }) {
       Text(LETTERS[i]).fontSize(FontSize.sm).fontColor(this.theme.inkFaint)
       Text(this.opts[i]).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.optInk(i)).layoutWeight(1)
-    }.width('100%').layoutWeight(inGrid ? 1 : 0).height(Cell.of(48))
+    }.width('100%').layoutWeight(inGrid ? 1 : 0).height(Cell.of(Bp.isShort() ? 48 : 44))
     .padding({ left: Space.sm, right: Space.sm })
     .backgroundColor(this.optBg(i)).borderRadius(Radius.md).shadow(Shadow.card)
     .animation({ duration: Motion.fast, curve: Motion.snap() }).focusable(Tv.on())
