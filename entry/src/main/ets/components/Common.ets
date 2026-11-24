@@ -1512,7 +1512,9 @@ build() {
           // ★★★ 2026-11-07 verifier-eng2 量化：355 款 enTagline 中位 28 字符、>24 字符 **226 款**
           //   ⇒ 2 行时（三标签全亮只剩 ~58vp）226 款吃省略号；3 行时约 36 字符、只有 ~100 款。
           //   ⇒ **长 tagline 给 3 行，短的给 2 行**（中文 9 字仍 2 行，竖排不复发）。
-          .maxLines(this.taglineText().length > 24 ? 3 : 2)
+          // ★ 2026-11-24：宽屏（≥700vp，横屏手机/平板）中文 tagline 只占一行就能放下，
+          //   原来给它 2 行 ⇒ 末尾单字孤行（实测「一板一球，清空全场」第二行只有「场」）。窄屏仍 2 行。
+          .maxLines(this.taglineText().length > 24 ? 3 : (Bp.width >= 700 ? 1 : 2))
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
           // ★ 真机实测（2026-10-13 模拟器 1320px）：长副标题（「一板一球，清空全场」）
