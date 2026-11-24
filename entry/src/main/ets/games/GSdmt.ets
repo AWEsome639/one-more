@@ -290,7 +290,7 @@ export struct GSdmt {
         Row({ space: Space.sm }) {
           ForEach([1, 2, 3], (d: number) => {
             Text(String((d))).fontSize(FontSize.xl).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 54)).borderRadius(Radius.md)
+            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 48)).borderRadius(Radius.md)
             .backgroundColor(this.tapped === (d) ? (this.ok ? Palette.emerald : Palette.rose) : Palette.primary)
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -305,7 +305,7 @@ export struct GSdmt {
         Row({ space: Space.sm }) {
           ForEach([4, 5, 6], (d: number) => {
             Text(String((d))).fontSize(FontSize.xl).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 54)).borderRadius(Radius.md)
+            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 48)).borderRadius(Radius.md)
             .backgroundColor(this.tapped === (d) ? (this.ok ? Palette.emerald : Palette.rose) : Palette.primary)
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
@@ -320,7 +320,7 @@ export struct GSdmt {
         Row({ space: Space.sm }) {
           ForEach([7, 8, 9], (d: number) => {
             Text(String((d))).fontSize(FontSize.xl).fontColor('#FFFFFF').textAlign(TextAlign.Center)
-            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 54)).borderRadius(Radius.md)
+            .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 38 : 48)).borderRadius(Radius.md)
             .backgroundColor(this.tapped === (d) ? (this.ok ? Palette.emerald : Palette.rose) : Palette.primary)
             .scale({ x: this.tapped === (d) ? Motion.pressScale : 1, y: this.tapped === (d) ? Motion.pressScale : 1 })
             .animation({ duration: Motion.fast, curve: Motion.snap() })
