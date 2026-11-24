@@ -632,7 +632,7 @@ export struct GKakuro {
       // ★ 2026-11-15（判据 2710/2715）：`-360` 时棋盘 `173vp`、底部「重开一题」按钮只剩 `60px`（应 132px）。
       //   作者 11-12 已用同一手法压过一次（230→173vp，按钮从完全出屏到露 60px）。
       //   再压一档 `-390`（棋盘 ≈143vp）⇒ 按钮多出 ~30vp = 90px，足够完整。
-      .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - (Bp.isShort() ? 450 : 480))) : Math.min(Bp.width - 2 * Space.lg, Math.max(160, Bp.height - 488)) })
+      .constraintSize({ maxWidth: Bp.height < 600 ? Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - (Bp.isShort() ? 450 : 480))) : Math.min(Bp.width - 2 * Space.lg, Math.max(160, Bp.height - 496)) })
       // ★ 2026-11-19（判据 3065）：**竖屏 `blk=2/48px`、底部「重开一题」被压到 `43px`**（应 `132px`）——
       //   实测（`2224x2496`，`onemore_fold`）：`lowest='重开一题' [62,2453][2162,2496]`，底边正好落在屏底。
       //   棋盘 `382vp` 时总高差 `16vp` ⇒ `-450 → -466`（棋盘 `382 → 366vp`，仍占屏宽 `49%`）。   // ★ 2026-11-19（判据 2986）：**tall 屏原来走 `9999` ⇒ 棋盘无上限**。横屏（`height 533 < 600`）走不到这支所以台账一直「正常」，而**真机竖屏（`853 ≥ 600`）正走这支**：`aspectRatio(1)` 会撑到容器宽 `493` ⇒ 加 `chrome` 后溢出约 `69vp`。改成与短屏同一口径（`450`）：竖屏下 `min(493, max(160, 403)) = 403vp`（占屏宽 `76%`），总高 `403+450 = 853` 留 `0` 余量、实测留 `21vp`。   // ★ 2026-11-12（判据 1928）：`aspectRatio(1)` 的棋盘 **`maxHeight` 只裁不缩**，必须用 `maxWidth` 才能真缩小
