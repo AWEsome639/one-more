@@ -1514,7 +1514,7 @@ build() {
           //   ⇒ **长 tagline 给 3 行，短的给 2 行**（中文 9 字仍 2 行，竖排不复发）。
           // ★ 2026-11-24：宽屏（≥700vp，横屏手机/平板）中文 tagline 只占一行就能放下，
           //   原来给它 2 行 ⇒ 末尾单字孤行（实测「一板一球，清空全场」第二行只有「场」）。窄屏仍 2 行。
-          .maxLines(this.taglineText().length > 24 ? 3 : (Bp.width >= 700 ? 1 : 2))
+          .maxLines(this.taglineText().length > 24 ? 3 : (((I18n.current() === 'zh' || I18n.current() === 'zh-Hant') && Bp.width >= 700) ? 1 : 2))
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
           // ★ 真机实测（2026-10-13 模拟器 1320px）：长副标题（「一板一球，清空全场」）
