@@ -1916,6 +1916,20 @@ build() {
       .backgroundColor(this.accentColor())
       .borderRadius(Radius.sm)
       .shadow(Shadow.card)
+      // ★ 2026-11-24（真机实测）：这条矮屏单行入口**从来没有 onClick** ⇒ 「今天这一局 开始」点了没反应。
+      //   与每日大卡 dailyCard() 对齐：点击 + 读屏。
+      .focusable(Tv.on())
+      .onFocus(() => { this.tvFocus = 'L1921'; })
+      .onBlur(() => { if (this.tvFocus === 'L1921') { this.tvFocus = ''; } })
+      .outline(Tv.focusOutline(this.tvFocus === 'L1921'))
+      .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.openGame(this.dailyId); }); })
+      .onClick(() => {
+        Haptics.tap();
+        this.openGame(this.dailyId);
+      })
+      .accessibilityGroup(true)
+      .accessibilityText(this.t('打开今日挑战：', 'Open today\'s challenge: ') + this.dailyName())
+      .accessibilityLevel('yes')
     }
   }
 
