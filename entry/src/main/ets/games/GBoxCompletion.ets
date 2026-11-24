@@ -334,7 +334,7 @@ export struct GBoxCompletion {
  if (bad === 0 && covered === per.length) {
    this.note = TG('边框合拢，完美盒子 🎉'); this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
  }
- this.note = TG2(TG('已补 {0} 格（边框共 {1} 格）'), String(n), String(per.length - covered + n));
+ this.note = TG2('已补 {0} 格（边框共 {1} 格）', String(n), String(per.length - covered + n));
  }
  private finish(solved: boolean): void {
  this.over = true; this.won = solved;
