@@ -39,8 +39,10 @@ CHECKS = [
     ('Simon Says 两行都限宽', 'entry/src/main/ets/games/GSimonSays.ets',
      # ★ 2026-11-21（判据 3097）：竖屏常数从 230 改成 536（四块全完整），横屏 410 不动。
      'Bp.height - (Bp.isShort() ? 410 : 536)', '3097'),
-    ('Memory 下限 160', 'entry/src/main/ets/games/GMemory.ets',
-     'Math.max(160, Bp.height - 360)', '3058'),
+    # ★ 2026-11-25：fold 上第 4 行卡片被「重新开始」压住 ⇒ 网格宽上限改 420（仅高屏），
+    #   实测 bottom 2374→2173、4 行全见（截图-Memory-050336.jpeg）。
+    ('Memory 下限 160 / 高屏 420', 'entry/src/main/ets/games/GMemory.ets',
+     'Math.max(160, Bp.height - (Bp.isShort() ? 360 : 420))', '3058'),
     ('Memory 矮屏隐藏重复控件', 'entry/src/main/ets/games/GMemory.ets',
      'Visibility.None', '3058'),
     ('Crossword 下限 130 / N 400', 'entry/src/main/ets/games/GCrossword.ets',
