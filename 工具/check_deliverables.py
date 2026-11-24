@@ -47,8 +47,9 @@ CHECKS = [
      'Bp.height - (Bp.isShort() ? 400 : 500)', '3054'),
     ('Collatz 按钮 34→24', 'entry/src/main/ets/games/GCollatz.ets',
      'Bp.isShort() ? 24 : 46', '3059'),
-    ('Kakuro 棋盘 -488', 'entry/src/main/ets/games/GKakuro.ets',
-     'Bp.height - 488', '3065'),
+    # ★ 2026-11-25：fold 2224x2496 上 bottom=2481 压手势线 ⇒ 496 实测 2456 / blk=0。
+    ('Kakuro 棋盘 -496', 'entry/src/main/ets/games/GKakuro.ets',
+     'Bp.height - 496', '3065'),
     ('Word Mastermind 键盘间距', 'entry/src/main/ets/games/GWordMastermind.ets',
      'Column({ space: 2 })', '3065'),
     ('Silhouette Match Ortho gs -494', 'entry/src/main/ets/games/GSilhouetteMatchOrtho.ets',
