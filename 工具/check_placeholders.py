@@ -13,7 +13,10 @@
 """
 import io, os, re, sys
 
-GAMES = '/Users/a0000/dev/yiju/entry/src/main/ets/games'
+# ★ 2026-11-24：原来写死 Mac 路径（/Users/a0000/dev/yiju/...），Windows 上必 FileNotFoundError
+#   ⇒ 按脚本位置推导仓库根，两平台都能跑。
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GAMES = os.path.join(ROOT, 'entry', 'src', 'main', 'ets', 'games')
 LIMIT = {'TG': 0, 'TG2': 3, 'TG4': 4}
 bad = []
 for fn in sorted(os.listdir(GAMES)):
