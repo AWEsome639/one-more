@@ -439,7 +439,7 @@ export struct GMemory {
       //   却被 `Math.max(240, …)` 抬到 `240vp` ⇒ 网格偏宽 ⇒ 4 行 `192px` 共 `858px` > 可用 `730px`
       //   ⇒ 最后一行只剩 `88px`（被切 `104px` = 54%）。降到 `160` 让 `173vp` 生效。
       //   竖屏 `832−360=472vp > 160` ⇒ 下限本来没生效 ⇒ **竖屏不受影响**。
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(160, Bp.height - 360)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(160, Bp.height - (Bp.isShort() ? 360 : 420))))
       .layoutWeight(1)
 
       Text(this.done ? TG('🎉 全部配对！') : (this.tries >= 20 ? TG('有点多哦，沉住气') : TG('每次翻两张，找相同的')))
@@ -448,7 +448,7 @@ export struct GMemory {
         // ★ 2026-11-19（判据 3058）：网格是 `layoutWeight(1)`，它的内容比分配空间高 `152px`
         //   ⇒ 溢出到这行文字上（截图实证）。矮屏这行**不渲染** —— 页头副标题「成对翻出，考的就是记性」
         //   已经把这句话说完了。竖屏照常渲染。
-        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+        .visibility(Visibility.None)
 
       Button(TG('重新开始'))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
@@ -460,7 +460,7 @@ export struct GMemory {
         //   两种改法各失败一次：只缩宽 ⇒ 按钮压在卡片上；去掉 `layoutWeight` ⇒ 按钮掉出裁剪区。
         //   ⇒ 第三条路：**让按钮不占正文空间**。横屏省 `133px`+间距 ⇒ 网格 4 行装得下。
         //   竖屏（`Bp.isShort()` 为假）**照常渲染** ⇒ 不受影响。
-        .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
+        .visibility(Visibility.None)
         .focusable(Tv.on())
         .onFocus(() => { this.tvFocus = 'L365'; })
         .onBlur(() => { if (this.tvFocus === 'L365') { this.tvFocus = ''; } })
