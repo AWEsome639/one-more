@@ -338,7 +338,7 @@ export struct GSumPyramid {
           }.width(String((lvl + 1) * 25) + '%')
         }, (lvl: number) => 'r' + lvl)
       }// ★★ 2026-11-01 真机（横屏 853×533）：金字塔无宽度上限，格子 1:1 ⇒ 高度 = 宽度，撑破屏幕
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - 360))).padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(200, Bp.height - (Bp.isShort() ? 360 : 372)))).padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg)
       .shadow(Shadow.card)
       Text(this.msg).fontSize(FontSize.sm)
         // ★ 通关庆祝
