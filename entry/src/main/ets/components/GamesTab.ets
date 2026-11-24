@@ -977,6 +977,10 @@ build() {
         this.chatPanel()
       }
       .width('100%')
+      .padding({ left: Space.md, right: Space.md, top: Bp.isShort() ? 84 : 100, bottom: Space.sm })
+      .backgroundColor(Color.Transparent)
+      // ★ 2026-11-24：对话面板原来贴着 Stack 顶部渲染，盖住标题与右侧按钮（截图确认「One Me…」被压）。
+      //   改为从顶栏下沿开始（padding.top），并用页面底色铺满，避免与下方网格文字叠在一起。
       .zIndex(10)
     }
     Column() {
@@ -2910,7 +2914,10 @@ build() {
       }, (p: Suggestion) => p.game.id)
     }
     .width('100%')
-    .padding({ left: Space.lg, right: Space.lg, bottom: Space.sm })
+    .padding({ left: Space.md, right: Space.md, top: Space.sm, bottom: Space.sm })
+    .backgroundColor(this.theme().surface)
+    .borderRadius(Radius.lg)
+    .shadow(Shadow.card)
   }
 
   @Builder
