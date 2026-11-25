@@ -487,8 +487,10 @@ export struct GamesTab {
   /** 当前该显示哪些游戏（带记忆化） */
   private list(): GameMeta[] {
     // ★ 搜索文本必须进 key，否则输入后命中旧缓存、列表不动（加搜索最容易踩的坑）
+    // ★ 2026-11-26（P1）：key 里必须带 tick —— 收藏/玩过变动只 +tick，
+    //   原来不带 ⇒ 在「收藏」页取消收藏，卡片与计数都不动。
     const key: string = this.seg + '|' + this.category + '|' + this.picked.join(',') +
-      '|s:' + this.searchText.trim().toLowerCase();
+      '|t:' + this.tick + '|s:' + this.searchText.trim().toLowerCase();
     if (key === this.listCacheKey) {
       return this.listCache;
     }
@@ -574,7 +576,9 @@ export struct GamesTab {
         const g: GameMeta = base[i];
         if (g.name.toLowerCase().indexOf(q) >= 0 ||
             (g.enName !== undefined && g.enName.toLowerCase().indexOf(q) >= 0) ||
-            (g.tagline !== undefined && g.tagline.toLowerCase().indexOf(q) >= 0)) {
+            (g.tagline !== undefined && g.tagline.toLowerCase().indexOf(q) >= 0) ||
+            displayName(g).toLowerCase().indexOf(q) >= 0 ||
+            displayTagline(g).toLowerCase().indexOf(q) >= 0) {
           hit.push(g);
         }
       }
@@ -841,7 +845,8 @@ export struct GamesTab {
     // ★ 缓存键必须包含**筛选/分段**（list() 自己的缓存键就是这三样）——
     //   第一版我只用 renderRev 当键 ⇒ 切分类后字母表还是旧数据（自查抓到的）
     const key: string = this.seg + '|' + this.category + '|' + this.picked.join(',')
-      + '|' + this.tick + '|' + this.langCode;   // ★ 带上语言：中文按拼音、英文按英文字母
+      + '|' + this.tick + '|' + this.langCode + '|s:' + this.searchText.trim().toLowerCase();
+    // ★ 2026-11-26（P1）：补 searchText —— 原来 A-Z 态改搜索词，计数变了列表不变（355 条照列）。
     if (key === this.azCacheKey && this.azCache.length > 0) {
       return this.azCache;
     }
