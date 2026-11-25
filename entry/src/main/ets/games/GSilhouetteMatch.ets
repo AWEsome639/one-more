@@ -282,7 +282,7 @@ export struct GSilhouetteMatch {
     //   而 `(Bp.height - 480)` 只扣了「一排」的预算 ⇒ 第二排整排出屏（实测 blk=3/72px）。
     //   横屏 `isShort()` 时仍按一排算，行为与改动前完全一致。
     const cardRows: number = Bp.isShort() ? 1 : 2;
-    const byH2: number = Math.floor((Bp.height - 480) / (cardRows * n3));
+    const byH2: number = Math.floor((Bp.height - (Bp.isShort() ? 480 : 520)) / (cardRows * n3));
     // ★ 2026-11-20（判据 3084）：选项格真实的容器是「半屏 × 72%」（见下方 `.width('72%')`
     //   嵌在 `.layoutWeight(1)` 里），原来按 `Bp.width` 算 ⇒ 竖屏给 132vp/格、
     //   5 格要 660vp 却只有 248vp 可用 ⇒ 横向撑爆、纵向连带超高（实测 blk=3/72px、第二排选项出屏）。
