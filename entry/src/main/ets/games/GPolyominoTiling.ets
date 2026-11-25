@@ -360,7 +360,7 @@ export struct GPolyominoTiling {
         }, (r: number) => 'r' + r)
       }.width('86%').aspectRatio(1).padding(Space.xs)
       // 2026-11-13: `%` 宽 + aspectRatio(1) ⇒ 高度被宽度锁死；限高后 aspectRatio 反推宽度
-      .constraintSize({ maxHeight: Math.max(120, Bp.height - 400) })
+      .constraintSize({ maxHeight: Math.max(120, Bp.height - (Bp.isShort() ? 400 : 412)) })
       .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.xs }) {
         ForEach(IDXS, (s: number) => { Column({ space: 2 }) {
