@@ -23,6 +23,7 @@ import { common, Want } from '@kit.AbilityKit';
 import { Haptics } from '../core/Haptics';
 import { L, I18n } from '../core/I18n';
 import { GamesTab } from '../components/GamesTab';
+import { GAMES } from '../core/GameRegistry';
 import { StatsTab } from '../components/StatsTab';
 import { SettingsTab } from '../components/SettingsTab';
 import { Diag } from '../core/Diag';
@@ -157,6 +158,25 @@ struct Index {
   @State private showPrivacy: boolean = false;
   /** ★ 2026-11-07 判据 1781：隐私链接打不开时的兜底提示（按钮点了必须有反馈） */
   @State private privacyFallback: string = '';
+
+  /**
+   * ★ 2026-11-26（P1）：跨零点回到前台时重算「今日挑战」。
+   *   原来的 `ensureDaily` 只放在 GamesTab 的 aboutToAppear 和 onPageShow 里——
+   *   前者进程内只跑一次，后者在 @Component 上根本不触发（项目已用真机证实）。
+   *   ⇒ 23:5x 完成挑战、不杀进程到 00:1x，卡片仍是昨天的游戏、仍写「今天已完成」。
+   *   @Entry 的 onPageShow 是有效的，在这里补一次；写入 AppStorage 后卡片（@StorageProp）自动刷新。
+   */
+  onPageShow(): void {
+    try {
+      const ids: string[] = [];
+      for (let i = 0; i < GAMES.length; i++) {
+        ids.push(GAMES[i].id);
+      }
+      ProgressStore.ensureDaily(ids);
+    } catch (e) {
+      // 兜底：拿不到游戏表也不影响首页
+    }
+  }
 
   aboutToAppear(): void {
     UiModeMgr.apply(UiModeMgr.current());

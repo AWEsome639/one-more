@@ -280,7 +280,8 @@ struct LanLobby {
         .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();   // ★ 2026-10-19 按压反馈
-          this.hostRoom();
+          // ★ 2026-11-26（P1）：竞速模式必须走 raceHost（原来恒走回合制 ⇒ 竞速排行榜永远是空的）
+          if (this.raceMode) { this.raceHost(); } else { this.hostRoom(); }
         })
 
       // 房间列表
@@ -309,7 +310,7 @@ struct LanLobby {
         .outline(Tv.focusOutline(this.tvFocus === 'LL280-' + r.ip + ':' + r.port))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => {
                     Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：加入房间是重要动作
-          this.joinRoom(r);
+          if (this.raceMode) { this.raceJoin(r); } else { this.joinRoom(r); }
         
         }); })
         .accessibilityGroup(true)
@@ -317,7 +318,7 @@ struct LanLobby {
         .accessibilityLevel('yes')
         .onClick(() => {
           Haptics.tap();   // ★ 2026-11-03（第 899 轮）补：加入房间是重要动作
-          this.joinRoom(r);
+          if (this.raceMode) { this.raceJoin(r); } else { this.joinRoom(r); }
         })
       }, (r: LanRoom) => r.ip + ':' + r.port)
 
@@ -435,9 +436,10 @@ struct LanLobby {
     const pt: number = Number.parseInt(this.manualPort.trim(), 10);
     const room: LanRoom = { ip: ip, port: isNaN(pt) ? 41235 : pt, host: 'Host', gameId: this.picked };
     this.status = TG('正在连接 {s}…').replace('{s}', ip);
+    if (this.raceMode) { this.raceJoin(room); return; }   // ★ 2026-11-26（P1）竞速走 raceJoin
     LanMatch.begin(false, (d: string) => {
       this.status = this.t('对手落子：', 'Opponent moved: ') + d;
-    }, this.picked);          // ★ P12：传 gameId，难度广播才生效
+    }, this.picked);
     const ok: boolean = await Lan.join(room, (m: LanMsg) => {
       LanMatch.receive(m);
       LanRace.receive(m);      // ★ 竞速模式（P-race）：和回合制并列，互不干扰
@@ -456,14 +458,14 @@ struct LanLobby {
     Haptics.tap();
     LanMatch.begin(false, (d: string) => {
       this.status = this.t('对手落子：', 'Opponent moved: ') + d;
-    }, this.picked);          // ★ P12：传 gameId，难度广播才生效
+    }, r.gameId);   // ★ 2026-11-26（P1）：用房间那款，而不是本地选中那款
     const ok: boolean = await Lan.join(r, (m: LanMsg) => {
       LanMatch.receive(m);
       LanRace.receive(m);      // ★ 竞速模式（P-race）：和回合制并列，互不干扰
       if (m.t === 'ack') {
         this.status = this.t('已连上房主，开局…', 'Connected! Starting…');
         // ★ 握手完成 ⇒ 直接进游戏（加入方后手）
-        router.pushUrl({ url: 'pages/GameHost', params: { id: this.picked } });
+        router.pushUrl({ url: 'pages/GameHost', params: { id: r.gameId } });
       }
     });
     this.status = ok ? TG('连上了！') : TG('连不上，可能房主退出了');
