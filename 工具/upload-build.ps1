@@ -15,8 +15,7 @@ if (-not $tok) { throw 'GITHUB_TOKEN not found in credentials refs' }
 $h = @{ Authorization = "Bearer $tok"; Accept = 'application/vnd.github+json'; 'User-Agent' = 'dsh-hp' }
 $app = Get-ChildItem $AppDir -Filter '*-release-signed-*.app' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if (-not $app) { throw 'no signed .app found' }
-$stamp = $app.LastWriteTime.ToString('yyyyMMdd-HHmm')
-$assetName = ($app.BaseName -replace '-signed-', "-signed-$stamp-") + '-app.zip'
+$assetName = $app.BaseName + '-app.zip'
 Write-Output "app: $($app.Name) ($([math]::Round($app.Length/1MB,2)) MB)"
 Write-Output "asset: $assetName"
 # release for version
@@ -34,7 +33,13 @@ if ($DryRun) { Write-Output 'dry run: stop before upload'; return }
 $zip = Join-Path $env:TEMP $assetName
 Compress-Archive -LiteralPath $app.FullName -DestinationPath $zip -Force
 $url = "https://uploads.github.com/repos/$Repo/releases/$($rel.id)/assets?name=$assetName"
-$code = & curl.exe -sS -o (Join-Path $env:TEMP 'gh_asset.json') -w "%{http_code}" --http1.1 --max-time 600 -X POST -H "Authorization: Bearer $tok" -H "Content-Type: application/octet-stream" -H "User-Agent: dsh-hp" -H "Expect:" --data-binary "@$zip" $url
+$code = ''
+for ($attempt = 1; $attempt -le 4; $attempt++) {
+  $code = & curl.exe -sS -o (Join-Path $env:TEMP 'gh_asset.json') -w "%{http_code}" --http1.1 --max-time 900 -X POST -H "Authorization: Bearer $tok" -H "Content-Type: application/octet-stream" -H "User-Agent: dsh-hp" -H "Expect:" --data-binary "@$zip" $url
+  if ($code -eq '201') { break }
+  Write-Output "upload attempt $attempt -> http=$code, retrying in 10s"
+  Start-Sleep 10
+}
 if ($code -ne '201') { throw "upload failed http=$code" }
 $j = Get-Content (Join-Path $env:TEMP 'gh_asset.json') -Raw | ConvertFrom-Json
 Write-Output "uploaded: $($j.name) $([math]::Round($j.size/1MB,2)) MB"
