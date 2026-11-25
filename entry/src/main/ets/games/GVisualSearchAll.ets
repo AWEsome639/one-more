@@ -311,7 +311,7 @@ export struct GVisualSearchAll {
       //   盘面是 aspectRatio(1) 的方形格 ⇒ 限宽即限高，放开 -220→-240 就能让出 ~20vp=60px。
       // ★ 2026-11-22（判据 3119）：竖屏「重开」被切掉大半（blkh=40px 而完整应 137px ⇒ 缺 97px ≈ 31vp）
       //   缺 31 + 留 10 ⇒ 竖屏 reserve 240 → 281；横屏（isShort）保持 240 逐字不变。
-      Bp.isShort() ? Math.max(200, Bp.height - 240) : Math.max(200, Bp.height - 281)))
+      Bp.isShort() ? Math.max(200, Bp.height - 240) : Math.max(200, Bp.height - 301)))
       .padding(Space.sm).backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg).shadow(Shadow.card)
       Text(this.note).fontSize(FontSize.sm)
