@@ -18,6 +18,18 @@ if (-not $app) { throw 'no signed .app found' }
 $assetName = $app.BaseName + '-app.zip'
 Write-Output "app: $($app.Name) ($([math]::Round($app.Length/1MB,2)) MB)"
 Write-Output "asset: $assetName"
+# ★ 2026-11-25：上传前先验签（.app 必须带 HAP Signing Block，否则 AGC/装机都会拒）
+$java = 'C:\Program Files\Huawei\DevEco Studio\jbr\bin\java.exe'
+$jar  = 'C:\Program Files\Huawei\DevEco Studio\sdk\default\openharmony\toolchains\lib\hap-sign-tool.jar'
+if ((Test-Path $java) -and (Test-Path $jar)) {
+  $ErrorActionPreference = 'Continue'   # java 往 stderr 打日志，Stop 会把它当异常
+  $vlog = & $java -jar $jar verify-app -inFile $app.FullName -outCertChain (Join-Path $env:TEMP 'v.cer') -outProfile (Join-Path $env:TEMP 'v.p7b') 2>&1
+  $ErrorActionPreference = 'Stop'
+  $vtext = ($vlog | Out-String)
+  if ($vtext -notmatch 'Find Hap Signing Block success') { throw "signature verify failed for $($app.Name)" }
+  $blk = ($vtext -split "`n" | Where-Object { $_ -match 'Find Hap Signing Block' } | Select-Object -First 1).Trim()
+  Write-Output "sign: $blk"
+} else { Write-Output 'sign: verify tool missing, skipped' }
 # release for version
 $rel = $null
 $rels = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases" -Headers $h -TimeoutSec 60

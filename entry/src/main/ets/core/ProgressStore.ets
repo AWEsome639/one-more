@@ -200,8 +200,14 @@ export class ProgressStore {
       AppStorage.setOrCreate(Keys.totalSolved, totalSolved);
       AppStorage.setOrCreate(Keys.superStreak, showStreak);
       AppStorage.setOrCreate(Keys.bestStreak, bestStreak);
-      AppStorage.setOrCreate(Keys.solvedToday, false);
+      // ★ 2026-11-25：重启后当天已打卡要认（否则连胜被重置成 1，P0）
+      AppStorage.setOrCreate(Keys.solvedToday, lastDay === today);
       AppStorage.setOrCreate(Keys.dailyCount, 0);
+      // ★ 2026-11-25（P1）：totalDays / dailyTotal / lastDayCounted 写了盘却从没读回
+      //   ⇒ 成就「月度常客/百日之约/挑战常客…」不可达，且每次冷启动首个结算把它们覆盖成 0/1。
+      AppStorage.setOrCreate('totalDays', p.getSync('totalDays', 0) as number);
+      AppStorage.setOrCreate('dailyTotal', p.getSync('dailyTotal', 0) as number);
+      AppStorage.setOrCreate('lastDayCounted', p.getSync('lastDayCounted', '') as string);
       AppStorage.setOrCreate(Keys.themeMode, mode);
       ProgressStore.applyThemeMode(mode);
 
@@ -424,7 +430,10 @@ export class ProgressStore {
     }
 
     // ② 全局打卡（今天第一次解出）
-    const alreadyToday: boolean = AppStorage.get<boolean>(Keys.solvedToday) === true;
+    // ★ 2026-11-25（P0）：solvedToday 是内存态，重启后为 false；必须用磁盘 lastDay 兜底，
+    //   否则「今天已打卡 → 重启 → 再玩一局」会把连胜重置成 1 并写回磁盘（superStreak 永久丢失）。
+    const lastDayNow: string = (ProgressStore.pref?.getSync('lastDay', '') as string) ?? '';
+    const alreadyToday: boolean = AppStorage.get<boolean>(Keys.solvedToday) === true || lastDayNow === today;
     let superStreak: number = AppStorage.get<number>(Keys.superStreak) ?? 0;
     if (!alreadyToday) {
       const lastDay: string = (ProgressStore.pref?.getSync('lastDay', '') as string) ?? '';
@@ -487,6 +496,7 @@ export class ProgressStore {
     const td: number = ProgressStore.totalDays() + 1;
     if (AppStorage.get<string>('lastDayCounted') !== ProgressStore.today()) {
       AppStorage.setOrCreate('lastDayCounted', ProgressStore.today());
+      ProgressStore.putString('lastDayCounted', ProgressStore.today());
       AppStorage.setOrCreate('totalDays', td);
       ProgressStore.putNumber('totalDays', td);
     }
