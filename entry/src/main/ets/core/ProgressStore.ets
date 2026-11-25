@@ -1549,7 +1549,9 @@ export class ProgressStore {
       //   ⇒ `dmax ≲ 110`，而「赢局最低分 > 输局最高分」在 `dmax < 353` 时恒成立 ✅
       //   ⇒ 注释里原来写「未修的 classic_maze」是**过时的**，别再拿它当待办。
       ProgressStore.lastWasBest = solved && score > prevBest;
-      if (score > prevBest) {
+      // ★ 2026-11-25（P2 收尾）：只写「赢局」的最高分。
+      //   原来对每局都写 ⇒ 输局分数更高时会把最高分刷成失败分（上面注释里挂了很久的已知残留）。
+      if (solved && score > prevBest) {
         mb[gameId] = score;
         const jb: string = JSON.stringify(mb);
         AppStorage.setOrCreate(Keys.perGameBest, jb);
