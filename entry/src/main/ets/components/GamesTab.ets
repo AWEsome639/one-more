@@ -91,8 +91,10 @@ export struct GamesTab {
   @State private manualUntil: number = 0;
   // ★★★ 2026-10-14 自动收起的【防抖闸门】：两次切换至少隔 900ms，杜绝甩动中反复重排
   @State private lastToggle: number = 0;
-  @State dailyId: string = '';
-  @State dailyDone: boolean = false;
+  // ★ 2026-11-26（真机证据）：@Component 上的 onPageShow 不触发（打完今日挑战回首页，
+  //   卡片仍写「开始 ›」）⇒ 这两个字段改挂 @StorageProp，由 AppStorage 变更自动刷新。
+  @StorageProp('dailyPick') dailyId: string = '';
+  @StorageProp('dailyDone') dailyDone: boolean = false;
   @State toast: string = '';
   @State renderRev: number = 0;
   @StorageProp('lang') langCode: string = 'zh';
@@ -216,8 +218,6 @@ export struct GamesTab {
       ids.push(GAMES[i].id);
     }
     ProgressStore.ensureDaily(ids);
-    this.dailyId = ProgressStore.dailyPick();
-    this.dailyDone = ProgressStore.dailyDoneToday();
   }
 
   /**
@@ -254,8 +254,6 @@ export struct GamesTab {
       idsNow.push(GAMES[i].id);
     }
     ProgressStore.ensureDaily(idsNow);
-    this.dailyId = ProgressStore.dailyPick();
-    this.dailyDone = ProgressStore.dailyDoneToday();
 
     // ★ 2026-10-13：这里的清理现在是【兜底】——
     //   正常情况下进游戏后 400ms 就已经清掉了（见 openGame），
