@@ -377,6 +377,8 @@ export struct GOddOneOut {
         .fontColor(this.theme.inkFaint)
         .width('100%')
         .textAlign(TextAlign.Center)
+        // ★ 2026-11-25：fold 上这行底 2496 被屏沿截掉一截，页头副标题已说明玩法 ⇒ 高屏不渲染。
+        .visibility(Bp.height > 900 ? Visibility.None : Visibility.Visible)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
