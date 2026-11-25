@@ -4329,3 +4329,4 @@
 2026-11-26T03:06:33	Symmetry Span	OK	2481	84.0s lowest='重开' [62,2328][2162,2481] blk=1/9px blkh=153px cov=5 board=2224x2496@0,0 scr=2224x2496 max=9 over=0px sumover=0px -> D:\work\one-more\_巡检记录\截图-Symmetry_Span-030631.jpeg @2026-11-26T03:06:33
 2026-11-26T03:07:57	Symmetry Span	OK	2481	83.6s lowest='重开' [62,2328][2162,2481] blk=1/9px blkh=153px cov=5 board=2224x2496@0,0 scr=2224x2496 max=9 over=0px sumover=0px -> D:\work\one-more\_巡检记录\截图-Symmetry_Span-030755.jpeg @2026-11-26T03:07:57
 2026-11-26T03:29:09	Symmetry Span	OK	2481	89.2s lowest='重开' [62,2328][2162,2481] blk=1/9px blkh=153px cov=5 board=2224x2496@0,0 scr=2224x2496 max=9 over=0px sumover=0px -> D:\work\one-more\_巡检记录\截图-Symmetry_Span-032907.jpeg @2026-11-26T03:29:09
+2026-11-26T03:42:08	Symmetry Span	OK_NOSHOT	2481	99.8s lowest='重开' [62,2328][2162,2481] recv failed @2026-11-26T03:42:08

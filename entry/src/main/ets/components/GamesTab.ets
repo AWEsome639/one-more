@@ -1046,7 +1046,9 @@ build() {
         if (!Bp.tinyScreen() && !this.searchOpen) {
           this.segRow()
         }
-        if (this.seg === Seg.ALL && !this.showFilter && !Bp.tinyScreen()) {
+        // ★ 2026-11-26（P2）：搜索时隐藏分类条——它显示的是全量计数（355/46/44…），
+    //   与「全部 · 2 款」同屏，用户会以为筛选没生效。
+    if (this.seg === Seg.ALL && !this.showFilter && !this.searchOpen && !Bp.tinyScreen()) {
           CategoryBar({
             items: categoryList(),
             selected: this.category,
