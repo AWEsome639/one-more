@@ -302,7 +302,7 @@ export struct GDynamicSalience {
       }.width('100%').aspectRatio(1)
       // ★ 2026-10-31 真机（横屏 853×533）：宽驱动 aspectRatio 无上限 ⇒ 棋盘撑到 813vp 高，
       //   而游戏区可用只有 377vp（屏高 533 − 顶栏 156）⇒ 下方按钮与说明整体在窗外。限高让 aspectRatio 反推宽度。
-      .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
+      .constraintSize({ maxHeight: Math.max(140, Bp.height - (Bp.isShort() ? 360 : 460)) })
       Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%').textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(this.over ? TG('再来一局') : TG('重开'))
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
