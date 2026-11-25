@@ -480,7 +480,7 @@ export struct GLightsOut {
           .width('100%')
         }, (r: number) => 'or' + r)
       }
-      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360)))
+      .width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - (Bp.isShort() ? 360 : 372))))
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.lg)
