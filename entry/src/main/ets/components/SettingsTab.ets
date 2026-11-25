@@ -398,8 +398,11 @@ export struct SettingsTab {
       // ★ 统一走 ProgressStore.resetAll()：清 AppStorage + preferences 库 + 内存里的连胜 Map
       //   （逐键清会漏掉 streaks，重置后一玩旧连胜又被写回磁盘 —— feat-settings 抓到的坑）
       ProgressStore.resetAll();
-      // 深色模式是"外观"不是"进度" ⇒ 重置后写回，别顺手把人家的主题改了
-      ProgressStore.setThemeDark(this.dark);
+      // ★ 2026-11-26（P1）：统计页的「近 7 天 / 今日得分 / 通关率」来自 GameLog，
+      //   resetAll 只清 preferences ⇒ 必须同时清日志，否则重置后统计还是旧数字。
+      try { GameLog.clear(); } catch (e) { }
+      // ★ 2026-11-26（P2）：resetAll 已保留 themeMode（含「跟随系统」），这里再 setThemeDark
+      //   会把 system 覆盖成固定 light/dark ⇒ 删掉。
       this.noteOk = true;
       this.note = this.t('已经清干净了：等级回到 1，通关和收藏都归零 ✅',
                          'All clear: level back to 1, clears and saves at zero ✅');

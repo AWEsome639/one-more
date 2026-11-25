@@ -877,6 +877,9 @@ struct GameHost {
     this.meta = findGame(next);
     this.fav = ProgressStore.isFavorite(next);
     animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
+                  //   的 if (this.finished) return 会把第二局及之后每一局吞掉（无结算/无 XP）。
+                  this.finished = false;
+                  this.startedAt = Date.now();
       this.showResult = false;
       this.lastSolved = false;
       this.lastScore = 0;
@@ -3747,6 +3750,10 @@ struct GameHost {
                 //   ⇒ 开新局前先把所有代打停掉（一处覆盖 355 款）。
                 Hint.stopAllAuto();
                 animateTo({ duration: Motion.fast, curve: Motion.spring() }, () => {
+                  // ★★★ 2026-11-26（P0）：再来一局必须复位 finished，否则 handleFinish 的
+                  //   if (this.finished) return 会把第二局及之后每一局整个吞掉（无结算/无 XP）。
+                  this.finished = false;
+                  this.startedAt = Date.now();
                   this.showResult = false;
                   this.nonce = this.nonce + 1;
                   // ★★★ 2026-11-01 **关键：切 diffTick 的奇偶 ⇒ 游戏组件「重建」**。

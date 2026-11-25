@@ -202,6 +202,8 @@ export class ProgressStore {
       AppStorage.setOrCreate(Keys.bestStreak, bestStreak);
       // ★ 2026-11-25：重启后当天已打卡要认（否则连胜被重置成 1，P0）
       AppStorage.setOrCreate(Keys.solvedToday, lastDay === today);
+  // ★ 2026-11-26（P1）：把「最后一次解出的日期」也装回内存（跨零点判据靠它）
+  AppStorage.setOrCreate('solvedOn', (p.getSync('solvedOn', lastDay) as string) ?? lastDay);
       AppStorage.setOrCreate(Keys.dailyCount, 0);
       // ★ 2026-11-25（P1）：totalDays / dailyTotal / lastDayCounted 写了盘却从没读回
       //   ⇒ 成就「月度常客/百日之约/挑战常客…」不可达，且每次冷启动首个结算把它们覆盖成 0/1。
@@ -421,6 +423,8 @@ export class ProgressStore {
     }
     ProgressStore.streaks.set(gameId, gs);
 
+    // ★ 2026-11-26（P1）：每局先清空成就缓存，避免把上一局的旧成就当本局的
+  ProgressStore.lastNewAch = [];
     if (!solved) {
       ProgressStore.persistStreaks();
       // ★ 没通关也要结算成就 —— 否则「初次开局」「手熟」这类"玩过就算"的成就永远解不开
@@ -433,7 +437,11 @@ export class ProgressStore {
     // ★ 2026-11-25（P0）：solvedToday 是内存态，重启后为 false；必须用磁盘 lastDay 兜底，
     //   否则「今天已打卡 → 重启 → 再玩一局」会把连胜重置成 1 并写回磁盘（superStreak 永久丢失）。
     const lastDayNow: string = (ProgressStore.pref?.getSync('lastDay', '') as string) ?? '';
-    const alreadyToday: boolean = AppStorage.get<boolean>(Keys.solvedToday) === true || lastDayNow === today;
+    // ★ 2026-11-26（P1）：按**日期**判，而不是内存 boolean ——
+  //   跨零点不杀进程时 solvedToday 还是昨天的 true ⇒ 新一天首胜不算连胜、lastDay 也不更新，
+  //   第二天 dayGap=2 直接把连胜清零。
+  const solvedOnNow: string = ((ProgressStore.pref?.getSync('solvedOn', '') as string) ?? '');
+  const alreadyToday: boolean = solvedOnNow === today;
     let superStreak: number = AppStorage.get<number>(Keys.superStreak) ?? 0;
     if (!alreadyToday) {
       const lastDay: string = (ProgressStore.pref?.getSync('lastDay', '') as string) ?? '';
@@ -448,6 +456,7 @@ export class ProgressStore {
       // ★★★ 存储满时 putSync 会抛 ⇒ 兜住（内存态已更新，界面照常）
       try {
         ProgressStore.pref?.putSync('lastDay', today);
+        ProgressStore.pref?.putSync('solvedOn', today);
       } catch (e) {
       }
     }
@@ -505,7 +514,8 @@ export class ProgressStore {
 
     ProgressStore.persist(xp, totalSolved, superStreak);
     ProgressStore.persistStreaks();
-    ProgressStore.checkAchievements();
+  // ★ 2026-11-26（P1）：赢局的新成就必须带回去，否则结算弹窗永远弹上一局的旧成就
+  ProgressStore.lastNewAch = ProgressStore.checkAchievements();
     return gained;
   }
 
@@ -1409,6 +1419,10 @@ export class ProgressStore {
     AppStorage.setOrCreate(Keys.perGameClears, '{}');
     AppStorage.setOrCreate(Keys.perGameDiff, '{}');
     AppStorage.setOrCreate('bestLevel', 1);
+    // ★ 2026-11-26（P2）：这几个没清 ⇒ 重置后成就墙立刻复亮（完美主义/马拉松）
+    AppStorage.setOrCreate('perfectCount', 0);
+    AppStorage.setOrCreate('todayMs', 0);
+    AppStorage.setOrCreate('solvedOn', '');
   }
 
   /**
