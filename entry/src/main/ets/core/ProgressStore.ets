@@ -1330,9 +1330,35 @@ export class ProgressStore {
     ProgressStore.streaks.clear();
     if (ProgressStore.pref !== null) {
       const pr: preferences.Preferences = ProgressStore.pref;
+      // ★ 2026-11-25（P2）：clearSync 会把 lang / accent / themeMode / privacyAgreed / onboarded
+      //   一起清掉 ⇒ 重置进度后重新弹隐私说明、语言与主题回默认。先存后写回。
+      let keepLang: string = '';
+      let keepAccent: string = '';
+      let keepMode: string = '';
+      let keepPrivacy: string = '';
+      let keepOnboard: string = '';
+      let keepDailyPick: string = '';
+      try {
+        keepLang = (pr.getSync('lang', '') as string) ?? '';
+        keepAccent = (pr.getSync('accent', '') as string) ?? '';
+        keepMode = (pr.getSync(Keys.themeMode, '') as string) ?? '';
+        keepPrivacy = (pr.getSync('privacyAgreed', '') as string) ?? '';
+        keepOnboard = (pr.getSync('onboarded', '') as string) ?? '';
+      } catch (e0) {
+      }
       try {
         pr.clearSync();
         pr.flushSync();
+        // 清完立刻写回「不是进度」的偏好
+        try {
+          if (keepLang.length > 0) { pr.putSync('lang', keepLang); }
+          if (keepAccent.length > 0) { pr.putSync('accent', keepAccent); }
+          if (keepMode.length > 0) { pr.putSync(Keys.themeMode, keepMode); }
+          if (keepPrivacy.length > 0) { pr.putSync('privacyAgreed', keepPrivacy); }
+          if (keepOnboard.length > 0) { pr.putSync('onboarded', keepOnboard); }
+          pr.flushSync();
+        } catch (e1) {
+        }
       } catch (e) {
         // ★★★ 清库失败就退回逐键清 —— ★ 这里本身也要兜：存储满时逐键清照样会抛
         //   （原来 catch 里的 putSync 无保护 ⇒ 在 catch 里再抛 ⇒ 直接崩）
