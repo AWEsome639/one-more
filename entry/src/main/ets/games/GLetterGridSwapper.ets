@@ -290,7 +290,7 @@ export struct GLetterGridSwapper {
       Column({ space: Space.xs }) {
         Text(TG('目标单词')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         Text(this.goal).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.amber)
-      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - 360))).padding(Space.sm).backgroundColor(this.theme.surface)
+      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(140, Bp.height - (Bp.isShort() ? 360 : 392)))).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Column({ space: Space.sm }) {
         ForEach(this.rowIdx(), (r: number) => {
@@ -318,7 +318,7 @@ export struct GLetterGridSwapper {
             }, (c: number) => 'c' + c)
           }.width('100%')
         }, (r: number) => 'r' + r)
-      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - 380)))
+      }.width(Math.min(Bp.width - 2 * Space.lg, Math.max(120, Bp.height - (Bp.isShort() ? 380 : 412))))
       Text(this.msg).fontSize(FontSize.md)
         // ★ 通关庆祝
         .scale({ x: this.winK, y: this.winK })
