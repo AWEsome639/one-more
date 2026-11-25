@@ -378,7 +378,15 @@ export class ChatFinder {
    * ★ 排序稳定（同分按 id 字典序），保证同一句话每次给同一批 —— 用户不会觉得「它在乱跳」。
    */
   static suggest(text: string, n: number): Suggestion[] {
-    const it: Intent = ChatFinder.parse(text);
+    return ChatFinder.suggestIntent(ChatFinder.parse(text), n);
+  }
+
+  /**
+   * ★ 2026-11-26（P2，真 bug）：按**已解析好的 Intent** 直接检索。
+   *   原来 suggest(text) 内部又 parse(text) 一次 —— 调用方好不容易用
+   *   端侧 LLM 抽到的意图在这里被规则版覆盖掉 ⇒ 「模型听懂了也没有结果」。
+   */
+  static suggestIntent(it: Intent, n: number): Suggestion[] {
     const scored: Suggestion[] = [];
     for (let i = 0; i < GAMES.length; i++) {
       const g: GameMeta = GAMES[i];

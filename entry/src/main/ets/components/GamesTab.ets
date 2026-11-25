@@ -348,7 +348,8 @@ export struct GamesTab {
       return;
     }
     this.chatAnswer = ChatFinder.echo(it);
-    this.chatPicks = ChatFinder.suggest(text, 3);
+    // ★ 2026-11-26：用传进来的 it（可能来自端侧 LLM），别再按 text 重新 parse。
+    this.chatPicks = ChatFinder.suggestIntent(it, 3);
     if (this.chatPicks.length === 0) {
       this.chatAnswer = this.t('这个组合没找到，换个说法试试？', 'Nothing matched — try different words?');
     }
