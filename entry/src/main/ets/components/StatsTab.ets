@@ -81,6 +81,7 @@ interface WeekStat {
   total: number;
   solved: number;
   todayMs: number;
+  todayTotal: number;
   topId: string;
   topCount: number;
 }
@@ -302,7 +303,7 @@ export struct StatsTab {
   /** 一次遍历算出「近期」要的三个数（7 天窗口内的局 / 通关数 / 今日时长 / 最常玩那款） */
   private weekStat(): WeekStat {
     const observed: number = this.plays;      // ← 依赖声明，别删（读一下才会重算；同 t() 的 langCode）
-    const st: WeekStat = { total: 0, solved: 0, todayMs: 0, topId: '', topCount: 0 };
+    const st: WeekStat = { total: 0, solved: 0, todayMs: 0, todayTotal: 0, topId: '', topCount: 0 };
     const recs: PlayRecord[] = GameLog.recent(LOG_WINDOW);
     const wk: number = this.weekStart();
     const td: number = this.dayStart();
@@ -318,6 +319,7 @@ export struct StatsTab {
       }
       if (r.t >= td) {
         st.todayMs += r.ms;                   // 「今日玩了多久」= 今天这些局的时长之和
+      st.todayTotal++;                      // ★ 2026-11-25：今日局数也从日志派生（原来用内存 dailyCount，只数赢局且重启归零）
       }
       cnt.set(r.g, (cnt.get(r.g) ?? 0) + 1);
     }
@@ -568,7 +570,7 @@ build() {
           'Серия {n} день', 'Серия {n} дня', 'Серия {n} дней')
         this.chip('🏅', '最长连了 {n} 天', 'Longest {n} days', this.bestStreak, Palette.amber,
           'Наибольшая серия {n} день', 'Наибольшая серия {n} дня', 'Наибольшая серия {n} дней')
-        this.chip('📅', '今天玩了 {n} 局', 'Today {n} rounds', this.dailyCount, Palette.sky,
+        this.chip('📅', '今天玩了 {n} 局', 'Today {n} rounds', this.weekStat().todayTotal, Palette.sky,
           'Играл сегодня {n} раунд', 'Играл сегодня {n} раунда', 'Играл сегодня {n} раундов')
         this.chip('⭐', '收藏 {n} 款', 'Saved {n}', ProgressStore.favorites().length, Palette.berry)
       }
