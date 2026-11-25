@@ -339,7 +339,7 @@ export struct GTracePath {
    *   原因：宽度驱动格子（layoutWeight+aspectRatio）在矮屏上高度也满宽推算 ⇒ 底行溢出。
    *   与收窄百分比不同：算出来写死不会被 layoutWeight 重分配（2904）。*/
   private cp(): number {
-    const byH: number = Math.floor((Bp.height - 300) / RX.length);
+    const byH: number = Math.floor((Bp.height - (Bp.isShort() ? 300 : 360)) / RX.length);
     const byW: number = Math.floor((Bp.width - 80) / RX.length);
     return Math.max(36, Math.min(byH, byW));
   }
