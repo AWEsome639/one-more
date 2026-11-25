@@ -766,8 +766,10 @@ export struct LevelHeader {
       // XP 进度条
       Column({ space: Space.xs }) {
         Row() {
-          Text(this.tn('再攒 {n} 点经验就升级', '{n} XP to next level', this.toNext(),
-                 'Ещё {n} опыт до уровня', 'Ещё {n} опыта до уровня', 'Ещё {n} опыта до уровня'))
+          Text(this.level >= LevelCurve.MAX_LEVEL
+            ? this.t('满级', 'Max')
+            : this.tn('再攒 {n} 点经验就升级', '{n} XP to next level', this.toNext(),
+              'Ещё {n} опыт до уровня', 'Ещё {n} опыта до уровня', 'Ещё {n} опыта до уровня'))
             .fontSize(FontSize.xxs)
             .fontColor(this.theme.inkFaint)
           Blank()
