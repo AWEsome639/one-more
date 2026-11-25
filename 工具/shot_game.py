@@ -982,7 +982,9 @@ def _body(name, t0):
     #   改成按屏高等比：`0.35H .. 0.625H`。H=1600 时就是 `560..1000`（与原来逐像素一致）。
     _H = int(os.environ.get('SHOT_SCREEN_H') or 1600)
     for t, (x1, y1, x2, y2) in texts(d):
-        if 0.35 * _H < y1 < 0.625 * _H and x2 > x1 + 100:
+        # ★ 2026-11-26（fold 实测）：折叠屏搜索结果卡顶 y=868，而 0.35*2496=874 ⇒
+        #   全部被排除、整批 NO_CARD。区间放宽到 0.28H..0.70H。
+        if 0.28 * _H < y1 < 0.70 * _H and x2 > x1 + 100:
             cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
             if fallback is None:
                 fallback = (cx, cy)
