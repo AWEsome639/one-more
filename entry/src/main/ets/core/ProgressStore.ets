@@ -473,7 +473,9 @@ export class ProgressStore {
     AppStorage.setOrCreate(Keys.dailyCount, dailyCount);
 
     // 本款连胜局数（单游戏连胜成就用）—— gs 就是本款刚更新后的连胜
-    AppStorage.setOrCreate(Keys.streak, gs);
+    // ★ 2026-11-25（P1）：这里原来写的是 GameStreak 对象，而成就读取端按 number 取（:733）
+    //   ⇒ streak_game_5/10 永远判 false，成就「五连霸/十连霸」恒灰。写数值字段即可。
+    AppStorage.setOrCreate(Keys.streak, gs.current);
     // ★★★ 2026-11-05（第 1393 轮）**「完美」必须同时满足「没用过提示」**
     //   判据 1314/1315：审计发现提示**完全免费**（355 款 0 款记录次数），
     //   而部分提示**直接给答案**（「答案是 X」「解集是 X」）⇒ 点一下就能通关。
