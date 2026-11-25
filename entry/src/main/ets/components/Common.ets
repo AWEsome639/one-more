@@ -8,6 +8,7 @@
 import { LengthMetrics } from '@kit.ArkUI';
 import { TG } from '../core/GameI18n';
 import { Bp } from '../core/Bp';
+import { LevelCurve } from '../core/LevelCurve';
 import { Tv } from '../core/Tv';
 import { Haptics } from '../core/Haptics';
 import { Digits, I18n } from '../core/I18n';   // ★ 2026-10-16 数字本地化
@@ -529,20 +530,21 @@ export struct LevelHeader {
     return Accent.color(this.accentId);
   }
 
-  /** 当前等级内进度 */
+  /**
+   * 当前等级内进度。
+   * ★ 2026-11-25（P0）：原来这里用 2.04 指数自算，而等级由 LevelCurve（EXP=1.3）算
+   *   ⇒ 首页/统计页的等级卡每次都自相矛盾（等级 LV10 却写「再攒 9164 点」，进度条 0%）。
+   *   统一走 LevelCurve，别再各算一套。
+   */
   private progress(): number {
-    const lo: number = this.level <= 1 ? 0 : Math.floor(100 * Math.pow(this.level - 1, 2.04));
-    const hi: number = Math.floor(100 * Math.pow(this.level, 2.04));
-    if (hi <= lo) {
-      return 1;
-    }
-    const p: number = (this.xp - lo) / (hi - lo);
-    return Math.min(1, Math.max(0, p));
+    return LevelCurve.progress(this.xp);
   }
 
   private toNext(): number {
-    const hi: number = Math.floor(100 * Math.pow(this.level, 2.04));
-    return Math.max(0, hi - this.xp);
+    if (this.level >= LevelCurve.MAX_LEVEL) {
+      return 0;
+    }
+    return Math.max(0, LevelCurve.xpForLevel(LevelCurve.levelOf(this.xp) + 1) - this.xp);
   }
 
   /**

@@ -548,6 +548,9 @@ export class ProgressStore {
     const joined: string = list.join(',');
     AppStorage.setOrCreate(Keys.favorites, joined);
     ProgressStore.putString(Keys.favorites, joined);
+    // ★ 2026-11-25（P2）：收藏类成就（fav_1/fav_10/fav_50）原来只在 finishGame 里复查
+    //   ⇒ 收藏后去成就墙仍是锁的，必须再玩一局才亮。这里顺手复查一次。
+    ProgressStore.checkAchievements();
     return i < 0;
   }
 
@@ -1398,6 +1401,9 @@ export class ProgressStore {
     AppStorage.setOrCreate(Keys.dailyDone, false);
     AppStorage.setOrCreate(Keys.dailyBonus, 0);
     AppStorage.setOrCreate('dailyTotal', 0);
+    // ★ 2026-11-25（P2）：重置也要把累计打卡数/上次计入日清掉，否则成就「月度常客/百日之约」会在重置后立刻亮
+    AppStorage.setOrCreate('totalDays', 0);
+    AppStorage.setOrCreate('lastDayCounted', '');
     AppStorage.setOrCreate(Keys.achievements, '');
     AppStorage.setOrCreate(Keys.cleared, '');
     AppStorage.setOrCreate(Keys.perGameClears, '{}');
