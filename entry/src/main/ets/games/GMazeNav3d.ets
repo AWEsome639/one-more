@@ -503,7 +503,7 @@ export struct GMazeNav3d {
       //   本处 `maxHeight: '70%'` 对 `aspectRatio(1)` 宽度驱动的场地**只裁不缩**（判据 3114），
       //   所以收百分比只是让裁剪线更早 —— 但那正好能把下方让出来。
       //   竖屏 70% → 66%（798.7 × 66% = 527，省 32vp > 缺的 21vp）；横屏保持 70% 逐字不变。
-      .constraintSize({ maxHeight: Bp.isShort() ? '70%' : '66%' })
+      .constraintSize({ maxHeight: Bp.isShort() ? '70%' : '62%' })
       .padding(Space.sm)
       .backgroundColor(this.theme.surfaceAlt)
       .borderRadius(Radius.md)
