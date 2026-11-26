@@ -486,7 +486,7 @@ export struct GSudokuHex {
       return;
     }
     this.sel = this.sel === i ? -1 : i;
-    this.status = this.sel < 0 ? TG('已取消选择') : '点数字填进这一格';
+    this.status = this.sel < 0 ? TG('已取消选择') : TG('点数字填进这一格');
   }
 
   private put(v: number): void {

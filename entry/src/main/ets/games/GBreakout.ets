@@ -307,7 +307,7 @@ export struct GBreakout {
     }
     const mid: number = this.paddleX + PADDLE_W / 2;
     const d: number = this.ballX - mid;
-    const side: string = d > 4 ? '右' : (d < -4 ? '左' : '');
+    const side: string = d > 4 ? TG('右') : (d < -4 ? TG('左') : '');
     let msg: string = TG('对准了，保持住');
     if (!this.launched) {
       msg = TG('按「发球」先把球打出去');
@@ -708,7 +708,7 @@ export struct GBreakout {
     if (!this.launched) {
       return TG('发球');
     }
-    return this.paused ? '继续' : TG('暂停');
+    return this.paused ? TG('继续') : TG('暂停');
   }
 
   /**

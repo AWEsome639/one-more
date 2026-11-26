@@ -935,7 +935,7 @@ export struct GGomoku {
       return TG('平局，棋盘满了');
     }
     if (LanMatch.isActive()) {
-      return this.turn === HUMAN ? '联机：轮到你落子（你 ●）' : TG('联机：等对手落子…');
+      return this.turn === HUMAN ? TG('联机：轮到你落子（你 ●）') : TG('联机：等对手落子…');
     }
     return this.thinking ? TG('电脑正在算…') : TG('轮到你落子（黑先）');
   }

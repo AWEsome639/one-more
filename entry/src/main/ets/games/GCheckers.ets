@@ -556,7 +556,7 @@ export struct GCheckers {
       this.msg = LanMatch.isActive() ? TG('联机：等对手走子…') : TG('电脑思考中…');
       this.scheduleAi(-1);
     } else {
-      this.msg = LanMatch.isActive() ? '联机：轮到你了' : TG('轮到你了');
+      this.msg = LanMatch.isActive() ? TG('联机：轮到你了') : TG('轮到你了');
     }
   }
 

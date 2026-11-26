@@ -512,7 +512,7 @@ export struct GAlphabetSudoku {
       return;
     }
     this.sel = this.sel === i ? -1 : i;
-    this.status = this.sel < 0 ? TG('已取消选择') : '点一个字母填进去';
+    this.status = this.sel < 0 ? TG('已取消选择') : TG('点一个字母填进去');
   }
 
   private put(v: number): void {

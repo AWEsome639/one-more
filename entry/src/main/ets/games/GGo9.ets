@@ -711,7 +711,7 @@ export struct GGo9 {
     }
     this.turn = WHITE;
     this.thinking = true;
-    this.msg = LanMatch.isActive() ? '联机：等对手落子…' : TG('电脑在想…');
+    this.msg = LanMatch.isActive() ? TG('联机：等对手落子…') : TG('电脑在想…');
     this.scheduleAi();
   }
 

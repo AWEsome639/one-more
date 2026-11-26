@@ -381,7 +381,7 @@ export struct GPhoneticGuess {
         : TG('😵 只答对 ') + this.right + '/' + this.diffTotal + '，再练一局';
     }
     if (this.picked >= 0) {
-      return this.picked === this.ans ? '✅ 答对了！' : TG('❌ 错了，正确答案已标绿');
+      return this.picked === this.ans ? TG('✅ 答对了！') : TG('❌ 错了，正确答案已标绿');
     }
     return TG('这个音标是哪个词？');
   }
