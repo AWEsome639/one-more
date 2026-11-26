@@ -10,18 +10,40 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 10; const PASS: number = 7; const GAP_MS: number = 900;
 
 /** [锚点, 近义词, 远义词] */
-const TRIOS: string[][] = [
-  ['冷', '冰', TG('火')], ['快', '疾', '缓'], ['大', '巨', '微'], ['亮', '明', '暗'],
-  ['甜', TG('蜜'), '苦'], ['高', '塔', '坑'], ['静', '悄', '闹'], ['旧', '古', '新'],
-  [TG('强'), TG('壮'), TG('弱')], [TG('近'), TG('邻'), TG('远')], [TG('圆'), TG('球'), TG('方')], [TG('湿'), TG('潮'), TG('干')],
-  ['硬', '钢', '棉'], ['香', TG('花'), '臭'], ['深', '海', '滩'], ['轻', '羽', '石']
+/**
+ * ★ 2026-11-26（内容本地化）：中文词表 + 英文词表分开（题目内容，不是界面文案）。
+ *   中文路径 call-time 求值 ⇒ 切语言即时生效；非中文统一走英文。
+ */
+function triosZh(): string[][] {
+  return [
+    [TG('冷'), TG('冰'), TG('火')], [TG('快'), TG('疾'), TG('缓')], [TG('大'), TG('巨'), TG('微')], [TG('亮'), TG('明'), TG('暗')],
+    [TG('甜'), TG('蜜'), TG('苦')], [TG('高'), TG('塔'), TG('坑')], [TG('静'), TG('悄'), TG('闹')], [TG('旧'), TG('古'), TG('新')],
+    [TG('强'), TG('壮'), TG('弱')], [TG('近'), TG('邻'), TG('远')], [TG('圆'), TG('球'), TG('方')], [TG('湿'), TG('潮'), TG('干')],
+    [TG('硬'), TG('钢'), TG('棉')], [TG('香'), TG('花'), TG('臭')], [TG('深'), TG('海'), TG('滩')], [TG('轻'), TG('羽'), TG('石')]
+  ];
+}
+
+const TRIOS_EN: string[][] = [
+  ['cold', 'ice', 'fire'], ['fast', 'swift', 'slow'], ['big', 'huge', 'tiny'], ['bright', 'luminous', 'dark'],
+  ['sweet', 'honey', 'bitter'], ['tall', 'tower', 'pit'], ['quiet', 'hushed', 'noisy'], ['old', 'ancient', 'new'],
+  ['strong', 'sturdy', 'weak'], ['near', 'neighbouring', 'far'], ['round', 'sphere', 'square'], ['wet', 'damp', 'dry'],
+  ['hard', 'steel', 'cotton'], ['fragrant', 'flower', 'stinking'], ['deep', 'ocean', 'beach'], ['light', 'feather', 'stone']
 ];
+
+function isZhUi(): boolean {
+  const l: string = I18n.current();
+  return l === 'zh' || l === 'zh-Hant';
+}
+
+function trios(): string[][] {
+  return isZhUi() ? triosZh() : TRIOS_EN;
+}
 
 @Component
 export struct GSemanticDistance {
@@ -74,7 +96,8 @@ export struct GSemanticDistance {
   }
 
   private next(): void {
-    const t: string[] = TRIOS[Math.floor(Math.random() * TRIOS.length)];
+    const pool: string[][] = trios();
+    const t: string[] = pool[Math.floor(Math.random() * pool.length)];
     if (Math.random() < 0.5) { this.opts = [t[1], t[2]]; this.ans = 0; }
     else { this.opts = [t[2], t[1]]; this.ans = 1; }
     this.anchor = t[0]; this.picked = -1;
