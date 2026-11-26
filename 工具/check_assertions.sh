@@ -207,6 +207,17 @@ case "${A11Y_YEL}" in ''|*[!0-9]*) A11Y_YEL=1; A11Y_YEL_S="?" ;; esac
 WARN=$((WARN + A11Y_RED + A11Y_YEL))
 printf "     %-42s %6s / %s\n" "读屏缺口（🔴纯图标 / 🟡有文字）" "${A11Y_RED_S}" "${A11Y_YEL_S}"
 
+# ★ 2026-11-27：内容双语表检查（13 款内容型：中/英表条数一致、无空表）
+#   起因：一次数组提取把 4 款中文表抠成空表，编译和断言都没报，靠人眼看代码才发现。
+CONTENT_OUT=$(python3 "$(dirname "$0")/../tools/check_content_tables.py" 2>&1)
+CONTENT_RC=$?
+if [ "${CONTENT_RC}" -ne 0 ]; then
+  FAIL=$((FAIL + 1))
+  printf "     %-42s %6s / %d\n" "check_content_tables.py（双语表）" "FAIL" "1"
+else
+  printf "     %-42s %6s / %d\n" "check_content_tables.py（双语表）" "ALL PASS" "0"
+fi
+
 # ★ 2026-10-31 基线变更：200342 → 200359（+17）
 #   原因：新增 `check_layout_guard.py`（17 处宽驱动 aspectRatio 的静态守卫）。
 #   ⚠️ 这是**加了一条尺子**，不是"断言变多了所以变好"。
