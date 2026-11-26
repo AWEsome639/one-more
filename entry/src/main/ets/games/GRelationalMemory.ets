@@ -249,7 +249,7 @@ export struct GRelationalMemory {
     const ok: boolean = o === ans;
     this.pick = ok ? 1 : 0;
     if (ok) { this.hits = this.hits + 1; }
-    this.msg = ok ? '✅ 对了' : TG2("❌ 应该是 {0}", ans);
+    this.msg = ok ? TG('✅ 对了') : TG2("❌ 应该是 {0}", ans);
     const last: boolean = k + 1 >= this.diffTotal;
     this.toId = setTimeout(() => {
       this.toId = -1;

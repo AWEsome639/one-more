@@ -24,11 +24,11 @@ interface Ev {
   label: string;
 }
 const POOL: Ev[] = [
-  { k: 0, icon: '🌅', label: '起床' }, { k: 1, icon: '☕', label: TG('早餐') },
+  { k: 0, icon: '🌅', label: TG('起床') }, { k: 1, icon: '☕', label: TG('早餐') },
   { k: 2, icon: '🚌', label: TG('通勤') }, { k: 3, icon: '💻', label: TG('工作') },
   { k: 4, icon: '🍜', label: TG('午餐') }, { k: 5, icon: '📞', label: TG('开会') },
   { k: 6, icon: '🏃', label: TG('运动') }, { k: 7, icon: '🍽️', label: TG('晚餐') },
-  { k: 8, icon: '📖', label: '阅读' }, { k: 9, icon: '🌙', label: TG('睡觉') }
+  { k: 8, icon: '📖', label: TG('阅读') }, { k: 9, icon: '🌙', label: TG('睡觉') }
 ];
 @Component
 export struct GEventTimelineMemory {

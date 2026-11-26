@@ -307,7 +307,7 @@ export struct GDivisibilityDash {
       this.streak = 0;
       this.score = Math.max(0, this.score - 5); this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
       this.tip = '✗ ' + String(this.num) + ' ÷ ' + String(this.div) + ' ' +
-        (this.yes ? '能整除' : '不能整除');
+        (this.yes ? TG('能整除') : TG('不能整除'));
     }
     this.roll();
   }

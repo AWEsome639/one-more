@@ -225,7 +225,7 @@ export struct GOddEvenFlash {
     if (!this.canAnswer || this.locked || this.over) { return; }
     this.locked = true;
     const truth: boolean = this.value % 2 === 1;
-    const word: string = truth ? '奇数' : TG('偶数');
+    const word: string = truth ? TG('奇数') : TG('偶数');
     if (truth === isOdd) {
       this.right = this.right + 1; this.score = this.score + 60;
       this.msg = TG2('✅ {0} 是{1}', this.value, word);

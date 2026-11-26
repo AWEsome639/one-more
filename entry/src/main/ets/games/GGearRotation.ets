@@ -21,7 +21,7 @@ const ROUNDS: number = 8;
 const LIVES: number = 3;
 
 function spinText(cw: boolean): string {
-  return cw ? '↻ 顺时针' : '↺ 逆时针';
+  return cw ? TG('↻ 顺时针') : TG('↺ 逆时针');
 }
 
 @Component

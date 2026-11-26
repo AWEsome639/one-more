@@ -229,7 +229,7 @@ export struct GSymbolicFlanker {
     if (this.pick >= 0 || this.over) { return; }
     this.pick = i;
     if (i === this.dir) { this.right = this.right + 1; this.msg = TG('✅ 对'); }
-    else { this.wrong = this.wrong + 1; this.msg = '❌ 中间是向' + (this.dir === 0 ? TG('左') : TG('右')); }
+    else { this.wrong = this.wrong + 1; this.msg = TG('❌ 中间是向') + (this.dir === 0 ? TG('左') : TG('右')); }
     this.to = setTimeout(() => {
       this.to = -1;
       if (this.trialNo >= this.diffTotal) { this.finishUp(); return; }

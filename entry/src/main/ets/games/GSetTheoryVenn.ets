@@ -19,7 +19,7 @@ const ROUNDS: number = 8; const PASS: number = 6; const NEXT_MS: number = 850; c
 /** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
  *  改为函数：渲染到哪取到哪（本文件引用已改成 REGION()）。 */
 function REGION(): string[] {
-  return [TG('只在 A'), TG('只在 B'), 'A、B 都有', '都不在'];
+  return [TG('只在 A'), TG('只在 B'), TG('A、B 都有'), TG('都不在')];
 }
 function sample(k: number, hi: number): number[] {
   const pool: number[] = [];

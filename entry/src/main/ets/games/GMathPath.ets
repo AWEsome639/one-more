@@ -432,7 +432,7 @@ export struct GMathPath {
     for (let i = 0; i < this.path.length; i++) {
       s += this.label(this.path[i]);
     }
-    return s === '' ? '空' : s;
+    return s === '' ? TG('空') : s;
   }
 
   private complete(): boolean {

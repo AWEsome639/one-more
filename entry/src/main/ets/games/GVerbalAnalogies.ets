@@ -28,7 +28,7 @@ const BANK: Analog[] = [
   { stem: 'HAND : GLOVE ＝ FOOT : ?', opts: [TG('SOCK 袜子'), TG('TOE 脚趾'), TG('LEG 腿'), TG('SANDAL 凉鞋')], ans: 0 },
   { stem: 'PUPPY : DOG ＝ KITTEN : ?', opts: [TG('CAT 猫'), TG('MOUSE 老鼠'), TG('CUB 幼兽'), TG('LAMB 羔羊')], ans: 0 },
   { stem: 'PEN : WRITE ＝ KNIFE : ?', opts: [TG('SHARP 锋利的'), TG('METAL 金属'), TG('CUT 切'), TG('SPOON 勺子')], ans: 2 },
-  { stem: 'EYE : SEE ＝ EAR : ?', opts: [TG('SOUND 声音'), TG('HEAR 听见'), 'LOUD 响的', 'MUSIC 音乐'], ans: 1 },
+  { stem: 'EYE : SEE ＝ EAR : ?', opts: [TG('SOUND 声音'), TG('HEAR 听见'), TG('LOUD 响的'), TG('MUSIC 音乐')], ans: 1 },
   { stem: 'SLOW : FAST ＝ QUIET : ?', opts: [TG('SOFT 软的'), TG('SILENT 寂静的'), TG('CALM 平静的'), TG('LOUD 响亮的')], ans: 3 },
   { stem: 'GALLERY : PAINTINGS ＝ LIBRARY : ?', opts: [TG('SHELVES 书架'), TG('BOOKS 书'), TG('READERS 读者'), TG('QUIET 安静')], ans: 1 },
   { stem: 'WINTER : SNOW ＝ SUMMER : ?', opts: [TG('ICE 冰'), TG('BEACH 沙滩'), TG('HEAT 炎热'), TG('COAT 外套')], ans: 2 }

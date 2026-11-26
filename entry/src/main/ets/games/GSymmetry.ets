@@ -21,7 +21,7 @@ const N: number = 4; const ROUNDS: number = 8; const PASS: number = 6; const FEE
 /** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
  *  改为函数：渲染到哪取到哪（本文件引用已改成 AXES()）。 */
 function AXES(): string[] {
-  return ['左右对称', '上下对称', TG('主对角'), TG('副对角')];
+  return [TG('左右对称'), TG('上下对称'), TG('主对角'), TG('副对角')];
 }
 
 function at(r: number, c: number, n: number): number { return r * n + c; }

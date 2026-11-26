@@ -97,7 +97,7 @@ export struct GSwitchTask {
   }
   private optName(i: number): string {
     if (this.rule === 0) { return i === 0 ? TG('>5 算大') : TG('≤5 算小'); }
-    return i === 0 ? '奇数' : TG('偶数');
+    return i === 0 ? TG('奇数') : TG('偶数');
   }
 
   /** 提示：直接报答案（切换任务，下标） */

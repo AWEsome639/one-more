@@ -378,7 +378,7 @@ export struct GPhoneticGuess {
     if (this.over) {
       return this.won
         ? TG('🎉 答对 ') + this.right + '/' + this.diffTotal + TG('，通关！')
-        : TG('😵 只答对 ') + this.right + '/' + this.diffTotal + '，再练一局';
+        : TG('😵 只答对 ') + this.right + '/' + this.diffTotal + TG('，再练一局');
     }
     if (this.picked >= 0) {
       return this.picked === this.ans ? TG('✅ 答对了！') : TG('❌ 错了，正确答案已标绿');

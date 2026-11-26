@@ -54,7 +54,7 @@ export struct GPathRecall {
   @State private seq: number[] = []; @State private playIdx: number = -1; @State private step: number = 0;
   /** ★ 2026-11-08 代打的记忆副本（刺激播完后抄下，作答只读它） */
   private aiMem: number[] = [];
-  @State private round: number = 1; @State private phase: string = '看';
+  @State private round: number = 1; @State private phase: string = TG('看');
   @State private over: boolean = false; @State private won: boolean = false; @State private msg: string = '';
   private startAt: number = 0; private timer: number = -1; private done: boolean = false;
 

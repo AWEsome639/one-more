@@ -224,7 +224,7 @@ export struct GTopology {
     if (guessSame === this.same) {
       this.hits = this.hits + 1; this.score = this.score + 12; this.msg = '✅ ' + pair;
     } else {
-      this.msg = '❌ ' + pair + ' ⇒ ' + (this.same ? '等价' : TG('不等价'));
+      this.msg = '❌ ' + pair + ' ⇒ ' + (this.same ? TG('等价') : TG('不等价'));
     }
     this.timer = setTimeout(() => { this.timer = -1; this.next(); }, FEED_MS);
   }
