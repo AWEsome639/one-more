@@ -17,7 +17,11 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { Bp } from '../core/Bp';
 
-const NAMES: string[] = [TG('红'), TG('黄'), TG('蓝'), TG('绿')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 NAMES()）。 */
+function NAMES(): string[] {
+  return [TG('红'), TG('黄'), TG('蓝'), TG('绿')];
+}
 const INKS: string[] = ['#EF4444', '#F59E0B', '#0EA5E9', '#10B981'];
 const TRIALS: number = 24;
 const PASS: number = 16;
@@ -79,7 +83,7 @@ export struct GColorWordMatchUp {
   }
 
   private nextTrial(): void {
-    this.wordIdx = Math.floor(Math.random() * NAMES.length);
+    this.wordIdx = Math.floor(Math.random() * NAMES().length);
     this.inkIdx = Math.floor(Math.random() * INKS.length);
   }
 
@@ -288,7 +292,7 @@ export struct GColorWordMatchUp {
 
       Column({ space: Space.sm }) {
         Text(TG('它的墨色是')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
-        Text(NAMES[this.wordIdx]).fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
+        Text(NAMES()[this.wordIdx]).fontSize(FontSize.hero).fontWeight(FontWeight.Bold)
           .fontColor(INKS[this.inkIdx]).padding(Space.lg).backgroundColor(this.theme.surface)
           .borderRadius(Radius.lg).shadow(Shadow.card)
           .animation({ duration: Motion.fast, curve: Motion.snap() })

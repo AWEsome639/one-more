@@ -16,7 +16,11 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 const ROUNDS: number = 8; const PASS: number = 6; const NEXT_MS: number = 850; const UNIVERSE: number = 12;
-const REGION: string[] = [TG('只在 A'), TG('只在 B'), 'A、B 都有', '都不在'];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 REGION()）。 */
+function REGION(): string[] {
+  return [TG('只在 A'), TG('只在 B'), 'A、B 都有', '都不在'];
+}
 function sample(k: number, hi: number): number[] {
   const pool: number[] = [];
   for (let i = 1; i <= hi; i++) { pool.push(i); }
@@ -194,8 +198,8 @@ export struct GSetTheoryVenn {
       return Hint.none('none');
     }
     const ans: number = this.solution();
-    return Hint.make([ans], TG2('应该是「{0}」', REGION[ans]),
-      TG2('It should be {0}', REGION[ans]), t0);
+    return Hint.make([ans], TG2('应该是「{0}」', REGION()[ans]),
+      TG2('It should be {0}', REGION()[ans]), t0);
   }
 
   private askAuto(): void {
@@ -227,9 +231,9 @@ export struct GSetTheoryVenn {
     this.answered = true; this.pick = k; const ans: number = this.solution();
     if (k === ans) {
       this.right = this.right + 1; this.score = this.score + 120; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
-      this.msg = TG2('✅ {0} 确实「{1}」', String(this.probe), REGION[ans]);
+      this.msg = TG2('✅ {0} 确实「{1}」', String(this.probe), REGION()[ans]);
     } else {
-      this.score = Math.max(0, this.score - 20); this.msg = TG2('❌ {0} 应该是「{1}」', String(this.probe), REGION[ans]); this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
+      this.score = Math.max(0, this.score - 20); this.msg = TG2('❌ {0} 应该是「{1}」', String(this.probe), REGION()[ans]); this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
     }
     if (this.nextTo >= 0) { clearTimeout(this.nextTo); }
     this.nextTo = setTimeout(() => {
@@ -315,7 +319,7 @@ export struct GSetTheoryVenn {
       Text(this.msg).fontSize(FontSize.sm)
         .fontColor(this.over ? (this.won ? Palette.emerald : Palette.rose) : this.theme.inkSoft).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: Space.sm }) {
-        Button(REGION[(0)])
+        Button(REGION()[(0)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.pick === (0) ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.pick === (0)
         ? ((0) === this.solution() ? Palette.emerald : Palette.rose)
@@ -330,7 +334,7 @@ export struct GSetTheoryVenn {
         .onBlur(() => { if (this.tvFocus === 'L321') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L321'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((0)); }); })
-        Button(REGION[(1)])
+        Button(REGION()[(1)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.pick === (1) ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.pick === (1)
         ? ((1) === this.solution() ? Palette.emerald : Palette.rose)
@@ -347,7 +351,7 @@ export struct GSetTheoryVenn {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((1)); }); })
       }.width('100%')
       Row({ space: Space.sm }) {
-        Button(REGION[(2)])
+        Button(REGION()[(2)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.pick === (2) ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.pick === (2)
         ? ((2) === this.solution() ? Palette.emerald : Palette.rose)
@@ -362,7 +366,7 @@ export struct GSetTheoryVenn {
         .onBlur(() => { if (this.tvFocus === 'L349') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L349'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.submit((2)); }); })
-        Button(REGION[(3)])
+        Button(REGION()[(3)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.sm).fontColor(this.pick === (3) ? '#FFFFFF' : this.theme.ink)
         .backgroundColor(this.pick === (3)
         ? ((3) === this.solution() ? Palette.emerald : Palette.rose)

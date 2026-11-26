@@ -24,7 +24,11 @@ const ROUNDS: number = 8;
 const LIVES: number = 3;
 const PER_CORRECT: number = 50;
 
-const COLOR_NAMES: string[] = [TG('红'), TG('绿'), TG('蓝')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 COLOR_NAMES()）。 */
+function COLOR_NAMES(): string[] {
+  return [TG('红'), TG('绿'), TG('蓝')];
+}
 const COLOR_VALUES: string[] = [Palette.rose, Palette.emerald, Palette.sky];
 
 @Component
@@ -118,17 +122,17 @@ export struct GDoubleTrouble {
     this.aOpts = opts;
 
     // ── 任务②：字义与颜色不符 ──
-    const wi: number = Math.floor(Math.random() * COLOR_NAMES.length);
-    let ii: number = Math.floor(Math.random() * COLOR_NAMES.length);
+    const wi: number = Math.floor(Math.random() * COLOR_NAMES().length);
+    let ii: number = Math.floor(Math.random() * COLOR_NAMES().length);
     if (ii === wi) {
-      ii = (ii + 1) % COLOR_NAMES.length;
+      ii = (ii + 1) % COLOR_NAMES().length;
     }
-    this.word = COLOR_NAMES[wi];
+    this.word = COLOR_NAMES()[wi];
     this.ink = COLOR_VALUES[ii];
-    this.bAns = COLOR_NAMES[ii];
+    this.bAns = COLOR_NAMES()[ii];
     const bo: string[] = [];
-    for (let i = 0; i < COLOR_NAMES.length; i++) {
-      bo.push(COLOR_NAMES[i]);
+    for (let i = 0; i < COLOR_NAMES().length; i++) {
+      bo.push(COLOR_NAMES()[i]);
     }
     this.bOpts = bo;
 

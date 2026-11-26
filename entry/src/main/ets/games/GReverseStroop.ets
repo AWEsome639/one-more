@@ -18,7 +18,11 @@ import { Bp } from '../core/Bp';
 const TOTAL: number = 12;
 const WIN_RIGHT: number = 10;
 const WIN_AVG: number = 1800;
-const WORDS: string[] = [TG('红'), TG('蓝'), TG('绿'), TG('黄')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 WORDS()）。 */
+function WORDS(): string[] {
+  return [TG('红'), TG('蓝'), TG('绿'), TG('黄')];
+}
 const INKS: string[] = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B'];
 @Component
 export struct GReverseStroop {
@@ -80,7 +84,7 @@ export struct GReverseStroop {
   }
   /** 出题：字义与墨色必然不同 */
   private next(): void {
-    const w: number = Math.floor(Math.random() * WORDS.length);
+    const w: number = Math.floor(Math.random() * WORDS().length);
     let k: number = Math.floor(Math.random() * INKS.length);
     if (k === w) { k = (k + 1) % INKS.length; }
     this.wIdx = w; this.kIdx = k; this.pick = -1; this.shownAt = Date.now();
@@ -190,8 +194,8 @@ export struct GReverseStroop {
     if (this.over || this.pick >= 0) {
       return Hint.none('none');
     }
-    return Hint.make([this.wIdx], TG2('要找的是「{0}」', WORDS[this.wIdx]),
-      TG2('Look for {0}', WORDS[this.wIdx]), t0);
+    return Hint.make([this.wIdx], TG2('要找的是「{0}」', WORDS()[this.wIdx]),
+      TG2('Look for {0}', WORDS()[this.wIdx]), t0);
   }
 
   private askAuto(): void {
@@ -229,7 +233,7 @@ export struct GReverseStroop {
       this.msg = TG('✅ 对');
     } else {
       this.wrong = this.wrong + 1;
-      this.msg = TG2('❌ 字是「{0}」', WORDS[w]);
+      this.msg = TG2('❌ 字是「{0}」', WORDS()[w]);
     }
     this.toId = setTimeout(() => {
       this.toId = -1;
@@ -279,12 +283,12 @@ export struct GReverseStroop {
       }.width('100%')
       Column({ space: Space.xs }) {
         Text(TG('点「字义」· 别看墨色')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text(WORDS[this.wIdx]).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(INKS[this.kIdx])
+        Text(WORDS()[this.wIdx]).fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(INKS[this.kIdx])
       }.width('100%').height(Bp.isShort() ? 104 : 150).justifyContent(FlexAlign.Center)
         .backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.sm }) {
         ForEach([0, 1, 2, 3], (i: number) => {
-          Text(WORDS[(i)]).fontSize(FontSize.lg).fontColor('#FFFFFF').textAlign(TextAlign.Center)
+          Text(WORDS()[(i)]).fontSize(FontSize.lg).fontColor('#FFFFFF').textAlign(TextAlign.Center)
           .layoutWeight(1).height(Cell.of(Bp.height < 600 ? 54 : 72)).borderRadius(Radius.md)
           .backgroundColor(this.pick === (i) && (i) !== this.wIdx ? Palette.primaryDeep : INKS[(i)])
           .opacity(this.pick >= 0 && (i) !== this.wIdx && (i) !== this.pick ? 0.45 : 1)

@@ -17,8 +17,12 @@ import { AppClock } from '../core/AppClock';
 
 const QN: number = 6; const PASS: number = 4; const DECOY_N: number = 3;
 const LIMIT_MS: number = 8000; const TICK_MS: number = 100; const FEED_MS: number = 900;
-const OXY: string[] = [TG('震耳欲聋的沉默'), '公开的秘密', '甜蜜的负担', '熟悉的陌生人', '有秩序的混乱',
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 OXY()）。 */
+function OXY(): string[] {
+  return [TG('震耳欲聋的沉默'), '公开的秘密', '甜蜜的负担', '熟悉的陌生人', '有秩序的混乱',
   TG('无声的呐喊'), TG('孤独的人群'), TG('缓慢的冲刺'), TG('温柔的暴力'), TG('明亮的黑夜'), TG('微小的巨变')];
+}
 const PLAIN: string[] = [TG('温暖的阳光'), TG('广阔的海洋'), TG('快速的列车'), TG('绿色的草地'), TG('香甜的蛋糕'),
   TG('高高的山峰'), TG('明亮的灯光'), TG('坚硬的石头'), TG('深邃的夜空'), TG('整齐的书架'), TG('新鲜的蔬菜'), TG('熟练的工匠')];
 interface OxyRound { opts: string[]; ans: number }
@@ -31,15 +35,15 @@ function shuffled(arr: string[]): string[] {
   return out;
 }
 function makeRound(): OxyRound {
-  const idx: number = Math.floor(Math.random() * OXY.length);
-  const pool: string[] = PLAIN.slice(); const opts: string[] = [OXY[idx]];
+  const idx: number = Math.floor(Math.random() * OXY().length);
+  const pool: string[] = PLAIN.slice(); const opts: string[] = [OXY()[idx]];
   for (let i = 0; i < DECOY_N; i++) {
     const j: number = Math.floor(Math.random() * pool.length);
     opts.push(pool[j]); pool.splice(j, 1);
   }
   const mixed: string[] = shuffled(opts);
   let ans: number = 0;
-  for (let i = 0; i < mixed.length; i++) { if (mixed[i] === OXY[idx]) { ans = i; } }
+  for (let i = 0; i < mixed.length; i++) { if (mixed[i] === OXY()[idx]) { ans = i; } }
   return { opts: mixed, ans: ans };
 }
 

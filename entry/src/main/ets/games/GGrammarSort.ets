@@ -17,7 +17,11 @@ import { Digits, Sec } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
-const KIND: string[] = [TG('名词'), TG('动词'), TG('形容词'), TG('副词')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 KIND()）。 */
+function KIND(): string[] {
+  return [TG('名词'), TG('动词'), TG('形容词'), TG('副词')];
+}
 const KIND_COLOR: string[] = [Palette.sky, Palette.orange, Palette.violet, Palette.emerald];
 const TOTAL: number = 16; const PASS: number = 12; const LIMIT_S: number = 45;
 const TICK_MS: number = 1000;
@@ -245,10 +249,10 @@ export struct GGrammarSort {
     if (k === this.cur().k) {
       this.right = this.right + 1;
       this.score = this.score + 80;
-      this.msg = TG2('✅ {0} 是{1}', this.cur().w, KIND[k]);
+      this.msg = TG2('✅ {0} 是{1}', this.cur().w, KIND()[k]);
     } else {
       this.wrong = this.wrong + 1;
-      this.msg = TG2('❌ {0} 其实是{1}', this.cur().w, KIND[this.cur().k]);
+      this.msg = TG2('❌ {0} 其实是{1}', this.cur().w, KIND()[this.cur().k]);
     }
     this.step = this.step + 1;
     if (this.step >= this.diffTotal) {
@@ -304,24 +308,24 @@ export struct GGrammarSort {
 
       Column({ space: Space.sm }) {
         Row({ space: Space.sm }) {
-          Button(KIND[(0)])
+          Button(KIND()[(0)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(KIND_COLOR[(0)]).borderRadius(Radius.md).layoutWeight(1).height(Bp.isShort() ? Cell.of(42) : Cell.tap(42)).enabled(!this.over).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L300'; })
       .onBlur(() => { if (this.tvFocus === 'L300') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L300')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((0)); }); }).onClick(() => { Haptics.tap(); this.pick((0)); })
-          Button(KIND[(1)])
+          Button(KIND()[(1)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(KIND_COLOR[(1)]).borderRadius(Radius.md).layoutWeight(1).height(Bp.isShort() ? Cell.of(42) : Cell.tap(42)).enabled(!this.over).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L302'; })
       .onBlur(() => { if (this.tvFocus === 'L302') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L302')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((1)); }); }).onClick(() => { Haptics.tap(); this.pick((1)); })
         }.width('100%')
         Row({ space: Space.sm }) {
-          Button(KIND[(2)])
+          Button(KIND()[(2)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(KIND_COLOR[(2)]).borderRadius(Radius.md).layoutWeight(1).height(Bp.isShort() ? Cell.of(42) : Cell.tap(42)).enabled(!this.over).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L306'; })
       .onBlur(() => { if (this.tvFocus === 'L306') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L306')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.pick((2)); }); }).onClick(() => { Haptics.tap(); this.pick((2)); })
-          Button(KIND[(3)])
+          Button(KIND()[(3)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.md).fontColor('#FFFFFF').backgroundColor(KIND_COLOR[(3)]).borderRadius(Radius.md).layoutWeight(1).height(Bp.isShort() ? Cell.of(42) : Cell.tap(42)).enabled(!this.over).focusable(Tv.on())
       .onFocus(() => { this.tvFocus = 'L308'; })
       .onBlur(() => { if (this.tvFocus === 'L308') { this.tvFocus = ''; } })

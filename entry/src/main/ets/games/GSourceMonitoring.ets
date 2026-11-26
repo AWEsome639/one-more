@@ -17,11 +17,15 @@ import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
-const CLAIMS: string[] = [
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 CLAIMS()）。 */
+function CLAIMS(): string[] {
+  return [
   TG('本周三有雷阵雨'), TG('图书馆周六闭馆'), TG('新食堂下月开张'), TG('地铁 15 号线年底通车'),
   TG('期末考提前一周'), TG('学校要办机器人赛'), TG('游泳馆水温调到 28 度'), TG('校车改到南门发车'),
   TG('下学期加开 Python 选修'), TG('操场跑道正在翻修')
 ];
+}
 const SOURCES: string[] = ['👩‍🏫 任课老师', '📰 校报', '🧑‍🔬 实验室学长', '👬 室友'];
 const Q_IDX: number[] = [0, 1, 2, 3, 4];
 const QUIZ: number = 5; const NEED: number = 4; const STUDY_SEC: number = 8; const WAIT_MS: number = 900;
@@ -81,7 +85,7 @@ export struct GSourceMonitoring {
   }
   private reset(): void {
     this.stopAll();
-    const ord: number[] = orderOf(CLAIMS.length); const cs: number[] = []; const ss: number[] = [];
+    const ord: number[] = orderOf(CLAIMS().length); const cs: number[] = []; const ss: number[] = [];
     for (let i = 0; i < this.diffTotal; i++) {
       cs.push(ord[i]);
       ss.push(Math.floor(Math.random() * SOURCES.length));
@@ -204,8 +208,8 @@ export struct GSourceMonitoring {
     }
     const who: string = SOURCES[this.srcs[this.q]];
     return Hint.make([this.srcs[this.q]],
-      TG2('「{0}」是{1}说的', CLAIMS[this.claimNo()], who),
-      TG2('{0} came from {1}', CLAIMS[this.claimNo()], who), t0);
+      TG2('「{0}」是{1}说的', CLAIMS()[this.claimNo()], who),
+      TG2('{0} came from {1}', CLAIMS()[this.claimNo()], who), t0);
   }
   private askAuto(): void {
     Haptics.tap();
@@ -276,7 +280,7 @@ export struct GSourceMonitoring {
         ForEach(Q_IDX, (i: number) => {
           Row({ space: Space.sm }) {
             Text(SOURCES[this.srcs.length > i ? this.srcs[i] : 0]).fontSize(FontSize.xs).fontColor(Palette.teal)
-            Text(CLAIMS[this.claims.length > i ? this.claims[i] : 0]).fontSize(FontSize.sm)
+            Text(CLAIMS()[this.claims.length > i ? this.claims[i] : 0]).fontSize(FontSize.sm)
               .fontColor(this.theme.ink).layoutWeight(1).maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }.width('100%').padding(Space.xs).backgroundColor(this.theme.surface)
@@ -293,7 +297,7 @@ export struct GSourceMonitoring {
       } else {
         Column({ space: Space.xs }) {
           Text(TG('这条消息是谁说的？')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-          Text(CLAIMS[this.claimNo()]).fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
+          Text(CLAIMS()[this.claimNo()]).fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
             .fontColor(this.theme.ink)
         }.width('100%').padding(Space.md).backgroundColor(this.theme.surface)
           .borderRadius(Radius.md).shadow(Shadow.card)

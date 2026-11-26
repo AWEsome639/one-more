@@ -43,7 +43,11 @@ const CELL_IDX: number[] = [0, 1, 2, 3];
  *     那样 LAYER_ORDER 的"上层先显示"又对不上了。
  */
 const LAYER_ORDER: number[] = [2, 1, 0]; // 上层先显示（z=2 是上层）
-const LAYER_NAME: string[] = [TG('下层'), TG('中层'), TG('上层')];   // 与 z 轴一致：z=0 最下
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 LAYER_NAME()）。 */
+function LAYER_NAME(): string[] {
+  return [TG('下层'), TG('中层'), TG('上层')];
+}   // 与 z 轴一致：z=0 最下
 const BTN_H: number = 44;
 /** 方向：0 左 1 右 2 上 3 下 4 升层 5 降层 */
 const DIR_LABEL: string[] = ['←', '→', '↑', '↓', TG('⬆ 升层'), TG('⬇ 降层')];
@@ -663,7 +667,7 @@ export struct GSnake3D {
   @Builder
   layer(z: number) {
     Column({ space: GAP }) {
-      Text(LAYER_NAME[z])
+      Text(LAYER_NAME()[z])
         .fontSize(FontSize.xxs)
         .fontColor(this.headZ() === z ? Palette.amber : this.theme.inkFaint)
       Column({ space: GAP }) {

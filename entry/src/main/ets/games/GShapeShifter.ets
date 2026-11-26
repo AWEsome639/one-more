@@ -23,7 +23,11 @@ const MAX_N: number = 6;
 const MAX_CELLS: number = MAX_N * MAX_N; const ROUNDS: number = 6; const NEED: number = 4;
 const ROWS: number[] = [0, 1, 2, 3];
 const PATH: number[] = [5, 6, 9, 10, 1, 2, 4, 8, 0, 3, 7, 11, 12, 13, 14, 15];   // 生长规律的固定次序
-const RULE_NAMES: string[] = [TG('每步顺时针转 90°'), TG('每步整块右移一格'), TG('每步多长出一格')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 RULE_NAMES()）。 */
+function RULE_NAMES(): string[] {
+  return [TG('每步顺时针转 90°'), TG('每步整块右移一格'), TG('每步多长出一格')];
+}
 /** 手挑的 6 个小块（4×4，各 5 格），都是「转 4 次才回原位」的非对称形 */
 const BLOBS: number[][] = [
   [0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -101,7 +105,7 @@ export struct GShapeShifter {
     this.over = false; this.won = false; this.done = false; this.startAt = Date.now();
     this.seq = [grow(3), grow(4), grow(5), grow(6)];
     this.opts = [grow(7), rot(grow(6), this.diffTotal), shiftR(grow(6), this.diffTotal), mirrorH(grow(6), this.diffTotal)];
-    this.ruleName = RULE_NAMES[2]; this.answerAt = 0;
+    this.ruleName = RULE_NAMES()[2]; this.answerAt = 0;
     this.note = TG(TG(TG('看这 4 个图，第 5 个该是哪个？')));
     this.newRound();
   }
@@ -131,7 +135,7 @@ export struct GShapeShifter {
       const opts: number[][] = [list[shift], list[(shift + 1) % 4], list[(shift + 2) % 4], list[(shift + 3) % 4]];
       let ansAt: number = 0;
       for (let i = 0; i < 4; i++) { if (opts[i] === ans) { ansAt = i; } }
-      this.seq = seq; this.opts = opts; this.answerAt = ansAt; this.ruleName = RULE_NAMES[rule];
+      this.seq = seq; this.opts = opts; this.answerAt = ansAt; this.ruleName = RULE_NAMES()[rule];
       this.picked = -1; this.note = TG(TG(TG('看这 4 个图，第 5 个该是哪个？')));
       return;
     }

@@ -16,7 +16,11 @@ import { LanRace } from '../core/LanRace';
 import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 12;
-const WORDS: string[] = [TG('红'), TG('黄'), TG('蓝'), TG('绿')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 WORDS()）。 */
+function WORDS(): string[] {
+  return [TG('红'), TG('黄'), TG('蓝'), TG('绿')];
+}
 const INKS: string[] = ['#EF4444', '#F59E0B', '#0EA5E9', '#10B981'];
 
 @Component
@@ -75,7 +79,7 @@ export struct GStroopTest {
   }
 
   private nextQuestion(): void {
-    const w: number = Math.floor(Math.random() * WORDS.length);
+    const w: number = Math.floor(Math.random() * WORDS().length);
     let i: number = Math.floor(Math.random() * INKS.length);
     if (i === w) { i = (i + 1) % INKS.length; }
     this.word = w;
@@ -186,8 +190,8 @@ export struct GStroopTest {
     if (this.over || this.pick >= 0) {
       return Hint.none('none');
     }
-    return Hint.make([this.ink], TG2('墨色是「{0}」', WORDS[this.ink]),
-      TG2('The ink colour is {0}', WORDS[this.ink]), t0);
+    return Hint.make([this.ink], TG2('墨色是「{0}」', WORDS()[this.ink]),
+      TG2('The ink colour is {0}', WORDS()[this.ink]), t0);
   }
 
   private askAuto(): void {
@@ -221,9 +225,9 @@ export struct GStroopTest {
     this.pick = k;
     if (k === ink) {
       this.right = this.right + 1; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110);
-      this.msg = TG2('✅ 墨色就是{0}', WORDS[ink]);
+      this.msg = TG2('✅ 墨色就是{0}', WORDS()[ink]);
     } else {
-      this.msg = TG2('❌ 墨色是{0}，"{1}"只是写在上面的字', WORDS[ink], WORDS[word]);
+      this.msg = TG2('❌ 墨色是{0}，"{1}"只是写在上面的字', WORDS()[ink], WORDS()[word]);
     }
     this.nextTo = setTimeout(() => { this.nextTo = -1; this.advance(); }, 600);
   }
@@ -265,7 +269,7 @@ export struct GStroopTest {
       .width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
       .borderRadius(Radius.md).shadow(Shadow.card).justifyContent(FlexAlign.SpaceBetween)
       Column({ space: Space.xs }) {
-        Text(WORDS[this.word])
+        Text(WORDS()[this.word])
           .fontSize(FontSize.hero).fontWeight(FontWeight.Bold).fontColor(INKS[this.ink])
           .animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(this.msg).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).textAlign(TextAlign.Center).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -307,7 +311,7 @@ export struct GStroopTest {
   /** 选项写颜色名，底色就用它自己的颜色，方便一眼对齐 */
   @Builder
   opt(k: number) {
-    Button(WORDS[k])
+    Button(WORDS()[k])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
       .fontSize(FontSize.xl).fontColor('#FFFFFF')
       .backgroundColor(this.pick === k ? Palette.primaryDeep : INKS[k])

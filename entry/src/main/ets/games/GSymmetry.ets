@@ -18,7 +18,11 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const N: number = 4; const ROUNDS: number = 8; const PASS: number = 6; const FEED_MS: number = 900;
-const AXES: string[] = ['左右对称', '上下对称', TG('主对角'), TG('副对角')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 AXES()）。 */
+function AXES(): string[] {
+  return ['左右对称', '上下对称', TG('主对角'), TG('副对角')];
+}
 
 function at(r: number, c: number, n: number): number { return r * n + c; }
 
@@ -299,9 +303,9 @@ export struct GSymmetry {
     if (this.over || this.revealed) { return; }
     this.revealed = true; this.pick = choice;
     if (choice === this.axis) {
-      this.hits = this.hits + 1; this.score = this.score + 12; this.msg = TG2('✅ 正是{0}', AXES[this.axis]);
+      this.hits = this.hits + 1; this.score = this.score + 12; this.msg = TG2('✅ 正是{0}', AXES()[this.axis]);
     } else {
-      this.msg = TG2('❌ 正确答案是 {0}', AXES[this.axis]);
+      this.msg = TG2('❌ 正确答案是 {0}', AXES()[this.axis]);
     }
     this.timer = setTimeout(() => { this.timer = -1; this.next(); }, FEED_MS);
   }
@@ -367,7 +371,7 @@ export struct GSymmetry {
       .constraintSize({ maxHeight: Math.max(140, Bp.height - 360) })
         .borderRadius(Radius.lg).shadow(Shadow.card)
       Row({ space: Space.xs }) {
-        Button(AXES[(0)])
+        Button(AXES()[(0)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xs).fontColor('#FFFFFF')
         .backgroundColor(this.revealed && (0) === this.axis ? Palette.emerald : (this.revealed && (0) === this.pick ? Palette.rose : Palette.violet))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.revealed && !this.over)
@@ -377,7 +381,7 @@ export struct GSymmetry {
         .onBlur(() => { if (this.tvFocus === 'L340') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L340'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((0)); }); })
-        Button(AXES[(1)])
+        Button(AXES()[(1)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xs).fontColor('#FFFFFF')
         .backgroundColor(this.revealed && (1) === this.axis ? Palette.emerald : (this.revealed && (1) === this.pick ? Palette.rose : Palette.violet))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.revealed && !this.over)
@@ -387,7 +391,7 @@ export struct GSymmetry {
         .onBlur(() => { if (this.tvFocus === 'L348') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L348'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((1)); }); })
-        Button(AXES[(2)])
+        Button(AXES()[(2)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xs).fontColor('#FFFFFF')
         .backgroundColor(this.revealed && (2) === this.axis ? Palette.emerald : (this.revealed && (2) === this.pick ? Palette.rose : Palette.violet))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.revealed && !this.over)
@@ -397,7 +401,7 @@ export struct GSymmetry {
         .onBlur(() => { if (this.tvFocus === 'L356') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L356'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.answer((2)); }); })
-        Button(AXES[(3)])
+        Button(AXES()[(3)])
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } }).fontSize(FontSize.xs).fontColor('#FFFFFF')
         .backgroundColor(this.revealed && (3) === this.axis ? Palette.emerald : (this.revealed && (3) === this.pick ? Palette.rose : Palette.violet))
         .borderRadius(Radius.md).layoutWeight(1).height(Cell.of(48)).enabled(!this.revealed && !this.over)

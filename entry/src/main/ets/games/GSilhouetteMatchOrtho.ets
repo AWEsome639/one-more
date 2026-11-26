@@ -19,7 +19,11 @@ import { Tv } from '../core/Tv';
 const M: number = 3; const CELLS: number = M * M; const LAYERS: number = 3;
 const ROUNDS: number = 6; const NEED: number = 4;
 const ROWS: number[] = [0, 1, 2]; const LAYER_IDX: number[] = [0, 1, 2];
-const LAYER_NAMES: string[] = [TG('1层 底'), TG('2层'), TG('3层 顶')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 LAYER_NAMES()）。 */
+function LAYER_NAMES(): string[] {
+  return [TG('1层 底'), TG('2层'), TG('3层 顶')];
+}
 
 function sig(a: number[]): string { return a.join(''); }
 
@@ -292,7 +296,7 @@ export struct GSilhouetteMatchOrtho {
             }.width('100%')
             }, (r: number) => 'gr' + r)
             }.width('100%') }.width('74%')
-            Text(LAYER_NAMES[l]).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+            Text(LAYER_NAMES()[l]).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
           }.layoutWeight(1).alignItems(HorizontalAlign.Center).padding(Space.xs)
             .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         }, (l: number) => 'ly' + l)

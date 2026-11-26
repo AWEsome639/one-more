@@ -25,7 +25,11 @@ const PR: number = R + 2;   // 外圈留空，方便绕行
 const PC: number = C + 2;
 const KINDS: number = 8;
 
-const LABELS: string[] = [TG('1萬'), TG('2萬'), TG('3萬'), TG('4萬'), TG('1筒'), TG('2筒'), TG('3筒'), TG('4筒')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 LABELS()）。 */
+function LABELS(): string[] {
+  return [TG('1萬'), TG('2萬'), TG('3萬'), TG('4萬'), TG('1筒'), TG('2筒'), TG('3筒'), TG('4筒')];
+}
 
 function labelColor(t: number): string {
   return t < 4 ? Palette.rose : Palette.sky;
@@ -192,7 +196,7 @@ export struct GMahjongSolitaire {
     }
     const p: number[] = this.findPair();
     if (p.length < 2) { return Hint.none('none'); }
-    const lab: string = LABELS[this.grid[p[0]]];
+    const lab: string = LABELS()[this.grid[p[0]]];
     const a1: string = String(Math.floor(p[0] / PC)) + TG(' 行 ') + String(p[0] % PC) + TG(' 列');
     const b1: string = String(Math.floor(p[1] / PC)) + TG(' 行 ') + String(p[1] % PC) + TG(' 列');
     return Hint.make(p, TG2('两张「{0}」能连：{1} 与 {2}', lab, a1, b1),
@@ -233,7 +237,7 @@ export struct GMahjongSolitaire {
     const pairs: number = Math.min(this.diffTotal, maxPairs);
     const tiles: number[] = [];
     for (let t = 0; t < pairs; t++) {
-      tiles.push(t % KINDS);      // 超出 KINDS 时循环取，避免 LABELS 越界
+      tiles.push(t % KINDS);      // 超出 KINDS 时循环取，避免 LABELS() 越界
       tiles.push(t % KINDS);
     }
     shuffleArr(tiles);
@@ -503,7 +507,7 @@ export struct GMahjongSolitaire {
               // ★ 内联，不用 @Builder —— Builder 的参数不建立 ArkUI 观察，
               //   牌被消掉后**不会重绘**（真机实测：牌面整片消失，但"剩余"不变）
               Stack() {
-                Text(this.grid[r * PC + c] < 0 ? '' : LABELS[this.grid[r * PC + c]])
+                Text(this.grid[r * PC + c] < 0 ? '' : LABELS()[this.grid[r * PC + c]])
                   .fontSize(FontSize.md)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(this.grid[r * PC + c] < 0 ? this.theme.inkFaint : labelColor(this.grid[r * PC + c]))
@@ -610,7 +614,7 @@ export struct GMahjongSolitaire {
   @Builder
   tileBox(i: number) {
     Stack() {
-      Text(this.grid[i] < 0 ? '' : LABELS[this.grid[i]])
+      Text(this.grid[i] < 0 ? '' : LABELS()[this.grid[i]])
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.grid[i] < 0 ? this.theme.inkFaint : labelColor(this.grid[i]))

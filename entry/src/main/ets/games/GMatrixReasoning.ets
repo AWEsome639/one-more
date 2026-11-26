@@ -22,7 +22,11 @@ const SIDE: number = 3; const CELLS: number = 9; const GOAL: number = 8;
 const LIMIT: number = 60; const TICK_MS: number = 1000; const PENALTY: number = 3; const NEXT_MS: number = 900;
 const ROWS: number[] = [0, 1, 2];
 const OPT_IDX: number[] = [0, 1, 2, 3];
-const RULE_TXT: string[] = [TG('第三个数 = 前两个数之和'), TG('第三个数 = 前两个数之积'), TG('第三个数 = 前两个数之和再加 1')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 RULE_TXT()）。 */
+function RULE_TXT(): string[] {
+  return [TG('第三个数 = 前两个数之和'), TG('第三个数 = 前两个数之积'), TG('第三个数 = 前两个数之和再加 1')];
+}
 
 function ri(lo: number, hi: number): number {
   return lo + Math.floor(Math.random() * (hi - lo + 1));
@@ -140,7 +144,7 @@ export struct GMatrixReasoning {
       const j: number = Math.floor(Math.random() * (i + 1));
       const t: number = opts[i]; opts[i] = opts[j]; opts[j] = t;
     }
-    this.cells = grid9; this.hole = hole; this.rule = RULE_TXT[kind];
+    this.cells = grid9; this.hole = hole; this.rule = RULE_TXT()[kind];
     this.opts = opts; this.ans = opts.indexOf(correct); this.picked = -1;
   }
 

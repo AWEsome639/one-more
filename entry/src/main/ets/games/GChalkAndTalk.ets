@@ -18,7 +18,11 @@ const SLOTS: number = 8; const SLOT_IDX: number[] = [0, 1, 2, 3, 4, 5, 6, 7];
 const TOTAL_S: number = 30; const TICK_MS: number = 500;
 const PASS: number = 12; const WRITE_MIN: number = 3; const SAY_GAP_MS: number = 600;
 
-const CAT_NAMES: string[] = [TG('水果'), TG('动物'), TG('颜色'), TG('交通工具')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 CAT_NAMES()）。 */
+function CAT_NAMES(): string[] {
+  return [TG('水果'), TG('动物'), TG('颜色'), TG('交通工具')];
+}
 const CATS: string[][] = [
   [TG('苹果'), TG('香蕉'), '橙子', '葡萄'],
   [TG('老虎'), '大象', '熊猫', '兔子'],
@@ -95,8 +99,8 @@ export struct GChalkAndTalk {
     const b: number = (a + 1 + Math.floor(Math.random() * (CATS.length - 1))) % CATS.length;
     const ok: boolean = Math.random() < 0.5;
     this.word = CATS[a][Math.floor(Math.random() * CATS[a].length)];
-    this.cat = ok ? CAT_NAMES[a] : CAT_NAMES[b];
-    this.trueCat = CAT_NAMES[a]; this.truth = ok;
+    this.cat = ok ? CAT_NAMES()[a] : CAT_NAMES()[b];
+    this.trueCat = CAT_NAMES()[a]; this.truth = ok;
   }
   /** 通关 = 说得准 + 真落过笔，防「只刷说」或「只刷写」 */
   private target(): boolean { return this.score >= this.diffTotal && this.writeOk >= WRITE_MIN; }

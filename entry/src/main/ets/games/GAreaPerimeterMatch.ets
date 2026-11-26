@@ -16,7 +16,11 @@ import { LanRace } from '../core/LanRace';
 import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 const MAXSIDE: number = 12; const TOTAL: number = 10; const PASS: number = 7; const NEXT_MS: number = 820;
-const CHOICES: string[] = [TG('A 更大'), TG('B 更大'), TG('一样大')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 CHOICES()）。 */
+function CHOICES(): string[] {
+  return [TG('A 更大'), TG('B 更大'), TG('一样大')];
+}
 @Component
 export struct GAreaPerimeterMatch {
   /** ★★★ 2026-10-16 BUG #24：数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
@@ -317,7 +321,7 @@ export struct GAreaPerimeterMatch {
         .width('100%').textAlign(TextAlign.Center)
       Row({ space: Space.sm }) {
         ForEach(this.slots, (i: number) => {
-          Text(CHOICES[(i)]).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
+          Text(CHOICES()[(i)]).fontSize(FontSize.sm).fontWeight(FontWeight.Bold).textAlign(TextAlign.Center)
           .fontColor(this.picked >= 0 && ((i) === this.ansIdx || (i) === this.picked) ? '#FFFFFF' : this.theme.ink)
           .layoutWeight(1).height(Cell.of(54))
           .backgroundColor(this.picked < 0 ? this.theme.surface

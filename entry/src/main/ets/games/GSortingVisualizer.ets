@@ -30,7 +30,11 @@ const COUNT: number = 12;
 const TICK_MS: number = 150;
 const MIN_V: number = 8;
 const MAX_V: number = 76;
-const ALGOS: string[] = [TG('冒泡'), TG('插入'), TG('选择'), TG('快速')];
+/** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
+ *  改为函数：渲染到哪取到哪（本文件引用已改成 ALGOS()）。 */
+function ALGOS(): string[] {
+  return [TG('冒泡'), TG('插入'), TG('选择'), TG('快速')];
+}
 const ALGO_IDX: number[] = [0, 1, 2, 3];
 const SLOTS: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 const BTN_H: number = 42;
@@ -119,7 +123,7 @@ export struct GSortingVisualizer {
     this.markB = -1;
     this.sorted = false;
     this.finished = false;
-    this.msg = TG2('选算法，点「开始」看{0}排序', ALGOS[this.algo]);
+    this.msg = TG2('选算法，点「开始」看{0}排序', ALGOS()[this.algo]);
     this.buildOps();
     this.startAt = Date.now();
   }
@@ -328,7 +332,7 @@ export struct GSortingVisualizer {
     if (this.sorted) { return Hint.none('none'); }
     const left: number = this.total - this.pc;
     return Hint.make([],
-      TG2('{0}还剩 {1} 步；正在比第 {2} 根', ALGOS[this.algo], String(left), String(this.markA + 1)),
+      TG2('{0}还剩 {1} 步；正在比第 {2} 根', ALGOS()[this.algo], String(left), String(this.markA + 1)),
       'Sort left: ' + String(left), t0);
   }
 
@@ -388,7 +392,7 @@ export struct GSortingVisualizer {
     this.sorted = true;
     this.markA = -1;
     this.markB = -1;
-    this.msg = TG2('🎉 {0}排好了', ALGOS[this.algo]);
+    this.msg = TG2('🎉 {0}排好了', ALGOS()[this.algo]);
     this.finish();
   }
 
@@ -484,7 +488,7 @@ export struct GSortingVisualizer {
 
       Row({ space: Space.xs }) {
         ForEach(ALGO_IDX, (k: number) => {
-          Text(ALGOS[k])
+          Text(ALGOS()[k])
             .fontSize(FontSize.xs)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.algo === k ? '#FFFFFF' : this.theme.inkSoft)
