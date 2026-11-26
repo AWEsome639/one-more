@@ -28,6 +28,7 @@
 
 import { socket } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 /** 发现用的广播端口（固定） */
 const DISCOVER_PORT: number = 41234;
@@ -133,6 +134,7 @@ export class Lan {
 
       // 周期广播（用 setInterval 保持存活）
       Lan.stopBeacon();
+      hilog.info(0x0000, 'LanBeacon', 'started');
       Lan.beaconTimer = setInterval(() => {
         udp.send({
           data: MAGIC + ' HERE ' + port + ' ' + Lan.nick() + ' ' + gameId,
@@ -306,6 +308,7 @@ export class Lan {
     if (Lan.beaconTimer >= 0) {
       clearInterval(Lan.beaconTimer);
       Lan.beaconTimer = -1;
+      hilog.info(0x0000, 'LanBeacon', 'stopped');
     }
   }
 
