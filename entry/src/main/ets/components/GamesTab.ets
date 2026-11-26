@@ -1133,7 +1133,7 @@ build() {
               .fontColor(this.theme().ink)
               .layoutWeight(1)
             // ★ 2026-11-08：裸 String() ⇒ 阿语下是西文数字（同屏另有 ٣٥٥），过 Digits 统一
-       Text(Digits(String(this.list().length), this.langCode) + this.t(' 款', ' games'))
+       Text(Digits(String(this.list().length), this.langCode) + this.t(' 款', this.list().length === 1 ? ' game' : ' games'))
               .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
           }
           .width('100%')
@@ -1603,7 +1603,7 @@ build() {
       // 左边：收起时显示当前分类；展开时显示游戏总数（两边都不重复、都有信息量）
       Text(this.topCollapsed
         ? L(this.category, catLabelEn(this.category))
-        : Digits(String(this.list().length) + this.t(' 款', ' games'), this.langCode))
+        : Digits(String(this.list().length) + this.t(' 款', this.list().length === 1 ? ' game' : ' games'), this.langCode))
         .fontSize(FontSize.xs)
         .fontColor(this.topCollapsed ? this.theme().ink : this.theme().inkFaint)
         .fontWeight(this.topCollapsed ? FontWeight.Medium : FontWeight.Normal)
@@ -1870,7 +1870,7 @@ build() {
         .fontColor(this.theme().ink)
         .layoutWeight(1)
       // ★ 2026-11-08：裸 String() ⇒ 阿语下是西文数字（同屏另有 ٣٥٥），过 Digits 统一
-       Text(Digits(String(this.list().length), this.langCode) + this.t(' 款', ' games'))
+       Text(Digits(String(this.list().length), this.langCode) + this.t(' 款', this.list().length === 1 ? ' game' : ' games'))
         .fontSize(FontSize.xxs).fontColor(this.theme().inkFaint)
     }
     .width('100%')
