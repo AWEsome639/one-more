@@ -276,7 +276,7 @@ export struct GSpatialCabinetMemory {
       this.score = this.score + 120; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110);
       this.msg = TG2('✅ 对！{0} 就在这里', ICONS[this.target]);
     } else {
-      this.msg = '❌ 它在第 ' + String(real + 1) + TG(' 格');
+      this.msg = TG2('❌ 它在第 {0} 格', String(real + 1));
     }
     this.nextTo = setTimeout(() => { this.nextTo = -1; this.advance(); }, 1000);
   }

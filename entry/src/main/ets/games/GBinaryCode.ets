@@ -115,7 +115,7 @@ export struct GBinaryCode {
         this.left = this.left - 1;
         if (this.left <= 0) {
           this.left = 0;
-          this.lose('⏰ 时间到，拼对 ' + String(this.level - 1) + TG(' 关'));
+          this.lose(TG2('⏰ 时间到，拼对 {0} 关', String(this.level - 1)));
         }
       }
     }, TICK_MS);

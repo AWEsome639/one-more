@@ -326,7 +326,7 @@ export struct GLaserReflect {
     this.grid = ng; this.moves = this.moves + 1; this.score = this.score + 5; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110); this.refresh();
     if (this.lit >= this.dets.length) {
       this.over = true; this.won = true; this.score = this.score + (MAX - this.moves) * 20 + 200;
-      this.msg = '🎉 全部点亮！用了 ' + this.moves + TG(' 步'); this.finish(true);
+      this.msg = TG2('🎉 全部点亮！用了 {0} 步', String(this.moves)); this.finish(true);
       return;
     }
     if (this.moves >= MAX) {

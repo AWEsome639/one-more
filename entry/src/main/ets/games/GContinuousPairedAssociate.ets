@@ -339,7 +339,7 @@ export struct GContinuousPairedAssociate {
     this.won = solved;
     this.phase = 2;
     this.lastMsg = solved
-      ? '🎉 8 题答完，错误 ' + this.mistakes + TG(' 次')
+      ? TG2('🎉 {0} 题答完，错误 {1} 次', String(this.diffTotal), String(this.mistakes))
       : TG2('错了 {0} 次，本轮结束',Digits(String(this.mistakes), this.langCode));
     this.finish(solved);
   }

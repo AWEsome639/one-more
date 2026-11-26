@@ -342,7 +342,7 @@ export struct GMatrixMultiplierMatch {
     if (!everyDone) { this.msg = TG('✅ 配对成功'); return; }
     this.score = this.score + 100; this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
     if (this.board >= BOARDS) {
-      this.end(true, '🎉 三块题板全对，错 ' + String(this.errs) + TG(' 次'));
+      this.end(true, TG2('🎉 三块题板全对，错 {0} 次', String(this.errs)));
       return;
     }
     this.board = this.board + 1;

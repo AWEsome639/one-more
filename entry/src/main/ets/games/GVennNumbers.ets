@@ -255,7 +255,7 @@ export struct GVennNumbers {
       if (this.placed >= 6) {
         this.over = true;
         this.won = this.wrong <= 3;
-        this.msg = (this.won ? TG('🎉 全部归位，通关！') : TG('💤 归位完成，错了 ') + String(this.wrong) + TG(' 次'));
+        this.msg = (this.won ? TG('🎉 全部归位，通关！') : TG2('💤 归位完成，错了 {0} 次', String(this.wrong)));
         this.clearAll();
         this.finish(this.won);
       }

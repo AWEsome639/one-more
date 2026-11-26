@@ -259,7 +259,7 @@ export struct GWordWheel {
   private end(solved: boolean): void {
     this.over = true; this.won = solved;
     this.msg = solved ? TG2('🎉 找齐 {0} 个词，通关！', this.goal())
-      : '💤 机会用完 —— 本组共有 ' + this.bank.length + TG(' 个词');
+      : TG2('💤 机会用完 —— 本组共有 {0} 个词', String(this.bank.length));
     if (this.finished) { return; }
     this.finished = true;
     const r: GameResult = { gameId: 'word_wheel', solved: solved, score: this.score,

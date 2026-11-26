@@ -98,7 +98,7 @@ export struct GMandalaRecall {
     this.lit = slots.slice(0, need);
     this.picks = [];
     this.phase = 0;
-    this.msg = '记住亮格（' + String(need) + TG(' 个）');
+    this.msg = TG2('记住亮格（{0} 个）', String(need));
     this.memTo = setTimeout(() => {
       this.memTo = -1; this.phase = 1; this.msg = TG(TG(TG('把亮过的格子都点回来')));
     }, MEM_MS);
@@ -274,7 +274,7 @@ export struct GMandalaRecall {
       return;
     }
     this.phase = 2; this.over = true; this.won = false;
-    this.msg = '❌ 记错了，止步第 ' + String(this.level) + TG(' 关');
+    this.msg = TG2('❌ 记错了，止步第 {0} 关', String(this.level));
     this.finish(false);
   }
 

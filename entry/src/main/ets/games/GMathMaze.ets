@@ -514,7 +514,7 @@ export struct GMathMaze {
       if (s === this.target) {
         this.over = true;
         this.won = true;
-        this.tip = '🎉 刚好 ' + String(this.target) + TG('，通关！');
+        this.tip = TG2('🎉 刚好 {0}，通关！', String(this.target));
         this.finish(true);
       } else {
         this.lose(TG2('到达终点时是 {0}，不等于目标 {1}', String(s), String(this.target)));

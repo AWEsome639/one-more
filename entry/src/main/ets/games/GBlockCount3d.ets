@@ -247,7 +247,7 @@ export struct GBlockCount3d {
     if (this.picked >= 0 || this.over) { return; }
     this.picked = i;
     const t: number = this.total();
-    if (i === this.ansIdx) { this.rightN = this.rightN + 1; this.score = this.score + 140; this.msg = '✅ 一共 ' + t + TG(' 块'); }
+    if (i === this.ansIdx) { this.rightN = this.rightN + 1; this.score = this.score + 140; this.msg = TG2('✅ 一共 {0} 块', String(t)); }
     else { this.score = Math.max(0, this.score - 20); this.msg = TG2('❌ 一共 {0} 块 —— 每格的高度加起来就是它', t); }
     this.clearNext();
     this.nextTo = setTimeout(() => { this.nextTo = -1; this.next(); }, NEXT_MS);

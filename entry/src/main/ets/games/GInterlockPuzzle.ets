@@ -258,7 +258,7 @@ export struct GInterlockPuzzle {
     if (this.takenCount() === PIECES) {
       this.over = true; this.won = true;
       this.score = this.score + (this.diffTotal - this.moves) * 25;
-      this.msg = '🎉 全部拆开！用了 ' + this.moves + TG(' 步');
+      this.msg = TG2('🎉 全部拆开！用了 {0} 步', String(this.moves));
       this.finish(true);
       return;
     }

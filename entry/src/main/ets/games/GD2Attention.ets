@@ -288,7 +288,7 @@ export struct GD2Attention {
     this.stopTimer();
     this.over = true;
     this.won = solved;
-    this.msg = solved ? '🎉 全找到了！用时 ' + (this.diffTotal - this.timeLeft) + TG(' 秒')
+    this.msg = solved ? TG2('🎉 全找到了！用时 {0} 秒', String(this.diffTotal - this.timeLeft))
       : TG2('时间到：命中 {0} / {1}，点错 {2}',Digits(String(this.hits), this.langCode),Digits(String(TARGETS), this.langCode),Digits(String(this.wrongTap), this.langCode));
     if (this.finished) { return; }
     this.finished = true;

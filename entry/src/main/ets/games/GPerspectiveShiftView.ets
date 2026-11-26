@@ -296,7 +296,7 @@ export struct GPerspectiveShiftView {
     if (this.q >= TOTAL) { this.finish(); return; }
     this.q = this.q + 1; this.chosen = -1;
     this.question();
-    this.msg = '继续：第 ' + String(this.q) + TG(' 题');
+    this.msg = TG2('继续：第 {0} 题', String(this.q));
   }
   private finish(): void {
     if (this.done) { return; }
