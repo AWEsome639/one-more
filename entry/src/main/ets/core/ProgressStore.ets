@@ -1423,8 +1423,6 @@ export class ProgressStore {
     AppStorage.setOrCreate('perfectCount', 0);
     AppStorage.setOrCreate('todayMs', 0);
     AppStorage.setOrCreate('solvedOn', '');
-    // ★ 2026-11-26（P2）：重置后统计页仍显示旧成就（Tabs 子页只建一次，无监听键变化就不重算）
-    AppStorage.setOrCreate('statsRev', (AppStorage.get<number>('statsRev') ?? 0) + 1);
   }
 
   /**
