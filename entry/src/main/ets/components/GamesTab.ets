@@ -182,10 +182,19 @@ export struct GamesTab {
     // ★ 2026-11-08 首帧闸门：先让 ForEach 把第一帧画出来，再切 LazyForEach。
     //   ⚠️ 切换时**必须先把数据源灌好**（`list()` 此时已记忆化，是幂等的），
     //      否则 LazyForEach 挂上来的第一帧又是空表（这正是上一版失败的形态）。
-    setTimeout(() => {
+    // ★ 2026-11-26（性能审计 P1）：原来用 setTimeout(0) 切 LazyForEach ——
+    //   首帧先 ForEach 建 355 张卡，0ms 后全部销毁再建 48 张 ⇒ 冷启动白付一遍全量。
+    //   aboutToAppear 在首帧 build 之前执行，这里同步灌好数据源并置位，
+    //   首帧直接走 LazyForEach；任何异常才退回旧的两段式（绝不空白）。
+    try {
       this.source.reset(this.list());
       this.gridReady = true;
-    }, 0);
+    } catch (e) {
+      setTimeout(() => {
+        this.source.reset(this.list());
+        this.gridReady = true;
+      }, 0);
+    }
     // ★ 大字模式默认收起顶部（否则网格被挤出屏幕 —— 实测）
     if (this.uiMode === 'elder') {
       this.topCollapsed = true;
