@@ -1423,6 +1423,8 @@ export class ProgressStore {
     AppStorage.setOrCreate('perfectCount', 0);
     AppStorage.setOrCreate('todayMs', 0);
     AppStorage.setOrCreate('solvedOn', '');
+    // ★ 2026-11-26（P2）：统计页是 Tabs 缓存的子页，收不到普通状态变化 ⇒ 用一个 rev 让 Index 重建它
+    AppStorage.setOrCreate('statsRev', (AppStorage.get<number>('statsRev') ?? 0) + 1);
   }
 
   /**

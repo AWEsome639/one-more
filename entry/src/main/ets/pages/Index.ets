@@ -156,6 +156,14 @@ struct Index {
    *     完全可控、可重试、不依赖系统时序。
    */
   @State private showPrivacy: boolean = false;
+
+  /** ★ 2026-11-26（P2）：重置进度后强制重建统计页（Tabs 缓存子页不响应 @StorageProp） */
+  @StorageProp('statsRev') @Watch('onStatsRevChanged') statsRevN: number = 0;
+  @State private statsUiRev: number = 0;
+
+  onStatsRevChanged(): void {
+    this.statsUiRev = this.statsUiRev + 1;
+  }
   /** ★ 2026-11-07 判据 1781：隐私链接打不开时的兜底提示（按钮点了必须有反馈） */
   @State private privacyFallback: string = '';
 
@@ -550,7 +558,7 @@ build() {
         //   真机证据：阿语下底部三标签显示 Games / Stats / Settings。（判据 1801：三层取词）
 
         TabContent() {
-          if (this.uiRev % 2 === 0) { StatsTab() } else { StatsTab() }
+          if (((this.uiRev + this.statsUiRev) % 2) === 0) { StatsTab() } else { StatsTab() }
         }
         .tabBar(this.barItem(1, '📊', '统计', 'Stats'))
 
