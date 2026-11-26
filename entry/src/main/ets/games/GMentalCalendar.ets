@@ -124,7 +124,7 @@ export struct GMentalCalendar {
   private tick(): void {
     if (this.over) { return; }
     this.left = this.left - 1;
-    if (this.left <= 0) { this.left = 0; this.end(false, TG2('⏰ 时间到，答对 {0} 题', String(this.right)) + TG(' 题')); }
+    if (this.left <= 0) { this.left = 0; this.end(false, TG2('⏰ 时间到，答对 {0} 题', String(this.right))); }
   }
 
   private ask(): void {
@@ -293,8 +293,8 @@ export struct GMentalCalendar {
       else if (fbV.indexOf('❌') >= 0 || fbV.indexOf('💤') >= 0 || fbV.indexOf('😵') >= 0 || fbV.indexOf('⏰') >= 0 || fbV.indexOf('⌛') >= 0) { this.lastFb = fbV; this.lastOk = false; }
 
     if (this.over) { return; }
-    if (this.right >= GOAL) { this.end(true, TG('🎉 答对 ') + String(GOAL) + ' 个日期，通关！剩 ' + String(this.left) + TG(' 秒')); return; }
-    if (this.left <= 0) { this.end(false, TG2('⏰ 时间到，答对 {0} 题', String(this.right)) + TG(' 题')); return; }
+    if (this.right >= GOAL) { this.end(true, TG2('🎉 答对 {0} 个日期，通关！剩 {1} 秒', String(GOAL), String(this.left))); return; }
+    if (this.left <= 0) { this.end(false, TG2('⏰ 时间到，答对 {0} 题', String(this.right))); return; }
     this.ask();
   }
 
