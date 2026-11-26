@@ -10,18 +10,40 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 10; const PASS: number = 7; const GAP_MS: number = 900;
 
 /** 强关联词对：[线索, 搭档] */
-const PAIRS: string[][] = [
-  ['针', '线'], ['锁', TG('钥匙')], ['笔', '纸'], ['茶', '杯'],
-  ['雨', TG('伞')], ['夜', '灯'], ['锅', '铲'], ['蜂', TG('蜜')],
-  ['雪', '冬'], ['火', '柴'], [TG('桥'), '河'], ['医', '药'],
-  ['鞋', '袜'], ['电脑', '键盘'], [TG('太阳'), '光'], ['风筝', '线轴']
+/**
+ * ★ 2026-11-26（内容本地化）：中文词对 + 英文词对分开（题目内容，不是界面文案）。
+ *   中文路径 call-time 求值 ⇒ 切语言即时生效；非中文统一走英文。
+ */
+function pairsZh(): string[][] {
+  return [
+    [TG('针'), TG('线')], [TG('锁'), TG('钥匙')], [TG('笔'), TG('纸')], [TG('茶'), TG('杯')],
+    [TG('雨'), TG('伞')], [TG('夜'), TG('灯')], [TG('锅'), TG('铲')], [TG('蜂'), TG('蜜')],
+    [TG('雪'), TG('冬')], [TG('火'), TG('柴')], [TG('桥'), TG('河')], [TG('医'), TG('药')],
+    [TG('鞋'), TG('袜')], [TG('电脑'), TG('键盘')], [TG('太阳'), TG('光')], [TG('风筝'), TG('线轴')]
+  ];
+}
+
+const PAIRS_EN: string[][] = [
+  ['needle', 'thread'], ['lock', 'key'], ['pen', 'paper'], ['tea', 'cup'],
+  ['rain', 'umbrella'], ['night', 'lamp'], ['pot', 'spatula'], ['bee', 'honey'],
+  ['snow', 'winter'], ['fire', 'match'], ['bridge', 'river'], ['doctor', 'medicine'],
+  ['shoe', 'sock'], ['computer', 'keyboard'], ['sun', 'light'], ['kite', 'spool']
 ];
+
+function isZhUi(): boolean {
+  const l: string = I18n.current();
+  return l === 'zh' || l === 'zh-Hant';
+}
+
+function pairs(): string[][] {
+  return isZhUi() ? pairsZh() : PAIRS_EN;
+}
 
 function shufStr(src: string[]): string[] {
   const out: string[] = src.slice();
@@ -83,10 +105,11 @@ export struct GSemanticAssociation {
   }
 
   private next(): void {
-    const pi: number = Math.floor(Math.random() * PAIRS.length);
-    const pair: string[] = PAIRS[pi];
+    const src: string[][] = pairs();
+    const pi: number = Math.floor(Math.random() * src.length);
+    const pair: string[] = src[pi];
     const pool: string[] = [];
-    for (let i = 0; i < PAIRS.length; i++) { if (i !== pi) { pool.push(PAIRS[i][1]); } }
+    for (let i = 0; i < src.length; i++) { if (i !== pi) { pool.push(src[i][1]); } }
     const mixed: string[] = shufStr(pool);
     const four: string[] = shufStr([pair[1], mixed[0], mixed[1], mixed[2]]);
     this.cue = pair[0]; this.opts = four; this.ans = four.indexOf(pair[1]);

@@ -3,7 +3,7 @@
  * 胜负：答对 ≥8 题通关；错 3 次或时间耗尽即失败　进度：题号 / 答对 / 失误 / 倒计时
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
-import { Sec } from '../core/I18n';
+import { Sec, I18n } from '../core/I18n';
 import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
@@ -23,15 +23,47 @@ const LIMIT_S: number = 60; const TICK_MS: number = 1000;
 interface Q { w: string; opts: string[] }
 
 /** opts[0] 恒为正确释义，运行时打乱 */
-const POOL: Q[] = [
-  { w: 'ephemeral', opts: ['转瞬即逝的', '坚不可摧的', '笨重迟缓的'] }, { w: 'loquacious', opts: ['话多的', TG('沉默寡言的'), '耳背的'] },
-  { w: 'zenith', opts: [TG('顶点；天顶'), TG('深渊'), '起点'] }, { w: 'candor', opts: [TG('坦率'), TG('欺骗'), TG('胆怯')] },
-  { w: 'obdurate', opts: ['固执的', '温顺的', '慷慨的'] }, { w: 'salient', opts: ['显著的', '隐蔽的', TG('潮湿的')] },
-  { w: 'verbose', opts: [TG('冗长的'), TG('精炼的'), TG('晦涩的')] }, { w: 'benign', opts: [TG('良性的；和善的'), TG('恶性的'), TG('有毒的')] },
-  { w: 'taciturn', opts: [TG('沉默寡言的'), '健谈的', '粗鲁的'] }, { w: 'adroit', opts: ['熟练的', '笨拙的', '迟缓的'] },
-  { w: 'myriad', opts: [TG('无数的'), TG('稀少的'), TG('单一的')] }, { w: 'placate', opts: [TG('安抚'), TG('激怒'), TG('忽视')] },
-  { w: 'lucid', opts: [TG('清晰易懂的'), TG('混乱的'), TG('昏暗的')] }, { w: 'audacious', opts: [TG('大胆的'), TG('胆怯的'), TG('谦逊的')] }
+/**
+ * ★ 2026-11-26（内容本地化）：英文在英文界面直接用英文词 + 英文释义（原来英文界面是
+ *   「英文题干 + 中文选项」，非中文玩家只能靠猜）。opts[0] 恒为正确释义，运行时打乱。
+ */
+function poolZh(): Q[] {
+  return [
+    { w: 'ephemeral', opts: [TG('转瞬即逝的'), TG('坚不可摧的'), TG('笨重迟缓的')] }, { w: 'loquacious', opts: [TG('话多的'), TG('沉默寡言的'), TG('耳背的')] },
+    { w: 'zenith', opts: [TG('顶点；天顶'), TG('深渊'), TG('起点')] }, { w: 'candor', opts: [TG('坦率'), TG('欺骗'), TG('胆怯')] },
+    { w: 'obdurate', opts: [TG('固执的'), TG('温顺的'), TG('慷慨的')] }, { w: 'salient', opts: [TG('显著的'), TG('隐蔽的'), TG('潮湿的')] },
+    { w: 'verbose', opts: [TG('冗长的'), TG('精炼的'), TG('晦涩的')] }, { w: 'benign', opts: [TG('良性的；和善的'), TG('恶性的'), TG('有毒的')] },
+    { w: 'taciturn', opts: [TG('沉默寡言的'), TG('健谈的'), TG('粗鲁的')] }, { w: 'adroit', opts: [TG('熟练的'), TG('笨拙的'), TG('迟缓的')] },
+    { w: 'myriad', opts: [TG('无数的'), TG('稀少的'), TG('单一的')] }, { w: 'placate', opts: [TG('安抚'), TG('激怒'), TG('忽视')] },
+    { w: 'lucid', opts: [TG('清晰易懂的'), TG('混乱的'), TG('昏暗的')] }, { w: 'audacious', opts: [TG('大胆的'), TG('胆怯的'), TG('谦逊的')] }
+  ];
+}
+
+const BANK_EN: Q[] = [
+  { w: 'ephemeral', opts: ['fleeting', 'unbreakable', 'sluggish'] },
+  { w: 'loquacious', opts: ['talkative', 'taciturn', 'hard of hearing'] },
+  { w: 'zenith', opts: ['peak; zenith', 'abyss', 'starting point'] },
+  { w: 'candor', opts: ['frankness', 'deceit', 'timidity'] },
+  { w: 'obdurate', opts: ['stubborn', 'docile', 'generous'] },
+  { w: 'salient', opts: ['notable', 'hidden', 'damp'] },
+  { w: 'verbose', opts: ['wordy', 'concise', 'obscure'] },
+  { w: 'benign', opts: ['harmless; kindly', 'malignant', 'poisonous'] },
+  { w: 'taciturn', opts: ['silent', 'chatty', 'rude'] },
+  { w: 'adroit', opts: ['skilful', 'clumsy', 'slow'] },
+  { w: 'myriad', opts: ['countless', 'scarce', 'single'] },
+  { w: 'placate', opts: ['appease', 'enrage', 'ignore'] },
+  { w: 'lucid', opts: ['clear', 'confused', 'dim'] },
+  { w: 'audacious', opts: ['bold', 'timid', 'humble'] }
 ];
+
+function isZhUi(): boolean {
+  const l: string = I18n.current();
+  return l === 'zh' || l === 'zh-Hant';
+}
+
+function pool(): Q[] {
+  return isZhUi() ? poolZh() : BANK_EN;
+}
 
 @Component
 export struct GDefinitionDash {
@@ -74,7 +106,7 @@ export struct GDefinitionDash {
      this.reset(); }
   aboutToDisappear(): void { if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; } }
 
-  private cur(): Q { return POOL[this.order[this.qi]]; }
+  private cur(): Q { return pool()[this.order[this.qi]]; }
 
   /** ★ 2026-10-14 动画补齐：进度/得分脉冲（本款原来一处 .animation() 都没有） */
 
@@ -93,7 +125,8 @@ export struct GDefinitionDash {
     this.over = false; this.won = false; this.done = false;
     this.msg = TG('六十秒，越快分越高'); this.startAt = Date.now();
     const idx: number[] = []; const out: number[] = [];
-    for (let i = 0; i < POOL.length; i++) { idx.push(i); }
+    const all: Q[] = pool();
+    for (let i = 0; i < all.length; i++) { idx.push(i); }
     for (let i = 0; i < this.diffTotal; i++) {
       const p: number = Math.floor(Math.random() * idx.length);
       out.push(idx[p]); idx.splice(p, 1);
