@@ -393,6 +393,7 @@ export class ProgressStore {
    */
   static finishGame(gameId: string, solved: boolean, baseXp: number, difficultyFactor: number,
                     score: number = 0, durationMs: number = 0): number {
+    ProgressStore.beginBatch();   // 结算期间多次落盘合并成末尾一次 flush
     const today: string = ProgressStore.today();
 
     // ⓪ 统计记账（每局都记，不论输赢）
@@ -430,6 +431,7 @@ export class ProgressStore {
       // ★ 没通关也要结算成就 —— 否则「初次开局」「手熟」这类"玩过就算"的成就永远解不开
       //   （真踩过：玩完整整一局，成就墙还是 0/53）
       ProgressStore.lastNewAch = ProgressStore.checkAchievements();
+      ProgressStore.endBatch();
       return 0;
     }
 
@@ -516,6 +518,7 @@ export class ProgressStore {
     ProgressStore.persistStreaks();
   // ★ 2026-11-26（P1）：赢局的新成就必须带回去，否则结算弹窗永远弹上一局的旧成就
   ProgressStore.lastNewAch = ProgressStore.checkAchievements();
+    ProgressStore.endBatch();
     return gained;
   }
 
@@ -1496,6 +1499,30 @@ export class ProgressStore {
     }
   }
 
+  /**
+   * ★ 2026-11-26（性能审计 P2）：一局结算会连续 put 多个键（经验/连胜/今日/成就/日志…），
+   *   而 putString/putNumber 每个都同步 flush ⇒ 结算瞬间 6~18 次同步落盘，正是弹窗卡顿来源。
+   *   ⇒ 批量模式：结算期间只 putSync，末尾 flush 一次；2 秒兜底自愈，异常没走到 endBatch 也不会永不落盘。
+   */
+  private static batching: boolean = false;
+  private static batchAt: number = 0;
+
+  private static beginBatch(): void {
+    ProgressStore.batching = true;
+    ProgressStore.batchAt = Date.now();
+  }
+
+  private static endBatch(): void {
+    ProgressStore.batching = false;
+    const pr: preferences.Preferences | null = ProgressStore.pref;
+    if (pr !== null) {
+      try {
+        pr.flush();
+      } catch (e) {
+      }
+    }
+  }
+
   private static putString(key: string, value: string): void {
     // 直接落盘（preferences 句柄在 init 时拿到）
     const pr: preferences.Preferences | null = ProgressStore.pref;
@@ -1504,8 +1531,13 @@ export class ProgressStore {
       //   putSync/flush 在【存储满】时会抛 BusinessError ⇒ 未捕获 ⇒ app 崩
       //   ⇒ 所有落盘一律 try/catch【静默失败】：内存态已经更新，界面照常可用
       try {
+        if (ProgressStore.batching && Date.now() - ProgressStore.batchAt > 2000) {
+          ProgressStore.endBatch();
+        }
         pr.putSync(key, value);
-        pr.flush();
+        if (!ProgressStore.batching) {
+          pr.flush();
+        }
       } catch (e) {
         // 写不进去就算了 —— 用户这一局照样能玩完，只是下次启动丢了这条记录
       }
@@ -1598,11 +1630,16 @@ export class ProgressStore {
 
   private static putNumber(key: string, value: number): void {
     const pr: preferences.Preferences | null = ProgressStore.pref;
+        if (ProgressStore.batching && Date.now() - ProgressStore.batchAt > 2000) {
+          ProgressStore.endBatch();
+        }
     if (pr !== null) {
       // ★★★ 同上：存储满时 putSync 会抛 ⇒ 静默失败
       try {
         pr.putSync(key, value);
-        pr.flush();
+        if (!ProgressStore.batching) {
+          pr.flush();
+        }
       } catch (e) {
       }
     }
