@@ -114,9 +114,11 @@ export class LanRace {
    */
   static noteStart(): void {
     if (!LanRace.racing) { return; }
-    if (LanRace.startAt <= 0) {
-      LanRace.startAt = Date.now();
-    }
+    // ★ 2026-11-26（审计 P2）：**以游戏真正开始的时刻为准**。
+    //   原来只在 startAt<=0 时兜底，而 race_go 早已把 startAt 设成「收到开局广播的那一刻」
+    //   ⇒ 排行榜上的秒数把「进游戏页 + 加载 + 3 秒演示」都算进去了，和对局结算显示的用时不是同一个数。
+    //   noteStart() 由每款游戏在本局开始时调用，用它覆盖才是「这局玩了多久」。
+    LanRace.startAt = Date.now();
   }
 
   /** ② 我完成了（或失败了）—— 用时自动算；也可显式传 */
