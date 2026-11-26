@@ -23,11 +23,16 @@ const PASS: number = 12; const WRITE_MIN: number = 3; const SAY_GAP_MS: number =
 function CAT_NAMES(): string[] {
   return [TG('水果'), TG('动物'), TG('颜色'), TG('交通工具')];
 }
+/**
+ * ★ 2026-11-26（真机 i18n 验证发现）：词表里一半没包 TG ⇒ 英文界面出题会变成
+ *   「does “红色” belong to “Vehicles”?」—— 选项翻了、被判断的词还是中文。
+ *   这些词在字典里本来就有 10 语言，全部包上即可（key 覆盖率不变）。
+ */
 const CATS: string[][] = [
-  [TG('苹果'), TG('香蕉'), '橙子', '葡萄'],
-  [TG('老虎'), '大象', '熊猫', '兔子'],
-  ['红色', '蓝色', '绿色', TG('黄色')],
-  ['汽车', TG('火车'), '飞机', '轮船']
+  [TG('苹果'), TG('香蕉'), TG('橙子'), TG('葡萄')],
+  [TG('老虎'), TG('大象'), TG('熊猫'), TG('兔子')],
+  [TG('红色'), TG('蓝色'), TG('绿色'), TG('黄色')],
+  [TG('汽车'), TG('火车'), TG('飞机'), TG('轮船')]
 ];
 
 @Component
