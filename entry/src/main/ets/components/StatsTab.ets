@@ -102,6 +102,8 @@ export struct StatsTab {
   }
   /** ★ 2026-10-13（P5）：主题色观察源 —— 设置页改色，本页立刻跟 */
   @StorageProp('accent') accentId: string = Palette.primary;
+  // ★ 2026-11-26（P2）：重置进度后强制重算（Tabs 子页只建一次，没有这个键变化就一直是旧数据）
+  @StorageProp('statsRev') statsRev: number = 0;
   @State achvExpanded: boolean = false;
   /** ★★★ 2026-11-07 交互死角：智慧屏/键盘焦点环 */
   @State private tvFocus: string = '';
@@ -961,7 +963,7 @@ build() {
 
   /** 已解锁排前面，这样一眼看到的都是点亮的（带记忆化） */
   private sortedAchv(): string[][] {
-    const key: string = this.unlockedIds().join(',') + '#' + this.renderRev;
+    const key: string = this.unlockedIds().join(',') + '#' + this.renderRev + '#' + this.statsRev;
     if (key === this.achvCacheKey) {
       return this.achvCache;
     }
