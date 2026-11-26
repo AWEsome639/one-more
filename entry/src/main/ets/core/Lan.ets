@@ -58,6 +58,9 @@ export class Lan {
   private static onMsg: (m: LanMsg) => void = () => {};
   /** 握手是否完成（join 靠它判断是否真的连上了） */
   private static handshake: boolean = false;
+  /** ★ 2026-11-26（P1）：广播定时器。原来每次开房都新起一个 setInterval 且从不清理 ⇒
+   *  同一进程越积越多（每 1.5s 各广播一次），离开大厅后还在广播。 */
+  private static beaconTimer: number = -1;
 
   /** 本机昵称（可在设置里改，默认用系统给的短名） */
   static nick(): string {
@@ -129,7 +132,8 @@ export class Lan {
       });
 
       // 周期广播（用 setInterval 保持存活）
-      setInterval(() => {
+      Lan.stopBeacon();
+      Lan.beaconTimer = setInterval(() => {
         udp.send({
           data: MAGIC + ' HERE ' + port + ' ' + Lan.nick() + ' ' + gameId,
           address: { address: '255.255.255.255', port: DISCOVER_PORT, family: 1 },
@@ -297,8 +301,17 @@ export class Lan {
     });
   }
 
+  /** ★ 2026-11-26（P1）：停掉房间广播（离开大厅/重开房时调） */
+  static stopBeacon(): void {
+    if (Lan.beaconTimer >= 0) {
+      clearInterval(Lan.beaconTimer);
+      Lan.beaconTimer = -1;
+    }
+  }
+
   /** 关掉所有连接（开新房/退出时调） */
   static closeAll(): void {
+    Lan.stopBeacon();
     try {
       if (Lan.conn !== null) {
         Lan.conn.close();
