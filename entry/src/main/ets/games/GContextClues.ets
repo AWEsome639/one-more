@@ -20,11 +20,11 @@ const ROUNDS: number = 10; const PASS: number = 8; const LIVES: number = 3;
 interface Q { s: string; w: string; opts: string[] }
 /** opts[0] 恒为正确释义，运行时打乱 */
 const POOL: Q[] = [
-  { s: 'The arid desert offered no shade for miles.', w: 'arid', opts: ['干旱的', TG('潮湿的'), '寒冷的', '肥沃的'] },
+  { s: 'The arid desert offered no shade for miles.', w: 'arid', opts: [TG('干旱的'), TG('潮湿的'), TG('寒冷的'), TG('肥沃的')] },
   { s: 'She gave a terse reply and hurried out.', w: 'terse', opts: [TG('简短生硬的'), TG('冗长啰嗦的'), TG('热情洋溢的'), TG('含糊不清的')] },
   { s: 'The doctor said the drug alleviated her pain.', w: 'alleviated', opts: [TG('减轻了'), TG('加剧了'), TG('忽视了'), TG('引发了')] },
   { s: 'He was meticulous about every detail of the plan.', w: 'meticulous', opts: [TG('一丝不苟的'), TG('粗心大意的'), TG('漫不经心的'), TG('慷慨大方的')] },
-  { s: 'The boisterous crowd drowned out the speaker.', w: 'boisterous', opts: ['喧闹的', TG('安静的'), '悲伤的', '整齐的'] },
+  { s: 'The boisterous crowd drowned out the speaker.', w: 'boisterous', opts: [TG('喧闹的'), TG('安静的'), TG('悲伤的'), TG('整齐的')] },
   { s: 'They shared a frugal meal of bread and soup.', w: 'frugal', opts: [TG('节俭的'), TG('奢侈的'), TG('丰盛的'), TG('辛辣的')] },
   { s: 'The evidence was ambiguous, so the jury hesitated.', w: 'ambiguous', opts: [TG('模棱两可的'), TG('确凿无疑的'), TG('伪造的'), TG('充分的')] },
   { s: 'She remained stoic through the whole ordeal.', w: 'stoic', opts: [TG('坚忍克制的'), TG('惊慌失措的'), TG('兴高采烈的'), TG('犹豫不决的')] },

@@ -22,10 +22,10 @@ interface Ev { e: string; t: string; }
 const ROUNDS: number = 5; const PASS: number = 4; const FEED_MS: number = 1100;
 
 const SETS: Ev[][] = [
-  [{ e: '🌱', t: TG('播种') }, { e: '🌿', t: TG('发芽') }, { e: '🌸', t: TG('开花') }, { e: '🍎', t: '结果' }],
+  [{ e: '🌱', t: TG('播种') }, { e: '🌿', t: TG('发芽') }, { e: '🌸', t: TG('开花') }, { e: '🍎', t: TG('结果') }],
   [{ e: '🥚', t: TG('下蛋') }, { e: '🐣', t: TG('破壳') }, { e: '🐥', t: TG('雏鸟') }, { e: '🐔', t: TG('成鸡') }],
   [{ e: '🧊', t: TG('冰块') }, { e: '💧', t: TG('化成水') }, { e: '♨️', t: TG('烧成汽') }, { e: '☁️', t: TG('聚成云') }],
-  [{ e: '🌰', t: TG('种子') }, { e: '🌳', t: '长成树' }, { e: '🪵', t: '伐成木' }, { e: '🪑', t: '做成椅' }],
+  [{ e: '🌰', t: TG('种子') }, { e: '🌳', t: TG('长成树') }, { e: '🪵', t: TG('伐成木') }, { e: '🪑', t: TG('做成椅') }],
   [{ e: '🍇', t: TG('采摘') }, { e: '🧺', t: TG('装筐') }, { e: '🍷', t: TG('压榨') }, { e: '🍾', t: TG('装瓶') }],
   [{ e: '📄', t: TG('写草稿') }, { e: '✏️', t: TG('反复改') }, { e: '🖨️', t: TG('打印') }, { e: '📮', t: TG('寄出去') }]
 ];
@@ -257,7 +257,7 @@ export struct GTemporalOrder {
     this.locked = true;
     let ok: boolean = true;
     for (let k = 0; k < p.length; k++) { if (this.orig[p[k]] !== k) { ok = false; } }
-    if (ok) { this.hits = this.hits + 1; this.score = this.score + 15; this.msg = TG('✅ 顺序完全正确'); } else { this.msg = '❌ 正确顺序：' + this.answerText(); }
+    if (ok) { this.hits = this.hits + 1; this.score = this.score + 15; this.msg = TG('✅ 顺序完全正确'); } else { this.msg = TG('❌ 正确顺序：') + this.answerText(); }
     this.timer = setTimeout(() => { this.timer = -1; this.next(); }, FEED_MS);
   }
 

@@ -20,7 +20,7 @@ import { AppClock } from '../core/AppClock';
 interface WordPair { a: string; b: string; }
 interface WordChoice { w: string; ok: boolean; }
 const PAIRS: WordPair[] = [
-  { a: TG('☀️ 太阳'), b: TG('🌙 月亮') }, { a: '🔑 钥匙', b: '🔒 锁' }, { a: '🖌️ 画笔', b: '🎨 颜料' },
+  { a: TG('☀️ 太阳'), b: TG('🌙 月亮') }, { a: TG('🔑 钥匙'), b: TG('🔒 锁') }, { a: TG('🖌️ 画笔'), b: TG('🎨 颜料') },
   { a: TG('🐟 鱼'), b: TG('🌊 水') }, { a: TG('✉️ 信封'), b: TG('📮 邮筒') }, { a: TG('🧵 针'), b: TG('🪡 线') },
   { a: TG('⚡ 闪电'), b: TG('⛈️ 雷声') }, { a: TG('🌱 种子'), b: TG('🌳 大树') }, { a: TG('🍚 米饭'), b: TG('🥢 筷子') },
   { a: TG('🚗 汽车'), b: TG('🛣️ 公路') }, { a: TG('🕯️ 蜡烛'), b: TG('🔥 火苗') }, { a: TG('🎻 提琴'), b: TG('🎵 旋律') },

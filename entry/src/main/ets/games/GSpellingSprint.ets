@@ -20,11 +20,11 @@ const LIMIT_S: number = 60; const TICK_MS: number = 1000; const GAP_MS: number =
 interface SPW { zh: string; w: string }
 
 const BANK: SPW[] = [
-  { zh: TG('苹果'), w: 'APPLE' }, { zh: TG('桥'), w: 'BRIDGE' }, { zh: '风暴', w: 'STORM' },
-  { zh: '沉默', w: 'SILENCE' }, { zh: '勇气', w: 'COURAGE' }, { zh: TG('森林'), w: 'FOREST' },
-  { zh: '窗户', w: 'WINDOW' }, { zh: TG('铅笔'), w: 'PENCIL' }, { zh: '海洋', w: 'OCEAN' },
+  { zh: TG('苹果'), w: 'APPLE' }, { zh: TG('桥'), w: 'BRIDGE' }, { zh: TG('风暴'), w: 'STORM' },
+  { zh: TG('沉默'), w: 'SILENCE' }, { zh: TG('勇气'), w: 'COURAGE' }, { zh: TG('森林'), w: 'FOREST' },
+  { zh: TG('窗户'), w: 'WINDOW' }, { zh: TG('铅笔'), w: 'PENCIL' }, { zh: TG('海洋'), w: 'OCEAN' },
   { zh: TG('灯笼'), w: 'LANTERN' }, { zh: TG('友谊'), w: 'FRIENDSHIP' }, { zh: TG('影子'), w: 'SHADOW' },
-  { zh: '旅程', w: 'JOURNEY' }, { zh: '珍珠', w: 'PEARL' }, { zh: TG('图书馆'), w: 'LIBRARY' },
+  { zh: TG('旅程'), w: 'JOURNEY' }, { zh: TG('珍珠'), w: 'PEARL' }, { zh: TG('图书馆'), w: 'LIBRARY' },
   { zh: TG('清晨'), w: 'MORNING' }
 ];
 

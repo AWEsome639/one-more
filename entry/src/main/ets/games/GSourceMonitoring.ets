@@ -26,7 +26,7 @@ function CLAIMS(): string[] {
   TG('下学期加开 Python 选修'), TG('操场跑道正在翻修')
 ];
 }
-const SOURCES: string[] = ['👩‍🏫 任课老师', '📰 校报', '🧑‍🔬 实验室学长', '👬 室友'];
+const SOURCES: string[] = [TG('👩‍🏫 任课老师'), TG('📰 校报'), TG('🧑‍🔬 实验室学长'), TG('👬 室友')];
 const Q_IDX: number[] = [0, 1, 2, 3, 4];
 const QUIZ: number = 5; const NEED: number = 4; const STUDY_SEC: number = 8; const WAIT_MS: number = 900;
 
