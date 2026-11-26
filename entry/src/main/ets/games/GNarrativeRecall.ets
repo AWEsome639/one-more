@@ -11,6 +11,7 @@ import { Demo } from '../core/Demo';
 import { Bp } from '../core/Bp';
 import { Haptics } from '../core/Haptics';
 import { GameDiff } from '../core/GameDiff';
+import { I18n } from '../core/I18n';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
@@ -35,7 +36,13 @@ const AI_STOP: string = '的地得了是在几个什么样为和与就把被从�
 interface Q { text: string; opts: string[]; right: number }
 interface Story { body: string; qs: Q[] }
 
-const STORIES: Story[] = [
+/**
+ * ★ 2026-11-27（内容本地化）：中文故事 + 英文故事分开（故事是题目内容，不是界面文案）。
+ *   英文版把「纸条上写着几个字」换成「几个词」，正文纸条正好 7 个词 —— 改正文必须同步改这题。
+ *   中文路径 call-time 求值；非中文走英文；按语言缓存。
+ */
+function storiesZh(): Story[] {
+  return [
   {
     body: TG('清晨六点，林小满骑着蓝色自行车去码头。她在第三个摊位买了一斤橘子，又用旧书换了一本 1987 年的地图册。回家路上忽然下雨，她躲进一家面馆点了一碗牛肉面，却把伞忘在了门口的伞桶里。'),
     qs: [
@@ -61,6 +68,47 @@ const STORIES: Story[] = [
     ]
   }
 ];
+}
+
+const STORIES_EN: Story[] = [
+  {
+    body: 'At six in the morning, Lin Xiaoman rode her blue bicycle to the docks. At the third stall she bought a pound of oranges, and traded an old book for a 1987 atlas. On the way home it started to rain, so she ducked into a noodle shop and ordered a bowl of beef noodles, but left her umbrella in the bucket by the door.',
+    qs: [
+      { text: 'What time did she set out?', opts: ['5 a.m.', '6 a.m.', '7 a.m.'], right: 1 },
+      { text: 'At which stall did she buy the oranges?', opts: ['the second', 'the third', 'the fifth'], right: 1 },
+      { text: 'What did she leave at the noodle shop?', opts: ['the atlas', 'her umbrella', 'her bicycle'], right: 1 }
+    ]
+  },
+  {
+    body: 'On Thursday afternoon, A Hai found a tin box in the attic. Inside were three coins and a faded photograph, and on the back of the photo someone had written 1996, Qingdao. He carried the box downstairs to the watch repair shop, where the old master said the coins were from 1965 and worth two hundred yuan. A Hai could not bring himself to sell them, and only slipped the photo into his textbook.',
+    qs: [
+      { text: 'Where did he find the box?', opts: ['the attic', 'the garage', 'a drawer'], right: 0 },
+      { text: 'Which year was written on the back of the photo?', opts: ['1965', '1986', '1996'], right: 2 },
+      { text: 'How much did the old master say the coins were worth?', opts: ['one hundred yuan', 'two hundred yuan', 'three hundred yuan'], right: 1 }
+    ]
+  },
+  {
+    // 纸条必须正好 7 个词（Q3 答案 = seven）
+    body: 'At nine at night, Su He took an orange cat to the seaside to watch the meteor shower. She waited forty minutes and saw only two meteors, but on the tideline she found a small green glass bottle. Inside was a slip of paper reading: meet me here again at dawn tomorrow.',
+    qs: [
+      { text: 'What animal did she bring?', opts: ['an orange cat', 'a shiba dog', 'a parrot'], right: 0 },
+      { text: 'How long did she wait?', opts: ['twenty minutes', 'forty minutes', 'an hour'], right: 1 },
+      { text: 'How many words were on the note?', opts: ['five', 'six', 'seven'], right: 2 }
+    ]
+  }
+];
+
+let storiesLang: string = '';
+let storiesCache: Story[] = [];
+
+function stories(): Story[] {
+  const l: string = I18n.current();
+  if (storiesLang !== l) {
+    storiesLang = l;
+    storiesCache = (l === 'zh' || l === 'zh-Hant') ? storiesZh() : STORIES_EN;
+  }
+  return storiesCache;
+}
 
 @Component
 export struct GNarrativeRecall {
@@ -123,16 +171,16 @@ export struct GNarrativeRecall {
   }
 
   private newRound(): void {
-    let k: number = Math.floor(Math.random() * STORIES.length);
+    let k: number = Math.floor(Math.random() * stories().length);
     let guard: number = 0;
     while (this.used.indexOf(k) >= 0 && guard < 20) {
-      k = Math.floor(Math.random() * STORIES.length);
+      k = Math.floor(Math.random() * stories().length);
       guard = guard + 1;
     }
     const picked: number[] = this.used.slice();
     picked.push(k);
     this.used = picked;
-    this.story = STORIES[k];
+    this.story = stories()[k];
     this.qIdx = 0; this.pick = -1; this.phase = 0;
     this.msg = TG2('第 {0} 篇：读一遍，记住细节', String(this.round));
   }
@@ -230,7 +278,10 @@ export struct GNarrativeRecall {
    */
   private aiAnswer(): number {
     const q: Q = this.story.qs[this.qIdx];
-    const delims: string[] = ['。', '，', '！', '？', '；', '、'];
+    // ★ 2026-11-27：英文正文里没有中文标点 ⇒ 原来会整段当一句、打分退化。按语言选切句符。
+    const l: string = I18n.current();
+    const zhUi: boolean = (l === 'zh' || l === 'zh-Hant');
+    const delims: string[] = zhUi ? ['。', '，', '！', '？', '；', '、'] : ['. ', ', ', '! ', '? ', '; '];
     let body: string = this.story.body;
     for (let d = 0; d < delims.length; d++) {
       body = body.split(delims[d]).join('。');
@@ -248,7 +299,7 @@ export struct GNarrativeRecall {
         score += 5;
         for (let c = 0; c < q.text.length; c++) {
           const ch: string = q.text.charAt(c);
-          if (AI_STOP.indexOf(ch) >= 0) {
+          if (zhUi ? (AI_STOP.indexOf(ch) >= 0) : ('aeioustnr'.indexOf(ch.toLowerCase()) >= 0)) {
             continue;
           }
           if (sents[s].indexOf(ch) >= 0) {
