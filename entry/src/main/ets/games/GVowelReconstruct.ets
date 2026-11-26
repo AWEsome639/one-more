@@ -15,14 +15,19 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const ROUNDS: number = 6; const PASS: number = 5; const VOWELS: string = 'AEIOU'; const FEED_MS: number = 900;
 
 interface VW { w: string; gloss: string }
 
-const BANK: VW[] = [
+/**
+ * ★ 2026-11-26（内容本地化）：中文表 + 英文表分开；中文 call-time 求值，非中文走英文，
+ *   按语言缓存（避免每帧重建）。英文表见下；w/word 保持原样，只换释义字段。
+ */
+function zhBank(): VW[] {
+  return [
   { w: 'MUSIC', gloss: '音乐 🎵' }, { w: 'GARDEN', gloss: '花园 🌷' }, { w: 'PENCIL', gloss: TG('铅笔 ✏️') },
   { w: 'CASTLE', gloss: TG('城堡 🏰') }, { w: 'RIVER', gloss: '河流 🏞️' }, { w: 'TIGER', gloss: '老虎 🐯' },
   { w: 'WINTER', gloss: TG('冬天 ❄️') }, { w: 'DOCTOR', gloss: '医生 🩺' }, { w: 'PLANET', gloss: '行星 🪐' },
@@ -30,6 +35,31 @@ const BANK: VW[] = [
   { w: 'CANDLE', gloss: '蜡烛 🕯️' }, { w: 'SILVER', gloss: TG('银 🥈') }, { w: 'WINDOW', gloss: '窗户 🪟' },
   { w: 'BRIDGE', gloss: '桥 🌉' }, { w: 'KITCHEN', gloss: TG('厨房 🍳') }, { w: 'MONKEY', gloss: '猴子 🐒' }
 ];
+}
+
+const BANK_EN: VW[] = [
+  { w: 'MUSIC', gloss: 'tunes you listen to 🎵' }, { w: 'GARDEN', gloss: 'where flowers and herbs grow 🌷' },
+  { w: 'PENCIL', gloss: 'graphite stick you write with ✏️' }, { w: 'CASTLE', gloss: 'stone home for a king 🏰' },
+  { w: 'RIVER', gloss: 'water flowing to the sea 🏞️' }, { w: 'TIGER', gloss: 'big striped cat 🐯' },
+  { w: 'WINTER', gloss: 'the coldest season ❄️' }, { w: 'DOCTOR', gloss: 'someone who treats the sick 🩺' },
+  { w: 'PLANET', gloss: 'a world orbiting a star 🪐' }, { w: 'MARKET', gloss: 'where people go shopping 🛒' },
+  { w: 'SUMMER', gloss: 'the hottest season ☀️' }, { w: 'ROBOT', gloss: 'a machine that moves by itself 🤖' },
+  { w: 'CANDLE', gloss: 'wax with a burning flame 🕯️' }, { w: 'SILVER', gloss: 'shiny grey metal, second place 🥈' },
+  { w: 'WINDOW', gloss: 'glass in a wall to look through 🪟' }, { w: 'BRIDGE', gloss: 'it carries a road over water 🌉' },
+  { w: 'KITCHEN', gloss: 'the room where you cook 🍳' }, { w: 'MONKEY', gloss: 'climbing ape with a long tail 🐒' }
+];
+
+let bankLang: string = '';
+let bankCache: VW[] = [];
+
+function bank(): VW[] {
+  const l: string = I18n.current();
+  if (bankLang !== l) {
+    bankLang = l;
+    bankCache = (l === 'zh' || l === 'zh-Hant') ? zhBank() : BANK_EN;
+  }
+  return bankCache;
+}
 
 function isVowel(ch: string): boolean { return VOWELS.indexOf(ch) >= 0; }
 
@@ -108,10 +138,10 @@ export struct GVowelReconstruct {
      this.reset(); }
   aboutToDisappear(): void { if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; } }
 
-  private cur(): VW { return BANK[this.order[this.qi]]; }
+  private cur(): VW { return bank()[this.order[this.qi]]; }
   private reset(): void {
     if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; }
-    this.order = pickIndexes(BANK.length, this.diffTotal);
+    this.order = pickIndexes(bank().length, this.diffTotal);
     this.qi = 0; this.solvedCount = 0; this.score = 0; this.over = false; this.won = false;
     this.done = false; this.pressed = -1; this.startAt = Date.now(); this.load();
   }

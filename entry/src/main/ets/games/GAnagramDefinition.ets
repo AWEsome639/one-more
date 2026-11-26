@@ -2,7 +2,7 @@
  * 字谜定义 —— 看中文释义，按顺序点字母把单词拼回来
  * 胜负：6 题答对 ≥4 ⇒ 通关｜进度：题号 / 答对 / 每题倒计时（点错罚 3 秒） */
 import { Hint, HintResult } from '../ai/Hint';
-import { Sec } from '../core/I18n';
+import { Sec, I18n } from '../core/I18n';
 import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { FontSize, Space, Radius, Palette, Motion, Theme, Shadow, Cell } from '../core/Design';
@@ -21,11 +21,38 @@ const LIMIT_MS: number = 20000; const TICK_MS: number = 100;
 const PENALTY_MS: number = 3000; const FEED_MS: number = 800;
 const EIGHT: number[] = [0, 1, 2, 3, 4, 5, 6, 7];
 interface AnaQ { word: string; def: string }
-const BANK: AnaQ[] = [
+/**
+ * ★ 2026-11-26（内容本地化）：中文表 + 英文表分开；中文 call-time 求值，非中文走英文，
+ *   按语言缓存（避免每帧重建）。英文表见下；w/word 保持原样，只换释义字段。
+ */
+function zhBank(): AnaQ[] {
+  return [
   { word: 'ORANGE', def: '橙子；橙色' }, { word: 'GARDEN', def: TG('花园') }, { word: 'WINTER', def: TG('冬天') }, { word: 'PLANET', def: '行星' },
   { word: 'SILVER', def: '银；银色的' }, { word: 'MARKET', def: '市场' }, { word: 'BRIDGE', def: TG('桥') }, { word: 'CASTLE', def: '城堡' },
   { word: 'PENCIL', def: TG('铅笔') }, { word: 'CLOUD', def: '云' }, { word: 'MUSIC', def: '音乐' }, { word: 'RIVER', def: TG('河流') }
 ];
+}
+
+const BANK_EN: AnaQ[] = [
+  { word: 'ORANGE', def: 'citrus fruit; its colour' }, { word: 'GARDEN', def: 'where flowers are planted' },
+  { word: 'WINTER', def: 'the coldest season' }, { word: 'PLANET', def: 'a world orbiting a star' },
+  { word: 'SILVER', def: 'shiny grey metal; its colour' }, { word: 'MARKET', def: 'where things are bought and sold' },
+  { word: 'BRIDGE', def: 'it spans water or a valley' }, { word: 'CASTLE', def: 'fortified stone home of a lord' },
+  { word: 'PENCIL', def: 'it writes and can be rubbed out' }, { word: 'CLOUD', def: 'white or grey shape in the sky' },
+  { word: 'MUSIC', def: 'organised sound; tunes' }, { word: 'RIVER', def: 'water running to the sea' }
+];
+
+let bankLang: string = '';
+let bankCache: AnaQ[] = [];
+
+function bank(): AnaQ[] {
+  const l: string = I18n.current();
+  if (bankLang !== l) {
+    bankLang = l;
+    bankCache = (l === 'zh' || l === 'zh-Hant') ? zhBank() : BANK_EN;
+  }
+  return bankCache;
+}
 
 /** 从 0..total-1 里随机取 k 个互不相同的下标 */
 function pickIndexes(total: number, k: number): number[] {
@@ -90,7 +117,7 @@ export struct GAnagramDefinition {
   }
   private reset(): void {
     this.stop();
-    this.queue = pickIndexes(BANK.length, QN);
+    this.queue = pickIndexes(bank().length, QN);
     this.qIndex = 0; this.right = 0; this.score = 0; this.over = false; this.won = false;
     this.done = false; this.startAt = AppClock.netNow(); this.load();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
@@ -99,12 +126,12 @@ export struct GAnagramDefinition {
     this.letters = shuffleStr(this.curWord().split(''));
     this.picked = []; this.leftMs = this.diffTotal; this.roundAt = AppClock.netNow(); this.msg = TG('把字母拼回这个单词');
   }
-  private cur(): AnaQ { return this.qIndex >= QN ? BANK[0] : BANK[this.queue[this.qIndex]]; }
+  private cur(): AnaQ { return this.qIndex >= QN ? bank()[0] : bank()[this.queue[this.qIndex]]; }
   /** ★ 2026-11-08 变位词求解：给定字母排序后与词库比对（不读答案） */
   private aiSolve(): string {
     const key: string = this.aiKey(this.letters.join(''));
-    for (let i = 0; i < BANK.length; i++) {
-      const w: string = BANK[i].word;
+    for (let i = 0; i < bank().length; i++) {
+      const w: string = bank()[i].word;
       if (w.length === this.letters.length && this.aiKey(w) === key) {
         return w;
       }
