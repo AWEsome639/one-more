@@ -632,8 +632,20 @@ struct GameHost {
     AppClock.hide();
   }
 
+  /**
+   * ★ 2026-11-26（性能审计 P2）：theme() 原来每帧 new 一个 Theme（build 里有 700+ 处调用，
+   *   单帧至少跑 110 处；结算时数字滚动 + 粒子连推 66 帧 ⇒ 每局 7000+ 个临时对象）。
+   *   照抄 GamesTab 的做法做两级记忆化：dark 变了才重建。
+   */
+  private themeCache: Theme | null = null;
+  private themeCacheDark: boolean = false;
+
   private theme(): Theme {
-    return this.dark ? Theme.dark() : Theme.light();
+    if (this.themeCache === null || this.themeCacheDark !== this.dark) {
+      this.themeCacheDark = this.dark;
+      this.themeCache = this.dark ? Theme.dark() : Theme.light();
+    }
+    return this.themeCache;
   }
 
   /** 所有游戏结算都走这里 */
@@ -823,12 +835,19 @@ struct GameHost {
     if (pool.length === 0) {
       return '';
     }
+    // ★ 2026-11-26（性能审计 P3）：先把「已通关」取一次装进 Set，
+    //   原来循环里每项调 hasCleared ⇒ 每次都 split 整条已通关串（355 款时 12.6 万次分配）。
+    const clearedOnce: Set<string> = new Set<string>();
+    const clearedArr: string[] = ProgressStore.clearedGames();
+    for (let ci = 0; ci < clearedArr.length; ci++) {
+      clearedOnce.add(clearedArr[ci]);
+    }
     // ① 同分类 + 没通关
     const cur: GameMeta | undefined = this.meta;
     if (cur !== undefined) {
       const same: GameMeta[] = [];
       for (let i = 0; i < pool.length; i++) {
-        if (pool[i].category === cur.category && !ProgressStore.hasCleared(pool[i].id)) {
+        if (pool[i].category === cur.category && !clearedOnce.has(pool[i].id)) {
           same.push(pool[i]);
         }
       }
@@ -839,7 +858,7 @@ struct GameHost {
     // ② 任意没通关
     const fresh: GameMeta[] = [];
     for (let i = 0; i < pool.length; i++) {
-      if (!ProgressStore.hasCleared(pool[i].id)) {
+      if (!clearedOnce.has(pool[i].id)) {
         fresh.push(pool[i]);
       }
     }
