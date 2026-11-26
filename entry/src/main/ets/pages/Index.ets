@@ -584,6 +584,9 @@ build() {
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
           this.current = i;
         });
+        // ★ 2026-11-26（性能审计 P1）：把当前 tab 发布出去，统计页据此决定
+        //   「要不要为不可见的自己跑 36 帧数字滚动」（每局结算白重建 36 次）。
+        AppStorage.setOrCreate('curTab', i);
       })
       .width('100%')
       .layoutWeight(1)
@@ -689,6 +692,7 @@ build() {
         animateTo({ duration: Motion.base, curve: Motion.spring() }, () => {
           this.current = idx;
         });
+        AppStorage.setOrCreate('curTab', idx);
       });
     })
   }

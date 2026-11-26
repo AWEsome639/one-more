@@ -127,6 +127,8 @@ export struct StatsTab {
   @StorageProp('bestStreak') bestStreak: number = 0;
   @StorageProp('dailyCount') dailyCount: number = 0;
   @StorageProp('solvedToday') solvedToday: boolean = false;
+  // ★ 2026-11-26（性能审计 P1）：当前 tab（0 游戏 / 1 统计 / 2 设置），Index 写；统计页不可见时不跑滚动动画
+  @StorageProp('curTab') curTabNo: number = 0;
   // ★ 2026-11-26（P1 真机抓到）：本会话解锁的成就在统计页不显示（重启才 4/53）
   //   ⇒ 把 achievements 也挂成 StorageProp，解锁即触发本页重算。
   @StorageProp('achievements') @Watch('onAchChanged') achRaw: string = '';
@@ -151,6 +153,10 @@ export struct StatsTab {
    *     再包一层动画会抢帧（项目纪律：别在后台每帧 setState）。
    */
   onPlaysChanged(): void {
+    if (this.curTabNo !== 1) {
+      this.playsShown = this.plays;   // 不可见：直接落值，别为 18 帧 × 2 白重建整页
+      return;
+    }
     this.rollPlays.to(this.plays, (v: number) => {
       this.playsShown = v;
     });
@@ -161,6 +167,10 @@ export struct StatsTab {
    *   同一个 bug 的第二个受害者（「🏆 通关了 N 局」原来也停在初值）。
    */
   onSolvedChanged(): void {
+    if (this.curTabNo !== 1) {
+      this.solvedShown = this.totalSolved;
+      return;
+    }
     this.rollSolved.to(this.totalSolved, (v: number) => {
       this.solvedShown = v;
     });
