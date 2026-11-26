@@ -127,6 +127,9 @@ export struct StatsTab {
   @StorageProp('bestStreak') bestStreak: number = 0;
   @StorageProp('dailyCount') dailyCount: number = 0;
   @StorageProp('solvedToday') solvedToday: boolean = false;
+  // ★ 2026-11-26（P1 真机抓到）：本会话解锁的成就在统计页不显示（重启才 4/53）
+  //   ⇒ 把 achievements 也挂成 StorageProp，解锁即触发本页重算。
+  @StorageProp('achievements') @Watch('onAchChanged') achRaw: string = '';
   // ↓ 数据本体仍走 ProgressStore 的方法，这几个只用来算"数据版本号"触发刷新
   @StorageProp('totalMs') totalMsRaw: number = 0;
   @StorageProp('perGamePlays') perGameRaw: string = '{}';
@@ -301,7 +304,16 @@ export struct StatsTab {
   }
 
   /** 一次遍历算出「近期」要的三个数（7 天窗口内的局 / 通关数 / 今日时长 / 最常玩那款） */
+  /** ★ 2026-11-26（性能审计 P1）：weekStat 在 build 里被调 6 次，每次都重扫 400 条日志。
+   *  按「局数 + 日志条数 + 今日起点」记忆化（三者任一变化才重算）。 */
+  private weekCache: WeekStat | null = null;
+  private weekCacheKey: string = '';
   private weekStat(): WeekStat {
+    const memoKey: string = this.plays + '|' + GameLog.count() + '|' + this.dayStart();
+    if (this.weekCache !== null && memoKey === this.weekCacheKey) {
+      return this.weekCache;
+    }
+    this.weekCacheKey = memoKey;
     const observed: number = this.plays;      // ← 依赖声明，别删（读一下才会重算；同 t() 的 langCode）
     const st: WeekStat = { total: 0, solved: 0, todayMs: 0, todayTotal: 0, topId: '', topCount: 0 };
     const recs: PlayRecord[] = GameLog.recent(LOG_WINDOW);
@@ -329,6 +341,7 @@ export struct StatsTab {
         st.topId = gid;
       }
     });
+    this.weekCache = st;
     return st;
   }
 
@@ -952,7 +965,12 @@ build() {
   // ───────── 成就墙 ─────────
 
   private unlockedIds(): string[] {
+    const observed: string = this.achRaw;   // 依赖声明：成就串变了就重算
     return ProgressStore.unlocked();
+  }
+
+  onAchChanged(): void {
+    this.renderRev = this.renderRev + 1;
   }
 
   // ★ 性能：53 项排序 + concat 每次渲染重算多次 ⇒ 记忆化
