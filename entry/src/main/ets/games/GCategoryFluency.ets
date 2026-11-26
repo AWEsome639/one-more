@@ -13,7 +13,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits, Sec } from '../core/I18n';
+import { Digits, Sec, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
@@ -22,16 +22,44 @@ const LIMIT_S: number = 25; const TICK_MS: number = 1000;
 
 interface Cat { name: string; words: string[] }
 
-const CATS: Cat[] = [
-  { name: '水果', words: [TG('苹果'), TG('香蕉'), '橙子', '葡萄', '西瓜', '草莓', '梨', '桃子',
-    TG('芒果'), TG('菠萝'), TG('柚子'), TG('蓝莓'), TG('樱桃'), TG('柠檬'), '石榴', '火龙果'] },
-  { name: '动物', words: [TG('老虎'), '大象', '熊猫', '猴子', '兔子', '狮子', '长颈鹿', '斑马',
-    '企鹅', TG('鲸鱼'), '海豚', '狐狸', '骆驼', '松鼠', '乌龟', '孔雀'] },
-  { name: '颜色', words: ['红色', '蓝色', '绿色', TG('黄色'), '紫色', '橙色', '黑色', '白色',
-    TG('灰色'), TG('粉色'), TG('棕色'), TG('青色'), TG('金色'), TG('银色'), TG('米色'), TG('靛蓝')] },
-  { name: '交通工具', words: ['汽车', TG('火车'), '飞机', '轮船', '自行车', '地铁', '公交车', '摩托车',
-    TG('直升机'), TG('热气球'), TG('卡车'), TG('帆船'), TG('潜艇'), TG('电车'), TG('三轮车'), TG('滑板')] }
+/**
+ * ★ 2026-11-26（内容本地化）：中文词表 + 英文词表分开，非中文统一走英文。
+ *   为什么不用 TG() 包每个词：这些是**题目内容**（要能被英文玩家拼写），
+ *   不是界面文案；且 TG 走字典只保证 10 种语言的译文，英文拼写需要的是单词本身。
+ *   中文路径仍是 call-time 求值，切换语言即时生效。
+ */
+function catsZh(): Cat[] {
+  return [
+    { name: TG('水果'), words: [TG('苹果'), TG('香蕉'), TG('橙子'), TG('葡萄'), TG('西瓜'), TG('草莓'), TG('梨'), TG('桃子'),
+      TG('芒果'), TG('菠萝'), TG('柚子'), TG('蓝莓'), TG('樱桃'), TG('柠檬'), TG('石榴'), TG('火龙果')] },
+    { name: TG('动物'), words: [TG('老虎'), TG('大象'), TG('熊猫'), TG('猴子'), TG('兔子'), TG('狮子'), TG('长颈鹿'), TG('斑马'),
+      TG('企鹅'), TG('鲸鱼'), TG('海豚'), TG('狐狸'), TG('骆驼'), TG('松鼠'), TG('乌龟'), TG('孔雀')] },
+    { name: TG('颜色'), words: [TG('红色'), TG('蓝色'), TG('绿色'), TG('黄色'), TG('紫色'), TG('橙色'), TG('黑色'), TG('白色'),
+      TG('灰色'), TG('粉色'), TG('棕色'), TG('青色'), TG('金色'), TG('银色'), TG('米色'), TG('靛蓝')] },
+    { name: TG('交通工具'), words: [TG('汽车'), TG('火车'), TG('飞机'), TG('轮船'), TG('自行车'), TG('地铁'), TG('公交车'), TG('摩托车'),
+      TG('直升机'), TG('热气球'), TG('卡车'), TG('帆船'), TG('潜艇'), TG('电车'), TG('三轮车'), TG('滑板')] }
+  ];
+}
+
+const CATS_EN: Cat[] = [
+  { name: 'Fruit', words: ['apple', 'banana', 'orange', 'grape', 'watermelon', 'strawberry', 'pear', 'peach',
+    'mango', 'pineapple', 'pomelo', 'blueberry', 'cherry', 'lemon', 'pomegranate', 'dragon fruit'] },
+  { name: 'Animal', words: ['tiger', 'elephant', 'panda', 'monkey', 'rabbit', 'lion', 'giraffe', 'zebra',
+    'penguin', 'whale', 'dolphin', 'fox', 'camel', 'squirrel', 'tortoise', 'peacock'] },
+  { name: 'Colour', words: ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'black', 'white',
+    'grey', 'pink', 'brown', 'cyan', 'gold', 'silver', 'beige', 'indigo'] },
+  { name: 'Vehicle', words: ['car', 'train', 'plane', 'ship', 'bicycle', 'subway', 'bus', 'motorbike',
+    'helicopter', 'hot-air balloon', 'truck', 'sailboat', 'submarine', 'tram', 'tricycle', 'skateboard'] }
 ];
+
+function isZhUi(): boolean {
+  const l: string = I18n.current();
+  return l === 'zh' || l === 'zh-Hant';
+}
+
+function cats(): Cat[] {
+  return isZhUi() ? catsZh() : CATS_EN;
+}
 
 @Component
 export struct GCategoryFluency {
@@ -222,14 +250,14 @@ export struct GCategoryFluency {
     this.stop();
     this.catIdx = 0; this.input = ''; this.used = []; this.total = 0; this.score = 0;
     this.leftS = this.diffTotal; this.over = false; this.won = false; this.done = false;
-    this.msg = TG2('第一类：{0} —— 越快越多越好', CATS[0].name);
+    this.msg = TG2('第一类：{0} —— 越快越多越好', cats()[0].name);
     this.startAt = Date.now();
     this.timer = setInterval(() => {
       if (AppClock.isPaused()) { return; }
       this.tick();
     }, TICK_MS);
   }
-  private cat(): Cat { return CATS[this.catIdx < CAT_N ? this.catIdx : CAT_N - 1]; }
+  private cat(): Cat { return cats()[this.catIdx < CAT_N ? this.catIdx : CAT_N - 1]; }
   private tick(): void {
     if (this.over) { return; }
     this.leftS = this.leftS - 1;
@@ -237,9 +265,11 @@ export struct GCategoryFluency {
   }
   private submit(): void {
     if (this.over) { return; }
-    const w: string = this.input.trim();
+    const raw: string = this.input.trim();
     this.input = '';
-    if (w.length === 0) { return; }
+    if (raw.length === 0) { return; }
+    // ★ 英文词表全是小写；用户打 "Apple" 也必须算对
+    const w: string = isZhUi() ? raw : raw.toLowerCase();
     if (this.used.indexOf(w) >= 0) { this.msg = TG2('🔁 「{0}」已经列过啦', w); return; }
     if (this.cat().words.indexOf(w) < 0) { this.msg = TG2('🤔 词库里没有「{0}」，换一个', w); return; }
     this.used = this.used.concat([w]);
