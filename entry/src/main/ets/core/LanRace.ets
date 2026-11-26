@@ -30,6 +30,7 @@
  */
 
 import { Lan, LanMsg } from './Lan';
+import { AppClock } from './AppClock';
 
 /** 一条成绩 */
 export interface RaceScore {
@@ -92,7 +93,7 @@ export class LanRace {
     LanRace.host = true;
     LanRace.round = LanRace.round + 1;
     LanRace.scores = [];
-    LanRace.startAt = Date.now();
+    LanRace.startAt = AppClock.netNow();
     LanRace.onChange();
     await Lan.send({ t: T_GO, d: JSON.stringify({ g: gameId, r: LanRace.round }) });
   }
@@ -118,13 +119,13 @@ export class LanRace {
     //   原来只在 startAt<=0 时兜底，而 race_go 早已把 startAt 设成「收到开局广播的那一刻」
     //   ⇒ 排行榜上的秒数把「进游戏页 + 加载 + 3 秒演示」都算进去了，和对局结算显示的用时不是同一个数。
     //   noteStart() 由每款游戏在本局开始时调用，用它覆盖才是「这局玩了多久」。
-    LanRace.startAt = Date.now();
+    LanRace.startAt = AppClock.netNow();
   }
 
   /** ② 我完成了（或失败了）—— 用时自动算；也可显式传 */
   static async noteDone(ms: number = -1): Promise<void> {
     if (!LanRace.racing) { return; }
-    const used: number = ms >= 0 ? ms : (Date.now() - LanRace.startAt);
+    const used: number = ms >= 0 ? ms : (AppClock.netNow() - LanRace.startAt);
     LanRace.addScore(Lan.nick(), used, true);
     await Lan.send({ t: T_DONE, d: JSON.stringify({ n: Lan.nick(), ms: used, r: LanRace.round }) });
   }
@@ -140,7 +141,7 @@ export class LanRace {
         LanRace.host = false;
         LanRace.round = r;
         LanRace.scores = [];
-        LanRace.startAt = Date.now();               // ★ 各端各自记起始时刻
+        LanRace.startAt = AppClock.netNow();               // ★ 各端各自记起始时刻
         LanRace.onChange();
       } catch (e) { /* 忽略坏包 */ }
       return;
