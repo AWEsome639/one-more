@@ -10,18 +10,44 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const LIVES: number = 3; const GAP_MS: number = 900;
 
 /** 每条链内部逐环语义递进 */
-const CHAINS: string[][] = [
+/**
+ * ★ 2026-11-27（内容本地化）：英文界面原来 24 格里有 16 格是裸中文（另 8 格 tg 了但模块级冻结）。
+ *   中文表 call-time 求值；非中文走英文；按语言缓存。
+ *   英文第 3 条链取 brook < stream < river（不用 great river：会和 river 同屏互为子串）。
+ */
+function chainsZh(): string[][] {
+  return [
   ['种子', '嫩芽', '树苗', '大树', TG('森林'), '地球'],
   ['面粉', '面团', '面包', TG('早餐'), '能量', '奔跑'],
   ['露水', '小溪', TG('河流'), '大江', '海洋', '云朵'],
   ['字母', TG('单词'), TG('句子'), TG('段落'), TG('文章'), TG('书籍')]
 ];
+}
+
+const CHAINS_EN: string[][] = [
+  ['seed', 'sprout', 'sapling', 'big tree', 'forest', 'Earth'],
+  ['flour', 'dough', 'bread', 'breakfast', 'energy', 'run'],
+  ['dew', 'brook', 'stream', 'river', 'ocean', 'cloud'],
+  ['letter', 'word', 'sentence', 'paragraph', 'article', 'book']
+];
+
+let chainsLang: string = '';
+let chainsCache: string[][] = [];
+
+function chains(): string[][] {
+  const l: string = I18n.current();
+  if (chainsLang !== l) {
+    chainsLang = l;
+    chainsCache = (l === 'zh' || l === 'zh-Hant') ? chainsZh() : CHAINS_EN;
+  }
+  return chainsCache;
+}
 
 function shufStr(src: string[]): string[] {
   const out: string[] = src.slice();
@@ -66,6 +92,8 @@ export struct GSemanticLink {
   @State private lastOk: boolean = true;
   @State won: boolean = false;
   private startAt: number = 0; private feed: number = -1; private done: boolean = false;
+  /** 本局开始时选定的语言池（防止中途切语言后，chain 与干扰链来自不同语言） */
+  private pool: string[][] = [];
 
   aboutToAppear(): void {
     LanRace.noteStart(); this.startAt = Date.now(); this.reset();
@@ -83,7 +111,8 @@ export struct GSemanticLink {
   private reset(): void {
     this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     this.stop();
-    this.chain = CHAINS[Math.floor(Math.random() * CHAINS.length)].slice();
+    this.pool = chains();
+    this.chain = this.pool[Math.floor(Math.random() * this.pool.length)].slice();
     this.at = 0; this.lives = this.diffTotal; this.score = 0;
     this.over = false; this.won = false; this.done = false;
     this.startAt = Date.now(); this.next();
@@ -101,9 +130,10 @@ export struct GSemanticLink {
       if (i !== this.at + 1) { sameWrong.push(this.chain[i]); }
     }
     const two: string[] = shufStr(sameWrong);
-    let oi: number = Math.floor(Math.random() * CHAINS.length);
-    if (CHAINS[oi][0] === this.chain[0]) { oi = (oi + 1) % CHAINS.length; }
-    const other: string[] = CHAINS[oi];
+    const src: string[][] = this.pool.length > 0 ? this.pool : chains();
+    let oi: number = Math.floor(Math.random() * src.length);
+    if (src[oi][0] === this.chain[0]) { oi = (oi + 1) % src.length; }
+    const other: string[] = src[oi];
     const four: string[] = shufStr([correct, two[0], two[1], other[Math.floor(Math.random() * other.length)]]);
     this.opts = four; this.ans = four.indexOf(correct); this.picked = -1;
     this.msg = TG2('「{0}」后面接哪个？', this.chain[this.at]);
@@ -117,9 +147,11 @@ export struct GSemanticLink {
     if (this.over) {
       return Hint.none('none');
     }
-    return Hint.make([this.at],
-      TG2('答案是第 {0} 个', String(this.at + 1)),
-      TG2('The answer is option {0}', String(this.at + 1)), t0);
+    // ★ 2026-11-27 真 bug：原来把「链位置 at」当选项号（at 可到 5，选项只有 4 个）⇒ 提示永远指错。
+    //   正确序号是打乱后的 this.ans。
+    return Hint.make([this.ans],
+      TG2('答案是第 {0} 个', String(this.ans + 1)),
+      TG2('The answer is option {0}', String(this.ans + 1)), t0);
   }
 
   private askHint(): void {
