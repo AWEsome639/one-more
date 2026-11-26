@@ -78,10 +78,23 @@ struct LanLobby {
   }
 
   aboutToAppear(): void {
+    // ★ 2026-11-26（P1）：对手掉线要有提示，不能永远「等对手落子…」
+    Lan.onPeerGone = () => {
+      this.status = TG('对手已离开');
+      LanMatch.end();
+      try {
+        const st = router.getState();
+        if (st !== undefined && st.name === 'GameHost') {
+          router.back();
+        }
+      } catch (e) {
+      }
+    };
     this.doScan();
   }
 
   aboutToDisappear(): void {
+    Lan.onPeerGone = () => {};   // ★ 不让旧页面继续收通知
     LanMatch.end();
     Lan.closeAll();
   }

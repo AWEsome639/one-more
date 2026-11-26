@@ -62,6 +62,9 @@ export class Lan {
   /** ★ 2026-11-26（P1）：广播定时器。原来每次开房都新起一个 setInterval 且从不清理 ⇒
    *  同一进程越积越多（每 1.5s 各广播一次），离开大厅后还在广播。 */
   private static beaconTimer: number = -1;
+  /** ★ 2026-11-26（P1）：对手掉线回调（切后台/断 Wi-Fi/杀进程）——
+   *  原来只在收到 'bye' 时结束对局，而 'bye' 永远发不出去 ⇒ 另一边永久停在「等对手落子」。 */
+  static onPeerGone: () => void = () => {};
 
   /** 本机昵称（可在设置里改，默认用系统给的短名） */
   static nick(): string {
@@ -101,6 +104,7 @@ export class Lan {
         });
         c.on('close', () => {
           Lan.conn = null;
+          try { Lan.onPeerGone(); } catch (e) { }
         });
       });
 
@@ -229,6 +233,10 @@ export class Lan {
       await tcp.connect({ address: { address: room.ip, port: room.port, family: 1 } });
       tcp.on('message', (v: socket.SocketMessageInfo) => {
         Lan.dispatch(Lan.decode(v.message));
+      });
+      // ★ 2026-11-26（P1）：加入方也必须有 close 监听（原来没有 ⇒ 房主退出后这边永远转圈）
+      tcp.on('close', () => {
+        try { Lan.onPeerGone(); } catch (e) { }
       });
       await Lan.send({ t: 'hello', d: Lan.nick() });
 
