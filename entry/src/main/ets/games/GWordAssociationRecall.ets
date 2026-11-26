@@ -28,7 +28,11 @@ interface Opt { text: string; ok: boolean }
  *   中文路径 call-time 求值（切语言即时生效）；非中文走英文；按语言缓存，避免每帧重建。
  */
 function zhPairs(): Pair[] {
-  return [];
+  return [
+  { cue: '医生 👨‍⚕️', mate: '医院 🏥' }, { cue: '蜜蜂 🐝', mate: '蜂蜜 🍯' }, { cue: '下雨 🌧️', mate: TG('雨伞 ☂️') },
+  { cue: '小鱼 🐟', mate: '河水 💧' }, { cue: TG('冬天 ❄️'), mate: '雪人 ⛄' }, { cue: '钥匙 🔑', mate: '门锁 🔒' },
+  { cue: '月亮 🌙', mate: '夜晚 🌃' }, { cue: TG('铅笔 ✏️'), mate: '白纸 📄' }, { cue: '厨房 🍳', mate: '厨师 👨‍🍳' },
+  { cue: TG('书本 📚'), mate: TG('书架 🗄️') } ];
 }
 
 const PAIRS_EN: Pair[] = [

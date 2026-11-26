@@ -29,7 +29,14 @@ interface Sent {
  *   中文路径 call-time 求值（切语言即时生效）；非中文走英文；按语言缓存，避免每帧重建。
  */
 function zhSents(): Sent[] {
-  return [];
+  return [
+  { text: '太阳从东边升起', ok: true, key: TG('太阳') }, { text: '鱼在树上打盹', ok: false, key: '鱼' },
+  { text: '冬天下雪', ok: true, key: TG('冬天') }, { text: '石头会自己走路', ok: false, key: '石头' },
+  { text: '春天花开', ok: true, key: '春天' }, { text: '猫会飞上天', ok: false, key: TG('猫') },
+  { text: '海水是咸的', ok: true, key: '海水' }, { text: '火车在水底跑', ok: false, key: TG('火车') },
+  { text: '小鸟会筑巢', ok: true, key: '小鸟' }, { text: '铅笔能写字', ok: true, key: TG('铅笔') },
+  { text: TG('蚂蚁比大象重'), ok: false, key: TG('蚂蚁') }, { text: TG('雨后常有彩虹'), ok: true, key: TG('彩虹') }
+];
 }
 
 const SENTS_EN: Sent[] = [

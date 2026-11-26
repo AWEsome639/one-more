@@ -24,7 +24,24 @@ interface Pair { a: string; b: string; same: boolean; note: string }
  *   中文路径 call-time 求值（切语言即时生效）；非中文走英文；按语言缓存，避免每帧重建。
  */
 function zhAll(): Pair[] {
-  return [];
+  return [
+  { a: 'night', b: TG('Nacht（德语）'), same: true, note: TG('同出古日耳曼 *nahts：夜') },
+  { a: 'father', b: TG('Vater（德语）'), same: true, note: TG('同出原始印欧 *ph₂tḗr：父') },
+  { a: 'three', b: TG('trois（法语）'), same: true, note: TG('同出 *tréyes：三') },
+  { a: 'heart', b: TG('Herz（德语）'), same: true, note: TG('同出 *ḱerd-：心') },
+  { a: 'water', b: TG('Wasser（德语）'), same: true, note: TG('同出 *wódr̥：水') },
+  { a: 'star', b: TG('Stern（德语）'), same: true, note: TG('同出 *h₂stḗr：星') },
+  { a: 'tooth', b: TG('Zahn（德语）'), same: true, note: TG('同出 *h₃dónts：齿') },
+  { a: 'milk', b: TG('Milch（德语）'), same: true, note: TG('同出 *melg-：挤奶') },
+  { a: 'much（多）', b: 'mucho（西语：多）', same: false, note: 'much 出 *meg-，mucho 出拉丁 multus' },
+  { a: 'pain（疼痛）', b: 'pan（西语：面包）', same: false, note: 'pain 出拉丁 poena，pan 出拉丁 panis' },
+  { a: 'red（红）', b: 'Rede（德语：演讲）', same: false, note: 'red 出 *raudaz，Rede 出 *raþjō' },
+  { a: 'tree（树）', b: 'drei（德语：三）', same: false, note: 'tree 出 *dóru，drei 出 *tréyes' },
+  { a: 'grass（草）', b: 'gris（西语：灰）', same: false, note: TG('grass 出 *gʰreh₁-，gris 出 *grēwaz') },
+  { a: TG('son（儿子）'), b: TG('Sonne（德语：太阳）'), same: false, note: TG('son 出 *suHnus，Sonne 出 *sóh₂wl̥') },
+  { a: TG('sun（太阳）'), b: TG('Sohn（德语：儿子）'), same: false, note: TG('sun 出 *sóh₂wl̥，Sohn 出 *suHnus') },
+  { a: TG('cold（冷）'), b: TG('Gold（德语：金子）'), same: false, note: TG('cold 出 *gel-，Gold 出 *ǵʰelh₃-') }
+];
 }
 
 const ALL_EN: Pair[] = [
