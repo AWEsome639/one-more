@@ -14,29 +14,49 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 const ROUNDS: number = 12; const PASS: number = 8; const SAME_N: number = 8;
 interface Pair { a: string; b: string; same: boolean; note: string }
 /** 前 8 条真同源，后 8 条形似而实不同源 */
-const ALL: Pair[] = [
-  { a: 'night', b: TG('Nacht（德语）'), same: true, note: TG('同出古日耳曼 *nahts：夜') },
-  { a: 'father', b: TG('Vater（德语）'), same: true, note: TG('同出原始印欧 *ph₂tḗr：父') },
-  { a: 'three', b: TG('trois（法语）'), same: true, note: TG('同出 *tréyes：三') },
-  { a: 'heart', b: TG('Herz（德语）'), same: true, note: TG('同出 *ḱerd-：心') },
-  { a: 'water', b: TG('Wasser（德语）'), same: true, note: TG('同出 *wódr̥：水') },
-  { a: 'star', b: TG('Stern（德语）'), same: true, note: TG('同出 *h₂stḗr：星') },
-  { a: 'tooth', b: TG('Zahn（德语）'), same: true, note: TG('同出 *h₃dónts：齿') },
-  { a: 'milk', b: TG('Milch（德语）'), same: true, note: TG('同出 *melg-：挤奶') },
-  { a: 'much（多）', b: 'mucho（西语：多）', same: false, note: 'much 出 *meg-，mucho 出拉丁 multus' },
-  { a: 'pain（疼痛）', b: 'pan（西语：面包）', same: false, note: 'pain 出拉丁 poena，pan 出拉丁 panis' },
-  { a: 'red（红）', b: 'Rede（德语：演讲）', same: false, note: 'red 出 *raudaz，Rede 出 *raþjō' },
-  { a: 'tree（树）', b: 'drei（德语：三）', same: false, note: 'tree 出 *dóru，drei 出 *tréyes' },
-  { a: 'grass（草）', b: 'gris（西语：灰）', same: false, note: TG('grass 出 *gʰreh₁-，gris 出 *grēwaz') },
-  { a: TG('son（儿子）'), b: TG('Sonne（德语：太阳）'), same: false, note: TG('son 出 *suHnus，Sonne 出 *sóh₂wl̥') },
-  { a: TG('sun（太阳）'), b: TG('Sohn（德语：儿子）'), same: false, note: TG('sun 出 *sóh₂wl̥，Sohn 出 *suHnus') },
-  { a: TG('cold（冷）'), b: TG('Gold（德语：金子）'), same: false, note: TG('cold 出 *gel-，Gold 出 *ǵʰelh₃-') }
+/**
+ * ★ 2026-11-26（内容本地化）：中文表 + 英文表分开（题目内容，不是界面文案）。
+ *   中文路径 call-time 求值（切语言即时生效）；非中文走英文；按语言缓存，避免每帧重建。
+ */
+function zhAll(): Pair[] {
+  return [];
+}
+
+const ALL_EN: Pair[] = [
+  { a: 'night', b: 'Nacht (German)', same: true, note: 'both from Proto-Germanic *nahts, night' },
+  { a: 'father', b: 'Vater (German)', same: true, note: 'both from PIE *ph₂tḗr, father' },
+  { a: 'three', b: 'trois (French)', same: true, note: 'both from PIE *tréyes, three' },
+  { a: 'heart', b: 'Herz (German)', same: true, note: 'both from PIE *ḱerd-, heart' },
+  { a: 'water', b: 'Wasser (German)', same: true, note: 'both from PIE *wódr̥, water' },
+  { a: 'star', b: 'Stern (German)', same: true, note: 'both from PIE *h₂stḗr, star' },
+  { a: 'tooth', b: 'Zahn (German)', same: true, note: 'both from PIE *h₃dónts, tooth' },
+  { a: 'milk', b: 'Milch (German)', same: true, note: 'both from *melg-, to milk' },
+  { a: 'much', b: 'mucho (Spanish: much)', same: false, note: 'much from *meg-, mucho from Latin multus' },
+  { a: 'pain', b: 'pan (Spanish: bread)', same: false, note: 'pain from Latin poena, pan from Latin panis' },
+  { a: 'red', b: 'Rede (German: speech)', same: false, note: 'red from *raudaz, Rede from *raþjō' },
+  { a: 'tree', b: 'drei (German: three)', same: false, note: 'tree from *dóru, drei from *tréyes' },
+  { a: 'grass', b: 'gris (Spanish: grey)', same: false, note: 'grass from *gʰreh₁-, gris from *grēwaz' },
+  { a: 'son', b: 'Sonne (German: sun)', same: false, note: 'son from *suHnus, Sonne from *sóh₂wl̥' },
+  { a: 'sun', b: 'Sohn (German: son)', same: false, note: 'sun from *sóh₂wl̥, Sohn from *suHnus' },
+  { a: 'cold', b: 'Gold (German: gold)', same: false, note: 'cold from *gel-, Gold from *ǵʰelh₃-' }
 ];
+
+let allDataLang: string = '';
+let allDataCache: Pair[] = [];
+
+function allData(): Pair[] {
+  const l: string = I18n.current();
+  if (allDataLang !== l) {
+    allDataLang = l;
+    allDataCache = (l === 'zh' || l === 'zh-Hant') ? zhAll() : ALL_EN;
+  }
+  return allDataCache;
+}
 @Component
 export struct GCognateCatch {
   /** ★★★ 2026-10-16 BUG #24：HUD 数字要走 Digits ⇒ 必须自己观察 lang（ArkUI 只认 @State/@Prop/@StorageProp 的读取） */
@@ -74,7 +94,7 @@ export struct GCognateCatch {
   onRestart(): void {
     this.diffTotal = GameDiff.sizeNow(ROUNDS);
      this.reset(); }
-  private cur(): Pair { return ALL[this.order[this.qi]]; }
+  private cur(): Pair { return allData()[this.order[this.qi]]; }
   /** 从 from 里随机取 k 个不重复的 */
   private pick(from: number[], k: number): number[] {
     const out: number[] = []; const copy: number[] = from.slice();
@@ -90,7 +110,7 @@ export struct GCognateCatch {
     this.msg = TG('这一对是同源词吗？'); this.startAt = Date.now();
     const ia: number[] = []; const ib: number[] = [];
     for (let i = 0; i < SAME_N; i++) { ia.push(i); }
-    for (let i = SAME_N; i < ALL.length; i++) { ib.push(i); }
+    for (let i = SAME_N; i < allData().length; i++) { ib.push(i); }
     const all: number[] = this.pick(ia, this.diffTotal / 2).concat(this.pick(ib, this.diffTotal / 2));
     for (let i = all.length - 1; i > 0; i--) {
       const j: number = Math.floor(Math.random() * (i + 1));

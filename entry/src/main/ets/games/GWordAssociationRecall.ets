@@ -13,7 +13,7 @@ import { HintBar } from '../components/HintBar';
 import { DemoBar } from '../components/DemoBar';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
@@ -23,11 +23,32 @@ const Q_MS: number = 8000; const TICK_MS: number = 100; const FEED_MS: number = 
 interface Pair { cue: string; mate: string }
 interface Opt { text: string; ok: boolean }
 
-const PAIRS: Pair[] = [
-  { cue: '医生 👨‍⚕️', mate: '医院 🏥' }, { cue: '蜜蜂 🐝', mate: '蜂蜜 🍯' }, { cue: '下雨 🌧️', mate: TG('雨伞 ☂️') },
-  { cue: '小鱼 🐟', mate: '河水 💧' }, { cue: TG('冬天 ❄️'), mate: '雪人 ⛄' }, { cue: '钥匙 🔑', mate: '门锁 🔒' },
-  { cue: '月亮 🌙', mate: '夜晚 🌃' }, { cue: TG('铅笔 ✏️'), mate: '白纸 📄' }, { cue: '厨房 🍳', mate: '厨师 👨‍🍳' },
-  { cue: TG('书本 📚'), mate: TG('书架 🗄️') } ];
+/**
+ * ★ 2026-11-26（内容本地化）：中文表 + 英文表分开（题目内容，不是界面文案）。
+ *   中文路径 call-time 求值（切语言即时生效）；非中文走英文；按语言缓存，避免每帧重建。
+ */
+function zhPairs(): Pair[] {
+  return [];
+}
+
+const PAIRS_EN: Pair[] = [
+  { cue: 'doctor 👨‍⚕️', mate: 'hospital 🏥' }, { cue: 'bee 🐝', mate: 'honey 🍯' }, { cue: 'rain 🌧️', mate: 'umbrella ☂️' },
+  { cue: 'little fish 🐟', mate: 'river water 💧' }, { cue: 'winter ❄️', mate: 'snowman ⛄' }, { cue: 'key 🔑', mate: 'door lock 🔒' },
+  { cue: 'moon 🌙', mate: 'night 🌃' }, { cue: 'pencil ✏️', mate: 'blank paper 📄' }, { cue: 'kitchen 🍳', mate: 'chef 👨‍🍳' },
+  { cue: 'book 📚', mate: 'bookshelf 🗄️' }
+];
+
+let pairsDataLang: string = '';
+let pairsDataCache: Pair[] = [];
+
+function pairsData(): Pair[] {
+  const l: string = I18n.current();
+  if (pairsDataLang !== l) {
+    pairsDataLang = l;
+    pairsDataCache = (l === 'zh' || l === 'zh-Hant') ? zhPairs() : PAIRS_EN;
+  }
+  return pairsDataCache;
+}
 
 /** 从 0..total-1 中随机取 k 个互不相同的下标（k=total 就是整段洗牌） */
 function pickIndexes(total: number, k: number): number[] {
@@ -63,13 +84,13 @@ export struct GWordAssociationRecall {
 
   /** ★ 2026-11-09 屏幕上问的是哪一组（用屏幕上的提示词反查） */
   private aiCue(): string {
-    return PAIRS[this.pairIdx()].cue;
+    return pairsData()[this.pairIdx()].cue;
   }
 
   /** ★ 2026-11-09 从自己记住的配对里查 mate */
   private aiMateOf(cue: string): string {
     for (let i = 0; i < this.aiMem.length; i++) {
-      const p: Pair = PAIRS[this.aiMem[i]];
+      const p: Pair = pairsData()[this.aiMem[i]];
       if (p.cue === cue) {
         return p.mate;
       }
@@ -105,7 +126,7 @@ export struct GWordAssociationRecall {
   private pairIdx(): number { return this.study[this.order[this.qi]]; }
   private reset(): void {
     this.stop();
-    this.study = pickIndexes(PAIRS.length, SETS); this.order = pickIndexes(SETS, SETS);
+    this.study = pickIndexes(pairsData().length, SETS); this.order = pickIndexes(SETS, SETS);
     this.qi = 0; this.right = 0; this.score = 0; this.picked = -1; this.locked = false;
     this.phase = 0; this.over = false; this.won = false; this.done = false;
     this.leftMs = this.total; this.msg = TG(TG('记住每一组搭配，9 秒后开始回忆'));
@@ -114,10 +135,10 @@ export struct GWordAssociationRecall {
   }
   private loadQuestion(): void {
     const idx: number = this.pairIdx();
-    const raw: Opt[] = [{ text: PAIRS[idx].mate, ok: true }];
+    const raw: Opt[] = [{ text: pairsData()[idx].mate, ok: true }];
     const others: number[] = this.study.filter((p: number) => p !== idx);
     const seq: number[] = pickIndexes(others.length, 3);
-    for (let i = 0; i < seq.length; i++) { raw.push({ text: PAIRS[others[seq[i]]].mate, ok: false }); }
+    for (let i = 0; i < seq.length; i++) { raw.push({ text: pairsData()[others[seq[i]]].mate, ok: false }); }
     this.opts = pickIndexes(raw.length, raw.length).map((k: number) => raw[k]);
     this.picked = -1; this.locked = false; this.leftMs = Q_MS; this.roundAt = AppClock.netNow();
     this.msg = TG(TG('它刚才和谁配成一对？'));
@@ -135,7 +156,7 @@ export struct GWordAssociationRecall {
       this.phase = 1; this.qi = 0; this.loadQuestion(); return;
     }
     if (this.locked) { return; }
-    this.locked = true; this.msg = TG2('⏰ 没想起来，它配的是 {0}', PAIRS[this.pairIdx()].mate);
+    this.locked = true; this.msg = TG2('⏰ 没想起来，它配的是 {0}', pairsData()[this.pairIdx()].mate);
     this.feed = setTimeout(() => { this.feed = -1; this.next(); }, FEED_MS);
   }
   /** 提示：哪个选项是对的（代打就是找 opts[i].ok） */
@@ -292,7 +313,7 @@ export struct GWordAssociationRecall {
     if (this.over || this.locked || this.phase === 0) { return; }
     this.locked = true; this.picked = i;
     if (this.opts[i].ok) { this.right = this.right + 1; this.score = this.score + 150; this.pulse = 1.045; setTimeout(() => { this.pulse = 1; }, 110); this.msg = TG(TG('✅ 配对了')); }
-    else { this.msg = TG('❌ 应该是 ') + PAIRS[this.pairIdx()].mate; }
+    else { this.msg = TG('❌ 应该是 ') + pairsData()[this.pairIdx()].mate; }
     this.feed = setTimeout(() => { this.feed = -1; this.next(); }, FEED_MS);
   }
   private next(): void {
@@ -328,7 +349,7 @@ export struct GWordAssociationRecall {
       }.width('100%').padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
       Column({ space: Space.xs }) {
         Text(this.phase === 1 ? TG('回忆') : TG('记忆时间')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text(this.phase === 1 ? PAIRS[this.pairIdx()].cue : TG('把 6 组搭配记牢')).fontSize(FontSize.xl)
+        Text(this.phase === 1 ? pairsData()[this.pairIdx()].cue : TG('把 6 组搭配记牢')).fontSize(FontSize.xl)
           .fontWeight(FontWeight.Bold).fontColor(Palette.berry)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card)
       if (this.phase !== 1) {
@@ -376,20 +397,20 @@ export struct GWordAssociationRecall {
   @Builder
   pairRow(p: number) {
     Row({ space: Space.sm }) {
-      Text(PAIRS[p].cue).fontSize(FontSize.md).layoutWeight(1).fontColor(this.theme.ink)
+      Text(pairsData()[p].cue).fontSize(FontSize.md).layoutWeight(1).fontColor(this.theme.ink)
       Text('→').accessibilityText(TG('指向')).fontSize(FontSize.sm).fontColor(this.theme.inkFaint).width(19).height(19).textAlign(TextAlign.Center)
         .accessibilityLevel('no')
-      Text(PAIRS[p].mate).fontSize(FontSize.md).layoutWeight(1).textAlign(TextAlign.End).fontColor(Palette.berry)
+      Text(pairsData()[p].mate).fontSize(FontSize.md).layoutWeight(1).textAlign(TextAlign.End).fontColor(Palette.berry)
     }.width('100%').padding(Bp.isShort() ? Space.xs : Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
   }
   /** ★ 判据 2880：两列用的半宽版（内容与 pairRow 一致，只改宽度） */
   @Builder
   pairRowHalf(p: number) {
     Row({ space: Space.xs }) {
-      Text(PAIRS[p].cue).fontSize(FontSize.sm).layoutWeight(1).fontColor(this.theme.ink)
+      Text(pairsData()[p].cue).fontSize(FontSize.sm).layoutWeight(1).fontColor(this.theme.ink)
       Text('→').accessibilityText(TG('指向')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
         .accessibilityLevel('no')
-      Text(PAIRS[p].mate).fontSize(FontSize.sm).layoutWeight(1).textAlign(TextAlign.End).fontColor(Palette.berry)
+      Text(pairsData()[p].mate).fontSize(FontSize.sm).layoutWeight(1).textAlign(TextAlign.End).fontColor(Palette.berry)
     }.width('48%').padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
   }
   @Builder

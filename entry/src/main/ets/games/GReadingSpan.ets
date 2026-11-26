@@ -15,7 +15,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits } from '../core/I18n';
+import { Digits, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 interface Sent {
@@ -24,14 +24,40 @@ interface Sent {
   key: string;
 }
 
-const SENTS: Sent[] = [
-  { text: '太阳从东边升起', ok: true, key: TG('太阳') }, { text: '鱼在树上打盹', ok: false, key: '鱼' },
-  { text: '冬天下雪', ok: true, key: TG('冬天') }, { text: '石头会自己走路', ok: false, key: '石头' },
-  { text: '春天花开', ok: true, key: '春天' }, { text: '猫会飞上天', ok: false, key: TG('猫') },
-  { text: '海水是咸的', ok: true, key: '海水' }, { text: '火车在水底跑', ok: false, key: TG('火车') },
-  { text: '小鸟会筑巢', ok: true, key: '小鸟' }, { text: '铅笔能写字', ok: true, key: TG('铅笔') },
-  { text: TG('蚂蚁比大象重'), ok: false, key: TG('蚂蚁') }, { text: TG('雨后常有彩虹'), ok: true, key: TG('彩虹') }
+/**
+ * ★ 2026-11-26（内容本地化）：中文表 + 英文表分开（题目内容，不是界面文案）。
+ *   中文路径 call-time 求值（切语言即时生效）；非中文走英文；按语言缓存，避免每帧重建。
+ */
+function zhSents(): Sent[] {
+  return [];
+}
+
+const SENTS_EN: Sent[] = [
+  { text: 'The sun rises in the east', ok: true, key: 'sun' },
+  { text: 'A fish can nap in a tree', ok: false, key: 'fish' },
+  { text: 'It snows in winter', ok: true, key: 'winter' },
+  { text: 'A stone can walk by itself', ok: false, key: 'stone' },
+  { text: 'Flowers bloom in spring', ok: true, key: 'spring' },
+  { text: 'A cat can fly into the sky', ok: false, key: 'cat' },
+  { text: 'The sea tastes salty', ok: true, key: 'sea' },
+  { text: 'A train runs under the sea', ok: false, key: 'train' },
+  { text: 'A bird builds a nest', ok: true, key: 'bird' },
+  { text: 'A pencil can write', ok: true, key: 'pencil' },
+  { text: 'An ant weighs more than an elephant', ok: false, key: 'ant' },
+  { text: 'A rainbow often follows rain', ok: true, key: 'rainbow' }
 ];
+
+let sentsDataLang: string = '';
+let sentsDataCache: Sent[] = [];
+
+function sentsData(): Sent[] {
+  const l: string = I18n.current();
+  if (sentsDataLang !== l) {
+    sentsDataLang = l;
+    sentsDataCache = (l === 'zh' || l === 'zh-Hant') ? zhSents() : SENTS_EN;
+  }
+  return sentsDataCache;
+}
 
 const START_SPAN: number = 2;
 const MAX_SPAN: number = 4;
@@ -99,7 +125,7 @@ export struct GReadingSpan {
     this.keys = []; this.pos = 0; this.got = 0; this.pool = []; this.phase = 0;
     const picked: number[] = [];
     while (picked.length < this.span) {
-      const k: number = Math.floor(Math.random() * SENTS.length);
+      const k: number = Math.floor(Math.random() * sentsData().length);
       if (picked.indexOf(k) < 0) { picked.push(k); }
     }
     this.order = picked;
@@ -107,7 +133,7 @@ export struct GReadingSpan {
   }
 
   private showSentence(): void {
-    const s: Sent = SENTS[this.order[this.pos]];
+    const s: Sent = sentsData()[this.order[this.pos]];
     this.curText = s.text; this.curOk = s.ok; this.curKey = s.key;
     this.msg = TG2("第 {0} / {1} 句：这句话通顺吗？", (this.pos + 1), this.span);
   }
@@ -277,7 +303,7 @@ export struct GReadingSpan {
     const pool: string[] = this.keys.slice();
     let extra: number = 0; let guard: number = 0;
     while (extra < 2 && guard < 80) {
-      const cand: string = SENTS[Math.floor(Math.random() * SENTS.length)].key;
+      const cand: string = sentsData()[Math.floor(Math.random() * sentsData().length)].key;
       if (pool.indexOf(cand) < 0) { pool.push(cand); extra = extra + 1; }
       guard = guard + 1;
     }

@@ -13,7 +13,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits, Sec } from '../core/I18n';
+import { Digits, Sec, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
@@ -22,12 +22,32 @@ const STUDY_S: number = 8; const TICK_MS: number = 1000; const FEED_MS: number =
 
 interface WordPair { a: string; b: string }
 
-const BANK: WordPair[] = [
-  { a: '太阳', b: '月亮' }, { a: '蜜蜂', b: '花朵' }, { a: '钥匙', b: '锁' }, { a: TG('铅笔'), b: '橡皮' },
-  { a: '大海', b: '鲸鱼' }, { a: TG('冬天'), b: '雪花' }, { a: '舞台', b: '演员' }, { a: '厨师', b: '炒锅' },
-  { a: TG('电脑'), b: '键盘' }, { a: '雨伞', b: '阵雨' }, { a: '医生', b: '听诊器' }, { a: '森林', b: TG('老虎') },
-  { a: TG('图书馆'), b: '书架' }, { a: '足球', b: '球门' }, { a: TG('咖啡'), b: '杯子' }, { a: '相机', b: '镜头' }
+/**
+ * ★ 2026-11-26（内容本地化）：中文表 + 英文表分开（题目内容，不是界面文案）。
+ *   中文路径 call-time 求值（切语言即时生效）；非中文走英文；按语言缓存，避免每帧重建。
+ */
+function zhBank(): WordPair[] {
+  return [];
+}
+
+const BANK_EN: WordPair[] = [
+  { a: 'sun', b: 'moon' }, { a: 'bee', b: 'flower' }, { a: 'key', b: 'lock' }, { a: 'pencil', b: 'eraser' },
+  { a: 'ocean', b: 'whale' }, { a: 'winter', b: 'snowflake' }, { a: 'stage', b: 'actor' }, { a: 'chef', b: 'frying pan' },
+  { a: 'computer', b: 'keyboard' }, { a: 'umbrella', b: 'rain shower' }, { a: 'doctor', b: 'stethoscope' }, { a: 'forest', b: 'tiger' },
+  { a: 'library', b: 'bookshelf' }, { a: 'football', b: 'goal' }, { a: 'coffee', b: 'cup' }, { a: 'camera', b: 'lens' }
 ];
+
+let bankDataLang: string = '';
+let bankDataCache: WordPair[] = [];
+
+function bankData(): WordPair[] {
+  const l: string = I18n.current();
+  if (bankDataLang !== l) {
+    bankDataLang = l;
+    bankDataCache = (l === 'zh' || l === 'zh-Hant') ? zhBank() : BANK_EN;
+  }
+  return bankDataCache;
+}
 
 /** 从 0..total-1 里随机取 k 个互不相同的下标 */
 function pickIndexes(total: number, k: number): number[] {
@@ -88,7 +108,7 @@ export struct GWordPairAssociateMemory {
     if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; } }
   private reset(): void {
     this.stop();
-    this.pairs = pickIndexes(BANK.length, this.diffTotal).map((k: number) => BANK[k]);
+    this.pairs = pickIndexes(bankData().length, this.diffTotal).map((k: number) => bankData()[k]);
     this.phase = 0; this.leftS = STUDY_S; this.qIndex = 0; this.right = 0; this.score = 0;
     this.pickedOk = -1; this.lastPick = ''; this.over = false; this.won = false; this.done = false;
     this.msg = TG2("记住这 {0} 组词对", this.diffTotal); this.startAt = Date.now();
