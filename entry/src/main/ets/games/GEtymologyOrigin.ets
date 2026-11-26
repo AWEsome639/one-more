@@ -13,7 +13,7 @@ import { GameDiff } from '../core/GameDiff';
 import { TG, TG2 } from '../core/GameI18n';
 import { GameResult } from '../core/GameRegistry';
 import { LanRace } from '../core/LanRace';
-import { Digits, Sec } from '../core/I18n';
+import { Digits, Sec, I18n } from '../core/I18n';
 import { Tv } from '../core/Tv';
 import { AppClock } from '../core/AppClock';
 
@@ -22,23 +22,60 @@ const MAX_WRONG: number = 4; const PASS: number = 8; const PENALTY_MS: number = 
 
 interface EtyQ { word: string; cn: string; lang: string; opts: string[] }
 
-const BANK: EtyQ[] = [
-  { word: 'ALGEBRA', cn: TG('代数'), lang: TG('阿拉伯语'), opts: [TG('阿拉伯语'), '希腊语', '拉丁语', '法语'] },
-  { word: 'SAUNA', cn: '桑拿浴', lang: '芬兰语', opts: ['芬兰语', '瑞典语', TG('俄语'), '德语'] },
-  { word: 'TSAR', cn: '沙皇', lang: TG('俄语'), opts: [TG('俄语'), TG('拉丁语'), '德语', '波兰语'] },
-  { word: 'TYCOON', cn: '企业大亨', lang: '日语', opts: ['日语', TG('汉语'), '韩语', '英语'] },
-  { word: 'PYJAMAS', cn: '睡衣裤', lang: TG('印地语'), opts: [TG('印地语'), '波斯语', TG('阿拉伯语'), '梵语'] },
-  { word: 'COFFEE', cn: '咖啡', lang: TG('阿拉伯语'), opts: [TG('阿拉伯语'), '法语', '拉丁语', '土耳其语'] },
-  { word: 'TYPHOON', cn: '台风', lang: '希腊语', opts: ['希腊语', TG('汉语'), TG('阿拉伯语'), '马来语'] },
-  { word: 'KETCHUP', cn: '番茄酱', lang: TG('汉语'), opts: [TG('汉语'), '马来语', '英语', '荷兰语'] },
-  { word: 'SHAMPOO', cn: '洗发水', lang: TG('印地语'), opts: [TG('印地语'), TG('阿拉伯语'), '梵语', '波斯语'] },
-  { word: 'KARAOKE', cn: '卡拉OK', lang: '日语', opts: ['日语', TG('汉语'), '韩语', '英语'] },
-  { word: 'PIANO', cn: '钢琴', lang: '意大利语', opts: ['意大利语', TG('法语'), TG('拉丁语'), '西班牙语'] },
-  { word: 'ROBOT', cn: '机器人', lang: '捷克语', opts: ['捷克语', '德语', TG('英语'), '波兰语'] },
-  { word: 'SAFARI', cn: '野外游猎', lang: '斯瓦希里语', opts: ['斯瓦希里语', TG('阿拉伯语'), '葡萄牙语', TG('印地语')] },
-  { word: 'CHOCOLATE', cn: '巧克力', lang: '纳瓦特尔语', opts: ['纳瓦特尔语', '西班牙语', TG('法语'), '玛雅语'] },
-  { word: 'YOGURT', cn: '酸奶', lang: '土耳其语', opts: ['土耳其语', '希腊语', TG('阿拉伯语'), '保加利亚语'] }
+/**
+ * ★ 2026-11-26（内容本地化）：英文界面原来出的是「英文词 + 中文释义 + 中文语言名」，
+ *   非中文玩家看不懂。英文表里 cn 承担「释义」、opts 是英文语言名。
+ *   中文路径 call-time 求值；非中文走英文。bank() 带按语言缓存，避免每帧重建 15 个对象。
+ */
+function bankZh(): EtyQ[] {
+  return [
+    { word: 'ALGEBRA', cn: TG('代数'), lang: TG('阿拉伯语'), opts: [TG('阿拉伯语'), TG('希腊语'), TG('拉丁语'), TG('法语')] },
+    { word: 'SAUNA', cn: TG('桑拿浴'), lang: TG('芬兰语'), opts: [TG('芬兰语'), TG('瑞典语'), TG('俄语'), TG('德语')] },
+    { word: 'TSAR', cn: TG('沙皇'), lang: TG('俄语'), opts: [TG('俄语'), TG('拉丁语'), TG('德语'), TG('波兰语')] },
+    { word: 'TYCOON', cn: TG('企业大亨'), lang: TG('日语'), opts: [TG('日语'), TG('汉语'), TG('韩语'), TG('英语')] },
+    { word: 'PYJAMAS', cn: TG('睡衣裤'), lang: TG('印地语'), opts: [TG('印地语'), TG('波斯语'), TG('阿拉伯语'), TG('梵语')] },
+    { word: 'COFFEE', cn: TG('咖啡'), lang: TG('阿拉伯语'), opts: [TG('阿拉伯语'), TG('法语'), TG('拉丁语'), TG('土耳其语')] },
+    { word: 'TYPHOON', cn: TG('台风'), lang: TG('希腊语'), opts: [TG('希腊语'), TG('汉语'), TG('阿拉伯语'), TG('马来语')] },
+    { word: 'KETCHUP', cn: TG('番茄酱'), lang: TG('汉语'), opts: [TG('汉语'), TG('马来语'), TG('英语'), TG('荷兰语')] },
+    { word: 'SHAMPOO', cn: TG('洗发水'), lang: TG('印地语'), opts: [TG('印地语'), TG('阿拉伯语'), TG('梵语'), TG('波斯语')] },
+    { word: 'KARAOKE', cn: TG('卡拉OK'), lang: TG('日语'), opts: [TG('日语'), TG('汉语'), TG('韩语'), TG('英语')] },
+    { word: 'PIANO', cn: TG('钢琴'), lang: TG('意大利语'), opts: [TG('意大利语'), TG('法语'), TG('拉丁语'), TG('西班牙语')] },
+    { word: 'ROBOT', cn: TG('机器人'), lang: TG('捷克语'), opts: [TG('捷克语'), TG('德语'), TG('英语'), TG('波兰语')] },
+    { word: 'SAFARI', cn: TG('野外游猎'), lang: TG('斯瓦希里语'), opts: [TG('斯瓦希里语'), TG('阿拉伯语'), TG('葡萄牙语'), TG('印地语')] },
+    { word: 'CHOCOLATE', cn: TG('巧克力'), lang: TG('纳瓦特尔语'), opts: [TG('纳瓦特尔语'), TG('西班牙语'), TG('法语'), TG('玛雅语')] },
+    { word: 'YOGURT', cn: TG('酸奶'), lang: TG('土耳其语'), opts: [TG('土耳其语'), TG('希腊语'), TG('阿拉伯语'), TG('保加利亚语')] }
+  ];
+}
+
+const BANK_EN: EtyQ[] = [
+  { word: 'ALGEBRA', cn: 'branch of maths', lang: 'Arabic', opts: ['Arabic', 'Greek', 'Latin', 'French'] },
+  { word: 'SAUNA', cn: 'steam bath', lang: 'Finnish', opts: ['Finnish', 'Swedish', 'Russian', 'German'] },
+  { word: 'TSAR', cn: 'Russian emperor', lang: 'Russian', opts: ['Russian', 'Latin', 'German', 'Polish'] },
+  { word: 'TYCOON', cn: 'business magnate', lang: 'Japanese', opts: ['Japanese', 'Chinese', 'Korean', 'English'] },
+  { word: 'PYJAMAS', cn: 'night clothes', lang: 'Hindi', opts: ['Hindi', 'Persian', 'Arabic', 'Sanskrit'] },
+  { word: 'COFFEE', cn: 'the morning drink', lang: 'Arabic', opts: ['Arabic', 'French', 'Latin', 'Turkish'] },
+  { word: 'TYPHOON', cn: 'tropical storm', lang: 'Greek', opts: ['Greek', 'Chinese', 'Arabic', 'Malay'] },
+  { word: 'KETCHUP', cn: 'tomato sauce', lang: 'Chinese', opts: ['Chinese', 'Malay', 'English', 'Dutch'] },
+  { word: 'SHAMPOO', cn: 'hair wash', lang: 'Hindi', opts: ['Hindi', 'Arabic', 'Sanskrit', 'Persian'] },
+  { word: 'KARAOKE', cn: 'sing-along machine', lang: 'Japanese', opts: ['Japanese', 'Chinese', 'Korean', 'English'] },
+  { word: 'PIANO', cn: 'keyboard instrument', lang: 'Italian', opts: ['Italian', 'French', 'Latin', 'Spanish'] },
+  { word: 'ROBOT', cn: 'machine person', lang: 'Czech', opts: ['Czech', 'German', 'English', 'Polish'] },
+  { word: 'SAFARI', cn: 'wildlife trip', lang: 'Swahili', opts: ['Swahili', 'Arabic', 'Portuguese', 'Hindi'] },
+  { word: 'CHOCOLATE', cn: 'cocoa sweet', lang: 'Nahuatl', opts: ['Nahuatl', 'Spanish', 'French', 'Mayan'] },
+  { word: 'YOGURT', cn: 'fermented milk', lang: 'Turkish', opts: ['Turkish', 'Greek', 'Arabic', 'Bulgarian'] }
 ];
+
+let bankLang: string = '';
+let bankCache: EtyQ[] = [];
+
+function bank(): EtyQ[] {
+  const l: string = I18n.current();
+  if (bankLang !== l) {
+    bankLang = l;
+    bankCache = (l === 'zh' || l === 'zh-Hant') ? bankZh() : BANK_EN;
+  }
+  return bankCache;
+}
 
 function shuffleStr(arr: string[]): string[] {
   const out: string[] = arr.slice();
@@ -95,14 +132,14 @@ export struct GEtymologyOrigin {
   private stop(): void { if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; } }
   private reset(): void {
     this.stop();
-    this.qIdx = Math.floor(Math.random() * BANK.length);
+    this.qIdx = Math.floor(Math.random() * bank().length);
     this.right = 0; this.wrong = 0; this.score = 0; this.leftMs = this.diffTotal;
     this.over = false; this.won = false; this.done = false;
     this.msg = TG('这个单词是从哪门语言借来的？'); this.startAt = AppClock.netNow(); this.roundAt = AppClock.netNow();
     this.load();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
-  private load(): void { this.opts = shuffleStr(BANK[this.qIdx].opts); }
+  private load(): void { this.opts = shuffleStr(bank()[this.qIdx].opts); }
   private tick(): void {
     if (AppClock.isPaused() || this.over) { return; }
     const gap: number = AppClock.netNow() - this.roundAt;
@@ -203,7 +240,7 @@ export struct GEtymologyOrigin {
     if (this.over) {
       return true;
     }
-    this.answer(BANK[this.qIdx].lang);
+    this.answer(bank()[this.qIdx].lang);
     return !this.over;
   }
 
@@ -213,7 +250,7 @@ export struct GEtymologyOrigin {
     if (this.over) {
       return Hint.none('none');
     }
-    const a: string = BANK[this.qIdx].lang;
+    const a: string = bank()[this.qIdx].lang;
     return Hint.make([], TG2('语源是「{0}」', a),
       TG2('The origin is {0}', a), t0);
   }
@@ -244,8 +281,8 @@ export struct GEtymologyOrigin {
 
   private answer(sel: string): void {
     if (this.over) { return; }
-    if (sel === BANK[this.qIdx].lang) {
-      this.right = this.right + 1; this.score = this.score + 120; this.msg = '✅ ' + BANK[this.qIdx].word + ' ← ' + sel;
+    if (sel === bank()[this.qIdx].lang) {
+      this.right = this.right + 1; this.score = this.score + 120; this.msg = '✅ ' + bank()[this.qIdx].word + ' ← ' + sel;
       if (this.right >= PASS) {
         this.over = true; this.won = true;
         this.msg = TG2("🎉 通关：答对 {0} 个",Digits(String(this.right), this.langCode));
@@ -253,7 +290,7 @@ export struct GEtymologyOrigin {
         return;
       }
     } else {
-      this.wrong = this.wrong + 1; this.msg = TG2('❌ 它其实来自 {0}', BANK[this.qIdx].lang);
+      this.wrong = this.wrong + 1; this.msg = TG2('❌ 它其实来自 {0}', bank()[this.qIdx].lang);
       const keep: number = this.leftMs - PENALTY_MS > 800 ? this.leftMs - PENALTY_MS : 800;
       this.leftMs = keep; this.roundAt = AppClock.netNow() - (this.diffTotal - keep);
       if (this.wrong >= MAX_WRONG) {
@@ -262,7 +299,7 @@ export struct GEtymologyOrigin {
         return;
       }
     }
-    this.qIdx = (this.qIdx + 1) % BANK.length;
+    this.qIdx = (this.qIdx + 1) % bank().length;
     this.load();
   }
   private finish(solved: boolean): void {
@@ -303,8 +340,8 @@ export struct GEtymologyOrigin {
 
       Column({ space: Space.xs }) {
         Text(TG('这个词借自？')).fontSize(FontSize.xs).fontColor(this.theme.inkFaint)
-        Text(BANK[this.qIdx].word).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
-        Text(BANK[this.qIdx].cn).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
+        Text(bank()[this.qIdx].word).fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text(bank()[this.qIdx].cn).fontSize(FontSize.sm).fontColor(this.theme.inkSoft)
       }.width('100%').padding(Space.md).backgroundColor(this.theme.surface).borderRadius(Radius.lg).shadow(Shadow.card).animation({ duration: Motion.fast, curve: Motion.snap() })
 
       Column({ space: Space.sm }) {
