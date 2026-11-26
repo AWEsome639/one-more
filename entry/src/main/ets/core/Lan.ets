@@ -65,6 +65,9 @@ export class Lan {
   /** ★ 2026-11-26（P1）：对手掉线回调（切后台/断 Wi-Fi/杀进程）——
    *  原来只在收到 'bye' 时结束对局，而 'bye' 永远发不出去 ⇒ 另一边永久停在「等对手落子」。 */
   static onPeerGone: () => void = () => {};
+  /** ★ 2026-11-26（P2）：本机唯一 id。两台设备默认昵称都是 Player ⇒
+   *  成绩按昵称去重会合并成一行；用 uid 做身份、昵称只做显示。 */
+  static readonly uid: string = 'p' + Math.random().toString(36).slice(2, 10);
 
   /** 本机昵称（可在设置里改，默认用系统给的短名） */
   static nick(): string {

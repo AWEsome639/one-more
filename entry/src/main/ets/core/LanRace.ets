@@ -34,9 +34,10 @@ import { AppClock } from './AppClock';
 
 /** 一条成绩 */
 export interface RaceScore {
-  nick: string;      // 玩家昵称
+  nick: string;      // 玩家昵称（只做显示）
   ms: number;        // 用时（毫秒）
   me: boolean;       // 是不是我自己
+  uid?: string;      // ★ 2026-11-26（P2）：设备唯一 id，用于去重（昵称可能重名）
 }
 
 /** 广播消息类型 */
@@ -126,8 +127,8 @@ export class LanRace {
   static async noteDone(ms: number = -1): Promise<void> {
     if (!LanRace.racing) { return; }
     const used: number = ms >= 0 ? ms : (AppClock.netNow() - LanRace.startAt);
-    LanRace.addScore(Lan.nick(), used, true);
-    await Lan.send({ t: T_DONE, d: JSON.stringify({ n: Lan.nick(), ms: used, r: LanRace.round }) });
+    LanRace.addScore(Lan.nick(), Lan.uid, used, true);
+    await Lan.send({ t: T_DONE, d: JSON.stringify({ n: Lan.nick(), u: Lan.uid, ms: used, r: LanRace.round }) });
   }
 
   // ─── 收消息（由 Lan 的 onMsg 转进来） ───
@@ -159,8 +160,9 @@ export class LanRace {
         const r: number = Number.parseInt(o.r, 10);
         if (r !== LanRace.round) { return; }        // 不是这一局，丢
         const n: string = o.n;
+        const u: string = (o.u !== undefined && o.u.length > 0) ? o.u : n;   // 兼容旧端（没有 uid）
         const ms: number = Number.parseInt(o.ms, 10);
-        if (!isNaN(ms)) { LanRace.addScore(n, ms, n === Lan.nick()); }
+        if (!isNaN(ms)) { LanRace.addScore(n, u, ms, u === Lan.uid); }
       } catch (e) { /* 忽略坏包 */ }
       return;
     }
@@ -171,16 +173,18 @@ export class LanRace {
   }
 
   /** 记一条成绩（同一个人只记最快的一次） */
-  private static addScore(nick: string, ms: number, me: boolean): void {
+  private static addScore(nick: string, uid: string, ms: number, me: boolean): void {
     for (let i = 0; i < LanRace.scores.length; i++) {
       const s: RaceScore = LanRace.scores[i];
-      if (s.nick === nick) {
-        if (ms < s.ms) { LanRace.scores[i] = { nick: nick, ms: ms, me: s.me || me }; }
+      // ★ 2026-11-26（P2）：按 uid 去重（两台默认昵称都叫 Player 时不能合并成一行）
+      const same: boolean = (s.uid !== undefined && s.uid.length > 0) ? (s.uid === uid) : (s.nick === nick);
+      if (same) {
+        if (ms < s.ms) { LanRace.scores[i] = { nick: nick, ms: ms, me: s.me || me, uid: uid }; }
         LanRace.onChange();
         return;
       }
     }
-    LanRace.scores.push({ nick: nick, ms: ms, me: me });
+    LanRace.scores.push({ nick: nick, ms: ms, me: me, uid: uid });
     LanRace.onChange();
   }
 
