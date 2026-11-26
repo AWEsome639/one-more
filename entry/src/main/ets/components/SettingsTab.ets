@@ -77,9 +77,11 @@ const MS_PER_MIN: number = 60000;
 const PICK_SCALE: number = 1.1;
 /** 首屏进场延迟 */
 const ENTER_DELAY: number = 30;
-/** 难度名（简/繁/其它语言都走字典） */
-const DIFF_ZH: string[] = [TG('简单'), TG('普通'), TG('困难')];
-const DIFF_EN: string[] = ['Easy', 'Normal', 'Hard'];
+/**
+ * ★ 2026-11-26（i18n 审计）：难度名原来是**模块级** `TG(...)` —— 模块只加载一次，
+ *   切语言后这里永远是加载时那种语言。现在只存中文 key，渲染时再取词（下方 `TG(DIFF_KEYS[d])`）。
+ */
+const DIFF_KEYS: string[] = ['简单', '普通', '困难'];
 
 /**
  * 开关行
@@ -1060,7 +1062,7 @@ build() {
       return line;
     }
     const d: number = Number.parseInt(p[3], 10);
-    const dn: string = this.t(DIFF_ZH[d], DIFF_EN[d]);
+    const dn: string = TG(DIFF_KEYS[d]);
     return p[1] + ' → ' + p[2] + '  (' + dn + ')';
   }
 
