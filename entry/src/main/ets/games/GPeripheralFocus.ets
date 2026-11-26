@@ -118,9 +118,14 @@ export struct GPeripheralFocus {
     if (this.over) {
       return Hint.none('none');
     }
-    return Hint.make([this.at],
-      TG2('答案是第 {0} 个', String(this.at + 1)),
-      TG2('The answer is option {0}', String(this.at + 1)), t0);
+    // ★ 2026-11-27 真 bug（提示下标审计）：this.at 是 3×3 网格的格号（0..8），
+    //   而选项只有 4 个且被打乱（L99 shuffle）⇒ 提示永远指错（7/8 的轮次会报不存在的「第 6–9 个」）。
+    //   正确是「打乱后正确选项的下标」= opts.indexOf(target)。
+    const kRaw: number = this.opts.indexOf(this.target);
+    const k: number = kRaw < 0 ? 0 : kRaw;
+    return Hint.make([k],
+      TG2('答案是第 {0} 个', String(k + 1)),
+      TG2('The answer is option {0}', String(k + 1)), t0);
   }
 
   private askHint(): void {

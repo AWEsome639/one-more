@@ -87,7 +87,10 @@ export struct GOddOneOut {
   private nextRound(): void {
     const p: string[][] = pairs();
     const one: string[] = p[Math.floor(Math.random() * p.length)];
-    const n: number = this.round <= 3 ? 6 : (this.round <= 7 ? 9 : 12);
+    // ★ 2026-11-27 真 bug（提示下标审计附带发现）：棋盘固定 3×3=9 格，但 round≥8 时 n=12
+    //   ⇒ 第 10–12 格根本不渲染；若不同字形落在那三格，这一轮**点不中、永远过不了**，
+    //   提示还会报「第 10–12 个」。这里把上限收到 9（棋盘能容纳的最大值）。
+    const n: number = this.round <= 3 ? 6 : 9;
     const g: string[] = [];
     for (let i = 0; i < n; i++) {
       g.push(one[0]);
