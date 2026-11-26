@@ -100,6 +100,22 @@ function pick(table: Record<string, string>, lang: string, zh: string): string {
   return en !== undefined ? en : zh;
 }
 
+/**
+ * ★ 2026-11-26（i18n 审计）：卡片首帧就要按语言出字，不能等异步。
+ *   与 readUiModeSync 同一个库、同一个写法；读不到就 'en'。
+ */
+function readLangSync(ctx: common.Context): string {
+  try {
+    const opt: preferences.Options = { name: STORE };
+    const pr: preferences.Preferences = preferences.getPreferencesSync(ctx, opt);
+    const l: string = pr.getSync('lang', 'en') as string;
+    return l.length > 0 ? l : 'en';
+  } catch (e) {
+    hilog.warn(DOMAIN, TAG, 'readLang failed: %{public}s', JSON.stringify(e));
+    return 'en';
+  }
+}
+
 /** 按语言取称号 */
 function pickTier(level: number, lang: string): string {
   let tier: number = 0;
@@ -180,11 +196,13 @@ function readFormId(want: Want): string {
   }
 }
 
-function defaults(): CardStats {
+function defaults(lang: string): CardStats {
+  // ★ 2026-11-26（i18n 审计）：兜底值也必须按语言 —— 以前这里写死中文，
+  //   非中文用户在「卡片已加、数据还没读到」的首帧会看到中文。
   const d: CardStats = {
-    level: '1', title: '新手上路', streak: '0',
-    today: '今天还没玩', solved: '0', xp: '0', pct: '0',
-    footer: '累计 0 局 · 点我开一局', done: '0',
+    level: '1', title: pickTier(1, lang), streak: '0',
+    today: pick(T_TODAY_YET, lang, '今天还没玩'), solved: '0', xp: '0', pct: '0',
+    footer: pick(T_FOOTER, lang, '累计 {n} 局 · 点我开一局').replace('{n}', '0'), done: '0',
     uiMode: 'normal', dim: '2*2'
   };
   return d;
@@ -236,7 +254,7 @@ function levelTitle(l: number): string {
 }
 
 async function readStats(ctx: common.Context, dim: string): Promise<CardStats> {
-  const out: CardStats = defaults();
+  const out: CardStats = defaults('en');
   out.dim = dim;
   try {
     const p: preferences.Preferences = await preferences.getPreferences(ctx, STORE);
@@ -260,13 +278,21 @@ async function readStats(ctx: common.Context, dim: string): Promise<CardStats> {
     const hi: number = LevelCurve.xpForLevel(level + 1);
     const pct: number = Math.round(LevelCurve.progress(xp) * 100);
 
+    // ★ 2026-11-26（i18n 审计）：这里原来直接写中文 ⇒ 桌面卡片对 10 种语言全显示中文
+    //   （T_TIERS/T_TODAY_*/T_FOOTER 三张表写好了却零调用点）。现在按 preferences 的 'lang' 取词。
+    const langRaw: string = p.getSync('lang', 'en') as string;
+    const lang: string = langRaw.length > 0 ? langRaw : 'en';
     out.level = String(level);
-    out.title = levelTitle(level);
+    out.title = pickTier(level, lang);
     out.streak = String(alive ? streakRaw : 0);
-    out.today = playedToday ? '今日已打卡' : '今天还没玩';
+    out.today = playedToday ? pick(T_TODAY_DONE, lang, '今日已打卡')
+                            : pick(T_TODAY_YET, lang, '今天还没玩');
     out.solved = String(total);
     out.xp = String(xp);
     out.pct = String(pct);
+    // ★ 同一次审计的另一处：footer/done 以前从不赋值 ⇒ 卡片永远「累计 0 局」、打卡点恒为未玩
+    out.footer = pick(T_FOOTER, lang, '累计 {n} 局 · 点我开一局').replace('{n}', String(total));
+    out.done = playedToday ? '1' : '0';
     // ★ 2026-11-08：界面模式（大字/简约）—— 卡片据此调 UiModeMgr.apply
     //   这里**复用已有的 `p` 句柄**（不另开一个，避免同一库两个实例各自缓存）
     const modeRaw: string = p.getSync('uiMode', '') as string;
@@ -290,7 +316,7 @@ export default class StatsCardAbility extends FormExtensionAbility {
   /** 卡片被加到桌面：先给默认值，保证立刻出画面 */
   onAddForm(want: Want): formBindingData.FormBindingData {
     hilog.info(DOMAIN, TAG, '%{public}s', 'onAddForm');
-    const d: CardStats = defaults();
+    const d: CardStats = defaults(readLangSync(this.context));
     // ★ 首帧就按用户的界面模式出画面，避免"先小字再跳大字"
     d.uiMode = readUiModeSync(this.context);
     // ★ ③：首帧就带上尺寸，卡片据此选「桌面版 / 手表版」布局

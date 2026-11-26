@@ -3581,7 +3581,7 @@ struct GameHost {
             Row({ space: Space.sm }) {
               Text('🎊').accessibilityLevel('no').fontSize(FontSize.lg)
               Text(TG('升到 LV ') + Digits(String(this.levelUpTo), this.langCode) + ' · '
-                 + ProgressStore.titleOf(this.levelUpTo))
+                 + TG(ProgressStore.titleOf(this.levelUpTo)))
                 .fontSize(FontSize.sm).fontWeight(FontWeight.Bold)
                 .fontColor(Palette.amber)
             }
