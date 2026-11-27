@@ -294,7 +294,9 @@ export class GomokuSearch {
     };
     this.zob = [];
     this.zob2 = [];
-    for (let i = 0; i < 15 * 15; i++) {
+    // ★ 2026-11-27（规则审计第三批）：棋盘随难度 11/15/20，Zobrist 表原来只覆盖 15×15=225
+    //   ⇒ 困难档 20×20 的 225~399 格不参与哈希（守卫生效不崩，但置换表命中率下降、AI 变弱）。
+    for (let i = 0; i < 20 * 20; i++) {
       this.zob.push([rnd(), rnd()]);
       this.zob2.push([rnd(), rnd()]);
     }
