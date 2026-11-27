@@ -237,7 +237,8 @@ export struct GOddEvenFlash {
 
   private next(): void {
     if (this.trial >= this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-28（第五批·中）：简单档 13 题要 13 对（100%）；按题数缩放。
+    this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TRIALS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, this.diffTotal);
       this.clearAll(); this.finish(this.won);
       return;
@@ -310,7 +311,7 @@ export struct GOddEvenFlash {
       .onBlur(() => { if (this.tvFocus === 'L300') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L300'))
       .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG2('提示：数字消失后才能作答，答满 {0} 题对 {1} 题即通关',Digits(String(this.diffTotal), this.langCode),Digits(String(PASS), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
+      Text(TG2('提示：数字消失后才能作答，答满 {0} 题对 {1} 题即通关',Digits(String(this.diffTotal), this.langCode),Digits(String(Math.max(1, Math.round(PASS * this.diffTotal / TRIALS))), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

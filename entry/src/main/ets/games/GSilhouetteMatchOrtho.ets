@@ -240,7 +240,8 @@ export struct GSilhouetteMatchOrtho {
     this.stopTimer();
     this.nextTimer = setTimeout(() => {
       this.nextTimer = -1;
-      if (this.asked >= this.diffTotal) { this.finish(this.hits >= NEED); return; }
+      // ★ 2026-11-28（第五批·中）：简单档 4 题要 4 对（100%）；按题数缩放。
+    if (this.asked >= this.diffTotal) { this.finish(this.hits >= Math.max(1, Math.round(NEED * this.diffTotal / ROUNDS))); return; }
       this.newRound();
     }, 900);
   }

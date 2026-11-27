@@ -367,7 +367,8 @@ export struct GCryptoArithmetic {
     if (this.round >= this.diffTotal) {
       this.over = true;
       this.tip = TG2("共解出 {0}/{1} 题", String(this.right), String(this.diffTotal));
-      this.finish(this.right >= PASS);
+      // ★ 2026-11-28（第五批·中）：简单档 4 题要 4 对（100%）；按题数缩放。
+    this.finish(this.right >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS)));
       return;
     }
     this.load();

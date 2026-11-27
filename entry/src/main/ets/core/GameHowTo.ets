@@ -471,12 +471,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '先看清球在哪个碗底下',
       '然后碗开始洗牌，停下来后点出球的位置',
-      '连中 5 关算通关，每过一关多洗 2 次'
+      '连中本档关数（4 / 5 / 7 关）算通关，每过一关多洗 2 次'
     ],
     en: [
       'First watch which cup the ball is under',
       'Then the cups shuffle; when they stop, tap where the ball is',
-      'Clear it by getting 5 in a row, with two more shuffles added each level'
+      'Clear this difficulty level’s number of rounds in a row (4 / 5 / 7), with two more shuffles added each level'
     ]
   },
   'orbit_tap': {
