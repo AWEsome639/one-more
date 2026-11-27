@@ -279,7 +279,8 @@ export struct GGoNoGo {
   private judge(): void {
     this.clearAll();
     this.over = true;
-    this.won = this.correctN() >= NEED_CORRECT && this.faN <= MAX_FA;
+    // ★ 2026-11-27（第三批）：简单档 14 试次 < NEED_CORRECT 17 ⇒ 必然失败；按试次数缩放。
+    this.won = this.correctN() >= Math.max(1, Math.round(NEED_CORRECT * this.diffTotal / TRIALS)) && this.faN <= MAX_FA;
     this.msg = TG2(this.won ? '🎉 通关！正确 {0}/{1}' : '💤 结束，正确 {0}/{1}', String(this.correctN()),Digits(String(this.diffTotal), this.langCode))
       + TG2(' · 误点 {0} 次',Digits(String(this.faN), this.langCode));
     if (!this.done) {

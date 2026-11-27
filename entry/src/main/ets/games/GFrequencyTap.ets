@@ -296,7 +296,8 @@ export struct GFrequencyTap {
   }
 
   private judge(): void {
-    this.phase = 2; this.over = true; this.won = this.hitN >= WIN_HITS;
+    // ★ 2026-11-27（第三批）：简单档拍数 14 < WIN_HITS 16 ⇒ 必然失败；按拍数缩放。
+    this.phase = 2; this.over = true; this.won = this.hitN >= Math.max(1, Math.round(WIN_HITS * this.diffTotal / BEATS));
     this.msg = TG2(this.won ? '🎉 节奏稳！命中 {0}/{1} 拍' : '💤 结束，命中 {0}/{1} 拍',Digits(String(this.hitN), this.langCode),Digits(String(this.diffTotal), this.langCode));
     if (!this.done) {
       this.done = true;

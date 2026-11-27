@@ -262,7 +262,8 @@ export struct GSentenceUnscramble {
       this.lives = this.lives - 1; this.msg = TG2('❌ 正确语序：{0}', this.plan[this.qi]);
     }
     if (this.qi + 1 >= this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-27（第三批）：简单 4 题要 4 对（100%）；按题数缩放。
+    this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, this.diffTotal);
       this.finish(this.won); return;
     }

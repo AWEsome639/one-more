@@ -270,7 +270,8 @@ export struct GContinuousRecognition {
     }
     this.trial++;
     if (this.wrong >= MAX_WRONG) { this.end(false); return; }
-    if (this.trial >= this.diffTotal) { this.end(this.correct >= PASS); return; }
+    // ★ 2026-11-27（规则审计第三批）：试次数随难度缩放（简单 17），PASS 恒 17 ⇒ 必然失败。
+    if (this.trial >= this.diffTotal) { this.end(this.correct >= Math.max(1, Math.round(PASS * this.diffTotal / TRIALS))); return; }
   }
 
   private end(solved: boolean): void {

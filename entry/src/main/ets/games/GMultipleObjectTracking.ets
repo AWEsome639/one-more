@@ -289,7 +289,8 @@ export struct GMultipleObjectTracking {
     this.nextTo = setTimeout(() => {
       this.nextTo = -1;
       if (this.round >= this.diffTotal) {
-        this.phase = 4; this.over = true; this.won = this.hitRounds >= 2;
+        // ★ 2026-11-27（第三批）：简单 2 轮要 2 轮全中（100%）；按轮数缩放。
+    this.phase = 4; this.over = true; this.won = this.hitRounds >= Math.max(1, Math.round(2 * this.diffTotal / ROUNDS));
         this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("全对 {0}/{1} 轮", String(this.hitRounds), String(this.diffTotal));
         this.finish(this.won);
         return;
