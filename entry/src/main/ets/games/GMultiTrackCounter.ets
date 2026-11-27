@@ -88,7 +88,8 @@ export struct GMultiTrackCounter {
     this.ticking = true;
     this.left = this.total;
     this.answer = 0;
-    this.deadline = Date.now() + BUDGET;
+    // ★ 2026-11-28（第六批·中）：倒计时显示用 total（本档 8.4/12/18 秒），deadline 却用常量 12 秒 ⇒ 显示与判定不同步。
+    this.deadline = Date.now() + this.total;
     this.msg = TG('数一数：三条轨道一共跳了多少下？');
     this.startTick();
   }
