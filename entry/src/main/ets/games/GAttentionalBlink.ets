@@ -288,7 +288,8 @@ export struct GAttentionalBlink {
       this.nextTo = -1;
       if (this.trialNo >= this.diffTotal) {
         this.over = true;
-        this.won = this.right >= NEED;
+        // ★ 2026-11-28（第六批·中）：简单档 4 轮要 4 对（100%）⇒ 按轮数缩放。
+    this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / TRIALS));
         this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
         this.clearAll();
         this.finish(this.won);

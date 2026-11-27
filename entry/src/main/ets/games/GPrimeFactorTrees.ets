@@ -264,7 +264,8 @@ export struct GPrimeFactorTrees {
       this.over = true;
       this.tip = msg + TG2('｜共拆开 {0}/{1} 棵', String(this.clears), String(this.diffTotal));
       const res: GameResult = {
-        gameId: 'prime_factor_trees', solved: this.clears >= PASS,
+        // ★ 2026-11-28（第六批·中）：简单档 4 关要 4 对（100%）⇒ 按关数缩放。
+    gameId: 'prime_factor_trees', solved: this.clears >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS)),
         score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.clears
       };
       LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）

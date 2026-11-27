@@ -249,7 +249,8 @@ export struct GTemporalOrderJudgment {
 
   private next(): void {
     if (this.trial >= this.diffTotal) {
-      this.over = true; this.won = this.hits >= PASS;
+      // ★ 2026-11-28（第六批·中）：简单档 7 次要 7 对（100%）⇒ 按次数缩放。
+    this.over = true; this.won = this.hits >= Math.max(1, Math.round(PASS * this.diffTotal / TRIALS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.hits, this.diffTotal);
       this.finish(this.won); return;
     }
@@ -289,7 +290,7 @@ export struct GTemporalOrderJudgment {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text((this.hits + ' / ' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.lime))
+        Text((this.hits + ' / ' + Math.max(1, Math.round(PASS * this.diffTotal / TRIALS)))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.lime))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })

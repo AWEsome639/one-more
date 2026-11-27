@@ -271,7 +271,8 @@ export struct GVisualCrowdingAcuity {
     if (this.done) { return; }
     this.done = true;
     this.over = true;
-    this.won = this.right >= NEED;
+    // ★ 2026-11-28（第六批·中）：简单档 6 题要 6 对（100%）⇒ 按题数缩放。
+    this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / TOTAL));
     this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
     this.clearAll();
     const r: GameResult = {

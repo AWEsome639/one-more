@@ -285,7 +285,8 @@ export struct GCryptogram {
     this.deal();
   }
   private end(): void {
-    this.over = true; this.won = this.solved >= PASS;
+    // ★ 2026-11-28（第六批·中）：简单档 6 题要 6 对（100%）⇒ 按题数缩放。
+    this.over = true; this.won = this.solved >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
     this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("破译 {0} / {1}", this.solved, this.diffTotal);
     if (this.done) { return; }
     this.done = true;
