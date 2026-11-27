@@ -232,7 +232,8 @@ export struct GStroopNumberSize {
 
   private advance(): void {
     if (this.round >= this.diffTotal) {
-      const win: boolean = this.right >= 10;
+      // ★ 2026-11-27（规则审计第二批）：题数随难度缩放（简单 8），判定硬编码 10 ⇒ 必败。
+    const win: boolean = this.right >= Math.max(1, Math.round(10 * this.diffTotal / ROUNDS));
       this.over = true; this.won = win;
       this.msg = (win ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1} 题", String(this.right), String(this.diffTotal));
       const res: GameResult = {

@@ -311,7 +311,8 @@ export struct GPercentageShopping {
       return;
     }
     if (this.round >= this.diffTotal) {
-      const ok: boolean = this.right >= PASS;
+      // ★ 2026-11-27（规则审计第二批）：件数随难度缩放（简单 4），PASS 恒 5 ⇒ 必败。
+    const ok: boolean = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = ok ? TG2('🎉 答对 {0}/{1} 件，通关！', String(this.right), String(this.diffTotal))
         : TG2('答对 {0}/{1} 件，还差一点', String(this.right), String(this.diffTotal));
       this.finish(ok);

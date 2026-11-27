@@ -266,7 +266,9 @@ export struct GFlankerTest {
   private judge(): void {
     const avg: number = this.avgRt();
     this.over = true;
-    this.won = this.rightN >= NEED_HIT && avg < LIMIT_MS;
+    // ★ 2026-11-27（规则审计第二批）：试次数随难度缩放（简单 8），门槛恒 11 ⇒ 简单档必败。
+    const needHit: number = Math.max(1, Math.round(NEED_HIT * this.diffTotal / TRIALS));
+    this.won = this.rightN >= needHit && avg < LIMIT_MS;
     this.msg = TG2(this.won ? '🎉 通关！正确 {0}/{1}' : '💤 结束，正确 {0}/{1}',Digits(String(this.rightN), this.langCode),Digits(String(this.diffTotal), this.langCode))
       + TG2(' · 平均 {0} ms', String(avg));
     if (!this.done) {

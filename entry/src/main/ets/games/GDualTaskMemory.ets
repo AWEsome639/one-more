@@ -335,7 +335,8 @@ export struct GDualTaskMemory {
   }
   private finish(): void {
     if (this.done) { return; }
-    this.done = true; this.over = true; this.won = this.totalRight >= NEED;
+    // ★ 2026-11-27（规则审计第二批）：轮数随难度缩放（简单 2 轮），NEED 恒 9 ⇒ 必败。
+    this.done = true; this.over = true; this.won = this.totalRight >= Math.max(1, Math.round(NEED * this.diffTotal / ROUNDS));
     this.msg = (this.won ? TG('🎉 通关！') : TG('💤 本局结束：'))
       + TG2('记住 {0}/{1}', String(this.totalRight), String(this.diffTotal * SPAN))
       + TG2(' · 心算对 {0}/{1}', String(this.mathRight), String(this.diffTotal * QS));

@@ -305,7 +305,8 @@ export struct GDefinitionDash {
 
   private end(): void {
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
-    this.over = true; this.won = this.correct >= PASS && this.miss < MISS_MAX;
+    // ★ 2026-11-27（规则审计第二批）：题数随难度缩放（简单 7），PASS 恒 8 ⇒ 必败。
+    this.over = true; this.won = this.correct >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS)) && this.miss < MISS_MAX;
     this.msg = this.won ? TG2('🎉 通关：答对 {0} / {1}', this.correct, this.diffTotal) : TG2('💤 结束：答对 {0} / {1}', this.correct, this.diffTotal);
     if (this.done) { return; }
     this.done = true;

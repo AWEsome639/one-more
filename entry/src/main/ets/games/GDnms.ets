@@ -255,7 +255,8 @@ export struct GDnms {
   }
   private advance(): void {
     if (this.trialNo >= this.diffTotal) {
-      this.won = this.right >= NEED; this.over = true;
+      // ★ 2026-11-27（规则审计第二批）：试次数随难度缩放（简单 4），NEED 恒 5 ⇒ 必败。
+    this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / TRIALS)); this.over = true;
       this.msg = (this.won ? TG('🎉 通关！') : TG('💤 本局结束：')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
       this.finish();
       return;
