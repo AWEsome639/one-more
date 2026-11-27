@@ -48,7 +48,9 @@ export struct GSpatialCabinetMemory {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(ITEMS);
+  // ★ 2026-11-27（规则审计第三批）：困难档 5 件占 6 格 ⇒ 只剩 1 个空格，「哪格有 X」退化成近似双射，
+  //   空间排除难度反而下降。上限收到 4 件（至少留 2 个空格）。
+  @State private diffTotal: number = Math.min(4, GameDiff.sizeNow(ITEMS));
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
 
@@ -76,7 +78,7 @@ export struct GSpatialCabinetMemory {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(ITEMS);
+    this.diffTotal = Math.min(4, GameDiff.sizeNow(ITEMS));
      this.reset(); }
   aboutToDisappear(): void { this.clearAll(); }
 
