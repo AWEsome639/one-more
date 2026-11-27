@@ -37,14 +37,14 @@ const BANK: GW[] = [
   { w: 'HONEST', k: 2 }, { w: 'BITTER', k: 2 }, { w: 'HARDLY', k: 3 }, { w: 'QUIETLY', k: 3 }
 ];
 
-function shuffleIdx(): number[] {
+function shuffleIdx(n: number = TOTAL): number[] {
   const out: number[] = [];
   for (let i = 0; i < BANK.length; i++) { out.push(i); }
   for (let i = out.length - 1; i > 0; i--) {
     const j: number = Math.floor(Math.random() * (i + 1));
     const t: number = out[i]; out[i] = out[j]; out[j] = t;
   }
-  return out.slice(0, TOTAL);
+  return out.slice(0, Math.min(n, out.length));
 }
 
 @Component
@@ -93,7 +93,8 @@ export struct GGrammarSort {
   }
   private reset(): void {
     this.stop();
-    this.queue = shuffleIdx();
+    // ★ 2026-11-28（第六批）：困难档题数 21 > 原来恒切 16 个下标 ⇒ 第 17 题起越界。按本档取。
+    this.queue = shuffleIdx(this.diffTotal);
     this.step = 0; this.right = 0; this.wrong = 0; this.score = 0; this.leftS = LIMIT_S;
     this.over = false; this.won = false; this.done = false;
     this.msg = TG('这个词是哪种词性？');
@@ -108,7 +109,8 @@ export struct GGrammarSort {
     if (this.over) { return; }
     this.leftS = this.leftS - 1;
     if (this.leftS <= 0) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-28（第六批）：简单档 11 题 < 固定 PASS 12 ⇒ 必败；按题数缩放。
+      this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL));
       this.msg = TG2('⌛ 时间到 —— 答对 {0} / {1}', this.right, this.diffTotal); this.finish(this.won);
     }
   }
@@ -256,7 +258,8 @@ export struct GGrammarSort {
     }
     this.step = this.step + 1;
     if (this.step >= this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-28（第六批）：简单档 11 题 < 固定 PASS 12 ⇒ 必败；按题数缩放。
+      this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, this.diffTotal);
       this.finish(this.won);
     }
@@ -289,7 +292,7 @@ export struct GGrammarSort {
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text((this.right + ' / ' + PASS)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        Text((this.right + ' / ' + Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('答错'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
@@ -343,7 +346,7 @@ export struct GGrammarSort {
       .onBlur(() => { if (this.tvFocus === 'L315') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L315')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
-      Text(TG2("{0} 个词，{1} 秒内答对 ≥{2} 通关",Digits(String(this.diffTotal), this.langCode), LIMIT_S, PASS)).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(TG2("{0} 个词，{1} 秒内答对 ≥{2} 通关",Digits(String(this.diffTotal), this.langCode), LIMIT_S, Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

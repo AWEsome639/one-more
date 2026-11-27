@@ -88,6 +88,13 @@ export struct GStaircaseMemory {
     if (this.wrongTo >= 0) { clearTimeout(this.wrongTo); this.wrongTo = -1; }
   }
 
+  /** ★ 2026-11-28（第六批）：阶数 = 2+关数（3..7），渲染原来恒 6 行 ⇒ 简单多幻影阶、困难第 7 阶点不到。 */
+  private stepRows(): number[] {
+    const a: number[] = [];
+    for (let i = 0; i < 2 + this.level; i++) { a.push(i); }
+    return a;
+  }
+
   private reset(): void {
     this.clearAll();
     this.order = []; this.cursor = 0; this.cur = 0; this.level = 1; this.phase = 0; this.score = 0;
@@ -324,7 +331,7 @@ export struct GStaircaseMemory {
       .width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
       .borderRadius(Radius.md).shadow(Shadow.card).justifyContent(FlexAlign.SpaceBetween)
       Column({ space: Space.xs }) {
-        ForEach([0, 1, 2, 3, 4, 5], (i: number) => {
+        ForEach(this.stepRows(), (i: number) => {
           this.stepRow(i)
         }, (i: number) => 's' + i)
       }

@@ -95,7 +95,8 @@ export struct GTypoglycemiaDecoder {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+    // ★ 2026-11-28（第六批）：BANK 只有 6 句，困难档要 8 题 ⇒ 池空后下标 undefined 崩。
+    this.diffTotal = Math.min(BANK.length, GameDiff.sizeNow(ROUNDS));
      this.reset(); }
   aboutToDisappear(): void { if (this.feed >= 0) { clearTimeout(this.feed); this.feed = -1; } }
 
@@ -281,7 +282,9 @@ export struct GTypoglycemiaDecoder {
 
   private end(): void {
     if (this.done) { return; }
-    this.done = true; this.over = true; this.won = this.right >= PASS;
+    this.done = true; this.over = true;
+    // ★ 2026-11-28（第六批）：简单 4 题要 4 对（100%）⇒ 按题数缩放。
+    this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
     this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("读对 {0}/{1}", this.right, this.diffTotal);
     const r: GameResult = { gameId: 'typoglycemia_decoder', solved: this.won, score: this.score,
       durationMs: Date.now() - this.startAt, levelReached: this.right };

@@ -49,7 +49,9 @@ export struct GRelationalMemory {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(PAIRS);
+  // ★ 2026-11-28（第六批）：POOL 只有 12 个符号，困难档 8 对需要 16 个 ⇒ sideB 出现 undefined。
+  //   配对数上限 = POOL/2 = 6。
+  @State private diffTotal: number = Math.min(GameDiff.sizeNow(PAIRS), POOL.length / 2);
   onFinish: (r: GameResult) => void = () => {};
   @State private sideA: string[] = [];
   @State private sideB: string[] = [];
@@ -74,7 +76,7 @@ export struct GRelationalMemory {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(PAIRS);
+    this.diffTotal = Math.min(GameDiff.sizeNow(PAIRS), POOL.length / 2);
      this.reset(); }
   aboutToDisappear(): void { this.clearTo(); }
   private clearTo(): void {

@@ -102,7 +102,8 @@ export struct GComplexFoldingNets {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(TOTAL);
+    // ★ 2026-11-28（第六批）：SEED 只有 8 条，困难档 10 题 ⇒ 第 9 题起空图。
+    this.diffTotal = Math.min(GameDiff.sizeNow(TOTAL), SEED.length);
      this.reset(); }
 
   private reset(): void {

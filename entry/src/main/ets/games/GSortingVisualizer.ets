@@ -107,6 +107,13 @@ export struct GSortingVisualizer {
     this.running = false;
   }
 
+  /** ★ 2026-11-28（第六批）：槽位原来写死 12，困难档 16 个柱会读 arr[12..15] = undefined。 */
+  private slotArr(): number[] {
+    const a: number[] = [];
+    for (let i = 0; i < this.diffTotal; i++) { a.push(i); }
+    return a;
+  }
+
   private reset(): void {
     this.stopLoop();
     const a: number[] = [];
@@ -511,7 +518,7 @@ export struct GSortingVisualizer {
       .width('100%')
 
       Row({ space: 2 }) {
-        ForEach(SLOTS, (i: number) => {
+        ForEach(this.slotArr(), (i: number) => {
           Column() {
           Row()
           .width('100%')
