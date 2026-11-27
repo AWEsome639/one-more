@@ -133,7 +133,9 @@ export struct GWordAssociationRecall {
     this.study = pickIndexes(pairsData().length, SETS); this.order = pickIndexes(SETS, SETS);
     this.qi = 0; this.right = 0; this.score = 0; this.picked = -1; this.locked = false;
     this.phase = 0; this.over = false; this.won = false; this.done = false;
-    this.leftMs = this.total; this.msg = TG(TG('记住每一组搭配，9 秒后开始回忆'));
+    this.leftMs = this.total;
+    // ★ 2026-11-28（第六批·中）：文案写死 9 秒，而本档 total 是 6.3/9/13.5 秒。
+    this.msg = TG2('记住每一组搭配，{0} 秒后开始回忆', String(Math.round(this.total / 1000)));
     this.startAt = AppClock.netNow(); this.roundAt = AppClock.netNow();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
   }
