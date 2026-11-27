@@ -75,6 +75,14 @@ export struct GMemory {
     this.reset();
   }
 
+  /** 本局牌数对应的行号（每行 4 张；牌数 8/12/16 ⇒ 2/3/4 行） */
+  private rowArr(): number[] {
+    const rows: number = Math.ceil(this.cards.length / 4);
+    const a: number[] = [];
+    for (let i = 0; i < rows; i++) { a.push(i); }
+    return a;
+  }
+
   private reset(): void {
     this.settled = false;
     this.aiKnown = [];
@@ -307,6 +315,11 @@ export struct GMemory {
     if (this.lock || this.done) {
       return;
     }
+    // ★ 2026-11-27（第四批）：牌数随难度 8/12/16，棋盘固定 4×4 会产生 8 个"幻影格"，
+    //   点到盘外下标时 cur[i] 是 undefined（越界/崩溃风险）。先挡掉非法下标。
+    if (i < 0 || i >= this.cards.length) {
+      return;
+    }
     const cur: Card[] = this.cards.map((c: Card) => {
       const n: Card = { face: c.face, open: c.open, matched: c.matched };
       return n;
@@ -396,7 +409,7 @@ export struct GMemory {
       .width('100%')
 
       Column({ space: Space.sm }) {
-        ForEach([0, 1, 2, 3], (r: number) => {
+        ForEach(this.rowArr(), (r: number) => {
           Row({ space: Space.sm }) {
             ForEach([0, 1, 2, 3], (c: number) => {
               Stack() {

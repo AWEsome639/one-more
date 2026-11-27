@@ -70,10 +70,14 @@ export struct GWordLadder {
   private reset(): void {
     const l: Ladder = LADDERS[Math.floor(Math.random() * LADDERS.length)];
     this.from = l.from; this.to = l.to; this.limit = l.limit; this.word = l.from;
-    this.limit = GameDiff.pick(9, 6, 4);   // ★ 难度作用到玩法：步数上限（简单 9 / 普通 6 / 困难 4）
+    // ★ 2026-11-27（第四批）：原来覆盖成固定的 9/6/4，而每组词对自带 limit（最短解 + 余量，
+    //   如 DARK→LAMP 的 limit=7），困难档 4 步可能短于最短解 ⇒ 无解。改成在每组 limit 上做偏移。
+    const dl: number = GameDiff.now();
+    this.limit = l.limit + (dl === 0 ? 2 : (dl === 2 ? -1 : 0));
+    if (this.limit < 3) { this.limit = 3; }
     this.trail = [l.from]; this.steps = 0; this.pick = -1;
     this.over = false; this.won = false; this.settled = false; this.startAt = Date.now();
-    this.msg = TG2('点一个字母位，再从键盘挑新字母（{0} 步内到 {1}）', l.limit, l.to);
+    this.msg = TG2('点一个字母位，再从键盘挑新字母（{0} 步内到 {1}）', this.limit, l.to);
   }
   private left(): number { const n: number = this.limit - this.steps; return n > 0 ? n : 0; }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
