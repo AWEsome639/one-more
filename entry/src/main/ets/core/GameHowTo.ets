@@ -505,12 +505,12 @@ export const HOW_TO: Record<string, HowTo> = {
   },
   'gomoku': {
     zh: [
-      '15×15 棋盘，你执黑先下，目标是把五颗子连成一条线（横竖斜都算）',
+      '棋盘随难度为 11×11 / 15×15 / 20×20，你执黑先下，目标是把五颗子连成一条线（横竖斜都算）',
       '电脑会用启发式评分：能成五就直接赢，你要成五就先堵',
       '谁先连成五颗谁赢'
     ],
     en: [
-      'A 15×15 board; you play black and move first — line up five in a row, any direction',
+      'The board is 11×11 / 15×15 / 20×20 depending on difficulty; you play black and move first — line up five in a row, any direction',
       'The computer scores heuristically: it wins immediately if it can, and blocks you if you can',
       'Whoever makes five first wins'
     ]
@@ -3457,12 +3457,12 @@ export const HOW_TO: Record<string, HowTo> = {
   },
   'circuit_connect': {
     zh: [
-      '4×4 的元件盘，点一下就把该元件顺时针转 90°',
+      '元件盘随难度为 3×3 / 4×4 / 5×5，点一下就把该元件顺时针转 90°',
       '电源从左上角的左边进入，目标是让电流通到右下角那一格',
       '电流通到右下角、并且朝右出去算通关；步数用尽还没接通就失败'
     ],
     en: [
-      'A 4×4 component board — each tap rotates that component 90° clockwise',
+      'The board is 3×3 / 4×4 / 5×5 depending on difficulty — each tap rotates that component 90° clockwise',
       'Power enters from the left edge of the top-left cell; your goal is to carry it to the bottom-right cell',
       'Clear it when current reaches the bottom-right cell and exits rightward; run out of moves and you fail'
     ]
