@@ -62,7 +62,9 @@ export struct GKenken {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法（lives）：MAX_MOVES 按难度换算
-  @State private diffTotal: number = GameDiff.livesNow(MAX_MOVES);
+  // ★ 2026-11-28（第五批·中）：4×4 至少 16 次落子，livesNow(40) 困难档只有 24 步（只许 8 次改错）。
+  //   下限抬到 28 步。
+  @State private diffTotal: number = Math.max(GameDiff.livesNow(MAX_MOVES), 28);
   onFinish: (r: GameResult) => void = () => {};
 
   /** 出题时的完整解 */
@@ -113,7 +115,7 @@ export struct GKenken {
   }
 
   onRestart(): void {
-    this.diffTotal = GameDiff.livesNow(MAX_MOVES);
+    this.diffTotal = Math.max(GameDiff.livesNow(MAX_MOVES), 28);
     this.reset();
   }
 
