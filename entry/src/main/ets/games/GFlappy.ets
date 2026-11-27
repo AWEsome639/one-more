@@ -143,6 +143,12 @@ export struct GFlappy {
     }
   }
 
+  /** ★ 2026-11-28（第五批·中）：原来难度只改了「时间总量」而这个值没人用（死状态），
+   *  三档手感完全一样。让难度作用到通关管道数（8 / 12 / 16）。 */
+  private goalPipes(): number {
+    return GameDiff.sizeNow(PIPE_GOAL);
+  }
+
   private startLoop(): void {
     this.stopLoop();
     // ★★ 2026-10-13 真机 BUG 修复（奥森报「动画根本没有」）：
@@ -259,7 +265,7 @@ export struct GFlappy {
     this.pipes = moved;
 
     // ★★ 2026-10-14 无尽模式：穿满 GOAL 不再结束，改为【进入无尽】
-    if (this.score >= PIPE_GOAL && !this.endless) {
+    if (this.score >= this.goalPipes() && !this.endless) {
       this.endless = true;
       this.msg = TG('🎉 通关！进入无尽模式 —— 看你能穿多少根');
     }
@@ -708,7 +714,7 @@ export struct GFlappy {
       }
       .width('100%')
 
-      Text(TG2('穿 {0} 根管道通关；撞管道或撞地就结束（点场地也能扇翅膀）',Digits(String(PIPE_GOAL), this.langCode)))
+      Text(TG2('穿 {0} 根管道通关；撞管道或撞地就结束（点场地也能扇翅膀）',Digits(String(this.goalPipes()), this.langCode)))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
     }
@@ -730,7 +736,7 @@ export struct GFlappy {
     Column({ space: 2 }) {
       Text(kind === 0 ? TG('穿过') : (kind === 1 ? TG('用时') : TG('状态')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-      Text(kind === 0 ? this.score + ' / ' + PIPE_GOAL
+      Text(kind === 0 ? this.score + ' / ' + this.goalPipes()
         : (kind === 1 ? this.secs + Sec()
           : (this.over ? (this.won ? TG('通关') : TG('结束')) : TG('飞行中'))))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)
