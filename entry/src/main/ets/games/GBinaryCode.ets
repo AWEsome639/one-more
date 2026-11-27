@@ -317,8 +317,8 @@ export struct GBinaryCode {
       this.clearLevel();
       return;
     }
-    this.msg = TG2('当前 {0}（{1}）· ', String(v), this.bitsText()) +
-      (v > this.target ? TG2('大了 {0}', String(v - this.target)) : TG2('还差 {0}', String(this.target - v)));
+    this.msg = v > this.target ? TG2('当前 {0}（{1}）· 大了 {2}', String(v), this.bitsText(), String(v - this.target))
+      : TG2('当前 {0}（{1}）· 还差 {2}', String(v), this.bitsText(), String(this.target - v));
   }
 
   private clearLevel(): void {

@@ -285,7 +285,7 @@ export struct GSpatialCabinetMemory {
     if (this.round >= ROUNDS) {
       const win: boolean = this.hit >= 5;
       this.over = true; this.won = win;
-      this.msg = (win ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1} 轮", String(this.hit), String(ROUNDS));
+      this.msg = win ? TG2('🎉 通关 答对 {0}/{1} 轮', String(this.hit), String(ROUNDS)) : TG2('💤 结束 答对 {0}/{1} 轮', String(this.hit), String(ROUNDS));
       const res: GameResult = {
         gameId: 'spatial_cabinet_memory', solved: win, score: this.score,
         durationMs: Date.now() - this.startAt, levelReached: this.round

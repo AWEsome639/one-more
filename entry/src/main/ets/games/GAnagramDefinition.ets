@@ -324,7 +324,7 @@ export struct GAnagramDefinition {
     this.qIndex = this.qIndex + 1;
     if (this.qIndex >= QN) {
       this.over = true; this.won = this.right >= PASS;
-      this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, QN); this.finish(this.won);
+      this.msg = this.won ? TG2('🎉 通关：答对 {0} / {1}', this.right, QN) : TG2('💤 结束：答对 {0} / {1}', this.right, QN); this.finish(this.won);
       return;
     }
     this.feed = setTimeout(() => { this.feed = -1; this.load(); }, FEED_MS);

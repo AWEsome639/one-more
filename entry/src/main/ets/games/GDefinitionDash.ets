@@ -306,7 +306,7 @@ export struct GDefinitionDash {
   private end(): void {
     if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; }
     this.over = true; this.won = this.correct >= PASS && this.miss < MISS_MAX;
-    this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.correct, this.diffTotal);
+    this.msg = this.won ? TG2('🎉 通关：答对 {0} / {1}', this.correct, this.diffTotal) : TG2('💤 结束：答对 {0} / {1}', this.correct, this.diffTotal);
     if (this.done) { return; }
     this.done = true;
     const r: GameResult = { gameId: 'definition_dash', solved: this.won, score: this.score,
