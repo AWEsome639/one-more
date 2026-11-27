@@ -87,8 +87,9 @@ export struct GMinesweeper {
 
   // ★ 难度作用到玩法：雷数按难度（简单 7 / 普通 10 / 困难 13）
   //   MINES 是模块常量，加载时就算死了 ⇒ 必须用运行时的 this.minesTotal
-  private minesTotal: number = GameDiff.sizeNow(MINES);
-  private safeTotal: number = SIDE * SIDE - GameDiff.sizeNow(MINES);
+  // ★ 2026-11-27（第三批低置信度）：两个字段原来不是 @State，难度切换后 HUD 可能停留在旧档。
+  @State private minesTotal: number = GameDiff.sizeNow(MINES);
+  @State private safeTotal: number = SIDE * SIDE - GameDiff.sizeNow(MINES);
   onFinish: (r: GameResult) => void = () => {};
 
   /** 代打计时器（-1 = 未运行）。必须 @State */

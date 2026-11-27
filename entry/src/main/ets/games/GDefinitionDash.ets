@@ -343,7 +343,7 @@ export struct GDefinitionDash {
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text((this.correct + '/' + PASS)).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        Text((this.correct + '/' + Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS)))).fontSize(FontSize.md).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         .scale({ x: this.k, y: this.k })
         }
         .layoutWeight(1).padding(Space.xs).backgroundColor(this.theme.surface)
