@@ -280,7 +280,9 @@ export struct GStopSignal {
     this.done = true;
     this.clearAll();
     const avg: number = this.avg();
-    const win: boolean = this.right >= 10 && avg < LIMIT_MS;
+    // ★ 2026-11-28（第五批）：简单档 8 回合 < 固定 10 对 ⇒ 必败；按回合缩放。
+    const need: number = Math.max(1, Math.ceil(this.diffTotal * 10 / 12));
+    const win: boolean = this.right >= need && avg < LIMIT_MS;
     this.over = true; this.won = win;
     this.msg = (win ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("正确 {0}/{1}", String(this.right), String(this.diffTotal))
       + TG2(' · 冲均值 {0} ms', String(avg));

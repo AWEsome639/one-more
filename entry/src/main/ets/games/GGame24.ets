@@ -62,7 +62,9 @@ export struct GGame24 {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(TARGET);
+  // ★ 2026-11-28（第五批）：目标值原来按 sizeNow(24)=17/24/31 变，而 4 处文案/提示仍印 24 ⇒
+  //   「按提示拼出 24」被判错。目标固定 24（游戏名就是 24）。
+  @State private diffTotal: number = TARGET;
   onFinish: (r: GameResult) => void = () => {};
 
   @State private items: Frac[] = [];        // 还没合并的数（前 4 个是原题）
@@ -93,7 +95,7 @@ export struct GGame24 {
 
   /** 宿主点了「换一局」 */
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(TARGET);
+    this.diffTotal = TARGET;
     this.reset();
   }
 

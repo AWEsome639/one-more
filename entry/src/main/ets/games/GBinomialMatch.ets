@@ -285,6 +285,9 @@ export struct GBinomialMatch {
         pick.push(ks[i]);
       }
     }
+    // ★ 2026-11-28（第五批）：n=3..7 时 C(n,k) 唯一值最多 4 个，而困难档要 5 对 ⇒ 100% 必败。
+    //   配对数收敛到「真实能凑出的唯一系数个数」。
+    this.diffTotal = pick.length;
     const terms: Term[] = [];
     for (let i = 0; i < pick.length; i++) {
       const t: Term = { k: pick[i], coef: coefs[i], text: termText(this.n, pick[i]) };

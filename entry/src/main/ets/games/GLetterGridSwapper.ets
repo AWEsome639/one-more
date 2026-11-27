@@ -48,7 +48,9 @@ export struct GLetterGridSwapper {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(3);
+  // ★ 2026-11-28（第五批）：词库固定 9 字母，网格按 sizeNow(3)=2/3/4 变 ⇒ 简单档 4 格有 5 个字母动不了、
+  //   困难档 16 格点幻影格会把 undefined 换进数组。网格固定 3×3（与词库同源）。
+  @State private diffTotal: number = N;
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
 
@@ -72,7 +74,7 @@ export struct GLetterGridSwapper {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(3);
+    this.diffTotal = N;
      this.reset(); }
   private reset(): void {
     const w: string = WORDS[Math.floor(Math.random() * WORDS.length)];

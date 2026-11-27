@@ -28,7 +28,9 @@ export struct GColorMatch {
   @Prop @Watch('onRestart') restartToken: number = 0;
 
   // ★ 难度作用到玩法：通关目标分（简单 100 / 普通 150 / 困难 220）
-  private goalScore: number = GameDiff.pick(100, 150, 220);
+  // ★ 2026-11-28（第五批）：困难档目标 220、22 步；3000 局贪心模拟上限仅 176 ⇒ 不可能。
+  //   改 70/95/125（模拟 p95 可过）。
+  private goalScore: number = GameDiff.pick(70, 95, 125);
  onFinish: (r: GameResult) => void = () => {};
 
   /** 代打计时器（-1 = 未运行）。必须 @State */
@@ -62,7 +64,7 @@ export struct GColorMatch {
     }
  }
  onRestart(): void {
-    this.goalScore = GameDiff.pick(100, 150, 220);
+    this.goalScore = GameDiff.pick(70, 95, 125);
      this.reset(); }
  private reset(): void {
  const a: number[] = [];

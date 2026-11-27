@@ -256,7 +256,8 @@ export struct GDigitSpanReverse {
   }
   private advance(): void {
     if (this.trialNo >= this.diffTotal) {
-      this.won = this.right >= NEED; this.over = true;
+      // ★ 2026-11-28（第五批）：简单档 4 轮 < NEED 5 ⇒ 必败；按轮数缩放。
+      this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / TRIALS)); this.over = true;
       this.msg = (this.won ? TG('🎉 通关！') : TG('💤 本局结束：')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
       this.finish();
       return;

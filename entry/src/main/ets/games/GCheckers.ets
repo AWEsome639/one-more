@@ -414,14 +414,17 @@ export struct GCheckers {
     this.clearTimer();
     this.diffTotal = this.pickSize();
     const b: number[] = new Array<number>(this.cellCount()).fill(EMPTY);
+    // ★ 2026-11-28（第五批）：4×4 时双方各摆两行会把 8 个深色格占满 ⇒ 开局 0 合法步、全局卡死。
+    //   小盘（≤4）每方只摆 1 行；标准 6×6/8×8 仍摆 2 行。
+    const setupRows: number = this.diffTotal <= 4 ? 1 : 2;
     for (let r = 0; r < this.diffTotal; r++) {
       for (let c = 0; c < this.diffTotal; c++) {
         if (!this.dark(r, c)) {
           continue;
         }
-        if (r <= 1) {
+        if (r < setupRows) {
           b[this.idx(r, c)] = A_MAN;
-        } else if (r >= this.diffTotal - 2) {
+        } else if (r >= this.diffTotal - setupRows) {
           b[this.idx(r, c)] = P_MAN;
         }
       }

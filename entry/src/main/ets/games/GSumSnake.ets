@@ -122,7 +122,8 @@ export struct GSumSnake {
       nums.push(1 + Math.floor(Math.random() * 9));
     }
     // 随机自避路径：它的和就是目标 ⇒ 保证有解
-    const head: number = Math.floor(Math.random() * CELLS);
+    // ★ 2026-11-28（第五批）：简单档 3×3=9 格，蛇头却从固定 16 格里取 ⇒ NaN 目标。
+    const head: number = Math.floor(Math.random() * (this.diffTotal * this.diffTotal));
     const p: number[] = [head];
     const want: number = 4 + Math.floor(Math.random() * 4);
     let guard: number = 0;
