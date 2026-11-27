@@ -3399,12 +3399,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '圆和菱形会交替出现，偶尔会连续两次相同 —— 那就是「反转」',
       '看到反转立刻点「反转！」；正常交替时不要点（点了算误报）',
-      '24 帧内命中 5 次以上、且误报不超过 2 次算通关'
+      '24 帧内命中 4 次以上、且误报不超过 2 次算通关'
     ],
     en: [
       'Circles and diamonds alternate, and now and then the same one appears twice in a row — that is the reversal',
       'Tap “reversal!” the moment you spot one; on normal alternation do not tap — tapping then counts as a false alarm',
-      'Clear it with at least 5 hits across 24 frames and no more than 2 false alarms'
+      'Clear it with at least 4 hits across 24 frames and no more than 2 false alarms'
     ]
   },
   'angle_finder': {
