@@ -254,7 +254,8 @@ export struct GRuleSwitcher {
     if (this.done) { return; }
     const a: number = this.avg();
     this.clearTo();
-    this.done = true; this.over = true; this.won = this.right >= WIN_RIGHT && a < WIN_AVG;
+    // ★ 2026-11-27（第四批）：简单档 11 题 < WIN_RIGHT 12 ⇒ 必败；按题数缩放。
+    this.done = true; this.over = true; this.won = this.right >= Math.max(1, Math.round(WIN_RIGHT * this.diffTotal / TOTAL)) && a < WIN_AVG;
     this.msg = (this.won ? TG('🎉 通关 · 对 ') : TG('💤 结束 · 对 ')) +TG2("{0}/{1} · 平均 {2} ms", String(this.right), String(this.diffTotal), String(a));
     const r: GameResult = {
       gameId: 'rule_switcher', solved: this.won, score: Math.max(0, this.right * 100 - Math.round(a / 20)),
@@ -338,7 +339,8 @@ export struct GRuleSwitcher {
         .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L327'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：15 题答对 ≥ 12 且平均 < 1600 ms（每 3 题换一次规则）'))
+      // 复用已有模板键（避免新增 10 语言）：答案门槛按本档题数算。
+      Text(TG2('判定：答对 ≥ {0}/{1} 且平均 < {2} ms', String(Math.max(1, Math.round(WIN_RIGHT * this.diffTotal / TOTAL))), String(this.diffTotal), '1600'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }
     .onTouch((e: TouchEvent) => {

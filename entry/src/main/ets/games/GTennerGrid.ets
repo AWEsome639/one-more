@@ -130,7 +130,7 @@ export struct GTennerGrid {
     let guard: number = 0;
     while (givens < 55 && guard < 400) {
       guard++;
-      const i: number = Math.floor(Math.random() * CELLS);
+      const i: number = Math.floor(Math.random() * (this.diffTotal * this.diffTotal));
       if (fixed[i] === 0) {
         grid[i] = sol[i];
         fixed[i] = 1;
@@ -268,7 +268,8 @@ export struct GTennerGrid {
     next[idx] = d;
     this.grid = next;
     this.placed += was < 0 ? 1 : 0;
-    if (this.placed === CELLS) {
+    // ★ 2026-11-27（第四批）：通关判据原来恒 100 格，而盘面是 diffTotal²（49/100/169）。
+    if (this.placed === this.diffTotal * this.diffTotal) {
       this.over = true;
       this.won = true;
       const sec: number = Math.floor((Date.now() - this.startAt) / 1000);
@@ -559,7 +560,7 @@ export struct GTennerGrid {
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Text((TG('已填'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.placed) + '/' + String(CELLS)))
+        Text((String(this.placed) + '/' + String(this.diffTotal * this.diffTotal)))
         .fontSize(FontSize.md)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

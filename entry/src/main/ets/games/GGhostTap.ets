@@ -261,7 +261,8 @@ export struct GGhostTap {
 
   private judge(): void {
     this.clearAll();
-    this.ghostIdx = -1; this.over = true; this.won = this.hitN >= WIN_HITS;
+    // ★ 2026-11-27（第四批）：简单档幽灵数 11 < WIN_HITS 12 ⇒ 必败；按本档数量缩放。
+    this.ghostIdx = -1; this.over = true; this.won = this.hitN >= Math.max(1, Math.round(WIN_HITS * this.diffTotal / GHOSTS));
     this.msg = TG2(this.won ? '🎉 通关！抓到 {0}/{1}' : '💤 结束，抓到 {0}/{1}',Digits(String(this.hitN), this.langCode),Digits(String(this.diffTotal), this.langCode));
     if (!this.done) {
       this.done = true;
@@ -368,7 +369,7 @@ export struct GGhostTap {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
-      Text(TG2('判定：{0} 只里抓到 {1} 只即通关，点偏会拖慢节奏',Digits(String(this.diffTotal), this.langCode),Digits(String(WIN_HITS), this.langCode)))
+      Text(TG2('判定：{0} 只里抓到 {1} 只即通关，点偏会拖慢节奏',Digits(String(this.diffTotal), this.langCode),Digits(String(Math.max(1, Math.round(WIN_HITS * this.diffTotal / GHOSTS))), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

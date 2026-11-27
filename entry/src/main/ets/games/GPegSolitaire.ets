@@ -69,7 +69,9 @@ export struct GPegSolitaire {
   @State private sel: number = -1;
   @State private dests: number[] = [];
   // ★ 难度作用到玩法（本局次数/起始量按难度换算）
-  private total: number = GameDiff.livesNow(START_PEGS);
+  // ★ 2026-11-27（第四批）：盘面恒 32 颗钉，用 livesNow(32)=48/32/19 会把钉数设成盘外值
+  //   （简单档 48 颗、困难档 19 颗 ⇒ pegs===1 永不成立/负数）。钉数固定 = 盘面常量。
+  private total: number = START_PEGS;
   @State private pegs: number = 0;
   @State private steps: number = 0;
   @State private over: boolean = false;
@@ -95,7 +97,7 @@ export struct GPegSolitaire {
 
   /** 宿主点了「换一局」 */
   onRestart(): void {
-    this.total = GameDiff.livesNow(START_PEGS);
+    this.total = START_PEGS;
     this.reset();
   }
 

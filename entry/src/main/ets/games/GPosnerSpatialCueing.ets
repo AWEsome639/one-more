@@ -247,7 +247,8 @@ export struct GPosnerSpatialCueing {
 
   private next(): void {
     if (this.trial >= this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-27（第四批）：简单档试次 11 < PASS 12 ⇒ 全对也判负；按试次缩放。
+    this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TRIALS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}，平均 {2} ms", this.right, this.diffTotal, this.avgRt());
       this.clearAll(); this.finish(this.won);
       return;

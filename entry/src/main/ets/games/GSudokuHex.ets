@@ -249,6 +249,13 @@ export struct GSudokuHex {
     this.stopTimer();
   }
 
+  /** 本档按键 1..diffTotal */
+  private keysArr(): number[] {
+    const a: number[] = [];
+    for (let i = 1; i <= this.diffTotal; i++) { a.push(i); }
+    return a;
+  }
+
   private reset(): void {
     this.stopTimer();
     const p: Puzzle = makePuzzle(this.diffTotal);
@@ -680,7 +687,8 @@ export struct GSudokuHex {
       .borderRadius(Radius.lg)
 
       Row({ space: Space.xs }) {
-        ForEach([1, 2, 3, 4, 5, 6], (v: number) => {
+        // ★ 2026-11-27（第四批）：键盘写死 1..6，困难档 8×8 需要 1..8。
+        ForEach(this.keysArr(), (v: number) => {
           Button(String(v))
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })
             .fontSize(FontSize.lg)

@@ -145,7 +145,8 @@ export struct GNavonHierarchical {
         if (AppClock.isPaused()) { return; }
         if (this.done || this.over) { return; }
         const used: number = Math.floor((Date.now() - this.startAt) / 1000);
-        this.left = Math.max(0, LIMIT - used);
+        // ★ 2026-11-27（第四批）：时限已按难度换算（this.total），这里仍用常量 LIMIT ⇒ 倒计时跳变。
+    this.left = Math.max(0, this.total - used);
         if (this.left === 0) {
           this.over = true;
           this.done = true;
