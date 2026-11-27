@@ -745,13 +745,13 @@ export const HOW_TO: Record<string, HowTo> = {
   },
   'sudoku_hex': {
     zh: [
-      '6×6 的格子，每行、每列都要出现 1~6 且不重复',
-      '2 行 × 3 列为一宫，每一宫里也要 1~6 不重复',
-      '点空格选中再点下方 1~6 填入，点「✕」擦除；失误满 5 次就失败'
+      '网格随难度 4×4 / 6×6 / 8×8；每行、每列都要出现 1~N 且不重复',
+      '每个粗线宫里的数字也不能重复',
+      '点空格选中再点下方数字填入，点「✕」擦除；失误满 5 次就失败'
     ],
     en: [
-      'A 6×6 grid where every row and column must contain 1–6 with no repeats',
-      'Each 2×3 box must also contain 1–6 exactly once',
+      'The grid is 4×4 / 6×6 / 8×8 depending on difficulty; every row and column must contain 1–N with no repeats',
+      'Each thick-lined box must also contain the digits without repeats',
       'Tap a cell then a digit below to fill it, or ✕ to erase; five mistakes and you fail'
     ]
   },
@@ -1357,14 +1357,14 @@ export const HOW_TO: Record<string, HowTo> = {
   },
   'tenner_grid': {
     zh: [
-      '10×10 的盘，每行、每列都要恰好含 0~9 各一次',
+      '盘面随难度 7×7 / 10×10 / 13×13；每行、每列都要含 0 到 N-1 各一次',
       '点空格选中，再点数字键盘填入；再点同一个数字就是擦掉',
-      '填满 100 格且无冲突算通关；冲突满 3 次就失败（冲突的数不会落盘）'
+      '填满本档所有格子且无冲突算通关；冲突满 3 次就失败（冲突的数不会落盘）'
     ],
     en: [
-      'A 10×10 grid where every row and column must contain 0–9 exactly once',
+      'The grid is 7×7 / 10×10 / 13×13 depending on difficulty; every row and column must contain 0 to N-1 exactly once',
       'Tap a cell then a digit to fill it; tapping the same digit again erases',
-      'Fill all 100 cells with no conflict to clear it; three conflicts and you fail — a conflicting digit never lands'
+      'Fill every cell of this board with no conflict to clear it; three conflicts and you fail — a conflicting digit never lands'
     ]
   },
   'tents_and_trees': {
@@ -2319,12 +2319,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '4×4 的格子里会有幽灵一闪即逝',
       '趁它还在的时候点中它；越往后它闪得越快',
-      '15 只幽灵里抓到 12 只以上算通关'
+      '幽灵总数随难度（11 / 15 / 20 只），抓到约八成算通关'
     ],
     en: [
       'A ghost flashes briefly somewhere on a 4×4 grid',
       'Tap it while it is still there — and it gets faster as you go',
-      'Catch at least 12 of the 15 ghosts to clear it'
+      'The ghost count depends on difficulty (11 / 15 / 20); catch about 80% to clear it'
     ]
   },
   'grocery_list': {
