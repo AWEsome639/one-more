@@ -105,7 +105,9 @@ export struct GMazeNav3d {
 
   /** 生成一份候选地图（层内随机游走 + 终点必通 + 层间通道） */
   private genWalls3d(): number[] {
-    const w = new Array<number>(CELLS).fill(1);
+    // ★ 2026-11-28（第六批·中）：数组按常量 3 层分配（75），而难度层数可到 4（索引 75..99）⇒ 越界写入/读不到。
+    //   按最大层数分配。
+    const w = new Array<number>(W * H * 4).fill(1);
     for (let z = 0; z < this.diffTotal; z++) {
       let cx = 0;
       let cy = 0;
