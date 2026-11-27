@@ -344,7 +344,8 @@ export struct GBinaryMatrixRank {
     }
     if (this.round >= this.diffTotal) {
       this.over = true;
-      this.won = this.right >= PASS;
+      // ★ 2026-11-27（规则审计第二批·中置信度）：题数随难度缩放（简单 6），PASS 恒 6 ⇒ 简单档要 100%。
+    this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL));
       this.msg = this.won
         ? TG2('🎉 答对 {0}/{1}，通关！', String(this.right), String(this.diffTotal))
         : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(PASS));

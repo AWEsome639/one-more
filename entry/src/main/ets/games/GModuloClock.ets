@@ -358,7 +358,8 @@ export struct GModuloClock {
       return;
     }
     if (this.round >= this.diffTotal) {
-      const ok: boolean = this.right >= PASS;
+      // ★ 2026-11-27（中置信度）：简单 6 题要 6 对（100%）；按题数缩放。
+    const ok: boolean = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = ok ? TG2('🎉 答对 {0}/{1} 题，通关！', String(this.right), String(this.diffTotal))
         : TG2('答对 {0}/{1} 题，还差一点', String(this.right), String(this.diffTotal));
       this.finish(ok);

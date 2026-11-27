@@ -256,7 +256,8 @@ export struct GSemanticAssociation {
       this.msg = '✅ ' + this.cue + ' ↔ ' + this.opts[i];
     } else { this.msg = TG2('❌ 更贴切的是 {0}', this.opts[this.ans]); }
     if (this.qi + 1 >= this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-27（中置信度）：简单 7 题要 7 对（100%）；按题数缩放。
+    this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, this.diffTotal);
       this.finish(this.won); return;
     }

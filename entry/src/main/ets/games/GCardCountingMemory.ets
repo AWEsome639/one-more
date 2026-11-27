@@ -304,7 +304,8 @@ export struct GCardCountingMemory {
       this.nextTo = -1;
       if (this.round >= this.diffTotal) {
         this.over = true;
-        this.won = this.right >= NEED;
+        // ★ 2026-11-27（中置信度）：简单 6 轮要 6 对（100%）；按轮数缩放。
+    this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / ROUNDS));
         this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
         this.clearAll();
         this.finish(this.won);

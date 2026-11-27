@@ -103,7 +103,8 @@ export struct GSpellingSprint {
     if (this.over) { return; }
     this.leftS = this.leftS - 1;
     if (this.leftS <= 0) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-27（中置信度）：简单 8 题要 8 对（100%）；按题数缩放。
+    this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL));
       this.msg = TG2('⌛ 时间到 —— 答对 {0} / {1}', this.right, this.diffTotal);
       this.finish(this.won);
     }
@@ -263,7 +264,8 @@ export struct GSpellingSprint {
     }
     this.input = '';
     if (this.qi + 1 >= this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-27（中置信度）：简单 8 题要 8 对（100%）；按题数缩放。
+    this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, this.diffTotal);
       this.finish(this.won); return;
     }
