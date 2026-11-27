@@ -376,7 +376,7 @@ export struct GOddOneOut {
         .onBlur(() => { if (this.tvFocus === 'L354') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L354'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：10 题答对 ≥ 8 题 · 6→9→12 格逐轮变难'))
+      Text(TG('判定：答对数达到本档通关线 · 6→9 格逐轮变难'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         .width('100%')

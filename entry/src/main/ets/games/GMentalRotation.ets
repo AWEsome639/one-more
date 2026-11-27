@@ -482,7 +482,7 @@ export struct GMentalRotation {
         .onBlur(() => { if (this.tvFocus === 'L433') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L433'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：10 题答对 ≥ 8 题 · 提示：不对称图形转过 90/180/270° 的样子'))
+      Text(TG('判定：答对数达到本档通关线 · 提示：不对称图形转过 90/180/270° 的样子'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         .width('100%')

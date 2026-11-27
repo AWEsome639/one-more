@@ -457,7 +457,7 @@ export struct GMirrorImage {
         .onBlur(() => { if (this.tvFocus === 'L443') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L443'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：10 题答对 ≥ 8 题 · 干扰项是「上下翻转」，别与左右镜像混了'))
+      Text(TG('判定：答对数达到本档通关线 · 干扰项是「上下翻转」，别与左右镜像混了'))
         .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

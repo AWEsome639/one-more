@@ -405,7 +405,7 @@ export struct GOddRotation {
         .onBlur(() => { if (this.tvFocus === 'L387') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L387'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：10 题答对 ≥ 8 题 · 图案角度每轮随机，别看错基准'))
+      Text(TG('判定：答对数达到本档通关线 · 图案角度每轮随机，别看错基准'))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
         .width('100%')
