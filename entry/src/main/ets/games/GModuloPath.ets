@@ -127,7 +127,16 @@ export struct GModuloPath {
       }
     }
     if (path.length < PATH_LEN) {
-      path = [0, 1, 2, 3, 4, 5];   // 兜底：第一行直线
+      // ★ 2026-11-28（第五批·中）：原来的 [0,1,2,3,4,5] 在 5 宽盘上第 6 格是 (row1,col0)，
+      //   与第 5 格 (row0,col4) 不相邻 ⇒ 兜底路径本身违反 near 规则。改成蛇形取前 PATH_LEN 格。
+      const snake: number[] = [];
+      for (let r = 0; r < GRID; r++) {
+        for (let k = 0; k < GRID; k++) {
+          const c: number = (r % 2 === 0) ? k : (GRID - 1 - k);
+          snake.push(r * GRID + c);
+        }
+      }
+      path = snake.slice(0, PATH_LEN);
     }
     const base: number = randInt(0, MOD - 1);
     for (let i = 0; i < path.length; i++) {

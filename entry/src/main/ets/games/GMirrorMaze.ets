@@ -144,10 +144,9 @@ export struct GMirrorMaze {
     this.wall = b.wall;
     this.goal = b.goal;
     this.pos = b.start;
+    // ★ 2026-11-28（第五批·中）：原来 short<6 时把最短路径伪造成 8，
+    //   结算里显示的是假「最短」，上限也跟着虚高。直接用 BFS 真值。
     this.short = bfs(b.wall, b.goal, b.start, this.diffTotal);
-    if (this.short < 6) {
-      this.short = 8;
-    }
     this.limit = this.short + 7;
     this.steps = 0;
     this.over = false;

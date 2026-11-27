@@ -66,7 +66,9 @@ export struct GHueSort {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = Math.max(GameDiff.livesNow(MAX_MOVES), REQUIRED);
+  // ★ 2026-11-28（第五批·中）：困难档给 15 步 = 16 格最坏交换数（零余量，一步错就必输）。
+  //   下限抬到 REQUIRED + 3。
+  @State private diffTotal: number = Math.max(GameDiff.livesNow(MAX_MOVES), REQUIRED + 3);
   @State private pulse: number = 1;   // ★ 2026-10-16 得分跳动
   onFinish: (r: GameResult) => void = () => {};
 
@@ -83,7 +85,7 @@ export struct GHueSort {
     }
   }
   onRestart(): void {
-    this.diffTotal = Math.max(GameDiff.livesNow(MAX_MOVES), REQUIRED);
+    this.diffTotal = Math.max(GameDiff.livesNow(MAX_MOVES), REQUIRED + 3);
      this.reset(); }
 
   private reset(): void {

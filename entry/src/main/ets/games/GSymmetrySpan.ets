@@ -85,7 +85,9 @@ export struct GSymmetrySpan {
   private makeRound(): void {
     const half: number[] = [];
     for (let r = 0; r < this.diffTotal; r++) {
-      for (let c = 0; c < this.diffTotal / 2; c++) { half.push(r * this.diffTotal + c); }
+      // ★ 2026-11-28（第五批·中）：奇数边长（3/5）时中列镜像到自己，只点亮 1 格，
+      //   凑不满「SPAN 格对称」。只用真正的成对列（c < floor(n/2)）。
+      for (let c = 0; c < Math.floor(this.diffTotal / 2); c++) { half.push(r * this.diffTotal + c); }
     }
     const g: number[] = new Array<number>(this.diffTotal * this.diffTotal).fill(0);
     let put: number = 0; let guard: number = 0;
