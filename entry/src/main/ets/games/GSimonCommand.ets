@@ -43,7 +43,9 @@ export struct GSimonCommand {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.livesNow(10);
+  // ★ 2026-11-27（规则审计第二批）：通关题数原来用 livesNow(10)（简单 15 / 困难 6，方向反了），
+  //   应使用「数量」换算：简单 7 / 普通 10 / 困难 13。
+  @State private diffTotal: number = GameDiff.sizeNow(10);
   onFinish: (r: GameResult) => void = () => {};
   @State hasWord: boolean = false; @State color: number = 0; @State correct: number = 0;
   @State errors: number = 0; @State left: number = LIMIT_MS; @State phase: string = 'play';
@@ -59,7 +61,7 @@ export struct GSimonCommand {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.livesNow(10);
+    this.diffTotal = GameDiff.sizeNow(10);
      this.reset(); }
   aboutToDisappear(): void { this.stopAll(); }
   private stopAll(): void {

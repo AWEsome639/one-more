@@ -21,8 +21,21 @@ const M: number = 4; const CELLS: number = M * M;
 //   而数组原来按 CELLS = 16 开 ⇒【困难档必越界】✗）
 const MAX_N: number = 6;
 const MAX_CELLS: number = MAX_N * MAX_N; const ROUNDS: number = 6; const NEED: number = 4;
-const ROWS: number[] = [0, 1, 2, 3];
-const PATH: number[] = [5, 6, 9, 10, 1, 2, 4, 8, 0, 3, 7, 11, 12, 13, 14, 15];   // 生长规律的固定次序
+// ROWS 由本档边长决定（见组件内 rowsArr()）
+// ★ 2026-11-27（规则审计第二批）：原来 PATH 是固定 4×4 的 16 格次序，但棋盘是
+//   diffTotal×diffTotal（简单 3 / 普通 4 / 困难 5）⇒ 简单档会点到 9 以后的格子（不显示）。
+//   改为按边长生成「中心向外」的次序，保证每个 n 的前缀都在盘面内。
+function growPath(size: number): number[] {
+  const a: number[] = [];
+  for (let r = 0; r < size; r++) { for (let c = 0; c < size; c++) { a.push(r * size + c); } }
+  const mid: number = (size - 1) / 2;
+  a.sort((x: number, y: number): number => {
+    const dx: number = (Math.floor(x / size) - mid) * (Math.floor(x / size) - mid) + (x % size - mid) * (x % size - mid);
+    const dy: number = (Math.floor(y / size) - mid) * (Math.floor(y / size) - mid) + (y % size - mid) * (y % size - mid);
+    return dx === dy ? x - y : dx - dy;
+  });
+  return a;
+}
 /** ★ 2026-11-26（i18n 审计）：模块级 TG 常量只在加载时求值一次，切语言后不更新。
  *  改为函数：渲染到哪取到哪（本文件引用已改成 RULE_NAMES()）。 */
 function RULE_NAMES(): string[] {
@@ -53,10 +66,11 @@ function mirrorH(a: number[], n: number): number[] {
   for (let i = 0; i < n * n; i++) { out[i] = a[Math.floor(i / n) * n + (n - 1 - i % n)]; }
   return out;
 }
-/** 按 PATH 次序点亮 n 格 */
-function grow(n: number): number[] {
+/** 按「中心向外」次序点亮 n 格（size = 本档棋盘边长） */
+function grow(n: number, size: number): number[] {
   const out: number[] = new Array<number>(MAX_CELLS).fill(0);
-  for (let i = 0; i < n && i < PATH.length; i++) { out[PATH[i]] = 1; }
+  const path: number[] = growPath(size);
+  for (let i = 0; i < n && i < path.length; i++) { out[path[i]] = 1; }
   return out;
 }
 function sig(a: number[]): string { return a.join(''); }
@@ -100,11 +114,18 @@ export struct GShapeShifter {
      this.reset(); }
   aboutToDisappear(): void { this.stopTimer(); }
   private stopTimer(): void { if (this.nextTimer >= 0) { clearTimeout(this.nextTimer); this.nextTimer = -1; } }
+  /** 本档棋盘的 0..diffTotal-1 */
+  private rowsArr(): number[] {
+    const a: number[] = [];
+    for (let i = 0; i < this.diffTotal; i++) { a.push(i); }
+    return a;
+  }
+
   private reset(): void {
     this.stopTimer(); this.asked = 0; this.hits = 0; this.picked = -1;
     this.over = false; this.won = false; this.done = false; this.startAt = Date.now();
-    this.seq = [grow(3), grow(4), grow(5), grow(6)];
-    this.opts = [grow(7), rot(grow(6), this.diffTotal), shiftR(grow(6), this.diffTotal), mirrorH(grow(6), this.diffTotal)];
+    this.seq = [grow(3, this.diffTotal), grow(4, this.diffTotal), grow(5, this.diffTotal), grow(6, this.diffTotal)];
+    this.opts = [grow(7, this.diffTotal), rot(grow(6, this.diffTotal), this.diffTotal), shiftR(grow(6, this.diffTotal), this.diffTotal), mirrorH(grow(6, this.diffTotal), this.diffTotal)];
     this.ruleName = RULE_NAMES()[2]; this.answerAt = 0;
     this.note = TG(TG(TG('看这 4 个图，第 5 个该是哪个？')));
     this.newRound();
@@ -115,8 +136,8 @@ export struct GShapeShifter {
       const seq: number[][] = []; let ans: number[] = [];
       if (rule === 2) {
         const n0: number = 3 + Math.floor(Math.random() * 2);
-        for (let i = 0; i < 4; i++) { seq.push(grow(n0 + i)); }
-        ans = grow(n0 + 4);
+        for (let i = 0; i < 4; i++) { seq.push(grow(n0 + i, this.diffTotal)); }
+        ans = grow(n0 + 4, this.diffTotal);
       } else {
         let cur: number[] = BLOBS[Math.floor(Math.random() * BLOBS.length)];
         for (let i = 0; i < 4; i++) { seq.push(cur); cur = rule === 0 ? rot(cur, this.diffTotal) : shiftR(cur, this.diffTotal); }
@@ -316,9 +337,9 @@ export struct GShapeShifter {
         ForEach([0, 1, 2, 3], (i: number) => {
           Column({ space: 2 }) {
             Column() { Column({ space: 2 }) {
-            ForEach(ROWS, (r: number) => {
+            ForEach(this.rowsArr(), (r: number) => {
             Row({ space: 2 }) {
-            ForEach(ROWS, (c: number) => {
+            ForEach(this.rowsArr(), (c: number) => {
             Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
             .backgroundColor(this.cellColor((this.seq[i]), (-1), r * this.diffTotal + c))
             }, (c: number) => 'gc' + c)
@@ -333,9 +354,9 @@ export struct GShapeShifter {
       Row({ space: Space.sm }) {
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
-        ForEach(ROWS, (r: number) => {
+        ForEach(this.rowsArr(), (r: number) => {
         Row({ space: 2 }) {
-        ForEach(ROWS, (c: number) => {
+        ForEach(this.rowsArr(), (c: number) => {
         Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(0)]), ((0)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
@@ -356,9 +377,9 @@ export struct GShapeShifter {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((0)); }); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
-        ForEach(ROWS, (r: number) => {
+        ForEach(this.rowsArr(), (r: number) => {
         Row({ space: 2 }) {
-        ForEach(ROWS, (c: number) => {
+        ForEach(this.rowsArr(), (c: number) => {
         Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(1)]), ((1)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
@@ -381,9 +402,9 @@ export struct GShapeShifter {
       //   ⇒ opts[2]/opts[3] **根本点不到**（约一半的题无解）。并为**一行四张**：卡宽 1205→587 ⇒ 卡高 858→426。
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
-        ForEach(ROWS, (r: number) => {
+        ForEach(this.rowsArr(), (r: number) => {
         Row({ space: 2 }) {
-        ForEach(ROWS, (c: number) => {
+        ForEach(this.rowsArr(), (c: number) => {
         Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(2)]), ((2)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)
@@ -404,9 +425,9 @@ export struct GShapeShifter {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tick(); this.pick((2)); }); })
         Column({ space: 2 }) {
         Column() { Column({ space: 2 }) {
-        ForEach(ROWS, (r: number) => {
+        ForEach(this.rowsArr(), (r: number) => {
         Row({ space: 2 }) {
-        ForEach(ROWS, (c: number) => {
+        ForEach(this.rowsArr(), (c: number) => {
         Stack().layoutWeight(1).aspectRatio(1).borderRadius(Radius.xs)
         .backgroundColor(this.cellColor((this.opts[(3)]), ((3)), r * this.diffTotal + c))
         }, (c: number) => 'gc' + c)

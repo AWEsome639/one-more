@@ -117,7 +117,9 @@ export struct GNim {
 
   private reset(): void {
     this.clearAi();
-    this.piles = [3, 5, 7];
+    // ★ 2026-11-27（规则审计第二批）：原来无条件写死 [3,5,7]，startPiles() 的难度初始堆
+    //   在每局开始时立刻被覆盖 ⇒ 三档实际都是 3/5/7。
+    this.piles = GNim.startPiles();
     this.turn = 0;
     this.moves = 0;
     this.over = false;

@@ -19,14 +19,16 @@ const NB: number = 2; const NF: number = 3; const NX: number = 1; const MAX: num
 const RG: number[] = [0, 1, 2, 3, 4, 5, 6];
 
 /** 走一遍光束：返回途经格子，出口坐标写进 out */
-function walk(g: number[], e: number[], out: number[]): number[] {
+// ★ 2026-11-27（规则审计第二批）：原来 walk() 固定按 GS=7 的坐标走，但棋盘边长是
+//   diffTotal（简单 5 / 普通 7 / 困难 9）⇒ 两套坐标。改成把边长传进来。
+function walk(g: number[], e: number[], out: number[], n: number): number[] {
   let r: number = e[0]; let c: number = e[1]; let d: number = e[2];
   const p: number[] = [];
   for (let s = 0; s < 160; s++) {
     r = r + (d === 0 ? -1 : (d === 2 ? 1 : 0));
     c = c + (d === 1 ? 1 : (d === 3 ? -1 : 0));
-    if (r < 0 || r >= GS || c < 0 || c >= GS) { out[0] = r; out[1] = c; break; }
-    const i: number = r * GS + c; p.push(i); const t: number = g[i];
+    if (r < 0 || r >= n || c < 0 || c >= n) { out[0] = r; out[1] = c; break; }
+    const i: number = r * n + c; p.push(i); const t: number = g[i];
     if (t === 1) { d = d === 1 ? 0 : (d === 0 ? 1 : (d === 3 ? 2 : 3)); }
     else if (t === 2) { d = d === 2 ? 1 : (d === 1 ? 2 : (d === 0 ? 3 : 0)); }
   }
@@ -117,7 +119,7 @@ export struct GLaserLink {
         }
         const dets: number[] = []; let bad: boolean = false;
         for (let k = 0; k < NB; k++) {
-          const out: number[] = [-9, -9]; const p: number[] = walk(gs, beams[k], out);
+          const out: number[] = [-9, -9]; const p: number[] = walk(gs, beams[k], out, this.diffTotal);
           let d0: number = -1;   // 探头 = 出界前最后那个空格（必在路径上，不会被走过头）
           let j: number = p.length - 1;
           while (j >= 0) {
@@ -136,7 +138,7 @@ export struct GLaserLink {
         let already: number = 0;
         for (let k = 0; k < NB; k++) {
           const o2: number[] = [-9, -9];
-          if (walk(gi, beams[k], o2).indexOf(dets[k]) >= 0) { already++; }
+          if (walk(gi, beams[k], o2, this.diffTotal).indexOf(dets[k]) >= 0) { already++; }
         }
         if (already >= NB) { continue; }
         this.emits = beams; this.dets = dets; this.slots = free; this.grid = gi; return;
@@ -146,7 +148,7 @@ export struct GLaserLink {
   /** 重算光束与已亮数 */ private refresh(): void {
     let n: number = 0; const lit: number[] = [];
     for (let k = 0; k < this.emits.length; k++) {
-      const out: number[] = [-9, -9]; const p: number[] = walk(this.grid, this.emits[k], out);
+      const out: number[] = [-9, -9]; const p: number[] = walk(this.grid, this.emits[k], out, this.diffTotal);
       for (let j = 0; j < p.length; j++) { lit.push(p[j]); }
       if (p.indexOf(this.dets[k]) >= 0) { n++; }
     }
