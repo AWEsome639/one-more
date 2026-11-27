@@ -63,7 +63,8 @@ const MAX_MISTAKE: number = 5;
 const TICK_MS: number = 1000;
 const GAP: number = 2;
 const KEY_H: number = 46;
-const LET: string[] = ['A', 'B', 'C', 'D', 'E', 'F'];
+// ★ 2026-11-27（第三批）：困难档 8×8 需要 8 个符号，原来只有 A–F 六个键 ⇒ 7/8 无处可填。
+const LET: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
 interface Puzzle {
   quiz: number[];

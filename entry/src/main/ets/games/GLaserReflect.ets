@@ -83,6 +83,11 @@ export struct GLaserReflect {
 
   /** 反推造局：先定解态，再按光束落点放探头 ⇒ 必定有解 */
   private setup(): void {
+    // ★ 2026-11-27（第三批）：简单档 6×6 时可选镜区只有 8 格，而 NF+NX=6 且要求两两不相邻
+    //   （最大独立集 4）⇒ setup 400 次全失败、slots 为空 ⇒ 空盘软锁。按可选格上限收缩数量。
+    const slotCap: number = Math.max(2, Math.floor(((this.diffTotal - 2) * Math.max(1, this.diffTotal - 4)) / 2));
+    const nf: number = Math.max(1, Math.min(NF, slotCap - 1));
+    const nx: number = Math.max(0, Math.min(NX, slotCap - nf));
     for (let a = 0; a < 400; a++) {
       const rows: number[] = [];
 
@@ -97,22 +102,22 @@ export struct GLaserReflect {
         const j: number = Math.floor(Math.random() * (i + 1)); const tv: number = cells[i]; cells[i] = cells[j]; cells[j] = tv;
       }
       const free: number[] = []; const fix: number[] = [];
-      for (let i = 0; i < cells.length && (free.length < NF || fix.length < NX); i++) {
+      for (let i = 0; i < cells.length && (free.length < nf || fix.length < nx); i++) {
         const v: number = cells[i]; let apart: boolean = true;
         for (let j = 0; j < free.length + fix.length; j++) {
           const o: number = j < free.length ? free[j] : fix[j - free.length];
           if (Math.abs(Math.floor(v / this.diffTotal) - Math.floor(o / this.diffTotal)) + Math.abs(v % this.diffTotal - o % this.diffTotal) <= 1) { apart = false; }
         }
         if (!apart) { continue; }
-        if (free.length < NF) { free.push(v); } else { fix.push(v); }
+        if (free.length < nf) { free.push(v); } else { fix.push(v); }
       }
-      if (free.length < NF || fix.length < NX) { continue; }
+      if (free.length < nf || fix.length < nx) { continue; }
       const base: number[] = new Array<number>(this.diffTotal * this.diffTotal).fill(0);
       for (let i = 0; i < fix.length; i++) { base[fix[i]] = 1 + Math.floor(Math.random() * 2); }
 
       for (let t = 0; t < 120; t++) {
         const target: number[] = []; const gs: number[] = base.slice();
-        for (let i = 0; i < NF; i++) {
+        for (let i = 0; i < nf; i++) {
           target.push(1 + Math.floor(Math.random() * 2)); gs[free[i]] = target[i];
         }
         const dets: number[] = []; let bad: boolean = false;
@@ -130,7 +135,7 @@ export struct GLaserReflect {
         }
         if (bad) { continue; }
         const init: number[] = []; const gi: number[] = base.slice();
-        for (let i = 0; i < NF; i++) {
+        for (let i = 0; i < nf; i++) {
           init.push((target[i] % 2) + 1); gi[free[i]] = init[i];   // 与解态不同，且必为 1/2
         }
         let already: number = 0;

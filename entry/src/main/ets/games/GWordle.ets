@@ -92,6 +92,13 @@ export struct GWordle {
   private timer: number = -1;
   private finished: boolean = false;
 
+  /** 本档机会数对应的行号 0..diffTotal-1（原来棋盘写死 5 行，简单档 8 次机会却有 3 行看不见） */
+  private rowIdx(): number[] {
+    const a: number[] = [];
+    for (let i = 0; i < this.diffTotal; i++) { a.push(i); }
+    return a;
+  }
+
   aboutToAppear(): void {
     LanRace.noteStart();  // ★ 竞速模式：本局开始计时
     this.reset();
@@ -482,7 +489,7 @@ export struct GWordle {
       .width('100%')
 
       Column({ space: GAP }) {
-        ForEach([0, 1, 2, 3, 4], (r: number) => {
+        ForEach(this.rowIdx(), (r: number) => {
           Row({ space: GAP }) {
             ForEach([0, 1, 2, 3, 4], (c: number) => {
               this.tileView(r, c)

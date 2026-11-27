@@ -51,7 +51,8 @@ export struct GWordGridConnection {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(4);
+  // ★ 2026-11-27（第三批）：词表恒 16 个，简单档 3×3=9 格放不下 ⇒ 永远连不完。
+  @State private diffTotal: number = Math.max(4, GameDiff.sizeNow(4));
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
 
@@ -75,7 +76,7 @@ export struct GWordGridConnection {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(4);
+    this.diffTotal = Math.max(4, GameDiff.sizeNow(4));
      this.reset(); }
   private reset(): void {
     const pool: string[] = [];

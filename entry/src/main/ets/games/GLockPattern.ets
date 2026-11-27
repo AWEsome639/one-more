@@ -103,7 +103,10 @@ export struct GLockPattern {
   private startLevel(): void {
     this.stopAll();
     const pool: number[] = [];
-    for (let i = 0; i < this.diffTotal; i++) {
+    // ★ 2026-11-27（第三批）：棋盘固定 3×3=9 点，原来按 diffTotal（困难 12）抽目标
+    //   ⇒ 抽到 9/10/11 时该点不存在，一点即判负。上限收到点数。
+    const dotN: number = Math.min(this.diffTotal, DOTS);
+    for (let i = 0; i < dotN; i++) {
       pool.push(i);
     }
     for (let i = pool.length - 1; i > 0; i--) {
