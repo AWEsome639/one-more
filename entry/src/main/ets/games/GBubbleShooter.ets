@@ -67,7 +67,9 @@ export struct GBubbleShooter {
   /** ★ 2026-10-15 得分跳动 */
   @State private scorePulse: number = 1;
   // ★ 难度作用到玩法（本局次数/起始量按难度换算）
-  private total: number = GameDiff.livesNow(SHOTS);
+  // ★ 2026-11-27（第四批统计）：泡泡墙约 27–34 颗，每次有效发射净减最少 2 颗 ⇒ 最少要 14–17 发；
+  //   livesNow(28) 困难档只有 16 发（floor(28*0.6)=16），最坏情况数学上打不完。下限抬到 18。
+  private total: number = Math.max(18, GameDiff.livesNow(SHOTS));
   @State private left: number = 0;
   @State private msg: string = TG('点一列，把泡泡射上去');
   @State private over: boolean = false;
@@ -87,7 +89,7 @@ export struct GBubbleShooter {
   }
 
   onRestart(): void {
-    this.total = GameDiff.livesNow(SHOTS);
+    this.total = Math.max(18, GameDiff.livesNow(SHOTS));
     this.reset();
   }
 
