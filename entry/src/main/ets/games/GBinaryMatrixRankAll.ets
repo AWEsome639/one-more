@@ -113,9 +113,13 @@ export struct GBinaryMatrixRankAll {
     if (this.over) {
       return Hint.none('none');
     }
-    return Hint.make([this.realRank],
-      TG2('答案是第 {0} 个', String(this.realRank + 1)),
-      TG2('The answer is option {0}', String(this.realRank + 1)), t0);
+    // ★ 2026-11-27（审计记录项）：原来直接把「秩值」当选项下标 —— 只在 ranks 恰好升序时成立。
+    //   改成按 ranks 反查，选项顺序若调整也不会错。
+    const idx: number = this.ranks.indexOf(this.realRank);
+    const k: number = idx < 0 ? 0 : idx;
+    return Hint.make([k],
+      TG2('答案是第 {0} 个', String(k + 1)),
+      TG2('The answer is option {0}', String(k + 1)), t0);
   }
 
   private askHint(): void {

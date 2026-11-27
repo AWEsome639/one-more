@@ -273,7 +273,8 @@ export struct GOddRotation {
       if (this.round >= this.diffTotal) {
         this.over = true;
         this.done = true;
-        this.won = this.right >= WIN;
+        // ★ 2026-11-27：简单档题数 < WIN ⇒ 必然失败；通关线按题数比例缩放。
+    this.won = this.right >= Math.max(1, Math.round(WIN * this.diffTotal / ROUNDS));
         this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
         this.finish();
         return;

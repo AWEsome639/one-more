@@ -46,7 +46,11 @@ export struct GWordMastermind {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(5);
+  // ★ 2026-11-27（规则一致性审计）：原来 diffTotal 同时当「单词长度」和难度缩放，
+  //   但题库里全是 5 字母词 ⇒ 简单档(4)/困难档(7) 永远拼不出答案、**永远无法通关**。
+  //   现在：词长固定 LEN；难度改作用在「尝试次数」上。
+  @State private diffTotal: number = LEN;
+  @State private maxTries: number = GameDiff.sizeNow(TRIES);
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
   onFinish: (r: GameResult) => void = () => {};
@@ -64,7 +68,8 @@ export struct GWordMastermind {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(5);
+    this.diffTotal = LEN;
+    this.maxTries = GameDiff.sizeNow(TRIES);
      this.reset(); }
   private reset(): void {
     this.answer = BANK[Math.floor(Math.random() * BANK.length)];
@@ -304,10 +309,10 @@ export struct GWordMastermind {
     this.marks = this.marks.concat([this.mark(g)]);
     this.typed = '';
     if (g === this.answer) {
-      this.over = true; this.won = true; this.score = (TRIES - this.rows.length + 1) * 100;
+      this.over = true; this.won = true; this.score = (this.maxTries - this.rows.length + 1) * 100;
       this.msg = TG2('🎉 猜中了：{0}', this.answer); this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
     }
-    if (this.rows.length >= TRIES) {
+    if (this.rows.length >= this.maxTries) {
       this.over = true; this.won = false; this.score = 0; this.msg = TG2('❌ 机会用完，答案是 {0}', this.answer);
       this.finish(false); return;
     }

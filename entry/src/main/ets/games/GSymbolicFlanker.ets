@@ -242,7 +242,8 @@ export struct GSymbolicFlanker {
     if (this.done) { return; }
     this.done = true;
     this.over = true;
-    this.won = this.right >= NEED;
+    // ★ 2026-11-27：轮数随难度缩放，门槛恒 NEED ⇒ 简单档必然失败；按比例缩放。
+    this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / TRIALS));
     this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
     this.clearAll();
     const r: GameResult = {

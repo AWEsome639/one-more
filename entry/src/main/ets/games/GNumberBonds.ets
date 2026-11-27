@@ -303,7 +303,10 @@ export struct GNumberBonds {
       return;
     }
     if (this.round >= this.diffTotal) {
-      const ok: boolean = this.right >= PASS;
+      // ★ 2026-11-27：题数随难度缩放（简单 7 题），但 PASS 恒 8 ⇒ 简单档 7/7 也判负。
+    //   改为按比例缩放通关线。
+    const need: number = Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
+    const ok: boolean = this.right >= need;
       this.msg = ok ? TG2('🎉 答对 {0}/{1} 题，通关！', String(this.right), String(this.diffTotal))
         : TG2('答对 {0}/{1} 题，还差一点', String(this.right), String(this.diffTotal));
       this.finish(ok);
@@ -375,7 +378,7 @@ export struct GNumberBonds {
         }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Row({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.right + '/' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((this.right + '/' + Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS)))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Row({ space: Space.xs }) {
         Text((TG('得分'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })

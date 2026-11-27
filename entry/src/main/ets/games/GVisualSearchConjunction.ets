@@ -259,7 +259,8 @@ export struct GVisualSearchConjunction {
     this.stop();
     if (!ok) { this.msg = TG('⌛ 超时了'); }
     if (this.round >= this.diffTotal) {
-      this.over = true; this.won = this.hits >= PASS;
+      // ★ 2026-11-27：局数随难度缩放（简单 4 局），PASS 恒 5 ⇒ 简单档不可能通关。
+    this.over = true; this.won = this.hits >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("找对 {0} / {1}", this.hits, this.diffTotal);
       this.finish(this.won);
       return;

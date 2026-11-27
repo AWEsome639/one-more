@@ -136,7 +136,7 @@ export struct GPerspectiveShiftView {
     }
   }
   // ═══════════ AI 代打（2026-10-24 第三期）═══════════
-  /** 提示：报答案（字段 this.dir） */
+  /** 提示：报答案（字段 this.answer；this.dir 是方向，不是选项号） */
   private computeHint(): HintResult {
     const t0: number = Date.now();
     if (this.over) {

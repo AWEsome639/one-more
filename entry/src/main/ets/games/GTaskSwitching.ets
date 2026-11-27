@@ -255,7 +255,8 @@ export struct GTaskSwitching {
     if (this.done) { return; }
     this.done = true;
     this.over = true;
-    this.won = this.right >= NEED;
+    // ★ 2026-11-27：同 GSymbolicFlanker —— 门槛随轮数缩放，简单档才可能通关。
+    this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / TRIALS));
     this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal))
       + TG2(' · 切换代价 {0}ms', String(this.cost()));
     this.clearAll();
