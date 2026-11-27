@@ -251,7 +251,8 @@ export struct GOddOneOut {
       if (this.round >= this.diffTotal) {
         this.over = true;
         this.done = true;
-        this.won = this.right >= WIN;
+        // ★ 2026-11-27（全库扫描）：简单档 7 题 < WIN 8 ⇒ 必败；按题数比例缩放。
+    this.won = this.right >= Math.max(1, Math.round(WIN * this.diffTotal / 10));
         this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
         this.finish();
         return;

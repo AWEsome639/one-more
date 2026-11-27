@@ -311,7 +311,8 @@ export struct GMirrorImage {
     if (this.done) { return; }
     this.done = true;
     this.over = true;
-    this.won = this.rightN >= WIN;
+    // ★ 2026-11-27（全库扫描）：简单档 7 题 < WIN 8 ⇒ 必败；按题数比例缩放。
+    this.won = this.rightN >= Math.max(1, Math.round(WIN * this.diffTotal / 10));
     this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.rightN), String(this.diffTotal));
     const r: GameResult = {
       gameId: 'mirror_image', solved: this.won,

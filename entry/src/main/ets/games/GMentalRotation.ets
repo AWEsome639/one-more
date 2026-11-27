@@ -332,7 +332,8 @@ export struct GMentalRotation {
     if (this.done) { return; }
     this.done = true;
     this.over = true;
-    this.won = this.right >= WIN;
+    // ★ 2026-11-27（全库扫描）：简单档 7 题 < WIN 8 ⇒ 必败；按题数比例缩放。
+    this.won = this.right >= Math.max(1, Math.round(WIN * this.diffTotal / 10));
     this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
     const r: GameResult = {
       gameId: 'mental_rotation', solved: this.won,

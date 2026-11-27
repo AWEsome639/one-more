@@ -305,7 +305,8 @@ export struct GWordPairAssociateMemory {
   private advance(): void {
     this.qIndex = this.qIndex + 1;
     if (this.qIndex >= this.diffTotal) {
-      this.phase = 2; this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-27（全库扫描）：题数随难度缩放（简单 4 题），PASS 恒 5 ⇒ 简单档必败。
+    this.phase = 2; this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / 6));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, this.diffTotal);
       this.finish(this.won);
       return;
