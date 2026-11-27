@@ -370,7 +370,8 @@ export struct GStopSignal {
           .outline(Tv.focusOutline(this.tvFocus === 'L355'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }
-      Text(TG('判定：正确 ≥ 10/12 且冲均值 < 800 ms（该按没按按 1500 ms 计）'))
+      // ★ 2026-11-28（第五批）：判定已按回合缩放，文案不再印固定 10/12（复用已有模板键，零新增译文）。
+      Text(TG2('判定：正确 ≥ {0}/{1}', String(Math.max(1, Math.round(10 * this.diffTotal / 12))), String(this.diffTotal)) + TG2(' · 冲均值 {0} ms', '800'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         .width('100%').textAlign(TextAlign.Center)
     }
