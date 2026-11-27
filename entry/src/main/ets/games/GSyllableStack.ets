@@ -282,7 +282,10 @@ export struct GSyllableStack {
   }
   private end(): void {
     if (this.done) { return; }
-    this.over = true; this.won = this.right >= ROUNDS; this.done = true;
+    // ★ 2026-11-27（第三批）：通关线恒 ROUNDS(6)，困难档生命 2 ⇒ 错一次后最多 5 对、数学上不可通关。
+    //   按「本档生命」反推可允许的失误：普通 6/6、简单 6/6（生命更多不额外放宽）、困难 5/6。
+    const need: number = Math.min(ROUNDS, ROUNDS - (LIVES - this.total));
+    this.over = true; this.won = this.right >= need; this.done = true;
     this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("叠对 {0}/{1}", this.right, ROUNDS);
     const r: GameResult = { gameId: 'syllable_stack', solved: this.won, score: this.score,
       durationMs: Date.now() - this.startAt, levelReached: this.right };

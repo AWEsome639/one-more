@@ -526,7 +526,8 @@ export struct GDoubleTrouble {
   /** 生命显示：❤ = 还剩，🤍 = 已扣 */
   private hearts(): string {
     let s: string = '';
-    for (let i = 0; i < LIVES; i++) {
+    // ★ 2026-11-27（第三批）：心形上界原来用常量 LIVES(3)，简单档 5 条命只画 3 颗心。
+    for (let i = 0; i < this.total; i++) {
       s += i < this.lives ? '❤' : '🤍';
     }
     return s;

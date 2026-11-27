@@ -265,7 +265,7 @@ export struct GInequalityDash {
       this.hits = this.hits + 1; this.score += 120 + this.left; this.msg = TG2('✅ 答案 x {0}', this.opts[this.ans]); this.hitsPulse = 1.3; setTimeout(() => { this.hitsPulse = 1; }, 140);
       if (this.hits >= TARGET) {
         this.over = true; this.won = true;
-        this.msg = TG2("🎉 答对 {0} 题，用了 {1} 秒", String(TARGET), String(LIMIT - this.left)); this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
+        this.msg = TG2("🎉 答对 {0} 题，用了 {1} 秒", String(TARGET), String(this.total - this.left)); this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
       }
     } else {
       this.score = Math.max(0, this.score - 25); this.msg = TG2('❌ 应是 x {0}', this.opts[this.ans]);

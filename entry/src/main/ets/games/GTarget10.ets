@@ -268,7 +268,7 @@ export struct GTarget10 {
       if (this.combo > this.best) { this.best = this.combo; }
       this.score = this.score + 10 + this.combo * 2; this.sel = -1;
       if (this.cleared >= TOTAL) {
-        this.over = true; this.won = true; this.msg = TG2("🎉 全消！用时 {0} 秒", String(LIMIT - this.left));
+        this.over = true; this.won = true; this.msg = TG2("🎉 全消！用时 {0} 秒", String(this.total - this.left));
         this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
       }
       this.msg = TG2('✅ 消掉一对，连击 {0}', String(this.combo));
