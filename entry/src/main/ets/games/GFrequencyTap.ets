@@ -373,7 +373,7 @@ export struct GFrequencyTap {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); if (this.phase === 0) { this.start(); } else { this.reset(); } }); })
         .onClick(() => { Haptics.tap(); if (this.phase === 0) { this.start(); } else { this.reset(); } })
 
-      Text(TG2("{0}{1} 拍即通关", TG2('判定：每拍误差 ≤ {0} ms 记命中，{1} 拍中 ', String(HIT_MS), String(this.diffTotal)),Digits(String(WIN_HITS), this.langCode)))
+      Text(TG2("{0}{1} 拍即通关", TG2('判定：每拍误差 ≤ {0} ms 记命中，{1} 拍中 ', String(HIT_MS), String(this.diffTotal)),Digits(String(Math.max(1, Math.round(WIN_HITS * this.diffTotal / BEATS))), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
     .onTouch((e: TouchEvent) => {

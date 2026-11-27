@@ -369,7 +369,7 @@ export struct GGoNoGo {
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
         .onClick(() => { Haptics.tap(); this.reset(); })
 
-      Text(TG2('判定：正确 ≥ {0}/{1}', String(NEED_CORRECT), String(this.diffTotal))
+      Text(TG2('判定：正确 ≥ {0}/{1}', String(Math.max(1, Math.round(NEED_CORRECT * this.diffTotal / TRIALS))), String(this.diffTotal))
         + TG2(' 且误点 ≤ {0} 次 · 红灯约四分之一',Digits(String(MAX_FA), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).width('100%').textAlign(TextAlign.Center)
     }
