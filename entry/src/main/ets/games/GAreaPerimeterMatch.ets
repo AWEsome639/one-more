@@ -244,7 +244,8 @@ export struct GAreaPerimeterMatch {
 
     if (this.over) { return; }
     if (this.round < this.qTotal) { this.round = this.round + 1; this.ask(); return; }
-    this.over = true; this.won = this.rightN >= PASS;
+    // ★ 2026-11-27：题数随难度（7/10/13），通关线按题数缩放。
+    this.over = true; this.won = this.rightN >= Math.max(1, Math.round(PASS * this.qTotal / TOTAL));
     this.msg = this.won ? TG2("🎉 答对 {0}/{1}，通关！",Digits(String(this.rightN), this.langCode),Digits(String(this.qTotal), this.langCode)) : TG2("😵 只答对 {0}/{1}，差 {2} 题", this.rightN, this.qTotal, (PASS - this.rightN));
     this.finish(this.won);
   }

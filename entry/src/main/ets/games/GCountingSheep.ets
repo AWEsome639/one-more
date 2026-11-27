@@ -268,7 +268,8 @@ export struct GCountingSheep {
       this.over = true;
       LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
       this.onFinish({
-        gameId: 'counting_sheep', solved: this.right >= PASS,
+        // ★ 2026-11-27（第四批文案批次）：题数随难度（7/10/13），通关线按题数缩放。
+    gameId: 'counting_sheep', solved: this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)),
         score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.right
       });
       return;
@@ -384,7 +385,7 @@ export struct GCountingSheep {
         .onClick(() => { Haptics.tap(); this.pick((this.opts[3])); })
       }.width('100%')
 
-      Button(this.over ? (this.right >= PASS ? TG('通关 🎉') : TG('结束')) : TG('重开'))
+      Button(this.over ? (this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)) ? TG('通关 🎉') : TG('结束')) : TG('重开'))
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

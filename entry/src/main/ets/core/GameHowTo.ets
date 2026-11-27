@@ -206,12 +206,12 @@ export const HOW_TO: Record<string, HowTo> = {
   'reflex_tap': {
     zh: [
       '屏幕上一个圆点亮起来时，立刻去点它',
-      '一共 8 次，会算你的平均反应时和最快一次',
+      '次数随难度（6 / 8 / 10 次），会算你的平均反应时和最快一次',
       '平均反应低于 550ms 且点偏不超过 2 次算通关'
     ],
     en: [
       'As soon as a dot lights up on screen, tap it right away',
-      'Eight rounds in total; your average and fastest reaction are tracked',
+      'The number of rounds depends on difficulty (6 / 8 / 10); your average and fastest reaction are tracked',
       'Clear it with an average under 550 ms and no more than 2 misses'
     ]
   },
@@ -1671,12 +1671,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '给一个乘法、除法或百分数的算式',
       '不用算精确值 —— 从四个选项里挑出最接近的估算结果',
-      '一共 8 题，答对 6 题以上算通关'
+      '题数随难度（6 / 8 / 10 题），答对约七成算通关'
     ],
     en: [
       'A multiplication, division or percentage expression appears',
       'No need for the exact value — pick the closest estimate from four options',
-      'Eight questions in all; get at least 6 right to clear it'
+      'The question count depends on difficulty (6 / 8 / 10); get about 70% right to clear it'
     ]
   },
   'percentage_peak': {
@@ -2823,12 +2823,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '双任务：一边判断词语的类别（说出来），一边等光标踩中 ✦ 时落笔（写下来）',
       '说对 +2、说错 −2；写对 +1、写歪 −1',
-      '得分 12 以上且成功落笔 3 次以上算通关'
+      '得分达到本档门槛（随难度 8 / 12 / 16）且成功落笔 3 次以上算通关'
     ],
     en: [
       'Two tasks at once: judging each word’s category (the “talk”), and writing when the cursor crosses the ✦ (the “chalk”)',
       'Right judgment +2, wrong −2; well-placed write +1, mistimed −1',
-      'Clear it with a score of at least 12 and at least 3 successful writes'
+      'Clear it with a score reaching this difficulty level’s target (8 / 12 / 16) and at least 3 successful writes'
     ]
   },
   'chimp_test': {
@@ -3123,19 +3123,19 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '屏幕给出一个线索词',
       '从候选里挑出与它关系最紧密的搭档词',
-      '10 题答对 7 题以上算通关'
+      '题数随难度（7 / 10 / 13 题），答对约七成算通关'
     ],
     en: [
       'A cue word appears',
       'Pick the candidate most tightly associated with it',
-      'Get at least 7 of 10 right to clear it'
+      'The question count depends on difficulty (7 / 10 / 13); get about 70% right to clear it'
     ]
   },
   'semantic_distance': {
     zh: [
       '屏幕给出一个锚点词和两个候选词',
       '判断哪一个离锚点词在意思上更近',
-      '10 题答对 7 题以上算通关'
+      '题数随难度（7 / 10 / 13 题），答对约七成算通关'
     ],
     en: [
       'An anchor word and two candidates appear',
@@ -3507,12 +3507,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一个立方体的展开图，六个面两两成对',
       '点格子循环切换 A / B / C，把配对的字母放进正确的格子里',
-      '全部放对算过关；6 关过 4 关以上算通关'
+      '全部放对算过关；关卡数随难度（4 / 6 / 8 关），过约七成算通关'
     ],
     en: [
       'A cube is unfolded flat, with its six faces paired up',
       'Tap a cell to cycle its letter between A, B and C, placing matching letters in the right cells',
-      'Get every placement right to pass a round; clear 4 of 6 rounds to win overall'
+      'Get every placement right to pass a round; the number of rounds depends on difficulty (4 / 6 / 8), clear about 70% to win overall'
     ]
   },
   'gear_rotation': {
@@ -3639,24 +3639,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '你在一面镜子上描线 —— 点左边，画出来的却在右边',
       '沿着目标形状一点点描过去',
-      '3 关全部画完算通关；笔数耗尽就失败（可以「擦掉」反悔）'
+      '关卡数随难度（2 / 3 / 4 关），全部画完算通关；笔数耗尽就失败（可以「擦掉」反悔）'
     ],
     en: [
       'You are tracing on a mirror — tap on the left and the line appears on the right',
       'Trace your way around the target shape',
-      'Complete all 3 rounds to clear it; run out of strokes and you fail (you can erase to undo)'
+      'Clear every round — the count depends on difficulty (2 / 3 / 4); run out of strokes and you fail (you can erase to undo)'
     ]
   },
   'navon_hierarchical': {
     zh: [
       '一张图里，大图形是一个字母，而构成它的小图形又是另一个字母',
       '每题两问都要答：大图是什么？小图是什么？',
-      '12 题里每题两问全对才算这一题得分；答对 8 题以上算通关'
+      '12 题里每题两问全对才算这一题得分；答对 8 题以上算通关（时限随难度）'
     ],
     en: [
       'In one image the large shape is one letter, while the small shapes composing it spell another',
       'Each question asks both: what is the big letter, and what is the small one?',
-      'A question only scores if both answers are right; score 8 of 12 to clear it'
+      'A question only scores if both answers are right; score 8 of 12 to clear it (the time limit depends on difficulty)'
     ]
   },
   'odd_one_out': {

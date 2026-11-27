@@ -260,7 +260,8 @@ export struct GCubeNetFold {
     }
     this.wins++; this.note = TG(TG(TG('这一关折对了 ✅')));
     if (this.round + 1 >= this.diffTotal) {
-      this.finish(this.wins >= PASS);
+      // ★ 2026-11-27：关卡数随难度（4/6/8），通关线按关卡数缩放。
+    this.finish(this.wins >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)));
       return;
     }
     this.locked = true;
@@ -380,7 +381,7 @@ export struct GCubeNetFold {
         }, (i: number) => 'k' + i)
       }.width('100%')
 
-      Button(this.over ? (this.wins >= PASS ? TG('通关 🎉') : TG('结束')) : TG('重开'))
+      Button(this.over ? (this.wins >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)) ? TG('通关 🎉') : TG('结束')) : TG('重开'))
       // ★（1880 补漏）矮屏不渲染「重开」（页头 ↻ 同动作，判据 1859/1867）
       .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
       .stateStyles({ pressed: { .scale({ x: 0.96, y: 0.96 }) }, normal: { .scale({ x: 1, y: 1 }) } })

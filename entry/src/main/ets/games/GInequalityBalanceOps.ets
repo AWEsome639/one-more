@@ -248,7 +248,8 @@ export struct GInequalityBalanceOps {
 
     if (this.over) { return; }
     if (this.round >= this.diffTotal) {
-      this.over = true; this.won = this.hits >= PASS;
+      // ★ 2026-11-27：题数随难度（6/8/10），通关线按题数缩放。
+    this.over = true; this.won = this.hits >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL));
       this.msg = this.won
         ? TG('🎉 答对 ') + String(this.hits) + '/' + String(this.diffTotal) + TG('，通关！')
         : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.hits), String(this.diffTotal), String(PASS - this.hits));
