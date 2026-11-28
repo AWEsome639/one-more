@@ -267,7 +267,8 @@ export struct GMemoryPalace {
         return;
       }
       if (this.round >= this.diffTotal) {
-        this.phase = 2; this.over = true; this.won = this.right >= PASS;
+        // ★ 2026-11-28（第七批）：简单档上限 6 分 < 通关线 7，字面不可能。按本档满分（轮数×每组数）缩放。
+    this.phase = 2; this.over = true; this.won = this.right >= Math.max(1, Math.round(this.diffTotal * PER * 0.75));
         this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + TG2('答对 {0}/{1}', String(this.right), String(this.asked));
         this.finish(this.won);
         return;

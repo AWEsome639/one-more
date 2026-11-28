@@ -246,7 +246,8 @@ export struct GReverseStroop {
     if (this.done) { return; }
     const a: number = this.avg();
     this.clearTo();
-    this.done = true; this.over = true; this.won = this.right >= WIN_RIGHT && a < WIN_AVG;
+    // ★ 2026-11-28（第七批）：简单 8 题 < 通关线 10，字面不可能。按题数缩放。
+    this.done = true; this.over = true; this.won = this.right >= Math.max(1, Math.round(WIN_RIGHT * this.diffTotal / TOTAL)) && a < WIN_AVG;
     this.msg = (this.won ? TG('🎉 通关 · 对 ') : TG('💤 结束 · 对 ')) +TG2("{0}/{1} · 平均 {2} ms", String(this.right), String(this.diffTotal), String(a));
     const r: GameResult = {
       gameId: 'reverse_stroop', solved: this.won, score: Math.max(0, this.right * 100 - Math.round(a / 20)),

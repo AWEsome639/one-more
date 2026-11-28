@@ -300,7 +300,8 @@ export struct GAttentionalBlinkProbe {
       this.nextTo = -1;
       if (this.trialNo >= this.diffTotal) {
         this.over = true;
-        this.won = this.score >= NEED;
+        // ★ 2026-11-28（第七批）：每题 2 分、三档上限 6/8/10 分，而通关线恒 6 ⇒ 简单满分。按本档满分缩放。
+    this.won = this.score >= Math.max(1, Math.round(this.diffTotal * 2 * 0.75));
         this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("共 {0}/{1} 分",Digits(String(this.score), this.langCode), String(this.diffTotal * 2));
         this.clearAll();
         this.finish(this.won);

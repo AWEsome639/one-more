@@ -269,7 +269,8 @@ export struct GNBack {
       return;
     }
     this.over = true;
-    this.won = this.right >= PASS;
+    // ★ 2026-11-28（第七批）：简单 8 题 < 通关线 9，字面不可能。按题数缩放。
+    this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TRIALS));
     this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) + TG2('答对 {0}/{1}', String(this.right), String(this.diffTotal));
     this.finish(this.won);
   }

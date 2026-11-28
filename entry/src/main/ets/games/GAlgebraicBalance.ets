@@ -309,7 +309,8 @@ export struct GAlgebraicBalance {
       if (this.idx >= this.diffTotal) {
         this.over = true;
         this.tip = TG2("共答对 {0}/{1} 题", String(this.right), String(this.diffTotal));
-        this.finish(this.right >= PASS);
+        // ★ 2026-11-28（第七批）：简单 7 题要 7 对（100%）⇒ 按题数缩放。
+    this.finish(this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)));
         return;
       }
       this.eq = makeEq();

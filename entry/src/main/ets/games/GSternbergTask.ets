@@ -252,7 +252,8 @@ export struct GSternbergTask {
 
   private next(): void {
     if (this.trial >= this.diffTotal) {
-      this.over = true; this.won = this.hits >= PASS;
+      // ★ 2026-11-28（第七批）：简单 7 题要 7 对（100%）⇒ 按题数缩放。
+    this.over = true; this.won = this.hits >= Math.max(1, Math.round(PASS * this.diffTotal / TRIALS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.hits, this.diffTotal);
       this.finish(this.won); return;
     }

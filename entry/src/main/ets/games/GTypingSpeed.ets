@@ -271,13 +271,13 @@ export struct GTypingSpeed {
   private tick(): void {
     if (AppClock.isPaused() || this.over) { return; }
     const gap: number = AppClock.netNow() - this.roundAt;
-    if (gap >= LIMIT_MS) {
+    if (gap >= this.total) {
       if (this.leftMs === 0) { return; }
       this.leftMs = 0; this.msg = TG('⌛ 超时，这句算错');
       this.roundDone();
       return;
     }
-    this.leftMs = LIMIT_MS - gap; this.statsNow();
+    this.leftMs = this.total - gap; this.statsNow();   // ★ 2026-11-28（第七批）：倒计时改用本档时限
   }
 
   private end(): void {

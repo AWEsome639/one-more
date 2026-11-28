@@ -283,7 +283,8 @@ export struct GDelayedMatchSample {
       this.msg = TG2('❌ 刚才是 {0}', truth);
     }
     if (this.wrong >= MAX_WRONG) { this.end(false); return; }
-    if (this.trial >= this.diffTotal) { this.end(this.correct >= PASS); return; }
+    // ★ 2026-11-28（第七批）：简单 6 题要 6 对（100%）⇒ 按题数缩放。
+    if (this.trial >= this.diffTotal) { this.end(this.correct >= Math.max(1, Math.round(PASS * this.diffTotal / TRIALS))); return; }
     this.trial++;
     this.nextTrial();
   }

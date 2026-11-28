@@ -287,7 +287,8 @@ export struct GChangeBlindness {
       this.stepTo = -1;
       if (this.roundNo >= this.diffTotal) {
         this.over = true;
-        this.won = this.right >= NEED;
+        // ★ 2026-11-28（第七批）：简单 4 轮要 4 对（100%）⇒ 按轮数缩放。
+    this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / ROUNDS));
         this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal));
         this.clearAll();
         this.finish(this.won);
