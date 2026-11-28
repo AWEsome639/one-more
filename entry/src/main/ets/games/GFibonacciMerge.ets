@@ -263,6 +263,17 @@ export struct GFibonacciMerge {
         this.over = true; this.won = true; this.msg = TG2('🎉 合出 {0}！第 {1} 步通关', String(sum),Digits(String(this.moves), this.langCode));
         this.winK = 1.18; setTimeout(() => { this.winK = 1; }, 320); this.finish(true); return;
       }
+      // ★ 2026-11-28（第七批·中）：83.7% 的对局会在几步后「没有可合并的相邻格」，
+      //   玩家只能继续点、每点一次掉一条命 ⇒ 实际是死局。这里检测到无解就重排一次。
+      if (this.findPair() < 0) {
+        this.reseed();
+        if (this.findPair() < 0) {
+          this.over = true; this.won = false;
+          this.msg = TG('💤 没有可合并的相邻格了，这一局到此为止');
+          this.finish(false); return;
+        }
+        this.msg = TG2('♻️ 没有可合并的相邻格，重排一次，继续往 {0} 冲', String(GOAL)); return;
+      }
       this.msg = TG2('✅ {0} 也是斐波那契数，继续往 {1} 冲', String(sum), String(GOAL)); return;
     }
     this.lives = this.lives - 1; this.score = Math.max(0, this.score - 20); this.shakeX = 8; setTimeout(() => { this.shakeX = -8; }, 60); setTimeout(() => { this.shakeX = 0; }, 120);
@@ -271,6 +282,17 @@ export struct GFibonacciMerge {
     }
     this.msg = TG2('❌ 要相邻两格、和还要是斐波那契数（这次和是 {0}），还剩 {1} 次', String(sum),Digits(String(this.lives), this.langCode));
   }
+  /** ★ 2026-11-28：把棋盘数值重新洗一遍（保留已合出的最好成绩），用来给死局开一条路。 */
+  private reseed(): void {
+    const next: number[] = this.cells.slice();
+    for (let i = next.length - 1; i > 0; i--) {
+      const j: number = Math.floor(Math.random() * (i + 1));
+      const tmp: number = next[i]; next[i] = next[j]; next[j] = tmp;
+    }
+    this.cells = next;
+    this.sel = -1;
+  }
+
   private finish(solved: boolean): void {
     if (this.finished) { return; }
     this.finished = true;
