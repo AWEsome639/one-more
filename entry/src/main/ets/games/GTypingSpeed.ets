@@ -1,6 +1,6 @@
 /**
  * 打字速度 —— 照抄屏幕上的一句话，实时统计 WPM 与正确率
- * 胜负：5 句都在 25 秒内打完且正确率 ≥ 90% 通关 ｜ 进度：第几句 / WPM / 正确率 / 剩余秒
+ * 胜负：5 句都在本档时限内打完且正确率 ≥ 90% 通关 ｜ 进度：第几句 / WPM / 正确率 / 剩余秒
  */
 import { FontSize, Space, Radius, Palette, Theme, Shadow, Cell } from '../core/Design';
 import { Demo } from '../core/Demo';
@@ -344,7 +344,8 @@ export struct GTypingSpeed {
           .outline(Tv.focusOutline(this.tvFocus === 'L336'))
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }.width('100%')
-      Text(TG('提示：不区分大小写；25 秒没打完算这句错')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      // ★ 2026-11-28（真机验收发现）：提示写死 25 秒，而困难档实际 17.5 秒。
+        Text(TG2('提示：不区分大小写；{0} 秒没打完算这句错', String(Math.round(this.total / 1000)))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
