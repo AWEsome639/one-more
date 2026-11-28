@@ -231,7 +231,8 @@ export struct GWisconsinCardSorting {
     }
     this.trial = this.trial + 1;
     if (this.trial > this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-28（第七批·中）：简单 13 题要 12 对（92%）⇒ 按题数缩放。
+    this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TRIALS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, this.diffTotal);
       this.finish(this.won);
       return;

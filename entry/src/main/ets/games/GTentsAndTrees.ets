@@ -137,9 +137,11 @@ export struct GTentsAndTrees {
     const board: number[] = new Array<number>(MAX_CELLS).fill(0);
     let made: number = 0;
     let guard: number = 0;
-    while (made < TARGET_TREES && guard < 500) {
+    // ★ 2026-11-28（第七批·中）：目标树数固定 8、随机格取固定 36 格，而盘面 4/6/8 ⇒ 树数按本档面积。
+    const wantTrees: number = Math.max(2, Math.floor(this.diffTotal * this.diffTotal / 4));
+    while (made < wantTrees && guard < 500) {
       guard++;
-      const p: number = Math.floor(Math.random() * CELLS);
+      const p: number = Math.floor(Math.random() * (this.diffTotal * this.diffTotal));
       if (board[p] !== 0 || this.nearTent(board, p)) {
         continue;
       }

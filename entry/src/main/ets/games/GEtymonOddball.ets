@@ -78,6 +78,11 @@ export struct GEtymonOddball {
 
   @State queue: number[] = []; @State shown: string[] = [];
   @State round: number = 0; @State right: number = 0; @State score: number = 0;
+  /** ★ 2026-11-28（第七批·中）：每题时限原来恒 20 秒（应 30/20/14 秒）。 */
+  private limitS(): number {
+    return Math.max(5, Math.round(GameDiff.timeNow(LIMIT_S * 1000) / 1000));
+  }
+
   @State leftS: number = LIMIT_S; @State msg: string = ''; @State over: boolean = false; @State won: boolean = false;
   private startAt: number = 0; private timer: number = -1; private done: boolean = false;
 
@@ -97,7 +102,7 @@ export struct GEtymonOddball {
     this.stop();
     // ★ 2026-11-28（第七批）：困难档 10 轮，原来只切 8 组 ⇒ 第 9 轮 GROUPS[undefined] 崩。
     this.queue = shuffleIdx(this.diffTotal);
-    this.round = 0; this.right = 0; this.score = 0; this.leftS = LIMIT_S;
+    this.round = 0; this.right = 0; this.score = 0; this.leftS = this.limitS();
     this.over = false; this.won = false; this.done = false;
     this.msg = TG('哪个词的词根不属于同一族？'); this.startAt = Date.now();
     this.load();

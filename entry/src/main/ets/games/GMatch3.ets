@@ -346,6 +346,11 @@ export struct GMatch3 {
     Hint.toastResult(r, TG('这一步看不出答案'));
   }
 
+  /** ★ 2026-11-28（第七批·中）：目标 1800 是按 25 步定的；步数随难度 38/25/15 ⇒ 目标同步缩放。 */
+  private targetScore(): number {
+    return Math.max(300, Math.round(TARGET * this.total / MOVES));
+  }
+
   private reset(): void {
     let b: number[] = this.makeBoard();
     if (!this.hasAnyMove(b)) {
@@ -443,7 +448,7 @@ export struct GMatch3 {
     this.sel = -1;
     this.movesLeft = this.movesLeft - 1;
     this.score = this.score + this.resolve(); this.scorePulse = 1.3; setTimeout(() => { this.scorePulse = 1; }, 140);
-    if (this.score >= TARGET) {
+    if (this.score >= this.targetScore()) {
       this.over = true;
       this.won = true;
       this.finish(true);
@@ -482,7 +487,7 @@ export struct GMatch3 {
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('分数'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((String(this.score) + '/' + String(TARGET))).fontSize(FontSize.md)
+        Text((String(this.score) + '/' + String(this.targetScore()))).fontSize(FontSize.md)
         // ★ 得分跳动
         .scale({ x: this.scorePulse, y: this.scorePulse })
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
