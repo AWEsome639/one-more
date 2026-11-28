@@ -403,7 +403,7 @@ export struct GDelayedMatchSample {
         .onBlur(() => { if (this.tvFocus === 'L367') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L367')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
-      Text(TG2("样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 {0} / {1} 通关",Digits(String(PASS), this.langCode),Digits(String(this.diffTotal), this.langCode)))
+      Text(TG2("样例亮 1.4 秒 ⇒ 遮挡 1.8 秒 ⇒ 作答；答对 {0} / {1} 通关",Digits(String(Math.max(1, Math.round(PASS * this.diffTotal / TRIALS))), this.langCode),Digits(String(this.diffTotal), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {

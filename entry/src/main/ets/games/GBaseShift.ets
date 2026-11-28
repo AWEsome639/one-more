@@ -565,7 +565,7 @@ export struct GBaseShift {
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
       Text(kind === 0 ? this.round + '/' + this.diffTotal
-        : (kind === 1 ? this.right + '/' + PASS : String(this.score)))
+        : (kind === 1 ? this.right + '/' + Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)) : String(this.score)))
         .fontSize(FontSize.lg)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.ink)

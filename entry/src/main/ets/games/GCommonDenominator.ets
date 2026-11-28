@@ -333,7 +333,7 @@ export struct GCommonDenominator {
     this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL));
       this.msg = this.won
         ? TG2('🎉 答对 {0}/{1}，通关！', String(this.right), String(this.diffTotal))
-        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(PASS));
+        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)) - this.right));
       this.finish(this.won);
       return;
     }
