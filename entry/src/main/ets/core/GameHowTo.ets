@@ -231,24 +231,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '数字在屏幕上一闪就消失，你要判断它刚才是奇数还是偶数',
       '闪现的时间会越来越短，越往后越看不清',
-      '一共 18 题，答对 13 题以上算通关'
+      '普通档：一共 18 题，答对 13 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A number flashes and vanishes; decide whether it was odd or even',
       'The flash gets shorter and shorter as you go, so later rounds are harder to catch',
-      'Eighteen rounds in all — get at least 13 right to clear it'
+      'Normal: Eighteen rounds in all — get at least 13 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'go_no_go': {
     zh: [
       '绿灯出现就快点，红灯出现要忍住不点',
       '点红灯就是误点，会扣分',
-      '20 试里答对 17 次以上、误点不超过 1 次算通关'
+      '普通档：20 试里答对 17 次以上、误点不超过 1 次算通关；题数与通关线随难度变化'
     ],
     en: [
       'Tap when the light is green; hold back and do not tap on red',
       'Tapping on red is a false alarm and counts against you',
-      'Clear it with at least 17 correct out of 20 trials and no more than 1 false alarm'
+      'Normal: Clear it with at least 17 correct out of 20 trials and no more than 1 false alarm; the question count and pass line scale with difficulty'
     ]
   },
   'stop_signal': {
@@ -279,36 +279,36 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '屏幕上是一个颜色词，却用另一种颜色印出来（比如“红”字印成绿色）',
       '要答的是它的墨色，不是字写的是什么',
-      '12 题答对 10 题以上算通关'
+      '普通档：12 题答对 10 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A colour word appears, printed in a different colour (the word “red” in green ink, say)',
       'Answer with the INK colour, not the word',
-      'Clear it with at least 10 correct out of 12'
+      'Normal: Clear it with at least 10 correct out of 12; the question count and pass line scale with difficulty'
     ]
   },
   'reverse_stroop': {
     zh: [
       '同样是「字义与墨色不符」的字，但这一次反过来',
       '要答的是字写的是什么，不是它的墨色',
-      '12 题答对 10 题以上、且平均反应低于 1800ms 算通关'
+      '普通档：12 题答对 10 题以上、且平均反应低于 1800ms 算通关；题数与通关线随难度变化'
     ],
     en: [
       'Same kind of word — meaning and ink disagree — but this time it is the other way round',
       'Answer with what the word SAYS, not the ink colour',
-      'Clear it with at least 10 correct out of 12 and an average under 1800 ms'
+      'Normal: Clear it with at least 10 correct out of 12 and an average under 1800 ms; the question count and pass line scale with difficulty'
     ]
   },
   'stroop_number_size': {
     zh: [
       '一个数字出现，但它的字号大小故意捣乱（小的印得大、大的印得小）',
       '只看数字本身 —— 它比 5 大还是小',
-      '12 题答对 10 题以上算通关'
+      '普通档：12 题答对 10 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A digit appears, but its font size is deliberately misleading (small values huge, large values tiny)',
       'Ignore the size — just judge the value: is it bigger or smaller than 5?',
-      'Clear it with at least 10 correct out of 12'
+      'Normal: Clear it with at least 10 correct out of 12; the question count and pass line scale with difficulty'
     ]
   },
   'color_word_match_up': {
@@ -363,24 +363,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '箭头的「指向 / 文字 / 位置」三样互相捣乱（比如写着左、画着右、位置在上）',
       '只准跟箭头的实际指向走，别管它写的什么字',
-      '12 题答对 9 题以上算通关'
+      '普通档：12 题答对 9 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'An arrow messes with you three ways at once: where it points, what its label says, and where it sits',
       'Follow the arrow’s actual direction and ignore the label',
-      'Clear it with at least 9 correct out of 12'
+      'Normal: Clear it with at least 9 correct out of 12; the question count and pass line scale with difficulty'
     ]
   },
   'typoglycemia_decoder': {
     zh: [
       '每个词只留首尾字母，中间全部打乱（比如 tihs 这种）',
       '靠语感把整句读出来，再从选项里挑出正确的那一句',
-      '6 句里读对 4 句以上算通关'
+      '普通档：6 句里读对 4 句以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Each word keeps its first and last letter with the middle shuffled (like tihs)',
       'Read the sentence by feel, then pick the matching option',
-      'Clear it by getting at least 4 of 6 sentences right'
+      'Normal: Clear it by getting at least 4 of 6 sentences right; the question count and pass line scale with difficulty'
     ]
   },
   'homophone_hunt': {
@@ -423,12 +423,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '给你三个数和一个目标值，下面有 4 个式子',
       '挑出结果正好等于目标值的那个式子',
-      '6 题答对 5 题以上算通关'
+      '普通档：6 题答对 5 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'You get three numbers and a target value, plus four expressions below',
       'Pick the expression whose result is exactly the target',
-      'Clear it with at least 5 correct out of 6'
+      'Normal: Clear it with at least 5 correct out of 6; the question count and pass line scale with difficulty'
     ]
   },
   'missing_operator': {
@@ -447,12 +447,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '数字一个接一个闪现，闪完凭记忆倒序点回去（正着是 1 2 3，你要点 3 2 1）',
       '一共 6 轮，每两轮位数加长一位',
-      '答对 5 轮以上算通关'
+      '普通档：答对 5 轮以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Digits flash one after another; afterwards tap them back in reverse order (1 2 3 becomes 3 2 1)',
       'Six rounds in all, with one more digit added every two rounds',
-      'Clear it with at least 5 rounds right'
+      'Normal: Clear it with at least 5 rounds right; the question count and pass line scale with difficulty'
     ]
   },
   'probe_digit_span': {
@@ -1359,12 +1359,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '盘面随难度 7×7 / 10×10 / 13×13；每行、每列都要含 0 到 N-1 各一次',
       '点空格选中，再点数字键盘填入；再点同一个数字就是擦掉',
-      '填满本档所有格子且无冲突算通关；冲突满 3 次就失败（冲突的数不会落盘）'
+      '普通档：填满本档所有格子且无冲突算通关；冲突满 3 次就失败（冲突的数不会落盘）；题数与通关线随难度变化'
     ],
     en: [
       'The grid is 7×7 / 10×10 / 13×13 depending on difficulty; every row and column must contain 0 to N-1 exactly once',
       'Tap a cell then a digit to fill it; tapping the same digit again erases',
-      'Fill every cell of this board with no conflict to clear it; three conflicts and you fail — a conflicting digit never lands'
+      'Normal: Fill every cell of this board with no conflict to clear it; three conflicts and you fail — a conflicting digit never lands; the question count and pass line scale with difficulty'
     ]
   },
   'tents_and_trees': {
@@ -1407,24 +1407,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '屏幕上一个一元一次方程，形如 a·x + b = c（也可能出现减号）',
       '从 4 个候选值里点出 x 的解',
-      '一共 10 题，答对 7 题以上算通关'
+      '普通档：一共 10 题，答对 7 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A one-variable linear equation appears, shaped like a·x + b = c (the sign may be a minus too)',
       'Solve for x and tap it among four candidates',
-      'Ten questions in all — get at least seven right to clear it'
+      'Normal: Ten questions in all — get at least seven right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'arithmetic_chain': {
     zh: [
       '从一个起始数出发，依次点运算符，最多 4 步',
       '每点一个运算符，当前数就按它变一次',
-      '让结果正好落到目标数上；5 关过 4 关算通关'
+      '普通档：让结果正好落到目标数上；5 关过 4 关算通关；题数与通关线随难度变化'
     ],
     en: [
       'Start from a given number and tap operators one after another, at most four steps',
       'Each operator you tap transforms the running value',
-      'Land exactly on the target; clear 4 of the 5 stages to pass'
+      'Normal: Land exactly on the target; clear 4 of the 5 stages to pass; the question count and pass line scale with difficulty'
     ]
   },
   'balance_scale': {
@@ -1515,12 +1515,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一个竖式里几个字母各代表一个数字，同一个字母代表同一个数字',
       '给五个字母指派互不相同的数字，而且多位数首位不能是 0',
-      '5 题里解出 4 题以上算通关'
+      '普通档：5 题里解出 4 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'In a column sum each letter stands for one digit, and the same letter is always the same digit',
       'Assign five distinct digits to the letters, keeping in mind a multi-digit number cannot start with 0',
-      'Solve at least 4 of the 5 puzzles to clear it'
+      'Normal: Solve at least 4 of the 5 puzzles to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'digit_swap_eq': {
@@ -1551,12 +1551,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '屏幕上一个幂塔 a^(b^c)',
       '要算出它的值，从 4 个候选里选一个',
-      '注意是从上往下算：先算 b^c，再拿它当指数。8 题答对 6 题以上算通关'
+      '普通档：注意是从上往下算：先算 b^c，再拿它当指数。8 题答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A power tower a^(b^c) appears on screen',
       'Work out its value and pick from four candidates',
-      'Remember it stacks upward: compute b^c first, then raise a to that. Get at least 6 of 8 right to clear it'
+      'Normal: Remember it stacks upward: compute b^c first, then raise a to that. Get at least 6 of 8 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'factor_finder': {
@@ -1647,24 +1647,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '现在是 N 点，再过 M 小时（或者 M 小时前）是几点？',
       '按模 12 算 —— 过了 12 点就绕回来',
-      '四选一作答，一共 8 题；答对 6 题以上算通关'
+      '普通档：四选一作答，一共 8 题；答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'It is N o’clock — what time will it be in M hours (or M hours ago)?',
       'Work modulo 12, so the clock wraps around',
-      'Eight questions with four choices each; get at least 6 right to clear it'
+      'Normal: Eight questions with four choices each; get at least 6 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'number_bonds': {
     zh: [
       '一个目标数要拆成两部分',
       '其中一部分已经给出，从四个选项里补上另一部分',
-      '一共 10 题，答对 8 题以上算通关'
+      '普通档：一共 10 题，答对 8 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A target number must split into two parts',
       'One part is given — pick the missing part from four options',
-      'Ten questions in all; get at least 8 right to clear it'
+      'Normal: Ten questions in all; get at least 8 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'numerical_estimation': {
@@ -1707,24 +1707,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       'b 进制下把一个数「左移 k 位」，也就是末尾添上 k 个 0',
       '选出它对应的十进制值 —— 添 k 个 0 相当于乘以 b 的 k 次方',
-      '四选一，10 题答对 7 题以上算通关；答错 3 次就失败'
+      '普通档：四选一，10 题答对 7 题以上算通关；答错 3 次就失败；题数与通关线随难度变化'
     ],
     en: [
       'A number in base b is shifted left by k places — k zeros appended',
       'Pick its decimal value: appending k zeros multiplies it by b to the k-th power',
-      'Four choices, ten questions; get at least 7 right to clear it, but three wrong answers and you fail'
+      'Normal: Four choices, ten questions; get at least 7 right to clear it, but three wrong answers and you fail; the question count and pass line scale with difficulty'
     ]
   },
   'binary_matrix_rank': {
     zh: [
       '给一个 4×4 的 0/1 矩阵',
       '算它在模 2（GF(2)）下的秩，也就是高斯消元后非零行的个数',
-      '模 2 下「同列相消」就是按位异或；四选一，8 题答对 6 题以上算通关'
+      '普通档：模 2 下「同列相消」就是按位异或；四选一，8 题答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A 4×4 matrix of zeros and ones appears',
       'Find its rank over GF(2) — the number of non-zero rows after Gaussian elimination',
-      'Over GF(2) elimination is just bitwise XOR; four choices, eight questions, get at least 6 right to clear it'
+      'Normal: Over GF(2) elimination is just bitwise XOR; four choices, eight questions, get at least 6 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'binary_scale_balance': {
@@ -1743,24 +1743,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '给两个分数',
       '选出它们的最小公分母（最小公倍数 = 两分母相乘 ÷ 最大公因数）',
-      '四选一，选完会顺带显示通分结果；8 题答对 6 题以上算通关'
+      '普通档：四选一，选完会顺带显示通分结果；8 题答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Two fractions appear',
       'Pick their least common denominator — the lcm, which is the two denominators multiplied and divided by their gcd',
-      'Four choices, and the converted fractions are shown afterwards; get at least 6 of 8 right to clear it'
+      'Normal: Four choices, and the converted fractions are shown afterwards; get at least 6 of 8 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'fraction_matcher': {
     zh: [
       '给出一个分数',
       '从四个分数里选出与它等值的那个（比如 1/2 与 2/4）',
-      '一共 8 题，答对 6 题以上算通关'
+      '普通档：一共 8 题，答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'One fraction is shown',
       'Pick the fraction among four that equals it, like 1/2 and 2/4',
-      'Eight questions in all; get at least 6 right to clear it'
+      'Normal: Eight questions in all; get at least 6 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'fractional_pizza': {
@@ -1779,12 +1779,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '天平两边各是一个算式',
       '比较它们的大小，选出正确的 < 、= 或 >',
-      '一共 8 题，答对 6 题以上算通关'
+      '普通档：一共 8 题，答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Each side of the balance holds an expression',
       'Compare them and pick the correct <, = or >',
-      'Eight questions in all; get at least 6 right to clear it'
+      'Normal: Eight questions in all; get at least 6 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'matrix_multiplier': {
@@ -1875,36 +1875,36 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '屏幕上一件商品的原价和折扣',
       '从 4 个选项里算出折后价',
-      '一共 6 件商品，答对 5 件以上算通关'
+      '普通档：一共 6 件商品，答对 5 件以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'An item’s original price and a discount appear',
       'Work out the sale price and pick it from four options',
-      'Six items in all; get at least 5 right to clear it'
+      'Normal: Six items in all; get at least 5 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'prime_factor_trees': {
     zh: [
       '屏幕上一个合数，要把它一路拆成质因数',
       '每次都选能整除它的质数，拆到底',
-      '5 棵质因数树里拆对 4 棵算通关'
+      '普通档：5 棵质因数树里拆对 4 棵算通关；题数与通关线随难度变化'
     ],
     en: [
       'A composite number must be broken down into prime factors',
       'Each time pick a prime that divides it and keep going to the bottom',
-      'Split 4 of the 5 factor trees correctly to clear it'
+      'Normal: Split 4 of the 5 factor trees correctly to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'prime_gap_hunt': {
     zh: [
       '找出相邻两个素数之间的差',
       '比如 7 和 11 之间隔 4',
-      '一共 10 题，答对 7 题以上算通关'
+      '普通档：一共 10 题，答对 7 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Find the gap between two neighbouring primes',
       'For example 7 and 11 are 4 apart',
-      'Ten questions in all; get at least 7 right to clear it'
+      'Normal: Ten questions in all; get at least 7 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'prime_hunter': {
@@ -1935,24 +1935,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '把一个根式 √n 化成 a√b 的形式',
       '要把 n 里所有平方因子都提出来',
-      '一共 8 题，答对 6 题以上算通关'
+      '普通档：一共 8 题，答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Simplify a radical √n into the form a√b',
       'Pull every perfect-square factor out of n',
-      'Eight questions in all; get at least 6 right to clear it'
+      'Normal: Eight questions in all; get at least 6 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'roman_arithmetic': {
     zh: [
       '屏幕上是罗马数字写的算式',
       '算出结果，或者选出正确的罗马数字答案',
-      '一共 8 题，答对 6 题以上算通关'
+      '普通档：一共 8 题，答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'An arithmetic problem written in Roman numerals',
       'Work out the result, or pick the correct Roman numeral answer',
-      'Eight questions in all; get at least 6 right to clear it'
+      'Normal: Eight questions in all; get at least 6 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'sequence_sleuth': {
@@ -1983,12 +1983,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '给出集合 A、B 和一个数字',
       '判断这个数字落在哪个区域：只在 A、只在 B、都在、都不在',
-      '一共 8 题，答对 6 题以上算通关'
+      '普通档：一共 8 题，答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Two sets A and B are given along with a number',
       'Decide where it lands: only in A, only in B, in both, or in neither',
-      'Eight questions in all; get at least 6 right to clear it'
+      'Normal: Eight questions in all; get at least 6 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'sum_pyramid': {
@@ -2019,24 +2019,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '给一个带单位的数值',
       '从 4 个选项里选出换算后的正确结果',
-      '一共 10 题，答对 8 题以上算通关'
+      '普通档：一共 10 题，答对 8 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A value arrives with its unit',
       'Pick the correctly converted result from four options',
-      'Ten questions in all; get at least 8 right to clear it'
+      'Normal: Ten questions in all; get at least 8 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'vector_dot_product': {
     zh: [
       '给出两个向量（2 维或 3 维）',
       '算出它们的点积',
-      '从 4 个选项里选；一共 8 题，答对 6 题以上算通关'
+      '普通档：从 4 个选项里选；一共 8 题，答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Two vectors are given, either 2D or 3D',
       'Compute their dot product',
-      'Pick from four options; eight questions, at least 6 right to clear it'
+      'Normal: Pick from four options; eight questions, at least 6 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'vector_grid_alignment': {
@@ -2091,36 +2091,36 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一串字符一个接一个快速闪过',
       '其中有一个是数字，你要找出它是几',
-      '5 轮里答对 4 轮以上算通关，每一轮间隔会再快 40ms'
+      '普通档：5 轮里答对 4 轮以上算通关，每一轮间隔会再快 40ms；题数与通关线随难度变化'
     ],
     en: [
       'A stream of characters flashes past one at a time',
       'Exactly one of them is a digit — work out which',
-      'Get at least 4 of 5 rounds right to clear it, with each round arriving 40 ms faster'
+      'Normal: Get at least 4 of 5 rounds right to clear it, with each round arriving 40 ms faster; the question count and pass line scale with difficulty'
     ]
   },
   'card_counting_memory': {
     zh: [
       '8 张牌会快速闪过一遍，其中有一张出现了两次',
       '闪完之后点出那张重复的牌',
-      '8 轮里答对 6 轮以上算通关'
+      '普通档：8 轮里答对 6 轮以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Eight cards flash past quickly, and one of them appears twice',
       'Afterwards, tap the card that repeated',
-      'Get at least 6 of 8 rounds right to clear it'
+      'Normal: Get at least 6 of 8 rounds right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'change_blindness': {
     zh: [
       '九宫格先闪 1.3 秒让你记住',
       '画面翻动后第二次呈现时，会悄悄换掉其中一格',
-      '指出是哪一格被换了；6 轮答对 4 轮以上算通关'
+      '普通档：指出是哪一格被换了；6 轮答对 4 轮以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A 3×3 grid flashes for 1.3 seconds to memorise',
       'After the screen flips, one cell comes back changed',
-      'Point out which cell — get at least 4 of 6 rounds right to clear it'
+      'Normal: Point out which cell — get at least 4 of 6 rounds right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'conjunction_search': {
@@ -2151,12 +2151,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '边数边记：每张卡上有若干黄点，先数出来',
       '全部数完之后，再按顺序回忆每张卡的数目',
-      '全对且张数到 5 算通关；2 条命用完就判负'
+      '普通档：全对且张数到 5 算通关；2 条命用完就判负；题数与通关线随难度变化'
     ],
     en: [
       'Count and remember at once: each card holds some yellow dots — count them first',
       'When all the cards are done, recall each count in order',
-      'Get everything right up to 5 cards to clear it; lose both lives and you fail'
+      'Normal: Get everything right up to 5 cards to clear it; lose both lives and you fail; the question count and pass line scale with difficulty'
     ]
   },
   'd2_attention': {
@@ -2175,12 +2175,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '先看一眼样例图形',
       '隔一小会儿之后，从 4 个图形里挑出刚才那个',
-      '8 题答对 6 题以上算通关；错满 3 题就判负'
+      '普通档：8 题答对 6 题以上算通关；错满 3 题就判负；题数与通关线随难度变化'
     ],
     en: [
       'Study a sample shape for a moment',
       'After a short delay, pick that same shape out of four',
-      'Get at least 6 of 8 right to clear it; three wrong answers and you fail'
+      'Normal: Get at least 6 of 8 right to clear it; three wrong answers and you fail; the question count and pass line scale with difficulty'
     ]
   },
   'divided_attention': {
@@ -2199,12 +2199,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '先记住一组样例图形',
       '然后从选项里挑出那个「你刚才没见过」的',
-      '6 轮答对 5 轮以上算通关；样例数会一轮比一轮多'
+      '普通档：6 轮答对 5 轮以上算通关；样例数会一轮比一轮多；题数与通关线随难度变化'
     ],
     en: [
       'Memorise a set of sample shapes',
       'Then pick the one among the options that you have not just seen',
-      'Get at least 5 of 6 rounds right to clear it, with more samples each round'
+      'Normal: Get at least 5 of 6 rounds right to clear it, with more samples each round; the question count and pass line scale with difficulty'
     ]
   },
   'double_n_back': {
@@ -2235,12 +2235,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '先记住 4 位数字',
       '中途会插入一段心算，你要边算边守住那 4 位',
-      '最后回忆数字；3 轮共 12 位，答对 9 位以上算通关'
+      '普通档：最后回忆数字；3 轮共 12 位，答对 9 位以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Memorise four digits first',
       'Then mental arithmetic interrupts — must hold those digits while you calculate',
-      'Finally recall them; across 3 rounds (12 digits), get at least 9 right to clear it'
+      'Normal: Finally recall them; across 3 rounds (12 digits), get at least 9 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'event_timeline_memory': {
@@ -2295,24 +2295,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一排箭头出现，只中间那个才是目标',
       '两侧的箭头可能跟它同向也可能反向 —— 要忽略它们',
-      '12 题答对 11 题以上、且平均反应低于 900ms 算通关'
+      '普通档：12 题答对 11 题以上、且平均反应低于 900ms 算通关；题数与通关线随难度变化'
     ],
     en: [
       'A row of arrows appears; only the middle one is your target',
       'The flanking arrows may agree with it or point the other way — ignore them',
-      'Clear it with at least 11 of 12 right and an average reaction under 900 ms'
+      'Normal: Clear it with at least 11 of 12 right and an average reaction under 900 ms; the question count and pass line scale with difficulty'
     ]
   },
   'frequency_tap': {
     zh: [
       '跟着 100 BPM 的节拍点圆盘',
       '要尽量踩在拍点上，系统会记录你每次的误差',
-      '20 拍命中 16 拍以上算通关'
+      '普通档：20 拍命中 16 拍以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Tap the disc in time with a 100 BPM beat',
       'Aim for the beat itself — your timing error is recorded on every tap',
-      'Clear it with at least 16 hits out of 20 beats'
+      'Normal: Clear it with at least 16 hits out of 20 beats; the question count and pass line scale with difficulty'
     ]
   },
   'ghost_tap': {
@@ -2367,24 +2367,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '几个圆点会先高亮一下，那就是要盯住的目标',
       '高亮消失后它们混进其他圆点里一起移动',
-      '停下后指出刚才那几个目标；3 轮里全对 2 轮以上算通关'
+      '普通档：停下后指出刚才那几个目标；3 轮里全对 2 轮以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A few dots light up briefly — those are the targets to watch',
       'The highlight fades and they move around among all the other dots',
-      'When everything stops, point out the original targets; get at least 2 of 3 rounds fully right to clear it'
+      'Normal: When everything stops, point out the original targets; get at least 2 of 3 rounds fully right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'n_back': {
     zh: [
       '字母一个一个出现',
       '每次判断：当前这个字母，和 2 步之前的那个是否相同',
-      '一共 12 个试次，答对 9 个以上算通关'
+      '普通档：一共 12 个试次，答对 9 个以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Letters appear one at a time',
       'Each time, decide whether the current letter matches the one from 2 steps back',
-      'Twelve trials in all; get at least 9 right to clear it'
+      'Normal: Twelve trials in all; get at least 9 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'narrative_recall': {
@@ -2415,24 +2415,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '6 个格子里摆着 5 个物件',
       '遮罩一闪之后，其中一个偷偷换了格子',
-      '指出是谁动了；8 轮答对 6 轮以上算通关'
+      '普通档：指出是谁动了；8 轮答对 6 轮以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Five objects sit in six cells',
       'A cover flashes, and one of them sneaks to a different cell',
-      'Point out which one moved; get at least 6 of 8 rounds right to clear it'
+      'Normal: Point out which one moved; get at least 6 of 8 rounds right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'object_shuffle': {
     zh: [
       '先看清 💎 在哪只盒子底下',
       '盒子开始两两换位，你要一直盯住它的落点',
-      '8 轮里猜中 6 轮以上算通关'
+      '普通档：8 轮里猜中 6 轮以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'First watch which box the 💎 is under',
       'The boxes start swapping in pairs — keep your eye on where it ends up',
-      'Get at least 6 of 8 rounds right to clear it'
+      'Normal: Get at least 6 of 8 rounds right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'operation_span': {
@@ -2463,12 +2463,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '先盯住中心的注视点',
       '然后会给出一个方位提示，接着目标出现',
-      '尽快点目标所在的那一侧；16 次答对 12 次以上算通关（越快分越高）'
+      '普通档：尽快点目标所在的那一侧；16 次答对 12 次以上算通关（越快分越高）；题数与通关线随难度变化'
     ],
     en: [
       'Fix your gaze on the centre point',
       'A directional cue appears, then the target does',
-      'Tap the side the target appeared on as fast as you can; get at least 12 of 16 right to clear it, and faster scores higher'
+      'Normal: Tap the side the target appeared on as fast as you can; get at least 12 of 16 right to clear it, and faster scores higher; the question count and pass line scale with difficulty'
     ]
   },
   'reading_span': {
@@ -2559,12 +2559,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '规则每 3 题就换一次：在「判奇偶」和「比大小」之间来回切',
       '要看清当前用的是哪条规则再作答',
-      '15 题答对 12 题以上、且平均反应低于 1600ms 算通关'
+      '普通档：15 题答对 12 题以上、且平均反应低于 1600ms 算通关；题数与通关线随难度变化'
     ],
     en: [
       'The rule flips every three questions, alternating between odd-or-even and bigger-or-smaller',
       'Check which rule is in force before answering',
-      'Clear it with at least 12 of 15 right and an average reaction under 1600 ms'
+      'Normal: Clear it with at least 12 of 15 right and an average reaction under 1600 ms; the question count and pass line scale with difficulty'
     ]
   },
   'running_memory_span': {
@@ -2643,24 +2643,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一团圆点只亮 420 毫秒',
       '来不及一个个数，只能「一眼看出」有几个',
-      '10 题答对 8 题以上算通关'
+      '普通档：10 题答对 8 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A cluster of dots shows for only 420 ms',
       'Too fast to count one by one — you have to just see how many there are',
-      'Get at least 8 of 10 right to clear it'
+      'Normal: Get at least 8 of 10 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'switch_task': {
     zh: [
       '同一个数字，按屏幕上的提示来决定怎么答',
       '提示会在「比大小」和「判奇偶」之间来回切换',
-      '12 轮答对 9 轮以上算通关'
+      '普通档：12 轮答对 9 轮以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'The same number appears, and the on-screen prompt decides how to answer',
       'The prompt switches back and forth between bigger-or-smaller and odd-or-even',
-      'Get at least 9 of 12 rounds right to clear it'
+      'Normal: Get at least 9 of 12 rounds right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'symbol_digit_assoc': {
@@ -2691,24 +2691,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一排箭头出现，只看正中间那个的方向',
       '两侧的箭头一律是干扰项，不管它们朝哪边',
-      '16 轮答对 13 轮以上算通关'
+      '普通档：16 轮答对 13 轮以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A row of arrows appears — judge only the direction of the middle one',
       'The flanking arrows are pure distraction, whichever way they point',
-      'Get at least 13 of 16 rounds right to clear it'
+      'Normal: Get at least 13 of 16 rounds right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'task_switching': {
     zh: [
       '同一个刺激，按提示在「判形状」和「判颜色」之间切换',
       '系统会对比「重复同一规则」和「刚切换过」两种情况的反应时',
-      '16 轮答对 12 轮以上算通关'
+      '普通档：16 轮答对 12 轮以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'One stimulus, and the prompt makes you switch between judging shape and judging colour',
       'The game compares your reaction time when the rule repeats versus when it just switched',
-      'Get at least 12 of 16 rounds right to clear it'
+      'Normal: Get at least 12 of 16 rounds right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'trail_making': {
@@ -2727,36 +2727,36 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '只回答正中间那个字母是什么',
       '两侧的干扰字母会越挤越近，越挤越难认',
-      '8 题答对 6 题以上算通关'
+      '普通档：8 题答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Answer only what the middle letter is',
       'Flanking letters crowd in closer and closer, making it harder to read',
-      'Get at least 6 of 8 right to clear it'
+      'Normal: Get at least 6 of 8 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'visual_search': {
     zh: [
       '满屏干扰项里，有一个跟其他都不一样',
       '一眼把它找出来点掉',
-      '8 局里找出 6 个以上算通关；每局 8 秒，点错罚 1.2 秒'
+      '普通档：8 局里找出 6 个以上算通关；每局 8 秒，点错罚 1.2 秒；题数与通关线随难度变化'
     ],
     en: [
       'Among a screenful of distractors, one stands out',
       'Spot it and tap it',
-      'Clear at least 6 of 8 rounds; each gives 8 seconds, and a wrong tap costs 1.2'
+      'Normal: Clear at least 6 of 8 rounds; each gives 8 seconds, and a wrong tap costs 1.2; the question count and pass line scale with difficulty'
     ]
   },
   'visual_search_conjunction': {
     zh: [
       '目标要「形状 + 颜色」两个特征同时对上',
       '干扰项各自只占其中一个 —— 所以只看一样会找错',
-      '6 局里找对 5 局以上算通关；每局 9 秒，点错罚 1.5 秒'
+      '普通档：6 局里找对 5 局以上算通关；每局 9 秒，点错罚 1.5 秒；题数与通关线随难度变化'
     ],
     en: [
       'The target must match on BOTH shape and colour',
       'Each distractor matches only one of the two, so watching a single feature misleads you',
-      'Clear at least 5 of 6 rounds; each gives 9 seconds, and a wrong tap costs 1.5'
+      'Normal: Clear at least 5 of 6 rounds; each gives 9 seconds, and a wrong tap costs 1.5; the question count and pass line scale with difficulty'
     ]
   },
   'wisconsin_card_sorting': {
@@ -2775,24 +2775,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '先记住 6 组词对',
       '之后给出一个词，凭记忆选出它的搭档',
-      '6 题答对 5 题以上算通关'
+      '普通档：6 题答对 5 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'First memorise six word pairs',
       'Then a word appears, and you pick its partner from memory',
-      'Get at least 5 of 6 right to clear it'
+      'Normal: Get at least 5 of 6 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'affix_factory': {
     zh: [
       '屏幕给出一个词根，还有中文释义',
       '给词根接上正确的词缀（前缀或后缀），造出符合释义的那个单词',
-      '8 题答对 6 题以上算通关'
+      '普通档：8 题答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A root and its Chinese meaning appear',
       'Attach the right affix — prefix or suffix — to build the word that matches the meaning',
-      'Get at least 6 of 8 right to clear it'
+      'Normal: Get at least 6 of 8 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'anagram_definition': {
@@ -2847,12 +2847,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '屏幕给出一对词',
       '判断它们是否同源（是否来自同一个古词根）',
-      '12 题答对 8 题以上算通关；每题答完会给一句词源小注'
+      '普通档：12 题答对 8 题以上算通关；每题答完会给一句词源小注；题数与通关线随难度变化'
     ],
     en: [
       'A pair of words appears',
       'Decide whether they are cognates — descended from the same ancient root',
-      'Get at least 8 of 12 right to clear it, and each answer comes with a short etymology note'
+      'Normal: Get at least 8 of 12 right to clear it, and each answer comes with a short etymology note; the question count and pass line scale with difficulty'
     ]
   },
   'consonant_reconstruct': {
@@ -2871,24 +2871,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '读一句英文例句',
       '从语境推断其中生词的意思，四选一',
-      '10 题答对 8 题以上算通关；错 3 次即失败'
+      '普通档：10 题答对 8 题以上算通关；错 3 次即失败；题数与通关线随难度变化'
     ],
     en: [
       'Read an English example sentence',
       'Infer the meaning of the unfamiliar word from context — four choices',
-      'Get at least 8 of 10 right to clear it; three wrong answers and you fail'
+      'Normal: Get at least 8 of 10 right to clear it; three wrong answers and you fail; the question count and pass line scale with difficulty'
     ]
   },
   'conundrum_anagram': {
     zh: [
       '读一则英文谜面，猜出一个单词',
       '卡住可以看字母乱序（anagram）当提示',
-      '6 则谜语猜中 5 则以上算通关；错 3 次或一直放弃即失败'
+      '普通档：6 则谜语猜中 5 则以上算通关；错 3 次或一直放弃即失败；题数与通关线随难度变化'
     ],
     en: [
       'Read an English riddle and guess the word it describes',
       'Stuck? Reveal the anagram as a hint',
-      'Solve at least 5 of 6 riddles to clear it; three mistakes or giving up repeatedly fails you'
+      'Normal: Solve at least 5 of 6 riddles to clear it; three mistakes or giving up repeatedly fails you; the question count and pass line scale with difficulty'
     ]
   },
   'crossword': {
@@ -2907,24 +2907,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '整段文字被凯撒位移加密（每个字母平移若干位）',
       '靠已经揭出来的明文映射，把剩下的密文还原',
-      '8 关解出 6 关以上算通关；错 3 次即失败；每揭一条「密文→明文」映射扣 30 分'
+      '普通档：8 关解出 6 关以上算通关；错 3 次即失败；每揭一条「密文→明文」映射扣 30 分；题数与通关线随难度变化'
     ],
     en: [
       'The text is Caesar-shifted — every letter moved along the alphabet by the same amount',
       'Use the plaintext mappings you have already found to decode the rest',
-      'Solve at least 6 of 8 rounds to clear it; three mistakes fail you, and each revealed cipher-to-plain pair costs 30 points'
+      'Normal: Solve at least 6 of 8 rounds to clear it; three mistakes fail you, and each revealed cipher-to-plain pair costs 30 points; the question count and pass line scale with difficulty'
     ]
   },
   'definition_dash': {
     zh: [
       '限时选释义，整局 60 秒',
       '答得越快分越高，答完立刻换下一题',
-      '答对 8 题以上算通关；错 3 次或时间耗尽即失败'
+      '普通档：答对 8 题以上算通关；错 3 次或时间耗尽即失败；题数与通关线随难度变化'
     ],
     en: [
       'Pick the right definition against a 60-second clock',
       'The faster you answer the more you score, and the next question comes straight away',
-      'Get at least 8 right to clear it; three mistakes or running out of time fails you'
+      'Normal: Get at least 8 right to clear it; three mistakes or running out of time fails you; the question count and pass line scale with difficulty'
     ]
   },
   'etymology_origin': {
@@ -2979,12 +2979,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '给出一批单词',
       '把它们分进「名词 / 动词 / 形容词 / 副词」四个桶里',
-      '16 个词里正确分类 12 个以上算通关'
+      '普通档：16 个词里正确分类 12 个以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A batch of words appears',
       'Sort each into one of four buckets: noun, verb, adjective or adverb',
-      'Classify at least 12 of the 16 correctly to clear it'
+      'Normal: Classify at least 12 of the 16 correctly to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'letter_bridge': {
@@ -3159,36 +3159,36 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '6 个单词被打乱了顺序',
       '按正确的语序把它们一个个点回去',
-      '5 句答对 4 句以上算通关；错 3 次就失败'
+      '普通档：5 句答对 4 句以上算通关；错 3 次就失败；题数与通关线随难度变化'
     ],
     en: [
       'Six words arrive in scrambled order',
       'Tap them back into the correct sentence order',
-      'Get at least 4 of 5 sentences right to clear it; three mistakes and you fail'
+      'Normal: Get at least 4 of 5 sentences right to clear it; three mistakes and you fail; the question count and pass line scale with difficulty'
     ]
   },
   'silent_letter_search': {
     zh: [
       '一个字母格里藏着一个不发音的字母',
       '把那个不发音的字母点出来',
-      '10 题答对 7 题以上算通关；错 3 次就失败'
+      '普通档：10 题答对 7 题以上算通关；错 3 次就失败；题数与通关线随难度变化'
     ],
     en: [
       'A silent letter hides somewhere in a grid of letters',
       'Tap the letter that is not pronounced',
-      'Get at least 7 of 10 right to clear it; three mistakes and you fail'
+      'Normal: Get at least 7 of 10 right to clear it; three mistakes and you fail; the question count and pass line scale with difficulty'
     ]
   },
   'spelling_sprint': {
     zh: [
       '看着中文释义',
       '在 60 秒内把对应的英文单词敲出来',
-      '答对 8 题以上算通关；超时或错满 3 次就失败'
+      '普通档：答对 8 题以上算通关；超时或错满 3 次就失败；题数与通关线随难度变化'
     ],
     en: [
       'A Chinese definition appears',
       'Type out the matching English word within 60 seconds',
-      'Get at least 8 right to clear it; running out of time or three mistakes fails you'
+      'Normal: Get at least 8 right to clear it; running out of time or three mistakes fails you; the question count and pass line scale with difficulty'
     ]
   },
   'spoonerism_solver': {
@@ -3603,24 +3603,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '左边是一组图形，右边是另一组',
       '判断右边那组是左边的「纯旋转」，还是被偷偷镜像过了',
-      '10 题答对 8 题以上算通关'
+      '普通档：10 题答对 8 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A shape sits on the left, another on the right',
       'Decide whether the right one is a pure rotation of the left, or has been secretly mirrored',
-      'Get at least 8 of 10 right to clear it'
+      'Normal: Get at least 8 of 10 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'mirror_image': {
     zh: [
       '左边一个图形，右边一个图形',
       '判断右边是不是左边沿中轴翻转出来的真镜像',
-      '10 题答对 8 题以上算通关'
+      '普通档：10 题答对 8 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'One shape on the left, one on the right',
       'Decide whether the right one is a true mirror image of the left, flipped across the axis',
-      'Get at least 8 of 10 right to clear it'
+      'Normal: Get at least 8 of 10 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'mirror_maze': {
@@ -3663,12 +3663,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一格里密密麻麻排着一堆相同字符',
       '其中混进了一个「不一样的字符」',
-      '把它点出来；10 题答对 8 题以上算通关'
+      '普通档：把它点出来；10 题答对 8 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A grid is packed with identical characters',
       'One different character is hidden among them',
-      'Tap it out; get at least 8 of 10 right to clear it'
+      'Normal: Tap it out; get at least 8 of 10 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'paper_folding': {
@@ -3903,24 +3903,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '狼披着羊皮混进了羊圈：一只羊 🐑 占 1 格，一头狼 🐺 占 2 格',
       '题型一「按格数」：一共占了几格；题型二「按只数」：真正的羊有几只',
-      '10 题答对 7 题以上算通关'
+      '普通档：10 题答对 7 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'Wolves are hiding among the sheep: each sheep 🐑 takes one cell, each wolf 🐺 takes two',
       'One question type asks how many cells are occupied; the other asks how many actual sheep there are',
-      'Get at least 7 of 10 right to clear it'
+      'Normal: Get at least 7 of 10 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'cross_section_slice': {
     zh: [
       '5×5×5 的方块堆，只画出第 h 层的平面图（黑格有方块、灰格是空的）',
       '要靠这张平面图逆推这一层一共有几个方块',
-      '8 题答对 6 题以上算通关'
+      '普通档：8 题答对 6 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A 5×5×5 stack of blocks, with only layer h drawn as a plan view (black cells hold blocks, grey are empty)',
       'Deduce from that plan how many blocks are on this layer',
-      'Get at least 6 of 8 right to clear it'
+      'Normal: Get at least 6 of 8 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'cryptogram_all': {
@@ -4071,12 +4071,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一格里排着一堆相同图形',
       '其中只有一个转了 90°，其余都停在同一角度',
-      '把转过的那个点出来；10 题答对 8 题以上算通关'
+      '普通档：把转过的那个点出来；10 题答对 8 题以上算通关；题数与通关线随难度变化'
     ],
     en: [
       'A grid is filled with identical shapes',
       'Exactly one of them is rotated 90° while the rest sit at the same angle',
-      'Tap the rotated one; get at least 8 of 10 right to clear it'
+      'Normal: Tap the rotated one; get at least 8 of 10 right to clear it; the question count and pass line scale with difficulty'
     ]
   },
   'path_recall': {
@@ -4179,12 +4179,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '先记住一组 4 个水果',
       '然后看一个探针水果，判断它是否在你记住的那组里',
-      '10 次答对 7 次以上算通关（越快分越高）'
+      '普通档：10 次答对 7 次以上算通关（越快分越高）；题数与通关线随难度变化'
     ],
     en: [
       'Memorise a set of four fruits',
       'A probe fruit then appears — decide whether it was in your set',
-      'Get at least 7 of 10 right to clear it, and faster scores higher'
+      'Normal: Get at least 7 of 10 right to clear it, and faster scores higher; the question count and pass line scale with difficulty'
     ]
   },
   'symmetry_span': {
@@ -4215,12 +4215,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '左右两侧会先后各亮起一个图形',
       '判断哪一个先出现',
-      '10 次答对 7 次以上算通关（越快分越高）'
+      '普通档：10 次答对 7 次以上算通关（越快分越高）；题数与通关线随难度变化'
     ],
     en: [
       'A shape lights up on the left and another on the right, one after the other',
       'Decide which one appeared first',
-      'Get at least 7 of 10 right to clear it, and faster scores higher'
+      'Normal: Get at least 7 of 10 right to clear it, and faster scores higher; the question count and pass line scale with difficulty'
     ]
   },
   'triple_sequence': {
