@@ -22,8 +22,8 @@ import { Digits } from '../core/I18n';
 import { Tv } from '../core/Tv';
 
 const PITS: number = 6;      // 每方 6 个坑
-const P_STORE: number = 6;   // 我方库
-const A_STORE: number = 13;  // 对手库
+// ★ 2026-11-29（第九批）：库/坑下标原写死 6/13（14 格环），难度改坑数后自家库恒 0。
+// 现在由 diffTotal 派生：我方坑 0..n-1，我方库 n，对方坑 n+1..2n，对方库 2n+1。
 const START: number = 4;     // 每坑初始石子
 
 /**
@@ -72,6 +72,20 @@ export struct GMancala {
     for (let i2 = 0; i2 < n2; i2++) { a2.push(i2); }
     return a2;
   }
+  private myStore(): number { return this.diffTotal; }
+
+  private oppStore(): number { return this.diffTotal * 2 + 1; }
+
+  private boardN(): number { return this.diffTotal * 2 + 2; }
+
+  /** 对方坑位，从右到左显示 */
+  private oppRow(): number[] {
+    const n: number = this.diffTotal;
+    const a: number[] = [];
+    for (let i = 2 * n; i > n; i--) { a.push(i); }
+    return a;
+  }
+
   onFinish: (r: GameResult) => void = () => {};
 
   @State private pits: number[] = [];
@@ -133,9 +147,9 @@ export struct GMancala {
   private reset(): void {
     this.clearAi();
     this.diffTotal = this.pickSize();
-    const p: number[] = new Array<number>(14).fill(START);
-    p[P_STORE] = 0;
-    p[A_STORE] = 0;
+    const p: number[] = new Array<number>(this.boardN()).fill(START);
+    p[this.myStore()] = 0;
+    p[this.oppStore()] = 0;
     this.pits = p;
     this.turn = 0;
     // ★ 联机：本地 turn 必须跟"轮到谁"对齐 —— 否则加入方开局会显示"轮到你"却点不动
@@ -156,7 +170,7 @@ export struct GMancala {
     n[pit] = 0;
     let pos: number = pit;
     while (stones > 0) {
-      pos = (pos + 1) % 14;
+      pos = (pos + 1) % this.boardN();
       if (pos === skip) {
         continue;
       }
@@ -168,18 +182,18 @@ export struct GMancala {
   }
 
   private mine(i: number, side: number): boolean {
-    return side === 0 ? (i >= 0 && i < this.diffTotal) : (i > this.diffTotal && i < A_STORE);
+    return side === 0 ? (i >= 0 && i < this.diffTotal) : (i > this.diffTotal && i < this.oppStore());
   }
 
   private applyMove(pit: number, side: number): void {
-    const store: number = side === 0 ? P_STORE : A_STORE;
-    const skip: number = side === 0 ? A_STORE : P_STORE;
+    const store: number = side === 0 ? this.myStore() : this.oppStore();
+    const skip: number = side === 0 ? this.oppStore() : this.myStore();
     let n: number[] = this.sow(this.pits, pit, skip);
     const last: number = this.lastLand;
     const extra: boolean = last === store;
 
     if (!extra && this.mine(last, side) && n[last] === 1) {
-      const opp: number = 12 - last;
+      const opp: number = this.boardN() - 2 - last;
       n[store] = n[store] + n[opp] + 1;
       n[opp] = 0;
       n[last] = 0;
@@ -202,7 +216,7 @@ export struct GMancala {
       }
     }
     let aEmpty: boolean = true;
-    for (let i = this.diffTotal + 1; i < A_STORE; i++) {
+    for (let i = this.diffTotal + 1; i < this.oppStore(); i++) {
       if (this.pits[i] > 0) {
         aEmpty = false;
       }
@@ -212,16 +226,16 @@ export struct GMancala {
     }
     const n: number[] = this.pits.slice();
     for (let i = 0; i < this.diffTotal; i++) {
-      n[P_STORE] = n[P_STORE] + n[i];
+      n[this.myStore()] = n[this.myStore()] + n[i];
       n[i] = 0;
     }
-    for (let i = this.diffTotal + 1; i < A_STORE; i++) {
-      n[A_STORE] = n[A_STORE] + n[i];
+    for (let i = this.diffTotal + 1; i < this.oppStore(); i++) {
+      n[this.oppStore()] = n[this.oppStore()] + n[i];
       n[i] = 0;
     }
     this.pits = n;
     this.over = true;
-    this.won = n[P_STORE] > n[A_STORE];
+    this.won = n[this.myStore()] > n[this.oppStore()];
     this.finish(this.won);
     return true;
   }
@@ -230,20 +244,20 @@ export struct GMancala {
   private aiPick(): number {
     let best: number = -1;
     let bestVal: number = -999999;
-    for (let i = this.diffTotal + 1; i < A_STORE; i++) {
+    for (let i = this.diffTotal + 1; i < this.oppStore(); i++) {
       if (this.pits[i] === 0) {
         continue;
       }
-      const s: number[] = this.sow(this.pits, i, P_STORE);
-      const extra: boolean = this.lastLand === A_STORE;
-      const gain: number = s[A_STORE] - this.pits[A_STORE];
+      const s: number[] = this.sow(this.pits, i, this.myStore());
+      const extra: boolean = this.lastLand === this.oppStore();
+      const gain: number = s[this.oppStore()] - this.pits[this.oppStore()];
       let opp: number = 0;
       for (let j = 0; j < this.diffTotal; j++) {
         if (s[j] === 0) {
           continue;
         }
-        const s2: number[] = this.sow(s, j, A_STORE);
-        const g: number = s2[P_STORE] - s[P_STORE];
+        const s2: number[] = this.sow(s, j, this.oppStore());
+        const g: number = s2[this.myStore()] - s[this.myStore()];
         if (g > opp) {
           opp = g;
         }
@@ -277,7 +291,7 @@ export struct GMancala {
       return;
     }
     const pit: number = p + LAN_OFFSET;
-    if (pit >= A_STORE || this.pits[pit] === 0) {
+    if (pit >= this.oppStore() || this.pits[pit] === 0) {
       return;
     }
     this.moves = this.moves + 1;
@@ -407,20 +421,20 @@ export struct GMancala {
       if (this.pits[i] === 0) {
         continue;
       }
-      const s: number[] = this.sow(this.pits, i, A_STORE);
+      const s: number[] = this.sow(this.pits, i, this.oppStore());
       const last: number = this.lastLand;
-      const extra: boolean = last === P_STORE;
-      let gain: number = s[P_STORE] - this.pits[P_STORE];
+      const extra: boolean = last === this.myStore();
+      let gain: number = s[this.myStore()] - this.pits[this.myStore()];
       if (!extra && last < this.diffTotal && s[last] === 1) {
-        gain = gain + s[12 - last];
+        gain = gain + s[this.boardN() - 2 - last];
       }
       let opp: number = 0;
-      for (let j = this.diffTotal + 1; j < A_STORE; j++) {
+      for (let j = this.diffTotal + 1; j < this.oppStore(); j++) {
         if (s[j] === 0) {
           continue;
         }
-        const s2: number[] = this.sow(s, j, P_STORE);
-        const g: number = s2[A_STORE] - s[A_STORE];
+        const s2: number[] = this.sow(s, j, this.myStore());
+        const g: number = s2[this.oppStore()] - s[this.oppStore()];
         if (g > opp) {
           opp = g;
         }
@@ -447,13 +461,13 @@ export struct GMancala {
     if (p < 0) {
       return Hint.none('none');
     }
-    const before: number = this.pits[P_STORE];
-    const s: number[] = this.sow(this.pits, p, A_STORE);
+    const before: number = this.pits[this.myStore()];
+    const s: number[] = this.sow(this.pits, p, this.oppStore());
     const last: number = this.lastLand;
-    const extra: boolean = last === P_STORE;
-    let add: number = s[P_STORE] - before;
+    const extra: boolean = last === this.myStore();
+    let add: number = s[this.myStore()] - before;
     if (!extra && last < this.diffTotal && s[last] === 1) {
-      add = add + s[12 - last];
+      add = add + s[this.boardN() - 2 - last];
     }
     const tail: string = extra ? TG('，最后一颗进自己的库 ⇒ 能再走一次') : '';
     return Hint.make([p],
@@ -486,6 +500,8 @@ export struct GMancala {
   }
 
   private playerMove(pit: number): void {
+    // ★ 2026-11-29：只接受自己的坑（0..diffTotal-1），防止派生下标后越界点。
+    if (pit < 0 || pit >= this.diffTotal) { return; }
     if (this.over || this.turn !== 0 || this.pits[pit] === 0) {
       return;
     }
@@ -543,9 +559,9 @@ export struct GMancala {
     const r: GameResult = {
       gameId: 'mancala',
       solved: solved,
-      score: this.pits[P_STORE] * 100 + (solved ? 200 : 0),
+      score: this.pits[this.myStore()] * 100 + (solved ? 200 : 0),
       durationMs: Date.now() - this.startAt,
-      levelReached: this.pits[P_STORE]
+      levelReached: this.pits[this.myStore()]
     };
     LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
     this.settled = true;
@@ -567,13 +583,13 @@ export struct GMancala {
       Row({ space: Space.md }) {
         Column({ space: 2 }) {
         Text((TG('我方库'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text((String(this.pits.length > 0 ? this.pits[P_STORE] : 0))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((String(this.pits.length > 0 ? this.pits[this.myStore()] : 0))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('对手库'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textOverflow({ overflow: TextOverflow.Ellipsis }).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text((String(this.pits.length > 0 ? this.pits[A_STORE] : 0))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((String(this.pits.length > 0 ? this.pits[this.oppStore()] : 0))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }
         .layoutWeight(1).padding(Space.sm)
         .backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
@@ -590,7 +606,7 @@ export struct GMancala {
         // 对手的库（在左）
         Column({ space: Space.xs }) {
           Text(LanMatch.isActive() ? TG('对手') : 'AI').fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs).textOverflow({ overflow: TextOverflow.Ellipsis })
-          Text(String(this.pits.length > 0 ? this.pits[A_STORE] : 0))
+          Text(String(this.pits.length > 0 ? this.pits[this.oppStore()] : 0))
             .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.orange)
         }
         .width(56)
@@ -601,7 +617,7 @@ export struct GMancala {
 
         Column({ space: Space.sm }) {
           Row({ space: Space.sm }) {
-            ForEach([12, 11, 10, 9, 8, 7], (i: number) => {
+            ForEach(this.oppRow(), (i: number) => {
               Column({ space: 2 }) {
               Text(String(this.pits.length > 0 ? this.pits[(i)] : 0))
               .fontSize(FontSize.xl).fontWeight(FontWeight.Bold)
@@ -672,7 +688,7 @@ export struct GMancala {
         // 我方的库（在右）
         Column({ space: Space.xs }) {
           Text(TG('我')).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-          Text(String(this.pits.length > 0 ? this.pits[P_STORE] : 0))
+          Text(String(this.pits.length > 0 ? this.pits[this.myStore()] : 0))
             .fontSize(FontSize.xxl).fontWeight(FontWeight.Bold).fontColor(Palette.emerald)
         }
         .width(56)
