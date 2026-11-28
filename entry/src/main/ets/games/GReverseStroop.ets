@@ -1,6 +1,6 @@
 /**
  * 反向斯特鲁普 —— 🧠 字用别的颜色印出来，请点「字义」而不是墨色（id: reverse_stroop）
- * 胜负：12 题答对 ≥ 10 且平均 < 1800ms ⇒ 通关；进度：题号/12 · 答对 · 平均
+ * 胜负：按本档题数的比例答对且平均 < 1800ms ⇒ 通关；进度：题号/本档题数 · 答对 · 平均
  */
 import { Hint, HintResult } from '../ai/Hint';
 import { HintBar } from '../components/HintBar';
@@ -318,7 +318,8 @@ export struct GReverseStroop {
         .onBlur(() => { if (this.tvFocus === 'L305') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L305'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：12 题答对 ≥ 10 且平均 < 1800 ms'))
+      // ★ 2026-11-28（真机验收发现）：判定文案写死 12 题/10 对，而题数与门槛随难度变化。
+        Text(TG2('判定：正确 ≥ {0}/{1}', String(Math.max(1, Math.round(WIN_RIGHT * this.diffTotal / TOTAL))), String(this.diffTotal)) + TG2(' · 平均 {0} ms', '1800'))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).textAlign(TextAlign.Center).width('100%')
     }
     .onTouch((e: TouchEvent) => {
