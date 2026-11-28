@@ -71,8 +71,10 @@ export struct GFaceNameAssociation {
   @State private rightN: number = 0;
   @State private pick: number = -1;
   // ★ 难度作用到玩法：本局时限 = 基础 × 难度倍率（简单 1.5× / 普通 1× / 困难 0.7×）
-  // ★ 2026-11-28（第六批·中）：timeNow 有 10 秒下限，timeNow(5) 三档都变成 10 ⇒ 改成 timeNow(10)（15/10/7）。
-  private total: number = GameDiff.timeNow(SHOW_SEC * 2);
+  // ★ 2026-11-28（第六批·中）：timeNow 有 10 秒下限，timeNow(5) 三档都变成 10 ⇒ 改成直接按 timeScale 算（15/10/7）。
+  /** ★ 2026-11-29（回归审查）：GameDiff.time 有 10 秒地板，timeNow(10) 困难档仍是 10；
+   *  直接用 timeScale 算并保底 7 秒 ⇒ 15 / 10 / 7。 */
+  private total: number = Math.max(7, Math.round((SHOW_SEC * 2) * GameDiff.timeScale('face_name_association')));
   @State private secLeft: number = 0;
   @State private msg: string = '';
   @State private over: boolean = false;
@@ -91,7 +93,7 @@ export struct GFaceNameAssociation {
     }
   }
   onRestart(): void {
-    this.total = GameDiff.timeNow(SHOW_SEC * 2);   // 难度可能刚变过，必须重算
+    this.total = Math.max(7, Math.round((SHOW_SEC * 2) * GameDiff.timeScale('face_name_association')));   // 难度可能刚变过，必须重算
      this.reset(); }
   aboutToDisappear(): void { this.clearAll(); }
 

@@ -271,7 +271,7 @@ export struct GTripletsLogic {
         disabled: this.demoId >= 0,
         autoOn: this.autoId >= 0
       })
-      Text(TG4('第 {0}/{1} 题 · 答对 {2}/{3}', Math.min(this.asked + 1, this.diffTotal), this.diffTotal, this.hits, NEED))
+      Text(TG4('第 {0}/{1} 题 · 答对 {2}/{3}', Math.min(this.asked + 1, this.diffTotal), this.diffTotal, this.hits, Math.max(1, Math.round(NEED * this.diffTotal / ROUNDS))))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
         .padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md)
       Column({ space: Space.xs }) {

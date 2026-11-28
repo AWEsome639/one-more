@@ -335,7 +335,7 @@ export struct GColorWordMatchUp {
         .onBlur(() => { if (this.tvFocus === 'L319') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L319')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
-      Text(TG2('答满 {0} 题且答对 ≥ {1} 即通关',Digits(String(this.diffTotal), this.langCode),Digits(String(PASS), this.langCode)))
+      Text(TG2('答满 {0} 题且答对 ≥ {1} 即通关',Digits(String(this.diffTotal), this.langCode),Digits(String(Math.max(1, Math.round(PASS * this.diffTotal / TRIALS))), this.langCode)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {

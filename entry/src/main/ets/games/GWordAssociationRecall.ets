@@ -152,7 +152,8 @@ export struct GWordAssociationRecall {
   private tick(): void {
     if (AppClock.isPaused() || this.over) { return; }
     const gap: number = AppClock.netNow() - this.roundAt;
-    const limit: number = this.phase === 0 ? STUDY_MS : Q_MS;
+    // ★ 2026-11-29（回归审查）：记忆阶段要按本档 total，否则文案 14/9/6 秒但实际恒 9 秒。
+    const limit: number = this.phase === 0 ? this.total : Q_MS;
     if (gap < limit) { this.leftMs = limit - gap; return; }
     if (this.leftMs === 0) { return; }
     this.leftMs = 0;

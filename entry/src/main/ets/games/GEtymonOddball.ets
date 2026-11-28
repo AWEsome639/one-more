@@ -267,12 +267,14 @@ export struct GEtymonOddball {
   private advance(): void {
     this.round = this.round + 1;
     if (this.round >= this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 回归审查：通关线按本档轮数。
+    this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.right, this.diffTotal);
       this.finish(this.won);
       return;
     }
-    this.leftS = LIMIT_S;
+    // ★ 回归审查：每题重置也要按本档时限。
+    this.leftS = this.limitS();
     this.load();
   }
   private finish(solved: boolean): void {
@@ -303,7 +305,7 @@ export struct GEtymonOddball {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.right + ' / ' + PASS)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
+        Text((this.right + ' / ' + Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS)))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.emerald))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: Space.xs }) {
         Text((TG('剩余'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
@@ -346,7 +348,7 @@ export struct GEtymonOddball {
       .onBlur(() => { if (this.tvFocus === 'L316') { this.tvFocus = ''; } })
       .outline(Tv.focusOutline(this.tvFocus === 'L316')).onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); }).onClick(() => { Haptics.tap(); this.reset(); })
 
-      Text(TG2("共 {0} 轮，答对 ≥{1} 通关；每题 {2} 秒",Digits(String(this.diffTotal), this.langCode), PASS,Digits(String(LIMIT_S), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+      Text(TG2("共 {0} 轮，答对 ≥{1} 通关；每题 {2} 秒",Digits(String(this.diffTotal), this.langCode), Digits(String(Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS))), this.langCode),Digits(String(this.limitS()), this.langCode))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）

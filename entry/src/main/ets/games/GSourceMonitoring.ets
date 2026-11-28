@@ -275,7 +275,7 @@ export struct GSourceMonitoring {
         autoOn: this.autoId >= 0
       })
       Text((this.phase === 'study' ? TG('记忆') : TG('题号 ') + Math.min(this.q + 1, this.diffTotal) + '/' + this.diffTotal)
-        + TG4('　答对 {0}/{1}　倒计时 {2}s', this.score, NEED, this.left, ''))
+        + TG4('　答对 {0}/{1}　倒计时 {2}s', this.score, Math.max(1, Math.round(NEED * this.diffTotal / 5)), this.left, ''))
         .fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
       if (this.phase === 'study') {
         ForEach(Q_IDX, (i: number) => {

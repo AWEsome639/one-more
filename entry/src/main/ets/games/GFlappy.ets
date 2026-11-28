@@ -79,6 +79,9 @@ export struct GFlappy {
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private diffTotal: number = GameDiff.timeNow(33);
+  /** ★ 2026-11-29（回归审查）：goalPipes() 原来在 16ms tick 里调 sizeNow，
+   *  每帧写一次 AppStorage.diffLog（~62 次/秒）；改为 reset 时缓存。 */
+  private goalN: number = GameDiff.sizeNow(PIPE_GOAL);
   onFinish: (r: GameResult) => void = () => {};
 
   @State private pipes: Pipe[] = [];
@@ -186,6 +189,7 @@ export struct GFlappy {
 
   private reset(): void {
     this.stopLoop();
+    this.goalN = GameDiff.sizeNow(PIPE_GOAL);
     this.serial = 0;
     this.py = 40;
     this.vy = 0;
@@ -265,7 +269,7 @@ export struct GFlappy {
     this.pipes = moved;
 
     // ★★ 2026-10-14 无尽模式：穿满 GOAL 不再结束，改为【进入无尽】
-    if (this.score >= this.goalPipes() && !this.endless) {
+    if (this.score >= this.goalN && !this.endless) {
       this.endless = true;
       this.msg = TG('🎉 通关！进入无尽模式 —— 看你能穿多少根');
     }
