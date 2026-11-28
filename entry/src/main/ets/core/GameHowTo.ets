@@ -2679,12 +2679,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '用符号代替数字的代数题',
       '由给出的两条线索，推出第一个符号是几（加或减的题型）',
-      '8 题答对 6 题以上算通关'
+      '题数与通关线随难度变化（约七成）算通关'
     ],
     en: [
       'Algebra where symbols stand in for numbers',
       'Two clues are given — work out what the first symbol equals (addition or subtraction)',
-      'Get at least 6 of 8 right to clear it'
+      'The question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'symbolic_flanker': {
@@ -3039,12 +3039,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '单词里的元音全部被挖空',
       '按顺序把它们补回去',
-      '6 题答对 4 题以上算通关'
+      '题数与通关线随难度变化（约七成）算通关'
     ],
     en: [
       'Every vowel in the word has been removed',
       'Put them back in the right order',
-      'Get at least 4 of 6 right to clear it'
+      'The question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'one_letter_shift': {
@@ -3783,12 +3783,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '不看形状，只看「洞」',
       '两张图的洞数相同，就是拓扑等价（可以互相拉伸变过去）',
-      '8 题答对 6 题以上算通关'
+      '题数与通关线随难度变化（约七成）算通关'
     ],
     en: [
       'Ignore the shape and count the holes',
       'Two figures with the same number of holes are topologically equivalent — one can be stretched into the other',
-      'Get at least 6 of 8 right to clear it'
+      'The question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'tower_of_hanoi': {
@@ -3891,12 +3891,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一条纸条沿标线依次对折（折痕可能在中间或四分之一处）',
       '每一次对折都会让纸层叠起来',
-      '问标记处一共叠了几层；8 题答对 6 题以上算通关'
+      '问标记处一共叠了几层；题数与通关线随难度变化（约七成）'
     ],
     en: [
       'A strip of paper is folded along marked lines one after another, at the middle or the quarter mark',
       'Each fold doubles up the layers of paper',
-      'Say how many layers sit at the marked point; get at least 6 of 8 right to clear it'
+      'Say how many layers sit at the marked point; the question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'counting_sheep': {
@@ -3927,12 +3927,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '一段凯撒移位密文 —— 每个字母都被整体平移了 k 位',
       '密钥只露出其中几位，其余要靠四个候选词反推',
-      '推出原词；8 题答对 6 题以上算通关'
+      '推出原词；题数与通关线随难度变化（约七成）算通关'
     ],
     en: [
       'A Caesar-shifted ciphertext where every letter has been moved by k places',
       'Only a few key letters are revealed — recover the rest by working back from four candidate words',
-      'Recover the original word; get at least 6 of 8 right to clear it'
+      'Recover the original word; the question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'directions_recall': {
@@ -3951,12 +3951,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '4×4 的符号矩阵里混着两种符号',
       '要在限时内数出目标那一种的个数',
-      '干扰项会越来越多；8 题答对 6 题以上算通关'
+      '干扰项会越来越多；题数与通关线随难度变化（约七成）'
     ],
     en: [
       'Two kinds of symbol are mixed in a 4×4 matrix',
       'Count how many of the target kind there are, against the clock',
-      'Distractors increase as you go; get at least 6 of 8 right to clear it'
+      'Distractors increase as you go; the question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'einstein_riddle': {
@@ -4095,12 +4095,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '给一张俯视图，以及一个观察方向',
       '选出「从那一侧看过去」会看到的排列',
-      '8 题答对 6 题以上算通关'
+      '题数与通关线随难度变化（约七成）算通关'
     ],
     en: [
       'A top-down view is shown along with a viewing direction',
       'Pick the arrangement you would see looking in from that side',
-      'Get at least 6 of 8 right to clear it'
+      'The question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'room_inspector': {
@@ -4131,24 +4131,24 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '三层 3×3 的方块叠在一起',
       '从正上方看下去（正投影）会得到哪个剪影？只要那一格有方块就算',
-      '6 题答对 4 题以上算通关'
+      '题数与通关线随难度变化（约七成）算通关'
     ],
     en: [
       'Three 3×3 layers of blocks are stacked',
       'Which silhouette do you get looking straight down from above? A cell counts if any layer has a block there',
-      'Get at least 4 of 6 right to clear it'
+      'The question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'simon_command': {
     zh: [
       '屏幕陆续给出指令',
       '只有以「西蒙说」开头的才照做；没有这句话就必须点「不做动作 ✋」',
-      '每题限时 2.2 秒；答对 10 题算通关，失误 3 次就失败'
+      '每题限时 2.2 秒；通关题数随难度变化（约七成），失误 3 次就失败'
     ],
     en: [
       'Instructions appear one after another',
       'Obey only those starting with “Simon says”; if it is absent you must tap “do nothing ✋”',
-      'Each has a 2.2-second limit; get 10 right to clear it, three mistakes and you fail'
+      'Each has a 2.2-second limit; the pass count scales with difficulty (about 70%); three mistakes and you fail'
     ]
   },
   'simon_sequence': {
@@ -4167,12 +4167,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '先记住 5 条消息各自是谁说的（限时 8 秒）',
       '之后逐条给出消息，问你「这话是谁说的」',
-      '5 题答对 4 题以上算通关'
+      '题数与通关线随难度变化（约七成）算通关'
     ],
     en: [
       'Memorise who said each of 5 messages, in 8 seconds',
       'Each message then appears and you are asked who said it',
-      'Get at least 4 of 5 right to clear it'
+      'The question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'sternberg_task': {
@@ -4203,12 +4203,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '4 件事被打乱了顺序',
       '按它们「发生的先后」依次点出来',
-      '5 题答对 4 题以上算通关'
+      '题数与通关线随难度变化（约七成）算通关'
     ],
     en: [
       'Four events appear out of order',
       'Tap them in the sequence they happened',
-      'Get at least 4 of 5 right to clear it'
+      'The question count and pass line scale with difficulty (about 70%)'
     ]
   },
   'temporal_order_judgment': {
