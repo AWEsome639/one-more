@@ -56,6 +56,8 @@ export struct GBoxCompletion {
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
   @State private diffTotal: number = GameDiff.sizeNow(4);   // 4 = 原 SIDE
+  /** ★ 2026-11-28（第八批）：目标周长原来写死 12，而盘面 3/4/5（周长 8/12/16）⇒ 必然误判。 */
+  @State private target: number = PERIM;
   /** ★ 2026-10-16 通关庆祝 */
   @State private winK: number = 1;
 
@@ -93,6 +95,7 @@ export struct GBoxCompletion {
  const n0: number = this.diffTotal;
  const h0: number = 1 + Math.floor(Math.random() * Math.min(5, n0 - 1));
  const w0: number = Math.min(6 - h0, n0 - 1);
+ this.target = 2 * (h0 + w0);
  const r1: number = Math.floor(Math.random() * (n0 - h0));
  const c1: number = Math.floor(Math.random() * (n0 - w0));
  const r2: number = r1 + h0;
@@ -113,7 +116,7 @@ export struct GBoxCompletion {
  g[2] = false; g[7] = false; g[11] = false; board = g;
  }
  this.cells = board; this.lit = new Array<boolean>(MAX_CELLS).fill(false);
- this.moves = 0; this.over = false; this.won = false; this.note = TG('点亮空格，把边框补成 12 格 📐');
+ this.moves = 0; this.over = false; this.won = false; this.note = TG2('点亮空格，把边框补成 {0} 格 📐', String(this.target));
  this.startAt = Date.now();
  }
  private litCount(): number {
@@ -304,8 +307,8 @@ export struct GBoxCompletion {
  }
  cur[i] = true; this.lit = cur; this.moves++;
  const n: number = this.litCount();
- if (n > PERIM) {
- this.note = TG2('补过头了，多出 {0} 格 ❌', n - PERIM); this.finish(false); return;
+ if (n > this.target) {
+ this.note = TG2('补过头了，多出 {0} 格 ❌', n - this.target); this.finish(false); return;
  }
  // ★ 判据 1710：旧判定写死「点亮 12 格」+「周长必须 = 12」，
  //   而 board 的矩形是随机大小（周长 8/12/16…）⇒ 非 12 的盘面**玩家也永远赢不了**
@@ -357,7 +360,7 @@ export struct GBoxCompletion {
      demoOn: false,
      disabled: this.demoId >= 0,
    })
- Text(TG2('已补 {0}/{1} 格　步数 {2}', this.litCount(), PERIM,Digits(String(this.moves), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
+ Text(TG2('已补 {0}/{1} 格　步数 {2}', this.litCount(), this.target,Digits(String(this.moves), this.langCode))).fontSize(FontSize.sm).fontColor(this.theme.inkSoft).width('100%')
  Column({ space: Space.xs }) {
  ForEach(this.rowIdx(), (r: number) => {
  Row({ space: Space.xs }) {
