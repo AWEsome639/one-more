@@ -80,7 +80,8 @@ export struct GComplexFoldingNets {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(TOTAL);
+  // ★ 2026-11-28（复核 P3）：困难档 10 > SEED 8 ⇒ 首进第 9 题空图。字段初始化也要夹。
+  @State private diffTotal: number = Math.min(GameDiff.sizeNow(TOTAL), SEED.length);
   onFinish: (r: GameResult) => void = () => {};
 
   @State private folds: number[] = [];

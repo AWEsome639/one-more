@@ -101,7 +101,8 @@ export struct GLaserLink {
       // ★ 2026-11-27（真机验收）：简单档 5×5 时可选镜区只有 (3 行 × 1 列)=3 格，
       //   而 NF+NX=4 且要求两两不相邻 ⇒ setup 全失败、slots 为空（已亮 0/0）。按可选区上限收缩。
       const slotCap: number = Math.max(2, Math.floor(((this.diffTotal - 2) * Math.max(1, this.diffTotal - 4)) / 2));
-      const nf: number = Math.max(1, Math.min(NF, slotCap - 1));
+      // ★ 2026-11-28（复核 P7）：slotCap=2 时原来只给 1 面可转镜（一点就通关）。优先给满可转镜，固定镜让位。
+      const nf: number = Math.max(1, Math.min(NF, slotCap));
       const nx: number = Math.max(0, Math.min(NX, slotCap - nf));
       const free: number[] = []; const fix: number[] = [];
       for (let i = 0; i < cells.length && (free.length < nf || fix.length < nx); i++) {

@@ -128,7 +128,9 @@ export struct GTennerGrid {
       }
     }
     let guard: number = 0;
-    while (givens < 55 && guard < 400) {
+    // ★ 2026-11-28（复核 P1）：目标固定 55 格，而简单档盘面只有 49 格 ⇒ 全盘被填成题面、无一格可落子。
+    const want: number = Math.max(1, Math.round(0.55 * this.diffTotal * this.diffTotal));
+    while (givens < want && guard < 400) {
       guard++;
       const i: number = Math.floor(Math.random() * (this.diffTotal * this.diffTotal));
       if (fixed[i] === 0) {

@@ -73,7 +73,8 @@ export struct GTypoglycemiaDecoder {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  // ★ 2026-11-28（复核 P2）：困难档 8 > BANK 6 ⇒ 首进 reset 前就塞 undefined。字段初始化也要夹。
+  @State private diffTotal: number = Math.min(BANK.length, GameDiff.sizeNow(ROUNDS));
   onFinish: (r: GameResult) => void = () => {};
 
   @State private order: number[] = []; @State private qi: number = 0;

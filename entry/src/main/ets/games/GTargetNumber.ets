@@ -335,7 +335,7 @@ export struct GTargetNumber {
     this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / 6));
       this.msg = this.won
         ? TG2('🎉 答对 {0}/{1}，通关！', String(this.right), String(this.diffTotal))
-        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(PASS - this.right));
+        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(Math.max(1, Math.round(PASS * this.diffTotal / 6)) - this.right));
       this.finish(this.won); return;
     }
     this.round = this.round + 1; this.ask(); this.msg = TG('哪个式子的结果等于目标？');

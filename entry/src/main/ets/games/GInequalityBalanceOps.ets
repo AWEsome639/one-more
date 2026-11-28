@@ -252,7 +252,7 @@ export struct GInequalityBalanceOps {
     this.over = true; this.won = this.hits >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL));
       this.msg = this.won
         ? TG('🎉 答对 ') + String(this.hits) + '/' + String(this.diffTotal) + TG('，通关！')
-        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.hits), String(this.diffTotal), String(PASS - this.hits));
+        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.hits), String(this.diffTotal), String(Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)) - this.hits));
       this.finish(this.won); return;
     }
     this.round = this.round + 1; this.ask();
@@ -295,7 +295,7 @@ export struct GInequalityBalanceOps {
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface).borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.hits + '/' + PASS)).fontSize(FontSize.lg)
+        Text((this.hits + '/' + Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)))).fontSize(FontSize.lg)
         // ★ 得分跳动
         .scale({ x: this.hitsPulse, y: this.hitsPulse })
         .animation({ duration: Motion.fast, curve: Motion.spring() }).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)

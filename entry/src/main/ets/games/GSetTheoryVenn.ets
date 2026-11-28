@@ -247,7 +247,7 @@ export struct GSetTheoryVenn {
     this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = this.won
         ? TG2('🎉 答对 {0}/{1}，通关！', String(this.right), String(this.diffTotal))
-        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(PASS - this.right));
+        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS)) - this.right));
       this.finish(this.won); return;
     }
     this.round = this.round + 1; this.ask(); this.msg = TG('看这个数字落在哪个区域');
@@ -280,7 +280,7 @@ export struct GSetTheoryVenn {
         .shadow(Shadow.card)
         Row({ space: Space.xs }) {
         Text((TG('答对'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint).maxLines(1).minFontSize(8).maxFontSize(FontSize.xxs)
-        Text((String(this.right) + '/' + String(PASS))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
+        Text((String(this.right) + '/' + String(Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS))))).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor(this.theme.ink)
         }.layoutWeight(1).padding(Space.xs).justifyContent(FlexAlign.SpaceBetween).backgroundColor(this.theme.surface).borderRadius(Radius.md)
         .shadow(Shadow.card)
         Row({ space: Space.xs }) {

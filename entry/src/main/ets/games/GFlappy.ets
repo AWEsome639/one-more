@@ -289,7 +289,7 @@ export struct GFlappy {
     }
     this.msg = this.endless
       ? TG2('♾️ 无尽模式　已穿 {0} 根', this.score)
-      : (TG2('穿过 {0} / {1} 根管道', this.score, PIPE_GOAL));
+      : (TG2('穿过 {0} / {1} 根管道', this.score, this.goalPipes()));
   }
 
   /**

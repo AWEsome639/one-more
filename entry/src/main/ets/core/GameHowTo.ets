@@ -255,12 +255,12 @@ export const HOW_TO: Record<string, HowTo> = {
     zh: [
       '大多数回合是「冲」—— 看到就立刻点',
       '偶尔会亮红灯，那时候按下去就算错',
-      '12 回合里答对 10 次以上，且「冲」的平均反应低于 800ms 算通关'
+      '回合数与通关线随难度变化（8/12/16 回合，约七成），且「冲」的平均反应低于 800ms 算通关'
     ],
     en: [
       'Most rounds say go — tap as soon as you see it',
       'Now and then a red stop signal appears; tapping then is an error',
-      'Clear it with at least 10 correct out of 12 and an average go-reaction under 800 ms'
+      'The round count and pass line scale with difficulty (8/12/16 rounds, about 70%), with an average go-reaction under 800 ms'
     ]
   },
   'vigilance_task': {
@@ -2629,14 +2629,14 @@ export const HOW_TO: Record<string, HowTo> = {
   },
   'staircase_memory': {
     zh: [
-      '六级台阶会逐级点亮，形成一段升序的路线',
+      '台阶会逐级点亮，形成一段升序的路线（级数随难度 3~7）',
       '暗下之后，照着顺序点回来',
-      '4 关从 3 级加到 6 级，全过算通关；错一级就失败'
+      '关卡与级数都随难度增加，全过算通关；错一级就失败'
     ],
     en: [
-      'Six steps light up one by one, tracing an ascending route',
+      'The steps light up one by one, tracing an ascending route (the count scales with difficulty, 3–7)',
       'Once they go dark, tap the steps back in that order',
-      'Four rounds grow from 3 steps to 6 — clear them all; one wrong step and you fail'
+      'Both the rounds and the step count grow with difficulty — clear them all; one wrong step and you fail'
     ]
   },
   'subitizing_rush': {
