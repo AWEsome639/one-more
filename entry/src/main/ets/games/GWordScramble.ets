@@ -73,7 +73,9 @@ export struct GWordScramble {
   // ★ 2026-11-08 常驻结果行：反馈不再依赖显示的几秒，随时能回看上一题的对错
   @State private lastFb: string = '';
   @State private lastOk: boolean = true;
-  @State score: number = 0; @State solved: number = 0; @State leftMs: number = LIMIT_MS;
+  /** ★ 2026-11-28（第九批）：三档都用 150 秒常量，计时没接难度。 */
+  @State private limitMs: number = GameDiff.timeNow(LIMIT_MS);
+  @State score: number = 0; @State solved: number = 0; @State leftMs: number = GameDiff.timeNow(LIMIT_MS);
   @State over: boolean = false; @State won: boolean = false;
   private startAt: number = 0; private timer: number = -1; private feed: number = -1;
   private settled: boolean = false;
@@ -228,7 +230,8 @@ export struct GWordScramble {
     this.lastFb = ''; this.lastOk = true;   // ★ 重开清常驻结果行
     this.stopAll();
     this.queue = mixEntries(BANK).slice(0, this.diffTotal);
-    this.idx = 0; this.score = 0; this.solved = 0; this.leftMs = LIMIT_MS;
+    this.limitMs = GameDiff.timeNow(LIMIT_MS);
+    this.idx = 0; this.score = 0; this.solved = 0; this.leftMs = this.limitMs;
     this.over = false; this.won = false; this.settled = false; this.startAt = AppClock.netNow();
     this.load();
     this.timer = setInterval(() => { this.tick(); }, TICK_MS);
@@ -248,8 +251,8 @@ export struct GWordScramble {
   private tick(): void {
     if (AppClock.isPaused() || this.over) { return; }
     const gap: number = AppClock.netNow() - this.startAt;
-    this.leftMs = gap >= LIMIT_MS ? 0 : LIMIT_MS - gap;
-    if (gap >= LIMIT_MS) {
+    this.leftMs = gap >= this.limitMs ? 0 : this.limitMs - gap;
+    if (gap >= this.limitMs) {
       this.over = true; this.won = false; this.msg = TG2("⌛ 时间到 —— 拼对 {0} 个词", this.solved); this.finish(false);
     }
   }

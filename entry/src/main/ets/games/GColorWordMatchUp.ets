@@ -235,7 +235,8 @@ export struct GColorWordMatchUp {
     }
     this.trial++;
     if (this.wrong >= MAX_WRONG) { this.end(false); return; }
-    if (this.trial >= this.diffTotal) { this.end(this.correct >= PASS); return; }
+    // ★ 第九批：简单 16/17 比困难更容易过（倒挂），按题数缩放。
+    if (this.trial >= this.diffTotal) { this.end(this.correct >= Math.max(1, Math.round(PASS * this.diffTotal / TRIALS))); return; }
     this.nextTrial();
   }
 

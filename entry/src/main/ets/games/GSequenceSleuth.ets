@@ -390,7 +390,8 @@ export struct GSequenceSleuth {
       this.over = true;
       this.tip = TG2("答对 {0}/{1} 题", String(this.right), String(this.diffTotal));
       const res: GameResult = {
-        gameId: 'sequence_sleuth', solved: this.right >= PASS,
+        // ★ 第九批：简单 6 题要 6 对（100%），按题数缩放。
+    gameId: 'sequence_sleuth', solved: this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)),
         score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.right
       };
       LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）

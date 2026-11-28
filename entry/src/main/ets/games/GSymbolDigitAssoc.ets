@@ -256,7 +256,8 @@ export struct GSymbolDigitAssoc {
     if (this.done) { return; }
     this.done = true;
     this.over = true;
-    this.won = this.right >= NEED;
+    // ★ 第九批：简单 8 题 < 通关线 9，按题数缩放。
+    this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / TOTAL));
     this.msg = (this.won ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1}", String(this.right), String(this.diffTotal))
       + TG2(' · 用时 {0}s', String(this.secs));
     this.clearAll();

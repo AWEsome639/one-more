@@ -51,7 +51,8 @@ export struct GTemporalOrder {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  // ★ 2026-11-28（第九批）：题组只有 SETS.length 组，困难 7 轮会越界。
+  @State private diffTotal: number = Math.min(SETS.length, GameDiff.sizeNow(ROUNDS));
   onFinish: (r: GameResult) => void = () => {};
   @State opts: Ev[] = []; @State orig: number[] = []; @State picked: number[] = []; @State plan: number[] = [];
   @State round: number = 1; @State hits: number = 0; @State score: number = 0;
@@ -272,7 +273,8 @@ export struct GTemporalOrder {
   }
   private next(): void {
     if (this.round >= this.diffTotal) {
-      this.over = true; this.won = this.hits >= PASS;
+      // ★ 第九批：按轮数缩放通关线。
+    this.over = true; this.won = this.hits >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.hits, this.diffTotal);
       this.finish(this.won); return;
     }

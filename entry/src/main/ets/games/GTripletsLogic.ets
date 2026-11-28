@@ -240,7 +240,8 @@ export struct GTripletsLogic {
     this.clearTimer();
     this.timer = setTimeout(() => {
       this.timer = -1;
-      if (this.asked >= this.diffTotal) { this.finish(this.hits >= NEED); return; }
+      // ★ 第九批：简单 4 题要 4 对（100%），按题数缩放。
+    if (this.asked >= this.diffTotal) { this.finish(this.hits >= Math.max(1, Math.round(NEED * this.diffTotal / ROUNDS))); return; }
       this.gen();
     }, PAUSE);
   }

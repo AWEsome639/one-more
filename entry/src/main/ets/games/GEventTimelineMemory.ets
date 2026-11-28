@@ -302,7 +302,8 @@ export struct GEventTimelineMemory {
   }
   private finish(): void {
     if (this.done) { return; }
-    this.done = true; this.over = true; this.won = this.right >= NEED;
+    // ★ 第九批：简单 2 轮要 2 对（100%），按轮数缩放。
+    this.done = true; this.over = true; this.won = this.right >= Math.max(1, Math.round(NEED * this.diffTotal / ROUNDS));
     this.msg = (this.won ? TG('🎉 通关！') : TG('💤 本局结束：'))
       + TG2('全对 {0}/{1} 轮', String(this.right), String(this.diffTotal));
     const r: GameResult = {
