@@ -45,6 +45,15 @@ export struct GCountingSpan {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
+  /** ★ 2026-11-28（第七批·低）：点数上限恒 5、生命恒 2 ⇒ 困难档只是格子多，记忆负荷没变。 */
+  private maxCount(): number {
+    return Math.min(7, 3 + Math.floor(this.diffTotal / 4));
+  }
+
+  private livesN(): number {
+    return Math.max(2, Math.round(3 * this.diffTotal / DOTS));
+  }
+
   @State private diffTotal: number = GameDiff.sizeNow(DOTS);
   onFinish: (r: GameResult) => void = () => {};
 
@@ -86,7 +95,7 @@ export struct GCountingSpan {
   }
 
   private reset(): void {
-    this.span = START_SPAN; this.best = 0; this.life = LIVES;
+    this.span = START_SPAN; this.best = 0; this.life = this.livesN();
     this.over = false; this.won = false; this.finished = false;
     this.startAt = Date.now();
     this.startRound();
@@ -94,7 +103,7 @@ export struct GCountingSpan {
 
   private startRound(): void {
     const cs: number[] = [];
-    for (let i = 0; i < this.span; i++) { cs.push(1 + Math.floor(Math.random() * MAX_COUNT)); }
+    for (let i = 0; i < this.span; i++) { cs.push(1 + Math.floor(Math.random() * this.maxCount())); }
     this.counts = cs;
     this.cardIdx = 0;
     this.recallIdx = 0;
@@ -361,7 +370,7 @@ export struct GCountingSpan {
         .borderRadius(Radius.md).shadow(Shadow.card)
         Column({ space: 2 }) {
         Text((TG('生命'))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-        Text((this.life + ' / ' + LIVES)).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
+        Text((this.life + ' / ' + this.livesN())).fontSize(FontSize.lg).fontWeight(FontWeight.Bold).fontColor((Palette.rose))
         }.layoutWeight(1).padding(Space.sm).backgroundColor(this.theme.surface)
         .borderRadius(Radius.md).shadow(Shadow.card)
       }.width('100%')

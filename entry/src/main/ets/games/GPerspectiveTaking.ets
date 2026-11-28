@@ -133,7 +133,14 @@ export struct GPerspectiveTaking {
         ask = types[Math.floor(Math.random() * types.length)]; ans = who[ask]; ok = true;
       }
     }
-    if (!ok) { spot = 12; way = 0; cells = [2, 14, 22]; ask = 2; ans = 0; }
+    if (!ok) {
+      // ★ 2026-11-28（第七批·低）：兜底原来是 5×5 的固定下标（22 在 4×4 上越界）。按本档棋盘取。
+      const n: number = this.diffTotal;
+      const c0: number = Math.min(n * n - 1, Math.floor(n * n / 2));
+      spot = c0; way = 0;
+      cells = [c0, Math.min(n * n - 1, c0 + 1), Math.min(n * n - 1, c0 + n)];
+      ask = 2; ans = 0;
+    }
     this.obs = spot; this.face = way; this.items = cells; this.ask = ask; this.answer = ans;
   }
   /** 提示：直接报答案（代打用的就是这个字段） */
