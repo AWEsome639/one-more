@@ -65,7 +65,8 @@ export struct GTrailMaking {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(TOTAL);
+    // ★ 2026-11-28（第七批）：网格固定 25 格，题数 sizeNow(25)=18/25/33 > 25 ⇒ 困难档 8 个下标永远 undefined。
+    this.diffTotal = Math.min(TOTAL, GameDiff.sizeNow(TOTAL));
      this.reset(); }
 
   /** 1→A→2→B→…→12→L→13，共 25 个 */

@@ -73,6 +73,18 @@ export struct GCountingSpan {
     this.diffTotal = GameDiff.sizeNow(DOTS);
      this.reset(); }
 
+  /** ★ 2026-11-28（第七批）：点阵按本档数量排成近似方阵（6→3×3、9→3×3、12→4×4）。 */
+  private gridN(): number {
+    const n: number = Math.ceil(Math.sqrt(this.diffTotal));
+    return n > 0 ? n : 1;
+  }
+
+  private gridIdx(): number[] {
+    const a: number[] = [];
+    for (let i = 0; i < this.gridN(); i++) { a.push(i); }
+    return a;
+  }
+
   private reset(): void {
     this.span = START_SPAN; this.best = 0; this.life = LIVES;
     this.over = false; this.won = false; this.finished = false;
@@ -355,12 +367,12 @@ export struct GCountingSpan {
       }.width('100%')
 
       Column({ space: Space.sm }) {
-        ForEach([0, 1, 2], (r: number) => {
+        ForEach(this.gridIdx(), (r: number) => {
           Row({ space: Space.sm }) {
-            ForEach([0, 1, 2], (c: number) => {
+            ForEach(this.gridIdx(), (c: number) => {
               Stack() {
               Text('●').accessibilityLevel('no').fontSize(FontSize.xl)
-              .fontColor(this.dots.length > (r * 3 + c) && this.dots[(r * 3 + c)] ? Palette.amber : this.theme.lineSoft)
+              .fontColor(this.dots.length > (r * this.gridN() + c) && this.dots[(r * this.gridN() + c)] ? Palette.amber : this.theme.lineSoft)
               }.layoutWeight(1).aspectRatio(1)
               .animation({ duration: Motion.fast, curve: Motion.snap() })
               // ★ 2026-10-15 补动画：ForEach 重建的元素加 transition（否则是硬切）

@@ -40,7 +40,9 @@ export struct GSlide15 {
 
   // ★ 难度作用到玩法：棋盘边长（原 N=4；简单 ×0.7 / 普通 ×1 / 困难 ×1.3）
   //   ⚠️ 光改常量没用 —— 渲染原本用的是写死的 [0, 1, 2, 3]，上面已一并改成按尺寸生成
-  @State private diffTotal: number = GameDiff.sizeNow(4);
+  // ★ 2026-11-28（第七批）：盘面代码全是 4×4（blocks/blank/终盘判定），diffTotal 却被难度改成 3/4/5 ⇒
+  //   简单档只显示 9 格、困难档 5×5 假解。盘面固定 4×4，难度改作用洗牌步数。
+  @State private diffTotal: number = N;
 
   /** 0..diffTotal-1（读 @State 建依赖，ArkUI 才追踪得到） */
   private rowIdx(): number[] {
@@ -104,7 +106,7 @@ export struct GSlide15 {
 
   /** 宿主点了「换一局」 */
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(4);
+    this.diffTotal = N;
     this.reset();
   }
 

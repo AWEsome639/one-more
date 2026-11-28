@@ -34,14 +34,14 @@ const GROUPS: string[][] = [
   [TG('心 (cardi-)'), 'CARDIAC', 'CARDIOGRAM', 'CARDIOLOGIST', 'CARDINAL']
 ];
 
-function shuffleIdx(): number[] {
+function shuffleIdx(n: number = ROUNDS): number[] {
   const out: number[] = [];
   for (let i = 0; i < GROUPS.length; i++) { out.push(i); }
   for (let i = out.length - 1; i > 0; i--) {
     const j: number = Math.floor(Math.random() * (i + 1));
     const t: number = out[i]; out[i] = out[j]; out[j] = t;
   }
-  return out.slice(0, ROUNDS);
+  return out.slice(0, Math.min(n, out.length));
 }
 function shuffleStr(arr: string[]): string[] {
   const out: string[] = arr.slice();
@@ -95,7 +95,8 @@ export struct GEtymonOddball {
   private stop(): void { if (this.timer >= 0) { clearInterval(this.timer); this.timer = -1; } }
   private reset(): void {
     this.stop();
-    this.queue = shuffleIdx();
+    // ★ 2026-11-28（第七批）：困难档 10 轮，原来只切 8 组 ⇒ 第 9 轮 GROUPS[undefined] 崩。
+    this.queue = shuffleIdx(this.diffTotal);
     this.round = 0; this.right = 0; this.score = 0; this.leftS = LIMIT_S;
     this.over = false; this.won = false; this.done = false;
     this.msg = TG('哪个词的词根不属于同一族？'); this.startAt = Date.now();

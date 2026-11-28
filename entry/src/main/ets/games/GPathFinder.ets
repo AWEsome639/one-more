@@ -143,7 +143,7 @@ export struct GPathFinder {
 
   onRestart(): void {
     this.budgetMul = GPathFinder.mulNow();
-    this.diffTotal = GameDiff.sizeNow(7);
+    // ★ 2026-11-28（第七批）：这里原来又把 7×7 改成 5/7/9（重开一次简单档走不到终点、困难档越界）。保持 7。
     this.reset();
   }
 
