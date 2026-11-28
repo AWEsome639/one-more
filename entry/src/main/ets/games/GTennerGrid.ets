@@ -757,7 +757,7 @@ export struct GTennerGrid {
       }
       .width('100%')
 
-      Text(TG('每行每列都要有 0~9 各一次；灰底是题目给的数'))
+      Text(TG('每行每列不重复；灰底是题目给的数'))
         .visibility(Bp.isShort() ? Visibility.None : Visibility.Visible)
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)

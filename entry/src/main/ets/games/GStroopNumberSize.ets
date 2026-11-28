@@ -324,7 +324,8 @@ export struct GStroopNumberSize {
         .onBlur(() => { if (this.tvFocus === 'L305') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L305'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：12 题答对 ≥ 10 题'))
+      // ★ 2026-11-28（同类扫描发现）：判定已按题数缩放，文案仍印 12/10。
+        Text(TG2('判定：正确 ≥ {0}/{1}', String(Math.max(1, Math.round(10 * this.diffTotal / ROUNDS))), String(this.diffTotal)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         .width('100%').textAlign(TextAlign.Center)
     }
