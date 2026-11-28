@@ -54,7 +54,8 @@ export struct GContextClues {
   @State private demoPhase: number = 0;
   @State private demoRound: number = 0;
   private demoHintText: string = '';   // 演示第 1 轮算出的提示，后续复用
-  @State private diffTotal: number = GameDiff.sizeNow(ROUNDS);
+  // ★ 2026-11-28：题池只有 12 条，任何入口都不能超过它。
+  @State private diffTotal: number = Math.min(POOL.length, GameDiff.sizeNow(ROUNDS));
   onFinish: (r: GameResult) => void = () => {};
   @State order: number[] = []; @State qi: number = 0; @State opts: string[] = [];
   @State ans: number = 0; @State picked: number = -1; @State correct: number = 0;

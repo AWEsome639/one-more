@@ -67,7 +67,7 @@ export struct GTemporalOrder {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+    this.diffTotal = Math.min(SETS.length, GameDiff.sizeNow(ROUNDS));
      this.reset(); }
   aboutToDisappear(): void { this.clearAll(); }
   private clearAll(): void { if (this.timer >= 0) { clearTimeout(this.timer); this.timer = -1; } }
