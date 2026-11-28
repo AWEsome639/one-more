@@ -257,7 +257,8 @@ export struct GConundrumAnagram {
     this.doBump();   // ★ 弹一下 this.hinted = false;
   }
   private end(): void {
-    this.over = true; this.won = this.solved >= PASS;
+    // ★ 第八批：简单 4 题 < 通关线 5，按题数缩放。
+    this.over = true; this.won = this.solved >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
     this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("猜中 {0} / {1}", this.solved, this.diffTotal);
     if (this.done) { return; }
     this.done = true;

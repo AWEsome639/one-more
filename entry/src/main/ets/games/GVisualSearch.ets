@@ -240,7 +240,8 @@ export struct GVisualSearch {
     this.stop();
     if (!ok) { this.msg = TG('⌛ 超时了'); }
     if (this.round >= this.diffTotal) {
-      this.over = true; this.won = this.found >= PASS;
+      // ★ 第八批：简单 6 轮要 6 对（满分），按轮数缩放。
+    this.over = true; this.won = this.found >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("找出 {0} / {1}", this.found, this.diffTotal);
       this.finish(this.won);
       return;

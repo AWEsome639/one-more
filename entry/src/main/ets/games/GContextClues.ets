@@ -69,7 +69,8 @@ export struct GContextClues {
     }
   }
   onRestart(): void {
-    this.diffTotal = GameDiff.sizeNow(ROUNDS);
+    // ★ 2026-11-28（第八批）：题池只有 12 条，困难档 13 题会越界。
+    this.diffTotal = Math.min(POOL.length, GameDiff.sizeNow(ROUNDS));
      this.reset(); }
   private cur(): Q { return POOL[this.order[this.qi]]; }
   private reset(): void {
@@ -248,7 +249,8 @@ export struct GContextClues {
     this.deal();
   }
   private end(): void {
-    this.over = true; this.won = this.correct >= PASS && this.life > 0;
+    // ★ 第八批：通关线按题数缩放。
+    this.over = true; this.won = this.correct >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS)) && this.life > 0;
     this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.correct, this.diffTotal);
     if (this.done) { return; }
     this.done = true;

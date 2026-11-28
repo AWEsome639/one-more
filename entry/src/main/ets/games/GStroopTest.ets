@@ -234,7 +234,8 @@ export struct GStroopTest {
 
   private advance(): void {
     if (this.round >= this.diffTotal) {
-      const win: boolean = this.right >= 10;
+      // ★ 第八批：简单 8 题 < 通关线 10，按题数缩放。
+    const win: boolean = this.right >= Math.max(1, Math.round(10 * this.diffTotal / ROUNDS));
       this.over = true; this.won = win;
       this.msg = (win ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1} 题", String(this.right), String(this.diffTotal));
       const res: GameResult = {
@@ -264,7 +265,7 @@ export struct GStroopTest {
       Row() {
         Text(TG2("题号 {0}/{1}", String(this.round), String(this.diffTotal))).fontSize(FontSize.sm).fontColor(this.theme.ink).scale({ x: this.pulse, y: this.pulse }).animation({ duration: Motion.fast, curve: Motion.snap() })
         Text(TG2('答对 {0}', String(this.right))).fontSize(FontSize.sm).fontColor(Palette.teal)
-        Text(TG('通关线 10')).fontSize(FontSize.sm).fontColor(this.theme.ink)
+        Text(TG2('通关线 {0}', String(Math.max(1, Math.round(10 * this.diffTotal / ROUNDS))))).fontSize(FontSize.sm).fontColor(this.theme.ink)
       }
       .width('100%').padding(Space.sm).backgroundColor(this.theme.surface)
       .borderRadius(Radius.md).shadow(Shadow.card).justifyContent(FlexAlign.SpaceBetween)
@@ -297,7 +298,7 @@ export struct GStroopTest {
         .onBlur(() => { if (this.tvFocus === 'L285') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L285'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：12 题答对 ≥ 10 题；答的是墨色，不是字面写的颜色'))
+      Text(TG2('判定：正确 ≥ {0}/{1}；答的是墨色，不是字面写的颜色', String(Math.max(1, Math.round(10 * this.diffTotal / ROUNDS))), String(this.diffTotal)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         .width('100%').textAlign(TextAlign.Center)
     }

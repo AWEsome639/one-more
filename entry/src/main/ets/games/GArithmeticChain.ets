@@ -377,7 +377,8 @@ export struct GArithmeticChain {
     if (this.level >= this.diffTotal) {
       this.over = true;
       this.tip = TG2('{0}｜共过 {1}/{2} 关', msg, String(this.clears), String(this.diffTotal));
-      this.finish(this.clears >= PASS);
+      // ★ 第八批：简单 4 关要 4 清（满分），按关数缩放。
+    this.finish(this.clears >= Math.max(1, Math.round(PASS * this.diffTotal / LEVELS)));
       return;
     }
     this.load(this.level);

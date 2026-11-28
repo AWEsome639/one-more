@@ -272,7 +272,8 @@ export struct GSubitizingRush {
 
   private advance(): void {
     if (this.round >= this.diffTotal) {
-      const win: boolean = this.right >= 8;
+      // ★ 第八批：简单 7 题 < 通关线 8，按题数缩放。
+    const win: boolean = this.right >= Math.max(1, Math.round(8 * this.diffTotal / ROUNDS));
       this.over = true; this.won = win;
       if (this.right > this.best) { this.best = this.right; }
       this.msg = (win ? TG('🎉 通关 ') : TG('💤 结束 ')) +TG2("答对 {0}/{1} 题", String(this.right), String(this.diffTotal));
@@ -341,7 +342,7 @@ export struct GSubitizingRush {
         .onBlur(() => { if (this.tvFocus === 'L327') { this.tvFocus = ''; } })
         .outline(Tv.focusOutline(this.tvFocus === 'L327'))
         .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
-      Text(TG('判定：10 题答对 ≥ 8 题；≤ 4 个靠直觉，≥ 5 个得靠分组'))
+      Text(TG2('判定：正确 ≥ {0}/{1}；≤ 4 个靠直觉，≥ 5 个得靠分组', String(Math.max(1, Math.round(8 * this.diffTotal / ROUNDS))), String(this.diffTotal)))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
         .width('100%').textAlign(TextAlign.Center)
     }

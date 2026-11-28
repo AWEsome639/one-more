@@ -269,7 +269,8 @@ export struct GDoubleNBack {
   }
   private finish(): void {
     if (this.done) { return; }
-    this.done = true; this.over = true; this.won = this.right >= NEED;
+    // ★ 第八批：前 2 题不判分，判分上限比题数少 ⇒ 通关线按可判分题数缩放。
+    this.done = true; this.over = true; this.won = this.right >= Math.max(1, Math.round(NEED * (this.diffTotal - N) / (TOTAL - N)));
     this.msg = (this.won ? TG('🎉 通关！') : TG('💤 本局结束：'))
       + TG2('正确 {0} · 错误 {1}', String(this.right), String(this.wrong));
     const raw: number = this.right * 60 - this.wrong * 20; const r: GameResult = {

@@ -231,7 +231,8 @@ export struct GTopology {
 
   private next(): void {
     if (this.round >= this.diffTotal) {
-      this.over = true; this.won = this.hits >= PASS;
+      // ★ 第八批：简单 6 轮要 6 对（满分），按轮数缩放。
+    this.over = true; this.won = this.hits >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
       this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.hits, this.diffTotal);
       this.finish(this.won); return;
     }

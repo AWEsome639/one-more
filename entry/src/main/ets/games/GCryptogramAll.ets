@@ -258,7 +258,8 @@ export struct GCryptogramAll {
       this.over = true;
       LanRace.noteDone();  // ★ 竞速模式：上报用时（没在竞速时是空操作）
       this.onFinish({
-        gameId: 'cryptogram_all', solved: this.right >= PASS,
+        // ★ 第八批：简单 6 题要 6 对（满分），按题数缩放。
+    gameId: 'cryptogram_all', solved: this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)),
         score: this.score, durationMs: Date.now() - this.startAt, levelReached: this.right
       });
       return;

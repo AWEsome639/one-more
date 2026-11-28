@@ -243,7 +243,8 @@ export struct GSourceMonitoring {
     if (this.nextTimer >= 0) { clearTimeout(this.nextTimer); }
     this.nextTimer = setTimeout(() => {
       this.nextTimer = -1;
-      if (this.q + 1 >= this.diffTotal) { this.finish(this.score >= NEED); return; }
+      // ★ 第八批：简单 4 题要 4 对（满分），按题数缩放。
+    if (this.q + 1 >= this.diffTotal) { this.finish(this.score >= Math.max(1, Math.round(NEED * this.diffTotal / 5))); return; }
       this.q++; this.picked = -1; this.note = TG('这条消息是谁说的？');
     }, WAIT_MS);
   }

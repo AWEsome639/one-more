@@ -294,7 +294,8 @@ export struct GCognateCatch {
     this.msg = TG('这一对是同源词吗？');
   }
   private end(): void {
-    this.over = true; this.won = this.correct >= PASS;
+    // ★ 第八批：简单 8 题要 8 对（满分），按题数缩放。
+    this.over = true; this.won = this.correct >= Math.max(1, Math.round(PASS * this.diffTotal / ROUNDS));
     this.msg = (this.won ? TG('🎉 通关：') : TG('💤 结束：')) +TG2("答对 {0} / {1}", this.correct, this.diffTotal);
     if (this.done) { return; }
     this.done = true;
