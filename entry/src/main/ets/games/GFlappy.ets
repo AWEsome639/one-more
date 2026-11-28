@@ -293,7 +293,7 @@ export struct GFlappy {
     }
     this.msg = this.endless
       ? TG2('♾️ 无尽模式　已穿 {0} 根', this.score)
-      : (TG2('穿过 {0} / {1} 根管道', this.score, this.goalPipes()));
+      : (TG2('穿过 {0} / {1} 根管道', this.score, this.goalN));
   }
 
   /**
@@ -718,7 +718,7 @@ export struct GFlappy {
       }
       .width('100%')
 
-      Text(TG2('穿 {0} 根管道通关；撞管道或撞地就结束（点场地也能扇翅膀）',Digits(String(this.goalPipes()), this.langCode)))
+      Text(TG2('穿 {0} 根管道通关；撞管道或撞地就结束（点场地也能扇翅膀）',Digits(String(this.goalN), this.langCode)))
         .fontSize(FontSize.xxs)
         .fontColor(this.theme.inkFaint)
     }
@@ -740,7 +740,7 @@ export struct GFlappy {
     Column({ space: 2 }) {
       Text(kind === 0 ? TG('穿过') : (kind === 1 ? TG('用时') : TG('状态')))
         .fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
-      Text(kind === 0 ? this.score + ' / ' + this.goalPipes()
+      Text(kind === 0 ? this.score + ' / ' + this.goalN
         : (kind === 1 ? this.secs + Sec()
           : (this.over ? (this.won ? TG('通关') : TG('结束')) : TG('飞行中'))))
         .fontSize(FontSize.md).fontWeight(FontWeight.Bold)

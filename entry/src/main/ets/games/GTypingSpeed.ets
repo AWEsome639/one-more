@@ -345,7 +345,7 @@ export struct GTypingSpeed {
           .onKeyEvent((e: KeyEvent) => { Tv.handleKey(e, () => { Haptics.tap(); this.reset(); }); })
       }.width('100%')
       // ★ 2026-11-28（真机验收发现）：提示写死 25 秒，而困难档实际 17.5 秒。
-        Text(TG2('提示：不区分大小写；{0} 秒没打完算这句错', String(Math.round(this.total / 1000)))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
+        Text(TG2('提示：不区分大小写；{0} 秒没打完算这句错', String(Math.floor(this.total / 1000)))).fontSize(FontSize.xxs).fontColor(this.theme.inkFaint)
     }
     .onTouch((e: TouchEvent) => {
       // ★ 演示：玩家一碰就停（不吞掉这次点击，事件照常往下传）
