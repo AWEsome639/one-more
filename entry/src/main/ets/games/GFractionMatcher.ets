@@ -262,10 +262,11 @@ export struct GFractionMatcher {
 
     if (this.over) { return; }
     if (this.round >= this.diffTotal) {
-      this.over = true; this.won = this.right >= PASS;
+      // ★ 2026-11-28（复核）：简单档 6 题要 6 对（100%）⇒ 按题数缩放。
+    this.over = true; this.won = this.right >= Math.max(1, Math.round(PASS * this.diffTotal / TOTAL));
       this.msg = this.won
         ? TG2('🎉 答对 {0}/{1}，通关！', String(this.right), String(this.diffTotal))
-        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(PASS - this.right));
+        : TG2('😵 只答对 {0}/{1}，差 {2} 题', String(this.right), String(this.diffTotal), String(Math.max(1, Math.round(PASS * this.diffTotal / TOTAL)) - this.right));
       this.finish(this.won); return;
     }
     this.round = this.round + 1; this.ask();
